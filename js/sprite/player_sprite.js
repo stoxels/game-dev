@@ -2,7 +2,7 @@ import { updateClassHUDManaBar } from '../classes/class-mana.js';
 import { _egEntrMoveMult } from '../combat/bosses/boss-entropy.js';
 import { _egSnailBroomHeld } from '../combat/bosses/boss-snail.js';
 import { _egPlayerHasAilment } from '../combat/combat-ailments-core.js';
-import { _egGetPlayerChargePct, _egSetHoldEPauseVisual } from
+import { _egGetHandChargePct, _egGetPlayerChargePct, _egSetHoldEPauseVisual } from
 '../combat/encounter-tick.js';
 import { _egComputePlayerStats, _egGetPlayerAttackInterval } from '../endgame/endgame-player-stats.js';
 import { EG_PLAYER_DEFAULT_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
@@ -101,11 +101,21 @@ export function _avatarBarsHTML(barWidth = '100%') {
                      player-charge-bar-color class so the stylesheet owns its
                      color (an inline background would beat every tier/ready
                      glow rule and the bar would stay green forever). -->
-                <div style="width: 100%; margin-bottom: 8px; display: flex; align-items: center; gap: 4px;">
+                <div id="avatar-charge1-row" style="width: 100%; margin-bottom: 8px; display: flex; align-items: center; gap: 4px;">
+                    <span id="avatar-charge-hand1" class="avatar-charge-hand" style="display: none;">1</span>
                     <div style="background: #111; width: 100%; height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid #000; box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);">
                         <div id="avatar-charge-fill" class="player-charge-bar-color" style="width: 0%; height: 100%; transition: width 0.1s linear;"></div>
                     </div>
                     <span id="avatar-charge-text" class="avatar-bar-num avatar-charge-num" style="flex-shrink: 0; min-width: 4ch; margin-bottom: 0;">0%</span>
+                </div>
+                <!-- dual-wield only: second charge-up bar for the off-hand weapon
+                     (shown by _egUpdatePlayerChargeBar while two 1H weapons are equipped) -->
+                <div id="avatar-charge2-row" style="width: 100%; margin-bottom: 8px; display: none; align-items: center; gap: 4px; margin-top: -4px;">
+                    <span id="avatar-charge-hand2" class="avatar-charge-hand">2</span>
+                    <div style="background: #111; width: 100%; height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid #000; box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);">
+                        <div id="avatar-charge2-fill" class="player-charge-bar-color" style="width: 0%; height: 100%; transition: width 0.1s linear;"></div>
+                    </div>
+                    <span id="avatar-charge2-text" class="avatar-bar-num avatar-charge-num" style="flex-shrink: 0; min-width: 4ch; margin-bottom: 0;">0%</span>
                 </div>
             </div>`;
 }
@@ -153,7 +163,10 @@ function _updateAvatarBarStack() {
     const chargeFill = document.getElementById('avatar-charge-fill');
     if (chargeFill) {
         let chargePct = 0;
-        if (typeof _egGetPlayerChargePct === 'function') {
+        if (typeof _egGetHandChargePct === 'function') {
+            // Per-hand reading: hand 1's own bar (dual-wielding has a second bar).
+            try { chargePct = _egGetHandChargePct(1); } catch (e) { chargePct = 0; }
+        } else if (typeof _egGetPlayerChargePct === 'function') {
             try { chargePct = _egGetPlayerChargePct(); } catch (e) { chargePct = 0; }
         } else {
             const chargeCur = (typeof _egPlayerCurrentCharge === 'number') ? globalThis._egPlayerCurrentCharge : 0;

@@ -865,6 +865,48 @@ const USP_MELEE_WEAPON = {
     // arc across the front, trailing soul-wisps (the game plays it once -
     // the looping gallery reads it as the whole harvest).
     usp_reap: { kind: 'scythe' },
+    // More melee + the reaction strikes (parry / block / dodge) - see the
+    // USP_MELEE_EXTRA table below for each one's markup.
+    usp_crushing_blow: { kind: 'hammer' },
+    usp_blade_flurry: { kind: 'flurry' },
+    usp_piercing_lunge: { kind: 'lunge' },
+    usp_seismic_slam: { kind: 'slam' },
+    usp_vampiric_strike: { kind: 'fang' },
+    usp_counterstrike: { kind: 'counter' },
+    usp_blade_dance: { kind: 'dance' },
+    usp_shield_slam: { kind: 'shield' },
+    usp_bastion_burst: { kind: 'bastion' },
+    usp_phantom_strike: { kind: 'phantom' },
+    usp_flicker_slash: { kind: 'flicker' },
+};
+
+// Markup + lifetime (ms) of the swing kinds added with the second melee batch.
+// Styles: css/universal-spells.css ("MORE MELEE + REACTION STRIKES").
+const _flurryCuts = '<div class="usp-flurry-cut usp-flurry-cut-1"></div><div class="usp-flurry-cut usp-flurry-cut-2"></div>' +
+    '<div class="usp-flurry-cut usp-flurry-cut-3"></div><div class="usp-flurry-cut usp-flurry-cut-4"></div>' +
+    '<div class="usp-flurry-cut usp-flurry-cut-5"></div>' +
+    '<div class="usp-flurry-spark usp-flurry-spark-1"></div><div class="usp-flurry-spark usp-flurry-spark-2"></div>' +
+    '<div class="usp-flurry-spark usp-flurry-spark-3"></div><div class="usp-flurry-spark usp-flurry-spark-4"></div>';
+const USP_MELEE_EXTRA = {
+    hammer: { ms: 700, html: '<div class="usp-hammer-arc"></div><div class="usp-hammer"><div class="usp-hammer-haft"></div><div class="usp-hammer-head"></div><div class="usp-hammer-face"></div></div><div class="usp-hammer-ring"></div><div class="usp-hammer-ring usp-hammer-ring-2"></div>' },
+    flurry: { ms: 700, html: _flurryCuts },
+    flicker: { ms: 700, html: _flurryCuts },
+    lunge: { ms: 560, html: '<div class="usp-lunge-streak"></div><div class="usp-lunge-rapier"><div class="usp-lunge-grip"></div><div class="usp-lunge-guard"></div><div class="usp-lunge-blade"></div></div>' },
+    slam: { ms: 850, html: '<div class="usp-slam-fist"></div><div class="usp-slam-ring"></div><div class="usp-slam-ring usp-slam-ring-2"></div><div class="usp-slam-ring usp-slam-ring-3"></div>' +
+        '<div class="usp-slam-crack usp-slam-crack-1"></div><div class="usp-slam-crack usp-slam-crack-2"></div><div class="usp-slam-crack usp-slam-crack-3"></div>' +
+        '<div class="usp-slam-crack usp-slam-crack-4"></div><div class="usp-slam-crack usp-slam-crack-5"></div><div class="usp-slam-crack usp-slam-crack-6"></div>' +
+        '<div class="usp-slam-rock usp-slam-rock-1"></div><div class="usp-slam-rock usp-slam-rock-2"></div><div class="usp-slam-rock usp-slam-rock-3"></div><div class="usp-slam-rock usp-slam-rock-4"></div>' },
+    fang: { ms: 560, html: '<div class="usp-sword-arc"></div><div class="usp-sword"><div class="usp-sword-blade"></div><div class="usp-sword-fuller"></div><div class="usp-sword-guard"></div><div class="usp-sword-grip"></div><div class="usp-sword-pommel"></div></div>' +
+        '<div class="usp-fang-drop usp-fang-drop-1"></div><div class="usp-fang-drop usp-fang-drop-2"></div><div class="usp-fang-drop usp-fang-drop-3"></div>' },
+    counter: { ms: 650, html: '<div class="usp-counter-flash"></div><div class="usp-counter-cut usp-counter-cut-1"></div><div class="usp-counter-cut usp-counter-cut-2"></div><div class="usp-counter-star"></div>' },
+    dance: { ms: 850, html: '<div class="usp-dance-ring"></div><div class="usp-dance-orbit"><div class="usp-dance-blade usp-dance-blade-1"></div><div class="usp-dance-blade usp-dance-blade-2"></div><div class="usp-dance-blade usp-dance-blade-3"></div></div>' +
+        '<div class="usp-dance-sparkle usp-dance-sparkle-1"></div><div class="usp-dance-sparkle usp-dance-sparkle-2"></div><div class="usp-dance-sparkle usp-dance-sparkle-3"></div><div class="usp-dance-sparkle usp-dance-sparkle-4"></div>' },
+    shield: { ms: 700, html: '<div class="usp-shield-wave"></div><div class="usp-shield-rush"><div class="usp-shield-body"></div></div><div class="usp-shield-impact"></div>' },
+    bastion: { ms: 900, html: '<div class="usp-bastion-ring"></div><div class="usp-bastion-ring usp-bastion-ring-2"></div><div class="usp-bastion-ring usp-bastion-ring-3"></div><div class="usp-bastion-crest"></div>' +
+        '<div class="usp-bastion-ray usp-bastion-ray-1"></div><div class="usp-bastion-ray usp-bastion-ray-2"></div><div class="usp-bastion-ray usp-bastion-ray-3"></div><div class="usp-bastion-ray usp-bastion-ray-4"></div>' +
+        '<div class="usp-bastion-ray usp-bastion-ray-5"></div><div class="usp-bastion-ray usp-bastion-ray-6"></div><div class="usp-bastion-ray usp-bastion-ray-7"></div><div class="usp-bastion-ray usp-bastion-ray-8"></div>' },
+    phantom: { ms: 700, html: '<div class="usp-phantom-arc"></div><div class="usp-phantom-blade usp-phantom-blade-3"></div><div class="usp-phantom-blade usp-phantom-blade-2"></div><div class="usp-phantom-blade usp-phantom-blade-1"></div>' +
+        '<div class="usp-phantom-mist usp-phantom-mist-1"></div><div class="usp-phantom-mist usp-phantom-mist-2"></div><div class="usp-phantom-mist usp-phantom-mist-3"></div><div class="usp-phantom-mist usp-phantom-mist-4"></div>' },
 };
 
 export function _uspMeleeSwing(spell, origin, aim) {
@@ -878,7 +920,7 @@ export function _uspMeleeSwing(spell, origin, aim) {
         el.style.left = `${origin.x}px`;
         el.style.top = `${origin.y}px`;
         el.style.transform = `rotate(${ang}rad)`;
-        el.innerHTML = (weapon === 'axe')
+        el.innerHTML = USP_MELEE_EXTRA[weapon] ? USP_MELEE_EXTRA[weapon].html : (weapon === 'axe')
             ? '<div class="usp-axe-arc"></div>' +
                 '<div class="usp-axe">' +
                     '<div class="usp-axe-haft"></div>' +
@@ -937,7 +979,7 @@ export function _uspMeleeSwing(spell, origin, aim) {
                     '<div class="usp-sword-pommel"></div>' +
                 '</div>';
         document.body.appendChild(el);
-        setTimeout(() => { try { el.remove(); } catch (x) { /* already gone */ } }, weapon === 'sword' ? 480 : (weapon === 'greatsword' ? 750 : (weapon === 'cleave' ? 680 : (weapon === 'whirl' ? 700 : (weapon === 'scythe' ? 700 : 620)))));
+        setTimeout(() => { try { el.remove(); } catch (x) { /* already gone */ } }, USP_MELEE_EXTRA[weapon] ? USP_MELEE_EXTRA[weapon].ms : weapon === 'sword' ? 480 : (weapon === 'greatsword' ? 750 : (weapon === 'cleave' ? 680 : (weapon === 'whirl' ? 700 : (weapon === 'scythe' ? 700 : 620)))));
     } catch (e) { /* swing is cosmetic */ }
 }
 

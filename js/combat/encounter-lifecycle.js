@@ -88,7 +88,10 @@ export function _egResetEncounterState() {
     // Manual melee charge starts empty each encounter (Secret-of-Mana-style:
     // every strike spends the bar, so every fight opens at 0%)
     globalThis._egPlayerCurrentCharge = 0;
+    globalThis._egPlayerCurrentCharge2 = 0;
     globalThis._egPendingMeleeChargePct = null;
+    // Reaction strikes (parry / block / dodge windows) never carry over a fight.
+    try { if (typeof globalThis.clearUniversalReactions === 'function') globalThis.clearUniversalReactions(); } catch (e) { /* optional */ }
     // ...and no hold carries over either (a stuck hold would root the hero
     // + keep them vulnerable with no finger on the key).
     globalThis._egMeleeHoldActive = false;
@@ -211,5 +214,6 @@ export function _egStopEncounter() {
     if (typeof _egSetHoldEPauseVisual === 'function') _egSetHoldEPauseVisual(false);
     // Drop any in-flight manual swing snapshot with the encounter
     globalThis._egPlayerCurrentCharge = 0;
+    globalThis._egPlayerCurrentCharge2 = 0;
     globalThis._egPendingMeleeChargePct = null;
 }

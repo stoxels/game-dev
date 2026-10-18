@@ -94,6 +94,13 @@ if (typeof document !== 'undefined' && document.readyState !== 'complete') {
     _initEgTargetHotkeys();
 }
 
+// Run statistics observer (js/combat/combat-run-stats.js): counts hits that
+// never reached the life bar. Read-only; absent in headless unit contexts.
+function _rsAvoid(kind) {
+    const rs = globalThis.RunStats;
+    if (rs) rs.avoided(kind);
+}
+
 // Applies incoming monster damage to the player, after dodge/block/resist/
 // armour/absorption mitigation. Returns the actual HP lost (0 if dodged/
 // blocked/fully absorbed) so callers can show an accurate floating number.
@@ -145,7 +152,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
 
     // Gear: fate - pure-luck chance to negate ANY incoming hit entirely
     // (attacks, spells and charge hits alike), before all other mitigation.
-    if (!isBossAbility && _egRollFateNegation(stats)) return 0;
+    if (!isBossAbility && _egRollFateNegation(stats)) { _rsAvoid('other'); return 0; }
 
     // Support spells (js/skills/universal-spells.js): the mitigation profile
     // is read once here so the rest of this function never re-derives it.
@@ -161,6 +168,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // resource and returns false immediately when no charge is held or the hit
     // is too small to be worth a charge.
     if (typeof _uspTryWardNegate === 'function' && _uspTryWardNegate(amount)) {
+        _rsAvoid('other');
         _egApplyPlayerMissFeedback();
         return 0;
     }
@@ -184,6 +192,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
                 const attacker = opts && opts.attacker ? opts.attacker : null;
                 const parryToast = (typeof t === 'function' ? t('eg_parried') : '');
                 globalThis.showCombatToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
+                _rsAvoid('parry');
                 _egApplyPlayerParryFeedback();
                 _egScheduleAbsorptionRegen();
                 // Sword identity: a successful Parry readies a riposte strike.
@@ -202,6 +211,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         if (spellParryChance > 0 && Math.random() * 100 < spellParryChance) {
             const parryToast = (typeof t === 'function' ? t('eg_parried') : '');
             globalThis.showCombatToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
+            _rsAvoid('parry');
             _egApplyPlayerParryFeedback();
             _egScheduleAbsorptionRegen();
             return 0;
@@ -216,6 +226,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         if (blindSt && blindSt.until > Date.now()) {
             const missPct = Math.min(90, 50 * (1 + (Number(blindSt.effectPct) || 0) / 100));
             if (Math.random() * 100 < missPct) {
+                _rsAvoid('other');
                 globalThis.showCombatToast(t('eg_blind_miss'));
                 _egApplyPlayerMissFeedback();
                 _egScheduleAbsorptionRegen();
@@ -239,6 +250,8 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
             dodgeChance = Math.min(75, dodgeChance * (1 + stats.windDancerEvadePct / 100));
         }
         if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
+            _rsAvoid('dodge');
+            try { if (typeof globalThis.noteUniversalReaction === 'function') globalThis.noteUniversalReaction('dodge'); } catch (e) { /* optional */ }
             globalThis.showCombatToast(t('eg_dodged'));
             _egApplyPlayerMissFeedback();
             _egScheduleAbsorptionRegen();
@@ -249,6 +262,8 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // Aspect of Stone (tree): chance to avoid physical damage from hits.
     if (!isSpell && !isBossAbility && !chargingMelee && !stunned && (Number(stats.avoidPhysHitPct) || 0) > 0
         && (!element || element === 'physical') && Math.random() * 100 < Math.min(75, stats.avoidPhysHitPct)) {
+        _rsAvoid('dodge');
+        try { if (typeof globalThis.noteUniversalReaction === 'function') globalThis.noteUniversalReaction('dodge'); } catch (e) { /* optional */ }
         globalThis.showCombatToast(t('eg_dodged'));
         Audio_Manager.playSFX('player_dodge');
         _egScheduleAbsorptionRegen();
@@ -318,6 +333,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         if ((stats.enduranceOnBlockPct || 0) > 0 && Math.random() * 100 < Math.min(100, stats.enduranceOnBlockPct)) {
             _egGainEnduranceCharge(stats.enduranceChargesMax, stats.enduranceDurationPct);
         }
+        _rsAvoid('block');
         globalThis.showCombatToast(t('eg_blocked'));
         _egApplyPlayerBlockFeedback();
         _egScheduleAbsorptionRegen();
@@ -460,9 +476,9 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     _egScheduleAbsorptionRegen();
 
     mitigated = Math.max(0, Math.round(mitigated));
-    if (mitigated <= 0) return 0;
+    if (mitigated <= 0) { _rsAvoid('other'); return 0; }
 
-    globalThis.playerCurrentHP = Math.max(0, globalThis.playerCurrentHP - mitigated);
+    globalThis.playerCurrentHP =Math.max(0, globalThis.playerCurrentHP - mitigated);
     globalThis._egLastHitTakenAt = Date.now();
     // Stun: forced by the source (opts.stun) or rolled from how much Life the hit took.
     if (globalThis.playerCurrentHP > 0) {
@@ -493,6 +509,12 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
             globalThis.showCombatToast(t('eg_warding'));
             Audio_Manager.playSFX('player_shield_damage_taken');
         }
+    }
+
+    // Run statistics: record BEFORE the game-over handler reads the panel.
+    if (globalThis.RunStats) {
+        globalThis.RunStats.hitTaken(mitigated, globalThis.RunStats.sourceLabel(isBossAbility, opts && opts.attacker),
+            { element, hp: globalThis.playerCurrentHP });
     }
 
     globalThis._renderPlayerHealth();

@@ -344,6 +344,7 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     }
 
     _egApplyHitToMonster(target, amount, opts);
+    if (globalThis.RunStats) globalThis.RunStats.hitDealt(amount, opts);
     // Pass crit + elemental info so the number can pop with the right colour/size
     const isCrit = !!(opts && opts.isCrit);
     _egShowDamageNumber(target.id, amount, isCrit, elements);

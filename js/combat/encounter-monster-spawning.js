@@ -7,6 +7,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { EG_MONSTER_ZONES } from './encounter-constants.js';
+import { _egPickRoomyZone } from './combat-monster-roam.js';
 import { _egRenderPanel } from './encounter.js';
 import { EG_MAX_CONCURRENT_MONSTERS, _egBuildMonster } from './combat-monsters.js';
 import { _egComputePlayerStats, _egFormatStatValue } from '../endgame/endgame-player-stats.js';
@@ -57,6 +58,12 @@ export function _egAssignRandomSpawnZone(monster) {
             }
         } catch (e) {}
     }
+    // Free-space layout (combat-monster-roam.js): pick the zone with the most
+    // room around the puzzle table. Arena zones and old code paths fall through.
+    try {
+        const roomy = _egPickRoomyZone(null, null);
+        if (roomy) { monster.zoneId = roomy; return; }
+    } catch (e) {}
     let zones = EG_MONSTER_ZONES;
     try {
         const counts = {};

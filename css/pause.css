@@ -1,46 +1,73 @@
+/* ── Game menu (pause screen) ─ World-of-Warcraft style escape menu ──────────
+   Stacked stone-slab buttons on a dark framed plate: run info on top, hero
+   screens, system buttons, leave-level, and a big RETURN TO GAME at the bottom. */
 #pause-overlay {
     display: none;
     position: fixed;
     inset: 0;
     z-index: 9999;
-    background: rgba(0, 0, 0, 0.92);
+    background: radial-gradient(ellipse at center, rgba(8, 10, 22, 0.78) 0%, rgba(0, 0, 0, 0.94) 100%);
     align-items: center;
     justify-content: center;
+    overflow-y: auto;
+    padding: 16px 0;
 }
 
 #pause-overlay.show {
     display: flex;
 }
 
-/* Centered card holding everything */
-.pause-panel {
+.pause-menu {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: min(520px, 90vw);
-    padding: 28px 32px 20px;
-    background: rgba(10, 12, 24, 0.85);
-    border: 1px solid var(--border2);
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+    gap: 14px;
+    width: min(420px, 92vw);
+    margin: auto;
+    padding: 16px 18px 14px;
+    background: linear-gradient(180deg, rgba(20, 22, 40, 0.96), rgba(8, 10, 20, 0.97));
+    border: 2px solid #8a7a4a;
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px #000, 0 0 0 4px rgba(138, 122, 74, 0.25), 0 14px 50px rgba(0, 0, 0, 0.8), inset 0 0 40px rgba(0, 0, 0, 0.55);
+}
+
+/* Title ribbon */
+.pm-title {
+    align-self: center;
+    margin: -34px 0 0;
+    padding: 8px 34px;
+    background: linear-gradient(180deg, #3a3326, #1c1810);
+    border: 2px solid #b09a5c;
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
 }
 
 #pause-label {
-    font-size: 2.4rem;
-    font-weight: 700;
-    letter-spacing: 0.25em;
-    color: #fff;
-    text-indent: 0.25em; /* visually centers letterspaced text */
-    margin-bottom: 18px;
+    font-family: var(--PX);
+    font-size: 15px;
+    letter-spacing: 0.22em;
+    text-indent: 0.22em;
+    color: #f3dc9a;
+    text-shadow: 0 2px 0 #000;
 }
 
-/* Level / score row */
+/* Run info plate */
+.pm-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(138, 122, 74, 0.35);
+    border-radius: 6px;
+}
+
 .pause-stats-row {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 28px;
+    gap: 26px;
     width: 100%;
-    margin-bottom: 16px;
 }
 
 .pause-stat {
@@ -52,48 +79,37 @@
 
 .pause-stat-label {
     font-family: var(--PX);
-    font-size: 11px;
+    font-size: 9px;
     letter-spacing: 2px;
     color: var(--setup-opt-inactive);
 }
 
-.pause-stat .gtb-lvl {
-    font-family: var(--PX);
-    font-size: 26px;
-    color: var(--yellow);
-}
-
+.pause-stat .gtb-lvl,
 .pause-stat-value {
     font-family: var(--PX);
-    font-size: 26px;
+    font-size: 20px;
     color: var(--yellow);
 }
 
 .pause-stat-divider {
     width: 1px;
-    height: 34px;
+    height: 30px;
     background: var(--border2);
 }
 
-/* Puzzle hint inside the panel */
 #pause-overlay .pause-section,
 #pause-overlay #top-hint {
-    font-size: clamp(14px, 1.6vw, 18px);
+    font-size: clamp(13px, 1.4vw, 16px);
     color: var(--puzzle-hint-text);
     font-style: italic;
     text-align: center;
-    line-height: 1.5;
-    margin-bottom: 10px;
+    line-height: 1.4;
 }
 
-/* Modifier tags */
-#pause-overlay .mod-tags-row {
-    margin-bottom: 14px;
-}
+#pause-overlay .mod-tags-row:empty { display: none; }
 
-/* Endgame variant: no level number / score / hint / bonus.
-   Instead the collected run loot is shown (chips with hover tooltips),
-   mirroring the win/lose map completion summary. */
+/* Endgame variant: no level number / score / hint / bonus - the collected run
+   loot (chips with hover tooltips) is shown instead. */
 #pause-overlay.eg-pause .pause-stats-row,
 #pause-overlay.eg-pause #top-hint,
 #pause-overlay.eg-pause #bonus-sidebar {
@@ -104,91 +120,132 @@
     display: none;
     width: 100%;
     text-align: left;
-    margin-bottom: 16px;
 }
 
 #pause-overlay.eg-pause #pause-loot-summary {
     display: block;
 }
 
-/* Bonus objective strip */
 .pause-bonus {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     width: 100%;
-    padding: 10px 14px;
+    padding: 8px 12px;
     background: rgba(255, 255, 255, 0.04);
     border-left: 3px solid var(--orange);
-    margin-bottom: 20px;
 }
 
 .pause-bonus-label {
     font-family: var(--PX);
-    font-size: 13px;
+    font-size: 10px;
     color: var(--orange);
     letter-spacing: 1px;
 }
 
 .pause-bonus-text {
-    font-size: clamp(12px, 1.4vw, 14px);
+    font-size: clamp(12px, 1.3vw, 14px);
     color: var(--accent2);
     text-align: center;
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
-/* Buttons */
-.pause-actions {
+/* Button sections */
+.pm-section {
     display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 8px;
 }
 
-#pause-overlay #btn-pause-settings,
-#pause-overlay #btn-pause-keybinds,
-#pause-overlay #btn-pause-spellbook {
-    padding: 9px 22px;
-    font-size: 0.95rem;
-    letter-spacing: 0.05em;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 6px;
-    color: #fff;
-    cursor: pointer;
-    transition: background .12s;
-}
-
-#pause-overlay #btn-pause-settings:hover,
-#pause-overlay #btn-pause-keybinds:hover,
-#pause-overlay #btn-pause-spellbook:hover {
-    background: rgba(255, 255, 255, 0.18);
-}
-
-#pause-overlay .gtb-btn {
+.pm-section-label {
     font-family: var(--PX);
-    font-size: 15px;
-    background: transparent;
-    border: 1px solid var(--border2);
-    color: var(--accent2);
-    padding: 7px 13px;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #a89a6a;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.pm-section-label::before,
+.pm-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(168, 154, 106, 0.55), transparent);
+}
+
+.pm-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+/* Stone-slab button */
+#pause-overlay .pm-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 40px;
+    padding: 8px 10px;
+    font-family: var(--PX);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: #e9e2cc;
+    background: linear-gradient(180deg, #4a4a58 0%, #30303c 55%, #25252f 100%);
+    border: 2px solid #15151c;
+    border-top-color: #6b6b7c;
+    border-left-color: #55556a;
+    border-radius: 5px;
+    box-shadow: 0 2px 0 #000, inset 0 0 12px rgba(0, 0, 0, 0.35);
+    text-shadow: 0 1px 0 #000;
     cursor: pointer;
-    transition: all .12s;
     white-space: nowrap;
+    transition: filter .1s, transform .05s, color .1s, border-color .1s;
 }
-
-#pause-overlay .gtb-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+#pause-overlay .pm-btn:hover {
+    filter: brightness(1.25);
+    color: #fff3c4;
+    border-color: #b09a5c;
 }
+#pause-overlay .pm-btn:active { transform: translateY(1px); }
+.pm-ico { font-size: 16px; line-height: 1; }
+.pm-wide { width: 100%; }
 
-/* Esc hint pinned at the bottom of the panel */
+#pause-overlay .pm-leave {
+    color: #f1b3a8;
+    background: linear-gradient(180deg, #4b3434 0%, #33201f 55%, #271717 100%);
+}
+#pause-overlay .pm-leave:hover { color: #ffd6cc; border-color: #d46a58; }
+
+#pause-overlay .pm-resume {
+    min-height: 48px;
+    margin-top: 4px;
+    font-size: 13px;
+    color: #fff3c4;
+    background: linear-gradient(180deg, #6a5a2a 0%, #4a3d1a 55%, #382d12 100%);
+    border-color: #1a1408;
+    border-top-color: #b09a5c;
+    border-left-color: #8a7a4a;
+}
+#pause-overlay .pm-resume:hover { filter: brightness(1.2); border-color: #f3dc9a; }
+
 #pause-hint {
-    margin-top: 16px;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.45);
+    text-align: center;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
     letter-spacing: 0.1em;
+}
+
+/* The tutorial quest is mandatory and self-contained: no side trips from its pause menu. */
+#pause-overlay.tq-pause .pm-features { display: none; }
+
+/* Screens opened from the menu are reachable above it (the game stays paused behind them). */
+#quest-log-modal.show,
+#achievements-modal.show {
+    z-index: 10000;
 }
 
 /* Make sure the settings modal renders ABOVE the pause overlay

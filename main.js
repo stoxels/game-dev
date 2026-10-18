@@ -95,6 +95,8 @@ function _updatePauseMenuReturnButtons() {
     const nexusBtn = document.getElementById('btn-go-nexus');
     if (levelsBtn) levelsBtn.style.display = (onEndgameMap || onTutorial) ? 'none' : '';
     if (nexusBtn) nexusBtn.style.display = onEndgameMap ? '' : 'none';
+    const pauseEl = document.getElementById('pause-overlay');
+    if (pauseEl) pauseEl.classList.toggle('tq-pause', onTutorial);
     return onEndgameMap;
 }
 
@@ -221,6 +223,12 @@ function _handleEscapeKey() {
     }
     if (_isOnGameScreen()) {
         togglePause();
+        return;
+    }
+    // Shop opened from the pause menu: Escape returns to the menu.
+    if (globalThis._pauseShopReturn && typeof globalThis._pauseCloseShopToGame === 'function'
+        && document.getElementById('screen-endgame-vendor')?.classList.contains('active')) {
+        globalThis._pauseCloseShopToGame();
         return;
     }
     // B sheet overlay over a running puzzle: Escape closes back into the

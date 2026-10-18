@@ -306,6 +306,7 @@ function _egStunPlayer(durationS = EG_AIL_STUN_DURATION_S) {
     _egStartPlayerStatusBarTicker();
     // Interrupt: the charge bar restarts and a running hold-cast is lost.
     globalThis._egPlayerCurrentCharge = 0;
+    globalThis._egPlayerCurrentCharge2 = 0;
     globalThis._egPlayerStunnedUntil = now + d * 1000;
     try { if (typeof isHoldCasting === 'function' && isHoldCasting()) cancelHoldCast(); } catch (e) { /* best-effort */ }
     Audio_Manager.playSFX('ail_stun');
@@ -477,6 +478,7 @@ function _egStopPlayerStatusBarTicker() {
     if (bar) bar.remove();
     const banners = document.getElementById('eg-ail-banners');
     if (banners) banners.remove();
+    _egSyncPlayerSpriteFx([]);
 }
 
 // True while the player is polymorphed: monsters attack each other and the
@@ -1150,6 +1152,7 @@ function _egSyncAilmentBanners() {
     const live = Object.keys(_egPlayerStatuses)
         .filter(key => EG_AIL_BANNER_TEXT[key] && _egPlayerStatuses[key].until > now)
         .sort((a, b) => _egPlayerStatuses[a].until - _egPlayerStatuses[b].until);
+    _egSyncPlayerSpriteFx(live);
     const shown = live.slice(0, EG_AIL_BANNER_MAX);
     const hidden = live.length - shown.length;
 
@@ -1195,6 +1198,64 @@ function _egSyncAilmentBanners() {
     } else if (more) {
         more.remove();
     }
+}
+
+// On-sprite ailment visuals: the same flames / sparks / frost / wisps the
+// monsters get, on a fixed layer that follows the hero sprite (rAF while any
+// effect is live), plus a colour tint on the sprite itself (.eg-spr-<key>).
+const EG_PLAYER_FX_KEYS = {
+    ignite: 'eg-ail-ignite', shocked: 'eg-ail-shocked', chill: 'eg-ail-chill', frozen: 'eg-ail-frozen',
+    shadowburn: 'eg-ail-shadowburn', poison: 'eg-ail-poison', polymorph: 'eg-ail-polymorph',
+    bleed: 'eg-bleeding', stunned: 'eg-ail-stunned',
+};
+let _egPlayerFxLayer = null;
+let _egPlayerFxRaf = null;
+let _egPlayerFxActive = [];
+
+function _egPlayerSpriteImgs() {
+    return ['avatar-sprite-img', 'avatar-sprite-img-simple'].map(id => document.getElementById(id)).filter(Boolean);
+}
+
+function _egPlayerFxFrame() {
+    _egPlayerFxRaf = null;
+    const layer = _egPlayerFxLayer;
+    if (!layer || !_egPlayerFxActive.length) return;
+    const img = _egPlayerSpriteImgs().find(el => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; });
+    if (img) {
+        const r = img.getBoundingClientRect();
+        layer.style.display = 'block';
+        layer.style.left = r.left + 'px';
+        layer.style.top = r.top + 'px';
+        layer.style.width = r.width + 'px';
+        layer.style.height = r.height + 'px';
+    } else {
+        layer.style.display = 'none';
+    }
+    _egPlayerFxRaf = requestAnimationFrame(_egPlayerFxFrame);
+}
+
+function _egSyncPlayerSpriteFx(liveKeys) {
+    const keys = liveKeys.filter(k => EG_PLAYER_FX_KEYS[k]);
+    const sig = keys.join(',');
+    if (sig === _egPlayerFxActive.join(',')) return;
+    _egPlayerFxActive = keys;
+    _egPlayerSpriteImgs().forEach(img => {
+        Object.keys(EG_PLAYER_FX_KEYS).forEach(k => img.classList.toggle('eg-spr-' + k, keys.includes(k)));
+    });
+    if (!keys.length) {
+        if (_egPlayerFxLayer) { _egPlayerFxLayer.remove(); _egPlayerFxLayer = null; }
+        return;
+    }
+    if (!_egPlayerFxLayer) {
+        const layer = document.createElement('div');
+        layer.id = 'eg-player-ail-fx';
+        layer.className = 'eg-player-ail-fx';
+        layer.innerHTML = '<div class="eg-ail-fx">' + EG_AILMENT_FX_HTML + '<i class="eg-fx-star s1">✦</i><i class="eg-fx-star s2">✦</i><i class="eg-fx-star s3">✦</i></div>';
+        document.body.appendChild(layer);
+        _egPlayerFxLayer = layer;
+    }
+    Object.keys(EG_PLAYER_FX_KEYS).forEach(k => _egPlayerFxLayer.classList.toggle(EG_PLAYER_FX_KEYS[k], keys.includes(k)));
+    if (!_egPlayerFxRaf) _egPlayerFxRaf = requestAnimationFrame(_egPlayerFxFrame);
 }
 
 function _egGetPlayerRectForAilment() {

@@ -1567,29 +1567,29 @@ export function _egBuildLeaveMapSummaryHTML(loot, items, maps, currency, essence
 
     const itemsHTML = items.map((item, i) => `
         <div class="eg-leave-summary-chip eg-item-pickup-chip eg-rarity-${_egLeaveRarityClass(item.rarity)}" data-item-idx="${i}">
-            ${item.icon || '📦'}
+            ${EG_ART.html('item', item.defId, item.icon || '📦')}
         </div>`).join('');
 
     const mapsHTML = maps.map((map, i) => `
         <div class="eg-leave-summary-chip eg-map-pickup-chip eg-rarity-${_egLeaveRarityClass(map.rarity)}" data-map-idx="${i}">
-            ${map.icon || '🗺️'}
+            ${EG_ART.html('item', EG_ART.artIdForItem(map), map.icon || '🗺️')}
         </div>`).join('');
 
     const currencyHTML = currency.map((entry, i) => `
         <div class="eg-leave-summary-chip eg-rarity-currency" data-currency-idx="${i}">
-            ${entry.icon || '💰'}
+            ${EG_ART.html('item', entry.id, entry.icon || '💰')}
             ${entry.count > 1 ? `<span class="eg-leave-summary-count">×${entry.count}</span>` : ''}
         </div>`).join('');
 
     const essencesHTML = essences.map((entry, i) => `
         <div class="eg-leave-summary-chip eg-rarity-essence" data-essence-idx="${i}">
-            ${entry.icon || '🧬'}
+            ${EG_ART.html('item', entry.id, entry.icon || '🧬')}
             ${entry.count > 1 ? `<span class="eg-leave-summary-count">×${entry.count}</span>` : ''}
         </div>`).join('');
 
     const goldHTML = gold > 0 ? `
         <div class="eg-leave-summary-chip eg-rarity-gold" data-gold-idx="0">
-            🪙
+            ${EG_ART.html('item', 'gold', '🪙')}
             <span class="eg-leave-summary-count">×${gold.toLocaleString()}</span>
         </div>` : '';
 
@@ -1672,7 +1672,7 @@ export function _egBuildLeaveItemTooltipHTML(item) {
 
     return `<div class="eg-tt-frame" style="--tt-border:${rc};">
         <div class="eg-tt-header">
-            <div class="eg-tt-icon">${item.icon || '📦'}</div>
+            <div class="eg-tt-icon">${EG_ART.html('item', item.defId, item.icon || '📦')}</div>
             <div class="eg-tt-name" style="color:${rc};">${item.name || '???'}</div>
             <div class="eg-tt-rarity-line" style="color:${rc};">${_egLeaveRarityLabel(_egLeaveRarityClass(item.rarity))}</div>
         </div>
@@ -1874,6 +1874,8 @@ export function _egShowLeaveMapTransition(atlasResult, opts) {
     if (container) {
         container.innerHTML = _egBuildLeaveMapSummaryHTML(state.loot, state.items, state.maps, state.currency, state.essences, state.gold);
     }
+    // Learning panel: whole-map combat statistics (win or defeat).
+    if (globalThis.RunStats) globalThis.RunStats.renderInto(failed ? 'map-lose' : 'map-win', el);
 
     _egWireLeaveMapSummaryTooltips(panel, state);
 
@@ -2078,6 +2080,7 @@ export function _egInjectLeaveMapTransitionStyles() {
             border-radius: 6px;
             font-size: 1.3rem;
         }
+        .eg-leave-summary-chip img.eg-art-img { width: 86%; height: 86%; object-fit: contain; }
         .eg-leave-summary-chip.eg-rarity-uncommon { border-color: #2ecc71; }
         .eg-leave-summary-chip.eg-rarity-rare { border-color: #3498db; }
         .eg-leave-summary-chip.eg-rarity-epic { border-color: #9b59b6; }

@@ -154,6 +154,34 @@
     width: 100%;
 }
 
+.ov-stats-columns.has-combat {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr);
+}
+
+/* Narrower screens: score | time on top, combat analytics full width below */
+@media (max-width: 900px) {
+    .ov-stats-columns.has-combat {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .ov-stats-columns.has-combat .ov-ca {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Combat Analytics: caption over an offense | defense column pair */
+.ov-ca {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+}
+.ov-ca-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(8px, 2vw, 16px);
+    width: 100%;
+}
+
 .ov-col {
     display: flex;
     flex-direction: column;
@@ -529,6 +557,10 @@
 
     .ov-col {
         gap: 2px;
+    }
+
+    .ov-stats-columns.has-combat {
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .ov-btns,

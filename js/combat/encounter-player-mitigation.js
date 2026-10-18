@@ -46,6 +46,8 @@ export function _egApplyGroundedReduction(rawDamage) {
 // Creates the short-lived HUD label shown after a held or dual-wield parry.
 export function _egApplyPlayerParryFeedback() {
     Audio_Manager.playSFX('player_parry');
+    // Reaction strikes (universal-spells.js) open for a few seconds after this.
+    try { if (typeof globalThis.noteUniversalReaction === 'function') globalThis.noteUniversalReaction('parry'); } catch (e) { /* optional */ }
     // Tutorial parry lesson counts every successful parry (set by gauntlet.js).
     try { if (typeof globalThis._egOnPlayerParry === 'function') globalThis._egOnPlayerParry(); } catch (e) { /* counter optional */ }
     const hud = document.getElementById('player-avatar-wrapper');

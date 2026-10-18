@@ -4,7 +4,8 @@ import { hideHUDTooltip } from '../classes/class-hud.js';
 import { SKILL_HOTBAR_COLS, SKILL_HOTBAR_SIZE, activateHotbarSlot, canAffordSkill, getHotbarSkill, getSkillCooldownRemaining, getSkillDef, getSkillImage, getSkillName, isSkillUsableNow } from './skill-registry.js';
 import { isSpellbookOpen, renderSpellbook, toggleSpellbook } from './skill-spellbook.js';
 import { isSkillHoldCast, tryBeginHoldCast } from './spell-casttime.js';
-import { getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, isUniversalAuraActive } from './universal-spells.js';
+import { getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellReaction, isUniversalAuraActive } from './universal-spells.js';
+import { LANG } from '../translation/translations.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -160,7 +161,11 @@ function _buildHotbarSlotHTML(slotIndex, skillId) {
     // press-and-hold behaviour is discoverable on the bar itself.
     const holdCast = isSkillHoldCast(skillId);
 
+    // Reaction strikes (parry / block / dodge): dim until the trigger just
+    // happened, then glow for as long as the window is open.
+    const reaction = getUniversalSpellReaction(skillId);
     const stateClasses = [
+        reaction ? (reaction.ready ? 'reaction-ready' : 'reaction-wait') : '',
         isArmed ? 'armed' : '',
         isOnCD ? 'on-cd' : '',
         noMana ? 'no-mana' : '',
@@ -191,6 +196,9 @@ function _buildHotbarSlotHTML(slotIndex, skillId) {
         : '';
     const noManaMark = noMana ? `<span class="skill-hotbar-nomana">✦</span>` : '';
     const lockMark = locked ? `<span class="skill-hotbar-lock">🔒</span>` : '';
+    const de = LANG === 'de';
+    const reactLabel = { parry: de ? 'PARADE' : 'PARRY', block: de ? 'BLOCK' : 'BLOCK', dodge: de ? 'AUSWEICH' : 'DODGE' };
+    const reactMark = reaction ? `<span class="skill-hotbar-react">${reactLabel[reaction.kind] || ''}</span>` : '';
 
     // Prefer the class-upgrade artwork when the skill ships one, else the
     // emoji/glyph from the registry. The image is a real <img> so it scales
@@ -211,6 +219,7 @@ function _buildHotbarSlotHTML(slotIndex, skillId) {
         + chargePips
         + noManaMark
         + lockMark
+        + reactMark
         + `</div>`;
 }
 

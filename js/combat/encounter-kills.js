@@ -30,7 +30,7 @@ import { _egFlashKillCard, _egRenderPanel } from './encounter.js';
 import { cur } from '../state.js';
 
 
-import { _egGrantMonsterXP } from '../endgame/endgame-leveling.js';
+import { _egGrantMonsterXP, _egShowXpGainText } from '../endgame/endgame-leveling.js';
 import { _egMapKillRecoveryMult } from '../endgame/endgame-map-launch.js';
 
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
@@ -189,7 +189,8 @@ export function _egKillMonster(monsterId) {
 
     // Experience (endgame-leveling.js) - scaled by the monster's level
     if (dying && typeof _egGrantMonsterXP === 'function') {
-        _egGrantMonsterXP(dying.level, !!dying.isBoss);
+        const xpGained = _egGrantMonsterXP(dying.level, !!dying.isBoss);
+        _egShowXpGainText(monsterId, xpGained);
     }
 
     setTimeout(() => _egRenderPanel(), EG_PANEL_RERENDER_DELAY_MS);
@@ -216,6 +217,7 @@ export function _egGameOver() {
             if (titleEl && typeof t === 'function') titleEl.textContent = t('eg_game_over');
             if (subEl && typeof t === 'function') subEl.textContent = t('eg_monsters_overwhelmed');
             lose.classList.add('show');
+            if (globalThis.RunStats) globalThis.RunStats.renderInto('lose');
         }
         if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('lose');
         return;

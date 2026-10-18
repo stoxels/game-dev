@@ -22,7 +22,7 @@ try { Object.defineProperty(globalThis, 'levelStartTime', { get() { return level
 try { Object.defineProperty(globalThis, 'luckyRewardClaimed', { get() { return luckyRewardClaimed; }, set(v) { luckyRewardClaimed = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'luckyTiles', { get() { return luckyTiles; }, set(v) { luckyTiles = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'mistakeCount', { get() { return mistakeCount; }, set(v) { mistakeCount = v; }, configurable: true }); } catch (e) {}
-try { Object.defineProperty(globalThis, 'playerCurrentHP', { get() { return playerCurrentHP; }, set(v) { playerCurrentHP = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, 'playerCurrentHP', { get() { return playerCurrentHP; }, set(v) { const o = playerCurrentHP; playerCurrentHP = v; if (v > o && typeof globalThis.__egOnPlayerHeal === 'function') globalThis.__egOnPlayerHeal(v - o); }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'playerCurrentMana', { get() { return playerCurrentMana; }, set(v) { playerCurrentMana = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'playerMaxHP', { get() { return playerMaxHP; }, set(v) { playerMaxHP = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'playerMaxMana', { get() { return playerMaxMana; }, set(v) { playerMaxMana = v; }, configurable: true }); } catch (e) {}

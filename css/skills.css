@@ -1654,3 +1654,31 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box { /* neutralized - see s
     outline-offset: -2px;
     box-shadow: 0 0 12px rgba(255, 215, 107, .75);
 }
+
+/* REACTION STRIKES (parry / block / dodge): the slot sits dimmed with its
+   trigger word until that has just happened, then glows gold and pulses for
+   as long as the window is open. */
+.skill-hotbar-slot.reaction-wait .skill-hotbar-icon { opacity: .38; filter: grayscale(.7); }
+.skill-hotbar-slot.reaction-wait { border-color: rgba(160, 160, 170, 0.4); }
+.skill-hotbar-slot.reaction-ready {
+    border-color: #ffd54f;
+    box-shadow: 0 0 10px rgba(255, 213, 79, .85), inset 0 0 8px rgba(255, 213, 79, .45);
+    animation: skill-hotbar-react-pulse .7s ease-in-out infinite alternate;
+}
+@keyframes skill-hotbar-react-pulse {
+    from { box-shadow: 0 0 6px rgba(255, 213, 79, .6), inset 0 0 5px rgba(255, 213, 79, .3); }
+    to   { box-shadow: 0 0 16px rgba(255, 236, 130, 1), inset 0 0 11px rgba(255, 213, 79, .6); }
+}
+.skill-hotbar-react {
+    position: absolute;
+    left: 0; right: 0; bottom: 1px;
+    text-align: center;
+    font-size: 8px;
+    font-weight: bold;
+    letter-spacing: .5px;
+    color: #cfd2da;
+    text-shadow: 0 1px 2px #000, 0 0 3px #000;
+    pointer-events: none;
+    z-index: 3;
+}
+.skill-hotbar-slot.reaction-ready .skill-hotbar-react { color: #fff3b0; }

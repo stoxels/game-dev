@@ -9,7 +9,7 @@ import { _egConsumeOnHitGearBonus } from './encounter-player-attacks.js';
 import { _egFlashImmune, _egRestartFlashClass } from './encounter.js';
 import { _egGetActiveMapModValue } from '../endgame/endgame-map-launch.js';
 import { _egTryMonsterMeleeSidestep } from './combat-monster-roam.js';
-import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _egComputePlayerStats, _egStrikeHandMult } from '../endgame/endgame-player-stats.js';
 import { EG_PLAYER_MELEE_ANIM_DURATION_MS, EG_PLAYER_MELEE_DAMAGE, _egIsActive } from './combat-state.js';
 import { _egFacingFromVector, _egGetEquippedWeaponInfo, _egMeleeTargetInRange } from './combat-weapon-swing-config.js';
 import { _egMeleeImpactThump, _egShowWeaponSwing, _egWeaponSwingSound } from './combat-weapon-swing.js';
@@ -132,8 +132,10 @@ export function _egApplyPlayerMeleeImpact(targetId, opts) {
     // rawHit is the charge-scaled swing rolled ONCE - cleaved side targets
     // AND weapon-art tier victims all take this same hit (the exec finisher
     // multiplies only the primary target below).
+    // Dual-wielding: this blow carries the struck hand's share of the combined
+    // strike (1 otherwise), so both hands together equal the old single strike.
     const rawHit = Math.max(1, Math.round(
-        _egCurrentMeleeDamage(chargePct) + _egConsumeOnHitGearBonus() * chargePct));
+        (_egCurrentMeleeDamage(chargePct) + _egConsumeOnHitGearBonus() * chargePct) * _egStrikeHandMult()));
     // Gauntlet combo: a melee strike soon after a spell hit crits harder.
     const gauntletHooks = globalThis._egGauntletMeleeHooks;
     const comboMult = gauntletHooks ? gauntletHooks.pre(targetId) : 1;

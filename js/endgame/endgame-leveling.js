@@ -583,7 +583,83 @@ export function _egGrantMonsterXP(monsterLevel, isBoss) {
     xp = Math.max(1, Math.round(xp * _egCalcXpMultiplier(playerLevel, mLvl) * mapXpMult));
 
     _egAwardXP(xp);
+    return globalThis.__devLevelLock ? 0 : xp;
 }
+
+// Floating "+N XP" text over a defeated monster's card (WoW Classic style:
+// violet number drifting up and fading). Lives on <body> as a fixed element
+// so it outlives the card's kill animation. Cosmetic only.
+export function _egShowXpGainText(monsterId, xp) {
+    if (!(xp > 0)) return;
+    const card = document.getElementById(`eg-card-${monsterId}`);
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    if (!r.width) return;
+    const el = document.createElement('div');
+    el.className = 'eg-xp-float';
+    el.textContent = `+${xp} XP`;
+    el.style.left = `${Math.round(r.left + r.width / 2)}px`;
+    el.style.top = `${Math.round(r.top + r.height * 0.25)}px`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1600);
+}
+
+// Progress to the next level in percent (100 at max level).
+function _egXpBarPct() {
+    const lvl = _egGetPlayerLevel();
+    if (lvl >= EG_LEVELING_CONFIG.maxLevel) return 100;
+    return Math.min(100, (_egGetPlayerXP() / Math.max(1, _egGetXpForNextLevel(lvl))) * 100);
+}
+
+// Highlights a just-earned XP gain on the bar: a bright band over the newly
+// filled stretch (from -> to, in percent) plus a "+N XP" label above it.
+export function _egShowXpBarGain(xp, from, to) {
+    const bar = document.getElementById('eg-xp-bar');
+    const gain = document.getElementById('eg-xp-bar-gain');
+    if (!bar || !gain || !(xp > 0) || bar.getBoundingClientRect().width === 0) return;
+    gain.style.left = `${from}%`;
+    gain.style.width = `${Math.max(0.8, to - from)}%`;
+    gain.classList.remove('on');
+    void gain.offsetWidth;
+    gain.classList.add('on');
+    const el = document.createElement('div');
+    el.className = 'eg-xp-bar-text';
+    el.textContent = `+${xp} XP`;
+    const x = Math.round(window.innerWidth * Math.max(from, to) / 100);
+    el.style.left = `${Math.min(window.innerWidth - 50, Math.max(50, x))}px`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3200);
+}
+
+// Experience bar along the very bottom edge of the game screen (#eg-xp-bar,
+// WoW Classic style). Fill width = progress to the next level; hovering it
+// shows how much XP is still missing (generic data-tip tooltip).
+let _egXpBarLastKey = '';
+let _egXpBarLastPct = 0;
+export function _egRenderXpBar() {
+    const bar = document.getElementById('eg-xp-bar');
+    const fill = document.getElementById('eg-xp-bar-fill');
+    if (!bar || !fill) return;
+    const lvl = _egGetPlayerLevel();
+    const xp = _egGetPlayerXP();
+    const maxed = lvl >= EG_LEVELING_CONFIG.maxLevel;
+    const need = maxed ? 0 : _egGetXpForNextLevel(lvl);
+    const key = `${lvl}|${xp}|${need}`;
+    if (key === _egXpBarLastKey) return;
+    _egXpBarLastKey = key;
+    const pct = maxed ? 100 : Math.min(100, (xp / Math.max(1, need)) * 100);
+    // After a level-up the bar wraps back to ~0: snap instead of sweeping backwards.
+    fill.style.transition = pct < _egXpBarLastPct ? 'none' : '';
+    fill.style.width = `${pct}%`;
+    _egXpBarLastPct = pct;
+    const tip = maxed
+        ? t('eg_xp_bar_tip_max').replace('{lvl}', lvl)
+        : t('eg_xp_bar_tip')
+            .replace('{lvl}', lvl).replace('{cur}', xp).replace('{need}', need)
+            .replace('{pct}', pct.toFixed(1)).replace('{rem}', Math.max(0, need - xp)).replace('{next}', lvl + 1);
+    bar.setAttribute('data-tip', tip);
+}
+setInterval(() => { try { _egRenderXpBar(); } catch (e) { /* cosmetic */ } }, 700);
 
 
 //------------------------------------------------------------------------
@@ -648,7 +724,14 @@ export function _egGrantCampaignLevelXP(gi, isFirstClear) {
         * (isFirstClear ? 1 : (c.campaignReplayFraction || 0));
     const mult = _egCalcXpMultiplier(_egGetPlayerLevel(), refLevel);
     const xp = Math.max(1, Math.round(base * fraction * mult));
-    return _egAwardXP(xp);
+    // Show the gain on the XP bar once the win overlay is coming up.
+    const lvl0 = _egGetPlayerLevel();
+    const pct0 = _egXpBarPct();
+    const levels = _egAwardXP(xp);
+    const from = _egGetPlayerLevel() > lvl0 ? 0 : pct0;
+    const to = _egXpBarPct();
+    setTimeout(() => _egShowXpBarGain(xp, from, to), 900);
+    return levels;
 }
 
 
@@ -841,6 +924,7 @@ export function _egLoadLevelingState() {
 // Refreshes the small level chip on the character panel label. It is optional
 // and this no-ops outside the hub.
 export function _egRenderLevelHUD() {
+    _egRenderXpBar();
     const pts = _egGetUnspentPoints();
     const lvl = _egGetPlayerLevel();
     const xp = _egGetPlayerXP();

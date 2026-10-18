@@ -175,6 +175,7 @@ const SURFACE_ASSETS = {
         'images/Level_Select_Topbar/back-arrow.webp',
         'images/Level_Select_Topbar/banner-title-plaque.webp',
         'images/Level_Select_Topbar/score-pts-scroll.webp',
+        'images/Level_Select_Topbar/Menu-Buttons.webp',
         'images/Level_Select_Topbar/Inference-Block.webp',
         'images/Level_Select_Topbar/Probability-Tree-Block.webp'
     ],

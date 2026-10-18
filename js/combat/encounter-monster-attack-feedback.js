@@ -19,6 +19,8 @@ export function _egApplyPlayerMissFeedback(silent) {
 // Shows a short blocked label above the player avatar.
 export function _egApplyPlayerBlockFeedback() {
     Audio_Manager.playSFX('player_block');
+    // Reaction strikes (universal-spells.js) open for a few seconds after this.
+    try { if (typeof globalThis.noteUniversalReaction === 'function') globalThis.noteUniversalReaction('block'); } catch (e) { /* optional */ }
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -131,3 +133,30 @@ export function _egApplyPlayerHitFeedback(damageValue, isCrit, element) {
     // Crits layer a heavier accent on top of the base hit sound.
     if (isCrit) Audio_Manager.playSFX('player_crit_taken');
 }
+
+// Healing numbers: every Life gain (any source) writes playerCurrentHP, whose
+// setter in state.js reports the gain here. Gains landing within a short
+// window merge into one green "+N" over the avatar. Continuous regeneration
+// (encounter-tick.js sets _egHealSilent around its tick) and anything outside
+// an active encounter stay silent.
+let _egHealPending = 0;
+let _egHealTimer = null;
+globalThis.__egOnPlayerHeal = function (amount) {
+    // Cosmetic only: a failure here must never break the heal itself.
+    try { if (globalThis._egHealSilent || !_egIsActive()) return; } catch (e) { return; }
+    _egHealPending += amount;
+    if (_egHealTimer) return;
+    _egHealTimer = setTimeout(() => {
+        _egHealTimer = null;
+        const n = Math.round(_egHealPending);
+        _egHealPending = 0;
+        const hud = document.getElementById('player-avatar-wrapper');
+        if (n < 1 || !hud) return;
+        const label = document.createElement('div');
+        label.className = 'eg-player-damage eg-player-heal';
+        label.textContent = `+${n}`;
+        label.style.marginLeft = `${(Math.random() * 18 - 9).toFixed(1)}px`;
+        hud.appendChild(label);
+        setTimeout(() => label.remove(), EG_PLAYER_DAMAGE_NUMBER_DURATION_MS);
+    }, 250);
+};

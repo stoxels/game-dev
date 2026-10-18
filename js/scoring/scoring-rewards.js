@@ -260,7 +260,7 @@ function buildTimeColumn(elapsed) {
 // Shows a success badge if the bonus was met, or the bonus hint if it was missed.
 function renderBonusBadge(bonusMet) {
     document.getElementById('bonus-list').innerHTML = `
-        <span class="bonus-badge ${bonusMet ? 'earned' : 'missed'}">
+        <span class="bonus-badge ${bonusMet ? 'earned' : 'missed'}" data-tip-t="${bonusMet ? 'tip_ov_bonus_met' : 'tip_ov_bonus_missed'}">
             ${bonusMet ? t('ov_bonus_met') : '🎯 ' + lvText(cur, 'bonusHint')}
         </span>`;
 }
@@ -344,6 +344,8 @@ export function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed,
     buildTimeColumn(elapsed);
     renderBonusBadge(bonusMet);
     renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel, isNexusPoint);
+    // Learning panel: the run's own combat statistics (only when there was combat).
+    if (globalThis.RunStats) globalThis.RunStats.renderInto('win');
 
     // Ascension levels always route back to the overworld: hide Next/Retry
     // and promote the Levels button to the primary action.

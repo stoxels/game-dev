@@ -5,7 +5,8 @@ import { _egMaybeShowLowHealthWarning } from './encounter-overlays.js';
 import { EG_MELEE_OVERCHARGE_RATIO, _egFireMonsterAttack, _egMeleeTierForCharge, _egOverchargeRateForTier, _egUpdateBars } from './encounter.js';
 import { _egHazardsTick } from './combat-hazards-lifecycle.js';
 import { _egGetActiveMapModValue } from '../endgame/endgame-map-launch.js';
-import { _egGetPlayerAttackInterval } from '../endgame/endgame-player-stats.js';
+import { _egGetPlayerAttackInterval, _egGetPlayerAttackIntervalForHand } from '../endgame/endgame-player-stats.js';
+import { _egIsDualWielding } from '../loot/loot-requirements.js';
 import { _egIsActive } from './combat-state.js';
 import { _egUpdateMeleeMarker } from './combat-weapon-swing-config.js';
 import { _egCheckMistakeLimit, _egTickLifeRegen } from './encounter-tick-support.js';
@@ -98,20 +99,59 @@ function _egSyncChargeToInterval(max) {
 // see EG_MELEE_OVERCHARGE_* in encounter-melee-arts.js).
 // Returns 0 outside encounters with no max.
 export function _egGetPlayerChargePct() {
-    if (typeof _egGetPlayerAttackInterval !== 'function') return 0;
-    const max = _egGetPlayerAttackInterval();
+    if (_egDualOn()) return Math.max(_egGetHandChargePct(1), _egGetHandChargePct(2));
+    return _egGetHandChargePct(1);
+}
+
+// DUAL-WIELD: two one-handed weapons run two independent charge bars (hand 1
+// = main hand, hand 2 = off-hand), each on its own weapon's charge time.
+// One attack key strikes with whichever bar is fuller (_egGetLeadHand); the
+// other keeps charging untouched.
+function _egDualOn() {
+    try { return typeof _egIsDualWielding === 'function' && !!_egIsDualWielding(); } catch (e) { return false; }
+}
+
+let _egLastChargeMax2 = 0;
+function _egHandMax(hand) {
+    if (_egDualOn()) {
+        const m = _egGetPlayerAttackIntervalForHand(hand);
+        return m > 0 ? m : 0;
+    }
+    return (typeof _egGetPlayerAttackInterval === 'function') ? _egGetPlayerAttackInterval() : 0;
+}
+
+// Charge % (0..5) of one hand's bar. Hand 2 is only meaningful while dual-wielding.
+export function _egGetHandChargePct(hand) {
+    const max = _egHandMax(hand === 2 ? 2 : 1);
     if (!max || max <= 0) return 0;
-    _egSyncChargeToInterval(max);
     const cap = (typeof EG_MELEE_OVERCHARGE_RATIO === 'number') ? EG_MELEE_OVERCHARGE_RATIO : 1;
+    if (hand === 2) {
+        if (_egLastChargeMax2 > 0 && Math.abs(max - _egLastChargeMax2) > 1e-6) {
+            globalThis._egPlayerCurrentCharge2 = (globalThis._egPlayerCurrentCharge2 || 0) * (max / _egLastChargeMax2);
+        }
+        _egLastChargeMax2 = max;
+        return Math.min(cap, Math.max(0, (globalThis._egPlayerCurrentCharge2 || 0) / max));
+    }
+    _egSyncChargeToInterval(max);
     return Math.min(cap, Math.max(0, globalThis._egPlayerCurrentCharge / max));
+}
+
+// The hand a strike would use right now: the fuller bar (ties go to hand 1).
+export function _egGetLeadHand() {
+    if (!_egDualOn()) return 1;
+    return _egGetHandChargePct(2) > _egGetHandChargePct(1) + 1e-9 ? 2 : 1;
 }
 
 // Spends the current charge and returns the consumed % (0..1). Manual
 // melee strikes (E) call this at key-press time; the strike then deals
-// that share of full damage (linear, Secret-of-Mana-style).
+// that share of full damage (linear, Secret-of-Mana-style). Dual-wielding
+// spends only the leading hand's bar (the hand is left in _egStrikeHand).
 export function _egConsumePlayerCharge() {
-    const pct = _egGetPlayerChargePct();
-    globalThis._egPlayerCurrentCharge = 0;
+    const hand = _egGetLeadHand();
+    const pct = _egGetHandChargePct(hand);
+    if (hand === 2) globalThis._egPlayerCurrentCharge2 = 0;
+    else globalThis._egPlayerCurrentCharge = 0;
+    globalThis._egStrikeHand = hand;
     return pct;
 }
 
@@ -148,17 +188,23 @@ export function _egTickPlayer() {
     // half speed (see _egGetPlayerChargeMultiplier in endgame-ailments.js).
     const chargeMult = (typeof _egGetPlayerChargeMultiplier === 'function') ? _egGetPlayerChargeMultiplier() : 1;
     if (chargeMult <= 0) return;
-    const max = (typeof _egGetPlayerAttackInterval === 'function') ? _egGetPlayerAttackInterval() : 0;
-    if (!max || max <= 0) return;
-    _egSyncChargeToInterval(max);
+    const dual = _egDualOn();
+    const max1 = _egHandMax(1);
+    if (!max1 || max1 <= 0) return;
+    _egGetHandChargePct(1); // keeps the stored charge in step with the full-charge time
     const overchargeCap = (typeof EG_MELEE_OVERCHARGE_RATIO === 'number') ? EG_MELEE_OVERCHARGE_RATIO : 1;
-    if (!globalThis._egMeleeHoldActive) {
-        // SoM auto-charge: no held key, no overcharge - refill toward 100%
-        // and wait there until the player taps (quick hit) or holds (arts).
-        if (globalThis._egPlayerCurrentCharge < max) {
-            globalThis._egPlayerCurrentCharge = Math.min(max, globalThis._egPlayerCurrentCharge + 0.1 * chargeMult); // Ticks at 10Hz
+    const holding = !!globalThis._egMeleeHoldActive;
+    // Only the leading hand follows a held key into overcharge.
+    const lead = dual ? _egGetLeadHand() : 1;
+    const advance = (key, max, isHeld) => {
+        if (!isHeld) {
+            // SoM auto-charge: no held key, no overcharge - refill toward 100%
+            // and wait there until the player taps (quick hit) or holds (arts).
+            if ((globalThis[key] || 0) < max) {
+                globalThis[key] = Math.min(max, (globalThis[key] || 0) + 0.1 * chargeMult); // Ticks at 10Hz
+            }
+            return;
         }
-    } else {
         // Holding: charge (from wherever the bar stands) past full into
         // OVERCHARGE, up to the cap, and hold there until released. Each
         // crossed milestone slows the climb (see
@@ -167,15 +213,25 @@ export function _egTickPlayer() {
         let bandRate = 1;
         try {
             bandRate = _egOverchargeRateForTier(
-                _egMeleeTierForCharge(Math.min(globalThis._egPlayerCurrentCharge / max, overchargeCap)));
+                _egMeleeTierForCharge(Math.min((globalThis[key] || 0) / max, overchargeCap)));
         } catch (e) { bandRate = 1; }
-        globalThis._egPlayerCurrentCharge = Math.min(max * overchargeCap, globalThis._egPlayerCurrentCharge + 0.1 * chargeMult * bandRate); // Ticks at 10Hz
+        globalThis[key] = Math.min(max * overchargeCap, (globalThis[key] || 0) + 0.1 * chargeMult * bandRate); // Ticks at 10Hz
+    };
+    advance('_egPlayerCurrentCharge', max1, holding && lead === 1);
+    if (dual) {
+        const max2 = _egHandMax(2);
+        if (max2 > 0) {
+            _egGetHandChargePct(2);
+            advance('_egPlayerCurrentCharge2', max2, holding && lead === 2);
+        }
+    } else {
+        globalThis._egPlayerCurrentCharge2 = 0;
     }
     // Charge-level feedback: crossing 100% / 200% / 300% / 400% / 500%
     // plays a rising tick so auto-ready and each overcharge tier feels
     // like charging up.
     try {
-        const pct = globalThis._egPlayerCurrentCharge / max;
+        const pct = _egGetPlayerChargePct();
         const level = pct >= overchargeCap - 0.001 ? 5 : pct >= 4 ? 4 : pct >= 3 ? 3 : pct >= 2 ? 2 : pct >= 1 ? 1 : 0;
         if (level > (globalThis._egMeleeChargeLevel || 0)) {
             globalThis._egMeleeChargeLevel = level;
@@ -195,6 +251,8 @@ export function _egSetHoldEPauseVisual(isPaused) {
     if (bar) bar.classList.toggle('eg-charge-paused', !!isPaused);
     const alt = document.getElementById('eg-player-charge-bar');
     if (alt) alt.classList.toggle('eg-charge-paused', !!isPaused);
+    const bar2 = document.getElementById('avatar-charge2-fill');
+    if (bar2) bar2.classList.toggle('eg-charge-paused', !!isPaused);
     // Sprite feedback - show "CHARGE PAUSED" directly on the avatar while the parry key is held
     const hud = document.getElementById('player-avatar-wrapper');
     if (hud) {
@@ -298,33 +356,50 @@ document.addEventListener('mouseover', (e) => {
 // toggles from the removed set-piece freeze era can't desync the visual:
 // paused reflects ONLY the live pause state (parry hold / frozen).
 export function _egUpdatePlayerChargeBar() {
-    const pct = _egGetPlayerChargePct();
-    const overcharged = pct > 1.001;
+    const dual = _egDualOn();
     const paused = _egIsPlayerChargePaused();
-    const ready = pct >= 1 && !paused;
-    // Overcharge milestone look: each weapon-art tier restyles the bar +
-    // readout a step further (see eg-charge-tier1..4 in monsters.css).
-    let tier = 0;
-    try { tier = (typeof _egMeleeTierForCharge === 'function') ? _egMeleeTierForCharge(pct) : 0; }
-    catch (e) { tier = 0; }
-    ['eg-player-charge-bar', 'avatar-charge-fill'].forEach(id => {
-        const bar = document.getElementById(id);
-        if (!bar) return;
-        // Visual fill caps at 100% - overcharge reads via the glow + label.
-        bar.style.width = Math.min(100, pct * 100) + '%';
-        bar.classList.toggle('eg-charge-paused', paused);
-        bar.classList.toggle('eg-charge-ready', ready);
-        bar.classList.toggle('eg-charge-overcharged', overcharged);
-        for (let i = 1; i <= 4; i++) bar.classList.toggle('eg-charge-tier' + i, tier === i);
+    const lead = dual ? _egGetLeadHand() : 1;
+    // One readout per hand (hand 2 only exists while dual-wielding). Overcharge
+    // milestone look: each weapon-art tier restyles the bar + readout a step
+    // further (see eg-charge-tier1..4 in monsters.css).
+    const paint = (hand, barIds, labelId) => {
+        const pct = _egGetHandChargePct(hand);
+        const overcharged = pct > 1.001;
+        const ready = pct >= 1 && !paused;
+        let tier = 0;
+        try { tier = (typeof _egMeleeTierForCharge === 'function') ? _egMeleeTierForCharge(pct) : 0; }
+        catch (e) { tier = 0; }
+        barIds.forEach(id => {
+            const bar = document.getElementById(id);
+            if (!bar) return;
+            // Visual fill caps at 100% - overcharge reads via the glow + label.
+            bar.style.width = Math.min(100, pct * 100) + '%';
+            bar.classList.toggle('eg-charge-paused', paused);
+            bar.classList.toggle('eg-charge-ready', ready);
+            bar.classList.toggle('eg-charge-overcharged', overcharged);
+            for (let i = 1; i <= 4; i++) bar.classList.toggle('eg-charge-tier' + i, tier === i);
+        });
+        // % readout next to the avatar's charge bar (pops at 100% - see CSS).
+        const label = document.getElementById(labelId);
+        if (label) {
+            label.textContent = `${Math.floor(pct * 100)}%`;
+            label.classList.toggle('eg-charge-ready', ready);
+            label.classList.toggle('eg-charge-overcharged', overcharged);
+            for (let i = 1; i <= 4; i++) label.classList.toggle('eg-charge-tier' + i, tier === i);
+        }
+    };
+    paint(1, ['eg-player-charge-bar', 'avatar-charge-fill'], 'avatar-charge-text');
+    // Second bar + the small hand numbers: only while dual-wielding. The
+    // number of the hand that would strike next is highlighted.
+    const row2 = document.getElementById('avatar-charge2-row');
+    if (row2) row2.style.display = dual ? 'flex' : 'none';
+    ['avatar-charge-hand1', 'avatar-charge-hand2'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = dual ? '' : 'none';
+        el.classList.toggle('eg-hand-next', dual && lead === i + 1);
     });
-    // % readout next to the avatar's charge bar (pops at 100% - see CSS).
-    const label = document.getElementById('avatar-charge-text');
-    if (label) {
-        label.textContent = `${Math.floor(pct * 100)}%`;
-        label.classList.toggle('eg-charge-ready', ready);
-        label.classList.toggle('eg-charge-overcharged', overcharged);
-        for (let i = 1; i <= 4; i++) label.classList.toggle('eg-charge-tier' + i, tier === i);
-    }
+    if (dual) paint(2, ['avatar-charge2-fill'], 'avatar-charge2-text');
     // Rooted-while-charging indicator: synced here centrally (10Hz) so
     // hold-begin, hold-cancel and strike-release can never desync it.
     try { _egSyncMeleeRootedVisual(!!globalThis._egMeleeHoldActive); } catch (e) {}
@@ -391,7 +466,8 @@ export function _egTickLoop() {
     globalThis._egMonsters.forEach(_egTickMonster);
 
     // Gear: lifeRegen - heals the player once per second
-    _egTickLifeRegen();
+    globalThis._egHealSilent = true;
+    try { _egTickLifeRegen(); } finally { globalThis._egHealSilent = false; }
 
     // Player mechanics
     _egTickPlayer();

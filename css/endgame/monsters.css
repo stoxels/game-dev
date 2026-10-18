@@ -2007,7 +2007,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    width: calc(96px * var(--eg-art, 1) + 12px); /* frame follows per-spawn scale, bars match */
+    width: calc(96px * var(--eg-art, 1) * var(--eg-zs, 1) + 12px); /* frame follows per-spawn scale (and the zone fit scale), bars match */
     position: relative;
     cursor: pointer;
     user-select: none;
@@ -2124,8 +2124,8 @@
    spawn via --eg-art (see _egBuildMonster artScale). */
 .eg-emoji-wrapper {
     position: relative;
-    width: calc(96px * var(--eg-art, 1));
-    height: calc(96px * var(--eg-art, 1));
+    width: calc(96px * var(--eg-art, 1) * var(--eg-zs, 1));
+    height: calc(96px * var(--eg-art, 1) * var(--eg-zs, 1));
     background: transparent;
     border: 3px solid transparent;
     border-radius: 10px;
@@ -2160,15 +2160,15 @@
 
 /* ── Boss Cards - larger than normal creatures, ~25% smaller than the old 192px base ───────────── */
 .eg-monster-card-compact.eg-boss-card {
-    width: calc(144px * var(--eg-art, 1) + 12px);
+    width: calc(144px * var(--eg-art, 1) * var(--eg-zs, 1) + 12px);
     margin: 0 8px;
 }
 
 /* No passive gold frame either - the crown + size already mark the boss.
    Gold only appears when targeted, red when enraged. */
 .eg-emoji-wrapper.eg-boss-emoji-wrapper {
-    width: calc(144px * var(--eg-art, 1));
-    height: calc(144px * var(--eg-art, 1));
+    width: calc(144px * var(--eg-art, 1) * var(--eg-zs, 1));
+    height: calc(144px * var(--eg-art, 1) * var(--eg-zs, 1));
     border: 3px solid transparent;
 }
 
@@ -2398,9 +2398,7 @@
 }
 
 /* Monsters on the far right: pin tooltip to the right edge of the emoji */
-#eg-panel-right .eg-monster-compact-tooltip,
-#eg-panel-top-corner .eg-monster-compact-tooltip,
-#eg-panel-bottom .eg-monster-compact-tooltip {
+#eg-panel-right .eg-monster-compact-tooltip {
     left: auto;
     right: 0;
     transform: translateX(0);
@@ -3263,3 +3261,196 @@ body.eg-cursor-shocked .gc {
 .eg-ail-banner-polymorph { --ail: #4ade80; }
 .eg-ail-banner-stunned { --ail: #ff9ec8; }
 @keyframes eg-ail-banner-in { from { opacity: 0; scale: .7; } to { opacity: 1; scale: 1; } }
+
+/* Spawn grace period: 👣 countdown on the card, charge bar tinted teal */
+.eg-grace-badge {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 90, 85, 0.92);
+    color: #bff5ea;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 1px 5px;
+    border-radius: 4px;
+    border: 1px solid #111;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 3;
+}
+.eg-card-grace .eg-charge-track-compact {
+    border-color: rgba(120, 230, 210, 0.85);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.9), 0 0 8px rgba(100, 230, 205, 0.6);
+}
+
+/* ── XP gain text over a defeated monster (WoW Classic style) ───────────── */
+.eg-xp-float {
+    position: fixed;
+    z-index: 9000;
+    transform: translate(-50%, 0);
+    pointer-events: none;
+    font-family: var(--PX, monospace);
+    font-size: 15px;
+    font-weight: bold;
+    color: #d9a8ff;
+    text-shadow: 0 0 6px rgba(160, 80, 255, 0.9), 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
+    white-space: nowrap;
+    animation: eg-xp-float-up 1.5s ease-out forwards;
+}
+@keyframes eg-xp-float-up {
+    0%   { opacity: 0; transform: translate(-50%, 6px) scale(0.8); }
+    12%  { opacity: 1; transform: translate(-50%, 0) scale(1.1); }
+    70%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -46px) scale(1); }
+}
+
+/* ── XP bar along the bottom edge: fills the 6px gap under the dock ─────── */
+#eg-xp-bar {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 6px;
+    z-index: 600;
+    background: #120a1c;
+    border-top: 1px solid #000;
+    box-sizing: border-box;
+}
+#eg-xp-bar-fill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(180deg, #c58cff 0%, #8e3fd8 55%, #5b1fa0 100%);
+    box-shadow: 0 0 6px rgba(160, 80, 255, 0.7);
+    transition: width 0.45s ease-out;
+}
+/* WoW-style notches: 20 divisions */
+#eg-xp-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(90deg, transparent 0, transparent calc(5% - 1px), rgba(0, 0, 0, 0.55) calc(5% - 1px), rgba(0, 0, 0, 0.55) 5%);
+}
+
+/* Bright band over the stretch of the XP bar that was just earned */
+#eg-xp-bar-gain {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, #fff 0%, #e9c9ff 50%, #b57cff 100%);
+    box-shadow: 0 0 10px 2px rgba(220, 170, 255, 0.95);
+}
+#eg-xp-bar-gain.on { animation: eg-xp-gain-glow 2.4s ease-out forwards; }
+@keyframes eg-xp-gain-glow {
+    0%, 35% { opacity: 1; }
+    100%    { opacity: 0; }
+}
+.eg-xp-bar-text {
+    position: fixed;
+    bottom: 12px;
+    z-index: 650;
+    transform: translateX(-100%);
+    pointer-events: none;
+    font-family: var(--PX, monospace);
+    font-size: 14px;
+    font-weight: bold;
+    color: #e9c9ff;
+    text-shadow: 0 0 6px rgba(160, 80, 255, 0.95), 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
+    white-space: nowrap;
+    animation: eg-xp-bar-text-rise 3.1s ease-out forwards;
+}
+@keyframes eg-xp-bar-text-rise {
+    0%   { opacity: 0; margin-bottom: -6px; }
+    10%  { opacity: 1; margin-bottom: 0; }
+    75%  { opacity: 1; }
+    100% { opacity: 0; margin-bottom: 14px; }
+}
+body:has(#screen-game.active) #eg-xp-bar { display: block; }
+
+/* Healing number over the player avatar */
+.eg-player-damage.eg-player-heal {
+    color: #4cff7a;
+    filter: drop-shadow(0 0 8px rgba(60,255,120,0.9)) drop-shadow(0 3px 5px rgba(0,0,0,0.9));
+}
+
+
+/* ── Ailment visuals on the hero sprite ─────────────────────────────────
+   #eg-player-ail-fx follows the sprite (_egSyncPlayerSpriteFx); it reuses the
+   monster flame / spark / frost / wisp art (.eg-ail-fx > i) via the same
+   .eg-ail-<key> classes, and the sprite itself is tinted (.eg-spr-<key>). */
+.eg-player-ail-fx {
+    position: fixed; z-index: 60; pointer-events: none; display: none;
+}
+.eg-player-ail-fx .eg-ail-fx { z-index: 61; }
+.eg-fx-star { font-size: 18px; color: #fde047; filter: drop-shadow(0 0 4px rgba(253,224,71,0.9)); }
+.eg-player-ail-fx.eg-ail-stunned .eg-fx-star { display: block; top: -14%; animation: eg-fx-stun-orbit 1s linear infinite; }
+.eg-player-ail-fx.eg-ail-stunned .eg-fx-star.s1 { left: 10%; }
+.eg-player-ail-fx.eg-ail-stunned .eg-fx-star.s2 { left: 42%; animation-delay: -0.33s; }
+.eg-player-ail-fx.eg-ail-stunned .eg-fx-star.s3 { left: 72%; animation-delay: -0.66s; }
+@keyframes eg-fx-stun-orbit {
+    0%   { transform: translate(-14px, 4px) scale(0.8); opacity: 0.6; }
+    50%  { transform: translate(14px, -4px) scale(1.15); opacity: 1; }
+    100% { transform: translate(-14px, 4px) scale(0.8); opacity: 0.6; }
+}
+.eg-player-ail-fx.eg-bleeding::after { top: 10%; right: 4%; }
+.eg-player-ail-fx.eg-ail-chill .eg-fx-frost, .eg-player-ail-fx.eg-ail-frozen .eg-fx-frost { font-size: 20px; }
+
+#avatar-sprite-img.eg-spr-ignite, #avatar-sprite-img-simple.eg-spr-ignite {
+    filter: drop-shadow(0 0 6px rgba(255,110,20,0.95)) sepia(0.35) saturate(1.6);
+    animation: eg-spr-burn 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-spr-burn { from { filter: drop-shadow(0 0 4px rgba(255,110,20,0.8)) sepia(0.2) saturate(1.3); } to { filter: drop-shadow(0 0 10px rgba(255,160,40,1)) sepia(0.45) saturate(1.9) brightness(1.1); } }
+#avatar-sprite-img.eg-spr-chill, #avatar-sprite-img-simple.eg-spr-chill { filter: drop-shadow(0 0 6px rgba(103,232,249,0.9)) hue-rotate(150deg) saturate(0.8) brightness(1.1); }
+#avatar-sprite-img.eg-spr-frozen, #avatar-sprite-img-simple.eg-spr-frozen { filter: drop-shadow(0 0 10px rgba(147,197,253,1)) hue-rotate(170deg) saturate(0.5) brightness(1.35) contrast(0.9); }
+#avatar-sprite-img.eg-spr-poison, #avatar-sprite-img-simple.eg-spr-poison { filter: drop-shadow(0 0 6px rgba(132,204,22,0.95)) hue-rotate(60deg) saturate(1.4); }
+#avatar-sprite-img.eg-spr-shadowburn, #avatar-sprite-img-simple.eg-spr-shadowburn { filter: drop-shadow(0 0 8px rgba(139,92,246,0.95)) brightness(0.75) saturate(1.3); }
+#avatar-sprite-img.eg-spr-shocked, #avatar-sprite-img-simple.eg-spr-shocked { animation: eg-spr-shock 0.4s steps(2, end) infinite; }
+@keyframes eg-spr-shock { 0% { filter: drop-shadow(0 0 8px rgba(253,224,71,1)) brightness(1.4); } 50% { filter: drop-shadow(0 0 3px rgba(255,255,255,0.9)) brightness(1); } }
+#avatar-sprite-img.eg-spr-polymorph, #avatar-sprite-img-simple.eg-spr-polymorph { animation: eg-fx-morph 1.4s linear infinite; }
+#avatar-sprite-img.eg-spr-bleed, #avatar-sprite-img-simple.eg-spr-bleed { filter: drop-shadow(0 0 5px rgba(220,38,38,0.95)) saturate(1.3); }
+
+/* DUAL-WIELD: a small hand number (1 = main hand, 2 = off-hand) to the left
+   of each charge-up bar. The hand that would strike next (the fuller bar)
+   is lit gold, the other stays dim. */
+.avatar-charge-hand {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    line-height: 12px;
+    text-align: center;
+    font-size: 9px;
+    font-weight: bold;
+    border-radius: 3px;
+    color: #9ca3af;
+    background: #1f2430;
+    border: 1px solid #3b4252;
+    transition: color 0.12s, background 0.12s, border-color 0.12s, box-shadow 0.12s;
+}
+.avatar-charge-hand.eg-hand-next {
+    color: #1a1400;
+    background: #facc15;
+    border-color: #fde68a;
+    box-shadow: 0 0 6px rgba(250, 204, 21, 0.85);
+}
+#avatar-charge2-fill.eg-charge-ready { background: #facc15; box-shadow: 0 0 8px rgba(250, 204, 21, 0.8); }
+#avatar-charge2-fill.eg-charge-overcharged { background: #fb923c; box-shadow: 0 0 14px rgba(251, 146, 60, 0.95); }
+#avatar-charge2-fill.eg-charge-tier2 { background: linear-gradient(90deg, #fb923c, #f43f5e); box-shadow: 0 0 18px rgba(244, 63, 94, 0.95); }
+#avatar-charge2-fill.eg-charge-tier3 { background: linear-gradient(90deg, #f43f5e, #a855f7); box-shadow: 0 0 22px rgba(168, 85, 247, 0.95); }
+#avatar-charge2-fill.eg-charge-tier4 { background: linear-gradient(90deg, #a855f7, #fde68a); box-shadow: 0 0 26px rgba(253, 230, 138, 0.95); }
+#avatar-charge2-fill.eg-charge-paused { opacity: 0.45; }
+#avatar-charge2-text.eg-charge-ready { color: #facc15; font-weight: bold; }
+#avatar-charge2-text.eg-charge-overcharged { color: #fb923c; }
+#player-avatar-simple #avatar-charge2-text,
+#player-avatar-wrapper #avatar-charge2-text {
+    opacity: 1;
+    font-size: 10px;
+    line-height: 1.2;
+    color: #9ca3af;
+}

@@ -44,6 +44,15 @@ let manualZoomActive = false;
 // and must always be followed by a fresh fit.
 let _lastNaturalH = 0;
 
+// True while a monster encounter runs on this level: only when the grid is so
+// big that no monster zone fits around it does the grid shrink a little to
+// leave room above (it stays centred; see _egLayoutSpawnZones in
+// combat/combat-monster-roam.js). Reset per level.
+let monsterRoom = false;
+// Extra px of height kept free above the grid while monsterRoom is on (0 = none).
+// Asked for only when the grid is so big that no monster zone fits around it.
+let monsterBand = 0;
+
 // Tracks which UI zone the mouse is currently hovering over.
 // Used by the arrow-key scroll router to decide which element to scroll.
 // Possible values: 'puzzle' | 'inventory' | 'none'
@@ -259,6 +268,8 @@ export function zoomOutBtn() {
 // Call this whenever a new puzzle level is loaded.
 export function resetZoom() {
     manualZoomActive = false;
+    monsterRoom = false;
+    monsterBand = 0;
     currentZoom = 1;
 
     const wrap = _getWrap();
@@ -290,9 +301,25 @@ function _applyVerticalCentering(scaledHeight) {
     const avail = _calcAvailableSpace();
     const leftover = avail.h - scaledHeight;
 
+    // Same placement with or without monsters, so the grid never jumps.
     container.style.marginTop = leftover > 0
         ? `${Math.floor(leftover * VERTICAL_CENTER_FACTOR)}px`
         : '0px';
+}
+
+// Switches the "keep one free band above the grid" placement on/off and
+// re-seats the grid right away.
+export function setPuzzleMonsterRoom(on, bandPx) {
+    const v = !!on;
+    // bandPx omitted = keep the band already asked for
+    const band = v ? (bandPx === undefined ? monsterBand : Math.max(0, Math.round(bandPx))) : 0;
+    if (v === monsterRoom && band === monsterBand) return;
+    monsterRoom = v;
+    monsterBand = band;
+    if (_lastNaturalH <= 0) return;
+    // A new band changes the fit; a manual zoom keeps the player's chosen size.
+    if (!manualZoomActive) scalePuzzle();
+    else _applyVerticalCentering(_lastNaturalH * currentZoom);
 }
 
 // Calculates and applies the best-fit scale for the current puzzle grid
@@ -308,7 +335,10 @@ export function scalePuzzle() {
     _lastNaturalH = natural.h;
 
     const avail = _calcAvailableSpace();
-    const autoScale = Math.min(avail.w / natural.w, avail.h / natural.h, SCALE_MAX);
+    // The grid stays centred, so a free band of B px above it means the
+    // leftover space (of which the top gets VERTICAL_CENTER_FACTOR) must be B/factor.
+    const band = monsterRoom ? monsterBand / VERTICAL_CENTER_FACTOR : 0;
+    const autoScale = Math.min(avail.w / natural.w, (avail.h - band) / natural.h, SCALE_MAX);
 
     if (!manualZoomActive) {
         currentZoom = autoScale;

@@ -111,6 +111,7 @@ export function _egTickLifeRegen() {
         _egLastLifePulseAt = now;
         if (globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP
             && !(typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_no_regeneration'))) {
+            globalThis._egHealSilent = false; // Surge of Vigour pulses are worth a number
             globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(globalThis.playerMaxHP * stats.lifePulsePct / 100) : (globalThis.playerMaxHP * stats.lifePulsePct / 100)));
             if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
         }

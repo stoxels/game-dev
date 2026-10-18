@@ -8,7 +8,9 @@ import { clearHover } from './mouse-over.js';
 import { showHS } from './screens/screens-highscore.js';
 import { cancelSlotName, confirmSlotName, showSaveSlotSelect } from './screens/screens-save-slots.js';
 import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goToPreviousScreen, hideModal, launchAtlasVendor, launchEndgameTestMode, launchExistingGame, showModal, showSetup, showTitle } from './screens/screens.js';
-import { ptGoBack, showPassiveTree, showPassiveTreeAsCharacter } from './probability-tree/probability-tree.js';
+import { switchScreen } from './screens/screens.js';
+import { openTreeFromGame, ptGoBack, showPassiveTree, showPassiveTreeAsCharacter } from './probability-tree/probability-tree.js';
+import { openHubFromGame } from './endgame/endgame-hub.js';
 import { showQuestLog } from './inference/inference-ui.js';
 import { _ptRefundAllPoints } from './probability-tree/probability-tree-state-points.js';
 import { STATE, save } from './state.js';
@@ -250,6 +252,62 @@ document.addEventListener('DOMContentLoaded', () => {
     // so the player can review spells mid-puzzle. The book is raised above
     // the pause overlay in css/pause.css.
     onClick('btn-pause-spellbook', () => { if (typeof globalThis.openSpellbook === 'function') globalThis.openSpellbook(); });
+
+    // ── Game menu (pause screen) side trips ──────────────────────────────
+    // Character sheet / tree / shop are full screens: the pause menu steps
+    // aside, the screen opens over the paused run, and when the player comes
+    // back to the game screen (Back, B, K, Esc) the menu is restored and the
+    // run is still paused. Inference and achievements are plain modals that
+    // simply float above the menu (css/pause.css).
+    let pauseMenuReturnPending = false;
+    function restorePauseMenuAfterSideTrip() {
+        if (!pauseMenuReturnPending) return;
+        pauseMenuReturnPending = false;
+        try { if (typeof globalThis._showPlayerAvatarSimple === 'function') globalThis._showPlayerAvatarSimple(); } catch (e) { /* cosmetic */ }
+        try { if (typeof globalThis._showPlayerAvatar === 'function') globalThis._showPlayerAvatar(); } catch (e) { /* cosmetic */ }
+        const ov = document.getElementById('pause-overlay');
+        if (ov && globalThis._gamePaused) ov.classList.add('show');
+    }
+    (function watchGameScreenForPauseMenu() {
+        const game = document.getElementById('screen-game');
+        if (!game || typeof MutationObserver === 'undefined') return;
+        new MutationObserver(() => { if (game.classList.contains('active')) restorePauseMenuAfterSideTrip(); })
+            .observe(game, { attributes: true, attributeFilter: ['class'] });
+    })();
+    function openFromPauseMenu(openFn, hideAvatars) {
+        const ov = document.getElementById('pause-overlay');
+        if (ov) ov.classList.remove('show');
+        pauseMenuReturnPending = true;
+        try {
+            if (hideAvatars) {
+                try { if (typeof globalThis._hidePlayerAvatarSimple === 'function') globalThis._hidePlayerAvatarSimple(); } catch (e) { /* cosmetic */ }
+                try { if (typeof globalThis._hidePlayerAvatar === 'function') globalThis._hidePlayerAvatar(); } catch (e) { /* cosmetic */ }
+            }
+            openFn();
+        } catch (e) {
+            console.error(e);
+            restorePauseMenuAfterSideTrip();
+        }
+    }
+    onClick('btn-pause-char', () => openFromPauseMenu(() => openHubFromGame(), false));
+    onClick('btn-pause-tree', () => openFromPauseMenu(() => openTreeFromGame(), false));
+    // The shop has no history entry for the game screen (it is not re-enterable
+    // through goToPreviousScreen), so its Back button / Esc close it directly.
+    function closeShopToGame() {
+        globalThis._pauseShopReturn = false;
+        switchScreen('screen-game');          // the game-screen watcher restores the menu
+    }
+    globalThis._pauseCloseShopToGame = closeShopToGame;
+    onClick('btn-pause-shop', () => openFromPauseMenu(() => {
+        launchAtlasVendor('screen-game');
+        globalThis.screenHistory.pop();       // undo launchAtlasVendor's history push
+        globalThis._pauseShopReturn = true;
+        const back = document.querySelector('#screen-endgame-vendor .back-btn');
+        if (back) back.onclick = closeShopToGame;
+    }, true));
+    onClick('btn-pause-inference', () => showQuestLog());
+    onClick('btn-pause-achievements', () => showAchievements());
+    onClick('btn-pause-resume', () => globalThis.unpauseGame());
 
     //------------------------------------------------------------------------
     //-------------------TITLE SCREEN-----------------------------------------

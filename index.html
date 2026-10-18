@@ -15,7 +15,7 @@
     <link rel="icon" type="image/png" href="images/favicon.png">
     <title>STOXELS - v0.31 BETA</title>
     <link rel="stylesheet" href="css/base.css?v=3">
-    <link rel="stylesheet" href="css/pause.css?v=4">
+    <link rel="stylesheet" href="css/pause.css?v=5">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/touch-controls.css">
     <link rel="stylesheet" href="css/title-screen.css?v=4">
@@ -25,12 +25,12 @@
     <link rel="stylesheet" href="css/game.css?v=5">
     <link rel="stylesheet" href="css/setup-screen.css?v=9">
     <link rel="stylesheet" href="css/inventory.css">
-    <link rel="stylesheet" href="css/overlays.css">
+    <link rel="stylesheet" href="css/overlays.css?v=3">
     <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/class.css?v=5">
-    <link rel="stylesheet" href="css/skills.css?v=21">
+    <link rel="stylesheet" href="css/skills.css?v=22">
     <link rel="stylesheet" href="css/spellbook-redesign.css?v=26">
-    <link rel="stylesheet" href="css/universal-spells.css?v=13">
+    <link rel="stylesheet" href="css/universal-spells.css?v=15">
     <link rel="stylesheet" href="css/achievements.css?v=3">
     <link rel="stylesheet" href="css/item_effects.css?v=2">
     <link rel="stylesheet" href="css/probability_tree.css?v=9">
@@ -47,7 +47,7 @@
     <link rel="stylesheet" href="css/classes/recursionist.css">
     <link rel="stylesheet" href="css/classes/statistician.css">
     <link rel="stylesheet" href="css/classes/targeting-reticle.css">
-    <link rel="stylesheet" href="css/endgame/monsters.css?v=7">
+    <link rel="stylesheet" href="css/endgame/monsters.css?v=17">
     <link rel="stylesheet" href="css/endgame/monster-spells.css?v=2">
     <link rel="stylesheet" href="css/endgame/gauntlet.css?v=6">
     <!-- bosses2.css (442 KB / 11,290 lines, boss-FX only - verified no
@@ -65,8 +65,8 @@
     <link rel="stylesheet" href="css/endgame/objectives_hud.css">
     <link rel="stylesheet" href="css/character-select.css?v=8">
     <link rel="stylesheet" href="css/map-view.css?v=4">
-    <link rel="stylesheet" href="css/map-view-topbar.css?v=23">
-    <link rel="stylesheet" href="css/quiz-exercises.css?v=5">
+    <link rel="stylesheet" href="css/map-view-topbar.css?v=24">
+    <link rel="stylesheet" href="css/quiz-exercises.css?v=6">
     <link rel="stylesheet" href="css/highscore.css?v=5">
     <link rel="stylesheet" href="css/moodle-codes.css?v=3">
     <link rel="stylesheet" href="css/inference.css">
@@ -1220,6 +1220,8 @@
         <!-- ENDGAME OBJECTIVES - fixed left panel, zero layout impact -->
         <div id="eg-objectives-strip" class="eg-hidden"></div>
     </div>
+    <!-- XP bar: root-level (not inside #screen-game) so it paints above the win/lose overlays; shown only while the game screen is active (css/endgame/monsters.css; js/endgame/endgame-leveling.js) -->
+    <div id="eg-xp-bar"><div id="eg-xp-bar-fill"></div><div id="eg-xp-bar-gain"></div></div>
 
 
     <!-- HIGHSCORES SCREEN -->
@@ -1285,14 +1287,14 @@
 
             <div class="ov-btns ov-btns-win-grid">
                 <div class="ov-btns-col">
-                    <button class="ob s" id="btn-win-levels" data-t="btn_levels">LEVELS</button>
+                    <button class="ob s" id="btn-win-levels" data-tip-t="tip_ov_levels" data-t="btn_levels">LEVELS</button>
                 </div>
                 <div class="ov-btns-col">
-                    <button class="ob s" id="btn-win-retry" data-t="btn_retry">REPLAY</button>
-                    <button class="ob y" id="btn-win-retry-setup" data-t="btn_retry_setup">⟳ REPLAY (NEW SETUP)</button>
+                    <button class="ob s" id="btn-win-retry" data-tip-t="tip_ov_retry" data-t="btn_retry">REPLAY</button>
+                    <button class="ob y" id="btn-win-retry-setup" data-tip-t="tip_ov_retry_setup" data-t="btn_retry_setup">⟳ REPLAY (NEW SETUP)</button>
                 </div>
                 <div class="ov-btns-col">
-                    <button class="ob p" id="btn-next-lvl" data-t="btn_next">NEXT ▶</button>
+                    <button class="ob p" id="btn-next-lvl" data-tip-t="tip_ov_next" data-t="btn_next">NEXT ▶</button>
                 </div>
             </div>
         </div>
@@ -1559,40 +1561,54 @@
 
 
     <div id="pause-overlay">
-        <div class="pause-panel">
-            <div id="pause-label" data-t="game_paused">PAUSED</div>
+        <!-- Game menu (World-of-Warcraft style escape menu). Every id below is read or written by game code. -->
+        <div class="pause-menu">
+            <div class="pm-title"><span id="pause-label" data-t="pause_menu_title">GAME MENU</span></div>
 
-            <div class="pause-stats-row">
-                <div class="pause-stat">
-                    <span class="pause-stat-label">LEVEL</span>
-                    <span class="gtb-lvl" id="top-id">1-1</span>
+            <div class="pm-info">
+                <div class="pause-stats-row">
+                    <div class="pause-stat">
+                        <span class="pause-stat-label">LEVEL</span>
+                        <span class="gtb-lvl" id="top-id">1-1</span>
+                    </div>
+                    <div class="pause-stat-divider"></div>
+                    <div class="pause-stat">
+                        <span class="pause-stat-label">SCORE</span>
+                        <span class="pause-stat-value" id="sc-disp">0</span>
+                    </div>
                 </div>
-                <div class="pause-stat-divider"></div>
-                <div class="pause-stat">
-                    <span class="pause-stat-label">SCORE</span>
-                    <span class="pause-stat-value" id="sc-disp">0</span>
+                <div class="pause-section" id="top-hint"></div>
+                <div class="mod-tags-row" id="mod-tags"></div>
+                <div class="pause-loot-summary" id="pause-loot-summary"></div>
+                <div class="pause-bonus" id="bonus-sidebar">
+                    <span class="pause-bonus-label" data-t="scr_bonus_label">🎯 BONUS</span>
+                    <span class="pause-bonus-text" id="bonus-sidebar-hint"></span>
                 </div>
             </div>
 
-            <div class="pause-section" id="top-hint"></div>
-
-            <div class="mod-tags-row" id="mod-tags"></div>
-
-            <div class="pause-loot-summary" id="pause-loot-summary"></div>
-
-            <div class="pause-bonus" id="bonus-sidebar">
-                <span class="pause-bonus-label" data-t="scr_bonus_label">🎯 BONUS</span>
-                <span class="pause-bonus-text" id="bonus-sidebar-hint"></span>
+            <div class="pm-section pm-features">
+                <div class="pm-section-label" data-t="pause_sec_hero">HERO</div>
+                <div class="pm-grid">
+                    <button class="pm-btn" id="btn-pause-char" data-tip-t="tip_tb_character"><span class="pm-ico">🛡️</span><span data-t="pause_char">CHARACTER</span></button>
+                    <button class="pm-btn" id="btn-pause-shop" data-tip-t="tip_tb_shop"><span class="pm-ico">🛖</span><span data-t="pause_shop">SHOP</span></button>
+                    <button class="pm-btn" id="btn-pause-tree" data-tip-t="tip_tb_tree"><span class="pm-ico">🌳</span><span data-t="pause_tree">TREE</span></button>
+                    <button class="pm-btn" id="btn-pause-inference" data-tip-t="tip_tb_inference"><span class="pm-ico">📜</span><span data-t="pause_inference">INFERENCE</span></button>
+                    <button class="pm-btn" id="btn-pause-spellbook" data-tip-t="tip_tb_spellbook"><span class="pm-ico">📖</span><span data-t="pause_spellbook">SPELLBOOK</span></button>
+                    <button class="pm-btn" id="btn-pause-achievements"><span class="pm-ico">🏅</span><span data-t="pause_achievements">ACHIEVEMENTS</span></button>
+                </div>
             </div>
 
-            <div class="pause-actions">
-                <button id="btn-pause-spellbook" data-t="btn_spellbook">📖 SPELLBOOK</button>
-                <button id="btn-pause-keybinds" data-t="btn_keybinds">⌨ KEYBINDS</button>
-                <button id="btn-pause-settings" data-t="btn_settings">⚙ SETTINGS</button>
-                <button class="gtb-btn" id="btn-go-levels" data-t="btn_levels">◀ LEVELS</button>
-                <button class="gtb-btn" id="btn-go-nexus" data-t="eg_return_to_nexus" style="display:none;">🌌 RETURN TO NEXUS</button>
+            <div class="pm-section">
+                <div class="pm-section-label" data-t="pause_sec_system">SYSTEM</div>
+                <div class="pm-grid">
+                    <button class="pm-btn" id="btn-pause-keybinds"><span class="pm-ico">⌨</span><span data-t="pause_keybinds">KEYBINDS</span></button>
+                    <button class="pm-btn" id="btn-pause-settings" data-tip-t="tip_tb_settings"><span class="pm-ico">⚙️</span><span data-t="pause_settings">SETTINGS</span></button>
+                </div>
+                <button class="pm-btn pm-wide pm-leave gtb-btn" id="btn-go-levels"><span class="pm-ico">◀</span><span data-t="pause_levels">LEAVE LEVEL</span></button>
+                <button class="pm-btn pm-wide pm-leave gtb-btn" id="btn-go-nexus" style="display:none;"><span class="pm-ico">🌌</span><span data-t="pause_nexus">RETURN TO NEXUS</span></button>
             </div>
 
+            <button class="pm-btn pm-wide pm-resume" id="btn-pause-resume"><span data-t="pause_resume">RETURN TO GAME</span></button>
             <div id="pause-hint" data-t="game_paused_hint">Press Esc to continue</div>
         </div>
     </div>

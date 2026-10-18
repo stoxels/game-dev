@@ -214,6 +214,7 @@ export function _egBuildMonsterCardHTML(m) {
             ${m.isBoss ? '<span class="eg-boss-crown">👑</span>' : ''}
             <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${EG_ART.html('monster', m.artId || m.baseId, m.emoji)}</span>
             <span class="eg-level-bottom-left">${m.level}</span>
+            <span class="eg-grace-badge" id="eg-grace-${m.id}" style="display:none"></span>
             ${m.gauntletTrait ? `<span class="ga-trait-badge" title="${m.gauntletTrait === 'warded' ? 'Spell Ward: takes 65% less damage from spells - melee works best' : (m.gauntletTrait === 'champion' ? 'Champion: tougher and hits harder' : 'Phased: takes 65% less damage from melee - spells work best')}">${m.gauntletTrait === 'warded' ? '🛡' : (m.gauntletTrait === 'champion' ? '👑' : '👻')}</span>` : ''}
 
             <div class="eg-monster-compact-tooltip">
@@ -254,6 +255,15 @@ function _egFaceMonsterTowardPlayer(m) {
     art.style.transform = flip === -1 ? 'scaleX(-1)' : '';
 }
 
+// Grace period (firstStepUntil): 👣 countdown on the card + teal charge bar.
+function _egUpdateGraceBadge(m) {
+    const badge = document.getElementById(`eg-grace-${m.id}`);
+    if (!badge) return;
+    const left = m.firstStepUntil ? m.firstStepUntil - Date.now() : 0;
+    badge.style.display = left > 0 ? '' : 'none'; badge.textContent = left > 0 ? '👣 ' + Math.ceil(left / 1000) + 's' : '';
+    badge.parentElement.parentElement.classList.toggle('eg-card-grace', left > 0);
+}
+
 // Updates the HP bar, charge bar, and HP label for a single monster.
 // Cheap DOM update used by the 10Hz tick loop - no full rebuild.
 export function _egUpdateMonsterBars(m) {
@@ -276,6 +286,7 @@ export function _egUpdateMonsterBars(m) {
     if (hpLabel) hpLabel.textContent = `${m.currentHP} / ${m.maxHP} HP`;
 
     _egFaceMonsterTowardPlayer(m);
+    _egUpdateGraceBadge(m);
 
     // Elemental ailment icon strip (only rebuilds when statuses change)
     _egRenderMonsterStatusStrip(m);

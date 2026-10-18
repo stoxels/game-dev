@@ -95,6 +95,9 @@ export function _egFacingFromVector(dx, dy) {
     return dy >= 0 ? 'down' : 'up';
 }
 
+// A selected monster keeps the swing if it is within this many px of the nearest one.
+const EG_MELEE_TIE_PX = 12;
+
 // Current reach in px: the equipped weapon family's base reach plus
 // Champion's Vigor (reworked node 20033) bonus meters. Guarded like the
 // ailment channels - no stats, no bonus.
@@ -158,17 +161,21 @@ export function _egMeleeFindVictim(preferredId) {
         // _egMeleeTargetInRange so headless paths keep their old behaviour.
         return preferredId;
     }
-    if (preferredId != null && _egMeleeTargetInRange(preferredId)) return preferredId;
+    // The nearest living monster in reach wins; the selected one only keeps
+    // the swing when it is about as close (within EG_MELEE_TIE_PX) as the nearest.
     const reach = _egMeleeReachPx();
     let best = null;
     let bestD = Infinity;
+    let prefD = Infinity;
     const list = Array.isArray(globalThis._egMonsters) ? globalThis._egMonsters : [];
     for (const m of list) {
         if (!m || !(m.currentHP > 0)) continue;
         const d = _egMeleeEdgeDistance(m.id);
         if (d == null || d > reach) continue;
+        if (m.id === preferredId) prefD = d;
         if (d < bestD) { best = m.id; bestD = d; }
     }
+    if (preferredId != null && prefD <= bestD + EG_MELEE_TIE_PX) return preferredId;
     return best;
 }
 

@@ -662,7 +662,10 @@ function _quizRefreshTutorButton() {
         btn.style.display = 'flex';
         // Corner chip shows just the tutor / professor emoji; the detail
         // (item count or super-tutor name) moves into the hover tooltip.
-        btn.textContent = superTutorEnabled ? '📚' : '🎓';
+        // Super Tutor shows the Professor's portrait (bigger chip); the normal tutor keeps the emoji.
+        btn.classList.toggle('qr-corner--prof', superTutorEnabled);
+        if (superTutorEnabled) btn.innerHTML = '<img src="images/Tutorial/Professor.webp" alt="" draggable="false">';
+        else btn.textContent = '🎓';
         btn.dataset.tipT = superTutorEnabled ? 'qz_super_tutor' : 'qz_ask_tutor';
         btn.dataset.tipN = superTutorEnabled ? '' : tutorCount;
     } else {

@@ -1578,12 +1578,14 @@ export function _egComputePlayerStats() {
 // shortened globally by EG_PLAYER_CHARGE_TIME_MULT for manual pacing.
 // Full breakdown for display: { base, reduction, interval } where interval
 // is the effective time-to-full-charge.
-export function _egGetPlayerAttackIntervalBreakdown() {
+// weaponOverride: dual-wielding charges one bar per hand, each on its own
+// weapon's base time (see _egGetPlayerAttackIntervalForHand).
+export function _egGetPlayerAttackIntervalBreakdown(weaponOverride) {
     const defBase = EG_PLAYER_DEFAULT_ATTACK_INTERVAL;
     let base = defBase;
     // Only the melee weapon slot defines the manual-strike charge time -
     // ranged weapons scale the input-driven projectile channel instead.
-    const weapon = _egGetAllEquippedItems().find(it => it.slotType === 'weapon');
+    const weapon = weaponOverride || _egGetAllEquippedItems().find(it => it.slotType === 'weapon');
     if (weapon) {
         if (weapon.attackIntervalSeconds != null) {
             base = Number(weapon.attackIntervalSeconds) || defBase;
@@ -1635,6 +1637,42 @@ export function _egGetPlayerAttackIntervalBreakdown() {
 
 export function _egGetPlayerAttackInterval() {
     return _egGetPlayerAttackIntervalBreakdown().interval;
+}
+
+// The weapon in a hand while dual-wielding (1 = main hand, 2 = off-hand);
+// null when not dual-wielding or the hand is empty.
+export function _egGetDualHandWeapon(hand) {
+    if (typeof _egIsDualWielding !== 'function' || !_egIsDualWielding()) return null;
+    if (typeof _egEquipped === 'undefined' || !_egEquipped) return null;
+    return (hand === 2 ? _egEquipped.weapon2 : _egEquipped.weapon1) || null;
+}
+
+// Full-charge time of one hand's bar while dual-wielding: that weapon's own
+// base time plus the shared attack-speed mods. Falls back to the single bar's
+// interval when the hand has no weapon.
+export function _egGetPlayerAttackIntervalForHand(hand) {
+    const weapon = _egGetDualHandWeapon(hand);
+    return _egGetPlayerAttackIntervalBreakdown(weapon || undefined).interval;
+}
+
+// Share (0..1) of the dual-wield strike total that one hand's blow carries,
+// weighted by each weapon's base damage (even split when unknown). The two
+// shares add up to 1, so landing both hands once deals the same total as the
+// old single combined strike - the second bar adds rhythm, not extra damage.
+export function _egDualHandShare(hand) {
+    const avg = (w) => (w && w.damage) ? ((Number(w.damage.min) || 0) + (Number(w.damage.max) || 0)) / 2 : 0;
+    const a = avg(_egGetDualHandWeapon(1));
+    const b = avg(_egGetDualHandWeapon(2));
+    if (!(a > 0) || !(b > 0)) return 0.5;
+    return (hand === 2 ? b : a) / (a + b);
+}
+
+// Damage multiplier of the strike that is landing now: 1 normally, the struck
+// hand's share while dual-wielding (the hand is stamped by the charge bar's
+// _egConsumePlayerCharge at key-press time).
+export function _egStrikeHandMult() {
+    if (typeof _egIsDualWielding !== 'function' || !_egIsDualWielding()) return 1;
+    return _egDualHandShare(globalThis._egStrikeHand === 2 ? 2 : 1);
 }
 
 
@@ -1776,6 +1814,7 @@ export function _egRollCrit(stats, bonus) {
     if ((Number(stats.neverCrit) || 0) > 0) return 1;
     const chance = (stats.critChance || 0) + ((bonus && bonus.chance) || 0);
     if (chance > 0 && Math.random() * 100 < chance) {
+        if (globalThis.RunStats) globalThis.RunStats.critTrial(chance, true);
         globalThis._egLastCritAt = Date.now();
         // Elemental Overload / Perfect Agony: the crit counts (ailments, "recently" lines)
         // but deals no extra damage. 1.0001 keeps the `> 1` crit tests true.
@@ -1783,6 +1822,7 @@ export function _egRollCrit(stats, bonus) {
         // 150% base crit damage + additive multiplier bonuses
         return 1.5 + ((stats.critMultiplierPct || 0) + ((bonus && bonus.multiplierPct) || 0)) / 100;
     }
+    if (chance > 0 && globalThis.RunStats) globalThis.RunStats.critTrial(chance, false);
     return 1;
 }
 

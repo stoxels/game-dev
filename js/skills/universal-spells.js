@@ -325,7 +325,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // only monster PHYSICAL resistance mitigates it (see _egApplyTargetResistances).
     {
         id: 'usp_heroic_strike', icon: '🤺', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'single', dmg: [11, 13], manaCost: 23, cooldownSeconds: 7, castTimeSeconds: 0.6,
+        behavior: 'single', dmg: [11, 13], manaCost: 23, cooldownSeconds: 3, castTimeSeconds: 0.6,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Heroic Strike', nameDE: 'Heroischer Stoß',
         descEn: 'A mighty empowered strike in front of you. Reliable physical damage for modest mana, instantly - hits whatever is in reach, no target needed.',
@@ -334,7 +334,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_mortal_strike', icon: '⚔️', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'single', dmg: [17, 23], manaCost: 49, cooldownSeconds: 20, castTimeSeconds: 1.4,
+        behavior: 'single', dmg: [17, 23], manaCost: 49, cooldownSeconds: 10, castTimeSeconds: 1.4,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Mortal Strike', nameDE: 'Tödlicher Stoß',
         descEn: 'Wind up and bring the blade down in front of you: a devastating blow that crushes whatever is in reach for heavy physical damage.',
@@ -343,7 +343,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_whirlwind', icon: '🌪️', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'nova', dmg: [5, 9], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 0.8, perTarget: true,
+        behavior: 'nova', dmg: [5, 9], manaCost: 42, cooldownSeconds: 9, castTimeSeconds: 0.8, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Whirlwind', nameDE: 'Wirbelwind',
         descEn: 'Spin into a steel storm around you, slashing EVERY enemy within reach.',
@@ -352,7 +352,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_rend', icon: '✂️', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'ticks', dmg: [3, 4], tickDmg: [2, 4], ticks: 5, manaCost: 31, cooldownSeconds: 14, castTimeSeconds: 0.7,
+        behavior: 'ticks', dmg: [3, 4], tickDmg: [2, 4], ticks: 5, manaCost: 31, cooldownSeconds: 7, castTimeSeconds: 0.7,
         tags: ['Spell', 'Physical', 'Damage over Time'], scalingTags: ['spell', 'physical', 'dot'],
         nameEn: 'Rend', nameDE: 'Verwunden',
         descEn: 'Rips open whatever is in front of you: instant damage plus bleeding over 5 seconds.',
@@ -361,7 +361,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_execute', icon: '💀', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'single', dmg: [20, 27], manaCost: 53, cooldownSeconds: 24, castTimeSeconds: 1.8,
+        behavior: 'single', dmg: [20, 27], manaCost: 53, cooldownSeconds: 12, castTimeSeconds: 1.8,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Execute', nameDE: 'Hinrichten',
         descEn: 'A finishing execution in front of you. The hardest-hitting physical strike in the arsenal.',
@@ -370,11 +370,120 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_cleave', icon: '🪓', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'nova', dmg: [5, 8], manaCost: 36, cooldownSeconds: 16, castTimeSeconds: 0.8, perTarget: true,
+        behavior: 'nova', dmg: [5, 8], manaCost: 36, cooldownSeconds: 8, castTimeSeconds: 0.8, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Cleave', nameDE: 'Spalten',
         descEn: 'A wide arc of steel in front of you that cleaves every enemy inside it. Instant.',
         descDE: 'Ein weiter Stahlbogen vor dir, der jeden Gegner darin spaltet. Sofort.',
+        sfx: 'cleave',
+    },
+
+    // ── PHYSICAL: MORE MELEE ────────────────────────────────────────────
+    // Same weapon-attack family as Heroic Strike / Cleave (castKind 'melee',
+    // see USP_MELEE_SPELLS). Extra melee keys: hits (rapid repeat strikes),
+    // stagger (ms the victims' attack charge freezes), healPct (% of max Life
+    // restored when the swing connects).
+    {
+        id: 'usp_crushing_blow', icon: '🔨', theme: 'blade', element: 'physical', damageKind: 'physical',
+        behavior: 'single', dmg: [15, 19], manaCost: 38, cooldownSeconds: 9, castTimeSeconds: 0.8,
+        tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
+        nameEn: 'Crushing Blow', nameDE: 'Vernichtender Schlag',
+        descEn: 'Bring a heavy hammer down in front of you. A crushing physical blow that also staggers the victim, freezing its attack charge for 1.5 seconds.',
+        descDE: 'Lass einen schweren Hammer vor dir niedergehen. Ein vernichtender physischer Schlag, der das Opfer zusätzlich ins Taumeln bringt: Sein Angriffsbalken steht 1,5 Sekunden still.',
+        sfx: 'diagonalStrike',
+    },
+    {
+        id: 'usp_blade_flurry', icon: '💫', theme: 'blade', element: 'physical', damageKind: 'physical',
+        behavior: 'single', dmg: [3, 4], manaCost: 33, cooldownSeconds: 8, castTimeSeconds: 0,
+        tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
+        nameEn: 'Blade Flurry', nameDE: 'Klingenhagel',
+        descEn: 'A blur of rapid cuts: strikes whatever is in front of you 4 times in a heartbeat. Instant.',
+        descDE: 'Ein Wirbel schneller Hiebe: trifft, was vor dir steht, in einem Herzschlag 4-mal. Sofort.',
+        sfx: 'diagonalStrike',
+    },
+    {
+        id: 'usp_piercing_lunge', icon: '🗡️', theme: 'blade', element: 'physical', damageKind: 'physical',
+        behavior: 'single', dmg: [11, 14], manaCost: 30, cooldownSeconds: 7, castTimeSeconds: 0,
+        tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
+        nameEn: 'Piercing Lunge', nameDE: 'Durchbohrender Ausfall',
+        descEn: 'Thrust a blade in a long, narrow line in front of you, skewering EVERY enemy standing in it. Instant.',
+        descDE: 'Stoße eine Klinge in einer langen, schmalen Linie vor dich und durchbohre JEDEN Gegner darin. Sofort.',
+        sfx: 'diagonalStrike',
+    },
+    {
+        id: 'usp_seismic_slam', icon: '🌍', theme: 'blade', element: 'physical', damageKind: 'physical',
+        behavior: 'nova', dmg: [6, 9], manaCost: 40, cooldownSeconds: 13, castTimeSeconds: 1.0, perTarget: true,
+        tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
+        nameEn: 'Seismic Slam', nameDE: 'Erdbebenschlag',
+        descEn: 'Smash the ground at your feet: a cracking shockwave hits EVERY enemy in reach and staggers them for 1.2 seconds.',
+        descDE: 'Schmettere den Boden zu deinen Füßen: Eine berstende Schockwelle trifft JEDEN Gegner in Reichweite und bringt ihn 1,2 Sekunden ins Taumeln.',
+        sfx: 'cleave',
+    },
+    {
+        id: 'usp_vampiric_strike', icon: '🧛', theme: 'blade', element: 'physical', damageKind: 'physical',
+        behavior: 'single', dmg: [10, 13], manaCost: 31, cooldownSeconds: 10, castTimeSeconds: 0,
+        tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
+        nameEn: 'Vampiric Strike', nameDE: 'Vampirhieb',
+        descEn: 'A crimson-edged cut that drinks deep: strikes in front of you and restores 6% of your maximum life if it connects. Instant.',
+        descDE: 'Ein blutroter Hieb, der tief trinkt: trifft vor dir und stellt 6 % deines maximalen Lebens wieder her, wenn er trifft. Sofort.',
+        sfx: 'diagonalStrike',
+    },
+
+    // ── REACTION STRIKES (only usable right after you avoided a hit) ─────────
+    // def.reaction: 'parry' | 'block' | 'dodge'. Locked until that has just
+    // happened (window: USP_REACTION_WINDOW_MS); using one spends the window.
+    {
+        id: 'usp_counterstrike', icon: '↪️', theme: 'blade', element: 'physical', damageKind: 'physical', reaction: 'parry',
+        behavior: 'single', dmg: [20, 26], manaCost: 22, cooldownSeconds: 4, castTimeSeconds: 0,
+        tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
+        nameEn: 'Counterstrike', nameDE: 'Gegenschlag',
+        descEn: 'REACTION - only after you PARRY (5 seconds). Turn the enemy\u2019s own momentum against it with a lightning-fast riposte for heavy physical damage that staggers the victim for 1 second.',
+        descDE: 'REAKTION - nur nach einer erfolgreichen PARADE (5 Sekunden). Wende den Schwung des Feindes gegen ihn: ein blitzschneller Konterhieb mit schwerem physischem Schaden, der das Opfer 1 Sekunde ins Taumeln bringt.',
+        sfx: 'diagonalStrike',
+    },
+    {
+        id: 'usp_blade_dance', icon: '💃', theme: 'blade', element: 'physical', damageKind: 'physical', reaction: 'parry',
+        behavior: 'nova', dmg: [4, 6], manaCost: 28, cooldownSeconds: 6, castTimeSeconds: 0, perTarget: true,
+        tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
+        nameEn: 'Dance of Blades', nameDE: 'Klingentanz',
+        descEn: 'REACTION - only after you PARRY (5 seconds). Flow out of the parry into a spinning dance that slashes EVERY enemy in reach three times.',
+        descDE: 'REAKTION - nur nach einer erfolgreichen PARADE (5 Sekunden). Gleite aus der Parade in einen wirbelnden Tanz, der JEDEN Gegner in Reichweite dreimal aufschlitzt.',
+        sfx: 'cleave',
+    },
+    {
+        id: 'usp_shield_slam', icon: '🛡️', theme: 'blade', element: 'physical', damageKind: 'physical', reaction: 'block',
+        behavior: 'single', dmg: [14, 18], manaCost: 20, cooldownSeconds: 4, castTimeSeconds: 0,
+        tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
+        nameEn: 'Shield Slam', nameDE: 'Schildstoß',
+        descEn: 'REACTION - only after you BLOCK (5 seconds). Throw your whole weight behind your guard and slam it into the enemy: heavy physical damage and a 2 second stagger.',
+        descDE: 'REAKTION - nur nach einem erfolgreichen BLOCK (5 Sekunden). Wirf dein ganzes Gewicht hinter die Deckung und ramme sie dem Feind entgegen: schwerer physischer Schaden und 2 Sekunden Taumeln.',
+        sfx: 'cleave',
+    },
+    {
+        id: 'usp_bastion_burst', icon: '🏰', theme: 'blade', element: 'physical', damageKind: 'physical', reaction: 'block',
+        behavior: 'nova', dmg: [8, 11], manaCost: 28, cooldownSeconds: 6, castTimeSeconds: 0, perTarget: true,
+        tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
+        nameEn: 'Bastion Burst', nameDE: 'Bastionswelle',
+        descEn: 'REACTION - only after you BLOCK (5 seconds). Release the force of the blocked blow as a golden shockwave that hits EVERY enemy in reach and staggers them for 1.2 seconds.',
+        descDE: 'REAKTION - nur nach einem erfolgreichen BLOCK (5 Sekunden). Entlade die Wucht des geblockten Hiebs als goldene Schockwelle, die JEDEN Gegner in Reichweite trifft und 1,2 Sekunden ins Taumeln bringt.',
+        sfx: 'cleave',
+    },
+    {
+        id: 'usp_phantom_strike', icon: '👤', theme: 'blade', element: 'physical', damageKind: 'physical', reaction: 'dodge',
+        behavior: 'single', dmg: [18, 23], manaCost: 24, cooldownSeconds: 4, castTimeSeconds: 0,
+        tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
+        nameEn: 'Phantom Strike', nameDE: 'Phantomhieb',
+        descEn: 'REACTION - only after you DODGE (4 seconds). Slip through the gap the miss left behind and cut from the shadows with an afterimage of yourself for heavy physical damage.',
+        descDE: 'REAKTION - nur nach einem erfolgreichen AUSWEICHEN (4 Sekunden). Schlüpfe durch die Lücke, die der Fehlschlag hinterlassen hat, und schlage mit einem Nachbild deiner selbst aus dem Schatten zu: schwerer physischer Schaden.',
+        sfx: 'diagonalStrike',
+    },
+    {
+        id: 'usp_flicker_slash', icon: '🌗', theme: 'blade', element: 'physical', damageKind: 'physical', reaction: 'dodge',
+        behavior: 'nova', dmg: [3, 5], manaCost: 24, cooldownSeconds: 5, castTimeSeconds: 0, perTarget: true,
+        tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
+        nameEn: 'Flicker Slash', nameDE: 'Flackerschnitt',
+        descEn: 'REACTION - only after you DODGE (4 seconds). Flicker between enemies and slash EVERY one of them in front of you three times before they notice.',
+        descDE: 'REAKTION - nur nach einem erfolgreichen AUSWEICHEN (4 Sekunden). Flackere zwischen den Feinden und schlitze JEDEN vor dir dreimal auf, bevor sie es merken.',
         sfx: 'cleave',
     },
 
@@ -607,7 +716,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // ── PATH OF EXILE: BLOOD & BLADES ───────────────────────────────────
     {
         id: 'usp_exsanguinate', icon: '🩸', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'single', dmg: [15, 19], manaCost: 42, cooldownSeconds: 16, castTimeSeconds: 1.2,
+        behavior: 'single', dmg: [15, 19], manaCost: 42, cooldownSeconds: 8, castTimeSeconds: 1.2,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Exsanguinate', nameDE: 'Ausbluten',
         descEn: 'Rips blood from whatever stands before you in melee range in a crimson cascade. A physical SPELL, not a strike - step close.',
@@ -616,7 +725,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_reap', icon: '🌾', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'nova', dmg: [7, 9], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0, perTarget: true,
+        behavior: 'nova', dmg: [7, 9], manaCost: 42, cooldownSeconds: 9, castTimeSeconds: 1.0, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Reap', nameDE: 'Ernte',
         descEn: 'A spectral scythe sweeps a wide arc and reaps EVERY enemy in it.',
@@ -940,6 +1049,22 @@ const USP_MELEE_SPELLS = {
     usp_cleave:        { kind: 'cone', reach: 250, angle: 110, all: true },
     usp_reap:          { kind: 'cone', reach: 280, angle: 150, all: true },
     usp_whirlwind:     { kind: 'circle', reach: 230, all: true },
+    // More melee. hits = rapid repeat strikes, hitDelayMs = gap between them,
+    // stagger = ms the victims' attack charge freezes, healPct = % max Life
+    // restored when the swing connects.
+    usp_crushing_blow:   { kind: 'cone', reach: 220, angle: 70, stagger: 1500 },
+    usp_blade_flurry:    { kind: 'cone', reach: 215, angle: 60, hits: 4, hitDelayMs: 110 },
+    usp_piercing_lunge:  { kind: 'cone', reach: 330, angle: 24, all: true },
+    usp_seismic_slam:    { kind: 'circle', reach: 215, all: true, stagger: 1200 },
+    usp_vampiric_strike: { kind: 'cone', reach: 215, angle: 70, healPct: 6 },
+    // Reaction strikes (def.reaction): only castable right after the matching
+    // parry / block / dodge.
+    usp_counterstrike:   { kind: 'cone', reach: 240, angle: 60, stagger: 1000 },
+    usp_blade_dance:     { kind: 'circle', reach: 225, all: true, hits: 3, hitDelayMs: 170 },
+    usp_shield_slam:     { kind: 'cone', reach: 210, angle: 70, stagger: 2000 },
+    usp_bastion_burst:   { kind: 'circle', reach: 235, all: true, stagger: 1200 },
+    usp_phantom_strike:  { kind: 'cone', reach: 260, angle: 50 },
+    usp_flicker_slash:   { kind: 'cone', reach: 250, angle: 100, all: true, hits: 3, hitDelayMs: 130 },
 };
 
 // CHANNEL: hold the button and the spell keeps firing every tickSeconds, each
@@ -1083,6 +1208,7 @@ function _uspDeriveTags(d) {
         }
     }
     if (d.behavior === 'ticks') add('Damage over Time');
+    if (d.reaction) add('Reaction');
     if (k === 'toggle') add('Aura');
     if (k === 'channel') add('Channelling');
     if (k === 'charge') add('Charged');
@@ -1133,6 +1259,7 @@ UNIVERSAL_SPELL_DEFS.forEach((d) => {
         d.melee = USP_MELEE_SPELLS[d.id];
         // Quick strikes lose their cast bar; the heavy ones keep theirs.
         if (['usp_heroic_strike', 'usp_rend', 'usp_cleave'].indexOf(d.id) !== -1) d.castTimeSeconds = 0;
+        if (d.reaction) d.castTimeSeconds = 0; // a reaction is a snap response, never a wind-up
     } else if (USP_GROUND_SPELLS[d.id]) {
         d.castKind = 'ground';
         d.ground = USP_GROUND_SPELLS[d.id];
@@ -2919,12 +3046,50 @@ function _uspApplyMeleeSpell(spell) {
     showSpellZone(shape, point, origin, spell.theme, 420, 'burst');
     try { _uspMeleeSwing(spell, origin, aim); } catch (e) { /* swing is cosmetic */ }
     const first = victims();
-    first.forEach((mon, i) => {
+    // hits > 1: rapid repeat strikes (Blade Flurry, Dance of Blades...). The
+    // first volley takes the victims picked above; later ones re-check the area
+    // for area strikes and stay on the same (still living) victims otherwise.
+    const hits = Math.max(1, Math.round(m.hits || 1));
+    const hitGap = m.hitDelayMs || 110;
+    for (let h = 0; h < hits; h++) {
         setTimeout(() => {
             if (!live()) return;
-            _uspStrike(spell, mon.id, spell.dmg[0], spell.dmg[1], { isMelee: true, isAoE: !!m.all });
-        }, i * 50);
-    });
+            const list = h === 0 ? first
+                : (m.all ? inside().slice(0, 8)
+                    : first.filter((v) => _uspLivingMonsters().some((mon) => mon.id === v.id)));
+            list.forEach((mon, i) => {
+                setTimeout(() => {
+                    if (!live()) return;
+                    _uspStrike(spell, mon.id, spell.dmg[0], spell.dmg[1], { isMelee: true, isAoE: !!m.all });
+                }, i * 50);
+            });
+        }, h * hitGap);
+    }
+    // Stagger: the victims' attack charge freezes for a while (same channel
+    // the Stagger gear stat uses).
+    if (m.stagger && first.length) {
+        const until = Date.now() + m.stagger;
+        first.forEach((mon) => {
+            mon.staggeredUntil = Math.max(mon.staggeredUntil || 0, until);
+            try {
+                if (typeof globalThis._egShowStatusLabel === 'function') {
+                    globalThis._egShowStatusLabel(mon.id, (typeof LANG !== 'undefined' && LANG === 'de') ? 'BENOMMEN' : 'STAGGERED');
+                }
+            } catch (e) { /* label is cosmetic */ }
+        });
+    }
+    // Life restored when the swing connects (Vampiric Strike).
+    if (m.healPct && first.length) {
+        try {
+            const maxHP = Number(globalThis.playerMaxHP) || 0;
+            const heal = Math.round(maxHP * m.healPct / 100);
+            if (heal > 0 && typeof globalThis.playerCurrentHP !== 'undefined') {
+                globalThis.playerCurrentHP = Math.min(maxHP, globalThis.playerCurrentHP + heal);
+                if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+                if (typeof globalThis.showCombatToast === 'function') globalThis.showCombatToast('🩸 +' + heal, '#ff6b81');
+            }
+        } catch (e) { /* heal is best-effort */ }
+    }
 
     // Damage-over-time follow-up (Rend bleeds one victim, Blade Vortex keeps
     // spinning): re-checks the area each second.
@@ -3225,6 +3390,66 @@ function _uspStartAura(spell) {
     return true;
 }
 
+//------------------------------------------------------------------------
+//-------------------------REACTION WINDOWS-------------------------------
+//------------------------------------------------------------------------
+// Reaction strikes (def.reaction = 'parry' | 'block' | 'dodge') can only be
+// cast shortly AFTER the player avoided a hit that way. The combat damage path
+// reports each success through noteUniversalReaction(); the hotbar lights the
+// matching spells up while the window is open and casting one spends it.
+const USP_REACTION_WINDOW_MS = { parry: 5000, block: 5000, dodge: 4000 };
+const _uspReactionUntil = { parry: 0, block: 0, dodge: 0 };
+const _uspReactionTimer = {};
+
+export function isUniversalReactionReady(kind) {
+    return Date.now() < (_uspReactionUntil[kind] || 0);
+}
+
+// Remaining ms of a spell's reaction window ('ready' false once it lapsed).
+// Null for spells without a reaction requirement.
+export function getUniversalSpellReaction(spellId) {
+    const spell = getUniversalSpellDef(spellId);
+    if (!spell || !spell.reaction) return null;
+    const remaining = Math.max(0, (_uspReactionUntil[spell.reaction] || 0) - Date.now());
+    return { kind: spell.reaction, ready: remaining > 0, remainingMs: remaining };
+}
+
+// Called by the damage path on every successful parry / block / dodge.
+export function noteUniversalReaction(kind) {
+    if (!USP_REACTION_WINDOW_MS[kind]) return;
+    _uspReactionUntil[kind] = Date.now() + USP_REACTION_WINDOW_MS[kind];
+    // Only bother the hotbar when a spell on it actually listens for this.
+    let relevant = false;
+    try {
+        relevant = (STATE.skillHotbar || []).some((id) => {
+            const d = id ? UNIVERSAL_SPELL_MAP[id] : null;
+            return d && d.reaction === kind;
+        });
+    } catch (e) { relevant = false; }
+    if (!relevant) return;
+    try { Audio_Manager.playSFX('spell_cooldown_ready'); } catch (e) { /* audio is best-effort */ }
+    try { renderSkillHotbar(); } catch (e) { /* hotbar is best-effort */ }
+    clearTimeout(_uspReactionTimer[kind]);
+    _uspReactionTimer[kind] = setTimeout(() => {
+        try { renderSkillHotbar(); } catch (e) { /* hotbar is best-effort */ }
+    }, USP_REACTION_WINDOW_MS[kind] + 60);
+}
+
+// Drops every open window (encounter end / reset).
+export function clearUniversalReactions() {
+    Object.keys(_uspReactionUntil).forEach((k) => { _uspReactionUntil[k] = 0; });
+    try { renderSkillHotbar(); } catch (e) { /* hotbar is best-effort */ }
+}
+
+function _uspReactionToast(spell) {
+    const de = typeof LANG !== 'undefined' && LANG === 'de';
+    const what = { parry: de ? 'einer Parade' : 'a parry', block: de ? 'einem Block' : 'a block', dodge: de ? 'einem Ausweichen' : 'a dodge' }[spell.reaction];
+    const name = de ? (spell.nameDE || spell.nameEn) : spell.nameEn;
+    const msg = de ? `${spell.icon} ${name} geht nur direkt nach ${what}!` : `${spell.icon} ${name} only works right after ${what}!`;
+    if (typeof globalThis.showCombatToast === 'function') globalThis.showCombatToast(msg, '#ff8a65');
+    else if (typeof globalThis.showToast === 'function') globalThis.showToast(msg, '#ff8a65');
+}
+
 // Main entry: cast a universal spell by id. Returns true if cast.
 // `opts.chargePower` (0.6 - 1.5) is set when a charged spell is released;
 // without it a charge spell fires at normal strength.
@@ -3303,6 +3528,14 @@ export function castUniversalSpell(spellId, opts) {
         return false;
     }
 
+    // Reaction strikes: refused (nothing spent) until the matching parry /
+    // block / dodge has just happened.
+    if (spell.reaction && !isUniversalReactionReady(spell.reaction)) {
+        Audio_Manager.playSFX('spell_fizzle');
+        _uspReactionToast(spell);
+        return false;
+    }
+
     // Toggle auras: switch on (pays a second of mana up front, then drains).
     if (isToggle) return _uspStartAura(spell);
 
@@ -3375,6 +3608,12 @@ export function castUniversalSpell(spellId, opts) {
             globalThis.showToast(t(noMana));
         }
         return false;
+    }
+
+    // The reaction window is spent by the cast (one follow-up per avoided hit).
+    if (spell.reaction) {
+        _uspReactionUntil[spell.reaction] = 0;
+        clearTimeout(_uspReactionTimer[spell.reaction]);
     }
 
     // Commit point: spend the charge (charge spells) or start the cooldown
