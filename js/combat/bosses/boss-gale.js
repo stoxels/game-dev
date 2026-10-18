@@ -52,7 +52,7 @@ export const EG_GAL_UPDRAFT_FLING = [0, 130, 155, 180]; // px fling (upward-bias
 // Crosswind (global breeze)
 export const EG_GAL_WIND_INTERVAL_MS = 9000;        // how long one gust blows
 export const EG_GAL_WIND_CALM_MS = 4500;            // calm between gusts (direction flips after it)
-export const EG_GAL_WIND_PUSH = [0, 80, 105, 135];  // px/s gust per phase (clearly felt, still walkable against)
+export const EG_GAL_WIND_PUSH = [0, 170, 210, 250]; // px/s gust per phase (walking is 320 px/s: strong, but you can still walk against it)
 export const EG_GAL_WIND_STREAKS = 7;               // streak elements per side
 // Cyclone funnels (perpetual Vault)
 export const EG_GAL_FUNNEL_N = [0, 1, 2, 2];        // alive per phase
@@ -74,7 +74,7 @@ export const EG_GAL_FINALE_TIME_MS = 2200;
 export const EG_GAL_FINALE_GAP_MS = 450;
 export const EG_GAL_FINALE_GAP_DEG = 62;
 export const EG_GAL_FINALE_DMG = 0.16;
-export const EG_GAL_FINALE_WIND_MULT = 1.4;         // gusts stay stronger afterwards
+export const EG_GAL_FINALE_WIND_MULT = 1.15;        // gusts stay a bit stronger afterwards (250 x 1.15 stays under walking speed)
 export const EG_GAL_FINALE_LANCE_EVERY_MS = [9000, 13000];
 // Eye of the Storm (30% gate)
 export const EG_GAL_CONTRACT_RINGS = 4;             // contracting rings in sequence
@@ -100,6 +100,32 @@ export let _egGaleWatcher = null; // per-fight storm state
 function _egGalRand(lo, hi) {
     return Math.round(lo + Math.random() * (hi - lo));
 }
+
+// Picks where a ring's opening sits (degrees clockwise from 12 o'clock).
+// Random, but only among angles whose opening is reachable ON SCREEN from the
+// ring centre: with the player near an edge, an opening pointing off-screen
+// could never be found in time. Falls back to facing the arena centre.
+function _egGalPickGapStart(cx, cy, gapDeg) {
+    const W = window.innerWidth, H = window.innerHeight, pad = 50;
+    const onScreen = (a, r) => {
+        const x = cx + Math.sin(a * Math.PI / 180) * r;
+        const y = cy - Math.cos(a * Math.PI / 180) * r;
+        return x >= pad && x <= W - pad && y >= pad && y <= H - pad;
+    };
+    const open = (start) => {
+        const mid = start + gapDeg / 2;
+        return onScreen(mid, 140) && onScreen(mid, 260)
+            && onScreen(start + 8, 200) && onScreen(start + gapDeg - 8, 200);
+    };
+    for (let i = 0; i < 40; i++) {
+        const start = Math.round(Math.random() * 360);
+        if (open(start)) return start;
+    }
+    // Nothing fits (tiny window / corner): point the opening at the screen centre.
+    const toCentre = Math.atan2(W / 2 - cx, -(H / 2 - cy)) * 180 / Math.PI;
+    return Math.round(((toCentre - gapDeg / 2) % 360 + 360) % 360);
+}
+
 
 // Phase lookup helper - resolves the boss's current phase (default 1).
 export function _egGalPhase(st) {
@@ -481,18 +507,22 @@ export function _egGaleTickRings(st, dtS, c) {
     const rg = st.rings;
     if (!rg) return;
     rg.t += dtS * 1000;
-    const ex = st.eye.x, ey = st.eye.y;
-    // Spawn the next ring on schedule.
+    // Spawn the next ring on schedule. Each ring closes in on WHERE THE PLAYER
+    // STANDS when it appears (the eye flies there too) - a ring centred on the
+    // arena could be ignored from a far corner.
     if (rg.idx < rg.rings.length && rg.t >= rg.rings[rg.idx].at && !rg.live) {
+        const W0 = window.innerWidth, H0 = window.innerHeight;
+        const cx = c ? c.x : W0 / 2, cy = c ? c.y : H0 / 2;
+        st.eye.tx = cx; st.eye.ty = cy;
         const el = _egNkEl(st.run, 'div', 'eg-gal-ring');
-        el.style.left = ex + 'px';
-        el.style.top = ey + 'px';
+        el.style.left = cx + 'px';
+        el.style.top = cy + 'px';
         // The opening: a wedge (clockwise from 12 o'clock) with no band. Each
         // ring puts it somewhere new; the player runs through it.
-        const gapStart = Math.round(Math.random() * 360);
+        const gapStart = _egGalPickGapStart(cx, cy, rg.gapDeg);
         el.style.setProperty('--gap', gapStart + 'deg');
         el.style.setProperty('--gapw', rg.gapDeg + 'deg');
-        rg.live = { el, t: 0, hit: false, gapStart };
+        rg.live = { el, t: 0, hit: false, gapStart, cx, cy };
         rg.idx++;
     }
     // Contract the live ring.
@@ -501,12 +531,11 @@ export function _egGaleTickRings(st, dtS, c) {
         r.t += dtS * 1000;
         const k = Math.min(1, r.t / rg.timeMs);
         const rad = EG_GAL_CONTRACT_START_R + (EG_GAL_CONTRACT_MIN_R - EG_GAL_CONTRACT_START_R) * k;
-        r.el.style.left = ex + 'px';
-        r.el.style.top = ey + 'px';
         r.el.style.width = r.el.style.height = Math.round(rad * 2) + 'px';
         r.el.style.marginLeft = r.el.style.marginTop = (-rad) + 'px';
         if (!r.hit && c) {
             // Hurt only while the BAND passes over you, and only outside the gap.
+            const ex = r.cx, ey = r.cy;
             const d = Math.hypot(c.x - ex, c.y - ey);
             if (Math.abs(d - rad) < EG_GAL_CONTRACT_BAND_PX) {
                 let ang = Math.atan2(c.x - ex, -(c.y - ey)) * 180 / Math.PI;   // clockwise from 12 o'clock
@@ -634,7 +663,8 @@ export function _egGaleTickLances(st, dtS, pr, p) {
             if (_egNkCircleHit(bx, by, 44, pr, 0)) {
                 l.hit = true;
                 const dealt = _egNkHit(EG_GAL_LANCE_DMG[l.p], 'cold', st.level);
-                _egNkAbilityHitToast(dealt, 'The Gale', 'Cyclone Lance');
+                // The damage number on the sprite already shows this hit - no toast.
+                _egNkAbilityHitToast(dealt, 'The Gale', 'Cyclone Lance', true);
                 // Knocked along the blast direction.
                 const dir = l.horizontal ? (l.fromLeft ? 1 : -1) : 0;
                 _egNkFlingAvatar(dir * EG_GAL_LANCE_FLING[l.p], (l.horizontal ? -30 : EG_GAL_LANCE_FLING[l.p]), bx, by);

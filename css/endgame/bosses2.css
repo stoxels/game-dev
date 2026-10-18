@@ -4356,6 +4356,10 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
    eye, wind streaks, chevron lanes, a ring with a visible gap. */
 
 /* The Eye: the boss's vortex body, wandering the arena. */
+/* Gale storm layers are body-level fixed overlays: hide them while the
+   character sheet floats over the paused run. */
+body:has(#screen-endgame-hub.active) [class*="eg-gal-"] { display: none !important; }
+
 .eg-gal-eye {
     position: fixed; left: 0; top: 0; z-index: 9003; pointer-events: none;
     width: 96px; height: 96px;

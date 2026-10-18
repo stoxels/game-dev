@@ -6,7 +6,7 @@
 // modifier it promises and the bases that can actually roll it.
 
 import { LANG, t } from '../translation/translations.js';
-import { _egEssenceCompatibleSlotTypes } from './loot-essences.js';
+import { _egEssenceCompatibleSlotTypes, _egEssenceItemLevelRange } from './loot-essences.js';
 import { _egEssenceFamilyDisplayName } from './loot-essences-names.js';
 
 
@@ -38,6 +38,15 @@ export function _egBuildEssenceDetailHTML(def) {
     } else {
         const noneStr = isDe ? 'Keine kompatiblen Basen gefunden' : 'No compatible bases found';
         html += `<div class="eg-tt-essence-line"><span class="eg-tt-essence-slots" style="color:#e74c3c;">${noneStr}</span></div>`;
+    }
+
+    // Item level the target item must have for the modifier to be able to roll.
+    const range = _egEssenceItemLevelRange(familyId);
+    if (range) {
+        const lvl = range.min === range.max ? `${range.min}+` : `${range.min}+ (${range.min}–${range.max})`;
+        const titleIlvl = isDe ? 'Benötigtes Itemlevel:' : 'Required item level:';
+        html += `<div class="eg-tt-essence-title" style="margin-top:6px;">${titleIlvl}</div>`;
+        html += `<div class="eg-tt-essence-line"><span class="eg-tt-essence-slots">${lvl}</span></div>`;
     }
 
     html += '</div>';

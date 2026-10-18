@@ -240,6 +240,9 @@ function _uspTooltipDamage(def, dmg) {
     if (dmg.count > 1 || dmg.perTarget) {
         html += `<div class="skl-tip-dmg">${totalLabel}: <b>${total}</b> ${de ? 'Schaden' : 'damage'}</div>`;
     }
+    if (dmg.weaponSwing) {
+        html += `<div class="skl-tip-dmg" style="opacity:.8">${de ? 'Enthält einen vollen Schlag deiner Nahkampfwaffe.' : 'Includes a full swing of your melee weapon.'}</div>`;
+    }
     return html;
 }
 

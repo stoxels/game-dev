@@ -337,8 +337,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'single', dmg: [17, 23], manaCost: 49, cooldownSeconds: 10, castTimeSeconds: 1.4,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Mortal Strike', nameDE: 'Tödlicher Stoß',
-        descEn: 'Wind up and bring the blade down in front of you: a devastating blow that crushes whatever is in reach for heavy physical damage.',
-        descDE: 'Hol aus und lass die Klinge vor dir niedergehen: ein verheerender Hieb, der alles in Reichweite mit schwerem physischem Schaden zerschmettert.',
+        descEn: 'Bring the blade down in front of you, instantly: a devastating blow that crushes whatever is in reach for heavy physical damage.',
+        descDE: 'Lass die Klinge sofort vor dir niedergehen: ein verheerender Hieb, der alles in Reichweite mit schwerem physischem Schaden zerschmettert.',
         sfx: 'diagonalStrike',
     },
     {
@@ -1045,7 +1045,7 @@ const USP_MELEE_SPELLS = {
     usp_mortal_strike: { kind: 'cone', reach: 230, angle: 80 },
     usp_execute:       { kind: 'cone', reach: 240, angle: 60 },
     usp_rend:          { kind: 'cone', reach: 210, angle: 70 },
-    usp_exsanguinate:  { kind: 'cone', reach: 220, angle: 70 },
+    usp_exsanguinate:  { kind: 'cone', reach: 220, angle: 70, noWeapon: true },
     usp_cleave:        { kind: 'cone', reach: 250, angle: 110, all: true },
     usp_reap:          { kind: 'cone', reach: 280, angle: 150, all: true },
     usp_whirlwind:     { kind: 'circle', reach: 230, all: true },
@@ -1257,8 +1257,9 @@ UNIVERSAL_SPELL_DEFS.forEach((d) => {
     } else if (USP_MELEE_SPELLS[d.id]) {
         d.castKind = 'melee';
         d.melee = USP_MELEE_SPELLS[d.id];
-        // Quick strikes lose their cast bar; the heavy ones keep theirs.
-        if (['usp_heroic_strike', 'usp_rend', 'usp_cleave'].indexOf(d.id) !== -1) d.castTimeSeconds = 0;
+        // Melee feels bad with a wind-up, so strikes are instant. Only the
+        // genuinely heavy finishers keep a cast bar.
+        if (['usp_execute', 'usp_seismic_slam'].indexOf(d.id) === -1) d.castTimeSeconds = 0;
         if (d.reaction) d.castTimeSeconds = 0; // a reaction is a snap response, never a wind-up
     } else if (USP_GROUND_SPELLS[d.id]) {
         d.castKind = 'ground';
@@ -2791,10 +2792,22 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
     const flatShare = Math.max(USP_FLAT_MIN_SHARE, Math.min(1, ((dmgMin + dmgMax) / 2) / USP_FLAT_FULL_HIT));
 
     let dmg = dmgMin + Math.random() * (dmgMax - dmgMin);
+    // Melee strikes: a full weapon swing (100% of the melee weapon's damage) plus
+    // the spell's own roll on top. Multi-hit strikes split the swing across their
+    // hits so the whole cast stays one swing; DoT ticks carry no swing. The swing
+    // is added after the spell-rank multiplier, so rank only grows the extra roll.
+    let swing = 0;
     if (isPhys) {
         const part = _uspPhysicalWeaponPart(spell, stats, tree);
-        dmg += part.flat * USP_PHYS_WEAPON_EFFECTIVENESS * flatShare;
-        dmg *= 1 + part.incPct / 100;
+        const isSwing = spell.theme !== 'arrow' && hitOpts && hitOpts.isMelee && hitOpts.meleeHits > 0 && !(spell.melee && spell.melee.noWeapon) && !hitOpts.isTick && !hitOpts.isDot;
+        if (isSwing) {
+            const hitsTotal = hitOpts.meleeHits;
+            swing = (part.flat / hitsTotal) * (1 + part.incPct / 100);
+            dmg *= 1 + part.incPct / 100;
+        } else {
+            dmg += part.flat * USP_PHYS_WEAPON_EFFECTIVENESS * flatShare;
+            dmg *= 1 + part.incPct / 100;
+        }
     } else {
         dmg *= _uspSpellLevelRamp();
         dmg += ((stats.spellDamageFlat || 0) + (tree.flat || 0)) * flatShare;
@@ -2825,16 +2838,21 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
     const critMult = _uspRollCritMult();
     const isCrit = critMult > 1;
     dmg *= critMult;
+    swing *= critMult;
 
     try {
-        if (typeof globalThis._egMapPlayerDamageMult === 'function') dmg *= globalThis._egMapPlayerDamageMult();
-        if (typeof globalThis._egQuizDamageBuffMult === 'function') dmg *= globalThis._egQuizDamageBuffMult();
+        let common = 1;
+        if (typeof globalThis._egMapPlayerDamageMult === 'function') common *= globalThis._egMapPlayerDamageMult();
+        if (typeof globalThis._egQuizDamageBuffMult === 'function') common *= globalThis._egQuizDamageBuffMult();
         // Charm orbs applied to this spell's charm: +1% damage each
         // (js/skills/skill-charms.js).
-        dmg *= getCharmSkillDamageMult(spell.id);
+        common *= getCharmSkillDamageMult(spell.id);
+        dmg *= common;
+        swing *= common;
         // Spell rank: rank 10 hits ~6× a rank-1 cast (SPELL_RANK_DAMAGE_MULT).
         dmg *= getSpellRankDamageMultForSkill(spell.id);
     } catch (e) { /* mods unavailable */ }
+    dmg += swing;
 
     let amount = Math.max(1, Math.round(dmg));
     let elements = {};
@@ -2888,10 +2906,31 @@ export function getUniversalSpellDamageEstimate(spellId) {
     if (spell.behavior === 'volley' || spell.behavior === 'starfall' || spell.behavior === 'wild') count = spell.count || 1;
     else if (spell.behavior === 'ticks') count = 1 + (spell.ticks || 0);
     else if (spell.behavior === 'chain') count = spell.chainMax || 1;
+    // Melee strikes also deal a full swing of the equipped melee weapon (see
+    // calcUniversalSpellHit): shown as part of the per-hit range, split across
+    // multi-hit strikes. Rend's swing rides its opening strike only.
+    let swing = 0;
+    const swingHits = (spell.castKind === 'melee' && spell.melee) ? Math.max(1, Math.round(spell.melee.hits || 1)) : 0;
+    if (swingHits && spell.damageKind === 'physical' && !spell.melee.noWeapon && spell.behavior !== 'aura') {
+        try {
+            const stats = globalThis._egComputePlayerStats();
+            const part = _uspPhysicalWeaponPart(spell, stats, getUniversalSpellDamageBonus(spell));
+            swing = (part.flat / swingHits) * (1 + part.incPct / 100);
+        } catch (e) { swing = 0; }
+    }
+    if (swingHits > 1) count = swingHits;
+    const swingOnce = spell.behavior === 'ticks' ? Math.round(swing) : 0;
+    const perHitSwing = spell.behavior === 'ticks' ? 0 : Math.round(swing);
+    const hitMin = perHitMin + perHitSwing;
+    const hitMax = perHitMax + perHitSwing;
     return {
-        perHitMin, perHitMax, count,
-        totalMin: perHitMin * count, totalMax: perHitMax * count,
+        perHitMin: spell.behavior === 'ticks' ? perHitMin + Math.round(swing) : hitMin,
+        perHitMax: spell.behavior === 'ticks' ? perHitMax + Math.round(swing) : hitMax,
+        count,
+        totalMin: hitMin * count + swingOnce,
+        totalMax: hitMax * count + swingOnce,
         perTarget: !!spell.perTarget || !!spell.hitsAll || spell.behavior === 'chain',
+        weaponSwing: swing > 0,
     };
 }
 
@@ -2967,9 +3006,23 @@ function _uspStrike(spell, monsterId, dmgMin, dmgMax, opts) {
     }
 }
 
-// Where a melee spell points: the selected monster, else the nearest living
-// one, else the cursor, else the way the hero is facing. Always returns a
-// point so the effect has a direction even when it is a pure whiff.
+// The monster a melee swing would hit - the orange "melee target" box, not the
+// yellow selection used by shots and spells: the selected monster when it is
+// about as close as the nearest one in weapon reach, otherwise the nearest in
+// reach. Null when nothing stands in reach.
+function _uspMeleeVictimId() {
+    try {
+        const sel = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null;
+        if (typeof globalThis._egMeleeFindVictim !== 'function') return sel ? sel.id : null;
+        const id = globalThis._egMeleeFindVictim(sel ? sel.id : null);
+        return id == null ? null : id;
+    } catch (e) { return null; }
+}
+
+// Where a melee spell points: the melee target (orange box), else the selected
+// monster, else the nearest living one, else the cursor, else the way the hero
+// is facing. Always returns a point so the effect has a direction even when it
+// is a pure whiff.
 function _uspMeleeAimPoint(origin) {
     const centreOf = (id) => {
         const card = document.getElementById(`eg-card-${id}`);
@@ -2978,6 +3031,11 @@ function _uspMeleeAimPoint(origin) {
         if (!r.width && !r.height) return null;
         return globalThis._egGetElementCentre(card);
     };
+    const meleeId = _uspMeleeVictimId();
+    if (meleeId != null) {
+        const c = centreOf(meleeId);
+        if (c) return c;
+    }
     try {
         const sel = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null;
         if (sel && sel.currentHP > 0) {
@@ -3021,15 +3079,11 @@ function _uspApplyMeleeSpell(spell) {
         if (!r.width && !r.height) return false;
         return shapeHitsRect(shape, point, origin, r);
     });
-    // Single-victim strikes: the selected monster when inside, else nearest.
+    // Single-victim strikes: the melee target (orange box) when inside the
+    // strike area, else the nearest monster inside it.
     const pickOne = (list) => {
         if (!list.length) return [];
-        let selId = null;
-        try {
-            const sel = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null;
-            selId = sel ? sel.id : null;
-        } catch (e) { selId = null; }
-        const chosen = list.find((mon) => mon.id === selId);
+        const chosen = list.find((mon) => mon.id === _uspMeleeVictimId());
         if (chosen) return [chosen];
         let best = list[0];
         let bestD = Infinity;
@@ -3060,7 +3114,7 @@ function _uspApplyMeleeSpell(spell) {
             list.forEach((mon, i) => {
                 setTimeout(() => {
                     if (!live()) return;
-                    _uspStrike(spell, mon.id, spell.dmg[0], spell.dmg[1], { isMelee: true, isAoE: !!m.all });
+                    _uspStrike(spell, mon.id, spell.dmg[0], spell.dmg[1], { isMelee: true, isAoE: !!m.all, meleeHits: hits });
                 }, i * 50);
             });
         }, h * hitGap);

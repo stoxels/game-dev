@@ -22,6 +22,13 @@ export const GEAR_GRIP_DATA = {
   "wpn_2h_4",
   "wpn_2h_5",
   "wpn_2h_6",
+  "wpn_axe2h_abyssal_greataxe_78",
+  "wpn_axe2h_bearded_greataxe_19",
+  "wpn_axe2h_berserker_axe_42",
+  "wpn_axe2h_headsman_axe_34",
+  "wpn_axe2h_stormcleaver_70",
+  "wpn_axe2h_warlord_greataxe_56",
+  "wpn_axe2h_woodsplitter_12",
   "wpn_dragonbone_battle_blade_67",
   "wpn_dusk_battle_blade_59",
   "wpn_ember_battle_blade_51",
@@ -103,7 +110,7 @@ export const GEAR_GRIP_DATA = {
    "rotByDir": {
     "down": 5,
     "up": -35,
-    "left": -80,
+    "left": 7,
     "right": 10
    },
    "recScale": null,
@@ -6243,6 +6250,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      }
     ]
@@ -6574,6 +6586,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -6608,6 +6625,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -6644,6 +6666,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -6678,6 +6705,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -6976,6 +7008,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -7343,6 +7380,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -7378,6 +7420,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -7412,6 +7459,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -7640,6 +7692,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -7972,6 +8029,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -8007,6 +8069,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -8041,6 +8108,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -8269,6 +8341,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -8601,6 +8678,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -8635,6 +8717,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -8671,6 +8758,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -8705,6 +8797,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -8948,9 +9045,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "back",
-       "rot": -160,
+       "rot": 7,
        "scale": null,
-       "flipX": false,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8968,6 +9065,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -9314,9 +9416,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "back",
-       "rot": -160,
+       "rot": -4,
        "scale": null,
-       "flipX": false,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -9334,6 +9436,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -9349,7 +9456,7 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "back",
-       "rot": -153,
+       "rot": -4,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -9369,6 +9476,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -9384,7 +9496,7 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "back",
-       "rot": -160,
+       "rot": -4,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -9404,6 +9516,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -9419,7 +9536,7 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "back",
-       "rot": -167,
+       "rot": -4,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -9439,6 +9556,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -9667,6 +9789,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -9999,6 +10126,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -10034,6 +10166,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -10068,6 +10205,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -10296,6 +10438,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -10593,6 +10740,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -10628,6 +10780,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -10662,6 +10819,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -10890,6 +11052,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -11222,6 +11389,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -11257,6 +11429,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -11291,6 +11468,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -11519,6 +11701,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -11851,6 +12038,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -11886,6 +12078,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -11920,6 +12117,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -12148,6 +12350,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -12515,6 +12722,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -12549,6 +12761,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -12585,6 +12802,11 @@ export const GEAR_GRIP_DATA = {
         "on": false,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -12619,6 +12841,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -12882,6 +13109,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -13214,6 +13446,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -13248,6 +13485,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -13284,6 +13526,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -13318,6 +13565,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -13546,6 +13798,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -13915,7 +14172,9 @@ export const GEAR_GRIP_DATA = {
        }
       },
       "poses": {
-       "wpn_1h_2": {},
+       "wpn_1h_2": {
+        "flipX": true
+       },
        "wpn_1h_1": {}
       }
      },
@@ -13952,6 +14211,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -13986,6 +14250,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -14218,6 +14487,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -14587,7 +14861,9 @@ export const GEAR_GRIP_DATA = {
        }
       },
       "poses": {
-       "wpn_1h_2": {},
+       "wpn_1h_2": {
+        "flipX": true
+       },
        "wpn_1h_1": {}
       }
      },
@@ -14624,6 +14900,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -14659,6 +14940,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -14693,6 +14979,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -14960,6 +15251,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -15329,7 +15625,9 @@ export const GEAR_GRIP_DATA = {
        }
       },
       "poses": {
-       "wpn_1h_2": {},
+       "wpn_1h_2": {
+        "flipX": true
+       },
        "wpn_1h_1": {}
       }
      },
@@ -15366,6 +15664,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -15401,6 +15704,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -15435,6 +15743,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -15702,6 +16015,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -16069,6 +16387,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -16103,6 +16426,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -16139,6 +16467,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -16173,6 +16506,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -16440,6 +16778,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -16809,7 +17152,9 @@ export const GEAR_GRIP_DATA = {
        }
       },
       "poses": {
-       "wpn_1h_2": {},
+       "wpn_1h_2": {
+        "flipX": true
+       },
        "wpn_1h_1": {}
       }
      },
@@ -16846,6 +17191,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -16881,6 +17231,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -16915,6 +17270,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -17182,6 +17542,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -17551,7 +17916,9 @@ export const GEAR_GRIP_DATA = {
        }
       },
       "poses": {
-       "wpn_1h_2": {},
+       "wpn_1h_2": {
+        "flipX": true
+       },
        "wpn_1h_1": {}
       }
      },
@@ -17588,6 +17955,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -17623,6 +17995,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -17657,6 +18034,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -17924,6 +18306,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -18293,7 +18680,9 @@ export const GEAR_GRIP_DATA = {
        }
       },
       "poses": {
-       "wpn_1h_2": {},
+       "wpn_1h_2": {
+        "flipX": true
+       },
        "wpn_1h_1": {}
       }
      },
@@ -18330,6 +18719,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -18365,6 +18759,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -18399,6 +18798,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -18666,6 +19070,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -19035,7 +19444,9 @@ export const GEAR_GRIP_DATA = {
        }
       },
       "poses": {
-       "wpn_1h_2": {},
+       "wpn_1h_2": {
+        "flipX": true
+       },
        "wpn_1h_1": {}
       }
      },
@@ -19072,6 +19483,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -19107,6 +19523,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -19141,6 +19562,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -19408,6 +19834,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -19777,7 +20208,9 @@ export const GEAR_GRIP_DATA = {
        }
       },
       "poses": {
-       "wpn_1h_2": {},
+       "wpn_1h_2": {
+        "flipX": true
+       },
        "wpn_1h_1": {}
       }
      },
@@ -19814,6 +20247,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -19849,6 +20287,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -19883,6 +20326,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -20150,6 +20598,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -20517,6 +20970,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -20551,6 +21009,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -20587,6 +21050,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -20621,6 +21089,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -20884,6 +21357,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -21251,6 +21729,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -21285,6 +21768,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -21321,6 +21809,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -21355,6 +21848,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -21618,6 +22116,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -21985,6 +22488,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -22019,6 +22527,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -22055,6 +22568,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -22089,6 +22607,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -22352,6 +22875,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -22719,6 +23247,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -22753,6 +23286,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -22789,6 +23327,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -22823,6 +23366,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -23086,6 +23634,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -23453,6 +24006,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -23487,6 +24045,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -23523,6 +24086,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -23557,6 +24125,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -23820,6 +24393,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -24187,6 +24765,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -24221,6 +24804,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -24257,6 +24845,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -24291,6 +24884,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -24554,6 +25152,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -24921,6 +25524,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -24955,6 +25563,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -24991,6 +25604,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -25025,6 +25643,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -25288,6 +25911,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -25655,6 +26283,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -25689,6 +26322,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -25725,6 +26363,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -25759,6 +26402,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -26022,6 +26670,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -26389,6 +27042,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -26423,6 +27081,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -26459,6 +27122,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -26493,6 +27161,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -26756,6 +27429,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }
@@ -27228,6 +27906,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -27262,6 +27945,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      },
@@ -27298,6 +27986,11 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
+       }
       }
      },
      {
@@ -27332,6 +28025,11 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": true,
         "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {
+        "flipX": true
        }
       }
      }

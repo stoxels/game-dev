@@ -81,6 +81,22 @@ const SUMMON_DEFS = ['rat', 'bat', 'beetle'];
 //-------------------SMALL HELPERS----------------------------------------
 //------------------------------------------------------------------------
 
+// Pause-aware setTimeout: only un-paused time counts, so wind-ups, telegraphs
+// and volleys freeze with the game (a plain timer would fire - and play its
+// sound - straight through the pause menu).
+function _msTimeout(fn, ms) {
+    let left = Math.max(0, ms);
+    let last = performance.now();
+    const step = () => {
+        const now = performance.now();
+        if (!globalThis._gamePaused) left -= now - last;
+        last = now;
+        if (left <= 0) { fn(); return; }
+        setTimeout(step, globalThis._gamePaused ? 100 : Math.min(left, 100));
+    };
+    setTimeout(step, Math.min(left, 100));
+}
+
 function _msName(id) {
     const s = SPELLS[id];
     return LANG === 'de' ? s.de : s.en;
@@ -110,7 +126,7 @@ function _msFx(el, x, y, ms, inner) {
     holder.style.top = `${y}px`;
     holder.innerHTML = inner;
     document.body.appendChild(holder);
-    setTimeout(() => holder.remove(), ms);
+    _msTimeout(() => holder.remove(), ms);
     return holder;
 }
 
@@ -141,10 +157,10 @@ function _msWindup(monster, id, ms, then) {
         tag.className = `ms-spell-name ms-el-${spell.el}`;
         tag.textContent = _msName(id);
         card.appendChild(tag);
-        setTimeout(() => tag.remove(), 1600);
+        _msTimeout(() => tag.remove(), 1600);
     }
     Audio_Manager.playSFX('monster_charge_windup');
-    setTimeout(() => {
+    _msTimeout(() => {
         const c = _msCard(monster);
         if (c) c.classList.remove('ms-casting', `ms-el-${spell.el}`);
         if (_msAlive(monster)) then();
@@ -154,8 +170,10 @@ function _msWindup(monster, id, ms, then) {
 // One damaging hit on the player through the normal mitigation pipeline.
 // Returns HP actually lost. Shows a small "resisted" tag when resistances
 // ate a large share of the hit.
-function _msHit(monster, mult, element, rollAilment) {
-    if (!_msAlive(monster)) return 0;
+// `inFlight`: the hit comes from a projectile already launched - it still
+// lands if its caster died meanwhile (only a finished encounter cancels it).
+function _msHit(monster, mult, element, rollAilment, inFlight) {
+    if (inFlight ? !_egIsActive() : !_msAlive(monster)) return 0;
     const raw = Math.max(1, Math.round(monster.damageValue * mult));
     const dealt = _egPlayerTakeDamage(raw, true, element, monster.level, { attacker: monster, isMonsterSpell: true });
     if (dealt > 0) {
@@ -170,7 +188,7 @@ function _msHit(monster, mult, element, rollAilment) {
             const pct = Math.round((1 - dealt / raw) * 100);
             tag.textContent = LANG === 'de' ? `🛡 Resistiert −${pct}%` : `🛡 Resisted −${pct}%`;
             hud.appendChild(tag);
-            setTimeout(() => tag.remove(), 1300);
+            _msTimeout(() => tag.remove(), 1300);
         }
     }
     return dealt;
@@ -202,7 +220,7 @@ function _castFireBolt(monster) {
         _msProjectile('ms-orb-fire', 'ms-trail-fire', from, to, 620, 'ease-in', () => {
             Audio_Manager.playSFX('monster_projectile_hit');
             _msImpact('fire', _msCentre(_msPlayerEl()) || to);
-            _msHit(monster, SPELLS.fire_bolt.mult, 'fire', true);
+            _msHit(monster, SPELLS.fire_bolt.mult, 'fire', true, true);
         });
     });
 }
@@ -218,7 +236,7 @@ function _castFrostNova(monster) {
         const tele = _msFx('cold', centre.x, centre.y, cfg.novaTelegraphMs + 80,
             `<div class="ms-nova-tele" style="left:${-r}px;top:${-r}px;width:${r * 2}px;height:${r * 2}px;--ms-nova-ms:${cfg.novaTelegraphMs}ms"></div>`);
         Audio_Manager.playSFX('monster_charge_windup');
-        setTimeout(() => {
+        _msTimeout(() => {
             tele.remove();
             _msFx('cold', centre.x, centre.y, 650,
                 `<div class="ms-nova-blast" style="left:${-r}px;top:${-r}px;width:${r * 2}px;height:${r * 2}px"></div>`);
@@ -257,7 +275,7 @@ function _castChainLightning(monster) {
     _msWindup(monster, 'chain_lightning', cfg.windupMs - 150, () => {
         const strikes = 3;
         for (let i = 0; i < strikes; i++) {
-            setTimeout(() => {
+            _msTimeout(() => {
                 if (!_msAlive(monster)) return;
                 const from = _msCentre(_msCard(monster));
                 const to = _msCentre(_msPlayerEl());
@@ -266,7 +284,7 @@ function _castChainLightning(monster) {
                 wrap.innerHTML = _boltSvg(from, to);
                 const svg = wrap.firstChild;
                 document.body.appendChild(svg);
-                setTimeout(() => svg.remove(), 300);
+                _msTimeout(() => svg.remove(), 300);
                 Audio_Manager.playSFX('monster_projectile_hit');
                 _msImpact('lightning', to);
                 _msHit(monster, SPELLS.chain_lightning.mult, 'lightning', i === strikes - 1);
@@ -287,7 +305,7 @@ function _castSoulDrain(monster) {
             const hit = _msCentre(_msPlayerEl()) || to;
             _msFx('shadow', hit.x, hit.y, 1000, '<span class="ms-vortex"></span>');
             _msImpact('shadow', hit);
-            const dealt = _msHit(monster, SPELLS.soul_drain.mult, 'shadow', true);
+            const dealt = _msHit(monster, SPELLS.soul_drain.mult, 'shadow', true, true);
 
             // Mana burn: the player loses a slice of their mana pool.
             let drained = 0;
@@ -367,7 +385,7 @@ function _castSummon(monster) {
         if (pos) _msFx('summon', pos.x, pos.y + 40, 1200, '<span class="ms-portal"></span>');
         monster._summonsCast = (monster._summonsCast || 0) + 1;
         const defId = SUMMON_DEFS[Math.floor(Math.random() * SUMMON_DEFS.length)];
-        setTimeout(() => {
+        _msTimeout(() => {
             if (!_msAlive(monster)) return;
             if ((globalThis._egMonsters || []).length >= EG_MAX_CONCURRENT_MONSTERS) return;
             const before = new Set((globalThis._egMonsters || []).map(m => m.id));
@@ -385,7 +403,7 @@ function _msGroundStrike(monster, el, x, y, r, teleMs, mult, fall, onResolve) {
     const falling = fall ? `<span class="ms-meteor" style="--ms-tele-ms:${teleMs}ms"></span>` : '';
     const tele = _msFx(el, x, y, teleMs + 80,
         `<div class="ms-ground-tele" style="left:${-r}px;top:${-r}px;width:${r * 2}px;height:${r * 2}px;--ms-tele-ms:${teleMs}ms"></div>${falling}`);
-    setTimeout(() => {
+    _msTimeout(() => {
         tele.remove();
         _msFx(el, x, y, 650,
             `<div class="ms-ground-blast" style="left:${-r}px;top:${-r}px;width:${r * 2}px;height:${r * 2}px"></div>`);
@@ -430,7 +448,7 @@ function _castEmberRain(monster) {
         const c = _msCentre(_msPlayerEl());
         if (!c) return;
         for (let i = 0; i < 4; i++) {
-            setTimeout(() => {
+            _msTimeout(() => {
                 if (!_msAlive(monster)) return;
                 const p = i === 0 ? c : _msScatter(c, 150);
                 _msGroundStrike(monster, 'fire', p.x, p.y, 42, 850, SPELLS.ember_rain.mult, true);
@@ -448,7 +466,7 @@ function _castIceLance(monster) {
         _msProjectile('ms-orb-cold', 'ms-trail-cold', from, to, 360, 'linear', () => {
             Audio_Manager.playSFX('monster_projectile_hit');
             _msImpact('cold', _msCentre(_msPlayerEl()) || to);
-            _msHit(monster, SPELLS.ice_lance.mult, 'cold', true);
+            _msHit(monster, SPELLS.ice_lance.mult, 'cold', true, true);
         });
     });
 }
@@ -458,7 +476,7 @@ function _castHailstorm(monster) {
         const c = _msCentre(_msPlayerEl());
         if (!c) return;
         for (let i = 0; i < 5; i++) {
-            setTimeout(() => {
+            _msTimeout(() => {
                 if (!_msAlive(monster)) return;
                 const p = i === 0 ? c : _msScatter(c, 170);
                 _msGroundStrike(monster, 'cold', p.x, p.y, 38, 800, SPELLS.hailstorm.mult, false);
@@ -472,7 +490,7 @@ function _castThunderStrike(monster) {
         // Three strikes, each aimed where the player stands at that moment:
         // keep moving.
         for (let i = 0; i < 3; i++) {
-            setTimeout(() => {
+            _msTimeout(() => {
                 if (!_msAlive(monster)) return;
                 const c = _msCentre(_msPlayerEl());
                 if (!c) return;
@@ -493,7 +511,7 @@ function _castDoomOrb(monster) {
             const hit = _msCentre(_msPlayerEl()) || to;
             _msFx('shadow', hit.x, hit.y, 1000, '<span class="ms-vortex"></span>');
             _msImpact('shadow', hit);
-            _msHit(monster, SPELLS.doom_orb.mult, 'shadow', true);
+            _msHit(monster, SPELLS.doom_orb.mult, 'shadow', true, true);
         });
     });
 }
@@ -501,7 +519,7 @@ function _castDoomOrb(monster) {
 function _castShadowVolley(monster) {
     _msWindup(monster, 'shadow_volley', EG_MONSTER_SPELL_CONFIG.windupMs, () => {
         for (let i = 0; i < 3; i++) {
-            setTimeout(() => {
+            _msTimeout(() => {
                 if (!_msAlive(monster)) return;
                 const from = _msCentre(_msCard(monster));
                 const to = _msCentre(_msPlayerEl());
@@ -511,7 +529,7 @@ function _castShadowVolley(monster) {
                 _msProjectile('ms-orb-shadow', 'ms-trail-shadow', from, aim, 520, 'ease-in', () => {
                     Audio_Manager.playSFX('monster_projectile_hit');
                     _msImpact('shadow', _msCentre(_msPlayerEl()) || aim);
-                    _msHit(monster, SPELLS.shadow_volley.mult, 'shadow', i === 2);
+                    _msHit(monster, SPELLS.shadow_volley.mult, 'shadow', i === 2, true);
                 });
             }, i * 150);
         }
@@ -537,7 +555,7 @@ function _castEnrage(monster) {
             _msParticles('rage', pos.x, pos.y, 10, '', 48);
         }
         Audio_Manager.playSFX('monster_charge_windup');
-        setTimeout(() => {
+        _msTimeout(() => {
             target._enraged = false;
             if (target._preEnrageDamage != null) target.damageValue = target._preEnrageDamage;
             const c = _msCard(target);

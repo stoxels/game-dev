@@ -235,6 +235,13 @@ export function _egBossTick() {
             const card = document.getElementById(`eg-card-${m.id}`);
             const wrapper = card ? card.querySelector('.eg-emoji-wrapper') : null;
             if (wrapper) wrapper.classList.add('eg-boss-enraged');
+            // One-shot red screen pulse (cosmetic, self-removing).
+            try {
+                const flash = document.createElement('div');
+                flash.className = 'eg-rage-flash';
+                document.body.appendChild(flash);
+                setTimeout(() => { try { flash.remove(); } catch (e) {} }, 1400);
+            } catch (e) { /* cosmetic */ }
         }
     });
 

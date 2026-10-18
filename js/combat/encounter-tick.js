@@ -56,6 +56,7 @@ export function _egTickMonster(m) {
             const rageCard = document.getElementById(`eg-card-${m.id}`);
             const rageWrap = rageCard ? rageCard.querySelector('.eg-emoji-wrapper') : null;
             if (rageWrap) rageWrap.classList.add('eg-boss-enraged');
+            _egRageScreenFlash();
         }
     }
 
@@ -165,6 +166,16 @@ export function _egIsPlayerChargePaused() {
     if (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) return true;
     if (typeof _egGetPlayerChargeMultiplier === 'function' && _egGetPlayerChargeMultiplier() === 0) return true;
     return false;
+}
+
+// One-shot red screen pulse when a boss turns enraged (cosmetic, self-removing).
+function _egRageScreenFlash() {
+    try {
+        const el = document.createElement('div');
+        el.className = 'eg-rage-flash';
+        document.body.appendChild(el);
+        setTimeout(() => { try { el.remove(); } catch (e) {} }, 1400);
+    } catch (e) { /* cosmetic */ }
 }
 
 // Advances the player's melee charge bar (Secret-of-Mana-style). The bar

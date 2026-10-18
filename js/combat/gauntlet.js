@@ -26,6 +26,7 @@ import { _egIsActive } from './combat-state.js';
 import { _egCalcPlayerDamage } from './combat-calculations.js';
 import { _egAddGold } from '../loot/loot-gold.js';
 import { _egPlayerTakeDamage } from './encounter-damage.js';
+import { _egApplyPlayerHitFeedback } from './encounter-monster-attack-feedback.js';
 import { _egAilmentsCleanup } from './combat-ailments.js';
 import { _egHazardsCleanup } from './combat-hazards-lifecycle.js';
 import { _egStopPickupSpawner } from './combat-grid-pickups-spawner.js';
@@ -515,6 +516,20 @@ function _modifierTick() {
     if (!_g.modifier || !_g.fighting) return;
     const cfg = EG_GAUNTLET_CONFIG;
     const now = Date.now();
+    // Paused: the pools stand still, deal nothing, and the clocks below do not
+    // advance (their stamps are pushed forward each tick so no time is "owed").
+    if (globalThis._gamePaused) {
+        const gap = now - (_g.modTickAt || now);
+        _g.modTickAt = now;
+        if (gap > 0) {
+            if (_g.lavaMovedAt) _g.lavaMovedAt += gap;
+            if (_g.lavaAt) _g.lavaAt += gap;
+            if (_g.shrineMovedAt) _g.shrineMovedAt += gap;
+            if (_g.shrineAt) _g.shrineAt += gap;
+        }
+        return;
+    }
+    _g.modTickAt = now;
     const pc = _playerCentreLocal();
     if (!pc) return;
     if (_g.modifier === 'lava') {
@@ -542,7 +557,8 @@ function _modifierTick() {
         if (inLava && now - _g.lavaAt >= cfg.lavaTickMs) {
             _g.lavaAt = now;
             const raw = Math.max(1, Math.round((Number(cur.campaignMonsterDamage) || 5) * cfg.lavaDamageMult));
-            _egPlayerTakeDamage(raw, true, 'fire', Number(cur.monsterLevel) || 1, { isEnvironment: true });
+            const dealt = _egPlayerTakeDamage(raw, true, 'fire', Number(cur.monsterLevel) || 1, { isEnvironment: true });
+            if (dealt > 0) _egApplyPlayerHitFeedback(dealt, false, 'fire');
         }
     } else if (_g.modifier === 'shrine') {
         const h = _g.hazards[0];

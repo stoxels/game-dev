@@ -98,6 +98,24 @@ export function _egEssenceCompatibleSlotTypes(familyId) {
     }
     return slots;
 }
+// Lowest item level at which the essence can roll its guaranteed modifier
+// (the family's weakest tier), per compatible slot type. Returns
+// { min, max } across slot types, or null when no slot can roll it.
+export function _egEssenceItemLevelRange(familyId) {
+    let min = Infinity;
+    let max = 0;
+    for (const slotType of _egEssenceCompatibleSlotTypes(familyId)) {
+        let tbl = null;
+        try { tbl = EG_SLOT_MOD_TABLE_MAP[slotType](); } catch (e) { continue; }
+        if (!tbl) continue;
+        const fam = (tbl.prefixes && tbl.prefixes[familyId]) || (tbl.suffixes && tbl.suffixes[familyId]);
+        if (!fam || !fam.tiers || !fam.tiers.length) continue;
+        const lowest = Math.min(...fam.tiers.map(t => t.ilvl || 1));
+        min = Math.min(min, lowest);
+        max = Math.max(max, lowest);
+    }
+    return Number.isFinite(min) ? { min, max } : null;
+}
 export function _egEssenceCanApplyToItem(familyId, item) {
     return _egEssenceIncompatibilityReason(familyId, item) === null;
 }

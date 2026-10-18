@@ -165,9 +165,31 @@ export function _egTickLifeRegen() {
 // While paused, shifts wall-clock encounter deadlines forward on resume so
 // paused encounters do not lose time to real-world timers.
 export let _egPauseStartedAt = 0;
+
+// Flying projectiles and monster-spell effects run on Web Animations, which
+// keep going behind the pause menu (and fire their on-arrival hit + sound).
+// Freeze them on pause, thaw only what we froze on resume.
+const _egFrozenFlightAnims = new Set();
+function _egFreezeFlightFx() {
+    try {
+        document.getAnimations().forEach(a => {
+            const el = a.effect && a.effect.target;
+            if (a.playState === 'running' && el && el.closest && el.closest('.eg-projectile, .ms-fx')) {
+                a.pause();
+                _egFrozenFlightAnims.add(a);
+            }
+        });
+    } catch (e) { /* cosmetic */ }
+}
+function _egThawFlightFx() {
+    _egFrozenFlightAnims.forEach(a => { try { a.play(); } catch (e) { /* already finished */ } });
+    _egFrozenFlightAnims.clear();
+}
+
 export function _egOnPause() {
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     _egPauseStartedAt = Date.now();
+    _egFreezeFlightFx();
     if (typeof _egPauseGridDrops === 'function') {
         try { _egPauseGridDrops(); } catch (e) {}
     }
@@ -175,6 +197,7 @@ export function _egOnPause() {
 
 // Resumes an encounter after shifting monster, status, and shared deadline times.
 export function _egOnResume() {
+    _egThawFlightFx();
     if (!_egPauseStartedAt) return;
     const delta = Date.now() - _egPauseStartedAt;
     _egPauseStartedAt = 0;

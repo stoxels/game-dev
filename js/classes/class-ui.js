@@ -413,6 +413,28 @@ function showClassChangeSelection() {
     Audio_Manager.playSFX('classSelection');
 }
 
+// The class overlay can open on the world-detail / map screens, whose topbar
+// portrait and walking sprite were built before the pick. Re-skin them now so
+// the new class/ascendency art shows without leaving and re-entering.
+function refreshClassSprites() {
+    const g = globalThis;
+    try {
+        if (typeof g.renderMapViewCharacterPortrait === 'function') {
+            g.renderMapViewCharacterPortrait('mv');
+            g.renderMapViewCharacterPortrait('wd');
+        }
+        if (typeof g.renderLSCharacterAvatar === 'function') g.renderLSCharacterAvatar();
+        const img = document.getElementById('wd-sprite-img');
+        if (img) {
+            img.src = (typeof g._getPlayerPuzzleDefaultImage === 'function')
+                ? g._getPlayerPuzzleDefaultImage()
+                : g._getPlayerCharacterImage();
+            if (typeof g._animSetDefaultDownImage === 'function') g._animSetDefaultDownImage(img);
+            if (typeof g._startAvatarIdleAnimation === 'function') g._startAvatarIdleAnimation('wd-sprite-img');
+        }
+    } catch (e) { /* cosmetic only */ }
+}
+
 // Consumes one class-change token and switches the base class.
 // Ascendency + all skill levels are reset, but every world-upgrade the
 // player has already banked is replayed on the new class, in order:
@@ -464,6 +486,7 @@ export function confirmClassChange(cid) {
 
     closeClassOverlay();
     buildClassHUD();
+    refreshClassSprites();
     serveClassChangeReplay();
     updateClassChangeButtons();
 }
@@ -685,6 +708,7 @@ export function confirmClassSelection(cid) {
 
     closeClassOverlay();
     buildClassHUD();
+    refreshClassSprites();
 }
 
 
@@ -1005,6 +1029,7 @@ export function confirmAscendencySelection(aid) {
     trackAchStat('ascendencyChosen');
     closeClassOverlay();
     buildClassHUD();
+    refreshClassSprites();
     serveClassChangeReplay();
 }
 

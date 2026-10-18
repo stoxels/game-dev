@@ -502,10 +502,10 @@ export function _ptxRunExpansion() {
     });
 
     ON_FILL.push((r, c) => {   // Butterfly Effect keystone (336)
-        if (!has('keystone_butterfly_effect') || Math.random() >= 0.10) return;
+        if (!has('keystone_butterfly_effect') || Math.random() >= 0.03) return;
         let n = 0;
         for (const [dr, dc] of ORTHO) {
-            if (n >= 3) break;
+            if (n >= 2) break;
             const nr = r + dr, nc = c + dc;
             if (inGrid(nr, nc) && revealAt(nr, nc)) n++;
         }
