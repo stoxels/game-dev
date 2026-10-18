@@ -210,8 +210,8 @@ export function _egBuildMonsterCardHTML(m) {
         <div class="eg-status-strip" id="eg-status-${m.id}"></div>
 
         <!-- Emoji icon with level badge and hover tooltip -->
-        <div class="eg-emoji-wrapper${m.isBoss ? ' eg-boss-emoji-wrapper' : ''}${(m.enrageStacks || 0) > 0 ? ' eg-boss-enraged' : ''} ${isTarget ? 'eg-compact-targeted' : ''}">
-            ${m.isBoss ? '<span class="eg-boss-crown">👑</span>' : ''}
+        <div class="eg-emoji-wrapper${m.isBoss ? ' eg-boss-emoji-wrapper' : ''}${((m.enrageStacks || 0) > 0 || m.enraged) ? ' eg-boss-enraged' : ''} ${isTarget ? 'eg-compact-targeted' : ''}">
+            ${m.isBoss ? '<span class="eg-boss-crown">👑</span><span class="eg-boss-rage-badge">😡</span>' : ''}
             <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${EG_ART.html('monster', m.artId || m.baseId, m.emoji)}</span>
             <span class="eg-level-bottom-left">${m.level}</span>
             <span class="eg-grace-badge" id="eg-grace-${m.id}" style="display:none"></span>

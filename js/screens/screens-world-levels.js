@@ -1462,7 +1462,8 @@ function _wdBuildTrialNode(wi, pos) {
     else if (isLocked) node.classList.add('locked');
     node.classList.add('convergence');
 
-    const icon = isDone ? `${wi + 1}` : (isLocked ? '🔒' : '🌿');
+    // Cleared trials show a "T" (not the world number, which read like a level).
+    const icon = isDone ? 'T' : (isLocked ? '🔒' : '🌿');
     const stoxelHtml = (typeof _wdBuildStoxelAuraHtml === 'function') ? _wdBuildStoxelAuraHtml(isDone) : '';
     const convHtml = (typeof _wdBuildConvergenceHtml === 'function') ? _wdBuildConvergenceHtml(isDone) : '';
     node.innerHTML = (typeof _wdBuildNodeEffectsHtml === 'function')

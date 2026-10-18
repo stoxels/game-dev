@@ -426,22 +426,48 @@ export function _egGetCompareItem(item) {
     return null;
 }
 
+// "Auto-compare" checkbox in the character sheet's top bar (persisted).
+// When on, hovering gear compares it without holding Alt.
+export function _egAutoCompareOn() {
+    if (typeof globalThis._egAutoCompare === 'boolean') return globalThis._egAutoCompare;
+    try { return localStorage.getItem('stoxels_auto_compare') === '1'; } catch (e) { return false; }
+}
 
-// Shows or hides the compare tooltip based on the current hover target
-// and Alt key state. Only shown while Alt is held AND the hovered item
-// is not itself the equipped one being compared.
+// Every equipped item the hovered piece could replace: both rings, both
+// earrings, and for weapons / shields / two-handers the main hand AND the
+// off-hand. Falls back to the single-slot lookup for everything else.
+export function _egGetCompareItems(item) {
+    if (!item || item.category !== 'equip' || !item.slotType) return [];
+    if (typeof EG_SLOT_ACCEPTS === 'undefined') return [];
+    const hands = (item.slotType === 'weapon' || item.slotType === 'shield');
+    const ids = Object.keys(EG_SLOT_ACCEPTS).filter(id =>
+        EG_SLOT_ACCEPTS[id] === item.slotType
+        || (hands && (id === 'weapon1' || id === 'weapon2')));
+    const out = [];
+    for (const id of ids) {
+        const eq = _egEquipped[id];
+        if (eq && out.indexOf(eq) === -1) out.push(eq);
+    }
+    return out;
+}
+
+
+// Shows or hides the compare tooltip based on the current hover target.
+// Shown while Alt is held or the sheet's Auto-compare box is checked -
+// unless the hovered item IS an equipped one.
 export function _egUpdateCompareTooltip() {
-    const compareItem = (_egAltDown && globalThis._egTooltipItem)
-        ? _egGetCompareItem(globalThis._egTooltipItem)
-        : null;
+    const hovered = globalThis._egTooltipItem;
+    const compareItems = (hovered && (_egAltDown || _egAutoCompareOn()))
+        ? _egGetCompareItems(hovered)
+        : [];
 
     // Don't "compare" an equipped item with itself.
-    if (compareItem === globalThis._egTooltipItem) {
+    if (compareItems.indexOf(hovered) !== -1) {
         _egHideCompareTooltip();
         return;
     }
 
-    if (compareItem) _egShowCompareTooltip(compareItem);
+    if (compareItems.length) _egShowCompareTooltip(compareItems);
     else _egHideCompareTooltip();
 }
 
@@ -476,11 +502,17 @@ export function _egGetCompareTip() {
 }
 
 
-export function _egShowCompareTooltip(item) {
+export function _egShowCompareTooltip(itemOrItems) {
+    const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
     const tip = _egGetCompareTip();
-    tip.innerHTML = `
+    // Several equipped candidates (rings, earrings, main/off-hand) sit side
+    // by side in one box.
+    tip.style.display = items.length > 1 ? 'flex' : 'block';
+    tip.style.gap = '14px';
+    tip.style.maxWidth = items.length > 1 ? '780px' : '380px';
+    tip.innerHTML = items.map(it => `<div style="max-width:360px">
 <div class="eg-compare-label">${t('eg_tt_currently_equipped')}</div>
-${_egBuildTooltipBodyHTML(item)}`;
+${_egBuildTooltipBodyHTML(it)}</div>`).join('');
     tip.style.opacity = '1';
     _egPositionCompareTooltip();
 }

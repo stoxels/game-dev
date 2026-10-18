@@ -880,6 +880,9 @@ export function getSlotSummary(slotNum) {
         questsClaimedCount: (raw.questsClaimed || []).length,
         totalTimePlayedSecs: raw.totalTimePlayedSecs || 0,
         playerLevel: raw.playerLevel || 1,
+        // Campaign trials cleared + atlas completions (for the highest map tier).
+        trialsDoneCount: Array.isArray(raw.trialsDone) ? raw.trialsDone.length : 0,
+        egAtlasCompleted: (raw.egAtlasCompleted && typeof raw.egAtlasCompleted === 'object') ? raw.egAtlasCompleted : {},
 
         lifetimeTilesRevealed: (raw.questStats && raw.questStats.lifetimeTilesRevealed) || 0,
         lifetimeTilesFilled: (raw.questStats && raw.questStats.lifetimeTilesFilled) || 0,

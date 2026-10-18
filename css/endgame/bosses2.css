@@ -9782,8 +9782,13 @@ body.eg-shp-flash::after {
     inset: 0;
     z-index: 8400;
     pointer-events: none;
-    background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.97) 0%, rgba(238, 242, 255, 0.93) 55%, rgba(224, 231, 255, 0.88) 100%);
-    animation: eg-nul-white-kf 5s ease-in-out infinite alternate;
+    /* Muted dusk-lavender instead of near-pure white (flashbang-free), eased in. */
+    background: radial-gradient(circle at 50% 45%, rgba(172, 180, 222, 0.88) 0%, rgba(150, 158, 206, 0.9) 55%, rgba(128, 136, 188, 0.92) 100%);
+    animation: eg-nul-white-in 1.6s ease-out, eg-nul-white-kf 5s ease-in-out infinite alternate;
+}
+@keyframes eg-nul-white-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 @keyframes eg-nul-white-kf {
     from { filter: brightness(0.98); }
@@ -9870,7 +9875,7 @@ body.eg-shp-flash::after {
 .eg-nul-implode {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(199, 210, 254, 0.7) 30%, rgba(67, 56, 202, 0.45) 60%, rgba(30, 27, 75, 0) 100%);
+    background: radial-gradient(circle at 50% 50%, rgba(205, 212, 246, 0.8) 0%, rgba(165, 175, 230, 0.6) 30%, rgba(67, 56, 202, 0.45) 60%, rgba(30, 27, 75, 0) 100%);
     z-index: 8700;
     pointer-events: none;
     animation: eg-nul-implode-kf 1.5s ease-in forwards;

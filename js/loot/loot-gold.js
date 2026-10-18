@@ -31,6 +31,19 @@ function _setGold(value) {
     if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return;
     globalThis.STATE.egGold = Math.max(0, Math.round(value));
     if (typeof save === 'function') save();
+    _refreshTopBarGold();
+}
+
+// Level select / world detail top bars show a gold pill that is otherwise only
+// drawn when the screen is built - keep it live when the balance changes
+// (e.g. buying in the shop while a top bar is on screen).
+function _refreshTopBarGold() {
+    if (typeof document === 'undefined') return;
+    const text = '🪙 ' + _goldNow().toLocaleString();
+    for (const id of ['mv-gold-balance', 'wd-gold-balance']) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+    }
 }
 
 // Kept for callers that only want to persist the current balance.

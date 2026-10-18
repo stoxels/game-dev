@@ -58,6 +58,7 @@ export const EG_NUL_LINE_DPS    = 9;      // %maxHP/s standing on a void line
 export const EG_NUL_LATTICE_R   = 320;    // lattice line length (px)
 export const EG_NUL_LINE_W      = 8;      // void line thickness
 export const EG_NUL_RECONTRACT  = 12;     // s between lattice re-contractions
+const EG_NUL_LATTICE_DRIFT = 45;   // px/s the lattice drifts across the arena
 export const EG_NUL_ERASE_MS    = 8000;   // a hypothesis erasure lasts
 export const EG_NUL_RAY_HIT     = 0.14;   // %maxHP crossing a null ray
 export const EG_NUL_RAYS        = 2;      // orbiting eye-beams
@@ -203,22 +204,52 @@ export function _egMechNulLattice(monster, phase) {
         _egNulLines = []; _egNulRing = [];
     };
 
-    drawLattice(W / 2, H / 2);
+    // The whole lattice drifts slowly across the arena toward a wandering
+    // target point, so standing still on a "safe" gap stops working. Geometry
+    // (collision data) moves with it; the elements move via the independent
+    // `translate` property so their rotate transforms stay untouched.
+    let cenX = W / 2, cenY = H / 2;
+    let tgtX = cenX, tgtY = cenY;
+    let offX = 0, offY = 0;
+    const pickDriftTarget = () => {
+        const W2 = window.innerWidth, H2 = window.innerHeight;
+        tgtX = W2 * (0.3 + Math.random() * 0.4);
+        tgtY = H2 * (0.3 + Math.random() * 0.4);
+    };
+    const driftLattice = (dtS) => {
+        const dist = Math.hypot(tgtX - cenX, tgtY - cenY);
+        if (dist < 8) { pickDriftTarget(); return; }
+        const step = Math.min(dist, EG_NUL_LATTICE_DRIFT * (p >= 3 ? 1.4 : 1) * dtS);
+        const dx = (tgtX - cenX) / dist * step, dy = (tgtY - cenY) / dist * step;
+        cenX += dx; cenY += dy; offX += dx; offY += dy;
+        const tr = Math.round(offX) + 'px ' + Math.round(offY) + 'px';
+        _egNulLines.forEach(l => { l.cx += dx; l.cy += dy; l.el.style.translate = tr; });
+        _egNulRing.forEach(r => {
+            r.x1 += dx; r.y1 += dy; r.x2 += dx; r.y2 += dy;
+            r.el.style.translate = tr;
+        });
+    };
+
+    drawLattice(cenX, cenY);
+    pickDriftTarget();
 
     _egNkLoop(run, (dtS) => {
         if (_egNulFinalActive()) return true;   // the proof whitewashes the lattice
         const pc = _egNulPC();
 
-        // Re-contraction cycle.
+        // Re-contraction cycle: the lattice redraws (new spoke angles, brief
+        // grace window) where it currently is, then keeps drifting.
         contractT += dtS;
         if (contractT >= EG_NUL_RECONTRACT * _EG_NUL_DEBUG_MULT) {
             contractT = 0;
             eraseLattice();
             growing = true;
             graceT = 0;
-            const W2 = window.innerWidth, H2 = window.innerHeight;
-            drawLattice(W2 * (0.3 + Math.random() * 0.4), H2 * (0.3 + Math.random() * 0.4));
+            offX = 0; offY = 0;
+            drawLattice(cenX, cenY);
+            pickDriftTarget();
         }
+        driftLattice(dtS);
         if (growing) {
             graceT += dtS;
             if (graceT >= 1.2) growing = false;
@@ -642,7 +673,11 @@ export function _egNulFinalStart(monster) {
                     _egNulAfter(g, 800, () => { try { shatter.remove(); } catch (e) {} });
                     _egNkToast('eg_mech_nul_expose', '🧿💥 CONTRADICTION EXPOSED - shell ' + g.shatters + '/' + EG_NUL_EXPOSE_GOAL + ' shatters!', '#a7f3d0');
                 } else {
+                    // Not in the ring is a failure with teeth too: otherwise
+                    // everywhere except the tiny red circle is a free spot and
+                    // the whole mechanic could be ignored at no cost.
                     g.fails++;
+                    _egNulTouch(EG_NUL_STRIKE_HIT, level, 'Void Strike');
                     _egNkToast('eg_mech_nul_fail', '🧿 You were not in the ring - the hypothesis holds!', '#f87171');
                 }
                 if (g.statusEl) g.statusEl.textContent = 'SHELLS ' + '●'.repeat(g.shatters) + '○'.repeat(Math.max(0, EG_NUL_EXPOSE_GOAL - g.shatters))

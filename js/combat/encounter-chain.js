@@ -799,6 +799,18 @@ export function _egOnAllBossesDead() {
 
     globalThis.showToast(t('eg_boss_all_slain'), '#4ade80');
 
+    // FIX: the arena puzzle was already solved (grid frozen by checkWin) when
+    // the last boss died, e.g. inside the arena-advance delay. The advance
+    // timer now no-ops, so nothing would unfreeze the board and the loot
+    // explosion would be unpickable. Carry the loot into a fresh puzzle,
+    // exactly like the "boss dies, then puzzle solved" path does.
+    if (_egPuzzleCompleteFired) {
+        setTimeout(() => {
+            if (!_egIsActive() || !_egPuzzleCompleteFired) return;
+            if (document.getElementById('eg-leave-map-overlay')) return;
+            _egStartChainCountdown();
+        }, 800);
+    }
 }
 
 
@@ -1347,7 +1359,7 @@ export function _egUpdateObjectivesHUD() {
         _egMapClearedShown = true;
         _egShowMapClearedBanner();
         Audio_Manager.playSFX('map_complete');
-        globalThis.showToast(t('eg_map_cleared_toast'), '#4ade80');
+        globalThis.showToast(t(_egActiveTrialKind() ? 'eg_trial_cleared_toast' : 'eg_map_cleared_toast'), '#4ade80');
     }
 
     // Render: single pill line (if any segments remain) + optional action button.
@@ -1364,6 +1376,15 @@ export function _egUpdateObjectivesHUD() {
     strip.innerHTML = `${lineHTML}${actionsHTML}`;
 }
 
+// Kind ('convergence' | 'ascension') of the running campaign trial, else null.
+// Campaign trials are not map runs, so their banners must not say "Map".
+function _egActiveTrialKind() {
+    try {
+        const tr = (typeof _egIsTrialRun === 'function') ? globalThis._egIsTrialRun() : null;
+        return tr ? (tr.kind || 'convergence') : null;
+    } catch (e) { return null; }
+}
+
 // Shows a big green "MAP CLEARED" text centered over the puzzle grid for
 // 3 seconds. Purely cosmetic - pointer-events are disabled via CSS.
 export function _egShowMapClearedBanner() {
@@ -1373,7 +1394,9 @@ export function _egShowMapClearedBanner() {
 
     const el = document.createElement('div');
     el.id = 'eg-map-cleared-banner';
-    el.textContent = t('eg_map_cleared');
+    const trialKind = _egActiveTrialKind();
+    el.textContent = t(trialKind === 'ascension' ? 'eg_ascension_cleared'
+        : trialKind ? 'eg_trial_cleared' : 'eg_map_cleared');
     document.body.appendChild(el);
 
     // Center the banner over the puzzle grid (fallback: screen center)

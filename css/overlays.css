@@ -323,6 +323,25 @@
     padding: clamp(16px, 4vw, 32px);
 }
 
+/* Game over: big title, wide last-hits box so names and HP are fully readable */
+#ov-lose #lose-title {
+    font-size: clamp(36px, 8vw, 84px);
+    letter-spacing: clamp(2px, 0.8vw, 8px);
+}
+
+#ov-lose .rs-panel {
+    width: min(920px, 94vw);
+    max-width: none;
+    box-sizing: border-box;
+    font-size: clamp(14px, 1.6vw, 18px);
+    padding: 14px 20px;
+}
+
+#ov-lose .rs-log-row { font-size: clamp(13px, 1.5vw, 17px); }
+#ov-lose .rs-log-t { flex-basis: 64px; }
+#ov-lose .rs-log-dmg { flex-basis: 70px; }
+#ov-lose .rs-log-hp { flex-basis: 110px; }
+
 
 /*
     ------------------------------------------------------------------------

@@ -2206,6 +2206,48 @@
     to   { box-shadow: 0 0 26px rgba(239, 68, 68, 0.85); }
 }
 
+/* Enrage reads at a glance, even while the boss is targeted (gold border):
+   pulsing red ring + red-hot art + an angry badge on the frame. */
+.eg-boss-rage-badge { display: none; }
+.eg-emoji-wrapper.eg-boss-enraged .eg-boss-rage-badge {
+    display: block;
+    position: absolute;
+    top: -17px;
+    left: -6px;
+    font-size: 1.3rem;
+    line-height: 1;
+    z-index: 3;
+    pointer-events: none;
+    filter: drop-shadow(0 0 6px rgba(239, 68, 68, 1));
+    animation: eg-boss-rage-badge-kf 0.5s ease-in-out infinite alternate;
+}
+.eg-emoji-wrapper.eg-boss-enraged::before {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 12px;
+    border: 3px solid rgba(239, 68, 68, 0.95);
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.9), inset 0 0 16px rgba(239, 68, 68, 0.55);
+    pointer-events: none;
+    z-index: 4;
+    animation: eg-boss-rage-ring-kf 0.7s ease-in-out infinite alternate;
+}
+.eg-emoji-wrapper.eg-boss-enraged .eg-monster-emoji-compact {
+    animation: eg-boss-rage-art-kf 0.7s ease-in-out infinite alternate;
+}
+@keyframes eg-boss-rage-ring-kf {
+    from { opacity: 0.55; transform: scale(1); }
+    to   { opacity: 1;    transform: scale(1.04); }
+}
+@keyframes eg-boss-rage-badge-kf {
+    from { transform: scale(0.9) rotate(-8deg); }
+    to   { transform: scale(1.15) rotate(8deg); }
+}
+@keyframes eg-boss-rage-art-kf {
+    from { filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.6)) saturate(1.1); }
+    to   { filter: drop-shadow(0 0 12px rgba(239, 68, 68, 1)) saturate(1.5) brightness(1.08); }
+}
+
 /* Target Border State - HIGH VISIBILITY (matches RPG damage-number punch) */
 .eg-emoji-wrapper.eg-compact-targeted {
     border-color: #ffd700;

@@ -568,6 +568,17 @@ export function _buildSaveSlotTooltipHTML(summary) {
     html += `<br>${t('cg_stat_inference')} <b>${summary.questsClaimedCount}</b>`;
     html += `<br>${t('cg_stat_upgrades')} <b>${upgradesAchieved}</b>`;
     html += `<br>${t('cg_stat_playtime')} <b>${_fmtPlaytime(summary.totalTimePlayedSecs)}</b>`;
+    html += `<br>${t('cg_stat_trials')} <b>${summary.trialsDoneCount || 0}</b>`;
+    // Highest atlas tier with a completed map, read from this slot's own save.
+    let highestTier = 0;
+    const lookup = globalThis.egAtlasNodeById;
+    if (typeof lookup === 'function' && summary.egAtlasCompleted) {
+        for (const id in summary.egAtlasCompleted) {
+            const node = summary.egAtlasCompleted[id] ? lookup(id) : null;
+            if (node && node.tier > highestTier) highestTier = node.tier;
+        }
+    }
+    html += `<br>${t('cg_stat_max_map_tier')} <b>${highestTier}</b>`;
     html += `<br><br><span style="opacity:.7">${t('cg_completion')}</span>`;
     html += `<br>&nbsp;&nbsp;${t('cg_comp_levels')} <b>${pctLevels}</b>`;
     html += `<br>&nbsp;&nbsp;${t('cg_comp_bonus')} <b>${pctBonus}</b>`;

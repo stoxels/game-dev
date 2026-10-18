@@ -288,6 +288,10 @@ export function _egBossCleanup(monsterId) {
     if (typeof _egClearAllFrozenCells === 'function') _egClearAllFrozenCells();
     if (typeof _egRemoveVeil === 'function') _egRemoveVeil();
     if (typeof globalThis._egRemoveBlackout === 'function') globalThis._egRemoveBlackout();
+    // Shadow-veiled row/column clues ('?') are timed puzzle effects with their
+    // own expiry; if the boss dies first they would stay hidden into the loot
+    // phase. Boss death ends them.
+    if (typeof globalThis._egClearAllPuzzleEffects === 'function') globalThis._egClearAllPuzzleEffects();
     if (typeof _egRemoveClueSwap === 'function') _egRemoveClueSwap();
     if (typeof _egRemoveGridInvert === 'function') _egRemoveGridInvert();
     if (typeof globalThis._egVoidSurgeTeardown === 'function') globalThis._egVoidSurgeTeardown();

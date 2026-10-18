@@ -20,6 +20,15 @@ import { STATE } from '../state.js';
 //-------------------HTML ASSEMBLY: FULL SCREEN---------------------------
 //------------------------------------------------------------------------
 
+// Initial state of the Auto-compare checkbox (also seeds the live flag the
+// hover tooltip reads).
+function _egAutoCompareChecked() {
+    let on = false;
+    try { on = localStorage.getItem('stoxels_auto_compare') === '1'; } catch (e) { on = false; }
+    globalThis._egAutoCompare = on;
+    return on;
+}
+
 // Builds the top navigation bar with back button and hub title.
 export function _egBuildTopbarHTML() {
     return `
@@ -35,6 +44,13 @@ export function _egBuildTopbarHTML() {
     <button class="eg-level-btn" id="eg-btn-export-build"
          title="Saves your gear, passive tree, spells and stats to a small file (for balance testing)"
          onclick="_egExportBuildSnapshot()">📤 Export build</button>
+    <label class="eg-level-btn eg-autocmp-toggle" id="eg-autocmp-toggle"
+         title="${t('eg_auto_compare_tip')}"
+         style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
+        <input type="checkbox" id="eg-autocmp-cb" ${_egAutoCompareChecked() ? 'checked' : ''}
+         onchange="globalThis._egAutoCompare=this.checked;try{localStorage.setItem('stoxels_auto_compare',this.checked?'1':'0')}catch(e){}">
+        ⚖ ${t('eg_auto_compare')}
+    </label>
     <button class="eg-info-btn" id="eg-hub-info-btn" aria-label="Info"
          onmouseenter="_egShowHubInfoTooltip(event)"
          onmousemove="moveGameTooltip(event)"

@@ -2294,12 +2294,15 @@ export function _egNkBossToastColor(bossName) {
 // eg_ability_hit / eg_ability_absorbed templates ({ability} / {n}); falls
 // back to the English literal when t() is unavailable. The absorbed flag is
 // consumed here so it can never leak into a later toast.
-export function _egNkAbilityHitToast(dealt, bossName, abilityName) {
+// quiet = skip the on-screen toast (for repeating contact hits that would
+// spam it); the dev fight log and the absorbed-flag reset still happen.
+export function _egNkAbilityHitToast(dealt, bossName, abilityName, quiet) {
     // Dev fight log: names the hit that _egPlayerTakeDamage just recorded.
     if (typeof globalThis.__fightLogAbility === 'function') globalThis.__fightLogAbility(dealt, bossName, abilityName);
     const ability = (bossName ? bossName + '’s ' : '') + abilityName;
     const absorbed = _egNkLastHitAbsorbed;
     _egNkLastHitAbsorbed = false;
+    if (quiet) return;
     if (dealt > 0) {
         let msg = '💥 ' + ability + ' hits you for ' + dealt + ' damage!';
         try {

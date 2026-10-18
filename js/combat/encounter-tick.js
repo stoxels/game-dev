@@ -52,6 +52,10 @@ export function _egTickMonster(m) {
                 m.bossBaseDamage = Math.round(m.bossBaseDamage * (1 + enragePct / 100));
             }
             globalThis.showCombatToast(`😡 ${t('eg_mm_toast_enrage') || 'The Boss is enraged!'}`);
+            // Card visual (a re-render picks it up from m.enraged as well).
+            const rageCard = document.getElementById(`eg-card-${m.id}`);
+            const rageWrap = rageCard ? rageCard.querySelector('.eg-emoji-wrapper') : null;
+            if (rageWrap) rageWrap.classList.add('eg-boss-enraged');
         }
     }
 

@@ -50,8 +50,9 @@ export const EG_GAL_UPDRAFT_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the 
 export const EG_GAL_UPDRAFT_CD_MS = 1100;           // per-eye touch cooldown
 export const EG_GAL_UPDRAFT_FLING = [0, 130, 155, 180]; // px fling (upward-biased)
 // Crosswind (global breeze)
-export const EG_GAL_WIND_INTERVAL_MS = 7000;        // direction swap cadence
-export const EG_GAL_WIND_PUSH = [0, 22, 30, 40];    // px/s breeze per phase
+export const EG_GAL_WIND_INTERVAL_MS = 9000;        // how long one gust blows
+export const EG_GAL_WIND_CALM_MS = 4500;            // calm between gusts (direction flips after it)
+export const EG_GAL_WIND_PUSH = [0, 80, 105, 135];  // px/s gust per phase (clearly felt, still walkable against)
 export const EG_GAL_WIND_STREAKS = 7;               // streak elements per side
 // Cyclone funnels (perpetual Vault)
 export const EG_GAL_FUNNEL_N = [0, 1, 2, 2];        // alive per phase
@@ -67,6 +68,14 @@ export const EG_GAL_LADDER_RISE_MS = 1250;          // climb time per twister
 export const EG_GAL_LADDER_W = 190;                 // lane width
 export const EG_GAL_LADDER_DMG = 0.13;              // %maxHP inside a twister
 export const EG_GAL_LADDER_GAP_MS = 350;            // stagger between twisters
+// Perfect Storm finale (10% gate): faster, tighter rings, then a 5-lane volley
+export const EG_GAL_FINALE_RINGS = 5;
+export const EG_GAL_FINALE_TIME_MS = 2200;
+export const EG_GAL_FINALE_GAP_MS = 450;
+export const EG_GAL_FINALE_GAP_DEG = 62;
+export const EG_GAL_FINALE_DMG = 0.16;
+export const EG_GAL_FINALE_WIND_MULT = 1.4;         // gusts stay stronger afterwards
+export const EG_GAL_FINALE_LANCE_EVERY_MS = [9000, 13000];
 // Eye of the Storm (30% gate)
 export const EG_GAL_CONTRACT_RINGS = 4;             // contracting rings in sequence
 export const EG_GAL_CONTRACT_START_R = 520;         // px starting radius
@@ -77,6 +86,8 @@ export const EG_GAL_CONTRACT_GAP_DEG = 78;          // width of the safe opening
 export const EG_GAL_CONTRACT_BAND_PX = 20;          // half-thickness of the damaging band
 export const EG_GAL_CONTRACT_DMG = 0.13;            // %maxHP caught in a ring
 // Cyclone Lance (charge attack)
+export const EG_GAL_LANCE_EVERY_MS = [13000, 20000]; // volley cadence (random in range)
+export const EG_GAL_LANCE_LINES = [2, 5];           // lanes per volley (random in range)
 export const EG_GAL_LANCE_WARN_MS = 1500;           // lane telegraph
 export const EG_GAL_LANCE_FLIGHT_MS = 520;          // bolt travel
 export const EG_GAL_LANCE_DMG = [0, 0.12, 0.14, 0.17]; // %maxHP by phase
@@ -84,6 +95,11 @@ export const EG_GAL_LANCE_FLING = [0, 170, 200, 230];  // px fling when hit
 
 
 export let _egGaleWatcher = null; // per-fight storm state
+
+// Uniform random integer in [lo, hi].
+function _egGalRand(lo, hi) {
+    return Math.round(lo + Math.random() * (hi - lo));
+}
 
 // Phase lookup helper - resolves the boss's current phase (default 1).
 export function _egGalPhase(st) {
@@ -123,8 +139,9 @@ export function _egGaleArenaInit(monster) {
         funnels: [], funnelAcc: 0,
         ladder: null, ladderLanes: [],
         rings: null,
-        lances: [], lanceAcc: 0,
-        gate60Done: false, gate30Done: false,
+        lances: [], lanceAcc: 0, lanceNextMs: _egGalRand(EG_GAL_LANCE_EVERY_MS[0], EG_GAL_LANCE_EVERY_MS[1]),
+        windAcc: 0, lastWindDir: 0, finale: false,
+        gate60Done: false, gate30Done: false, gate10Done: false,
         everLive: false, bornAt: performance.now(),
     };
     _egGaleWatcher = st;
@@ -162,20 +179,25 @@ export function _egGaleArenaInit(monster) {
         const hpPct = live.maxHP > 0 ? live.currentHP / live.maxHP : 1;
         if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _egGaleLadder(st, now); }
         if (!st.gate30Done && hpPct <= 0.30) { st.gate30Done = true; _egGaleContract(st, now); }
+        // Finale waits for an earlier set-piece to finish (a big HP dive can cross several gates).
+        if (!st.gate10Done && hpPct <= 0.10 && st.gate30Done && !st.rings && !st.ladder) {
+            st.gate10Done = true;
+            _egGaleContract(st, now, true);
+        }
 
         // ── The Eye: wander, Updraft on touch ──
         const e = st.eye;
         e.repickAt -= dtS * 1000;
         const edx = e.tx - e.x, edy = e.ty - e.y;
         const ed = Math.hypot(edx, edy) || 1;
-        const estep = EG_GAL_EYE_SPEED[p] * dtS;
-        if (ed <= estep || e.repickAt <= 0) {
+        const estep = (st.rings ? 260 : EG_GAL_EYE_SPEED[p]) * dtS;   // planted eye rushes to centre so rings read as centred
+        if (!st.rings && (ed <= estep || e.repickAt <= 0)) {
             e.tx = 150 + Math.random() * Math.max(60, W - 300);
             e.ty = 120 + Math.random() * Math.max(60, H - 360);
             e.repickAt = EG_GAL_EYE_REPICK_MS;
-        } else {
-            e.x += (edx / ed) * estep;
-            e.y += (edy / ed) * estep;
+        } else if (ed > 1) {
+            e.x += (edx / ed) * Math.min(estep, ed);
+            e.y += (edy / ed) * Math.min(estep, ed);
         }
         e.el.style.transform = 'translate(' + Math.round(e.x - EG_GAL_EYE_R) + 'px,' + Math.round(e.y - EG_GAL_EYE_R) + 'px)';
         if (c && pr && now >= e.cdUntil && _egNkCircleHit(e.x, e.y, EG_GAL_EYE_R * 0.85, pr, 0)) {
@@ -194,13 +216,26 @@ export function _egGaleArenaInit(monster) {
 
         // ── Crosswind: direction swap + push + streak visuals ──
         if (now >= st.windUntil) {
-            st.windDir = st.windDir === 0 ? (Math.random() < 0.5 ? -1 : 1) : -st.windDir;
-            st.windUntil = now + EG_GAL_WIND_INTERVAL_MS;
-            _egGaleShowWindBanner(st, st.windDir);
+            if (st.windDir !== 0) {
+                // Gust over: a calm spell before the wind comes back the other way.
+                st.lastWindDir = st.windDir;
+                st.windDir = 0;
+                st.windUntil = now + EG_GAL_WIND_CALM_MS;
+            } else {
+                st.windDir = st.lastWindDir === 0 ? (Math.random() < 0.5 ? -1 : 1) : -st.lastWindDir;
+                st.windUntil = now + EG_GAL_WIND_INTERVAL_MS;
+                _egGaleShowWindBanner(st, st.windDir);
+            }
         }
         if (c && st.windDir !== 0 && !st.ladder && !st.rings) {
-            // Gentle constant push (nudge is frame-rate safe via dtS).
-            _egNkNudgeAvatar(st.windDir * EG_GAL_WIND_PUSH[p] * dtS, 0);
+            // Whole pixels only: the avatar position is read back as an integer,
+            // so per-frame sub-pixel pushes (e.g. 0.3px at 60fps) used to vanish.
+            st.windAcc += st.windDir * EG_GAL_WIND_PUSH[p] * (st.finale ? EG_GAL_FINALE_WIND_MULT : 1) * dtS;
+            const whole = Math.trunc(st.windAcc);
+            if (whole !== 0) {
+                st.windAcc -= whole;
+                _egNkNudgeAvatar(whole, 0);
+            }
         }
         _egGaleTickStreaks(st, dtS);
 
@@ -220,9 +255,11 @@ export function _egGaleArenaInit(monster) {
 
         // ── Cyclone Lance volleys (ambient pressure between gates) ──
         st.lanceAcc += dtS * 1000;
-        if (st.lanceAcc >= 9000 && st.lances.length < 1 && !st.ladder && !st.rings) {
+        if (st.lanceAcc >= st.lanceNextMs && st.lances.length === 0 && !st.ladder && !st.rings) {
             st.lanceAcc = 0;
-            _egGaleLance(st, p);
+            const every = st.finale ? EG_GAL_FINALE_LANCE_EVERY_MS : EG_GAL_LANCE_EVERY_MS;
+            st.lanceNextMs = _egGalRand(every[0], every[1]);
+            _egGaleLanceVolley(st, p);
         }
         _egGaleTickLances(st, dtS, pr, p);
 
@@ -320,7 +357,9 @@ export function _egGaleTickFunnels(st, dtS, now, c, pr, p) {
             if (now >= (f.cdUntil || 0)) {
                 f.cdUntil = now + EG_GAL_FUNNEL_CD_MS;
                 const dealt = _egNkHit(EG_GAL_FUNNEL_DMG[p] / 100 * (EG_GAL_FUNNEL_CD_MS / 1000), 'cold', st.level);
-                _egNkAbilityHitToast(dealt, 'The Gale', 'Cyclone');
+                // Contact hits repeat every 0.7s while inside the funnel - the
+                // hit flash and HP bar already show them, so no toast spam.
+                _egNkAbilityHitToast(dealt, 'The Gale', 'Cyclone', true);
             }
         }
         // Funnel life: roams 9s, then dissolves (respawn handled by cadence).
@@ -412,18 +451,27 @@ export function _egGaleTickLadder(st, dtS, pr) {
 
 // ── 30% gate: Eye of the Storm ───────────────────────────────────────────
 // The eye plants at center; 4 vortex rings contract inward in sequence.
-export function _egGaleContract(st, now) {
+export function _egGaleContract(st, now, finale) {
     if (st.rings) return;
     const W = window.innerWidth, H = window.innerHeight;
     const eyeEl = st.eye.el;
     eyeEl.classList.add('planted');
     st.eye.tx = W / 2; st.eye.ty = H / 2; // eye parks at center
+    const nRings = finale ? EG_GAL_FINALE_RINGS : EG_GAL_CONTRACT_RINGS;
+    const timeMs = finale ? EG_GAL_FINALE_TIME_MS : EG_GAL_CONTRACT_TIME_MS;
+    const gapMs = finale ? EG_GAL_FINALE_GAP_MS : EG_GAL_CONTRACT_GAP_MS;
     const rings = [];
-    for (let i = 0; i < EG_GAL_CONTRACT_RINGS; i++) {
-        rings.push({ at: 600 + i * (EG_GAL_CONTRACT_TIME_MS + EG_GAL_CONTRACT_GAP_MS) });
+    for (let i = 0; i < nRings; i++) {
+        // First ring waits ~1.6s so the eye can reach the centre and the toast reads.
+        rings.push({ at: 1600 + i * (timeMs + gapMs) });
     }
-    st.rings = { rings, idx: 0, t: 0, live: null };
-    _egNkToast('eg_gale_contract', '🌀 EYE OF THE STORM! Run through the GAP in each ring!');
+    st.rings = {
+        rings, idx: 0, t: 0, live: null, finale: !!finale, timeMs,
+        gapDeg: finale ? EG_GAL_FINALE_GAP_DEG : EG_GAL_CONTRACT_GAP_DEG,
+        dmg: finale ? EG_GAL_FINALE_DMG : EG_GAL_CONTRACT_DMG,
+    };
+    if (finale) _egNkToast('eg_gale_finale', '🌪️💥 PERFECT STORM! Faster rings - find every GAP, then dodge the lances!');
+    else _egNkToast('eg_gale_contract', '🌀 EYE OF THE STORM! Run through the GAP in each ring!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e) {}
 }
 
@@ -443,7 +491,7 @@ export function _egGaleTickRings(st, dtS, c) {
         // ring puts it somewhere new; the player runs through it.
         const gapStart = Math.round(Math.random() * 360);
         el.style.setProperty('--gap', gapStart + 'deg');
-        el.style.setProperty('--gapw', EG_GAL_CONTRACT_GAP_DEG + 'deg');
+        el.style.setProperty('--gapw', rg.gapDeg + 'deg');
         rg.live = { el, t: 0, hit: false, gapStart };
         rg.idx++;
     }
@@ -451,8 +499,10 @@ export function _egGaleTickRings(st, dtS, c) {
     if (rg.live) {
         const r = rg.live;
         r.t += dtS * 1000;
-        const k = Math.min(1, r.t / EG_GAL_CONTRACT_TIME_MS);
+        const k = Math.min(1, r.t / rg.timeMs);
         const rad = EG_GAL_CONTRACT_START_R + (EG_GAL_CONTRACT_MIN_R - EG_GAL_CONTRACT_START_R) * k;
+        r.el.style.left = ex + 'px';
+        r.el.style.top = ey + 'px';
         r.el.style.width = r.el.style.height = Math.round(rad * 2) + 'px';
         r.el.style.marginLeft = r.el.style.marginTop = (-rad) + 'px';
         if (!r.hit && c) {
@@ -462,10 +512,10 @@ export function _egGaleTickRings(st, dtS, c) {
                 let ang = Math.atan2(c.x - ex, -(c.y - ey)) * 180 / Math.PI;   // clockwise from 12 o'clock
                 ang = ((ang % 360) + 360) % 360;
                 const into = (((ang - r.gapStart) % 360) + 360) % 360;
-                const inGap = into >= 6 && into <= EG_GAL_CONTRACT_GAP_DEG - 6;
+                const inGap = into >= 6 && into <= rg.gapDeg - 6;
                 if (!inGap) {
                     r.hit = true;
-                    const dealt = _egNkHit(EG_GAL_CONTRACT_DMG, 'cold', st.level);
+                    const dealt = _egNkHit(rg.dmg, 'cold', st.level);
                     _egNkAbilityHitToast(dealt, 'The Gale', 'Vortex Ring');
                 }
             }
@@ -478,7 +528,13 @@ export function _egGaleTickRings(st, dtS, c) {
     // Done: release the eye + clear the gate.
     if (rg.idx >= rg.rings.length && !rg.live) {
         st.eye.el.classList.remove('planted');
+        const wasFinale = rg.finale;
         st.rings = null;
+        if (wasFinale) {
+            // Finale closer: a full 5-lane volley; gusts and lances stay fiercer to the end.
+            st.finale = true;
+            _egGaleLanceVolley(st, 3, 5);
+        }
     }
 }
 
@@ -491,16 +547,45 @@ export function _egGaleCycloneLance(monster) {
     const st = _egGaleWatcher;
     if (!st || _egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
-    _egGaleLance(st, p);
+    _egGaleLanceVolley(st, p);
 }
 
 
-// Spawns one lance: horizontal lane at the player's live row.
-export function _egGaleLance(st, p) {
-    if (st.lances.length >= 3) return;
+// A volley of 2-5 lanes (n overrides): the first is aimed at the player's
+// live row/column, the rest land on random rows/columns, spaced so every
+// volley leaves safe ground between its lanes.
+export function _egGaleLanceVolley(st, p, n) {
+    if (st.lances.length >= 6) return;
     const W = window.innerWidth, H = window.innerHeight;
-    const c = _egNkPlayerCenter() || { x: W / 2, y: H / 2 };
-    const horizontal = Math.random() < 0.6;
+    const count = n || _egGalRand(EG_GAL_LANCE_LINES[0], EG_GAL_LANCE_LINES[1]);
+    const used = { h: [], v: [] };
+    const spacing = 170;
+    const pc = _egNkPlayerCenter() || { x: W / 2, y: H / 2 };
+    for (let i = 0; i < count; i++) {
+        let horizontal = Math.random() < 0.55;
+        let at;
+        for (let tries = 0; tries < 12; tries++) {
+            if (i === 0) {
+                at = { x: pc.x, y: pc.y };
+            } else {
+                at = { x: 60 + Math.random() * Math.max(60, W - 120), y: 60 + Math.random() * Math.max(60, H - 120) };
+            }
+            const list = horizontal ? used.h : used.v;
+            const coord = horizontal ? at.y : at.x;
+            if (i === 0 || !list.some(u => Math.abs(u - coord) < spacing)) break;
+            horizontal = !horizontal;   // crowded - try the other orientation
+        }
+        (horizontal ? used.h : used.v).push(horizontal ? at.y : at.x);
+        _egGaleLance(st, p, at, horizontal);
+    }
+}
+
+
+// Spawns one lance lane through `aim` (default: the player's live position).
+export function _egGaleLance(st, p, aim, horizontalOverride) {
+    const W = window.innerWidth, H = window.innerHeight;
+    const c = aim || _egNkPlayerCenter() || { x: W / 2, y: H / 2 };
+    const horizontal = (typeof horizontalOverride === 'boolean') ? horizontalOverride : Math.random() < 0.6;
     const el = _egNkEl(st.run, 'div', 'eg-gal-lance' + (horizontal ? ' horiz' : ' vert'));
     const fromLeft = Math.random() < 0.5;
     if (horizontal) {

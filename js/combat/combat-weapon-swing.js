@@ -12,7 +12,7 @@ import {
     _egMeleeRaiseAvatar,
 } from './encounter-melee-delivery.js';
 import { _egMeleeTierForCharge } from './encounter-melee-arts.js';
-import { EG_WEAPON_SWING_COOLDOWN_MS, EG_WEAPON_SWING_DURATION_MS, _egFacingFromVector, _egGetAttackFacing, _egGetEquippedWeaponInfo, _egMeleeAimFacing, _egMeleeFindVictim } from './combat-weapon-swing-config.js';
+import { EG_WEAPON_SWING_COOLDOWN_MS, EG_WEAPON_SWING_DURATION_MS, _egFacingFromVector, _egGetAttackFacing, _egGetEquippedWeaponInfo, _egGetStrikeWeaponFamily, _egMeleeAimFacing, _egMeleeFindVictim } from './combat-weapon-swing-config.js';
 import { _egIsActive } from './combat-state.js';
 
 //  endgame-weapon-swing.js
@@ -206,7 +206,7 @@ function _egMeleeDeliverArtStrike(targetId, tier, chargePct) {
                     face = _egFacingFromVector(b.x - a.x, b.y - a.y);
                 }
             } catch (e) {}
-            const { family } = _egGetEquippedWeaponInfo();
+            const family = _egGetStrikeWeaponFamily(true);
             _egShowWeaponSwing(family, face);
             _egWeaponSwingSound(family);
             // The impact (damage + follow-through arts) lands with the
@@ -327,7 +327,7 @@ export function _egDoWeaponAttack() {
         return;
     }
 
-    const { family } = _egGetEquippedWeaponInfo();
+    const family = _egGetStrikeWeaponFamily(hasTarget);
     const facing = _egMeleeAimFacing(strikeId || selectedId);
     _egShowWeaponSwing(family, facing);
     _egWeaponSwingHop(facing);

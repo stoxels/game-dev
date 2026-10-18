@@ -235,6 +235,12 @@ import { _egAddGold } from '../loot/loot-gold.js';
             background: rgba(20,20,40,0.78); border: 1px solid #5555aa; border-radius: 8px;
             color: #dde; font-size: 13px; line-height: 1.45; }
         .rs-panel.rs-lose { border-color: #aa5566; }
+        .rs-panel.rs-side { flex: 0 1 400px; margin: 0 0 0 16px; max-height: 80vh; overflow-y: auto;
+            box-sizing: border-box; align-self: center; }
+        @media (max-width: 1150px) {
+            .eg-leave-map-transition.eg-has-side { flex-direction: column; overflow-y: auto; justify-content: flex-start; gap: 12px; padding: 12px 0; }
+            .rs-panel.rs-side { margin: 0; flex: none; width: 90%; max-width: 640px; max-height: none; }
+        }
         .rs-title { font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px; }
         .rs-row { margin: 2px 0; }
         .rs-hist { display: flex; align-items: flex-end; gap: 3px; height: 54px; margin: 6px 0 2px; }
@@ -261,6 +267,7 @@ import { _egAddGold } from '../loot/loot-gold.js';
         .rs-log-last { color: #ff8da0; font-weight: 700; }
         .rs-q { margin-top: 10px; padding-top: 8px; border-top: 1px dashed #5555aa; }
         .rs-q-title { font-weight: 700; margin-bottom: 4px; }
+        .rs-q-hint { margin-bottom: 4px; color: #ffd76a; font-weight: 700; }
         .rs-choices { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
         .rs-choice { min-width: 56px; padding: 5px 12px; cursor: pointer; border-radius: 6px;
             border: 1px solid #7777cc; background: #23233a; color: #fff; font: inherit; }
@@ -395,7 +402,10 @@ import { _egAddGold } from '../loot/loot-gold.js';
     function wireQuestion(panel, d, q, reward) {
         const box = document.createElement('div');
         box.className = 'rs-q';
+        const hint = (reward && !d.rewarded)
+            ? `<div class="rs-q-hint">${esc(tr('rs_q_hint', { n: REWARD_GOLD }))}</div>` : '';
         box.innerHTML = `<div class="rs-q-title">${esc(tr('rs_q_title'))}</div>
+            ${hint}
             <div class="rs-q-text">${esc(q.text)}</div>
             <div class="rs-choices"></div>
             <div class="rs-result" style="display:none"></div>
@@ -446,7 +456,10 @@ import { _egAddGold } from '../loot/loot-gold.js';
         else if (kind === 'win') anchor = document.getElementById('item-reward-zone');
         else anchor = document.querySelector('#ov-lose .ov-btns');
         if (!anchor || !anchor.parentNode) return;
-        const old = anchor.parentNode.querySelector('.rs-panel');
+        // Map summaries show the analytics beside the loot panel (the overlay
+        // is a flex row), not stacked above the loot.
+        const oldHost = isMap ? host : anchor.parentNode;
+        const old = oldHost.querySelector('.rs-panel');
         if (old) old.remove();
 
         const d = peek();
@@ -470,7 +483,13 @@ import { _egAddGold } from '../loot/loot-gold.js';
             }
             wireQuestion(panel, d, q, reward);
         }
-        anchor.parentNode.insertBefore(panel, anchor);
+        if (isMap) {
+            panel.classList.add('rs-side');
+            host.classList.add('eg-has-side');
+            host.appendChild(panel);
+        } else {
+            anchor.parentNode.insertBefore(panel, anchor);
+        }
     }
 
     globalThis.RunStats = {

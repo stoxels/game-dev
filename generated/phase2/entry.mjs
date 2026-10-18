@@ -561,6 +561,7 @@ try { Object.defineProperty(globalThis, "_egCheckItemDropClaim", { get() { retur
 try { Object.defineProperty(globalThis, "_egCheckMistakeLimit", { get() { return _egCheckMistakeLimit; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egCleansePlayerAilments", { get() { return _egCleansePlayerAilments; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egCleanupCampaignTrialSeed", { get() { return _egCleanupCampaignTrialSeed; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egClearAllPuzzleEffects", { get() { return _egClearAllPuzzleEffects; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egClearTooltip", { get() { return _egClearTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egCloseCraftingBench", { get() { return _egCloseCraftingBench; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egCloseMassSellModal", { get() { return _egCloseMassSellModal; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

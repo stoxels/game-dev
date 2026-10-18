@@ -1,5 +1,6 @@
 import { _egGetElementCentre } from './combat-class-projectiles.js';
-import { _egComputePlayerStats, _egGetAllEquippedItems } from '../endgame/endgame-player-stats.js';
+import { _egComputePlayerStats, _egGetAllEquippedItems, _egGetDualHandWeapon } from '../endgame/endgame-player-stats.js';
+import { _egGetLeadHand } from './encounter-tick.js';
 
 //------------------------------------------------------------------------
 //-------------------WEAPON CONFIGURATION AND RESOLUTION----------------
@@ -78,6 +79,20 @@ export function _egGetEquippedWeaponInfo() {
     const hands = (item && item.hands === 2) ? 2 : 1;
     const label = item ? (item.baseName || item.name || '') : '';
     return { item, family, hands, label };
+}
+
+// Weapon family of the blow that is swinging NOW. Dual-wielding strikes with
+// one hand at a time, so the swing visual and sound must follow that hand's
+// weapon (not always the first equipped one). `consumed` = the strike already
+// spent a charge bar and stamped _egStrikeHand; otherwise (a whiff, which
+// spends nothing) the hand that would strike is the fuller bar.
+export function _egGetStrikeWeaponFamily(consumed) {
+    try {
+        const hand = consumed ? (globalThis._egStrikeHand === 2 ? 2 : 1) : _egGetLeadHand();
+        const w = _egGetDualHandWeapon(hand);
+        if (w) return _egWeaponSwingFamily(w);
+    } catch (e) { /* fall back to the single-weapon lookup */ }
+    return _egGetEquippedWeaponInfo().family;
 }
 
 // The direction the avatar is currently facing. Movement writes it to the

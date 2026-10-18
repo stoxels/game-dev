@@ -277,9 +277,10 @@ export function _egbtGetSpecialPhaseInfo(bossId) {
             ];
         case 'boss_gale':
             return [
-                { name: 'Crosswind + Funnels', desc: _egbtTr('eg_boss_test_gale_wind', 'All fight: wind flips L/R every 7s (lean into it) + hunting cyclone funnels burn %HP/s inside. Touching the eye flings you.') },
+                { name: 'Crosswind + Funnels', desc: _egbtTr('eg_boss_test_gale_wind', 'All fight: strong gusts push you sideways for ~9s, then a calm spell, then the other way. Hunting cyclone funnels burn %HP/s inside. Every 13-20s a Cyclone Lance volley fires 2-5 lanes. Touching the eye flings you.') },
                 { name: 'Tornado Ladder', desc: _egbtTr('eg_boss_test_gale_ladder', 'At 60% HP: 3 twister lanes climb bottom→top staggered. Exit the lanes.') },
-                { name: 'Eye of the Storm', desc: _egbtTr('eg_boss_test_gale_eye', 'At 30% HP: 4 rings contract onto the planted eye - you are hit when INSIDE a shrinking ring, so time crossings, don’t just stay out.') }
+                { name: 'Eye of the Storm', desc: _egbtTr('eg_boss_test_gale_eye', 'At 30% HP: 4 rings contract onto the planted eye - you are hit when INSIDE a shrinking ring, so time crossings, don’t just stay out.') },
+                { name: 'Perfect Storm (finale)', desc: _egbtTr('eg_boss_test_gale_finale', 'At 10% HP: 5 faster, tighter rings - run through every gap - then a 5-lane Cyclone Lance volley. Gusts and lances stay fiercer to the end.') }
             ];
         case 'boss_lodestone':
             return [
