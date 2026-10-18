@@ -49,25 +49,25 @@ export const EG_MONSTER_SPELL_CONFIG = {
 // casters. `mult` scales monster.damageValue.
 const SPELLS = {
     fire_bolt:       { el: 'fire',      mult: 1.3,  en: 'Fire Bolt',       de: 'Feuerblitz' },
-    frost_nova:      { el: 'cold',      mult: 1.7,  en: 'Frost Nova',      de: 'Frostnova' },
+    frost_nova:      { el: 'cold',      mult: 1.7,  en: 'Cold Eruption',   de: 'Kälteausbruch' },
     chain_lightning: { el: 'lightning', mult: 0.7,  en: 'Chain Lightning', de: 'Kettenblitz' },
-    soul_drain:      { el: 'shadow',    mult: 1.0,  en: 'Soul Drain',      de: 'Seelenentzug' },
+    soul_drain:      { el: 'shadow',    mult: 1.0,  en: 'Spirit Siphon',   de: 'Geistersog' },
     mend:            { el: 'heal',      mult: 0,    en: 'Mend',            de: 'Heilung' },
     summon:          { el: 'summon',    mult: 0,    en: 'Summon',          de: 'Beschwörung' },
     meteor:          { el: 'fire',      mult: 2.2,  en: 'Meteor',          de: 'Meteor' },
     ember_rain:      { el: 'fire',      mult: 0.8,  en: 'Ember Rain',      de: 'Glutregen' },
-    ice_lance:       { el: 'cold',      mult: 1.5,  en: 'Ice Lance',       de: 'Eislanze' },
+    ice_lance:       { el: 'cold',      mult: 1.5,  en: 'Icicle Dart',     de: 'Eiszapfen' },
     hailstorm:       { el: 'cold',      mult: 0.8,  en: 'Hailstorm',       de: 'Hagelsturm' },
-    thunder_strike:  { el: 'lightning', mult: 1.1,  en: 'Thunder Strike',  de: 'Donnerschlag' },
+    thunder_strike:  { el: 'lightning', mult: 1.1,  en: 'Skybolt',         de: 'Himmelsblitz' },
     doom_orb:        { el: 'shadow',    mult: 2.0,  en: 'Doom Orb',        de: 'Verderbniskugel' },
     shadow_volley:   { el: 'shadow',    mult: 0.6,  en: 'Shadow Volley',   de: 'Schattensalve' },
     enrage:          { el: 'rage',      mult: 0,    en: 'Enrage',          de: 'Wutanfall' },
     inferno_ring:    { el: 'fire',      mult: 1.0,  en: 'Ring of Fire',    de: 'Feuerring' },
     flame_wall:      { el: 'fire',      mult: 0.75, en: 'Wall of Flame',   de: 'Flammenwand' },
     glacial_spikes:  { el: 'cold',      mult: 0.9,  en: 'Glacial Spikes',  de: 'Gletscherzacken' },
-    frozen_orb:      { el: 'cold',      mult: 1.6,  en: 'Frozen Orb',      de: 'Gefrorene Kugel' },
+    frozen_orb:      { el: 'cold',      mult: 1.6,  en: 'Winter Sphere',   de: 'Wintersphäre' },
     static_field:    { el: 'lightning', mult: 0.8,  en: 'Static Field',    de: 'Statisches Feld' },
-    ball_lightning:  { el: 'lightning', mult: 1.9,  en: 'Ball Lightning',  de: 'Kugelblitz' },
+    ball_lightning:  { el: 'lightning', mult: 1.9,  en: 'Thunder Orb',     de: 'Donnerkugel' },
     void_rift:       { el: 'shadow',    mult: 2.1,  en: 'Void Rift',       de: 'Leerenriss' },
     grasping_shadows: { el: 'shadow',   mult: 0.85, en: 'Grasping Shadows', de: 'Greifende Schatten' },
 };
@@ -255,7 +255,7 @@ function _castFrostNova(monster) {
             if (rect && _egCircleOverlapsRect(centre.x, centre.y, r, rect)) {
                 _msHit(monster, SPELLS.frost_nova.mult, 'cold', true);
             } else if (typeof globalThis.showToast === 'function') {
-                globalThis.showCombatToast(LANG === 'de' ? '💨 Der Frostnova ausgewichen!' : '💨 Dodged the Frost Nova!');
+                globalThis.showCombatToast(LANG === 'de' ? '💨 Dem Kälteausbruch ausgewichen!' : '💨 Dodged the Cold Eruption!');
             }
         }, cfg.novaTelegraphMs);
     });

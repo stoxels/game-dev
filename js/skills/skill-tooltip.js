@@ -61,13 +61,15 @@ function _skillTooltipTags(def) {
 }
 
 // Cost line - becomes red when the player cannot currently pay it, and
-// switches to Life under Blood Magic maps.
-function _skillTooltipCost(def) {
+// switches to Life under Blood Magic maps. `preview` (shop / rank preview)
+// never shows the unaffordable red: nothing is being cast there, so the
+// current mana pool is irrelevant and the cost keeps its normal colour.
+function _skillTooltipCost(def, preview) {
     const cost = getSkillManaCost(def.id);
     if (!cost) return '';
     const blood = _bloodMagicActive();
     const label = blood ? t('cls_life') : t('cls_mana');
-    const affordable = canAffordSkill(def.id);
+    const affordable = preview || canAffordSkill(def.id);
     const color = blood ? '#ff7a7a' : '#7fb3ff';
     // Channels and auras drain continuously: their cost is per second.
     let per = '';
@@ -370,7 +372,7 @@ function _buildSkillTooltipHTML(skillId, charmKey, previewRank) {
         + _skillTooltipTitle(skillId, rank)
         + _skillTooltipTags(def)
         + `<div class="skl-tip-stat">${t('skill_tip_rank')}: <b style="color:#f1c40f">${rank}</b></div>`
-        + _skillTooltipCost(def)
+        + _skillTooltipCost(def, !!previewRank)
         + _skillTooltipCastTime(def)
         + _skillTooltipCooldown(def)
         + _skillTooltipCharmInfo(hovered)
