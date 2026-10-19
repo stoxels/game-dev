@@ -13,6 +13,36 @@ export const CHANGELOG_DATA = [
 
 
     {
+        version: "v0.32 BETA",
+        date: "19.10.2026",
+        changes: [
+            {
+                category: ["New Features", "Neue Funktionen"],
+                items: [
+                    ["Touch controls for phones and tablets: an on-screen joystick, action buttons, finger painting on the grid, pinch zoom and a layout editor to move the buttons where you like them.", "Touch-Steuerung für Handys und Tablets: ein Bildschirm-Joystick, Aktionstasten, Malen mit dem Finger auf dem Raster, Pinch-Zoom und ein Layout-Editor, um die Tasten nach Wunsch zu verschieben."],
+                    ["Guaranteed rewards are more varied. Completing a level's bonus objective now gives a puzzle item about half the time, otherwise an equipment piece, a core or an essence. Hover the reward on the win screen to see its tooltip.", "Garantierte Belohnungen sind abwechslungsreicher. Das Bonusziel eines Levels gibt jetzt etwa zur Hälfte ein Rätsel-Item, sonst ein Ausrüstungsteil, einen Kern oder eine Essenz. Fahre auf dem Siegbildschirm über die Belohnung, um ihren Tooltip zu sehen."],
+                    ["Inference quests can now reward equipment, cores and essences too, and the quest log shows which kind before you claim it. The 16 Atlas tier quests also give a map of their tier. All of it is rolled at your level, so rewards are helpful but never a jackpot: equipment is uncommon or rare, and the strongest cores stay out of reach.", "Inferenz-Quests können jetzt auch Ausrüstung, Kerne und Essenzen belohnen, und das Questlog zeigt vor dem Einlösen, welche Art es ist. Die 16 Atlas-Stufen-Quests geben zusätzlich eine Karte ihrer Stufe. Alles wird auf deiner Stufe gewürfelt, Belohnungen sind also hilfreich, aber nie ein Jackpot: Ausrüstung ist ungewöhnlich oder selten, und die stärksten Kerne bleiben außer Reichweite."],
+                    ["The Cartographer's Spell Charms tab has filter buttons by spell type: Fire, Cold, Lightning, Shadow, Arcane, Holy, Physical, Melee, Projectile, Area, Movement, Cleanse, Defensive and Buff.", "Der Zauber-Charm-Reiter des Kartografen hat Filterknöpfe nach Zaubertyp: Feuer, Kälte, Blitz, Schatten, Arkan, Heilig, Physisch, Nahkampf, Projektil, Fläche, Bewegung, Reinigung, Defensiv und Verstärkung."],
+                ],
+            },
+            {
+                category: ["Combat & Gameplay", "Kampf & Gameplay"],
+                items: [
+                    ["Combat and other toasts now use the right singular or plural, for example 1 mark erased and 3 marks erased, in English and German.", "Kampf- und andere Hinweise verwenden jetzt die richtige Einzahl oder Mehrzahl, zum Beispiel 1 Markierung gelöscht und 3 Markierungen gelöscht, in Deutsch und Englisch."],
+                    ["The boss The Shaper was renamed The Frostwright so it no longer copies another game.", "Der Boss Der Former heißt jetzt Der Frostwerker, damit er kein anderes Spiel mehr kopiert."],
+                ],
+            },
+            {
+                category: ["Bug Fixes & Technical", "Fehlerbehebungen & Technik"],
+                items: [
+                    ["Fixed the shop's Back button doing nothing after finishing the tutorial until you started another level.", "Behoben: Die Zurück-Schaltfläche im Shop tat nach dem Tutorial nichts, bis ein weiteres Level gestartet wurde."],
+                    ["The shop header now reads Cartographers' Supplies, and the Puzzle 2-3 background and two intro images were refreshed.", "Die Shop-Überschrift lautet jetzt Vorräte der Kartografen, und der Hintergrund von Rätsel 2-3 sowie zwei Intro-Bilder wurden aufgefrischt."],
+                ],
+            },
+        ],
+    },
+
+    {
         version: "v0.31 BETA",
         date: "16.10.2026",
         changes: [

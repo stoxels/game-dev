@@ -147,6 +147,30 @@ function _appendToastEl(el, key, accentColor) {
     return el;
 }
 
+// ---- PLURALS --------------------------------------------------------------
+// Toast templates mark optional endings with a bracketed suffix: "{n} cell(s)",
+// "{n} Zelle(n)", "{n} Markierung(en)". Once the number is filled in, this
+// resolves each marker against the closest number before it: exactly 1 drops
+// the suffix ("1 cell", "1 Zelle"), anything else keeps it ("3 cells",
+// "3 Zellen"). A marker with no number just before it is left untouched.
+const PLURAL_MARK_RE = /(\d+(?:[.,]\d+)?)|(?<=[A-Za-zÄÖÜäöüß])\((s|n|e|en)\)/g;
+const PLURAL_MAX_GAP = 40;
+
+function _pluralizeToastText(text) {
+    const str = String(text);
+    let lastNum = null;
+    let lastEnd = -Infinity;
+    return str.replace(PLURAL_MARK_RE, (match, num, suffix, offset) => {
+        if (num !== undefined) {
+            lastNum = Number(num.replace(',', '.'));
+            lastEnd = offset + match.length;
+            return match;
+        }
+        if (lastNum === null || offset - lastEnd > PLURAL_MAX_GAP) return match;
+        return lastNum === 1 ? '' : suffix;
+    });
+}
+
 // Adds a new message to the bottom of the stack. It fades in independently
 // and fades out on its own timer, without affecting other visible messages.
 // If the same message is already visible, it is replaced so repeated uses of
@@ -154,6 +178,7 @@ function _appendToastEl(el, key, accentColor) {
 // `accentColor` (optional) tints the message text - used e.g. for
 // rarity-colored loot / pickup notifications.
 export function showToast(msg, accentColor) {
+    msg = _pluralizeToastText(msg);
     const el = document.createElement('div');
     el.className = 'toast-msg';
     el.textContent = msg;
@@ -212,6 +237,7 @@ function _dropCombatToast(entry) {
 // Same signature as showToast(). Use for combat, boss abilities, ailments,
 // dodge / block / parry results and similar in-fight feedback.
 export function showCombatToast(msg, accentColor) {
+    msg = _pluralizeToastText(msg);
     const box = _combatToastContainer();
     if (!box) return showToast(msg, accentColor);
 
@@ -264,6 +290,7 @@ export function puzzleItemIconHtml(def) {
 // instead of plain text. All interpolated caller text must be escaped with
 // _escapeToastHtml() first - or use showItemToast() below.
 export function showHtmlToast(html, accentColor) {
+    html = _pluralizeToastText(html);
     const el = document.createElement('div');
     el.className = 'toast-msg';
     el.innerHTML = html;

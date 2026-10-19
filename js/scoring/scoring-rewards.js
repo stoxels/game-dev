@@ -274,6 +274,9 @@ const BONUS_PUZZLE_ITEM_SHARE = 0.55;
 // Colour of the reward card for a non-puzzle-item bonus reward.
 const BONUS_LOOT_COLORS = { common: '#d0d0d0', uncommon: '#5fd38d', rare: '#5dade2', epic: '#bb8fce', currency: '#d8b45a', essence: '#7fe0d0' };
 
+// The stash entry behind the current bonus-loot card (feeds its hover tooltip).
+let _bonusLootItem = null;
+
 // Builds the card for an equipment / core / essence bonus reward, or '' when
 // the grant failed (the caller then falls back to a puzzle item).
 function grantBonusLoot(gi) {
@@ -282,8 +285,9 @@ function grantBonusLoot(gi) {
     const color = BONUS_LOOT_COLORS[loot.rarity] || '#d0d0d0';
     const count = loot.count > 1 ? ` ×${loot.count}` : '';
     showToast(`🎁 ${loot.icon} ${loot.name}${count}`);
+    _bonusLootItem = loot.item;
     return `
-        <div class="item-reward" style="border-color:${color};color:${color};cursor:default;">
+        <div class="item-reward" id="bonus-loot-card" style="border-color:${color};color:${color};cursor:default;">
             ${t('ov_item_earned')}: ${loot.icon} <strong>${loot.name}${count}</strong>
         </div>`;
 }
@@ -327,6 +331,7 @@ function buildBonusClaimedNote() {
 function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel, isNexusPoint) {
     const irz = document.getElementById('item-reward-zone');
     irz.innerHTML = '';
+    _bonusLootItem = null;
     const bonusAlreadyDone = STATE.bonusDone.includes(gi);
     const isQuizBonus = cur.bonusType === 'quiz';
 
@@ -356,6 +361,13 @@ function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel, isNe
 
     // Attach hover tooltips to every item-reward card
     setTimeout(() => {
+        const lootCard = irz.querySelector('#bonus-loot-card');
+        if (lootCard && _bonusLootItem) {
+            const item = _bonusLootItem;
+            lootCard.addEventListener('mouseenter', e => globalThis._egShowTooltip(item, e));
+            lootCard.addEventListener('mousemove', e => globalThis._egMoveTooltip(e));
+            lootCard.addEventListener('mouseleave', () => globalThis._egClearTooltip());
+        }
         irz.querySelectorAll('[data-reward-defid]').forEach(el => {
             attachItemTooltip(el, el.dataset.rewardDefid);
         });

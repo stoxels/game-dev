@@ -154,7 +154,8 @@ export function _egScriptedLootLevel() {
 }
 
 // Grants one guaranteed loot reward straight into the hub stashes and
-// returns { kind, icon, name, rarity, count } for the caller to display
+// returns { kind, icon, name, rarity, count, item } (item = the stash entry,
+// usable for the hover tooltip) for the caller to display
 // (null when nothing could be granted). kind: equipment | core | essence |
 // map. `level` is the power level to roll at; `tier` only matters for maps.
 export function egGrantScriptedLoot(kind, level, tier) {
@@ -165,7 +166,7 @@ export function egGrantScriptedLoot(kind, level, tier) {
         const item = _egGenerateEquipmentDrop(level, Math.random() < 0.6 ? 'uncommon' : 'rare');
         if (item) {
             _egAddItemToStash(item);
-            result = { kind, icon: item.icon, name: item.name, rarity: item.rarity, count: 1 };
+            result = { kind, icon: item.icon, name: item.name, rarity: item.rarity, count: 1, item };
         }
     } else if (kind === 'core') {
         const pool = EG_SCRIPTED_CORE_POOL.filter(e => level >= e[2] && EG_CURRENCY_DEFS[e[0]]);
@@ -173,19 +174,19 @@ export function egGrantScriptedLoot(kind, level, tier) {
         const def = EG_CURRENCY_DEFS[id];
         const count = lo + Math.floor(Math.random() * (hi - lo + 1));
         if (egAddCurrency(id, count, { name: def.name, icon: def.icon, rarity: 'currency', category: 'currency', description: def.description })) {
-            result = { kind, icon: def.icon, name: def.name, rarity: 'currency', count };
+            result = { kind, icon: def.icon, name: def.name, rarity: 'currency', count, item: { ...def, id, category: 'currency', count } };
         }
     } else if (kind === 'essence') {
         _egHydrateMapCompletionEssencePool();
         const entry = _egScriptedPick(EG_MAP_COMPLETION_ESSENCE_POOL, e => e.weight);
         const def = EG_ESSENCE_DEFS[entry.id];
         if (def && egAddEssence(entry.id, 1, def)) {
-            result = { kind, icon: def.icon, name: def.name, rarity: 'essence', count: 1 };
+            result = { kind, icon: def.icon, name: def.name, rarity: 'essence', count: 1, item: { ...def, id: entry.id, category: 'essence', count: 1 } };
         }
     } else if (kind === 'map') {
         const map = _egGenerateMapDrop(level, tier || 1);
         if (map && _egAddMapToMapStash(map)) {
-            result = { kind, icon: map.icon || '🗺️', name: map.name, rarity: map.rarity || 'common', count: 1 };
+            result = { kind, icon: map.icon || '🗺️', name: map.name, rarity: map.rarity || 'common', count: 1, item: map };
         }
     }
     if (result) egSaveHubState();
