@@ -670,7 +670,7 @@ export function _dndDrop(e) {
     _dndFinalizeDrop();
 }
 
-// Handles dropping onto a currency cell (PoE fixed-slot tab).
+// Handles dropping onto a currency cell (fixed-slot tab).
 // Only the assigned currency id for that slot is accepted; otherwise reject.
 // Same-id drops merge stack counts.
 export function _dndDropOnCurrencyCell(currencyCell) {
@@ -751,7 +751,7 @@ export function _dndDropOnEquipSlot(equipSlotEl) {
     const fromSlot = _dnd.sourceZone === 'equip' ? _dnd.sourceSlot : undefined;
     const gate = _egCanEquipInSlot(_dnd.item, slotId, fromSlot);
     if (!gate.ok) {
-        // PoE-style: equipping a 2H weapon auto-unequips the off-hand to the
+        // Two-hand rule: equipping a 2H weapon auto-unequips the off-hand to the
         // stash instead of rejecting (other hand conflicts still reject).
         if (gate.handError === 'two_handed_blocks_offhand' && slotId === 'weapon1'
             && typeof _egTryAutoUnequipOffhandForTwoHander === 'function'
@@ -854,7 +854,7 @@ export function _dndQuickEquipFromStash(invCell) {
 
     const gate = _egCanEquipInSlot(item, slotId);
     if (!gate.ok) {
-        // PoE-style: quick-equipping a 2H weapon auto-unequips the off-hand.
+        // Two-hand rule: quick-equipping a 2H weapon auto-unequips the off-hand.
         if (gate.handError === 'two_handed_blocks_offhand' && slotId === 'weapon1'
             && typeof _egTryAutoUnequipOffhandForTwoHander === 'function'
             && _egTryAutoUnequipOffhandForTwoHander()) {
@@ -1125,7 +1125,7 @@ export function _egRenderCurrencyCell(row, col) {
 //-------------------CURRENCY PUBLIC API----------------------------------
 //------------------------------------------------------------------------
 
-// Adds `amount` of a currency type to the currency stash (fixed PoE-style slots).
+// Adds `amount` of a currency type to the currency stash (fixed slots).
 // Each currency id has a pre-assigned slot; stacks simply increment there.
 // Returns true on success, false if the id has no assigned slot or no def for a new stack.
 export function egAddCurrency(id, amount = 1, def = null) {

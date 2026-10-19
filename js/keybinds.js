@@ -70,7 +70,7 @@ const KEYBIND_DEFAULTS = [
     { id: 'hotbar-9',  label: 'Hotbar Slot 9',  keys: '9' },
     { id: 'hotbar-10', label: 'Hotbar Slot 10', keys: '0' },
 
-    // Spell book (P by default - Path-of-Exile/WoW-style spellbook key).
+    // Spell book (P by default - classic ARPG/MMO spellbook key).
     { id: 'spellbook', label: 'Toggle Spellbook', keys: 'p' },
 
     // Probability tree (K by default) - opens the tree over a running

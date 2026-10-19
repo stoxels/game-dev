@@ -2984,12 +2984,12 @@ EG_BASE_TYPES_WEAPON.push(
 
 
 //------------------------------------------------------------------------
-//-------------------WEAPON HAND CLASSIFICATION (PoE-STYLE)----------------
+//-------------------WEAPON HAND CLASSIFICATION (ARPG-STYLE)----------------
 //------------------------------------------------------------------------
 // Every melee weapon base carries `hands`: 1 (one-handed) or 2 (two-handed).
 //   1H → weapon1 (main-hand) OR weapon2 (off-hand, dual-wield)
 //   2H → weapon1 ONLY, and blocks the off-hand while equipped
-// Staves are 2H (PoE-style); wands / sceptres / swords / axes / daggers are 1H.
+// Staves are 2H (ARPG-style); wands / sceptres / swords / axes / daggers are 1H.
 // Static 2H bases are also rebalanced here: ~2x damage at a slower interval so
 // 2H DPS lands ~1.6-1.7x a same-tier 1H (offense vs shield defense tradeoff).
 // (hands, 2H damage and swing-interval values are now hard-defined on each

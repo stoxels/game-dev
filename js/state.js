@@ -552,7 +552,7 @@ export function buildFreshState() {
         // the Nexus screen and the setup-screen "Enter the Nexus" button.
         nexusUnlocked: false,
 
-        // Resistance penalty stage (Path of Exile style): 0 = none, 1 = -30% to all
+        // Resistance penalty stage (ARPG style): 0 = none, 1 = -30% to all
         // resistances (Ascension Trial that opens the ascendency class cleared),
         // 2 = -60% (World 14 / Nexus Point cleared, before the endgame maps).
         resistPenaltyStage: 0,
@@ -593,7 +593,7 @@ export function buildFreshState() {
             typeof globalThis.EG_ESSENCE_COLS !== 'undefined' ? globalThis.EG_ESSENCE_COLS : 8
         ),
         egMapSlotItem: null,
-        // Unique Stash - PoE-style collection tab: one slot per EG_UNIQUE_ITEMS entry
+        // Unique Stash - ARPG-style collection tab: one slot per EG_UNIQUE_ITEMS entry
         egUniqueStash: {},
         egUniqueCollected: [],
     };

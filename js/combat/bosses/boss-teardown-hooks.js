@@ -96,7 +96,7 @@ export const EG_BOSS_TEARDOWN_HOOKS = [
     // The Jester (rework): bouncing mayhem, card toss, juggler's jinx and
     // the GRAND FINALE set-piece.
     ['boss_jester', '_egJsTeardown'],
-    // The Shaper (rework): glacier rift, frost monoliths, ice walkers and
+    // The Frostwright (rework): glacier rift, frost monoliths, ice walkers and
     // the SHAPED WINTER set-piece.
     ['boss_shaper', '_egShpTeardown'],
     // The Siren (rework): wail beam patterns, undertow, siren's reply and

@@ -26,7 +26,7 @@ import { TALENT_TREE_DATA } from '../probability-tree/probability-tree-data.js';
 //   - XP is earned from the very first story level: completing a level
 //     grants a one-time XP bonus (replays grant a reduced amount) and every
 //     monster killed grants kill XP.
-//   - Monster XP is scaled by the monster's level and by a Path-of-Exile
+//   - Monster XP is scaled by the monster's level and by an ARPG-style
 //     multiplier: full XP only while the monster is within a safe level
 //     range of the character; beyond that range (too high OR too low) XP
 //     falls off exponentially - so re-farming old content gives little.
@@ -62,7 +62,7 @@ import { TALENT_TREE_DATA } from '../probability-tree/probability-tree-data.js';
 //   _egGrantMonsterXP(mLevel, isBoss)      → called on every monster kill
 //   _egGetPlayerLevel() / _egGetPlayerXP() → current progression
 //   _egGetXpForNextLevel(level)            → XP needed to leave `level`
-//   _egCalcXpMultiplier(playerLvl, mLvl)   → PoE-style range multiplier
+//   _egCalcXpMultiplier(playerLvl, mLvl)   → ARPG-style range multiplier
 //   _egAllocateAttribute('str'|'agi'|'int')→ spend one point
 //   _egRefundAttribute('str'|'agi'|'int')  → verify & refund one point
 //   _egCanRefundAttribute(attr)            → refund legality check
@@ -84,7 +84,7 @@ export const EG_LEVELING_CONFIG = {
     // is tuned (tools/xp-curve-tune.py) so a clean playthrough of all 184 story
     // levels + their monsters ends around campaignEndLevel (68) - Tier 1
     // maps are then tuned around monster level ~68 instead of level 3, so
-    // the atlas is a genuine next step, PoE-style (T1 = 68 → T16 = 90).
+    // the atlas is a genuine next step, ARPG-style (T1 = 68 → T16 = 90).
     // Campaign pacing does not depend on the curve's shape: level-completion
     // XP is a FRACTION of xpToNextLevel(expectedLevel) - see
     // EG_LEVELING_CONFIG.campaignFirstClearFraction.
@@ -130,16 +130,16 @@ export const EG_LEVELING_CONFIG = {
     xpEndgameScale: 63,
     xpEndgamePower: 3,
 
-    // PoE-style safe range: monsters up to
+    // ARPG-style safe range: monsters up to
     //   (safeRangeBelowBase + floor(playerLevel / safeRangeBelowLevelsPer))
     // levels BELOW the character give full XP; monsters up to
-    // safeRangeAbove levels above do too (softened 3→5 toward PoE's
+    // safeRangeAbove levels above do too (softened 3→5 toward the genre's
     // "full XP from anything above you", so white-only players who fall
     // behind the tier ladder can still catch up on repeat farms). Outside
     // the band the multiplier decays as ratio^penaltyExponent (never below
     // minMultiplier), which still blocks tier-skipping hard (a level-20
     // character in a T16 map earns 0.01×).
-    // Narrowed below vs PoE's 3+floor(lvl/16) and steepened 6→8 so farming
+    // Narrowed below vs the genre's 3+floor(lvl/16) and steepened 6→8 so farming
     // content 20 levels below you at 91 pays ~0.28× instead of 0.41×,
     // pushing players into T16 for efficient late XP (T16 at mLvl 90
     // stays ~full-XP through the late 90s, still optimal at 99 ≈ 0.92×).
@@ -163,7 +163,7 @@ export const EG_LEVELING_CONFIG = {
     // Campaign completion XP (levels 1..campaignEndLevel): a first clear
     // grants campaignFirstClearFraction of the XP needed for the level's
     // EXPECTED character level, and a replay grants campaignReplayFraction
-    // of that. Both are additionally scaled by the PoE-style range
+    // of that. Both are additionally scaled by the ARPG-style range
     // multiplier against the expected level, so farming old content gives
     // almost nothing. Monster kills (see _egGrantMonsterXP) make up the
     // rest of the budget.
@@ -384,10 +384,10 @@ export function _egSyncBaseAttributes() {
 //-------------------XP GAIN----------------------------------------------
 //------------------------------------------------------------------------
 
-// Path-of-Exile-style experience multiplier based on the gap between the
+// ARPG-style experience multiplier based on the gap between the
 // character's level and the monster's level:
 //   - Monster inside the safe band → 100% XP.
-//   - Monster too far BELOW → ((mLvl + 5) / (safeEdge + 5))^6 (PoE formula).
+//   - Monster too far BELOW → ((mLvl + 5) / (safeEdge + 5))^6 (genre formula).
 //   - Monster too far ABOVE → mirrored decay against its overhang edge.
 // Returns a value clamped to [minMultiplier, 1].
 export function _egCalcXpMultiplier(playerLevel, monsterLevel) {
@@ -564,7 +564,7 @@ export function _egAwardXP(xpGain) {
 }
 
 // Awards XP for killing one monster of `monsterLevel`: the kill value is
-// scaled by the PoE-style range multiplier against the character level and
+// scaled by the ARPG-style range multiplier against the character level and
 // by the active map's "% more Experience" bonus (neutral outside runs),
 // then handed to _egAwardXP.
 export function _egGrantMonsterXP(monsterLevel, isBoss) {
@@ -586,7 +586,7 @@ export function _egGrantMonsterXP(monsterLevel, isBoss) {
     return globalThis.__devLevelLock ? 0 : xp;
 }
 
-// Floating "+N XP" text over a defeated monster's card (WoW Classic style:
+// Floating "+N XP" text over a defeated monster's card (classic MMO style:
 // violet number drifting up and fading). Lives on <body> as a fixed element
 // so it outlives the card's kill animation. Cosmetic only.
 export function _egShowXpGainText(monsterId, xp) {
@@ -632,7 +632,7 @@ export function _egShowXpBarGain(xp, from, to) {
 }
 
 // Experience bar along the very bottom edge of the game screen (#eg-xp-bar,
-// WoW Classic style). Fill width = progress to the next level; hovering it
+// classic MMO style). Fill width = progress to the next level; hovering it
 // shows how much XP is still missing (generic data-tip tooltip).
 let _egXpBarLastKey = '';
 let _egXpBarLastPct = 0;
@@ -672,9 +672,9 @@ setInterval(() => { try { _egRenderXpBar(); } catch (e) { /* cosmetic */ } }, 70
 //     campaignFirstClearFraction, a replay campaignReplayFraction of that.
 //   • Monsters spawning in every campaign level grant kill XP through the
 //     normal _egGrantMonsterXP path; their level tracks the expected level
-//     so the PoE range multiplier stays ~1 during normal play.
+//     so the ARPG range multiplier stays ~1 during normal play.
 // Both are scaled by _egCalcXpMultiplier(), so re-farming content far below
-// the character's level gives almost nothing (anti-farm, PoE-style).
+// the character's level gives almost nothing (anti-farm, ARPG-style).
 
 export let _egCampaignLevelCountCache = null;
 

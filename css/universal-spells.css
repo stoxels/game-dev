@@ -318,10 +318,10 @@
 }
 @keyframes usp-lt-jolt{ from{transform:scale(1)} to{transform:scale(1.04) translateX(.6px)} }
 
-/* ━━━ SPARK (usp_spark) — Path-of-Exile crackling orb ━━━━━━━━━━━━━━━━ */
+/* ━━━ SPARK (usp_spark) — crackling orb ━━━━━━━━━━━━━━━━ */
 /* Signature projectile: a white-hot core wrapped in flickering zigzag
    arcs, trailing live sparks and jittering erratically off its flight
-   line like a bouncing PoE spark. Built +X; the yellow thunderbolt
+   line like a bouncing spark. Built +X; the yellow thunderbolt
    stays for the rest of the lightning school. Purely additive. */
 .usp-proj-spark{ filter: drop-shadow(0 0 10px rgba(255,255,255,.95)) drop-shadow(0 0 20px rgba(255,235,59,.85)) drop-shadow(0 0 34px rgba(255,171,0,.45)); }
 .usp-p-spark{
@@ -379,7 +379,7 @@
     box-shadow: 0 0 6px #fff;
 }
 
-/* ━━━ ARC (usp_arc) — Path-of-Exile chaining fork ━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━ ARC (usp_arc) — chaining fork ━━━━━━━━━━━━━━━━━━━━ */
 /* Signature projectile: a fat white-blue bolt with side forks, snapping
    card-to-card on the 200ms chain leaps. Built +X; the yellow
    thunderbolt stays for the rest of the lightning school. Purely
@@ -507,7 +507,7 @@
     box-shadow: inset 0 0 3px rgba(255,255,255,.96), 0 0 5px rgba(0,0,0,.48);
 }
 
-/* ━━━ ETHEREAL KNIVES (usp_ethereal_knives) — PoE spirit knives ━━━━━━ */
+/* ━━━ ETHEREAL KNIVES (usp_ethereal_knives) — spirit knives ━━━━━━ */
 /* Five conjured ghost-knives: real knife silhouettes (wrapped grip +
    crossguard + pointed blade) in pale translucent spirit-steel, each
    trailing cyan wisp-light. The tumbling crimson reaver stays for the
@@ -1585,7 +1585,7 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
     .skill-hotbar-slot.is-toggled { animation: none; }
 }
 
-/* ━━━ PYROBLAST (usp_pyroblast) — WoW-Classic "immense fiery boulder" ━━ */
+/* ━━━ PYROBLAST (usp_pyroblast) — classic "immense fiery boulder" ━━ */
 /* Signature override: owns its silhouette + 2.4x launch scale while Fireball
    keeps the shared fire theme untouched. Lumpy molten mass, slow churn,
    ragged ember trail. Still aims +X in the 44x28 box; the engine scales it. */
@@ -1637,7 +1637,7 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
 }
 @keyframes usp-pyro-core{ from{transform:scale(1)} to{transform:scale(1.15)} }
 
-/* ━━━ FLAMESTRIKE (usp_flamestrike) — WoW-Classic pillar of flame ━━━━━ */
+/* ━━━ FLAMESTRIKE (usp_flamestrike) — pillar of flame ━━━━━ */
 /* Signature impact: a column of fire rips up from under the victim's feet
    and swallows the whole card. Monster cards never clip overflow, so the
    pillar genuinely rises above the target. Replaces the generic nova ring. */
@@ -1718,7 +1718,7 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
     0%{opacity:1} 70%{opacity:1} 100%{opacity:0}
 }
 
-/* ━━━ RAIN OF FIRE (usp_rain_of_fire) — WoW-Classic downpour ━━━━━━━━━━ */
+/* ━━━ RAIN OF FIRE (usp_rain_of_fire) — downpour ━━━━━━━━━━ */
 /* Zone weather: little flame streaks pouring inside the placed circle.
    The drop spans the full zone height so translateY % always crosses it,
    whatever the reticle size is; only the ::before head is visible flame. */
@@ -1802,7 +1802,7 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
 }
 @keyframes usp-shard-fall{ from{transform:rotate(16deg) translateY(-12%)} to{transform:rotate(16deg) translateY(112%)} }
 
-/* ━━━ CONE OF COLD (usp_cone_of_cold) — WoW-Classic cone blast ━━━━━━━━━ */
+/* ━━━ CONE OF COLD (usp_cone_of_cold) — cone blast ━━━━━━━━━ */
 /* Signature zone blast: an icy wedge flashing out from the caster end of
    the placed cone, with splinters streaking downrange inside it. Each
    shard is a full-width track so translateX % always spans the cone,
@@ -2328,7 +2328,7 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
 .usp-p-star-mote-1{ left:8px; top:4px; }
 .usp-p-star-mote-2{ left:4px; top:19px; animation-delay:.25s; }
 
-/* ━━━ WRATH (usp_wrath) — WoW-Classic Druid nature ball ━━━━━━━━━━━━━━━ */
+/* ━━━ WRATH (usp_wrath) — Druid nature ball ━━━━━━━━━━━━━━━ */
 /* Signature projectile: a swirling ball of golden-green nature energy with
    wind bands and drifting leaves. Built pointing +X; the spin is inner
    only (bands), the ball itself stays aimed. The yellow thunderbolt stays
@@ -2374,7 +2374,7 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
 .usp-p-wrath-leaf-1{ left:14px; top:4px; transform:rotate(-22deg); }
 .usp-p-wrath-leaf-2{ left:10px; top:20px; transform:rotate(18deg) scaleX(-1); animation-delay:.3s; }
 
-/* ━━━ LIGHTNING BOLT (usp_lightning_bolt) — WoW-Shaman crackle ━━━━━━━━━ */
+/* ━━━ LIGHTNING BOLT (usp_lightning_bolt) — shaman crackle ━━━━━━━━━ */
 /* Signature projectile: a flat-flying jagged bolt, white-hot core with
    electric-blue edges and forked arcs jittering off it. Built pointing
    +X; the shared yellow thunderbolt stays for the school. */

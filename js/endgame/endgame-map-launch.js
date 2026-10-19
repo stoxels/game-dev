@@ -310,7 +310,7 @@ export function _egApplyMapModsToMonster(monster) {
         });
     }
 
-    // PoE-style behaviour mods - read live by the encounter/ailment systems.
+    // ARPG-style behaviour mods - read live by the encounter/ailment systems.
     const critPct = _egGetActiveMapModValue('map_monster_crit');
     if (critPct > 0) monster.critChancePct = critPct;
 
@@ -334,7 +334,7 @@ export function _egApplyMapModsToMonster(monster) {
             Math.round(monster.chargeMax * Math.min(95, ambushPct + 5) / 100));
     }
 
-    // PoE-style escalation mods - read live by the encounter systems.
+    // ARPG-style escalation mods - read live by the encounter systems.
     const etherealPct = _egGetActiveMapModValue('map_monster_ethereal');
     if (etherealPct > 0) monster.etherealPct = etherealPct;
 

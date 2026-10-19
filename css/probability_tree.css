@@ -303,7 +303,7 @@
     box-sizing: border-box;
 }
 
-/* PoE-port review overlay: nodes awaiting approval glow blue instead of
+/* ARPG-port review overlay: nodes awaiting approval glow blue instead of
    red. Declared after the unreworked rule so it wins at equal specificity. */
 .pt-node-proposed::after,
 .pt-node-unreworked.pt-node-proposed::after {

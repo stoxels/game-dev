@@ -46,7 +46,7 @@ const DECO_PANELS = [
         [0, 1, 0, 1, 0],
         [0, 1, 1, 1, 0],
     ],
-    // Panel 2 – passive tree node (diamond / PoE style)
+    // Panel 2 – passive tree node (diamond / ARPG style)
     [
         [0, 0, 1, 0, 0],
         [0, 1, 1, 1, 0],

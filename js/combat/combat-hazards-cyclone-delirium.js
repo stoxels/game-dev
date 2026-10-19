@@ -78,7 +78,7 @@ export function _egHzTickCyclone(dtMs) {
 //------------------------------------------------------------------------
 //-------------------DELIRIUM MIST----------------------------------------
 //------------------------------------------------------------------------
-// PoE Delirium: a purple mist periodically floods the screen. While it holds,
+// Delirium: a purple mist periodically floods the screen. While it holds,
 // there is one chance roll to polymorph the player into chaos.
 
 export function _egHzInitDelirium(intensity) {

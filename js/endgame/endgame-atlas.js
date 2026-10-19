@@ -7,10 +7,10 @@ import { egSaveHubState } from './endgame-hub.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
-//-------------------ENDGAME ATLAS (POE-STYLE MAP GRAPH)------------------
+//-------------------ENDGAME ATLAS (ARPG-STYLE MAP GRAPH)------------------
 //------------------------------------------------------------------------
-// PoE-style atlas of the endgame map system, laid out like a classic
-// two-continent atlas (faithful to the original Lua "Atlas of Azeroth"):
+// Atlas of the endgame map system, laid out like a classic
+// two-continent atlas:
 //   - 86 fixed map regions ("nodes") grouped into tiers 1..16
 //   - Hand-authored node positions: an eastern and a western continent
 //     (mirrored except for deliberate horizontal offsets that widen the
@@ -36,7 +36,7 @@ import { STATE } from '../state.js';
 //   egAtlasIsCompleted(id)         - node already cleared?
 //   egAtlasIsUnlocked(id)          - node reachable? (tier 1 or completed neighbour)
 //   egAtlasPickNodeIdForTier(tier) - random node id of a tier, prefers unlocked
-//   egAtlasDropNodeIds(id, isBoss) - PoE-style drop pool for kills in that node's map
+//   egAtlasDropNodeIds(id, isBoss) - ARPG-style drop pool for kills in that node's map
 //   egAtlasPickDropNodeId(id, isBoss) - pool pick; bosses favour the +1 climb
 //   egAtlasProgress()              - { completed, total, highestTier }
 //   _egAtlasOnMapCompleted(map)    - completion hook (called from _egEndMap)
@@ -425,7 +425,7 @@ export function egAtlasNodeName(node) {
     return (typeof LANG !== 'undefined' && LANG === 'de') ? node.nameDe : node.name;
 }
 
-// PoE-style map-drop pool for kills inside the given region's map.
+// Map-drop pool for kills inside the given region's map.
 //   normal kill:  the active region itself, every LINKED region of the
 //                 same or a lower tier, plus every COMPLETED region whose
 //                 tier is at most the active tier (a completed map drops
@@ -468,7 +468,7 @@ export function egAtlasDropNodeIds(activeNodeId, isBoss) {
 }
 
 // Bonus per completed atlas region for the independent adjacent-map drop
-// (PoE-style atlas bonus): every completed region grants +1% chance that
+// (atlas bonus): every completed region grants +1% chance that
 // finishing a map awards one extra adjacent-region map on top of all
 // regular drops. No cap needed (86 regions max = 86% max).
 export const EG_ATLAS_ADJACENT_BONUS_PER_MAP = 0.01;
@@ -534,7 +534,7 @@ export function egAtlasPickAdjacentBonusNodeId(activeNodeId) {
 // boss kills still sustain the current tier most of the time.
 export const EG_ATLAS_BOSS_CLIMB_DROP_SHARE = 0.55;
 
-// Picks a random atlas node id from the PoE-style drop pool. Boss kills
+// Picks a random atlas node id from the ARPG-style drop pool. Boss kills
 // are biased toward the +1-tier climb regions so reaching the next tier
 // feels deliberate instead of a lucky uniform roll: EG_ATLAS_BOSS_CLIMB_DROP_SHARE
 // of all boss drops target the climb, the rest come from the remaining
@@ -619,7 +619,7 @@ export function egAtlasChainBlueprint(node) {
     const flavor = EG_ATLAS_CHAIN_FLAVORS[Math.floor(rng() * EG_ATLAS_CHAIN_FLAVORS.length)];
 
     // One fixed boss per region - the map's own boss, fought in the arena
-    // after the chain (like PoE's per-map bosses). The roster in
+    // after the chain (like per-map bosses). The roster in
     // js/combat/bosses/boss-rosters.js assigns each region its specific
     // boss (easy fights low, brutal fights at the pinnacle).
     const bossIds = (typeof EG_BOSS_DEFS !== 'undefined') ? Object.keys(globalThis.EG_BOSS_DEFS) : [];

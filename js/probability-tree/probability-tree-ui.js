@@ -387,19 +387,19 @@ export function _ptTooltipBuildStatusHtml(id, state, lang) {
     return `<div style="margin-top:7px;font-size:11px;color:#555;">${lockedText}</div>`;
 }
 
-// Blue "awaiting approval" block of the PoE-port review overlay: the PoE 1
-// original next to the planned Stoxels effect (see PT_REWORK_PROPOSALS).
+// Blue "awaiting approval" block of the ARPG-port review overlay: the
+// original design next to the planned Stoxels effect (see PT_REWORK_PROPOSALS).
 function _ptTooltipBuildProposalHtml(proposal) {
     const esc = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-    const poeLines = (proposal.poe.stats || []).map(esc).join('<br>') || '-';
+    const referenceLines = (proposal.reference.stats || []).map(esc).join('<br>') || '-';
     const plan = proposal.plan || {};
     const planLines = (plan.lines && plan.lines.length)
         ? plan.lines.map(esc).join('<br>')
         : '<i>(left empty for now)</i>';
     return `<div style="margin-top:8px;padding:6px 8px;border:1px solid #4da3ff;border-radius:4px;background:rgba(40,90,160,0.18);font-size:11px;color:#bcd9ff;">`
         + `<div style="font-size:10px;letter-spacing:1px;color:#4da3ff;">PROPOSAL - AWAITING APPROVAL</div>`
-        + `<div style="margin-top:4px;color:#8fb4e0;">PoE 1: ${esc(proposal.poe.name || '')}</div>`
-        + `<div>${poeLines}</div>`
+        + `<div style="margin-top:4px;color:#8fb4e0;">Original: ${esc(proposal.reference.name || '')}</div>`
+        + `<div>${referenceLines}</div>`
         + `<div style="margin-top:5px;color:#8fb4e0;">Planned${plan.name ? ': ' + esc(plan.name) : ''}</div>`
         + `<div>${planLines}</div>`
         + (plan.note ? `<div style="margin-top:4px;color:#8fb4e0;">${esc(plan.note)}</div>` : '')
@@ -1062,7 +1062,7 @@ export function _ptBindNodeEvents() {
 
 // Builds and appends a single node <div> for the given skill.
 // Shape, icon, and events are handled by the helpers above.
-// Node size follows the three-tier hierarchy (Path of Exile style):
+// Node size follows the three-tier hierarchy (ARPG style):
 //   keystone  1.5x - ornate amber gems, build-defining choices
 //   notable   1.12x - the regular mechanical pickups
 //   travel    0.8x - small connectors (statKey prefix 'travel_')

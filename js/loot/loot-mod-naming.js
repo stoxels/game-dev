@@ -13,7 +13,7 @@ import { _egPickRareItemName } from './loot-mod-rare-names.js';
 
 // common   → base name only
 // uncommon → proper-language affix naming (see below)
-// rare/epic→ random two-word name from EG_RARE_NAME_WORDS_* (PoE-style);
+// rare/epic→ random two-word name from EG_RARE_NAME_WORDS_* (ARPG-style);
 //            the base type stays visible via .baseName on the item
 //
 // Uncommon items use EG_MOD_NAME_WORDS (loot-mod-name-words.js), which
@@ -59,7 +59,7 @@ export function _egModDeGenitive(familyId) {
 export function _egBuildItemName(baseName, rarity, mods) {
     if (rarity === 'common' || mods.length === 0) return baseName;
 
-    // rare/epic: PoE-style random two-word name ("Doom Bane").
+    // rare/epic: ARPG-style random two-word name ("Doom Bane").
     if (rarity === 'rare' || rarity === 'epic') return _egPickRareItemName();
 
     const prefixes = mods.filter(m => m.type === 'prefix');

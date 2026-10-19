@@ -332,7 +332,7 @@ export function _egMechColoBoulders(monster, phase) {
 //------------------------------------------------------------------------
 // Two golem statues climb out of cracks and slow-push toward the player:
 // moving walls that pin you into stride telegraphs. Ram a golem 3× (crack
-// stages, like the Shaper's monoliths) to crumble it early - every ram
+// stages, like the Frostwright's monoliths) to crumble it early - every ram
 // shoves you back and costs a small hit, so ramming is a choice, not a
 // trap. They crumble on their own after ~9s.
 export const EG_GOLEM_COUNT     = [0, 0, 2, 2];
@@ -610,7 +610,7 @@ export function _egColoFinalStart(monster) {
         });
         g.activeChutes = (g.activeChutes || []).filter(ch => !ch.done);
 
-        // ── Seal ram (Shaper monolith crack pattern): a ram counts when you
+        // ── Seal ram (Frostwright monolith crack pattern): a ram counts when you
         // charge in from outside - standing on the seal does nothing.
         const dSeal = Math.hypot(pc.x - seal.x, pc.y - seal.y);
         if (dSeal > 95) g.armed = true;

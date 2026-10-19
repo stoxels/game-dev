@@ -22,13 +22,13 @@ import { STATE } from '../state.js';
 // consumed surface: handleSkillTip / handleSkillTipMove / handleSkillTipLeave.
 
 //------------------------------------------------------------------------
-//-------------------SKILL TOOLTIP (PATH-OF-EXILE STYLE)-------------------
+//-------------------SKILL TOOLTIP (ARPG STYLE)-------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Builds the hover tooltip shared by the spell book and the hotbar.
 //
-// Layout mirrors Path of Exile's gem tooltip:
+// Layout mirrors the genre's charm tooltip:
 //
 //   Arcane Reveal                ← title
 //   Spell, Reveal, Area          ← type tags
@@ -157,7 +157,7 @@ function _skillTooltipCastTime(def) {
     return `<div class="skl-tip-stat">${t('skill_tip_cast_time')}: <b style="color:#e6e6e6">${value}</b></div>`;
 }
 
-// Damage block - the puzzle-ability equivalent of PoE's "Deals X to Y
+// Damage block - the puzzle-ability equivalent of the genre's "Deals X to Y
 // Physical Damage" lines: each revealed cell fires a reveal projectile.
 // Universal spells get their own direct-damage wording (see below).
 function _skillTooltipDamage(def) {

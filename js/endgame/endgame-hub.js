@@ -205,7 +205,7 @@ export function _egBuildCurrencyGridHTML() {
     return html;
 }
 
-// Hub: left-side Orbs & Shards panel (PoE currency tab style)
+// Hub: left-side Orbs & Shards panel (currency tab style)
 export function _egBuildCurrencyPanelHTML() {
     return `
 <div class="eg-currency-col">
@@ -300,7 +300,7 @@ export function _egBuildInventoryGridHTML() {
 }
 
 // Assembles the full-width stash panel at the bottom of the screen.
-// Now with two tabs: INVENTORY (regular stash) and UNIQUES (PoE-style collection).
+// Now with two tabs: INVENTORY (regular stash) and UNIQUES (stash collection).
 export function _egBuildStashPanelHTML() {
     const invActive = _egStashTab !== 'uniques';
     const uniqActive = _egStashTab === 'uniques';
@@ -600,7 +600,7 @@ export function _egClearStashInfo() {
 
 // Assembles the complete hub screen layout:
 // topbar → [ Orbs & Shards (left) | character panel (center) | Essence (right) ] → stash.
-// The Orbs & Shards tab uses fixed PoE-style slots; the item tooltip is a floating mouseover.
+// The Orbs & Shards tab uses fixed slots; the item tooltip is a floating mouseover.
 export function _egBuildFullScreenHTML() {
     return `
 <div class="eg-hub-layout">
@@ -1143,7 +1143,7 @@ export function openHubFromGame(returnScreen = 'screen-game') {
 // snapshotted pools (max HP / max mana / absorption) are only set at level
 // start - equipping +health/+mana/+absorption mid-puzzle would otherwise do
 // nothing until the next level. Grants max-increases to the current pool
-// (PoE-style) and clamps decreases, then refreshes every combat HUD element
+// and clamps decreases, then refreshes every combat HUD element
 // so the new values are visible the instant B closes the sheet.
 export function _egSyncOverlayGearPools() {
     try {

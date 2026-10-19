@@ -170,7 +170,7 @@ export const EG_CURRENCY_DEFS = {
         },
     },
 
-    // Common -> random rarity (uncommon/rare/epic), like PoE's Chance Orb.
+    // Common -> random rarity (uncommon/rare/epic) on a lucky roll.
     // Very rarely forges a unique of the same slot instead (Ancient Orb behaviour).
     orb_chance: {
         id: 'orb_chance', name: t('eg_orb_chance'), icon: '🎲',
@@ -207,7 +207,7 @@ export const EG_CURRENCY_DEFS = {
         },
     },
 
-    // Blessing Orb - rerolls the numeric values of an item's IMPLICIT modifiers (PoE Blessed Orb).
+    // Blessing Orb - rerolls the numeric values of an item's IMPLICIT modifiers.
     // Only orb that can touch implicits; regular orbs preserve them.
     orb_blessing: {
         id: 'orb_blessing', name: t('eg_orb_blessing'), icon: '🙏',

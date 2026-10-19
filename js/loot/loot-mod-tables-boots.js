@@ -506,10 +506,10 @@ export const EG_MOD_TABLE_BOOTS = {
             ]
         },
 
-        // --- BOOTS-EXCLUSIVE: MOVEMENT SPEED (PoE-style) ---
+        // --- BOOTS-EXCLUSIVE: MOVEMENT SPEED ---
         // Flat % increased movement speed for your on-screen avatar.
         // Affects WASD travel - crucial for dodging
-        // telegraphed hazards like Fire Walls. PoE values: 10–35% in
+        // telegraphed hazards like Fire Walls. Typical values: 10–35% in
         // 5% steps; higher tiers are rarer. Caps at ~35% per boot
         // (only one boot slot, so at most 35%). Family weight = best eligible
         // tier weight, so the top tier is weighted high: boots roll this often

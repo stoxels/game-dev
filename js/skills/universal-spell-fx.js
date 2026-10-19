@@ -151,7 +151,7 @@ export const USP_THEME_PROJ = {
 // NOTE: keep each build() as an inline root.innerHTML concatenation - the
 // spell gallery builder parses that literal to render flight demos.
 const USP_SPELL_PROJ = {
-    // Ethereal Knives - Path-of-Exile spirit knives: five ACTUAL knives
+    // Ethereal Knives - spirit knives: five ACTUAL knives
     // (wrapped grip + crossguard + pointed ghost-steel blade) hurled in
     // the staggered volley fan, each trailing spirit-wisp light. Snappy
     // 550ms flight so the 130ms stagger reads as one hurled handful.
@@ -256,7 +256,7 @@ const USP_SPELL_PROJ = {
                 '</div>';
         },
     },
-    // Pyroblast - WoW-Classic "immense fiery boulder": a lumpy molten mass
+    // Pyroblast - classic "immense fiery boulder": a lumpy molten mass
     // at 2.4x launch scale (~1.7x a Fireball), slow churning swirl, ragged
     // ember trail. Fireball keeps the shared fire theme exactly as-is.
     // Meteor - Diablo-2 skyfall: a huge burning rock that drops almost
@@ -279,7 +279,7 @@ const USP_SPELL_PROJ = {
                 '</div>';
         },
     },
-    // Lightning Bolt - WoW-Shaman crackle: a jagged blue-white bolt with
+    // Lightning Bolt - shaman crackle: a jagged blue-white bolt with
     // forking arcs jittering off it, flying flat and fierce. The shared
     // yellow emoji-style thunderbolt stays for the rest of the school.
     usp_lightning_bolt: {
@@ -297,7 +297,7 @@ const USP_SPELL_PROJ = {
                 '</div>';
         },
     },
-    // Storm Smite - WoW-priest smite in storm colors: a thick sky-bolt with
+    // Storm Smite - priest smite in storm colors: a thick sky-bolt with
     // a white-gold core and storm-blue edges, falling from above (the
     // engine fires fromSky strikes from 340px above at a fixed 550ms fall
     // - the def mirrors that so the gallery shows the true timing).
@@ -335,7 +335,7 @@ const USP_SPELL_PROJ = {
                 '</div>';
         },
     },
-    // Wrath - WoW-Classic Druid: a swirling ball of golden-green nature
+    // Wrath - Druid: a swirling ball of golden-green nature
     // energy with wind bands and drifting leaves, not electricity. Theme
     // stays lightning (damage/impact/sound untouched) - only the hurled
     // visual becomes nature. The yellow thunderbolt stays for the school.
@@ -392,7 +392,7 @@ const USP_SPELL_PROJ = {
                 '</div>';
         },
     },
-    // Spark - Path-of-Exile crackling orb: a white-hot core wrapped in
+    // Spark - crackling orb: a white-hot core wrapped in
     // flickering zigzag arcs, dragging a tail of live sparks and jittering
     // erratically off its flight line. The 6 wild shots already fly at
     // random enemies - the wobble sells the bouncing-spark chaos. The
@@ -412,7 +412,7 @@ const USP_SPELL_PROJ = {
                 '</div>';
         },
     },
-    // Storm Call - Path-of-Exile marker strike: the same white-blue fork
+    // Storm Call - marker strike: the same white-blue fork
     // as Arc, crashing down from the sky onto the marked enemies. Mirrors
     // the engine's fixed 550ms skyfall so the gallery shows true timing.
     // Heavy 2x launch with a big arrival for the all-enemy 7-9 hit.
@@ -431,7 +431,7 @@ const USP_SPELL_PROJ = {
                 '</div>';
         },
     },
-    // Arc - Path-of-Exile chaining bolt: a fat white-blue fork that snaps
+    // Arc - chaining bolt: a fat white-blue fork that snaps
     // card-to-card almost instantly (200ms leaps). Brighter and thicker
     // than the school's yellow thunderbolt, with side forks licking off
     // the main trunk. Damage, falloff and sound stay lightning.
@@ -470,7 +470,7 @@ const USP_SPELL_PROJ = {
                 '</div>';
         },
     },
-    // Chaos Bolt - WoW-TBC cataclysm: a very big fat bolt of churning
+    // Chaos Bolt - fel cataclysm: a very big fat bolt of churning
     // chaos, shadow violet shot through with fel green, dragging ragged
     // tendrils. Slow and heavy (900ms), arriving with the big impact
     // treatment befitting the hardest single hit in the arsenal. The
@@ -613,7 +613,7 @@ const USP_IMPACT_SFX = {
 // here erupts its own overlay on every hit - and may skip the generic nova
 // ring when the signature already reads as the AoE.
 const USP_SPELL_IMPACT = {
-    // Flamestrike - WoW-Classic pillar of flame: a column that rips up from
+    // Flamestrike - pillar of flame: a column that rips up from
     // under the victim's feet and swallows the whole card. Replaces the ring.
     usp_flamestrike: { cssClass: 'usp-pillar-flamestrike', ms: 950, skipNova: true },
     // Immolate - no projectile at all: the opening hit lands instantly with
@@ -624,7 +624,7 @@ const USP_SPELL_IMPACT = {
     // Meteor's instead of flying flat. The bolt visual lives in the
     // projectile overrides below.
     usp_smite: { skyfall: true },
-    // Sunfire - WoW-style sacred flames in fire colors: the opener lands
+    // Sunfire - sacred flames in fire colors: the opener lands
     // instantly under a golden-white burst, then the regular fire sizzle
     // burns on.
     usp_holy_fire: { noFlight: true, cssClass: 'usp-sunfire-burst', ms: 800 },
@@ -691,7 +691,7 @@ const USP_SPELL_IMPACT = {
     // the hit with the regular shadow impact. soulbeam builds the return
     // beam; nothing ever flies hero-to-victim.
     usp_soulrend: { noFlight: true, soulbeam: true },
-    // Blight - Path-of-Exile festering grasp: the opener coats every
+    // Blight - festering grasp: the opener coats every
     // victim in creeping rot directly (no flight - decay starts ON them),
     // and each tick seeps fresh rot into the wound. Dark grasping mass,
     // not Contagion's drifting green cloud.
@@ -709,7 +709,7 @@ const USP_ZONE_RAIN = {
     // Arrow Volley - arrow rain: full-size ranger shafts pouring straight
     // down inside the square, dense enough to read as a real arrow storm.
     usp_arrow_volley: { count: 24, cssClass: 'usp-rain-arrow' },
-    // Rain of Fire - WoW-Classic downpour: loads of little flame streaks,
+    // Rain of Fire - downpour: loads of little flame streaks,
     // dense enough to read as actually raining fire inside the circle.
     usp_rain_of_fire: { count: 30, cssClass: 'usp-rain-drop' },
     // Blizzard - same storm, icy: wind-blown shards falling at a slant
@@ -723,7 +723,7 @@ const USP_ZONE_RAIN = {
 // demo (which never removes its box) replays the blast; in game the zone is
 // gone after ~450ms, i.e. a single eruption.
 const USP_ZONE_BLAST = {
-    // Cone of Cold - WoW-Classic cone: an icy wedge flashing out from the
+    // Cone of Cold - cone blast: an icy wedge flashing out from the
     // caster plus splinters streaking downrange inside it.
     usp_cone_of_cold: { shards: 12 },
     // Crackling Lance - a rail-lance discharge: a white-blue trunk as
@@ -1074,7 +1074,7 @@ export function _uspBladeBlastPlant(spell, origin, point, delayMs) {
 // its victims with its own rune instead of the generic dashed danger.
 // The gallery builder parses cssClass the same way it does impacts.
 const USP_SPELL_MARK = {
-    // Storm Call - Path-of-Exile marker: a crackling rune circle etched
+    // Storm Call - marker: a crackling rune circle etched
     // onto the victim, counting down to the skyfall.
     usp_storm_call: { cssClass: 'usp-mark-storm' },
 };
@@ -1938,7 +1938,7 @@ export function _uspAuraShow(spell, radius) {
         // toggle. Children of the aura element, so they die with it.
         const isBlades = spell.id === 'usp_blade_vortex';
         if (isBlades) el.classList.add('is-blades');
-        // Vortex - a Path-of-Exile style ice whirlwind: spiral arms of
+        // Vortex - an ARPG-style ice whirlwind: spiral arms of
         // snow curling in to an eye, with ice shards slung round on
         // different orbits. Built only for usp_vortex; other toggle
         // auras keep the shared shell.

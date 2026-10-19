@@ -10,8 +10,8 @@ import { STATE } from '../state.js';
 //------------------------------------------------------------------------
 //-------------------ENDGAME ATLAS SCREEN---------------------------------
 //------------------------------------------------------------------------
-// PoE-style atlas overview, presented like a classic WoW atlas dialog
-// (faithful to the original Lua "Atlas of Azeroth" addon):
+// Atlas overview of the endgame map system, presented like a classic
+// MMO atlas dialog:
 //   - Regions are SMALL SQUARE NODES with the tier numeral (I..XVI) inside
 //   - The region name floats ABOVE the node, coloured by rarity band
 //     (game rarity palette): tiers I–V uncommon green · VI–X rare blue ·

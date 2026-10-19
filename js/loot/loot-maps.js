@@ -27,7 +27,7 @@ import { EG_MAP_MOD_TABLES } from './loot-map-mod-tables.js';
 export function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts = null) {
     monsterLevel = Math.max(1, Math.round(monsterLevel || 1));
 
-    // Forced atlas region (PoE-style drop rules): the drop code resolves
+    // Forced atlas region (ARPG-style drop rules): the drop code resolves
     // the exact region a map may come from - tier and item level derive
     // from it. Atlas tier override: keep item level / mod rolls consistent
     // with the forced tier (tier N ≈ curve level, inverse of _egRollMapTier).
@@ -121,7 +121,7 @@ export function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts =
 
 // While a device run is active with a known atlas region, dropped maps are
 // restricted to the active node's own tier plus its connected tiers
-// (PoE-style: you find your own tier and directly adjacent regions).
+// (drop rule: you find your own tier and directly adjacent regions).
 // The tier is rolled directly from the allowed set - deriving it from the
 // monster level via ceil(level/4) could never produce the lower connected
 // tier and made higher tiers vanishingly rare.
@@ -130,7 +130,7 @@ export function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts =
 // players unlock the atlas (and climb tiers) quickly, while high-tier runs
 // stay focused on their own tier.
 // Resolves the atlas REGION a map dropped inside the active run comes from
-// (PoE-style drop rules - see egAtlasDropNodeIds in endgame-atlas.js):
+// (ARPG-style drop rules - see egAtlasDropNodeIds in endgame-atlas.js):
 //   normal kill: linked regions of the same or a lower tier + the active
 //                region itself + completed regions at or below the active
 //                tier

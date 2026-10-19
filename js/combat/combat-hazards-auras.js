@@ -19,7 +19,7 @@ import { _egHzFirewall, _egHzFrostNova, _egHzVolatile, _egSetHzFirewall, _egSetH
 //------------------------------------------------------------------------
 //-------------------VOLATILE WISPS---------------------------------------
 //------------------------------------------------------------------------
-// PoE-style Volatiles: unstable wisps spawn off-screen-ish and slowly home
+// Volatile hazards: unstable wisps spawn off-screen-ish and slowly home
 // in on the player. When close (or after a lifetime) they flash briefly,
 // then detonate - shadow damage in a blast radius, may inflict Shadow Burn.
 
@@ -143,7 +143,7 @@ export function _egHzTickVolatile(dtMs) {
 //------------------------------------------------------------------------
 //-------------------FROST NOVAS------------------------------------------
 //------------------------------------------------------------------------
-// PoE-style freezing novas: a frosty core erupts near the player and the
+// Freezing novas: a frosty core erupts near the player and the
 // expanding ring damages anything it passes through once (chill + freeze
 // chance). Cold Resistance mitigates; dodging out of the ring radius works.
 

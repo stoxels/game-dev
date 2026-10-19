@@ -6,7 +6,7 @@ import { endUniversalChannel, fireUniversalChannelTick, getUniversalSpellCastKin
 //------------------------------------------------------------------------
 //----------------------HOLD-TO-CAST (CAST BAR)---------------------------
 //------------------------------------------------------------------------
-// World-of-Warcraft style cast times for the heavy spells. A spell whose
+// Classic MMO-style cast times for the heavy spells. A spell whose
 // def carries `castTimeSeconds` (see UNIVERSAL_SPELL_DEFS + the tutorial
 // Fireball) cannot be fired with a quick click: the button - hotbar slot
 // click OR bound key - must be HELD until the cast bar fills. Releasing
@@ -402,7 +402,7 @@ function _holdCastTick() {
 //-------------------------CAST BAR + CHARGE ORB--------------------------
 //------------------------------------------------------------------------
 
-// Builds (once) the WoW-style cast bar pinned above the avatar's health bar.
+// Builds (once) the classic MMO-style cast bar pinned above the avatar's health bar.
 function _holdCastBarEls() {
     let bar = document.getElementById('spell-castbar');
     if (bar) {

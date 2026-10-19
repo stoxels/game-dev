@@ -36,7 +36,7 @@ export let _egCurrentWeaponBase = null;
 
 // Every slotType value (from equipment-base-items.js) and the mod table
 // it rolls from. Melee weapons all use slotType 'weapon': 1H rolls
-// WEAPON_1H, 2H rolls the harder-hitting WEAPON_2H (PoE-style). Shields
+// WEAPON_1H, 2H rolls the harder-hitting WEAPON_2H (ARPG-style). Shields
 // use slotType 'shield', a defensive-only derivative of WEAPON2.
 export const EG_SLOT_MOD_TABLE_MAP = {
     head: () => EG_MOD_TABLE_HEAD,

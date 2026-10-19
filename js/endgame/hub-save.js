@@ -267,7 +267,7 @@ function _egLoadHubState() {
     })();
     if (STATE.egMapStashActiveTier != null) globalThis._egMapStashActiveTier = Math.max(1, Math.min(EG_MAP_TIER_COUNT, Math.round(STATE.egMapStashActiveTier)));
 
-    // ── Currency stash migration to fixed PoE-style slots ──
+    // ── Currency stash migration to fixed slots ──
     // Old saves were 1×30; new is 6×5 with fixed positions. Migrate by collecting items
     // and re-inserting them into their assigned slots (stacking counts).
     (function _migrateCurrency() {

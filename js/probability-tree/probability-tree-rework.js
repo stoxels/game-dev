@@ -32,16 +32,16 @@ export function isPassiveTreeNodeReworked(id) {
 }
 
 
-// PoE-port review overlay. While a batch of nodes is waiting for the
-// owner's approval, each one has an entry here describing the Path of
-// Exile 1 original and the planned Stoxels effect. The tree draws these
+// ARPG-port review overlay. While a batch of nodes is waiting for the
+// owner's approval, each one has an entry here describing the original
+// design and the planned Stoxels effect. The tree draws these
 // nodes with a BLUE marker and the tooltip shows both texts. The map is
 // emptied again as soon as a batch is approved and implemented, so a
 // published game never carries pending proposals. Presentation only: it
 // does not change allocation, stats or the reworked status.
-//   id -> { poe: { name, stats: [...] },
+//   id -> { reference: { name, stats: [...] },
 //           plan: { name, lines: [...] | [], note? } }
-// An empty `lines` array means "deliberately left empty for now" (a PoE
+// An empty `lines` array means "deliberately left empty for now" (a genre
 // mechanic the game does not have yet - reserved for future puzzle work).
 export const PT_REWORK_PROPOSALS = Object.freeze({});
 

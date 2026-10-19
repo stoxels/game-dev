@@ -50,7 +50,7 @@ export const EG_PLAYER_STATS = {
     chargePushback: 1.5, // Seconds removed from a monster's charge bar on hit
 };
 
-// PoE-style weapon setups (see _egIsDualWielding in endgame-requirements.js):
+// ARPG-style weapon setups (see _egIsDualWielding in endgame-requirements.js):
 // dual-wielding two 1H weapons sums both weapons' melee damage then scales by
 // EG_DUAL_WIELD_DAMAGE_MULT (~1.4x a single 1H, below a 2H's ~1.6-1.7x), and
 // grants EG_DUAL_WIELD_PARRY_PCT base parry chance WITHOUT holding the parry key
@@ -242,7 +242,7 @@ export const EG_MELEE_BUCKET_MAP = {
 // first-seen template, keeping the original line order. Lines without a
 // numeric value and downside mods are never merged with normal mods.
 // Returns [{ label: string, downside: bool, tierLabel: string }] for tooltip rendering.
-// tierLabel is PoE-style affix tier badge: "P4" for prefix tier 4, "S1" for suffix tier 1,
+// tierLabel is the affix tier badge: "P4" for prefix tier 4, "S1" for suffix tier 1,
 // and "P2+S3" when multiple mods were merged into one combined line (including hybrids).
 export function _egTryHealLegacyDualMod(mod) {
     // Legacy items rolled before the min/min2 -> min1/min2 fix stored a single
@@ -393,7 +393,7 @@ export function _egGetAllEquippedItems() {
 //-------------------LOCAL ITEM DEFENSES----------------------------------
 //------------------------------------------------------------------------
 // Flat and "% increased" armour / evasion / absorption mods are LOCAL in the
-// Path of Exile sense: they only modify the base defense values of the very
+// ARPG sense: they only modify the base defense values of the very
 // item they rolled on, not the character-wide totals.
 //
 // Effective item value = round((base + localFlat) * (1 + localIncPct / 100)).
@@ -450,7 +450,7 @@ export function _egGetItemEffectiveDefenses(item) {
     (Array.isArray(item.mods) ? item.mods : []).forEach(mod => {
         (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(applyLocalDefense);
     });
-    // Implicits also contribute to local defenses (PoE-style)
+    // Implicits also contribute to local defenses (local scope)
     (Array.isArray(item.implicits) ? item.implicits : []).forEach(mod => {
         (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(applyLocalDefense);
     });
@@ -466,7 +466,7 @@ export function _egGetItemEffectiveDefenses(item) {
 //------------------------------------------------------------------------
 //-------------------LOCAL ITEM DAMAGE------------------------------------
 //------------------------------------------------------------------------
-// Weapon damage mods are LOCAL in the Path of Exile sense (for display
+// Weapon damage mods are LOCAL in the ARPG sense (for display
 // purposes): flat added Physical / elemental damage and "% increased
 // Physical Damage" rolled on a weapon are baked into the weapon's own
 // damage ranges shown in its tooltip.
@@ -584,7 +584,7 @@ export function _egGetItemEffectiveAttackInterval(item) {
 //-------------------LOCAL ITEM BLOCK CHANCE------------------------------
 //------------------------------------------------------------------------
 // Shields carry a flat "Chance to Block" on the base type (item.blockChance).
-// Rolled "+#% Chance to Block Attacks" suffixes are LOCAL in the PoE sense
+// Rolled "+#% Chance to Block Attacks" suffixes are LOCAL in the ARPG sense
 // for shields: they directly increase the shield's own displayed block value
 // (underneath the Armour/Evasion lines) instead of appearing only as a
 // separate global stat. The tooltip highlights the combined value when local
@@ -1293,7 +1293,7 @@ export function _egComputePlayerStats() {
         s.meleePhysIncPct += attackShield + (passiveTreeBonuses.meleePhysShieldIncPct || 0);
     }
 
-    // Dual-wield balance (PoE-style): two 1H weapons sum their base damage
+    // Dual-wield balance (ARPG-style): two 1H weapons sum their base damage
     // and melee mods, then the strike total is scaled by
     // EG_DUAL_WIELD_DAMAGE_MULT (0.7) so dual-wield lands ~1.4x a single 1H -
     // below a 2H weapon's ~1.6-1.7x, trading raw damage for the parry bonus.
@@ -1681,7 +1681,7 @@ export function _egStrikeHandMult() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Armour mitigation is damage-relative (PoE-style): the same armour value
+// Armour mitigation is damage-relative (ARPG-style): the same armour value
 // mitigates many small hits strongly but large hits weakly, so it never
 // trivially caps once gear values grow and stays relevant at every level.
 export const EG_ARMOUR_DAMAGE_FACTOR = 12;   // reduction% = armour / (armour + factor * rawDamage) - was 10, raised so armour is less dominant at high tiers (more challenging when lacking)
@@ -1702,7 +1702,7 @@ export function _egCalcArmourMitigation(rawDamage, armour) {
 }
 
 // Converts evasion into a % chance to fully dodge an incoming hit, capped at
-// 75%. The benchmark constant scales with the ATTACKER's level (PoE-style):
+// 75%. The benchmark constant scales with the ATTACKER's level (ARPG-style):
 // higher-level monsters are harder to dodge, so evasion keeps requiring
 // upgrades instead of permanently sitting at the cap once gear values grow.
 export const EG_EVASION_DODGE_K = 200;        // dodge% = evasion / (evasion + K) at monster level 1
@@ -1723,7 +1723,7 @@ export function _egCalcEvasionDodgeChance(evasion, monsterLevel) {
 // strikes and projectiles - see _egRollPlayerMiss in endgame-encounter.js.
 //
 // Every character additionally gains INNATE accuracy with their own level
-// (PoE-style level scaling), so a fresh, under-geared character is not
+// (ARPG-style level scaling), so a fresh, under-geared character is not
 // punished by the raw formula: at parity (player level ≈ monster level)
 // even a naked character lands most hits, while accuracy investment from
 // gear lets you comfortably fight content ABOVE your level. Fighting
@@ -2652,7 +2652,7 @@ Defensives:
  
     +Evasion(flat additive value), 
     local evasion multiplier on item base(multiplies the item evasion value of the item equipped in that slot)
-    Evasion gives a chance (with poe like entropy?) that a monster misses the player when it attacks with ranged or melee attacks 
+    Evasion gives a chance (with an entropy-like roll?) that a monster misses the player when it attacks with ranged or melee attacks 
 
     + Absorption - a secondary layer of values on top of life (some monsters can ignore this absorption layer)
                 - absorption starts slowly automatically regenrating back to full after 5 seconds of not taking a hit, but this regeneration is interrupted if the player gets attacked

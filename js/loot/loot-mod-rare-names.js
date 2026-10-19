@@ -8,10 +8,10 @@ import { LANG } from '../translation/translations.js';
 // [english, german]. Pure data plus the picker; the affix namer is the only
 // caller.
 
-// PoE-style random names for rare/epic items: a word from the FIRST pool
+// ARPG-style random names for rare/epic items: a word from the FIRST pool
 // combined with a word from the SECOND pool, e.g. "Doom Bane".
 // Each entry is [englishWord, germanWord]. The base type is still shown
-// separately via .baseName, exactly like PoE handles rare names.
+// separately via .baseName, exactly like the genre handles rare names.
 
 export const EG_RARE_NAME_WORDS_FIRST = [
     ['Blood', 'Blut'],

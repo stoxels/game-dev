@@ -7,7 +7,7 @@
 //   quantity - % higher chance for loot/currency/item drops
 //   rarity   - % weight boost for non-common rarities when items drop
 // Values are indexed by (tier - 1); T1 = strongest roll. More dangerous
-// maps are therefore always strictly more rewarding, PoE-style.
+// maps are therefore always strictly more rewarding, by design.
 
 export const EG_MAP_MOD_REWARDS = {
     // ── Monster-strengthening ────────────────────────────────────

@@ -85,12 +85,12 @@ export function _egAddMapToMapStash(item, tierOverride) {
 }
 
 // Called by the kill handlers in endgame-encounter.js.
-// PoE-style sustain: while running a map the drop chance is multiplied by the
+// ARPG-style sustain: while running a map the drop chance is multiplied by the
 // active map's Quantity bonus (EG_MAP_MOD_REWARDS.quantity). Harder maps
 // (more / higher-tier mods) therefore sustain maps much better.
 // force - skip the chance roll (the kill handler already picked this bucket).
 export function _egTryDropMap(isBoss, monsterLevel, force = false, opts = null) {
-    // PoE-style: map items only drop from monsters level 55 or higher
+    // Map items only drop from monsters level 55 or higher
     // (allows drops in late campaign: World 13 EXPECTATION PLATEAU and Nexus World)
     const MIN_MONSTER_LEVEL_FOR_MAP_DROPS = 55;
     // Late-campaign drops (worlds 12-14, gated by the caller) skip the level
@@ -108,7 +108,7 @@ export function _egTryDropMap(isBoss, monsterLevel, force = false, opts = null) 
         qtyMult = 1 + (rw.quantity || 0) / 100;
     }
 
-    // PoE-style drop rules: the atlas region a dropped map belongs to is
+    // ARPG-style drop rules: the atlas region a dropped map belongs to is
     // resolved per kill source (see _egResolveAtlasDropTarget). When no
     // device run is active this is null and the legacy tier roll applies.
     const targetNodeId = _egResolveAtlasDropTarget(isBoss);
@@ -137,7 +137,7 @@ export function _egTryDropMap(isBoss, monsterLevel, force = false, opts = null) 
     if (typeof _egSpawnMapDrop === 'function') _egSpawnMapDrop(map);
 }
 
-// Atlas completion bonus (PoE-style): after a SUCCESSFUL map run there is
+// Atlas completion bonus (ARPG-style): after a SUCCESSFUL map run there is
 // one independent extra roll for an additional ADJACENT map drop. Chance =
 // +1% per completed atlas region (see egAtlasAdjacentBonusChance).
 // The bonus map comes from a region linked to the just-finished run's

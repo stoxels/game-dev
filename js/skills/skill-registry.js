@@ -62,7 +62,7 @@ export const HEARTBLOOM_SKILL_ID = 'heartbloom';
 //------------------------------------------------------------------------
 // Extra info the ability defs do not carry. Keyed by skill id.
 //
-//   tags    - the PoE-style type line ("Spell, AoE, Duration")
+//   tags    - the ARPG-style type line ("Spell, AoE, Duration")
 //   scaling - what the skill's numbers grow with (shown as "Scales with")
 //   damage  - null for non-damaging skills, otherwise:
 //               count(effect, level) → how many reveal projectiles it fires

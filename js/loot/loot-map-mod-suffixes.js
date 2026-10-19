@@ -28,7 +28,7 @@ export const EG_MAP_MOD_SUFFIXES = {
         // `EG_MAP_MOD_REWARDS` for legacy maps that already rolled it, but it
         // no longer appears on new maps so orbs cannot influence the boss roll.
 
-        // ── Monster behaviour (PoE-style) ─────────────────────────────
+        // ── Monster behaviour ─────────────────────────────
         map_monster_crit: {
             id: 'map_monster_crit', affects: 'monster',
             label: 'Monsters have +#% chance to deal Double Damage', labelDe: 'Monster haben +#% Chance auf doppelten Schaden',

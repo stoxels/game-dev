@@ -9,7 +9,7 @@ import { _egBossTierNorm, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkL
 //------------------------------------------------------------------------
 //-------------------BOSS: BRUTUS (boss_brutus)---------------------------
 //------------------------------------------------------------------------
-// PoE Brutus homage: full-width ground-slam bands (dodge vertically),
+// Full-width ground-slam bands (dodge vertically),
 // sacrificial zombies, corrupt cells. Plate armor soaks physical hits
 // but conducts elements (+25% elemental taken).
 //------------------------------------------------------------------------

@@ -40,8 +40,8 @@ export function _egCancelCurrencyUse(silent) {
     }
 }
 
-// Keeps use-mode active after an application (shift-click chaining, like
-// PoE). The currency cell may have been re-rendered by the application,
+// Keeps use-mode active after an application (shift-click chaining).
+// The currency cell may have been re-rendered by the application,
 // so the chip element is re-acquired from the DOM.
 export function _egRefreshCurrencyUseHighlight() {
     if (!_egPendingCurrencyUse) return;

@@ -11,14 +11,14 @@ import { STATE } from '../state.js';
 //------------------------------------------------------------------------
 //---------------------------SKILL HOTBAR---------------------------------
 //------------------------------------------------------------------------
-// World-of-Warcraft style action bar pinned to the bottom-right of the
+// Classic MMO-style action bar pinned to the bottom-right of the
 // puzzle screen: SKILL_HOTBAR_SIZE slots in SKILL_HOTBAR_COLS columns
 // (2 rows of 5 by default).
 //
 // Each slot shows the spell icon, its bound key and - while the spell is on
 // cooldown or unaffordable - the same indicators the old class HUD buttons
 // used (countdown text / dimmed "no mana" state). Hover shows the
-// Path-of-Exile style tooltip from skill-tooltip.js.
+// ARPG-style tooltip from skill-tooltip.js.
 //
 // Slots mirror the spell-book charm slots 1:1 (charm slot N casts from
 // hotbar key N - see skill-charms.js). The bar itself is click-to-cast
@@ -208,7 +208,7 @@ function _buildHotbarSlotHTML(slotIndex, skillId) {
         ? `<img class="skill-hotbar-icon" src="${image}" alt="${getSkillName(skillId)}" draggable="false">`
         : `<span class="skill-hotbar-icon">${def.icon || '✦'}</span>`;
 
-    // Hovering a slot shows the same Path-of-Exile tooltip the spell book does.
+    // Hovering a slot shows the same ARPG-style tooltip the spell book does.
     return `<div class="skill-hotbar-slot ${stateClasses}" data-slot="${slotIndex}" data-skill="${skillId}"
                  onmouseenter="handleSkillTip(event,'${skillId}')"
                  onmousemove="handleSkillTipMove(event)"

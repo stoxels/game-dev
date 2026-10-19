@@ -406,7 +406,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // same ignitePct stat gear uses; still needs fire damage in the hit.
     ignite_chance_pct: { channel: 'igniteChancePct', en: '+{v}% Chance to Ignite on Hit', de: '+{v}% Chance, bei Treffern zu entzünden' },
     // Weapon-family (sword/axe/staff/wand) and dual-wield lines, extra cold/lightning,
-    // tree freeze/shock chance and per-element penetration (PoE-port phase A).
+    // tree freeze/shock chance and per-element penetration (ARPG port phase A).
     crit_chance_sword: { channel: 'critChanceSwordPct', en: '+{v}% to Critical Strike Chance with Swords', de: '+{v}% auf die kritische Trefferchance mit Schwertern' },
     crit_multi_sword: { channel: 'critMultiplierSwordPct', en: '+{v}% to Critical Strike Multiplier with Swords', de: '+{v}% auf den kritischen Schadensmultiplikator mit Schwertern' },
     crit_chance_axe: { channel: 'critChanceAxePct', en: '+{v}% to Critical Strike Chance with Axes', de: '+{v}% auf die kritische Trefferchance mit Äxten' },
@@ -544,7 +544,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     fork_chance: { channel: 'forkChancePct', en: '{v}% Chance for Projectile hits to Fork to 2 other enemies', de: '{v}% Chance, dass Projektiltreffer sich auf 2 weitere Gegner gabeln' },
     fork_extra: { channel: 'forkExtraChancePct', en: '+{v}% Chance for a Fork to hit one additional enemy', de: '+{v}% Chance, dass eine Gabelung einen weiteren Gegner trifft' },
     multishot_chance: { channel: 'multishotChanceTreePct', en: '+{v}% Chance to fire an additional Projectile', de: '+{v}% Chance auf ein zusätzliches Projektil' },
-    // Keystone batch (batch 40): PoE-style keystones adapted to Stoxels.
+    // Keystone batch (batch 40): ARPG-style keystones adapted to Stoxels.
     evasion_to_armour: { channel: 'evasionToArmour', flag: true, en: 'Converts all Evasion Rating to Armour', de: 'Wandelt die gesamte Ausweichwertung in Rüstung um' },
     agility_no_evasion: { channel: 'agilityNoEvasion', flag: true, en: 'Agility provides no bonus to Evasion Rating', de: 'Beweglichkeit gewährt keine Ausweichwertung' },
     life_leech_instant: { channel: 'lifeLeechInstant', flag: true, en: 'Life Leech from Melee Damage is Instant', de: 'Lebensraub durch Nahkampfschaden ist sofort' },
@@ -597,7 +597,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     impale_spread: { channel: 'impaleSpread', flag: true, en: 'When your Hits Impale an Enemy, other enemies in its area are Impaled too', de: 'Wenn deine Treffer einen Gegner aufspießen, werden auch andere Gegner in seinem Bereich aufgespießt' },
     impale_extra: { channel: 'impaleExtra', en: 'Inflict {v} additional Impales on enemies you Impale', de: 'Verursache {v} zusätzliche Aufspießungen bei Gegnern, die du aufspießt' },
     impale_lockout: { channel: 'impaleLockout', en: 'For {v} seconds after Impaling an Enemy it cannot be Impaled again', de: 'Für {v} Sekunden nach dem Aufspießen kann ein Gegner nicht erneut aufgespießt werden' },
-    // Keystone batch (batch 40): PoE-style keystones adapted to Stoxels.
+    // Keystone batch (batch 40): ARPG-style keystones adapted to Stoxels.
     never_miss: { channel: 'attacksNeverMiss', flag: true, en: 'Your attacks can no longer miss', de: 'Deine Angriffe können nicht mehr verfehlen' },
     movement_speed_less: { channel: 'movementSpeedLessPct', en: '{v}% reduced Movement Speed', de: '{v}% verringerte Bewegungsgeschwindigkeit' },
     no_repeat_target: { channel: 'noRepeatTarget', flag: true, en: 'Projectiles cannot hit the same enemy twice in a row (they pick another enemy when one is alive)', de: 'Projektile können denselben Gegner nicht zweimal hintereinander treffen (sie wählen einen anderen Gegner, wenn einer lebt)' },

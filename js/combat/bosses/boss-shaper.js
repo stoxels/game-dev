@@ -17,7 +17,7 @@ export const _EG_SHP_DEBUG_MULT = _EG_SHP_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_shaper: {
-        id: 'boss_shaper', name: 'The Shaper', emoji: '❄️',
+        id: 'boss_shaper', name: 'The Frostwright', emoji: '❄️',
         baseHP: 1060, baseDamage: 22, chargeMax: 12,
         element: 'cold', resistances: { fire: 15, cold: 30, lightning: 15, shadow: 15 }
     },
@@ -59,7 +59,7 @@ export const EG_SHP_HIT_CD_MS     = 700;              // shared touch cooldown
 //-------------------SHARED VISUAL HELPERS---------------------------------
 //------------------------------------------------------------------------
 
-// Touch damage helper shared by all Shaper hazards. Returns true if a hit
+// Touch damage helper shared by all Frostwright hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
 export let _egShpHitCd = 0;
 export function _egShpTouch(pct, level, label) {
@@ -69,7 +69,7 @@ export function _egShpTouch(pct, level, label) {
     if (!pr) return false;
     _egShpHitCd = now + EG_SHP_HIT_CD_MS;
     const dealt = _egNkHit(pct, 'cold', level);
-    _egNkAbilityHitToast(dealt, 'The Shaper', label);
+    _egNkAbilityHitToast(dealt, 'The Frostwright', label);
     return true;
 }
 
@@ -243,7 +243,7 @@ export function _egMechShpRift(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------MECHANIC: FROST MONOLITHS (phase 2+)-------------------
 //------------------------------------------------------------------------
-// The Shaper plants rune-carved monoliths at the edges; each erects a
+// The Frostwright plants rune-carved monoliths at the edges; each erects a
 // growing wall of frost that slowly SHRINKS the arena toward the centre.
 // Break the monoliths (3 hits each) to stop their walls. Walls despawn
 // when their monolith dies; unbroken walls retract after the cast ends.
@@ -270,7 +270,7 @@ export function _egMechShpMonoliths(monster, phase) {
         spots.push(cands.splice(Math.floor(Math.random() * cands.length), 1)[0]);
     }
 
-    _egNkToast('eg_mech_shp_monos', '❄️ The Shaper: FROST MONOLITHS - break them to stop the walls!', '#7dd3fc');
+    _egNkToast('eg_mech_shp_monos', '❄️ The Frostwright: FROST MONOLITHS - break them to stop the walls!', '#7dd3fc');
 
     const monos = spots.map(spot => {
         const el = _egNkEl(run, 'div', 'eg-shp-mono', '🗿');
@@ -404,7 +404,7 @@ export function _egMechShpWalker(monster, phase) {
     const n = p >= 3 ? 2 : 1;
     for (let i = 0; i < n; i++) mk(i * 1800 * _EG_SHP_DEBUG_MULT);
 
-    _egNkToast('eg_mech_shp_walker', '❄️ The Shaper: ICE WALKER - it shatters on contact!', '#7dd3fc');
+    _egNkToast('eg_mech_shp_walker', '❄️ The Frostwright: ICE WALKER - it shatters on contact!', '#7dd3fc');
 
     const shards = [];   // { x, y, vx, vy, el, born, dead }
     let t = 0, touchCd = 0, shardTouchCd = 0;
@@ -480,7 +480,7 @@ export function _egMechShpWalker(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------⛄… THE SHAPED WINTER (≤10% HP one-shot finale)--------
 //------------------------------------------------------------------------
-// The Shaper assembles a colossal ice monolith at the centre and goes
+// The Frostwright assembles a colossal ice monolith at the centre and goes
 // immune. Three frost arms sweep the arena like a radar blade, spinning
 // faster each beat - and three CORES on the monolith's faces light up one
 // at a time. The lit core shelters you from the arms: stand on it to

@@ -106,7 +106,7 @@ export const EG_MAP_MOD_PREFIXES = {
             ],
         },
 
-        // ── Curses & Defences-down (PoE-style) ───────────────────────
+        // ── Curses & Defences-down ───────────────────────
         map_elem_weakness: {
             id: 'map_elem_weakness', affects: 'player',
             label: 'Elemental Weakness - #% reduced all Resistances', labelDe: 'Elementarschwäche – #% reduziert alle Widerstände',

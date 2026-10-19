@@ -14,7 +14,7 @@ import { EG_SLOT_MOD_TABLE_MAP, _egGetModTable } from './loot-equipment-mod-tabl
 //--------------------------CONSTANTS & STATE---------------------------
 //----------------------------------------------------------------------
 
-// Essence stash dimensions - fixed PoE-style tab with pre-assigned slots
+// Essence stash dimensions - fixed tab with pre-assigned slots
 // (mirrors the Orbs & Shards currency tab). Every essence id has a
 // dedicated cell; hovering an empty cell still shows its essence tooltip.
 // 12 rows × 8 cols = 96 cells → 95 modifier essences + 1 decorative empty.

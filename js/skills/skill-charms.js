@@ -148,7 +148,7 @@ const CHARM_DROP_MAX_ON_BOARD = 2;       // simultaneous charm drops
 // eslint-disable-next-line no-unused-vars -- flagged dead, kept deliberately
 const CHARM_RANK_RARITY = ['common', 'rare', 'epic'];
 
-// PoE-style rank gates: the minimum MONSTER level that can DROP each rank.
+// ARPG-style rank gates: the minimum MONSTER level that can DROP each rank.
 // Index = rank - 1. Ranks 1-5 drop throughout the campaign (monster levels
 // 1..68), ranks 6-10 are map-only (T1 maps start at monster level 68, T16 at
 // 90 - see EG_MAP_TIER_MONSTER_LEVELS). Bosses share the same cap: a boss
@@ -606,7 +606,7 @@ export function getCharmSkillDamageMult(skillId) {
 
 // True when a charm with this skill sits in any spell slot AND meets its
 // player-level requirement. An over-level charm stays owned but does not
-// unlock its spell until the character grows into it (PoE gem-style).
+// unlock its spell until the character grows into it (charm-style).
 export function isSkillCharmUnlocked(skillId) {
     if (!STATE) return true;
     // Tutorial: the Professor's Scroll of Fireball (Rank 1) lesson gates the

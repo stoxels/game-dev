@@ -22,7 +22,7 @@ import '../endgame/endgame-map-launch.js';
 import { applyUniqueReworks } from './unique-item-reworks.js';
 
 //------------------------------------------------------------------------
-//-------------------UNIQUE ITEMS (PoE-STYLE)-----------------------------
+//-------------------UNIQUE ITEMS (ARPG-STYLE)-----------------------------
 //------------------------------------------------------------------------
 // Fixed-modifier named items with a built-in downside - the golden tier
 // above epics. Uniques are NOT rolled: every copy of a unique has the exact

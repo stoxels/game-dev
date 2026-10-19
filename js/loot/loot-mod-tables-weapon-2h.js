@@ -9,7 +9,7 @@ import { EG_MOD_TABLE_WEAPON1 } from './loot-mod-tables-weapon1.js';
 //------------------------------------------------------------------------
 //-------------------TWO-HANDED MELEE MODIFIER TABLE----------------------
 //------------------------------------------------------------------------
-// PoE-style: 2H weapons roll the same families as 1H but hit ~45% harder on
+// ARPG-style: 2H weapons roll the same families as 1H but hit ~45% harder on
 // flat damage (physical + elemental) and ~25% harder on % increased physical.
 // Attack speed / crit / accuracy / status / cleave pools are unchanged, so a
 // 2H weapon feels like a bigger version of a 1H - not a different item class.

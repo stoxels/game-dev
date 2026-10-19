@@ -24,7 +24,7 @@ export const EG_MONSTER_ZONES = [
 
 // Default monster count per wave if cur.maxMonsters is not set.
 // Scales with monster level so T16 feels dense: 3 at low tiers, 4 at mid, 5 at high.
-// T1 stays breezy, T3-7 ramp, T8+ feels crowded (PoE density).
+// T1 stays breezy, T3-7 ramp, T8+ feels crowded (high density).
 export function _egGetDefaultMonsterCap(baseLevel) {
     const lvl = Number(baseLevel) || 1;
     if (lvl >= 60) return 5;

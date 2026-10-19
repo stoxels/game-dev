@@ -93,7 +93,7 @@ export function _egBuildMapDeviceHTML() {
 }
 
 // Hover tooltip for the map device's "?" info button: explains the
-// PoE-style map-drop rules (normal kills / cleared regions / bosses).
+// ARPG-style map-drop rules (normal kills / cleared regions / bosses).
 // The one-line translation is split on its ' · ' separators so each rule
 // gets its own line inside the tooltip.
 export function _egOnDropRulesEnter(e) {
@@ -120,7 +120,7 @@ export function _egOnDropRulesLeave() {
 //-------------------HTML HELPERS: POTENTIAL MAP DROPS--------------------
 //------------------------------------------------------------------------
 // Right-hand panel next to the map device: lists every map that could
-// potentially drop while running the map currently in the device (PoE
+// potentially drop while running the map currently in the device (same
 // drop rules, same pools the kill handlers roll from - see
 // egAtlasDropNodeIds in endgame-atlas.js):
 //   normal kills: this region + linked regions of the same/lower tier +
@@ -419,7 +419,7 @@ export function _egBuildGatePanelHTML() {
 // read from and write to the SAME _egCurrencyStash, so amounts stay in sync;
 // _egRenderCurrencyCell() in endgame-hub-drag-and-drop.js updates both.
 
-// Builds a single Orbs & Shards cell for the gate screen (PoE fixed slots).
+// Builds a single Orbs & Shards cell for the gate screen (fixed slots).
 export function _egBuildGateCurrencyCellHTML(row, col) {
     return `
 <div class="eg-inv-cell eg-currency-cell"
@@ -446,7 +446,7 @@ export function _egBuildGateCurrencyGridHTML() {
     return html;
 }
 
-// Assembles the gate-side Orbs & Shards strip panel: label + currency cell grid (PoE fixed slots).
+// Assembles the gate-side Orbs & Shards strip panel: label + currency cell grid (fixed slots).
 export function _egBuildGateCurrencyStripHTML() {
     return `
 <div class="eg-currency-strip">
@@ -556,7 +556,7 @@ export function _egRenderGateLevelChip() {
 }
 
 // Builds the top navigation bar with back button, gate title, level chip and the
-// Atlas of Statistica button (opens the PoE-style map overview screen).
+// Atlas of Statistica button (opens the map overview screen).
 export function _egBuildGateTopbarHTML() {
     return `
 <div class="eg-topbar">

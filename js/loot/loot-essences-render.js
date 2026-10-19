@@ -319,7 +319,7 @@ if (typeof document !== 'undefined' && document.addEventListener) {
         .eg-item-chip.eg-rarity-essence .eg-item-chip-icon {
             filter: drop-shadow(0 0 4px #b06ae0);
         }
-        /* PoE-style essence detail in tooltip */
+        /* Essence detail in tooltip */
         .eg-tt-essence-detail { padding-top: 6px; }
         .eg-tt-essence-title { color: #b59248; font-weight: 700; font-size: 0.82rem; margin-bottom: 5px; letter-spacing: 0.02em; }
         .eg-tt-essence-line { display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.78rem; line-height: 1.45; padding: 3px 0; border-bottom: 1px solid rgba(181,146,72,0.08); }

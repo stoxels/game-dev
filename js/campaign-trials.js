@@ -518,7 +518,7 @@ export function _egGrantConvergenceTrialReward(wi) {
         window._pendingConvergenceModal = true;
     }
     // Flat completion XP on top of kill XP: one first-clear share of the
-    // trial level's requirement (replays: reduced share), PoE-banded.
+    // trial level's requirement (replays: reduced share), tier-banded.
     if (typeof _egAwardXP === 'function' && typeof _egGetXpForNextLevel === 'function') {
         try {
             const c = (typeof EG_LEVELING_CONFIG !== 'undefined') ? EG_LEVELING_CONFIG : {};

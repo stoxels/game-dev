@@ -22,7 +22,7 @@ export let _egLastHitCritMult = 1;
 // timer, after a line, after a mistake). Returns one multiplier for a single
 // Attack roll; the "next Attack after a mistake" bonus is consumed here.
 export function _egCrossoverDamageMult(stats) {
-    // Path-of-Exile rule: these lines are all "increased" damage, so they add into
+    // ARPG rule: these lines are all "increased" damage, so they add into
     // one bucket (returned as 1 + sum) instead of multiplying each other.
     let sum = 0;
     const flags = globalThis.LEVEL_FLAGS;
@@ -56,7 +56,7 @@ export function _egCrossoverDamageMult(stats) {
 export function _egCalcPlayerDamage() {
     const stats = _egComputePlayerStats();
 
-    // Path-of-Exile layering: every "increased damage" line that applies to a hit
+    // ARPG layering: every "increased damage" line that applies to a hit
     // adds into ONE bucket per damage share (physical / each element); only the
     // deliberate "more" steps below multiply. Generic damage, projectile damage and
     // the situational lines apply to both shares.
@@ -157,7 +157,7 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
         (typeof EG_MELEE_OVERCHARGE_MULT === 'number') ? EG_MELEE_OVERCHARGE_MULT : 1,
         Math.max(0, Number(chargePct) || 0));
 
-    // Path-of-Exile layering: generic melee increase, weapon stance, weapon family,
+    // ARPG layering: generic melee increase, weapon stance, weapon family,
     // generic damage, dagger damage and the situational lines are ONE additive bucket
     // for the physical share (and generic/dagger/situational also feed the elemental
     // bucket below). Rage, riposte, double damage and crit stay multiplicative.
@@ -224,7 +224,7 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     // The tree's generic melee crit line applies to every melee strike.
     const daggerMultiPct = stats.isDaggerEquipped ? (stats.critMultiplierDaggerPct || 0) : 0;
     const daggerChancePct = stats.isDaggerEquipped ? (stats.critChanceDaggerPct || 0) : 0;
-    // Sword / Axe / Staff / Wand crit lines (PoE-port phase A), same scoping.
+    // Sword / Axe / Staff / Wand crit lines (ARPG port phase A), same scoping.
     const famChancePct = stats.isSwordEquipped ? (stats.critChanceSwordPct || 0)
         : stats.isAxeEquipped ? (stats.critChanceAxePct || 0)
         : stats.isStaffEquipped ? (stats.critChanceStaffPct || 0)

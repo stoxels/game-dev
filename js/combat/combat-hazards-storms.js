@@ -385,7 +385,7 @@ export function _egHzFireArcaneBeam() {
 //------------------------------------------------------------------------
 //-------------------METEOR BARRAGE---------------------------------------
 //------------------------------------------------------------------------
-// PoE-style meteor volleys: every interval a salvo of meteors telegraphs
+// Meteor volleys: every interval a salvo of meteors telegraphs
 // impact circles, then slams down from above. Fire damage, may ignite.
 
 export function _egHzInitMeteor(intensity) {

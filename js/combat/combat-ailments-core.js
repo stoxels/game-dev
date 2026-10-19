@@ -53,7 +53,7 @@ const EG_SPELL_INNATE_AILMENT = {
 const EG_AIL_BLEED_DURATION_S = 5;
 const EG_AIL_BLEED_DMG_SHARE = 0.15;    // dps = share of the triggering hit
 const EG_PHYS_INNATE_BLEED_CHANCE_PCT = 10;   // physical hits bleed even w/o mods
-// Poison is the SHADOW damage-over-time status (PoE's chaos poison). It has
+// Poison is the SHADOW damage-over-time status (the chaos poison). It has
 // no innate chance: only the passive tree's poisonChanceAttackPct causes it,
 // and it deals a share of the hit's SHADOW damage, so a hit with no shadow
 // share can never poison. Monsters can poison the player too: a monster hit
@@ -161,7 +161,7 @@ function _egApplyStatusToMap(statusMap, key, durationS, dps) {
 // Applies an ailment to a monster (or refreshes an existing one).
 function _egApplyMonsterAilment(monster, key, dps) {
     if (!monster) return;
-    // Active map run: monsters may avoid ailments entirely (PoE purity).
+    // Active map run: monsters may avoid ailments entirely (purity).
     if ((monster.avoidAilmentPct || 0) > 0 && Math.random() * 100 < monster.avoidAilmentPct) return;
     if (!monster.statuses) monster.statuses = {};
     let durationS = ({

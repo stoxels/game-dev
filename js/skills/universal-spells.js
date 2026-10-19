@@ -16,7 +16,7 @@ import { STATE } from '../state.js';
 //------------------------------------------------------------------------
 //--------------------UNIVERSAL SPELL ARSENAL-----------------------------
 //------------------------------------------------------------------------
-// A Path-of-Exile / WoW-Classic inspired spell arsenal. Every spell here:
+// A classic ARPG / MMO inspired spell arsenal. Every spell here:
 //   - lives in the SPELLBOOK under its own "Universal" section,
 //   - is dragged onto the hotbar like any other skill,
 //   - costs MANA (scaled by _scaleAbilityManaCost, Blood-Magic aware),
@@ -543,7 +543,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'drifterExplosion',
     },
 
-    // ── PATH OF EXILE: FIRE ─────────────────────────────────────────────
+    // ── FIRE SCHOOL ─────────────────────────────────────────────
     {
         id: 'usp_firestorm', icon: '🌋', theme: 'fire', element: 'fire', damageKind: 'fire',
         behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 5, hitsAll: true, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
@@ -572,7 +572,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'dofBurn',
     },
 
-    // ── PATH OF EXILE: COLD ─────────────────────────────────────────────
+    // ── COLD SCHOOL ─────────────────────────────────────────────
     {
         id: 'usp_freezing_pulse', icon: '🌊', theme: 'frost', element: 'cold', damageKind: 'cold',
         behavior: 'volley', dmg: [4, 5], count: 3, manaCost: 29, cooldownSeconds: 11, castTimeSeconds: 0.6,
@@ -610,7 +610,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'time_freeze',
     },
 
-    // ── PATH OF EXILE: LIGHTNING ────────────────────────────────────────
+    // ── LIGHTNING SCHOOL ────────────────────────────────────────
     {
         id: 'usp_spark', icon: '🎇', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
         behavior: 'wild', dmg: [3, 5], count: 6, volleyDelayMs: 150, manaCost: 42, cooldownSeconds: 16, castTimeSeconds: 1.0,
@@ -675,7 +675,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'gust_thunder',
     },
 
-    // ── PATH OF EXILE: SHADOW & CHAOS ───────────────────────────────────
+    // ── SHADOW & CHAOS SCHOOL ───────────────────────────────────
     {
         id: 'usp_contagion', icon: '🤢', theme: 'shadow', element: 'shadow', damageKind: 'shadow',
         behavior: 'ticks', dmg: [3, 4], tickDmg: [2, 4], ticks: 5, hitsAll: true, manaCost: 42, cooldownSeconds: 20, castTimeSeconds: 0.9,
@@ -713,7 +713,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'bayesTrapExplosion',
     },
 
-    // ── PATH OF EXILE: BLOOD & BLADES ───────────────────────────────────
+    // ── BLOOD & BLADES SCHOOL ───────────────────────────────────
     {
         id: 'usp_exsanguinate', icon: '🩸', theme: 'blade', element: 'physical', damageKind: 'physical',
         behavior: 'single', dmg: [15, 19], manaCost: 42, cooldownSeconds: 8, castTimeSeconds: 1.2,
@@ -2842,7 +2842,7 @@ function _uspRollCritMult() {
 // Flat "+N spell damage" is added to EVERY hit, so it used to dwarf the base
 // roll of the small-hit spells: a 3-5 channel tick with +115 flat dealt ~120
 // per half second, ~5x what a single big cast of the same mana did. Flat
-// damage now scales with the size of the hit it is added to (like PoE's
+// damage now scales with the size of the hit it is added to (like the genre's
 // damage effectiveness): full for a big single hit (>= USP_FLAT_FULL_HIT
 // base damage), proportionally less for the many-small-hits spells, never
 // below USP_FLAT_MIN_SHARE.

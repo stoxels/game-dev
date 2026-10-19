@@ -1,5 +1,5 @@
 ﻿/* ================================================================
-   ENDGAME ITEM TOOLTIP - PoE-style frame
+   ENDGAME ITEM TOOLTIP - ARPG-style frame
    Add these rules to your main CSS file (wherever .eg-tooltip-* lives).
    ================================================================ */
 
@@ -30,7 +30,7 @@
     max-width: 640px !important;
 }
 
-    /* Lift the PoE frame's own 360px cap inside the controls tooltip */
+    /* Lift the frame's own 360px cap inside the controls tooltip */
     #ghud-floating-tip.eg-controls-tip .eg-tt-frame {
         max-width: none;
     }
@@ -44,7 +44,7 @@
     max-width: 560px !important;
 }
 
-/* Lift the PoE frame's own 360px cap inside equipment tooltips */
+/* Lift the frame's own 360px cap inside equipment tooltips */
 #ghud-floating-tip .eg-tt-frame {
     max-width: none;
 }
@@ -59,7 +59,7 @@
     max-width: 620px !important;
 }
 
-/* Lift the PoE frame's own 360px cap inside map tooltips */
+/* Lift the frame's own 360px cap inside map tooltips */
 #ghud-floating-tip .eg-map-frame {
     max-width: none;
 }
@@ -272,7 +272,7 @@
     margin-left: 6px;
 }
 
-/* Implicit mod lines - PoE-style distinct blue with separator */
+/* Implicit mod lines - distinct blue with separator */
 .eg-tt-implicits-section {
     border-bottom: 1px solid rgba(255,255,255,0.08);
 }

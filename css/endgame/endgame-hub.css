@@ -177,7 +177,7 @@ Layout Architecture:
         overflow: hidden;
     }
 
-/* ── LEFT COLUMN: ORBS & SHARDS (PoE currency tab) ── */
+/* ── LEFT COLUMN: ORBS & SHARDS (currency tab) ── */
 .eg-currency-col {
     position: absolute;
     top: 0;

@@ -61,7 +61,7 @@ export function _egBuildTooltipBodyHTML(item) {
             : item.slotType.charAt(0).toUpperCase() + item.slotType.slice(1))
         : '';
 
-    // ── Weapon hand line (PoE-style): One-Handed / Heavy ────────────────
+    // ── Weapon hand line: One-Handed / Heavy ────────────────
     // Shown directly under the rarity line so the 1H/heavy choice - and with
     // it the shield / dual-wield decision - is visible before equipping.
     let handHTML = '';
@@ -91,9 +91,9 @@ export function _egBuildTooltipBodyHTML(item) {
     }
 
     // ── Implicit defenses & damage ───────────────────────────────────
-    // Defense and damage values shown are the LOCAL-modified totals (base +
-    // local flat, scaled by the item's own "% increased" mods - Path of
-    // Exile style). Values altered by local mods get the
+    // Defense and damage values shown are the LOCAL-modified totals (base +    // local flat, scaled by the item's own "% increased" mods). Values
+    // altered by local mods get the
+
     // .eg-tt-val-modified highlight so the player can tell them apart from
     // the untouched base value.
     const implicitLines = [];
@@ -166,10 +166,10 @@ export function _egBuildTooltipBodyHTML(item) {
         ? `<div class="eg-tt-section">${implicitLines.join('')}</div>`
         : '';
 
-    // ── Implicit modifiers (PoE-style base implicits) ────────────────
+    // ── Implicit modifiers (base implicits) ────────────────
     // Each equipment base has 1 (sometimes 2) beneficial implicits scaled
     // by required level. Rendered in its own blue section with an "Implicit"
-    // tag and a separator line above explicit mods, matching PoE layout.
+    // tag and a separator line above explicit mods, matching the usual layout.
     let implicitsHTML = '';
     const implicits = Array.isArray(item.implicits) ? item.implicits : [];
     if (implicits.length > 0) {
@@ -177,7 +177,7 @@ export function _egBuildTooltipBodyHTML(item) {
             ? _egBuildMergedModLines(implicits)
             : implicits.flatMap(imp => (imp.rolledStats||[]).map(s => ({ label: s.label, downside:false, tierLabel:'Implicit' })));
         const lines = merged.map(entry => {
-            // Implicits are always beneficial - render in PoE implicit blue (no text tag needed, color is the indicator)
+            // Implicits are always beneficial - render in implicit blue (no text tag needed, color is the indicator)
             return `<div class="eg-tt-mod eg-tt-mod-implicit"><span class="eg-tt-mod-label">${entry.label}</span></div>`;
         });
         if (lines.length) {
@@ -230,7 +230,7 @@ export function _egBuildTooltipBodyHTML(item) {
             .replace('{list}', _egGetUnmetRequirementsText(chain.broken))}</div></div>`
         : '';
 
-    // ── Hand-conflict warning (PoE-style) ────────────────────────────
+    // ── Hand-conflict warning ────────────────────────────
     // Shown when the item fits its own slot but the hand setup forbids it
     // (2H needs a free off-hand, off-hand takes 1H/shield only).
     let handHTML2 = '';
@@ -260,7 +260,7 @@ export function _egBuildTooltipBodyHTML(item) {
         // Mods sharing the same stat (e.g. flat Health + the Health half of
         // a hybrid roll) are merged into one combined line per stat.
         const mergedLines = _egBuildMergedModLines(mods);
-        // Unique items use bespoke mods without tiers - hide PoE-style tier badges.
+        // Unique items use bespoke mods without tiers - hide tier badges.
         const hideTier = !!item.isUnique;
         const lines = mergedLines.map(entry => {
             // Unique downsides render in warning red instead of mod blue.

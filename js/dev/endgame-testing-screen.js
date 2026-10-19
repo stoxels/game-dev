@@ -38,7 +38,7 @@ import { t } from '../translation/translations.js';
 //-------------------TEST MAP DEFINITIONS-----------------------------------
 //------------------------------------------------------------------------
 
-// Five test maps, roughly increasing in difficulty/juice (PoE-map style).
+// Five test maps, roughly increasing in difficulty/juice (ARPG-map style).
 // puzzlePool criteria are the same shape _egBuildChainPool() already
 // understands (minCells/maxCells/minRows/maxRows/minCols/maxCols/worlds/
 // excludeWorlds) - see endgame-encounter-chain.js.

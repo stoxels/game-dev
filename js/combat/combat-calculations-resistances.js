@@ -20,7 +20,7 @@ export function _egGetPlayerResistCap(stats, element) {
 
 export const EG_ELEMENTS = ['fire', 'cold', 'lightning', 'shadow'];
 
-// Campaign resistance penalty (Path of Exile style): -30% to ALL four
+// Campaign resistance penalty (ARPG style): -30% to ALL four
 // resistances once the Ascension Trial that opens the ascendency class is
 // cleared (stage 1) and another -30% when World 14 / the Nexus Point is
 // cleared, right before the endgame maps (stage 2), -60% in total. It is
@@ -113,7 +113,7 @@ export function _egHasDamageConversion(stats) {
         .some((k) => (Number(stats[k]) || 0) > 0);
 }
 
-// Strength of the "gain as extra <element>" parts. Path-of-Exile rule: general
+// Strength of the "gain as extra <element>" parts. ARPG rule: general
 // elemental, the element's own increase and any caller-supplied generic increase
 // all ADD into one bucket. `passed` is either a fire multiplier (legacy number) or
 // { fire, cold, lightning, shadow } multipliers the caller already built that way.
@@ -148,7 +148,7 @@ export function _egApplyDamageConversion(stats, physical, elements, multsArg = 1
     // Same for "as extra Shadow" (node 20218): extra, taken from physical,
     // scaled by the shadow increase; dropped under fire-only like any shadow.
     const extraShadowPct = Math.max(0, Number(stats && stats.physAsExtraShadowPct) || 0);
-    // Extra cold / lightning (PoE-port phase A): same shape, scaled by the
+    // Extra cold / lightning (ARPG port phase A): same shape, scaled by the
     // element's own increases; dropped under fire-only like any non-fire part.
     const extraColdPct = Math.max(0, Number(stats && stats.physAsExtraColdPct) || 0);
     const extraLightningPct = Math.max(0, Number(stats && stats.physAsExtraLightningPct) || 0);
@@ -338,7 +338,7 @@ export function _egApplyTargetResistances(amount, target, elements, opts) {
             EG_ELEMENTS.forEach(el => {
                 const part = (elements[el] || 0) * factor;
                 if (part <= 0) return;
-                // Penetration (opts.penetration, PoE-port phase A) lowers the
+                // Penetration (opts.penetration, ARPG port phase A) lowers the
                 // monster's resistance for this hit only.
                 const penV = (opts && opts.penetration && opts.penetration[el]) || 0;
                 mitigated += part * (1 - clampRes((Number(res[el]) || 0) - penV) / 100);

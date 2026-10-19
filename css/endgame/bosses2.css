@@ -950,7 +950,7 @@
     animation: eg-nk-spin 0.5s linear infinite;
 }
 
-/* Shaper frozen domains */
+/* Frostwright frozen domains */
 .eg-nk-domain {
     position: fixed; left: 0; top: 0;
     pointer-events: none; z-index: 9001;

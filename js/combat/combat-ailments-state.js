@@ -109,7 +109,7 @@ export function _egGainEnduranceCharge(max, durationPct = 0) {
 //------------------------------------------------------------------------
 //-------------------FRENZY CHARGES---------------------------------------
 //------------------------------------------------------------------------
-// Offensive charge resource (like Path of Exile's Frenzy Charges). Each
+// Offensive charge resource (like Frenzy Charges). Each
 // active charge grants EG_FRENZY_MELEE_SPEED_PER_CHARGE % increased melee
 // charge-up speed and EG_FRENZY_DAMAGE_PER_CHARGE % more projectile damage
 // (folded in _egComputePlayerStats). Charges share one timer: gaining a
@@ -148,7 +148,7 @@ export function _egResetFrenzyCharges() {
 //------------------------------------------------------------------------
 //-------------------ONSLAUGHT--------------------------------------------
 //------------------------------------------------------------------------
-// Timed speed buff (PoE Onslaught): while active, melee charge-up, cast and
+// Timed speed buff (Onslaught): while active, melee charge-up, cast and
 // movement speed rise by EG_ONSLAUGHT_SPEED_PCT (scaled by the effect line).
 // Gained on kill through the tree; every gain refreshes the timer.
 export const EG_ONSLAUGHT_DURATION_MS = 4000;
@@ -210,7 +210,7 @@ export function _egResetGhostShrouds() {
 //------------------------------------------------------------------------
 //-------------------POWER CHARGES----------------------------------------
 //------------------------------------------------------------------------
-// Critical-strike charge resource (PoE Power Charges). Each live charge adds
+// Critical-strike charge resource (Power Charges). Each live charge adds
 // EG_POWER_CRIT_PER_CHARGE % crit chance (attacks and spells) and feeds the
 // tree's damage-per-charge line (folded in _egComputePlayerStats). Shared
 // timer like Frenzy/Endurance; resolved lazily against the clock.
@@ -244,7 +244,7 @@ export function _egResetPowerCharges() {
 //------------------------------------------------------------------------
 //-------------------FORTIFICATION----------------------------------------
 //------------------------------------------------------------------------
-// Defensive stacks (PoE Fortify, stack form): each stack takes
+// Defensive stacks (Fortify, stack form): each stack takes
 // EG_FORTIFY_DR_PER_STACK % less damage from hits (scaled by the effect line).
 // Gaining a stack refreshes the shared timer; all stacks expire together.
 export const EG_FORTIFY_DURATION_MS = 4000;
