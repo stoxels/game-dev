@@ -124,7 +124,7 @@
 }
 
 /* ---------------------------------------------------------
-   4. COMBINED SCORE + DIFFICULTY RIBBON (single scroll)
+   4. SCORE + TITLES-PROGRESS RIBBON (single scroll)
    --------------------------------------------------------- */
 
 #screen-map-view .mv-ribbon-combined,
@@ -134,18 +134,46 @@
     align-items: center;
     justify-content: center;
     background: url('../images/Level_Select_Topbar/score-pts-scroll.webp') center / 100% 100% no-repeat;
-    width: clamp(130px, 15vw, 300px);
+    /* Wide enough for the longest line this scroll holds - the
+       "3/24 Titles collected" progress caption (Press Start 2P advances
+       a full 1em per glyph, so 21 glyphs need ~21x the font size). */
+    width: clamp(200px, 18vw, 340px);
     height: auto;
     aspect-ratio: 3.75 / 1;
     box-sizing: border-box;
-    padding: clamp(3px, 0.8vw, 6px) clamp(10px, 2.5vw, 20px);
+    padding: clamp(3px, 0.8vw, 6px) clamp(4px, 1.1vw, 10px);
     font-family: var(--PX, monospace);
     white-space: nowrap;
     flex-shrink: 1;
     line-height: 1.35;
+    transition: filter 0.15s, box-shadow 0.15s;
 }
 
-/* Line 1 - total score (e.g. "TOTAL: 2939") */
+/* Wrapper: the always-visible "TITLES" caption sits ABOVE the scroll,
+   so the ribbon itself never swaps its artwork on hover. */
+#screen-map-view .mv-ribbon-wrap,
+#screen-world-detail .mv-ribbon-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(1px, 0.3vw, 4px);
+    flex-shrink: 1;
+    cursor: pointer;
+}
+
+#screen-map-view .mv-ribbon-label,
+#screen-world-detail .mv-ribbon-label {
+    font-family: var(--PX, monospace);
+    font-size: clamp(8px, 1vw, 12px);
+    font-weight: bold;
+    letter-spacing: clamp(1px, 0.25vw, 3px);
+    color: #f0d090;
+    text-shadow: 1px 1px 0 #000, 0 0 8px rgba(255, 200, 80, 0.45);
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* Line 1 - total score (e.g. "12,345") */
 #screen-map-view #mv-ls-score,
 #screen-world-detail #wd-ls-score {
     font-size: clamp(9px, 1.3vw, 15px);
@@ -155,13 +183,30 @@
     letter-spacing: 1px;
 }
 
-/* Line 2 - points to next code */
+/* Line 2 - collected title progress (e.g. "3/24 Titles collected").
+   Small and tight: this line is the longest text the narrow scroll holds.
+   The vw factor stays below the scroll's own growth rate so it never
+   overflows the scroll at any width (min 6.5px, max 9.5px). */
 #screen-map-view #mv-ls-pts-next,
 #screen-world-detail #wd-ls-pts-next {
-    font-size: clamp(7px, 1vw, 11px);
+    font-size: clamp(6.5px, 0.7vw, 9.5px);
     color: #010101;
     opacity: 1;
-    letter-spacing: 0.5px;
+    letter-spacing: 0;
+    line-height: 1.25;
+}
+
+/* The score scroll opens the TITLES list (see js/titles.js): a real
+   button-shaped affordance. Hover / keyboard focus raises a gold glow -
+   the ribbon's artwork never changes, only the glow. */
+#screen-map-view .mv-ribbon-wrap:hover .mv-ribbon-combined,
+#screen-world-detail .mv-ribbon-wrap:hover .mv-ribbon-combined,
+#screen-map-view .mv-ribbon-wrap:focus-visible .mv-ribbon-combined,
+#screen-world-detail .mv-ribbon-wrap:focus-visible .mv-ribbon-combined {
+    filter: brightness(1.12);
+    box-shadow: 0 0 14px rgba(255, 215, 0, 0.65);
+    outline: 2px solid rgba(255, 215, 0, 0.85);
+    outline-offset: 2px;
 }
 
 
@@ -398,7 +443,7 @@
 
     #screen-map-view .mv-ribbon-combined,
     #screen-world-detail .mv-ribbon-combined {
-        width: clamp(110px, 34vw, 180px);
+        width: clamp(170px, 34vw, 200px);
     }
 
     #screen-map-view .mv-char-portrait-wrap,

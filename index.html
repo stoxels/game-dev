@@ -1014,8 +1014,8 @@
             </div>
             <div class="ls-topbar-row2">
                 <span class="ls-mods-label" id="ls-mods"></span>
-                <span class="ls-score" id="ls-score">TOTAL: 0</span>
-                <span class="ls-pts-next" id="ls-pts-next"></span>
+                <span class="ls-score" id="ls-score" data-tip-t="tip_titles_ribbon">TOTAL: 0</span>
+                <span class="ls-pts-next" id="ls-pts-next" data-tip-t="tip_titles_ribbon"></span>
             </div>
         </div>
         <div class="ls-body" id="ls-body"></div>
@@ -1026,9 +1026,12 @@
         <div class="ls-topbar">
             <button class="back-btn" id="mv-btn-back" data-t="btn_back">◀ BACK</button>
             <div class="mv-char-portrait-wrap" id="mv-char-portrait-wrap"></div>
-            <div class="mv-ribbon-combined">
-                <span id="mv-ls-score"> 0</span>
-                <span id="mv-ls-pts-next"></span>
+            <div class="mv-ribbon-wrap" role="button" tabindex="0" data-tip-t="tip_titles_ribbon">
+                <span class="mv-ribbon-label" data-t="titles_ribbon_label">TITLES</span>
+                <div class="mv-ribbon-combined">
+                    <span id="mv-ls-score"></span>
+                    <span id="mv-ls-pts-next"></span>
+                </div>
             </div>
             <span class="ls-title" data-t="ls_title">SELECT LEVEL</span>
 
@@ -1077,9 +1080,12 @@
         <div class="ls-topbar">
             <button class="back-btn" id="wd-btn-back" data-t="btn_back">◀ BACK</button>
             <div class="mv-char-portrait-wrap" id="wd-char-portrait-wrap"></div>
-            <div class="mv-ribbon-combined">
-                <span id="wd-ls-score"> 0</span>
-                <span id="wd-ls-pts-next"></span>
+            <div class="mv-ribbon-wrap" role="button" tabindex="0" data-tip-t="tip_titles_ribbon">
+                <span class="mv-ribbon-label" data-t="titles_ribbon_label">TITLES</span>
+                <div class="mv-ribbon-combined">
+                    <span id="wd-ls-score"></span>
+                    <span id="wd-ls-pts-next"></span>
+                </div>
             </div>
             <!-- (class-change token button lives in .ls-topbar-right below) -->
             <span class="ls-title" id="wd-title-plaque">WORLD</span>

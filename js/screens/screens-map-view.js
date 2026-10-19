@@ -1790,7 +1790,8 @@ function _renderTopBarMods() {
 export function _renderTopBarScore(p = 'mv') {
     const scoreEl = document.getElementById(p + '-ls-score');
     if (scoreEl) {
-        scoreEl.textContent = (STATE ? STATE.totalScore : 0);
+        // Plain total Score - this scroll opens the TITLES list (see js/titles.js).
+        scoreEl.textContent = String(STATE ? STATE.totalScore : 0);
     }
     // A freshly earned title is celebrated when the player is back on a map.
     if (typeof globalThis.checkTitleUnlocks === 'function') setTimeout(() => globalThis.checkTitleUnlocks(), 700);
@@ -1801,11 +1802,17 @@ export function _renderTopBarScore(p = 'mv') {
 }
 
 /**
- * Renders the "score to next title" display in the map view top bar.
+ * Renders the collected-title progress line in the map view top bar
+ * (the line under the total Score on the TITLES ribbon), e.g.
+ * "3/24 Titles collected". Falls back to the classic "score to next title"
+ * hint when the titles module is unavailable.
  */
 export function _renderTopBarNextCode(p = 'mv') {
     const ptsNextEl = document.getElementById(p + '-ls-pts-next');
-    if (ptsNextEl && typeof buildNextTitleStr === 'function') {
+    if (!ptsNextEl) return;
+    if (typeof globalThis.titlesCollectedText === 'function') {
+        ptsNextEl.textContent = globalThis.titlesCollectedText();
+    } else if (typeof buildNextTitleStr === 'function') {
         ptsNextEl.textContent = buildNextTitleStr();
     }
 }

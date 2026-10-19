@@ -321,7 +321,7 @@ import { BONUS_QUIZ_POOLS } from '../../js/quiz-exercise/quiz-questions.js';
 import { _quizCalcEliminationChance, answerQuizInput, closeQuiz, finishQuiz, quizUseTutor, showQuiz, skipQuiz } from '../../js/quiz-exercise/quiz.js';
 import { _getWrap, currentZoom, resetZoom, scalePuzzle, setPuzzleMonsterRoom, setPuzzleZoom, zoomInBtn, zoomOutBtn } from '../../js/grid-scaling.js';
 import { WORLD_CODES, checkWorldCodes, checkWorldCodesSync, showCodes } from '../../js/codes.js';
-import { TITLE_DEFS, checkTitleUnlocks, getActiveTitle, getActiveTitleName, getEarnedTitlesForScore, getNextTitle, getTitleEffectSpecs, getTitleForScore, getTitleName, getTitleStatLines, showTitlesModal, titleProgressText, withTitle } from '../../js/titles.js';
+import { TITLE_DEFS, checkTitleUnlocks, getActiveTitle, getActiveTitleName, getEarnedTitleTotalLines, getEarnedTitleTotals, getEarnedTitlesForScore, getNextTitle, getTitleEffectSpecs, getTitleForScore, getTitleName, getTitleStatLines, showTitlesModal, titleProgressText, titlesCollectedText, withTitle } from '../../js/titles.js';
 import { _applyCentralTendency, _applyCompletionGlimpse, _applyDeadReckoningStart, _applyDensityMapping, _applyInterquartileVision, _applyMarginalDistribution, _applyNullHypothesis, _applyProbabilisticStartRolls, _applySparseRegion, _applySylaForestAffinity, _deadReckoningApplyClues, _getGridSizeTier, _hideCompletionGlimpseBar, _initLuckyTiles, _revealCellsAndFinalize, triggerSylaFlowerEffect } from '../../js/start-level-passives.js';
 import { _doStartLevel, _setMistakeCounterText } from '../../js/start-level.js';
 import { confirmReset } from '../../js/save-reset.js';
@@ -977,6 +977,7 @@ try { Object.defineProperty(globalThis, "submitPrimerAnswer", { get() { return s
 try { Object.defineProperty(globalThis, "syncDiffModButtons", { get() { return syncDiffModButtons; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "t", { get() { return t; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "titleProgressText", { get() { return titleProgressText; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "titlesCollectedText", { get() { return titlesCollectedText; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "togMod", { get() { return togMod; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "triggerBanter", { get() { return triggerBanter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "triggerClassEventIfPending", { get() { return triggerClassEventIfPending; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

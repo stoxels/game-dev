@@ -1,94 +1,373 @@
 /* Titles (js/titles.js): list modal, unlock ceremony, save-slot line.
    The two modals reuse the parchment frame of the Moodle code modal
-   (.pw-box in modals.css), so text here is dark brown on parchment. */
+   (.pw-box in modals.css), so text here is dark brown on parchment.
+   Readability rules: full-ink body text, solid card fills (never faint
+   washes that drown in the parchment grain), and a clear visual ladder
+   header -> total box -> earned cards -> locked rows. */
 
 #titles-modal,
 #title-ceremony {
     z-index: 9000; /* above win overlay / hub overlays */
 }
 
-.titles-box .tt-head {
-    text-align: center;
+/* ---- Header: score line + count line (top, full width) ----
+   Only the list modal has this header block - the unlock ceremony is a
+   separate, compact modal and keeps the plain .pw-box frame. */
+
+#titles-modal .tt-top {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     color: #2c1a0c;
-    font-size: clamp(12px, 2.7cqw, 17px);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
-.titles-box .tt-sub {
-    opacity: 0.75;
-    margin-top: 2px;
+#titles-modal .tt-score {
+    font-weight: 800;
+    font-size: clamp(16px, 3.2cqw, 22px);
+    color: #241405;
+    letter-spacing: 0.2px;
+}
+
+#titles-modal .tt-sub {
+    font-weight: 800;
+    font-size: clamp(15px, 2.8cqw, 20px);
+    color: #2c1a0c;          /* dark ink: the old mid-brown washed out on parchment */
+    letter-spacing: 0.3px;
+    margin-top: 0;
+}
+
+/* ---- Much larger modal ------------------------------------------------
+   The shared .pw-box frame (css/modals.css) is sized for a small dialog:
+   `width: 94%` capped at min(700px, 120vh) with a huge percentage padding,
+   which left the titles list squeezed into ~400x220px of parchment.
+
+   This shell mirrors the achievements modal's .ach-modal-box: a DEFINITE
+   width, the frame art's own aspect ratio (so the stone frame is not
+   stretched), and padding that keeps the content on the flat parchment
+   area. The width MUST be definite - .pw-box sets `container-type:
+   inline-size`, and inline-size containment means an `auto` width resolves
+   to ZERO (the box collapses to its padding only). Never use `width: auto`
+   here.
+
+   Scoped to #titles-modal on purpose: the unlock ceremony shares the
+   .titles-box class but is a small celebration, so it keeps the plain
+   .pw-box frame. */
+
+#titles-modal .titles-box {
+    position: relative;
+    width: min(1200px, 95vw, 145vh);
+    max-width: none;                  /* override .modal-box's 660px cap */
+    aspect-ratio: 611 / 470;          /* keep the frame art undistorted */
+    max-height: calc(100vh - 40px);
+    background-image: url('../images/Settings/settings_background.webp');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    border-left: none;
+    box-shadow: none;
+    padding: clamp(48px, 12%, 170px) clamp(42px, 10.5%, 150px) clamp(40px, 11%, 150px);
+    overflow: visible;                 /* plaque + close button hang over the frame edge */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0;
+    container-type: inline-size;
+    color: #2c1a0c;
+}
+
+/* Short-wide windows: release the art ratio so the frame borders never
+   outgrow the box (same fix as .ach-modal-box / .tut-box). */
+@media (min-width: 701px) and (max-height: 620px) {
+    #titles-modal .titles-box {
+        aspect-ratio: auto;
+        height: calc(100vh - 40px);
+    }
+}
+
+/* Narrow windows: single column, so switch top/bottom padding to vh. */
+@media (max-width: 700px) {
+    #titles-modal .titles-box {
+        aspect-ratio: auto;
+        max-height: calc(100vh - 40px);
+        padding-top: clamp(48px, 11vh, 170px);
+        padding-bottom: clamp(40px, 10vh, 150px);
+    }
+}
+
+/* The body panel: a flex column that fills the frame's inner height, so
+   the columns below can size themselves against it. */
+#titles-modal .pw-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;                  /* the list column does the scrolling */
+    padding-right: 0;
+    gap: 14px;
+}
+
+/* Header plaque: bigger "TITLES" text (no emoji - handled in translations).
+   Sized off the box (cqw) like the achievements plaque. */
+#titles-modal .modal-title {
+    width: max(min(40%, 500px), 320px);
+    height: clamp(56px, 9cqw, 104px);
+    font-size: min(clamp(20px, 3.2cqw, 40px), 6vh);
+    letter-spacing: 3px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 14px rgba(0, 0, 0, 0.6);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+}
+
+/* ---- Two columns: scrollable titles list | fixed total bonus summary ---- */
+
+#titles-modal .tt-top {
+    flex: 0 0 auto;
+}
+
+#titles-modal .tt-columns {
+    display: flex;
+    gap: 22px;
+    align-items: stretch;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+#titles-modal .tt-list-column {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 10px;
+    scrollbar-width: thin;
+}
+
+/* Parchment-toned scrollbar, same as the shared .pw-scroll one. */
+#titles-modal .tt-list-column::-webkit-scrollbar {
+    width: 8px;
+}
+
+#titles-modal .tt-list-column::-webkit-scrollbar-track {
+    background: rgba(44, 26, 12, 0.12);
+    border-radius: 6px;
+}
+
+#titles-modal .tt-list-column::-webkit-scrollbar-thumb {
+    background: rgba(44, 26, 12, 0.45);
+    border-radius: 6px;
+}
+
+#titles-modal .tt-total-column {
+    flex: 0 0 auto;
+    width: 340px;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* The summary list scrolls on its own (21 stat lines at full unlock), so
+   the "always show my highest title" toggle stays pinned below it. */
+#titles-modal .tt-total-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 8px;
+    scrollbar-width: thin;
+}
+
+#titles-modal .tt-total-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+#titles-modal .tt-total-scroll::-webkit-scrollbar-track {
+    background: rgba(44, 26, 12, 0.12);
+    border-radius: 6px;
+}
+
+#titles-modal .tt-total-scroll::-webkit-scrollbar-thumb {
+    background: rgba(44, 26, 12, 0.45);
+    border-radius: 6px;
+}
+
+#titles-modal .tt-total-column .tt-auto {
+    flex: 0 0 auto;
+    margin-top: 12px;
+}
+
+/* Stacked-total summary: the answer to "do I get ALL of these?".
+   Gold-bordered card so it reads as the most important block. */
+.titles-box .tt-total {
+    margin: 0 0 14px 0;
+    max-width: none;
+    background: rgba(255, 246, 214, 0.85);
+    border: 2px solid #8a5a00;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgba(255, 252, 235, 0.7),
+                0 0 10px rgba(200, 140, 20, 0.45),
+                0 2px 6px rgba(0, 0, 0, 0.3);
+    padding: clamp(8px, 1.8cqw, 14px) clamp(10px, 2.2cqw, 18px);
+}
+
+.titles-box .tt-total-head {
+    font-weight: 800;
+    font-size: clamp(13px, 2.9cqw, 18px);
+    letter-spacing: 0.04em;
+    color: #6b3a00;
+    margin-bottom: 5px;
+}
+
+.titles-box .tt-total-line {
+    font-weight: 700;
+    font-size: clamp(13px, 2.8cqw, 17px);
+    color: #241405;
+    line-height: 1.55;
+}
+
+.titles-box .tt-total-sub {
+    margin-top: 6px;
+    font-size: clamp(12px, 2.5cqw, 15px);
+    font-style: italic;
+    line-height: 1.5;
+    color: #4a2c12;
+}
+
+/* Before the first title the box becomes a "how this works" hint. */
+.titles-box .tt-total-empty {
+    background: rgba(255, 246, 214, 0.5);
+    border: 2px dashed rgba(74, 44, 18, 0.6);
+    box-shadow: none;
+    font-size: clamp(12px, 2.6cqw, 16px);
+    font-style: italic;
+    line-height: 1.55;
+    color: #4a2c12;
 }
 
 .titles-box .tt-auto {
-    margin-top: 6px;
-    background: rgba(44, 26, 12, 0.08);
-    border: 1px solid rgba(44, 26, 12, 0.45);
+    margin-top: 8px;
+    background: rgba(255, 246, 214, 0.6);
+    border: 2px solid rgba(44, 26, 12, 0.6);
+    border-radius: 20px;
     color: #2c1a0c;
-    padding: 3px 10px;
+    font-weight: 700;
+    font-size: clamp(12px, 2.6cqw, 16px);
+    padding: 5px 16px;
     cursor: pointer;
-    font: inherit;
+    font-family: inherit;
+}
+
+.titles-box .tt-auto:hover {
+    border-color: #8a5a00;
+    color: #6b3a00;
 }
 
 .titles-box .tt-auto.on {
-    background: rgba(44, 26, 12, 0.3);
-    font-weight: 700;
+    background: #8a5a00;
+    border-color: #5d3a10;
+    color: #fff8dc;
+    box-shadow: 0 0 8px rgba(200, 140, 20, 0.6);
 }
+
+/* ---- Title rows: solid cards, never faint washes ---- */
 
 .titles-box .tt-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    padding: 6px 8px;
-    margin-bottom: 4px;
-    border: 1px solid rgba(44, 26, 12, 0.25);
-    background: rgba(44, 26, 12, 0.05);
-    color: rgba(44, 26, 12, 0.55);
+    gap: 12px;
+    padding: clamp(8px, 1.8cqw, 12px) clamp(10px, 2cqw, 14px);
+    margin-bottom: 6px;
+    border: 2px solid rgba(44, 26, 12, 0.4);
+    border-radius: 8px;
+    background: rgba(255, 248, 220, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(255, 248, 220, 0.5),
+                0 2px 5px rgba(0, 0, 0, 0.25);
+    color: #2c1a0c;
 }
 
 .titles-box .tt-row.earned {
-    color: #2c1a0c;
-    background: rgba(255, 244, 214, 0.35);
-    border-color: rgba(44, 26, 12, 0.55);
+    background: rgba(255, 244, 208, 0.9);
+    border-color: rgba(74, 44, 18, 0.75);
+}
+
+.titles-box .tt-row:not(.earned) {
+    border-style: dashed;
+    background: rgba(255, 248, 220, 0.35);
 }
 
 .titles-box .tt-row.active {
     border-color: #8a5a00;
-    box-shadow: 0 0 6px rgba(200, 140, 20, 0.6);
+    border-style: solid;
+    box-shadow: inset 0 0 0 1px rgba(255, 252, 235, 0.7),
+                0 0 10px rgba(200, 140, 20, 0.65),
+                0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .titles-box .tt-name {
-    font-weight: 700;
-    font-size: clamp(12px, 2.6cqw, 16px);
+    font-weight: 800;
+    font-size: clamp(14px, 3cqw, 18px);
+    color: #241405;
+}
+
+.titles-box .tt-row:not(.earned) .tt-name {
+    color: rgba(44, 26, 12, 0.8);
 }
 
 .titles-box .tt-stat {
-    font-size: clamp(12px, 2.6cqw, 17px);
-    opacity: 0.9;
+    font-size: clamp(13px, 2.7cqw, 17px);
+    font-weight: 600;
+    line-height: 1.5;
+    color: #3a240e;
+}
+
+.titles-box .tt-row:not(.earned) .tt-stat {
+    color: rgba(58, 36, 14, 0.8);
+}
+
+/* Per-row stacking tag: this bonus applies even when another title is shown. */
+.titles-box .tt-always {
+    display: inline-block;
+    margin-top: 3px;
+    font-size: clamp(11px, 2.3cqw, 14px);
+    font-weight: 800;
+    color: #2e6b3f;
 }
 
 .titles-box .tt-state {
     flex: 0 0 auto;
-    font-size: clamp(11px, 2.4cqw, 15px);
+    font-size: clamp(12px, 2.5cqw, 15px);
     text-align: right;
 }
 
 .titles-box .tt-equip {
-    background: rgba(44, 26, 12, 0.18);
-    border: 1px solid #2c1a0c;
-    color: #2c1a0c;
-    padding: 4px 12px;
+    background: #8a5a00;
+    border: 2px solid #5d3a10;
+    border-radius: 6px;
+    color: #fff8dc;
+    font-weight: 800;
+    font-size: clamp(12px, 2.6cqw, 16px);
+    padding: 6px 16px;
     cursor: pointer;
-    font: inherit;
+    font-family: inherit;
+    white-space: nowrap;
 }
 
 .titles-box .tt-equip:hover {
-    background: rgba(44, 26, 12, 0.35);
+    background: #6b3a00;
+    box-shadow: 0 0 8px rgba(200, 140, 20, 0.7);
 }
 
 .titles-box .tt-equipped {
-    color: #6b4200;
+    color: #6b3a00;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.titles-box .tt-lock {
+    color: #5d3a10;
     font-weight: 700;
+    white-space: nowrap;
 }
 
 /* ---- Ceremony ---- */
@@ -114,16 +393,17 @@
 
 .titles-box .tt-also {
     font-size: clamp(12px, 2.6cqw, 16px);
-    opacity: 0.75;
+    color: #4a2c12;
     margin-top: 2px;
 }
 
 .titles-box .tt-bonus-head {
     margin: 10px 0 4px;
-    font-size: clamp(11px, 2.4cqw, 15px);
+    font-size: clamp(12px, 2.6cqw, 16px);
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    opacity: 0.7;
+    color: #4a2c12;
 }
 
 .titles-box .tt-buttons {
@@ -146,6 +426,11 @@
 /* The score banner opens the titles list. */
 #ls-score, #ls-pts-next, .mv-ribbon-combined {
     cursor: pointer;
+}
+
+#ls-score:hover, #ls-pts-next:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }
 
 /* Save-slot card: equipped title above the score. */
