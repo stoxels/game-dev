@@ -1,4 +1,12 @@
 import { EG_ATLAS_MAX_TIER } from '../endgame/endgame-atlas.js';
+import { egAddCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
+import { egSaveHubState } from '../endgame/endgame-hub.js';
+import { _egAddItemToStash } from '../endgame/hub-stash.js';
+import { _egGetPlayerLevel } from '../endgame/endgame-leveling.js';
+import { _egGenerateEquipmentDrop } from './loot-equipment-generator.js';
+import { _egAddMapToMapStash } from './loot-map-drops.js';
+import { _egGenerateMapDrop } from './loot-maps.js';
+import { egAddEssence } from './loot-essences-stash.js';
 import { EG_CURRENCY_DEFS } from './loot-currency.js';
 import { _EG_ESSENCE_FAMILIES } from './loot-essences.js';
 import { EG_ESSENCE_DEFS } from './loot-essences-defs.js';
@@ -102,3 +110,89 @@ export function _egRollMapCompletionReward(map) {
 }
 
 
+//-------------------GUARANTEED LOOT REWARDS-------------------------------
+//------------------------------------------------------------------------
+// Bonus objectives and inference quests pay out a fixed KIND of loot (an
+// equipment piece, a core, an essence or an atlas map) rolled at a level
+// that fits where the player is: helpful, never a jackpot. Equipment is
+// capped at uncommon/rare, cores come from a level-gated pool (no mirror,
+// ancient or elevation-tier orbs) and maps keep the quest's own tier.
+
+export const EG_SCRIPTED_LOOT_KINDS = ['equipment', 'core', 'essence'];
+
+// Cores a guaranteed reward may hand out: [id, weight, minLevel, minCount, maxCount].
+const EG_SCRIPTED_CORE_POOL = [
+    ['orb_transmutation', 40, 1, 2, 3],
+    ['orb_augmentation', 40, 1, 2, 3],
+    ['orb_alteration', 50, 1, 2, 3],
+    ['orb_alchemy', 30, 6, 1, 2],
+    ['orb_scouring', 25, 10, 1, 2],
+    ['orb_chance', 25, 12, 1, 2],
+    ['orb_blessing', 25, 16, 1, 2],
+    ['orb_regal', 20, 22, 1, 2],
+    ['orb_bloom', 12, 28, 1, 1],
+    ['orb_annulment', 10, 30, 1, 1],
+    ['orb_chaos', 14, 34, 1, 1],
+    ['orb_exalted', 5, 50, 1, 1],
+    ['orb_divine', 5, 50, 1, 1],
+];
+
+// Weighted pick over a list, weight read through `weightOf`.
+function _egScriptedPick(list, weightOf) {
+    const total = list.reduce((s, e) => s + weightOf(e), 0);
+    let roll = Math.random() * total;
+    for (const e of list) {
+        roll -= weightOf(e);
+        if (roll <= 0) return e;
+    }
+    return list[list.length - 1];
+}
+
+// The level guaranteed rewards are rolled at: the player's own level.
+export function _egScriptedLootLevel() {
+    return Math.max(1, Math.round(Number(_egGetPlayerLevel()) || 1));
+}
+
+// Grants one guaranteed loot reward straight into the hub stashes and
+// returns { kind, icon, name, rarity, count } for the caller to display
+// (null when nothing could be granted). kind: equipment | core | essence |
+// map. `level` is the power level to roll at; `tier` only matters for maps.
+export function egGrantScriptedLoot(kind, level, tier) {
+    level = Math.max(1, Math.round(Number(level) || 1));
+    if (typeof globalThis._egLoadHubState === 'function') globalThis._egLoadHubState();
+    let result = null;
+    if (kind === 'equipment') {
+        const item = _egGenerateEquipmentDrop(level, Math.random() < 0.6 ? 'uncommon' : 'rare');
+        if (item) {
+            _egAddItemToStash(item);
+            result = { kind, icon: item.icon, name: item.name, rarity: item.rarity, count: 1 };
+        }
+    } else if (kind === 'core') {
+        const pool = EG_SCRIPTED_CORE_POOL.filter(e => level >= e[2] && EG_CURRENCY_DEFS[e[0]]);
+        const [id, , , lo, hi] = _egScriptedPick(pool, e => e[1]);
+        const def = EG_CURRENCY_DEFS[id];
+        const count = lo + Math.floor(Math.random() * (hi - lo + 1));
+        if (egAddCurrency(id, count, { name: def.name, icon: def.icon, rarity: 'currency', category: 'currency', description: def.description })) {
+            result = { kind, icon: def.icon, name: def.name, rarity: 'currency', count };
+        }
+    } else if (kind === 'essence') {
+        _egHydrateMapCompletionEssencePool();
+        const entry = _egScriptedPick(EG_MAP_COMPLETION_ESSENCE_POOL, e => e.weight);
+        const def = EG_ESSENCE_DEFS[entry.id];
+        if (def && egAddEssence(entry.id, 1, def)) {
+            result = { kind, icon: def.icon, name: def.name, rarity: 'essence', count: 1 };
+        }
+    } else if (kind === 'map') {
+        const map = _egGenerateMapDrop(level, tier || 1);
+        if (map && _egAddMapToMapStash(map)) {
+            result = { kind, icon: map.icon || '🗺️', name: map.name, rarity: map.rarity || 'common', count: 1 };
+        }
+    }
+    if (result) egSaveHubState();
+    return result;
+}
+
+// Picks a loot kind for the bonus objective's non-puzzle-item outcomes.
+export function _egRollScriptedLootKind() {
+    return EG_SCRIPTED_LOOT_KINDS[Math.floor(Math.random() * EG_SCRIPTED_LOOT_KINDS.length)];
+}

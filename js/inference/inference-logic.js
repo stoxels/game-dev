@@ -6,7 +6,8 @@ import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
 import { pickRandomItem } from '../puzzle-items/item-pool.js';
 import { buildInventoryPanel } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { _escapeToastHtml, puzzleItemIconHtml, showHtmlToast, showItemGainPopup, showToast } from '../puzzle-mechanics/toasts-and-popups.js';
-import { LEDGER_CATEGORIES, _MILESTONE_MAP } from './inference-data.js';
+import { LEDGER_CATEGORIES, _MILESTONE_MAP, _milestoneEffectiveReward } from './inference-data.js';
+import { _egScriptedLootLevel, egGrantScriptedLoot } from '../loot/loot-map-completion-reward.js';
 import { _incDirect } from './inference-stats.js';
 import { renderQuestLog } from './inference-ui.js';
 
@@ -20,6 +21,9 @@ import { renderQuestLog } from './inference-ui.js';
 // UI reads progress through the _milestone_* queries; claiming flows
 // through claimQuest() only.
 //
+
+// Icon per loot reward kind (equipment piece, core, essence, atlas map).
+export const _LOOT_ICONS = { equipment: '🛡️', core: '🔮', essence: '✨', map: '🗺️' };
 
 // How long (ms) the claim banner stays visible before starting to fade out.
 const BANNER_DISMISS_MS = 4000;
@@ -144,25 +148,31 @@ function _reward_grantPassivePoints(amount) {
     _incDirect('lifetimePassivePointsObtained', amount);
 }
 
-// Grants all rewards defined on a milestone: passive-tree points and/or
-// items. Also triggers the reward SFX. Returns the defIds of every item
-// actually granted (resolved, non-null).
+// Grants all rewards defined on a milestone: passive-tree points, items and
+// loot. Also triggers the reward SFX. Returns { itemIds, loot }: the defIds
+// of every puzzle item actually granted (resolved, non-null) and the loot
+// pieces (see egGrantScriptedLoot) that landed in the stashes.
 function _reward_grantAll(ms) {
     Audio_Manager.playSFX('questRewardClaimed');
+    const reward = _milestoneEffectiveReward(ms);
 
-    if (ms.reward.ptPoints) {
-        _reward_grantPassivePoints(ms.reward.ptPoints);
+    if (reward.ptPoints) {
+        _reward_grantPassivePoints(reward.ptPoints);
     }
 
-    const grantedIds = [];
-    if (ms.reward.items) {
-        ms.reward.items.forEach(defId => {
-            const resolvedId = _reward_grantOneItem(defId);
-            if (resolvedId) grantedIds.push(resolvedId);
-        });
-    }
+    const itemIds = [];
+    reward.items.forEach(defId => {
+        const resolvedId = _reward_grantOneItem(defId);
+        if (resolvedId) itemIds.push(resolvedId);
+    });
 
-    return grantedIds;
+    const loot = [];
+    reward.loot.forEach(spec => {
+        const got = egGrantScriptedLoot(spec.kind, _egScriptedLootLevel(), spec.tier);
+        if (got) loot.push(got);
+    });
+
+    return { itemIds, loot };
 }
 
 
@@ -205,16 +215,18 @@ function _questItemGrantToast(defId) {
 function _banner_buildRewardParts(ms) {
     const de = LANG === 'de';
     const parts = [];
+    const reward = _milestoneEffectiveReward(ms);
 
-    if (ms.reward.ptPoints) {
-        parts.push(`🌳 +${ms.reward.ptPoints} ${t('qa_convergence_point')}`);
+    if (reward.ptPoints) {
+        parts.push(`🌳 +${reward.ptPoints} ${t('qa_convergence_point')}`);
     }
 
-    if (ms.reward.items) {
-        ms.reward.items.forEach(defId => {
-            parts.push(_banner_resolveItemLabel(defId, de));
-        });
-    }
+    reward.items.forEach(defId => {
+        parts.push(_banner_resolveItemLabel(defId, de));
+    });
+    reward.loot.forEach(spec => {
+        parts.push(`${_LOOT_ICONS[spec.kind]} ${t('qa_loot_' + spec.kind).replace('{n}', spec.tier)}`);
+    });
 
     return parts;
 }
@@ -381,7 +393,7 @@ export function claimQuest(milestoneId) {
     if (_milestone_isClaimed(ms) || !_milestone_isComplete(ms)) return;
 
     _claim_recordClaim(ms);
-    const grantedIds = _reward_grantAll(ms);
+    const { itemIds: grantedIds, loot: grantedLoot } = _reward_grantAll(ms);
 
     save();
     _trackInferenceAchievements(ms, cat);
@@ -392,4 +404,5 @@ export function claimQuest(milestoneId) {
     if (typeof buildInventoryPanel === 'function') buildInventoryPanel();
     grantedIds.forEach(defId => showItemGainPopup(defId));
     grantedIds.forEach(defId => _questItemGrantToast(defId));
+    grantedLoot.forEach(got => showToast(`🎒 ${t('qa_added_prefix')}: ${got.icon} ${got.name}${got.count > 1 ? ' ×' + got.count : ''}`));
 }

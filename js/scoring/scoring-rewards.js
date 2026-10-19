@@ -16,6 +16,8 @@ import { showEndgameNexus } from '../endgame/endgame-nexus.js';
 import { checkWorldCompleteAch } from '../achievements/achievements.js';
 import { isMonsterless } from '../difficulty-modifiers.js';
 import { isConvergenceLevel } from './scoring-core.js';
+import { _egCampaignMonsterLevel } from '../endgame/endgame-leveling.js';
+import { _egRollScriptedLootKind, egGrantScriptedLoot } from '../loot/loot-map-completion-reward.js';
 
 // Live end-of-level state shared across the concatenated core (owned by
 // start-level.js / state.js / difficulty-modifiers.js as module-let
@@ -265,9 +267,34 @@ function renderBonusBadge(bonusMet) {
         </span>`;
 }
 
-// Builds the HTML for a guaranteed first-time bonus item reward,
-// adds it to the inventory, and saves.
-function grantBonusItem() {
+// Share of first-time bonus rewards that are a puzzle item; the rest is an
+// equipment piece, a core or an essence rolled at the level's monster level.
+const BONUS_PUZZLE_ITEM_SHARE = 0.55;
+
+// Colour of the reward card for a non-puzzle-item bonus reward.
+const BONUS_LOOT_COLORS = { common: '#d0d0d0', uncommon: '#5fd38d', rare: '#5dade2', epic: '#bb8fce', currency: '#d8b45a', essence: '#7fe0d0' };
+
+// Builds the card for an equipment / core / essence bonus reward, or '' when
+// the grant failed (the caller then falls back to a puzzle item).
+function grantBonusLoot(gi) {
+    const loot = egGrantScriptedLoot(_egRollScriptedLootKind(), _egCampaignMonsterLevel(gi));
+    if (!loot) return '';
+    const color = BONUS_LOOT_COLORS[loot.rarity] || '#d0d0d0';
+    const count = loot.count > 1 ? ` ×${loot.count}` : '';
+    showToast(`🎁 ${loot.icon} ${loot.name}${count}`);
+    return `
+        <div class="item-reward" style="border-color:${color};color:${color};cursor:default;">
+            ${t('ov_item_earned')}: ${loot.icon} <strong>${loot.name}${count}</strong>
+        </div>`;
+}
+
+// Builds the HTML for a guaranteed first-time bonus reward (a puzzle item
+// most of the time, otherwise loot), adds it to the player's stash and saves.
+function grantBonusItem(gi) {
+    if (Math.random() >= BONUS_PUZZLE_ITEM_SHARE) {
+        const lootCard = grantBonusLoot(gi);
+        if (lootCard) return lootCard;
+    }
     const defId = pickRandomItem();
     if (!defId) return '';
 
@@ -293,7 +320,7 @@ function buildBonusClaimedNote() {
 
 // Writes item rewards into the item-reward zone (irz) based on bonus state.
 // Priority order:
-//   1. First-time bonus clear → guaranteed item
+//   1. First-time bonus clear → guaranteed reward (puzzle item or loot)
 //   2. Repeat bonus clear     → "already claimed" note + lucky drop chance
 //   3. Bonus missed           → lucky drop chance only
 // Ironman mode and quiz bonuses suppress all item rewards.
@@ -319,7 +346,7 @@ function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel, isNe
     if (_liveMods().ironman || isQuizBonus) return;
 
     if (bonusMet && !bonusAlreadyDone) {
-        irz.innerHTML += grantBonusItem();
+        irz.innerHTML += grantBonusItem(gi);
     } else if (bonusMet && bonusAlreadyDone) {
         irz.innerHTML += buildBonusClaimedNote();
         irz.innerHTML += rollLuckyDrops();

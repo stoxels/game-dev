@@ -129,7 +129,8 @@ export function _egPickBaseWithEarlyArmourBias(eligible, monsterLevel) {
 
 // Picks a base type the monster is high enough for, rolls rarity, mods
 // and implicits off it, and assembles the finished item object.
-export function _egGenerateEquipmentDrop(monsterLevel = 1) {
+// forcedRarity (optional) skips the rarity roll - guaranteed rewards use it.
+export function _egGenerateEquipmentDrop(monsterLevel = 1, forcedRarity = null) {
 
     // ── 1. Pick base type ────────────────────────────────────────────
     let eligible = EG_ALL_BASE_TYPES.filter(b => b.minLevel <= monsterLevel);
@@ -137,7 +138,7 @@ export function _egGenerateEquipmentDrop(monsterLevel = 1) {
     const base = _egPickBaseWithEarlyArmourBias(eligible, monsterLevel);
 
     // ── 2. Roll rarity ───────────────────────────────────────────────
-    const rarity = _egRollRarity();
+    const rarity = forcedRarity || _egRollRarity();
 
     // ── 3. Get the mod table for this slot ───────────────────────────
     const modTable = _egGetModTable(base);

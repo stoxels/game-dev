@@ -1,7 +1,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
-import { LEDGER_CATEGORIES, LEDGER_GROUPS } from './inference-data.js';
-import { _milestone_getProgress, _milestone_isClaimed, _milestone_isComplete } from './inference-logic.js';
+import { LEDGER_CATEGORIES, LEDGER_GROUPS, _milestoneEffectiveReward } from './inference-data.js';
+import { _LOOT_ICONS, _milestone_getProgress, _milestone_isClaimed, _milestone_isComplete } from './inference-logic.js';
 import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
 import { rarityColors } from '../puzzle-items/item-pool.js';
 import { puzzleItemIconHtml } from '../puzzle-mechanics/toasts-and-popups.js';
@@ -454,27 +454,31 @@ function _ledger_buildItemChip(defId, de) {
 /**
  * Builds the coloured reward chip HTML for a milestone's reward definition.
  * PT-point chips are green; item chips are orange with a hover tooltip.
- * @param {Object} reward - The ms.reward object
+ * @param {Object} ms - The milestone (its reward may be swapped for loot)
  * @returns {string} HTML string
  */
-function _ledger_buildRewardChips(reward) {
+function _ledger_buildRewardChips(ms) {
     const de = LANG === 'de';
     const chips = [];
 
-    if (reward.ptPoints) {
+    const eff = _milestoneEffectiveReward(ms);
+
+    if (eff.ptPoints) {
         chips.push(
-            `<span class="quest-reward-pt">🌳 +${reward.ptPoints} ${t('qa_convergence_point')}</span>`
+            `<span class="quest-reward-pt">🌳 +${eff.ptPoints} ${t('qa_convergence_point')}</span>`
         );
     }
 
-    if (reward.items) {
-        reward.items.forEach(defId => {
-            chips.push(defId === '__random__'
-                ? `<span class="quest-reward-item">🎁 ${t('qa_random_item')}</span>`
-                : _ledger_buildItemChip(defId, de)
-            );
-        });
-    }
+    eff.items.forEach(defId => {
+        chips.push(defId === '__random__'
+            ? `<span class="quest-reward-item">🎁 ${t('qa_random_item')}</span>`
+            : _ledger_buildItemChip(defId, de)
+        );
+    });
+    eff.loot.forEach(spec => {
+        const label = t('qa_loot_' + spec.kind).replace('{n}', spec.tier);
+        chips.push(`<span class="quest-reward-item">${_LOOT_ICONS[spec.kind]} ${label}</span>`);
+    });
 
     return chips.join('');
 }
@@ -527,7 +531,7 @@ function _ledger_buildMilestoneRow(ms) {
             </div>
             <div class="quest-reward-row">
                 <div class="quest-rewards">
-                    ${_ledger_buildRewardChips(ms.reward)}
+                    ${_ledger_buildRewardChips(ms)}
                 </div>
                 ${_ledger_buildClaimButton(ms, claimable, claimed)}
             </div>

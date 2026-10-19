@@ -2037,3 +2037,40 @@ export const _MILESTONE_MAP = {};
         });
     });
 })();
+
+//------------------------------------------------------------------------
+//-------------------LOOT REWARDS------------------------------------------
+//------------------------------------------------------------------------
+// Which milestones pay loot (equipment, core, essence, atlas map) instead of
+// a puzzle item. The choice is fixed per milestone id, so the quest log can
+// show the reward kind before it is claimed. Atlas-tier quests add a map of
+// their own tier; roughly two in five item milestones swap their last puzzle
+// item for one loot piece.
+
+const _LOOT_KINDS = ['equipment', 'core', 'essence'];
+
+// Small stable string hash (same id always lands on the same bucket).
+function _lootHash(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+    return h;
+}
+
+// Resolves a milestone's reward into { ptPoints, items, loot } where loot is
+// a list of { kind, tier? } granted through egGrantScriptedLoot.
+export function _milestoneEffectiveReward(ms) {
+    const reward = ms.reward || {};
+    const items = Array.isArray(reward.items) ? reward.items.slice() : [];
+    const loot = [];
+    const atlas = /^atlas_t(\d+)_complete$/.exec(ms.id);
+    if (atlas) {
+        loot.push({ kind: 'map', tier: Number(atlas[1]) });
+    } else if (items.length) {
+        const h = _lootHash(ms.id);
+        if (h % 100 < 40) {
+            items.pop();
+            loot.push({ kind: _LOOT_KINDS[Math.floor(h / 100) % _LOOT_KINDS.length] });
+        }
+    }
+    return { ptPoints: reward.ptPoints || 0, items, loot };
+}
