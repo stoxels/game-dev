@@ -1,5 +1,11 @@
 import { _ptCurrentSpentCount } from './inference-stats.js';
 import { STATE } from '../state.js';
+import { ACH_STATE } from '../achievements/achievements.js';
+
+// Current value of an achievement counter (the endgame keeps kills, maps, crafts and loot there).
+function _ach(stat) {
+    return (ACH_STATE && ACH_STATE.stats && ACH_STATE.stats[stat]) || 0;
+}
 
 // Sort leder by categories
 
@@ -8,6 +14,8 @@ export const LEDGER_GROUPS = [
     { id: 'gameplay', labelEn: 'Gameplay', labelDE: 'Spielweise' },
     { id: 'itemsclasses', labelEn: 'Items & Classes', labelDE: 'Gegenstände & Klassen' },
     { id: 'challenges', labelEn: 'Challenges', labelDE: 'Herausforderungen' },
+    { id: 'combat', labelEn: 'Combat', labelDE: 'Kampf' },
+    { id: 'crafting', labelEn: 'Loot & Crafting', labelDE: 'Beute & Handwerk' },
     { id: 'atlas', labelEn: 'Atlas', labelDE: 'Atlas' },
 ];
 
@@ -183,22 +191,22 @@ export const LEDGER_CATEGORIES = [
         groupId: 'progression',
         icon: '🌿',
         titleEn: 'Convergence', titleDE: 'Konvergenz',
-        descEn: 'As the sample size n increases, the sequence converges to truth. Clear convergence levels.',
-        descDE: 'Wenn der Stichprobneumfang wächst konvergiert die Folge zur Wahrheit. Schließe Konvergenz-Level ab.',
+        descEn: 'As the sample size n increases, the sequence converges to truth. Pass the Convergence Trials.',
+        descDE: 'Wenn der Stichprobenumfang wächst, konvergiert die Folge zur Wahrheit. Bestehe die Konvergenz-Prüfungen.',
         milestones: [
             {
-                id: 'conv_1', labelEn: '5 convergence levels', labelDE: '5 Konvergenz-Level',
-                check: qs => ({ current: qs.convergenceLevels || 0, target: 5 }),
+                id: 'conv_1', labelEn: '3 Convergence Trials cleared', labelDE: '3 Konvergenz-Prüfungen bestanden',
+                check: qs => ({ current: qs.convergenceLevels || 0, target: 3 }),
                 reward: { items: ['reveal4', 'markWrong6'] }
             },
             {
-                id: 'conv_2', labelEn: '13 convergence levels', labelDE: '13 Konvergenz-Level',
-                check: qs => ({ current: qs.convergenceLevels || 0, target: 13 }),
+                id: 'conv_2', labelEn: '8 Convergence Trials cleared', labelDE: '8 Konvergenz-Prüfungen bestanden',
+                check: qs => ({ current: qs.convergenceLevels || 0, target: 8 }),
                 reward: { items: ['colSolve', 'tutor4'] }
             },
             {
-                id: 'conv_3', labelEn: '26 convergence levels', labelDE: '26 Konvergenz-Level',
-                check: qs => ({ current: qs.convergenceLevels || 0, target: 26 }),
+                id: 'conv_3', labelEn: 'All 13 Convergence Trials cleared', labelDE: 'Alle 13 Konvergenz-Prüfungen bestanden',
+                check: qs => ({ current: qs.convergenceLevels || 0, target: 13 }),
                 reward: { items: ['rowSolve', 'colSolve'] }
             },
         ]
@@ -2020,6 +2028,590 @@ export const LEDGER_CATEGORIES = [
 
 
 
+    //------------------------------------------------------------------------
+    //----------------------COMBAT, LOOT & CRAFTING QUESTS-------------------------
+    //------------------------------------------------------------------------
+    // Read the achievement counters the endgame already keeps (kills, maps,
+    // crafts, loot), so no extra tracking is needed.
+
+    {
+        id: 'monster_hunter',
+        groupId: 'combat',
+        icon: '🗡️',
+        titleEn: 'Monster Hunter', titleDE: 'Monsterjäger',
+        descEn: 'Every monster you defeat in the arena adds to your tally.',
+        descDE: 'Jedes Monster, das du in der Arena besiegst, zählt.',
+        milestones: [
+            {
+                id: 'monster_hunter_1', labelEn: '25 monsters slain', labelDE: '25 Monster besiegt',
+                check: () => ({ current: _ach('egMonstersSlain'), target: 25 }),
+                reward: { items: ['reveal4', 'markWrong6', 'shield'] }
+            },
+            {
+                id: 'monster_hunter_2', labelEn: '150 monsters slain', labelDE: '150 Monster besiegt',
+                check: () => ({ current: _ach('egMonstersSlain'), target: 150 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'addTime600'] }
+            },
+            {
+                id: 'monster_hunter_3', labelEn: '600 monsters slain', labelDE: '600 Monster besiegt',
+                check: () => ({ current: _ach('egMonstersSlain'), target: 600 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+            {
+                id: 'monster_hunter_4', labelEn: '2,500 monsters slain', labelDE: '2.500 Monster besiegt',
+                check: () => ({ current: _ach('egMonstersSlain'), target: 2500 }),
+                reward: { items: ['rowSolve', 'colSolve', 'addTime900'] }
+            },
+            {
+                id: 'monster_hunter_5', labelEn: '8,000 monsters slain', labelDE: '8.000 Monster besiegt',
+                check: () => ({ current: _ach('egMonstersSlain'), target: 8000 }),
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'grandPearl'] }
+            },
+        ]
+    },
+
+    {
+        id: 'boss_slayer',
+        groupId: 'combat',
+        icon: '👹',
+        titleEn: 'Boss Slayer', titleDE: 'Bossjäger',
+        descEn: 'Bosses guard the trials and the atlas. Bring them down.',
+        descDE: 'Bosse bewachen die Prüfungen und den Atlas. Bring sie zu Fall.',
+        milestones: [
+            {
+                id: 'boss_slayer_1', labelEn: '1 boss defeated', labelDE: '1 Boss besiegt',
+                check: () => ({ current: _ach('egBossKills'), target: 1 }),
+                reward: { items: ['reveal4', 'markWrong6', 'shield'] }
+            },
+            {
+                id: 'boss_slayer_2', labelEn: '5 bosses defeated', labelDE: '5 Bosse besiegt',
+                check: () => ({ current: _ach('egBossKills'), target: 5 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'addTime600'] }
+            },
+            {
+                id: 'boss_slayer_3', labelEn: '15 bosses defeated', labelDE: '15 Bosse besiegt',
+                check: () => ({ current: _ach('egBossKills'), target: 15 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+            {
+                id: 'boss_slayer_4', labelEn: '40 bosses defeated', labelDE: '40 Bosse besiegt',
+                check: () => ({ current: _ach('egBossKills'), target: 40 }),
+                reward: { items: ['rowSolve', 'colSolve', 'addTime900'] }
+            },
+            {
+                id: 'boss_slayer_5', labelEn: '100 bosses defeated', labelDE: '100 Bosse besiegt',
+                check: () => ({ current: _ach('egBossKills'), target: 100 }),
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'grandPearl'] }
+            },
+        ]
+    },
+
+    {
+        id: 'bestiary',
+        groupId: 'combat',
+        icon: '📖',
+        titleEn: 'Bestiary', titleDE: 'Bestiarium',
+        descEn: 'Learn the habits of every kind of boss by defeating each one.',
+        descDE: 'Lerne jede Bossart kennen, indem du jede einmal besiegst.',
+        milestones: [
+            {
+                id: 'bestiary_1', labelEn: '5 different bosses defeated', labelDE: '5 verschiedene Bosse besiegt',
+                check: () => ({ current: _ach('egBossTypesSlain'), target: 5 }),
+                reward: { items: ['reveal4', 'markWrong6', 'shield'] }
+            },
+            {
+                id: 'bestiary_2', labelEn: '15 different bosses defeated', labelDE: '15 verschiedene Bosse besiegt',
+                check: () => ({ current: _ach('egBossTypesSlain'), target: 15 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'addTime600'] }
+            },
+            {
+                id: 'bestiary_3', labelEn: '30 different bosses defeated', labelDE: '30 verschiedene Bosse besiegt',
+                check: () => ({ current: _ach('egBossTypesSlain'), target: 30 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+            {
+                id: 'bestiary_4', labelEn: '50 different bosses defeated', labelDE: '50 verschiedene Bosse besiegt',
+                check: () => ({ current: _ach('egBossTypesSlain'), target: 50 }),
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'addTime900'] }
+            },
+        ]
+    },
+
+    {
+        id: 'veteran',
+        groupId: 'combat',
+        icon: '⭐',
+        titleEn: 'Veteran', titleDE: 'Veteran',
+        descEn: 'Experience is the best estimator. Raise your character level.',
+        descDE: 'Erfahrung ist der beste Schätzer. Steigere deine Charakterstufe.',
+        milestones: [
+            {
+                id: 'veteran_1', labelEn: 'Reach level 10', labelDE: 'Erreiche Stufe 10',
+                check: () => ({ current: _ach('egPlayerLevel'), target: 10 }),
+                reward: { items: ['reveal4', 'markWrong6', 'shield'] }
+            },
+            {
+                id: 'veteran_2', labelEn: 'Reach level 25', labelDE: 'Erreiche Stufe 25',
+                check: () => ({ current: _ach('egPlayerLevel'), target: 25 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'addTime600'] }
+            },
+            {
+                id: 'veteran_3', labelEn: 'Reach level 45', labelDE: 'Erreiche Stufe 45',
+                check: () => ({ current: _ach('egPlayerLevel'), target: 45 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+            {
+                id: 'veteran_4', labelEn: 'Reach level 68', labelDE: 'Erreiche Stufe 68',
+                check: () => ({ current: _ach('egPlayerLevel'), target: 68 }),
+                reward: { items: ['rowSolve', 'colSolve', 'addTime900'] }
+            },
+            {
+                id: 'veteran_5', labelEn: 'Reach level 90', labelDE: 'Erreiche Stufe 90',
+                check: () => ({ current: _ach('egPlayerLevel'), target: 90 }),
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'grandPearl'] }
+            },
+        ]
+    },
+
+    {
+        id: 'affliction',
+        groupId: 'combat',
+        icon: '🔥',
+        titleEn: 'Affliction Specialist', titleDE: 'Zustandsspezialist',
+        descEn: 'Burn, freeze, shock and bleed your enemies.',
+        descDE: 'Verbrenne, vereise, schocke und blute deine Gegner aus.',
+        milestones: [
+            {
+                id: 'affliction_1', labelEn: '25 ailments inflicted', labelDE: '25 Zustände zugefügt',
+                check: () => ({ current: _ach('egAilmentsInflicted'), target: 25 }),
+                reward: { items: ['reveal4', 'markWrong6', 'shield'] }
+            },
+            {
+                id: 'affliction_2', labelEn: '100 ailments inflicted', labelDE: '100 Zustände zugefügt',
+                check: () => ({ current: _ach('egAilmentsInflicted'), target: 100 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'addTime600'] }
+            },
+            {
+                id: 'affliction_3', labelEn: '400 ailments inflicted', labelDE: '400 Zustände zugefügt',
+                check: () => ({ current: _ach('egAilmentsInflicted'), target: 400 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+            {
+                id: 'affliction_4', labelEn: '1,500 ailments inflicted', labelDE: '1.500 Zustände zugefügt',
+                check: () => ({ current: _ach('egAilmentsInflicted'), target: 1500 }),
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'addTime900'] }
+            },
+        ]
+    },
+
+    {
+        id: 'trial_ascension',
+        groupId: 'combat',
+        icon: '🏛️',
+        titleEn: 'Trial of Ascension', titleDE: 'Aufstiegsprüfung',
+        descEn: 'Prove yourself in the Ascension Trials at the end of each world.',
+        descDE: 'Beweise dich in den Aufstiegsprüfungen am Ende jeder Welt.',
+        milestones: [
+            {
+                id: 'trial_ascension_1', labelEn: '1 Ascension Trial cleared', labelDE: '1 Aufstiegsprüfung bestanden',
+                check: () => ({ current: (STATE.ascensionTrialsDone ? STATE.ascensionTrialsDone.length : 0), target: 1 }),
+                reward: { items: ['reveal4', 'markWrong6', 'shield'] }
+            },
+            {
+                id: 'trial_ascension_2', labelEn: '5 Ascension Trials cleared', labelDE: '5 Aufstiegsprüfungen bestanden',
+                check: () => ({ current: (STATE.ascensionTrialsDone ? STATE.ascensionTrialsDone.length : 0), target: 5 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'addTime600'] }
+            },
+            {
+                id: 'trial_ascension_3', labelEn: '10 Ascension Trials cleared', labelDE: '10 Aufstiegsprüfungen bestanden',
+                check: () => ({ current: (STATE.ascensionTrialsDone ? STATE.ascensionTrialsDone.length : 0), target: 10 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+        ]
+    },
+
+    {
+        id: 'map_runner',
+        groupId: 'combat',
+        icon: '🗺️',
+        titleEn: 'Map Runner', titleDE: 'Kartenläufer',
+        descEn: 'Complete maps and trials, again and again.',
+        descDE: 'Schließe Karten und Prüfungen ab, immer wieder.',
+        milestones: [
+            {
+                id: 'map_runner_1', labelEn: '1 map or trial completed', labelDE: '1 Karte oder Prüfung abgeschlossen',
+                check: () => ({ current: _ach('egMapsCompleted'), target: 1 }),
+                reward: { items: ['reveal4', 'markWrong6', 'shield'] }
+            },
+            {
+                id: 'map_runner_2', labelEn: '10 maps and trials completed', labelDE: '10 Karten und Prüfungen abgeschlossen',
+                check: () => ({ current: _ach('egMapsCompleted'), target: 10 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'addTime600'] }
+            },
+            {
+                id: 'map_runner_3', labelEn: '40 maps and trials completed', labelDE: '40 Karten und Prüfungen abgeschlossen',
+                check: () => ({ current: _ach('egMapsCompleted'), target: 40 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+            {
+                id: 'map_runner_4', labelEn: '120 maps and trials completed', labelDE: '120 Karten und Prüfungen abgeschlossen',
+                check: () => ({ current: _ach('egMapsCompleted'), target: 120 }),
+                reward: { items: ['rowSolve', 'colSolve', 'addTime900'] }
+            },
+            {
+                id: 'map_runner_5', labelEn: '300 maps and trials completed', labelDE: '300 Karten und Prüfungen abgeschlossen',
+                check: () => ({ current: _ach('egMapsCompleted'), target: 300 }),
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'grandPearl'] }
+            },
+        ]
+    },
+
+    {
+        id: 'untouchable',
+        groupId: 'combat',
+        icon: '🛡️',
+        titleEn: 'Untouchable', titleDE: 'Unberührbar',
+        descEn: 'Finish maps without taking a single hit.',
+        descDE: 'Schließe Karten ab, ohne einen einzigen Treffer zu kassieren.',
+        milestones: [
+            {
+                id: 'untouchable_1', labelEn: '1 flawless map', labelDE: '1 makellose Karte',
+                check: () => ({ current: _ach('egMapsFlawless'), target: 1 }),
+                reward: { items: ['reveal4', 'markWrong6', 'shield'] }
+            },
+            {
+                id: 'untouchable_2', labelEn: '5 flawless maps', labelDE: '5 makellose Karten',
+                check: () => ({ current: _ach('egMapsFlawless'), target: 5 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'addTime600'] }
+            },
+            {
+                id: 'untouchable_3', labelEn: '20 flawless maps', labelDE: '20 makellose Karten',
+                check: () => ({ current: _ach('egMapsFlawless'), target: 20 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+            {
+                id: 'untouchable_4', labelEn: '50 flawless maps', labelDE: '50 makellose Karten',
+                check: () => ({ current: _ach('egMapsFlawless'), target: 50 }),
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'addTime900'] }
+            },
+        ]
+    },
+
+    {
+        id: 'risk_taker',
+        groupId: 'combat',
+        icon: '☠️',
+        titleEn: 'Risk Taker', titleDE: 'Risikofreudig',
+        descEn: 'Heavily modified and hazardous maps pay off for the brave.',
+        descDE: 'Stark veränderte und gefährliche Karten lohnen sich für die Mutigen.',
+        milestones: [
+            {
+                id: 'risk_taker_1', labelEn: '1 heavily modded map completed', labelDE: '1 stark modifizierte Karte abgeschlossen',
+                check: () => ({ current: _ach('egMapsHeavilyModded'), target: 1 }),
+                reward: { items: ['reveal4', 'markWrong6', 'shield'] }
+            },
+            {
+                id: 'risk_taker_2', labelEn: '5 heavily modded maps completed', labelDE: '5 stark modifizierte Karten abgeschlossen',
+                check: () => ({ current: _ach('egMapsHeavilyModded'), target: 5 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'addTime600'] }
+            },
+            {
+                id: 'risk_taker_3', labelEn: '20 heavily modded maps completed', labelDE: '20 stark modifizierte Karten abgeschlossen',
+                check: () => ({ current: _ach('egMapsHeavilyModded'), target: 20 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+        ]
+    },
+
+    {
+        id: 'hazard_pay',
+        groupId: 'combat',
+        icon: '⚠️',
+        titleEn: 'Hazard Pay', titleDE: 'Gefahrenzulage',
+        descEn: 'Survive maps with environmental hazards.',
+        descDE: 'Überlebe Karten mit Umweltgefahren.',
+        milestones: [
+            {
+                id: 'hazard_pay_1', labelEn: '1 hazard map completed', labelDE: '1 Gefahrenkarte abgeschlossen',
+                check: () => ({ current: _ach('egMapsHazardCompleted'), target: 1 }),
+                reward: { items: ['reveal4', 'markWrong6', 'shield'] }
+            },
+            {
+                id: 'hazard_pay_2', labelEn: '5 hazard maps completed', labelDE: '5 Gefahrenkarten abgeschlossen',
+                check: () => ({ current: _ach('egMapsHazardCompleted'), target: 5 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'addTime600'] }
+            },
+            {
+                id: 'hazard_pay_3', labelEn: '20 hazard maps completed', labelDE: '20 Gefahrenkarten abgeschlossen',
+                check: () => ({ current: _ach('egMapsHazardCompleted'), target: 20 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+        ]
+    },
+
+    {
+        id: 'pinnacle_runner',
+        groupId: 'combat',
+        icon: '🏔️',
+        titleEn: 'Pinnacle Runner', titleDE: 'Gipfelstürmer',
+        descEn: 'The Tier 16 pinnacle maps are the ultimate test.',
+        descDE: 'Die Gipfelkarten der Stufe 16 sind der ultimative Test.',
+        milestones: [
+            {
+                id: 'pinnacle_runner_1', labelEn: '1 Tier 16 map completed', labelDE: '1 Karte der Stufe 16 abgeschlossen',
+                check: () => ({ current: _ach('egMapsT16Completed'), target: 1 }),
+                reward: { items: ['reveal4', 'markWrong6', 'shield'] }
+            },
+            {
+                id: 'pinnacle_runner_2', labelEn: '5 Tier 16 maps completed', labelDE: '5 Karten der Stufe 16 abgeschlossen',
+                check: () => ({ current: _ach('egMapsT16Completed'), target: 5 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'addTime600'] }
+            },
+            {
+                id: 'pinnacle_runner_3', labelEn: '25 Tier 16 maps completed', labelDE: '25 Karten der Stufe 16 abgeschlossen',
+                check: () => ({ current: _ach('egMapsT16Completed'), target: 25 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+        ]
+    },
+
+    {
+        id: 'master_crafter',
+        groupId: 'crafting',
+        icon: '⚒️',
+        titleEn: 'Master Crafter', titleDE: 'Handwerksmeister',
+        descEn: 'Use the crafting bench to forge better gear.',
+        descDE: 'Nutze die Werkbank, um bessere Ausrüstung zu schmieden.',
+        milestones: [
+            {
+                id: 'master_crafter_1', labelEn: '5 bench crafts', labelDE: '5 Werkbank-Herstellungen',
+                check: () => ({ current: _ach('egBenchCrafts'), target: 5 }),
+                reward: { items: ['reveal4', 'markWrong6', 'scoutPrimer'] }
+            },
+            {
+                id: 'master_crafter_2', labelEn: '25 bench crafts', labelDE: '25 Werkbank-Herstellungen',
+                check: () => ({ current: _ach('egBenchCrafts'), target: 25 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'reveal4'] }
+            },
+            {
+                id: 'master_crafter_3', labelEn: '100 bench crafts', labelDE: '100 Werkbank-Herstellungen',
+                check: () => ({ current: _ach('egBenchCrafts'), target: 100 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+            {
+                id: 'master_crafter_4', labelEn: '300 bench crafts', labelDE: '300 Werkbank-Herstellungen',
+                check: () => ({ current: _ach('egBenchCrafts'), target: 300 }),
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'markWrong8'] }
+            },
+        ]
+    },
+
+    {
+        id: 'core_technician',
+        groupId: 'crafting',
+        icon: '🔮',
+        titleEn: 'Core Technician', titleDE: 'Kerntechniker',
+        descEn: 'Apply cores to reshape your items.',
+        descDE: 'Wende Kerne an, um deine Gegenstände umzuformen.',
+        milestones: [
+            {
+                id: 'core_technician_1', labelEn: '10 cores applied', labelDE: '10 Kerne angewendet',
+                check: () => ({ current: _ach('egCurrencyApplied'), target: 10 }),
+                reward: { items: ['reveal4', 'markWrong6', 'scoutPrimer'] }
+            },
+            {
+                id: 'core_technician_2', labelEn: '50 cores applied', labelDE: '50 Kerne angewendet',
+                check: () => ({ current: _ach('egCurrencyApplied'), target: 50 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'reveal4'] }
+            },
+            {
+                id: 'core_technician_3', labelEn: '200 cores applied', labelDE: '200 Kerne angewendet',
+                check: () => ({ current: _ach('egCurrencyApplied'), target: 200 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+            {
+                id: 'core_technician_4', labelEn: '600 cores applied', labelDE: '600 Kerne angewendet',
+                check: () => ({ current: _ach('egCurrencyApplied'), target: 600 }),
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'markWrong8'] }
+            },
+        ]
+    },
+
+    {
+        id: 'essence_alchemist',
+        groupId: 'crafting',
+        icon: '✨',
+        titleEn: 'Essence Alchemist', titleDE: 'Essenzalchemist',
+        descEn: 'Essences guarantee the modifier you want.',
+        descDE: 'Essenzen garantieren den gewünschten Modifikator.',
+        milestones: [
+            {
+                id: 'essence_alchemist_1', labelEn: '3 essences applied', labelDE: '3 Essenzen angewendet',
+                check: () => ({ current: _ach('egEssencesApplied'), target: 3 }),
+                reward: { items: ['reveal4', 'markWrong6', 'scoutPrimer'] }
+            },
+            {
+                id: 'essence_alchemist_2', labelEn: '15 essences applied', labelDE: '15 Essenzen angewendet',
+                check: () => ({ current: _ach('egEssencesApplied'), target: 15 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'reveal4'] }
+            },
+            {
+                id: 'essence_alchemist_3', labelEn: '50 essences applied', labelDE: '50 Essenzen angewendet',
+                check: () => ({ current: _ach('egEssencesApplied'), target: 50 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+            {
+                id: 'essence_alchemist_4', labelEn: '150 essences applied', labelDE: '150 Essenzen angewendet',
+                check: () => ({ current: _ach('egEssencesApplied'), target: 150 }),
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'markWrong8'] }
+            },
+        ]
+    },
+
+    {
+        id: 'treasure_hunter',
+        groupId: 'crafting',
+        icon: '💎',
+        titleEn: 'Treasure Hunter', titleDE: 'Schatzjäger',
+        descEn: 'Find rare gear: epic items and six-modifier pieces.',
+        descDE: 'Finde seltene Ausrüstung: epische Gegenstände und Teile mit sechs Modifikatoren.',
+        milestones: [
+            {
+                id: 'treasure_hunter_1', labelEn: '1 epic item found', labelDE: '1 epischer Gegenstand gefunden',
+                check: () => ({ current: _ach('egEpicLooted'), target: 1 }),
+                reward: { items: ['reveal4', 'markWrong6', 'scoutPrimer'] }
+            },
+            {
+                id: 'treasure_hunter_2', labelEn: '10 epic items found', labelDE: '10 epische Gegenstände gefunden',
+                check: () => ({ current: _ach('egEpicLooted'), target: 10 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'reveal4'] }
+            },
+            {
+                id: 'treasure_hunter_3', labelEn: '50 epic items found', labelDE: '50 epische Gegenstände gefunden',
+                check: () => ({ current: _ach('egEpicLooted'), target: 50 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+            {
+                id: 'treasure_hunter_4', labelEn: '150 epic items found', labelDE: '150 epische Gegenstände gefunden',
+                check: () => ({ current: _ach('egEpicLooted'), target: 150 }),
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'markWrong8'] }
+            },
+        ]
+    },
+
+    {
+        id: 'perfect_roll',
+        groupId: 'crafting',
+        icon: '🎲',
+        titleEn: 'Perfect Roll', titleDE: 'Perfekter Wurf',
+        descEn: 'Six modifiers on a single item: the luckiest rolls.',
+        descDE: 'Sechs Modifikatoren auf einem Gegenstand: die glücklichsten Würfe.',
+        milestones: [
+            {
+                id: 'perfect_roll_1', labelEn: '1 six-modifier item found', labelDE: '1 Gegenstand mit sechs Modifikatoren gefunden',
+                check: () => ({ current: _ach('egSixModLooted'), target: 1 }),
+                reward: { items: ['reveal4', 'markWrong6', 'scoutPrimer'] }
+            },
+            {
+                id: 'perfect_roll_2', labelEn: '3 six-modifier items found', labelDE: '3 Gegenstände mit sechs Modifikatoren gefunden',
+                check: () => ({ current: _ach('egSixModLooted'), target: 3 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'reveal4'] }
+            },
+            {
+                id: 'perfect_roll_3', labelEn: '10 six-modifier items found', labelDE: '10 Gegenstände mit sechs Modifikatoren gefunden',
+                check: () => ({ current: _ach('egSixModLooted'), target: 10 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+        ]
+    },
+
+    {
+        id: 'collector',
+        groupId: 'crafting',
+        icon: '🏺',
+        titleEn: 'Unique Collector', titleDE: 'Unikatsammler',
+        descEn: 'Add unique items to your collection.',
+        descDE: 'Füge deiner Sammlung einzigartige Gegenstände hinzu.',
+        milestones: [
+            {
+                id: 'collector_1', labelEn: '1 unique item collected', labelDE: '1 einzigartiger Gegenstand gesammelt',
+                check: () => ({ current: _ach('egUniquesCollected'), target: 1 }),
+                reward: { items: ['reveal4', 'markWrong6', 'scoutPrimer'] }
+            },
+            {
+                id: 'collector_2', labelEn: '5 unique items collected', labelDE: '5 einzigartige Gegenstände gesammelt',
+                check: () => ({ current: _ach('egUniquesCollected'), target: 5 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'reveal4'] }
+            },
+            {
+                id: 'collector_3', labelEn: '15 unique items collected', labelDE: '15 einzigartige Gegenstände gesammelt',
+                check: () => ({ current: _ach('egUniquesCollected'), target: 15 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+            {
+                id: 'collector_4', labelEn: '40 unique items collected', labelDE: '40 einzigartige Gegenstände gesammelt',
+                check: () => ({ current: _ach('egUniquesCollected'), target: 40 }),
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'markWrong8'] }
+            },
+        ]
+    },
+
+    {
+        id: 'gold_rush',
+        groupId: 'crafting',
+        icon: '🪙',
+        titleEn: 'Gold Rush', titleDE: 'Goldrausch',
+        descEn: 'Earn gold to spend at the Cartographer.',
+        descDE: 'Verdiene Gold, um es beim Kartografen auszugeben.',
+        milestones: [
+            {
+                id: 'gold_rush_1', labelEn: '1,000 gold earned', labelDE: '1.000 Gold verdient',
+                check: () => ({ current: _ach('egGoldEarned'), target: 1000 }),
+                reward: { items: ['reveal4', 'markWrong6', 'scoutPrimer'] }
+            },
+            {
+                id: 'gold_rush_2', labelEn: '10,000 gold earned', labelDE: '10.000 Gold verdient',
+                check: () => ({ current: _ach('egGoldEarned'), target: 10000 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'reveal4'] }
+            },
+            {
+                id: 'gold_rush_3', labelEn: '100,000 gold earned', labelDE: '100.000 Gold verdient',
+                check: () => ({ current: _ach('egGoldEarned'), target: 100000 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+            {
+                id: 'gold_rush_4', labelEn: '1,000,000 gold earned', labelDE: '1.000.000 Gold verdient',
+                check: () => ({ current: _ach('egGoldEarned'), target: 1000000 }),
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'markWrong8'] }
+            },
+        ]
+    },
+
+    {
+        id: 'recycler',
+        groupId: 'crafting',
+        icon: '♻️',
+        titleEn: 'Recycler', titleDE: 'Wiederverwerter',
+        descEn: 'Sell gear you no longer need and melt it down.',
+        descDE: 'Verkaufe Ausrüstung, die du nicht mehr brauchst, und schmelze sie ein.',
+        milestones: [
+            {
+                id: 'recycler_1', labelEn: '25 items sold', labelDE: '25 Gegenstände verkauft',
+                check: () => ({ current: _ach('egItemsSold'), target: 25 }),
+                reward: { items: ['reveal4', 'markWrong6', 'scoutPrimer'] }
+            },
+            {
+                id: 'recycler_2', labelEn: '100 items sold', labelDE: '100 Gegenstände verkauft',
+                check: () => ({ current: _ach('egItemsSold'), target: 100 }),
+                reward: { items: ['rowSolve', 'markWrong8', 'reveal4'] }
+            },
+            {
+                id: 'recycler_3', labelEn: '500 items sold', labelDE: '500 Gegenstände verkauft',
+                check: () => ({ current: _ach('egItemsSold'), target: 500 }),
+                reward: { items: ['colSolve', 'tutor6'] }
+            },
+        ]
+    },
 ];
 
 

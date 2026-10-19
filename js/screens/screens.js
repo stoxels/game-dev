@@ -363,8 +363,6 @@ export function launchExistingGame() {
     STATE.mapViewEnabled = true;
     if (typeof save === 'function') save();
 
-    if (typeof globalThis.checkLockedCodesOnSetup === 'function') globalThis.checkLockedCodesOnSetup();
-
     if (typeof showMapView === 'function') {
         showMapView();
     } else {

@@ -772,5 +772,10 @@ export function _egAtlasOnMapCompleted(mapItem) {
         try { updateQuestStats('atlasTierCompleted', { nodeId: node.id, tier: node.tier }); } catch (e) {}
     }
 
+    // A cleared atlas region may complete a Moodle code's requirement.
+    if (firstClear && typeof globalThis.checkWorldCodes === 'function') {
+        setTimeout(() => globalThis.checkWorldCodes(), 1500);
+    }
+
     return { node, firstClear, newlyUnlocked };
 }

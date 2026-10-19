@@ -320,7 +320,7 @@ import { ALL, NEXUS_WORLD_INDEX, WORLD_START_GI, getNexusPointGi, isAscensionLev
 import { BONUS_QUIZ_POOLS } from '../../js/quiz-exercise/quiz-questions.js';
 import { _quizCalcEliminationChance, answerQuizInput, closeQuiz, finishQuiz, quizUseTutor, showQuiz, skipQuiz } from '../../js/quiz-exercise/quiz.js';
 import { _getWrap, currentZoom, resetZoom, scalePuzzle, setPuzzleMonsterRoom, setPuzzleZoom, zoomInBtn, zoomOutBtn } from '../../js/grid-scaling.js';
-import { WORLD_CODES, checkLockedCodesOnSetup, checkWorldCodes, checkWorldCodesSync, showCodes } from '../../js/codes.js';
+import { WORLD_CODES, checkWorldCodes, checkWorldCodesSync, showCodes } from '../../js/codes.js';
 import { _applyCentralTendency, _applyCompletionGlimpse, _applyDeadReckoningStart, _applyDensityMapping, _applyInterquartileVision, _applyMarginalDistribution, _applyNullHypothesis, _applyProbabilisticStartRolls, _applySparseRegion, _applySylaForestAffinity, _deadReckoningApplyClues, _getGridSizeTier, _hideCompletionGlimpseBar, _initLuckyTiles, _revealCellsAndFinalize, triggerSylaFlowerEffect } from '../../js/start-level-passives.js';
 import { _doStartLevel, _setMistakeCounterText } from '../../js/start-level.js';
 import { confirmReset } from '../../js/save-reset.js';
@@ -816,7 +816,7 @@ try { Object.defineProperty(globalThis, "buildInventoryPanel", { get() { return 
 try { Object.defineProperty(globalThis, "cancelRetrySetupModal", { get() { return cancelRetrySetupModal; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "cellDown", { get() { return cellDown; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "charmKeyFor", { get() { return charmKeyFor; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
-try { Object.defineProperty(globalThis, "checkLockedCodesOnSetup", { get() { return checkLockedCodesOnSetup; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "checkWorldCodes", { get() { return checkWorldCodes; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "claimQuest", { get() { return claimQuest; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "clearUniversalReactions", { get() { return clearUniversalReactions; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "closeClassOverlay", { get() { return closeClassOverlay; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

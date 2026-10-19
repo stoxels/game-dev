@@ -1,5 +1,3 @@
-import { ACHIEVEMENT_DEFS } from './achievements/achievements-data.js';
-import { ACH_STATE } from './achievements/achievements.js';
 import { Audio_Manager } from './audio/audio.js';
 import { showModal, showTitle, switchScreen } from './screens/screens.js';
 import { save } from './state.js';
@@ -9,63 +7,126 @@ import { STATE } from './state.js';
 //------------------------------------------------------------------------
 //-------------------MOODLE CODES (codes.js)-------------------------------
 //------------------------------------------------------------------------
-// Moodle codes the player unlocks with score + achievement-tier progress.
+// Moodle codes the player unlocks by reaching progression steps (tutorial,
+// campaign worlds, atlas tiers).
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 
-// Ensures the "locked codes" reminder only shows once per game session,
-// instead of after every level completion.
-let _lockedCodesModalShownThisSession = false;
+// Progress helpers. Each returns { current, target }; a code unlocks once
+// current >= target. They read live game data through globalThis, like the
+// rest of the concatenated core.
 
-// Each entry defines a Moodle code the player can unlock by reaching
-// a score threshold AND a minimum percentage of all achievement tiers.
-// achPct: 0 means only the score requirement matters for that code.
+// True when every level of world `wi` is in STATE.done.
+function _worldFullyCleared(wi) {
+    const world = globalThis.WORLDS && globalThis.WORLDS[wi];
+    const start = globalThis.WORLD_START_GI && globalThis.WORLD_START_GI[wi];
+    if (!world || start == null) return false;
+    return world.data.every((_, li) => STATE.done.includes(start + li));
+}
+
+// How many campaign worlds are fully cleared.
+function _worldsClearedCount() {
+    const worlds = globalThis.WORLDS || [];
+    let n = 0;
+    for (let wi = 0; wi < worlds.length; wi++) if (_worldFullyCleared(wi)) n++;
+    return n;
+}
+
+// Atlas regions cleared among those whose tier passes `tierOk`.
+function _atlasRegionProgress(tierOk) {
+    const nodes = (Array.isArray(globalThis.EG_ATLAS_NODES) ? globalThis.EG_ATLAS_NODES : []).filter(n => tierOk(n.tier));
+    const done = STATE.egAtlasCompleted || {};
+    return { current: nodes.filter(n => done[n.id]).length, target: Math.max(1, nodes.length) };
+}
+
+// The real Moodle codes are not stored as readable text. Each entry keeps a
+// masked blob, decoded only when the player has earned that code (see
+// _codeText). This keeps them out of a plain text search of the source; it
+// is a speed bump, not real security - the game runs in the player's browser.
+function _h53(str, seed) {
+    let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for (let i = 0; i < str.length; i++) {
+        const ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
+
+// Unmasks a blob (hex bytes) for the code with the given id.
+function _unmask(id, blob) {
+    const key = ['q7', 'Zm', '4x', 'Rk'].join('') + ':' + id.slice(1);
+    let out = '';
+    for (let j = 0; j * 2 < blob.length; j++) {
+        out += String.fromCharCode(parseInt(blob.substr(j * 2, 2), 16) ^ (_h53(key, j + 1) % 256));
+    }
+    return out;
+}
+
+// Each entry is one Moodle code and the progression step that earns it.
+// goal*: the requirement text; unit*: [singular, plural] of what progress counts.
 export const WORLD_CODES = [
-    { threshold: 10000, achPct: 0, code: 'TY_4_Playing_Stoxels', titleEn: 'Code 1', titleDE: 'Code 1' },
-    { threshold: 25000, achPct: 0.15, code: 'IsThereADog?', titleEn: 'Code 2', titleDE: 'Code 2' },
-    { threshold: 50000, achPct: 0.30, code: 'Stox0rTrix', titleEn: 'Code 3', titleDE: 'Code 3' },
-    { threshold: 75000, achPct: 0.50, code: 'MonstersInStoxels', titleEn: 'Code 4', titleDE: 'Code 4' },
-    { threshold: 100000, achPct: 0.80, code: 'Examn1.0afterStoxels', titleEn: 'Code 5', titleDE: 'Code 5' },
+    {
+        id: 'c1', blob: 'c3c52ee8355359e96ea753ea37efcc5203d5de06', titleEn: 'Code 1', titleDE: 'Code 1',
+        goalEn: 'Finish the tutorial and clear World 1', goalDE: 'Schließe das Tutorial ab und räume Welt 1',
+        unitEn: ['step', 'steps'], unitDE: ['Schritt', 'Schritte'],
+        progress: () => ({ current: (STATE.tutorialDone ? 1 : 0) + (_worldFullyCleared(0) ? 1 : 0), target: 2 }),
+    },
+    {
+        id: 'c2', blob: '2f2829caf6036b970586d8ec', titleEn: 'Code 2', titleDE: 'Code 2',
+        goalEn: 'Fully clear 6 worlds', goalDE: 'Räume 6 Welten vollständig',
+        unitEn: ['world', 'worlds'], unitDE: ['Welt', 'Welten'],
+        progress: () => ({ current: Math.min(6, _worldsClearedCount()), target: 6 }),
+    },
+    {
+        id: 'c3', blob: '65f56399041e9ab5b6af', titleEn: 'Code 3', titleDE: 'Code 3',
+        goalEn: 'Fully clear every campaign world', goalDE: 'Räume jede Kampagnenwelt vollständig',
+        unitEn: ['world', 'worlds'], unitDE: ['Welt', 'Welten'],
+        progress: () => ({ current: _worldsClearedCount(), target: Math.max(1, (globalThis.WORLDS || []).length) }),
+    },
+    {
+        id: 'c4', blob: '4bb6db1ee085ff0fe995bd1dd861eb8c0b', titleEn: 'Code 4', titleDE: 'Code 4',
+        goalEn: 'Clear every atlas map up to Tier 6', goalDE: 'Räume jede Atlas-Karte bis einschließlich Stufe 6',
+        unitEn: ['map', 'maps'], unitDE: ['Karte', 'Karten'],
+        progress: () => _atlasRegionProgress(tier => tier <= 6),
+    },
+    {
+        id: 'c5', blob: 'c3f69eee5d14382724fb3242ef09a79658268719', titleEn: 'Code 5', titleDE: 'Code 5',
+        goalEn: 'Clear every Tier 16 map at least once', goalDE: 'Räume jede Karte der Stufe 16 mindestens einmal',
+        unitEn: ['map', 'maps'], unitDE: ['Karte', 'Karten'],
+        progress: () => _atlasRegionProgress(tier => tier === 16),
+    },
 ];
 
+// True once the player has met the requirement of one WORLD_CODES entry.
+function _codeEarned(wc) {
+    const { current, target } = wc.progress();
+    return current >= target;
+}
 
-//------------------------------------------------------------------------
-//-------------------ACHIEVEMENT / ELIGIBILITY HELPERS---------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
+// True when the player already owns this code. Saves record the code id;
+// older saves recorded the readable code text, which is matched too.
+function _codeOwned(wc) {
+    return STATE.unlockedCodes.includes(wc.id) || STATE.unlockedCodes.includes(_unmask(wc.id, wc.blob));
+}
 
-// Shared tier-count lookup used by every function that needs to compare
-// "achievement tiers unlocked" against "total achievement tiers".
-function _getAchievementTierCounts() {
-    const total = ACHIEVEMENT_DEFS.reduce((sum, def) => sum + def.tiers.length, 0);
-    const have = ACH_STATE.unlocked.length;
-    return { total, have };
+// The readable code, only for a code the player owns or has just earned.
+function _codeText(wc) {
+    return (_codeOwned(wc) || _codeEarned(wc)) ? _unmask(wc.id, wc.blob) : '';
+}
+
+// Localised requirement text of a code entry.
+function getCodeGoal(wc) {
+    return LANG === 'de' ? wc.goalDE : wc.goalEn;
 }
 
 // Returns the localised title for a code entry based on the active language
 function getCodeTitle(worldCode) {
     return LANG === 'de' ? worldCode.titleDE : worldCode.titleEn;
-}
-
-// Calculates what fraction of all achievement tiers the player has unlocked.
-// Returns a value between 0 and 1 (e.g. 0.5 = 50 % complete).
-function calcAchievementProgress() {
-    const { total, have } = _getAchievementTierCounts();
-    return total > 0 ? have / total : 0;
-}
-
-// Evaluates a single WORLD_CODES entry against the player's current
-// score and achievement progress.
-// Returns: 'unlocked' | 'locked_achievements' | 'not_reached'
-function evaluateCodeEligibility(worldCode, achPctDone) {
-    const scoreOk = STATE.totalScore >= worldCode.threshold;
-    const achOk = achPctDone >= (worldCode.achPct || 0);
-
-    if (scoreOk && achOk) return 'unlocked';
-    if (scoreOk && !achOk) return 'locked_achievements';
-    return 'not_reached';
 }
 
 
@@ -74,60 +135,19 @@ function evaluateCodeEligibility(worldCode, achPctDone) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Builds the { wc, needed, have } shape used by both the locked-codes
-// collectors and the "locked" modal renderer.
-function _buildLockedCodeEntry(wc, tierCounts) {
-    return {
-        wc,
-        needed: Math.ceil(wc.achPct * tierCounts.total),
-        have: tierCounts.have,
-    };
-}
-
-// Checks every WORLD_CODES entry and sorts them into:
-//   newCodes    - ready to unlock right now
-//   lockedCodes - score met, but not enough achievements yet
-// Returns both lists so the caller can act on them.
+// Checks every WORLD_CODES entry, records the ones just earned in
+// STATE.unlockedCodes and returns them.
 function collectCodeUnlockResults() {
     const newCodes = [];
-    const lockedCodes = [];
-
-    const tierCounts = _getAchievementTierCounts();
-    const achPctDone = calcAchievementProgress();
-
     WORLD_CODES.forEach(wc => {
         // Skip codes the player already owns
-        if (STATE.unlockedCodes.includes(wc.code)) return;
-
-        const result = evaluateCodeEligibility(wc, achPctDone);
-
-        if (result === 'unlocked') {
-            STATE.unlockedCodes.push(wc.code);
+        if (_codeOwned(wc)) return;
+        if (_codeEarned(wc)) {
+            STATE.unlockedCodes.push(wc.id);
             newCodes.push(wc);
-        } else if (result === 'locked_achievements') {
-            lockedCodes.push(_buildLockedCodeEntry(wc, tierCounts));
         }
     });
-
-    return { newCodes, lockedCodes };
-}
-
-// Same eligibility check as collectCodeUnlockResults(), but read-only -
-// does not mutate STATE.unlockedCodes. Used for the setup-screen reminder only.
-function collectLockedCodesOnly() {
-    const lockedCodes = [];
-    const tierCounts = _getAchievementTierCounts();
-    const achPctDone = calcAchievementProgress();
-
-    WORLD_CODES.forEach(wc => {
-        if (STATE.unlockedCodes.includes(wc.code)) return;
-        const result = evaluateCodeEligibility(wc, achPctDone);
-        if (result === 'locked_achievements') {
-            lockedCodes.push(_buildLockedCodeEntry(wc, tierCounts));
-        }
-    });
-
-    return lockedCodes;
+    return { newCodes };
 }
 
 
@@ -169,7 +189,7 @@ function buildCodeUnlockBlock(worldCode) {
     return `
         <div class="pw-card">
             <div class="pw-card-title">${title}</div>
-            <div class="pw-unlock-anim">${worldCode.code}</div>
+            <div class="pw-unlock-anim">${_codeText(worldCode)}</div>
             <div class="pw-hint">${t('pw_hint')}</div>
         </div>
     `;
@@ -202,55 +222,6 @@ function showUnlockedCodesModal(codes) {
     });
 }
 
-// Builds the HTML for a single code block inside the "locked" modal.
-// Shows the code's title, confirms the score requirement is already met,
-// and tells the player how many more achievement tiers they still need.
-//
-// @param {object} lockedEntry - { wc, needed, have } as produced by
-//                                collectCodeUnlockResults()
-function buildCodeLockedBlock(lockedEntry) {
-    const { wc, needed, have } = lockedEntry;
-    const title = getCodeTitle(wc);
-    const remaining = Math.max(0, needed - have);
-
-    const scoreLineText = t('scr_score_req_met');
-
-    const achLineText = t('scr_ach_more_needed')
-        .replace('{n}', remaining)
-        .replace('{have}', have)
-        .replace('{needed}', needed);
-
-    return `
-        <div class="pw-card">
-            <div class="pw-card-title">${title}</div>
-            <div class="pw-card-status-score">${scoreLineText}</div>
-            <div class="pw-card-status-ach">${achLineText}</div>
-        </div>
-    `;
-}
-
-// Populates and opens the same pw-modal used for unlocks, but with
-// "locked" content: tells the player their score is high enough for one
-// or more codes, but they still need more achievement tiers to unlock them.
-function showLockedCodesModal(lockedCodes) {
-    const contentEl = document.getElementById('pw-content');
-
-    const lockedTitle = t('scr_code_still_locked');
-
-    const lockedIntro = t('scr_locked_intro');
-
-    document.getElementById('pw-modal')
-        .querySelector('.modal-title')
-        .textContent = lockedTitle;
-
-    contentEl.innerHTML =
-        `<p class="pw-intro">${lockedIntro}</p>` +
-        lockedCodes.map(buildCodeLockedBlock).join('');
-
-    showModal('pw-modal');
-}
-
-
 //------------------------------------------------------------------------
 //-------------------------CODES SCREEN UI - REDESIGNED-------------------
 //------------------------------------------------------------------------
@@ -266,29 +237,27 @@ function showLockedCodesModal(lockedCodes) {
 /**
  * Builds one requirement line + progress bar block.
  *
- * @param {string}  label     - Display label, e.g. "Required Score"
- * @param {number}  current   - Player's current value
- * @param {number}  required  - Value needed to unlock
+ * @param {string}  label     - The requirement text, e.g. "Fully clear 6 worlds"
+ * @param {number}  current   - Player's current progress
+ * @param {number}  required  - Progress needed to unlock
  * @param {boolean} met       - Whether the requirement is already satisfied
- * @param {string}  barClass  - 'score' or 'ach' (controls bar colour via CSS)
  * @returns {string} HTML string
  */
-function _mcBuildReqBlock(label, current, required, met, barClass) {
+function _mcBuildReqBlock(label, current, required, met) {
     const displayCurrent = met ? required : current;
     const pct = Math.min(100, Math.round((displayCurrent / required) * 100));
     const metCls = met ? ' met' : '';
-    const fmtNum = (n) => barClass === 'score' ? n.toLocaleString() : String(n);
 
     return `
         <div class="mc-req-line">
-            <span class="mc-req-label">${label}:</span>
-            <span class="mc-req-values${metCls}">${fmtNum(displayCurrent)} / ${fmtNum(required)}</span>
+            <span class="mc-req-label">${label}</span>
+            <span class="mc-req-values${metCls}">${displayCurrent} / ${required}</span>
             ${met
             ? '<span class="mc-check">✓</span>'
             : '<span class="mc-check hidden">✓</span>'}
         </div>
         <div class="mc-bar-wrap">
-            <div class="mc-bar-fill ${barClass}${metCls}" style="width:${pct}%"></div>
+            <div class="mc-bar-fill score${metCls}" style="width:${pct}%"></div>
         </div>`;
 }
 
@@ -296,30 +265,18 @@ function _mcBuildReqBlock(label, current, required, met, barClass) {
  * Builds the overlay content for one parchment row.
  * No icon HTML is emitted - icons are already in the background image.
  *
- * @param {object}  wc               - Entry from WORLD_CODES
- * @param {number}  total            - Player's current total score
- * @param {number}  achPct           - Achievement completion fraction (0–1)
- * @param {number}  totalAchTiers    - Total achievement tiers in the game
- * @param {number}  unlockedAchTiers - How many the player has earned
+ * @param {object} wc - Entry from WORLD_CODES
  * @returns {string} HTML string
  */
-function _mcBuildRow(wc, total, achPct, totalAchTiers, unlockedAchTiers) {
-    const unlocked = STATE.unlockedCodes.includes(wc.code);
+function _mcBuildRow(wc) {
+    const unlocked = _codeOwned(wc);
     const tierName = getCodeTitle(wc);
-    const scoreMet = total >= wc.threshold;
-    const scoreLabel = t('codes_req_score');
-    const scoreBlock = _mcBuildReqBlock(scoreLabel, total, wc.threshold, scoreMet, 'score');
-
-    let achBlock = '';
-    if (wc.achPct > 0) {
-        const achRequired = Math.ceil(wc.achPct * totalAchTiers);
-        const achMet = achPct >= wc.achPct;
-        const achLabel = t('codes_req_ach');
-        achBlock = _mcBuildReqBlock(achLabel, unlockedAchTiers, achRequired, achMet, 'ach');
-    }
+    const { current, target } = wc.progress();
+    const met = unlocked || current >= target;
+    const reqBlock = _mcBuildReqBlock(getCodeGoal(wc), current, target, met);
 
     const codeReveal = unlocked
-        ? `<div class="mc-code-reveal mc-unlock-anim">${wc.code}</div>` : '';
+        ? `<div class="mc-code-reveal mc-unlock-anim">${_codeText(wc)}</div>` : '';
 
     const rowIndex = WORLD_CODES.indexOf(wc) + 1;
 
@@ -328,8 +285,7 @@ function _mcBuildRow(wc, total, achPct, totalAchTiers, unlockedAchTiers) {
         <img class="mc-icon" src="images/Moodle_Codes_Screen/icon_${rowIndex}.webp" alt="">
         <div class="mc-row-content">
             <div class="mc-row-title">${tierName}${codeReveal}</div>
-            ${scoreBlock}
-            ${achBlock}
+            ${reqBlock}
         </div>
     </div>`;
 }
@@ -343,13 +299,12 @@ function buildCodesScreen() {
     const screenEl = document.getElementById('screen-codes');
     if (!screenEl) return;
 
-    const total = STATE.totalScore;
-    const achPct = calcAchievementProgress();
-    const { total: totalAchTiers, have: unlockedAchTiers } = _getAchievementTierCounts();
+    // Codes can be earned in places that never ran the check (older saves,
+    // atlas progress): record them now so the screen shows them.
+    const { newCodes } = collectCodeUnlockResults();
+    if (newCodes.length) save();
 
-    const rowsHTML = WORLD_CODES.map(wc =>
-        _mcBuildRow(wc, total, achPct, totalAchTiers, unlockedAchTiers)
-    ).join('');
+    const rowsHTML = WORLD_CODES.map(_mcBuildRow).join('');
 
     screenEl.innerHTML = `
         <div class="mc-canvas">
@@ -370,6 +325,8 @@ function buildCodesScreen() {
     // Re-wire back button (innerHTML wipe removes the old listener)
     const backBtn = document.getElementById('btn-codes-back');
     if (backBtn) backBtn.addEventListener('click', () => showTitle());
+
+    if (newCodes.length) setTimeout(() => showUnlockedCodesModal(newCodes), 400);
 }
 
 
@@ -392,18 +349,6 @@ export function checkWorldCodesSync() {
     const { newCodes } = collectCodeUnlockResults();
     if (newCodes.length) save();
     return newCodes;
-}
-
-// Call this once, when the player confirms Game Setup (before entering
-// level select). Shows the locked-codes reminder at most once per session.
-export function checkLockedCodesOnSetup() {
-    if (_lockedCodesModalShownThisSession) return;
-
-    const lockedCodes = collectLockedCodesOnly();
-    if (lockedCodes.length) {
-        _lockedCodesModalShownThisSession = true;
-        showLockedCodesModal(lockedCodes);
-    }
 }
 
 /**

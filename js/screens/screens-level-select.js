@@ -103,13 +103,16 @@ function renderLSTopBar() {
 }
 
 
-// Builds the "points to next unlock code" hint string.
-// Returns a trophy message if all codes are already unlocked.
+// Builds the "what is left for the next unlock code" hint string, e.g.
+// "3 worlds to next code". Returns a trophy message if every code is unlocked.
 export function buildNextCodeStr() {
-    const nextCode = globalThis.WORLD_CODES.find(wc => STATE.totalScore < wc.threshold);
-    if (!nextCode) return `🏆 ${t('ls_all_codes')}`;
+    const next = globalThis.WORLD_CODES.find(wc => !STATE.unlockedCodes.includes(wc.code));
+    if (!next) return `🏆 ${t('ls_all_codes')}`;
 
-    return `${nextCode.threshold - STATE.totalScore} ${t('ls_to_next')}`;
+    const { current, target } = next.progress();
+    const remaining = Math.max(0, target - current);
+    const [one, many] = LANG === 'de' ? next.unitDE : next.unitEn;
+    return `${remaining} ${remaining === 1 ? one : many} ${t('ls_to_next')}`;
 }
 
 // Renders the total score and the "points to next unlock code" hint into the top bar.

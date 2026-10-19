@@ -100,6 +100,27 @@ const LEDGER_CATEGORY_ICON = {
     zero_variance: 'images/Inference/icons/zero_variance.webp',
     precision_large: 'images/Inference/icons/precision_large.webp',
 
+    // Combat, Loot & Crafting (shared art until dedicated icons exist)
+    monster_hunter: 'images/Inference/icons/outlier_resistance.webp',
+    boss_slayer: 'images/Inference/icons/significance_level.webp',
+    bestiary: 'images/Inference/icons/prior_distribution.webp',
+    veteran: 'images/Inference/icons/descriptive_stats.webp',
+    affliction: 'images/Inference/icons/curse_dimensionality.webp',
+    trial_ascension: 'images/Inference/icons/choose_ascendency.webp',
+    map_runner: 'images/Inference/icons/cartographic_mastery.webp',
+    untouchable: 'images/Inference/icons/zero_variance.webp',
+    risk_taker: 'images/Inference/icons/monte_carlo.webp',
+    hazard_pay: 'images/Inference/icons/countdown_crisis_master.webp',
+    pinnacle_runner: 'images/Inference/icons/precision_large.webp',
+    master_crafter: 'images/Inference/icons/erasure_engine.webp',
+    core_technician: 'images/Inference/icons/item_distribution.webp',
+    essence_alchemist: 'images/Inference/icons/shadow_seal_init.webp',
+    treasure_hunter: 'images/Inference/icons/lucky_drop_event.webp',
+    perfect_roll: 'images/Inference/icons/overfitting_gambler.webp',
+    collector: 'images/Inference/icons/witch_immunity.webp',
+    gold_rush: 'images/Inference/icons/gamblers_fortune.webp',
+    recycler: 'images/Inference/icons/tutor_regression.webp',
+
     // Atlas Tiers 1-16
     atlas_tier_1: 'images/Inference/icons/parameter_space.webp',
     atlas_tier_2: 'images/Inference/icons/parameter_space.webp',
@@ -211,6 +232,22 @@ function _showQuestRewardTooltip(def, anchorEl) {
     _positionTooltipNearAnchor(tip, anchorEl);
 }
 
+/**
+ * Shows a plain explanation of what a loot reward chip will give.
+ * @param {string} kind - equipment | core | essence | map
+ * @param {string} [tier] - Atlas tier, for map rewards
+ * @param {HTMLElement} anchorEl - The chip element that was hovered
+ */
+function _showQuestLootTooltip(kind, tier, anchorEl) {
+    const tip = _ensureQuestRewardTooltip();
+    const title = t('qa_loot_' + kind).replace('{n}', tier || '');
+    tip.innerHTML = `
+        <div class="inv-tip-name">${_LOOT_ICONS[kind] || '🎁'} ${title}</div>
+        <div class="inv-tip-desc">${t('qa_loot_tip_' + kind).replace('{n}', tier || '')}</div>`;
+    tip.classList.add('visible');
+    _positionTooltipNearAnchor(tip, anchorEl);
+}
+
 /** Hides the floating reward tooltip. Called from chip onmouseleave. */
 export function _hideQuestRewardTooltip() {
     if (_questRewardTipEl) _questRewardTipEl.classList.remove('visible');
@@ -223,6 +260,12 @@ export function _hideQuestRewardTooltip() {
  * @param {string} defId
  */
 export function _questChipHover(el, defId) {
+    // Loot chips (equipment, core, essence, map) pass 'loot:<kind>[:<tier>]'.
+    if (String(defId).startsWith('loot:')) {
+        const [, kind, tier] = String(defId).split(':');
+        _showQuestLootTooltip(kind, tier, el);
+        return;
+    }
     const def = ITEM_DEFS[defId];
     if (def) _showQuestRewardTooltip(def, el);
 }
@@ -477,7 +520,9 @@ function _ledger_buildRewardChips(ms) {
     });
     eff.loot.forEach(spec => {
         const label = t('qa_loot_' + spec.kind).replace('{n}', spec.tier);
-        chips.push(`<span class="quest-reward-item">${_LOOT_ICONS[spec.kind]} ${label}</span>`);
+        chips.push(`<span class="quest-reward-item quest-reward-item-tip"
+              onmouseenter="_questChipHover(this,'loot:${spec.kind}${spec.tier ? ':' + spec.tier : ''}')"
+              onmouseleave="_hideQuestRewardTooltip()">${_LOOT_ICONS[spec.kind]} ${label}</span>`);
     });
 
     return chips.join('');
