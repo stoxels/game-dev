@@ -80,6 +80,7 @@ function _buildSlotCardHtml(slotNum, summary) {
 
     return `${headingHtml}
               ${portraitHtml}
+              ${_buildSlotTitleHtml(summary)}
               <div class="ssc-score">${t('score_lbl')}: ${summary.totalScore}</div>
               <div class="ssc-levels">${t('scr_stoxels_done').replace('{n}', summary.levelsDone)}</div>
               ${levelHtml}
@@ -88,6 +89,14 @@ function _buildSlotCardHtml(slotNum, summary) {
 }
 
 
+
+// The slot's Title line (the equipped title, else the highest earned), or ''
+// while the save has not earned one yet.
+function _buildSlotTitleHtml(summary) {
+    if (typeof globalThis.getTitleForScore !== 'function') return '';
+    const def = globalThis.getTitleForScore(Number(summary.totalScore) || 0, summary.activeTitle);
+    return def ? `<div class="ssc-title">${globalThis.getTitleName(def)}</div>` : '';
+}
 
 // Wires up click-to-select and delete-button behavior on a slot card.
 function _attachSlotCardListeners(card, slotNum) {

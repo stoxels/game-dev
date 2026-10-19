@@ -8186,3 +8186,47 @@ Object.assign(T.de, {
     sra_mana: 'Mana',
     sra_dmg: 'Gesamtschaden',
 });
+
+//------------------------------------------------------------------------
+//---------------------TITLES (score milestones)-------------------------
+//------------------------------------------------------------------------
+
+Object.assign(T.en, {
+    titles_modal_title: '🏅 TITLES',
+    titles_score_now: 'Score: {n}',
+    titles_count: '{c} / {n} titles earned',
+    titles_equip: 'Equip',
+    titles_equipped: 'Shown',
+    titles_auto: 'Always show my highest title',
+    titles_locked_at: 'Score {n}',
+    titles_ceremony_head: '🏅 NEW TITLE EARNED!',
+    titles_ceremony_head_many: '🏅 NEW TITLES EARNED!',
+    titles_ceremony_stats: 'Permanent bonuses',
+    titles_ceremony_equip: 'Wear it',
+    titles_ceremony_view: 'All titles',
+    ls_next_title: '{n} Score to next title',
+    ls_all_titles: 'All titles earned!',
+    ov_win_combat: 'Combat Score',
+    eg_atlas_score: 'Atlas Score: {n}',
+    eg_atlas_score_tooltip: 'Earned by clearing atlas regions: big for a first clear, small for the next nine repeats. It counts toward your total Score and your Titles.',
+});
+
+Object.assign(T.de, {
+    titles_modal_title: '🏅 TITEL',
+    titles_score_now: 'Punkte: {n}',
+    titles_count: '{c} / {n} Titel errungen',
+    titles_equip: 'Tragen',
+    titles_equipped: 'Getragen',
+    titles_auto: 'Immer meinen höchsten Titel zeigen',
+    titles_locked_at: 'Punkte {n}',
+    titles_ceremony_head: '🏅 NEUER TITEL ERRUNGEN!',
+    titles_ceremony_head_many: '🏅 NEUE TITEL ERRUNGEN!',
+    titles_ceremony_stats: 'Dauerhafte Boni',
+    titles_ceremony_equip: 'Tragen',
+    titles_ceremony_view: 'Alle Titel',
+    ls_next_title: '{n} Punkte bis zum nächsten Titel',
+    ls_all_titles: 'Alle Titel errungen!',
+    ov_win_combat: 'Kampfpunkte',
+    eg_atlas_score: 'Atlas-Punkte: {n}',
+    eg_atlas_score_tooltip: 'Gibt es für geräumte Atlas-Regionen: viel beim ersten Mal, wenig für die nächsten neun Wiederholungen. Zählt zu deinen Gesamtpunkten und deinen Titeln.',
+});

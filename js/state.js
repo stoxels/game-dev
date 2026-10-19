@@ -481,6 +481,11 @@ export function buildFreshState() {
     return {
         totalScore: 0,
         levelHS: {},
+        levelMonsterHS: {},
+        atlasScore: 0,
+        atlasClears: {},
+        titlesSeen: [],
+        activeTitle: null,
         levelMistakes: {},
         inventory: [],
         unlockedCodes: [],
@@ -613,6 +618,12 @@ export function _migrateCoreFields(s) {
         else hs.score = Number(hs.score);
     });
 
+    // Title / score fields added with the Titles system.
+    if (!s.levelMonsterHS || typeof s.levelMonsterHS !== 'object') s.levelMonsterHS = {};
+    if (!Number.isFinite(Number(s.atlasScore))) s.atlasScore = 0;
+    if (!s.atlasClears || typeof s.atlasClears !== 'object') s.atlasClears = {};
+    if (!Array.isArray(s.titlesSeen)) s.titlesSeen = [];
+    if (typeof s.activeTitle !== 'string') s.activeTitle = null;
     if (!s.bonusDone) s.bonusDone = [];
     if (s.tutorialDone === undefined) s.tutorialDone = false;
     if (!s.mathGatePassed) s.mathGatePassed = [];
@@ -868,6 +879,7 @@ export function getSlotSummary(slotNum) {
         empty: false,
         name: getSlotName(slotNum),
         totalScore: raw.totalScore || 0,
+        activeTitle: typeof raw.activeTitle === 'string' ? raw.activeTitle : null,
         levelsDone: (raw.done || []).length,
         playerCharacter: raw.playerCharacter || null,
         playerClass: raw.playerClass || null,

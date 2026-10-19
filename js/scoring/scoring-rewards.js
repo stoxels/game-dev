@@ -241,13 +241,14 @@ function buildMistakeLine() {
     return `<div class="ov-sub-line ${cssClass}">✗ ${_liveMistakes()} ${mistakeWord}</div>`;
 }
 
-function buildScoreColumn(pts, ptsAwarded, prevBest, mult) {
+function buildScoreColumn(pts, ptsAwarded, prevBest, mult, monsterPts = 0, monsterAwarded = 0) {
     const safeMult = Number.isFinite(Number(mult)) ? Number(mult) : 1;
     const gainNote = buildGainNote(pts, ptsAwarded, prevBest);
     document.getElementById('ov-col-score').innerHTML = `
         <div class="ov-sub-line ov-sub-pts">${pts} ${t('ov_win_pts')}</div>
         <div class="ov-sub-line ov-sub-pts">${t('ov_win_multiplier')} ×${safeMult.toFixed(2)}</div>
-        <div class="ov-sub-line ov-sub-pts">${gainNote}</div>`;
+        <div class="ov-sub-line ov-sub-pts">${gainNote}</div>
+        ${monsterPts > 0 ? `<div class="ov-sub-line ov-sub-pts">⚔ ${t('ov_win_combat')} ${monsterPts} (+${monsterAwarded})</div>` : ''}`;
 }
 
 function buildTimeColumn(elapsed) {
@@ -375,9 +376,9 @@ function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel, isNe
 }
 
 // Orchestrates the full win overlay render: stats, bonus badge, and item rewards.
-export function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusMet, isAscensionLevel, isFirstClear, isNexusPoint }) {
+export function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, monsterPts, monsterAwarded, elapsed, bonusMet, isAscensionLevel, isFirstClear, isNexusPoint }) {
     document.getElementById('ov-reveal-quote').innerHTML = `"${lvText(cur, 'reveal')}"`;
-    buildScoreColumn(pts, ptsAwarded, prevBest, mult);
+    buildScoreColumn(pts, ptsAwarded, prevBest, mult, monsterPts, monsterAwarded);
     // Beating an existing personal best (a first clear has no prior score).
     if (ptsAwarded > 0 && Number(prevBest) > 0) Audio_Manager.playSFX('new_highscore');
     buildTimeColumn(elapsed);

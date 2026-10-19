@@ -225,6 +225,11 @@ function _egGetPassiveTreeTravelBonuses() {
             for (const channel in gearChannels) totals[channel] = (totals[channel] || 0) + gearChannels[channel];
         }
     } catch (e) { /* equipment not initialised yet (load order) */ }
+    // Earned titles add small permanent bonuses (titles.js), tree or no tree.
+    if (typeof globalThis.getTitleEffectSpecs === 'function') {
+        const titleChannels = ptEffectChannels(globalThis.getTitleEffectSpecs());
+        for (const channel in titleChannels) totals[channel] = (totals[channel] || 0) + titleChannels[channel];
+    }
     const state = typeof globalThis.STATE !== 'undefined' ? globalThis.STATE : null;
     if (!state || !state.passiveTreeAllocated) return totals;
     if (typeof globalThis.isTreeless === 'function' && globalThis.isTreeless()) return totals;

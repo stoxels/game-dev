@@ -1,0 +1,156 @@
+/* Titles (js/titles.js): list modal, unlock ceremony, save-slot line.
+   The two modals reuse the parchment frame of the Moodle code modal
+   (.pw-box in modals.css), so text here is dark brown on parchment. */
+
+#titles-modal,
+#title-ceremony {
+    z-index: 9000; /* above win overlay / hub overlays */
+}
+
+.titles-box .tt-head {
+    text-align: center;
+    color: #2c1a0c;
+    font-size: clamp(12px, 2.7cqw, 17px);
+    margin-bottom: 8px;
+}
+
+.titles-box .tt-sub {
+    opacity: 0.75;
+    margin-top: 2px;
+}
+
+.titles-box .tt-auto {
+    margin-top: 6px;
+    background: rgba(44, 26, 12, 0.08);
+    border: 1px solid rgba(44, 26, 12, 0.45);
+    color: #2c1a0c;
+    padding: 3px 10px;
+    cursor: pointer;
+    font: inherit;
+}
+
+.titles-box .tt-auto.on {
+    background: rgba(44, 26, 12, 0.3);
+    font-weight: 700;
+}
+
+.titles-box .tt-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 6px 8px;
+    margin-bottom: 4px;
+    border: 1px solid rgba(44, 26, 12, 0.25);
+    background: rgba(44, 26, 12, 0.05);
+    color: rgba(44, 26, 12, 0.55);
+}
+
+.titles-box .tt-row.earned {
+    color: #2c1a0c;
+    background: rgba(255, 244, 214, 0.35);
+    border-color: rgba(44, 26, 12, 0.55);
+}
+
+.titles-box .tt-row.active {
+    border-color: #8a5a00;
+    box-shadow: 0 0 6px rgba(200, 140, 20, 0.6);
+}
+
+.titles-box .tt-name {
+    font-weight: 700;
+    font-size: clamp(12px, 2.6cqw, 16px);
+}
+
+.titles-box .tt-stat {
+    font-size: clamp(12px, 2.6cqw, 17px);
+    opacity: 0.9;
+}
+
+.titles-box .tt-state {
+    flex: 0 0 auto;
+    font-size: clamp(11px, 2.4cqw, 15px);
+    text-align: right;
+}
+
+.titles-box .tt-equip {
+    background: rgba(44, 26, 12, 0.18);
+    border: 1px solid #2c1a0c;
+    color: #2c1a0c;
+    padding: 4px 12px;
+    cursor: pointer;
+    font: inherit;
+}
+
+.titles-box .tt-equip:hover {
+    background: rgba(44, 26, 12, 0.35);
+}
+
+.titles-box .tt-equipped {
+    color: #6b4200;
+    font-weight: 700;
+}
+
+/* ---- Ceremony ---- */
+.titles-box .tt-ceremony {
+    text-align: center;
+    color: #2c1a0c;
+}
+
+.titles-box .tt-burst {
+    font-size: clamp(22px, 6cqw, 40px);
+    color: #b87a00;
+    animation: tt-spin 4s linear infinite;
+}
+
+.titles-box .tt-big {
+    font-size: clamp(20px, 6cqw, 36px);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: #6b3a00;
+    text-shadow: 0 0 10px rgba(255, 200, 80, 0.9);
+    animation: tt-pop 0.7s ease-out both;
+}
+
+.titles-box .tt-also {
+    font-size: clamp(12px, 2.6cqw, 16px);
+    opacity: 0.75;
+    margin-top: 2px;
+}
+
+.titles-box .tt-bonus-head {
+    margin: 10px 0 4px;
+    font-size: clamp(11px, 2.4cqw, 15px);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.7;
+}
+
+.titles-box .tt-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+@keyframes tt-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes tt-pop {
+    0% { transform: scale(0.4); opacity: 0; }
+    70% { transform: scale(1.12); opacity: 1; }
+    100% { transform: scale(1); }
+}
+
+/* The score banner opens the titles list. */
+#ls-score, #ls-pts-next, .mv-ribbon-combined {
+    cursor: pointer;
+}
+
+/* Save-slot card: equipped title above the score. */
+.ssc-title {
+    font-size: 16px;
+    color: #f5d98a;
+    margin-top: 2px;
+}

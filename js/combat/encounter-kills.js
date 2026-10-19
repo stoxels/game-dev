@@ -134,6 +134,9 @@ export function _egKillMonster(monsterId) {
         }
     } catch(e){}
 
+    // Score: campaign kills add to the level's combat tally (see scoring-core.js)
+    if (dying && typeof globalThis.recordMonsterKillScore === 'function') globalThis.recordMonsterKillScore(dying);
+
     if (dying && !dying.isBoss) _egHandleNormalMonsterKill(dying);
     if (dying && dying.isBoss) _egHandleBossKill(dying);
 

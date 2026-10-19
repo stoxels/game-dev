@@ -543,7 +543,8 @@ export function renderLSCharacterAvatar() {
     if (!topbarRight) return;
 
     const lang = LANG;
-    const charName = lang === 'de' ? char.nameDE : char.name;
+    const baseName = lang === 'de' ? char.nameDE : char.name;
+    const charName = typeof globalThis.withTitle === 'function' ? globalThis.withTitle(baseName) : baseName;
 
     const avatar = document.createElement('div');
     avatar.id = 'ls-char-avatar';
@@ -591,7 +592,8 @@ function _buildCharacterTooltipClassHtml() {
 
 function _buildCharacterTooltipContent(char) {
     const lang = LANG;
-    const charName = lang === 'de' ? char.nameDE : char.name;
+    const baseName = lang === 'de' ? char.nameDE : char.name;
+    const charName = typeof globalThis.withTitle === 'function' ? globalThis.withTitle(baseName) : baseName;
     const tagline = lang === 'de' ? char.taglineDE : char.tagline;
 
     const traitsHtml = (char.traits || []).map(tr => {

@@ -39,7 +39,8 @@ export function _getPlayerCharacterImage() {
 // Returns the display name of the currently selected character.
 export function _getAvatarCharacterName() {
     const names = { stox: 'STOX', trix: 'TRIX', syla: 'SYLA' };
-    return names[STATE?.playerCharacter] || 'STOX';
+    const name = names[STATE?.playerCharacter] || 'STOX';
+    return typeof globalThis.withTitle === 'function' ? globalThis.withTitle(name) : name;
 }
 
 function _getAvatarCharacterColor() {

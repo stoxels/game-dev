@@ -139,7 +139,7 @@ function checkWin() {
 
     // The score lives in scoring-core.js - this call is the hand-off point
     // between the orchestrator and the calculation/reward halves.
-    const { pts, ptsAwarded, prevBest, mult } = calculateScore(rows, cols);
+    const { pts, ptsAwarded, prevBest, mult, monsterPts, monsterAwarded } = calculateScore(rows, cols);
     save();
     document.getElementById('sc-disp').textContent = STATE.totalScore;
 
@@ -160,7 +160,7 @@ function checkWin() {
         // Render the win overlay content (buildReveal() is deferred until
         // #ov-win is actually visible - see the two branches below, and
         // finishQuiz()/skipQuiz() in quiz.js for the quiz-bonus path)
-        renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusMet: bonusResult, isAscensionLevel, isFirstClear, isNexusPoint });
+        renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, monsterPts, monsterAwarded, elapsed, bonusMet: bonusResult, isAscensionLevel, isFirstClear, isNexusPoint });
 
         // World completion hooks - persist code unlocks immediately so they're
         // not lost if the player closes the game before the delayed modal shows.
@@ -182,6 +182,9 @@ function checkWin() {
 
         // Codes popup delayed so it feels distinct from the win overlay
         setTimeout(() => checkWorldCodes(), 2000);
+
+        // New Score may have earned a title: celebrate after the codes popup
+        setTimeout(() => globalThis.checkTitleUnlocks && globalThis.checkTitleUnlocks(), 2600);
 
         // Quest stats update
         updateQuestStats('levelComplete', {

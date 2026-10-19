@@ -95,10 +95,55 @@ export function maybeUpdateHighScore(gi, pts) {
     }
 }
 
+// Score a single campaign monster kill is worth before the level multiplier.
+// Grows with the monster's level; bosses are worth ten times as much.
+export function monsterKillScore(monster) {
+    const level = Math.max(1, Number(monster && monster.level) || 1);
+    const base = 2 + Math.round(level / 2);
+    return monster && monster.isBoss ? base * 10 : base;
+}
+
+// Adds one kill to the running tally of the current campaign level. Only
+// campaign levels count - map runs earn their score when the map is cleared
+// (see awardAtlasClearScore). The tally restarts with every level start.
+export function recordMonsterKillScore(monster) {
+    if (typeof globalThis._egIsCampaignRun !== 'function' || !globalThis._egIsCampaignRun()) return;
+    globalThis._runMonsterScore = (Number(globalThis._runMonsterScore) || 0) + monsterKillScore(monster);
+}
+
+// Combat half of a level win: the best monster tally per level counts, like
+// the puzzle high score, so replaying a level only pays when it beats the
+// record. Returns the net-new points.
+export function computeMonsterPointsAwarded(gi, mult) {
+    const runPts = Math.round((Number(globalThis._runMonsterScore) || 0) * mult);
+    if (!STATE.levelMonsterHS) STATE.levelMonsterHS = {};
+    const prevBest = Number(STATE.levelMonsterHS[gi]) || 0;
+    if (runPts <= prevBest) return { monsterPts: runPts, monsterAwarded: 0 };
+    STATE.levelMonsterHS[gi] = runPts;
+    return { monsterPts: runPts, monsterAwarded: runPts - prevBest };
+}
+
+// Endgame half of the score: a cleared atlas region pays tier x 150 the first
+// time and tier x 15 for each of its next nine clears, then nothing, so the
+// number cannot be farmed forever. Returns the points added.
+export function awardAtlasClearScore(node, firstClear) {
+    if (!node || !STATE) return 0;
+    if (!STATE.atlasClears) STATE.atlasClears = {};
+    const clears = Number(STATE.atlasClears[node.id]) || 0;
+    const tier = Math.max(1, Number(node.tier) || 1);
+    const pts = firstClear ? tier * 150 : (clears < 10 ? tier * 15 : 0);
+    STATE.atlasClears[node.id] = clears + 1;
+    if (!pts) return 0;
+    STATE.atlasScore = (Number(STATE.atlasScore) || 0) + pts;
+    STATE.totalScore = (Number(STATE.totalScore) || 0) + pts;
+    return pts;
+}
+
 // Master score calculation function.
 // Computes the final score, awards net-new points to the player's total,
 // updates the level high score if beaten, and returns all relevant values
-// for display and quest-stat tracking.
+// for display and quest-stat tracking. Campaign monster kills add their own
+// best-per-level share (monsterPts / monsterAwarded).
 export function calculateScore(rows, cols) {
     const gi = cur.gIdx;
     const rawScore = computeRawScore(rows, cols);
@@ -108,12 +153,13 @@ export function calculateScore(rows, cols) {
     const pts = Number.isFinite(calculatedPts) ? Math.max(0, calculatedPts) : 0;
 
     const { ptsAwarded, prevBest } = computePointsAwarded(pts, gi);
+    const { monsterPts, monsterAwarded } = computeMonsterPointsAwarded(gi, mult);
 
     const currentTotal = Number.isFinite(Number(STATE.totalScore)) ? Number(STATE.totalScore) : 0;
-    STATE.totalScore = currentTotal + ptsAwarded;
+    STATE.totalScore = currentTotal + ptsAwarded + monsterAwarded;
     maybeUpdateHighScore(gi, pts);
 
-    return { pts, ptsAwarded, prevBest, mult };
+    return { pts, ptsAwarded, prevBest, mult, monsterPts, monsterAwarded };
 }
 
 //------------------------------------------------------------------------

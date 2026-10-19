@@ -289,6 +289,9 @@ export function _egAtlasBuildHeaderHTML() {
                 <span class="ega-header-highest">
                     ${t('eg_atlas_highest_tier').replace('{n}', prog.highestTier)}
                 </span>
+                <span class="ega-header-highest" data-tip-t="eg_atlas_score_tooltip">
+                    ⭐ ${t('eg_atlas_score').replace('{n}', (Number(STATE.atlasScore) || 0).toLocaleString())}
+                </span>
             </div>
             <div class="ega-progress-track"><div class="ega-progress-fill" style="width:${pct}%"></div></div>
             <div class="ega-header-line">

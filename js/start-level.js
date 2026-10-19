@@ -117,6 +117,7 @@ function _resetGameplayFlags() {
     if (!isChainTransition) globalThis._levelTimeLost = 0;
     if (!isChainTransition) globalThis._levelMistakesErased = 0;
     globalThis.levelStartTime = Date.now();
+    if (!isChainTransition) globalThis._runMonsterScore = 0;
     globalThis.itemsUsedThisLevel = 0;
     globalThis.dead = false;
     globalThis.painting = false;

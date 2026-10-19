@@ -730,6 +730,9 @@ export function _egAtlasOnMapCompleted(mapItem) {
 
     STATE.egAtlasCompleted[node.id] = true;
 
+    // Score: a cleared region pays out (first clear big, repeats small).
+    if (typeof globalThis.awardAtlasClearScore === 'function') globalThis.awardAtlasClearScore(node, firstClear);
+
     // Freshly reached regions (cap the spam on dense rows).
     const newlyUnlocked = node.links
         .filter(l => !wasUnlocked[l] && egAtlasIsUnlocked(l))
@@ -776,6 +779,9 @@ export function _egAtlasOnMapCompleted(mapItem) {
     if (firstClear && typeof globalThis.checkWorldCodes === 'function') {
         setTimeout(() => globalThis.checkWorldCodes(), 1500);
     }
+
+    // The extra Score may have earned a title.
+    if (typeof globalThis.checkTitleUnlocks === 'function') setTimeout(() => globalThis.checkTitleUnlocks(), 2200);
 
     return { node, firstClear, newlyUnlocked };
 }

@@ -103,24 +103,20 @@ function renderLSTopBar() {
 }
 
 
-// Builds the "what is left for the next unlock code" hint string, e.g.
-// "3 worlds to next code". Returns a trophy message if every code is unlocked.
-export function buildNextCodeStr() {
-    const next = globalThis.WORLD_CODES.find(wc => !STATE.unlockedCodes.includes(wc.code));
-    if (!next) return `🏆 ${t('ls_all_codes')}`;
-
-    const { current, target } = next.progress();
-    const remaining = Math.max(0, target - current);
-    const [one, many] = LANG === 'de' ? next.unitDE : next.unitEn;
-    return `${remaining} ${remaining === 1 ? one : many} ${t('ls_to_next')}`;
+// Builds the "what is left for the next title" hint string, e.g.
+// "430 Score to next title". Returns a trophy message once every title is
+// earned (the text itself lives in titles.js).
+export function buildNextTitleStr() {
+    return typeof globalThis.titleProgressText === 'function' ? globalThis.titleProgressText() : '';
 }
 
-// Renders the total score and the "points to next unlock code" hint into the top bar.
+// Renders the total score and the "score to next title" hint into the top bar.
 function renderLSScoreRow() {
     document.getElementById('ls-score').textContent = STATE.totalScore;
+    if (typeof globalThis.checkTitleUnlocks === 'function') setTimeout(() => globalThis.checkTitleUnlocks(), 700);
 
     const ptsNextEl = document.getElementById('ls-pts-next');
-    if (ptsNextEl) ptsNextEl.textContent = buildNextCodeStr();
+    if (ptsNextEl) ptsNextEl.textContent = buildNextTitleStr();
 }
 
 

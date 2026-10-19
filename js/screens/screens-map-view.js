@@ -1,7 +1,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
-import { MOD_CLASSES, MOD_LABELS, applyClassStatusActiveStyle, applyClassStatusEmptyStyle, buildNextCodeStr, isLevelConvergence, isMaxCleared, renderLevelSelect } from './screens-level-select.js';
+import { MOD_CLASSES, MOD_LABELS, applyClassStatusActiveStyle, applyClassStatusEmptyStyle, buildNextTitleStr, isLevelConvergence, isMaxCleared, renderLevelSelect } from './screens-level-select.js';
 import { showWorldDetail, wdGoBackToMap } from './screens-world-levels.js';
 import { launchAtlasVendor, showModal, showSetup, switchScreen } from './screens.js';
 import { showQuestLog } from '../inference/inference-ui.js';
@@ -1792,6 +1792,8 @@ export function _renderTopBarScore(p = 'mv') {
     if (scoreEl) {
         scoreEl.textContent = (STATE ? STATE.totalScore : 0);
     }
+    // A freshly earned title is celebrated when the player is back on a map.
+    if (typeof globalThis.checkTitleUnlocks === 'function') setTimeout(() => globalThis.checkTitleUnlocks(), 700);
     // Gold balance pill (between the title plaque and the button grid) is
     // refreshed together with the score - both top bars call this on build.
     const goldEl = document.getElementById(p + '-gold-balance');
@@ -1799,12 +1801,12 @@ export function _renderTopBarScore(p = 'mv') {
 }
 
 /**
- * Renders the "points to next code" display in the map view top bar.
+ * Renders the "score to next title" display in the map view top bar.
  */
 export function _renderTopBarNextCode(p = 'mv') {
     const ptsNextEl = document.getElementById(p + '-ls-pts-next');
-    if (ptsNextEl && typeof buildNextCodeStr === 'function') {
-        ptsNextEl.textContent = buildNextCodeStr();
+    if (ptsNextEl && typeof buildNextTitleStr === 'function') {
+        ptsNextEl.textContent = buildNextTitleStr();
     }
 }
 
