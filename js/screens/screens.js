@@ -395,7 +395,7 @@ export function launchAtlasVendor(fromScreen) {
 // the level select screen (its exits are hidden and the title-bindings
 // handlers refuse); this guard is the last line of defense.
 export function goToLevelSelect() {
-    if (cur && cur.isTutorialQuest) return;
+    if (cur && cur.isTutorialQuest && !STATE.tutorialDone) return;
     hideResultOverlays();
     globalThis.closeQuiz();
 
@@ -476,7 +476,9 @@ export function goToPreviousScreen() {
     if (globalThis.screenHistory.length) {
         // Mid-tutorial there is no valid previous level-select screen -
         // stay put instead of popping history toward the locked screens.
-        if (cur && cur.isTutorialQuest) return;
+        // (`cur` keeps pointing at the last tutorial puzzle after graduation until
+        // another level starts, so the guard only holds while the tutorial is open.)
+        if (cur && cur.isTutorialQuest && !STATE.tutorialDone) return;
         // Escape is also a valid close path for the title-screen tree
         // preview. Restore its temporary character before leaving the screen.
         if (document.getElementById('screen-passive-tree')?.classList.contains('active')) {

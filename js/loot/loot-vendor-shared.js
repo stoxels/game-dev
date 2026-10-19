@@ -106,3 +106,62 @@ export function _egvRefreshGoldDisplay() {
         balanceEl.textContent = t('eg_vendor_gold_balance').replace('{n}', egGetGold().toLocaleString());
     }
 }
+
+//------------------------------------------------------------------------
+//-------------------CHARM TYPE FILTER-------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Spell-type filter chips above the charm cards: label key, plus a test on the
+// spell's definition (its tags come from the registry's ARPG-style type line).
+const EG_VENDOR_CHARM_FILTERS = [
+    { id: 'fire', test: d => _egvHasTag(d, 'Fire') },
+    { id: 'cold', test: d => _egvHasTag(d, 'Cold') },
+    { id: 'lightning', test: d => _egvHasTag(d, 'Lightning') },
+    { id: 'shadow', test: d => _egvHasTag(d, 'Shadow') },
+    { id: 'arcane', test: d => _egvHasTag(d, 'Arcane') },
+    { id: 'holy', test: d => _egvHasTag(d, 'Holy') },
+    { id: 'physical', test: d => _egvHasTag(d, 'Physical') },
+    { id: 'melee', test: d => d.castKind === 'melee' },
+    { id: 'projectile', test: d => _egvHasTag(d, 'Projectile') },
+    { id: 'area', test: d => _egvHasTag(d, 'Area') },
+    { id: 'movement', test: d => ['Movement', 'Leap', 'Teleport', 'Dash'].some(g => _egvHasTag(d, g)) },
+    { id: 'cleanse', test: d => _egvHasTag(d, 'Cleanse') },
+    { id: 'defensive', test: d => ['Shield', 'Heal', 'Heal over Time'].some(g => _egvHasTag(d, g))
+        || ['guard', 'ward', 'evade', 'thorns', 'shield', 'heal', 'hot'].includes(d.behavior) },
+    { id: 'buff', test: d => _egvHasTag(d, 'Buff') },
+];
+
+// Chosen chip ('all' = no filter); remembered while the shop stays loaded.
+let _egvCharmFilter = 'all';
+
+// The raw universal-spell definition (carries tags, castKind and behavior;
+// the generic skill def only keeps the tags).
+function _egvUniversalDef(id) {
+    const defs = Array.isArray(globalThis.UNIVERSAL_SPELL_DEFS) ? globalThis.UNIVERSAL_SPELL_DEFS : [];
+    return defs.find(d => d && d.id === id) || {};
+}
+
+// True when the spell definition carries the given tag.
+function _egvHasTag(def, tag) {
+    return Array.isArray(def.tags) && def.tags.includes(tag);
+}
+
+// Picks a spell-type chip and redraws the charm cards.
+export function _egvSetCharmFilter(id) {
+    _egvCharmFilter = id;
+    _egvRefreshTabContent();
+}
+
+// One chip per spell type, with the chosen one highlighted.
+export function _egvBuildCharmFilterBarHTML() {
+    const chip = (id, label) => `<button type="button" class="egv-filter-btn${_egvCharmFilter === id ? ' egv-filter-btn-on' : ''}" onclick="_egvSetCharmFilter('${id}')">${label}</button>`;
+    return `<div class="egv-charm-filters">${chip('all', t('eg_vendor_charm_filter_all'))}${
+        EG_VENDOR_CHARM_FILTERS.map(f => chip(f.id, t('eg_vendor_charm_filter_' + f.id))).join('')}</div>`;
+}
+
+// Keeps only the spell ids that match the chosen chip.
+export function _egvFilterCharmIds(ids) {
+    const filter = EG_VENDOR_CHARM_FILTERS.find(f => f.id === _egvCharmFilter);
+    return filter ? ids.filter(id => filter.test(_egvUniversalDef(id))) : ids;
+}

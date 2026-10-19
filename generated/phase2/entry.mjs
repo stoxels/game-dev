@@ -213,7 +213,7 @@ import { EG_SCREEN_NAV, _egResolveBackFn } from '../../js/combat/combat-state-na
 import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MELEE_ANIM_DURATION_MS, EG_PLAYER_MELEE_DAMAGE, EG_PLAYER_MIN_ATTACK_INTERVAL, _egActiveBlasts, _egBossCorrupted, _egBossFrozen, _egBossTimers, _egCellInBounds, _egCurrencyDrops, _egDragChargeElements, _egIsActive, _egIsCampaignRun, _egIsMapRun, _egItemDrops, _egLootDrops, _egPickupSpawnerInfo, _egPickups, _egRecentFills } from '../../js/combat/combat-state.js';
 import '../../js/loot/unique-items.js';
 import { _egvSwitchTab, showEndgameVendor } from '../../js/loot/loot-vendor.js';
-import '../../js/loot/loot-vendor-shared.js';
+import { _egvSetCharmFilter } from '../../js/loot/loot-vendor-shared.js';
 import { _egvBuyTierMap } from '../../js/loot/loot-vendor-maps.js';
 import { _egvBuyCharm, _egvBuyCurrency, _egvBuyEssence, _egvBuyPuzzleItem } from '../../js/loot/loot-vendor-supplies.js';
 import { _egvSetBaseFilter, _egvSetWeaponTypeFilter, _egvSetDefenseFilter, _egvToggleUsableFilter, _egvShowBaseTooltip, _egvHideBaseTooltip, _egvBuyBaseItem } from '../../js/loot/loot-vendor-equipment.js';
@@ -742,6 +742,7 @@ try { Object.defineProperty(globalThis, "_egvBuyPuzzleItem", { get() { return _e
 try { Object.defineProperty(globalThis, "_egvBuyTierMap", { get() { return _egvBuyTierMap; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvHideBaseTooltip", { get() { return _egvHideBaseTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvSetBaseFilter", { get() { return _egvSetBaseFilter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egvSetCharmFilter", { get() { return _egvSetCharmFilter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvSetDefenseFilter", { get() { return _egvSetDefenseFilter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvSetWeaponTypeFilter", { get() { return _egvSetWeaponTypeFilter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvShowBaseTooltip", { get() { return _egvShowBaseTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -1009,6 +1010,7 @@ try { globalThis["_egCraftingBenchSelect"] = _egCraftingBenchSelect; } catch (e)
 try { globalThis["_egCraftingBenchApply"] = _egCraftingBenchApply; } catch (e) {} // PHASE3-SHIM (js/loot/loot-crafting-bench.js)
 try { globalThis["_egvSwitchTab"] = _egvSwitchTab; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor.js)
 try { globalThis["showEndgameVendor"] = showEndgameVendor; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor.js)
+try { globalThis["_egvSetCharmFilter"] = _egvSetCharmFilter; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-shared.js)
 try { globalThis["_egvBuyTierMap"] = _egvBuyTierMap; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-maps.js)
 try { globalThis["_egvBuyCharm"] = _egvBuyCharm; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-supplies.js)
 try { globalThis["_egvBuyCurrency"] = _egvBuyCurrency; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-supplies.js)

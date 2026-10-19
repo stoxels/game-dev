@@ -133,7 +133,7 @@ function _egvBuildSearchView(contentEl) {
     contentEl.innerHTML = EG_VENDOR_TABS.map(tab => `
 <div class="egv-search-section">
     <div class="egv-search-title">${t(tab.labelKey)}</div>
-    ${builders[tab.id]()}
+    ${builders[tab.id](true)}
 </div>`).join('') + `<div class="egv-search-none" id="egv-search-none" style="display:none">${t('eg_vendor_search_none')}</div>`;
     const hintEl = document.getElementById('egv-hint');
     if (hintEl) hintEl.textContent = t('eg_vendor_hint_search');

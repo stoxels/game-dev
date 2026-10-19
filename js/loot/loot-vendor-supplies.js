@@ -7,7 +7,7 @@ import { EG_ESSENCE_DEFS } from './loot-essences-defs.js';
 import { egAddEssence } from './loot-essences-stash.js';
 import { egAddCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
 import { egGetGold, egSpendGold } from './loot-gold.js';
-import { _egvBuildCardHTML, _egvIconHTML, _egvPurchase, _egvRefreshTabContent } from './loot-vendor-shared.js';
+import { _egvBuildCardHTML, _egvBuildCharmFilterBarHTML, _egvFilterCharmIds, _egvIconHTML, _egvPurchase, _egvRefreshTabContent } from './loot-vendor-shared.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE--------------------------------------
@@ -337,11 +337,13 @@ function _egvCharmOwned(skillId, rank) {
     return !!globalThis.getCharmByKey(globalThis.charmKeyFor(skillId, rank));
 }
 
-// Builds one card per spell with a buy button for every sold rank.
-export function _egvBuildCharmsTabHTML() {
+// Builds one card per spell with a buy button for every sold rank. The
+// all-tabs search passes ignoreFilter so a query still covers every spell.
+export function _egvBuildCharmsTabHTML(ignoreFilter) {
     const lv = _egvPlayerLevel();
     const gold = egGetGold();
-    const cards = _egvCharmSkillIds().map(id => {
+    const ids = ignoreFilter ? _egvCharmSkillIds() : _egvFilterCharmIds(_egvCharmSkillIds());
+    const cards = ids.map(id => {
         const def = globalThis.getSkillDef(id);
         const art = globalThis.getCharmArtForSkill(id, 1);
         const icon = art ? `<img class="eg-art-img" src="${art}" alt="" draggable="false">` : (def.icon || '💫');
@@ -367,7 +369,8 @@ export function _egvBuildCharmsTabHTML() {
     <div class="egv-charm-ranks">${ranks}</div>
 </div>`;
     }).join('');
-    return `<div class="egv-cards">${cards}</div>`;
+    const bar = ignoreFilter ? '' : _egvBuildCharmFilterBarHTML();
+    return `${bar}<div class="egv-cards">${cards}</div>`;
 }
 
 // Buys one rank's charm; it goes straight into the spell book.

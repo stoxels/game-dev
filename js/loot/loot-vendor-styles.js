@@ -147,6 +147,7 @@ export function _egvEnsureStyles() {
             border: 1px solid var(--border2, #666); border-radius: 4px;
             padding: 5px 12px; cursor: pointer;
         }
+        .egv-charm-filters { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 0 0 12px; }
         .egv-filter-btn-on {
             color: var(--accent, #c8a84b); border-color: var(--accent, #c8a84b);
             background: rgba(200,168,75,0.22);
