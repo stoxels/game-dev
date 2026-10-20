@@ -2650,6 +2650,10 @@ function _lootHash(str) {
 
 // Resolves a milestone's reward into { ptPoints, items, loot } where loot is
 // a list of { kind, tier? } granted through egGrantScriptedLoot.
+// Balance: no milestone pays more than two puzzle items - the third/fourth
+// item is trimmed from the richest milestones (one- and two-item
+// milestones are untouched). Applied after the loot swap so swapped
+// milestones keep their 2-items-plus-loot shape.
 export function _milestoneEffectiveReward(ms) {
     const reward = ms.reward || {};
     const items = Array.isArray(reward.items) ? reward.items.slice() : [];
@@ -2664,5 +2668,6 @@ export function _milestoneEffectiveReward(ms) {
             loot.push({ kind: _LOOT_KINDS[Math.floor(h / 100) % _LOOT_KINDS.length] });
         }
     }
+    if (items.length > 2) items.length = 2;
     return { ptPoints: reward.ptPoints || 0, items, loot };
 }

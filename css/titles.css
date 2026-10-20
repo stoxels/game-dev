@@ -14,27 +14,53 @@
    Only the list modal has this header block - the unlock ceremony is a
    separate, compact modal and keeps the plain .pw-box frame. */
 
+/* Header: dark banner (same look as the unlock ceremony hero) so the score
+   and progress read at a glance. */
 #titles-modal .tt-top {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    color: #2c1a0c;
+    gap: 4px;
     margin-bottom: 6px;
+    padding: clamp(8px, 1.6cqw, 14px) clamp(12px, 2.4cqw, 20px);
+    border: 2px solid #8a5a00;
+    border-radius: 12px;
+    background: radial-gradient(ellipse at 50% 0%, #4b2f12 0%, #2a170a 75%, #1c0f06 100%);
+    box-shadow: inset 0 0 0 1px rgba(255, 214, 120, 0.35),
+                inset 0 0 20px rgba(0, 0, 0, 0.55),
+                0 0 12px rgba(200, 140, 20, 0.45),
+                0 3px 8px rgba(0, 0, 0, 0.35);
 }
 
 #titles-modal .tt-score {
     font-weight: 800;
-    font-size: clamp(16px, 3.2cqw, 22px);
-    color: #241405;
-    letter-spacing: 0.2px;
+    font-size: clamp(15px, 3cqw, 21px);
+    color: #ffe08a;
+    text-shadow: 0 0 8px rgba(255, 190, 60, 0.6), 0 1px 0 #3a1f05;
+    letter-spacing: 0.3px;
 }
 
 #titles-modal .tt-sub {
-    font-weight: 800;
-    font-size: clamp(15px, 2.8cqw, 20px);
-    color: #2c1a0c;          /* dark ink: the old mid-brown washed out on parchment */
+    font-weight: 700;
+    font-size: clamp(13px, 2.5cqw, 17px);
+    color: #f5d98a;
     letter-spacing: 0.3px;
     margin-top: 0;
+}
+
+#titles-modal .tt-bar {
+    height: clamp(8px, 1.4cqw, 12px);
+    margin-top: 2px;
+    border: 1px solid rgba(255, 214, 120, 0.5);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+}
+
+#titles-modal .tt-bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #b87a00, #ffd25a);
+    box-shadow: 0 0 8px rgba(255, 200, 80, 0.8);
 }
 
 /* ---- Much larger modal ------------------------------------------------
@@ -139,8 +165,10 @@
     min-width: 0;
     min-height: 0;
     overflow-y: auto;
+    overflow-x: hidden;
     padding-right: 10px;
     scrollbar-width: thin;
+    scrollbar-color: rgba(44, 26, 12, 0.5) rgba(44, 26, 12, 0.12);
 }
 
 /* Parchment-toned scrollbar, same as the shared .pw-scroll one. */
@@ -173,8 +201,10 @@
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
+    overflow-x: hidden;
     padding-right: 8px;
     scrollbar-width: thin;
+    scrollbar-color: rgba(44, 26, 12, 0.5) rgba(44, 26, 12, 0.12);
 }
 
 #titles-modal .tt-total-scroll::-webkit-scrollbar {
@@ -213,9 +243,12 @@
 .titles-box .tt-total-head {
     font-weight: 800;
     font-size: clamp(13px, 2.9cqw, 18px);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     color: #6b3a00;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 2px solid rgba(138, 90, 0, 0.5);
 }
 
 .titles-box .tt-total-line {
@@ -299,9 +332,38 @@
 .titles-box .tt-row.active {
     border-color: #8a5a00;
     border-style: solid;
+    background: linear-gradient(90deg, rgba(255, 226, 140, 0.95), rgba(255, 244, 208, 0.95));
     box-shadow: inset 0 0 0 1px rgba(255, 252, 235, 0.7),
                 0 0 10px rgba(200, 140, 20, 0.65),
                 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Rank badge: gold medal when earned, grey stone when locked. */
+.titles-box .tt-rank {
+    flex: 0 0 auto;
+    width: clamp(26px, 5cqw, 36px);
+    height: clamp(26px, 5cqw, 36px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: 800;
+    font-size: clamp(11px, 2.2cqw, 15px);
+    color: rgba(44, 26, 12, 0.7);
+    background: rgba(44, 26, 12, 0.15);
+    border: 2px solid rgba(44, 26, 12, 0.35);
+}
+
+.titles-box .tt-row.earned .tt-rank {
+    color: #3a1f05;
+    background: radial-gradient(circle at 35% 30%, #ffe48a, #c98a10);
+    border-color: #6b3a00;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.titles-box .tt-main {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .titles-box .tt-name {
@@ -370,51 +432,213 @@
     white-space: nowrap;
 }
 
-/* ---- Ceremony ---- */
+/* ---- Ceremony ----
+   Same definite-width / art-ratio shell as the list modal (see the long
+   comment above for why width must never be auto). Layout: hero (rays +
+   title) | scrolling bonus grid | pinned buttons, so the buttons are always
+   reachable no matter how many titles unlock at once. */
+
+#title-ceremony .titles-box {
+    position: relative;
+    width: min(860px, 95vw, 135vh);
+    max-width: none;
+    aspect-ratio: 611 / 470;
+    max-height: calc(100vh - 24px);
+    padding: clamp(48px, 12%, 150px) clamp(42px, 10.5%, 130px) clamp(40px, 11%, 130px);
+    justify-content: flex-start;
+    color: #2c1a0c;
+}
+
+@media (min-width: 701px) and (max-height: 620px) {
+    #title-ceremony .titles-box {
+        aspect-ratio: auto;
+        height: calc(100vh - 24px);
+    }
+}
+
+@media (max-width: 700px) {
+    #title-ceremony .titles-box {
+        aspect-ratio: auto;
+        padding-top: clamp(48px, 11vh, 150px);
+        padding-bottom: clamp(40px, 10vh, 130px);
+    }
+}
+
+#title-ceremony .modal-title {
+    width: max(min(46%, 520px), 320px);
+    height: clamp(52px, 8.5cqw, 92px);
+    font-size: min(clamp(16px, 2.8cqw, 32px), 5vh);
+    letter-spacing: 2px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 14px rgba(0, 0, 0, 0.6);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+}
+
+#title-ceremony .pw-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-right: 0;
+}
+
 .titles-box .tt-ceremony {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(6px, 1.4cqw, 12px);
     text-align: center;
     color: #2c1a0c;
 }
 
+/* Hero: a dark "banner" panel so the glowing gold name has real contrast
+   (gold on grainy parchment was the old readability problem). */
+.titles-box .tt-hero {
+    position: relative;
+    flex: 0 0 auto;
+    overflow: hidden;
+    padding: clamp(8px, 2cqw, 18px) clamp(10px, 3cqw, 24px);
+    border: 2px solid #8a5a00;
+    border-radius: 12px;
+    background: radial-gradient(ellipse at 50% 40%, #4b2f12 0%, #2a170a 70%, #1c0f06 100%);
+    box-shadow: inset 0 0 0 1px rgba(255, 214, 120, 0.35),
+                inset 0 0 24px rgba(0, 0, 0, 0.6),
+                0 0 14px rgba(200, 140, 20, 0.55),
+                0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+.titles-box .tt-rays {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 220%;
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    background: repeating-conic-gradient(from 0deg, rgba(255, 200, 80, 0.16) 0deg 8deg, transparent 8deg 24deg);
+    -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 55%);
+    mask-image: radial-gradient(circle, #000 0%, transparent 55%);
+    animation: tt-spin 24s linear infinite;
+    pointer-events: none;
+}
+
 .titles-box .tt-burst {
-    font-size: clamp(22px, 6cqw, 40px);
-    color: #b87a00;
-    animation: tt-spin 4s linear infinite;
+    position: relative;
+    font-size: clamp(18px, 4.2cqw, 34px);
+    line-height: 1;
+    color: #ffd25a;
+    text-shadow: 0 0 12px rgba(255, 200, 80, 0.95);
+    animation: tt-twinkle 2.2s ease-in-out infinite;
 }
 
 .titles-box .tt-big {
-    font-size: clamp(20px, 6cqw, 36px);
+    position: relative;
+    font-size: clamp(24px, 6.4cqw, 52px);
     font-weight: 800;
-    letter-spacing: 0.04em;
-    color: #6b3a00;
-    text-shadow: 0 0 10px rgba(255, 200, 80, 0.9);
+    line-height: 1.15;
+    letter-spacing: 0.05em;
+    color: #ffe08a;
+    text-shadow: 0 0 6px rgba(255, 190, 60, 0.9), 0 2px 0 #6b3a00, 0 0 22px rgba(255, 170, 40, 0.7);
     animation: tt-pop 0.7s ease-out both;
 }
 
 .titles-box .tt-also {
-    font-size: clamp(12px, 2.6cqw, 16px);
-    color: #4a2c12;
-    margin-top: 2px;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-top: clamp(4px, 1cqw, 8px);
+}
+
+.titles-box .tt-also-chip {
+    padding: 2px 10px;
+    border: 1px solid rgba(255, 214, 120, 0.6);
+    border-radius: 12px;
+    background: rgba(255, 214, 120, 0.12);
+    color: #f5d98a;
+    font-weight: 700;
+    font-size: clamp(12px, 2.4cqw, 16px);
 }
 
 .titles-box .tt-bonus-head {
-    margin: 10px 0 4px;
-    font-size: clamp(12px, 2.6cqw, 16px);
+    flex: 0 0 auto;
+    margin: 2px 0 0;
+    font-size: clamp(13px, 2.7cqw, 17px);
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     color: #4a2c12;
 }
 
+.titles-box .tt-bonus-scroll {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 2px 8px 2px 2px;
+    scrollbar-width: thin;
+}
+
+.titles-box .tt-bonus-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.titles-box .tt-bonus-scroll::-webkit-scrollbar-track {
+    background: rgba(44, 26, 12, 0.12);
+    border-radius: 6px;
+}
+
+.titles-box .tt-bonus-scroll::-webkit-scrollbar-thumb {
+    background: rgba(44, 26, 12, 0.45);
+    border-radius: 6px;
+}
+
+.titles-box .tt-bonus-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(130px, 28cqw, 220px), 1fr));
+    gap: 6px;
+}
+
+.titles-box .tt-bonus-chip {
+    padding: clamp(5px, 1.1cqw, 9px) clamp(8px, 1.6cqw, 12px);
+    border: 2px solid rgba(138, 90, 0, 0.7);
+    border-radius: 8px;
+    background: rgba(255, 244, 208, 0.9);
+    box-shadow: inset 0 0 0 1px rgba(255, 252, 235, 0.7), 0 1px 4px rgba(0, 0, 0, 0.25);
+    color: #241405;
+    font-weight: 800;
+    font-size: clamp(13px, 2.6cqw, 17px);
+    line-height: 1.3;
+}
+
 .titles-box .tt-buttons {
+    flex: 0 0 auto;
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-top: 12px;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 2px;
+}
+
+.titles-box .tt-buttons .tt-equip {
+    font-size: clamp(14px, 2.9cqw, 19px);
+    padding: clamp(7px, 1.4cqw, 11px) clamp(18px, 3.4cqw, 30px);
+    border-radius: 8px;
+}
+
+.titles-box .tt-buttons .tt-equip:first-child {
+    box-shadow: 0 0 12px rgba(255, 190, 60, 0.75);
 }
 
 @keyframes tt-spin {
     to { transform: rotate(360deg); }
+}
+
+@keyframes tt-twinkle {
+    0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+    50% { transform: scale(1.25) rotate(45deg); opacity: 1; }
 }
 
 @keyframes tt-pop {

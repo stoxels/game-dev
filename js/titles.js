@@ -251,7 +251,7 @@ function _openModal(modal, titleKey, bodyHtml) {
 // One row of the titles list: name, stats, and an Equip button when earned.
 // Earned rows carry an "always active" tag: the bonus applies whether or
 // not the title is the one shown in front of the character name.
-function _buildTitleRow(def, activeId) {
+function _buildTitleRow(def, activeId, index) {
     const earned = _score() >= def.score;
     const stats = getTitleStatLines(def).map(l => `<div class="tt-stat">${l}</div>`).join('');
     const always = earned ? `<div class="tt-always">${t('titles_always')}</div>` : '';
@@ -261,6 +261,7 @@ function _buildTitleRow(def, activeId) {
             ? `<span class="tt-equipped">✓ ${t('titles_equipped')}</span>`
             : `<button class="tt-equip" data-equip="${def.id}">${t('titles_equip')}</button>`;
     return `<div class="tt-row${earned ? ' earned' : ''}${def.id === activeId ? ' active' : ''}">
+        <div class="tt-rank">${index + 1}</div>
         <div class="tt-main"><div class="tt-name">${getTitleName(def)}</div>${stats}${always}</div>
         <div class="tt-state">${state}</div>
     </div>`;
@@ -286,11 +287,13 @@ export function showTitlesModal() {
     const modal = _ensureModal('titles-modal', 'titles_modal_title');
     const active = getActiveTitle();
     const earnedCount = getEarnedTitlesForScore(_score()).length;
+    const pct = Math.round(earnedCount / TITLE_DEFS.length * 100);
     const top = `<div class="tt-top">
         <div class="tt-score">${t('titles_score_now').replace('{n}', _score().toLocaleString())} · ${titleProgressText()}</div>
         <div class="tt-sub">${t('titles_count').replace('{c}', earnedCount).replace('{n}', TITLE_DEFS.length)}</div>
+        <div class="tt-bar"><div class="tt-bar-fill" style="width:${pct}%"></div></div>
     </div>`;
-    const list = `<div class="tt-list-column">${TITLE_DEFS.map(def => _buildTitleRow(def, active && active.id)).join('')}</div>`;
+    const list = `<div class="tt-list-column">${TITLE_DEFS.map((def, i) => _buildTitleRow(def, active && active.id, i)).join('')}</div>`;
     const totals = `<div class="tt-total-column">
         <div class="tt-total-scroll">${_buildTotalBox(earnedCount)}</div>
         <button class="tt-auto${STATE.activeTitle ? '' : ' on'}" data-equip="">${t('titles_auto')}</button>
@@ -327,15 +330,18 @@ function showTitleCeremony(fresh) {
     const top = fresh[fresh.length - 1];
     const modal = _ensureModal('title-ceremony', 'titles_ceremony_head');
     const headKey = fresh.length > 1 ? 'titles_ceremony_head_many' : 'titles_ceremony_head';
-    const stats = fresh.flatMap(getTitleStatLines).map(l => `<div class="tt-stat">${l}</div>`).join('');
+    const stats = fresh.flatMap(getTitleStatLines).map(l => `<div class="tt-bonus-chip">${l}</div>`).join('');
     const others = fresh.length > 1
-        ? `<div class="tt-also">${fresh.slice(0, -1).map(getTitleName).join(' · ')}</div>` : '';
+        ? `<div class="tt-also">${fresh.slice(0, -1).map(def => `<span class="tt-also-chip">${getTitleName(def)}</span>`).join('')}</div>` : '';
     const body = `<div class="tt-ceremony">
-        <div class="tt-burst">✦</div>
-        <div class="tt-big">${getTitleName(top)}</div>
-        ${others}
+        <div class="tt-hero">
+            <div class="tt-rays"></div>
+            <div class="tt-burst">✦</div>
+            <div class="tt-big">${getTitleName(top)}</div>
+            ${others}
+        </div>
         <div class="tt-bonus-head">${t('titles_ceremony_stats')}</div>
-        ${stats}
+        <div class="tt-bonus-scroll"><div class="tt-bonus-grid">${stats}</div></div>
         <div class="tt-buttons">
             <button class="tt-equip" data-ceremony="equip">${t('titles_ceremony_equip')}</button>
             <button class="tt-equip" data-ceremony="list">${t('titles_ceremony_view')}</button>
