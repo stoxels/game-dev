@@ -21,7 +21,7 @@ import { _endBlackSwan } from '../classes/class-outlier-black-swan.js';
 import { triggerBanter } from '../sprite/character-banter.js';
 import { checkWorldCodes, checkWorldCodesSync } from '../codes.js';
 import { showQuiz } from '../quiz-exercise/quiz.js';
-import { _grantCampaignLevelXP } from '../endgame/endgame-leveling.js';
+import { _grantCampaignLevelXP } from '../hub/hub-leveling.js';
 
 //------------------------------------------------------------------------
 //-------------------SCORING ORCHESTRATOR (scoring.js)---------------------

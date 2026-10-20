@@ -1599,7 +1599,7 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box { /* neutralized - see s
    9. CHARM DROPS ON THE GRID (reuses .sx-pickup-overlay)
    -----------------------------------------------------------------------
    Compound selectors keep these wins over the base .sx-pickup-overlay rules
-   in css/endgame/monsters.css, which loads after this file.
+   in css/combat/monsters.css, which loads after this file.
    ----------------------------------------------------------------------- */
 
 .sx-pickup-overlay.sx-charm-overlay { z-index: 6; }

@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
-import { INV_COLS, _inventory } from '../endgame/endgame-hub.js';
+import { INV_COLS, _inventory } from '../hub/hub.js';
 import { _lootFilter, _loadLootFilter, _saveLootFilter, _lootFilterNormaliseRule, _lootFilterNormaliseState } from './loot-filter-state.js';
 import { _lootFilterShouldVendor, _lootFilterAllModFamilies, _lootFilterBasesForSlot, _lootFilterModFamiliesForSlot, _lootFilterSlotTypes } from './loot-filter-rules.js';
 import { _injectLootFilterStyles } from './loot-filter-styles.js';

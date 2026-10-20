@@ -1,7 +1,7 @@
 import { MELEE_OVERCHARGE_MULT } from './encounter.js';
 import { _egMapPlayerDamageMult, _egMapPlayerMeleeMult } from '../endgame/endgame-map-launch.js';
-import { PLAYER_STATS, _computePlayerStats, _rollCrit } from '../endgame/endgame-player-stats.js';
-import { _quizDamageBuffMult } from '../endgame/endgame-quiz-buffs.js';
+import { PLAYER_STATS, _computePlayerStats, _rollCrit } from './combat-player-stats.js';
+import { _quizDamageBuffMult } from './combat-quiz-buffs.js';
 import { PLAYER_MELEE_DAMAGE } from './combat-state.js';
 import { RIPOSTE_BASE_MORE_PCT, _consumeRiposte } from './combat-ailments-state.js';
 import { _getTarget } from './encounter-charged-shot.js';

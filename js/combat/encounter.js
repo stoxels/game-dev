@@ -12,7 +12,7 @@ import { t } from '../translation/translations.js';
 import { DAMAGE_NUMBER_DURATION_MS, IMMUNE_FLASH_DURATION_MS, IMMUNE_LABEL_DURATION_MS, MONSTER_ZONES } from './encounter-constants.js';
 import { _getDominantElement } from './encounter-monster-damage.js';
 import { _renderMonsterStatusStrip } from './combat-ailments-core.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from './combat-art.js';
 import { _roamShouldRoam, _roamSync, _roamTeardown } from './combat-monster-roam.js';
 import { _isActive } from './combat-state.js';
 

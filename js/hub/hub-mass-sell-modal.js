@@ -10,8 +10,8 @@
 
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { _clearTooltip } from './endgame-hub-tooltips.js';
-import { _renderInventory, _updateInvCount } from './endgame-hub.js';
+import { _clearTooltip } from './hub-tooltips.js';
+import { _renderInventory, _updateInvCount } from './hub.js';
 import { SHARD_DEFS, _rollShardForItem, addShard } from '../loot/loot-shards.js';
 import { saveHubState } from './hub-save.js';
 import { MASS_SELL_RARITIES, _isProtectedFromMassSell, _loadMassSellSettings, _massSellCounts, _massSellKeep, _massSellMinItemLevel, _massSellMinReqLevel, _normaliseMassSellKeep, _saveMassSellSettings } from './hub-mass-sell.js';

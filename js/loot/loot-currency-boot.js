@@ -9,7 +9,7 @@
 // here would read a not-yet-initialized _currencyStash (typeof THROWS
 // on TDZ bindings) and silently skip.
 
-import { _currencyStash, _healCurrencyItem } from '../endgame/endgame-hub.js';
+import { _currencyStash, _healCurrencyItem } from '../hub/hub.js';
 import { CURRENCY_DEFS } from './loot-currency.js';
 import { SHARD_DEFS } from './loot-shards.js';
 

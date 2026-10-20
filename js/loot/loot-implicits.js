@@ -1,4 +1,4 @@
-import { _buildMergedModLines } from '../endgame/endgame-player-stats.js';
+import { _buildMergedModLines } from '../combat/combat-player-stats.js';
 import { ALL_BASE_TYPES } from './equipment-base-items.js';
 import { IMPLICIT_FAMILIES } from './loot-implicit-families.js';
 import { _buildImplicitRolledStats, _getImplicitRange, _implicitAllowedOnBase } from './loot-implicit-scaling.js';

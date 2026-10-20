@@ -47,22 +47,22 @@
     <link rel="stylesheet" href="css/classes/recursionist.css">
     <link rel="stylesheet" href="css/classes/statistician.css">
     <link rel="stylesheet" href="css/classes/targeting-reticle.css">
-    <link rel="stylesheet" href="css/endgame/monsters.css?v=17">
-    <link rel="stylesheet" href="css/endgame/monster-spells.css?v=2">
-    <link rel="stylesheet" href="css/endgame/gauntlet.css?v=6">
+    <link rel="stylesheet" href="css/combat/monsters.css?v=17">
+    <link rel="stylesheet" href="css/combat/monster-spells.css?v=2">
+    <link rel="stylesheet" href="css/combat/gauntlet.css?v=6">
     <!-- bosses2.css (442 KB / 11,290 lines, boss-FX only - verified no
          non-boss code uses its classes; base monster-card styles live in
          monsters.css) is NOT render-blocking: it is warmed up once at idle
          after boot and force-loaded at encounter start if needed (see
          _warmBossStylesheet / _ensureBossStylesheetSync in
          endgame-encounter.js). -->
-    <link rel="stylesheet" href="css/endgame/projectiles.css">
-    <link rel="stylesheet" href="css/endgame/weapon-swing.css">
-    <link rel="stylesheet" href="css/endgame/hazards.css">
-    <link rel="stylesheet" href="css/endgame/endgame-hub.css?v=4">
-    <link rel="stylesheet" href="css/endgame/endgame-crafting-bench.css">
-    <link rel="stylesheet" href="css/endgame/endgame-tooltip-styles.css">
-    <link rel="stylesheet" href="css/endgame/objectives_hud.css">
+    <link rel="stylesheet" href="css/combat/projectiles.css">
+    <link rel="stylesheet" href="css/combat/weapon-swing.css">
+    <link rel="stylesheet" href="css/combat/hazards.css">
+    <link rel="stylesheet" href="css/hub/hub.css?v=4">
+    <link rel="stylesheet" href="css/hub/crafting-bench.css">
+    <link rel="stylesheet" href="css/hub/tooltip-styles.css">
+    <link rel="stylesheet" href="css/combat/objectives_hud.css">
     <link rel="stylesheet" href="css/character-select.css?v=8">
     <link rel="stylesheet" href="css/map-view.css?v=4">
     <link rel="stylesheet" href="css/map-view-topbar.css?v=26">
@@ -1228,7 +1228,7 @@
         <!-- ENDGAME OBJECTIVES - fixed left panel, zero layout impact -->
         <div id="sx-objectives-strip" class="sx-hidden"></div>
     </div>
-    <!-- XP bar: root-level (not inside #screen-game) so it paints above the win/lose overlays; shown only while the game screen is active (css/endgame/monsters.css; js/endgame/endgame-leveling.js) -->
+    <!-- XP bar: root-level (not inside #screen-game) so it paints above the win/lose overlays; shown only while the game screen is active (css/combat/monsters.css; js/hub/hub-leveling.js) -->
     <div id="sx-xp-bar"><div id="sx-xp-bar-fill"></div><div id="sx-xp-bar-gain"></div></div>
 
 
@@ -1635,7 +1635,7 @@
       into single implementations in 2026-09 - DO NOT re-declare them
       elsewhere:
         _showHubTooltip        -> endgame-currency.js
-        _renderCurrencyCell -> endgame-hub-drag-and-drop.js
+        _renderCurrencyCell -> hub-drag-and-drop.js
         _generateEquipmentDrop -> endgame-equipment-generator.js
         _buildItemName + naming helpers -> endgame-mod-application.js
           (a second _buildItemName/_modNameEntry pair that read the
@@ -1931,7 +1931,7 @@
     
     
     
-    <!-- Split out of endgame-hub.js 2026-09-10 (Pass 3). hub-uniques MUST
+    <!-- Split out of hub.js 2026-09-10 (Pass 3). hub-uniques MUST
          load BEFORE hub.js (hub.js's load-time _loadHubState calls
          _ensureUniqueStash unguarded); hub-tooltips loads AFTER hub.js. -->
     

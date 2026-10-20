@@ -21,10 +21,10 @@ try { Object.defineProperty(globalThis, '_massSellMinReqLevel', { get() { return
 try { Object.defineProperty(globalThis, '_showItemLevel', { get() { return _showItemLevel; }, set(v) { _showItemLevel = v; }, configurable: true }); } catch (e) {}
 
 import { save } from '../state.js';
-import { GAME_ART } from './endgame-art.js';
+import { GAME_ART } from '../combat/combat-art.js';
 import { _showHubTooltip } from '../loot/loot-currency-tooltip.js';
-import { _dndPickUp } from './endgame-hub-drag-and-drop.js';
-import { _clearTooltip } from './endgame-hub-tooltips.js';
+import { _dndPickUp } from './hub-drag-and-drop.js';
+import { _clearTooltip } from './hub-tooltips.js';
 import { _isItemBlocked } from '../loot/loot-requirements.js';
 import { saveHubState } from './hub-save.js';
 import { INV_COLS, _inventory } from './hub-stash.js';

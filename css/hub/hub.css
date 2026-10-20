@@ -1118,7 +1118,7 @@ img.sx-art-img {
 
 
 /* ── (TOOLTIP PANEL REMOVED - items now use the floating mouseover
-       tooltip from tooltips-hud.js; see endgame-hub.js) ── */
+       tooltip from tooltips-hud.js; see hub.js) ── */
 
 .sx-tooltip-item {
     display: flex;

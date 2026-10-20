@@ -1,11 +1,11 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from '../combat/combat-art.js';
 import { egAtlasAdjacentBonusChance, egAtlasAdjacentBonusPercent, egAtlasPickAdjacentBonusNodeId } from '../endgame/endgame-atlas.js';
 import { _getElementCentre } from '../combat/combat-class-projectiles.js';
 import { _egRenderMapStashCell, _egUpdateMapStashTabCounts } from '../endgame/endgame-gate.js';
 import { LOOT_DROP_LIFETIME_MS, _animatePickupDiscard, _buildPickupEligiblePool, _cancelTrackedExpiry, _cellHasAnyDrop, _rarityToastColor, _scheduleTrackedExpiry, _startDropExpireCountdown } from '../combat/combat-grid-pickups.js';
-import { EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_TIER_COUNT, _egFindFreeMapCellForTier, _egGetMapTierGrid, _egMapStash, _egRebuildMapStashGrid, saveHubState } from '../endgame/endgame-hub.js';
+import { EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_TIER_COUNT, _egFindFreeMapCellForTier, _egGetMapTierGrid, _egMapStash, _egRebuildMapStashGrid, saveHubState } from '../hub/hub.js';
 import { _egActiveMapItem, _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
 import { _isActive } from '../combat/combat-state.js';
 import { _egGetMapRewardBonuses } from './loot-map-mod-rewards.js';

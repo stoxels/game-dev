@@ -6,12 +6,12 @@ import { _updateMistakeCounterHUD } from '../penalty.js';
 import { questStat_mistakesRemoved } from '../inference/inference-stats.js';
 import { _charmCellHasDrop } from '../skills/skill-charms.js';
 import { t } from '../translation/translations.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from './combat-art.js';
 import { _getElementCentre } from './combat-class-projectiles.js';
 import { _egActiveMapItem } from '../endgame/endgame-map-launch.js';
 import { EG_MAX_MAP_TIER } from '../loot/loot-map-config.js';
 import { _egMapDrops } from '../loot/loot-map-drops.js';
-import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _computePlayerStats } from './combat-player-stats.js';
 import { _currencyDrops, _itemDrops, _lootDrops, _pickups } from './combat-state.js';
 import { cur } from '../state.js';
 

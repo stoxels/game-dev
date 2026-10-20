@@ -1,15 +1,15 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from './combat-art.js';
 import { _getElementCentre } from './combat-class-projectiles.js';
 import { _tryDropCurrency } from '../loot/loot-currency-drops.js';
 import { _updateObjectivesHUD } from './encounter-chain.js';
 import { _spawnItemDrop } from './combat-grid-pickups-items.js';
 import { _generateEquipmentDrop } from '../loot/loot-equipment-generator.js';
 import { _tryDropEssence } from '../loot/loot-essences-drops.js';
-import { _addUniqueToCollection } from '../endgame/endgame-hub-uniques.js';
-import { INV_COLS, _addItemToStash, _inventory, _rebuildInventoryGrid, _renderInventory, _renderUniqueStash, saveHubState } from '../endgame/endgame-hub.js';
+import { _addUniqueToCollection } from '../hub/hub-uniques.js';
+import { INV_COLS, _addItemToStash, _inventory, _rebuildInventoryGrid, _renderInventory, _renderUniqueStash, saveHubState } from '../hub/hub.js';
 import { _lootFilterAutoVendor } from '../loot/loot-filter.js';
 import { _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
 import { _egTryDropMap } from '../loot/loot-map-drops.js';

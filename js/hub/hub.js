@@ -8,7 +8,7 @@
 //   - Character panel with paperdoll equipment slots and stats
 //   - Currency strip (Runes & Orbs row) + full-width equipment stash
 //   - Floating item tooltip on mouseover (+ Alt-hold compare tooltip)
-//   - Drag-and-drop is handled in endgame-hub-drag-and-drop.js
+//   - Drag-and-drop is handled in hub-drag-and-drop.js
 //   - The Probability Gate (map device + map stash) - see endgame-gate.js
 //
 // Phase 4 split: stash/currency/map-stash/mass-sell/topbar/load/modal
@@ -31,20 +31,20 @@ import { switchScreen } from '../screens/screens.js';
 import { renderSkillHotbar } from '../skills/skill-hotbar.js';
 import { pauseTimer, resumeTimer } from '../timer/timer.js';
 import { LANG, t } from '../translation/translations.js';
-import { GAME_ART } from './endgame-art.js';
+import { GAME_ART } from '../combat/combat-art.js';
 import { _showHubTooltip } from '../loot/loot-currency-tooltip.js';
 import { _onPause, _onResume } from '../combat/encounter-tick-support.js';
 import { _getEncounterBaseLevel, _getTarget, _renderPanel } from '../combat/encounter.js';
 import { _buildEssenceTabHTML, _renderEssenceStash } from '../loot/loot-essences-render.js';
-import { _egRenderMapSlot, _egRenderMapStash } from './endgame-gate.js';
+import { _egRenderMapSlot, _egRenderMapStash } from '../endgame/endgame-gate.js';
 import { _flushRunLootToStash } from '../combat/combat-grid-pickups-loot.js';
-import { _bindDragEvents, _renderCurrencyCell } from './endgame-hub-drag-and-drop.js';
-import { _buildTooltipBodyHTML, _clearTooltip } from './endgame-hub-tooltips.js';
-import { _ensureUniqueStash, _getUniqueCount, _isUniqueCollected, _moveUniqueToInventory, _updateUniqueTabBadge } from './endgame-hub-uniques.js';
-import { LEVELING_CONFIG, _getPlayerLevel, _renderLevelHUD } from './endgame-leveling.js';
-import { _egMapPlayerLifeMult } from './endgame-map-launch.js';
-import { showEndgameNexus } from './endgame-nexus.js';
-import { PLAYER_STATS, _buildGroupedStats, _calcAccuracyMissChance, _calcArmourReductionPct, _calcEvasionDodgeChance, _computePlayerStats } from './endgame-player-stats.js';
+import { _bindDragEvents, _renderCurrencyCell } from './hub-drag-and-drop.js';
+import { _buildTooltipBodyHTML, _clearTooltip } from './hub-tooltips.js';
+import { _ensureUniqueStash, _getUniqueCount, _isUniqueCollected, _moveUniqueToInventory, _updateUniqueTabBadge } from './hub-uniques.js';
+import { LEVELING_CONFIG, _getPlayerLevel, _renderLevelHUD } from './hub-leveling.js';
+import { _egMapPlayerLifeMult } from '../endgame/endgame-map-launch.js';
+import { showEndgameNexus } from '../endgame/endgame-nexus.js';
+import { PLAYER_STATS, _buildGroupedStats, _calcAccuracyMissChance, _calcArmourReductionPct, _calcEvasionDodgeChance, _computePlayerStats } from '../combat/combat-player-stats.js';
 import { _isItemBlocked } from '../loot/loot-requirements.js';
 import { CURRENCY_COLS, CURRENCY_ROWS, _buildCraftingBenchSlotHTML, _currencyDefForId, _currencyIdForSlot, _currencyStash } from '../loot/hub-currency.js';
 import { _pendingHandMigrationToast, _showHandMigrationToast } from './hub-save.js';
@@ -64,7 +64,7 @@ import { UNIQUE_ITEMS } from '../loot/unique-item-data.js';
 //   - Full-width equipment stash (below the currency strip)
 //   - Floating item tooltip on mouseover (+ Alt-hold compare tooltip
 //     against the equipped item in the matching paperdoll slot)
-//   - Drag-and-drop is handled in endgame-hub-drag-and-drop.js
+//   - Drag-and-drop is handled in hub-drag-and-drop.js
 //   - The Probability Gate (map device + map stash) lives on its own
 //     screen - see endgame-gate.js
 //------------------------------------------------------------------------
@@ -741,7 +741,7 @@ export function _updateInvCount() {
 // Re-renders a single cell in the currency stash grid.
 // Empty assigned slots show a faint placeholder icon and dashed border.
 // _renderCurrencyCell is defined ONCE, in
-// endgame-hub-drag-and-drop.js: it renders a currency-stash cell into BOTH
+// hub-drag-and-drop.js: it renders a currency-stash cell into BOTH
 // the hub grid (sx-currency-cell-*) and the gate grid
 // (eg-gate-currency-cell-*) using drag-and-drop chips. The earlier copy
 // that lived here (hub-only, non-dnd chips) was removed in 2026-09 - the
@@ -788,7 +788,7 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 //   offense - upper left corner block, defense - upper right corner block,
 //   puzzle  - center column between the paperdoll slots.
 // Reads live gear via _computePlayerStats() / _buildGroupedStats()
-// (endgame-player-stats.js) so it always reflects whatever is equipped.
+// (combat-player-stats.js) so it always reflects whatever is equipped.
 export function _renderStatsList() {
     const stats = _computePlayerStats();
     const groups = _buildGroupedStats(stats);
@@ -826,7 +826,7 @@ export function _renderStatsList() {
 // Builds the hover tooltip body for a single stat row: stat name as the
 // title plus its mechanic description. For armour and evasion the live
 // combat values (damage reduction / dodge chance) are appended, using the
-// exact formulas from endgame-player-stats.js. For resistance rows the
+// exact formulas from combat-player-stats.js. For resistance rows the
 // uncapped gear total and the effective cap are revealed (the row itself
 // shows the capped value).
 export function _buildStatDescTooltipHTML(descKey, label, row) {
@@ -998,14 +998,14 @@ export function _renderAll() {
 //------------------------------------------------------------------------
 
 // Creates and injects the hub screen DOM element on first call.
-// Also binds the delegated drag-start event listener (defined in endgame-hub-drag-and-drop.js).
+// Also binds the delegated drag-start event listener (defined in hub-drag-and-drop.js).
 export function _createScreen() {
     const screen = document.createElement('div');
     screen.id = 'screen-endgame-hub';
     screen.className = 'screen';
     screen.innerHTML = _buildFullScreenHTML();
     document.body.appendChild(screen);
-    _bindDragEvents();  // defined in endgame-hub-drag-and-drop.js
+    _bindDragEvents();  // defined in hub-drag-and-drop.js
     _injectMassSellStyles();
 }
 
@@ -1303,7 +1303,7 @@ export {
     _egMapStash,
     _egMapTierToIndex,
     _egRebuildMapStashGrid,
-} from './hub-map-stash.js';
+} from '../endgame/endgame-map-stash.js';
 
 export {
     MASS_SELL_RARITIES,

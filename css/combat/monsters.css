@@ -367,7 +367,7 @@
 
 /* ── Quiz reward: damage-buff aura ─────────────────────────────────── */
 /* A red ring around the character sprite while the quiz damage buff is
-   active. --qi (0..1) is set from the stack count by endgame-quiz-buffs.js:
+   active. --qi (0..1) is set from the stack count by combat-quiz-buffs.js:
    more stacks = wider, brighter, stronger glow. Anchored to the avatar
    wrapper at the sprite's centre (the wrapper holds bars above the sprite). */
 .sx-quiz-aura {
@@ -2135,7 +2135,7 @@
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-/* Real monster art fills the frame (item icons keep the 1em rule in endgame-hub.css) */
+/* Real monster art fills the frame (item icons keep the 1em rule in hub.css) */
 .sx-emoji-wrapper img.sx-art-img {
     width: 88%;
     height: 88%;

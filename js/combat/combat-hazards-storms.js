@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { _applyPlayerAilment } from './combat-ailments-core.js';
-import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _computePlayerStats } from './combat-player-stats.js';
 import {
     HZ_ARCANE_BASE_DMG_PCT, HZ_ARCANE_BEAM_HEIGHT, HZ_ARCANE_BEAM_TRAVEL_MS,
     HZ_ARCANE_CHARGE_MAX_MS, HZ_ARCANE_CHARGE_MIN_MS, HZ_ARCANE_INTERVAL_MAX_MS,

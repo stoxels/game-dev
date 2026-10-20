@@ -10,7 +10,7 @@ import { MONSTER_ZONES } from './encounter-constants.js';
 import { _pickRoomyZone } from './combat-monster-roam.js';
 import { _renderPanel } from './encounter.js';
 import { MAX_CONCURRENT_MONSTERS, _buildMonster } from './combat-monsters.js';
-import { _computePlayerStats, _formatStatValue } from '../endgame/endgame-player-stats.js';
+import { _computePlayerStats, _formatStatValue } from './combat-player-stats.js';
 //------------------------------------------------------------------------
 //-------------------MONSTER SPAWNING-------------------------------------
 //------------------------------------------------------------------------

@@ -9,8 +9,8 @@
 
 import { t } from '../translation/translations.js';
 import { _egRenderMapSlot, _egRenderMapStashCell, _egSwitchMapStashTier, _egUpdateMapStashTabCounts } from '../endgame/endgame-gate.js';
-import { _dndChipScreenEl } from '../endgame/endgame-hub-drag-and-drop.js';
-import { EG_MAP_STASH_COLS, _currencyStash, _equipped, _egFindFreeMapCellForTier, _egGetMapTierGrid, _healCurrencyItem, _inventory, _egMapStash, _egRebuildMapStashGrid, _renderEquipSlot, _renderEquipSlots, _renderInventory, _renderInventoryCell, _showStashInfo } from '../endgame/endgame-hub.js';
+import { _dndChipScreenEl } from '../hub/hub-drag-and-drop.js';
+import { EG_MAP_STASH_COLS, _currencyStash, _equipped, _egFindFreeMapCellForTier, _egGetMapTierGrid, _healCurrencyItem, _inventory, _egMapStash, _egRebuildMapStashGrid, _renderEquipSlot, _renderEquipSlots, _renderInventory, _renderInventoryCell, _showStashInfo } from '../hub/hub.js';
 import { CURRENCY_DEFS } from './loot-currency.js';
 import { _applyCurrencyToItem, _cancelCurrencyUse, _pendingCurrencyUse, _startCurrencyUse } from './loot-currency-use.js';
 import { SHARD_DEFS } from './loot-shards.js';

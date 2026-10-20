@@ -20,7 +20,7 @@ import { _calcPlayerDamage, _lastHitElements, _lastHitWasCrit } from './combat-c
 import { DAMAGE_ELEMENTS, _scaleElements, _secondaryDamage } from './combat-calculations-resistances.js';
 import { _restartFlashClass } from './encounter.js';
 import { _egGetActiveMapModValue, _egMapPlayerProjectileMult } from '../endgame/endgame-map-launch.js';
-import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _computePlayerStats } from './combat-player-stats.js';
 import { _dragChargeElements, _isActive, _recentFills } from './combat-state.js';
 
 // Player projectiles fly at half their old speed (2x the class def's flight

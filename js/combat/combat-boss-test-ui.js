@@ -4,7 +4,7 @@
 // Tooltip construction, card rendering, screen markup, and injected styles.
 
 import { t } from '../translation/translations.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from './combat-art.js';
 import { _egRollMapTier } from '../loot/loot-map-config.js';
 import {
     BOSS_TEST_DEFAULT_LEVEL,

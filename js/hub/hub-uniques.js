@@ -1,11 +1,11 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { _findFreeInvCell, _inventory, _renderInventoryCell, _renderUniqueStash, _stashTab, _updateInvCount, saveHubState } from './endgame-hub.js';
+import { _findFreeInvCell, _inventory, _renderInventoryCell, _renderUniqueStash, _stashTab, _updateInvCount, saveHubState } from './hub.js';
 import { UNIQUE_ITEMS } from '../loot/unique-items.js';
 
-//  endgame-hub-uniques.js
-//  UNIQUE COLLECTION - extracted 2026-09-10 from endgame-hub.js
-//  (unique stash helpers). MUST load BEFORE endgame-hub.js: hub.js's
+//  hub-uniques.js
+//  UNIQUE COLLECTION - extracted 2026-09-10 from hub.js
+//  (unique stash helpers). MUST load BEFORE hub.js: hub.js's
 //  load-time _loadHubState() calls _ensureUniqueStash() unguarded.
 //  Load-time code here: none (pure function declarations).
 //

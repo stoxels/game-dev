@@ -12,7 +12,7 @@ import { STATE } from '../state.js';
 // _buildPickupEligiblePool, _getElementCentre, _animatePickupDiscard,
 // _getPlayerLevel, _tqIsTutorialActive) deliberately stay on the
 // globalThis bridge: importing combat/loot modules from here creates cycle
-// edges that TDZ-break top-level const reads in endgame-leveling.js (the
+// edges that TDZ-break top-level const reads in hub-leveling.js (the
 // cycle-TDZ audit in dev/scratch flags exactly this).
 //------------------------------------------------------------------------
 //---------------------------CHARM SYSTEM---------------------------------

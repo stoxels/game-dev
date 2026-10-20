@@ -18,7 +18,7 @@ import { _isActive } from './combat-state.js';
 //  endgame-weapon-swing.js
 //  MANUAL WEAPON ATTACK (E) + shared CSS swing visuals.
 //  Loads AFTER endgame-encounter.js, endgame-encounter-tick.js,
-//  endgame-player-stats.js and sprite_animations.js (all globals are
+//  combat-player-stats.js and sprite_animations.js (all globals are
 //  typeof-guarded so load order is forgiving; behaviour only runs live).
 //
 //  WHY THIS EXISTS: the game has dozens of weapon base types (daggers,
@@ -30,7 +30,7 @@ import { _isActive } from './combat-state.js';
 //       (js/sprite/gear_overlays.js, tuned in the grip lab) rotates around
 //       its grip point via the independent `rotate` CSS property, so the
 //       base placement transform is never touched;
-//    2. a family-skinned CSS arc/trail (css/endgame/weapon-swing.css)
+//    2. a family-skinned CSS arc/trail (css/combat/weapon-swing.css)
 //       plays underneath for impact readability.
 //  The swing is skinned per weapon FAMILY - not per base item - and rotated
 //  toward the facing direction.

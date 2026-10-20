@@ -1,5 +1,5 @@
 import { MONSTER_DEFS } from './combat-monsters-data.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from './combat-art.js';
 import { CAMPAIGN_MONSTER_CONFIG, _earlyEaseBlend } from './encounter-campaign-spawns.js';
 import { _egApplyMapModsToMonster } from '../endgame/endgame-map-launch.js';
 import { _isCampaignRun } from './combat-state.js';

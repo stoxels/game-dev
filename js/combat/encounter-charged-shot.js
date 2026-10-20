@@ -7,7 +7,7 @@ import { MONSTER_PROJ_DURATION_MS, _animatePlayerProjectile, _playerTakeDamage }
 import { _applyPlayerHitFeedback } from './encounter-monster-attack-feedback.js';
 import { _showStatusLabel } from './encounter-monster-damage.js';
 import { _isPlayerInDarknessCloud } from './combat-hazards-storms.js';
-import { _calcAccuracyMissChance, _computePlayerStats, _getDragTier, _getDragTierLabelKey } from '../endgame/endgame-player-stats.js';
+import { _calcAccuracyMissChance, _computePlayerStats, _getDragTier, _getDragTierLabelKey } from './combat-player-stats.js';
 import { _dragChargeElements, _isActive } from './combat-state.js';
 
 //------------------------------------------------------------------------

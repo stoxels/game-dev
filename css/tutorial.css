@@ -304,7 +304,7 @@ body.tq-spellbook-open .tq-aside-bubble {
 }
 
 /* Meet-the-Professor circle (puzzle 1 opener): same mechanic/look as the
-   endgame safe circles (.sx-shr-safe-circle in css/endgame/bosses2.css) -
+   endgame safe circles (.sx-shr-safe-circle in css/combat/bosses2.css) -
    golden while waiting, green flash + shrink when the avatar stands inside. */
 .tq-meet-circle {
     position: fixed;

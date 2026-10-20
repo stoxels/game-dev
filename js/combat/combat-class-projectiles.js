@@ -6,7 +6,7 @@ import { STATE } from '../state.js';
 //------------------------------------------------------------------------
 
 // Class projectile visuals - drawn entirely in code (nested DOM + CSS, see
-// css/endgame/projectiles.css). No emojis: every shape is built pointing
+// css/combat/projectiles.css). No emojis: every shape is built pointing
 // RIGHT (+x) inside a 44x28 px box so it can always be rotated exactly along
 // the flight vector toward the targeted creature.
 export const CLASS_PROJECTILES = {

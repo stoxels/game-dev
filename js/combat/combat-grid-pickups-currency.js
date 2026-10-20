@@ -1,8 +1,8 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from './combat-art.js';
 import { _getElementCentre } from './combat-class-projectiles.js';
-import { addCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
+import { addCurrency } from '../hub/hub-drag-and-drop.js';
 import { addEssence } from '../loot/loot-essences-stash.js';
 import {
     CURRENCY_DROP_MAX_ON_BOARD,

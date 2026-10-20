@@ -1,7 +1,7 @@
-import { _bossTestRenderGrid } from '../combat/combat-boss-test-ui.js';
-import { _renderPanel } from '../combat/encounter.js';
-import { _renderEquipSlots, _renderInventory } from './endgame-hub.js';
-import { _isActive } from '../combat/combat-state.js';
+import { _bossTestRenderGrid } from './combat-boss-test-ui.js';
+import { _renderPanel } from './encounter.js';
+import { _renderEquipSlots, _renderInventory } from '../hub/hub.js';
+import { _isActive } from './combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------PLACEHOLDER ART SYSTEM-------------------------------

@@ -4,7 +4,7 @@ import { _snailBroomHeld } from '../combat/bosses/boss-snail.js';
 import { _playerHasAilment } from '../combat/combat-ailments-core.js';
 import { _getHandChargePct, _getPlayerChargePct, _setHoldEPauseVisual } from
 '../combat/encounter-tick.js';
-import { _computePlayerStats, _getPlayerAttackInterval } from '../endgame/endgame-player-stats.js';
+import { _computePlayerStats, _getPlayerAttackInterval } from '../combat/combat-player-stats.js';
 import { PLAYER_DEFAULT_ATTACK_INTERVAL, _isActive } from '../combat/combat-state.js';
 import { keybindKeyFor, keybindMatches } from '../keybinds.js';
 import { _refreshQuestionModalFlag } from '../screens/screens.js';

@@ -10,8 +10,8 @@ import { Audio_Manager } from '../audio/audio.js';
 import { trackAchStat } from '../achievements/achievements.js';
 import { t } from '../translation/translations.js';
 import { _egRenderMapStashCell, _egUpdateMapStashTabCounts } from '../endgame/endgame-gate.js';
-import { _renderCurrencyCell } from '../endgame/endgame-hub-drag-and-drop.js';
-import { INV_COLS, EG_MAP_STASH_COLS, _addItemToStash, _currencyStash, _ensureInvRows, _egFindFreeMapCellForTier, _getInvRows, _egGetMapTierGrid, _inventory, _egMapStash, _egRebuildMapStashGrid, _renderInventoryCell, _renderStatsList, _showStashInfo, _updateInvCount, saveHubState } from '../endgame/endgame-hub.js';
+import { _renderCurrencyCell } from '../hub/hub-drag-and-drop.js';
+import { INV_COLS, EG_MAP_STASH_COLS, _addItemToStash, _currencyStash, _ensureInvRows, _egFindFreeMapCellForTier, _getInvRows, _egGetMapTierGrid, _inventory, _egMapStash, _egRebuildMapStashGrid, _renderInventoryCell, _renderStatsList, _showStashInfo, _updateInvCount, saveHubState } from '../hub/hub.js';
 import { CURRENCY_DEFS } from './loot-currency.js';
 import { EG_MAP_CURRENCY_RULES } from './loot-map-orbs.js';
 

@@ -2,7 +2,7 @@ import { _getElementCentre } from '../combat/combat-class-projectiles.js';
 import { LOOT_DROP_LIFETIME_MS, _buildPickupEligiblePool, _cancelTrackedExpiry, _cellHasAnyDrop, _scheduleTrackedExpiry, _startDropExpireCountdown } from '../combat/combat-grid-pickups.js';
 import { _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
 import { _isActive } from '../combat/combat-state.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from '../combat/combat-art.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { _addGold } from './loot-gold.js';

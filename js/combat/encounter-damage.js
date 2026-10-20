@@ -31,10 +31,10 @@ import { isHoldCasting } from '../skills/spell-casttime.js';
 import { _calcPlayerResistanceReduction } from './combat-calculations-resistances.js';
 import { _maybeShowAbsorptionBroken } from './encounter-overlays.js';
 import { _renderPanel } from './encounter.js';
-import { _getPlayerLevel } from '../endgame/endgame-leveling.js';
+import { _getPlayerLevel } from '../hub/hub-leveling.js';
 import { _isDualWielding } from '../loot/loot-requirements.js';
 import { _egGetActiveMapModValue, _egMapDamageTakenAmpMult } from '../endgame/endgame-map-launch.js';
-import { _calcArmourMitigation, _calcEvasionDodgeChance, _computePlayerStats, _getAllEquippedItems, _scheduleAbsorptionRegen } from '../endgame/endgame-player-stats.js';
+import { _calcArmourMitigation, _calcEvasionDodgeChance, _computePlayerStats, _getAllEquippedItems, _scheduleAbsorptionRegen } from './combat-player-stats.js';
 import { _isActive } from './combat-state.js';
 import { STATE } from '../state.js';
 

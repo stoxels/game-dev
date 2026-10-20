@@ -27,8 +27,8 @@
 // missing data or images (G5) — worst case an item simply doesn't draw.
 //------------------------------------------------------------------------
 
-import { GAME_ART } from '../endgame/endgame-art.js';
-import { _equipped } from '../endgame/hub-stash.js';
+import { GAME_ART } from '../combat/combat-art.js';
+import { _equipped } from '../hub/hub-stash.js';
 import { _getWeaponHands } from '../loot/loot-requirements.js';
 import { GEAR_GRIP_DATA } from './gear-overlays-data.js';
 import { resolvePlacement, placeItem } from './grip-render.js';

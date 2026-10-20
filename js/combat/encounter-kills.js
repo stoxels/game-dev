@@ -30,10 +30,10 @@ import { _flashKillCard, _renderPanel } from './encounter.js';
 import { cur } from '../state.js';
 
 
-import { _grantMonsterXP, _showXpGainText } from '../endgame/endgame-leveling.js';
+import { _grantMonsterXP, _showXpGainText } from '../hub/hub-leveling.js';
 import { _egMapKillRecoveryMult } from '../endgame/endgame-map-launch.js';
 
-import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _computePlayerStats } from './combat-player-stats.js';
 import { _isActive, _isCampaignRun } from './combat-state.js';
 import { _gainEnduranceCharge, _gainFrenzyCharge, _gainOnslaught, _gainPowerCharge } from './combat-ailments-state.js';
 import { _handleBossKill, _handleNormalMonsterKill } from './encounter-kill-rewards.js';
@@ -191,7 +191,7 @@ export function _killMonster(monsterId) {
         }
     }
 
-    // Experience (endgame-leveling.js) - scaled by the monster's level
+    // Experience (hub-leveling.js) - scaled by the monster's level
     if (dying && typeof _grantMonsterXP === 'function') {
         const xpGained = _grantMonsterXP(dying.level, !!dying.isBoss);
         _showXpGainText(monsterId, xpGained);

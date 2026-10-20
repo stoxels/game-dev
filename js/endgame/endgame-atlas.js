@@ -3,7 +3,7 @@ import { setAchStat, trackAchStat } from '../achievements/achievements.js';
 import { updateQuestStats } from '../inference/inference-stats.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
-import { saveHubState } from './endgame-hub.js';
+import { saveHubState } from '../hub/hub.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -41,7 +41,7 @@ import { STATE } from '../state.js';
 //   egAtlasProgress()              - { completed, total, highestTier }
 //   _egAtlasOnMapCompleted(map)    - completion hook (called from _endMap)
 //
-// Load order: this file runs BEFORE endgame-maps.js / endgame-hub.js, so no
+// Load order: this file runs BEFORE endgame-maps.js / hub.js, so no
 // top-level code may touch their symbols - everything below only uses LANG,
 // STATE and its own data at load time.
 //------------------------------------------------------------------------

@@ -9,10 +9,10 @@ import { _getRevealProjectileDamagePct } from '../combat/combat-class-projectile
 import { _calcPlayerDamage, _lastHitElements } from '../combat/combat-calculations.js';
 import { _scaleElements } from '../combat/combat-calculations-resistances.js';
 import { _animatePlayerProjectile } from '../combat/encounter.js';
-import { _egRenderGateLevelChip } from './endgame-gate.js';
-import { _renderEquipSlots, _renderInventory, _renderStatsList } from './endgame-hub.js';
-import { _egMapPlayerLifeMult, _egMapXpMult } from './endgame-map-launch.js';
-import { _cancelAbsorptionRegen, _computePlayerStats, _getAllEquippedItems } from './endgame-player-stats.js';
+import { _egRenderGateLevelChip } from '../endgame/endgame-gate.js';
+import { _renderEquipSlots, _renderInventory, _renderStatsList } from './hub.js';
+import { _egMapPlayerLifeMult, _egMapXpMult } from '../endgame/endgame-map-launch.js';
+import { _cancelAbsorptionRegen, _computePlayerStats, _getAllEquippedItems } from '../combat/combat-player-stats.js';
 import { PLAYER_BASE_ATTRIBUTES, _findUnmetRequirements, _getUnmetRequirementsText } from '../loot/loot-requirements.js';
 import { _isActive } from '../combat/combat-state.js';
 import { STATE } from '../state.js';
@@ -53,7 +53,7 @@ import { TALENT_TREE_DATA } from '../probability-tree/probability-tree-data.js';
 //
 // Dependencies (must be loaded before this file):
 //   js/state.js             - STATE, save()
-//   endgame-player-stats.js  - _getAllEquippedItems()
+//   combat-player-stats.js  - _getAllEquippedItems()
 //   endgame-requirements.js - PLAYER_BASE_ATTRIBUTES,
 //                             _findUnmetRequirements(),
 //                             _getUnmetRequirementsText()
@@ -277,7 +277,7 @@ function _getPassiveTreeTravelBonuses() {
             totals.fireResistFlat += bonus.fireResistFlat || 0;
             totals.coldResistFlat += bonus.coldResistFlat || 0;
             totals.lightningResistFlat += bonus.lightningResistFlat || 0;
-            // Percentage maxima are handed to endgame-player-stats.js, which
+            // Percentage maxima are handed to combat-player-stats.js, which
             // multiplies them onto the flat Life/Mana totals.
             totals.healthIncPct += bonus.healthIncPct || 0;
             totals.manaIncPct += bonus.manaIncPct || 0;
@@ -1117,6 +1117,6 @@ export function _injectLevelingStyles() {
 //------------------------------------------------------------------------
 
 // Loads saved progression immediately (same pattern as _loadHubState in
-// endgame-hub.js) so level requirements are enforced without visiting the hub.
+// hub.js) so level requirements are enforced without visiting the hub.
 _loadLevelingState();
 _injectLevelingStyles();

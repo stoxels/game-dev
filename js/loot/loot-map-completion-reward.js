@@ -1,8 +1,8 @@
 import { EG_ATLAS_MAX_TIER } from '../endgame/endgame-atlas.js';
-import { addCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
-import { saveHubState } from '../endgame/endgame-hub.js';
-import { _addItemToStash } from '../endgame/hub-stash.js';
-import { _getPlayerLevel } from '../endgame/endgame-leveling.js';
+import { addCurrency } from '../hub/hub-drag-and-drop.js';
+import { saveHubState } from '../hub/hub.js';
+import { _addItemToStash } from '../hub/hub-stash.js';
+import { _getPlayerLevel } from '../hub/hub-leveling.js';
 import { _generateEquipmentDrop } from './loot-equipment-generator.js';
 import { _egAddMapToMapStash } from './loot-map-drops.js';
 import { _egGenerateMapDrop } from './loot-maps.js';

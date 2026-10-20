@@ -1,8 +1,8 @@
 import { t } from '../translation/translations.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from '../combat/combat-art.js';
 import { _egAtlasResolveNodeForMap, egAtlasIsCompleted, egAtlasNodeById, egAtlasNodeName, egAtlasTierDifficulty } from '../endgame/endgame-atlas.js';
 import { EG_MAP_BASE_BOSS_CHANCE } from '../endgame/endgame-map-launch.js';
-import { _buildMergedModLines } from '../endgame/endgame-player-stats.js';
+import { _buildMergedModLines } from '../combat/combat-player-stats.js';
 import { _egMapModAffects } from './loot-map-mod-tables.js';
 import { _egGetMapGoldRewardRange, _egGetMapRewardBonuses } from './loot-map-mod-rewards.js';
 import { _egGetCompletionRewardDef } from './loot-map-completion-reward.js';

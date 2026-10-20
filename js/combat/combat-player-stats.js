@@ -1,10 +1,10 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
-import { RESIST_CAP_PCT } from '../combat/combat-calculations-resistances.js';
-import { DEFLECT_BASE_DMG_PCT, DEFLECT_BASE_PCT, PARRY_BASE_PCT, _getDeflectChancePct, _getDeflectDamagePct, _getDualWieldParryChancePct, _getParryChancePct } from '../combat/encounter.js';
-import { _equipped } from './endgame-hub.js';
-import { _getPlayerLevel, _syncBaseAttributes } from './endgame-leveling.js';
-import { _egGetActiveMapModValue, _egMapAbsorptionMult, _egMapAccuracyMult, _egMapActionSlowMult, _egMapAttackSpeedMult, _egMapBlockMult, _egMapEvasionMult, _egMapPlayerDefenceMult, _egMapSpellDamageMult } from './endgame-map-launch.js';
+import { RESIST_CAP_PCT } from './combat-calculations-resistances.js';
+import { DEFLECT_BASE_DMG_PCT, DEFLECT_BASE_PCT, PARRY_BASE_PCT, _getDeflectChancePct, _getDeflectDamagePct, _getDualWieldParryChancePct, _getParryChancePct } from './encounter.js';
+import { _equipped } from '../hub/hub.js';
+import { _getPlayerLevel, _syncBaseAttributes } from '../hub/hub-leveling.js';
+import { _egGetActiveMapModValue, _egMapAbsorptionMult, _egMapAccuracyMult, _egMapActionSlowMult, _egMapAttackSpeedMult, _egMapBlockMult, _egMapEvasionMult, _egMapPlayerDefenceMult, _egMapSpellDamageMult } from '../endgame/endgame-map-launch.js';
 import {_rollInt} from '../loot/loot-mod-application.js';
 import { MOD_TABLE_AMULET } from '../loot/loot-mod-tables-amulet.js';
 import { MOD_TABLE_ARCANE } from '../loot/loot-mod-tables-arcane.js';
@@ -25,9 +25,9 @@ import { MOD_TABLE_WEAPON_2H } from '../loot/loot-mod-tables-weapon-2h.js';
 import { MOD_TABLE_WEAPON1, MOD_TABLE_WEAPON_1H } from '../loot/loot-mod-tables-weapon1.js';
 import { MOD_TABLE_WEAPON2 } from '../loot/loot-mod-tables-weapon2.js';
 import { PLAYER_BASE_ATTRIBUTES, _isDualWielding, _isTwoHandedWeapon } from '../loot/loot-requirements.js';
-import { ONSLAUGHT_SPEED_PCT, _onslaughtActive, _setRageDecayMult, ENDURANCE_ARMOUR_PER_CHARGE, ENDURANCE_BASE_MAX, ENDURANCE_ELEM_RES_PER_CHARGE, FRENZY_BASE_MAX, FRENZY_DAMAGE_PER_CHARGE, FRENZY_MELEE_SPEED_PER_CHARGE, _getEnduranceCharges, _getFrenzyCharges, _getRage, FORTIFY_BASE_MAX, POWER_BASE_MAX, POWER_CRIT_PER_CHARGE, _getFortifyStacks, _getPowerCharges } from '../combat/combat-ailments-state.js';
-import { PX_PER_METER, _getEquippedWeaponInfo, _isMaceOrSceptre } from '../combat/combat-weapon-swing-config.js';
-import { MELEE_DAMAGE_MULT, PLAYER_CHARGE_TIME_MULT, PLAYER_ABS_MIN_CHARGE_TIME, PLAYER_DEFAULT_ATTACK_INTERVAL, PLAYER_MIN_ATTACK_INTERVAL, _isActive } from '../combat/combat-state.js';
+import { ONSLAUGHT_SPEED_PCT, _onslaughtActive, _setRageDecayMult, ENDURANCE_ARMOUR_PER_CHARGE, ENDURANCE_BASE_MAX, ENDURANCE_ELEM_RES_PER_CHARGE, FRENZY_BASE_MAX, FRENZY_DAMAGE_PER_CHARGE, FRENZY_MELEE_SPEED_PER_CHARGE, _getEnduranceCharges, _getFrenzyCharges, _getRage, FORTIFY_BASE_MAX, POWER_BASE_MAX, POWER_CRIT_PER_CHARGE, _getFortifyStacks, _getPowerCharges } from './combat-ailments-state.js';
+import { PX_PER_METER, _getEquippedWeaponInfo, _isMaceOrSceptre } from './combat-weapon-swing-config.js';
+import { MELEE_DAMAGE_MULT, PLAYER_CHARGE_TIME_MULT, PLAYER_ABS_MIN_CHARGE_TIME, PLAYER_DEFAULT_ATTACK_INTERVAL, PLAYER_MIN_ATTACK_INTERVAL, _isActive } from './combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & DATA DEFINITIONS-------------------------
@@ -2542,7 +2542,7 @@ export function _buildStatLine(bucket, stats) {
 
         // Elemental resistances - shown as the CAPPED (effective) value;
         // the uncapped gear total + the current cap are revealed on hover
-        // (see _buildStatDescTooltipHTML in endgame-hub.js). The cap is
+        // (see _buildStatDescTooltipHTML in hub.js). The cap is
         // 75% base, raised by "increased maximum Resistance" uniques.
         case 'fireResist': case 'coldResist': case 'lightningResist': case 'shadowResist': {
             const element = bucket.replace('Resist', '');

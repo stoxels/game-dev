@@ -1,9 +1,9 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { switchScreen } from '../screens/screens.js';
 import { t } from '../translation/translations.js';
-import { GAME_ART } from './endgame-art.js';
+import { GAME_ART } from '../combat/combat-art.js';
 import { EG_ATLAS_MAX_TIER, EG_ATLAS_NODES, egAtlasAdjacentBonusPercent, egAtlasChainBlueprint, egAtlasIsCompleted, egAtlasIsUnlocked, egAtlasNodeById, egAtlasNodeName, egAtlasProgress } from './endgame-atlas.js';
-import { EG_MAP_TIER_ROMANS, _egMapStash } from './endgame-hub.js';
+import { EG_MAP_TIER_ROMANS, _egMapStash } from '../hub/hub.js';
 import { SCREEN_NAV, _resolveBackFn } from '../combat/combat-state-navigation.js';
 import { STATE } from '../state.js';
 

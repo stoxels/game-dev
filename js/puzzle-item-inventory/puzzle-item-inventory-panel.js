@@ -1,5 +1,5 @@
 import { trackAchStat } from '../achievements/achievements.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from '../combat/combat-art.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';
 import { RESHUFFLE_GOAL, reshuffleCount, reshuffleRightClickItem, updateReshuffleCounter } from './puzzle-item-reshuffle.js';

@@ -19,7 +19,7 @@ import { _getPolymorphVictim, _isPolymorphActive } from './combat-ailments-core.
 import { _maybePuzzleAttack } from './combat-ailments-puzzle.js';
 import { _fireProjectile, _getElementCentre } from './combat-class-projectiles.js';
 import { _egApplyMonsterHitMods, _egRollMonsterCritMult } from '../endgame/endgame-map-launch.js';
-import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _computePlayerStats } from './combat-player-stats.js';
 import { _isActive } from './combat-state.js';
 import { _maybeCastMonsterSpell } from './monster-spells.js';
 

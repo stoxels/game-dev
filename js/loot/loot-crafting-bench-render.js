@@ -1,5 +1,5 @@
 import { LANG, t } from '../translation/translations.js';
-import { _buildItemChipHTML, _currencyDefForId } from '../endgame/endgame-hub.js';
+import { _buildItemChipHTML, _currencyDefForId } from '../hub/hub.js';
 import { hideGameTooltip, moveGameTooltip, showGameTooltip } from '../tooltips-hud.js';
 import {
     CRAFTED_MOD_CAPS,

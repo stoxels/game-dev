@@ -1,7 +1,7 @@
 import { t } from '../translation/translations.js';
-import { _dndFindTargetSlot } from '../endgame/endgame-hub-drag-and-drop.js';
-import { INV_COLS, _ensureInvRows, _equipped, _findFreeInvCell, _inventory, _renderEquipSlot, _renderInventory, _renderInventoryCell, _renderStatsList, _showStashInfo, _updateInvCount, saveHubState } from '../endgame/endgame-hub.js';
-import { _getAllEquippedItems } from '../endgame/endgame-player-stats.js';
+import { _dndFindTargetSlot } from '../hub/hub-drag-and-drop.js';
+import { INV_COLS, _ensureInvRows, _equipped, _findFreeInvCell, _inventory, _renderEquipSlot, _renderInventory, _renderInventoryCell, _renderStatsList, _showStashInfo, _updateInvCount, saveHubState } from '../hub/hub.js';
+import { _getAllEquippedItems } from '../combat/combat-player-stats.js';
 import { _canEquipInSlot, _checkMoveAllowed, _checkUnequipSlot, _computeLoadoutAttributes, _findUnmetRequirements, _getUnmetRequirementsText } from './loot-requirements-core.js';
 import { _handErrorMessage, _healWeaponHands, _isOneHandedWeapon, _isTwoHandedWeapon, _checkHandCompatibilityInSlot } from './loot-requirements-weapons.js';
 

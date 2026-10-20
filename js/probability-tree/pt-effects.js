@@ -2,7 +2,7 @@
 //
 // Why this exists: reworking nodes one by one touched five places per node
 // (data.js statKey + hand-written EN/DE desc, a bonus-table entry in
-// endgame-leveling.js, seeding/labels in endgame-player-stats.js and
+// hub-leveling.js, seeding/labels in combat-player-stats.js and
 // translation strings). With 1000+ stat-stick nodes to author that is not
 // feasible. This registry makes a plain stat node a SINGLE data.js line:
 //
@@ -11,7 +11,7 @@
 // One effect = ONE stat channel + ONE localised template line. Composite
 // nodes simply list several effects (one per advertised line, matching the
 // rework rule "one stat per line"). The stat channels accumulate through
-// the generic scan in endgame-leveling.js (_getPassiveTreeTravelBonuses)
+// the generic scan in hub-leveling.js (_getPassiveTreeTravelBonuses)
 // and the tooltip text is generated in both languages by
 // ptResolveNodeDesc(), so no hand-written descEn/descDe and no per-node
 // bonus-table entry are needed.

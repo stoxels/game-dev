@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { cur } from '../state.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from '../combat/combat-art.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - FX HELPERS----------------------

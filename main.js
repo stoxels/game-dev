@@ -2,7 +2,7 @@ import { Audio_Manager } from './js/audio/audio.js';
 import { _bayesTrapsCleanup } from './js/classes/class-bayesian.js';
 import { _renderPauseLootSummary } from './js/combat/encounter-chain.js';
 import { _onPause, _onResume } from './js/combat/encounter-tick-support.js';
-import { closeHubToGame, isHubGameOverlay } from './js/endgame/endgame-hub.js';
+import { closeHubToGame, isHubGameOverlay } from './js/hub/hub.js';
 import { scalePuzzle } from './js/grid-scaling.js';
 import { stopPainting } from './js/mouse-button-handlers.js';
 import { _dofNudge } from './js/probability-tree/probability-tree-special-nodes-logic.js';

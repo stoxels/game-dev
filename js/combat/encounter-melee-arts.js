@@ -303,7 +303,7 @@ export function _meleeLeapVisual(victimId, opts) {
 }
 
 // Weapon-nova visual: a ring of the EQUIPPED weapon's icon bursts outward
-// around the target card (styles in css/endgame/weapon-swing.css). Falls
+// around the target card (styles in css/combat/weapon-swing.css). Falls
 // back to ⚔️ without a weapon. Never throws.
 export function _meleeNovaVisual(targetId, grand) {
     try {
@@ -338,7 +338,7 @@ export function _meleeNovaVisual(targetId, grand) {
 }
 
 // Fullscreen gold flash for the 500% grand nova (styles in
-// css/endgame/weapon-swing.css). Skipped under prefers-reduced-motion.
+// css/combat/weapon-swing.css). Skipped under prefers-reduced-motion.
 export function _meleeGrandFlash() {
     try {
         if (typeof document === 'undefined') return;

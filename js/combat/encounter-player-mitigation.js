@@ -13,7 +13,7 @@ import { DEFLECT_BASE_DMG_PCT, DEFLECT_BASE_PCT, PARRY_BASE_PCT } from './encoun
 import { _applyPlayerMissFeedback } from './encounter-monster-attack-feedback.js';
 import { _damageTargetById } from './encounter-monster-damage.js';
 import { _fireProjectile, _getElementCentre, _getProjectileDef } from './combat-class-projectiles.js';
-import { DUAL_WIELD_PARRY_PCT, _computePlayerStats, _scheduleAbsorptionRegen } from '../endgame/endgame-player-stats.js';
+import { DUAL_WIELD_PARRY_PCT, _computePlayerStats, _scheduleAbsorptionRegen } from './combat-player-stats.js';
 import { _isDualWielding } from '../loot/loot-requirements.js';
 import { _isActive } from './combat-state.js';
 

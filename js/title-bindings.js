@@ -10,7 +10,7 @@ import { cancelSlotName, confirmSlotName, showSaveSlotSelect } from './screens/s
 import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goToPreviousScreen, hideModal, launchAtlasVendor, launchEndgameTestMode, launchExistingGame, showModal, showSetup, showTitle } from './screens/screens.js';
 import { switchScreen } from './screens/screens.js';
 import { openTreeFromGame, ptGoBack, showPassiveTree, showPassiveTreeAsCharacter } from './probability-tree/probability-tree.js';
-import { openHubFromGame } from './endgame/endgame-hub.js';
+import { openHubFromGame } from './hub/hub.js';
 import { showQuestLog } from './inference/inference-ui.js';
 import { _ptRefundAllPoints } from './probability-tree/probability-tree-state-points.js';
 import { STATE, save } from './state.js';

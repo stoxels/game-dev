@@ -9,9 +9,9 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { trackAchStat } from '../achievements/achievements.js';
 import { LANG, t } from '../translation/translations.js';
-import { _dndChipScreenEl } from '../endgame/endgame-hub-drag-and-drop.js';
-import { _clearTooltip } from '../endgame/endgame-hub-tooltips.js';
-import { _equipped, _inventory, _renderEquipSlot, _renderEquipSlots, _renderInventory, _renderInventoryCell, _renderStatsList, _showStashInfo, saveHubState } from '../endgame/endgame-hub.js';
+import { _dndChipScreenEl } from '../hub/hub-drag-and-drop.js';
+import { _clearTooltip } from '../hub/hub-tooltips.js';
+import { _equipped, _inventory, _renderEquipSlot, _renderEquipSlots, _renderInventory, _renderInventoryCell, _renderStatsList, _showStashInfo, saveHubState } from '../hub/hub.js';
 import { _cancelCurrencyUse, _pendingCurrencyUse } from './loot-currency-use.js';
 import { ESSENCE_REASON_KEYS, _essenceIncompatibilityReason, _essenceStash } from './loot-essences.js';
 import { _applyEssenceCraft } from './loot-essences-craft.js';

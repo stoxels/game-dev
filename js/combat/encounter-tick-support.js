@@ -7,7 +7,7 @@ import { LIFE_REGEN_INTERVAL_MS } from './encounter.js';
 import { _pauseGridDrops, _resumeGridDrops } from './combat-grid-pickups-spawner.js';
 import { _egHasActiveMapMod } from '../endgame/endgame-map-launch.js';
 import { t } from '../translation/translations.js';
-import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _computePlayerStats } from './combat-player-stats.js';
 import { _playerStatuses, _puzzleEffects } from './combat-ailments-state.js';
 import { _isActive } from './combat-state.js';
 import { cur } from '../state.js';

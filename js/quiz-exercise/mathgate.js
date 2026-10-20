@@ -2,7 +2,7 @@ import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { curMods } from '../difficulty-modifiers.js';
 import { _onQuestionAnswered } from '../combat/encounter-chain.js';
-import { _applyQuizRewardBuff } from '../endgame/endgame-quiz-buffs.js';
+import { _applyQuizRewardBuff } from '../combat/combat-quiz-buffs.js';
 import { _isActive } from '../combat/combat-state.js';
 import { WORLDS } from '../levels/level-world-data.js';
 import { WORLD_START_GI } from '../levels/levels.js';

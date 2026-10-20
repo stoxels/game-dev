@@ -5,7 +5,7 @@ import { CURRENCY_COLS, CURRENCY_ROWS, CURRENCY_SLOT_MAP, _currencyDefForId } fr
 import { ESSENCE_COLS, ESSENCE_ROWS, ESSENCE_SLOT_MAP } from '../loot/loot-essences.js';
 import { _essenceDefForId } from '../loot/loot-essences-defs.js';
 import { _isActive } from '../combat/combat-state.js';
-import { SLOT_ACCEPTS } from '../endgame/endgame-hub-drag-and-drop.js';
+import { SLOT_ACCEPTS } from '../hub/hub-drag-and-drop.js';
 import { ALL_BASE_TYPES } from '../loot/equipment-base-items.js';
 import { SLOT_ICONS } from '../loot/equipment-slot-icons.js';
 import { _rollModCounts } from '../loot/loot-equipment-generator.js';
@@ -13,8 +13,8 @@ import { _getModTable } from '../loot/loot-equipment-mod-tables.js';
 import { _rollImplicitsForBase } from '../loot/loot-implicits.js';
 import { _buildItemName } from '../loot/loot-mod-naming.js';
 import { _rollMods } from '../loot/loot-mod-application.js';
-import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
-import { _quizDamageBuffMult } from '../endgame/endgame-quiz-buffs.js';
+import { _computePlayerStats } from '../combat/combat-player-stats.js';
+import { _quizDamageBuffMult } from '../combat/combat-quiz-buffs.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { showMapView } from '../screens/screens-map-view.js';
 import { onSaveSlotChosen, renderSaveSlotScreen, showSaveSlotSelect } from '../screens/screens-save-slots.js';
@@ -65,7 +65,7 @@ window.DEV_EFFECT_TIME_SCALE = 1;
 // Duration wiring sites for the effect time scale (see header section 3):
 //   combat-ailments-core.js (_applyStatusToMap)   - ailment durations
 //   class-cooldown-state.js (startSlotCooldown)      - ability cooldowns
-//   endgame-quiz-buffs.js (expiry, FX, toast label)  - quiz buff stacks
+//   combat-quiz-buffs.js (expiry, FX, toast label)  - quiz buff stacks
 //   universal-spells.js                              - spell durations
 //   shield/shield.js (cursed-ward window)            - shield item
 // Deliberately NOT scaled: level/puzzle timer, boss-phase timers.
@@ -714,7 +714,7 @@ DevTest.clearFightLog = function () {
 //------------------------------------------------------------------------
 //-------------------LEVEL LOCK (constant-level balance tests)-------------
 //------------------------------------------------------------------------
-// While locked, _awardXP (endgame-leveling.js) awards nothing, so the
+// While locked, _awardXP (hub-leveling.js) awards nothing, so the
 // character stays at exactly its level through monster kills, trial chains
 // and level clears - fights stay comparable. Persisted across reloads.
 // Button: "🔒 Level Lock" on the dev mode-select screen; console:

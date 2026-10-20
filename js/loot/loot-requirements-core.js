@@ -1,7 +1,7 @@
 import { t } from '../translation/translations.js';
-import { _syncBaseAttributes } from '../endgame/endgame-leveling.js';
-import { STAT_KEY_MAP } from '../endgame/endgame-player-stats.js';
-import { _equipped } from '../endgame/endgame-hub.js';
+import { _syncBaseAttributes } from '../hub/hub-leveling.js';
+import { STAT_KEY_MAP } from '../combat/combat-player-stats.js';
+import { _equipped } from '../hub/hub.js';
 import { _checkHandCompatibilityInSlot } from './loot-requirements-weapons.js';
 
 //------------------------------------------------------------------------

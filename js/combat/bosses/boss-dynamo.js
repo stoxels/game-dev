@@ -1,5 +1,5 @@
 import { t } from '../../translation/translations.js';
-import { GAME_ART } from '../../endgame/endgame-art.js';
+import { GAME_ART } from '../combat-art.js';
 import { _hpBarClass } from '../encounter.js';
 import { MONSTER_DEFS } from '../combat-monsters-data.js';
 import { _isActive } from '../combat-state.js';

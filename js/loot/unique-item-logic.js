@@ -18,9 +18,9 @@ import { ALL_BASE_TYPES } from './equipment-base-items.js';
 import { _rollImplicitsForBase } from './loot-implicits.js';
 import { _egMapLootRarityWeightMult } from '../endgame/endgame-map-launch.js';
 import { SLOT_ICONS } from './equipment-slot-icons.js';
-import { saveHubState } from '../endgame/hub-save.js';
+import { saveHubState } from '../hub/hub-save.js';
 import { UNIQUE_DROP_CHANCE, UNIQUE_ITEMS, UNIQUE_ZERO_AUTOMARK_DE, UNIQUE_ZERO_AUTOMARK_EN } from './unique-item-data.js';
-import { _equipped, _inventory } from '../endgame/hub-stash.js';
+import { _equipped, _inventory } from '../hub/hub-stash.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
 

@@ -571,7 +571,7 @@ export function buildFreshState() {
         achStats: {},
 
         // endgame hub
-        // Character leveling & attribute points (see endgame-leveling.js)
+        // Character leveling & attribute points (see hub-leveling.js)
         playerLevel: 1,
         playerXP: 0,
         egAttrPoints: 0,
@@ -1062,7 +1062,7 @@ export function loadStateFromSlot(slotNum) {
     // character would fight with the old slot's gear (inflated HP / mana /
     // absorption / damage on the avatar bars, and stash grants landing in
     // the wrong mirror). Re-sync immediately, mirroring the parse-time
-    // completion pattern in endgame-hub.js.
+    // completion pattern in hub.js.
     if (typeof globalThis._loadHubState === 'function') {
         window._hubLoadInProgress = true;
         try {

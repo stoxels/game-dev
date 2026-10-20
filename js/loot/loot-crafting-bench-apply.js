@@ -7,7 +7,7 @@ import {
     _renderAll,
     _updateCraftingBenchLauncherSlot,
     saveHubState,
-} from '../endgame/endgame-hub.js';
+} from '../hub/hub.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import {
     _craftingBenchItem,

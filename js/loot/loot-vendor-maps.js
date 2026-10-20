@@ -5,7 +5,7 @@ import { EG_ATLAS_MAX_TIER } from '../endgame/endgame-atlas.js';
 import { _egGenerateMapDrop } from './loot-maps.js';
 import { EG_MAX_MAP_TIER, _egMapTierMonsterLevel } from './loot-map-config.js';
 import { _egAddMapToMapStash } from './loot-map-drops.js';
-import { saveHubState } from '../endgame/endgame-hub.js';
+import { saveHubState } from '../hub/hub.js';
 import { getGold } from './loot-gold.js';
 import { _vendorBuildCardHTML, _vendorIconHTML, _vendorRefreshGoldDisplay } from './loot-vendor-shared.js';
 

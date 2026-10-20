@@ -5,7 +5,7 @@ import { cancelHoldCast, isHoldCasting } from '../skills/spell-casttime.js';
 import { _maybeShowAbsorptionBroken } from './encounter-overlays.js';
 import { _gameOver, _killMonster, _playerTakeDamage, _showDamageNumber } from './encounter.js';
 import { _egGetActiveMapModValue, _egHasActiveMapMod } from '../endgame/endgame-map-launch.js';
-import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _computePlayerStats } from './combat-player-stats.js';
 import { _isActive } from './combat-state.js';
 import { CRUSH_DURATION_S, _ailmentDamageMult } from './combat-calculations-resistances.js';
 import { _gainEnduranceCharge, _gainPowerCharge, _addGroundFireAcc, _groundFireAcc, _playerStatuses, _puzzleEffects, _playerStatusBarTicker, _replacePuzzleEffects, _setPlayerStatusBarTicker } from './combat-ailments-state.js';
@@ -1060,7 +1060,7 @@ function _buildStatusIconsHTML(statusMap) {
 }
 
 // Ailment key -> card class driving the big on-monster effect (CSS:
-// .sx-ail-* in css/endgame/monsters.css). Flames, lightning, frost... so the
+// .sx-ail-* in css/combat/monsters.css). Flames, lightning, frost... so the
 // state reads at a glance without hunting for the small status chip.
 const AILMENT_CARD_FX = {
     ignite: 'sx-ail-ignite', shocked: 'sx-ail-shocked', chill: 'sx-ail-chill',

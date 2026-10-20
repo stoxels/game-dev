@@ -1,12 +1,12 @@
 import { showModal, switchScreen } from '../screens/screens.js';
-import { GAME_ART } from './endgame-art.js';
+import { GAME_ART } from '../combat/combat-art.js';
 import { LANG, t } from '../translation/translations.js';
 import { _egAtlasBuildTierProgressHTML, _egAtlasEnsureStyles, _egAtlasRoman, _egAtlasTierGroupColor } from './endgame-atlas-ui.js';
 import { _egAtlasResolveNodeForMap, egAtlasDropNodeIds, egAtlasIsCompleted, egAtlasNodeById, egAtlasNodeName } from './endgame-atlas.js';
 import { _chainTransitioning } from '../combat/encounter-chain.js';
-import { _clearTooltip } from './endgame-hub-tooltips.js';
-import { CURRENCY_COLS, CURRENCY_ROWS, EG_MAP_STASH_COLS, EG_MAP_STASH_INITIAL_ROWS, EG_MAP_TIER_COUNT, EG_MAP_TIER_ROMANS, _buildItemChipHTML, _currencyDefForId, _currencyIdForSlot, _currencyStash, _getCellFill, _egGetMapStashRowsForTier, _egGetMapTierGrid, _egMapStash, _renderCurrencyStash, saveHubState, ensureEndgameHubScreen } from './endgame-hub.js';
-import { LEVELING_CONFIG, _getPlayerLevel, _getPlayerXP, _getUnspentPoints, _getXpForNextLevel } from './endgame-leveling.js';
+import { _clearTooltip } from '../hub/hub-tooltips.js';
+import { CURRENCY_COLS, CURRENCY_ROWS, EG_MAP_STASH_COLS, EG_MAP_STASH_INITIAL_ROWS, EG_MAP_TIER_COUNT, EG_MAP_TIER_ROMANS, _buildItemChipHTML, _currencyDefForId, _currencyIdForSlot, _currencyStash, _getCellFill, _egGetMapStashRowsForTier, _egGetMapTierGrid, _egMapStash, _renderCurrencyStash, saveHubState, ensureEndgameHubScreen } from '../hub/hub.js';
+import { LEVELING_CONFIG, _getPlayerLevel, _getPlayerXP, _getUnspentPoints, _getXpForNextLevel } from '../hub/hub-leveling.js';
 import { _egLaunchMapFromDevice } from './endgame-map-launch.js';
 import { EG_MAP_MOD_TABLES, _egMapModAffects } from '../loot/loot-map-mod-tables.js';
 import { _egGetMapModRewards } from '../loot/loot-map-mod-rewards.js';
@@ -21,12 +21,12 @@ import { STATE } from '../state.js';
 //   - Map stash grid below the device
 //
 // The underlying state (_egMapSlotItem, _egMapStash) lives in
-// endgame-hub.js and is persisted together with the rest of the hub
+// hub.js and is persisted together with the rest of the hub
 // state via saveHubState() / _loadHubState().
 //
 // Dependencies (must be loaded before this file):
-//   endgame-hub.js              - state vars, chip builder, persistence
-//   endgame-hub-drag-and-drop.js - drag & drop zone handling
+//   hub.js              - state vars, chip builder, persistence
+//   hub-drag-and-drop.js - drag & drop zone handling
 //   tooltips-hud.js             - floating tooltip engine
 //
 // Entry point:
@@ -417,7 +417,7 @@ export function _egBuildGatePanelHTML() {
 // The gate screen has its OWN cell ids (eg-gate-currency-cell-*) because the
 // hub screen's cells (sx-currency-cell-*) may coexist in the DOM. Both grids
 // read from and write to the SAME _currencyStash, so amounts stay in sync;
-// _renderCurrencyCell() in endgame-hub-drag-and-drop.js updates both.
+// _renderCurrencyCell() in hub-drag-and-drop.js updates both.
 
 // Builds a single Orbs & Shards cell for the gate screen (fixed slots).
 export function _egBuildGateCurrencyCellHTML(row, col) {
@@ -536,7 +536,7 @@ export function _egInjectGateLevelChipStyles() {
 _egInjectGateLevelChipStyles();
 
 // Refreshes the level chip in the gate topbar. Reuses the same XP/percentage
-// logic as _renderLevelHUD (endgame-leveling.js) so the gate stays in sync.
+// logic as _renderLevelHUD (hub-leveling.js) so the gate stays in sync.
 export function _egRenderGateLevelChip() {
     const el = document.getElementById('eg-gate-level-chip');
     if (!el) return;
@@ -548,7 +548,7 @@ export function _egRenderGateLevelChip() {
     const pct = lvl >= maxLvl ? 100 : (need > 0 ? Math.min(100, (xp / need) * 100) : 0);
     const lvlLabel = (typeof t === 'function') ? t('eg_lvl_short').replace('{n}', lvl) : `Lv. ${lvl}`;
     const ptsHtml = pts > 0 ? `<span class="sx-lvl-chip-points">✦${pts > 99 ? '99+' : pts}</span>` : '';
-    // inner chip is styled by the shared sx-lvl-chip rules from endgame-leveling.js
+    // inner chip is styled by the shared sx-lvl-chip rules from hub-leveling.js
     el.innerHTML = `<span class="sx-lvl-chip" style="pointer-events:none;"><span class="sx-lvl-chip-lvl">${lvlLabel}</span><span class="sx-lvl-chip-bar"><span class="sx-lvl-chip-bar-fill" style="width:${pct}%"></span></span>${ptsHtml}</span>`;
     // No native title fallback here: the chip's hint is the styled tooltip
     // driven from its own onmouseenter (see _egBuildGateTopbarHTML), and a
@@ -975,7 +975,7 @@ export function egActivateMap() {
 // rolled stat line, tier, a plain-language effect description and the
 // reward bonuses granted by that modifier.
 // Follows the create-once + .show toggle pattern of _ensureDeleteModal()
-// in endgame-hub.js.
+// in hub.js.
 
 // Category colors - same scheme as the map tooltips (tooltips-hud.js).
 export const EG_MM_CATEGORY_COLORS = { monster: '#e67e22', player: '#e74c3c', puzzle: '#5b9cf6' };

@@ -3,7 +3,7 @@ import { _calcPlayerDamage, _lastHitElements } from './combat-calculations.js';
 import { _scaleElements } from './combat-calculations-resistances.js';
 import { _animatePlayerProjectile } from './encounter.js';
 import { _egMapAbilityRevealMult, _egMapItemRevealMult } from '../endgame/endgame-map-launch.js';
-import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _computePlayerStats } from './combat-player-stats.js';
 import { _isActive } from './combat-state.js';
 import { cur } from '../state.js';
 

@@ -19,8 +19,8 @@ try { Object.defineProperty(globalThis, '_stashTab', { get() { return _stashTab;
 try { Object.defineProperty(globalThis, '_uniqueStash', { get() { return _uniqueStash; }, set(v) { _uniqueStash = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_uniqueCollected', { get() { return _uniqueCollected; }, set(v) { _uniqueCollected = v; }, configurable: true }); } catch (e) {}
 
-import { _addUniqueToCollection, _updateUniqueTabBadge } from './endgame-hub-uniques.js';
-import { _buildInventoryGridHTML, _renderInventory, _renderInventoryCell, _updateInvCount } from './endgame-hub.js';
+import { _addUniqueToCollection, _updateUniqueTabBadge } from './hub-uniques.js';
+import { _buildInventoryGridHTML, _renderInventory, _renderInventoryCell, _updateInvCount } from './hub.js';
 
 
 // Main equipment stash dimensions

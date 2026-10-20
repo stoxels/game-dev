@@ -164,7 +164,7 @@ let _specCacheCount = -1;
 let _specCache = [];
 
 // Effect specs of every earned title. Read by the stat aggregation in
-// endgame-leveling.js, so it is cached until a new title is earned.
+// hub-leveling.js, so it is cached until a new title is earned.
 export function getTitleEffectSpecs() {
     const earned = getEarnedTitlesForScore(_score());
     if (earned.length !== _specCacheCount) {

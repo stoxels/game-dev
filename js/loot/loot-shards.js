@@ -3,9 +3,9 @@ import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { _pendingCurrencyUse } from './loot-currency-use.js';
 import { _egRenderMapSlot, _egRenderMapStashCell } from '../endgame/endgame-gate.js';
-import { _dndChipScreenEl, _renderCurrencyCell, addCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
-import { _clearTooltip } from '../endgame/endgame-hub-tooltips.js';
-import { CURRENCY_COLS, _currencySlotForId, _currencyStash, _egGetMapTierGrid, _inventory, _egMapStash, _renderInventoryCell, _updateInvCount, saveHubState } from '../endgame/endgame-hub.js';
+import { _dndChipScreenEl, _renderCurrencyCell, addCurrency } from '../hub/hub-drag-and-drop.js';
+import { _clearTooltip } from '../hub/hub-tooltips.js';
+import { CURRENCY_COLS, _currencySlotForId, _currencyStash, _egGetMapTierGrid, _inventory, _egMapStash, _renderInventoryCell, _updateInvCount, saveHubState } from '../hub/hub.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME ORB SHARDS (SELL SYSTEM)---------------------
@@ -23,7 +23,7 @@ import { CURRENCY_COLS, _currencySlotForId, _currencyStash, _egGetMapTierGrid, _
 // converts the stack into the matching orb (or just bumps the existing orb
 // counter).
 //
-// Load AFTER endgame-hub.js and endgame-hub-drag-and-drop.js (needs
+// Load AFTER hub.js and hub-drag-and-drop.js (needs
 // _inventory, _renderInventoryCell, addCurrency, saveHubState,
 // showToast) and AFTER endgame-currency.js (needs _pendingCurrencyUse).
 //------------------------------------------------------------------------

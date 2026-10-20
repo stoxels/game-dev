@@ -5,7 +5,7 @@ import { checkWorldCodes, checkWorldCodesSync } from '../codes.js';
 import { curMods } from '../difficulty-modifiers.js';
 import { _onQuestionAnswered } from '../combat/encounter-chain.js';
 import { _egOnQuizWrongAnswer } from '../endgame/endgame-map-launch.js';
-import { _applyQuizRewardBuff } from '../endgame/endgame-quiz-buffs.js';
+import { _applyQuizRewardBuff } from '../combat/combat-quiz-buffs.js';
 import { buildReveal } from '../grid.js';
 import { addTimeSecs } from '../timer/timer-adjust.js';
 import { PT } from '../probability-tree/probability-tree.js';

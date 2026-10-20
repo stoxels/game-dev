@@ -1,4 +1,4 @@
-import { _egIsTieredMapStash, _egMapStash } from '../endgame/endgame-hub.js';
+import { _egIsTieredMapStash, _egMapStash } from '../hub/hub.js';
 import { STATE } from '../state.js';
 import { _egRollMapBossStatus } from './loot-map-implicit-parts.js';
 import { _egRollMapImplicits } from './loot-map-implicits.js';

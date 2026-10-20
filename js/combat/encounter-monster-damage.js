@@ -7,7 +7,7 @@ import { DAMAGE_NUMBER_DURATION_MS } from './encounter-constants.js';
 import { _killMonster } from './encounter-kills.js';
 import { STAGGER_DURATION_MS } from './encounter-lifecycle.js';
 import { _flashDamageCard, _flashImmune, _showDamageNumber, _spawnHitBurst, _updateBars } from './encounter.js';
-import { PLAYER_STATS, _computePlayerStats } from '../endgame/endgame-player-stats.js';
+import { PLAYER_STATS, _computePlayerStats } from './combat-player-stats.js';
 import { _isActive } from './combat-state.js';
 import { startTimerFreeze } from '../timer/timer-freeze.js';
 import { _gainFortify, _gainPowerCharge, _gainRage } from './combat-ailments-state.js';

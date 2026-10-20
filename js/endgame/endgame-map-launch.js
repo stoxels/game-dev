@@ -7,7 +7,7 @@ import { _buildChainPool } from '../combat/encounter-chain-pool.js';
 import { _ensureLoseOverlayEndgameUI } from '../combat/encounter-defeat-overlay.js';
 import { _playerTakeDamage } from '../combat/encounter.js';
 import { _egRenderMapSlot } from './endgame-gate.js';
-import { saveHubState } from './endgame-hub.js';
+import { saveHubState } from '../hub/hub.js';
 import { _egGetMapRewardBonuses } from '../loot/loot-map-mod-rewards.js';
 import { _egRollMapSizeMix } from '../loot/loot-map-implicit-parts.js';
 import { egMapBaseDurationForTier, egMapBaseMistakesForTier, egMapBasePuzzlesForTier, egMapBaseQuestionsForTier } from '../loot/loot-map-config.js';
@@ -31,7 +31,7 @@ import { cur } from '../state.js';
 //
 // Dependencies (must be loaded before this file):
 //   endgame-maps.js            - EG_MAP_MOD_TABLES / mod shape
-//   endgame-hub.js             - _egMapSlotItem, saveHubState()
+//   hub.js             - _egMapSlotItem, saveHubState()
 //   endgame-encounter-chain.js - _buildChainPool, _chainCleanup hook
 //
 // Entry point:

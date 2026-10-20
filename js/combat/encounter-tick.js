@@ -5,7 +5,7 @@ import { _maybeShowLowHealthWarning } from './encounter-overlays.js';
 import { MELEE_OVERCHARGE_RATIO, _fireMonsterAttack, _meleeTierForCharge, _overchargeRateForTier, _updateBars } from './encounter.js';
 import { _hazardsTick } from './combat-hazards-lifecycle.js';
 import { _egGetActiveMapModValue } from '../endgame/endgame-map-launch.js';
-import { _getPlayerAttackInterval, _getPlayerAttackIntervalForHand } from '../endgame/endgame-player-stats.js';
+import { _getPlayerAttackInterval, _getPlayerAttackIntervalForHand } from './combat-player-stats.js';
 import { _isDualWielding } from '../loot/loot-requirements.js';
 import { _isActive } from './combat-state.js';
 import { _updateMeleeMarker } from './combat-weapon-swing-config.js';

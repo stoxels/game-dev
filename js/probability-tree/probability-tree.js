@@ -258,7 +258,7 @@ export function ptGoBack() {
 //------------------------------------------------------------------------
 //-------------------GAME OVERLAY MODE (K KEYBIND)-------------------------
 //------------------------------------------------------------------------
-// Same pattern as the character-sheet overlay (B, see endgame-hub.js) and
+// Same pattern as the character-sheet overlay (B, see hub.js) and
 // the spell-book pause (P): K mid-puzzle pauses the run silently (no pause
 // overlay), hides the body-anchored avatars (they would float above the
 // tree), and K (or BACK) returns straight to the running puzzle exactly

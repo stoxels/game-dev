@@ -9,7 +9,7 @@
 // that module's write-through globalThis accessor, then persists it.
 
 import { t } from '../translation/translations.js';
-import { _renderEquipSlots } from './endgame-hub.js';
+import { _renderEquipSlots } from './hub.js';
 import { _saveMassSellSettings, _showItemLevel } from './hub-mass-sell.js';
 import { _rebuildInventoryGrid } from './hub-stash.js';
 import { STATE } from '../state.js';

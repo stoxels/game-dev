@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from './combat-art.js';
 import { _getElementCentre } from './combat-class-projectiles.js';
 import { _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
 import {

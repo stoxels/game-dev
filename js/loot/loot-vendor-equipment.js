@@ -2,10 +2,10 @@ import { t, LANG } from '../translation/translations.js';
 import { ALL_BASE_TYPES } from './equipment-base-items.js';
 import { SLOT_ICONS } from './equipment-slot-icons.js';
 import { PLAYER_BASE_ATTRIBUTES, _computeLoadoutAttributes, _formatRequirementPart } from './loot-requirements.js';
-import { _clearTooltip } from '../endgame/endgame-hub-tooltips.js';
+import { _clearTooltip } from '../hub/hub-tooltips.js';
 import { _showHubTooltip } from './loot-currency-tooltip.js';
-import { _addItemToStash, _equipped } from '../endgame/endgame-hub.js';
-import { _getPlayerLevel } from '../endgame/endgame-leveling.js';
+import { _addItemToStash, _equipped } from '../hub/hub.js';
+import { _getPlayerLevel } from '../hub/hub-leveling.js';
 import { _vendorBuildCardHTML, _vendorIconHTML, _vendorPurchase, _vendorRefreshGoldDisplay, _vendorRefreshTabContent } from './loot-vendor-shared.js';
 
 //------------------------------------------------------------------------
@@ -336,7 +336,7 @@ export function _vendorBuildBaseItemFromBase(base) {
     };
 }
 
-// Shows the shared floating equipment tooltip (from endgame-hub.js) for a
+// Shows the shared floating equipment tooltip (from hub.js) for a
 // base type card. Holding Alt also compares against the equipped item.
 export function _vendorShowBaseTooltip(baseId, e) {
     const base = ALL_BASE_TYPES.find(b => b.id === baseId);

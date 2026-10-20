@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from '../combat/combat-art.js';
 import { _ptAllocated, _ptBuildAdjacency, _ptGetNodeVisualState, _ptIsDeallocatable, _ptLang, _ptOnNodeClick, _ptPoints, _ptRefreshPointsDisplay, ensurePassiveTreeRoot } from './probability-tree-state-points.js';
 import { getPassiveTreeRootId, isPassiveTreeStartNode } from './probability-tree.js';
 import { getPassiveTreeNodeProposal, isPassiveTreeNodeReworked } from './probability-tree-rework.js';

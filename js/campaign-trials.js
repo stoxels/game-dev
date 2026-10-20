@@ -8,11 +8,11 @@ import { _buildChainPool } from './combat/encounter-chain-pool.js';
 import { _ensureLoseOverlayEndgameUI } from './combat/encounter-defeat-overlay.js';
 import { _stopEncounter } from './combat/encounter.js';
 import { _flushRunLootToStash } from './combat/combat-grid-pickups-loot.js';
-import { saveHubState } from './endgame/endgame-hub.js';
-import { LEVELING_CONFIG, _awardXP, _calcXpMultiplier, _campaignExpectedLevel, _getPlayerLevel, _getXpForNextLevel, _grantCampaignLevelXP } from './endgame/endgame-leveling.js';
+import { saveHubState } from './hub/hub.js';
+import { LEVELING_CONFIG, _awardXP, _calcXpMultiplier, _campaignExpectedLevel, _getPlayerLevel, _getXpForNextLevel, _grantCampaignLevelXP } from './hub/hub-leveling.js';
 import { _egPickMapRunSeedGi } from './endgame/endgame-map-launch.js';
 import { _egBankUnclaimedMapDrops } from './loot/loot-map-drops.js';
-import { _resetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
+import { _resetQuizDamageBuff } from './combat/combat-quiz-buffs.js';
 import { WORLDS } from './levels/level-world-data.js';
 import { ALL, WORLD_START_GI, isNexusPointLevel, isNexusWorld } from './levels/levels.js';
 import { buildInventoryPanel } from './puzzle-item-inventory/puzzle-item-inventory-panel.js';
@@ -68,7 +68,7 @@ import { cur } from './state.js';
 //
 // Dependencies (all optional at load time, required at run time):
 //   js/levels/levels.js, js/state.js, endgame-encounter-chain.js,
-//   endgame-map-launch.js (_egPickMapRunSeedGi), endgame-leveling.js,
+//   endgame-map-launch.js (_egPickMapRunSeedGi), hub-leveling.js,
 //   js/scoring.js (applyConvergenceReward path), js/classes/class-ui.js
 //------------------------------------------------------------------------
 

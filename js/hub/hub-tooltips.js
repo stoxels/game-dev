@@ -1,16 +1,16 @@
 import { LANG, t } from '../translation/translations.js';
-import { GAME_ART } from './endgame-art.js';
+import { GAME_ART } from '../combat/combat-art.js';
 import { _showHubTooltip } from '../loot/loot-currency-tooltip.js';
-import { SLOT_ACCEPTS, _dndFindTargetSlot } from './endgame-hub-drag-and-drop.js';
-import { _equipped } from './endgame-hub.js';
-import { _buildMergedModLines, _getAllEquippedItems, _getItemEffectiveAttackInterval, _getItemEffectiveBlockChance, _getItemEffectiveDamage, _getItemEffectiveDefenses } from './endgame-player-stats.js';
+import { SLOT_ACCEPTS, _dndFindTargetSlot } from './hub-drag-and-drop.js';
+import { _equipped } from './hub.js';
+import { _buildMergedModLines, _getAllEquippedItems, _getItemEffectiveAttackInterval, _getItemEffectiveBlockChance, _getItemEffectiveDamage, _getItemEffectiveDefenses } from '../combat/combat-player-stats.js';
 import { PLAYER_BASE_ATTRIBUTES, _checkHandCompatibilityInSlot, _getSwapChainBreak, _getUnmetRequirementsText, _getWeaponHands, _handErrorMessage, _previewEquipAttributes } from '../loot/loot-requirements.js';
 import { _getUniqueSpecialLines, _inferWeaponHands } from '../loot/unique-items.js';
 
-//  endgame-hub-tooltips.js
-//  HUB TOOLTIPS - extracted 2026-09-10 from endgame-hub.js
+//  hub-tooltips.js
+//  HUB TOOLTIPS - extracted 2026-09-10 from hub.js
 //  (stat-block tooltip builder, mouse tracking, Alt-compare tooltip
-//  and their event listeners). Loads AFTER endgame-hub.js; the single
+//  and their event listeners). Loads AFTER hub.js; the single
 //  _showHubTooltip implementation in endgame-currency.js dispatches to
 //  _buildTooltipBodyHTML / _updateCompareTooltip at runtime.
 //
@@ -341,7 +341,7 @@ export function _buildTooltipBodyHTML(item) {
 // cards, map tooltips) via the shared tooltip engine from tooltips-hud.js,
 // and drives the Alt-compare tooltip (_updateCompareTooltip /
 // _hideCompareTooltip). Historically this file and
-// endgame-hub-drag-and-drop.js each shipped their own copy and the
+// hub-drag-and-drop.js each shipped their own copy and the
 // LAST-DECLARED-WINS load-order rule picked currency's version silently -
 // the duplicates were removed (2026-09) and this is the single source.
 

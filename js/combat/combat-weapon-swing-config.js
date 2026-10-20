@@ -1,5 +1,5 @@
 import { _getElementCentre } from './combat-class-projectiles.js';
-import { _computePlayerStats, _getAllEquippedItems, _getDualHandWeapon } from '../endgame/endgame-player-stats.js';
+import { _computePlayerStats, _getAllEquippedItems, _getDualHandWeapon } from './combat-player-stats.js';
 import { _getLeadHand } from './encounter-tick.js';
 
 //------------------------------------------------------------------------

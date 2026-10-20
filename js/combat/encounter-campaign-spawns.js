@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------
 
 import { cur } from '../state.js';
-import { _campaignMonsterLevel } from '../endgame/endgame-leveling.js';
+import { _campaignMonsterLevel } from '../hub/hub-leveling.js';
 import { MONSTER_DEFS } from './combat-monsters-data.js';
 
 try { Object.defineProperty(globalThis, '_clearCampaignLevelFields', { get() { return _clearCampaignLevelFields; }, set(v) { _clearCampaignLevelFields = v; }, configurable: true }); } catch (e) {}

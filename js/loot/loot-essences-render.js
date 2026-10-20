@@ -8,8 +8,8 @@
 // re-renders this panel - a separate filter module would have to import
 // this one back, so the two are kept together on purpose.
 
-import { GAME_ART } from '../endgame/endgame-art.js';
-import { _dndBuildCurrencyChipHTML } from '../endgame/endgame-hub-drag-and-drop.js';
+import { GAME_ART } from '../combat/combat-art.js';
+import { _dndBuildCurrencyChipHTML } from '../hub/hub-drag-and-drop.js';
 import { t } from '../translation/translations.js';
 import { ALL_BASE_TYPES } from './equipment-base-items.js';
 import { SLOT_MOD_TABLE_MAP } from './loot-equipment-mod-tables.js';

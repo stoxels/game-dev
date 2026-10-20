@@ -1,15 +1,15 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { trackAchStat } from '../achievements/achievements.js';
-import { GAME_ART } from './endgame-art.js';
+import { GAME_ART } from '../combat/combat-art.js';
 import { _closeCraftingBench, _refreshCraftingBench } from '../loot/loot-crafting-bench-overlay.js';
 import { _setCraftingBenchItem } from '../loot/loot-crafting-bench-apply.js';
 import { _craftingBenchItem } from '../loot/loot-crafting-bench-state.js';
 import { _essenceIdForSlot } from '../loot/loot-essences.js';
 import { _renderEssenceCell } from '../loot/loot-essences-render.js';
-import { _egRenderMapSlot, _egRenderMapStash, _egRenderMapStashCell, _egSwitchMapStashTier } from './endgame-gate.js';
-import { _clearTooltip } from './endgame-hub-tooltips.js';
-import { _addUniqueToCollection, _updateUniqueTabBadge } from './endgame-hub-uniques.js';
-import { CURRENCY_COLS, INV_COLS, EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_TIER_ROMANS, _addItemToStash, _currencyDefForId, _currencyIdForSlot, _currencySlotForId, _currencyStash, _ensureInvRows, _egEnsureMapTierRows, _equipped, _findFreeInvCell, _egFindFreeMapCellForTier, _getInvRows, _egGetMapTierGrid, _inventory, _egMapStash, _renderEquipSlot, _renderEquipSlots, _renderInventory, _renderInventoryCell, _renderStatsList, _renderUniqueStash, _showStashInfo, _stashTab, _switchStashTab, _updateCraftingBenchLauncherSlot, _updateInvCount, saveHubState } from './endgame-hub.js';
+import { _egRenderMapSlot, _egRenderMapStash, _egRenderMapStashCell, _egSwitchMapStashTier } from '../endgame/endgame-gate.js';
+import { _clearTooltip } from './hub-tooltips.js';
+import { _addUniqueToCollection, _updateUniqueTabBadge } from './hub-uniques.js';
+import { CURRENCY_COLS, INV_COLS, EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_TIER_ROMANS, _addItemToStash, _currencyDefForId, _currencyIdForSlot, _currencySlotForId, _currencyStash, _ensureInvRows, _egEnsureMapTierRows, _equipped, _findFreeInvCell, _egFindFreeMapCellForTier, _getInvRows, _egGetMapTierGrid, _inventory, _egMapStash, _renderEquipSlot, _renderEquipSlots, _renderInventory, _renderInventoryCell, _renderStatsList, _renderUniqueStash, _showStashInfo, _stashTab, _switchStashTab, _updateCraftingBenchLauncherSlot, _updateInvCount, saveHubState } from './hub.js';
 import { _canEquipInSlot, _checkMoveAllowed, _checkUnequipSlot, _getWeaponHands, _isTwoHandedWeapon, _showRequirementsToast, _tryAutoUnequipOffhandForTwoHander } from '../loot/loot-requirements.js';
 
 //------------------------------------------------------------------------
@@ -29,7 +29,7 @@ import { _canEquipInSlot, _checkMoveAllowed, _checkUnequipSlot, _getWeaponHands,
 //   - CSS style injection for drag visuals (dragover highlight, reject flash, ghost)
 //
 // Dependencies (must be loaded before this file):
-//   endgame-hub.js - exposes all _eg* state variables and render helpers
+//   hub.js - exposes all _eg* state variables and render helpers
 //
 // Entry point:
 //   Call initEndgameHubDnD() once after the hub screen has been created.
@@ -1060,7 +1060,7 @@ export function _dndBuildCurrencyChipHTML(item) {
 </div>`;
 }
 
-// Overrides the base _renderCurrencyCell from endgame-hub.js.
+// Overrides the base _renderCurrencyCell from hub.js.
 // Uses _dndBuildCurrencyChipHTML so stacked currency shows the count badge.
 // Renders BOTH twin grids - hub's left tab (sx-currency-cell-*) and the
 // Probability Gate's strip (eg-gate-currency-cell-*) - because both read
@@ -1118,7 +1118,7 @@ export function _renderCurrencyCell(row, col) {
 //------------------------------------------------------------------------
 // _showHubTooltip now lives ONLY in endgame-currency.js (single source of
 // truth). The legacy override copies that used to race via load order in
-// this file and endgame-hub.js were removed 2026-09; the commented-out
+// this file and hub.js were removed 2026-09; the commented-out
 // panel-based implementation below was already dead code. Currency chips
 // rendered by this file dispatch through the shared global at runtime.
 //------------------------------------------------------------------------
@@ -1394,7 +1394,7 @@ export function initEndgameHubDnD() {
     _dndBindListeners();
 }
 
-// Called from endgame-hub.js _createScreen() - alias so the hub bootstrap
+// Called from hub.js _createScreen() - alias so the hub bootstrap
 // doesn't need to know whether it's calling the init function or the bind function.
 export function _bindDragEvents() {
     initEndgameHubDnD();

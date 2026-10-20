@@ -16,7 +16,7 @@ import { showEndgameNexus } from '../endgame/endgame-nexus.js';
 import { checkWorldCompleteAch } from '../achievements/achievements.js';
 import { isMonsterless } from '../difficulty-modifiers.js';
 import { isConvergenceLevel } from './scoring-core.js';
-import { _campaignMonsterLevel } from '../endgame/endgame-leveling.js';
+import { _campaignMonsterLevel } from '../hub/hub-leveling.js';
 import { _egRollScriptedLootKind, grantScriptedLoot } from '../loot/loot-map-completion-reward.js';
 
 // Live end-of-level state shared across the concatenated core (owned by

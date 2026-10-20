@@ -1,7 +1,7 @@
 import { _getPlayerMaxMana, gainMana } from '../classes/class-mana.js';
-import { _egMapHasBloodMagic } from './endgame-map-launch.js';
+import { _egMapHasBloodMagic } from '../endgame/endgame-map-launch.js';
 
-// endgame-quiz-buffs.js
+// combat-quiz-buffs.js
 //------------------------------------------------------------------------
 //-------------------ENDGAME QUIZ REWARD BUFFS-----------------------------
 //------------------------------------------------------------------------

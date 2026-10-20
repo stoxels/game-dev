@@ -12,7 +12,7 @@ import { t } from '../translation/translations.js';
 //=  flows. Contains the following doors:                                =
 //=                                                                      =
 //=    1. Character Sheet & Inventory -> showEndgameHub()                =
-//=       (endgame-hub.js)                                               =
+//=       (hub.js)                                               =
 //=    2. Probability Gate         -> showEndgameGate()                  =
 //=       (endgame-gate.js)                                              =
 //=    3. Atlas of Statistica      -> showEndgameAtlas()                 =

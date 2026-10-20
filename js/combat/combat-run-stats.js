@@ -10,7 +10,7 @@
 //
 // Read-only observer: nothing here changes combat. Hooks call
 // globalThis.RunStats.* (typeof-guarded) from encounter-damage.js,
-// encounter-monster-damage.js, endgame-player-stats.js (_rollCrit),
+// encounter-monster-damage.js, combat-player-stats.js (_rollCrit),
 // encounter-kills.js (campaign defeat), timer.js (time up),
 // scoring-rewards.js (win overlay) and encounter-chain.js (map summary).
 //

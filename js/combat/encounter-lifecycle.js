@@ -22,7 +22,7 @@ import { _setHoldEPauseVisual, _tickLoop } from './encounter-tick.js';
 import { _hideMonsterPanel, _renderPanel } from './encounter.js';
 import { _startPickupSpawner, _stopPickupSpawner } from './combat-grid-pickups-spawner.js';
 import { _hazardsCleanup, _hazardsReset } from './combat-hazards-lifecycle.js';
-import { _cancelAbsorptionRegen, _computePlayerStats, _getAllEquippedItems } from '../endgame/endgame-player-stats.js';
+import { _cancelAbsorptionRegen, _computePlayerStats, _getAllEquippedItems } from './combat-player-stats.js';
 import { _recentFills } from './combat-state.js';
 import { cur } from '../state.js';
 import { t } from '../translation/translations.js';
@@ -119,7 +119,7 @@ export function _attachBossStylesheet() {
     if (document.querySelector('link[data-eg-boss-css]')) return;
     const l = document.createElement('link');
     l.rel = 'stylesheet';
-    l.href = 'css/endgame/bosses2.css';
+    l.href = 'css/combat/bosses2.css';
     l.setAttribute('data-eg-boss-css', '1');
     document.head.appendChild(l);
 }

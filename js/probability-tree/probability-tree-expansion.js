@@ -7,7 +7,7 @@ import { addTimeSecs, previewGainSecs, subtractTimeSecs } from '../timer/timer-a
 import { t } from '../translation/translations.js';
 import { _executeFieldScan } from '../classes/class-probabilist.js';
 import { ptHasSkill } from './probability-tree-state-points.js';
-import { _getTreeTimerStartSecs } from '../endgame/endgame-leveling.js';
+import { _getTreeTimerStartSecs } from '../hub/hub-leveling.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
 

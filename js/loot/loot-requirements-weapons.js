@@ -1,6 +1,6 @@
 import { t } from '../translation/translations.js';
 import { ALL_BASE_TYPES } from './equipment-base-items.js';
-import { _equipped } from '../endgame/endgame-hub.js';
+import { _equipped } from '../hub/hub.js';
 import { _inferWeaponHands } from './unique-items.js';
 
 //------------------------------------------------------------------------

@@ -5,7 +5,7 @@ import { t } from '../translation/translations.js';
 import { CURRENCY_DEFS } from './loot-currency.js';
 import { ESSENCE_DEFS } from './loot-essences-defs.js';
 import { addEssence } from './loot-essences-stash.js';
-import { addCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
+import { addCurrency } from '../hub/hub-drag-and-drop.js';
 import { getGold, spendGold } from './loot-gold.js';
 import { _vendorBuildCardHTML, _vendorBuildCharmFilterBarHTML, _vendorFilterCharmIds, _vendorIconHTML, _vendorPurchase, _vendorRefreshTabContent } from './loot-vendor-shared.js';
 

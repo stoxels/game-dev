@@ -15,7 +15,7 @@ import '../probability-tree/probability-tree-state-points.js';
 import '../state.js';
 import '../translation/translations.js';
 import './equipment-base-items.js';
-import '../endgame/endgame-hub.js';
+import '../hub/hub.js';
 import './loot-implicits.js';
 import { requirementStatTarget, scaleRequirements } from './equipment-base-types.js';
 import '../endgame/endgame-map-launch.js';

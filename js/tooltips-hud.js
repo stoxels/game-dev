@@ -4,7 +4,7 @@ import { _egActiveMapItem } from './endgame/endgame-map-launch.js';
 import { _egGetMapRewardBonuses } from './loot/loot-map-mod-rewards.js';
 import { _egMapModAffects } from './loot/loot-map-mod-tables.js';
 import { _egResolveMapBoss } from './loot/loot-map-implicit-parts.js';
-import { _buildMergedModLines } from './endgame/endgame-player-stats.js';
+import { _buildMergedModLines } from './combat/combat-player-stats.js';
 import { _isActive } from './combat/combat-state.js';
 import { ALL, lvText } from './levels/levels.js';
 import { ptHasSkill } from './probability-tree/probability-tree-state-points.js';

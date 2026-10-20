@@ -9,7 +9,7 @@ import { _consumeOnHitGearBonus } from './encounter-player-attacks.js';
 import { _flashImmune, _restartFlashClass } from './encounter.js';
 import { _egGetActiveMapModValue } from '../endgame/endgame-map-launch.js';
 import { _tryMonsterMeleeSidestep } from './combat-monster-roam.js';
-import { _computePlayerStats, _strikeHandMult } from '../endgame/endgame-player-stats.js';
+import { _computePlayerStats, _strikeHandMult } from './combat-player-stats.js';
 import { PLAYER_MELEE_ANIM_DURATION_MS, PLAYER_MELEE_DAMAGE, _isActive } from './combat-state.js';
 import { _facingFromVector, _getEquippedWeaponInfo, _meleeTargetInRange } from './combat-weapon-swing-config.js';
 import { _meleeImpactThump, _showWeaponSwing, _weaponSwingSound } from './combat-weapon-swing.js';

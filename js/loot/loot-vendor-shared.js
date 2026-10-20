@@ -2,8 +2,8 @@ import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { _addGold, getGold, spendGold } from './loot-gold.js';
-import { saveHubState } from '../endgame/endgame-hub.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
+import { saveHubState } from '../hub/hub.js';
+import { GAME_ART } from '../combat/combat-art.js';
 
 //------------------------------------------------------------------------
 //-------------------CARD HELPERS------------------------------------------

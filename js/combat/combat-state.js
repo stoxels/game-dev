@@ -147,7 +147,7 @@ let _mapDef = null;
 // melee strikes.
 // Base charge time in seconds when no weapon is equipped. The equipped
 // weapon's attackIntervalSeconds defines the actual base (see
-// _getPlayerAttackInterval in endgame-player-stats.js); the weapon's
+// _getPlayerAttackInterval in combat-player-stats.js); the weapon's
 // attack_speed mods then subtract seconds from it, and
 // PLAYER_CHARGE_TIME_MULT shortens the result globally.
 export const PLAYER_DEFAULT_ATTACK_INTERVAL = 10;

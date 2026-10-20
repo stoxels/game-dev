@@ -1,4 +1,4 @@
-import { _loadLevelingState } from './endgame/endgame-leveling.js';
+import { _loadLevelingState } from './hub/hub-leveling.js';
 import { showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { renderSaveSlotScreen } from './screens/screens-save-slots.js';
 import { hideModal, showTitle } from './screens/screens.js';

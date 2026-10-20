@@ -1,4 +1,4 @@
-import { _buildItemChipHTML } from '../endgame/hub-mass-sell.js';
+import { _buildItemChipHTML } from '../hub/hub-mass-sell.js';
 
 //------------------------------------------------------------------------
 //-------------------CURRENCY TAB UI---------------------------------------

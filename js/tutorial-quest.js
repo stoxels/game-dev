@@ -12,11 +12,11 @@ import { _dropHeartPickup, _stopPickupSpawner } from './combat/combat-grid-picku
 import { _flushRunLootToStash, _renderLootOverlay } from './combat/combat-grid-pickups-loot.js';
 import { _renderCurrencyDropOverlay } from './combat/combat-grid-pickups-currency.js';
 import { _renderItemDropOverlay } from './combat/combat-grid-pickups-items.js';
-import { closeHubToGame, isHubGameOverlay, openHubFromGame, showEndgameHub } from './endgame/endgame-hub.js';
-import { _addItemToStash, _inventory } from './endgame/hub-stash.js';
-import { saveHubState } from './endgame/hub-save.js';
-import { _resetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
-import { _getAllEquippedItems } from './endgame/endgame-player-stats.js';
+import { closeHubToGame, isHubGameOverlay, openHubFromGame, showEndgameHub } from './hub/hub.js';
+import { _addItemToStash, _inventory } from './hub/hub-stash.js';
+import { saveHubState } from './hub/hub-save.js';
+import { _resetQuizDamageBuff } from './combat/combat-quiz-buffs.js';
+import { _getAllEquippedItems } from './combat/combat-player-stats.js';
 import { _currencyDrops, _itemDrops, _lootDrops, _pickups } from './combat/combat-state.js';
 import { CURRENCY_DEFS } from './loot/loot-currency.js';
 import { VENDOR_FREE_BASE_IDS, _vendorBuildBaseItemFromBase, _vendorGetSlotOrder } from './loot/loot-vendor-equipment.js';
@@ -3115,7 +3115,7 @@ function restartTutorialQuest() {
 
 // B (rebindable via the keybind setup) toggles the real endgame character
 // sheet + inventory over a running puzzle - the same screen the hub uses, so
-// everything stays synchronized. Overlay mode (see endgame-hub.js): B opens
+// everything stays synchronized. Overlay mode (see hub.js): B opens
 // the sheet paused over the run, B again closes it back into the puzzle.
 // Phase 3 (step 10): as a real module this file evaluates before
 // keybinds.js in the import phase, so a top-level registration would be

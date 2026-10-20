@@ -1,4 +1,4 @@
-import { _currencyDefForId, _currencySlotForId, _currencyStash } from '../endgame/endgame-hub.js';
+import { _currencyDefForId, _currencySlotForId, _currencyStash } from '../hub/hub.js';
 import { _craftingBenchCostFor } from './loot-crafting-costs.js';
 import { ITEM_MOD_CAPS } from './loot-equipment-generator.js';
 import { _getModTable } from './loot-equipment-mod-tables.js';

@@ -1,5 +1,5 @@
 import { save, STATE } from '../state.js';
-import { saveHubState } from '../endgame/endgame-hub.js';
+import { saveHubState } from '../hub/hub.js';
 
 //------------------------------------------------------------------------
 //-------------------LOOT FILTER STATE--------------------------------------

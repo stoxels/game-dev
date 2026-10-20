@@ -3,14 +3,14 @@
 //----------------------------------------------------------------------
 
 // THE single _showHubTooltip implementation (consolidated 2026-09 from
-// endgame-hub.js / endgame-hub-drag-and-drop.js, where duplicate
+// hub.js / hub-drag-and-drop.js, where duplicate
 // copies used to race via load order). Currency/essence/shard items
 // get a styled card; maps use loot-maps.js's tooltip builder;
 // everything else uses the full stat block from _buildTooltipBodyHTML.
 
 import { t } from '../translation/translations.js';
-import { GAME_ART } from '../endgame/endgame-art.js';
-import { _buildTooltipBodyHTML, _hideCompareTooltip, _lastMouse, _updateCompareTooltip } from '../endgame/endgame-hub-tooltips.js';
+import { GAME_ART } from '../combat/combat-art.js';
+import { _buildTooltipBodyHTML, _hideCompareTooltip, _lastMouse, _updateCompareTooltip } from '../hub/hub-tooltips.js';
 import { CURRENCY_DEFS } from './loot-currency.js';
 import { ESSENCE_DEFS } from './loot-essences-defs.js';
 import { _buildEssenceDetailHTML } from './loot-essences-tooltip.js';

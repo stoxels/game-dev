@@ -12,7 +12,7 @@ import { t } from '../translation/translations.js';
 
     Purpose: a lightweight "map select" screen so the endgame combat/loot
     systems (endgame-encounter.js, endgame-encounter-chain.js,
-    endgame-player-stats.js, endgame-hub.js) can be tested directly after
+    combat-player-stats.js, hub.js) can be tested directly after
     the setup screen, without playing through the full story.
 
     A "map" here is just a parameter set (monster level, kill count, boss
