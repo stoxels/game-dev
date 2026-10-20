@@ -379,6 +379,22 @@ function _claim_recordClaim(ms) {
     STATE.questsClaimed.push(ms.id);
 }
 
+// A brand-new character starts with every milestone that the ACCOUNT already
+// completed marked as claimed, WITHOUT rewards. Many endgame milestones read
+// the account-wide achievement counters (kills, maps, crafts, loot...), so a new
+// slot would otherwise auto-claim hundreds of them at once and flood the
+// inventory. Called by the slot loader (state.js) for fresh slots and full
+// resets, before any event can complete a milestone legitimately.
+export function _questBaselineNewSlot() {
+    if (!STATE.questsClaimed) STATE.questsClaimed = [];
+    for (const cat of LEDGER_CATEGORIES) {
+        for (const ms of cat.milestones) {
+            if (!_milestone_isClaimed(ms) && _milestone_isComplete(ms)) STATE.questsClaimed.push(ms.id);
+        }
+    }
+}
+globalThis._questBaselineNewSlot = _questBaselineNewSlot;
+
 // Claims a milestone by id if it is complete and not yet claimed.
 // On success: records the claim, grants rewards, saves, shows the banner,
 // refreshes the badge, tracks achievements, and re-renders the quest log.

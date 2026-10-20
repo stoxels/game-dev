@@ -43,6 +43,7 @@ function confirmFullReset() {
     wipeSaveData();
     resetAllBeats();
     globalThis.STATE = buildFreshState();
+    if (typeof globalThis._questBaselineNewSlot === 'function') globalThis._questBaselineNewSlot();
     if (typeof _loadLevelingState === 'function') _loadLevelingState(); // re-sync endgame leveling
     save(); // writes the blank state back into the active slot
     showTitle();

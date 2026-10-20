@@ -345,6 +345,7 @@ function showTitleCeremony(fresh) {
         <div class="tt-buttons">
             <button class="tt-equip" data-ceremony="equip">${t('titles_ceremony_equip')}</button>
             <button class="tt-equip" data-ceremony="list">${t('titles_ceremony_view')}</button>
+            <button class="tt-equip" data-ceremony="close">${t('titles_ceremony_continue')}</button>
         </div>
     </div>`;
     _openModal(modal, headKey, body);

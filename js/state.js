@@ -1045,6 +1045,7 @@ export function save() {
 // save-select screen.
 export function loadStateFromSlot(slotNum) {
     let raw = loadRawSaveFromSlot(slotNum);
+    const isNewSlot = !raw;
     if (raw) {
         migrateOldSave(raw);
     } else {
@@ -1052,6 +1053,8 @@ export function loadStateFromSlot(slotNum) {
     }
     setActiveSlot(slotNum);
     STATE = raw;
+    // New character: account-wide progress must not pay out its old milestones again.
+    if (isNewSlot && typeof globalThis._questBaselineNewSlot === 'function') globalThis._questBaselineNewSlot();
     // New slot = new data: clear this session's hub load/save latches so the
     // hub re-syncs its mirrors from the freshly loaded STATE (and so a load
     // failure bound to the previous slot does not poison this one).
