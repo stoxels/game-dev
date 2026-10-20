@@ -4,10 +4,12 @@ import { save, STATE } from '../state.js';
 import { t } from '../translation/translations.js';
 import { CURRENCY_DEFS } from './loot-currency.js';
 import { ESSENCE_DEFS } from './loot-essences-defs.js';
+import { _essenceCompatibleSlotTypes } from './loot-essences.js';
+import { ITEM_GROUPS } from '../puzzle-items/item-definitions.js';
 import { addEssence } from './loot-essences-stash.js';
 import { addCurrency } from '../hub/hub-drag-and-drop.js';
 import { getGold, spendGold } from './loot-gold.js';
-import { _vendorBuildCardHTML, _vendorBuildCharmFilterBarHTML, _vendorFilterCharmIds, _vendorIconHTML, _vendorPurchase, _vendorRefreshTabContent } from './loot-vendor-shared.js';
+import { _vendorBuildCardHTML, _vendorBuildCharmFilterBarHTML, _vendorBuildChipBarHTML, _vendorFilterCharmIds, _vendorGetEssenceFilter, _vendorGetItemFilter, _vendorIconHTML, _vendorPurchase, _vendorRefreshTabContent } from './loot-vendor-shared.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE--------------------------------------
@@ -219,18 +221,57 @@ function _vendorEssencePrice(id) {
     return VENDOR_ESSENCE_PRICES[id] != null ? VENDOR_ESSENCE_PRICES[id] : VENDOR_ESSENCE_DEFAULT_PRICE;
 }
 
-// Builds purchase cards for every known essence.
-export function _vendorBuildEssencesTabHTML() {
-    const defs = Object.values(ESSENCE_DEFS);
-    const cards = defs.map(def => _vendorBuildCardHTML({
-        icon: _vendorIconHTML(def.id, def.icon),
-        title: def.name,
-        desc: def.description,
-        price: _vendorEssencePrice(def.id),
-        buyCall: `_vendorBuyEssence('${def.id}')`,
-        extraClass: 'sx-vendor-essence-card',
-    })).join('');
-    return `<div class="sx-vendor-cards">${cards}</div>`;
+// Display order of the equipment base types in the essence filter.
+const VENDOR_SLOT_ORDER = ['weapon', 'ranged', 'arcane', 'shield', 'head', 'shoulders', 'chest', 'gloves', 'bracers',
+    'belt', 'pants', 'boots', 'cloak', 'amulet', 'ring', 'earring', 'talisman'];
+
+// Cache of the base types per essence id.
+const _vendorEssenceSlotCache = {};
+
+// Equipment base types an essence can be applied to.
+function _vendorEssenceSlots(def) {
+    if (!_vendorEssenceSlotCache[def.id]) {
+        let slots = [];
+        try { slots = _essenceCompatibleSlotTypes(def.guaranteedFamily) || []; } catch (e) { slots = []; }
+        _vendorEssenceSlotCache[def.id] = slots;
+    }
+    return _vendorEssenceSlotCache[def.id];
+}
+
+// Label for a base type (slot type), falling back to the raw id.
+function _vendorSlotLabel(slot) {
+    const key = 'eg_slot_' + slot;
+    const txt = t(key);
+    return txt && txt !== key ? txt : slot;
+}
+
+// Builds purchase cards for the essences. Each card is compact: the name and
+// the base types it works on (the long how-to text lives in the tab hint).
+// The all-tabs search passes ignoreFilter so a query still covers every essence.
+export function _vendorBuildEssencesTabHTML(ignoreFilter) {
+    const all = Object.values(ESSENCE_DEFS);
+    const present = new Set();
+    all.forEach(def => _vendorEssenceSlots(def).forEach(s => present.add(s)));
+    const order = VENDOR_SLOT_ORDER.filter(s => present.has(s))
+        .concat([...present].filter(s => VENDOR_SLOT_ORDER.indexOf(s) === -1));
+    const filter = ignoreFilter ? 'all' : _vendorGetEssenceFilter();
+    const defs = filter === 'all' ? all : all.filter(def => _vendorEssenceSlots(def).includes(filter));
+    const worksOn = t('eg_vendor_essence_works_on');
+    const cards = defs.map(def => {
+        const slots = _vendorEssenceSlots(def);
+        const list = slots.length >= order.length - 1 ? t('eg_vendor_essence_all_gear')
+            : slots.map(_vendorSlotLabel).join(', ');
+        return _vendorBuildCardHTML({
+            icon: _vendorIconHTML(def.id, def.icon),
+            title: def.name,
+            desc: `${worksOn} ${list}`,
+            price: _vendorEssencePrice(def.id),
+            buyCall: `_vendorBuyEssence('${def.id}')`,
+            extraClass: 'sx-vendor-essence-card',
+        });
+    }).join('');
+    const bar = ignoreFilter ? '' : _vendorBuildChipBarHTML(order.map(s => ({ id: s, label: _vendorSlotLabel(s) })), filter, '_vendorSetEssenceFilter');
+    return `${bar}<div class="sx-vendor-cards sx-vendor-cards-essence">${cards}</div>`;
 }
 
 // Buys one essence and adds it to the hub stash.
@@ -264,9 +305,15 @@ function _vendorPuzzleItemPrice(rarity) {
     return VENDOR_ITEM_RARITY_PRICES[rarity] != null ? VENDOR_ITEM_RARITY_PRICES[rarity] : 100;
 }
 
-// Builds purchase cards for every regular puzzle item.
-export function _vendorBuildItemsTabHTML() {
-    const cards = Object.values(globalThis.ITEM_DEFS).map(def => _vendorBuildCardHTML({
+// Builds purchase cards for the regular puzzle items, optionally narrowed to
+// one category (Reveal, Mark, Time...). The all-tabs search passes
+// ignoreFilter so a query still covers every item.
+export function _vendorBuildItemsTabHTML(ignoreFilter) {
+    const filter = ignoreFilter ? 'all' : _vendorGetItemFilter();
+    const group = ITEM_GROUPS.find(g => g.label === filter);
+    const all = Object.values(globalThis.ITEM_DEFS);
+    const defs = group ? all.filter(def => group.slots.includes(def.id)) : all;
+    const cards = defs.map(def => _vendorBuildCardHTML({
         icon: _vendorIconHTML(def.id, def.icon),
         title: globalThis.itemName(def),
         subtitle: def.rarity,
@@ -274,7 +321,8 @@ export function _vendorBuildItemsTabHTML() {
         price: _vendorPuzzleItemPrice(def.rarity),
         buyCall: `_vendorBuyPuzzleItem('${def.id}')`,
     })).join('');
-    return `<div class="sx-vendor-cards">${cards}</div>`;
+    const bar = ignoreFilter ? '' : _vendorBuildChipBarHTML(ITEM_GROUPS.map(g => ({ id: g.label, label: t(g.labelKey) })), filter, '_vendorSetItemFilter');
+    return `${bar}<div class="sx-vendor-cards">${cards}</div>`;
 }
 
 // Buys a regular puzzle item straight into the persistent main inventory.

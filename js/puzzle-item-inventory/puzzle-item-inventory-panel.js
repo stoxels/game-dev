@@ -3,7 +3,7 @@ import { GAME_ART } from '../combat/combat-art.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';
 import { RESHUFFLE_GOAL, reshuffleCount, reshuffleRightClickItem, updateReshuffleCounter } from './puzzle-item-reshuffle.js';
-import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
+import { ITEM_DEFS, ITEM_GROUPS } from '../puzzle-items/item-definitions.js';
 import { itemDesc, itemName, rarityColors } from '../puzzle-items/item-pool.js';
 import { checkInventoryAchievements, showItemToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { STATE } from '../state.js';
@@ -16,15 +16,7 @@ import { STATE } from '../state.js';
 // Defines the grouped slot layout for the inventory panel.
 // Each group has a visible label and an ordered list of item definition IDs.
 // Order within slots[] controls display order within the group.
-const INV_SLOT_GROUPS = [
-    { label: 'Reveal', slots: ['reveal1', 'reveal2', 'reveal3', 'reveal4'] },
-    { label: 'Mark', slots: ['markWrong2', 'markWrong4', 'markWrong6', 'markWrong8'] },
-    { label: 'Time', slots: ['addTime60', 'addTime300', 'addTime600', 'addTime900'] },
-    { label: 'Utility', slots: ['shield', 'freeze', 'tutor', 'tutor4', 'tutor6', 'tutorAll', 'scoutPrimer'] },
-    { label: 'Power', slots: ['rowSolve', 'colSolve', 'surveyScope', 'artifactComplete'] },
-    { label: 'Cursed', slots: ['cursedReveal', 'cursedTime', 'cursedShield', 'cursedRowSolve', 'cursedColSolve', 'cursedRowCol', 'chronoFracture'] },
-    { label: 'Special', slots: ['pearlOfHaste', 'pearlOfSwiftness', 'grandPearl', 'theWitch', 'goldenClock', 'shadowSeal'] },
-];
+const INV_SLOT_GROUPS = ITEM_GROUPS;
 
 // Maps inventory group labels to their translation keys.
 const INV_GROUP_LABEL_KEYS = {

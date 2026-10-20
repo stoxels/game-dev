@@ -190,7 +190,7 @@ export const EG_MAP_MOD_PREFIXES = {
         },
         map_reduced_attack_speed: {
             id: 'map_reduced_attack_speed', affects: 'player',
-            label: '#% less Attack Speed', labelDe: '#% weniger Angriffsgeschwindigkeit',
+            label: '#% reduced melee charge-up speed', labelDe: '#% reduzierte Nahkampf-Aufladegeschwindigkeit',
             tiers: [
                 { tier: 1, min: 32, max: 43, weight: 90, ilvl: 50 },
                 { tier: 2, min: 18, max: 31, weight: 310, ilvl: 24 },

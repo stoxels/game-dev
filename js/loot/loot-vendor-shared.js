@@ -165,3 +165,35 @@ export function _vendorFilterCharmIds(ids) {
     const filter = VENDOR_CHARM_FILTERS.find(f => f.id === _vendorCharmFilter);
     return filter ? ids.filter(id => filter.test(_vendorUniversalDef(id))) : ids;
 }
+
+//------------------------------------------------------------------------
+//-------------------ESSENCE (BASE TYPE) & PUZZLE ITEM (CATEGORY) FILTERS--
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+let _vendorEssenceFilter = 'all';
+let _vendorItemFilter = 'all';
+
+// Current chip for the essence tab ('all' or an equipment slot type).
+export function _vendorGetEssenceFilter() { return _vendorEssenceFilter; }
+// Current chip for the puzzle-item tab ('all' or a category label).
+export function _vendorGetItemFilter() { return _vendorItemFilter; }
+
+// Picks a base-type chip and redraws the essence cards.
+export function _vendorSetEssenceFilter(id) {
+    _vendorEssenceFilter = id;
+    _vendorRefreshTabContent();
+}
+
+// Picks a category chip and redraws the puzzle-item cards.
+export function _vendorSetItemFilter(id) {
+    _vendorItemFilter = id;
+    _vendorRefreshTabContent();
+}
+
+// A row of filter chips: [{ id, label }], the chosen one highlighted.
+// `setter` is the global handler name the chips call with their id.
+export function _vendorBuildChipBarHTML(entries, current, setter) {
+    const chip = (id, label) => `<button type="button" class="sx-vendor-filter-btn${current === id ? ' sx-vendor-filter-btn-on' : ''}" onclick="${setter}('${id}')">${label}</button>`;
+    return `<div class="sx-vendor-charm-filters">${chip('all', t('eg_vendor_charm_filter_all'))}${entries.map(e => chip(e.id, e.label)).join('')}</div>`;
+}

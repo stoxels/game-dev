@@ -495,3 +495,27 @@
 .setup-back-corner-btn {
     font-size: 20px;
 }
+
+/* Screen title plaque - top centre, above the book */
+.setup-plaque {
+    position: absolute;
+    top: clamp(6px, 1.4vh, 18px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    box-sizing: border-box;
+    min-width: clamp(300px, 28vw, 520px);
+    height: clamp(52px, 8vh, 84px);
+    padding: 0 clamp(40px, 4vw, 72px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: url('../images/Settings/settings_title_plague.webp') center / 100% 100% no-repeat;
+    font-family: var(--PX, monospace);
+    font-size: clamp(14px, 1.3vw, 22px);
+    letter-spacing: 3px;
+    white-space: nowrap;
+    color: var(--yellow, #f3dc9a);
+    text-shadow: 0 2px 3px #000;
+    pointer-events: none;
+}

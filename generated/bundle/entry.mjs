@@ -34,7 +34,7 @@ import { _getAsymptoticMasteryReduction, _getPenaltySecondsAtCount, _updateMista
 import '../../js/scoring/scoring.js';
 import { _getLevelSpecialStatus, awardAtlasClearScore, calculateScore, checkIsConvergenceLevel, checkIsLargeAdjMatrix, checkWorldJustCompleted, computeMonsterPointsAwarded, computePointsAwarded, computeRawScore, countFilledCells, countMarkedCells, evaluateBonusObjective, fireAchievements, isConvergenceLevel, isPuzzleSolved, maybeUpdateHighScore, monsterKillScore, recordMonsterKillScore } from '../../js/scoring/scoring-core.js';
 import { renderWinOverlay, rollLuckyDrops, formatTime } from '../../js/scoring/scoring-rewards.js';
-import { ITEM_DEFS } from '../../js/puzzle-items/item-definitions.js';
+import { ITEM_DEFS, ITEM_GROUPS } from '../../js/puzzle-items/item-definitions.js';
 import { RARITY_COLOR_MAP, itemDesc, itemName, pickLuckyItem, pickRandomItem, rarityColors } from '../../js/puzzle-items/item-pool.js';
 import { CELL_FX_DURATION, _applyCellEffect, _ensureCellEffectCSS } from '../../js/puzzle-mechanics/cell-fx.js';
 import { CHAOS_BLAST_COLOURS, CHRONOBOLT_X_FRACTIONS, FX_Z, PARTICLES, PEARL_VARIANTS, TUTOR_ITEM_SFX, _ensureFreezeCountdownStyles, _fxClock, _fxGetGridCorners, _fxGetPuzzleRect, _fxGetPuzzleRectForWrap, _fxMakeClockBurst, _fxMakeClockRays, _fxMakeElement, _fxMakeGoldTintFill, _fxMakeIcon, _fxMakeRing, _fxOverlay, _fxShieldBorderAdd, _fxShieldBorderRemove, _fxSpawnParticles, playFreezeCountdownOverlay } from '../../js/puzzle-mechanics/fx-helpers.js';
@@ -213,7 +213,7 @@ import { SCREEN_NAV, _resolveBackFn } from '../../js/combat/combat-state-navigat
 import { MELEE_DAMAGE_MULT, PLAYER_CHARGE_TIME_MULT, PLAYER_DEFAULT_ATTACK_INTERVAL, PLAYER_MELEE_ANIM_DURATION_MS, PLAYER_MELEE_DAMAGE, PLAYER_MIN_ATTACK_INTERVAL, _activeBlasts, _bossCorrupted, _bossFrozen, _bossTimers, _cellInBounds, _currencyDrops, _dragChargeElements, _isActive, _isCampaignRun, _isMapRun, _itemDrops, _lootDrops, _pickupSpawnerInfo, _pickups, _recentFills } from '../../js/combat/combat-state.js';
 import '../../js/loot/unique-items.js';
 import { _vendorSwitchTab, showVendor } from '../../js/loot/loot-vendor.js';
-import { _vendorSetCharmFilter } from '../../js/loot/loot-vendor-shared.js';
+import { _vendorSetCharmFilter, _vendorSetEssenceFilter, _vendorSetItemFilter } from '../../js/loot/loot-vendor-shared.js';
 import { _vendorBuyTierMap } from '../../js/loot/loot-vendor-maps.js';
 import { _vendorBuyCharm, _vendorBuyCurrency, _vendorBuyEssence, _vendorBuyPuzzleItem } from '../../js/loot/loot-vendor-supplies.js';
 import { _vendorSetBaseFilter, _vendorSetWeaponTypeFilter, _vendorSetDefenseFilter, _vendorToggleUsableFilter, _vendorShowBaseTooltip, _vendorHideBaseTooltip, _vendorBuyBaseItem } from '../../js/loot/loot-vendor-equipment.js';
@@ -1032,6 +1032,8 @@ try { globalThis["_craftingBenchApply"] = _craftingBenchApply; } catch (e) {} //
 try { globalThis["_vendorSwitchTab"] = _vendorSwitchTab; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor.js)
 try { globalThis["showVendor"] = showVendor; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor.js)
 try { globalThis["_vendorSetCharmFilter"] = _vendorSetCharmFilter; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-shared.js)
+try { globalThis["_vendorSetEssenceFilter"] = _vendorSetEssenceFilter; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-shared.js)
+try { globalThis["_vendorSetItemFilter"] = _vendorSetItemFilter; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-shared.js)
 try { globalThis["_vendorBuyTierMap"] = _vendorBuyTierMap; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-maps.js)
 try { globalThis["_vendorBuyCharm"] = _vendorBuyCharm; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-supplies.js)
 try { globalThis["_vendorBuyCurrency"] = _vendorBuyCurrency; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-supplies.js)

@@ -295,3 +295,15 @@ export const ITEM_DEFS = {
         rarity: 'cursed', weight: 0
     },
 };
+
+// Category groups for puzzle items (inventory panel flyouts and the shop's
+// category filter). Order here is the display order.
+export const ITEM_GROUPS = [
+    { label: 'Reveal', labelKey: 'itm_group_reveal', slots: ['reveal1', 'reveal2', 'reveal3', 'reveal4'] },
+    { label: 'Mark', labelKey: 'itm_group_mark', slots: ['markWrong2', 'markWrong4', 'markWrong6', 'markWrong8'] },
+    { label: 'Time', labelKey: 'itm_group_time', slots: ['addTime60', 'addTime300', 'addTime600', 'addTime900'] },
+    { label: 'Utility', labelKey: 'itm_group_utility', slots: ['shield', 'freeze', 'tutor', 'tutor4', 'tutor6', 'tutorAll', 'scoutPrimer'] },
+    { label: 'Power', labelKey: 'itm_group_power', slots: ['rowSolve', 'colSolve', 'surveyScope', 'artifactComplete'] },
+    { label: 'Cursed', labelKey: 'itm_group_cursed', slots: ['cursedReveal', 'cursedTime', 'cursedShield', 'cursedRowSolve', 'cursedColSolve', 'cursedRowCol', 'chronoFracture'] },
+    { label: 'Special', labelKey: 'itm_group_special', slots: ['pearlOfHaste', 'pearlOfSwiftness', 'grandPearl', 'theWitch', 'goldenClock', 'shadowSeal'] },
+];

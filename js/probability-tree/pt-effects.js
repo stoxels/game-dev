@@ -364,7 +364,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     projectile_elemental_damage_inc: { channel: 'projectileElementalDamageIncPct', en: '{v}% increased Elemental Damage with Projectiles', de: '{v}% erhöhter elementarer Schaden mit Projektilen' },
 
     // --- speed ------------------------------------------------------------
-    attack_speed_pct: { channel: 'attackSpeedPct', en: '{v}% increased Attack Speed', de: '{v}% erhöhte Angriffsgeschwindigkeit' },
+    attack_speed_pct: { channel: 'attackSpeedPct', en: '{v}% increased melee attack charge-up speed', de: '{v}% erhöhte Nahkampf-Aufladegeschwindigkeit' },
     melee_charge_speed_pct: { channel: 'meleeChargeSpeedPct', en: '{v}% increased melee attack charge-up speed', de: '{v}% erhöhte Nahkampf-Aufladegeschwindigkeit' },
     // Life leech from the tree (grit batch, nodes 30257/30258/20043): MELEE
     // attacks only. It is a separate channel from the gear leech bucket

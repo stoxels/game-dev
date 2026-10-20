@@ -4202,7 +4202,7 @@ export const UNIQUE_ITEMS = [
         requirements: { level: 28, str: 0, agi: 105, int: 0 },
         defenses: { armour: 0, evasion: 120, absorption: 0 },
         bonuses: [
-            { key: 'attack_speed', value: 15, en: '#% increased Attack Speed', de: '#% erhöhte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: 15, en: '#% increased melee charge-up speed', de: '#% erhöhte Nahkampf-Aufladegeschwindigkeit' },
             { key: 'crit_chance', value: 10, en: '+#% Critical Hit Chance', de: '+#% Kritische Trefferchance' },
             { key: 'agility', value: 10, en: '+# to Agility', de: '+# zu Geschick' }
         ],
@@ -4318,7 +4318,7 @@ export const UNIQUE_ITEMS = [
         minLevel: 44,
         requirements: { level: 44, str: 0, agi: 165, int: 0 },
         bonuses: [
-            { key: 'attack_speed', value: 20, en: '#% increased Attack Speed', de: '#% erhöhte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: 20, en: '#% increased melee charge-up speed', de: '#% erhöhte Nahkampf-Aufladegeschwindigkeit' },
             { key: 'dodge', value: 6, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'flat_health', value: 44, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
@@ -4438,7 +4438,7 @@ export const UNIQUE_ITEMS = [
         ],
         defenses: { armour: 260, evasion: 0, absorption: 0 },
         downsides: [
-            { key: 'attack_speed', value: -13, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
+            { key: 'attack_speed', value: -13, en: '#% reduced melee charge-up speed', de: '#% reduzierte Nahkampf-Aufladegeschwindigkeit' }
         ],
         flavorEn: 'It has not moved in four hundred years. It is not about to start.',
         flavorDe: 'Es hat sich seit vierhundert Jahren nicht bewegt. Es hat auch nicht vor, damit anzufangen.',
@@ -4555,7 +4555,7 @@ export const UNIQUE_ITEMS = [
             { key: 'warding', value: 150, en: '+# Warding', de: '+# Wardschutz' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -19.5, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
+            { key: 'attack_speed', value: -19.5, en: '#% reduced melee charge-up speed', de: '#% reduzierte Nahkampf-Aufladegeschwindigkeit' }
         ],
         flavorEn: 'Carrying the weight of the world, plus interest.',
         flavorDe: 'Trägst das Gewicht der Welt. Zuzüglich Zinsen.',
@@ -4892,7 +4892,7 @@ export const UNIQUE_ITEMS = [
         requirements: { level: 39, str: 0, agi: 148, int: 0 },
         defenses: { armour: 0, evasion: 95, absorption: 0 },
         bonuses: [
-            { key: 'attack_speed', value: 22, en: '#% increased Attack Speed', de: '#% erhöhte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: 22, en: '#% increased melee charge-up speed', de: '#% erhöhte Nahkampf-Aufladegeschwindigkeit' },
             { key: 'flat_health', value: 49, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' }
         ],
@@ -5020,7 +5020,7 @@ export const UNIQUE_ITEMS = [
             { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -13, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
+            { key: 'attack_speed', value: -13, en: '#% reduced melee charge-up speed', de: '#% reduzierte Nahkampf-Aufladegeschwindigkeit' }
         ],
         flavorEn: 'Carry the one. Then carry the monster.',
         flavorDe: 'Übertrage die Eins. Dann trag das Monster.',
@@ -5180,7 +5180,7 @@ export const UNIQUE_ITEMS = [
             { key: 'flat_health', value: 44, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -10.4, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
+            { key: 'attack_speed', value: -10.4, en: '#% reduced melee charge-up speed', de: '#% reduzierte Nahkampf-Aufladegeschwindigkeit' }
         ],
         flavorEn: 'Formal wear for people who expect the floor to betray them.',
         flavorDe: 'Festtagskleidung für Menschen, die vom Boden Verrat erwarten.',
@@ -5240,7 +5240,7 @@ export const UNIQUE_ITEMS = [
             { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -15.6, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: -15.6, en: '#% reduced melee charge-up speed', de: '#% reduzierte Nahkampf-Aufladegeschwindigkeit' },
             { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Wait. Wait. Now.',
@@ -5360,7 +5360,7 @@ export const UNIQUE_ITEMS = [
             { key: 'flat_health', value: 46, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -10.4, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
+            { key: 'attack_speed', value: -10.4, en: '#% reduced melee charge-up speed', de: '#% reduzierte Nahkampf-Aufladegeschwindigkeit' }
         ],
         flavorEn: 'Never retreat in the same direction twice.',
         flavorDe: 'Nie zweimal in dieselbe Richtung zurückweichen.',
@@ -5379,7 +5379,7 @@ export const UNIQUE_ITEMS = [
             { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -19.5, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
+            { key: 'attack_speed', value: -19.5, en: '#% reduced melee charge-up speed', de: '#% reduzierte Nahkampf-Aufladegeschwindigkeit' }
         ],
         flavorEn: 'You will get there. Eventually. Definitely.',
         flavorDe: 'Du kommst an. Irgendwann. Ganz bestimmt.',
@@ -5414,7 +5414,7 @@ export const UNIQUE_ITEMS = [
         defenses: { armour: 230, evasion: 60, absorption: 0 },
         bonuses: [
             { key: 'chance_to_ignite', value: 20, en: '#% chance to Ignite', de: '#% Chance auf Entzünden' },
-            { key: 'attack_speed', value: 10, en: '#% increased Attack Speed', de: '#% erhöhte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: 10, en: '#% increased melee charge-up speed', de: '#% erhöhte Nahkampf-Aufladegeschwindigkeit' },
             { key: 'flat_health', value: 72, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
@@ -6076,7 +6076,7 @@ export const UNIQUE_ITEMS = [
             { key: 'flat_health', value: 49, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -15.6, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
+            { key: 'attack_speed', value: -15.6, en: '#% reduced melee charge-up speed', de: '#% reduzierte Nahkampf-Aufladegeschwindigkeit' }
         ],
         flavorEn: 'Elegant against rain, arrows, and meteors alike.',
         flavorDe: 'Elegant gegen Regen, Pfeile und Meteore gleichermaßen.',
@@ -6140,7 +6140,7 @@ export const UNIQUE_ITEMS = [
             { key: 'spell_block_chance', value: 10, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -26, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: -26, en: '#% reduced melee charge-up speed', de: '#% reduzierte Nahkampf-Aufladegeschwindigkeit' },
             { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Form 27-B must be filed before any monster may pass. In triplicate.',

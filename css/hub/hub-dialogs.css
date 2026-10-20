@@ -1,0 +1,418 @@
+/* ════════════════════════════════════════════════════════════════════════
+   HUB DIALOGS - art skin for the Crafting Bench, Loot Filter, Mass Sell
+   filter and Mass Sell confirm. The base looks are injected at runtime by
+   js/loot/loot-filter-styles.js and js/hub/hub-mass-sell-modal.js (and
+   crafting-bench.css), so every rule here is id-scoped to win. Looks only -
+   markup, ids and game code are untouched. Reuses the Settings rune frame,
+   plaque, stone button and close button, and the Game Setup backdrop.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* Dimmed art backdrop */
+#sx-mass-sell-modal,
+#sx-loot-filter-modal,
+#sx-crafting-bench-overlay {
+    background:
+        linear-gradient(rgba(8, 6, 16, 0.86), rgba(4, 3, 9, 0.94)),
+        url('../../images/Game_Setup/Game_Setup_New_Background.webp') center bottom / cover no-repeat;
+    backdrop-filter: none;
+}
+
+/* Rune-stone frame (dark inside so the text stays readable) */
+#sx-mass-sell-modal .sx-mass-sell-box,
+#sx-mass-sell-modal #sx-mass-sell-confirm,
+#sx-loot-filter-modal .sx-lf-box,
+#sx-crafting-bench-overlay .sx-craft-bench-panel {
+    position: relative;
+    box-sizing: border-box;
+    border: 40px solid transparent;
+    border-image: url('../../images/Settings/settings_background.webp') 46 / 40px stretch;
+    border-radius: 0;
+    background: rgba(14, 12, 24, 0.95);
+    background-clip: padding-box;
+    box-shadow: none;
+    overflow: visible;
+    color: #f3e6c8;
+    filter: drop-shadow(0 0 24px rgba(140, 90, 220, 0.35)) drop-shadow(0 16px 26px rgba(0, 0, 0, 0.7));
+}
+#sx-mass-sell-modal .sx-mass-sell-box { width: min(620px, 96vw); max-height: min(760px, 94vh); }
+#sx-mass-sell-modal #sx-mass-sell-confirm { width: min(520px, 94vw); }
+#sx-loot-filter-modal .sx-lf-box { width: min(760px, 96vw); max-height: min(800px, 94vh); }
+#sx-crafting-bench-overlay .sx-craft-bench-panel { width: min(1180px, 98vw); max-height: 96vh; }
+
+/* Title plaque instead of a header bar */
+#sx-mass-sell-modal .sx-ms-head,
+#sx-loot-filter-modal .sx-lf-head,
+#sx-crafting-bench-overlay .sx-craft-head {
+    position: relative;
+    justify-content: center;
+    min-height: 62px;
+    margin: -18px 3% 10px;
+    padding: 0 44px;
+    border: none;
+    background: url('../../images/Settings/settings_title_plague.webp') center / 100% 100% no-repeat;
+}
+#sx-mass-sell-modal .sx-ms-head-icon,
+#sx-loot-filter-modal .sx-lf-head-icon,
+#sx-crafting-bench-overlay .sx-craft-head-icon { display: none; }
+#sx-mass-sell-modal .sx-ms-head-title,
+#sx-loot-filter-modal .sx-lf-head-title,
+#sx-crafting-bench-overlay .sx-craft-head-title {
+    flex: 0 1 auto;
+    font-size: clamp(12px, 1.1vw, 16px);
+    letter-spacing: 3px;
+    color: #f3dc9a;
+    text-shadow: 0 2px 3px #000;
+    text-align: center;
+}
+
+/* Stone close button */
+#sx-mass-sell-modal .sx-ms-close,
+#sx-loot-filter-modal .sx-lf-close,
+#sx-crafting-bench-overlay .sx-craft-close {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    font-size: 15px;
+    color: #f3dc9a;
+    text-shadow: 0 2px 2px #000;
+    border: none;
+    border-radius: 0;
+    background: url('../../images/Game-Reset/Close-Button.webp') center / 100% 100% no-repeat transparent;
+}
+#sx-mass-sell-modal .sx-ms-close:hover,
+#sx-loot-filter-modal .sx-lf-close:hover,
+#sx-crafting-bench-overlay .sx-craft-close:hover {
+    border: none;
+    color: #fff;
+    background: url('../../images/Game-Reset/Close-Button.webp') center / 100% 100% no-repeat transparent;
+    filter: brightness(1.35) drop-shadow(0 0 6px rgba(255, 120, 90, 0.7));
+}
+
+/* Bodies: thin gold scrollbars */
+#sx-mass-sell-modal .sx-ms-body,
+#sx-loot-filter-modal .sx-lf-body,
+#sx-crafting-bench-overlay .sx-craft-body {
+    padding: 8px 6px;
+    gap: 12px;
+    scrollbar-color: #8a7a4a transparent;
+}
+#sx-mass-sell-modal .sx-ms-body::-webkit-scrollbar-thumb,
+#sx-loot-filter-modal .sx-lf-body::-webkit-scrollbar-thumb,
+#sx-crafting-bench-overlay .sx-craft-body::-webkit-scrollbar-thumb,
+#sx-crafting-bench-overlay .sx-craft-col::-webkit-scrollbar-thumb { background: #8a7a4a; }
+
+/* "How it works" slab */
+#sx-mass-sell-modal .sx-ms-how,
+#sx-loot-filter-modal .sx-lf-how {
+    background: rgba(8, 6, 16, 0.55);
+    border: 1px solid rgba(240, 225, 180, 0.22);
+    border-left: 3px solid #c8a84b;
+    border-radius: 3px;
+    padding: 10px 12px;
+}
+#sx-mass-sell-modal .sx-ms-how-title,
+#sx-loot-filter-modal .sx-lf-how-title {
+    font-size: 9px;
+    color: #f3dc9a;
+    opacity: 1;
+}
+#sx-mass-sell-modal .sx-ms-how-li,
+#sx-loot-filter-modal .sx-lf-how-li {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #f3e6c8;
+    opacity: 1;
+}
+#sx-mass-sell-modal .sx-ms-how-b,
+#sx-loot-filter-modal .sx-lf-how-b { color: #c8a84b; }
+
+/* Section headings */
+#sx-mass-sell-modal .sx-ms-section-title,
+#sx-loot-filter-modal .sx-lf-section-title {
+    font-size: 10px;
+    color: #f3dc9a;
+    text-shadow: 0 2px 2px #000;
+}
+#sx-mass-sell-modal .sx-ms-section-line,
+#sx-loot-filter-modal .sx-lf-section-line { background: rgba(240, 225, 180, 0.3); opacity: 1; }
+#sx-loot-filter-modal .sx-lf-section-count { font-size: 14px; color: #cdbf95; }
+
+/* Rows and toggles */
+#sx-mass-sell-modal .sx-mass-sell-row,
+#sx-mass-sell-modal .sx-ms-toggle,
+#sx-loot-filter-modal .sx-lf-toggle {
+    font-size: 15px;
+    padding: 6px 10px;
+    color: #f3e6c8;
+    background: rgba(8, 6, 16, 0.4);
+    border: 1px solid rgba(240, 225, 180, 0.12);
+}
+#sx-mass-sell-modal .sx-mass-sell-rarities { gap: 5px; }
+#sx-mass-sell-modal .sx-mass-sell-row:hover { background: rgba(255, 255, 255, 0.07); border-color: var(--rar, #c8a84b); }
+#sx-mass-sell-modal .sx-ms-toggle:hover,
+#sx-loot-filter-modal .sx-lf-toggle:hover { background: rgba(200, 168, 75, 0.12); border-color: rgba(200, 168, 75, 0.5); }
+#sx-mass-sell-modal .sx-mass-sell-keep-hint { font-size: 12px; opacity: 0.75; }
+#sx-mass-sell-modal .sx-ms-toggle-gold span,
+#sx-loot-filter-modal .sx-lf-toggle-gold span { color: #ffd35a; }
+
+/* Gold checkboxes */
+#sx-mass-sell-modal .sx-ms-check,
+#sx-loot-filter-modal .sx-lf-check {
+    width: 18px;
+    height: 18px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid #8a7a4a;
+}
+#sx-mass-sell-modal .sx-ms-check:hover,
+#sx-loot-filter-modal .sx-lf-check:hover { border-color: #f3dc9a; }
+#sx-mass-sell-modal .sx-ms-check:checked,
+#sx-loot-filter-modal .sx-lf-check:checked {
+    background: #c8a84b;
+    border-color: #f3dc9a;
+    box-shadow: 0 0 7px rgba(255, 200, 80, 0.55);
+}
+#sx-mass-sell-modal .sx-ms-check:checked::after,
+#sx-loot-filter-modal .sx-lf-check:checked::after { font-size: 13px; color: #1c1408; }
+
+/* Fields */
+#sx-mass-sell-modal .sx-ms-field > label,
+#sx-loot-filter-modal .sx-lf-field > label { font-size: 9px; color: #cdbf95; }
+#sx-mass-sell-modal .sx-ms-field input[type="number"],
+#sx-loot-filter-modal .sx-lf-field select,
+#sx-loot-filter-modal .sx-lf-field input[type="number"] {
+    font-size: 15px;
+    padding: 6px 9px;
+    color: #ffe9a8;
+    background: rgba(8, 6, 16, 0.75);
+    border: 1px solid #8a7a4a;
+    border-radius: 2px;
+}
+#sx-loot-filter-modal .sx-lf-field select { color: #f3e6c8; }
+#sx-mass-sell-modal .sx-ms-field input[type="number"]:focus,
+#sx-loot-filter-modal .sx-lf-field select:focus,
+#sx-loot-filter-modal .sx-lf-field input[type="number"]:focus {
+    border-color: #f3dc9a;
+    box-shadow: 0 0 7px rgba(255, 200, 80, 0.35);
+}
+#sx-mass-sell-modal .sx-ms-zero-hint,
+#sx-loot-filter-modal .sx-lf-zero-hint { font-size: 12px; color: #cdbf95; opacity: 1; }
+
+/* Loot filter rule cards */
+#sx-loot-filter-modal .sx-lf-rule {
+    background: rgba(8, 6, 16, 0.55);
+    border: 1px solid rgba(240, 225, 180, 0.22);
+    border-left: 3px solid #c8a84b;
+    border-radius: 3px;
+    padding: 10px 12px 12px;
+}
+#sx-loot-filter-modal .sx-lf-rule.sx-lf-rule-off { border-left-color: #5a5468; }
+#sx-loot-filter-modal .sx-lf-rule-title { font-size: 11px; color: #f3dc9a; }
+#sx-loot-filter-modal .sx-lf-rule-del { width: 26px; height: 26px; font-size: 11px; opacity: 0.9; }
+#sx-loot-filter-modal .sx-lf-empty {
+    font-size: 14px;
+    color: #cdbf95;
+    background: rgba(8, 6, 16, 0.4);
+    border: 1px dashed rgba(240, 225, 180, 0.3);
+}
+#sx-loot-filter-modal .sx-lf-add {
+    font-size: 11px;
+    padding: 12px;
+    color: #f3dc9a;
+    background: rgba(200, 168, 75, 0.06);
+    border: 1px dashed #8a7a4a;
+    border-radius: 2px;
+}
+#sx-loot-filter-modal .sx-lf-add:hover {
+    border-color: #f3dc9a;
+    background: rgba(200, 168, 75, 0.15);
+    box-shadow: 0 0 10px rgba(255, 200, 80, 0.25);
+}
+
+/* Footers */
+#sx-mass-sell-modal .sx-ms-foot,
+#sx-loot-filter-modal .sx-lf-foot,
+#sx-crafting-bench-overlay .sx-craft-footer {
+    background: transparent;
+    border-top: 1px solid rgba(240, 225, 180, 0.28);
+    padding: 12px 6px 4px;
+}
+#sx-mass-sell-modal .sx-mass-sell-preview,
+#sx-loot-filter-modal .sx-lf-preview {
+    font-size: 15px;
+    color: #f3e6c8;
+    text-shadow: 0 1px 3px #000;
+}
+#sx-mass-sell-modal .sx-ms-n-keep,
+#sx-loot-filter-modal .sx-lf-n-keep { color: #7ee2a0; font-weight: 700; }
+#sx-mass-sell-modal .sx-ms-n-sell,
+#sx-loot-filter-modal .sx-lf-n-vendor { color: #ffb066; font-weight: 700; }
+
+/* Stone buttons (hover re-asserts the texture - base rules reset `background`) */
+#sx-mass-sell-modal .sx-mass-sell-btn,
+#sx-loot-filter-modal .sx-lf-btn,
+#sx-crafting-bench-overlay .sx-craft-apply {
+    min-width: 150px;
+    padding: 16px 28px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-weight: 400;
+    color: #f0d98a;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
+    border: none;
+    border-radius: 0;
+    background: url('../../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+}
+#sx-mass-sell-modal .sx-mass-sell-btn:hover,
+#sx-loot-filter-modal .sx-lf-btn:hover,
+#sx-crafting-bench-overlay .sx-craft-apply:not(:disabled):hover {
+    border: none;
+    color: #fff3c4;
+    background: url('../../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+    filter: brightness(1.28);
+    box-shadow: none;
+}
+#sx-mass-sell-modal .sx-mass-sell-btn.sx-mass-sell-save,
+#sx-loot-filter-modal .sx-lf-btn.sx-lf-save,
+#sx-crafting-bench-overlay .sx-craft-apply {
+    color: #ffe9a8;
+    font-weight: 400;
+    filter: drop-shadow(0 0 8px rgba(255, 190, 70, 0.5));
+}
+#sx-mass-sell-modal .sx-mass-sell-btn.sx-mass-sell-save:hover,
+#sx-loot-filter-modal .sx-lf-btn.sx-lf-save:hover {
+    filter: brightness(1.25) drop-shadow(0 0 10px rgba(255, 190, 70, 0.7));
+    box-shadow: none;
+}
+#sx-crafting-bench-overlay .sx-craft-apply:disabled {
+    opacity: 0.5;
+    color: #a89978;
+    filter: grayscale(0.6);
+    background: url('../../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+}
+/* Destructive confirm button: red-tinted glow */
+#sx-mass-sell-modal .sx-mass-sell-btn.sx-mass-sell-confirm {
+    width: auto;  /* the base `.sx-mass-sell-confirm` panel width also matches this button */
+    color: #ffc0b0;
+    background: url('../../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+    filter: drop-shadow(0 0 9px rgba(255, 70, 50, 0.65));
+}
+#sx-mass-sell-modal .sx-mass-sell-btn.sx-mass-sell-confirm:hover {
+    color: #fff;
+    filter: brightness(1.2) drop-shadow(0 0 12px rgba(255, 70, 50, 0.9));
+    box-shadow: none;
+}
+#sx-mass-sell-modal .sx-mass-sell-btns,
+#sx-loot-filter-modal .sx-lf-btns { gap: 14px; flex-wrap: wrap; }
+
+/* Mass sell confirm: the sentence is the star */
+#sx-mass-sell-modal .sx-ms-confirm-body { padding: 14px 8px 4px; gap: 18px; }
+#sx-mass-sell-modal .sx-mass-sell-confirm-text {
+    font-size: 18px;
+    line-height: 1.55;
+    color: #f3e6c8;
+    text-shadow: 0 1px 3px #000;
+    padding: 14px 16px;
+    background: rgba(8, 6, 16, 0.55);
+    border: 1px solid rgba(240, 225, 180, 0.22);
+    border-radius: 3px;
+}
+
+/* ── Crafting bench ─────────────────────────────────────────────────── */
+#sx-crafting-bench-overlay .sx-craft-bench-item,
+#sx-crafting-bench-overlay .sx-craft-ilvl,
+#sx-crafting-bench-overlay .sx-craft-capacity,
+#sx-crafting-bench-overlay .sx-craft-legend {
+    background: rgba(8, 6, 16, 0.55);
+    border: 1px solid rgba(240, 225, 180, 0.22);
+    border-radius: 3px;
+}
+#sx-crafting-bench-overlay .sx-craft-ilvl { font-size: 11px; color: #f3dc9a; }
+#sx-crafting-bench-overlay .sx-craft-capacity { font-size: 11px; color: #e8dcb8; }
+#sx-crafting-bench-overlay .sx-craft-capacity-bar { height: 8px; border-color: #8a7a4a; }
+#sx-crafting-bench-overlay .sx-craft-capacity-fill { background: linear-gradient(90deg, #c8a84b, #ffd35a); }
+#sx-crafting-bench-overlay .sx-craft-legend { font-size: 10px; color: #e8dcb8; }
+#sx-crafting-bench-overlay .sx-crafting-slot {
+    font-size: 9px;
+    color: #cdbf95;
+    border: 1px dashed #8a7a4a;
+    background: rgba(8, 6, 16, 0.4);
+}
+#sx-crafting-bench-overlay .sx-craft-drop-active { border-color: #f3dc9a !important; background: rgba(200, 168, 75, 0.15) !important; }
+#sx-crafting-bench-overlay .sx-craft-empty {
+    font-size: 11px;
+    line-height: 1.7;
+    color: #cdbf95;
+    border: 1px dashed rgba(240, 225, 180, 0.3);
+    background: rgba(8, 6, 16, 0.4);
+}
+#sx-crafting-bench-overlay .sx-craft-selected-label { font-size: 11px; color: #f3dc9a; }
+
+/* Column headers: stone slabs */
+#sx-crafting-bench-overlay .sx-craft-col-head {
+    font-size: 11px;
+    padding: 9px 12px;
+    background: url('../../images/Game-Reset/Note-Banner.webp') center / 100% 100% no-repeat;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    text-shadow: 0 2px 3px #000;
+}
+#sx-crafting-bench-overlay .sx-craft-col { scrollbar-color: #8a7a4a transparent; }
+
+/* Mod family cards + tier buttons */
+#sx-crafting-bench-overlay .sx-craft-family {
+    background: rgba(8, 6, 16, 0.5);
+    border: 1px solid rgba(240, 225, 180, 0.2);
+    padding: 12px;
+}
+#sx-crafting-bench-overlay .sx-craft-family:hover { border-color: rgba(240, 225, 180, 0.5); }
+#sx-crafting-bench-overlay .sx-craft-family-badge { font-size: 8px; padding: 4px 8px; }
+#sx-crafting-bench-overlay .sx-craft-family-name { font-size: 13px; }
+#sx-crafting-bench-overlay .sx-craft-family-count { font-size: 9px; padding: 3px 8px; }
+#sx-crafting-bench-overlay .sx-craft-tier {
+    padding: 10px 12px;
+    font-size: 11px;
+    border-color: rgba(240, 225, 180, 0.18);
+    background: rgba(0, 0, 0, 0.32);
+}
+#sx-crafting-bench-overlay .sx-craft-tier .tier-range { font-size: 14px; color: #fff3d0; }
+#sx-crafting-bench-overlay .sx-craft-tier .tier-label { color: #f3dc9a; }
+#sx-crafting-bench-overlay .sx-craft-tier.ready { border-left-color: #4ade80; background: linear-gradient(90deg, rgba(74, 222, 128, 0.14), rgba(0, 0, 0, 0.28)); }
+#sx-crafting-bench-overlay .sx-craft-tier.short { border-left-color: #f87171; background: linear-gradient(90deg, rgba(248, 113, 113, 0.12), rgba(0, 0, 0, 0.3)); }
+#sx-crafting-bench-overlay .sx-craft-tier.locked { background: rgba(0, 0, 0, 0.3); }
+#sx-crafting-bench-overlay .sx-craft-tier.ready:hover,
+#sx-crafting-bench-overlay .sx-craft-tier.selected {
+    border-color: #f3dc9a;
+    border-left-color: #4ade80;
+    background: rgba(200, 168, 75, 0.2);
+    box-shadow: 0 0 0 1px rgba(243, 220, 154, 0.4), 0 0 10px rgba(255, 200, 80, 0.2);
+}
+#sx-crafting-bench-overlay .sx-craft-pill { font-size: 9px; padding: 3px 9px; }
+#sx-crafting-bench-overlay .sx-craft-chip { font-size: 11px; padding: 3px 8px 3px 6px; }
+#sx-crafting-bench-overlay .sx-craft-chip-name { font-size: 10px; color: #d6cdb0; }
+#sx-crafting-bench-overlay .sx-craft-chip-qty { font-size: 12px; }
+#sx-crafting-bench-overlay .sx-craft-chip-icon { font-size: 15px; }
+#sx-crafting-bench-overlay .sx-craft-apply { width: auto; align-self: center; min-width: 260px; }
+
+/* Hub launcher button */
+.sx-crafting-launcher { background: transparent; border-top: 1px solid rgba(240, 225, 180, 0.2); }
+.sx-crafting-open-btn {
+    padding: 14px 8px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #f0d98a;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
+    border: none;
+    border-radius: 0;
+    background: url('../../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+}
+.sx-crafting-open-btn:hover {
+    color: #fff3c4;
+    border: none;
+    box-shadow: none;
+    background: url('../../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+    filter: brightness(1.28);
+}

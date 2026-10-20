@@ -457,7 +457,10 @@ export function _getCompareItems(item) {
 // unless the hovered item IS an equipped one.
 export function _updateCompareTooltip() {
     const hovered = globalThis._tooltipItem;
-    const compareItems = (hovered && (_altDown || _autoCompareOn()))
+    // Shop previews (id ends in _preview) compare only while Alt is held: the
+    // auto-compare pop-up beside every card is just noise when browsing.
+    const shopPreview = !!(hovered && /_preview$/.test(String(hovered.id || '')));
+    const compareItems = (hovered && (_altDown || (_autoCompareOn() && !shopPreview)))
         ? _getCompareItems(hovered)
         : [];
 
