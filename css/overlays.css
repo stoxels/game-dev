@@ -808,3 +808,10 @@ body.question-modal-open #player-avatar-simple {
 @media (min-height: 800px) and (min-width: 1200px) {
     #ov-win .ov-ca { zoom: 1; }
 }
+
+/* hover must keep the stone texture (the old .ob hover rules reset `background`) */
+.ob:hover, .ob.p:hover, .ob.y:hover, .ob.s:hover {
+    background: url('../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+}
+/* room for the full "Projectiles" label in the win-screen damage bars */
+#ov-win .rs-col .rs-kind { grid-template-columns: 112px minmax(0, 1fr) 42px; }
