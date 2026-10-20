@@ -24,7 +24,7 @@ import { Audio_Manager } from '../../js/audio/audio.js';
 import { T } from '../../js/translation/translations-strings.js';
 import { getActiveDictionary, t, updateLangButtons, stripTitleButtonIcon, applyTranslationsToDOM, updateTitleExpansionLogos, setLang } from '../../js/translation/translations.js';
 import { ACHIEVEMENT_DEFS } from '../../js/achievements/achievements-data.js';
-import { ACH_STATE, _doResetAchievements, checkWorldCompleteAch, onLevelCompleteAch, saveAchState, setAchStat, showResetAchievementsModal, trackAchStat } from '../../js/achievements/achievements.js';
+import { ACH_STATE, _doResetAchievements, checkWorldCompleteAch, onLevelCompleteAch, saveAchState, setAchStat, showResetAchievementsModal, trackAchStat, trackAchUnique } from '../../js/achievements/achievements.js';
 import { SAVE_SLOT_COUNT, _migrateAscendencyFields, _migrateCharmFields, _migrateClassFields, _migrateCoreFields, _migrateEndgameFields, _migratePassiveTreeFields, _resetLevelFlags, buildFreshState, beginPassiveTreeCharacterPreview, endPassiveTreeCharacterPreview, getActiveSlot, getPassiveTreeCharacterRootId, getSlotName, getSlotSummary, initState, loadRawSaveFromSlot, loadStateFromSlot, migrateOldSave, reconcilePassiveTreeForClass, save, setActiveSlot, setSlotName, wipeSlot } from '../../js/state.js';
 import { _applyLowHealthVignette, _applyLowTimeVignette, _calcEmergencyScanDuration, _egClearCenterGridBanners, _resetLowTimeWarningState, _trackTimerDelta, resumeTimer, timerInterval, timesUp, updTimer } from '../../js/timer/timer.js';
 import { addTimeSecs, previewGainSecs, setTimeSecs, subtractTimeSecs } from '../../js/timer/timer-adjust.js';
@@ -845,6 +845,7 @@ try { Object.defineProperty(globalThis, "executeActiveAbility", { get() { return
 try { Object.defineProperty(globalThis, "finishQuiz", { get() { return finishQuiz; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "finishTutorial", { get() { return finishTutorial; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "gainMana", { get() { return gainMana; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "getActiveTitleName", { get() { return getActiveTitleName; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getAvatarLastMoveDir", { get() { return getAvatarLastMoveDir; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getCharmArtForSkill", { get() { return getCharmArtForSkill; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getCharmByKey", { get() { return getCharmByKey; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

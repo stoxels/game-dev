@@ -18,6 +18,7 @@
 // the other combat modules reach through globalThis (no import cycles).
 import { t } from '../translation/translations.js';
 import { _egAddGold } from '../loot/loot-gold.js';
+import { trackAchStat, setAchStat } from '../achievements/achievements.js';
 
 (function () {
     const MAX_SAMPLES = 3000;
@@ -52,6 +53,43 @@ import { _egAddGold } from '../loot/loot-gold.js';
         };
     }
 
+    // ── Achievement feed (category "combat") ──────────────────────────
+    // Hits arrive many times a second, but every trackAchStat call rewrites
+    // the achievement save, so counters are collected here and flushed in
+    // one go after a short quiet period (and when the page is hidden).
+    // Achievements are global across save slots, unlike the per-run record.
+    const achCounts = {};
+    let achBiggestHit = 0;
+    let achFlushTimer = null;
+
+    function flushAch() {
+        achFlushTimer = null;
+        for (const key of Object.keys(achCounts)) {
+            const n = achCounts[key];
+            delete achCounts[key];
+            if (n > 0) trackAchStat(key, n);
+        }
+        if (achBiggestHit > 0) setAchStat('combatBiggestHit', achBiggestHit);
+    }
+    function achAdd(key, n) {
+        achCounts[key] = (achCounts[key] || 0) + n;
+        if (!achFlushTimer) achFlushTimer = setTimeout(flushAch, 2000);
+    }
+    if (typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => { if (document.hidden) flushAch(); });
+    }
+
+    // Fight finished in victory: untouched / clutch wins. Idempotent per run
+    // (the win panel can be rendered more than once for the same fight).
+    function achFightWon(d) {
+        if (!d || d.achWon || d.dealtCount === 0) return;
+        d.achWon = true;
+        if (d.hitsTaken === 0) trackAchStat('combatUntouchedWins', 1);
+        const hp = Number(globalThis.playerCurrentHP);
+        const max = Number(globalThis.playerMaxHP);
+        if (hp > 0 && max > 0 && hp / max < 0.1) trackAchStat('combatClutchWins', 1);
+    }
+
     let data = null;
     function ensure() {
         const key = currentKey();
@@ -79,6 +117,12 @@ import { _egAddGold } from '../loot/loot-gold.js';
         k.n++;
         k.sum += dmg;
         if (opts && opts.isCrit) k.crits++;
+
+        achAdd('combatDamageDealt', dmg);
+        if (dmg > achBiggestHit) { achBiggestHit = dmg; if (!achFlushTimer) achFlushTimer = setTimeout(flushAch, 2000); }
+        if (hitKind(opts) === 'melee') achAdd('combatMeleeHits', 1);
+        else if (hitKind(opts) === 'projectile') achAdd('combatProjectileHits', 1);
+        else if (hitKind(opts) === 'spell') achAdd('combatSpellHits', 1);
     }
 
     // Where a player hit came from, read from the tags the damage pipeline
@@ -99,7 +143,7 @@ import { _egAddGold } from '../loot/loot-gold.js';
         if (p <= 0) return;
         const d = ensure();
         d.critTrials++;
-        if (isCrit) d.crits++;
+        if (isCrit) { d.crits++; achAdd('combatCrits', 1); }
         d.critExp += p;
         d.critVar += p * (1 - p);
     }
@@ -110,6 +154,7 @@ import { _egAddGold } from '../loot/loot-gold.js';
         const d = ensure();
         d.hitsTaken++;
         d.dmgTaken += dmg;
+        achAdd('combatDamageTaken', dmg);
         const key = label || 'other';
         d.sources[key] = (d.sources[key] || 0) + dmg;
         // Ring buffer for the defeat screen's "last hits" log.
@@ -121,6 +166,9 @@ import { _egAddGold } from '../loot/loot-gold.js';
         const d = ensure();
         const k = (kind === 'dodge' || kind === 'block' || kind === 'parry') ? kind : 'other';
         d.avoided[k]++;
+        if (k === 'dodge') achAdd('combatDodges', 1);
+        else if (k === 'block') achAdd('combatBlocks', 1);
+        else if (k === 'parry') achAdd('combatParries', 1);
     }
 
     // Source label for a hit on the player (monster name, boss ability, ...).
@@ -449,6 +497,7 @@ import { _egAddGold } from '../loot/loot-gold.js';
         const lose = kind === 'lose' || kind === 'map-lose';
         const isMap = kind === 'map-win' || kind === 'map-lose';
 
+        if (kind === 'win' || kind === 'map-win') achFightWon(peek());
         if (kind === 'win') { injectStyles(); renderWinColumns(peek()); return; }
 
         let anchor = null;

@@ -544,17 +544,33 @@
 #screen-world-detail .tb-gold {
     margin-left: auto;
     flex: 0 0 auto;
-    padding: clamp(3px, 0.4vw, 6px) clamp(6px, 0.9vw, 16px);
+    display: inline-flex;
+    align-items: center;
+    gap: clamp(4px, 0.5vw, 8px);
+    padding: clamp(2px, 0.3vw, 5px) clamp(8px, 1vw, 16px) clamp(2px, 0.3vw, 5px) clamp(4px, 0.5vw, 8px);
     font-family: var(--PX, monospace);
-    font-size: clamp(9px, 1.05vw, 15px);
+    font-size: clamp(10px, 1.15vw, 17px);
     letter-spacing: 1px;
     white-space: nowrap;
-    color: #ffd86b;
-    text-shadow: 1px 1px 2px #000, 0 0 8px rgba(255, 200, 80, 0.35);
-    background: rgba(12, 10, 18, 0.72);
-    border: 2px solid #15131a;
-    border-radius: 6px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 4px rgba(0, 0, 0, 0.5);
+    color: #ffe08a;
+    text-shadow: 0 1px 0 #3a1f05, 0 0 8px rgba(255, 190, 60, 0.5);
+    /* Warm engraved plate with a gold rim - no black box behind the coin. */
+    background: linear-gradient(180deg, rgba(92, 62, 28, 0.9), rgba(52, 33, 14, 0.9));
+    border: 2px solid #c8982a;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px rgba(255, 226, 150, 0.35),
+                inset 0 2px 5px rgba(0, 0, 0, 0.45),
+                0 0 8px rgba(200, 150, 40, 0.4),
+                0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.tb-gold .tb-gold-icon {
+    width: clamp(26px, 3vw, 44px);
+    height: clamp(26px, 3vw, 44px);
+    margin: calc(-1 * clamp(5px, 0.6vw, 9px)) 0;   /* overhang the plate a little */
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+    image-rendering: auto;
 }
 
 #screen-map-view .tb-gold:empty,

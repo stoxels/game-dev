@@ -115,6 +115,7 @@ export function _egKillMonster(monsterId) {
     // Endgame achievements - combat
     if (typeof trackAchStat === 'function') try {
         if (dying && !dying.isBoss) trackAchStat('egMonstersSlain', 1);
+        if (dying && Number(dying.level) > 0 && typeof setAchStat === 'function') setAchStat('combatHighestMonsterLevel', Number(dying.level));
         if (dying && dying.isBoss) {
             trackAchStat('egBossKills', 1);
             // Track distinct boss types slain: maintain a set in ACH_STATE

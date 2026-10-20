@@ -102,6 +102,41 @@
     pointer-events: none;
 }
 
+/* Equipped title: engraved gold-on-dark lettering under the name image,
+   with flanking rules so it reads as part of the name plate. */
+.setup-char-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 100%;
+    margin-top: -2px;
+    font-family: var(--C);
+    font-weight: 700;
+    font-size: clamp(15px, 1.8vw, 22px);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: #5a3200;
+    text-shadow: 0 1px 0 rgba(255, 240, 200, 0.7), 0 0 6px rgba(255, 200, 80, 0.45);
+    pointer-events: none;
+}
+
+.setup-char-title:empty {
+    display: none;
+}
+
+.setup-char-title::before,
+.setup-char-title::after {
+    content: '';
+    width: clamp(18px, 3vw, 44px);
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #8a5a00);
+}
+
+.setup-char-title::after {
+    background: linear-gradient(270deg, transparent, #8a5a00);
+}
+
 .setup-char-portrait {
     width: 210px;
     max-height: 168px;

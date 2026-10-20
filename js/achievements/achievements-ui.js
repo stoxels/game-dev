@@ -23,6 +23,8 @@ const ACH_CATEGORIES = [
     { key: 'items', icon: '🎁', labelEn: 'Items & Inventory', labelDE: 'Items & Inventar' },
     { key: 'quiz', icon: '🧠', labelEn: 'Quiz & Exercises', labelDE: 'Quiz & Aufgaben' },
     { key: 'class', icon: '🔮', labelEn: 'Classes & Abilities', labelDE: 'Klassen & Fähigkeiten' },
+    { key: 'tree', icon: '🌳', labelEn: 'Probability Tree', labelDE: 'Wahrscheinlichkeitsbaum' },
+    { key: 'combat', icon: '🗡️', labelEn: 'Combat', labelDE: 'Kampf' },
     { key: 'inference', icon: '🔍', labelEn: 'Inference', labelDE: 'Inferenz' },
     { key: 'endgame', icon: '⚔️', labelEn: 'Endgame', labelDE: 'Endgame' },
 ];
@@ -48,6 +50,9 @@ const ACH_CATEGORY_ASSETS = {
     items:      { img: 'images/Achievement_Screen/Achievements_Category_ItemsInventory.webp',   glow: '#5ad8ff' },
     quiz:       { img: 'images/Achievement_Screen/Achievements_Category_QuizExcercises.webp',   glow: '#5ad8ff' },
     class:      { img: 'images/Achievement_Screen/Achievements_Category_ClassesAbilities.webp', glow: '#7ef29a' },
+    tree:       { img: 'images/Achievement_Screen/Achievements_Category_ProbabilityTree.webp',  glow: '#7ef29a' },
+    // Combat has no artwork of its own yet - it borrows the weapons picture.
+    combat:     { img: 'images/Achievement_Screen/Achievements_Category_ClassesAbilities.webp', glow: '#ff9f43' },
     inference:  { img: 'images/Achievement_Screen/Achievements_Category_Inference.webp',        glow: '#ffc857' },
     endgame:    { img: 'images/Achievement_Screen/Achievements_Category_Endgame.webp',          glow: '#c07bff' },
 };
@@ -296,7 +301,7 @@ function _buildCardHtml(def, lang) {
     return `
         <div class="${cardClass}">
             <div class="ach-card-top">
-                <span class="ach-card-icon">${def.icon}</span>
+                <span class="ach-card-icon"><span class="ach-card-icon-glyph">${def.icon}</span></span>
                 <div class="ach-card-info">
                     <div class="ach-card-name">${name}</div>
                     <div class="ach-card-desc">${desc}</div>
@@ -431,15 +436,17 @@ function _buildOverviewFixedHeaderHtml(lang) {
     const pct = _calcProgressPct(unlockedTiers, totalTiers);
 
     return `
-        <div class="ach-total-banner">
-            <span class="ach-total-banner-label"><span class="ach-total-banner-label-text">${t('scr_ach_total_milestones')}</span></span>
-            <span class="ach-total-banner-value">${unlockedTiers.toLocaleString()} / ${totalTiers.toLocaleString()}</span>
-            <span class="ach-total-banner-pct">${pct}%</span>
-            <div class="ach-total-banner-bar">
-                <div class="ach-total-banner-bar-inner" style="width:${pct}%"></div>
+        <div class="ach-ov-head">
+            <div class="ach-ov-head-row">
+                <span class="ach-ov-caption">${t('scr_ach_category_overview')}</span>
+                <span class="ach-ov-total">
+                    <span class="ach-ov-total-label">${t('scr_ach_total_milestones')}</span>
+                    <span class="ach-ov-total-value">${unlockedTiers.toLocaleString()} / ${totalTiers.toLocaleString()}</span>
+                    <span class="ach-ov-total-pct">${pct}%</span>
+                </span>
             </div>
-        </div>
-        <div class="ach-overview-caption">${t('scr_ach_category_overview')}</div>`;
+            <div class="ach-ov-bar"><div class="ach-ov-bar-fill" style="width:${pct}%"></div></div>
+        </div>`;
 }
 
 // _buildCategoryGridHtml - the scrolling part of the overview: a responsive
@@ -476,27 +483,22 @@ function _buildCategoryCardHtml(cat, defs, lang) {
         <div class="ach-cat-card ${isComplete ? 'complete' : ''}"
              role="button" tabindex="0" data-cat="${cat.key}"
              style="--cat-glow: ${glow}">
-            <div class="ach-cat-card-banner">
-                <img class="ach-cat-card-banner-img" src="images/Achievement_Screen/Achievements_Category_Header.webp" alt="">
+            <div class="ach-cat-card-art"${bodyStyle}>
                 <span class="ach-cat-card-title">${catLabel}</span>
+                <span class="ach-cat-card-pct">${pct}%</span>
             </div>
-            <div class="ach-cat-card-body"${bodyStyle}>
-                <div class="ach-cat-card-rows">
-                    <div class="ach-cat-card-row">
-                        <span class="ach-cat-card-row-label">${t('qa_ach_completed')}:</span>
-                        <span class="ach-cat-card-row-value">${unlockedAchs} / ${totalAchs}</span>
-                    </div>
-                    <div class="ach-cat-card-row">
-                        <span class="ach-cat-card-row-label">${t('qa_ach_milestones')}:</span>
-                        <span class="ach-cat-card-row-value">${unlockedTiers} / ${totalTiers}</span>
-                    </div>
+            <div class="ach-cat-card-stats">
+                <div class="ach-cat-card-stat">
+                    <span class="ach-cat-card-stat-value">${unlockedAchs} / ${totalAchs}</span>
+                    <span class="ach-cat-card-stat-label">${t('qa_ach_completed')}</span>
+                </div>
+                <div class="ach-cat-card-stat">
+                    <span class="ach-cat-card-stat-value">${unlockedTiers} / ${totalTiers}</span>
+                    <span class="ach-cat-card-stat-label">${t('qa_ach_milestones')}</span>
                 </div>
             </div>
-            <div class="ach-cat-card-footer">
-                <div class="ach-cat-card-bar-outer">
-                    <div class="ach-cat-card-bar-inner" style="width:${pct}%"></div>
-                </div>
-                <span class="ach-cat-card-pct">${pct}% ${t('scr_ach_pct_complete')}</span>
+            <div class="ach-cat-card-bar-outer">
+                <div class="ach-cat-card-bar-inner" style="width:${pct}%"></div>
             </div>
         </div>`;
 }
@@ -521,11 +523,11 @@ function _buildCategoryDetailHtml(catKey, lang) {
     return `
         <div class="ach-cat-detail" style="--cat-glow: ${glow}">
             <div class="ach-cat-detail-topbar">
-                <button class="ach-cat-back-btn back-btn" id="btn-ach-cat-back">${t('btn_back')}</button>
-                <span class="ach-cat-detail-count">${unlockedTiers} / ${totalTiers} - ${pct}%</span>
-            </div>
-            <div class="ach-cat-detail-bar-outer">
-                <div class="ach-cat-detail-bar-inner" style="width:${pct}%"></div>
+                <button class="ach-cat-back-btn" id="btn-ach-cat-back">${t('btn_back')}</button>
+                <div class="ach-cat-detail-bar-outer">
+                    <div class="ach-cat-detail-bar-inner" style="width:${pct}%"></div>
+                </div>
+                <span class="ach-cat-detail-count">${unlockedTiers} / ${totalTiers} · ${pct}%</span>
             </div>
             <div class="ach-grid">${cardsHtml}</div>
         </div>`;

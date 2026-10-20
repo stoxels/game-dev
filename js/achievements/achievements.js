@@ -53,6 +53,7 @@ function migrateAchState(s) {
     if (!s) s = {}; // tolerate null/undefined (corrupt or absent save)
     if (!s.stats) s.stats = {};
     if (!s.unlocked) s.unlocked = [];
+    if (!s.uniques) s.uniques = {};
     return s;
 }
 
@@ -82,6 +83,20 @@ export function trackAchStat(stat, amount = 1) {
     if (typeof _cur !== 'undefined' && _cur && _cur.isTutorialQuest) return;
     if (!ACH_STATE.stats[stat]) ACH_STATE.stats[stat] = 0;
     ACH_STATE.stats[stat] += amount;
+    saveAchState();
+    checkAchievements();
+}
+
+// trackAchUnique - counts DISTINCT things (keystones tried, wheels completed...)
+//   across every save slot and every session: remembers `key` under `stat` in
+//   ACH_STATE.uniques and sets the stat to how many different keys were seen.
+//   Unlike counters it cannot be farmed by repeating the same action.
+export function trackAchUnique(stat, key) {
+    if (!ACH_STATE.uniques) ACH_STATE.uniques = {};
+    const seen = ACH_STATE.uniques[stat] || (ACH_STATE.uniques[stat] = []);
+    if (seen.includes(key)) return;
+    seen.push(key);
+    ACH_STATE.stats[stat] = seen.length;
     saveAchState();
     checkAchievements();
 }

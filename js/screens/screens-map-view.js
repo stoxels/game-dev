@@ -1798,7 +1798,10 @@ export function _renderTopBarScore(p = 'mv') {
     // Gold balance pill (between the title plaque and the button grid) is
     // refreshed together with the score - both top bars call this on build.
     const goldEl = document.getElementById(p + '-gold-balance');
-    if (goldEl) goldEl.textContent = '🪙 ' + Math.max(0, Math.round(Number(STATE && STATE.egGold) || 0)).toLocaleString();
+    if (goldEl) {
+        const gold = Math.max(0, Math.round(Number(STATE && STATE.egGold) || 0));
+        goldEl.innerHTML = `<img class="tb-gold-icon" src="images/items/pickups/pickups/pickup_gold.webp" alt=""><span class="tb-gold-num">${gold.toLocaleString()}</span>`;
+    }
 }
 
 /**

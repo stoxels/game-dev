@@ -1022,6 +1022,12 @@ export function _updateSetupScreenCharacter() {
     const nameImg = document.getElementById('setup-char-name-img');
     if (nameImg) nameImg.src = _getSetupCharNameImage();
 
+    // The equipped score title (js/titles.js) sits under the name image.
+    const titleEl = document.getElementById('setup-char-title');
+    if (titleEl) {
+        titleEl.textContent = typeof globalThis.getActiveTitleName === 'function' ? globalThis.getActiveTitleName() : '';
+    }
+
     const portraitImg = document.getElementById('setup-char-portrait');
     if (portraitImg) portraitImg.src = _getPlayerCharacterImage();
 }

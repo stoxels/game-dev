@@ -1,5 +1,5 @@
 import { Audio_Manager } from '../audio/audio.js';
-import { setAchStat, trackAchStat } from '../achievements/achievements.js';
+import { setAchStat, trackAchStat, trackAchUnique } from '../achievements/achievements.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { TALENT_TREE_DATA } from './probability-tree-data.js';
@@ -511,20 +511,79 @@ export function _ptTrackOuterRimCount(allocatedKeys) {
     setAchStat('treeOuterRimNodes', count);
 }
 
+// ---- Passive-tree achievements (category "tree") ----------------------
+// Achievement progress is GLOBAL (all save slots, all sessions) while the
+// allocation itself is per save slot, so nothing here counts raw clicks -
+// respeccing is free, and click counters would be trivially farmable.
+// Instead: "peak" stats (best number allocated at once, kept by setAchStat's
+// monotonic max) and "unique" stats (distinct nodes / wheels ever reached,
+// kept by trackAchUnique). Both survive deleting a save slot.
+const PT_GOD_NODE_IDS = new Set([55, 72, 88]);
+const PT_CLASS_EXTENSION_FIRST = 41001;   // 30 class-wheel extension notables
+const PT_CLASS_EXTENSION_LAST = 41030;
+const PT_ASCENDENCY_FIRST = 41031;        // 6 ascendency wheels x 8 notables
+const PT_ASCENDENCY_WHEELS = 6;
+const PT_ASCENDENCY_WHEEL_SIZE = 8;
+
+let _ptNodeIndex = null;
+function _ptNodeById(id) {
+    if (!_ptNodeIndex) {
+        _ptNodeIndex = new Map();
+        for (const node of TALENT_TREE_DATA.nodes) _ptNodeIndex.set(Number(node.id), node);
+    }
+    return _ptNodeIndex.get(Number(id));
+}
+
+function _ptIsRegularKeystone(node) {
+    return !!node && node.tier === 'keystone' && !PT_GOD_NODE_IDS.has(Number(node.id));
+}
+
+// Best-so-far counts of what is allocated right now.
+function _ptTrackPeakCounts(alloc) {
+    let nodes = 0, notables = 0, keystones = 0, travel = 0, extension = 0;
+    for (const id of alloc) {
+        const node = _ptNodeById(id);
+        if (!node || node.tier === 'start') continue;
+        nodes++;
+        if (node.tier === 'notable') notables++;
+        else if (node.tier === 'travel') travel++;
+        else if (_ptIsRegularKeystone(node)) keystones++;
+        if (id >= PT_CLASS_EXTENSION_FIRST && id <= PT_CLASS_EXTENSION_LAST) extension++;
+    }
+    setAchStat('treeNodesPeak', nodes);
+    setAchStat('treeNotablesPeak', notables);
+    setAchStat('treeKeystonesPeak', keystones);
+    setAchStat('treeTravelPeak', travel);
+    setAchStat('treeWheelExtensionPeak', extension);
+}
+
+// Distinct things ever reached: the node just allocated, and any wheel it completed.
+function _ptTrackUniqueReaches(nodeId, alloc) {
+    const node = _ptNodeById(nodeId);
+    if (node && node.tier === 'notable') trackAchUnique('treeNotablesUnique', Number(nodeId));
+    if (_ptIsRegularKeystone(node)) trackAchUnique('treeKeystonesUnique', Number(nodeId));
+    if (PT_GOD_NODE_IDS.has(Number(nodeId))) trackAchUnique('treeGodsUnique', Number(nodeId));
+
+    // Class wheels: all 18 nodes of the Stox / Trix / Syla circle.
+    const keys = _ptGetAllAllocatedStatKeys();
+    [PT_BRANCH_STATISTICIAN, PT_BRANCH_MATHMAGICIAN, PT_BRANCH_PROBABILIST].forEach((wheel, i) => {
+        if ([...wheel].every(k => keys.has(k))) trackAchUnique('treeBranchesUnique', i);
+    });
+
+    // Ascendency wheels: eight consecutive notables each.
+    for (let w = 0; w < PT_ASCENDENCY_WHEELS; w++) {
+        const first = PT_ASCENDENCY_FIRST + w * PT_ASCENDENCY_WHEEL_SIZE;
+        let complete = true;
+        for (let i = 0; i < PT_ASCENDENCY_WHEEL_SIZE && complete; i++) complete = alloc.has(first + i);
+        if (complete) trackAchUnique('treeAscendWheelsUnique', w);
+    }
+}
+
 // Master dispatcher - runs all achievement checks after a node is allocated.
-// Requires trackAchStat to be available; bails silently if it is not.
 export function _ptTrackAllocationAchievements(nodeId, alloc) {
     if (typeof trackAchStat !== 'function') return;
-
-    const statKey = _ptGetSkillStatKey(nodeId);
-    const allocatedKeys = _ptGetAllAllocatedStatKeys();
-
-    _ptTrackSimpleAchievements(statKey);
-    _ptTrackGodNodeAchievements(statKey);
-    _ptTrackKeystoneAchievements(alloc);
-    _ptTrackBranchCompletions(allocatedKeys);
-    _ptTrackClusterCompletions(allocatedKeys);
-    _ptTrackOuterRimCount(allocatedKeys);
+    _ptTrackPeakCounts(alloc);
+    _ptTrackUniqueReaches(nodeId, alloc);
 }
 
 
@@ -548,9 +607,6 @@ export function _ptHandleDeallocation(id, alloc) {
     save();
     _ptRefreshAllStyles(_ptAffectedNodeIds([id]));
 
-    if (typeof trackAchStat === 'function') {
-        trackAchStat('treeNodesDeallocated');
-    }
     return true;
 }
 
@@ -595,11 +651,8 @@ export function _ptRefundAllPoints() {
     _ptRefreshAllStyles(_ptAffectedNodeIds(refundable));
     _ptRefreshPointsDisplay();
 
-    if (typeof trackAchStat === 'function') {
-        for (let i = 0; i < refundable.length; i++) {
-            trackAchStat('treeNodesDeallocated');
-        }
-    }
+    // Only a real rebuild counts (5+ nodes), not undoing a misclick.
+    if (refundable.length >= 5 && typeof trackAchStat === 'function') trackAchStat('treeRespecs');
 }
 
 // Entry point called when the player clicks any passive tree node.

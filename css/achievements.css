@@ -141,43 +141,42 @@
         transform: scale(1.06);
     }
 
-/* FOOTER STRIP - reset button centered on the parchment's bottom edge. */
+/* FOOTER STRIP - a compact, flat danger button. The old stone-slab art got
+   stretched to the full frame width; a small outlined pill never distorts. */
 .ach-frame-footer {
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: clamp(6px, 1cqw, 12px);
+    margin-top: clamp(6px, 0.9cqw, 10px);
 }
 
 .ach-reset-btn {
-    font-family: var(--PX);
-    font-size: clamp(12px, 1.6cqw, 18px);
-    letter-spacing: 1px;
-    color: #8a3324;
-    background-image: url('../images/Game_Setup/Button-Block-1.webp');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-color: transparent;
-    border: none;
-    /* Full frame width: the label always sits on the art's flat middle -
-       its carved side notches (outer ~5–9% each side) stay text-free even
-       at the widest size. */
-    width: 100%;
-    padding: clamp(11px, 1.7cqw, 20px) clamp(30px, 5.5%, 62px);
+    font-family: var(--C, serif);
+    font-weight: 700;
+    font-size: clamp(11px, 1.2cqw, 14px);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8a2c1e;
+    background: rgba(255, 246, 214, 0.92);
+    border: 2px solid rgba(138, 44, 30, 0.7);
+    box-shadow: inset 0 0 0 1px rgba(255, 252, 235, 0.7), 0 2px 4px rgba(0, 0, 0, 0.3);
+    border-radius: 999px;
+    padding: 5px clamp(14px, 2cqw, 26px);
     cursor: pointer;
-    transition: transform .12s, filter .12s;
+    transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.12s;
 }
 
     .ach-reset-btn:hover {
-        filter: brightness(1.18);
-        transform: translateY(-1px);
+        background: #8a2c1e;
+        border-color: #5d1a10;
+        color: #fff4e0;
     }
 
     .ach-reset-btn:active {
-        background-image: url('../images/Game_Setup/Button-Block-2.webp');
         transform: translateY(1px);
     }
+
 
 /* Scroll panel inside the frame - the frame's inner parchment area. */
 .ach-body {
@@ -201,101 +200,79 @@
     border-radius: 6px;
 }
 
-/* Carved banner holding the grand totals above the category grid.
-   Art: the warm carved-stone banner (inference-header.png), gold serif on it.
-   Kept at the art's natural aspect (955/260, same treatment as the highscores
-   title plaque) so the carved roll ends aren't squashed - it reads as a real
-   carved stone slab instead of a thin stretched strip. */
-.ach-total-banner {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: clamp(8px, 1.2cqw, 16px);
-    width: clamp(340px, 50%, 600px);
-    aspect-ratio: 955 / 260;
-    margin: 0 auto clamp(10px, 1.6cqw, 18px);
-    padding: clamp(12px, 2.5cqw, 28px) clamp(18px, 4.5cqw, 62px);
-    box-sizing: border-box;
-    background-image: url('../images/Inference/inference-header.webp');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+/* Overview header: one slim row of dark ink on the parchment (no stone slab),
+   caption on the left, totals on the right, a thin gold bar underneath. */
+.ach-ov-head {
+    margin: 0 0 clamp(8px, 1.2cqw, 14px);
+    padding: clamp(6px, 0.9cqw, 10px) clamp(10px, 1.4cqw, 16px);
+    background: rgba(255, 246, 214, 0.92);
+    border: 2px solid rgba(74, 44, 18, 0.6);
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgba(255, 252, 235, 0.7), 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-.ach-total-banner-img {
-    display: none; /* banner art applied as the strip's background above */
+.ach-ov-head-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin-bottom: 6px;
 }
 
-/* -- Grand-totals banner label: the text itself may wrap to two lines
-   ("TOTAL MILESTONES" at narrow widths) while the counters stay vertically
-   centered - the label flex item stretches the banner's full height and the
-   inner span centers itself within it. -- */
-.ach-total-banner-label {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    align-items: center;
+.ach-ov-caption {
     font-family: var(--C, serif);
-    font-size: clamp(11px, 1.8cqw, 22px);
     font-weight: 700;
-    letter-spacing: clamp(0.5px, 0.25cqw, 3px);
-    line-height: 1.25;
-    color: #f0d090;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
-    text-transform: uppercase;
+    font-size: clamp(12px, 1.5cqw, 17px);
+    letter-spacing: 0.2em;
+    color: #4a2c12;
+    text-shadow: 0 1px 0 rgba(255, 240, 200, 0.6);
 }
 
-.ach-total-banner-value {
-    flex-shrink: 0;
-    font-family: var(--PX);
-    font-size: clamp(10px, 1.5cqw, 19px);
-    color: #fff3d6;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+.ach-ov-total {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
     white-space: nowrap;
 }
 
-.ach-total-banner-pct {
-    flex-shrink: 0;
-    font-family: var(--PX);
-    font-size: clamp(11px, 1.7cqw, 21px);
-    color: var(--yellow);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-    white-space: nowrap;
+.ach-ov-total-label {
+    font-family: var(--C, serif);
+    font-weight: 700;
+    font-size: clamp(10px, 1.2cqw, 14px);
+    letter-spacing: 0.12em;
+    color: #5d4326;
 }
 
-/* Thin gold completion bar across the banner's lower edge */
-.ach-total-banner-bar {
-    position: absolute;
-    left: clamp(18px, 4.5cqw, 62px);
-    right: clamp(18px, 4.5cqw, 62px);
-    bottom: clamp(9px, 1.8cqw, 20px);
-    height: clamp(4px, 0.6cqw, 7px);
-    border-radius: 3px;
-    background: rgba(0, 0, 0, 0.45);
+.ach-ov-total-value {
+    font-family: var(--PX);
+    font-size: clamp(11px, 1.4cqw, 16px);
+    color: #6b3a00;
+}
+
+.ach-ov-total-pct {
+    font-family: var(--PX);
+    font-size: clamp(11px, 1.4cqw, 16px);
+    color: #a3540e;
+}
+
+.ach-ov-bar {
+    height: clamp(8px, 1cqw, 12px);
+    border-radius: 8px;
+    background: rgba(44, 26, 12, 0.28);
+    border: 1px solid rgba(44, 26, 12, 0.5);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
     overflow: hidden;
 }
 
-.ach-total-banner-bar-inner {
+.ach-ov-bar-fill {
     height: 100%;
-    border-radius: 3px;
-    background: linear-gradient(180deg, #ffe9a8, #f0b93a 60%, #c98a1e);
+    border-radius: 8px;
+    background: linear-gradient(180deg, #ffe9a8, #f0b93a 55%, #c98a1e);
     box-shadow: 0 0 6px rgba(253, 215, 0, 0.55);
     transition: width 0.4s ease;
 }
 
-/* Big centered "CATEGORY OVERVIEW" caption above the grid.
-   Same carved-gold look as the ACHIEVEMENTS plaque: Cinzel, theme gold,
-   soft dark drop-shadow. */
-.ach-overview-caption {
-    font-family: var(--C, serif);
-    font-size: clamp(12px, 1.5cqw, 18px);
-    font-weight: 700;
-    letter-spacing: clamp(2px, 0.4cqw, 5px);
-    color: var(--yellow);
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-    text-align: center;
-    margin: 2px 0 clamp(10px, 1.6cqw, 18px);
-}
 
 /* Responsive grid: 3 columns so the cards get real width (wider cards keep
    the stat rows clear of the category artwork). Breakpoints are CONTAINER
@@ -661,39 +638,34 @@
 /* -------------------------------------------------------------------------
    -------------------------CATEGORY CARDS----------------------------------
    -------------------------------------------------------------------------
-   The clickable category cards of the overview grid (caption + grid layout
-   live in the CATEGORY OVERVIEW section above). Each card = carved stone
-   banner (title) + framed panel (category artwork) + stats rows +
-   completion bar, with a per-category glow colour.
+   The clickable category cards of the overview grid. Each card = artwork
+   strip with the category name beside it, two big stat numbers with small
+   labels underneath, and a completion bar, tinted per category (--cat-glow).
    ------------------------------------------------------------------------- */
 
-/* -- Card shell -- the --cat-glow custom property is set inline per card -- */
 .ach-cat-card {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     border-radius: 10px;
     cursor: pointer;
     user-select: none;
     outline: none;
-    /* glow halo around the whole card, tinted per category */
+    background: #17141d;
+    border: 2px solid color-mix(in srgb, var(--cat-glow, #66fcf1) 45%, #1b1b22);
     box-shadow:
-        0 0 14px color-mix(in srgb, var(--cat-glow, #66fcf1) 30%, transparent),
-        inset 0 0 12px rgba(0, 0, 0, 0.55);
-    border: 2px solid #1b1b22;
-    background: #14141a;
-    transition:
-        box-shadow 0.18s ease,
-        transform 0.12s ease,
-        border-color 0.18s ease;
+        0 0 12px color-mix(in srgb, var(--cat-glow, #66fcf1) 25%, transparent),
+        0 3px 8px rgba(0, 0, 0, 0.4);
+    transition: box-shadow 0.18s ease, transform 0.12s ease, border-color 0.18s ease;
 }
 
     .ach-cat-card:hover,
     .ach-cat-card:focus-visible {
         transform: translateY(-3px);
-        border-color: color-mix(in srgb, var(--cat-glow, #66fcf1) 55%, #1b1b22);
+        border-color: var(--cat-glow, #66fcf1);
         box-shadow:
-            0 0 22px color-mix(in srgb, var(--cat-glow, #66fcf1) 55%, transparent),
-            inset 0 0 12px rgba(0, 0, 0, 0.55);
+            0 0 20px color-mix(in srgb, var(--cat-glow, #66fcf1) 55%, transparent),
+            0 4px 10px rgba(0, 0, 0, 0.45);
     }
 
     .ach-cat-card:active {
@@ -705,110 +677,95 @@
         --cat-glow: var(--yellow);
     }
 
+/* Artwork strip: art right-aligned, a dark fade on the left keeps the name
+   readable whatever the picture looks like. */
+.ach-cat-card-art {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: clamp(64px, 8cqw, 110px);
+    padding: 0 clamp(10px, 1.2cqw, 16px);
+    background-color: #0e0d13;
+    background-repeat: no-repeat;
+    background-position: right 5% center;
+    background-size: contain;
+}
+
+    .ach-cat-card-art::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(14, 13, 19, 0.95) 0%, rgba(14, 13, 19, 0.75) 42%, rgba(14, 13, 19, 0) 78%);
+        pointer-events: none;
+    }
+
+.ach-cat-card-title {
+    position: relative;
+    max-width: 62%;
+    font-family: var(--C, serif);
+    font-size: clamp(13px, 1.55cqw, 19px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #f3ead0;
+    text-shadow:
+        0 0 10px color-mix(in srgb, var(--cat-glow, #66fcf1) 60%, transparent),
+        0 2px 2px rgba(0, 0, 0, 0.9);
+}
+
     .ach-cat-card.complete .ach-cat-card-title {
         color: #ffe9a8;
     }
 
-/* -- Banner: stone header art with the category name carved on top -- */
-.ach-cat-card-banner {
-    position: relative;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 2px;
-}
-
-.ach-cat-card-banner-img {
-    display: block;
-    width: 100%;
-    height: auto;
-    pointer-events: none;
-    user-select: none;
-}
-
-.ach-cat-card-title {
+/* Percentage badge, top-right of the artwork */
+.ach-cat-card-pct {
     position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--C, serif);
-    font-size: clamp(12px, 1.4cqw, 18px);
-    font-weight: 700;
-    letter-spacing: clamp(0.5px, 0.15vw, 2px);
-    text-transform: uppercase;
-    color: #e8e0c8;
-    text-shadow:
-        0 0 10px color-mix(in srgb, var(--cat-glow, #66fcf1) 65%, transparent),
-        0 2px 2px rgba(0, 0, 0, 0.9);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0 10%;
+    top: 6px;
+    right: 8px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: rgba(8, 7, 12, 0.8);
+    border: 1px solid color-mix(in srgb, var(--cat-glow, #66fcf1) 60%, transparent);
+    font-family: var(--PX);
+    font-size: clamp(10px, 1.05cqw, 13px);
+    color: var(--cat-glow, #66fcf1);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
-/* -- Body: framed panel with the category artwork right-aligned inside -- */
-.ach-cat-card-body {
-    position: relative;
-    flex: 1;
-    min-height: clamp(72px, 8cqw, 120px);
-    background-color: #101016;
-    background-repeat: no-repeat;
-    background-position: right 4% center;
-    background-size: contain;
-    margin: clamp(4px, 0.6cqw, 8px) clamp(6px, 0.9cqw, 12px);
-    border-radius: 6px;
-    box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.65);
+/* Two stat columns: big number over a small label */
+.ach-cat-card-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: clamp(8px, 1cqw, 12px) clamp(10px, 1.2cqw, 16px) 6px;
 }
 
-/* Stat rows run across the FULL card width at the panel's bottom, on a
-   darkened plate so the numbers stay readable over any artwork. No more
-   left-column squeeze - artwork and stats never share a row. */
-.ach-cat-card-rows {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
+.ach-cat-card-stat {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding: clamp(4px, 0.6cqw, 8px) clamp(6px, 0.9cqw, 12px) clamp(4px, 0.6cqw, 8px);
-    background: linear-gradient(180deg, rgba(5, 5, 10, 0) 0%, rgba(5, 5, 10, 0.72) 34%, rgba(5, 5, 10, 0.88) 100%);
-    border-radius: 0 0 6px 6px;
+    min-width: 0;
 }
 
-.ach-cat-card-row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 8px;
-    font-size: clamp(10px, 1.15cqw, 15px);
-    line-height: 1.35;
-    color: #f0ede4;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.7);
-    white-space: nowrap;
-}
-
-.ach-cat-card-row-value {
-    flex-shrink: 0;
-    color: #ffd76e;
+.ach-cat-card-stat-value {
+    font-family: var(--C, serif);
     font-weight: 700;
+    font-size: clamp(14px, 1.7cqw, 21px);
+    color: #ffd76e;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-/* -- Footer: completion bar + percentage -- */
-.ach-cat-card-footer {
-    flex-shrink: 0;
-    padding: 0 clamp(7px, 1cqw, 13px) clamp(7px, 1cqw, 13px);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.ach-cat-card-stat-label {
+    font-size: clamp(10px, 1.1cqw, 13px);
+    line-height: 1.25;
+    color: #cfc7b4;
 }
 
 .ach-cat-card-bar-outer {
-    flex: 1;
-    height: 10px;
-    border-radius: 5px;
+    height: clamp(7px, 0.9cqw, 10px);
+    margin: 2px clamp(10px, 1.2cqw, 16px) clamp(10px, 1.2cqw, 14px);
+    border-radius: 6px;
     background: #0a0a0f;
     border: 1px solid #2a2a35;
     overflow: hidden;
@@ -816,7 +773,7 @@
 
 .ach-cat-card-bar-inner {
     height: 100%;
-    border-radius: 5px;
+    border-radius: 6px;
     background: linear-gradient(180deg,
         color-mix(in srgb, var(--cat-glow, #66fcf1) 90%, #ffffff) 0%,
         var(--cat-glow, #66fcf1) 55%,
@@ -825,13 +782,6 @@
     transition: width 0.4s ease;
 }
 
-.ach-cat-card-pct {
-    flex-shrink: 0;
-    font-size: clamp(10px, 1cqw, 13px);
-    color: #f0ede4;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
-    white-space: nowrap;
-}
 
 
 
@@ -847,56 +797,61 @@
     margin: 0 auto;
 }
 
-/* Back button - the unified .back-btn stone slab (base.css).
-   .ach-cat-back-btn remains as an alias for older markup. */
+/* Back chip: a small parchment pill in the same gold-rimmed style as the
+   titles / ceremony buttons - not the big stone slab. */
 .ach-cat-back-btn {
-    font-size: clamp(11px, 1.15cqw, 14px);
-    padding: clamp(8px, 1.1cqw, 13px) clamp(14px, 1.8cqw, 22px);
-    min-width: clamp(96px, 11cqw, 140px);
+    flex: 0 0 auto;
+    font-family: var(--C, serif);
+    font-weight: 700;
+    font-size: clamp(11px, 1.25cqw, 15px);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #4a2c12;
+    background: rgba(255, 246, 214, 0.9);
+    border: 2px solid #8a5a00;
+    border-radius: 999px;
+    padding: 5px clamp(12px, 1.6cqw, 20px);
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px rgba(255, 252, 235, 0.7), 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: background 0.12s, color 0.12s, transform 0.12s;
 }
+
+    .ach-cat-back-btn:hover {
+        background: #8a5a00;
+        color: #fff8dc;
+    }
 
     .ach-cat-back-btn:active {
         transform: translateY(1px);
-        filter: brightness(0.95);
     }
 
-/* -- Detail topbar: one single row - back button on the left, the category
-   artwork beside it, progress numbers pushed to the right edge. The
-   completion bar renders underneath as a full-width row; the category name
-   itself lives on the modal's title plaque. -- */
+/* -- Detail topbar: ONE row - back chip, completion bar (fills the space),
+   progress numbers. The category name lives on the modal's title plaque. -- */
 .ach-cat-detail-topbar {
     display: flex;
     align-items: center;
     gap: clamp(10px, 1.4cqw, 18px);
     margin-bottom: clamp(10px, 1.4cqw, 16px);
+    padding: clamp(5px, 0.8cqw, 9px) clamp(8px, 1.2cqw, 14px);
+    background: rgba(255, 246, 214, 0.92);
+    border: 2px solid rgba(74, 44, 18, 0.6);
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px rgba(255, 252, 235, 0.7), 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-/* Category-wide completion bar, spanning the full width underneath the
-   topbar row */
-.ach-cat-detail-count {
-    margin-left: auto;
-    font-family: var(--PX);
-    font-size: clamp(11px, 1.3cqw, 16px);
-    color: #ffd76e;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-    white-space: nowrap;
-}
-
-/* Category-wide completion bar, spanning the full width underneath the
-   topbar row */
 .ach-cat-detail-bar-outer {
+    flex: 1;
     height: clamp(10px, 1.2cqw, 14px);
-    margin-bottom: clamp(12px, 1.6cqw, 20px);
-    border-radius: 6px;
-    background: rgba(0, 0, 0, 0.55);
-    border: 1px solid rgba(44, 26, 12, 0.45);
+    border-radius: 7px;
+    background: rgba(44, 26, 12, 0.28);
+    border: 1px solid rgba(44, 26, 12, 0.5);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
     overflow: hidden;
-    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.8);
 }
 
 .ach-cat-detail-bar-inner {
     height: 100%;
-    border-radius: 6px;
+    border-radius: 7px;
     background: linear-gradient(180deg,
         color-mix(in srgb, var(--cat-glow, #66fcf1) 90%, #ffffff) 0%,
         var(--cat-glow, #66fcf1) 55%,
@@ -905,18 +860,20 @@
     transition: width 0.4s ease;
 }
 
-/* -- Achievement cards inside the detail view --
-   NO image texture: alternating parchment stripes like the how-to-play
-   modal's section cards (css/modals.css .tut-section) - light tint and a
-   deeper parchment tint alternate row by row across the grid. All text
-   colors flip to the dark-ink parchment scheme for readability.
+.ach-cat-detail-count {
+    flex: 0 0 auto;
+    font-family: var(--PX);
+    font-size: clamp(11px, 1.3cqw, 16px);
+    color: #6b3a00;
+    white-space: nowrap;
+}
 
-   Unlike the overview's auto-fill grid, the detail grid uses FIXED column
-   counts (3 / 2 / 1, the same container tiers as .ach-cat-grid) so every
-   row is fully known and the stripe tint below can cover whole rows at
-   every width. */
+/* -- Achievement cards: uniform parchment cards with a coloured state stripe
+   on the left (grey = locked, orange = in progress, gold = complete), a round
+   icon badge, and larger, calmer text. No more alternating row tints. -- */
 .ach-cat-detail .ach-grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: clamp(8px, 1.1cqw, 14px);
 }
 
 @container (max-width: 780px) {
@@ -928,133 +885,125 @@
 }
 
 .ach-cat-detail .ach-card {
-    background: rgba(255, 248, 220, 0.55);
-    border: 2px solid rgba(44, 26, 12, 0.4);
-    border-radius: 8px;
-    box-shadow: inset 0 0 0 1px rgba(255, 248, 220, 0.5),
-                0 2px 6px rgba(0, 0, 0, 0.35);
-    padding: clamp(12px, 1.4cqw, 18px);
+    --ach-state: #9a8f7a;
+    background: linear-gradient(180deg, rgba(255, 248, 220, 0.95), rgba(238, 220, 180, 0.95));
+    border: 2px solid rgba(74, 44, 18, 0.5);
+    border-left: 6px solid var(--ach-state);
+    border-radius: 10px;
+    padding: clamp(10px, 1.2cqw, 16px);
+    gap: 8px;
+    box-shadow: inset 0 0 0 1px rgba(255, 252, 235, 0.6), 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-    /* 2nd, 4th, … rows get the deeper parchment tint, mirroring the
-       how-to-play modal's stripes. The cycle follows .ach-grid's fixed
-       column count - 3/2/1 columns at the same container tiers - so all
-       cards of a row share one tint at every width:
-         3 columns → a row is 3 cards → even rows are the 6n+4/5/6 cycle
-         2 columns → a row is 2 cards → even rows are the 4n+3/4 cycle
-         1 column  → one card per row → alternate per card (even cards) */
-    .ach-cat-detail .ach-card:nth-child(6n + 4),
-    .ach-cat-detail .ach-card:nth-child(6n + 5),
-    .ach-cat-detail .ach-card:nth-child(6n + 6) {
-        background: rgba(214, 190, 150, 0.45);
-    }
-
-    /* 2 columns → reset the 3-column tint, then re-stripe per card pair. */
-    @container (max-width: 780px) {
-        .ach-cat-detail .ach-card:nth-child(6n + 4),
-        .ach-cat-detail .ach-card:nth-child(6n + 5),
-        .ach-cat-detail .ach-card:nth-child(6n + 6) {
-            background: rgba(255, 248, 220, 0.55);
-        }
-
-        .ach-cat-detail .ach-card:nth-child(4n + 3),
-        .ach-cat-detail .ach-card:nth-child(4n + 4) {
-            background: rgba(214, 190, 150, 0.45);
-        }
-    }
-
-    /* Single column: one card per row, so alternate per card (even cards). */
-    @container (max-width: 520px) {
-        .ach-cat-detail .ach-card:nth-child(4n + 3),
-        .ach-cat-detail .ach-card:nth-child(4n + 4) {
-            background: rgba(255, 248, 220, 0.55);
-        }
-
-        .ach-cat-detail .ach-card:nth-child(even) {
-            background: rgba(214, 190, 150, 0.45);
-        }
-    }
-
     .ach-cat-detail .ach-card:hover {
-        border-color: rgba(44, 26, 12, 0.65);
+        border-color: rgba(74, 44, 18, 0.75);
+        border-left-color: var(--ach-state);
         filter: brightness(1.03);
     }
 
-    /* -- Parchment text scheme --
-       The shared card styles use the grey-blue theme (cyan names, near-white
-       desc, muted borders); on the parchment stripes those flip to dark ink
-       with the theme accents only for highlights. -- */
+    .ach-cat-detail .ach-card.locked {
+        --ach-state: #9a8f7a;
+        opacity: 0.82;
+    }
+
+    .ach-cat-detail .ach-card.partial {
+        --ach-state: #d9822b;
+    }
+
+    .ach-cat-detail .ach-card.complete {
+        --ach-state: #d4a017;
+        box-shadow: inset 0 0 0 1px rgba(255, 230, 140, 0.6),
+                    0 0 12px rgba(253, 215, 0, 0.3),
+                    0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Round icon badge */
+    .ach-cat-detail .ach-card-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: clamp(34px, 4cqw, 48px);
+        height: clamp(34px, 4cqw, 48px);
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 30%, #4b2f12, #24140a);
+        border: 2px solid var(--ach-state);
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6);
+    }
+
+    .ach-cat-detail .ach-card-icon-glyph {
+        font-size: clamp(17px, 2.1cqw, 26px);
+        line-height: 1;
+    }
+
+    .ach-cat-detail .ach-card.locked .ach-card-icon-glyph {
+        filter: grayscale(0.9);
+        opacity: 0.7;
+    }
+
     .ach-cat-detail .ach-card .ach-card-name {
-        color: #4a2c12;
+        font-family: var(--C, serif);
+        font-weight: 700;
+        font-size: clamp(13px, 1.5cqw, 17px);
+        letter-spacing: 0.03em;
+        color: #3a1f05;
         text-shadow: none;
+        margin-bottom: 2px;
     }
 
     .ach-cat-detail .ach-card .ach-card-desc {
+        font-size: clamp(12px, 1.2cqw, 15px);
+        line-height: 1.4;
         color: #5d4326;
     }
 
     .ach-cat-detail .ach-card .ach-card-earned {
+        font-family: inherit;
+        font-weight: 700;
+        font-size: clamp(12px, 1.2cqw, 14px);
         color: #8a5a12;
+        margin-top: 4px;
+        letter-spacing: 0.02em;
+    }
+
+    .ach-cat-detail .ach-card .ach-tier-dot {
+        font-size: clamp(13px, 1.4cqw, 17px);
+    }
+
+    .ach-cat-detail .ach-card .ach-tier-dot.locked {
+        color: rgba(44, 26, 12, 0.35);
     }
 
     .ach-cat-detail .ach-card .ach-card-progress-bar-outer {
-        background: rgba(44, 26, 12, 0.25);
-        border-color: rgba(44, 26, 12, 0.4);
+        height: 8px;
+        border-radius: 5px;
+        background: rgba(44, 26, 12, 0.22);
+        border: 1px solid rgba(44, 26, 12, 0.4);
+        overflow: hidden;
     }
 
-    /* Progress fill keeps its state colors (purple/orange/yellow), but the
-       label tier name gets a darker variant per state for the parchment */
+    .ach-cat-detail .ach-card .ach-card-progress-bar-inner {
+        border-radius: 4px;
+    }
+
     .ach-cat-detail .ach-card .ach-card-progress-label {
+        font-family: inherit;
+        font-size: clamp(11px, 1.1cqw, 14px);
+        font-weight: 700;
         color: #4a2c12;
     }
 
     .ach-cat-detail .ach-card .ach-card-progress-label em {
-        color: #6d3fa0; /* darker purple for locked cards on parchment */
+        color: #6d3fa0;
     }
 
     .ach-cat-detail .ach-card.partial .ach-card-progress-label em {
-        color: #a3540e; /* darker orange */
+        color: #a3540e;
     }
 
     .ach-cat-detail .ach-card.complete .ach-card-progress-label em {
-        color: #8a5a12; /* darker gold */
+        color: #8a5a12;
     }
 
-    /* Tier dots: earned stays gold, locked turns to dark ink on parchment */
-    .ach-cat-detail .ach-card .ach-tier-dot.locked {
-        color: rgba(44, 26, 12, 0.45);
-    }
-
-    /* State accents: locked dims, partial tints the border orange,
-       complete tints it gold (backgrounds stay the parchment stripes). */
-    .ach-cat-detail .ach-card.locked {
-        opacity: 0.6;
-    }
-
-    .ach-cat-detail .ach-card.partial {
-        border-color: rgba(160, 90, 20, 0.65);
-        box-shadow: inset 0 0 0 1px rgba(255, 200, 120, 0.4),
-                    0 2px 6px rgba(0, 0, 0, 0.35);
-    }
-
-    .ach-cat-detail .ach-card.partial:hover {
-        border-color: rgba(200, 120, 30, 0.85);
-        filter: brightness(1.03);
-    }
-
-    .ach-cat-detail .ach-card.complete {
-        border-color: rgba(190, 140, 20, 0.8);
-        box-shadow: inset 0 0 0 1px rgba(255, 220, 120, 0.45),
-                    0 0 10px rgba(253, 215, 0, 0.25),
-                    0 2px 6px rgba(0, 0, 0, 0.35);
-    }
-
-    .ach-cat-detail .ach-card.complete:hover {
-        border-color: rgba(220, 170, 30, 0.95);
-        box-shadow: inset 0 0 0 1px rgba(255, 220, 120, 0.45),
-                    0 0 16px rgba(253, 215, 0, 0.35),
-                    0 2px 6px rgba(0, 0, 0, 0.35);
-    }
 
 
 

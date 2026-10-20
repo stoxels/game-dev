@@ -3265,4 +3265,423 @@ export const ACHIEVEMENT_DEFS = [
         ]
     },
 
+    // Passive-tree achievements are GLOBAL (all save slots): peak / distinct
+    // stats, never raw click counters - see _ptTrackAllocationAchievements.
+    //------------------------------------------------------------------------
+    //--------------------PROBABILITY TREE------------------------------------------
+    //------------------------------------------------------------------------
+
+    {
+        id: 'tree_nodes_peak',
+        category: 'tree',
+        icon: '🌱',
+        nameEn: 'Rooted Growth',
+        nameDE: 'Wurzelwachstum',
+        descEn: 'Have this many passive nodes allocated at once (best result across all save slots).',
+        descDE: 'Habe so viele Passivknoten gleichzeitig vergeben (Bestwert über alle Spielstände).',
+        stat: 'treeNodesPeak',
+        tiers: [
+            { threshold: 10, labelEn: 'Seedling', labelDE: 'Setzling' },
+            { threshold: 25, labelEn: 'Sapling', labelDE: 'Schössling' },
+            { threshold: 50, labelEn: 'Grown Tree', labelDE: 'Ausgewachsen' },
+            { threshold: 75, labelEn: 'Great Oak', labelDE: 'Große Eiche' },
+            { threshold: 100, labelEn: 'World Tree', labelDE: 'Weltenbaum' },
+        ]
+    },
+
+    {
+        id: 'tree_notables_peak',
+        category: 'tree',
+        icon: '💠',
+        nameEn: 'Notable Collection',
+        nameDE: 'Bemerkenswerte Sammlung',
+        descEn: 'Have Notable nodes allocated at the same time.',
+        descDE: 'Habe gleichzeitig Notable-Knoten vergeben.',
+        stat: 'treeNotablesPeak',
+        tiers: [
+            { threshold: 5, labelEn: 'Standouts', labelDE: 'Hingucker' },
+            { threshold: 15, labelEn: 'Highlight Reel', labelDE: 'Highlights' },
+            { threshold: 30, labelEn: 'Specialist', labelDE: 'Spezialist' },
+            { threshold: 50, labelEn: 'Master Build', labelDE: 'Meisterbuild' },
+        ]
+    },
+
+    {
+        id: 'tree_notables_unique',
+        category: 'tree',
+        icon: '📖',
+        nameEn: 'Notable Hunter',
+        nameDE: 'Notable-Jäger',
+        descEn: 'Allocate different Notable nodes at least once. Respeccing never loses this tally.',
+        descDE: 'Vergib verschiedene Notable-Knoten mindestens einmal. Umskillen kostet dich diesen Fortschritt nie.',
+        stat: 'treeNotablesUnique',
+        tiers: [
+            { threshold: 25, labelEn: 'Window Shopper', labelDE: 'Schaufensterbummler' },
+            { threshold: 100, labelEn: 'Browser', labelDE: 'Stöberer' },
+            { threshold: 250, labelEn: 'Connoisseur', labelDE: 'Kenner' },
+            { threshold: 400, labelEn: 'Completionist', labelDE: 'Komplettist' },
+        ]
+    },
+
+    {
+        id: 'tree_keystones_peak',
+        category: 'tree',
+        icon: '🗝️',
+        nameEn: 'Rule Breaker',
+        nameDE: 'Regelbrecher',
+        descEn: 'Have Keystones active at the same time (God Keystones do not count).',
+        descDE: 'Habe gleichzeitig Schlüsselsteine aktiv (Gott-Schlüsselsteine zählen nicht).',
+        stat: 'treeKeystonesPeak',
+        tiers: [
+            { threshold: 1, labelEn: 'Bold Choice', labelDE: 'Mutige Wahl' },
+            { threshold: 2, labelEn: 'Double Down', labelDE: 'Doppelt hält besser' },
+            { threshold: 3, labelEn: 'Triple Threat', labelDE: 'Dreifachbedrohung' },
+            { threshold: 5, labelEn: 'Keystone Collector', labelDE: 'Schlusssteinsammler' },
+        ]
+    },
+
+    {
+        id: 'tree_keystones_unique',
+        category: 'tree',
+        icon: '🔑',
+        nameEn: 'Keystone Explorer',
+        nameDE: 'Schlüsselstein-Entdecker',
+        descEn: 'Try different Keystones (God Keystones do not count). Respeccing never loses this tally.',
+        descDE: 'Probiere verschiedene Schlüsselsteine aus (Gott-Schlüsselsteine zählen nicht). Umskillen kostet dich diesen Fortschritt nie.',
+        stat: 'treeKeystonesUnique',
+        tiers: [
+            { threshold: 3, labelEn: 'Curious', labelDE: 'Neugierig' },
+            { threshold: 10, labelEn: 'Experimenter', labelDE: 'Experimentierer' },
+            { threshold: 25, labelEn: 'Theorycrafter', labelDE: 'Theoretiker' },
+            { threshold: 50, labelEn: 'Master of Mechanics', labelDE: 'Mechanik-Meister' },
+            { threshold: 75, labelEn: 'Keystone Sage', labelDE: 'Schlusstein-Weiser' },
+        ]
+    },
+
+    {
+        id: 'tree_gods_unique',
+        category: 'tree',
+        icon: '✨',
+        nameEn: 'Pantheon',
+        nameDE: 'Pantheon',
+        descEn: 'Allocate each God Keystone at least once: Statistics, Math and Probabilities.',
+        descDE: 'Vergib jeden Gott-Schlüsselstein mindestens einmal: Statistik, Mathe und Wahrscheinlichkeit.',
+        stat: 'treeGodsUnique',
+        tiers: [
+            { threshold: 1, labelEn: 'First Devotion', labelDE: 'Erste Hingabe' },
+            { threshold: 2, labelEn: 'Two Gods', labelDE: 'Zwei Götter' },
+            { threshold: 3, labelEn: 'Full Pantheon', labelDE: 'Volles Pantheon' },
+        ]
+    },
+
+    {
+        id: 'tree_branches_unique',
+        category: 'tree',
+        icon: '🔱',
+        nameEn: 'Wheel Master',
+        nameDE: 'Radmeister',
+        descEn: 'Complete an entire class wheel of Stox, Trix or Syla: all 18 nodes, God Keystone included.',
+        descDE: 'Vervollständige ein komplettes Klassenrad von Stox, Trix oder Syla: alle 18 Knoten inklusive Gott-Schlüsselstein.',
+        stat: 'treeBranchesUnique',
+        tiers: [
+            { threshold: 1, labelEn: 'Wheel Complete', labelDE: 'Rad vollendet' },
+            { threshold: 2, labelEn: 'Two Wheels', labelDE: 'Zwei Räder' },
+            { threshold: 3, labelEn: 'Trinity', labelDE: 'Dreifaltigkeit' },
+        ]
+    },
+
+    {
+        id: 'tree_wheel_extension',
+        category: 'tree',
+        icon: '🎡',
+        nameEn: 'Outer Rings',
+        nameDE: 'Äußere Ringe',
+        descEn: 'Have class wheel extension notables allocated at the same time.',
+        descDE: 'Habe gleichzeitig Erweiterungs-Notables der Klassenräder vergeben.',
+        stat: 'treeWheelExtensionPeak',
+        tiers: [
+            { threshold: 5, labelEn: 'Extended Reach', labelDE: 'Erweiterte Reichweite' },
+            { threshold: 10, labelEn: 'Wide Reach', labelDE: 'Weite Reichweite' },
+            { threshold: 20, labelEn: 'Far Reach', labelDE: 'Fernste Reichweite' },
+        ]
+    },
+
+    {
+        id: 'tree_ascend_wheels',
+        category: 'tree',
+        icon: '🌀',
+        nameEn: 'Ascended Wheels',
+        nameDE: 'Aufgestiegene Räder',
+        descEn: 'Complete an entire Ascendency wheel: all 8 of its notables.',
+        descDE: 'Vervollständige ein komplettes Aufstiegsrad: alle 8 Notables.',
+        stat: 'treeAscendWheelsUnique',
+        tiers: [
+            { threshold: 1, labelEn: 'First Ascent', labelDE: 'Erster Aufstieg' },
+            { threshold: 3, labelEn: 'Triple Ascent', labelDE: 'Dreifacher Aufstieg' },
+            { threshold: 6, labelEn: 'Total Ascent', labelDE: 'Totaler Aufstieg' },
+        ]
+    },
+
+    {
+        id: 'tree_travel_peak',
+        category: 'tree',
+        icon: '🛤️',
+        nameEn: 'Long Road',
+        nameDE: 'Langer Weg',
+        descEn: 'Have Travel nodes allocated at the same time - the long paths between clusters.',
+        descDE: 'Habe gleichzeitig Reiseknoten vergeben - die langen Wege zwischen den Clustern.',
+        stat: 'treeTravelPeak',
+        tiers: [
+            { threshold: 5, labelEn: 'Wanderer', labelDE: 'Wanderer' },
+            { threshold: 15, labelEn: 'Pathfinder', labelDE: 'Pfadfinder' },
+            { threshold: 30, labelEn: 'Trailblazer', labelDE: 'Wegbereiter' },
+            { threshold: 60, labelEn: 'Cartographer', labelDE: 'Kartograph' },
+        ]
+    },
+
+    {
+        id: 'tree_respecs',
+        category: 'tree',
+        icon: '♻️',
+        nameEn: 'Second Thoughts',
+        nameDE: 'Zweite Gedanken',
+        descEn: 'Rebuild your tree: refund 5 or more nodes at once with Refund All.',
+        descDE: 'Baue deinen Baum um: Erstatte mit Alles erstatten 5 oder mehr Knoten auf einmal.',
+        stat: 'treeRespecs',
+        tiers: [
+            { threshold: 1, labelEn: 'Fresh Start', labelDE: 'Neuanfang' },
+            { threshold: 5, labelEn: 'Rebuilder', labelDE: 'Umbauer' },
+            { threshold: 15, labelEn: 'Eternal Tinkerer', labelDE: 'Ewiger Tüftler' },
+        ]
+    },
+
+    // Combat achievements are fed by RunStats (js/combat/combat-run-stats.js).
+    //------------------------------------------------------------------------
+    //--------------------COMBAT------------------------------------------
+    //------------------------------------------------------------------------
+
+    {
+        id: 'combat_crits',
+        category: 'combat',
+        icon: '💥',
+        nameEn: 'Critical Mass',
+        nameDE: 'Kritische Masse',
+        descEn: 'Land critical hits.',
+        descDE: 'Lande kritische Treffer.',
+        stat: 'combatCrits',
+        tiers: [
+            { threshold: 25, labelEn: 'Lucky Strike', labelDE: 'Glückstreffer' },
+            { threshold: 100, labelEn: 'Sharp Eye', labelDE: 'Scharfes Auge' },
+            { threshold: 500, labelEn: 'Crit Machine', labelDE: 'Krit-Maschine' },
+            { threshold: 2000, labelEn: 'Deadly Precision', labelDE: 'Tödliche Präzision' },
+            { threshold: 5000, labelEn: 'Executioner', labelDE: 'Henker' },
+        ]
+    },
+
+    {
+        id: 'combat_damage_dealt',
+        category: 'combat',
+        icon: '⚔️',
+        nameEn: 'Damage Dealer',
+        nameDE: 'Schadensverursacher',
+        descEn: 'Deal damage to monsters (all fights, all save slots).',
+        descDE: 'Füge Monstern Schaden zu (alle Kämpfe, alle Spielstände).',
+        stat: 'combatDamageDealt',
+        tiers: [
+            { threshold: 1000, labelEn: 'Scratches', labelDE: 'Kratzer' },
+            { threshold: 10000, labelEn: 'Bruiser', labelDE: 'Raufbold' },
+            { threshold: 100000, labelEn: 'Wrecking Crew', labelDE: 'Abrissbirne' },
+            { threshold: 1000000, labelEn: 'Million Club', labelDE: 'Millionenclub' },
+            { threshold: 5000000, labelEn: 'Calamity', labelDE: 'Katastrophe' },
+        ]
+    },
+
+    {
+        id: 'combat_big_hit',
+        category: 'combat',
+        icon: '🔨',
+        nameEn: 'Heavy Hitter',
+        nameDE: 'Schwerer Treffer',
+        descEn: 'Deal a single hit of at least this much damage.',
+        descDE: 'Verteile einen einzelnen Treffer mit mindestens so viel Schaden.',
+        stat: 'combatBiggestHit',
+        tiers: [
+            { threshold: 100, labelEn: 'Solid Hit', labelDE: 'Solider Treffer' },
+            { threshold: 500, labelEn: 'Haymaker', labelDE: 'Hammerschlag' },
+            { threshold: 1500, labelEn: 'Bone Breaker', labelDE: 'Knochenbrecher' },
+            { threshold: 5000, labelEn: 'Wall Crusher', labelDE: 'Mauerbrecher' },
+            { threshold: 15000, labelEn: 'Cataclysm', labelDE: 'Kataklysmus' },
+        ]
+    },
+
+    {
+        id: 'combat_damage_taken',
+        category: 'combat',
+        icon: '🩹',
+        nameEn: 'Thick Skin',
+        nameDE: 'Dicke Haut',
+        descEn: 'Take damage in combat and keep fighting.',
+        descDE: 'Nimm im Kampf Schaden und kämpfe weiter.',
+        stat: 'combatDamageTaken',
+        tiers: [
+            { threshold: 500, labelEn: 'Bruised', labelDE: 'Angeschlagen' },
+            { threshold: 5000, labelEn: 'Battle-Scarred', labelDE: 'Kampfnarben' },
+            { threshold: 25000, labelEn: 'Veteran Tank', labelDE: 'Veteranen-Tank' },
+            { threshold: 100000, labelEn: 'Immovable', labelDE: 'Unbeweglich' },
+        ]
+    },
+
+    {
+        id: 'combat_dodges',
+        category: 'combat',
+        icon: '💨',
+        nameEn: 'Evasive Maneuvers',
+        nameDE: 'Ausweichmanöver',
+        descEn: 'Dodge incoming attacks.',
+        descDE: 'Weiche eingehenden Angriffen aus.',
+        stat: 'combatDodges',
+        tiers: [
+            { threshold: 10, labelEn: 'Nimble', labelDE: 'Flink' },
+            { threshold: 50, labelEn: 'Slippery', labelDE: 'Glitschig' },
+            { threshold: 200, labelEn: 'Shadow Step', labelDE: 'Schattenschritt' },
+            { threshold: 750, labelEn: 'Ghost', labelDE: 'Geist' },
+        ]
+    },
+
+    {
+        id: 'combat_blocks',
+        category: 'combat',
+        icon: '🧱',
+        nameEn: 'Shield Wall',
+        nameDE: 'Schildwall',
+        descEn: 'Block incoming attacks.',
+        descDE: 'Blocke eingehende Angriffe.',
+        stat: 'combatBlocks',
+        tiers: [
+            { threshold: 10, labelEn: 'Steady Guard', labelDE: 'Feste Deckung' },
+            { threshold: 50, labelEn: 'Bulwark', labelDE: 'Bollwerk' },
+            { threshold: 200, labelEn: 'Fortress', labelDE: 'Festung' },
+            { threshold: 750, labelEn: 'Unbreakable', labelDE: 'Unzerbrechlich' },
+        ]
+    },
+
+    {
+        id: 'combat_parries',
+        category: 'combat',
+        icon: '🤺',
+        nameEn: 'Riposte',
+        nameDE: 'Riposte',
+        descEn: 'Parry incoming attacks.',
+        descDE: 'Pariere eingehende Angriffe.',
+        stat: 'combatParries',
+        tiers: [
+            { threshold: 5, labelEn: 'Quick Wrist', labelDE: 'Flinke Hand' },
+            { threshold: 25, labelEn: 'Duelist', labelDE: 'Duellant' },
+            { threshold: 100, labelEn: 'Swordmaster', labelDE: 'Schwertmeister' },
+            { threshold: 400, labelEn: 'Flawless Form', labelDE: 'Makellose Form' },
+        ]
+    },
+
+    {
+        id: 'combat_melee_hits',
+        category: 'combat',
+        icon: '🗡️',
+        nameEn: 'Up Close',
+        nameDE: 'Nah dran',
+        descEn: 'Land melee strikes.',
+        descDE: 'Lande Nahkampftreffer.',
+        stat: 'combatMeleeHits',
+        tiers: [
+            { threshold: 50, labelEn: 'Brawler', labelDE: 'Raufer' },
+            { threshold: 250, labelEn: 'Blademaster', labelDE: 'Klingenmeister' },
+            { threshold: 1000, labelEn: 'Warlord', labelDE: 'Kriegsherr' },
+            { threshold: 4000, labelEn: 'Avatar of War', labelDE: 'Kriegsavatar' },
+        ]
+    },
+
+    {
+        id: 'combat_projectile_hits',
+        category: 'combat',
+        icon: '🏹',
+        nameEn: 'Sharpshooter',
+        nameDE: 'Scharfschütze',
+        descEn: 'Hit monsters with projectiles.',
+        descDE: 'Triff Monster mit Projektilen.',
+        stat: 'combatProjectileHits',
+        tiers: [
+            { threshold: 50, labelEn: 'Marksman', labelDE: 'Schütze' },
+            { threshold: 250, labelEn: 'Sniper', labelDE: 'Sniper' },
+            { threshold: 1000, labelEn: 'Eagle Eye', labelDE: 'Adlerauge' },
+            { threshold: 4000, labelEn: 'Rain of Arrows', labelDE: 'Pfeilhagel' },
+        ]
+    },
+
+    {
+        id: 'combat_spell_hits',
+        category: 'combat',
+        icon: '🔮',
+        nameEn: 'Spellslinger',
+        nameDE: 'Zauberschleuderer',
+        descEn: 'Hit monsters with spells.',
+        descDE: 'Triff Monster mit Zaubern.',
+        stat: 'combatSpellHits',
+        tiers: [
+            { threshold: 50, labelEn: 'Apprentice', labelDE: 'Lehrling' },
+            { threshold: 250, labelEn: 'Evoker', labelDE: 'Beschwörer' },
+            { threshold: 1000, labelEn: 'Archmage', labelDE: 'Erzmagier' },
+            { threshold: 4000, labelEn: 'Arcane Storm', labelDE: 'Arkanes Sturm' },
+        ]
+    },
+
+    {
+        id: 'combat_untouched',
+        category: 'combat',
+        icon: '🕊️',
+        nameEn: 'Not a Scratch',
+        nameDE: 'Nicht ein Kratzer',
+        descEn: 'Win a fight without taking any damage.',
+        descDE: 'Gewinne einen Kampf, ohne Schaden zu nehmen.',
+        stat: 'combatUntouchedWins',
+        tiers: [
+            { threshold: 1, labelEn: 'Lucky Day', labelDE: 'Glückstag' },
+            { threshold: 5, labelEn: 'Clean Fighter', labelDE: 'Sauberer Kampf' },
+            { threshold: 15, labelEn: 'Dancer', labelDE: 'Tänzer' },
+            { threshold: 40, labelEn: 'Phantom Fighter', labelDE: 'Phantomkämpfer' },
+        ]
+    },
+
+    {
+        id: 'combat_clutch',
+        category: 'combat',
+        icon: '❤️‍🔥',
+        nameEn: 'Hanging by a Thread',
+        nameDE: 'Am seidenen Faden',
+        descEn: 'Win a fight with less than 10% of your Life left.',
+        descDE: 'Gewinne einen Kampf mit weniger als 10 % deines Lebens.',
+        stat: 'combatClutchWins',
+        tiers: [
+            { threshold: 1, labelEn: 'Close Call', labelDE: 'Knapp' },
+            { threshold: 5, labelEn: 'Nerves of Steel', labelDE: 'Nerven aus Stahl' },
+            { threshold: 15, labelEn: 'Living Dangerously', labelDE: 'Gefährlich gelebt' },
+            { threshold: 40, labelEn: 'Death Defier', labelDE: 'Todesverächter' },
+        ]
+    },
+
+    {
+        id: 'combat_monster_level',
+        category: 'combat',
+        icon: '☠️',
+        nameEn: 'Deep Dive',
+        nameDE: 'Tiefer Tauchgang',
+        descEn: 'Defeat a monster of at least this level.',
+        descDE: 'Besiege ein Monster mit mindestens dieser Stufe.',
+        stat: 'combatHighestMonsterLevel',
+        tiers: [
+            { threshold: 10, labelEn: 'Fresh Blood', labelDE: 'Frisches Blut' },
+            { threshold: 25, labelEn: 'Hardened', labelDE: 'Abgehärtet' },
+            { threshold: 50, labelEn: 'Giant Slayer', labelDE: 'Riesentöter' },
+            { threshold: 70, labelEn: 'Dread Hunter', labelDE: 'Schreckensjäger' },
+            { threshold: 90, labelEn: 'Legend', labelDE: 'Legende' },
+        ]
+    },
 ];

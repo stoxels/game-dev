@@ -39,10 +39,10 @@ function _setGold(value) {
 // (e.g. buying in the shop while a top bar is on screen).
 function _refreshTopBarGold() {
     if (typeof document === 'undefined') return;
-    const text = '🪙 ' + _goldNow().toLocaleString();
+    const html = `<img class="tb-gold-icon" src="images/items/pickups/pickups/pickup_gold.webp" alt=""><span class="tb-gold-num">${_goldNow().toLocaleString()}</span>`;
     for (const id of ['mv-gold-balance', 'wd-gold-balance']) {
         const el = document.getElementById(id);
-        if (el) el.textContent = text;
+        if (el) el.innerHTML = html;
     }
 }
 
