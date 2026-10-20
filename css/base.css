@@ -35,6 +35,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap');
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@700&display=swap');
+/* Lora: readable proportional serif for prose on parchment (How-To-Play,
+   changelog, dialogs). The mono/pixel fonts stay for HUD-style text. */
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&display=swap');
 
 
 
@@ -174,6 +177,7 @@
     --F: 'Share Tech Mono', monospace; /* General UI text, descriptions, stats     */ /*'Georgia', 'Times New Roman', serif;*/
     --PX: 'Press Start 2P', monospace; /* Titles, buttons, and retro display text  */
     --C: 'Cinzel', serif;
+    --B: 'Lora', Georgia, 'Times New Roman', serif; /* Prose on parchment cards and dialogs */
 }
 
 

@@ -100,10 +100,16 @@ const KEYBIND_KEY_INDEX = {};
 const KEYBIND_HANDLERS = {};
 
 // Placeholder → action mapping (index into KEYBIND_TUT_ACTIONS):
-//   {k1}…{k4} → hotbar-1…hotbar-4, {k5} → 'escape' (hard pause key).
+//   {k1}…{k4} → hotbar-1…hotbar-4, {k5} → 'escape' (hard pause key),
+//   {k6}…{k9} → move up/left/down/right, {k10} melee attack, {k11} parry,
+//   {k12} cycle target, {k13} spell book, {k14} character sheet,
+//   {k15} Probability Tree. Used by the How-To-Play controls card.
 const KEYBIND_TUT_ACTIONS = [
     'hotbar-1', 'hotbar-2', 'hotbar-3', 'hotbar-4',
     null, // {k5} - the pause key is fixed, shown as its key-cap label
+    'move-up', 'move-left', 'move-down', 'move-right',
+    'sx-attack', 'sx-parry', 'cycle-target',
+    'spellbook', 'char-sheet', 'passive-tree',
 ];
 
 

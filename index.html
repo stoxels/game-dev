@@ -14,19 +14,19 @@
     </script>
     <link rel="icon" type="image/png" href="images/favicon.png">
     <title>STOXELS - v0.32 BETA</title>
-    <link rel="stylesheet" href="css/base.css?v=3">
+    <link rel="stylesheet" href="css/base.css?v=4">
     <link rel="stylesheet" href="css/pause.css?v=5">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/touch-controls.css">
     <link rel="stylesheet" href="css/title-screen.css?v=4">
-    <link rel="stylesheet" href="css/save-slots.css?v=4">
+    <link rel="stylesheet" href="css/save-slots.css?v=5">
     <link rel="stylesheet" href="css/screens.css">
     <link rel="stylesheet" href="css/world-proto.css?v=1">
     <link rel="stylesheet" href="css/game.css?v=5">
     <link rel="stylesheet" href="css/setup-screen.css?v=11">
     <link rel="stylesheet" href="css/inventory.css">
     <link rel="stylesheet" href="css/overlays.css?v=3">
-    <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/modals.css?v=3">
     <link rel="stylesheet" href="css/class.css?v=5">
     <link rel="stylesheet" href="css/skills.css?v=22">
     <link rel="stylesheet" href="css/spellbook-redesign.css?v=26">
@@ -37,7 +37,7 @@
     <link rel="stylesheet" href="css/passive_effects.css">
     <link rel="stylesheet" href="css/quests.css">
     <link rel="stylesheet" href="css/passive-tracker.css">
-    <link rel="stylesheet" href="css/changelog.css">
+    <link rel="stylesheet" href="css/changelog.css?v=2">
     <link rel="stylesheet" href="css/classes/actuary.css">
     <link rel="stylesheet" href="css/classes/bayesian.css">
     <link rel="stylesheet" href="css/classes/markovian.css">
@@ -75,7 +75,7 @@
     <link rel="stylesheet" href="css/class_selection.css?v=3">
     <link rel="stylesheet" href="css/class_spell_upgrade.css">
     <link rel="stylesheet" href="css/class_ascendency_selection.css">
-    <link rel="stylesheet" href="css/reset-game.css">
+    <link rel="stylesheet" href="css/reset-game.css?v=3">
     <link rel="stylesheet" href="css/replay.css">
     <link rel="stylesheet" href="css/dev-mode-select.css">
     <!-- Boot: discover title art as early as possible -->
@@ -225,7 +225,7 @@
                     </div>
                     <div class="modal-section tut-section tut-section-basics">
                         <h3 data-t="tut_s2h">CONTROLS</h3>
-                        <p data-t="tut_s2p"><strong>Left click</strong> - fill a cell<br><strong>Right click</strong> - mark a cell as empty<br><strong>Hold Left Click and Drag</strong> - fill multiple cells<br><strong>CTRL + MouseWheel</strong> - Zoom in &amp; out to scale<br><strong>Left &amp; Right Arrow Keys</strong> - Move the row clue headers towards the left/right<br><strong>1,2,3,4</strong> - use Class Abilities<br><strong>Escape</strong> - Pause the Game</p>
+                        <p data-t="tut_s2p"><strong>Left click</strong> - fill a cell<br><strong>Right click</strong> - mark a cell as empty<br><strong>Hold Left Click and Drag</strong> - fill multiple cells<br><strong>CTRL + MouseWheel</strong> - Zoom in &amp; out<br><strong>Left &amp; Right Arrow Keys</strong> - Move the row clue headers<br><strong>{k6} {k7} {k8} {k9}</strong> - walk your character<br><strong>{k10}</strong> (hold, then release) - charged melee strike<br><strong>{k11}</strong> (hold) - parry<br><strong>{k12}</strong> - cycle target<br><strong>{k1} - {k4} ...</strong> - cast the spells on your hotbar<br><strong>{k14}</strong> - character sheet &amp; inventory<br><strong>{k13}</strong> - spell book<br><strong>{k15}</strong> - Probability Tree<br><strong>{k5}</strong> - pause the game<br>Every key can be changed under Keybinds.</p>
                     </div>
                     <div class="modal-section tut-section tut-section-diff">
                         <h3 data-t="tut_s3h">DIFFICULTY</h3>
@@ -236,16 +236,36 @@
                         <p data-t="tut_s4p"><strong style="color:var(--orange)">Time Trial</strong> - 50% less time per level, but 20% more Score<br><strong style="color:var(--red)">Hardcore</strong> - one mistake fails the level, but 30% more Score<br><strong style="color:var(--purple)">Ironman</strong> - items cannot be used, but 15% more Score<br><strong style="color:var(--accent)">Classless</strong> - Class Abilities cannot be used, but 20% more Score<br><strong style="color:var(--green)">Treeless</strong> - Probability Tree nodes have no effect, but 25% more Score<br>Modifiers can be combined with each other.</p>
                     </div>
                     <div class="modal-section tut-section tut-section-progression">
-                        <h3 data-t="tut_s5h">ITEMS &amp; INVENTORY</h3>
-                        <p data-t="tut_s5p">Complete a level's bonus objective to earn a random item. Cursed items are powerful but also have a negative effect.</p>
+                        <h3 data-t="tut_s5h">ITEMS, LOOT &amp; EQUIPMENT</h3>
+                        <p data-t="tut_s5p">Complete a level's bonus objective for a guaranteed reward: about half the time a puzzle item, otherwise a piece of equipment, a core or an essence. Cursed puzzle items are powerful but have a negative effect.<br>Monsters also drop loot, gold, hearts and charms onto the grid. A <strong>correct fill</strong> on the cell that holds a drop claims it - a <strong>right-click</strong> destroys it, and drops fade after a while. Press <strong>{k14}</strong> to equip gear from your inventory.</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-combat">
+                        <h3 data-t="tut_s11h">COMBAT &amp; MONSTERS</h3>
+                        <p data-t="tut_s11p">Monsters roam the grid from the very first levels of the campaign, not just in the endgame. Every correctly revealed cell charges a projectile that damages your target - drag across several cells for a bigger shot, and press <strong>{k12}</strong> to switch target.<br>You can also fight with a <strong>melee weapon</strong> (walk close, hold <strong>{k10}</strong>, release to strike) and with <strong>spells</strong> from your hotbar, which cost mana.<br>Some monsters are immune to blades or to certain spells - if a hit flashes IMMUNE, switch your attack. Defeated monsters drop loot and gold.</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-combat">
+                        <h3 data-t="tut_s12h">SURVIVING A FIGHT</h3>
+                        <p data-t="tut_s12p">Monsters attack when their attack bars fill, and a hit costs you <strong>Life</strong>. Hold <strong>{k11}</strong> to <strong>parry</strong> and take no damage; armour, evasion and shields on your gear help you <strong>block</strong> or <strong>dodge</strong> as well. Pick up <strong>hearts</strong> that drop on the grid to heal. Spells cost <strong>mana</strong>, which refills over time.<br>If your Life reaches zero the level is lost - and puzzle mistakes still cost time as usual.</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-combat">
+                        <h3 data-t="tut_s13h">BOSSES &amp; TRIALS</h3>
+                        <p data-t="tut_s13p"><strong>Bosses</strong> guard the Ascension and Convergence Trials in the campaign and also appear in endgame maps. They hit harder, use special attacks and always drop a charm. Defeat one to clear its trial.</p>
                     </div>
                     <div class="modal-section tut-section tut-section-progression">
                         <h3 data-t="tut_s6h">QUIZ &amp; Probability Gates</h3>
                         <p data-t="tut_s6p">Some levels require answering a quiz correctly after finishing a level in order to achieve the bonus objective, and some levels have a Probability Gate that can be unlocked by solving an exercise.</p>
                     </div>
                     <div class="modal-section tut-section tut-section-progression">
-                        <h3 data-t="tut_s7h">ACHIEVEMENT CODES</h3>
-                        <p data-t="tut_s7p">Reach score milestones to unlock Moodle Codes. You can see your progress towards the next achievement in the Highscores tab. More score can be earned by replaying levels on higher difficulties or by adding more game modifiers.</p>
+                        <h3 data-t="tut_s7h">MOODLE CODES</h3>
+                        <p data-t="tut_s7p">Moodle Codes are earned through <strong>progression</strong>, not Score: <strong>Code 1</strong> for finishing the tutorial and clearing World 1, <strong>Code 2</strong> for fully clearing 6 worlds, <strong>Code 3</strong> for every campaign world, <strong>Code 4</strong> for every atlas map up to Tier 6 and <strong>Code 5</strong> for every Tier 16 map. The Moodle Codes screen on the title screen shows your progress for each one.</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-progression">
+                        <h3 data-t="tut_s14h">TITLES</h3>
+                        <p data-t="tut_s14p">Your total <strong>Score</strong> unlocks <strong>50 Titles</strong>. Every Title you earn gives a <strong>permanent bonus that always stays active</strong> and stacks with all your other Titles. Click your Score on the map screens to open the Titles list, then equip the one you want in front of your character's name - or let the game show your highest.</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-progression">
+                        <h3 data-t="tut_s15h">ACHIEVEMENTS</h3>
+                        <p data-t="tut_s15p">Achievements track everything you do across <strong>all save slots</strong> and every play session - deleting a save slot never removes them. The Inference Ledger is different: it belongs to one save slot and starts over with it. Open Achievements from the title screen; every category has tiers to unlock, from Probability Tree to Combat.</p>
                     </div>
                     <div class="modal-section tut-section tut-section-progression">
                         <h3 data-t="tut_s8h">CLASSES &amp; CLASS ABILITIES</h3>
@@ -253,11 +273,15 @@
                     </div>
                     <div class="modal-section tut-section tut-section-progression">
                         <h3 data-t="tut_s9h">CHARMS &amp; SPELL SLOTS</h3>
-                        <p data-t="tut_s9p"><strong>Charms</strong> drop from defeated monsters onto the grid - bosses always drop one. Every skill has one charm for each rank (1–10). Unlocking a class grants its rank-1 charms, and upgrading an ability grants the next rank.<br><strong>Spell Slots</strong> - 10 slots (2 rows of 5) in the spell book. Slotting a charm unlocks that spell at that rank; drag it onto your hotbar to cast it. A higher rank hits far harder but costs far more mana.<br><strong>Duplicates</strong> become a <strong>Lemma</strong> - 10 Lemmas automatically prove one <strong>Theorem</strong>.<br><strong>Shift-left-click</strong> a charm to spend a Theorem: +1% permanent damage for that spell.</p>
+                        <p data-t="tut_s9p"><strong>Charms</strong> drop from defeated monsters onto the grid - bosses always drop one. Every skill has one charm for each rank (1–10). Unlocking a class grants its rank-1 charms, and upgrading an ability grants the next rank.<br><strong>Spell Slots</strong> - 10 slots (2 rows of 5) in the spell book. Slotting a charm unlocks that spell directly on the matching hotbar key (slot 1 = key 1, slot 2 = key 2, ...). A higher rank hits far harder but costs far more mana.<br><strong>Duplicates</strong> become a <strong>Lemma</strong> - 10 Lemmas automatically prove one <strong>Theorem</strong>.<br><strong>Shift-left-click</strong> a charm to spend a Theorem: +1% permanent damage for that spell.</p>
                     </div>
                     <div class="modal-section tut-section tut-section-progression">
                         <h3 data-t="tut_s10h">CONVERGENCE, INFERENCE &amp; PROBABILITY TREE</h3>
                         <p data-t="tut_s10p">Completing Convergence - Levels grants Convergence Points, which can be spent on the Probability Tree to customize the way you play the game. Completing Inference - Objectives rewards additional Convergence Points.</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-combat">
+                        <h3 data-t="tut_s16h">MAPS &amp; THE NEXUS</h3>
+                        <p data-t="tut_s16p">A <strong>map</strong> is a chain of puzzles fought back to back, with modifiers and hazards. Maps drop from monsters and can be played throughout the game. The <strong>Nexus</strong> is the endgame hub: its Probability Gate lets you launch and roll maps, climb the atlas up to Tier 16 and craft better gear.</p>
                     </div>
                 </div>
             </div>
@@ -625,11 +649,14 @@
                 </div>
             </div>
 
-            <div class="slot-name-input-wrap">
-                <input type="text" id="slot-name-input" class="slot-name-input"
-                       placeholder="TYPE A NAME..." maxlength="20" autocomplete="off" spellcheck="false">
+            <div class="dialog-plate slot-name-plate">
+                <div class="slot-name-input-wrap">
+                    <input type="text" id="slot-name-input" class="slot-name-input"
+                           placeholder="TYPE A NAME..." maxlength="20" autocomplete="off" spellcheck="false">
+                    <span class="slot-name-count" id="slot-name-count">0 / 20</span>
+                </div>
+                <div class="slot-name-hint" data-t="scr_slot_name_hint">Leave empty to use the default slot number. Max 20 characters.</div>
             </div>
-            <div class="slot-name-hint" data-t="scr_slot_name_hint">Leave empty to use the default slot number. Max 20 characters.</div>
 
             <div class="reset-footer">
                 <button class="reset-btn reset-btn-confirm" id="btn-confirm-slot-name" data-t="scr_slot_name_save">
@@ -1551,18 +1578,34 @@
 
     <!-- ACHIEVEMENT RESET CONFIRM MODAL -->
     <div id="ach-reset-modal" class="modal-bg safe-center">
-        <div class="modal-box modal-box-danger">
-            <button class="modal-close" id="ach-reset-close" data-t="reset_close">✕ CLOSE</button>
-            <div class="modal-title text-red" data-t="scr_reset_ach_title">⚠ RESET ACHIEVEMENTS</div>
-            <div class="modal-section">
-                <p class="reset-body-text" data-t="scr_reset_ach_body">
+        <div class="slot-name-box ach-reset-box">
+            <button class="reset-close-btn" id="ach-reset-close" data-t="reset_close">✕ CLOSE</button>
+
+            <div class="reset-header">
+                <div class="reset-icon-slot reset-header-slot">
+                    <div class="reset-header-icon reset-icon-gear"></div>
+                </div>
+                <div class="reset-title" data-t="scr_reset_ach_title">⚠ RESET ACHIEVEMENTS</div>
+                <div class="reset-icon-slot reset-header-slot">
+                    <div class="reset-header-icon reset-icon-swirl"></div>
+                </div>
+            </div>
+
+            <div class="dialog-plate dialog-plate-danger">
+                <p class="dialog-body-text" data-t="scr_reset_ach_body">
                     This will permanently erase all achievement progress and unlocked tiers.<br><br>
                     <strong class="text-accent2">This cannot be undone.</strong>
                 </p>
             </div>
-            <div class="modal-actions">
-                <button class="title-btn back-btn" id="ach-reset-confirm" data-t="scr_reset_ach_confirm">YES, RESET ACHIEVEMENTS</button>
-                <button class="title-btn back-btn" id="ach-reset-cancel" data-t="reset_cancel">CANCEL</button>
+
+            <div class="reset-footer">
+                <button class="reset-btn reset-btn-confirm" id="ach-reset-confirm" data-t="scr_reset_ach_confirm">
+                    YES, RESET ACHIEVEMENTS
+                </button>
+                <div class="reset-portal-deco"></div>
+                <button class="reset-btn reset-btn-cancel" id="ach-reset-cancel" data-t="reset_cancel">
+                    CANCEL
+                </button>
             </div>
         </div>
     </div>

@@ -1990,7 +1990,7 @@
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(10px, 1.4vw, 18px);
-    align-items: stretch;
+    align-items: start; /* cards keep their own height instead of stretching to the row */
 }
 
     /* 2 columns → a row is 2 cards; even rows are the 4n+3/4 cycle
@@ -2003,12 +2003,12 @@
         .tut-section:nth-child(6n + 4),
         .tut-section:nth-child(6n + 5),
         .tut-section:nth-child(6n + 6) {
-            background: rgba(255, 248, 220, 0.55);
+            background: rgba(255, 248, 226, 0.95);
         }
 
         .tut-section:nth-child(4n + 3),
         .tut-section:nth-child(4n + 4) {
-            background: rgba(214, 190, 150, 0.45);
+            background: rgba(242, 224, 186, 0.95);
         }
     }
 
@@ -2020,11 +2020,11 @@
 
         .tut-section:nth-child(4n + 3),
         .tut-section:nth-child(4n + 4) {
-            background: rgba(255, 248, 220, 0.55);
+            background: rgba(255, 248, 226, 0.95);
         }
 
         .tut-section:nth-child(even) {
-            background: rgba(214, 190, 150, 0.45);
+            background: rgba(242, 224, 186, 0.95);
         }
     }
 
@@ -2055,53 +2055,66 @@
     }
 }
 
-/* STONE CARD - one tutorial section. Cards stretch to their row's tallest
-   sibling (grid stretch), so the base fill shows on odd rows while even
-   rows get the deeper tint below - clean alternating stripes. */
+/* PARCHMENT CARD - one tutorial section. Near-opaque cream fills (the old
+   55% washes let the grainy parchment through and the brown text drowned),
+   a coloured accent edge per topic group, and alternating row tints. */
 .tut-section {
-    background: rgba(255, 248, 220, 0.55);
-    border: 2px solid rgba(44, 26, 12, 0.4);
-    border-radius: 8px;
-    box-shadow: inset 0 0 0 1px rgba(255, 248, 220, 0.5),
+    --tut-accent: #8a5a12;
+    background: rgba(255, 248, 226, 0.95);
+    border: 2px solid rgba(74, 44, 18, 0.5);
+    border-left: 6px solid var(--tut-accent);
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgba(255, 252, 235, 0.6),
                 0 2px 6px rgba(0, 0, 0, 0.35);
     padding: clamp(10px, 1.4vw, 16px) clamp(12px, 1.6vw, 18px);
     margin-bottom: 0; /* grid gap handles the spacing inside .tut-columns */
 }
 
-    /* 2nd, 4th, … rows - deeper parchment tint so short and long cards
-       align into clean alternating stripes across the whole row. In a
-       3-column grid a row is 3 cards, so even rows are the 6n+4/5/6
-       cycle (cards 4–6, 10–12, …). */
+.tut-section-basics      { --tut-accent: #5b8a3c; }
+.tut-section-diff        { --tut-accent: #c0762a; }
+.tut-section-combat      { --tut-accent: #b03a2e; }
+.tut-section-progression { --tut-accent: #8a5a12; }
+
+    /* 2nd, 4th, ... rows - slightly deeper cream so rows read as stripes. */
     .tut-section:nth-child(6n + 4),
     .tut-section:nth-child(6n + 5),
     .tut-section:nth-child(6n + 6) {
-        background: rgba(214, 190, 150, 0.45);
+        background: rgba(242, 224, 186, 0.95);
     }
 
-/* Section heading - stone-brown like the settings hint text. */
+/* Section heading - Cinzel, dark ink, underlined in the card's accent. */
 .tut-section h3 {
-    font-family: var(--PX);
-    font-size: clamp(9px, 1vw, 12px);
-    color: #2c1a0c;
-    letter-spacing: 1px;
-    line-height: 1.5;
-    margin: 0 0 clamp(8px, 1.2vw, 12px);
+    font-family: var(--C);
+    font-size: clamp(13px, 1.3vw, 17px);
+    color: #3a1f05;
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+    margin: 0 0 clamp(8px, 1.1vw, 12px);
+    padding-bottom: 6px;
+    border-bottom: 2px solid color-mix(in srgb, var(--tut-accent) 55%, transparent);
     text-shadow: 0 1px 0 rgba(255, 248, 220, 0.8);
     overflow-wrap: break-word;
 }
 
-/* Section body - dark brown instead of the shared modal grey-blue, so it
-   reads on the light parchment card. Inline colored <strong>s from the
-   translations stay as-is (they're bright enough on parchment). */
+/* Section body - Lora (a proportional serif) in near-black brown. The old
+   11-14px monospace in mid-brown was the readability problem. */
 .tut-section p {
-    font-family: var(--F);
-    font-size: clamp(11px, 1.15vw, 14px);
-    line-height: 1.7;
-    color: #4a2c12;
+    font-family: var(--B);
+    font-size: clamp(13px, 1.2vw, 15.5px);
+    font-weight: 500;
+    line-height: 1.6;
+    color: #2c1a0c;
     margin: 0;
     overflow-wrap: break-word; /* let long compound words wrap inside the card */
 }
 
     .tut-section p strong {
-        color: #2c1a0c;
+        color: #1c0f05;
+        font-weight: 700;
+    }
+
+    /* Inline-coloured labels (Easy/Normal/Hard, modifier names) use the
+       bright game palette, which vanishes on cream - darken them in place. */
+    .tut-section p strong[style*="color"] {
+        filter: brightness(0.62) saturate(1.35);
     }

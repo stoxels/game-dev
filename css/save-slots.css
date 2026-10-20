@@ -366,8 +366,8 @@
    ============================================================ */
 .slot-name-box {
     position: relative;
-    width: min(560px, 94vw);
-    padding: clamp(56px, 10vw, 88px) clamp(28px, 6vw, 56px) clamp(30px, 5vw, 48px);
+    width: min(620px, 94vw);
+    padding: clamp(56px, 10vw, 92px) clamp(28px, 6vw, 56px) clamp(30px, 5vw, 48px);
     box-sizing: border-box;
     background-image: url('../images/Settings/settings_background.webp');
     background-size: 100% 100%;
@@ -376,7 +376,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
     z-index: 1;
     overflow: visible;
 }
@@ -388,53 +388,105 @@
     height: clamp(44px, 6vw, 60px);
 }
 
+/* Cream plate that carries a dialog's text. The parchment frame is mid-brown,
+   so thin brown text printed straight on it was unreadable. */
+.dialog-plate {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: clamp(12px, 2vw, 18px) clamp(14px, 2.4vw, 22px);
+    background: linear-gradient(180deg, rgba(255, 249, 230, 0.97), rgba(243, 226, 190, 0.97));
+    border: 2px solid rgba(74, 44, 18, 0.6);
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px rgba(255, 252, 235, 0.7), 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+
+.dialog-plate-danger {
+    border-left: 6px solid #b03a2e;
+}
+
+.dialog-body-text {
+    margin: 0;
+    text-align: center;
+    font-family: var(--B);
+    font-weight: 600;
+    font-size: clamp(15px, 2.3vw, 19px);
+    line-height: 1.5;
+    color: #2c1a0c;
+}
+
+    .dialog-body-text strong {
+        color: #8a2c1e;
+        font-weight: 700;
+    }
+
 .slot-name-input-wrap {
+    position: relative;
     width: 100%;
     display: flex;
     justify-content: center;
 }
 
 .slot-name-input {
-    width: min(100%, 380px);
-    font-family: var(--PX);
-    font-size: 16px;
-    letter-spacing: 1px;
-    color: #4a2c12;
-    background: rgba(255, 246, 224, 0.92);
-    border: 2px solid #7a5a34;
-    border-radius: 4px;
-    padding: 10px 14px;
+    width: min(100%, 420px);
+    box-sizing: border-box;
+    font-family: var(--C);
+    font-weight: 700;
+    font-size: clamp(17px, 2.6vw, 22px);
+    letter-spacing: 0.06em;
+    color: #2c1a0c;
+    background: #fffaf0;
+    border: 2px solid #8a5a00;
+    border-radius: 10px;
+    padding: 11px 56px 11px 16px; /* right padding keeps text clear of the counter */
     text-align: center;
     outline: none;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.18);
 }
 
     .slot-name-input:focus {
-        border-color: var(--accent);
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 8px rgba(255, 200, 90, 0.35);
+        border-color: #d4a017;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.18), 0 0 10px rgba(255, 200, 90, 0.55);
     }
 
     .slot-name-input::placeholder {
-        color: #a08663;
-        opacity: 0.8;
+        color: #8a7458;
+        font-weight: 600;
+        opacity: 1;
     }
 
+/* Live "7 / 20" character counter inside the input's right edge */
+.slot-name-count {
+    position: absolute;
+    right: max(8px, calc(50% - 210px + 10px));
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--B);
+    font-weight: 700;
+    font-size: 13px;
+    color: #6b3a00;
+    pointer-events: none;
+}
+
 .slot-name-hint {
-    font-family: var(--PX);
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    color: #6b4a26;
+    font-family: var(--B);
+    font-weight: 600;
+    font-size: clamp(13px, 1.9vw, 15.5px);
+    line-height: 1.4;
+    color: #4a2c12;
     text-align: center;
-    opacity: 0.85;
 }
 
 /* The footer row (SAVE NAME / portal / CANCEL) reuses .reset-footer +
    .reset-btn, but the stone buttons are sized for the 1000px-wide reset
-   modal - shrink them a touch here so two fit the 560px frame. */
+   modal - shrink them a touch here so two fit the frame. */
 .slot-name-box .reset-btn {
-    min-width: clamp(120px, 16vw, 180px);
+    min-width: clamp(120px, 16vw, 190px);
     padding: clamp(10px, 1.6vw, 16px) clamp(14px, 2.4vw, 24px);
-    font-size: clamp(9px, 1.2vw, 12px);
+    font-size: clamp(10px, 1.3vw, 13px);
 }
 
 .slot-name-box .reset-portal-deco {
@@ -445,21 +497,12 @@
 
 @media (max-width: 700px) {
     .slot-name-box {
-        gap: 10px;
-    }
-
-    .slot-name-input {
-        font-size: 14px;
-        padding: 8px 10px;
-    }
-
-    .slot-name-hint {
-        font-size: 8px;
+        gap: 12px;
     }
 
     .slot-name-box .reset-btn {
         min-width: 104px;
         padding: 9px 12px;
-        font-size: 9px;
+        font-size: 10px;
     }
 }

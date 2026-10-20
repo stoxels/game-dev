@@ -199,6 +199,10 @@ function showSlotNameModal(slotNum) {
     input.value = getSlotName(slotNum);
     input.placeholder = t('scr_slot_name_placeholder');
     input.maxLength = 20;
+    const counter = document.getElementById('slot-name-count');
+    const syncCounter = () => { if (counter) counter.textContent = `${input.value.length} / 20`; };
+    input.oninput = syncCounter;
+    syncCounter();
     showModal('slot-name-modal');
     // Focus after the modal is visible; select-all so overwrite typing is instant.
     requestAnimationFrame(() => { input.focus(); input.select(); });
@@ -253,22 +257,34 @@ function _setResetModalTextForSlot(slotNum) {
 
 */
 
+// Save-slot names are typed by the player, so they must never reach innerHTML raw.
+function _escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 // Swaps the reset modal's copy to reference a single save slot.
 // Strips any data-t attributes on the elements it touches so a later
 // translation re-render doesn't overwrite this slot-specific text; the
 // original wording is restored by _restoreResetModalTextForFullReset()
 // whenever the modal is opened for the title-screen "reset everything" flow.
+// The plaque only has room for a short label (a 20-character name overflowed
+// it), so it shows the slot NUMBER while the banner below shows the full
+// name, highlighted, and may wrap onto a second line.
 function _setResetModalTextForSlot(slotNum) {
     const modal = document.getElementById('reset-modal');
     if (!modal) return;
 
-    const slotLabel = getSlotName(slotNum) || slotNum;
+    const slotLabel = String(getSlotName(slotNum) || slotNum);
     const title = modal.querySelector('.reset-title');
-    if (title) { title.removeAttribute('data-t'); title.textContent = t('scr_delete_slot_title').replace('{n}', () => slotLabel); }
+    if (title) { title.removeAttribute('data-t'); title.textContent = t('scr_delete_slot_title').replace('{n}', () => slotNum); }
 
     // Target by class and DOM structure instead of [data-t="..."]
     const note1 = modal.querySelector('.reset-note-text span:first-child');
-    if (note1) { note1.removeAttribute('data-t'); note1.textContent = t('scr_delete_slot_note1').replace('{n}', () => slotLabel); }
+    if (note1) {
+        note1.removeAttribute('data-t');
+        const named = `<strong class="reset-note-slotname">${_escapeHtml(slotLabel)}</strong>`;
+        note1.innerHTML = _escapeHtml(t('scr_delete_slot_note1')).replace('{n}', () => named);
+    }
 
     // Target by class and DOM structure instead of [data-t="..."]
     const note2 = modal.querySelector('.reset-note-text span:last-child');

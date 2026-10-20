@@ -55,7 +55,7 @@ export const T = {
         tut_s2h: 'CONTROLS',
         // {k1}…{k7} are filled at runtime with the player's current keybinds
         // (see tutUpdateKeybinds in js/keybinds.js).
-        tut_s2p: '<strong>Left click</strong> - fill a cell<br><strong>Right click</strong> - mark a cell as empty<br><strong>Hold Left Click and Drag</strong> - fill multiple cells<br><strong>CTRL + MouseWheel</strong> - Zoom in & out to scale <br> <strong>Left & Right Arrow Keys</strong> - Move the row clue headers towards the left/right<br> <strong>{k1},{k2},{k3},{k4}</strong> - use Class Abilities <br> <strong>{k5}</strong> - Pause the Game',
+        tut_s2p: '<strong>Left click</strong> - fill a cell<br><strong>Right click</strong> - mark a cell as empty<br><strong>Hold Left Click and Drag</strong> - fill multiple cells<br><strong>CTRL + MouseWheel</strong> - Zoom in & out<br><strong>Left & Right Arrow Keys</strong> - Move the row clue headers<br><strong>{k6} {k7} {k8} {k9}</strong> - walk your character<br><strong>{k10}</strong> (hold, then release) - charged melee strike<br><strong>{k11}</strong> (hold) - parry<br><strong>{k12}</strong> - cycle target<br><strong>{k1} {k2} {k3} {k4} ...</strong> - cast the spells on your hotbar<br><strong>{k14}</strong> - character sheet & inventory<br><strong>{k13}</strong> - spell book<br><strong>{k15}</strong> - Probability Tree<br><strong>{k5}</strong> - pause the game<br>Every key can be changed under Keybinds.',
 
         tut_s3h: 'DIFFICULTY',
         tut_s3p: '<strong style="color:var(--green)">Easy</strong> - low time penalties for mistakes, 50% less Score<br><strong style="color:var(--yellow)">Normal</strong> - standard time penalties for mistakes<br><strong style="color:var(--red)">Hard</strong> - heavy time penalties for mistakes, 50% more score',
@@ -63,14 +63,14 @@ export const T = {
         tut_s4h: 'GAME MODIFIERS',
         tut_s4p: '<strong style="color:var(--orange)">Time Trial</strong> - 50% less time per level, but 20% more Score<br><strong style="color:var(--red)">Hardcore</strong> - one mistake fails the level, but 30% more Score<br><strong style="color:var(--purple)">Ironman</strong> - items cannot be used, but 15% more Score<br><strong style="color:var(--accent)">Classless</strong> - Class Abilities cannot be used, but 20% more Score<br><strong style="color:var(--green)">Treeless</strong> - Probability Tree nodes have no effect, but 25% more Score<br>Modifiers can be combined with each other.',
 
-        tut_s5h: 'ITEMS & INVENTORY',
-        tut_s5p: 'Complete a level\'s bonus objective to earn a random item. Cursed items are powerful but also have a negative effect.',
+        tut_s5h: 'ITEMS, LOOT & EQUIPMENT',
+        tut_s5p: 'Complete a level\'s bonus objective for a guaranteed reward: about half the time a puzzle item, otherwise a piece of equipment, a core or an essence. Cursed puzzle items are powerful but have a negative effect.<br>Monsters also drop loot, gold, hearts and charms onto the grid. A <strong>correct fill</strong> on the cell that holds a drop claims it - a <strong>right-click</strong> destroys it, and drops fade after a while. Press <strong>{k14}</strong> to equip gear from your inventory.',
 
         tut_s6h: 'QUIZ & Probability Gates',
         tut_s6p: 'Some levels require answering a quiz correctly after finishing a level in order to achieve the bonus objective, and some levels have a Probability Gate that can be unlocked by solving an exercise.',
 
-        tut_s7h: 'ACHIEVEMENT CODES',
-        tut_s7p: 'Reach score milestones to unlock Moodle Codes. You can see your progress towards the next achievement in the Highscores tab. More score can be earned by replaying levels on higher difficulties or by adding more game modifiers.',
+        tut_s7h: 'MOODLE CODES',
+        tut_s7p: 'Moodle Codes are earned through <strong>progression</strong>, not Score: <strong>Code 1</strong> for finishing the tutorial and clearing World 1, <strong>Code 2</strong> for fully clearing 6 worlds, <strong>Code 3</strong> for every campaign world, <strong>Code 4</strong> for every atlas map up to Tier 6 and <strong>Code 5</strong> for every Tier 16 map. The Moodle Codes screen on the title screen shows your progress for each one.',
 
         tut_s8h: 'CLASSES & CLASS ABILITIES',
         tut_s8p: 'Completing Ascension - Levels allows you to select one out of three possible classes. Each class has a passive ability and two active abilities, which can heavily alter the way you approach a Stoxel and help in case you get stuck. Abilities can be upgraded by playing more Ascension - Levels.',
@@ -80,6 +80,25 @@ export const T = {
 
         tut_s10h: 'CONVERGENCE, INFERENCE & PROBABILITY TREE',
         tut_s10p: 'Completing Convergence - Levels grants Convergence Points, which can be spent on the Probability Tree to customize the way you play the game. Completing Inference - Objectives rewards additional Convergence Points.',
+
+        tut_s11h: 'COMBAT & MONSTERS',
+        tut_s11p: 'Monsters roam the grid from the very first levels of the campaign, not just in the endgame. Every correctly revealed cell charges a projectile that damages your target - drag across several cells for a bigger shot, and press <strong>{k12}</strong> to switch target.<br>You can also fight with a <strong>melee weapon</strong> (walk close, hold <strong>{k10}</strong>, release to strike) and with <strong>spells</strong> from your hotbar, which cost mana.<br>Some monsters are immune to blades or to certain spells - if a hit flashes IMMUNE, switch your attack. Defeated monsters drop loot and gold.',
+
+        tut_s12h: 'SURVIVING A FIGHT',
+        tut_s12p: 'Monsters attack when their attack bars fill, and a hit costs you <strong>Life</strong>. Hold <strong>{k11}</strong> to <strong>parry</strong> and take no damage; armour, evasion and shields on your gear help you <strong>block</strong> or <strong>dodge</strong> as well. Pick up <strong>hearts</strong> that drop on the grid to heal. Spells cost <strong>mana</strong>, which refills over time.<br>If your Life reaches zero the level is lost - and puzzle mistakes still cost time as usual.',
+
+        tut_s13h: 'BOSSES & TRIALS',
+        tut_s13p: '<strong>Bosses</strong> guard the Ascension and Convergence Trials in the campaign and also appear in endgame maps. They hit harder, use special attacks and always drop a charm. Defeat one to clear its trial.',
+
+        tut_s14h: 'TITLES',
+        tut_s14p: 'Your total <strong>Score</strong> unlocks <strong>50 Titles</strong>. Every Title you earn gives a <strong>permanent bonus that always stays active</strong> and stacks with all your other Titles. Click your Score on the map screens to open the Titles list, then equip the one you want in front of your character\'s name - or let the game show your highest.',
+
+        tut_s15h: 'ACHIEVEMENTS',
+        tut_s15p: 'Achievements track everything you do across <strong>all save slots</strong> and every play session - deleting a save slot never removes them. The Inference Ledger is different: it belongs to one save slot and starts over with it. Open Achievements from the title screen; every category has tiers to unlock, from Probability Tree to Combat.',
+
+        tut_s16h: 'MAPS & THE NEXUS',
+        tut_s16p: 'A <strong>map</strong> is a chain of puzzles fought back to back, with modifiers and hazards. Maps drop from monsters and can be played throughout the game. The <strong>Nexus</strong> is the endgame hub: its Probability Gate lets you launch and roll maps, climb the atlas up to Tier 16 and craft better gear.',
+
 
         // Setup screen
         setup_title: 'GAME SETUP',
@@ -588,7 +607,7 @@ export const T = {
         tut_s2h: 'STEUERUNG',
         // {k1}…{k5} werden zur Laufzeit mit den aktuellen Tastenbelegungen
         // gefüllt (siehe tutUpdateKeybinds in js/keybinds.js).
-        tut_s2p: '<strong>Linksklick</strong> - Zelle füllen<br><strong>Rechtsklick</strong> - Zelle als leer markieren<br><strong>Linksklick gedrückt halten & Ziehen</strong> - Mehrere Zellen füllen<br><strong>STRG + Mausrad</strong> - Hinein- & herauszoomen zum Skalieren<br><strong>Linke - und - Rechte Pfeiltaste</strong> - Zeilenhinweise nach links/rechts bewegen<br> <strong>{k1},{k2},{k3},{k4}</strong> - Klassenfähigkeiten verwenden <br>  <strong>{k5}</strong> - Spiel pausieren',
+        tut_s2p: '<strong>Linksklick</strong> - Zelle füllen<br><strong>Rechtsklick</strong> - Zelle als leer markieren<br><strong>Linksklick gedrückt halten & Ziehen</strong> - Mehrere Zellen füllen<br><strong>STRG + Mausrad</strong> - Hinein- & herauszoomen<br><strong>Pfeiltasten Links & Rechts</strong> - Zeilenhinweise verschieben<br><strong>{k6} {k7} {k8} {k9}</strong> - Figur bewegen<br><strong>{k10}</strong> (halten, dann loslassen) - aufgeladener Nahkampfschlag<br><strong>{k11}</strong> (halten) - parieren<br><strong>{k12}</strong> - Ziel wechseln<br><strong>{k1} {k2} {k3} {k4} ...</strong> - Zauber aus der Hotbar wirken<br><strong>{k14}</strong> - Charakterblatt & Inventar<br><strong>{k13}</strong> - Zauberbuch<br><strong>{k15}</strong> - Wahrscheinlichkeitsbaum<br><strong>{k5}</strong> - Spiel pausieren<br>Jede Taste lässt sich unter Tasten ändern.',
 
         tut_s3h: 'SCHWIERIGKEIT',
         tut_s3p: '<strong style="color:var(--green)">Leicht</strong> - geringe Zeitstrafen bei Fehlern, 50% weniger Punkte<br><strong style="color:var(--yellow)">Normal</strong> - normale Zeitstrafen bei Fehlern <br> <strong style="color:var(--red)">Schwer</strong> - schwere Zeitstrafen bei Fehlern, 50% mehr Punkte',
@@ -596,13 +615,13 @@ export const T = {
         tut_s4h: 'SPIELMODIFIKATOREN',
         tut_s4p: '<strong style="color:var(--orange)">Time Trial</strong> - 50% weniger Zeit pro Level - 20% mehr Punkte<br><strong style="color:var(--red)">Hardcore</strong> - ein Fehler = sofort verloren - 30% mehr Punkte<br><strong style="color:var(--purple)">Ironman</strong> - Items können nicht verwendet werden - 15% mehr Punkte <br><strong style="color:var(--accent)">Klassenlos</strong> - Keine aktiven oder passiven Klassenfähigkeiten, aber dafür 20% mehr Punkte <br><strong style="color:var(--green)">Baumlos</strong> - Probability Alle Effekte vom Wahrscheinlichkeitsbaum sind deaktiviert, aber dafür 25% mehr Punkte <br>Modifikatoren können miteinander kombiniert werden.',
 
-        tut_s5h: 'ITEMS & INVENTAR',
-        tut_s5p: 'Erfülle das Bonusziel eines Levels, um ein zufälliges Item zu erhalten. Verfluchte Items sind mächtig, aber haben auch negative Effekte.',
+        tut_s5h: 'ITEMS, BEUTE & AUSRÜSTUNG',
+        tut_s5p: 'Erfülle das Bonusziel eines Levels für eine garantierte Belohnung: etwa zur Hälfte ein Rätsel-Item, sonst ein Ausrüstungsteil, ein Kern oder eine Essenz. Verfluchte Rätsel-Items sind mächtig, haben aber einen negativen Effekt.<br>Monster lassen außerdem Beute, Gold, Herzen und Anhänger auf das Gitter fallen. Eine <strong>korrekte Füllung</strong> auf der Zelle mit dem Drop sammelt ihn ein - ein <strong>Rechtsklick</strong> zerstört ihn, und Drops verschwinden nach einer Weile. Drücke <strong>{k14}</strong>, um Ausrüstung aus deinem Inventar anzulegen.',
 
         tut_s6h: 'QUIZ & WAHRSCHEINLICHKEITSTORE',
         tut_s6p: 'Manche Level erfordern nach dem Abschluss eine korrekt beantwortete Quizfrage, um das Bonusziel zu erreichen. Außerdem haben einige Level ein Wahrscheinlichkeitstor, das durch Lösen einer Aufgabe freigeschaltet werden kann.',
 
-        tut_s7h: 'ACHIEVEMENT CODES',
+        tut_s7h: 'MOODLE-CODES',
         tut_s7p: 'Erreiche Punktemeilensteine, um Moodle-Codes freizuschalten. Deinen Fortschritt zum nächsten Achievement siehst du im Highscores-Tab. Mehr Punkte lassen sich durch Wiederholen von Levels auf höheren Schwierigkeitsstufen oder durch zusätzliche Modifikatoren verdienen.',
 
         tut_s8h: 'KLASSEN & KLASSEN FÄHIGKEITEN',
@@ -613,6 +632,25 @@ export const T = {
 
         tut_s10h: 'KONVERGENZ, INFERENZ & WAHRSCHEINLICHKEITSBAUM',
         tut_s10p: 'Nach dem Beenden eines Konvergenz - Levels erhältst du Konvergenzpunkte, die im Wahrscheinlichkeitsbaum ausgegeben werden können, um deine Spielweise anzupassen. Das Abschließen von Inferenz - Zielen gibt zusätzliche Konvergenzpunkte.',
+
+        tut_s11h: 'KAMPF & MONSTER',
+        tut_s11p: 'Monster streifen schon ab den ersten Leveln der Kampagne über das Gitter, nicht erst im Endgame. Jede korrekt aufgedeckte Zelle lädt ein Projektil auf, das dein Ziel verletzt - ziehe über mehrere Zellen für einen größeren Schuss und drücke <strong>{k12}</strong>, um das Ziel zu wechseln.<br>Außerdem kannst du mit einer <strong>Nahkampfwaffe</strong> kämpfen (nah herangehen, <strong>{k10}</strong> halten, zum Zuschlagen loslassen) und mit <strong>Zaubern</strong> aus deiner Hotbar, die Mana kosten.<br>Manche Monster sind immun gegen Klingen oder bestimmte Zauber - blitzt bei einem Treffer IMMUN auf, wechsle deinen Angriff. Besiegte Monster lassen Beute und Gold fallen.',
+
+        tut_s12h: 'EINEN KAMPF ÜBERLEBEN',
+        tut_s12p: 'Monster greifen an, sobald sich ihre Angriffsbalken füllen, und ein Treffer kostet dich <strong>Leben</strong>. Halte <strong>{k11}</strong> gedrückt, um zu <strong>parieren</strong> und keinen Schaden zu nehmen; Rüstung, Ausweichen und Schilde deiner Ausrüstung helfen dir ebenfalls beim <strong>Blocken</strong> oder <strong>Ausweichen</strong>. Sammle <strong>Herzen</strong> ein, die auf das Gitter fallen, um dich zu heilen. Zauber kosten <strong>Mana</strong>, das sich mit der Zeit auffüllt.<br>Sinkt dein Leben auf null, ist das Level verloren - und Rätselfehler kosten weiterhin wie gewohnt Zeit.',
+
+        tut_s13h: 'BOSSE & PRÜFUNGEN',
+        tut_s13p: '<strong>Bosse</strong> bewachen die Aufstiegs- und Konvergenzprüfungen der Kampagne und erscheinen auch in Endgame-Karten. Sie schlagen härter zu, nutzen Spezialangriffe und lassen immer einen Anhänger fallen. Besiege einen, um seine Prüfung zu bestehen.',
+
+        tut_s14h: 'TITEL',
+        tut_s14p: 'Deine gesamte <strong>Punktzahl</strong> schaltet <strong>50 Titel</strong> frei. Jeder verdiente Titel gibt einen <strong>dauerhaften Bonus, der immer aktiv bleibt</strong> und sich mit all deinen anderen Titeln summiert. Klicke auf den Kartenbildschirmen auf deine Punktzahl, um die Titelliste zu öffnen, und lege den Titel an, der vor dem Namen deiner Figur stehen soll - oder lass das Spiel deinen höchsten anzeigen.',
+
+        tut_s15h: 'ERFOLGE',
+        tut_s15p: 'Erfolge zählen alles, was du tust, über <strong>alle Spielstände</strong> und jede Spielsitzung hinweg - einen Spielstand zu löschen entfernt sie nie. Das Inferenz-Buch ist anders: Es gehört zu einem Spielstand und beginnt mit ihm von vorn. Öffne die Erfolge im Titelbildschirm; jede Kategorie hat Stufen zum Freischalten, vom Wahrscheinlichkeitsbaum bis zum Kampf.',
+
+        tut_s16h: 'KARTEN & DER NEXUS',
+        tut_s16p: 'Eine <strong>Karte</strong> ist eine Kette aus Rätseln, die du nacheinander kämpfst, mit Modifikatoren und Gefahren. Karten fallen von Monstern und können im ganzen Spiel gespielt werden. Der <strong>Nexus</strong> ist der Endgame-Knotenpunkt: Sein Wahrscheinlichkeitstor lässt dich Karten starten und würfeln, den Atlas bis Stufe 16 erklimmen und bessere Ausrüstung herstellen.',
+
 
         // Setup screen
         setup_title: 'SPIELEINRICHTUNG',
