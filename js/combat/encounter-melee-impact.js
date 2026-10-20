@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { _calcPlayerMeleeDamage, _lastMeleeElements, _lastMeleeWasCrit } from './combat-calculations.js';
+import { _calcPlayerMeleeDamage, _calcStaffShotDamage, _lastMeleeElements, _lastMeleeWasCrit } from './combat-calculations.js';
 import { _secondaryDamage } from './combat-calculations-resistances.js';
 import { _getElementCentre } from './combat-class-projectiles.js';
 import { _playerTakeDamage } from './encounter-damage.js';
@@ -76,7 +76,7 @@ export function _applyPlayerMeleeImpact(targetId, opts) {
     // reach, see _meleeFindVictim, so this is a backstop for callers that
     // name a far target). At 200%+ the weapon art dashes to the target
     // instead, so this gate never fires.
-    if (_meleeTierForCharge(chargePct) < 1
+    if (!(opts && opts.shot) && _meleeTierForCharge(chargePct) < 1
         && typeof _meleeTargetInRange === 'function' && !_meleeTargetInRange(targetId)) {
         return;
     }
@@ -207,6 +207,16 @@ export function _applyPlayerMeleeImpact(targetId, opts) {
     if (typeof _tryMonsterMeleeSidestep === 'function') {
         try { _tryMonsterMeleeSidestep(targetId); } catch (e) {}
     }
+}
+
+// A staff's bolt landing (see _fireWeaponShot): its own school hit, separate from
+// the melee blow. `chargePct` is the share spent at key-press. Never throws.
+export function _applyStaffShotImpact(targetId, chargePct = 1) {
+    if (!_isActive() || !globalThis._monsters.some(m => m.id === targetId)) return;
+    if (_rollPlayerMiss(targetId)) return;
+    const shot = _calcStaffShotDamage(chargePct);
+    if (!shot) return;
+    _damageTargetById(targetId, shot.dmg, shot.elements, { isCrit: shot.crit, chargePct });
 }
 
 // Cleave gear modifier (main weapon suffix): rolls against cleavePct and,

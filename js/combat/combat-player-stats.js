@@ -507,6 +507,11 @@ export function _getItemEffectiveDamage(item) {
     };
     let physIncPct = 0;
     const modded = { phys: false, fire: false, cold: false, lightning: false, shadow: false };
+    // Caster weapons carry their own school range (a staff's bolt included).
+    if (item.elemDamage && item.school && out[item.school + 'Max'] != null) {
+        out[item.school + 'Min'] += item.elemDamage.min || 0;
+        out[item.school + 'Max'] += item.elemDamage.max || 0;
+    }
 
     function applyDamage(stat) {
         if (stat.value == null) return;
@@ -970,7 +975,7 @@ export function _computePlayerStats() {
         onslaughtOnKillPct: passiveTreeBonuses.onslaughtOnKillPct || 0,
         onslaughtDefencePct: passiveTreeBonuses.onslaughtDefencePct || 0,
         leechEffectRecentCritPct: passiveTreeBonuses.leechEffectRecentCritPct || 0,
-        wandPhysAsLightningPct: passiveTreeBonuses.wandPhysAsLightningPct || 0,
+        wandLightningDamageIncPct: passiveTreeBonuses.wandLightningDamageIncPct || 0,
         bowAoePct: passiveTreeBonuses.bowAoePct || 0,
         dmgFullAbsorptionPct: passiveTreeBonuses.dmgFullAbsorptionPct || 0,
         critMultiHeavy: passiveTreeBonuses.critMultiHeavy || 0,
@@ -1087,6 +1092,9 @@ export function _computePlayerStats() {
         meleeFireMin: 0, meleeFireMax: 0, meleeColdMin: 0, meleeColdMax: 0,
         meleeLightningMin: 0, meleeLightningMax: 0,
         meleeShadowMin: 0, meleeShadowMax: 0,
+        // Staff bolt: the staff's own school range (a separate projectile hit, not a melee roll).
+        staffShotMin: 0, staffShotMax: 0, staffShotSchool: null,
+        isCasterWeapon: false,
         spellDamageFlat: 0, spellDamageIncPct: passiveTreeBonuses.spellDamageIncPct || 0,
         // "% increased elemental damage" (passive tree only - no gear mod
         // feeds this bucket). Multiplies the ELEMENTAL share of a hit and
@@ -1249,6 +1257,21 @@ export function _computePlayerStats() {
                 s.meleePhysMax += max;
             }
         }
+        // Caster weapons: a wand's school range joins the melee elemental buckets
+        // (its strike IS the bolt); a staff's feeds its separate bolt.
+        if (item.slotType === 'weapon' && item.elemDamage && item.school) {
+            const eMin = item.elemDamage.min || 0;
+            const eMax = item.elemDamage.max || 0;
+            if (item.casterKind === 'staff') {
+                s.staffShotMin += eMin;
+                s.staffShotMax += eMax;
+                s.staffShotSchool = item.school;
+            } else {
+                const key = item.school.charAt(0).toUpperCase() + item.school.slice(1);
+                s['melee' + key + 'Min'] += eMin;
+                s['melee' + key + 'Max'] += eMax;
+            }
+        }
         function applyStatsFromList(list) {
             (Array.isArray(list) ? list : []).forEach(mod => {
                 (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {
@@ -1311,7 +1334,7 @@ export function _computePlayerStats() {
         s.castSpeedPct += s.dualCastSpeedPct || 0;
         s.spellDamageIncPct += s.dualSpellDamagePct || 0;
         s.movementSpeedPct += s.dualMoveSpeedPct || 0;
-        for (const k of ['meleePhysMin', 'meleePhysMax',
+        for (const k of ['meleePhysMin', 'meleePhysMax', 'staffShotMin', 'staffShotMax',
             'meleeFireMin', 'meleeFireMax', 'meleeColdMin', 'meleeColdMax',
             'meleeLightningMin', 'meleeLightningMax', 'meleeShadowMin', 'meleeShadowMax']) {
             s[k] = Math.round((s[k] || 0) * dw);
@@ -1326,7 +1349,7 @@ export function _computePlayerStats() {
     // scaled (only flat ranges are).
     if (typeof MELEE_DAMAGE_MULT !== 'undefined' && MELEE_DAMAGE_MULT !== 1) {
         const mm = MELEE_DAMAGE_MULT;
-        for (const k of ['meleePhysMin', 'meleePhysMax',
+        for (const k of ['meleePhysMin', 'meleePhysMax', 'staffShotMin', 'staffShotMax',
             'meleeFireMin', 'meleeFireMax', 'meleeColdMin', 'meleeColdMax',
             'meleeLightningMin', 'meleeLightningMax', 'meleeShadowMin', 'meleeShadowMax']) {
             s[k] = Math.round((s[k] || 0) * mm);
@@ -1444,9 +1467,10 @@ export function _computePlayerStats() {
     // Staves and Wands are separate families; sceptres count as Maces.
     s.isStaffEquipped = weaponFamily === 'staff';
     s.isWandEquipped = weaponFamily === 'wand' && !s.isMaceEquipped;
+    s.isCasterWeapon = s.isWandEquipped || s.isStaffEquipped;
     s.isBowEquipped = weaponFamily === 'bow';
     // Phase C-2: wand / bow conditional lines, Onslaught, recent-crit leech.
-    if (s.isWandEquipped) s.physAsExtraLightningPct = (s.physAsExtraLightningPct || 0) + (s.wandPhysAsLightningPct || 0);
+    if (s.isWandEquipped) s.lightningDamageIncPct = (s.lightningDamageIncPct || 0) + (s.wandLightningDamageIncPct || 0);
     if (s.isBowEquipped) s.areaOfEffectPct += s.bowAoePct || 0;
     if (Date.now() - (Number(globalThis._lastCritAt) || 0) < 4000) {
         s.lifeLeechEffectIncPct = (s.lifeLeechEffectIncPct || 0) + (s.leechEffectRecentCritPct || 0);
@@ -2162,7 +2186,7 @@ export const STAT_DISPLAY_LABELS = {
     onslaughtOnKillPct: { label: t('eg_stat_onslaught_on_kill'), suffix: '%' },
     onslaughtDefencePct: { label: t('eg_stat_onslaught_defences'), suffix: '%' },
     leechEffectRecentCritPct: { label: t('eg_stat_leech_effect_recent_crit'), suffix: '%' },
-    wandPhysAsLightningPct: { label: t('eg_stat_wand_phys_as_lightning'), suffix: '%' },
+    wandLightningDamageIncPct: { label: t('eg_stat_wand_phys_as_lightning'), suffix: '%' },
     bowAoePct: { label: t('eg_stat_bow_aoe'), suffix: '%' },
     dmgFullAbsorptionPct: { label: t('eg_stat_dmg_full_absorption'), suffix: '%' },
     critMultiHeavy: { label: t('eg_stat_crit_multi_heavy'), suffix: '%' },

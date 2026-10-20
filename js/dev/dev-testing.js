@@ -7,6 +7,7 @@ import { _essenceDefForId } from '../loot/loot-essences-defs.js';
 import { _isActive } from '../combat/combat-state.js';
 import { SLOT_ACCEPTS } from '../hub/hub-drag-and-drop.js';
 import { ALL_BASE_TYPES } from '../loot/equipment-base-items.js';
+import { _baseWeaponFields } from '../loot/equipment-base-types.js';
 import { SLOT_ICONS } from '../loot/equipment-slot-icons.js';
 import { _rollModCounts } from '../loot/loot-equipment-generator.js';
 import { _getModTable } from '../loot/loot-equipment-mod-tables.js';
@@ -333,7 +334,7 @@ function _devTestMakeItem(base, level, rarity) {
         itemLevel: level,
         requirements: { ...base.requirements },
         defenses: { ...base.defenses },
-        ...(base.damage ? { damage: { ...base.damage }, attackIntervalSeconds: base.attackIntervalSeconds } : {}),
+        ..._baseWeaponFields(base),
         ...(base.hands ? { hands: base.hands } : {}),
         ...(base.blockChance ? { blockChance: base.blockChance } : {}),
         mods,

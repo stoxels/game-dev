@@ -848,7 +848,7 @@ function upgradeBase(def) {
     }
     if (def.damage && (def.slotType === 'weapon' || def.slotType === 'ranged')) {
         const hands = def.hands || 1;
-        const comp = bases.filter(b => b.damage && (def.slotType === 'ranged' || (b.hands || 1) === hands));
+        const comp = bases.filter(b => b.damage && !b.casterKind && (def.slotType === 'ranged' || (b.hands || 1) === hands));
         const ranged = def.slotType === 'ranged';
         const dps = (dmg, iv) => ((dmg.min + dmg.max) / 2) / (iv || 1);
         const bestDps = Math.max(0, ...comp.map(b => dps(b.damage, ranged ? 1 : b.attackIntervalSeconds)));

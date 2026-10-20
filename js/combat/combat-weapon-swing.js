@@ -1,10 +1,10 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { _getElementCentre } from './combat-class-projectiles.js';
+import { _fireProjectile, _getElementCentre, _getElementRestCentre, _getWeaponShotDef } from './combat-class-projectiles.js';
 import { _consumePlayerCharge, _getPlayerChargePct, _updatePlayerChargeBar } from './encounter-tick.js';
 import { _meleeTierLabel } from './encounter.js';
 import { _showStatusLabel } from './encounter-monster-damage.js';
-import { _applyPlayerMeleeImpact } from './encounter-melee-impact.js';
+import { _applyPlayerMeleeImpact, _applyStaffShotImpact } from './encounter-melee-impact.js';
 import {
     _meleeDashOut,
     _meleeDeliveryAvailable,
@@ -12,7 +12,7 @@ import {
     _meleeRaiseAvatar,
 } from './encounter-melee-delivery.js';
 import { _meleeTierForCharge } from './encounter-melee-arts.js';
-import { WEAPON_SWING_COOLDOWN_MS, WEAPON_SWING_DURATION_MS, _facingFromVector, _getAttackFacing, _getEquippedWeaponInfo, _getStrikeWeaponFamily, _meleeAimFacing, _meleeFindVictim } from './combat-weapon-swing-config.js';
+import { WEAPON_SWING_COOLDOWN_MS, WEAPON_SWING_DURATION_MS, _facingFromVector, _getAttackFacing, _getEquippedWeaponInfo, _getStrikeWeaponFamily, _getStrikeWeaponSchool, _meleeAimFacing, _meleeFindVictim, _shotVictim } from './combat-weapon-swing-config.js';
 import { _isActive } from './combat-state.js';
 
 //  endgame-weapon-swing.js
@@ -228,6 +228,38 @@ function _meleeDeliverArtStrike(targetId, tier, chargePct) {
     } catch (e) {}
 }
 
+// Wand / staff bolt: a school-skinned projectile from the avatar to the target
+// card; `onArrive` runs when it lands (or at once when there is nothing to
+// measure, e.g. headless). Never throws.
+export function _fireWeaponShot(targetId, school, onArrive) {
+    try {
+        const avatar = document.getElementById('player-avatar-wrapper');
+        const card = document.getElementById(`sx-card-${targetId}`);
+        if (!avatar || !card) { setTimeout(onArrive, 0); return; }
+        const def = _getWeaponShotDef(school);
+        _fireProjectile(def, def.cssClass, _getElementCentre(avatar), _getElementRestCentre(card),
+            def.duration, def.easing, onArrive, null, 1);
+    } catch (e) { try { onArrive(); } catch (e2) {} }
+}
+
+// A wand strike IS its bolt: no swing arc, no reach needed. The spent charge
+// share is captured now so a second press mid-flight cannot steal it.
+function _wandShot(targetId, facing) {
+    const spent = (typeof _pendingMeleeChargePct === 'number') ? globalThis._pendingMeleeChargePct : 1;
+    globalThis._pendingMeleeChargePct = null;
+    _swingEquippedWeapon(220, false);
+    _weaponSwingHop(facing);
+    _weaponSwingSound('wand');
+    _fireWeaponShot(targetId, _getStrikeWeaponSchool(true), () => {
+        try {
+            if (typeof _isActive === 'function' && !_isActive()) return;
+            if (typeof dead !== 'undefined' && globalThis.dead) return;
+            if (!globalThis._monsters.some(m => m.id === targetId && m.currentHP > 0)) return;
+            _applyPlayerMeleeImpact(targetId, { shot: true, chargePct: spent });
+        } catch (e) {}
+    });
+}
+
 // Manual weapon attack (Secret-of-Mana-style): directional CSS swing + hop,
 // damage through the standard melee channel against the CURRENT target
 // (same damage, cleave, accuracy and reflect rules as before). The strike
@@ -283,7 +315,9 @@ export function _doWeaponAttack() {
     // selected target from anywhere.
     const selectedId = (typeof _targetId === 'undefined' || !globalThis._targetId)
         ? null : globalThis._targetId;
-    const victimId = _meleeFindVictim(selectedId);
+    // Wands and staves shoot: any living monster is a valid target, no reach needed.
+    const shooter = ['wand', 'staff'].includes(_getStrikeWeaponFamily(false));
+    const victimId = shooter ? _shotVictim(selectedId) : _meleeFindVictim(selectedId);
     let peekTier = 0;
     try {
         peekTier = (typeof _getPlayerChargePct === 'function' && typeof _meleeTierForCharge === 'function')
@@ -329,9 +363,17 @@ export function _doWeaponAttack() {
 
     const family = _getStrikeWeaponFamily(hasTarget);
     const facing = _meleeAimFacing(strikeId || selectedId);
+    if (family === 'wand' && hasTarget) { _wandShot(strikeId, facing); return; }
     _showWeaponSwing(family, facing);
     _weaponSwingHop(facing);
     _weaponSwingSound(family);
+    // Staff: the swing is joined by a school bolt at the same target (own hit).
+    if (family === 'staff' && hasTarget) {
+        const spent = (typeof _pendingMeleeChargePct === 'number') ? globalThis._pendingMeleeChargePct : 1;
+        _fireWeaponShot(strikeId, _getStrikeWeaponSchool(true), () => {
+            try { _applyStaffShotImpact(strikeId, spent); } catch (e) {}
+        });
+    }
 
     // Damage at swing impact (matches the visual mid-point).
     setTimeout(() => {

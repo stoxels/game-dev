@@ -19769,8 +19769,8 @@ export const TALENT_TREE_DATA = {
    "id": 31111,
    "x": 986,
    "y": -1984,
-   "nameEn": "Wand Physical Damage",
-   "nameDe": "Physischer Zauberstabschaden",
+   "nameEn": "Wand Damage",
+   "nameDe": "Zauberstabschaden",
    "icon": "",
    "statKey": "travel_wand_physical_damage_31111",
    "effects": [
@@ -19782,8 +19782,8 @@ export const TALENT_TREE_DATA = {
    "id": 31112,
    "x": 946,
    "y": -1984,
-   "nameEn": "Wand Physical Damage and Charge-Up Speed",
-   "nameDe": "Physischer Zauberstabschaden und Tempo",
+   "nameEn": "Wand Damage and Charge-Up Speed",
+   "nameDe": "Zauberstabschaden und Tempo",
    "icon": "",
    "statKey": "small_wand_physical_damage_and_attack_speed_31112",
    "effects": [
@@ -19796,8 +19796,8 @@ export const TALENT_TREE_DATA = {
    "id": 31113,
    "x": 913,
    "y": -1935,
-   "nameEn": "Wand Physical Damage and Charge-Up Speed",
-   "nameDe": "Physischer Zauberstabschaden und Tempo",
+   "nameEn": "Wand Damage and Charge-Up Speed",
+   "nameDe": "Zauberstabschaden und Tempo",
    "icon": "",
    "statKey": "small_wand_physical_damage_and_attack_speed_31113",
    "effects": [

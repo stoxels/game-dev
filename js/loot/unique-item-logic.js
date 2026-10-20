@@ -164,7 +164,7 @@ export function _uniqueFallbackDefenses(def) {
 }
 export function _uniqueFallbackDamage(def) {
     if (typeof ALL_BASE_TYPES === 'undefined' || !Array.isArray(ALL_BASE_TYPES)) return null;
-    let candidates = ALL_BASE_TYPES.filter(b => b.slotType === def.slotType && b.damage);
+    let candidates = ALL_BASE_TYPES.filter(b => b.slotType === def.slotType && b.damage && !b.casterKind);
     if (!candidates.length) return null;
     let sameArch = candidates.filter(b => b.archetype === def.archetype);
     let pool = sameArch.length ? sameArch : candidates;

@@ -95,6 +95,31 @@ export function _getStrikeWeaponFamily(consumed) {
     return _getEquippedWeaponInfo().family;
 }
 
+// Spell school of the weapon that is striking NOW ('fire' | 'cold' | 'lightning'
+// | 'shadow'), or null for a weapon with no school (its bolt is plain physical).
+export function _getStrikeWeaponSchool(consumed) {
+    try {
+        const hand = consumed ? (globalThis._strikeHand === 2 ? 2 : 1) : _getLeadHand();
+        const w = _getDualHandWeapon(hand) || _getEquippedWeaponInfo().item;
+        return (w && w.school) || null;
+    } catch (e) { return null; }
+}
+
+// Wands and staves fire a bolt on every strike, so they need no one in melee
+// reach: the shot goes to the selected monster, else the nearest living one.
+export function _shotVictim(selectedId) {
+    const list = (Array.isArray(globalThis._monsters) ? globalThis._monsters : []).filter(m => m && m.currentHP > 0);
+    if (!list.length) return null;
+    if (selectedId != null && list.some(m => m.id === selectedId)) return selectedId;
+    let best = list[0].id;
+    let bestD = Infinity;
+    for (const m of list) {
+        const d = _meleeEdgeDistance(m.id);
+        if (d != null && d < bestD) { best = m.id; bestD = d; }
+    }
+    return best;
+}
+
 // The direction the avatar is currently facing. Movement writes it to the
 // walk loop; idle keeps the last travel direction, with a down fallback.
 export function _getAttackFacing() {
@@ -203,7 +228,7 @@ export function _updateMeleeMarker() {
     let victim = null;
     try {
         const info = _getEquippedWeaponInfo();
-        if (info.item && info.item.slotType === 'weapon') {
+        if (info.item && info.item.slotType === 'weapon' && info.family !== 'wand') {
             const selected = globalThis._targetId || null;
             const v = _meleeFindVictim(selected);
             if (v != null && v !== selected) victim = v;

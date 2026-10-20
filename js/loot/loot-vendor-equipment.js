@@ -1,5 +1,6 @@
 import { t, LANG } from '../translation/translations.js';
 import { ALL_BASE_TYPES } from './equipment-base-items.js';
+import { _baseWeaponFields } from './equipment-base-types.js';
 import { SLOT_ICONS } from './equipment-slot-icons.js';
 import { PLAYER_BASE_ATTRIBUTES, _computeLoadoutAttributes, _formatRequirementPart } from './loot-requirements.js';
 import { _clearTooltip } from '../hub/hub-tooltips.js';
@@ -330,7 +331,7 @@ export function _vendorBuildBaseItemFromBase(base) {
         itemLevel: base.minLevel,
         requirements: { ...base.requirements },
         defenses: { ...base.defenses },
-        ...(base.damage ? { damage: { ...base.damage }, attackIntervalSeconds: base.attackIntervalSeconds } : {}),
+        ..._baseWeaponFields(base),
         ...(base.hands ? { hands: base.hands } : {}),
         ...(base.blockChance ? { blockChance: base.blockChance } : {}),
     };

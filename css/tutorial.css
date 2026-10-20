@@ -661,3 +661,6 @@ body.tq-intermission-active #screen-hub .sx-topbar .sx-level-btn {
     to   { opacity: 1; transform: translateY(-50%); }
 }
 
+/* Puzzle 3: choose the starter weapon (sword or wand) */
+.tq-bubble-choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 10px; }
+.tq-bubble-choices .tq-bubble-choice { margin-top: 0; }

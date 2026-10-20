@@ -130,6 +130,9 @@ export function _buildTooltipBodyHTML(item) {
         } else {
             rangeLine('eg_stat_phys_damage', item.damage.min, item.damage.max, false);
         }
+        if (item.casterKind && item.school) {
+            implicitLines.push(`<div class="sx-tt-implicit">${t(item.casterKind === 'staff' ? 'eg_tt_shot_staff' : 'eg_tt_shot_wand').replace('{school}', t('eg_school_' + item.school))}</div>`);
+        }
         // Only the melee weapon slot has a charge interval (time to 100% for
         // manual E strikes) - ranged weapons scale the input-driven
         // projectile channel instead.

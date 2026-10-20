@@ -7775,11 +7775,80 @@ for (const _slotTable of [
     for (const _base of _slotTable) _BASE_TYPE_BY_ID.set(_base.id, _base);
 }
 
-export function _healItemRequirements(item) {
-    if (!item || item.isUnique || !item.baseId || !item.requirements) return false;
+//------------------------------------------------------------------------
+//-------------------CASTER WEAPONS (WANDS + STAVES)----------------------
+//------------------------------------------------------------------------
+// Wands are "Shoot" weapons: no physical damage, every strike fires a bolt of
+// ONE spell school (fire / cold / lightning / shadow) that scales with spell
+// and elemental damage. Staves are hybrids: a smaller physical blow plus a
+// weaker school bolt. Sceptres stay melee maces.
+// Each caster base gets (applied once, at load, from its old physical range):
+//   casterKind  'wand' | 'staff'
+//   school      'fire' | 'cold' | 'lightning' | 'shadow'
+//   elemDamage  the school range (wand = the old range; staff = 40% of it)
+//   damage      what is left of the physical range (wand 0-0; staff 60%)
+const CASTER_STAFF_PHYS_SHARE = 0.6;
+const CASTER_SCHOOLS = ['fire', 'cold', 'lightning', 'shadow'];
+const CASTER_SCHOOL_BY_NAME = [
+    [/frost|glacial/i, 'cold'], [/ember|dragonbone|flame/i, 'fire'],
+    [/storm|tempest/i, 'lightning'], [/dusk|void|shadow/i, 'shadow'],
+];
+
+function _casterKindOfBase(base) {
+    if (!base || base.slotType !== 'weapon') return null;
+    if (base.icon === '🦯') return 'staff';
+    if (base.icon === '🪄' && !/sceptre|scepter|zepter/i.test(base.name || '')) return 'wand';
+    return null;
+}
+
+let _casterRotation = 0;
+for (const _base of BASE_TYPES_WEAPON) {
+    const kind = _casterKindOfBase(_base);
+    if (!kind || !_base.damage) continue;
+    const named = CASTER_SCHOOL_BY_NAME.find(([re]) => re.test(_base.name));
+    _base.casterKind = kind;
+    _base.school = named ? named[1] : CASTER_SCHOOLS[_casterRotation++ % CASTER_SCHOOLS.length];
+    const old = _base.damage;
+    const share = kind === 'staff' ? 1 - CASTER_STAFF_PHYS_SHARE : 1;
+    _base.elemDamage = { min: Math.round(old.min * share), max: Math.round(old.max * share) };
+    _base.damage = { min: old.min - _base.elemDamage.min, max: old.max - _base.elemDamage.max };
+}
+
+// The weapon-only fields an item copies from its base at drop time.
+export function _baseWeaponFields(base) {
+    if (!base.damage) return {};
+    return {
+        damage: { ...base.damage },
+        attackIntervalSeconds: base.attackIntervalSeconds,
+        ...(base.casterKind ? {
+            casterKind: base.casterKind, school: base.school, elemDamage: { ...base.elemDamage },
+        } : {}),
+    };
+}
+
+// Saves from before the caster rework hold wands/staves with a plain physical
+// `damage` range. Converts such an item (by its baseId) to the new shape using
+// its OWN stored range, so nothing is lost. Idempotent; returns true on change.
+export function _healCasterWeapon(item) {
+    if (!item || item.isUnique || !item.baseId || item.casterKind || !item.damage) return false;
     const base = _BASE_TYPE_BY_ID.get(item.baseId);
-    if (!base || !base.requirements) return false;
-    let changed = false;
+    if (!base || !base.casterKind) return false;
+    const share = base.casterKind === 'staff' ? 1 - CASTER_STAFF_PHYS_SHARE : 1;
+    const old = item.damage;
+    item.casterKind = base.casterKind;
+    item.school = base.school;
+    item.elemDamage = { min: Math.round(old.min * share), max: Math.round(old.max * share) };
+    item.damage = { min: old.min - item.elemDamage.min, max: old.max - item.elemDamage.max };
+    return true;
+}
+
+export function _healItemRequirements(item) {
+    // Also the one load-time hook that visits every saved item, so it carries the caster conversion.
+    const casterChanged = _healCasterWeapon(item);
+    if (!item || item.isUnique || !item.baseId || !item.requirements) return casterChanged;
+    const base = _BASE_TYPE_BY_ID.get(item.baseId);
+    if (!base || !base.requirements) return casterChanged;
+    let changed = casterChanged;
     for (const k of ['str', 'agi', 'int']) {
         const want = base.requirements[k] || 0;
         if ((item.requirements[k] || 0) !== want) {

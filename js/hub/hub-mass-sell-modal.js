@@ -302,6 +302,9 @@ export function _requestMassSell() {
     modal.classList.add('show');
 }
 
+// Cancelling the sell confirmation closes the dialog (it used to fall back to the
+// filter settings, which read as "the loot filter opened by itself"). The filter
+// view is reset so the next open starts there.
 export function _cancelMassSellConfirm() {
     const modal = document.getElementById('sx-mass-sell-modal');
     if (!modal) return;
@@ -309,8 +312,7 @@ export function _cancelMassSellConfirm() {
     const confirm = document.getElementById('sx-mass-sell-confirm');
     if (box) box.style.display = '';
     if (confirm) confirm.style.display = 'none';
-    // stay open on the filter view (user can tweak and sell again) - alternatively close:
-    // _closeMassSellModal();
+    _closeMassSellModal();
 }
 
 export function _confirmMassSell() {

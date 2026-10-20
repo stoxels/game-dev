@@ -70,6 +70,36 @@ export const CLASS_PROJECTILES = {
     },
 };
 
+// Wand / staff bolts, one per spell school (css/combat/projectiles.css). Fire
+// reuses the mathmagician firebolt; 'physical' is the plain bolt (uniques whose
+// wand still deals physical damage).
+export const WEAPON_SHOTS = {
+    fire: { ...CLASS_PROJECTILES.mathmagician, duration: 420, easing: 'ease-in' },
+    cold: {
+        cssClass: 'sx-wshot-cold', duration: 460, easing: 'ease-out', rotOffset: 0,
+        build(root) {
+            root.innerHTML = '<div class="egp"><div class="sx-projfx-ice-trail"></div><div class="sx-projfx-ice-shard"></div><div class="sx-projfx-ice-spark sx-projfx-ice-spark-1"></div><div class="sx-projfx-ice-spark sx-projfx-ice-spark-2"></div></div>';
+        },
+    },
+    lightning: {
+        cssClass: 'sx-wshot-lightning', duration: 280, easing: 'linear', rotOffset: 0,
+        build(root) {
+            root.innerHTML = '<div class="egp"><div class="sx-projfx-zap"></div><div class="sx-projfx-zap-core"></div></div>';
+        },
+    },
+    shadow: {
+        cssClass: 'sx-wshot-shadow', duration: 520, easing: 'ease-in', rotOffset: 0,
+        build(root) {
+            root.innerHTML = '<div class="egp"><div class="sx-projfx-umbra-tail"></div><div class="sx-projfx-umbra-orb"></div><div class="sx-projfx-umbra-ring sx-projfx-spin"></div></div>';
+        },
+    },
+    physical: { ...CLASS_PROJECTILES._default, duration: 380, easing: 'linear' },
+};
+
+export function _getWeaponShotDef(school) {
+    return WEAPON_SHOTS[school] || WEAPON_SHOTS.physical;
+}
+
 //------------------------------------------------------------------------
 //-------------------PROJECTILE HELPERS-----------------------------------
 //------------------------------------------------------------------------

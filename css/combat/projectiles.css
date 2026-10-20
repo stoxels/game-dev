@@ -444,3 +444,95 @@
     background: linear-gradient(160deg, #fff59d, #ffd600);
     clip-path: polygon(65% 0, 15% 58%, 48% 58%, 38% 100%, 85% 42%, 52% 42%);
 }
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   WAND / STAFF BOLTS - one per spell school (fire reuses the firebolt above)
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* COLD - frost shard with an icy trail */
+.sx-wshot-cold { filter: drop-shadow(0 0 7px rgba(130, 220, 255, 0.95)); }
+.sx-projfx-ice-trail {
+    position: absolute;
+    left: 0;
+    top: 11px;
+    width: 20px;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, rgba(190, 240, 255, 0), rgba(190, 240, 255, 0.85));
+}
+.sx-projfx-ice-shard {
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    width: 34px;
+    height: 18px;
+    background: linear-gradient(100deg, #e8fbff 0%, #9fe6ff 40%, #4fb8f0 80%, #d8f6ff 100%);
+    clip-path: polygon(0 50%, 22% 18%, 68% 0, 100% 50%, 68% 100%, 22% 82%);
+    animation: sx-projfx-shard-glimmer 380ms ease-in-out infinite alternate;
+}
+.sx-projfx-ice-spark {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #ffffff;
+    animation: sx-projfx-spark-flicker 260ms ease-in-out infinite alternate;
+}
+.sx-projfx-ice-spark-1 { left: 12px; top: 3px; }
+.sx-projfx-ice-spark-2 { left: 6px; top: 21px; animation-delay: 130ms; }
+
+/* LIGHTNING - jagged arc with a white-hot head */
+.sx-wshot-lightning { filter: drop-shadow(0 0 7px rgba(255, 240, 110, 0.95)); }
+.sx-projfx-zap {
+    position: absolute;
+    inset: 2px 0;
+    background: linear-gradient(90deg, rgba(255, 255, 160, 0), #fff6a0 30%, #ffffff 62%, #ffe34d);
+    clip-path: polygon(0 55%, 18% 30%, 30% 60%, 48% 12%, 60% 58%, 78% 22%, 100% 50%, 80% 70%, 62% 94%, 50% 52%, 32% 92%, 20% 64%);
+    animation: sx-projfx-zap-flicker 90ms steps(2) infinite alternate;
+}
+.sx-projfx-zap-core {
+    position: absolute;
+    left: 31px;
+    top: 9px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffffff 0%, #fff6a0 55%, rgba(255, 227, 77, 0) 100%);
+}
+@keyframes sx-projfx-zap-flicker {
+    from { opacity: 0.65; transform: scaleY(0.85); }
+    to   { opacity: 1;    transform: scaleY(1.1); }
+}
+
+/* SHADOW - dark orb with a wispy tail and an orbiting ring */
+.sx-wshot-shadow { filter: drop-shadow(0 0 8px rgba(150, 80, 230, 0.95)); }
+.sx-projfx-umbra-tail {
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 28px;
+    height: 12px;
+    background: linear-gradient(to right, rgba(91, 42, 140, 0), #5b2a8c);
+    clip-path: polygon(100% 50%, 60% 5%, 25% 22%, 45% 50%, 10% 70%, 55% 95%);
+    animation: sx-projfx-flame-flicker 200ms ease-in-out infinite alternate;
+}
+.sx-projfx-umbra-orb {
+    position: absolute;
+    left: 22px;
+    top: 5px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 38%, #d9b6ff 0%, #8a4fd6 38%, #2b0f4f 85%);
+}
+.sx-projfx-umbra-ring {
+    position: absolute;
+    left: 19px;
+    top: 2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px dotted rgba(217, 182, 255, 0.85);
+    --sx-projfx-spin-ms: 900ms;
+}

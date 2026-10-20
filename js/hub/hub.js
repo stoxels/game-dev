@@ -343,6 +343,7 @@ export function _buildStashPanelHTML() {
     <div class="sx-stash-tab-body ${uniqActive ? 'active' : ''}" id="sx-stash-tab-uniques">
         <div class="sx-unique-hint">${t('eg_unique_stash_hint')}</div>
         <div class="sx-unique-count" id="sx-unique-count">${t('eg_uniques_collected').replace('{found}', foundUniques).replace('{total}', totalUniques)}</div>
+        <div class="sx-unique-progress"><i id="sx-unique-progress-fill" style="width:${totalUniques ? Math.round(foundUniques / totalUniques * 100) : 0}%"></i></div>
         <div class="sx-unique-grid" id="sx-unique-grid" data-eg-dropzone="uniques" ondragover="hubDragOver(event)" ondragleave="hubDragLeave(event)">
             ${_buildUniqueGridHTML()}
         </div>
@@ -401,6 +402,8 @@ export function _renderUniqueStash() {
     const found = (globalThis._uniqueCollected ? globalThis._uniqueCollected.size : 0);
     const cntEl = document.getElementById('sx-unique-count');
     if (cntEl) cntEl.textContent = t('eg_uniques_collected').replace('{found}', found).replace('{total}', total);
+    const fillEl = document.getElementById('sx-unique-progress-fill');
+    if (fillEl) fillEl.style.width = (total ? Math.round(found / total * 100) : 0) + '%';
     _updateUniqueTabBadge();
 }
 export function _onUniqueCellClick(e, uid) {
@@ -1237,12 +1240,12 @@ export function addTestItems() {
 
 
 // Global Escape handler for the endgame stash modals (only when open):
-// closes the mass-sell overlay (confirm step steps back to filter view).
+// closes the mass-sell overlay.
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         const m = document.getElementById('sx-mass-sell-modal');
         if (m && m.classList.contains('show')) {
-            // If confirm sub-panel is visible, first step back to the filter view.
+            // Cancelling the confirm step also closes the overlay.
             const confirm = document.getElementById('sx-mass-sell-confirm');
             if (confirm && confirm.style.display !== 'none') {
                 _cancelMassSellConfirm();

@@ -195,7 +195,10 @@ export function _calcPlayerMeleeDamage(chargePct = 1) {
     // "+% increased elemental damage" from the passive tree and finally by
     // that tree's per-element increases.
     const rollEl = (min, max) => (min > 0 || max > 0) ? (min + Math.random() * (max - min)) * charge : 0;
-    const elemBase = (stats.elementalDamageIncPct || 0) + genericPct;
+    // A wand's bolt is spell-school damage: it also scales with spell damage and
+    // the tree's wand damage line (its physical share is zero).
+    const wandBoostPct = stats.isWandEquipped ? (stats.spellDamageIncPct || 0) + (stats.wandDamageIncPct || 0) : 0;
+    const elemBase = (stats.elementalDamageIncPct || 0) + genericPct + wandBoostPct;
     const fireMult = 1 + (elemBase + (stats.fireDamageIncPct || 0)) / 100;
     const coldMult = 1 + (elemBase + (stats.coldDamageIncPct || 0)) / 100;
     const lightningMult = 1 + (elemBase + (stats.lightningDamageIncPct || 0)) / 100;
@@ -292,4 +295,33 @@ export function _calcPlayerMeleeDamage(chargePct = 1) {
     }
 
     return dmg;
+}
+
+// Staff bolt: the staff's own school range as a separate projectile hit on
+// every strike. Scales with spell damage, elemental damage, the staff damage
+// line and the school's own increase; rolls its own crit (staff crit lines
+// apply). `chargePct` is the spent charge share like the melee roll. Returns
+// { dmg, school, elements, crit } or null when no staff bolt is equipped.
+export function _calcStaffShotDamage(chargePct = 1) {
+    const stats = _computePlayerStats();
+    if (!stats.isStaffEquipped || !(stats.staffShotMax > 0) || !stats.staffShotSchool) return null;
+    const school = stats.staffShotSchool;
+    const charge = Math.min(
+        (typeof MELEE_OVERCHARGE_MULT === 'number') ? MELEE_OVERCHARGE_MULT : 1,
+        Math.max(0, Number(chargePct) || 0));
+    const crossPct = (_crossoverDamageMult(stats) - 1) * 100;
+    const incPct = (stats.damageIncPct || 0) + crossPct + (stats.spellDamageIncPct || 0)
+        + (stats.elementalDamageIncPct || 0) + (stats.staffDamageIncPct || 0)
+        + (stats[school + 'DamageIncPct'] || 0);
+    let dmg = (stats.staffShotMin + (stats.staffShotMax - stats.staffShotMin) * Math.random()) * charge;
+    dmg *= 1 + incPct / 100;
+    const critMult = _rollCrit(stats, {
+        chance: stats.critChanceStaffPct || 0,
+        multiplierPct: stats.critMultiplierStaffPct || 0,
+    });
+    dmg *= critMult;
+    if (typeof _egMapPlayerDamageMult === 'function') dmg *= _egMapPlayerDamageMult();
+    if (typeof _quizDamageBuffMult === 'function') dmg *= _quizDamageBuffMult();
+    dmg = Math.max(1, Math.round(dmg));
+    return { dmg, school, elements: { fire: 0, cold: 0, lightning: 0, shadow: 0, [school]: dmg }, crit: critMult > 1 };
 }

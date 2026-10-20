@@ -9,6 +9,7 @@
 import { LANG } from '../translation/translations.js';
 import { _egMapLootRarityWeightMult } from '../endgame/endgame-map-launch.js';
 import { ALL_BASE_TYPES } from './equipment-base-items.js';
+import { _baseWeaponFields } from './equipment-base-types.js';
 import { SLOT_ICONS } from './equipment-slot-icons.js';
 import { _getModTable } from './loot-equipment-mod-tables.js';
 import { _rollImplicitsForBase } from './loot-implicits.js';
@@ -180,7 +181,7 @@ export function _generateEquipmentDrop(monsterLevel = 1, forcedRarity = null) {
         requirements: { ...base.requirements },
         defenses: { ...base.defenses },
 
-        ...(base.damage ? { damage: { ...base.damage }, attackIntervalSeconds: base.attackIntervalSeconds } : {}),
+        ..._baseWeaponFields(base),
         ...(base.hands ? { hands: base.hands } : {}),
         ...(base.blockChance ? { blockChance: base.blockChance } : {}),
 

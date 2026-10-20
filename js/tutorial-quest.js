@@ -267,6 +267,10 @@ let _tqP3DropCell = null;
 // right-click (deliberate destroy lesson).
 let _tqP3DropButton = 1;
 // Puzzle-3 sword lesson state.
+// Which starter weapon the player chose at the start of the p3 lesson
+// ('sword' = Rusted Sword, 'wand' = Carved Wand). Survives retries.
+let _tqP3Weapon = 'sword';
+const TQ_P3_WEAPON_BASE = { sword: 'wpn_1h_1', wand: 'wpn_int_1' };
 let _tqP3SwordKey = null;
 let _tqP3SwordClaimed = false;
 // Puzzle-3 charm lesson state.
@@ -461,6 +465,10 @@ function _tqEnsureBubbleDom() {
             <div class="tq-bubble-name">${t('tq_prof_name')}</div>
             <div class="char-speech-bubble-text tq-bubble-text" id="tq-bubble-text"></div>
             <button class="tq-bubble-continue" id="tq-bubble-continue" style="display:none;">${t('tq_continue')}</button>
+            <div class="tq-bubble-choices" id="tq-bubble-choices" style="display:none;">
+                <button class="tq-bubble-continue tq-bubble-choice" data-weapon="sword">${t('tq_p3_choose_sword')}</button>
+                <button class="tq-bubble-continue tq-bubble-choice" data-weapon="wand">${t('tq_p3_choose_wand')}</button>
+            </div>
         </div>`;
     document.getElementById('screen-game').appendChild(wrap);
     // stopPropagation: the Continue click must not reach document-level
@@ -468,13 +476,29 @@ function _tqEnsureBubbleDom() {
     // would otherwise close the flyout the tutorial just pinned open.
     document.getElementById('tq-bubble-continue')
         .addEventListener('click', (e) => { e.stopPropagation(); _tqOnContinue(); });
+    document.querySelectorAll('#tq-bubble-choices .tq-bubble-choice').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            _tqP3Weapon = btn.dataset.weapon === 'wand' ? 'wand' : 'sword';
+            document.getElementById('tq-bubble-choices').style.display = 'none';
+            _tqOnContinue();
+        });
+    });
+}
+
+// A line key's wand variant (`<key>_wand`) when the player chose the wand and
+// the dictionary has one, else the key itself.
+function _tqLineKey(textKey) {
+    if (_tqP3Weapon !== 'wand') return textKey;
+    const k = textKey + '_wand';
+    return t(k) !== k ? k : textKey;
 }
 
 // Shows a Professor line. When `wait` is true the game pauses silently and
 // the bubble shows a Continue button; otherwise it stays visible while the
 // player performs the current task.
 // Placeholders ({character_name}, {key_move_*}) are resolved by _tqFormatLine().
-function _tqSay(textKey, wait) {
+function _tqSay(textKey, wait, choice) {
     _tqEnsureBubbleDom();
     const wrap = document.getElementById('tq-professor-wrap');
     const bubble = document.getElementById('tq-bubble');
@@ -482,12 +506,14 @@ function _tqSay(textKey, wait) {
     const cont = document.getElementById('tq-bubble-continue');
     if (!wrap || !bubble) return;
     wrap.style.display = '';
-    text.textContent = _tqFormatLine(textKey);
+    text.textContent = _tqFormatLine(_tqLineKey(textKey));
     // Pop the bubble in with the banter-bubble transition (toggled class -
     // identical behaviour to the player's banter bubble).
     requestAnimationFrame(() => bubble.classList.add('show'));
     _tqWaitingForContinue = !!wait;
-    cont.style.display = wait ? '' : 'none';
+    cont.style.display = wait && !choice ? '' : 'none';
+    const choices = document.getElementById('tq-bubble-choices');
+    if (choices) choices.style.display = wait && choice ? '' : 'none';
     _tqSetPaused(!!wait);
     // Non-paused steps: the player character replies after a natural pause
     // (paused steps reply on Continue instead).
@@ -1318,7 +1344,7 @@ function _tqStepsFor(phase) {
         case 'p3': return [
             // Sword lesson: no monster yet, board locked, sword drops on the
             // grid and is claimed with a single left-click.
-            { say: 'tq_p3_s0', wait: true, fn: () => { _tqGridLocked = true; _tqActiveDemo = null; _tqRefreshGridLockBorder(); } },
+            { say: 'tq_p3_s0', wait: true, choice: true, fn: () => { _tqGridLocked = true; _tqActiveDemo = null; _tqRefreshGridLockBorder(); } },
             { say: 'tq_p3_s1', fn: () => { _tqPlaceSwordDrop(); _tqPointAtDrop('.sx-loot-overlay'); } },
             { task: 'pick_sword' },
             // Equip lesson: B opens the sheet over the paused run.
@@ -1420,7 +1446,7 @@ function _tqRunCurrentPhase() {
         _tqRefreshGridLockBorder();
         // Show the line FIRST - a combined say+task step must display its
         // explanation while the task polls (wait+task never co-exists).
-        if (st.say) _tqSay(st.say, !!st.wait);
+        if (st.say) _tqSay(st.say, !!st.wait, !!st.choice);
         if (st.task) { _tqStartTask(st.task); return; }
         if (st.say && st.wait) return;   // resume via the Continue button
     }
@@ -1838,7 +1864,7 @@ function _tqSpawnHeart() {
 
 function _tqIsTutorialSword(item) {
     return !!(item && (item.isTutorialSword
-        || (typeof item.id === 'string' && item.id.indexOf('wpn_1h_1_tutorial_') === 0)));
+        || (typeof item.id === 'string' && /^wpn_(1h|int)_1_tutorial_/.test(item.id))));
 }
 
 function _tqHasTutorialSwordInGrid(grid) {
@@ -1897,11 +1923,11 @@ function _tqPlaceSwordDrop() {
             _tqGrantSwordToStash();
             return;
         }
-        const base = ALL_BASE_TYPES.find((b) => b && b.id === 'wpn_1h_1');
+        const base = ALL_BASE_TYPES.find((b) => b && b.id === TQ_P3_WEAPON_BASE[_tqP3Weapon]);
         if (!base) { _tqGrantSwordToStash(); return; }
         const stamp = Date.now();
         const item = _vendorBuildBaseItemFromBase(base);
-        item.id = `wpn_1h_1_tutorial_${stamp}`;
+        item.id = `${base.id}_tutorial_${stamp}`;
         item.noSellValue = true;   // loot-filter proof, like the starter gear
         item.isTutorialSword = true;
         const key = '2-2';
@@ -1928,10 +1954,10 @@ function _tqGrantSwordToStash() {
     }
     try {
         if (typeof ALL_BASE_TYPES === 'undefined' || typeof _vendorBuildBaseItemFromBase !== 'function') return;
-        const base = ALL_BASE_TYPES.find((b) => b && b.id === 'wpn_1h_1');
+        const base = ALL_BASE_TYPES.find((b) => b && b.id === TQ_P3_WEAPON_BASE[_tqP3Weapon]);
         if (!base) return;
         const item = _vendorBuildBaseItemFromBase(base);
-        item.id = `wpn_1h_1_tutorial_${Date.now()}`;
+        item.id = `${base.id}_tutorial_${Date.now()}`;
         item.noSellValue = true;
         item.isTutorialSword = true;
         if (typeof _addItemToStash === 'function') _addItemToStash(item);
