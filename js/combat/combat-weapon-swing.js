@@ -12,7 +12,7 @@ import {
     _meleeRaiseAvatar,
 } from './encounter-melee-delivery.js';
 import { _meleeTierForCharge } from './encounter-melee-arts.js';
-import { WEAPON_SWING_COOLDOWN_MS, WEAPON_SWING_DURATION_MS, _facingFromVector, _getAttackFacing, _getEquippedWeaponInfo, _getStrikeWeaponFamily, _getStrikeWeaponSchool, _meleeAimFacing, _meleeFindVictim, _shotVictim } from './combat-weapon-swing-config.js';
+import { WEAPON_SWING_COOLDOWN_MS, WEAPON_SWING_DURATION_MS, _facingFromVector, _getAttackFacing, _getEquippedWeaponInfo, _getStrikeWeaponFamily, _getStrikeWeaponSchool, _meleeAimFacing, _meleeFindVictim, _shotVictim, _strikeShootKind } from './combat-weapon-swing-config.js';
 import { _isActive } from './combat-state.js';
 
 //  endgame-weapon-swing.js
@@ -316,7 +316,7 @@ export function _doWeaponAttack() {
     const selectedId = (typeof _targetId === 'undefined' || !globalThis._targetId)
         ? null : globalThis._targetId;
     // Wands and staves shoot: any living monster is a valid target, no reach needed.
-    const shooter = ['wand', 'staff'].includes(_getStrikeWeaponFamily(false));
+    const shooter = !!_strikeShootKind(false);
     const victimId = shooter ? _shotVictim(selectedId) : _meleeFindVictim(selectedId);
     let peekTier = 0;
     try {
@@ -362,13 +362,14 @@ export function _doWeaponAttack() {
     }
 
     const family = _getStrikeWeaponFamily(hasTarget);
+    const shootKind = _strikeShootKind(hasTarget);
     const facing = _meleeAimFacing(strikeId || selectedId);
-    if (family === 'wand' && hasTarget) { _wandShot(strikeId, facing); return; }
+    if (shootKind === 'wand' && hasTarget) { _wandShot(strikeId, facing); return; }
     _showWeaponSwing(family, facing);
     _weaponSwingHop(facing);
     _weaponSwingSound(family);
     // Staff: the swing is joined by a school bolt at the same target (own hit).
-    if (family === 'staff' && hasTarget) {
+    if (shootKind === 'staff' && hasTarget) {
         const spent = (typeof _pendingMeleeChargePct === 'number') ? globalThis._pendingMeleeChargePct : 1;
         _fireWeaponShot(strikeId, _getStrikeWeaponSchool(true), () => {
             try { _applyStaffShotImpact(strikeId, spent); } catch (e) {}

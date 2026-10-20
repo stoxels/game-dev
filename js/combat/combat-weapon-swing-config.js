@@ -95,6 +95,25 @@ export function _getStrikeWeaponFamily(consumed) {
     return _getEquippedWeaponInfo().family;
 }
 
+// True for a weapon whose strike is a bolt: wands (incl. unique wands) - never
+// sceptres, which swing as maces.
+export function _weaponShoots(item) {
+    return !!item && _weaponSwingFamily(item) === 'wand' && !_isMaceOrSceptre(item);
+}
+
+// What the striking hand does: 'wand' (bolt only), 'staff' (swing + bolt) or
+// null (plain melee). While dual-wielding it follows that hand's weapon, so a
+// wand + sword pair alternates bolts and blade blows with its two charge bars.
+export function _strikeShootKind(consumed) {
+    try {
+        const hand = consumed ? (globalThis._strikeHand === 2 ? 2 : 1) : _getLeadHand();
+        const w = _getDualHandWeapon(hand) || _getEquippedWeaponInfo().item;
+        if (!w) return null;
+        if (_weaponSwingFamily(w) === 'staff') return 'staff';
+        return _weaponShoots(w) ? 'wand' : null;
+    } catch (e) { return null; }
+}
+
 // Spell school of the weapon that is striking NOW ('fire' | 'cold' | 'lightning'
 // | 'shadow'), or null for a weapon with no school (its bolt is plain physical).
 export function _getStrikeWeaponSchool(consumed) {
@@ -228,7 +247,7 @@ export function _updateMeleeMarker() {
     let victim = null;
     try {
         const info = _getEquippedWeaponInfo();
-        if (info.item && info.item.slotType === 'weapon' && info.family !== 'wand') {
+        if (info.item && info.item.slotType === 'weapon' && _strikeShootKind(false) !== 'wand') {
             const selected = globalThis._targetId || null;
             const v = _meleeFindVictim(selected);
             if (v != null && v !== selected) victim = v;

@@ -1,6 +1,7 @@
 import { MELEE_OVERCHARGE_MULT } from './encounter.js';
 import { _egMapPlayerDamageMult, _egMapPlayerMeleeMult } from '../endgame/endgame-map-launch.js';
-import { PLAYER_STATS, _computePlayerStats, _rollCrit } from './combat-player-stats.js';
+import { PLAYER_STATS, _computePlayerStats, _getDualHandWeapon, _rollCrit } from './combat-player-stats.js';
+import { _weaponShoots } from './combat-weapon-swing-config.js';
 import { _quizDamageBuffMult } from './combat-quiz-buffs.js';
 import { PLAYER_MELEE_DAMAGE } from './combat-state.js';
 import { RIPOSTE_BASE_MORE_PCT, _consumeRiposte } from './combat-ailments-state.js';
@@ -147,6 +148,10 @@ export let _lastMeleeCritMult = 1;
 // charge share (see _applyPlayerMeleeImpact in encounter-charged-shot.js).
 export function _calcPlayerMeleeDamage(chargePct = 1) {
     const stats = _computePlayerStats();
+    // Wand + melee pair: this blow uses the striking hand's own ranges (see handRanges).
+    const strikeHand = globalThis._strikeHand === 2 ? 2 : 1;
+    const R = (stats.dualMixed && stats.handRanges) ? stats.handRanges[strikeHand] : stats;
+    const wandStrike = stats.dualMixed ? _weaponShoots(_getDualHandWeapon(strikeHand)) : stats.isWandEquipped;
     // Manual charge share (Secret-of-Mana-style, linear): 1 = fully-charged
     // full damage. Applied up front so crit, map mods AND life leech below
     // all operate on the scaled hit - chip hits can't leech full damage.
@@ -164,8 +169,8 @@ export function _calcPlayerMeleeDamage(chargePct = 1) {
     const sitPct = (_crossoverDamageMult(stats) - 1) * 100;
     const genericPct = (stats.damageIncPct || 0) + sitPct + (stats.isDaggerEquipped ? (stats.daggerDamageIncPct || 0) : 0);
     let dmg;
-    if (stats.meleePhysMax > 0) {
-        dmg = stats.meleePhysMin + (stats.meleePhysMax - stats.meleePhysMin) * Math.random();
+    if (R.meleePhysMax > 0) {
+        dmg = R.meleePhysMin + (R.meleePhysMax - R.meleePhysMin) * Math.random();
         // Weapon-stance split from the passive tree (melee batch): Heavy
         // with a two-handed weapon equipped, one-handed otherwise (1H +
         // shield, dual-wield or unarmed). Exactly one side applies, on top
@@ -183,6 +188,10 @@ export function _calcPlayerMeleeDamage(chargePct = 1) {
         dmg *= 1 + ((stats.meleePhysIncPct || 0) + stanceIncPct + familyIncPct + genericPct) / 100;
         // Rage (axe notable 369): each Rage is a "more" step on melee damage.
         if ((stats.rage || 0) > 0) dmg *= 1 + (stats.rage * (stats.rageMeleeMorePct || 0)) / 100;
+    } else if (wandStrike || R.meleeFireMax > 0 || R.meleeColdMax > 0 || R.meleeLightningMax > 0 || R.meleeShadowMax > 0) {
+        // A wand bolt (or any elemental-only weapon) has no physical share - the
+        // flat unarmed punch below must not ride along.
+        dmg = 0;
     } else {
         // Unarmed / no weapon damage - flat fallback strike
         dmg = PLAYER_MELEE_DAMAGE * (1 + genericPct / 100);
@@ -197,16 +206,16 @@ export function _calcPlayerMeleeDamage(chargePct = 1) {
     const rollEl = (min, max) => (min > 0 || max > 0) ? (min + Math.random() * (max - min)) * charge : 0;
     // A wand's bolt is spell-school damage: it also scales with spell damage and
     // the tree's wand damage line (its physical share is zero).
-    const wandBoostPct = stats.isWandEquipped ? (stats.spellDamageIncPct || 0) + (stats.wandDamageIncPct || 0) : 0;
+    const wandBoostPct = wandStrike ? (stats.spellDamageIncPct || 0) + (stats.wandDamageIncPct || 0) : 0;
     const elemBase = (stats.elementalDamageIncPct || 0) + genericPct + wandBoostPct;
     const fireMult = 1 + (elemBase + (stats.fireDamageIncPct || 0)) / 100;
     const coldMult = 1 + (elemBase + (stats.coldDamageIncPct || 0)) / 100;
     const lightningMult = 1 + (elemBase + (stats.lightningDamageIncPct || 0)) / 100;
     const elements = {
-        fire: rollEl(stats.meleeFireMin, stats.meleeFireMax) * fireMult,
-        cold: rollEl(stats.meleeColdMin, stats.meleeColdMax) * coldMult,
-        lightning: rollEl(stats.meleeLightningMin, stats.meleeLightningMax) * lightningMult,
-        shadow: rollEl(stats.meleeShadowMin, stats.meleeShadowMax) * (1 + (elemBase + (stats.shadowDamageIncPct || 0)) / 100),
+        fire: rollEl(R.meleeFireMin, R.meleeFireMax) * fireMult,
+        cold: rollEl(R.meleeColdMin, R.meleeColdMax) * coldMult,
+        lightning: rollEl(R.meleeLightningMin, R.meleeLightningMax) * lightningMult,
+        shadow: rollEl(R.meleeShadowMin, R.meleeShadowMax) * (1 + (elemBase + (stats.shadowDamageIncPct || 0)) / 100),
     };
     // Fire conversion / fire-only (Primal Flame keystone).
     const converted = _applyDamageConversion(stats, dmg, elements, {

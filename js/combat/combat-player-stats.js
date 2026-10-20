@@ -26,7 +26,7 @@ import { MOD_TABLE_WEAPON1, MOD_TABLE_WEAPON_1H } from '../loot/loot-mod-tables-
 import { MOD_TABLE_WEAPON2 } from '../loot/loot-mod-tables-weapon2.js';
 import { PLAYER_BASE_ATTRIBUTES, _isDualWielding, _isTwoHandedWeapon } from '../loot/loot-requirements.js';
 import { ONSLAUGHT_SPEED_PCT, _onslaughtActive, _setRageDecayMult, ENDURANCE_ARMOUR_PER_CHARGE, ENDURANCE_BASE_MAX, ENDURANCE_ELEM_RES_PER_CHARGE, FRENZY_BASE_MAX, FRENZY_DAMAGE_PER_CHARGE, FRENZY_MELEE_SPEED_PER_CHARGE, _getEnduranceCharges, _getFrenzyCharges, _getRage, FORTIFY_BASE_MAX, POWER_BASE_MAX, POWER_CRIT_PER_CHARGE, _getFortifyStacks, _getPowerCharges } from './combat-ailments-state.js';
-import { PX_PER_METER, _getEquippedWeaponInfo, _isMaceOrSceptre } from './combat-weapon-swing-config.js';
+import { PX_PER_METER, _getEquippedWeaponInfo, _isMaceOrSceptre, _weaponShoots } from './combat-weapon-swing-config.js';
 import { MELEE_DAMAGE_MULT, PLAYER_CHARGE_TIME_MULT, PLAYER_ABS_MIN_CHARGE_TIME, PLAYER_DEFAULT_ATTACK_INTERVAL, PLAYER_MIN_ATTACK_INTERVAL, _isActive } from './combat-state.js';
 
 //------------------------------------------------------------------------
@@ -1094,7 +1094,7 @@ export function _computePlayerStats() {
         meleeShadowMin: 0, meleeShadowMax: 0,
         // Staff bolt: the staff's own school range (a separate projectile hit, not a melee roll).
         staffShotMin: 0, staffShotMax: 0, staffShotSchool: null,
-        isCasterWeapon: false,
+        isCasterWeapon: false, dualMixed: false, handRanges: null,
         spellDamageFlat: 0, spellDamageIncPct: passiveTreeBonuses.spellDamageIncPct || 0,
         // "% increased elemental damage" (passive tree only - no gear mod
         // feeds this bucket). Multiplies the ELEMENTAL share of a hit and
@@ -1221,7 +1221,16 @@ export function _computePlayerStats() {
         absorptionRegenRatePct: passiveTreeBonuses.absorptionRegenRatePct || 0, fasterAbsorptionRegenStart: 0,
     };
 
+    // Per-weapon share of the melee ranges, so a wand + melee pair can strike with
+    // each hand's OWN damage (see handRanges below).
+    const HAND_RANGE_KEYS = ['meleePhysMin', 'meleePhysMax', 'staffShotMin', 'staffShotMax',
+        'meleeFireMin', 'meleeFireMax', 'meleeColdMin', 'meleeColdMax',
+        'meleeLightningMin', 'meleeLightningMax', 'meleeShadowMin', 'meleeShadowMax'];
+    const handOwn = { 1: null, 2: null };
     _getAllEquippedItems().forEach(item => {
+        const handNo = (typeof _equipped !== 'undefined' && _equipped)
+            ? (_equipped.weapon1 === item ? 1 : _equipped.weapon2 === item ? 2 : 0) : 0;
+        const rangesBefore = handNo ? HAND_RANGE_KEYS.map(k => s[k] || 0) : null;
         if (item.defenses) {
             // Use the LOCAL-modified values (base + flat, scaled by the
             // item's own "% increased" mods) - see _getItemEffectiveDefenses.
@@ -1302,6 +1311,10 @@ export function _computePlayerStats() {
         }
         applyStatsFromList(item.mods);
         applyStatsFromList(item.implicits);
+        if (rangesBefore) {
+            handOwn[handNo] = {};
+            HAND_RANGE_KEYS.forEach((k, i) => { handOwn[handNo][k] = (s[k] || 0) - rangesBefore[i]; });
+        }
     });
 
     // Shield batch (reworked nodes 30375/30374/30376/285): physical damage
@@ -1334,9 +1347,22 @@ export function _computePlayerStats() {
         s.castSpeedPct += s.dualCastSpeedPct || 0;
         s.spellDamageIncPct += s.dualSpellDamagePct || 0;
         s.movementSpeedPct += s.dualMoveSpeedPct || 0;
-        for (const k of ['meleePhysMin', 'meleePhysMax', 'staffShotMin', 'staffShotMax',
-            'meleeFireMin', 'meleeFireMax', 'meleeColdMin', 'meleeColdMax',
-            'meleeLightningMin', 'meleeLightningMax', 'meleeShadowMin', 'meleeShadowMax']) {
+        // Wand + melee weapon: each hand strikes with its OWN weapon's damage (the
+        // wand's bolt never carries the blade's physical, the blade never the
+        // bolt's fire). Gear shared by both hands splits evenly, so landing both
+        // hands once still equals the old pooled strike.
+        const w1 = _equipped && _equipped.weapon1;
+        const w2 = _equipped && _equipped.weapon2;
+        if (handOwn[1] && handOwn[2] && _weaponShoots(w1) !== _weaponShoots(w2)) {
+            s.dualMixed = true;
+            s.handRanges = { 1: {}, 2: {} };
+            for (const k of HAND_RANGE_KEYS) {
+                const shared = (s[k] || 0) - handOwn[1][k] - handOwn[2][k];
+                s.handRanges[1][k] = Math.round((handOwn[1][k] + shared * 0.5) * dw);
+                s.handRanges[2][k] = Math.round((handOwn[2][k] + shared * 0.5) * dw);
+            }
+        }
+        for (const k of HAND_RANGE_KEYS) {
             s[k] = Math.round((s[k] || 0) * dw);
         }
     }
@@ -1349,10 +1375,9 @@ export function _computePlayerStats() {
     // scaled (only flat ranges are).
     if (typeof MELEE_DAMAGE_MULT !== 'undefined' && MELEE_DAMAGE_MULT !== 1) {
         const mm = MELEE_DAMAGE_MULT;
-        for (const k of ['meleePhysMin', 'meleePhysMax', 'staffShotMin', 'staffShotMax',
-            'meleeFireMin', 'meleeFireMax', 'meleeColdMin', 'meleeColdMax',
-            'meleeLightningMin', 'meleeLightningMax', 'meleeShadowMin', 'meleeShadowMax']) {
+        for (const k of HAND_RANGE_KEYS) {
             s[k] = Math.round((s[k] || 0) * mm);
+            if (s.handRanges) for (const h of [1, 2]) s.handRanges[h][k] = Math.round(s.handRanges[h][k] * mm);
         }
     }
 
@@ -1467,6 +1492,7 @@ export function _computePlayerStats() {
     // Staves and Wands are separate families; sceptres count as Maces.
     s.isStaffEquipped = weaponFamily === 'staff';
     s.isWandEquipped = weaponFamily === 'wand' && !s.isMaceEquipped;
+    if (s.dualMixed) s.isWandEquipped = true;   // a wand in either hand earns the tree's wand lines
     s.isCasterWeapon = s.isWandEquipped || s.isStaffEquipped;
     s.isBowEquipped = weaponFamily === 'bow';
     // Phase C-2: wand / bow conditional lines, Onslaught, recent-crit leech.
@@ -1696,6 +1722,7 @@ export function _dualHandShare(hand) {
 // _consumePlayerCharge at key-press time).
 export function _strikeHandMult() {
     if (typeof _isDualWielding !== 'function' || !_isDualWielding()) return 1;
+    if (_computePlayerStats().dualMixed) return 1;   // mixed pair: ranges are already per hand
     return _dualHandShare(globalThis._strikeHand === 2 ? 2 : 1);
 }
 
