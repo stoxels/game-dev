@@ -1857,3 +1857,142 @@ img.sx-art-img {
 }
 .sx-unique-grid.sx-dragover { border: 1px dashed #f5b642; }
 #sx-tab-uniques.sx-dragover { box-shadow: 0 0 10px rgba(245,182,66,0.5); border-color: #f5b642 !important; color: #f5d98a !important; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   ART SKIN - character sheet & inventory (rune-stone frames, stone buttons)
+   Appended last, id-scoped: only looks change, layout hooks stay as they
+   were. Reuses Settings / Game Reset / Level-Select-Topbar assets.
+   ════════════════════════════════════════════════════════════════════════ */
+#screen-hub {
+    background:
+        linear-gradient(rgba(8, 6, 16, 0.88), rgba(4, 3, 9, 0.94)),
+        url('../../images/Game_Setup/Game_Setup_New_Background.webp') center bottom / cover no-repeat;
+}
+
+/* Top bar: the seamless stone tile used by the level map */
+#screen-hub .sx-topbar {
+    background-color: #4f485c;
+    background-image: url('../../images/Level_Select_Topbar/topbar-stone-tile2.webp');
+    background-size: auto 100%;
+    background-repeat: repeat-x;
+    background-position: center;
+    border-bottom: 2px solid #5a3a14;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6), inset 0 -2px 0 rgba(200, 168, 75, 0.25);
+    padding: 6px 14px;
+    flex-wrap: wrap;
+    row-gap: 6px;
+}
+#screen-hub .sx-topbar-title {
+    box-sizing: border-box;
+    padding: 12px 38px;
+    background: url('../../images/Settings/settings_title_plague.webp') center / 100% 100% no-repeat;
+    color: var(--yellow, #f3dc9a);
+    text-shadow: 0 2px 3px #000;
+    white-space: nowrap;
+}
+/* Stone buttons: topbar actions + info button + stash actions */
+#screen-hub .sx-level-btn,
+#screen-hub .sx-info-btn,
+#screen-hub .sx-stash-btn {
+    background: url('../../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    color: #eadfc0;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
+    transition: filter 0.15s, transform 0.12s;
+}
+#screen-hub .sx-level-btn { padding: 12px 15px; font-size: 9px; margin-left: 0; white-space: nowrap; }
+#screen-hub .sx-topbar { gap: 8px; }
+#screen-hub .sx-topbar-title { padding: 10px 30px; font-size: 11px; }
+#screen-hub .sx-topbar-right .sx-level-btn { margin-left: 0; }
+#screen-hub .sx-info-btn { min-width: 44px; padding: 13px 14px; }
+#screen-hub .sx-stash-btn { padding: 11px 20px; font-size: 10px; }
+#screen-hub .sx-level-btn:hover,
+#screen-hub .sx-info-btn:hover,
+#screen-hub .sx-stash-btn:hover {
+    background: url('../../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+    border: none;
+    box-shadow: none;
+    color: #fff3c4;
+    filter: brightness(1.28);
+    transform: translateY(-1px);
+}
+#screen-hub .sx-stash-btn-sell { color: #f0d98a; }
+#screen-hub .sx-level-btn.unspent-points { border: none !important; box-shadow: none; color: #ffe27a; filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.7)); }
+
+/* Panels: rune-stone rim around a dark, readable inside */
+#screen-hub .sx-currency-col,
+#screen-hub .sx-essence-col,
+#screen-hub .sx-panel-char,
+#screen-hub .sx-panel-inv {
+    box-sizing: border-box;
+    border: 18px solid transparent;
+    border-image: url('../../images/Settings/settings_background.webp') 46 / 18px stretch;
+    background: rgba(14, 12, 24, 0.9);
+    background-clip: padding-box;
+    box-shadow: none;
+}
+#screen-hub .sx-char-wrap { border-bottom: none; }
+#screen-hub .sx-currency-grid { background: transparent; }
+#screen-hub .sx-panel-label {
+    background: rgba(0, 0, 0, 0.35);
+    border-bottom: 1px solid rgba(240, 225, 180, 0.22);
+    color: #f3dc9a;
+    font-size: 10px;
+    text-shadow: 0 2px 2px #000;
+}
+#screen-hub .sx-inv-cell,
+#screen-hub .sx-equip-slot {
+    border-color: rgba(240, 225, 180, 0.2);
+}
+
+/* Stash tabs: stone tabs, active one glows */
+#screen-hub .sx-stash-tabs { border-bottom-color: rgba(240, 225, 180, 0.22); }
+#screen-hub .sx-stash-tab {
+    padding: 11px 24px;
+    font-size: 10px;
+    color: #cfc6ad;
+    background: url('../../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+    border: none;
+    text-shadow: 0 2px 3px #000;
+}
+#screen-hub .sx-stash-tab:hover { background: url('../../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent; border: none; filter: brightness(1.25); color: #fff3c4; }
+#screen-hub .sx-stash-tab.active {
+    background: url('../../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+    border: none;
+    color: #ffe9a8;
+    box-shadow: none;
+    filter: drop-shadow(0 0 8px rgba(255, 190, 70, 0.65));
+}
+
+/* Legibility pass: bigger type on the skinned buttons, labels and tabs */
+#screen-hub .sx-level-btn { font-size: 12px; padding: 13px 18px; }
+#screen-hub .sx-topbar-title { font-size: 15px; padding: 12px 36px; }
+#screen-hub .sx-stash-btn { font-size: 12px; padding: 12px 22px; }
+#screen-hub .sx-stash-tab { font-size: 13px; padding: 12px 28px; }
+#screen-hub .sx-panel-label { font-size: 13px; letter-spacing: 3px; }
+#screen-hub .sx-panel-label .sx-stash-actions { align-items: center; }
+#screen-hub #sx-hub-info-btn {
+    width: 52px;
+    height: 46px;
+    line-height: 46px;
+    padding: 0;
+    margin-left: auto;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* Uniques counter (3/303) on the tab and inside the uniques stash */
+#screen-hub .sx-stash-tab .sx-tab-count {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.45);
+    color: #ffe9a8;
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 2px #000;
+}
+#screen-hub .sx-unique-count { font-size: 13px; }
+#screen-hub .sx-unique-hint { font-size: 12px; }

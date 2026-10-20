@@ -316,20 +316,20 @@ export function _buildStashPanelHTML() {
                      onclick="_toggleItemLevelDisplay()"
                      onmouseenter="_showItemLevelToggleTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
-                     onmouseleave="hideGameTooltip()">${_showItemLevel ? '🔢' : '👤'} ${t(_showItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</button>
+                     onmouseleave="hideGameTooltip()">${t(_showItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</button>
             <button class="sx-stash-btn sx-stash-btn-config" id="sx-loot-filter-btn"
                      onclick="_openLootFilterModal()"
                      onmouseenter="_showLootFilterTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
-                     onmouseleave="hideGameTooltip()">⚗ ${t('eg_loot_filter_btn')}</button>
+                     onmouseleave="hideGameTooltip()">${t('eg_loot_filter_btn')}</button>
             <button class="sx-stash-btn sx-stash-btn-config" onclick="_openMassSellModal()"
                      onmouseenter="_showMassSellConfigTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
-                     onmouseleave="hideGameTooltip()">⚙ ${t('eg_mass_sell_config')}</button>
+                     onmouseleave="hideGameTooltip()">${t('eg_mass_sell_config')}</button>
             <button class="sx-stash-btn sx-stash-btn-sell" onclick="_requestMassSell()"
                      onmouseenter="_showMassSellTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
-                     onmouseleave="hideGameTooltip()">⚒ ${t('eg_mass_sell_btn')}</button>
+                     onmouseleave="hideGameTooltip()">${t('eg_mass_sell_btn')}</button>
         </div>
     </div>
     <div class="sx-stash-tabs" id="sx-stash-tabs">

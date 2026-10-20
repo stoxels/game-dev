@@ -43,13 +43,13 @@ export function _buildTopbarHTML() {
          onclick="showEndgameGate('showHub')">🎲 ${t('mg_gate_badge')}</button>
     <button class="sx-level-btn" id="sx-btn-export-build"
          title="Saves your gear, passive tree, spells and stats to a small file (for balance testing)"
-         onclick="_exportBuildSnapshot()">📤 Export build</button>
+         onclick="_exportBuildSnapshot()">Export build</button>
     <label class="sx-level-btn sx-autocmp-toggle" id="sx-autocmp-toggle"
          title="${t('eg_auto_compare_tip')}"
          style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
         <input type="checkbox" id="sx-autocmp-cb" ${_autoCompareChecked() ? 'checked' : ''}
          onchange="globalThis._autoCompare=this.checked;try{localStorage.setItem('stoxels_auto_compare',this.checked?'1':'0')}catch(e){}">
-        ⚖ ${t('eg_auto_compare')}
+        ${t('eg_auto_compare')}
     </label>
     <button class="sx-info-btn" id="sx-hub-info-btn" aria-label="Info"
          onmouseenter="_showHubInfoTooltip(event)"
@@ -139,7 +139,7 @@ export function _toggleItemLevelDisplay() {
 export function _updateItemLevelToggleButton() {
     const btn = document.getElementById('sx-toggle-ilvl-btn');
     if (btn) {
-        btn.innerHTML = `${_showItemLevel ? '🔢' : '👤'} ${t(_showItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}`;
+        btn.innerHTML = `${t(_showItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}`;
     }
 }
 
@@ -198,6 +198,7 @@ export function _buildHubInfoTooltipHTML() {
         if (!txt) return '';
         return `<div class="sx-tt-mod">${txt}</div>`;
     };
+    const head = (key) => `<div class="sx-tt-mod" style="color:#f5d98a;letter-spacing:.12em;font-size:.85em;margin-top:6px;">${t(key)}</div>`;
     return `
 <div class="sx-tt-frame" style="--tt-border:#c8a84b;">
     <div class="sx-tt-header">
@@ -205,13 +206,19 @@ export function _buildHubInfoTooltipHTML() {
         <div class="sx-tt-name" style="color:#f5d98a;">${t('eg_hub_info_title')}</div>
     </div>
     <div class="sx-tt-section" style="display:flex;flex-direction:column;gap:5px;">
-        ${line('eg_hub_info_currency')}
-        ${line('eg_hub_info_sell')}
-        ${line('eg_hub_info_repeat')}
-        ${line('eg_hub_info_craft')}
-        <div style="height:1px;background:var(--border,#4a5475);opacity:.4;margin:2px 0;"></div>
+        ${head('eg_hub_info_h_items')}
         ${line('eg_hub_info_dragdrop')}
+        ${line('eg_hub_info_quickmove')}
         ${line('eg_hub_info_compare')}
+        ${head('eg_hub_info_h_currency')}
+        ${line('eg_hub_info_currency')}
+        ${line('eg_hub_info_repeat')}
+        ${line('eg_hub_info_essence')}
+        ${head('eg_hub_info_h_sell')}
+        ${line('eg_hub_info_sell')}
+        ${line('eg_hub_info_mass_sell')}
+        ${head('eg_hub_info_h_craft')}
+        ${line('eg_hub_info_craft')}
     </div>
 </div>`;
 }
