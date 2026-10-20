@@ -49,16 +49,16 @@ export function _mechSpeedLanes(monster, phase) {
     const level = monster ? monster.level : 1;
     const H = window.innerHeight;
     const lanes = [0.22, 0.41, 0.60, 0.79].map((fy, i) => {
-        const el = _nkEl(run, 'div', 'eg-nk-speedlane');
+        const el = _nkEl(run, 'div', 'sx-nk-speedlane');
         el.style.top = Math.round(H * fy - laneH / 2) + 'px';
         el.style.height = laneH + 'px';
         const dir = i % 2 === 0 ? 1 : -1;
         el.textContent = dir > 0 ? '➡️➡️➡️' : '⬅️⬅️⬅️';
         return { y: H * fy, dir, el };
     });
-    const topEdge = _nkEl(run, 'div', 'eg-nk-edge-burn eg-nk-edge-top');
+    const topEdge = _nkEl(run, 'div', 'sx-nk-edge-burn sx-nk-edge-top');
     topEdge.textContent = '🔥';
-    const botEdge = _nkEl(run, 'div', 'eg-nk-edge-burn eg-nk-edge-bottom');
+    const botEdge = _nkEl(run, 'div', 'sx-nk-edge-burn sx-nk-edge-bottom');
     botEdge.textContent = '🔥';
     _nkToast('eg_mech_velocity', '🏎️ The Velocity: Speed Lanes! Choose your slide!');
     let e = 0, dotWarnAt = 0;

@@ -32,9 +32,9 @@ const AUTO_DISMISS_MS = 4500;
 const CLICK_SUPPRESS_MS = 900;
 
 // Things the game gives a right-click action to.
-const CONTEXT_TARGETS = '.eg-item-chip, .eg-unique-cell, .sb3-charm-row[data-charm-key], .sb3-theorem';
+const CONTEXT_TARGETS = '.sx-item-chip, .sx-unique-cell, .sb3-charm-row[data-charm-key], .sb3-theorem';
 // Hub item chips: draggable by hold-then-move.
-const DRAG_TARGETS = '.eg-item-chip';
+const DRAG_TARGETS = '.sx-item-chip';
 
 let holdTimer = null;
 let liftTimer = null;

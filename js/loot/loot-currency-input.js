@@ -21,11 +21,11 @@ import { SHARD_DEFS } from './loot-shards.js';
 // contextmenu handler (bound later, at hub-open time) and can stop it
 // from also processing the click.
 document.addEventListener('contextmenu', function (e) {
-    const chip = e.target.closest('.eg-item-chip');
+    const chip = e.target.closest('.sx-item-chip');
     // Active on both the hub and the Probability Gate screens (shared state).
     if (!chip || (typeof _dndChipScreenEl === 'function' ? !_dndChipScreenEl(chip) : !chip.closest('#screen-endgame-hub'))) return;
 
-    const currencyCell = chip.closest('.eg-currency-cell');
+    const currencyCell = chip.closest('.sx-currency-cell');
     if (!currencyCell) return; // not currency - let the normal handler deal with it
 
     e.preventDefault();
@@ -75,7 +75,7 @@ document.addEventListener('mousedown', function (e) {
     if (!_pendingCurrencyUse) return;
     if (e.button !== 0) return;
 
-    const chip = e.target.closest('.eg-item-chip');
+    const chip = e.target.closest('.sx-item-chip');
     // Active on both the hub and the Probability Gate screens (shared state).
     const onManagedScreen = !!chip && (typeof _dndChipScreenEl === 'function'
         ? !!_dndChipScreenEl(chip)
@@ -85,7 +85,7 @@ document.addEventListener('mousedown', function (e) {
         return;
     }
 
-    if (chip.closest('.eg-currency-cell')) {
+    if (chip.closest('.sx-currency-cell')) {
         _cancelCurrencyUse(); // clicking any orb cancels use-mode
         return;
     }
@@ -93,8 +93,8 @@ document.addEventListener('mousedown', function (e) {
     e.preventDefault();
     e.stopImmediatePropagation();
 
-    const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell):not(.eg-essence-cell)');
-    const equipSlot = chip.closest('.eg-equip-slot');
+    const invCell = chip.closest('.sx-inv-cell:not(.sx-currency-cell):not(.eg-map-stash-cell):not(.sx-essence-cell)');
+    const equipSlot = chip.closest('.sx-equip-slot');
     // Map targets: map stash cells and the map device slot (gate screen).
     const mapStashCell = chip.closest('.eg-map-stash-cell');
     const mapSlotEl = chip.closest('#eg-map-slot');

@@ -25,12 +25,12 @@ import { _maybeCastMonsterSpell } from './monster-spells.js';
 
 // Flashes the monster's card to signal it is attacking.
 export function _flashMonsterAttackCard(monster) {
-    const card = document.getElementById(`eg-card-${monster.id}`);
+    const card = document.getElementById(`sx-card-${monster.id}`);
     Audio_Manager.playSFX('monster_charge_windup');
     if (!card) return;
-    card.classList.remove('eg-flash-attack');
+    card.classList.remove('sx-flash-attack');
     void card.offsetWidth; // force reflow so the CSS animation restarts
-    card.classList.add('eg-flash-attack');
+    card.classList.add('sx-flash-attack');
 }
 
 // Resolves whether this attack should be melee or ranged.
@@ -169,7 +169,7 @@ function _isNullWorld1Trial(monster) {
 // another monster instead (friendly fire). With no other monster alive the
 // attack lands on the player as usual.
 export function _animateMonsterProjectile(monster, dmgMult = 1) {
-    const sourceCard = document.getElementById(`eg-card-${monster.id}`);
+    const sourceCard = document.getElementById(`sx-card-${monster.id}`);
     const targetHud = document.getElementById('player-avatar-wrapper');
     if (!sourceCard || !targetHud) return;
 
@@ -182,11 +182,11 @@ export function _animateMonsterProjectile(monster, dmgMult = 1) {
 
     const start = _getElementCentre(sourceCard);
     const end = polymorphVictim
-        ? _getElementCentre(document.getElementById(`eg-card-${polymorphVictim.id}`) || targetHud)
+        ? _getElementCentre(document.getElementById(`sx-card-${polymorphVictim.id}`) || targetHud)
         : _getElementCentre(targetHud);
 
     Audio_Manager.playSFX('monster_projectile_launch');
-    _fireProjectile(monster.emoji, 'eg-proj-monster', start, end, MONSTER_PROJ_DURATION_MS, 'ease-in', () => {
+    _fireProjectile(monster.emoji, 'sx-proj-monster', start, end, MONSTER_PROJ_DURATION_MS, 'ease-in', () => {
         Audio_Manager.playSFX('monster_projectile_hit');
         if (polymorphVictim) {
             // Confused attack hits the other monster - no player mitigation
@@ -264,7 +264,7 @@ export function _rollPreemptiveDodge(monster) {
 // Damage triggers at the animation midpoint (impact apex).
 // While POLYMORPHED the lunge visually chases the confused-attack victim.
 export function _animateMonsterMelee(monster) {
-    const sourceCard = document.getElementById(`eg-card-${monster.id}`);
+    const sourceCard = document.getElementById(`sx-card-${monster.id}`);
     const targetHud = document.getElementById('player-avatar-wrapper');
     if (!sourceCard || !targetHud) return;
 
@@ -275,7 +275,7 @@ export function _animateMonsterMelee(monster) {
         polymorphVictim = _getPolymorphVictim(monster.id);
     }
     const meleeTargetEl = polymorphVictim
-        ? (document.getElementById(`eg-card-${polymorphVictim.id}`) || targetHud)
+        ? (document.getElementById(`sx-card-${polymorphVictim.id}`) || targetHud)
         : targetHud;
 
     const start = _getElementCentre(sourceCard);

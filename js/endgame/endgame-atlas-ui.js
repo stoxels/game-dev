@@ -218,13 +218,13 @@ export function _egAtlasBuildNodeTooltipHTML(nodeId) {
         : null;
     const bossLabel = boss ? `${bossIcon} ${boss.name}` : t('eg_map_has_boss');
     return `
-<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">🗺</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${egAtlasNodeName(node)}</div>
+<div class="sx-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon">🗺</div>
+        <div class="sx-tt-name" style="color:#f5d98a;">${egAtlasNodeName(node)}</div>
     </div>
-    <div class="eg-tt-section">
-        <div class="eg-tt-mod" style="color:#e74c3c;font-weight:700;">${bossLabel}</div>
+    <div class="sx-tt-section">
+        <div class="sx-tt-mod" style="color:#e74c3c;font-weight:700;">${bossLabel}</div>
     </div>
 </div>`;
 }
@@ -342,15 +342,15 @@ export function _egAtlasBuildTierTooltipHTML(tier) {
     const rows = nodes.map(n => {
         const status = _egAtlasNodeStatus(n);
         const glyph = status === 'completed' ? '✔' : status === 'available' ? '?' : '🔒';
-        return `<div class="eg-tt-mod" style="color:${_egAtlasStatusColor(status)}">${glyph} ${egAtlasNodeName(n)}</div>`;
+        return `<div class="sx-tt-mod" style="color:${_egAtlasStatusColor(status)}">${glyph} ${egAtlasNodeName(n)}</div>`;
     }).join('');
     return `
-<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">🗺</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${t('eg_map_tier_tt').replace('{n}', tier)} · ${done}/${nodes.length}</div>
+<div class="sx-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon">🗺</div>
+        <div class="sx-tt-name" style="color:#f5d98a;">${t('eg_map_tier_tt').replace('{n}', tier)} · ${done}/${nodes.length}</div>
     </div>
-    <div class="eg-tt-section">${rows}</div>
+    <div class="sx-tt-section">${rows}</div>
 </div>`;
 }
 
@@ -358,9 +358,9 @@ export function _egAtlasBuildTierTooltipHTML(tier) {
 export function _egAtlasBuildFullScreenHTML() {
     return `
 <div class="ega-layout">
-    <div class="eg-topbar">
-        <button class="eg-back-btn back-btn" onclick="${_egAtlasBackFn}()">${t('btn_back')}</button>
-        <span class="eg-topbar-title">${t('eg_atlas_title')}</span>
+    <div class="sx-topbar">
+        <button class="sx-back-btn back-btn" onclick="${_egAtlasBackFn}()">${t('btn_back')}</button>
+        <span class="sx-topbar-title">${t('eg_atlas_title')}</span>
     </div>
     ${_egAtlasBuildHeaderHTML()}
     <div class="ega-frame">
@@ -735,7 +735,7 @@ export function _egAtlasEnsureStyles() {
             font-size: 7px; color: #fff; opacity: 0.9;
             text-shadow: 1px 1px 0 #000, -1px 1px 0 #000;
         }
-        /* Boss tooltip is built with the shared eg-tt-* tooltip frame
+        /* Boss tooltip is built with the shared sx-tt-* tooltip frame
            (see _egAtlasBuildNodeTooltipHTML) - nothing extra below the
            node square. */
 

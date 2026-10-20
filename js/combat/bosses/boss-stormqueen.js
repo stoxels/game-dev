@@ -48,7 +48,7 @@ export function _mechQueenStorms(monster, phase) {
     const level = monster ? monster.level : 1;
     const storms = [];
     for (let i = 0; i < 3; i++) {
-        const el = _nkEl(run, 'div', 'eg-nk-storm');
+        const el = _nkEl(run, 'div', 'sx-nk-storm');
         el.style.width = radius * 2 + 'px';
         el.style.height = radius * 2 + 'px';
         const s = {
@@ -117,7 +117,7 @@ export function _mechShrapnelDownpour(monster, phase) {
                 x = 40 + Math.random() * Math.max(40, window.innerWidth - 80);
                 y = 40 + Math.random() * Math.max(40, window.innerHeight - 80);
             }
-            const el = _nkEl(run, 'div', 'eg-nk-mark');
+            const el = _nkEl(run, 'div', 'sx-nk-mark');
             el.style.left = Math.round(x - radius) + 'px';
             el.style.top = Math.round(y - radius) + 'px';
             el.style.width = radius * 2 + 'px';
@@ -130,7 +130,7 @@ export function _mechShrapnelDownpour(monster, phase) {
             d.t += dtS * 1000;
             if (!d.struck && d.t >= warnMs) {
                 d.struck = true;
-                d.el.classList.add('eg-nk-mark-hit');
+                d.el.classList.add('sx-nk-mark-hit');
                 if (pr && now >= cdUntil && _nkCircleHit(d.x, d.y, radius, pr, 0)) {
                     cdUntil = now + 350;
                     const dealt = _nkHit(dmgPct, 'lightning', level);

@@ -118,15 +118,15 @@ let _tooltipItem = null;
 // Builds a single equipment slot div (the outer drop-target container).
 export function _buildEquipSlotHTML(slot) {
     return `
-<div class="eg-equip-slot"
-     id="eg-equip-slot-${slot.id}"
+<div class="sx-equip-slot"
+     id="sx-equip-slot-${slot.id}"
      data-slot-id="${slot.id}"
      data-eg-dropzone="equip"
      ondragover="egDragOver(event)"
      ondrop="egDropOnEquip(event, '${slot.id}')"
      ondragleave="egDragLeave(event)">
-    <div class="eg-equip-slot-item" id="eg-equip-item-${slot.id}">
-        <span class="eg-equip-slot-placeholder">${slot.icon || '◻'}</span>
+    <div class="sx-equip-slot-item" id="sx-equip-item-${slot.id}">
+        <span class="sx-equip-slot-placeholder">${slot.icon || '◻'}</span>
     </div>
 </div>`;
 }
@@ -143,29 +143,29 @@ export function _buildEquipColHTML(col) {
 // center puzzle stats, right slots, defense stats (upper right), weapon row.
 export function _buildCharPanelHTML() {
     return `
-<div class="eg-panel eg-panel-char">
-    <div class="eg-panel-label eg-char-label-row"><span>${t('eg_char_label')}</span><span id="eg-char-level-inline"></span></div>
-    <div class="eg-char-panel eg-char-panel-no-model">
-        <div class="eg-stat-block" id="eg-stats-offense">
-            <div class="eg-stats-header">${t('eg_stats_offense_label')}</div>
-            <div class="eg-stats-list" id="eg-offense-stats-list"></div>
+<div class="sx-panel sx-panel-char">
+    <div class="sx-panel-label sx-char-label-row"><span>${t('eg_char_label')}</span><span id="sx-char-level-inline"></span></div>
+    <div class="sx-char-panel sx-char-panel-no-model">
+        <div class="sx-stat-block" id="sx-stats-offense">
+            <div class="sx-stats-header">${t('eg_stats_offense_label')}</div>
+            <div class="sx-stats-list" id="sx-offense-stats-list"></div>
         </div>
-        <div class="eg-equip-col eg-equip-left" id="eg-equip-left">
+        <div class="sx-equip-col sx-equip-left" id="sx-equip-left">
             ${_buildEquipColHTML('left')}
         </div>
-        <div class="eg-char-stats-panel" id="eg-char-stats-panel">
-            <div class="eg-stats-header">${t('eg_stats_label')}</div>
-            <div class="eg-stats-list" id="eg-stats-list"></div>
+        <div class="sx-char-stats-panel" id="sx-char-stats-panel">
+            <div class="sx-stats-header">${t('eg_stats_label')}</div>
+            <div class="sx-stats-list" id="sx-stats-list"></div>
         </div>
-        <div class="eg-equip-col eg-equip-right" id="eg-equip-right">
+        <div class="sx-equip-col sx-equip-right" id="sx-equip-right">
             ${_buildEquipColHTML('right')}
         </div>
-        <div class="eg-stat-block" id="eg-stats-defense">
-            <div class="eg-stats-header">${t('eg_stats_defense_label')}</div>
-            <div class="eg-stats-list" id="eg-defense-stats-list"></div>
+        <div class="sx-stat-block" id="sx-stats-defense">
+            <div class="sx-stats-header">${t('eg_stats_defense_label')}</div>
+            <div class="sx-stats-list" id="sx-defense-stats-list"></div>
         </div>
     </div>
-    <div class="eg-equip-bottom-row" id="eg-equip-bottom">
+    <div class="sx-equip-bottom-row" id="sx-equip-bottom">
         ${_buildEquipColHTML('bottom')}
     </div>
 </div>`;
@@ -181,8 +181,8 @@ export function _buildCharPanelHTML() {
 export function _buildCurrencyCellHTML(row, col) {
     // Placeholder tooltip handled via JS hover helpers; cell carries data for empty display.
     return `
-<div class="eg-inv-cell eg-currency-cell"
-     id="eg-currency-cell-${row}-${col}"
+<div class="sx-inv-cell sx-currency-cell"
+     id="sx-currency-cell-${row}-${col}"
      data-row="${row}" data-col="${col}"
      data-eg-dropzone="currency"
      onmouseenter="_onCurrencyCellEnter(${row}, ${col}, event)"
@@ -208,9 +208,9 @@ export function _buildCurrencyGridHTML() {
 // Hub: left-side Orbs & Shards panel (currency tab style)
 export function _buildCurrencyPanelHTML() {
     return `
-<div class="eg-currency-col">
-    <div class="eg-panel-label">${t('eg_runes_orbs')}</div>
-    <div class="eg-currency-grid" id="eg-currency-grid"
+<div class="sx-currency-col">
+    <div class="sx-panel-label">${t('eg_runes_orbs')}</div>
+    <div class="sx-currency-grid" id="sx-currency-grid"
          style="grid-template-columns: repeat(${CURRENCY_COLS}, 1fr);">
         ${_buildCurrencyGridHTML()}
     </div>
@@ -221,9 +221,9 @@ export function _buildCurrencyPanelHTML() {
 // Gate: horizontal Orbs & Shards strip (same fixed slots, shared data)
 export function _buildCurrencyStripHTML() {
     return `
-<div class="eg-currency-strip">
-    <div class="eg-panel-label">${t('eg_runes_orbs')}</div>
-    <div class="eg-currency-row" id="eg-currency-grid"
+<div class="sx-currency-strip">
+    <div class="sx-panel-label">${t('eg_runes_orbs')}</div>
+    <div class="sx-currency-row" id="sx-currency-grid"
          style="grid-template-columns: repeat(${CURRENCY_COLS}, 1fr);">
         ${_buildCurrencyGridHTML()}
     </div>
@@ -232,7 +232,7 @@ export function _buildCurrencyStripHTML() {
 
 // Hover helpers for empty assigned slots - show placeholder name without needing an item.
 export function _onCurrencyCellEnter(row, col, e) {
-    document.getElementById(`eg-currency-cell-${row}-${col}`);
+    document.getElementById(`sx-currency-cell-${row}-${col}`);
     const item = _currencyStash[row] && _currencyStash[row][col];
     if (item) return; // occupied → chip's own onmouseenter handles tooltip
     const assignedId = _currencyIdForSlot(row, col);
@@ -245,19 +245,19 @@ export function _onCurrencyCellEnter(row, col, e) {
     const ttDesc = def.description || '';
     // Respect LANG for shards/orbs already translated; just use def fields
     const html = `
-<div class="eg-tt-frame" style="--tt-border:#b59248;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon" style="opacity:0.55;">${GAME_ART.html('item', assignedId, ttIcon)}</div>
-        <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${ttName}</div>
-        <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
+<div class="sx-tt-frame" style="--tt-border:#b59248;">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon" style="opacity:0.55;">${GAME_ART.html('item', assignedId, ttIcon)}</div>
+        <div class="sx-tt-name" style="color:#f5d98a; opacity:0.9;">${ttName}</div>
+        <div class="sx-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
     </div>
-    <div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:0.85;">${ttDesc}</div></div>
+    <div class="sx-tt-section"><div class="sx-tt-desc" style="opacity:0.85;">${ttDesc}</div></div>
 </div>`;
     if (typeof showGameTooltip === 'function') globalThis.showGameTooltip(html, e);
 }
 export function _onCurrencyCellMove(e) {
     // Only move tooltip when hovering an empty assigned slot (occupied chips manage themselves)
-    const cell = e.currentTarget || e.target.closest && e.target.closest('.eg-currency-cell');
+    const cell = e.currentTarget || e.target.closest && e.target.closest('.sx-currency-cell');
     if (!cell) return;
     const r = +cell.dataset.row, c = +cell.dataset.col;
     const item = _currencyStash[r] && _currencyStash[r][c];
@@ -277,8 +277,8 @@ export function _onCurrencyCellLeave() {
 // Builds a single equipment stash cell div (drop target).
 export function _buildInventoryCellHTML(row, col) {
     return `
-<div class="eg-inv-cell"
-     id="eg-inv-cell-${row}-${col}"
+<div class="sx-inv-cell"
+     id="sx-inv-cell-${row}-${col}"
      data-row="${row}" data-col="${col}"
      data-eg-dropzone="inv"
      ondragover="egDragOver(event)"
@@ -307,44 +307,44 @@ export function _buildStashPanelHTML() {
     const totalUniques = (typeof UNIQUE_ITEMS !== 'undefined' ? UNIQUE_ITEMS.length : 0);
     const foundUniques = (globalThis._uniqueCollected ? globalThis._uniqueCollected.size : 0);
     return `
-<div class="eg-panel eg-panel-inv">
-    <div class="eg-panel-label eg-stash-header">
+<div class="sx-panel sx-panel-inv">
+    <div class="sx-panel-label sx-stash-header">
         <span>${t('eg_stash_label')}</span>
-        <div id="eg-stash-info" class="eg-stash-info" aria-live="polite"></div>
-        <div class="eg-stash-actions">
-            <button class="eg-stash-btn eg-stash-btn-config" id="eg-toggle-ilvl-btn"
+        <div id="sx-stash-info" class="sx-stash-info" aria-live="polite"></div>
+        <div class="sx-stash-actions">
+            <button class="sx-stash-btn sx-stash-btn-config" id="sx-toggle-ilvl-btn"
                      onclick="_toggleItemLevelDisplay()"
                      onmouseenter="_showItemLevelToggleTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
                      onmouseleave="hideGameTooltip()">${_showItemLevel ? '🔢' : '👤'} ${t(_showItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</button>
-            <button class="eg-stash-btn eg-stash-btn-config" id="eg-loot-filter-btn"
+            <button class="sx-stash-btn sx-stash-btn-config" id="sx-loot-filter-btn"
                      onclick="_openLootFilterModal()"
                      onmouseenter="_showLootFilterTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
                      onmouseleave="hideGameTooltip()">⚗ ${t('eg_loot_filter_btn')}</button>
-            <button class="eg-stash-btn eg-stash-btn-config" onclick="_openMassSellModal()"
+            <button class="sx-stash-btn sx-stash-btn-config" onclick="_openMassSellModal()"
                      onmouseenter="_showMassSellConfigTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
                      onmouseleave="hideGameTooltip()">⚙ ${t('eg_mass_sell_config')}</button>
-            <button class="eg-stash-btn eg-stash-btn-sell" onclick="_requestMassSell()"
+            <button class="sx-stash-btn sx-stash-btn-sell" onclick="_requestMassSell()"
                      onmouseenter="_showMassSellTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
                      onmouseleave="hideGameTooltip()">⚒ ${t('eg_mass_sell_btn')}</button>
         </div>
     </div>
-    <div class="eg-stash-tabs" id="eg-stash-tabs">
-        <button class="eg-stash-tab ${invActive ? 'active' : ''}" id="eg-tab-inventory" data-tab="inventory" onclick="_switchStashTab('inventory')">${t('eg_tab_inventory') || 'INVENTORY'}</button>
-        <button class="eg-stash-tab ${uniqActive ? 'active' : ''}" id="eg-tab-uniques" data-tab="uniques" onclick="_switchStashTab('uniques')">${t('eg_tab_uniques') || 'UNIQUES'} <span class="eg-tab-count">${foundUniques}/${totalUniques}</span></button>
+    <div class="sx-stash-tabs" id="sx-stash-tabs">
+        <button class="sx-stash-tab ${invActive ? 'active' : ''}" id="sx-tab-inventory" data-tab="inventory" onclick="_switchStashTab('inventory')">${t('eg_tab_inventory') || 'INVENTORY'}</button>
+        <button class="sx-stash-tab ${uniqActive ? 'active' : ''}" id="sx-tab-uniques" data-tab="uniques" onclick="_switchStashTab('uniques')">${t('eg_tab_uniques') || 'UNIQUES'} <span class="sx-tab-count">${foundUniques}/${totalUniques}</span></button>
     </div>
-    <div class="eg-stash-tab-body ${invActive ? 'active' : ''}" id="eg-stash-tab-inventory">
-        <div class="eg-inv-grid" id="eg-inv-grid" style="grid-template-columns: repeat(${INV_COLS}, 1fr);">
+    <div class="sx-stash-tab-body ${invActive ? 'active' : ''}" id="sx-stash-tab-inventory">
+        <div class="sx-inv-grid" id="sx-inv-grid" style="grid-template-columns: repeat(${INV_COLS}, 1fr);">
             ${_buildInventoryGridHTML()}
         </div>
     </div>
-    <div class="eg-stash-tab-body ${uniqActive ? 'active' : ''}" id="eg-stash-tab-uniques">
-        <div class="eg-unique-hint">${t('eg_unique_stash_hint')}</div>
-        <div class="eg-unique-count" id="eg-unique-count">${t('eg_uniques_collected').replace('{found}', foundUniques).replace('{total}', totalUniques)}</div>
-        <div class="eg-unique-grid" id="eg-unique-grid" data-eg-dropzone="uniques" ondragover="egDragOver(event)" ondragleave="egDragLeave(event)">
+    <div class="sx-stash-tab-body ${uniqActive ? 'active' : ''}" id="sx-stash-tab-uniques">
+        <div class="sx-unique-hint">${t('eg_unique_stash_hint')}</div>
+        <div class="sx-unique-count" id="sx-unique-count">${t('eg_uniques_collected').replace('{found}', foundUniques).replace('{total}', totalUniques)}</div>
+        <div class="sx-unique-grid" id="sx-unique-grid" data-eg-dropzone="uniques" ondragover="egDragOver(event)" ondragleave="egDragLeave(event)">
             ${_buildUniqueGridHTML()}
         </div>
     </div>
@@ -353,10 +353,10 @@ export function _buildStashPanelHTML() {
 export function _switchStashTab(tab) {
     Audio_Manager.playSFX('ui_tab_switch');
     globalThis._stashTab = (tab === 'uniques' ? 'uniques' : 'inventory');
-    const invBody = document.getElementById('eg-stash-tab-inventory');
-    const uniqBody = document.getElementById('eg-stash-tab-uniques');
-    const invTab = document.getElementById('eg-tab-inventory');
-    const uniqTab = document.getElementById('eg-tab-uniques');
+    const invBody = document.getElementById('sx-stash-tab-inventory');
+    const uniqBody = document.getElementById('sx-stash-tab-uniques');
+    const invTab = document.getElementById('sx-tab-inventory');
+    const uniqTab = document.getElementById('sx-tab-uniques');
     if (invBody) invBody.classList.toggle('active', _stashTab === 'inventory');
     if (uniqBody) uniqBody.classList.toggle('active', _stashTab === 'uniques');
     if (invTab) invTab.classList.toggle('active', _stashTab === 'inventory');
@@ -365,7 +365,7 @@ export function _switchStashTab(tab) {
     else _renderInventory();
 }
 export function _buildUniqueGridHTML() {
-    if (typeof UNIQUE_ITEMS === 'undefined' || !Array.isArray(UNIQUE_ITEMS)) return '<div class="eg-unique-empty">No uniques defined</div>';
+    if (typeof UNIQUE_ITEMS === 'undefined' || !Array.isArray(UNIQUE_ITEMS)) return '<div class="sx-unique-empty">No uniques defined</div>';
     let html = '';
     for (let i = 0; i < UNIQUE_ITEMS.length; i++) {
         const def = UNIQUE_ITEMS[i];
@@ -379,28 +379,28 @@ export function _buildUniqueGridHTML() {
         else if (count === 0) cellCls = 'collected-empty';
         else cellCls = 'collected';
         const icon = collected ? (items[0] ? (items[0].icon || def.icon || '❓') : (def.icon || '❓')) : '?';
-        const countBadge = count > 1 ? `<span class="eg-unique-count-badge">${t('eg_unique_count').replace('{n}', count)}</span>` : (count === 0 && collected ? `<span class="eg-unique-count-badge" style="background:#888;">0</span>` : '');
-        const lockedOverlay = !collected ? '<span class="eg-unique-lock">?</span>' : '';
-        html += `<div class="eg-unique-cell ${cellCls}" data-unique-id="${uid}" data-uid="${uid}" data-eg-dropzone="uniques"
+        const countBadge = count > 1 ? `<span class="sx-unique-count-badge">${t('eg_unique_count').replace('{n}', count)}</span>` : (count === 0 && collected ? `<span class="sx-unique-count-badge" style="background:#888;">0</span>` : '');
+        const lockedOverlay = !collected ? '<span class="sx-unique-lock">?</span>' : '';
+        html += `<div class="sx-unique-cell ${cellCls}" data-unique-id="${uid}" data-uid="${uid}" data-eg-dropzone="uniques"
             ondragover="egDragOver(event)" ondragleave="egDragLeave(event)"
             onmouseenter="_onUniqueCellEnter('${uid}', event)"
             onmousemove="_onUniqueCellMove('${uid}', event)"
             onmouseleave="_onUniqueCellLeave('${uid}', event)"
             oncontextmenu="_onUniqueCellRightClick(event, '${uid}')"
             onclick="_onUniqueCellClick(event, '${uid}')">
-            <div class="eg-unique-cell-name">${displayName}</div>
-            <div class="eg-unique-cell-icon">${GAME_ART ? GAME_ART.html('item', uid, icon) : icon}${countBadge}${lockedOverlay}</div>
+            <div class="sx-unique-cell-name">${displayName}</div>
+            <div class="sx-unique-cell-icon">${GAME_ART ? GAME_ART.html('item', uid, icon) : icon}${countBadge}${lockedOverlay}</div>
         </div>`;
     }
     return html;
 }
 export function _renderUniqueStash() {
-    const grid = document.getElementById('eg-unique-grid');
+    const grid = document.getElementById('sx-unique-grid');
     if (!grid) return;
     grid.innerHTML = _buildUniqueGridHTML();
     const total = (typeof UNIQUE_ITEMS !== 'undefined' ? UNIQUE_ITEMS.length : 0);
     const found = (globalThis._uniqueCollected ? globalThis._uniqueCollected.size : 0);
-    const cntEl = document.getElementById('eg-unique-count');
+    const cntEl = document.getElementById('sx-unique-count');
     if (cntEl) cntEl.textContent = t('eg_uniques_collected').replace('{found}', found).replace('{total}', total);
     _updateUniqueTabBadge();
 }
@@ -426,8 +426,8 @@ export function _onUniqueCellEnter(uid, e) {
     const arr = globalThis._uniqueStash[uid];
     // Ensure previous multi-tip inline overrides don't leak into next tooltip
     const prevTip = document.getElementById('ghud-floating-tip');
-    if (prevTip && prevTip.classList.contains('eg-unique-multi')) {
-        prevTip.classList.remove('eg-unique-multi','eg-wide-tip');
+    if (prevTip && prevTip.classList.contains('sx-unique-multi')) {
+        prevTip.classList.remove('sx-unique-multi','sx-wide-tip');
         prevTip.style.maxWidth = '380px';
         prevTip.style.width = '';
         prevTip.style.maxHeight = '';
@@ -443,10 +443,10 @@ export function _onUniqueCellEnter(uid, e) {
         const name = def ? ((LANG==='de'?def.nameDe:def.nameEn)||def.nameEn) : uid;
         const icon = def ? (def.icon || '?') : '?';
         if (isCollected) {
-            const html = `<div class="eg-tt-frame" style="--tt-border:#c8a84b;"><div class="eg-tt-header"><div class="eg-tt-icon" style="opacity:0.6;">${GAME_ART ? GAME_ART.html('item', uid, icon) : icon}</div><div class="eg-tt-name" style="color:#c8a84b;">${name}</div><div class="eg-tt-rarity-line" style="color:#f5d98a;">${t('eg_unique_in_inventory') || 'Collected - in Inventory (0 remaining)'}</div></div><div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:.8;">${t('eg_unique_empty_hint') || 'All copies moved to Inventory. Drag one back or loot another.'}</div></div></div>`;
+            const html = `<div class="sx-tt-frame" style="--tt-border:#c8a84b;"><div class="sx-tt-header"><div class="sx-tt-icon" style="opacity:0.6;">${GAME_ART ? GAME_ART.html('item', uid, icon) : icon}</div><div class="sx-tt-name" style="color:#c8a84b;">${name}</div><div class="sx-tt-rarity-line" style="color:#f5d98a;">${t('eg_unique_in_inventory') || 'Collected - in Inventory (0 remaining)'}</div></div><div class="sx-tt-section"><div class="sx-tt-desc" style="opacity:.8;">${t('eg_unique_empty_hint') || 'All copies moved to Inventory. Drag one back or loot another.'}</div></div></div>`;
             globalThis.showGameTooltip(html, e);
         } else {
-            const html = `<div class="eg-tt-frame" style="--tt-border:#555;"><div class="eg-tt-header"><div class="eg-tt-icon">?</div><div class="eg-tt-name" style="color:#888;">${name}</div><div class="eg-tt-rarity-line" style="color:#888;">${t('eg_unique_not_collected')}</div></div><div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:.6;">${t('eg_unique_stash_hint')}</div></div></div>`;
+            const html = `<div class="sx-tt-frame" style="--tt-border:#555;"><div class="sx-tt-header"><div class="sx-tt-icon">?</div><div class="sx-tt-name" style="color:#888;">${name}</div><div class="sx-tt-rarity-line" style="color:#888;">${t('eg_unique_not_collected')}</div></div><div class="sx-tt-section"><div class="sx-tt-desc" style="opacity:.6;">${t('eg_unique_stash_hint')}</div></div></div>`;
             globalThis.showGameTooltip(html, e);
         }
         return;
@@ -459,9 +459,9 @@ export function _onUniqueCellEnter(uid, e) {
         // add hint via stash info? Instead append to tooltip DOM after show
         setTimeout(()=>{
             const tip=document.getElementById('ghud-floating-tip');
-            if(tip && !tip.querySelector('.eg-unique-tip-hint')){
+            if(tip && !tip.querySelector('.sx-unique-tip-hint')){
                 const h=document.createElement('div');
-                h.className='eg-unique-tip-hint';
+                h.className='sx-unique-tip-hint';
                 h.textContent=t('eg_unique_right_click_hint');
                 h.style.cssText='margin-top:6px;padding-top:4px;border-top:1px dashed #444;font-size:9px;color:#f5d98a;text-align:center;';
                 tip.appendChild(h);
@@ -472,11 +472,11 @@ export function _onUniqueCellEnter(uid, e) {
     // Multiple copies: build side-by-side frames – scrollable, stays open while hovering tip
     const frames = arr.map(it=>_buildTooltipBodyHTML(it)).join('');
     const header = `<div style="text-align:center;font-family:var(--PX);font-size:9px;color:#f5d98a;margin-bottom:6px;letter-spacing:1px;">${t('eg_unique_tooltip_count').replace('{n}', arr.length)} - ${t('eg_unique_right_click_hint')}</div>`;
-    const html = `<div class="eg-unique-multi-tip">${header}<div class="eg-unique-multi-row">${frames}</div></div>`;
+    const html = `<div class="sx-unique-multi-tip">${header}<div class="sx-unique-multi-row">${frames}</div></div>`;
     globalThis.showGameTooltip(html, e);
     const tip=document.getElementById('ghud-floating-tip');
     if(tip){
-        tip.classList.add('eg-wide-tip','eg-unique-multi');
+        tip.classList.add('sx-wide-tip','sx-unique-multi');
         tip.style.maxWidth = '96vw';
         tip.style.width = 'auto';
         tip.style.maxHeight = '85vh';
@@ -486,10 +486,10 @@ export function _onUniqueCellEnter(uid, e) {
         tip.onmouseenter = null;
         tip.onmouseleave = (ev) => {
             // hide when leaving the tip unless re-entering the originating cell
-            const stillOverCell = document.querySelector(`.eg-unique-cell[data-uid="${uid}"]:hover`);
+            const stillOverCell = document.querySelector(`.sx-unique-cell[data-uid="${uid}"]:hover`);
             if (!stillOverCell) {
                 globalThis.hideGameTooltip();
-                tip.classList.remove('eg-wide-tip','eg-unique-multi');
+                tip.classList.remove('sx-wide-tip','sx-unique-multi');
                 tip.style.maxWidth = '380px';
                 tip.style.width = '';
                 tip.style.maxHeight = '';
@@ -511,22 +511,22 @@ export function _onUniqueCellMove(uid, e){
     // support both signatures: (uid, e) and (e)
     if (e === undefined) { e = uid; uid = null; }
     const tip=document.getElementById('ghud-floating-tip');
-    if (tip && tip.classList.contains('eg-unique-multi')) return; // multi tip is pinned, don't follow mouse
+    if (tip && tip.classList.contains('sx-unique-multi')) return; // multi tip is pinned, don't follow mouse
     if(typeof moveGameTooltip==='function') globalThis.moveGameTooltip(e);
 }
 export function _onUniqueCellLeave(uid, e){
     if (e === undefined && typeof uid === 'object' && uid && uid.type) { e = uid; uid = null; }
     const tip=document.getElementById('ghud-floating-tip');
-    if(tip && tip.classList.contains('eg-unique-multi')) {
+    if(tip && tip.classList.contains('sx-unique-multi')) {
         // don't hide immediately – let tip's own mouseleave handle it, or delay to allow moving onto tip
         setTimeout(()=>{
             const tipNow=document.getElementById('ghud-floating-tip');
             if(!tipNow) return;
             const overTip = tipNow.matches(':hover');
-            const overCell = uid ? document.querySelector(`.eg-unique-cell[data-uid="${uid}"]:hover`) : null;
+            const overCell = uid ? document.querySelector(`.sx-unique-cell[data-uid="${uid}"]:hover`) : null;
             if (!overTip && !overCell) {
                 globalThis.hideGameTooltip();
-                tipNow.classList.remove('eg-wide-tip','eg-unique-multi');
+                tipNow.classList.remove('sx-wide-tip','sx-unique-multi');
                 tipNow.style.maxWidth = '380px';
                 tipNow.style.width = '';
                 tipNow.style.maxHeight = '';
@@ -540,7 +540,7 @@ export function _onUniqueCellLeave(uid, e){
     }
     globalThis.hideGameTooltip();
     if(tip) {
-        tip.classList.remove('eg-wide-tip','eg-unique-multi');
+        tip.classList.remove('sx-wide-tip','sx-unique-multi');
         tip.style.maxWidth = '380px';
         tip.style.width = '';
         tip.style.maxHeight = '';
@@ -554,16 +554,16 @@ export function _onUniqueCellLeave(uid, e){
 export let _stashInfoTimer = null;
 
 export function _ensureStashInfoEl() {
-    let el = document.getElementById('eg-stash-info');
+    let el = document.getElementById('sx-stash-info');
     if (el) return el;
-    const header = document.querySelector('.eg-stash-header');
+    const header = document.querySelector('.sx-stash-header');
     if (!header) return null;
     el = document.createElement('div');
-    el.id = 'eg-stash-info';
-    el.className = 'eg-stash-info';
+    el.id = 'sx-stash-info';
+    el.className = 'sx-stash-info';
     el.setAttribute('aria-live', 'polite');
     // insert between label and actions (as 2nd child)
-    const actions = header.querySelector('.eg-stash-actions');
+    const actions = header.querySelector('.sx-stash-actions');
     if (actions) header.insertBefore(el, actions);
     else header.appendChild(el);
     return el;
@@ -584,7 +584,7 @@ export function _showStashInfo(message, opts = {}) {
         }
     } catch (e) {}
     el.textContent = message;
-    el.className = 'eg-stash-info show eg-stash-info--' + type;
+    el.className = 'sx-stash-info show sx-stash-info--' + type;
     if (_stashInfoTimer) clearTimeout(_stashInfoTimer);
     _stashInfoTimer = setTimeout(() => {
         el.classList.remove('show');
@@ -592,7 +592,7 @@ export function _showStashInfo(message, opts = {}) {
 }
 
 export function _clearStashInfo() {
-    const el = document.getElementById('eg-stash-info');
+    const el = document.getElementById('sx-stash-info');
     if (el) el.classList.remove('show');
     if (_stashInfoTimer) { clearTimeout(_stashInfoTimer); _stashInfoTimer = null; }
 }
@@ -603,15 +603,15 @@ export function _clearStashInfo() {
 // The Orbs & Shards tab uses fixed slots; the item tooltip is a floating mouseover.
 export function _buildFullScreenHTML() {
     return `
-<div class="eg-hub-layout">
+<div class="sx-hub-layout">
     ${_buildTopbarHTML()}
-    <div class="eg-body">
-        <div class="eg-upper-row">
+    <div class="sx-body">
+        <div class="sx-upper-row">
             ${_buildCurrencyPanelHTML()}
-            <div class="eg-char-wrap">
+            <div class="sx-char-wrap">
                 ${_buildCharPanelHTML()}
             </div>
-            <div class="eg-essence-col">
+            <div class="sx-essence-col">
                 ${typeof _buildEssenceTabHTML === 'function' ? _buildEssenceTabHTML() : ''}
             </div>
         </div>
@@ -630,8 +630,8 @@ export function _buildFullScreenHTML() {
 // The whole slot cell is tinted with the item's rarity color (same scheme
 // as the main stash cells).
 export function _renderEquipSlot(slotId) {
-    const slotEl = document.getElementById(`eg-equip-slot-${slotId}`);
-    const el = document.getElementById(`eg-equip-item-${slotId}`);
+    const slotEl = document.getElementById(`sx-equip-slot-${slotId}`);
+    const el = document.getElementById(`sx-equip-item-${slotId}`);
     if (!el) return;
     const slot = EQUIP_SLOTS.find(s => s.id === slotId);
     const item = _equipped[slotId] || null;
@@ -647,7 +647,7 @@ export function _renderEquipSlot(slotId) {
 
     el.innerHTML = item
         ? _buildItemChipHTML(item)
-        : `<span class="eg-equip-slot-placeholder">${placeholderIcon}</span>`;
+        : `<span class="sx-equip-slot-placeholder">${placeholderIcon}</span>`;
 
     if (slotEl) {
         if (item) {
@@ -695,7 +695,7 @@ export function _getCellFill(item) {
 
 // Re-renders a single cell in the main stash grid.
 export function _renderInventoryCell(row, col) {
-    const cell = document.getElementById(`eg-inv-cell-${row}-${col}`);
+    const cell = document.getElementById(`sx-inv-cell-${row}-${col}`);
     if (!cell) return;
     const item = _inventory[row][col];
     cell.innerHTML = item
@@ -725,7 +725,7 @@ export function _renderInventory() {
 
 // Updates the stash item-count label (if present in the DOM).
 export function _updateInvCount() {
-    const el = document.getElementById('eg-inv-count');
+    const el = document.getElementById('sx-inv-count');
     if (!el) return;
     let used = 0;
     _inventory.forEach(row => row.forEach(cell => { if (cell) used++; }));
@@ -742,7 +742,7 @@ export function _updateInvCount() {
 // Empty assigned slots show a faint placeholder icon and dashed border.
 // _renderCurrencyCell is defined ONCE, in
 // endgame-hub-drag-and-drop.js: it renders a currency-stash cell into BOTH
-// the hub grid (eg-currency-cell-*) and the gate grid
+// the hub grid (sx-currency-cell-*) and the gate grid
 // (eg-gate-currency-cell-*) using drag-and-drop chips. The earlier copy
 // that lived here (hub-only, non-dnd chips) was removed in 2026-09 - the
 // drag-and-drop version already won via load order, so behaviour is
@@ -760,9 +760,9 @@ export function _renderCurrencyStash() {
 // lazily on first use). Cells rendered with emoji fallbacks before that
 // refresh here so they swap to art without needing a reload.
 if (typeof document !== 'undefined' && document.addEventListener) {
-    document.addEventListener('eg-art-loaded', function () {
+    document.addEventListener('sx-art-loaded', function () {
         try {
-            if (document.getElementById('eg-currency-cell-0-0') || document.getElementById('eg-gate-currency-cell-0-0')) {
+            if (document.getElementById('sx-currency-cell-0-0') || document.getElementById('eg-gate-currency-cell-0-0')) {
                 _renderCurrencyStash();
             }
         } catch (e) { /* hub not open - safe to ignore */ }
@@ -794,8 +794,8 @@ export function _renderStatsList() {
     const groups = _buildGroupedStats(stats);
 
     const emptyHTML = `
-<div class="eg-stat-row eg-stat-placeholder">
-    <span class="eg-stat-name">${t('eg_no_stats_yet')}</span>
+<div class="sx-stat-row sx-stat-placeholder">
+    <span class="sx-stat-name">${t('eg_no_stats_yet')}</span>
 </div>`;
 
     function renderSide(listId, categories) {
@@ -806,19 +806,19 @@ export function _renderStatsList() {
             return;
         }
         el.innerHTML = categories.map(cat => `
-<div class="eg-stats-category">
-    <div class="eg-stats-category-title">${cat.title}</div>
+<div class="sx-stats-category">
+    <div class="sx-stats-category-title">${cat.title}</div>
     ${cat.lines.map(line => `
-    <div class="eg-stat-row" data-desc-key="${line.descKey}" data-desc-label="${line.label}"${line.resTotal != null ? ` data-res-total="${line.resTotal}" data-res-cap="${line.resCap}" data-res-penalty="${line.resPenalty || 0}"` : ''}>
-        <span class="eg-stat-name">${line.label}</span>
-        <span class="eg-stat-value">${line.value}</span>
+    <div class="sx-stat-row" data-desc-key="${line.descKey}" data-desc-label="${line.label}"${line.resTotal != null ? ` data-res-total="${line.resTotal}" data-res-cap="${line.resCap}" data-res-penalty="${line.resPenalty || 0}"` : ''}>
+        <span class="sx-stat-name">${line.label}</span>
+        <span class="sx-stat-value">${line.value}</span>
     </div>`).join('')}
 </div>`).join('');
     }
 
-    renderSide('eg-offense-stats-list', groups.offense);
-    renderSide('eg-defense-stats-list', groups.defense);
-    renderSide('eg-stats-list', groups.puzzle);
+    renderSide('sx-offense-stats-list', groups.offense);
+    renderSide('sx-defense-stats-list', groups.defense);
+    renderSide('sx-stats-list', groups.puzzle);
     _bindStatTooltips();
 }
 
@@ -929,22 +929,22 @@ export function _buildStatDescTooltipHTML(descKey, label, row) {
 // (delegation survives frequent innerHTML re-renders; the dataset guard
 // makes repeated calls after each _renderStatsList() a no-op).
 export function _bindStatTooltips() {
-    ['eg-offense-stats-list', 'eg-stats-list', 'eg-defense-stats-list'].forEach(id => {
+    ['sx-offense-stats-list', 'sx-stats-list', 'sx-defense-stats-list'].forEach(id => {
         const el = document.getElementById(id);
         if (!el || el.dataset.statTipBound) return;
         el.dataset.statTipBound = '1';
 
         el.addEventListener('mouseover', e => {
-            const row = e.target.closest ? e.target.closest('.eg-stat-row') : null;
-            if (row && !row.classList.contains('eg-stat-placeholder')) {
+            const row = e.target.closest ? e.target.closest('.sx-stat-row') : null;
+            if (row && !row.classList.contains('sx-stat-placeholder')) {
                 globalThis.showGameTooltip(_buildStatDescTooltipHTML(row.dataset.descKey, row.dataset.descLabel, row), e);
             }
         });
         el.addEventListener('mousemove', e => {
-            if (e.target.closest && e.target.closest('.eg-stat-row')) globalThis.moveGameTooltip(e);
+            if (e.target.closest && e.target.closest('.sx-stat-row')) globalThis.moveGameTooltip(e);
         });
         el.addEventListener('mouseout', e => {
-            const row = e.target.closest ? e.target.closest('.eg-stat-row') : null;
+            const row = e.target.closest ? e.target.closest('.sx-stat-row') : null;
             if (row && !(e.relatedTarget && row.contains(e.relatedTarget))) globalThis.hideGameTooltip();
         });
     });
@@ -953,7 +953,7 @@ export function _bindStatTooltips() {
 
 // Re-renders the launcher slot for the crafting bench (in the currency panel).
 export function _updateCraftingBenchLauncherSlot() {
-    const craftingSlot = document.getElementById('eg-crafting-bench-launch-slot');
+    const craftingSlot = document.getElementById('sx-crafting-bench-launch-slot');
     if (craftingSlot) {
         const item = typeof _craftingBenchItem !== 'undefined' ? globalThis._craftingBenchItem : null;
         craftingSlot.innerHTML = item ? _buildItemChipHTML(item) : 'Drop equipment here';
@@ -968,10 +968,10 @@ export function _renderAll() {
     _renderUniqueStash();
     _updateUniqueTabBadge();
     // keep tab visibility in sync
-    const invBody = document.getElementById('eg-stash-tab-inventory');
-    const uniqBody = document.getElementById('eg-stash-tab-uniques');
-    const invTab = document.getElementById('eg-tab-inventory');
-    const uniqTab = document.getElementById('eg-tab-uniques');
+    const invBody = document.getElementById('sx-stash-tab-inventory');
+    const uniqBody = document.getElementById('sx-stash-tab-uniques');
+    const invTab = document.getElementById('sx-tab-inventory');
+    const uniqTab = document.getElementById('sx-tab-uniques');
     if (invBody) invBody.classList.toggle('active', _stashTab !== 'uniques');
     if (uniqBody) uniqBody.classList.toggle('active', _stashTab === 'uniques');
     if (invTab) invTab.classList.toggle('active', _stashTab !== 'uniques');
@@ -984,7 +984,7 @@ export function _renderAll() {
     _renderStatsList();
     if (typeof _renderLevelHUD === 'function') _renderLevelHUD();
     _updatePassiveTreeButton();
-    const craftingSlot = document.getElementById('eg-crafting-bench-launch-slot');
+    const craftingSlot = document.getElementById('sx-crafting-bench-launch-slot');
     if (craftingSlot) {
         const item = typeof _craftingBenchItem !== 'undefined' ? globalThis._craftingBenchItem : null;
         craftingSlot.innerHTML = item ? _buildItemChipHTML(item) : 'Drop equipment here';
@@ -1074,7 +1074,7 @@ export function isHubGameOverlay() {
 // both ways on every showEndgameHub).
 export function _applyOverlayChrome() {
     const hide = _hubGameOverlay === true;
-    ['eg-btn-passive-tree', 'eg-btn-atlas', 'eg-btn-gate'].forEach((id) => {
+    ['sx-btn-passive-tree', 'sx-btn-atlas', 'sx-btn-gate'].forEach((id) => {
         const btn = document.getElementById(id);
         if (btn) btn.style.display = hide ? 'none' : '';
     });
@@ -1241,10 +1241,10 @@ export function addTestItems() {
 // closes the mass-sell overlay (confirm step steps back to filter view).
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        const m = document.getElementById('eg-mass-sell-modal');
+        const m = document.getElementById('sx-mass-sell-modal');
         if (m && m.classList.contains('show')) {
             // If confirm sub-panel is visible, first step back to the filter view.
-            const confirm = document.getElementById('eg-mass-sell-confirm');
+            const confirm = document.getElementById('sx-mass-sell-confirm');
             if (confirm && confirm.style.display !== 'none') {
                 _cancelMassSellConfirm();
             } else {

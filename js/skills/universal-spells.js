@@ -1796,7 +1796,7 @@ export function _uspBuildSupportStatusIconsHTML() {
             const secs = Math.ceil((b.until - now) / 1000);
             const label = de ? (b.nameDE || b.nameEn) : b.nameEn;
             const charges = (b.kind === 'ward' && _uspWardCharges > 0) ? `×${_uspWardCharges} ` : '';
-            return `<span class="eg-status-icon usp-buff-icon usp-buff-${b.kind}" data-tip="${globalThis._tipAttr(label)}">${b.icon}${charges}${secs}</span>`;
+            return `<span class="sx-status-icon usp-buff-icon usp-buff-${b.kind}" data-tip="${globalThis._tipAttr(label)}">${b.icon}${charges}${secs}</span>`;
         })
         .join('');
 }
@@ -1804,7 +1804,7 @@ export function _uspBuildSupportStatusIconsHTML() {
 // Forces the shared player status strip to rebuild on its next tick without
 // waiting for an ailment change (the sentinel never matches a real signature).
 function _uspForceBuffIconRefresh() {
-    const strip = document.getElementById('eg-player-status-strip');
+    const strip = document.getElementById('sx-player-status-strip');
     if (strip) strip.dataset.sig = '__usp_dirty__';
 }
 
@@ -2188,7 +2188,7 @@ function _uspLeapGlide(el, fromX, fromY, toX, toY, ms, dir, arcPx, onLand) {
 
 // Viewport centre of a living monster's card, or null.
 function _uspMonsterCentre(id) {
-    const card = document.getElementById(`eg-card-${id}`);
+    const card = document.getElementById(`sx-card-${id}`);
     if (!card || typeof globalThis._getElementCentre !== 'function') return null;
     const r = card.getBoundingClientRect();
     if (!r.width && !r.height) return null;
@@ -3137,7 +3137,7 @@ function _uspMeleeVictimId() {
 // is a pure whiff.
 function _uspMeleeAimPoint(origin) {
     const centreOf = (id) => {
-        const card = document.getElementById(`eg-card-${id}`);
+        const card = document.getElementById(`sx-card-${id}`);
         if (!card || typeof globalThis._getElementCentre !== 'function') return null;
         const r = card.getBoundingClientRect();
         if (!r.width && !r.height) return null;
@@ -3185,7 +3185,7 @@ function _uspApplyMeleeSpell(spell) {
         try { return typeof globalThis._isActive !== 'function' || !!globalThis._isActive(); } catch (e) { return false; }
     };
     const inside = () => _uspLivingMonsters().filter((mon) => {
-        const card = document.getElementById(`eg-card-${mon.id}`);
+        const card = document.getElementById(`sx-card-${mon.id}`);
         if (!card) return false;
         const r = card.getBoundingClientRect();
         if (!r.width && !r.height) return false;
@@ -3200,7 +3200,7 @@ function _uspApplyMeleeSpell(spell) {
         let best = list[0];
         let bestD = Infinity;
         for (const mon of list) {
-            const card = document.getElementById(`eg-card-${mon.id}`);
+            const card = document.getElementById(`sx-card-${mon.id}`);
             const c = card && typeof globalThis._getElementCentre === 'function' ? globalThis._getElementCentre(card) : null;
             const d = c ? Math.hypot(c.x - origin.x, c.y - origin.y) : Infinity;
             if (d < bestD) { best = mon; bestD = d; }
@@ -3296,7 +3296,7 @@ function _uspApplyGroundSpell(spell, point) {
         try { return typeof globalThis._isActive !== 'function' || !!globalThis._isActive(); } catch (e) { return false; }
     };
     const victims = () => _uspLivingMonsters().filter((m) => {
-        const card = document.getElementById(`eg-card-${m.id}`);
+        const card = document.getElementById(`sx-card-${m.id}`);
         if (!card) return false;
         const r = card.getBoundingClientRect();
         if (!r.width && !r.height) return false;
@@ -3502,7 +3502,7 @@ function _uspPulseAura(spell) {
     showSpellZone(shape, origin, origin, spell.theme, 450, 'burst');
     try { _uspAuraPulse(spell.id); } catch (e) { /* flash is cosmetic */ }
     _uspLivingMonsters().filter((mon) => {
-        const card = document.getElementById(`eg-card-${mon.id}`);
+        const card = document.getElementById(`sx-card-${mon.id}`);
         if (!card) return false;
         const r = card.getBoundingClientRect();
         if (!r.width && !r.height) return false;

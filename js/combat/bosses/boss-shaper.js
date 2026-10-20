@@ -77,13 +77,13 @@ export function _shpTouch(pct, level, label) {
 // so it survives the run ending in the same frame).
 export function _shpShards(x, y, big) {
     const layer = document.createElement('div');
-    layer.className = 'eg-shp-shards' + (big ? ' eg-shp-shards-big' : '');
+    layer.className = 'sx-shp-shards' + (big ? ' sx-shp-shards-big' : '');
     layer.style.left = Math.round(x) + 'px';
     layer.style.top = Math.round(y) + 'px';
     document.body.appendChild(layer);
     for (let i = 0; i < (big ? 12 : 7); i++) {
         const s = document.createElement('div');
-        s.className = 'eg-shp-shard';
+        s.className = 'sx-shp-shard';
         const ang = Math.random() * Math.PI * 2;
         const dist = 20 + Math.random() * (big ? 88 : 48);
         s.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
@@ -142,13 +142,13 @@ export function _mechShpRift(monster, phase) {
     gaps.sort((a, b) => a - b);
 
     // Telegraph: fissure lines across the sweep axis + arrows on the origin.
-    const warn = _nkEl(run, 'div', 'eg-shp-riftwarn');
+    const warn = _nkEl(run, 'div', 'sx-shp-riftwarn');
     warn.style.top = '0px';
     warn.style.width = W + 'px';
     warn.style.height = H + 'px';
     gaps.forEach(g => {
         // The safe lane: as tall as the real safe band (±52px).
-        const line = _nkEl(run, 'div', 'eg-shp-fissure', fromLeft ? 'SAFE LANE ▶' : '◀ SAFE LANE');
+        const line = _nkEl(run, 'div', 'sx-shp-fissure', fromLeft ? 'SAFE LANE ▶' : '◀ SAFE LANE');
         line.style.top = Math.round(g - 52) + 'px';
         line.style.left = '0px';
         line.style.width = W + 'px';
@@ -164,7 +164,7 @@ export function _mechShpRift(monster, phase) {
         const pr = _nkPlayerRect();
         if (!erupted && t >= warnMs) {
             erupted = true;
-            const front = _nkEl(run, 'div', 'eg-shp-front' + (fromLeft ? ' eg-shp-from-left' : ' eg-shp-from-right'));
+            const front = _nkEl(run, 'div', 'sx-shp-front' + (fromLeft ? ' sx-shp-from-left' : ' sx-shp-from-right'));
             front.style.top = '0px';
             front.style.height = H + 'px';
             front.style.width = bandH + 'px';
@@ -195,12 +195,12 @@ export function _mechShpRift(monster, phase) {
                 const room = Math.max(0, 5 - _shpPools.length);
                 const seeds = gaps.slice(0, Math.min(gaps.length, room));
                 seeds.forEach(g => {
-                    const el = _nkEl(run, 'div', 'eg-shp-pool');
+                    const el = _nkEl(run, 'div', 'sx-shp-pool');
                     el.style.width = '190px';
                     el.style.height = '190px';
                     el.style.transform = 'translate(' + Math.round(W / 2 - 95) + 'px,' + Math.round(g - 95) + 'px)';
-                    el.classList.add('eg-shp-pool-forming');
-                    const fid = setTimeout(() => el.classList.remove('eg-shp-pool-forming'), 800 * _SHP_DEBUG_MULT);
+                    el.classList.add('sx-shp-pool-forming');
+                    const fid = setTimeout(() => el.classList.remove('sx-shp-pool-forming'), 800 * _SHP_DEBUG_MULT);
                     run.timers.push(fid);
                     const zone = { x: W / 2, y: g, radius: 95, until: now + poolLife, armAt: now + 800 * _SHP_DEBUG_MULT };
                     _shpPools.push(zone);
@@ -215,7 +215,7 @@ export function _mechShpRift(monster, phase) {
         _shpPrunePools(now);
         Array.from(poolEls.entries()).forEach(([z, el]) => {
             if (z.until <= now) {
-                el.classList.add('eg-shp-pool-out');
+                el.classList.add('sx-shp-pool-out');
                 const rm = setTimeout(() => { try { el.remove(); } catch (e) {} }, 400);
                 run.timers.push(rm);
                 poolEls.delete(z);
@@ -273,14 +273,14 @@ export function _mechShpMonoliths(monster, phase) {
     _nkToast('eg_mech_shp_monos', '❄️ The Frostwright: FROST MONOLITHS - break them to stop the walls!', '#7dd3fc');
 
     const monos = spots.map(spot => {
-        const el = _nkEl(run, 'div', 'eg-shp-mono', '🗿');
+        const el = _nkEl(run, 'div', 'sx-shp-mono', '🗿');
         el.style.left = Math.round(spot[0] - 24) + 'px';
         el.style.top = Math.round(spot[1] - 24) + 'px';
         // Wall grows from the monolith toward the arena centre.
         const dx = W / 2 - spot[0], dy = H / 2 - spot[1];
         const len = Math.hypot(dx, dy) || 1;
         const ang = Math.atan2(dy, dx) * 180 / Math.PI;
-        const wall = _nkEl(run, 'div', 'eg-shp-wall');
+        const wall = _nkEl(run, 'div', 'sx-shp-wall');
         wall.style.left = Math.round(spot[0]) + 'px';
         wall.style.top = Math.round(spot[1]) + 'px';
         wall.style.width = '0px';
@@ -342,9 +342,9 @@ export function _mechShpMonoliths(monster, phase) {
                 if (Math.hypot(pc.x - m.x, pc.y - m.y) < 46) {
                     crackCd = now + 500;
                     m.hp--;
-                    m.el.classList.remove('eg-shp-mono-crack1', 'eg-shp-mono-crack2');
-                    if (m.hp === 2) m.el.classList.add('eg-shp-mono-crack1');
-                    if (m.hp === 1) m.el.classList.add('eg-shp-mono-crack2');
+                    m.el.classList.remove('sx-shp-mono-crack1', 'sx-shp-mono-crack2');
+                    if (m.hp === 2) m.el.classList.add('sx-shp-mono-crack1');
+                    if (m.hp === 1) m.el.classList.add('sx-shp-mono-crack2');
                     _shpShards(m.x, m.y, false);
                     if (m.hp <= 0) {
                         m.dead = true;
@@ -392,7 +392,7 @@ export function _mechShpWalker(monster, phase) {
                 y: side === 2 ? 50 : side === 3 ? H - 50 : H * (0.2 + Math.random() * 0.6),
                 ang: Math.random() * Math.PI * 2, born: 0, el: null, dead: false,
             };
-            wk.el = _nkEl(run, 'div', 'eg-shp-walker', '⛄');
+            wk.el = _nkEl(run, 'div', 'sx-shp-walker', '⛄');
             wk.el.style.left = Math.round(wk.x - 18) + 'px';
             wk.el.style.top = Math.round(wk.y - 18) + 'px';
             walkers.push(wk);
@@ -415,7 +415,7 @@ export function _mechShpWalker(monster, phase) {
         for (let i = 0; i < SHP_SHARD_COUNT; i++) {
             const a = (i / SHP_SHARD_COUNT) * Math.PI * 2 + Math.random() * 0.5;
             const spd = (230 + Math.random() * 90) / _SHP_DEBUG_MULT;
-            const el = _nkEl(run, 'div', 'eg-shp-shardlet', '❄');
+            const el = _nkEl(run, 'div', 'sx-shp-shardlet', '❄');
             el.style.left = Math.round(wk.x - 8) + 'px';
             el.style.top = Math.round(wk.y - 8) + 'px';
             shards.push({ x: wk.x, y: wk.y, vx: Math.cos(a) * spd, vy: Math.sin(a) * spd, el, born: t });
@@ -553,9 +553,9 @@ export function _shpFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds monolith, arms and the sweep loop.
@@ -564,20 +564,20 @@ export function _shpFinalStart(monster) {
 
     // Colossal monolith at the arena centre.
     const monolith = document.createElement('div');
-    monolith.className = 'eg-shp-gmonolith';
+    monolith.className = 'sx-shp-gmonolith';
     monolith.textContent = '🗿';
     monolith.style.left = Math.round(g.px - 52) + 'px';
     monolith.style.top = Math.round(g.py - 52) + 'px';
     document.body.appendChild(monolith);
     g.monolith = monolith;
     g.fxRun.els.push(monolith);
-    requestAnimationFrame(() => monolith.classList.add('eg-shp-gmonolith-on'));
+    requestAnimationFrame(() => monolith.classList.add('sx-shp-gmonolith-on'));
 
     // Three frost arms (120° apart), anchored at the monolith.
     const maxR = Math.hypot(W, H);
     g.arms = [0, 120, 240].map(() => {
         const el = document.createElement('div');
-        el.className = 'eg-shp-arm';
+        el.className = 'sx-shp-arm';
         el.style.left = Math.round(g.px) + 'px';
         el.style.top = Math.round(g.py - 11) + 'px';
         el.style.width = Math.round(maxR) + 'px';
@@ -590,7 +590,7 @@ export function _shpFinalStart(monster) {
     // core is the safe arc the player must stand in - and body-check.
     g.cores = [0, 120, 240].map((ang) => {
         const el = document.createElement('div');
-        el.className = 'eg-shp-core';
+        el.className = 'sx-shp-core';
         el.textContent = '💎';
         el.style.left = Math.round(g.px + Math.cos(ang * Math.PI / 180) * 120 - 20) + 'px';
         el.style.top = Math.round(g.py + Math.sin(ang * Math.PI / 180) * 120 - 20) + 'px';
@@ -601,11 +601,11 @@ export function _shpFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-shp-cd';
+    ov.className = 'sx-shp-cd';
     ov.innerHTML =
-        '<div class="eg-shp-cd-label">⛄ THE SHAPED WINTER</div>' +
-        '<div class="eg-shp-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-shp-cd-hint">Stand on the lit core - it shields you from the arms. Shatter all three!</div>';
+        '<div class="sx-shp-cd-label">⛄ THE SHAPED WINTER</div>' +
+        '<div class="sx-shp-cd-num sx-bmb-cd-pop">' + g.count + '</div>' +
+        '<div class="sx-shp-cd-hint">Stand on the lit core - it shields you from the arms. Shatter all three!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -615,11 +615,11 @@ export function _shpFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss channels.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-shp-channelling');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-shp-channelling');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
@@ -669,14 +669,14 @@ export function _shpFinalStart(monster) {
             if (Math.hypot(c.x - cx, c.y - cy) < 58) {
                 coreTouchCd = now + SHP_CORE_TOUCH_CD;
                 lc.hp--;
-                lc.el.classList.remove('eg-shp-core-crack1', 'eg-shp-core-crack2');
-                if (lc.hp === 2) lc.el.classList.add('eg-shp-core-crack1');
-                if (lc.hp === 1) lc.el.classList.add('eg-shp-core-crack2');
+                lc.el.classList.remove('sx-shp-core-crack1', 'sx-shp-core-crack2');
+                if (lc.hp === 2) lc.el.classList.add('sx-shp-core-crack1');
+                if (lc.hp === 1) lc.el.classList.add('sx-shp-core-crack2');
                 _shpShards(cx, cy, false);
                 if (lc.hp <= 0) {
                     lc.shattered = true;
                     lc.lit = false;
-                    lc.el.classList.add('eg-shp-core-shattered');
+                    lc.el.classList.add('sx-shp-core-shattered');
                     _shpShards(cx, cy, true);
                     g.coresUp--;
                     if (g.coresUp <= 0) {
@@ -686,8 +686,8 @@ export function _shpFinalStart(monster) {
                     _nkToast('eg_mech_shp_core_down', '❄️ Core shattered - ' + g.coresUp + ' to go!', '#4ade80');
                     // The next core lights at once - no waiting for a beat.
                     const nx = g.cores.find(c2 => !c2.shattered);
-                    g.cores.forEach(c2 => { c2.lit = c2 === nx; c2.el.classList.toggle('eg-shp-core-lit', c2 === nx); });
-                    const num = g.overlay && g.overlay.querySelector('.eg-shp-cd-num');
+                    g.cores.forEach(c2 => { c2.lit = c2 === nx; c2.el.classList.toggle('sx-shp-core-lit', c2 === nx); });
+                    const num = g.overlay && g.overlay.querySelector('.sx-shp-cd-num');
                     if (num) num.textContent = g.coresUp;
                 }
             }
@@ -701,7 +701,7 @@ export function _shpFinalStart(monster) {
     // two cores had ever been lit - shattering all three was impossible.)
     // The big number in the banner is the cores left.
     const beatMs = SHP_BEAT_MS * (_SHP_DEBUG_SLOW ? 8 : 1);
-    const numEl = g.overlay && g.overlay.querySelector('.eg-shp-cd-num');
+    const numEl = g.overlay && g.overlay.querySelector('.sx-shp-cd-num');
     if (numEl) numEl.textContent = g.coresUp;
     const lightNext = () => {
         if (!_shpFinal || _shpFinal !== g || g.finished) return;
@@ -714,7 +714,7 @@ export function _shpFinalStart(monster) {
         g.omega = SHP_ARM_OMEGAS[Math.min(SHP_ARM_OMEGAS.length - 1, g.beat - 1)];
         if (!g.cores.some(c2 => c2.lit && !c2.shattered)) {
             const next = g.cores.find(c2 => !c2.shattered);
-            g.cores.forEach(c2 => { c2.lit = c2 === next; c2.el.classList.toggle('eg-shp-core-lit', c2 === next); });
+            g.cores.forEach(c2 => { c2.lit = c2 === next; c2.el.classList.toggle('sx-shp-core-lit', c2 === next); });
             if (next) _nkToast('eg_mech_shp_core_lit', '💎 A core lights up - stand on it to crack it!', '#7dd3fc');
         }
         g.beatTimer = setTimeout(lightNext, beatMs);
@@ -731,18 +731,18 @@ export function _shpBreak(g, level) {
     // centre - 3.2s covers a walk from any corner (320 px/s + reaction).
     g.breaking = true;
     const ring = document.createElement('div');
-    ring.className = 'eg-shp-breakring';
+    ring.className = 'sx-shp-breakring';
     ring.style.left = Math.round(g.px) + 'px';
     ring.style.top = Math.round(g.py) + 'px';
-    ring.innerHTML = '<span class="eg-shp-break-count"></span>';
+    ring.innerHTML = '<span class="sx-shp-break-count"></span>';
     document.body.appendChild(ring);
     g.fxRun.els.push(ring);
-    const hint = g.overlay && g.overlay.querySelector('.eg-shp-cd-hint');
+    const hint = g.overlay && g.overlay.querySelector('.sx-shp-cd-hint');
     if (hint) hint.textContent = 'MONOLITH BREAK - get into the ring at the centre!';
     const SAFE_R = 130;
     const warnMs = 3200 * (_SHP_DEBUG_SLOW ? 8 : 1);
     const t0 = performance.now();
-    const countEl = ring.querySelector('.eg-shp-break-count');
+    const countEl = ring.querySelector('.sx-shp-break-count');
     const cd = setInterval(() => {
         const left = warnMs - (performance.now() - t0);
         if (countEl) countEl.textContent = left > 0 ? String(Math.ceil(left / 1000)) : '';
@@ -753,8 +753,8 @@ export function _shpBreak(g, level) {
         if (!g || g.finished) return;
         try { ring.remove(); } catch (e) {}
         _shpShards(g.px, g.py, true);
-        document.body.classList.add('eg-shp-flash');
-        const fid = setTimeout(() => document.body.classList.remove('eg-shp-flash'), 700);
+        document.body.classList.add('sx-shp-flash');
+        const fid = setTimeout(() => document.body.classList.remove('sx-shp-flash'), 700);
         if (g.fxRun) g.fxRun.timers.push(fid);
         const c = _nkPlayerCenter();
         if (c && Math.hypot(c.x - g.px, c.y - g.py) > SAFE_R) {
@@ -775,12 +775,12 @@ export function _shpFinalEnd(g, success) {
     g.cores.forEach(c2 => { try { c2.el.remove(); } catch (e) {} });
     g.cores = [];
     if (g.fxRun) { try { _nkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
-    document.body.classList.remove('eg-shp-flash');
-    document.querySelectorAll('.eg-shp-channelling').forEach(el => el.classList.remove('eg-shp-channelling'));
+    document.body.classList.remove('sx-shp-flash');
+    document.querySelectorAll('.sx-shp-channelling').forEach(el => el.classList.remove('sx-shp-channelling'));
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -803,17 +803,17 @@ export function _shpFinalEnd(g, success) {
 export function _shpTeardown() {
     if (_shpFinal) { try { _shpFinalEnd(_shpFinal, false); } catch (e) {} _shpFinal = null; }
     _shpPools = [];
-    document.querySelectorAll('.eg-shp-riftwarn, .eg-shp-fissure, .eg-shp-front, .eg-shp-pool, ' +
-        '.eg-shp-mono, .eg-shp-wall, .eg-shp-walker, .eg-shp-shardlet, ' +
-        '.eg-shp-gmonolith, .eg-shp-arm, .eg-shp-core, .eg-shp-cd, ' +
-        '.eg-shp-breakring, .eg-shp-shards').forEach(el => {
+    document.querySelectorAll('.sx-shp-riftwarn, .sx-shp-fissure, .sx-shp-front, .sx-shp-pool, ' +
+        '.sx-shp-mono, .sx-shp-wall, .sx-shp-walker, .sx-shp-shardlet, ' +
+        '.sx-shp-gmonolith, .sx-shp-arm, .sx-shp-core, .sx-shp-cd, ' +
+        '.sx-shp-breakring, .sx-shp-shards').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.body.classList.remove('eg-shp-flash');
-    document.querySelectorAll('.eg-shp-channelling').forEach(el => el.classList.remove('eg-shp-channelling'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.body.classList.remove('sx-shp-flash');
+    document.querySelectorAll('.sx-shp-channelling').forEach(el => el.classList.remove('sx-shp-channelling'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

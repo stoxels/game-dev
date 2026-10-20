@@ -1515,7 +1515,7 @@ export function _charmTryMonsterDrop(isBoss, monsterLevel, force = false) {
 
     _charmDrops.set(key, charm);
     _charmRenderOverlay(r, c, charm);
-    globalThis._scheduleTrackedExpiry(_charmDrops, key, charm, CHARM_DROP_LIFETIME_MS, `eg-charm-${r}-${c}`, _charmRemoveOverlay);
+    globalThis._scheduleTrackedExpiry(_charmDrops, key, charm, CHARM_DROP_LIFETIME_MS, `sx-charm-${r}-${c}`, _charmRemoveOverlay);
     return true;
 }
 
@@ -1524,15 +1524,15 @@ export function _charmRenderOverlay(row, col, charm) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     const span = document.createElement('span');
-    span.className = `eg-pickup-overlay eg-charm-overlay eg-charm-rank-${charm.rank}`;
-    span.id = `eg-charm-${row}-${col}`;
+    span.className = `sx-pickup-overlay sx-charm-overlay sx-charm-rank-${charm.rank}`;
+    span.id = `sx-charm-${row}-${col}`;
     span.innerHTML = _charmIconMarkup(charm);
     el.appendChild(span);
 }
 
 function _charmRemoveOverlay(key) {
     const [r, c] = key.split('-').map(Number);
-    const span = document.getElementById(`eg-charm-${r}-${c}`);
+    const span = document.getElementById(`sx-charm-${r}-${c}`);
     if (span) span.remove();
 }
 
@@ -1543,10 +1543,10 @@ function _charmAnimateClaim(row, col, charm) {
     if (!el || typeof globalThis._getElementCentre !== 'function') return;
     const centre = globalThis._getElementCentre(el);
     const floater = document.createElement('div');
-    floater.className = 'eg-pickup-floater charm-floater';
+    floater.className = 'sx-pickup-floater charm-floater';
     const art = charm && _charmArtUrl(charm.skillId, charm.rank);
     floater.innerHTML = art
-        ? `<img src="${art}" alt="" class="eg-art-img" draggable="false">`
+        ? `<img src="${art}" alt="" class="sx-art-img" draggable="false">`
         : CHARM_BASE_ICON;
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
@@ -1625,7 +1625,7 @@ export function _charmReplaceCarriedDrops(charms) {
         const key = `${r}-${c}`;
         _charmDrops.set(key, charm);
         _charmRenderOverlay(r, c, charm);
-        globalThis._scheduleTrackedExpiry(_charmDrops, key, charm, CHARM_DROP_LIFETIME_MS, `eg-charm-${r}-${c}`, _charmRemoveOverlay);
+        globalThis._scheduleTrackedExpiry(_charmDrops, key, charm, CHARM_DROP_LIFETIME_MS, `sx-charm-${r}-${c}`, _charmRemoveOverlay);
     }
 }
 

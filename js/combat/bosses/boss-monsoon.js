@@ -72,7 +72,7 @@ export function _mnTouch(pct, level, label) {
 // One expanding ring (impact/splash) at (x, y) - body-level visual.
 export function _mnRing(x, y, cls, lifeMs, run, timers) {
     const el = document.createElement('div');
-    el.className = 'eg-mn-icyring' + (cls ? ' ' + cls : '');
+    el.className = 'sx-mn-icyring' + (cls ? ' ' + cls : '');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
     document.body.appendChild(el);
@@ -109,7 +109,7 @@ export function _mechMnRainBands(monster, phase) {
         const ang = (i % 2 === 0 ? 1 : -1) * (30 + Math.random() * 30) * Math.PI / 180;
         const cx = Math.max(90, Math.min(W - 90, c0.x + (Math.random() * 2 - 1) * 160));
         const cy = Math.max(90, Math.min(H - 90, c0.y + (Math.random() * 2 - 1) * 160));
-        const el = _nkEl(run, 'div', 'eg-mn-band eg-mn-band-warn');
+        const el = _nkEl(run, 'div', 'sx-mn-band sx-mn-band-warn');
         el.style.width = Math.round(len) + 'px';
         el.style.height = MN_BAND_W + 'px';
         el.style.left = Math.round(cx - len / 2) + 'px';
@@ -130,11 +130,11 @@ export function _mechMnRainBands(monster, phase) {
             if (!b.live) {
                 if (t < warnMs) { alive = true; return; }
                 b.live = true;
-                b.el.classList.remove('eg-mn-band-warn');
+                b.el.classList.remove('sx-mn-band-warn');
             }
             if (t >= warnMs + lifeMs) {
                 b.faded = true;
-                b.el.classList.add('eg-mn-band-fade');
+                b.el.classList.add('sx-mn-band-fade');
                 const el = b.el;
                 setTimeout(() => { try { el.remove(); } catch (e) {} }, 460);
                 return;
@@ -182,7 +182,7 @@ export function _mechMnThunderbolts(monster, phase) {
         const y = 120 + Math.random() * Math.max(60, H - 240);
         if (pc0 && Math.hypot(pc0.x - x, pc0.y - y) < 120) continue;
         if (!strikes.every(s => Math.hypot(s.x - x, s.y - y) > 150)) continue;
-        const warn = _nkEl(run, 'div', 'eg-mn-boltwarn');
+        const warn = _nkEl(run, 'div', 'sx-mn-boltwarn');
         warn.style.left = Math.round(x - 58) + 'px';
         warn.style.top = Math.round(y - 58) + 'px';
         strikes.push({ x, y, warn, at: warnMs + strikes.length * gapMs, done: false });
@@ -199,10 +199,10 @@ export function _mechMnThunderbolts(monster, phase) {
             s.done = true;
             try { s.warn.remove(); } catch (e) {}
             // The bolt: a golden streak from the sky down to the mark.
-            const bolt = _nkEl(run, 'div', 'eg-mn-bolt');
+            const bolt = _nkEl(run, 'div', 'sx-mn-bolt');
             bolt.style.left = Math.round(s.x - 3) + 'px';
             bolt.style.height = Math.round(s.y) + 'px';
-            _mnRing(s.x, s.y, 'eg-mn-flashring', 520, run, run.timers);
+            _mnRing(s.x, s.y, 'sx-mn-flashring', 520, run, run.timers);
             if (pr && now >= touchCd && _nkCircleHit(s.x, s.y, MN_BOLT_R, pr, 0)) {
                 touchCd = now + MN_HIT_CD_MS;
                 _mnTouch(dmgPct, level, 'Thunderbolt');
@@ -240,7 +240,7 @@ export function _mechMnStormSurge(monster, phase) {
     const dmgPct = MN_SURGE_DMG[p];
 
     const water = document.createElement('div');
-    water.className = 'eg-mn-water';
+    water.className = 'sx-mn-water';
     document.body.appendChild(water);
     run.els.push(water);
 
@@ -309,10 +309,10 @@ export function _mechMnHailBarrage(monster, phase) {
                 x = 40 + Math.random() * Math.max(40, W - 80);
                 y = 40 + Math.random() * Math.max(40, H - 80);
             }
-            const warn = _nkEl(run, 'div', 'eg-mn-hailwarn');
+            const warn = _nkEl(run, 'div', 'sx-mn-hailwarn');
             warn.style.left = Math.round(x - 30) + 'px';
             warn.style.top = Math.round(y - 30) + 'px';
-            const stone = _nkEl(run, 'div', 'eg-mn-hail');
+            const stone = _nkEl(run, 'div', 'sx-mn-hail');
             stone.style.left = Math.round(x - 11) + 'px';
             stone.style.top = Math.round(y - 260) + 'px';
             stone.style.transition = 'top ' + (warnMs / 1000) + 's linear';
@@ -399,7 +399,7 @@ export function _mnPlaceIsland(g, r, prev) {
     } while (prev && Math.hypot(x - prev.x, y - prev.y) < 320 && guard < 40);
     g.ix = x; g.iy = y; g.ir = r;
     const el = document.createElement('div');
-    el.className = 'eg-mn-island';
+    el.className = 'sx-mn-island';
     el.style.width = (r * 2) + 'px';
     el.style.height = (r * 2) + 'px';
     el.style.left = Math.round(x - r) + 'px';
@@ -433,9 +433,9 @@ export function _mnFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds water, island and cleanup timers.
@@ -444,14 +444,14 @@ export function _mnFinalStart(monster) {
 
     // Storm overlay: dark sky + driving rain streaks.
     const storm = document.createElement('div');
-    storm.className = 'eg-mn-storm';
+    storm.className = 'sx-mn-storm';
     document.body.appendChild(storm);
     g.storm = storm;
-    requestAnimationFrame(() => storm.classList.add('eg-mn-storm-on'));
+    requestAnimationFrame(() => storm.classList.add('sx-mn-storm-on'));
 
     // The floodwater itself (final variant stacks above the storm tint).
     const water = document.createElement('div');
-    water.className = 'eg-mn-water eg-mn-water-final';
+    water.className = 'sx-mn-water sx-mn-water-final';
     water.style.height = '0px';
     document.body.appendChild(water);
     g.water = water;
@@ -459,11 +459,11 @@ export function _mnFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-mn-cd';
+    ov.className = 'sx-mn-cd';
     ov.innerHTML =
-        '<div class="eg-mn-cd-label">🌊 THE GREAT FLOOD</div>' +
-        '<div class="eg-mn-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-mn-cd-hint">Climb! Reach the dry island before each surge!</div>';
+        '<div class="sx-mn-cd-label">🌊 THE GREAT FLOOD</div>' +
+        '<div class="sx-mn-cd-num sx-bmb-cd-pop">' + g.count + '</div>' +
+        '<div class="sx-mn-cd-hint">Climb! Reach the dry island before each surge!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -473,11 +473,11 @@ export function _mnFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss churns, whipping the storm into a frenzy.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-mn-churning');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-mn-churning');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     // First island right away so beat 1 already has high ground to reach.
@@ -512,8 +512,8 @@ export function _mnFinalStart(monster) {
             try { g.overlay.remove(); } catch (e) {}
             g.overlay = null;
             _nkToast('eg_mech_mn_final_bang', '🌊💀 THE FLOOD BREAKS!', '#e2e8f0');
-            document.body.classList.add('eg-mn-flash');
-            const fid = setTimeout(() => document.body.classList.remove('eg-mn-flash'), 700);
+            document.body.classList.add('sx-mn-flash');
+            const fid = setTimeout(() => document.body.classList.remove('sx-mn-flash'), 700);
             g.fxRun.timers.push(fid);
             const id = setTimeout(() => _mnFinalEnd(g), _MN_DEBUG_SLOW ? 6500 : 1500);
             g.fxRun.timers.push(id);
@@ -521,12 +521,12 @@ export function _mnFinalStart(monster) {
         }
         g.count--;
         _mnPlaceIsland(g, g.count === 1 ? MN_ISLAND_R_FINAL : MN_ISLAND_R, { x: g.ix, y: g.iy });
-        const num = g.overlay && g.overlay.querySelector('.eg-mn-cd-num');
+        const num = g.overlay && g.overlay.querySelector('.sx-mn-cd-num');
         if (num) {
             num.textContent = g.count;
-            num.classList.remove('eg-bmb-cd-pop');
+            num.classList.remove('sx-bmb-cd-pop');
             void num.offsetWidth;
-            num.classList.add('eg-bmb-cd-pop');
+            num.classList.add('sx-bmb-cd-pop');
         }
     }, cdTick);
 }
@@ -540,12 +540,12 @@ export function _mnFinalEnd(g) {
     if (g.water) { try { g.water.remove(); } catch (e) {} g.water = null; }
     if (g.islandEl) { try { g.islandEl.remove(); } catch (e) {} g.islandEl = null; }
     if (g.fxRun) { try { _nkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
-    document.body.classList.remove('eg-mn-flash');
-    document.querySelectorAll('.eg-mn-churning').forEach(el => el.classList.remove('eg-mn-churning'));
+    document.body.classList.remove('sx-mn-flash');
+    document.querySelectorAll('.sx-mn-churning').forEach(el => el.classList.remove('sx-mn-churning'));
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -567,16 +567,16 @@ export function _mnFinalEnd(g) {
 // removes every run element, overlay and body class this boss ever created.
 export function _mnTeardown() {
     if (_mnFinal) { try { _mnFinalEnd(_mnFinal); } catch (e) {} _mnFinal = null; }
-    document.querySelectorAll('.eg-mn-band, .eg-mn-bolt, .eg-mn-boltwarn, .eg-mn-flashring, ' +
-        '.eg-mn-water, .eg-mn-hailwarn, .eg-mn-hail, .eg-mn-icyring, .eg-mn-island, ' +
-        '.eg-mn-storm, .eg-mn-cd').forEach(el => {
+    document.querySelectorAll('.sx-mn-band, .sx-mn-bolt, .sx-mn-boltwarn, .sx-mn-flashring, ' +
+        '.sx-mn-water, .sx-mn-hailwarn, .sx-mn-hail, .sx-mn-icyring, .sx-mn-island, ' +
+        '.sx-mn-storm, .sx-mn-cd').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.body.classList.remove('eg-mn-flash');
-    document.querySelectorAll('.eg-mn-churning').forEach(el => el.classList.remove('eg-mn-churning'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.body.classList.remove('sx-mn-flash');
+    document.querySelectorAll('.sx-mn-churning').forEach(el => el.classList.remove('sx-mn-churning'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

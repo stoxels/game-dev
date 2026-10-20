@@ -32,26 +32,26 @@ function _autoCompareChecked() {
 // Builds the top navigation bar with back button and hub title.
 export function _buildTopbarHTML() {
     return `
-<div class="eg-topbar">
-    <button class="eg-back-btn back-btn" onclick="safeGoBackFromHub()">${t('btn_back')}</button>
-    <span class="eg-topbar-title">${t('eg_char_sheet_title')}</span>
-    <button class="eg-level-btn" id="eg-btn-passive-tree"
+<div class="sx-topbar">
+    <button class="sx-back-btn back-btn" onclick="safeGoBackFromHub()">${t('btn_back')}</button>
+    <span class="sx-topbar-title">${t('eg_char_sheet_title')}</span>
+    <button class="sx-level-btn" id="sx-btn-passive-tree"
          onclick="showPassiveTree('screen-endgame-hub')">🌿 ${t('scr_probability_tree')}</button>
-    <button class="eg-level-btn" id="eg-btn-atlas"
+    <button class="sx-level-btn" id="sx-btn-atlas"
          onclick="showEndgameAtlas('showEndgameHub')">🗺 ${t('eg_atlas_title')}</button>
-    <button class="eg-level-btn" id="eg-btn-gate"
+    <button class="sx-level-btn" id="sx-btn-gate"
          onclick="showEndgameGate('showEndgameHub')">🎲 ${t('mg_gate_badge')}</button>
-    <button class="eg-level-btn" id="eg-btn-export-build"
+    <button class="sx-level-btn" id="sx-btn-export-build"
          title="Saves your gear, passive tree, spells and stats to a small file (for balance testing)"
          onclick="_exportBuildSnapshot()">📤 Export build</button>
-    <label class="eg-level-btn eg-autocmp-toggle" id="eg-autocmp-toggle"
+    <label class="sx-level-btn sx-autocmp-toggle" id="sx-autocmp-toggle"
          title="${t('eg_auto_compare_tip')}"
          style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
-        <input type="checkbox" id="eg-autocmp-cb" ${_autoCompareChecked() ? 'checked' : ''}
+        <input type="checkbox" id="sx-autocmp-cb" ${_autoCompareChecked() ? 'checked' : ''}
          onchange="globalThis._autoCompare=this.checked;try{localStorage.setItem('stoxels_auto_compare',this.checked?'1':'0')}catch(e){}">
         ⚖ ${t('eg_auto_compare')}
     </label>
-    <button class="eg-info-btn" id="eg-hub-info-btn" aria-label="Info"
+    <button class="sx-info-btn" id="sx-hub-info-btn" aria-label="Info"
          onmouseenter="_showHubInfoTooltip(event)"
          onmousemove="moveGameTooltip(event)"
          onmouseleave="_hideHubInfoTooltip()">?</button>
@@ -112,15 +112,15 @@ export function _exportBuildSnapshot() {
 // Shows a golden border/glow and a yellow point count when there are unspent
 // Convergence Points - mirrors renderLSPassiveTreeButton and _renderTopBarTreePoints.
 export function _updatePassiveTreeButton() {
-    const btn = document.getElementById('eg-btn-passive-tree');
+    const btn = document.getElementById('sx-btn-passive-tree');
     if (!btn) return;
     const points = (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;
     const hasPoints = points > 0;
     btn.classList.toggle('unspent-points', hasPoints);
-    let countEl = document.getElementById('eg-pt-point-count');
+    let countEl = document.getElementById('sx-pt-point-count');
     if (!countEl) {
         countEl = document.createElement('span');
-        countEl.id = 'eg-pt-point-count';
+        countEl.id = 'sx-pt-point-count';
         btn.appendChild(countEl);
     }
     countEl.textContent = hasPoints ? ` (${points})` : '';
@@ -137,7 +137,7 @@ export function _toggleItemLevelDisplay() {
 
 // Updates the toggle button text/icon to match current state.
 export function _updateItemLevelToggleButton() {
-    const btn = document.getElementById('eg-toggle-ilvl-btn');
+    const btn = document.getElementById('sx-toggle-ilvl-btn');
     if (btn) {
         btn.innerHTML = `${_showItemLevel ? '🔢' : '👤'} ${t(_showItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}`;
     }
@@ -146,13 +146,13 @@ export function _updateItemLevelToggleButton() {
 // Tooltip for the item level toggle button.
 export function _showItemLevelToggleTooltip(e) {
     const html = `
-<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">${_showItemLevel ? '🔢' : '👤'}</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${t(_showItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</div>
+<div class="sx-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon">${_showItemLevel ? '🔢' : '👤'}</div>
+        <div class="sx-tt-name" style="color:#f5d98a;">${t(_showItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</div>
     </div>
-    <div class="eg-tt-section">
-        <div class="eg-tt-desc">${t(_showItemLevel ? 'eg_show_req_level_desc' : 'eg_show_item_level_desc')}</div>
+    <div class="sx-tt-section">
+        <div class="sx-tt-desc">${t(_showItemLevel ? 'eg_show_req_level_desc' : 'eg_show_item_level_desc')}</div>
     </div>
 </div>`;
     globalThis.showGameTooltip(html, e);
@@ -161,13 +161,13 @@ export function _showItemLevelToggleTooltip(e) {
 // Tooltip for the mass-sell FILTER button (custom game tooltip instead of native title).
 export function _showMassSellConfigTooltip(e) {
     const html = `
-<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">⚙</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${t('eg_mass_sell_config')}</div>
+<div class="sx-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon">⚙</div>
+        <div class="sx-tt-name" style="color:#f5d98a;">${t('eg_mass_sell_config')}</div>
     </div>
-    <div class="eg-tt-section">
-        <div class="eg-tt-desc">${t('eg_mass_sell_config_title')}</div>
+    <div class="sx-tt-section">
+        <div class="sx-tt-desc">${t('eg_mass_sell_config_title')}</div>
     </div>
 </div>`;
     globalThis.showGameTooltip(html, e);
@@ -176,13 +176,13 @@ export function _showMassSellConfigTooltip(e) {
 // Tooltip for the MASS SELL button (custom game tooltip instead of native title).
 export function _showMassSellTooltip(e) {
     const html = `
-<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">⚒</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${t('eg_mass_sell_btn')}</div>
+<div class="sx-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon">⚒</div>
+        <div class="sx-tt-name" style="color:#f5d98a;">${t('eg_mass_sell_btn')}</div>
     </div>
-    <div class="eg-tt-section">
-        <div class="eg-tt-desc">${t('eg_mass_sell_title')}</div>
+    <div class="sx-tt-section">
+        <div class="sx-tt-desc">${t('eg_mass_sell_title')}</div>
     </div>
 </div>`;
     globalThis.showGameTooltip(html, e);
@@ -196,15 +196,15 @@ export function _buildHubInfoTooltipHTML() {
     const line = (key) => {
         const txt = t(key);
         if (!txt) return '';
-        return `<div class="eg-tt-mod">${txt}</div>`;
+        return `<div class="sx-tt-mod">${txt}</div>`;
     };
     return `
-<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">❓</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${t('eg_hub_info_title')}</div>
+<div class="sx-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon">❓</div>
+        <div class="sx-tt-name" style="color:#f5d98a;">${t('eg_hub_info_title')}</div>
     </div>
-    <div class="eg-tt-section" style="display:flex;flex-direction:column;gap:5px;">
+    <div class="sx-tt-section" style="display:flex;flex-direction:column;gap:5px;">
         ${line('eg_hub_info_currency')}
         ${line('eg_hub_info_sell')}
         ${line('eg_hub_info_repeat')}
@@ -220,16 +220,16 @@ export function _showHubInfoTooltip(e) {
     globalThis.showGameTooltip(_buildHubInfoTooltipHTML(), e);
     // The controls list needs much more width than the shared default -
     // without this the tooltip becomes very narrow and very tall.
-    // eg-controls-tip is exclusive to this tooltip; the engine's inline
+    // sx-controls-tip is exclusive to this tooltip; the engine's inline
     // max-width only yields to it via the !important rule in CSS.
     const tip = document.getElementById('ghud-floating-tip');
-    if (tip) tip.classList.add('eg-wide-tip', 'eg-controls-tip');
+    if (tip) tip.classList.add('sx-wide-tip', 'sx-controls-tip');
 }
 
 // Hides the hub info tooltip AND drops the widened-tip classes again so
 // other tooltips on the shared engine keep their default width.
 export function _hideHubInfoTooltip() {
     const tip = document.getElementById('ghud-floating-tip');
-    if (tip) tip.classList.remove('eg-wide-tip', 'eg-controls-tip');
+    if (tip) tip.classList.remove('sx-wide-tip', 'sx-controls-tip');
     globalThis.hideGameTooltip();
 }

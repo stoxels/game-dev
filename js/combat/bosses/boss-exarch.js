@@ -48,8 +48,8 @@ export function _mechConstriction(monster, phase) {
     const c0 = _nkPlayerCenter();
     const cx = c0 ? Math.max(r1 + 20, Math.min(window.innerWidth - r1 - 20, c0.x)) : window.innerWidth / 2;
     const cy = c0 ? Math.max(r1 + 60, Math.min(window.innerHeight - r1 - 20, c0.y)) : window.innerHeight / 2;
-    const ring = _nkEl(run, 'div', 'eg-nk-ring');
-    _nkEl(run, 'div', 'eg-nk-tint');
+    const ring = _nkEl(run, 'div', 'sx-nk-ring');
+    _nkEl(run, 'div', 'sx-nk-tint');
     _nkToast('eg_mech_constrict', '🔥 The Exarch: Constriction! Stay inside the ring!');
     let e = 0, dotWarnAt = 0;
     _nkLoop(run, (dtS, now) => {

@@ -11,7 +11,7 @@ import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkKillRun,
 // PROOF BY CONTRADICTION at ≤10%: expose 3 counter-examples or face
 // NULLIFICATION.
 //
-// Prefix discipline: everything here is _bossNul / eg-nul-.
+// Prefix discipline: everything here is _bossNul / sx-nul-.
 // Compatibility: the framework's shared cleanup typeof-guards
 // _removeBlackout and _voidSurgeTeardown - both still live HERE.
 //------------------------------------------------------------------------
@@ -164,7 +164,7 @@ export function _mechNulLattice(monster, phase) {
         for (let i = 0; i < 3; i++) {
             const ang = i * Math.PI / 3 + Math.random() * 0.18;
             const el = document.createElement('div');
-            el.className = 'eg-nul-line';
+            el.className = 'sx-nul-line';
             el.style.left = Math.round(cx - len / 2) + 'px';
             el.style.top = Math.round(cy - NUL_LINE_W / 2) + 'px';
             el.style.width = Math.round(len) + 'px';
@@ -182,7 +182,7 @@ export function _mechNulLattice(monster, phase) {
             const x1 = cx + Math.cos(a1) * d, y1 = cy + Math.sin(a1) * d;
             const x2 = cx + Math.cos(a2) * d, y2 = cy + Math.sin(a2) * d;
             const seg = document.createElement('div');
-            seg.className = 'eg-nul-line eg-nul-ring-seg';
+            seg.className = 'sx-nul-line sx-nul-ring-seg';
             seg.style.left = Math.round(x1) + 'px';
             seg.style.top = Math.round(y1 - NUL_LINE_W / 2) + 'px';
             seg.style.width = Math.round(Math.hypot(x2 - x1, y2 - y1)) + 'px';
@@ -290,20 +290,20 @@ export function _applyBlackout() {
     document.querySelectorAll('[id^="rn-"], [id^="cn-"]').forEach(span => {
         span.dataset.origText = span.textContent;
         span.textContent = '?';
-        span.classList.add('eg-blackout-clue');
+        span.classList.add('sx-blackout-clue');
     });
 }
 
 // Restores all clue spans to their original text and removes the styling.
 export function _removeBlackout() {
-    if (!globalThis._blackoutActive && !document.querySelector('.eg-blackout-clue')) return;
+    if (!globalThis._blackoutActive && !document.querySelector('.sx-blackout-clue')) return;
     globalThis._blackoutActive = false;
     document.querySelectorAll('[id^="rn-"], [id^="cn-"]').forEach(span => {
         if (span.dataset.origText !== undefined) {
             span.textContent = span.dataset.origText;
             delete span.dataset.origText;
         }
-        span.classList.remove('eg-blackout-clue');
+        span.classList.remove('sx-blackout-clue');
     });
 }
 
@@ -311,7 +311,7 @@ export function _removeBlackout() {
 export function _voidSurgeTeardown() {
     globalThis._voidSurgeActive = false;
     if (globalThis._voidSurgePollInterval) { clearInterval(globalThis._voidSurgePollInterval); globalThis._voidSurgePollInterval = null; }
-    ['eg-void-surge-overlay', 'eg-void-surge-circle', 'eg-void-surge-countdown']
+    ['sx-void-surge-overlay', 'sx-void-surge-circle', 'sx-void-surge-countdown']
         .forEach(id => { const el = document.getElementById(id); if (el) el.remove(); });
 }
 
@@ -332,7 +332,7 @@ export function _mechNulErasure(monster, phase) {
         (target === 'clues' ? 'clue numbers' : target === 'charge' ? 'charge bar' : 'class HUD') + ' for 8s!', '#a5b4fc');
 
     const marker = document.createElement('div');
-    marker.className = 'eg-nul-erase-marker';
+    marker.className = 'sx-nul-erase-marker';
     marker.textContent = '🧿';
     let host = null;
     if (target === 'clues') {
@@ -341,7 +341,7 @@ export function _mechNulErasure(monster, phase) {
         host = document.getElementById('ptable');
     } else if (target === 'charge') {
         host = document.getElementById('avatar-charge-fill')
-            || document.getElementById('eg-player-charge-bar');
+            || document.getElementById('sx-player-charge-bar');
     } else {
         host = document.getElementById('class-hud-panel') || document.getElementById('class-hud-drag-handle');
     }
@@ -356,32 +356,32 @@ export function _mechNulErasure(monster, phase) {
         host.appendChild(marker);
     } else {
         document.body.appendChild(marker);
-        marker.classList.add('eg-nul-erase-marker-free');
+        marker.classList.add('sx-nul-erase-marker-free');
     }
 
     // Erasure hides INFORMATION only (the design: grey it out, marker on
     // top) - the bar keeps filling; you just cannot read it.
     if (target === 'charge') {
-        ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+        ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
             const el = document.getElementById(id);
-            if (el) el.classList.add('eg-nul-erased');
+            if (el) el.classList.add('sx-nul-erased');
         });
     } else if (target === 'hud') {
         const hud = document.getElementById('class-hud-panel') || document.getElementById('class-hud-drag-handle');
-        if (hud) hud.classList.add('eg-nul-erased');
+        if (hud) hud.classList.add('sx-nul-erased');
     }
 
     _nulDelay(NUL_ERASE_MS * _NUL_DEBUG_MULT, () => {
         try { marker.remove(); } catch (e) {}
         if (target === 'clues') _removeBlackout();
         if (target === 'charge') {
-            ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+            ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.classList.remove('eg-nul-erased');
+                if (el) el.classList.remove('sx-nul-erased');
             });
         }
         const hud = document.getElementById('class-hud-panel') || document.getElementById('class-hud-drag-handle');
-        if (hud) hud.classList.remove('eg-nul-erased');
+        if (hud) hud.classList.remove('sx-nul-erased');
     });
 }
 
@@ -401,14 +401,14 @@ export function _mechNulRays(monster, phase) {
     _nulEnsureRecRun(monster);
 
     const cx = W / 2, cy = H * 0.45;
-    const anchor = _nkEl(run, 'div', 'eg-nul-anchor', '🧿');
+    const anchor = _nkEl(run, 'div', 'sx-nul-anchor', '🧿');
     anchor.style.left = Math.round(cx - 26) + 'px';
     anchor.style.top = Math.round(cy - 26) + 'px';
     const len = Math.hypot(W, H);
     const omega = NUL_RAY_SPEED * (p >= 3 ? 1.35 : 1);
     const beams = [];
     for (let i = 0; i < NUL_RAYS + (p >= 3 ? 1 : 0); i++) {
-        const el = _nkEl(run, 'div', 'eg-nul-ray');
+        const el = _nkEl(run, 'div', 'sx-nul-ray');
         el.style.left = Math.round(cx) + 'px';
         el.style.top = Math.round(cy - 11) + 'px';
         el.style.width = Math.round(len) + 'px';
@@ -433,7 +433,7 @@ export function _mechNulRays(monster, phase) {
         let crossed = false;
         beams.forEach(b => {
             const a = b.off + (live / 1000) * omega;
-            b.el.classList.toggle('eg-nul-ray-warn', warning);
+            b.el.classList.toggle('sx-nul-ray-warn', warning);
             b.el.style.transform = 'rotate(' + a + 'rad)';
             const bx = cx + Math.cos(a) * len, by = cy + Math.sin(a) * len;
             if (!warning && _ptSegDist(pc.x, pc.y, cx, cy, bx, by) < 11 + 9) crossed = true;
@@ -536,9 +536,9 @@ export function _nulFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -547,21 +547,21 @@ export function _nulFinalStart(monster) {
 
     // Pure-white arena + countdown overlay.
     const white = document.createElement('div');
-    white.className = 'eg-nul-white';
+    white.className = 'sx-nul-white';
     document.body.appendChild(white);
     g.fxRun.els.push(white);
 
     const ov = document.createElement('div');
-    ov.className = 'eg-nul-cd';
+    ov.className = 'sx-nul-cd';
     ov.innerHTML =
-        '<div class="eg-nul-cd-label">🧿💀 PROOF BY CONTRADICTION</div>' +
-        '<div class="eg-nul-cd-status">SHELLS ○○○   MISSES 0/3</div>' +
-        '<div class="eg-nul-cd-timer">-</div>' +
-        '<div class="eg-nul-cd-hint">Stand in the glowing ring. Avoid the red circle.</div>';
+        '<div class="sx-nul-cd-label">🧿💀 PROOF BY CONTRADICTION</div>' +
+        '<div class="sx-nul-cd-status">SHELLS ○○○   MISSES 0/3</div>' +
+        '<div class="sx-nul-cd-timer">-</div>' +
+        '<div class="sx-nul-cd-hint">Stand in the glowing ring. Avoid the red circle.</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
-    g.statusEl = ov.querySelector('.eg-nul-cd-status');
-    g.timerEl = ov.querySelector('.eg-nul-cd-timer');
+    g.statusEl = ov.querySelector('.sx-nul-cd-status');
+    g.timerEl = ov.querySelector('.sx-nul-cd-timer');
     g.fxRun.els.push(ov);
 
     _nkToast('eg_mech_nul_final_cd', '🧿💀 PROOF BY CONTRADICTION - the Null says you cannot hit it. Prove it wrong!', '#c7d2fe');
@@ -570,9 +570,9 @@ export function _nulFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss card whitens while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.add('eg-nul-allin');
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.add('sx-nul-allin');
 
     const level = monster.level || 1;
 
@@ -590,7 +590,7 @@ export function _nulFinalStart(monster) {
         const t0 = performance.now();
         const walkMs = NUL_STRIKE_WALK * _NUL_DEBUG_MULT;
 
-        const phantom = _nkEl(g.fxRun, 'div', 'eg-nul-phantom', '👤');
+        const phantom = _nkEl(g.fxRun, 'div', 'sx-nul-phantom', '👤');
         const startS = buf[0];
         phantom.style.left = Math.round(startS.x - 16) + 'px';
         phantom.style.top = Math.round(startS.y - 16) + 'px';
@@ -628,19 +628,19 @@ export function _nulFinalStart(monster) {
             phantom.style.left = Math.round(endS.x - 16) + 'px';
             phantom.style.top = Math.round(endS.y - 16) + 'px';
 
-            const safe = _nkEl(g.fxRun, 'div', 'eg-nul-safe-ring');
+            const safe = _nkEl(g.fxRun, 'div', 'sx-nul-safe-ring');
             safe.style.left = Math.round(endS.x - NUL_EXPOSE_R) + 'px';
             safe.style.top = Math.round(endS.y - NUL_EXPOSE_R) + 'px';
             safe.style.width = safe.style.height = (NUL_EXPOSE_R * 2) + 'px';
-            safe.innerHTML = '<span class="eg-nul-ring-label">STAND HERE</span><span class="eg-nul-ring-count"></span>';
-            const warn = _nkEl(g.fxRun, 'div', 'eg-nul-strike-warn');
+            safe.innerHTML = '<span class="sx-nul-ring-label">STAND HERE</span><span class="sx-nul-ring-count"></span>';
+            const warn = _nkEl(g.fxRun, 'div', 'sx-nul-strike-warn');
             warn.style.left = Math.round(sx - 55) + 'px';
             warn.style.top = Math.round(sy - 55) + 'px';
-            warn.innerHTML = '<span class="eg-nul-ring-label eg-nul-danger-label">DANGER</span>';
+            warn.innerHTML = '<span class="sx-nul-ring-label sx-nul-danger-label">DANGER</span>';
 
             // Visible 3-2-1 on the ring.
             g.counting = true;
-            const countEl = safe.querySelector('.eg-nul-ring-count');
+            const countEl = safe.querySelector('.sx-nul-ring-count');
             const cdMs = NUL_STRIKE_DELAY * _NUL_DEBUG_MULT;
             const cdStart = performance.now();
             const cdTick = () => {
@@ -667,7 +667,7 @@ export function _nulFinalStart(monster) {
                     _nkToast('eg_mech_nul_fail', '🧿 You stood in the red - the hypothesis holds!', '#f87171');
                 } else if (inRing) {
                     g.shatters++;
-                    const shatter = _nkEl(g.fxRun, 'div', 'eg-nul-shatter');
+                    const shatter = _nkEl(g.fxRun, 'div', 'sx-nul-shatter');
                     shatter.style.left = Math.round(endS.x - 70) + 'px';
                     shatter.style.top = Math.round(endS.y - 70) + 'px';
                     _nulAfter(g, 800, () => { try { shatter.remove(); } catch (e) {} });
@@ -714,7 +714,7 @@ export function _nulCollapse(g, monster) {
     if (g.finished) return;
     _nkToast('eg_mech_nul_collapse', '🧿💥 THE HYPOTHESIS COLLAPSES - the Null refutes itself!', '#a7f3d0');
     const flash = document.createElement('div');
-    flash.className = 'eg-nul-implode';
+    flash.className = 'sx-nul-implode';
     document.body.appendChild(flash);
     setTimeout(() => { try { flash.remove(); } catch (e) {} }, 1500);
     _nulFinalEnd(g, monster);
@@ -733,11 +733,11 @@ export function _nulNullification(g, monster, level) {
     _nkToast('eg_mech_nul_nullify', '🧿💀 NULLIFICATION - everything is erased but the ring!', '#f87171');
     const W = window.innerWidth, H = window.innerHeight;
     const dark = document.createElement('div');
-    dark.className = 'eg-nul-dark';
+    dark.className = 'sx-nul-dark';
     document.body.appendChild(dark);
     g.fxRun.els.push(dark);
     const ring = document.createElement('div');
-    ring.className = 'eg-nul-ring-safe';
+    ring.className = 'sx-nul-ring-safe';
     ring.style.left = Math.round(W / 2 - NUL_RING_R) + 'px';
     ring.style.top = Math.round(H / 2 - NUL_RING_R) + 'px';
     document.body.appendChild(ring);
@@ -762,16 +762,16 @@ export function _nulFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.eg-nul-white, .eg-nul-cd, .eg-nul-phantom, .eg-nul-strike-warn, ' +
-        '.eg-nul-shatter, .eg-nul-implode, .eg-nul-dark, .eg-nul-ring-safe, .eg-nul-safe-ring').forEach(el => {
+    document.querySelectorAll('.sx-nul-white, .sx-nul-cd, .sx-nul-phantom, .sx-nul-strike-warn, ' +
+        '.sx-nul-shatter, .sx-nul-implode, .sx-nul-dark, .sx-nul-ring-safe, .sx-nul-safe-ring').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.remove('eg-nul-allin');
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.remove('sx-nul-allin');
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -798,21 +798,21 @@ export function _nulTeardown() {
     globalThis._voidSurgeActive = false;
     _removeBlackout();
     _voidSurgeTeardown();
-    document.querySelectorAll('.eg-nul-line, .eg-nul-ring-seg, .eg-nul-anchor, .eg-nul-ray, ' +
-        '.eg-nul-erase-marker, .eg-nul-erase-marker-free, .eg-nul-white, .eg-nul-cd, ' +
-        '.eg-nul-phantom, .eg-nul-strike-warn, .eg-nul-shatter, .eg-nul-implode, ' +
-        '.eg-nul-dark, .eg-nul-ring-safe, .eg-nul-safe-ring').forEach(el => {
+    document.querySelectorAll('.sx-nul-line, .sx-nul-ring-seg, .sx-nul-anchor, .sx-nul-ray, ' +
+        '.sx-nul-erase-marker, .sx-nul-erase-marker-free, .sx-nul-white, .sx-nul-cd, ' +
+        '.sx-nul-phantom, .sx-nul-strike-warn, .sx-nul-shatter, .sx-nul-implode, ' +
+        '.sx-nul-dark, .sx-nul-ring-safe, .sx-nul-safe-ring').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-nul-erased', 'eg-charge-paused');
+        if (el) el.classList.remove('sx-nul-erased', 'sx-charge-paused');
     });
     const hud = document.getElementById('class-hud-panel') || document.getElementById('class-hud-drag-handle');
-    if (hud) hud.classList.remove('eg-nul-erased');
-    const card = document.getElementById('eg-card-boss_null');
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.remove('eg-nul-allin');
+    if (hud) hud.classList.remove('sx-nul-erased');
+    const card = document.getElementById('sx-card-boss_null');
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.remove('sx-nul-allin');
 }
 
 

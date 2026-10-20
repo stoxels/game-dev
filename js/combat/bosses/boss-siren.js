@@ -84,13 +84,13 @@ export function _sireHeal(amount) {
 // so it survives the run ending in the same frame).
 export function _sireSplash(x, y, big) {
     const layer = document.createElement('div');
-    layer.className = 'eg-sire-splash' + (big ? ' eg-sire-splash-big' : '');
+    layer.className = 'sx-sire-splash' + (big ? ' sx-sire-splash-big' : '');
     layer.style.left = Math.round(x) + 'px';
     layer.style.top = Math.round(y) + 'px';
     document.body.appendChild(layer);
     for (let i = 0; i < (big ? 12 : 7); i++) {
         const s = document.createElement('div');
-        s.className = 'eg-sire-droplet';
+        s.className = 'sx-sire-droplet';
         const ang = Math.random() * Math.PI * 2;
         const dist = 18 + Math.random() * (big ? 86 : 46);
         s.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
@@ -148,7 +148,7 @@ export function _mechSireWail(monster, phase) {
     const sweepMs = [0, 3400, 3000, 2600][p] * _SIRE_DEBUG_MULT;
     const a0 = -0.65, a1 = 0.65;
 
-    const beam = _nkEl(run, 'div', 'eg-nk-beam');
+    const beam = _nkEl(run, 'div', 'sx-nk-beam');
     beam.style.width = Math.round(len) + 'px';
     beam.style.height = halfW * 2 + 'px';
     beam.style.left = Math.round(a.x) + 'px';
@@ -161,7 +161,7 @@ export function _mechSireWail(monster, phase) {
         const ea = a0 + (a1 - a0) * (0.25 + 0.25 * i);
         const ex = a.x + Math.cos(ea) * rr;
         const ey = a.y + Math.sin(ea) * rr;
-        const el = _nkEl(run, 'div', 'eg-sire-echo', '🎵');
+        const el = _nkEl(run, 'div', 'sx-sire-echo', '🎵');
         el.style.width = '120px';
         el.style.height = '120px';
         el.style.transform = 'translate(' + Math.round(ex - 60) + 'px,' + Math.round(ey - 60) + 'px)';
@@ -187,7 +187,7 @@ export function _mechSireWail(monster, phase) {
         e += dtS * 1000;
         const ang = e < warnMs ? a0 : angleAt(e - warnMs);
         beam.style.transform = 'rotate(' + ang + 'rad)';
-        beam.classList.toggle('eg-nk-beam-warn', e < warnMs);
+        beam.classList.toggle('sx-nk-beam-warn', e < warnMs);
         const pr = _nkPlayerRect();
         if (e >= warnMs) {
             if (pr && now >= cdUntil && _sireBeamHit(a.x, a.y, ang, len, halfW, pr, 6)) {
@@ -239,7 +239,7 @@ export function _mechSireUndertow(monster, phase) {
     const stepPx = SIRE_PULL_STEP * (p >= 3 ? 1.3 : 1);
     const novaDmg = SIRE_NOVA_DMG[p];
 
-    const pool = _nkEl(run, 'div', 'eg-sire-pool');
+    const pool = _nkEl(run, 'div', 'sx-sire-pool');
     pool.style.width = '340px';
     pool.style.height = '340px';
     pool.style.transform = 'translate(' + Math.round(a.x - 170) + 'px,' + Math.round(a.y - 170) + 'px)';
@@ -249,7 +249,7 @@ export function _mechSireUndertow(monster, phase) {
     for (let i = 0; i < 4; i++) {
         const aa = Math.random() * Math.PI * 2;
         const rr = 320 + Math.random() * 160;
-        const el = _nkEl(run, 'div', 'eg-sire-flotsam', '🪵');
+        const el = _nkEl(run, 'div', 'sx-sire-flotsam', '🪵');
         el.style.left = Math.round(a.x + Math.cos(aa) * rr - 14) + 'px';
         el.style.top = Math.round(a.y + Math.sin(aa) * rr - 14) + 'px';
         flotsam.push({ ang: aa, r: rr, el });
@@ -307,7 +307,7 @@ export function _mechSireUndertow(monster, phase) {
         // THE NOVA: the whirlpool detonates near the end of the song.
         if (!novaDone && t >= lifeMs * 0.75) {
             novaDone = true;
-            pool.classList.add('eg-sire-pool-nova');
+            pool.classList.add('sx-sire-pool-nova');
             _sireSplash(a.x, a.y, true);
             const c = _nkPlayerCenter();
             if (c && Math.hypot(c.x - a.x, c.y - a.y) < 200) {
@@ -345,16 +345,16 @@ export function _mechSireReply(monster, phase) {
 
     // Primary: thin, sweeps down. Mirror: thin, sweeps up. Third (p3): slow.
     const mk = (halfW, cls) => {
-        const el = _nkEl(run, 'div', 'eg-nk-beam ' + cls);
+        const el = _nkEl(run, 'div', 'sx-nk-beam ' + cls);
         el.style.width = Math.round(len) + 'px';
         el.style.height = halfW * 2 + 'px';
         el.style.left = Math.round(a.x) + 'px';
         el.style.top = Math.round(a.y - halfW) + 'px';
         return el;
     };
-    const b1 = mk(10, 'eg-sire-beam-thin');
-    const b2 = mk(10, 'eg-sire-beam-thin');
-    const b3 = p >= 3 ? mk(13, 'eg-sire-beam-fat') : null;
+    const b1 = mk(10, 'sx-sire-beam-thin');
+    const b2 = mk(10, 'sx-sire-beam-thin');
+    const b3 = p >= 3 ? mk(13, 'sx-sire-beam-fat') : null;
 
     _nkToast('eg_mech_sire_reply', '🌀 The Siren: SIREN\u2019S REPLY - two songs at once!', '#7dd3fc');
 
@@ -372,9 +372,9 @@ export function _mechSireReply(monster, phase) {
             const ang3 = -0.2 + 0.5 * k;
             b3.style.transform = 'rotate(' + ang3 + 'rad)';
         }
-        b1.classList.toggle('eg-nk-beam-warn', !live);
-        b2.classList.toggle('eg-nk-beam-warn', !live);
-        if (b3) b3.classList.toggle('eg-nk-beam-warn', !live);
+        b1.classList.toggle('sx-nk-beam-warn', !live);
+        b2.classList.toggle('sx-nk-beam-warn', !live);
+        if (b3) b3.classList.toggle('sx-nk-beam-warn', !live);
         if (live) {
             const pr = _nkPlayerRect();
             if (pr && now >= cdUntil) {
@@ -460,9 +460,9 @@ export function _sireFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the stage and the song timeline.
@@ -471,10 +471,10 @@ export function _sireFinalStart(monster) {
 
     // The concert-hall water.
     const stage = document.createElement('div');
-    stage.className = 'eg-sire-stage';
+    stage.className = 'sx-sire-stage';
     document.body.appendChild(stage);
     g.stage = stage;
-    requestAnimationFrame(() => stage.classList.add('eg-sire-stage-on'));
+    requestAnimationFrame(() => stage.classList.add('sx-sire-stage-on'));
 
     // The audience: bubbles in three rings around the centre (8/10/12).
     const ringCounts = [8, 10, 12];
@@ -486,7 +486,7 @@ export function _sireFinalStart(monster) {
             const y = cy + Math.sin(ang) * ringRadii[ring];
             if (y < 70 || y > H - 70 || x < 70 || x > W - 70) continue;
             const el = document.createElement('div');
-            el.className = 'eg-sire-bubble';
+            el.className = 'sx-sire-bubble';
             el.style.left = Math.round(x - 26) + 'px';
             el.style.top = Math.round(y - 26) + 'px';
             document.body.appendChild(el);
@@ -497,10 +497,10 @@ export function _sireFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-sire-cd';
+    ov.className = 'sx-sire-cd';
     ov.innerHTML =
-        '<div class="eg-sire-cd-label">🌀 THE DEADLY ARIA</div>' +
-        '<div class="eg-sire-cd-hint">Follow the song line - reach the far bubble!</div>';
+        '<div class="sx-sire-cd-label">🌀 THE DEADLY ARIA</div>' +
+        '<div class="sx-sire-cd-hint">Follow the song line - reach the far bubble!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -510,11 +510,11 @@ export function _sireFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss sings.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-sire-singing');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-sire-singing');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
@@ -554,7 +554,7 @@ export function _sireFinalStart(monster) {
             return;
         }
         chain.forEach((b, i) => {
-            b.el.classList.add('eg-sire-bubble-lit');
+            b.el.classList.add('sx-sire-bubble-lit');
             b.el.style.setProperty('--lit-delay', (i * 90) + 'ms');
         });
         const far = chain[chain.length - 1];
@@ -567,12 +567,12 @@ export function _sireFinalStart(monster) {
             const onFar = c && Math.hypot(c.x - far.x, c.y - far.y) < 66;
             g.bubbles.forEach(b => {
                 if (b === far || b.popped) return;
-                if (b.el.classList.contains('eg-sire-bubble-lit') || Math.random() < 0.25) {
+                if (b.el.classList.contains('sx-sire-bubble-lit') || Math.random() < 0.25) {
                     b.popped = true;
                     try { b.el.remove(); } catch (e) {}
                     _sireSplash(b.x, b.y, false);
                 }
-                b.el.classList.remove('eg-sire-bubble-lit');
+                b.el.classList.remove('sx-sire-bubble-lit');
             });
             if (!onFar) _sireTouch(SIRE_BUBBLE_DMG, level, 'Deadly Aria');
             g.line++;
@@ -598,8 +598,8 @@ export function _sireCrescendo(g, monster, level) {
     // note - the aria always gives you a place to run to).
     const far = alive.reduce((best, b) =>
         Math.hypot(b.x - c0.x, b.y - c0.y) > Math.hypot(best.x - c0.x, best.y - c0.y) ? b : best, alive[0]);
-    far.el.classList.add('eg-sire-bubble-safe');
-    alive.forEach(b => { if (b !== far) b.el.classList.add('eg-sire-bubble-doom'); });
+    far.el.classList.add('sx-sire-bubble-safe');
+    alive.forEach(b => { if (b !== far) b.el.classList.add('sx-sire-bubble-doom'); });
     _nkToast('eg_mech_sire_crescendo', '🌀💀 THE KILLER CRESCENDO - stand on the last bubble!', '#7dd3fc');
     const warnMs = 2600 * (__SIRE_DEBUG_SLOW ? 8 : 1);
     g.lineTimer = setTimeout(() => {
@@ -627,11 +627,11 @@ export function _sireFinalEnd(g) {
     if (g.overlay) { try { g.overlay.remove(); } catch (e) {} g.overlay = null; }
     if (g.stage) { try { g.stage.remove(); } catch (e) {} g.stage = null; }
     if (g.fxRun) { try { _nkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
-    document.querySelectorAll('.eg-sire-singing').forEach(el => el.classList.remove('eg-sire-singing'));
+    document.querySelectorAll('.sx-sire-singing').forEach(el => el.classList.remove('sx-sire-singing'));
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -653,15 +653,15 @@ export function _sireFinalEnd(g) {
 // removes every run element, overlay and body class this boss ever created.
 export function _sireTeardown() {
     if (_sireFinal) { try { _sireFinalEnd(_sireFinal); } catch (e) {} _sireFinal = null; }
-    document.querySelectorAll('.eg-sire-echo, .eg-sire-pool, .eg-sire-flotsam, ' +
-        '.eg-sire-beam-thin, .eg-sire-beam-fat, .eg-sire-stage, .eg-sire-bubble, ' +
-        '.eg-sire-cd, .eg-sire-splash').forEach(el => {
+    document.querySelectorAll('.sx-sire-echo, .sx-sire-pool, .sx-sire-flotsam, ' +
+        '.sx-sire-beam-thin, .sx-sire-beam-fat, .sx-sire-stage, .sx-sire-bubble, ' +
+        '.sx-sire-cd, .sx-sire-splash').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-sire-singing').forEach(el => el.classList.remove('eg-sire-singing'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.querySelectorAll('.sx-sire-singing').forEach(el => el.classList.remove('sx-sire-singing'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

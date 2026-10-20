@@ -38,14 +38,14 @@ Object.assign(BOSS_MECHANICS, {
 
 
 export function _chaosDrop(run, x, y, level, dmg) {
-    const el = _nkEl(run, 'div', 'eg-nk-mark');
+    const el = _nkEl(run, 'div', 'sx-nk-mark');
     el.style.left = Math.round(x - 26) + 'px';
     el.style.top = Math.round(y - 26) + 'px';
     el.style.width = '52px';
     el.style.height = '52px';
     const st = { t: 0 };
     const step = { update(dtS) { st.t += dtS * 1000; return st.t < 800; }, strike() {
-        el.classList.add('eg-nk-mark-hit');
+        el.classList.add('sx-nk-mark-hit');
         setTimeout(() => el.remove(), 400);
         if (_nkCircleHit(x, y, 26, _nkPlayerRect(), 0)) {
             const dealt = _nkHit(dmg, 'shadow', level);
@@ -56,7 +56,7 @@ export function _chaosDrop(run, x, y, level, dmg) {
 }
 
 export function _chaosOrb(run, x, y, vx, vy, level, dmg) {
-    const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-orb');
+    const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-orb');
     const o = { x, y, vx, vy, t: 0, hitDone: false, el };
     o.update = (dtS, now, cd) => {
         o.t += dtS * 1000;
@@ -111,7 +111,7 @@ export function _mechChaosRoulette(monster, phase) {
             }
         } else if (kind === 2) {
             // Fast chaser, short life.
-            const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-serpent', '💢');
+            const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-serpent', '💢');
             const ch = { x: Math.random() * W, y: 60, t: 0, el, cdU: 0 };
             ch.update = (dtS, now) => {
                 ch.t += dtS * 1000;
@@ -136,7 +136,7 @@ export function _mechChaosRoulette(monster, phase) {
             // Pulse ring from a random anchor - outrun the band.
             const ax = 100 + Math.random() * Math.max(60, W - 200);
             const ay = 100 + Math.random() * Math.max(60, H - 200);
-            const ring = _nkEl(run, 'div', 'eg-nk-ring');
+            const ring = _nkEl(run, 'div', 'sx-nk-ring');
             const pu = { t: 0, r: 30 };
             const rMax = 320;
             pu.update = (dtS, now) => {
@@ -193,8 +193,8 @@ export function _mechWarShout(monster, phase) {
     if (typeof _bossRecalcDamage === 'function') {
         try { _bossRecalcDamage(monster); } catch (e) {}
     }
-    const card = document.getElementById(`eg-card-${monster.id}`);
-    const wrapper = card ? card.querySelector('.eg-emoji-wrapper') : null;
-    if (wrapper) wrapper.classList.add('eg-boss-enraged');
+    const card = document.getElementById(`sx-card-${monster.id}`);
+    const wrapper = card ? card.querySelector('.sx-emoji-wrapper') : null;
+    if (wrapper) wrapper.classList.add('sx-boss-enraged');
     _nkToast('eg_tactician_rage', '💢 The Chaos ROARS! Its damage surges!', '#f87171');
 }

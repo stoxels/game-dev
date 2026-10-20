@@ -54,11 +54,11 @@ export function _mechLightCycle(monster, phase) {
     const bike = {
         x: window.innerWidth * 0.2, y: window.innerHeight * 0.3,
         dir: 0, turnIn: 900,
-        el: _nkEl(run, 'div', 'eg-nk-dot eg-nk-bike', '🏍️'),
+        el: _nkEl(run, 'div', 'sx-nk-dot sx-nk-bike', '🏍️'),
     };
     const trail = []; // { x, y, el }
     const laySegment = () => {
-        const el = _nkEl(run, 'div', 'eg-nk-trail');
+        const el = _nkEl(run, 'div', 'sx-nk-trail');
         el.style.transform = 'translate(' + Math.round(bike.x - 8) + 'px,' + Math.round(bike.y - 8) + 'px)';
         trail.push({ x: bike.x, y: bike.y, el });
         if (trail.length > maxSegs) {

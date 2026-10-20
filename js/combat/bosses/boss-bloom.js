@@ -138,10 +138,10 @@ export function _mechBlmBlooms(monster, phase) {
         blooms.push({ mode: 'track', x: 0, y: 0, t: 0, frozen: false, frozenT: 0, struck: false });
     }
     blooms.forEach(b => {
-        b.mark = _nkEl(run, 'div', 'eg-blm-bloom-mark');
+        b.mark = _nkEl(run, 'div', 'sx-blm-bloom-mark');
         b.mark.style.width = BLM_RADIUS * 2 + 'px';
         b.mark.style.height = BLM_RADIUS * 2 + 'px';
-        b.flower = _nkEl(run, 'div', 'eg-nk-dot eg-blm-flower', '🌸');
+        b.flower = _nkEl(run, 'div', 'sx-nk-dot sx-blm-flower', '🌸');
     });
 
     _nkLoop(run, (dtS, now) => {
@@ -175,7 +175,7 @@ export function _mechBlmBlooms(monster, phase) {
             }
 
             if (!b.frozen) {
-                b.mark.classList.add('eg-blm-bloom-track');
+                b.mark.classList.add('sx-blm-bloom-track');
                 b.mark.style.left = Math.round(b.x - BLM_RADIUS) + 'px';
                 b.mark.style.top = Math.round(b.y - BLM_RADIUS) + 'px';
                 b.flower.style.left = Math.round(b.x - 22) + 'px';
@@ -184,14 +184,14 @@ export function _mechBlmBlooms(monster, phase) {
             }
 
             // ── Frozen → burst window. ──
-            b.mark.classList.remove('eg-blm-bloom-track');
-            b.mark.classList.add('eg-blm-bloom-lock');
+            b.mark.classList.remove('sx-blm-bloom-track');
+            b.mark.classList.add('sx-blm-bloom-lock');
             b.frozenT += dtS * 1000;
             if (b.frozenT < BLM_WARN_MS * _BLM_DEBUG_MULT) continue;
 
             // BURST.
             b.struck = true;
-            b.mark.classList.add('eg-blm-bloom-burst');
+            b.mark.classList.add('sx-blm-bloom-burst');
             if (pr && _nkCircleHit(b.x, b.y, BLM_RADIUS, pr, 0)) {
                 const dealt = _nkHit(BLM_BURST_DMG[p], 'fire', level);
                 _nkAbilityHitToast(dealt, 'The Bloom', 'Scarlet Bloom');
@@ -219,8 +219,8 @@ export function _blmPlantGarden(bossId, x, y, p, level) {
     gr.passive = true;
     const g = {
         x, y, age: 0, p, level, run: gr,
-        el: _nkEl(gr, 'div', 'eg-blm-rot'),
-        rotorEl: _nkEl(gr, 'div', 'eg-blm-rotor'),
+        el: _nkEl(gr, 'div', 'sx-blm-rot'),
+        rotorEl: _nkEl(gr, 'div', 'sx-blm-rotor'),
         rotorA: Math.random() * Math.PI * 2,
         critDone: false,
     };
@@ -248,7 +248,7 @@ export function _blmPlantGarden(bossId, x, y, p, level) {
         // Critical mass: the garden bursts once into seed pods.
         if (!g.critDone && g.age >= BLM_CRIT_AT * _BLM_DEBUG_MULT) {
             g.critDone = true;
-            g.el.classList.add('eg-blm-rot-crit');
+            g.el.classList.add('sx-blm-rot-crit');
             _blmSeedBurst(g);
         }
         // The garden withers at the end of its life.
@@ -276,7 +276,7 @@ export function _blmSeedBurst(g) {
     const pods = [];
     for (let i = 0; i < BLM_PODS; i++) {
         const a = (i / BLM_PODS) * Math.PI * 2 + Math.random() * 0.5;
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-blm-pod', '🌱');
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-blm-pod', '🌱');
         pods.push({ x: g.x, y: g.y, vx: Math.cos(a) * BLM_POD_SPD, vy: Math.sin(a) * BLM_POD_SPD, t: 0, el, hitDone: false });
     }
     let planted = 0;
@@ -348,7 +348,7 @@ export function _mechBlmVolley(monster, phase) {
     // Pods fly in sequence; each lands and plants a garden.
     const pods = spots.map((s, i) => ({
         s, t: -i * 420 * _BLM_DEBUG_MULT,
-        el: _nkEl(run, 'div', 'eg-nk-dot eg-blm-pod', '🌱'),
+        el: _nkEl(run, 'div', 'sx-nk-dot sx-blm-pod', '🌱'),
         sx: fromX, sy: H * 0.1, landed: false,
     }));
     _nkLoop(run, (dtS) => {
@@ -395,16 +395,16 @@ export function _mechBlmVeil(monster, phase) {
     if (tbl) {
         const parent = tbl.parentElement;
         if (parent) {
-            let veil = document.getElementById('eg-grid-veil');
+            let veil = document.getElementById('sx-grid-veil');
             if (!veil) {
                 veil = document.createElement('div');
-                veil.id = 'eg-grid-veil';
-                veil.className = 'eg-grid-veil';
+                veil.id = 'sx-grid-veil';
+                veil.className = 'sx-grid-veil';
                 parent.style.position = 'relative';
                 parent.appendChild(veil);
             }
-            veil.classList.remove('eg-hidden');
-            veil.classList.add('eg-blm-veil-tinted');
+            veil.classList.remove('sx-hidden');
+            veil.classList.add('sx-blm-veil-tinted');
         }
     }
     globalThis.showCombatToast(t('eg_mech_blm_veil'));
@@ -412,17 +412,17 @@ export function _mechBlmVeil(monster, phase) {
     // Wilting state chip: fill = wilt, mistake = regrow.
     let wilt = 0; // 0 = full veil, 100 = fully wilted
     const chip = document.createElement('div');
-    chip.className = 'eg-blm-veil-chip';
+    chip.className = 'sx-blm-veil-chip';
     document.body.appendChild(chip);
     const run = _nkNewRun(monster && monster.id, false);
     run.passive = true;
     run.els.push(chip);
     _nkLoop(run, () => {
-        const v = document.getElementById('eg-grid-veil');
+        const v = document.getElementById('sx-grid-veil');
         if (!v) return false;   // veil removed by teardown
         chip.textContent = '🌸 WILT ' + Math.round(wilt) + '% - fill cells to prune the veil!';
         v.style.setProperty('--blm-wilt', String(Math.round(wilt)));
-        v.classList.toggle('eg-blm-veil-open', wilt >= 90);
+        v.classList.toggle('sx-blm-veil-open', wilt >= 90);
         return true;
     });
 
@@ -533,17 +533,17 @@ export function _blmFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-blm-cd';
+    ov.className = 'sx-blm-cd';
     ov.innerHTML =
-        '<div class="eg-blm-cd-label">🌸 FULMINATION</div>' +
-        '<div class="eg-blm-cd-hint">Dodge each judgment-bloom - every dodge carves a scar. Three scars open the ONE TRUE GAP!</div>';
+        '<div class="sx-blm-cd-label">🌸 FULMINATION</div>' +
+        '<div class="sx-blm-cd-hint">Dodge each judgment-bloom - every dodge carves a scar. Three scars open the ONE TRUE GAP!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -553,11 +553,11 @@ export function _blmFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss card wears the full-bloom crown while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-blm-allin');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-blm-allin');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
@@ -582,7 +582,7 @@ export function _blmFinalStart(monster) {
         const laneWarns = [];
         for (let i = 0; i < lanes; i++) {
             const a = g.gapAngle + (i / lanes) * Math.PI * 2;
-            const el = _nkEl(jRun, 'div', 'eg-blm-petal-warn');
+            const el = _nkEl(jRun, 'div', 'sx-blm-petal-warn');
             el.style.left = cx + 'px';
             el.style.top = cy + 'px';
             el.style.width = Math.max(W, H) + 'px';
@@ -591,7 +591,7 @@ export function _blmFinalStart(monster) {
             laneWarns.push({ a, el });
         }
         // Judgment bloom: a tracker on your live position (short fuse).
-        const mark = _nkEl(jRun, 'div', 'eg-blm-bloom-mark eg-blm-judgment-mark');
+        const mark = _nkEl(jRun, 'div', 'sx-blm-bloom-mark sx-blm-judgment-mark');
         mark.style.width = '130px';
         mark.style.height = '130px';
         let markX = cx, markY = cy;
@@ -649,7 +649,7 @@ export function _blmFinalStart(monster) {
         lRun.passive = true;
         g.curRun = lRun;
         // The safe wedge: 70° wide, centred on gapAngle, reaching the edge.
-        const gapEl = _nkEl(lRun, 'div', 'eg-blm-gap');
+        const gapEl = _nkEl(lRun, 'div', 'sx-blm-gap');
         gapEl.style.left = cx + 'px';
         gapEl.style.top = cy + 'px';
         gapEl.style.width = Math.max(W, H) + 'px';
@@ -658,7 +658,7 @@ export function _blmFinalStart(monster) {
 
         _blmAfter(g, 2400 * _BLM_DEBUG_MULT, () => {
             if (g.finished) return;
-            gapEl.classList.add('eg-blm-gap-bloom');
+            gapEl.classList.add('sx-blm-gap-bloom');
             const pc = _blmPC();
             // Inside the gap wedge = safe. Angle test against the wedge arc.
             const dx = pc.x - cx, dy = pc.y - cy;
@@ -683,18 +683,18 @@ export function _blmFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.curRun) _nkKillRun(g.curRun); } catch (e) {}
-    document.querySelectorAll('.eg-blm-cd, .eg-blm-petal-warn, .eg-blm-judgment-mark, .eg-blm-gap').forEach(el => {
+    document.querySelectorAll('.sx-blm-cd, .sx-blm-petal-warn, .sx-blm-judgment-mark, .sx-blm-gap').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.remove('eg-blm-allin');
-        wrap.classList.remove('eg-nk-shielded');
+        wrap.classList.remove('sx-blm-allin');
+        wrap.classList.remove('sx-nk-shielded');
     }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -714,20 +714,20 @@ export function _blmTeardown() {
     // Kill every garden's run (removes its elements with it).
     _blmGardens.slice().forEach(gg => { try { _nkKillRun(gg.run); } catch (e) {} });
     _blmGardens.length = 0;
-    document.querySelectorAll('.eg-blm-bloom-mark, .eg-blm-flower, .eg-blm-rot, .eg-blm-rotor, ' +
-        '.eg-blm-pod, .eg-blm-petal-warn, .eg-blm-judgment-mark, .eg-blm-gap, .eg-blm-cd, ' +
-        '.eg-blm-veil-chip').forEach(el => {
+    document.querySelectorAll('.sx-blm-bloom-mark, .sx-blm-flower, .sx-blm-rot, .sx-blm-rotor, ' +
+        '.sx-blm-pod, .sx-blm-petal-warn, .sx-blm-judgment-mark, .sx-blm-gap, .sx-blm-cd, ' +
+        '.sx-blm-veil-chip').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-blm-allin').forEach(el => el.classList.remove('eg-blm-allin'));
-    const veil = document.getElementById('eg-grid-veil');
+    document.querySelectorAll('.sx-blm-allin').forEach(el => el.classList.remove('sx-blm-allin'));
+    const veil = document.getElementById('sx-grid-veil');
     if (veil) {
-        veil.classList.remove('eg-blm-veil-tinted', 'eg-blm-veil-open');
+        veil.classList.remove('sx-blm-veil-tinted', 'sx-blm-veil-open');
         veil.style.removeProperty('--blm-wilt');
     }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

@@ -49,7 +49,7 @@ export function _mechDormantSeekers(monster, phase) {
     const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const seekers = [0.25, 0.5, 0.75].map(fx => {
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-seeker', '🏹');
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-seeker', '🏹');
         const s = {
             x: window.innerWidth * fx,
             y: window.innerHeight * (0.3 + Math.random() * 0.4),
@@ -72,14 +72,14 @@ export function _mechDormantSeekers(monster, phase) {
                     s.stage = 'ignite';
                     s.t = 0;
                     s.el.style.opacity = '';
-                    s.el.classList.add('eg-nk-fuse');
+                    s.el.classList.add('sx-nk-fuse');
                 }
             } else if (s.stage === 'ignite') {
                 s.t += dtS * 1000;
                 if (s.t >= igniteMs) {
                     s.stage = 'chase';
                     s.t = 0;
-                    s.el.classList.remove('eg-nk-fuse');
+                    s.el.classList.remove('sx-nk-fuse');
                 }
             } else if (s.stage === 'chase') {
                 s.t += dtS * 1000;

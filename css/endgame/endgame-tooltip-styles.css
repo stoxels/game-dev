@@ -1,10 +1,10 @@
 ﻿/* ================================================================
    ENDGAME ITEM TOOLTIP - ARPG-style frame
-   Add these rules to your main CSS file (wherever .eg-tooltip-* lives).
+   Add these rules to your main CSS file (wherever .sx-tooltip-* lives).
    ================================================================ */
 
 /* Outer frame - border color driven by --tt-border CSS var */
-.eg-tt-frame {
+.sx-tt-frame {
     border: 2px solid var(--tt-border, #7a7a7a);
     border-radius: 4px;
     padding: 10px 12px;
@@ -18,7 +18,7 @@
 
 /* The shared game tooltip engine caps its floating tip at a narrower
    default - lift that cap while an endgame equipment tooltip is shown. */
-#ghud-floating-tip.eg-wide-tip {
+#ghud-floating-tip.sx-wide-tip {
     max-width: 560px;
 }
 
@@ -26,26 +26,26 @@
    The shared engine sets max-width as an INLINE style, so this rule
    needs !important to win - other tooltips are unaffected because
    the class is only applied while the info tooltip is open. */
-#ghud-floating-tip.eg-controls-tip {
+#ghud-floating-tip.sx-controls-tip {
     max-width: 640px !important;
 }
 
     /* Lift the frame's own 360px cap inside the controls tooltip */
-    #ghud-floating-tip.eg-controls-tip .eg-tt-frame {
+    #ghud-floating-tip.sx-controls-tip .sx-tt-frame {
         max-width: none;
     }
 
 /* Equipment / currency item tooltips - widened purely via content
-   detection (:has), so EVERY call site that renders an .eg-tt-frame gets
+   detection (:has), so EVERY call site that renders an .sx-tt-frame gets
    the extra width automatically (the engine's inline max-width would
    otherwise crush non-hub call sites down to ~280px). Must come BEFORE
    the map rule below so maps keep their wider 620px cap. */
-#ghud-floating-tip:has(.eg-tt-frame) {
+#ghud-floating-tip:has(.sx-tt-frame) {
     max-width: 560px !important;
 }
 
 /* Lift the frame's own 360px cap inside equipment tooltips */
-#ghud-floating-tip .eg-tt-frame {
+#ghud-floating-tip .sx-tt-frame {
     max-width: none;
 }
 
@@ -67,8 +67,8 @@
 /* Safety net - no descendant of the tooltip frame should ever be able to
    push past its right edge, even a single long unbroken string with no
    spaces to wrap on (e.g. a long guaranteed-modifier description). */
-.eg-tt-frame,
-.eg-tt-frame * {
+.sx-tt-frame,
+.sx-tt-frame * {
     overflow-wrap: anywhere;
     word-break: break-word;
     box-sizing: border-box;
@@ -79,11 +79,11 @@
    previously had no rules at all, so long modifier descriptions (unlike
    the short 2-3 word names most families use) had nothing forcing them
    to stay inside the frame. */
-.eg-tt-essence-detail {
+.sx-tt-essence-detail {
     width: 100%;
 }
 
-.eg-tt-essence-title {
+.sx-tt-essence-title {
     color: #d9b96c;
     font-size: 0.78rem;
     text-transform: uppercase;
@@ -91,26 +91,26 @@
     opacity: 0.85;
 }
 
-.eg-tt-essence-line {
+.sx-tt-essence-line {
     display: block;
     width: 100%;
     white-space: normal;
 }
 
-.eg-tt-essence-mod {
+.sx-tt-essence-mod {
     display: block;
     color: #f5d98a;
     font-weight: 600;
     white-space: normal;
 }
 
-.eg-tt-essence-slots {
+.sx-tt-essence-slots {
     display: block;
     color: #c8c8c8;
     white-space: normal;
 }
 
-.eg-tt-essence-note {
+.sx-tt-essence-note {
     display: block;
     font-size: 0.75rem;
     color: #9aa0b0;
@@ -118,7 +118,7 @@
 }
 
 /* Header block */
-.eg-tt-header {
+.sx-tt-header {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -128,26 +128,26 @@
     margin-bottom: 8px;
 }
 
-.eg-tt-icon {
+.sx-tt-icon {
     font-size: 2rem;
     line-height: 1;
     margin-bottom: 4px;
 }
 
 /* Item art in tooltip headers renders larger than the 1em emoji default */
-.eg-tt-icon img.eg-art-img {
+.sx-tt-icon img.sx-art-img {
     width: 44px;
     height: 44px;
     object-fit: contain;
 }
 
-.eg-tt-name {
+.sx-tt-name {
     font-weight: 700;
     font-size: 0.95rem;
     letter-spacing: 0.03em;
 }
 
-.eg-tt-rarity-line {
+.sx-tt-rarity-line {
     font-size: 0.75rem;
     opacity: 0.8;
     margin-top: 2px;
@@ -156,7 +156,7 @@
 }
 
 /* Weapon hand line (One-Handed / Two-Handed) - same muted header style */
-.eg-tt-hands {
+.sx-tt-hands {
     font-size: 0.75rem;
     opacity: 0.85;
     margin-top: 2px;
@@ -166,26 +166,26 @@
 }
 
 /* Sections - separated by a subtle divider */
-.eg-tt-section {
+.sx-tt-section {
     padding: 5px 0;
     border-bottom: 1px solid rgba(255,255,255,0.08);
     margin-bottom: 5px;
 }
 
-    .eg-tt-section:last-of-type {
+    .sx-tt-section:last-of-type {
         border-bottom: none;
         margin-bottom: 0;
     }
 
 /* Implicit lines (armour / evasion / damage / block) */
-.eg-tt-implicit {
+.sx-tt-implicit {
     display: flex;
     justify-content: space-between;
     color: #a8c8e8;
     padding: 1px 0;
 }
 
-.eg-tt-val {
+.sx-tt-val {
     font-weight: 600;
     color: #d4eaff;
     margin-left: 8px;
@@ -193,24 +193,24 @@
 
     /* Defense value already includes the item's local "% increased" mods -
    tinted gold to distinguish it from the plain base value */
-    .eg-tt-val.eg-tt-val-modified {
+    .sx-tt-val.sx-tt-val-modified {
         color: #ffcf70;
     }
 
 /* Requirements line */
-.eg-tt-req {
+.sx-tt-req {
     color: #888;
     font-size: 0.77rem;
 }
 
     /* Individual requirement part the player does not currently meet */
-    .eg-tt-req .eg-tt-req-unmet {
+    .sx-tt-req .sx-tt-req-unmet {
         color: #e74c3c;
         font-weight: 600;
     }
 
 /* "Missing: X Agi" line under unmet requirements */
-.eg-tt-req-missing {
+.sx-tt-req-missing {
     color: #e74c3c;
     font-size: 0.77rem;
     margin-top: 2px;
@@ -218,17 +218,17 @@
 
 /* Warning shown when equipping would displace an item whose bonuses other
    equipped gear relies on (requirement chain-break) */
-.eg-tt-swap-warning {
+.sx-tt-swap-warning {
     color: #f39c12;
     font-size: 0.77rem;
 }
 
 /* Explicit mod lines */
-.eg-tt-mods-section {
-    /* no extra border - inherits .eg-tt-section */
+.sx-tt-mods-section {
+    /* no extra border - inherits .sx-tt-section */
 }
 
-.eg-tt-mod {
+.sx-tt-mod {
     color: #8ab4e8;
     padding: 1px 0;
     display: flex;
@@ -237,11 +237,11 @@
     gap: 10px;
 }
 
-.eg-tt-mod-label {
+.sx-tt-mod-label {
     flex: 1 1 auto;
 }
 
-.eg-tt-mod-tier {
+.sx-tt-mod-tier {
     flex: 0 0 auto;
     font-size: 0.70rem;
     font-weight: 600;
@@ -257,7 +257,7 @@
 }
 
 /* "Crafted" badge shown on modifiers added via the crafting bench */
-.eg-tt-mod-crafted {
+.sx-tt-mod-crafted {
     flex: 0 0 auto;
     font-size: 0.70rem;
     font-weight: 600;
@@ -273,37 +273,37 @@
 }
 
 /* Implicit mod lines - distinct blue with separator */
-.eg-tt-implicits-section {
+.sx-tt-implicits-section {
     border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-.eg-tt-mod.eg-tt-mod-implicit {
+.sx-tt-mod.sx-tt-mod-implicit {
     color: #88c0ff;
 }
 
-.eg-tt-mod-tier-implicit {
+.sx-tt-mod-tier-implicit {
     color: #88c0ff;
     border-color: rgba(136,192,255,0.35);
     background: rgba(136,192,255,0.10);
 }
 
-.eg-tt-group-title {
+.sx-tt-group-title {
     font-family: var(--PX, monospace);
 }
 
 /* Downside mod lines on unique items - shown in warning red */
-.eg-tt-mod.eg-tt-mod-downside {
+.sx-tt-mod.sx-tt-mod-downside {
     color: #e74c3c;
 }
 
-    .eg-tt-mod.eg-tt-mod-downside .eg-tt-mod-tier {
+    .sx-tt-mod.sx-tt-mod-downside .sx-tt-mod-tier {
         color: #e88a8a;
         border-color: rgba(231,76,60,0.35);
         background: rgba(231,76,60,0.10);
     }
 
 /* Flavor text at the bottom of unique item tooltips */
-.eg-tt-flavor {
+.sx-tt-flavor {
     margin-top: 6px;
     font-style: italic;
     font-size: 0.75rem;
@@ -312,7 +312,7 @@
 }
 
 /* Item level footer */
-.eg-tt-ilvl {
+.sx-tt-ilvl {
     margin-top: 6px;
     font-size: 0.73rem;
     color: #666;
@@ -320,7 +320,7 @@
 }
 
 /* Mirrored-copy marker */
-.eg-tt-mirrored {
+.sx-tt-mirrored {
     margin-top: 4px;
     font-size: 0.73rem;
     font-style: italic;
@@ -328,37 +328,37 @@
     text-align: right;
 }
 
-/* Rarity chip color classes used on .eg-item-chip */
-.eg-rarity-common {
+/* Rarity chip color classes used on .sx-item-chip */
+.sx-rarity-common {
     border-color: #7a7a7a !important;
 }
 
-.eg-rarity-uncommon {
+.sx-rarity-uncommon {
     border-color: #2ecc71 !important;
     color: #2ecc71;
 }
 
-.eg-rarity-rare {
+.sx-rarity-rare {
     border-color: #3498db !important;
     color: #3498db;
 }
 
-.eg-rarity-epic {
+.sx-rarity-epic {
     border-color: #9b59b6 !important;
     color: #c39bd3;
 }
 
-.eg-rarity-legendary {
+.sx-rarity-legendary {
     border-color: #f39c12 !important;
     color: #f5b642;
 }
 
-.eg-rarity-cursed {
+.sx-rarity-cursed {
     border-color: #e74c3c !important;
     color: #e74c3c;
 }
 
-.eg-rarity-artifact {
+.sx-rarity-artifact {
     border-color: #f1c40f !important;
     color: #f1c40f;
 }

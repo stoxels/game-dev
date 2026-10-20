@@ -11,7 +11,7 @@ import { _nkAbilityHitToast, _nkDodgeBusy, _nkDotTick, _nkEl, _nkFrozen, _nkHit,
 // fissure vents for the kill.
 //------------------------------------------------------------------------
 
-// Prefix discipline: everything here is _infV / eg-infv- (the _inf stem
+// Prefix discipline: everything here is _infV / sx-infv- (the _inf stem
 // is shared - do not shorten).
 
 // DEBUG: slow Inferno's timing 2.5x so manual playtests / screenshot
@@ -120,14 +120,14 @@ export let _infVHotAuraTimer = 0;
 export function _infVHudApply() {
     if (!_infVHeatHudEl) {
         _infVHeatHudEl = document.createElement('div');
-        _infVHeatHudEl.className = 'eg-infv-heat';
+        _infVHeatHudEl.className = 'sx-infv-heat';
         _infVHeatHudEl.innerHTML =
-            '<div class="eg-infv-heat-fill"></div>' +
-            '<div class="eg-infv-heat-label">HEAT</div>';
+            '<div class="sx-infv-heat-fill"></div>' +
+            '<div class="sx-infv-heat-label">HEAT</div>';
         document.body.appendChild(_infVHeatHudEl);
     }
     _infVHeatHudEl.style.setProperty('--infv-heat', String(Math.round(_infVHeat)));
-    _infVHeatHudEl.classList.toggle('eg-infv-heat-critical', _infVHeat > 75);
+    _infVHeatHudEl.classList.toggle('sx-infv-heat-critical', _infVHeat > 75);
 }
 
 // The heat watcher: created lazily by the first cast, re-created after the
@@ -223,7 +223,7 @@ export function _mechInfVTides(monster, phase) {
     const t0ms = performance.now();
     sides.forEach((s, i) => {
         // Telegraph, then flood.
-        const warn = _nkEl(run, 'div', 'eg-infv-tide-warn');
+        const warn = _nkEl(run, 'div', 'sx-infv-tide-warn');
         warn.style.left = Math.round(s.x) + 'px';
         warn.style.top = Math.round(s.y) + 'px';
         warn.style.width = Math.round(s.w) + 'px';
@@ -235,7 +235,7 @@ export function _mechInfVTides(monster, phase) {
             if (t >= startAt + INFV_TIDE_WARN && !fired) {
                 fired = true;
                 try { warn.remove(); } catch (e) {}
-                const lava = _nkEl(run, 'div', 'eg-infv-lava');
+                const lava = _nkEl(run, 'div', 'sx-infv-lava');
                 lava.style.left = Math.round(s.x) + 'px';
                 lava.style.top = Math.round(s.y) + 'px';
                 lava.style.width = Math.round(s.w) + 'px';
@@ -257,7 +257,7 @@ export const INFV_TIDE_WARN = 1500;  // telegraph before each flood (ms)
 
 export function _infVSpawnTile(x, y) {
     const el = document.createElement('div');
-    el.className = 'eg-infv-tile';
+    el.className = 'sx-infv-tile';
     el.dataset.crack = '0';
     el.style.left = Math.round(x - 34) + 'px';
     el.style.top = Math.round(y - 34) + 'px';
@@ -295,9 +295,9 @@ export function _mechInfVSurge(monster, phase) {
     const gaps = gapFracs.map(f => span * f);
 
     // Ash cloud behind the wall (pressure, no damage).
-    const ash = _nkEl(run, 'div', 'eg-infv-ash');
+    const ash = _nkEl(run, 'div', 'sx-infv-ash');
     let ashW = 0;
-    const wall = _nkEl(run, 'div', 'eg-infv-wall');
+    const wall = _nkEl(run, 'div', 'sx-infv-wall');
     // Build the wall from segments around the gaps so gaps are real holes.
     const segs = [];
     let cursor = 0;
@@ -308,7 +308,7 @@ export function _mechInfVSurge(monster, phase) {
     if (span - cursor > 20) segs.push([cursor, span - cursor]);
 
     // Telegraph: shimmering edge.
-    const warn = _nkEl(run, 'div', 'eg-infv-surge-warn');
+    const warn = _nkEl(run, 'div', 'sx-infv-surge-warn');
     if (vertical) { warn.style.left = (ltr ? '0px' : W + 'px'); warn.style.top = '0px'; warn.style.width = '8px'; warn.style.height = H + 'px'; }
     else { warn.style.top = (ltr ? '0px' : H + 'px'); warn.style.left = '0px'; warn.style.height = '8px'; warn.style.width = W + 'px'; }
 
@@ -389,7 +389,7 @@ export function _mechInfVVents(monster, phase) {
     for (let i = 0; i < INFV_VENTS; i++) {
         const vx = W * (0.14 + Math.random() * 0.72);
         const vy = H * (0.16 + Math.random() * 0.68);
-        const warn = _nkEl(run, 'div', 'eg-infv-vent-warn');
+        const warn = _nkEl(run, 'div', 'sx-infv-vent-warn');
         warn.style.left = Math.round(vx - 44) + 'px';
         warn.style.top = Math.round(vy - 44) + 'px';
         _infVDelay(INFV_TIDE_WARN * _INFV_DEBUG_MULT, () => {
@@ -397,7 +397,7 @@ export function _mechInfVVents(monster, phase) {
             try { warn.remove(); } catch (e) {}
             // The jet erupts FROM the vent spot: a local column burst, not
             // a full-screen lane (the telegraph marked a spot, not a lane).
-            const jet = _nkEl(run, 'div', 'eg-infv-jet');
+            const jet = _nkEl(run, 'div', 'sx-infv-jet');
             const jetH = 200;
             jet.style.left = Math.round(vx - 34) + 'px';
             jet.style.top = Math.round(vy - jetH / 2) + 'px';
@@ -407,7 +407,7 @@ export function _mechInfVVents(monster, phase) {
                 _infVTouch(INFV_VENT_HIT, level, 'Eruption Jet');
             }
             const haze = document.createElement('div');
-            haze.className = 'eg-infv-haze';
+            haze.className = 'sx-infv-haze';
             const r = 80;
             haze.style.left = Math.round(vx - r) + 'px';
             haze.style.top = Math.round(vy - r) + 'px';
@@ -509,9 +509,9 @@ export function _infVFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -520,17 +520,17 @@ export function _infVFinalStart(monster) {
 
     // Ice sheet overlay.
     const ice = document.createElement('div');
-    ice.className = 'eg-infv-ice';
+    ice.className = 'sx-infv-ice';
     document.body.appendChild(ice);
     g.fxRun.els.push(ice);
 
     // Countdown overlay (title + timer).
     const ov = document.createElement('div');
-    ov.className = 'eg-infv-cd';
+    ov.className = 'sx-infv-cd';
     ov.innerHTML =
-        '<div class="eg-infv-cd-label">🌋❄️ SUPERVOLCANIC WINTER</div>' +
-        '<div class="eg-infv-cd-timer">-</div>' +
-        '<div class="eg-infv-cd-hint">Lure the magma surges into the fissure vents - blow the cap!</div>';
+        '<div class="sx-infv-cd-label">🌋❄️ SUPERVOLCANIC WINTER</div>' +
+        '<div class="sx-infv-cd-timer">-</div>' +
+        '<div class="sx-infv-cd-hint">Lure the magma surges into the fissure vents - blow the cap!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
     g.fxRun.els.push(ov);
@@ -541,9 +541,9 @@ export function _infVFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss card inverts to ice while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.add('eg-infv-allin');
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.add('sx-infv-allin');
 
     const level = monster.level || 1;
 
@@ -588,7 +588,7 @@ export function _infVFinalStart(monster) {
         const ventX = W * INFV_WINTER_VENT_X[idx];
 
         // Fissure vent telegraph (the lure target).
-        const vent = _nkEl(g.fxRun, 'div', 'eg-infv-fissure');
+        const vent = _nkEl(g.fxRun, 'div', 'sx-infv-fissure');
         vent.style.left = Math.round(ventX - 44) + 'px';
         vent.style.top = Math.round(bandY - 44) + 'px';
 
@@ -596,7 +596,7 @@ export function _infVFinalStart(monster) {
         _infVAfter(g, 2200 * _INFV_DEBUG_MULT, () => {
             if (g.finished) return;
             try { vent.remove(); } catch (e) {}
-            const blob = _nkEl(g.fxRun, 'div', 'eg-infv-surge-blob');
+            const blob = _nkEl(g.fxRun, 'div', 'sx-infv-surge-blob');
             const fromLeft = Math.random() < 0.5;
             let bx = fromLeft ? -60 : W + 60;
             const speed = 130;   // px/s (loop clock)
@@ -616,7 +616,7 @@ export function _infVFinalStart(monster) {
                     try { blob.remove(); } catch (e) {}
                     g.lured++;
                     _nkToast('eg_mech_infv_ventblow', '🌋💥 THE VENT BLOWS - ' + g.lured + '/' + INFV_SURGE_GOAL + ' surges lured!', '#fde68a');
-                    const flash = _nkEl(g.fxRun, 'div', 'eg-infv-vent-flash');
+                    const flash = _nkEl(g.fxRun, 'div', 'sx-infv-vent-flash');
                     flash.style.left = Math.round(ventX - 120) + 'px';
                     flash.style.top = Math.round(bandY - 120) + 'px';
                     _infVAfter(g, 900, () => { try { flash.remove(); } catch (e) {} });
@@ -657,13 +657,13 @@ export function _infVFallBombs(g, level, n) {
     for (let i = 0; i < n; i++) {
         const bx = W * (0.12 + Math.random() * 0.76);
         const by = H * (0.16 + Math.random() * 0.68);
-        const warn = _nkEl(g.fxRun, 'div', 'eg-infv-bomb-warn');
+        const warn = _nkEl(g.fxRun, 'div', 'sx-infv-bomb-warn');
         warn.style.left = Math.round(bx - 40) + 'px';
         warn.style.top = Math.round(by - 40) + 'px';
         _infVAfter(g, 1100 * _INFV_DEBUG_MULT, () => {
             if (g.finished) return;
             try { warn.remove(); } catch (e) {}
-            const boom = _nkEl(g.fxRun, 'div', 'eg-infv-bomb-boom');
+            const boom = _nkEl(g.fxRun, 'div', 'sx-infv-bomb-boom');
             boom.style.left = Math.round(bx - 70) + 'px';
             boom.style.top = Math.round(by - 70) + 'px';
             const pc = _infVPC();
@@ -680,7 +680,7 @@ export function _infVLastStand(g, monster, level) {
     if (g.finished) return;
     _nkToast('eg_mech_infv_laststand', '🌋💀 THE CORE DETONATES - get between the vents!', '#f87171');
     const W = window.innerWidth, H = window.innerHeight;
-    const flash = _nkEl(g.fxRun, 'div', 'eg-infv-laststand');
+    const flash = _nkEl(g.fxRun, 'div', 'sx-infv-laststand');
     flash.style.left = '0px'; flash.style.top = '0px';
     flash.style.width = W + 'px'; flash.style.height = H + 'px';
     _infVAfter(g, 1600 * _INFV_DEBUG_MULT, () => {
@@ -701,7 +701,7 @@ export function _infVCapBlown(g, monster) {
     if (g.finished) return;
     _nkToast('eg_mech_infv_capblown', '🌋💥 THE CAP BLOWS - Supervolcanic Winter ends in fire AND ice!', '#fde68a');
     const flash = document.createElement('div');
-    flash.className = 'eg-infv-restart-flash';
+    flash.className = 'sx-infv-restart-flash';
     document.body.appendChild(flash);
     setTimeout(() => { try { flash.remove(); } catch (e) {} }, 1500);
     _infVFinalEnd(g, monster);
@@ -719,17 +719,17 @@ export function _infVFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.eg-infv-ice, .eg-infv-cd, .eg-infv-fissure, .eg-infv-surge-blob, ' +
-        '.eg-infv-vent-flash, .eg-infv-bomb-warn, .eg-infv-bomb-boom, .eg-infv-laststand, ' +
-        '.eg-infv-restart-flash').forEach(el => {
+    document.querySelectorAll('.sx-infv-ice, .sx-infv-cd, .sx-infv-fissure, .sx-infv-surge-blob, ' +
+        '.sx-infv-vent-flash, .sx-infv-bomb-warn, .sx-infv-bomb-boom, .sx-infv-laststand, ' +
+        '.sx-infv-restart-flash').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.remove('eg-infv-allin');
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.remove('sx-infv-allin');
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -753,18 +753,18 @@ export function _infVTeardown() {
     _infVLavaZones = []; _infVTiles = []; _infVHazes = [];
     _infVHeat = 0;
     if (_infVHeatHudEl) { try { _infVHeatHudEl.remove(); } catch (e) {} _infVHeatHudEl = null; }
-    document.querySelectorAll('.eg-infv-tide-warn, .eg-infv-lava, .eg-infv-tile, .eg-infv-ash, ' +
-        '.eg-infv-wall, .eg-infv-surge-warn, .eg-infv-vent-warn, .eg-infv-jet, .eg-infv-haze, ' +
-        '.eg-infv-ice, .eg-infv-cd, .eg-infv-fissure, .eg-infv-surge-blob, .eg-infv-vent-flash, ' +
-        '.eg-infv-bomb-warn, .eg-infv-bomb-boom, .eg-infv-laststand, .eg-infv-restart-flash').forEach(el => {
+    document.querySelectorAll('.sx-infv-tide-warn, .sx-infv-lava, .sx-infv-tile, .sx-infv-ash, ' +
+        '.sx-infv-wall, .sx-infv-surge-warn, .sx-infv-vent-warn, .sx-infv-jet, .sx-infv-haze, ' +
+        '.sx-infv-ice, .sx-infv-cd, .sx-infv-fissure, .sx-infv-surge-blob, .sx-infv-vent-flash, ' +
+        '.sx-infv-bomb-warn, .sx-infv-bomb-boom, .sx-infv-laststand, .sx-infv-restart-flash').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-boss_inferno');
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.remove('eg-infv-allin');
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    const card = document.getElementById('sx-card-boss_inferno');
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.remove('sx-infv-allin');
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

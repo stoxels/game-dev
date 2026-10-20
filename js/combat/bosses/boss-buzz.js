@@ -77,9 +77,9 @@ export function _bzGridCenter() {
 // with the metallic blade disc as a CHILD element (rotate animations run on
 // the child - never on the fixed wrapper). size in px.
 export function _bzSawEl(run, size, cls) {
-    const dot = _nkEl(run, 'div', 'eg-nk-dot eg-bz-saw' + (cls ? ' ' + cls : ''));
+    const dot = _nkEl(run, 'div', 'sx-nk-dot sx-bz-saw' + (cls ? ' ' + cls : ''));
     const blade = document.createElement('div');
-    blade.className = 'eg-bz-blade';
+    blade.className = 'sx-bz-blade';
     blade.style.width = size + 'px';
     blade.style.height = size + 'px';
     dot.appendChild(blade);
@@ -90,13 +90,13 @@ export function _bzSawEl(run, size, cls) {
 // only, body-level so it survives the run ending in the same frame).
 export function _bzSparks(x, y, big) {
     const layer = document.createElement('div');
-    layer.className = 'eg-bz-sparks' + (big ? ' eg-bz-sparks-big' : '');
+    layer.className = 'sx-bz-sparks' + (big ? ' sx-bz-sparks-big' : '');
     layer.style.left = Math.round(x) + 'px';
     layer.style.top = Math.round(y) + 'px';
     document.body.appendChild(layer);
     for (let i = 0; i < (big ? 8 : 5); i++) {
         const s = document.createElement('div');
-        s.className = 'eg-bz-spark';
+        s.className = 'sx-bz-spark';
         const ang = Math.random() * Math.PI * 2;
         const dist = 18 + Math.random() * (big ? 60 : 34);
         s.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
@@ -156,7 +156,7 @@ export function _mechBzRicochetSaws(monster, phase) {
         else { x = pc.x + (Math.random() * 2 - 1) * W * 0.25; y = H - 30; }
         const ang = Math.atan2(pc.y - y, pc.x - x) + (Math.random() * 0.5 - 0.25);
         const sp = speed * (0.85 + Math.random() * 0.3);
-        const sprite = _bzSawEl(run, size, 'eg-bz-flying');
+        const sprite = _bzSawEl(run, size, 'sx-bz-flying');
         sprite.dot.style.transform = 'translate(' + Math.round(x - size / 2) + 'px,' + Math.round(y - size / 2) + 'px)';
         saws.push({ x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, sp, sprite, bounces: 0, embedded: false, floorEl: null, born: 0 });
     }
@@ -187,11 +187,11 @@ export function _mechBzRicochetSaws(monster, phase) {
                 try { s.sprite.dot.remove(); } catch (err) {}
                 _bzSparks(s.x, s.y, true);
                 const floor = document.createElement('div');
-                floor.className = 'eg-bz-floorblade';
+                floor.className = 'sx-bz-floorblade';
                 floor.style.left = Math.round(s.x - 30) + 'px';
                 floor.style.top = Math.round(s.y - 30) + 'px';
                 const blade = document.createElement('div');
-                blade.className = 'eg-bz-blade eg-bz-blade-floor';
+                blade.className = 'sx-bz-blade sx-bz-blade-floor';
                 blade.style.width = '54px';
                 blade.style.height = '54px';
                 floor.appendChild(blade);
@@ -205,7 +205,7 @@ export function _mechBzRicochetSaws(monster, phase) {
             if (!s.embedded || !s.floorEl) return;
             const age = e - s.born;
             if (age > BZ_FLOOR_LIFE_MS * _BZ_DEBUG_MULT) {
-                s.floorEl.classList.add('eg-bz-retract');
+                s.floorEl.classList.add('sx-bz-retract');
                 const el = s.floorEl;
                 s.floorEl = null;
                 setTimeout(() => { try { el.remove(); } catch (err) {} }, 500);
@@ -247,7 +247,7 @@ export function _mechBzCutLine(monster, phase) {
     _nkToast('eg_mech_bz_cutline', '🪚 The Buzzsaw: CUT LINE - out of the band!', '#fbbf24');
 
     const band = document.createElement('div');
-    band.className = 'eg-bz-cutband';
+    band.className = 'sx-bz-cutband';
     band.style.width = Math.round(len) + 'px';
     band.style.height = BZ_CUT_BAND_W + 'px';
     band.style.left = Math.round(cx - len / 2) + 'px';
@@ -257,7 +257,7 @@ export function _mechBzCutLine(monster, phase) {
     document.body.appendChild(band);
     run.els.push(band);
 
-    const sweep = _bzSawEl(run, 86, 'eg-bz-cutter');
+    const sweep = _bzSawEl(run, 86, 'sx-bz-cutter');
     const sweepDot = sweep.dot;
     sweepDot.style.zIndex = '9004';
 
@@ -269,7 +269,7 @@ export function _mechBzCutLine(monster, phase) {
 
         if (!sweeping) {
             sweeping = true;
-            band.classList.add('eg-bz-cutband-live');
+            band.classList.add('sx-bz-cutband-live');
         }
         // Sweep progress 0..1 across the band, minus a short tail.
         const sweepMs = 1500 * _BZ_DEBUG_MULT;
@@ -325,7 +325,7 @@ export function _mechBzSawTraps(monster, phase) {
         const x = 100 + Math.random() * (W - 200);
         const y = 120 + Math.random() * (H - 240);
         const warn = document.createElement('div');
-        warn.className = 'eg-bz-trap-warn';
+        warn.className = 'sx-bz-trap-warn';
         warn.style.left = Math.round(x - 34) + 'px';
         warn.style.top = Math.round(y - 34) + 'px';
         document.body.appendChild(warn);
@@ -346,11 +346,11 @@ export function _mechBzSawTraps(monster, phase) {
             try { tr.warn.remove(); } catch (e) {}
             _bzSparks(tr.x, tr.y, true);
             const blade = document.createElement('div');
-            blade.className = 'eg-bz-floorblade eg-bz-trap';
+            blade.className = 'sx-bz-floorblade sx-bz-trap';
             blade.style.left = Math.round(tr.x - 30) + 'px';
             blade.style.top = Math.round(tr.y - 30) + 'px';
             const b = document.createElement('div');
-            b.className = 'eg-bz-blade eg-bz-blade-floor';
+            b.className = 'sx-bz-blade sx-bz-blade-floor';
             b.style.width = '56px';
             b.style.height = '56px';
             blade.appendChild(b);
@@ -370,7 +370,7 @@ export function _mechBzSawTraps(monster, phase) {
         // End: fade all blades out.
         if (t > (BZ_TRAP_WINDUP_MS + BZ_TRAP_LIFE_MS) * _BZ_DEBUG_MULT || (!anyBlade && eruptIdx >= traps.length && t > windupMs + 500)) {
             traps.forEach(tr => {
-                if (tr.bladeEl) { tr.bladeEl.classList.add('eg-bz-retract'); const el = tr.bladeEl; setTimeout(() => { try { el.remove(); } catch (e) {} }, 500); }
+                if (tr.bladeEl) { tr.bladeEl.classList.add('sx-bz-retract'); const el = tr.bladeEl; setTimeout(() => { try { el.remove(); } catch (e) {} }, 500); }
                 try { tr.warn.remove(); } catch (e) {}
             });
             return false;
@@ -399,11 +399,11 @@ export function _mechBzPendulumBlades(monster, phase) {
 
     const mkPend = (xCtr, phaseOff) => {
         const wrap = document.createElement('div');
-        wrap.className = 'eg-bz-pendulum';
+        wrap.className = 'sx-bz-pendulum';
         wrap.style.left = Math.round(xCtr) + 'px';
         const chain = document.createElement('div');
-        chain.className = 'eg-bz-chain';
-        const sprite = _bzSawEl(run, 88, 'eg-bz-pendsaw');
+        chain.className = 'sx-bz-chain';
+        const sprite = _bzSawEl(run, 88, 'sx-bz-pendsaw');
         sprite.dot.style.position = 'absolute';
         sprite.dot.style.left = '-44px';
         sprite.dot.style.bottom = '-44px';
@@ -513,9 +513,9 @@ export function _bzFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // Four toothed wall-saws close in from the edges (CSS transition drives
@@ -523,7 +523,7 @@ export function _bzFinalStart(monster) {
     const inset = g.pocketR;   // final distance each wall stops from centre
     const mkWall = (which) => {
         const w = document.createElement('div');
-        w.className = 'eg-bz-wall';
+        w.className = 'sx-bz-wall';
         const W = window.innerWidth, H = window.innerHeight;
         if (which === 'top' || which === 'bottom') {
             w.style.left = '0px'; w.style.width = W + 'px';
@@ -549,20 +549,20 @@ export function _bzFinalStart(monster) {
     });
 
     // Boss spin-up: the card tilts and vibrates like a revving saw.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-bz-spinning');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-bz-spinning');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-bz-cd';
+    ov.className = 'sx-bz-cd';
     ov.innerHTML =
-        '<div class="eg-bz-cd-label">🪚 THE FINAL CUT</div>' +
-        '<div class="eg-bz-cd-num eg-bz-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-bz-cd-hint">The walls are closing in - hold the CENTRE pocket!</div>';
+        '<div class="sx-bz-cd-label">🪚 THE FINAL CUT</div>' +
+        '<div class="sx-bz-cd-num sx-bz-cd-pop">' + g.count + '</div>' +
+        '<div class="sx-bz-cd-hint">The walls are closing in - hold the CENTRE pocket!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -605,12 +605,12 @@ export function _bzFinalStart(monster) {
             _bzFinalBang(g, monster);
             return;
         }
-        const num = g.overlay && g.overlay.querySelector('.eg-bz-cd-num');
+        const num = g.overlay && g.overlay.querySelector('.sx-bz-cd-num');
         if (num) {
             num.textContent = g.count;
-            num.classList.remove('eg-bz-cd-pop');
+            num.classList.remove('sx-bz-cd-pop');
             void num.offsetWidth;
-            num.classList.add('eg-bz-cd-pop');
+            num.classList.add('sx-bz-cd-pop');
         }
     }, cdTick);
 }
@@ -626,13 +626,13 @@ export function _bzFinalBang(g, monster) {
     _nkToast('eg_mech_bz_final_bang', '🪚💀 CROSSCUT!', '#e2e8f0');
 
     // Screen flash at the moment of the crosscut.
-    document.body.classList.add('eg-bz-flash');
-    setTimeout(() => document.body.classList.remove('eg-bz-flash'), 700);
+    document.body.classList.add('sx-bz-flash');
+    setTimeout(() => document.body.classList.remove('sx-bz-flash'), 700);
 
     // Giant X: two blade streaks rotating out from the centre.
     for (let i = 0; i < 2; i++) {
         const streak = document.createElement('div');
-        streak.className = 'eg-bz-cross';
+        streak.className = 'sx-bz-cross';
         streak.style.left = Math.round(g.center.x) + 'px';
         streak.style.top = Math.round(g.center.y) + 'px';
         streak.style.rotate = (i === 0 ? 45 : -45) + 'deg';
@@ -671,12 +671,12 @@ export function _bzFinalEnd(g) {
     if (g.overlay) { try { g.overlay.remove(); } catch (e) {} g.overlay = null; }
     Object.values(g.walls).forEach(w => { try { w.remove(); } catch (e) {} });
     if (g.run) { try { _nkKillRun(g.run); } catch (e) {} g.run = null; }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
-    document.body.classList.remove('eg-bz-flash');
-    document.querySelectorAll('.eg-bz-spinning').forEach(el => el.classList.remove('eg-bz-spinning'));
+    document.body.classList.remove('sx-bz-flash');
+    document.querySelectorAll('.sx-bz-spinning').forEach(el => el.classList.remove('sx-bz-spinning'));
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -698,15 +698,15 @@ export function _bzFinalEnd(g) {
 // removes every run element, overlay and body class this boss ever created.
 export function _bzTeardown() {
     if (_bzFinal) { try { _bzFinalEnd(_bzFinal); } catch (e) {} _bzFinal = null; }
-    document.querySelectorAll('.eg-bz-cutband, .eg-bz-floorblade, .eg-bz-trap-warn, ' +
-        '.eg-bz-pendulum, .eg-bz-sparks, .eg-bz-wall, .eg-bz-cross, .eg-bz-cd').forEach(el => {
+    document.querySelectorAll('.sx-bz-cutband, .sx-bz-floorblade, .sx-bz-trap-warn, ' +
+        '.sx-bz-pendulum, .sx-bz-sparks, .sx-bz-wall, .sx-bz-cross, .sx-bz-cd').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.body.classList.remove('eg-bz-flash');
-    document.querySelectorAll('.eg-bz-spinning').forEach(el => el.classList.remove('eg-bz-spinning'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.body.classList.remove('sx-bz-flash');
+    document.querySelectorAll('.sx-bz-spinning').forEach(el => el.classList.remove('sx-bz-spinning'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

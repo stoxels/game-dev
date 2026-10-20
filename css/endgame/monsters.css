@@ -1,7 +1,7 @@
 ﻿/* Endgame Monster Sandbox Styles */
 
 
-#eg-monster-wrapper {
+#sx-monster-wrapper {
     position: absolute; /* out of flow - monster spawns never push or offset the puzzle grid */
     bottom: calc(var(--inv-panel-h) + 30px); /* sits directly above the inventory bar */
     right: 20px;
@@ -18,11 +18,11 @@
     overflow: visible; /* cards can visually overflow without pushing content below */
 }
 
-    #eg-monster-wrapper.eg-hidden {
+    #sx-monster-wrapper.sx-hidden {
         display: none !important;
     }
 
-#eg-monster-panel {
+#sx-monster-panel {
     display: flex;
     flex-direction: row;
     gap: 8px;
@@ -30,17 +30,17 @@
     flex-wrap: wrap;
     justify-content: center;
     /* The panel box itself must never take clicks: a card that is click-through
-       over the grid (.eg-over-grid) would otherwise still leave this box (as
+       over the grid (.sx-over-grid) would otherwise still leave this box (as
        tall as its widest card + bars) swallowing clicks on the cells beneath,
        e.g. the bottom-right cell. Only the cards inside take clicks. */
     pointer-events: none;
 }
 
-#eg-monster-panel > * {
+#sx-monster-panel > * {
     pointer-events: auto;
 }
 
-.eg-monster-card {
+.sx-monster-card {
     border: 2px solid #444;
     padding: 10px;
     border-radius: 8px;
@@ -53,13 +53,13 @@
     position: relative;
 }
 
-    .eg-monster-card:hover {
+    .sx-monster-card:hover {
         transform: translateY(-2px);
         border-color: #666;
     }
 
 /* Targeted State - high-visibility (legacy large cards) */
-.eg-targeted {
+.sx-targeted {
     border-color: #ffd700;
     border-width: 3px;
     background: linear-gradient(180deg, #2a2a22 0%, #1a1a14 100%);
@@ -69,10 +69,10 @@
         0 0 32px rgba(255, 100, 0, 0.55),
         inset 0 0 14px rgba(255, 215, 0, 0.18);
     transform: scale(1.02);
-    animation: eg-target-pulse-legacy 0.9s ease-in-out infinite;
+    animation: sx-target-pulse-legacy 0.9s ease-in-out infinite;
     filter: brightness(1.12);
 }
-@keyframes eg-target-pulse-legacy {
+@keyframes sx-target-pulse-legacy {
     0%, 100% {
         box-shadow:
             0 0 0 2px rgba(255, 215, 0, 0.35),
@@ -91,7 +91,7 @@
     }
 }
 
-.eg-target-badge {
+.sx-target-badge {
     font-size: 0.65em;
     background: #ff3366;
     color: white;
@@ -102,31 +102,31 @@
 }
 
 /* Internal Layout */
-.eg-monster-top {
+.sx-monster-top {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 10px;
 }
 
-.eg-monster-emoji {
+.sx-monster-emoji {
     font-size: 2.2em;
     line-height: 1;
 }
 
-.eg-monster-name {
+.sx-monster-name {
     font-weight: bold;
     font-size: 0.9em;
     margin-bottom: 3px;
 }
 
-.eg-hp-label {
+.sx-hp-label {
     font-size: 0.8em;
     color: #bbb;
 }
 
 /* Health Bar */
-.eg-hp-track {
+.sx-hp-track {
     width: 100%;
     height: 8px;
     background: #111;
@@ -135,25 +135,25 @@
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
 }
 
-.eg-hp-bar {
+.sx-hp-bar {
     height: 100%;
     transition: width 0.2s ease-out, background-color 0.2s ease;
 }
 
-.eg-hp-high {
+.sx-hp-high {
     background: #4caf50;
 }
 
-.eg-hp-mid {
+.sx-hp-mid {
     background: #ff9800;
 }
 
-.eg-hp-low {
+.sx-hp-low {
     background: #f44336;
 }
 
 /* Animations */
-@keyframes eg-damage-shake {
+@keyframes sx-damage-shake {
     0% {
         background-color: #610000;
         transform: translateX(-4px);
@@ -169,14 +169,14 @@
     }
 }
 
-.eg-flash-damage {
-    animation: eg-damage-shake 1s ease-out;
+.sx-flash-damage {
+    animation: sx-damage-shake 1s ease-out;
 }
 
 /* ── Cleave proc ────────────────────────────────────────────────────── */
 /* Amber slash-shockwave that sweeps across cards struck by a cleave,
    visually distinguishing them from regular single-target damage. */
-@keyframes eg-cleave-wave {
+@keyframes sx-cleave-wave {
     0% {
         box-shadow: inset 0 0 0 rgba(255, 180, 40, 0);
         transform: translateX(0);
@@ -196,11 +196,11 @@
     }
 }
 
-.eg-flash-cleave {
-    animation: eg-cleave-wave 0.5s ease-out;
+.sx-flash-cleave {
+    animation: sx-cleave-wave 0.5s ease-out;
 }
 
-@keyframes eg-death {
+@keyframes sx-death {
     0% {
         transform: scale(1);
         opacity: 1;
@@ -214,15 +214,15 @@
     }
 }
 
-.eg-flash-kill {
-    animation: eg-death 0.8s forwards;
+.sx-flash-kill {
+    animation: sx-death 0.8s forwards;
     pointer-events: none;
 }
 
-/* The killing blow also adds .eg-flash-damage, whose rule sits later in this file and
+/* The killing blow also adds .sx-flash-damage, whose rule sits later in this file and
    used to win - the dead card stayed fully visible (last gauntlet monster). Death wins. */
-.eg-monster-card-compact.eg-flash-kill {
-    animation: eg-death 0.8s forwards;
+.sx-monster-card-compact.sx-flash-kill {
+    animation: sx-death 0.8s forwards;
 }
 
 
@@ -230,13 +230,13 @@
 
 /* Melee marker: the monster the next sword swing would hit when it is NOT
    the selected (yellow) target. Orange-red outline + a small sword badge. */
-.eg-monster-card-compact.eg-card-melee-target {
+.sx-monster-card-compact.sx-card-melee-target {
     outline: 2px dashed #ff6a2b;
     outline-offset: 2px;
     border-radius: 8px;
     box-shadow: 0 0 12px rgba(255, 106, 43, 0.6);
 }
-.eg-monster-card-compact.eg-card-melee-target::after {
+.sx-monster-card-compact.sx-card-melee-target::after {
     content: '⚔️';
     position: absolute;
     top: -6px; right: -6px;
@@ -245,16 +245,16 @@
     pointer-events: none;
 }
 /* Brief pulse on a card that a melee swing just hit without it being selected. */
-.eg-monster-card-compact.eg-card-melee-hit {
-    animation: eg-melee-hit-pulse 0.5s ease-out;
+.sx-monster-card-compact.sx-card-melee-hit {
+    animation: sx-melee-hit-pulse 0.5s ease-out;
 }
-@keyframes eg-melee-hit-pulse {
+@keyframes sx-melee-hit-pulse {
     0%   { box-shadow: 0 0 0 0 rgba(255, 106, 43, 0.95); filter: brightness(1.6); }
     100% { box-shadow: 0 0 0 18px rgba(255, 106, 43, 0); filter: brightness(1); }
 }
 
 /* Charge Bar */
-.eg-charge-track {
+.sx-charge-track {
     width: 100%;
     height: 5px;
     background: #111;
@@ -264,14 +264,14 @@
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
 }
 
-.eg-charge-bar {
+.sx-charge-bar {
     height: 100%;
     background: #9b59b6; /* Purple to distinguish from HP */
     transition: width 0.1s linear; /* Smooth 100ms ticking */
 }
 
 /* Attack Animations */
-.eg-projectile {
+.sx-projectile {
     position: fixed;
     z-index: 10000;
     font-size: 28px;
@@ -282,15 +282,15 @@
 /* Charging projectile: stacks up while the player drag-paints.
    Anchored over the stroke's start cell via left/top (set in JS) and pulled
    back by half its size so growth stays centred on the cell. */
-.eg-proj-charging {
+.sx-proj-charging {
     z-index: 10001;
-    /* --egp-charge-scale grows with stacked cells (set in JS); emoji visuals
+    /* --sx-projfx-charge-scale grows with stacked cells (set in JS); emoji visuals
        keep growing via font-size instead */
-    transform: translate(-50%, -50%) scale(var(--egp-charge-scale, 1));
-    animation: eg-charge-pulse 0.6s ease-in-out infinite;
+    transform: translate(-50%, -50%) scale(var(--sx-projfx-charge-scale, 1));
+    animation: sx-charge-pulse 0.6s ease-in-out infinite;
 }
 
-@keyframes eg-charge-pulse {
+@keyframes sx-charge-pulse {
     0%, 100% {
         filter: brightness(1);
         text-shadow: 0 0 10px rgba(255, 200, 60, 0.8);
@@ -304,19 +304,19 @@
 /* Charged overkill ricochet: smaller projectile that carries surplus damage
    from an overkilling drag-paint shot to the next monster. Slightly more
    transparent and with a tighter glow so it reads as a secondary shard. */
-.eg-proj-ricochet {
+.sx-proj-ricochet {
     opacity: 0.88;
     filter: brightness(1.25) drop-shadow(0 0 4px rgba(255, 220, 100, 0.9));
 }
 
-.eg-proj-ricochet.eg-built {
+.sx-proj-ricochet.sx-built {
     /* built visuals are 44x28 fixed; extra shrink via the flight scale
        (CHARGED_RICOCHET_SCALE) already makes it smaller - this just
        softens the glow for the secondary shot */
     filter: brightness(1.15) drop-shadow(0 0 4px rgba(255, 220, 100, 0.8));
 }
 
-@keyframes eg-attack-pulse {
+@keyframes sx-attack-pulse {
     0% {
         transform: scale(1);
         filter: brightness(1);
@@ -334,8 +334,8 @@
     }
 }
 
-.eg-flash-attack {
-    animation: eg-attack-pulse 0.3s ease-out;
+.sx-flash-attack {
+    animation: sx-attack-pulse 0.3s ease-out;
 }
 
 
@@ -344,7 +344,7 @@
 
 
 /* ── Damage numbers - RPG pop (base) ─────────────────────────────────── */
-.eg-damage-number, .eg-player-damage {
+.sx-damage-number, .sx-player-damage {
     position: absolute;
     font-family: 'Impact', 'Anton', 'Arial Black', sans-serif;
     font-weight: 900;
@@ -370,7 +370,7 @@
    active. --qi (0..1) is set from the stack count by endgame-quiz-buffs.js:
    more stacks = wider, brighter, stronger glow. Anchored to the avatar
    wrapper at the sprite's centre (the wrapper holds bars above the sprite). */
-.eg-quiz-aura {
+.sx-quiz-aura {
     --qi: 0.12;
     position: absolute;
     left: 50%;
@@ -392,28 +392,28 @@
         0 0 calc(8px + 30px * var(--qi)) rgba(255, 60, 30, calc(0.45 + 0.5 * var(--qi))),
         inset 0 0 calc(8px + 26px * var(--qi)) rgba(255, 60, 30, calc(0.3 + 0.5 * var(--qi)));
     transform: translate(-50%, -50%);
-    animation: eg-quiz-shield-in 0.35s ease-out, eg-quiz-aura-pulse 1.4s ease-in-out 0.35s infinite alternate;
+    animation: sx-quiz-shield-in 0.35s ease-out, sx-quiz-aura-pulse 1.4s ease-in-out 0.35s infinite alternate;
     transition: width 0.4s, height 0.4s, border-width 0.4s;
 }
 
 /* Fade-in on apply … */
-@keyframes eg-quiz-shield-in {
+@keyframes sx-quiz-shield-in {
     from { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
     to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 /* … soft pulse while active (faster / bigger swing with more stacks)… */
-@keyframes eg-quiz-aura-pulse {
+@keyframes sx-quiz-aura-pulse {
     from { opacity: 0.7; transform: translate(-50%, -50%) scale(0.97); }
     to   { opacity: 1;   transform: translate(-50%, -50%) scale(1.04); }
 }
 
 /* … and fade-out when the buff expires */
-.eg-quiz-shield-out {
-    animation: eg-quiz-shield-fade-out 0.4s ease-in forwards !important;
+.sx-quiz-shield-out {
+    animation: sx-quiz-shield-fade-out 0.4s ease-in forwards !important;
 }
 
-@keyframes eg-quiz-shield-fade-out {
+@keyframes sx-quiz-shield-fade-out {
     from {
         opacity: 1;
     }
@@ -425,21 +425,21 @@
 }
 
 /* ── Quiz reward buff label (floats above the player HUD) ─────────── */
-.eg-quiz-buff-label {
+.sx-quiz-buff-label {
     left: 50%;
     top: -6px;
     margin-left: -40px;
     width: 80px;
     text-align: center;
     font-size: 16px;
-    color: var(--eg-hit-color, #ffffff);
+    color: var(--sx-hit-color, #ffffff);
     /* Above the quiz overlay (z-index 450) so the reward FX stays visible
        while the result message is still showing */
     z-index: 520;
-    animation: eg-quiz-buff-float 0.9s ease-out forwards;
+    animation: sx-quiz-buff-float 0.9s ease-out forwards;
 }
 
-@keyframes eg-quiz-buff-float {
+@keyframes sx-quiz-buff-float {
     0% {
         transform: translateY(0);
         opacity: 0;
@@ -457,7 +457,7 @@
 
 /* ── Player status bar (above inventory) ───────────────────────────── */
 /* Shared row of status chips: block recovery + active player ailments. */
-#eg-player-status-bar {
+#sx-player-status-bar {
     position: fixed;
     /* Compact bar sitting in the gap between the puzzle grid and
        the inventory strip at the bottom of the screen */
@@ -473,7 +473,7 @@
 }
 
 /* One status chip (block lockout / ailment) inside the bar */
-#eg-player-status-bar .eg-status-chip {
+#sx-player-status-bar .sx-status-chip {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -486,42 +486,42 @@
     font-family: var(--PX, monospace);
 }
 
-#eg-player-status-bar .eg-status-chip-lockout {
+#sx-player-status-bar .sx-status-chip-lockout {
     /* uses the default red border/shadow */
 }
 
-#eg-player-status-bar .eg-status-chip-ignite {
+#sx-player-status-bar .sx-status-chip-ignite {
     border-color: rgba(255, 120, 40, 0.85);
     box-shadow: 0 0 10px rgba(255, 120, 40, 0.45), inset 0 0 8px rgba(255, 120, 40, 0.2);
 }
-#eg-player-status-bar .eg-status-chip-chill,
-#eg-player-status-bar .eg-status-chip-frozen {
+#sx-player-status-bar .sx-status-chip-chill,
+#sx-player-status-bar .sx-status-chip-frozen {
     border-color: rgba(96, 200, 255, 0.85);
     box-shadow: 0 0 10px rgba(96, 200, 255, 0.45), inset 0 0 8px rgba(96, 200, 255, 0.2);
 }
-#eg-player-status-bar .eg-status-chip-shocked {
+#sx-player-status-bar .sx-status-chip-shocked {
     border-color: rgba(253, 224, 71, 0.85);
     box-shadow: 0 0 10px rgba(253, 224, 71, 0.5), inset 0 0 8px rgba(253, 224, 71, 0.25);
 }
-#eg-player-status-bar .eg-status-chip-shadowburn {
+#sx-player-status-bar .sx-status-chip-shadowburn {
     border-color: rgba(148, 51, 199, 0.85);
     box-shadow: 0 0 10px rgba(148, 51, 199, 0.5), inset 0 0 8px rgba(148, 51, 199, 0.25);
 }
-#eg-player-status-bar .eg-status-chip-polymorph {
+#sx-player-status-bar .sx-status-chip-polymorph {
     border-color: rgba(74, 222, 128, 0.85);
     box-shadow: 0 0 10px rgba(74, 222, 128, 0.45), inset 0 0 8px rgba(74, 222, 128, 0.2);
 }
 
-#eg-player-status-bar .eg-lockout-icon {
+#sx-player-status-bar .sx-lockout-icon {
     font-size: 16px;
     line-height: 1;
     filter: grayscale(0.4) drop-shadow(0 0 4px rgba(255, 71, 87, 0.7));
 }
 
-#eg-player-status-bar .eg-status-chip-shocked .eg-lockout-icon { animation: eg-spark-flicker 0.3s steps(2) infinite; }
-#eg-player-status-bar .eg-status-chip-ignite .eg-lockout-icon  { animation: eg-spark-flicker 0.6s steps(2) infinite; }
+#sx-player-status-bar .sx-status-chip-shocked .sx-lockout-icon { animation: sx-spark-flicker 0.3s steps(2) infinite; }
+#sx-player-status-bar .sx-status-chip-ignite .sx-lockout-icon  { animation: sx-spark-flicker 0.6s steps(2) infinite; }
 
-#eg-player-status-bar .eg-lockout-countdown {
+#sx-player-status-bar .sx-lockout-countdown {
     font-size: 15px;
     font-weight: bold;
     color: #ff6b7d;
@@ -530,7 +530,7 @@
     text-align: right;
 }
 
-#eg-player-status-bar .eg-lockout-label {
+#sx-player-status-bar .sx-lockout-label {
     font-size: 10px;
     color: #c8c8c8;
     opacity: 0.85;
@@ -538,7 +538,7 @@
 }
 
 /* ── Damage number placement + animation ──────────────────────────────── */
-.eg-damage-number {
+.sx-damage-number {
     left: 50%;
     top: -8px;
     transform: translateX(-50%);
@@ -546,7 +546,7 @@
     animation: damage-float 1.05s cubic-bezier(0.18, 1.15, 0.32, 1) forwards;
 }
 
-.eg-player-damage {
+.sx-player-damage {
     left: 50%;
     top: 46%;
     transform: translateX(-50%) translateY(-50%);
@@ -556,20 +556,20 @@
 }
 
 /* ── Elemental variants - vivid color + matching glow ───────── */
-.eg-damage-number.eg-dmg-physical { color: #ffffff; }
-.eg-damage-number.eg-dmg-fire      { color: #ff3b1f; }
-.eg-damage-number.eg-dmg-cold      { color: #6ecbff; }
-.eg-damage-number.eg-dmg-lightning { color: #ffe536; }
-.eg-damage-number.eg-dmg-shadow    { color: #c084ff; }
+.sx-damage-number.sx-dmg-physical { color: #ffffff; }
+.sx-damage-number.sx-dmg-fire      { color: #ff3b1f; }
+.sx-damage-number.sx-dmg-cold      { color: #6ecbff; }
+.sx-damage-number.sx-dmg-lightning { color: #ffe536; }
+.sx-damage-number.sx-dmg-shadow    { color: #c084ff; }
 
-.eg-damage-number.eg-dmg-fire      { filter: drop-shadow(0 0 8px rgba(255,70,20,0.95)) drop-shadow(0 0 16px rgba(255,90,20,0.75)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
-.eg-damage-number.eg-dmg-cold      { filter: drop-shadow(0 0 8px rgba(80,180,255,0.95)) drop-shadow(0 0 16px rgba(90,200,255,0.75)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
-.eg-damage-number.eg-dmg-lightning { filter: drop-shadow(0 0 8px rgba(255,230,60,0.95)) drop-shadow(0 0 16px rgba(255,210,40,0.75)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
-.eg-damage-number.eg-dmg-shadow    { filter: drop-shadow(0 0 8px rgba(180,90,255,0.95)) drop-shadow(0 0 16px rgba(160,80,255,0.75)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
-.eg-damage-number.eg-dmg-physical  { filter: drop-shadow(0 0 7px rgba(255,255,255,0.65)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
+.sx-damage-number.sx-dmg-fire      { filter: drop-shadow(0 0 8px rgba(255,70,20,0.95)) drop-shadow(0 0 16px rgba(255,90,20,0.75)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
+.sx-damage-number.sx-dmg-cold      { filter: drop-shadow(0 0 8px rgba(80,180,255,0.95)) drop-shadow(0 0 16px rgba(90,200,255,0.75)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
+.sx-damage-number.sx-dmg-lightning { filter: drop-shadow(0 0 8px rgba(255,230,60,0.95)) drop-shadow(0 0 16px rgba(255,210,40,0.75)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
+.sx-damage-number.sx-dmg-shadow    { filter: drop-shadow(0 0 8px rgba(180,90,255,0.95)) drop-shadow(0 0 16px rgba(160,80,255,0.75)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
+.sx-damage-number.sx-dmg-physical  { filter: drop-shadow(0 0 7px rgba(255,255,255,0.65)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
 
 /* ── Critical hit - bigger, gold, starburst, extra glow ───────────────── */
-.eg-damage-number.eg-dmg-crit {
+.sx-damage-number.sx-dmg-crit {
     font-size: 64px;
     z-index: 700;
     color: #ffd700;
@@ -582,13 +582,13 @@
         drop-shadow(0 3px 6px rgba(0,0,0,0.9));
     animation: damage-float-crit 1.5s cubic-bezier(0.18, 1.18, 0.30, 1) forwards;
 }
-.eg-damage-number.eg-dmg-crit.eg-dmg-fire      { color: #ff5420; }
-.eg-damage-number.eg-dmg-crit.eg-dmg-cold      { color: #9be2ff; }
-.eg-damage-number.eg-dmg-crit.eg-dmg-lightning { color: #fff34a; }
-.eg-damage-number.eg-dmg-crit.eg-dmg-shadow    { color: #d6a6ff; }
+.sx-damage-number.sx-dmg-crit.sx-dmg-fire      { color: #ff5420; }
+.sx-damage-number.sx-dmg-crit.sx-dmg-cold      { color: #9be2ff; }
+.sx-damage-number.sx-dmg-crit.sx-dmg-lightning { color: #fff34a; }
+.sx-damage-number.sx-dmg-crit.sx-dmg-shadow    { color: #d6a6ff; }
 
 /* faint “CRIT!” sub-label for critical hits */
-.eg-damage-number.eg-dmg-crit::after {
+.sx-damage-number.sx-dmg-crit::after {
     content: 'CRIT!';
     position: absolute;
     left: 50%;
@@ -604,16 +604,16 @@
 }
 
 /* ── Elemental crit icon prefix */
-.eg-dmg-crit.eg-dmg-fire::before      { content: '🔥 '; font-size: 0.55em; vertical-align: middle; }
-.eg-dmg-crit.eg-dmg-cold::before      { content: '❄ '; font-size: 0.55em; vertical-align: middle; }
-.eg-dmg-crit.eg-dmg-lightning::before { content: '⚡ '; font-size: 0.55em; vertical-align: middle; }
-.eg-dmg-crit.eg-dmg-shadow::before    { content: '💜 '; font-size: 0.5em; vertical-align: middle; }
+.sx-dmg-crit.sx-dmg-fire::before      { content: '🔥 '; font-size: 0.55em; vertical-align: middle; }
+.sx-dmg-crit.sx-dmg-cold::before      { content: '❄ '; font-size: 0.55em; vertical-align: middle; }
+.sx-dmg-crit.sx-dmg-lightning::before { content: '⚡ '; font-size: 0.55em; vertical-align: middle; }
+.sx-dmg-crit.sx-dmg-shadow::before    { content: '💜 '; font-size: 0.5em; vertical-align: middle; }
 
 /* small physical hits get a slight shrink so crits stand out more */
-.eg-damage-number.eg-dmg-small { font-size: 22px; opacity: 0.95; }
+.sx-damage-number.sx-dmg-small { font-size: 22px; opacity: 0.95; }
 
 /* status labels (Staggered!, Snipe etc.) must NOT be giant */
-.eg-damage-number.eg-status-label {
+.sx-damage-number.sx-status-label {
     font-size: 15px;
     font-family: var(--PX, monospace);
     font-weight: 800;
@@ -648,7 +648,7 @@
     100% { opacity: 0; transform: translateX(-50%) translateY(-82%) scale(0.9); }
 }
 /* crit player-taken hit */
-.eg-player-damage.eg-dmg-crit {
+.sx-player-damage.sx-dmg-crit {
     font-size: 34px;
     color: #ff453a;
     filter: drop-shadow(0 0 10px rgba(255,60,40,0.9)) drop-shadow(0 0 18px rgba(255,0,0,0.6)) drop-shadow(0 3px 6px rgba(0,0,0,0.9));
@@ -662,7 +662,7 @@
 }
 
 /* Optional: Flash effect for the monster card when hit */
-.eg-flash-damage {
+.sx-flash-damage {
     animation: flash-red 0.3s ease;
 }
 
@@ -682,7 +682,7 @@
 
 
 
-.eg-level-badge {
+.sx-level-badge {
     font-size: 0.65em;
     background: #2c7be5;
     color: white;
@@ -693,40 +693,40 @@
 }
 
 /* Per-class projectile tweaks (optional visual differentiation) */
-.eg-proj-arrow {
+.sx-proj-arrow {
     filter: drop-shadow(0 0 4px #ffe066);
 }
 
-.eg-proj-fireball {
+.sx-proj-fireball {
     filter: drop-shadow(0 0 8px #ff6b35);
     font-size: 32px;
 }
 
-.eg-proj-sword {
+.sx-proj-sword {
     filter: drop-shadow(0 0 4px #aad4f5);
 }
 
-.eg-proj-dizzy {
+.sx-proj-dizzy {
     filter: drop-shadow(0 0 6px #b388ff);
 }
 
-.eg-proj-scroll {
+.sx-proj-scroll {
     filter: drop-shadow(0 0 4px #ffd54f);
 }
 
-.eg-proj-infinity {
+.sx-proj-infinity {
     filter: drop-shadow(0 0 6px #64ffda);
 }
 
-.eg-proj-chain {
+.sx-proj-chain {
     filter: drop-shadow(0 0 4px #90a4ae);
 }
 
-.eg-proj-brain {
+.sx-proj-brain {
     filter: drop-shadow(0 0 4px #ff8a80);
 }
 
-.eg-proj-dice {
+.sx-proj-dice {
     filter: drop-shadow(0 0 4px #fff176);
 }
 
@@ -737,7 +737,7 @@
 
 
 /* ── Monster level badge ─────────────────────────────────────────────────── */
-.eg-level-badge {
+.sx-level-badge {
     font-size: 0.65em;
     background: #2c7be5;
     color: #fff;
@@ -749,16 +749,16 @@
 
 
 /* ── Per-class player projectile tweaks ──────────────────────────────────── */
-.eg-proj-arrow {
+.sx-proj-arrow {
     filter: drop-shadow(0 0 4px #ffe066);
 }
 
-.eg-proj-fireball {
+.sx-proj-fireball {
     filter: drop-shadow(0 0 8px #ff6b35);
     font-size: 32px;
 }
 
-.eg-proj-sword {
+.sx-proj-sword {
     filter: drop-shadow(0 0 4px #aad4f5);
 }
 
@@ -768,7 +768,7 @@
    Sits inside a .gc cell as an absolutely-positioned child.
    Uses pointer-events:none so it never blocks mouse input on the cell.
 */
-.eg-pickup-overlay {
+.sx-pickup-overlay {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -777,40 +777,40 @@
     line-height: 1;
     pointer-events: none;
     z-index: 5;
-    animation: eg-pickup-pulse 2s ease-in-out infinite;
+    animation: sx-pickup-pulse 2s ease-in-out infinite;
     filter: drop-shadow(0 0 3px rgba(255,255,255,0.6));
 }
 
 /* Rarity glow variants - colors match the game's rarity palette */
-.eg-pickup-rarity-common {
+.sx-pickup-rarity-common {
     filter: drop-shadow(0 0 2px rgba(176,176,176,0.7));
 }
 
-.eg-pickup-rarity-uncommon {
+.sx-pickup-rarity-uncommon {
     filter: drop-shadow(0 0 4px rgba(46,204,113,0.8));
 }
 
-.eg-pickup-rarity-rare {
+.sx-pickup-rarity-rare {
     filter: drop-shadow(0 0 6px rgba(52,152,219,0.9));
 }
 
-.eg-pickup-rarity-epic {
+.sx-pickup-rarity-epic {
     filter: drop-shadow(0 0 7px rgba(155,89,182,0.95));
 }
 
-.eg-pickup-rarity-legendary {
+.sx-pickup-rarity-legendary {
     filter: drop-shadow(0 0 8px rgba(245,182,66,1));
 }
 
-.eg-pickup-rarity-cursed {
+.sx-pickup-rarity-cursed {
     filter: drop-shadow(0 0 7px rgba(231,76,60,0.95));
 }
 
-.eg-pickup-rarity-artifact {
+.sx-pickup-rarity-artifact {
     filter: drop-shadow(0 0 8px rgba(241,196,15,1));
 }
 
-.eg-pickup-rarity-currency {
+.sx-pickup-rarity-currency {
     filter: drop-shadow(0 0 5px rgba(181,146,72,0.9));
 }
 
@@ -822,8 +822,8 @@
    drop-shadow filter creates a stacking context, so the negative z-index
    halo stays behind the item sprite but above the grid cell.
 */
-.eg-loot-overlay.eg-unique-drop {
-    animation: eg-unique-pulse 1.6s ease-in-out infinite;
+.sx-loot-overlay.sx-unique-drop {
+    animation: sx-unique-pulse 1.6s ease-in-out infinite;
     filter:
         drop-shadow(0 0 4px rgba(255,215,120,1))
         drop-shadow(0 0 10px rgba(245,182,66,0.95))
@@ -831,7 +831,7 @@
     z-index: 6;
 }
 
-.eg-loot-overlay.eg-unique-drop::before {
+.sx-loot-overlay.sx-unique-drop::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -865,12 +865,12 @@
     );
     -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 62%);
     mask-image: radial-gradient(circle, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 62%);
-    animation: eg-unique-spin 3.2s linear infinite;
+    animation: sx-unique-spin 3.2s linear infinite;
     pointer-events: none;
     z-index: -1;
 }
 
-.eg-loot-overlay.eg-unique-drop::after {
+.sx-loot-overlay.sx-unique-drop::after {
     content: '✦';
     position: absolute;
     top: -22%;
@@ -878,27 +878,27 @@
     font-size: 0.75em;
     color: #ffe9ad;
     text-shadow: 0 0 5px #f5b642, 0 0 10px rgba(243,156,18,0.8);
-    animation: eg-unique-sparkle 1.3s ease-in-out infinite;
+    animation: sx-unique-sparkle 1.3s ease-in-out infinite;
     pointer-events: none;
 }
 
-@keyframes eg-unique-spin {
+@keyframes sx-unique-spin {
     from { transform: translate(-50%, -50%) rotate(0deg); }
     to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-@keyframes eg-unique-pulse {
+@keyframes sx-unique-pulse {
     0%   { transform: translate(-50%, -50%) scale(1); }
     50%  { transform: translate(-50%, -50%) scale(1.22); }
     100% { transform: translate(-50%, -50%) scale(1); }
 }
 
-@keyframes eg-unique-sparkle {
+@keyframes sx-unique-sparkle {
     0%, 100% { opacity: 0.15; transform: scale(0.6) rotate(0deg); }
     50%      { opacity: 1;    transform: scale(1.15) rotate(25deg); }
 }
 
-@keyframes eg-pickup-pulse {
+@keyframes sx-pickup-pulse {
     0% {
         transform: translate(-50%, -50%) scale(1);
         opacity: 0.9;
@@ -917,16 +917,16 @@
 
 
 /* ── Pickup claim floater (rises and fades from the cell) ────────────────── */
-.eg-pickup-floater {
+.sx-pickup-floater {
     position: fixed;
     font-size: 28px;
     pointer-events: none;
     z-index: 10001;
     transform: translateX(-50%);
-    animation: eg-pickup-float 0.8s ease-out forwards;
+    animation: sx-pickup-float 0.8s ease-out forwards;
 }
 
-@keyframes eg-pickup-float {
+@keyframes sx-pickup-float {
     0% {
         opacity: 1;
         transform: translate(-50%, 0px) scale(1.3);
@@ -940,8 +940,8 @@
 
 /* Pickup art inside the transient claim/destroy animations: sized to the
    surrounding emoji type so the art pops exactly where the glyph used to. */
-.eg-pickup-floater img.eg-art-img,
-.eg-pickup-broken-shard img.eg-art-img {
+.sx-pickup-floater img.sx-art-img,
+.sx-pickup-broken-shard img.sx-art-img {
     width: 1.6em;
     height: 1.6em;
     object-fit: contain;
@@ -951,19 +951,19 @@
 
 
 /* ── The Overfitter feedback ───────────────────────────────────────────── */
-.eg-overfitter-drift-clue {
+.sx-overfitter-drift-clue {
     color: #f0abfc !important;
     text-shadow: 0 0 8px rgba(217, 70, 239, 0.95);
-    animation: eg-overfitter-drift 0.7s ease-in-out infinite alternate;
+    animation: sx-overfitter-drift 0.7s ease-in-out infinite alternate;
 }
 
-@keyframes eg-overfitter-drift {
+@keyframes sx-overfitter-drift {
     from { opacity: 0.55; transform: translateX(-1px); }
     to   { opacity: 1; transform: translateX(1px); }
 }
 
 /* ── Boss Phase Badge ─────────────────────────────── */
-.eg-boss-phase-badge {
+.sx-boss-phase-badge {
     font-size: 10px;
     font-weight: 700;
     padding: 1px 5px;
@@ -975,16 +975,16 @@
     color: #fff;
 }
 
-    .eg-boss-phase-badge.eg-boss-phase-2 {
+    .sx-boss-phase-badge.sx-boss-phase-2 {
         background: #dc2626;
     }
 
-    .eg-boss-phase-badge.eg-boss-phase-3 {
+    .sx-boss-phase-badge.sx-boss-phase-3 {
         background: #f97316;
-        animation: eg-enrage-pulse 0.6s ease-in-out infinite alternate;
+        animation: sx-enrage-pulse 0.6s ease-in-out infinite alternate;
     }
 
-.eg-boss-immune-badge {
+.sx-boss-immune-badge {
     font-size: 10px;
     font-weight: 700;
     padding: 1px 5px;
@@ -992,15 +992,15 @@
     margin-left: 4px;
     background: #6b7280;
     color: #fff;
-    animation: eg-immune-shimmer 0.5s ease-in-out infinite alternate;
+    animation: sx-immune-shimmer 0.5s ease-in-out infinite alternate;
 }
 
 /* ── Boss Card Transition Flash ──────────────────── */
-.eg-boss-transition {
-    animation: eg-boss-transition-flash 1.5s ease-out forwards !important;
+.sx-boss-transition {
+    animation: sx-boss-transition-flash 1.5s ease-out forwards !important;
 }
 
-@keyframes eg-boss-transition-flash {
+@keyframes sx-boss-transition-flash {
     0% {
         box-shadow: 0 0 0 3px #7c3aed, 0 0 20px #7c3aed;
         background: rgba(124,58,237,0.3);
@@ -1018,11 +1018,11 @@
 }
 
 /* ── Immune Flash ────────────────────────────────── */
-.eg-flash-immune {
-    animation: eg-immune-flash 0.4s ease-out forwards !important;
+.sx-flash-immune {
+    animation: sx-immune-flash 0.4s ease-out forwards !important;
 }
 
-@keyframes eg-immune-flash {
+@keyframes sx-immune-flash {
     0% {
         background: rgba(107,114,128,0.5);
         box-shadow: inset 0 0 12px rgba(200,200,200,0.8);
@@ -1034,7 +1034,7 @@
     }
 }
 
-@keyframes eg-immune-shimmer {
+@keyframes sx-immune-shimmer {
     from {
         opacity: 0.7;
     }
@@ -1044,14 +1044,14 @@
     }
 }
 
-.eg-immune-label {
+.sx-immune-label {
     color: #9ca3af !important;
     font-size: 11px !important;
     font-weight: 700 !important;
 }
 
 /* ── Enrage Pulse ────────────────────────────────── */
-@keyframes eg-enrage-pulse {
+@keyframes sx-enrage-pulse {
     from {
         opacity: 0.8;
         transform: scale(0.97);
@@ -1064,7 +1064,7 @@
 }/* ── Corrupt Cell Overlay ────────────────────────── */
 /* ☣️ biohazard sigil on a sickly dark-purple curse field - the corruption
    should read as a festering wound on the grid, not a plain stop marker. */
-.eg-corrupt-overlay {
+.sx-corrupt-overlay {
     position: absolute;
     inset: 0;
     display: flex;
@@ -1077,10 +1077,10 @@
     border-radius: 3px;
     pointer-events: none;
     z-index: 6;
-    animation: eg-corrupt-pulse 1.2s ease-in-out infinite alternate;
+    animation: sx-corrupt-pulse 1.2s ease-in-out infinite alternate;
 }
 
-@keyframes eg-corrupt-pulse {
+@keyframes sx-corrupt-pulse {
     from {
         background: radial-gradient(circle at 50% 50%, rgba(74, 4, 78, 0.4), rgba(49, 10, 63, 0.25));
         border-color: #6b21a8;
@@ -1094,7 +1094,7 @@
 
 /* ── Corrupt Spread Telegraph ────────────────────── */
 /* Ghosted ☣️ pulsing on the target before spreading corruption lands there */
-.eg-corrupt-telegraph {
+.sx-corrupt-telegraph {
     position: absolute;
     inset: 0;
     display: flex;
@@ -1106,10 +1106,10 @@
     border-radius: 3px;
     pointer-events: none;
     z-index: 6;
-    animation: eg-corrupt-telegraph-pulse 0.45s ease-in-out infinite alternate;
+    animation: sx-corrupt-telegraph-pulse 0.45s ease-in-out infinite alternate;
 }
 
-@keyframes eg-corrupt-telegraph-pulse {
+@keyframes sx-corrupt-telegraph-pulse {
     from {
         opacity: 0.3;
         background: rgba(74, 4, 78, 0.08);
@@ -1126,7 +1126,7 @@
 /* Corruption torn loose by the gale, transformed into a shadowy dagger and
    blown at the downwind screen edge. Fixed-position node translated by JS
    (transform), rotating around its own center; shadow trail via ::after. */
-.eg-gust-dagger {
+.sx-gust-dagger {
     position: fixed;
     left: 0;
     top: 0;
@@ -1141,7 +1141,7 @@
 }
 
 /* Windward trail: smoky shadow wake behind the tumbling blade. */
-.eg-gust-dagger::after {
+.sx-gust-dagger::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -1151,30 +1151,30 @@
     right: 16px;
     border-radius: 3px;
     background: linear-gradient(270deg, rgba(91, 33, 182, 0.65), rgba(30, 27, 75, 0));
-    animation: eg-gust-dagger-trail 0.5s ease-in-out infinite alternate;
+    animation: sx-gust-dagger-trail 0.5s ease-in-out infinite alternate;
 }
 
-@keyframes eg-gust-dagger-trail {
+@keyframes sx-gust-dagger-trail {
     from { opacity: 0.35; }
     to   { opacity: 0.85; }
 }
 
 /* Mirrored trail when the gale blows the other way. */
-.eg-gust-dagger.left::after {
+.sx-gust-dagger.left::after {
     right: auto;
     left: 16px;
     background: linear-gradient(90deg, rgba(91, 33, 182, 0.65), rgba(30, 27, 75, 0));
 }
 
 /* Exit fade once the blade reaches the downwind edge. */
-.eg-gust-dagger.gone {
+.sx-gust-dagger.gone {
     opacity: 0;
     transition: opacity 0.4s ease;
 }
 
 /* ── Frozen Creep Telegraph ───────────────────────── */
 /* Ghosted ❄️ pulsing on the target before a creeping frost lands (P2+) */
-.eg-freeze-telegraph {
+.sx-freeze-telegraph {
     position: absolute;
     inset: 0;
     display: flex;
@@ -1186,10 +1186,10 @@
     border-radius: 3px;
     pointer-events: none;
     z-index: 6;
-    animation: eg-freeze-telegraph-pulse 0.45s ease-in-out infinite alternate;
+    animation: sx-freeze-telegraph-pulse 0.45s ease-in-out infinite alternate;
 }
 
-@keyframes eg-freeze-telegraph-pulse {
+@keyframes sx-freeze-telegraph-pulse {
     from {
         opacity: 0.3;
         background: rgba(56, 189, 248, 0.08);
@@ -1203,7 +1203,7 @@
 }
 
 /* ── Frozen Cell Overlay ─────────────────────────── */
-.eg-freeze-overlay {
+.sx-freeze-overlay {
     position: absolute;
     inset: 0;
     display: flex;
@@ -1215,10 +1215,10 @@
     border-radius: 3px;
     pointer-events: none;
     z-index: 6;
-    animation: eg-freeze-pulse 1.4s ease-in-out infinite alternate;
+    animation: sx-freeze-pulse 1.4s ease-in-out infinite alternate;
 }
 
-@keyframes eg-freeze-pulse {
+@keyframes sx-freeze-pulse {
     from {
         background: rgba(56, 189, 248, 0.25);
         border-color: #38bdf8;
@@ -1234,7 +1234,7 @@
 /* A live 💣 bomb sits on a filled cell with its detonation countdown ABOVE
    the icon. Standing the player sprite on the bomb pauses the fuse and
    fills the green defuse strip - hold for 3s to disarm it. */
-.eg-prior-bomb-fuse {
+.sx-prior-bomb-fuse {
     position: absolute;
     inset: 0;
     display: flex;
@@ -1247,10 +1247,10 @@
     background: rgba(139, 92, 246, 0.35);
     border: 2px solid #8b5cf6;
     border-radius: 3px;
-    animation: eg-prior-bomb-fuse-pulse 0.5s ease-in-out infinite alternate;
+    animation: sx-prior-bomb-fuse-pulse 0.5s ease-in-out infinite alternate;
 }
 
-@keyframes eg-prior-bomb-fuse-pulse {
+@keyframes sx-prior-bomb-fuse-pulse {
     from {
         background: rgba(139, 92, 246, 0.25);
         border-color: #8b5cf6;
@@ -1264,13 +1264,13 @@
     }
 }
 
-.eg-prior-bomb-fuse .eg-pb-icon {
+.sx-prior-bomb-fuse .sx-pb-icon {
     font-size: 0.8em;
     filter: drop-shadow(0 0 3px rgba(240, 171, 252, 0.95));
 }
 
 /* Detonation countdown, rendered above the icon */
-.eg-prior-bomb-fuse .eg-pb-cd {
+.sx-prior-bomb-fuse .sx-pb-cd {
     font-size: 0.55em;
     font-weight: 800;
     line-height: 1;
@@ -1279,12 +1279,12 @@
 }
 
 /* Last 3s before detonation: urgent blink */
-.eg-prior-bomb-fuse .eg-pb-cd.eg-pb-critical {
+.sx-prior-bomb-fuse .sx-pb-cd.sx-pb-critical {
     color: #fca5a5;
-    animation: eg-pb-cd-blink 0.3s steps(2) infinite;
+    animation: sx-pb-cd-blink 0.3s steps(2) infinite;
 }
 
-@keyframes eg-pb-cd-blink {
+@keyframes sx-pb-cd-blink {
     0% {
         opacity: 1;
     }
@@ -1295,7 +1295,7 @@
 }
 
 /* Defuse progress strip along the bottom of the bomb */
-.eg-prior-bomb-fuse .eg-pb-defuse {
+.sx-prior-bomb-fuse .sx-pb-defuse {
     position: absolute;
     left: 2px;
     right: 2px;
@@ -1307,7 +1307,7 @@
     overflow: hidden;
 }
 
-.eg-prior-bomb-fuse .eg-pb-defuse i {
+.sx-prior-bomb-fuse .sx-pb-defuse i {
     display: block;
     height: 100%;
     width: 0%;
@@ -1316,22 +1316,22 @@
 }
 
 /* Player standing on the bomb: fuse paused, defusing in progress */
-.eg-prior-bomb-fuse.eg-pb-defusing {
+.sx-prior-bomb-fuse.sx-pb-defusing {
     animation: none;
     background: rgba(16, 185, 129, 0.45);
     border-color: #34d399;
 }
 
-.eg-prior-bomb-fuse.eg-pb-defusing .eg-pb-cd {
+.sx-prior-bomb-fuse.sx-pb-defusing .sx-pb-cd {
     color: #bbf7d0;
 }
 
 /* Bomb successfully defused - brief green flash, the fill survives */
-.eg-pb-defused {
-    animation: eg-pb-defused-flash 1s ease-out forwards !important;
+.sx-pb-defused {
+    animation: sx-pb-defused-flash 1s ease-out forwards !important;
 }
 
-@keyframes eg-pb-defused-flash {
+@keyframes sx-pb-defused-flash {
     0% {
         box-shadow: inset 0 0 0 3px #4ade80, 0 0 16px rgba(74, 222, 128, 0.95);
     }
@@ -1346,11 +1346,11 @@
    "the fuse went off here", NOT "you defused this" (that one is green).
    The fireball/ring/sparks of the blast itself are spawned by
    _priorBombBoom in shared-boss-abilities.js. */
-.eg-pb-detonated {
-    animation: eg-pb-detonated-flash 0.9s ease-out forwards !important;
+.sx-pb-detonated {
+    animation: sx-pb-detonated-flash 0.9s ease-out forwards !important;
 }
 
-@keyframes eg-pb-detonated-flash {
+@keyframes sx-pb-detonated-flash {
     0% {
         box-shadow: inset 0 0 0 4px #f0abfc, 0 0 26px 6px rgba(192, 132, 252, 0.95);
         filter: brightness(1.6);
@@ -1367,7 +1367,7 @@
    old cell to the new one over SHIFT_FLY_MS (1.5s). Driven by rAF
    transforms in JS - this class only provides the look (same dim-red cross
    as .gc.marked::after, plus a golden halo so it reads while moving). */
-.eg-shift-fly {
+.sx-shift-fly {
     position: fixed;
     z-index: 9999;
     pointer-events: none;
@@ -1387,11 +1387,11 @@
 
 /* ── Shifted Mark Glow (Probability Shift P2+) ──── */
 /* Brief golden halo on marks the boss just relocated so the shuffle is readable */
-.eg-shift-moved {
-    animation: eg-shift-glow 1.6s ease-out forwards;
+.sx-shift-moved {
+    animation: sx-shift-glow 1.6s ease-out forwards;
 }
 
-@keyframes eg-shift-glow {
+@keyframes sx-shift-glow {
     0% {
         box-shadow: inset 0 0 0 2px #fbbf24, 0 0 14px rgba(251, 191, 36, 0.9);
     }
@@ -1403,19 +1403,19 @@
 
 /* ── Grid Inversion Field ────────────────────────── */
 /* Applied to the puzzle table by the Inversion Field boss mechanic */
-#ptable.eg-grid-invert {
+#ptable.sx-grid-invert {
     filter: invert(1) hue-rotate(180deg);
     transition: filter 0.4s ease-in-out;
 }
 
 /* ── Clue Blackout ───────────────────────────────── */
-.eg-blackout-clue {
+.sx-blackout-clue {
     color: #6b7280 !important;
     opacity: 0.6;
-    animation: eg-blackout-flicker 2s ease-in-out infinite alternate;
+    animation: sx-blackout-flicker 2s ease-in-out infinite alternate;
 }
 
-@keyframes eg-blackout-flicker {
+@keyframes sx-blackout-flicker {
     from {
         opacity: 0.4;
     }
@@ -1426,11 +1426,11 @@
 }
 
 /* ── Prior Bomb Cell Flash ───────────────────────── */
-.eg-prior-bomb-flash {
-    animation: eg-prior-bomb 0.6s ease-out forwards !important;
+.sx-prior-bomb-flash {
+    animation: sx-prior-bomb 0.6s ease-out forwards !important;
 }
 
-@keyframes eg-prior-bomb {
+@keyframes sx-prior-bomb {
     0% {
         background: rgba(139,92,246,0.7);
         box-shadow: 0 0 12px #8b5cf6;
@@ -1443,16 +1443,16 @@
 }
 
 /* ── Grid Veil ───────────────────────────────────── */
-.eg-grid-veil {
+.sx-grid-veil {
     position: absolute;
     inset: 0;
     background: repeating-linear-gradient( 45deg, rgba(139,92,246,0.08) 0px, rgba(139,92,246,0.08) 4px, transparent 4px, transparent 12px );
     pointer-events: none;
     z-index: 5;
-    animation: eg-veil-drift 8s linear infinite;
+    animation: sx-veil-drift 8s linear infinite;
 }
 
-@keyframes eg-veil-drift {
+@keyframes sx-veil-drift {
     from {
         background-position: 0 0;
     }
@@ -1464,7 +1464,7 @@
 
 
 
-.eg-pickup-broken-shard {
+.sx-pickup-broken-shard {
     position: fixed;
     font-size: 1.4rem;
     pointer-events: none;
@@ -1473,15 +1473,15 @@
     transform: translate(-50%, -50%);
 }
 
-.eg-pickup-broken-left {
-    animation: eg-shard-left 0.7s ease-out forwards;
+.sx-pickup-broken-left {
+    animation: sx-shard-left 0.7s ease-out forwards;
 }
 
-.eg-pickup-broken-right {
-    animation: eg-shard-right 0.7s ease-out forwards;
+.sx-pickup-broken-right {
+    animation: sx-shard-right 0.7s ease-out forwards;
 }
 
-@keyframes eg-shard-left {
+@keyframes sx-shard-left {
     0% {
         transform: translate(-50%, -50%) scale(1);
         opacity: 1;
@@ -1493,7 +1493,7 @@
     }
 }
 
-@keyframes eg-shard-right {
+@keyframes sx-shard-right {
     0% {
         transform: translate(-50%, -50%) scale(1);
         opacity: 1;
@@ -1507,16 +1507,16 @@
 
 
 /* Player elemental ailment feedback */
-.eg-player-ground { position: fixed; width: 110px; height: 42px; margin: -21px 0 0 -55px; border-radius: 50%; pointer-events: none; z-index: 850; opacity: .8; animation: eg-ground-pulse 1s ease-in-out infinite alternate; }
-.eg-player-ground-fire { width: 82px; height: 82px; margin: -41px 0 0 -41px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(255,180,40,.38), rgba(150,20,0,.22) 62%, transparent 76%); box-shadow: 0 0 18px rgba(255,69,31,.95), 0 0 42px rgba(255,120,20,.75); }
-.eg-player-ground-fire::before { content: '🔥'; font-size: 3.8rem; line-height: 1; filter: drop-shadow(0 0 7px #ff451f); animation: eg-fire-emoji-flicker .55s ease-in-out infinite alternate; }
-@keyframes eg-fire-emoji-flicker { from { transform: scale(.9) rotate(-4deg); filter: drop-shadow(0 0 5px #ff451f); } to { transform: scale(1.12) rotate(4deg); filter: drop-shadow(0 0 15px #ffd166); } }
-.eg-player-ground-shadow { width: 150px; height: 85px; margin: -42px 0 0 -75px; background: radial-gradient(ellipse, rgba(25,10,40,.92), rgba(80,25,100,.5) 55%, transparent 75%); filter: blur(2px); box-shadow: 0 0 28px #6d28d9; }
-.eg-arcane-bomb-overlay { display: block; font-size: 1.5rem; animation: eg-ground-pulse 1s infinite alternate; }
-@keyframes eg-ground-pulse { from { transform: scale(.92); opacity: .65; } to { transform: scale(1.08); opacity: 1; } }
+.sx-player-ground { position: fixed; width: 110px; height: 42px; margin: -21px 0 0 -55px; border-radius: 50%; pointer-events: none; z-index: 850; opacity: .8; animation: sx-ground-pulse 1s ease-in-out infinite alternate; }
+.sx-player-ground-fire { width: 82px; height: 82px; margin: -41px 0 0 -41px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(255,180,40,.38), rgba(150,20,0,.22) 62%, transparent 76%); box-shadow: 0 0 18px rgba(255,69,31,.95), 0 0 42px rgba(255,120,20,.75); }
+.sx-player-ground-fire::before { content: '🔥'; font-size: 3.8rem; line-height: 1; filter: drop-shadow(0 0 7px #ff451f); animation: sx-fire-emoji-flicker .55s ease-in-out infinite alternate; }
+@keyframes sx-fire-emoji-flicker { from { transform: scale(.9) rotate(-4deg); filter: drop-shadow(0 0 5px #ff451f); } to { transform: scale(1.12) rotate(4deg); filter: drop-shadow(0 0 15px #ffd166); } }
+.sx-player-ground-shadow { width: 150px; height: 85px; margin: -42px 0 0 -75px; background: radial-gradient(ellipse, rgba(25,10,40,.92), rgba(80,25,100,.5) 55%, transparent 75%); filter: blur(2px); box-shadow: 0 0 28px #6d28d9; }
+.sx-arcane-bomb-overlay { display: block; font-size: 1.5rem; animation: sx-ground-pulse 1s infinite alternate; }
+@keyframes sx-ground-pulse { from { transform: scale(.92); opacity: .65; } to { transform: scale(1.08); opacity: 1; } }
 
 /* ── Void Surge: full-screen overlay ────────────────────────────────────── */
-#eg-void-surge-overlay {
+#sx-void-surge-overlay {
     position: fixed;
     inset: 0;
     pointer-events: none;
@@ -1525,12 +1525,12 @@
 }
 
     /* Warning phase - ominous red tint fading in */
-    #eg-void-surge-overlay.eg-void-surge-warning {
+    #sx-void-surge-overlay.sx-void-surge-warning {
         background: rgba(100, 0, 0, 0.35);
-        animation: eg-void-warning-pulse 0.5s ease-in-out infinite alternate;
+        animation: sx-void-warning-pulse 0.5s ease-in-out infinite alternate;
     }
 
-@keyframes eg-void-warning-pulse {
+@keyframes sx-void-warning-pulse {
     from {
         background: rgba(100, 0, 0, 0.25);
     }
@@ -1541,14 +1541,14 @@
 }
 
 /* Active phase - full blackout except for safe zone (handled by circle cutout) */
-#eg-void-surge-overlay.eg-void-surge-active {
+#sx-void-surge-overlay.sx-void-surge-active {
     background: rgba(5, 0, 20, 0.82);
     animation: none;
 }
 
 
 /* ── Void Surge: safe-zone circle ────────────────────────────────────────── */
-#eg-void-surge-circle {
+#sx-void-surge-circle {
     position: fixed;
     width: 160px; /* diameter = VOID_SURGE_SAFE_RADIUS * 2 */
     height: 160px;
@@ -1560,11 +1560,11 @@
     border: 3px solid rgba(255, 220, 60, 0.9);
     background: rgba(255, 220, 60, 0.08);
     box-shadow: 0 0 20px rgba(255, 220, 60, 0.5), inset 0 0 20px rgba(255, 220, 60, 0.15);
-    animation: eg-safe-zone-breathe 1s ease-in-out infinite alternate;
+    animation: sx-safe-zone-breathe 1s ease-in-out infinite alternate;
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
-@keyframes eg-safe-zone-breathe {
+@keyframes sx-safe-zone-breathe {
     from {
         box-shadow: 0 0 16px rgba(255,220,60,0.4), inset 0 0 16px rgba(255,220,60,0.1);
         border-color: rgba(255,220,60,0.8);
@@ -1577,7 +1577,7 @@
 }
 
 /* HUD is inside the safe zone - glow turns green */
-#eg-void-surge-circle.eg-void-surge-safe {
+#sx-void-surge-circle.sx-void-surge-safe {
     border-color: rgba(80, 255, 120, 1.0);
     background: rgba(80, 255, 120, 0.12);
     box-shadow: 0 0 30px rgba(80, 255, 120, 0.7), inset 0 0 20px rgba(80, 255, 120, 0.2);
@@ -1585,7 +1585,7 @@
 }
 
 /* Resolve flash - survived */
-#eg-void-surge-circle.eg-void-surge-survived {
+#sx-void-surge-circle.sx-void-surge-survived {
     border-color: #4ade80;
     background: rgba(74, 222, 128, 0.25);
     box-shadow: 0 0 50px rgba(74, 222, 128, 0.9);
@@ -1593,7 +1593,7 @@
 }
 
 /* Resolve flash - hit */
-#eg-void-surge-circle.eg-void-surge-hit {
+#sx-void-surge-circle.sx-void-surge-hit {
     border-color: #ef4444;
     background: rgba(239, 68, 68, 0.25);
     box-shadow: 0 0 50px rgba(239, 68, 68, 0.9);
@@ -1602,7 +1602,7 @@
 
 
 /* ── Void Surge: countdown label inside the circle ───────────────────────── */
-#eg-void-surge-countdown {
+#sx-void-surge-countdown {
     position: fixed;
     width: 160px;
     height: 160px;
@@ -1626,7 +1626,7 @@
    Shared by Heat Death Bloom / Rewrite Fate / Prior Collapse. Accent colour
    per mechanic comes in via the --blast-accent custom property. */
 
-.eg-blast-overlay {
+.sx-blast-overlay {
     position: fixed;
     inset: 0;
     pointer-events: none;
@@ -1634,23 +1634,23 @@
     transition: background 0.4s ease;
 }
 
-    .eg-blast-overlay.eg-blast-warning {
+    .sx-blast-overlay.sx-blast-warning {
         background: rgba(100, 20, 0, 0.35);
-        animation: eg-blast-warning-pulse 0.5s ease-in-out infinite alternate;
+        animation: sx-blast-warning-pulse 0.5s ease-in-out infinite alternate;
     }
 
-@keyframes eg-blast-warning-pulse {
+@keyframes sx-blast-warning-pulse {
     from { background: rgba(100, 20, 0, 0.25); }
     to   { background: rgba(150, 30, 0, 0.45); }
 }
 
-    .eg-blast-overlay.eg-blast-active {
+    .sx-blast-overlay.sx-blast-active {
         background: rgba(8, 2, 16, 0.82);
         animation: none;
     }
 
 /* Safe-zone circle - accent colour driven by --blast-accent */
-.eg-blast-circle {
+.sx-blast-circle {
     position: fixed;
     border-radius: 50%;
     pointer-events: none;
@@ -1660,11 +1660,11 @@
     background: color-mix(in srgb, var(--blast-accent, #ffd93c) 8%, transparent);
     box-shadow: 0 0 20px var(--blast-accent, #ffd93c),
                 inset 0 0 20px var(--blast-accent, #ffd93c);
-    animation: eg-blast-breathe 1s ease-in-out infinite alternate;
+    animation: sx-blast-breathe 1s ease-in-out infinite alternate;
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
-@keyframes eg-blast-breathe {
+@keyframes sx-blast-breathe {
     from {
         box-shadow: 0 0 14px var(--blast-accent, #ffd93c);
         border-color: var(--blast-accent, #ffd93c);
@@ -1677,13 +1677,13 @@
 }
 
 /* Decoy zone (Prior Collapse) - dimmer, desaturated during the warning */
-.eg-blast-circle.eg-blast-fake {
+.sx-blast-circle.sx-blast-fake {
     opacity: 0.55;
     filter: saturate(0.4) grayscale(0.35);
 }
 
 /* The real zone's tell during a Prior Collapse warning */
-.eg-blast-circle.eg-blast-true::after {
+.sx-blast-circle.sx-blast-true::after {
     content: '✨';
     position: absolute;
     inset: 0;
@@ -1691,29 +1691,29 @@
     align-items: center;
     justify-content: center;
     font-size: 2rem;
-    animation: eg-blast-sparkle 0.9s ease-in-out infinite alternate;
+    animation: sx-blast-sparkle 0.9s ease-in-out infinite alternate;
 }
 
-@keyframes eg-blast-sparkle {
+@keyframes sx-blast-sparkle {
     from { transform: scale(0.85); opacity: 0.6; }
     to   { transform: scale(1.15); opacity: 1; }
 }
 
 /* Fake zone collapsing at blast impact */
-.eg-blast-circle.eg-blast-collapsed {
+.sx-blast-circle.sx-blast-collapsed {
     transition: transform 0.45s ease-in, opacity 0.45s ease-in;
     transform: scale(0.05);
     opacity: 0;
 }
 
 /* Zone jump flash (Rewrite Fate) */
-.eg-blast-circle.eg-blast-jump {
+.sx-blast-circle.sx-blast-jump {
     animation: none;
     box-shadow: 0 0 60px #ffffff, inset 0 0 40px #ffffff;
 }
 
 /* HUD inside → green glow */
-.eg-blast-circle.eg-blast-safe {
+.sx-blast-circle.sx-blast-safe {
     border-color: rgba(80, 255, 120, 1.0) !important;
     background: rgba(80, 255, 120, 0.12);
     box-shadow: 0 0 30px rgba(80, 255, 120, 0.7), inset 0 0 20px rgba(80, 255, 120, 0.2);
@@ -1721,14 +1721,14 @@
 }
 
 /* Resolve flashes */
-.eg-blast-circle.eg-blast-survived {
+.sx-blast-circle.sx-blast-survived {
     border-color: #4ade80 !important;
     background: rgba(74, 222, 128, 0.25);
     box-shadow: 0 0 50px rgba(74, 222, 128, 0.9);
     animation: none;
 }
 
-.eg-blast-circle.eg-blast-hit {
+.sx-blast-circle.sx-blast-hit {
     border-color: #ef4444 !important;
     background: rgba(239, 68, 68, 0.25);
     box-shadow: 0 0 50px rgba(239, 68, 68, 0.9);
@@ -1736,19 +1736,19 @@
 }
 
 /* Bright flash on the warning → active boundary - "the blast is live NOW" */
-.eg-blast-overlay.eg-blast-impact {
+.sx-blast-overlay.sx-blast-impact {
     background: rgba(255, 246, 224, 0.92);
     transition: none;
 }
 
 /* Impact beat: a short, subtle whole-body shake so the blast going live
-   is felt as well as seen. The JS engine re-triggers .eg-screen-shake,
+   is felt as well as seen. The JS engine re-triggers .sx-screen-shake,
    so the animation always restarts cleanly from its 0% keyframe. */
-.eg-screen-shake {
-    animation: eg-screen-shake 0.5s ease-out;
+.sx-screen-shake {
+    animation: sx-screen-shake 0.5s ease-out;
 }
 
-@keyframes eg-screen-shake {
+@keyframes sx-screen-shake {
     0%   { transform: translate(0, 0); }
     10%  { transform: translate(-6px, 4px); }
     25%  { transform: translate(5px, -5px); }
@@ -1759,23 +1759,23 @@
 }
 
 /* Final seconds of the hold window: countdown turns red */
-.eg-blast-countdown.eg-blast-urgent {
+.sx-blast-countdown.sx-blast-urgent {
     color: #ff5a5a !important;
     text-shadow: 0 0 14px rgba(255, 60, 60, 0.95), 0 2px 4px rgba(0, 0, 0, 0.9) !important;
-    animation: eg-blast-urgent-pulse 0.4s ease-in-out infinite alternate;
+    animation: sx-blast-urgent-pulse 0.4s ease-in-out infinite alternate;
 }
 
-@keyframes eg-blast-urgent-pulse {
+@keyframes sx-blast-urgent-pulse {
     from { transform: scale(1); }
     to { transform: scale(1.18); }
 }
 
 /* Player outside during the final seconds: zone border flashes red/white */
-.eg-blast-circle.eg-blast-lastcall {
-    animation: eg-blast-lastcall-pulse 0.22s ease-in-out infinite alternate;
+.sx-blast-circle.sx-blast-lastcall {
+    animation: sx-blast-lastcall-pulse 0.22s ease-in-out infinite alternate;
 }
 
-@keyframes eg-blast-lastcall-pulse {
+@keyframes sx-blast-lastcall-pulse {
     from {
         border-color: #ffffff;
         box-shadow: 0 0 18px rgba(255, 255, 255, 0.8), inset 0 0 14px rgba(255, 255, 255, 0.25);
@@ -1788,20 +1788,20 @@
 }
 
 /* Rewrite Fate: the destination ghost "charges" right before the jump */
-.eg-blast-ghost.eg-blast-ghost-charge {
+.sx-blast-ghost.sx-blast-ghost-charge {
     border-style: solid;
     opacity: 1;
     box-shadow: 0 0 30px var(--blast-accent, #ffd93c), inset 0 0 18px var(--blast-accent, #ffd93c);
-    animation: eg-blast-ghost-charge-pulse 0.15s ease-in-out infinite alternate;
+    animation: sx-blast-ghost-charge-pulse 0.15s ease-in-out infinite alternate;
 }
 
-@keyframes eg-blast-ghost-charge-pulse {
+@keyframes sx-blast-ghost-charge-pulse {
     from { transform: scale(1); }
     to { transform: scale(1.12); }
 }
 
 /* Bottom status line (crush-walls idiom) - hidden until the engine paints it */
-.eg-blast-status {
+.sx-blast-status {
     position: fixed;
     left: 50%;
     bottom: clamp(96px, 14vh, 180px);
@@ -1820,39 +1820,39 @@
     transition: opacity 0.15s ease;
 }
 
-.eg-blast-status-hidden {
+.sx-blast-status-hidden {
     opacity: 0;
     visibility: hidden;
 }
 
-.eg-blast-status-ok {
+.sx-blast-status-ok {
     color: #4ade80;
     border-color: rgba(74, 222, 128, 0.5);
     box-shadow: 0 0 22px rgba(74, 222, 128, 0.45);
 }
 
-.eg-blast-status-warn {
+.sx-blast-status-warn {
     color: #fbbf24;
     border-color: rgba(251, 191, 36, 0.55);
     box-shadow: 0 0 22px rgba(251, 191, 36, 0.45);
-    animation: eg-blast-status-pulse 0.7s ease-in-out infinite alternate;
+    animation: sx-blast-status-pulse 0.7s ease-in-out infinite alternate;
 }
 
-.eg-blast-status-danger {
+.sx-blast-status-danger {
     color: #f87171;
     border-color: rgba(248, 113, 113, 0.6);
     box-shadow: 0 0 26px rgba(248, 113, 113, 0.6);
-    animation: eg-blast-status-pulse 0.4s ease-in-out infinite alternate;
+    animation: sx-blast-status-pulse 0.4s ease-in-out infinite alternate;
 }
 
-@keyframes eg-blast-status-pulse {
+@keyframes sx-blast-status-pulse {
     from { transform: translateX(-50%) scale(1); }
     to { transform: translateX(-50%) scale(1.05); }
 }
 
 /* Resolve outcome emblems on the zone itself (overrides the ✨ tell) */
-.eg-blast-circle.eg-blast-survived::after,
-.eg-blast-circle.eg-blast-hit::after {
+.sx-blast-circle.sx-blast-survived::after,
+.sx-blast-circle.sx-blast-hit::after {
     content: '✓';
     position: absolute;
     inset: 0;
@@ -1864,13 +1864,13 @@
     animation: none;
 }
 
-.eg-blast-circle.eg-blast-survived::after {
+.sx-blast-circle.sx-blast-survived::after {
     content: '✓';
     color: #4ade80;
     text-shadow: 0 0 18px rgba(74, 222, 128, 0.9);
 }
 
-.eg-blast-circle.eg-blast-hit::after {
+.sx-blast-circle.sx-blast-hit::after {
     content: '✗';
     color: #f87171;
     text-shadow: 0 0 18px rgba(248, 113, 113, 0.95);
@@ -1879,15 +1879,15 @@
 /* ── Crushing Walls (boss_vise) ─────────────────────────────────────
    Mega-Man corridor: boss proxy anchors center-right, block walls sweep
    right → left. Everything is pointer-events:none - never blocks clicks. */
-#eg-crush-layer {
+#sx-crush-layer {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 9001;
     overflow: hidden;
 }
-#eg-crush-layer.eg-crush-done { opacity: 0; transition: opacity 0.45s ease; }
-#eg-crush-boss {
+#sx-crush-layer.sx-crush-done { opacity: 0; transition: opacity 0.45s ease; }
+#sx-crush-boss {
     position: absolute;
     width: 72px;
     height: 72px;
@@ -1899,13 +1899,13 @@
     font-size: 3rem;
     line-height: 1;
     filter: drop-shadow(0 0 14px rgba(251, 146, 60, 0.9));
-    animation: eg-crush-boss-pulse 0.8s ease-in-out infinite alternate;
+    animation: sx-crush-boss-pulse 0.8s ease-in-out infinite alternate;
 }
-@keyframes eg-crush-boss-pulse {
+@keyframes sx-crush-boss-pulse {
     from { transform: scale(1); filter: drop-shadow(0 0 8px rgba(251,146,60,0.6)); }
     to { transform: scale(1.12); filter: drop-shadow(0 0 22px rgba(239,68,68,0.95)); }
 }
-.eg-crush-block {
+.sx-crush-block {
     position: absolute;
     top: 0;
     left: 0;
@@ -1916,27 +1916,27 @@
     border: 2px solid rgba(255, 237, 213, 0.85);
     box-shadow: 0 0 12px rgba(249, 115, 22, 0.8), inset 0 0 6px rgba(0,0,0,0.5);
 }
-.eg-crush-block-upper { background: linear-gradient(180deg, #fed7aa 0%, #fb923c 45%, #c2410c 100%); }
-.eg-crush-block-hit {
+.sx-crush-block-upper { background: linear-gradient(180deg, #fed7aa 0%, #fb923c 45%, #c2410c 100%); }
+.sx-crush-block-hit {
     border-color: #ef4444 !important;
     box-shadow: 0 0 22px rgba(239, 68, 68, 1), inset 0 0 8px rgba(239,68,68,0.8) !important;
 }
-#eg-crush-overlay {
+#sx-crush-overlay {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 9000;
     transition: background 0.4s ease;
 }
-#eg-crush-overlay.eg-crush-overlay-warn { background: rgba(120, 40, 0, 0.30); animation: eg-crush-warn-pulse 0.5s ease-in-out infinite alternate; }
-@keyframes eg-crush-warn-pulse {
+#sx-crush-overlay.sx-crush-overlay-warn { background: rgba(120, 40, 0, 0.30); animation: sx-crush-warn-pulse 0.5s ease-in-out infinite alternate; }
+@keyframes sx-crush-warn-pulse {
     from { background: rgba(120, 40, 0, 0.22); }
     to { background: rgba(160, 50, 0, 0.42); }
 }
-#eg-crush-overlay.eg-crush-overlay-active { background: rgba(10, 4, 2, 0.45); animation: none; }
-#eg-crush-overlay.eg-crush-outside { background: rgba(120, 8, 8, 0.62); }
-#eg-crush-overlay.eg-crush-done, #eg-crush-label.eg-crush-done { opacity: 0; transition: opacity 0.45s ease; }
-#eg-crush-label {
+#sx-crush-overlay.sx-crush-overlay-active { background: rgba(10, 4, 2, 0.45); animation: none; }
+#sx-crush-overlay.sx-crush-outside { background: rgba(120, 8, 8, 0.62); }
+#sx-crush-overlay.sx-crush-done, #sx-crush-label.sx-crush-done { opacity: 0; transition: opacity 0.45s ease; }
+#sx-crush-label {
     position: fixed;
     transform: translate(-50%, 0);
     pointer-events: none;
@@ -1946,16 +1946,16 @@
     letter-spacing: 1.5px;
     color: #fdba74;
     text-shadow: 0 0 12px rgba(249,115,22,0.9), 0 2px 4px rgba(0,0,0,0.9);
-    animation: eg-crush-label-pulse 0.7s ease-in-out infinite alternate;
+    animation: sx-crush-label-pulse 0.7s ease-in-out infinite alternate;
     white-space: nowrap;
 }
-@keyframes eg-crush-label-pulse {
+@keyframes sx-crush-label-pulse {
     from { opacity: 0.75; transform: translate(-50%, 0) scale(0.98); }
     to { opacity: 1; transform: translate(-50%, 0) scale(1.03); }
 }
 
 /* Dashed ghost preview of the relocation target (Rewrite Fate) */
-.eg-blast-ghost {
+.sx-blast-ghost {
     position: fixed;
     border-radius: 50%;
     pointer-events: none;
@@ -1963,16 +1963,16 @@
     border: 3px dashed var(--blast-accent, #ffd93c);
     background: transparent;
     opacity: 0.7;
-    animation: eg-blast-ghost-pulse 1s ease-in-out infinite alternate;
+    animation: sx-blast-ghost-pulse 1s ease-in-out infinite alternate;
 }
 
-@keyframes eg-blast-ghost-pulse {
+@keyframes sx-blast-ghost-pulse {
     from { opacity: 0.35; }
     to   { opacity: 0.85; }
 }
 
 /* Countdown number inside the real zone */
-.eg-blast-countdown {
+.sx-blast-countdown {
     position: fixed;
     display: flex;
     align-items: center;
@@ -2002,12 +2002,12 @@
 
 
 /* Compact Main Container - ~25% smaller than the old 128px base */
-.eg-monster-card-compact {
+.sx-monster-card-compact {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    width: calc(96px * var(--eg-art, 1) * var(--eg-zs, 1) + 12px); /* frame follows per-spawn scale (and the zone fit scale), bars match */
+    width: calc(96px * var(--sx-art, 1) * var(--sx-zs, 1) + 12px); /* frame follows per-spawn scale (and the zone fit scale), bars match */
     position: relative;
     cursor: pointer;
     user-select: none;
@@ -2015,7 +2015,7 @@
 }
 
 /* ── Compact bars - RPG pop style (matches damage numbers / TARGET pill) ── */
-.eg-compact-bars {
+.sx-compact-bars {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -2028,8 +2028,8 @@
         drop-shadow(0 0 4px rgba(0,0,0,0.60));
 }
 
-.eg-charge-track-compact,
-.eg-hp-track-compact {
+.sx-charge-track-compact,
+.sx-hp-track-compact {
     width: 100%;
     background: #0d0d0d;
     border: 1px solid rgba(255,255,255,0.22);
@@ -2042,15 +2042,15 @@
         0 1px 3px rgba(0,0,0,0.75);
 }
 
-.eg-charge-track-compact {
+.sx-charge-track-compact {
     height: 8px;
 }
 
-.eg-hp-track-compact {
+.sx-hp-track-compact {
     height: 10px;
 }
 
-.eg-hp-bar-compact {
+.sx-hp-bar-compact {
     height: 100%;
     background: linear-gradient(180deg, #ff6b6b 0%, #e63946 48%, #b91c1c 100%);
     box-shadow:
@@ -2061,26 +2061,26 @@
 }
 
 /* HP colour states - keep functional readability but with RPG gradient + glow */
-.eg-hp-bar-compact.eg-hp-high {
+.sx-hp-bar-compact.sx-hp-high {
     background: linear-gradient(180deg, #7aff9a 0%, #22c55e 48%, #15803d 100%);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.42), 0 0 7px rgba(34,197,94,0.75);
 }
-.eg-hp-bar-compact.eg-hp-mid {
+.sx-hp-bar-compact.sx-hp-mid {
     background: linear-gradient(180deg, #ffd27a 0%, #f59e0b 48%, #c2410c 100%);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.42), 0 0 7px rgba(245,158,11,0.78);
 }
-.eg-hp-bar-compact.eg-hp-low {
+.sx-hp-bar-compact.sx-hp-low {
     background: linear-gradient(180deg, #ff7a7a 0%, #ef4444 48%, #991b1b 100%);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 0 9px rgba(239,68,68,0.92);
-    animation: eg-hp-low-pulse 0.85s ease-in-out infinite;
+    animation: sx-hp-low-pulse 0.85s ease-in-out infinite;
 }
-@keyframes eg-hp-low-pulse {
+@keyframes sx-hp-low-pulse {
     0%, 100% { filter: brightness(1); }
     50%      { filter: brightness(1.28); }
 }
 
 /* ── Targeted card: bars pop even harder - gold border, scale, brighter glow ── */
-.eg-monster-card-compact.eg-card-targeted .eg-compact-bars {
+.sx-monster-card-compact.sx-card-targeted .sx-compact-bars {
     transform: scale(1.06);
     transform-origin: center bottom;
     gap: 4px;
@@ -2088,8 +2088,8 @@
         drop-shadow(0 2px 5px rgba(0,0,0,0.90))
         drop-shadow(0 0 10px rgba(255,215,0,0.55));
 }
-.eg-monster-card-compact.eg-card-targeted .eg-charge-track-compact,
-.eg-monster-card-compact.eg-card-targeted .eg-hp-track-compact {
+.sx-monster-card-compact.sx-card-targeted .sx-charge-track-compact,
+.sx-monster-card-compact.sx-card-targeted .sx-hp-track-compact {
     border-color: rgba(255,215,0,0.92);
     border-width: 1.5px;
     box-shadow:
@@ -2097,23 +2097,23 @@
         0 0 10px rgba(255,215,0,0.72),
         0 0 18px rgba(255,140,0,0.42);
 }
-.eg-monster-card-compact.eg-card-targeted .eg-charge-track-compact { height: 9px; }
-.eg-monster-card-compact.eg-card-targeted .eg-hp-track-compact     { height: 12px; }
-.eg-monster-card-compact.eg-card-targeted .eg-hp-bar-compact,
-.eg-monster-card-compact.eg-card-targeted .eg-charge-bar {
+.sx-monster-card-compact.sx-card-targeted .sx-charge-track-compact { height: 9px; }
+.sx-monster-card-compact.sx-card-targeted .sx-hp-track-compact     { height: 12px; }
+.sx-monster-card-compact.sx-card-targeted .sx-hp-bar-compact,
+.sx-monster-card-compact.sx-card-targeted .sx-charge-bar {
     filter: brightness(1.14);
 }
-.eg-monster-card-compact.eg-card-targeted .eg-hp-bar-compact.eg-hp-low {
-    animation: eg-hp-low-pulse 0.55s ease-in-out infinite;
+.sx-monster-card-compact.sx-card-targeted .sx-hp-bar-compact.sx-hp-low {
+    animation: sx-hp-low-pulse 0.55s ease-in-out infinite;
 }
 
 /* ── Charge bar - purple base + danger shift when near full ────────────────── */
-.eg-charge-bar.eg-charge-danger {
+.sx-charge-bar.sx-charge-danger {
     background: linear-gradient(180deg, #ffb07a 0%, #ff3b30 48%, #991b1b 100%) !important;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 0 9px rgba(255,59,48,0.92) !important;
-    animation: eg-charge-danger-pulse 0.55s ease-in-out infinite;
+    animation: sx-charge-danger-pulse 0.55s ease-in-out infinite;
 }
-@keyframes eg-charge-danger-pulse {
+@keyframes sx-charge-danger-pulse {
     0%, 100% { filter: brightness(1); }
     50%      { filter: brightness(1.35); }
 }
@@ -2121,11 +2121,11 @@
 /* Monster art floats free - no passive frame (frames were an emoji-era
    leftover). The border stays transparent until the monster is targeted
    or enraged, so highlights never cause layout shift. Size varies per
-   spawn via --eg-art (see _buildMonster artScale). */
-.eg-emoji-wrapper {
+   spawn via --sx-art (see _buildMonster artScale). */
+.sx-emoji-wrapper {
     position: relative;
-    width: calc(96px * var(--eg-art, 1) * var(--eg-zs, 1));
-    height: calc(96px * var(--eg-art, 1) * var(--eg-zs, 1));
+    width: calc(96px * var(--sx-art, 1) * var(--sx-zs, 1));
+    height: calc(96px * var(--sx-art, 1) * var(--sx-zs, 1));
     background: transparent;
     border: 3px solid transparent;
     border-radius: 10px;
@@ -2136,7 +2136,7 @@
 }
 
 /* Real monster art fills the frame (item icons keep the 1em rule in endgame-hub.css) */
-.eg-emoji-wrapper img.eg-art-img {
+.sx-emoji-wrapper img.sx-art-img {
     width: 88%;
     height: 88%;
     /* pop sprites off busy backgrounds now that the dark tile is gone */
@@ -2144,11 +2144,11 @@
 }
 
 /* Subtle hover affordance now that there is no frame to hover */
-.eg-monster-card-compact:hover .eg-emoji-wrapper:not(.eg-compact-targeted) {
+.sx-monster-card-compact:hover .sx-emoji-wrapper:not(.sx-compact-targeted) {
     transform: scale(1.05);
 }
 
-.eg-monster-emoji-compact {
+.sx-monster-emoji-compact {
     font-size: 2.25rem;
     line-height: 1;
     display: inline-flex;
@@ -2159,32 +2159,32 @@
 }
 
 /* ── Boss Cards - larger than normal creatures, ~25% smaller than the old 192px base ───────────── */
-.eg-monster-card-compact.eg-boss-card {
-    width: calc(144px * var(--eg-art, 1) * var(--eg-zs, 1) + 12px);
+.sx-monster-card-compact.sx-boss-card {
+    width: calc(144px * var(--sx-art, 1) * var(--sx-zs, 1) + 12px);
     margin: 0 8px;
 }
 
 /* No passive gold frame either - the crown + size already mark the boss.
    Gold only appears when targeted, red when enraged. */
-.eg-emoji-wrapper.eg-boss-emoji-wrapper {
-    width: calc(144px * var(--eg-art, 1) * var(--eg-zs, 1));
-    height: calc(144px * var(--eg-art, 1) * var(--eg-zs, 1));
+.sx-emoji-wrapper.sx-boss-emoji-wrapper {
+    width: calc(144px * var(--sx-art, 1) * var(--sx-zs, 1));
+    height: calc(144px * var(--sx-art, 1) * var(--sx-zs, 1));
     border: 3px solid transparent;
 }
 
-.eg-monster-emoji-compact.eg-boss-emoji {
+.sx-monster-emoji-compact.sx-boss-emoji {
     font-size: 4.5rem;
     filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.6));
 }
 
 /* Golden aura pulsing around the boss emoji frame */
-@keyframes eg-boss-glow {
+@keyframes sx-boss-glow {
     from { box-shadow: 0 0 8px rgba(212, 175, 55, 0.35); }
     to   { box-shadow: 0 0 24px rgba(212, 175, 55, 0.75); }
 }
 
 /* Crown badge pinned to the top-right of the boss frame */
-.eg-boss-crown {
+.sx-boss-crown {
     position: absolute;
     top: -17px;
     right: -6px;
@@ -2196,20 +2196,20 @@
 }
 
 /* Soft-enrage visual: red-hot border while enrage stacks are active */
-.eg-emoji-wrapper.eg-boss-enraged {
+.sx-emoji-wrapper.sx-boss-enraged {
     border-color: #f97316 !important;
-    animation: eg-boss-enrage-glow 1s ease-in-out infinite alternate;
+    animation: sx-boss-enrage-glow 1s ease-in-out infinite alternate;
 }
 
-@keyframes eg-boss-enrage-glow {
+@keyframes sx-boss-enrage-glow {
     from { box-shadow: 0 0 10px rgba(249, 115, 22, 0.5); }
     to   { box-shadow: 0 0 26px rgba(239, 68, 68, 0.85); }
 }
 
 /* Enrage reads at a glance, even while the boss is targeted (gold border):
    pulsing red ring + red-hot art + an angry badge on the frame. */
-.eg-boss-rage-badge { display: none; }
-.eg-emoji-wrapper.eg-boss-enraged .eg-boss-rage-badge {
+.sx-boss-rage-badge { display: none; }
+.sx-emoji-wrapper.sx-boss-enraged .sx-boss-rage-badge {
     display: block;
     position: absolute;
     top: -17px;
@@ -2219,9 +2219,9 @@
     z-index: 3;
     pointer-events: none;
     filter: drop-shadow(0 0 6px rgba(239, 68, 68, 1));
-    animation: eg-boss-rage-badge-kf 0.5s ease-in-out infinite alternate;
+    animation: sx-boss-rage-badge-kf 0.5s ease-in-out infinite alternate;
 }
-.eg-emoji-wrapper.eg-boss-enraged::before {
+.sx-emoji-wrapper.sx-boss-enraged::before {
     content: '';
     position: absolute;
     inset: -5px;
@@ -2230,27 +2230,27 @@
     box-shadow: 0 0 18px rgba(239, 68, 68, 0.9), inset 0 0 16px rgba(239, 68, 68, 0.55);
     pointer-events: none;
     z-index: 4;
-    animation: eg-boss-rage-ring-kf 0.7s ease-in-out infinite alternate;
+    animation: sx-boss-rage-ring-kf 0.7s ease-in-out infinite alternate;
 }
-.eg-emoji-wrapper.eg-boss-enraged .eg-monster-emoji-compact {
-    animation: eg-boss-rage-art-kf 0.7s ease-in-out infinite alternate;
+.sx-emoji-wrapper.sx-boss-enraged .sx-monster-emoji-compact {
+    animation: sx-boss-rage-art-kf 0.7s ease-in-out infinite alternate;
 }
-@keyframes eg-boss-rage-ring-kf {
+@keyframes sx-boss-rage-ring-kf {
     from { opacity: 0.55; transform: scale(1); }
     to   { opacity: 1;    transform: scale(1.04); }
 }
-@keyframes eg-boss-rage-badge-kf {
+@keyframes sx-boss-rage-badge-kf {
     from { transform: scale(0.9) rotate(-8deg); }
     to   { transform: scale(1.15) rotate(8deg); }
 }
-@keyframes eg-boss-rage-art-kf {
+@keyframes sx-boss-rage-art-kf {
     from { filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.6)) saturate(1.1); }
     to   { filter: drop-shadow(0 0 12px rgba(239, 68, 68, 1)) saturate(1.5) brightness(1.08); }
 }
 
 /* ── REAL enrage look: shaking card, rising flames + embers, hot-red art ── */
-.eg-boss-rage-fire { display: none; }
-.eg-emoji-wrapper.eg-boss-enraged .eg-boss-rage-fire {
+.sx-boss-rage-fire { display: none; }
+.sx-emoji-wrapper.sx-boss-enraged .sx-boss-rage-fire {
     display: block;
     position: absolute;
     inset: -26px -18px -4px -18px;
@@ -2263,9 +2263,9 @@
         radial-gradient(ellipse 26% 60% at 66% 100%, rgba(255, 180, 40, 0.95) 0%, rgba(255, 80, 20, 0.7) 45%, transparent 75%),
         radial-gradient(ellipse 28% 52% at 88% 100%, rgba(255, 200, 50, 0.9) 0%, rgba(239, 68, 68, 0.7) 45%, transparent 75%);
     transform-origin: 50% 100%;
-    animation: eg-rage-flames 0.45s ease-in-out infinite alternate;
+    animation: sx-rage-flames 0.45s ease-in-out infinite alternate;
 }
-.eg-emoji-wrapper.eg-boss-enraged .eg-boss-rage-fire::after {
+.sx-emoji-wrapper.sx-boss-enraged .sx-boss-rage-fire::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -2275,47 +2275,47 @@
         radial-gradient(circle 1.5px at 70% 92%, #ffd24a 0, transparent 100%),
         radial-gradient(circle 2px at 85% 96%, #ff7a2a 0, transparent 100%),
         radial-gradient(circle 1.5px at 32% 98%, #ffe27a 0, transparent 100%);
-    animation: eg-rage-embers 1.1s linear infinite;
+    animation: sx-rage-embers 1.1s linear infinite;
 }
-@keyframes eg-rage-flames {
+@keyframes sx-rage-flames {
     from { transform: scaleY(0.82) scaleX(0.96); opacity: 0.8; }
     to   { transform: scaleY(1.12) scaleX(1.04); opacity: 1; }
 }
-@keyframes eg-rage-embers {
+@keyframes sx-rage-embers {
     from { transform: translateY(0); opacity: 1; }
     to   { transform: translateY(-46px); opacity: 0; }
 }
-.eg-emoji-wrapper.eg-boss-enraged {
-    animation: eg-rage-shake 0.22s linear infinite;
+.sx-emoji-wrapper.sx-boss-enraged {
+    animation: sx-rage-shake 0.22s linear infinite;
 }
-@keyframes eg-rage-shake {
+@keyframes sx-rage-shake {
     0%   { translate: 0 0; }
     25%  { translate: 1.5px -1px; }
     50%  { translate: -1px 1.5px; }
     75%  { translate: -1.5px -1px; }
     100% { translate: 0 0; }
 }
-.eg-emoji-wrapper.eg-boss-enraged .eg-monster-emoji-compact {
+.sx-emoji-wrapper.sx-boss-enraged .sx-monster-emoji-compact {
     filter: sepia(0.6) saturate(3) hue-rotate(-18deg) brightness(1.05)
         drop-shadow(0 0 10px rgba(239, 68, 68, 1));
 }
 /* Whole-screen red pulse the moment a boss enrages. */
-.eg-rage-flash {
+.sx-rage-flash {
     position: fixed;
     inset: 0;
     z-index: 9500;
     pointer-events: none;
     background: radial-gradient(ellipse at 50% 50%, rgba(239, 68, 68, 0) 35%, rgba(185, 20, 20, 0.55) 100%);
-    animation: eg-rage-flash-kf 1.3s ease-out forwards;
+    animation: sx-rage-flash-kf 1.3s ease-out forwards;
 }
-@keyframes eg-rage-flash-kf {
+@keyframes sx-rage-flash-kf {
     0%   { opacity: 0; }
     20%  { opacity: 1; }
     100% { opacity: 0; }
 }
 
 /* Target Border State - HIGH VISIBILITY (matches RPG damage-number punch) */
-.eg-emoji-wrapper.eg-compact-targeted {
+.sx-emoji-wrapper.sx-compact-targeted {
     border-color: #ffd700;
     border-width: 3px;
     background: #2a2a18;
@@ -2326,14 +2326,14 @@
         0 0 32px rgba(255, 140, 0, 0.75),
         0 0 48px rgba(255, 60, 0, 0.35),
         inset 0 0 14px rgba(255, 215, 0, 0.30);
-    animation: eg-target-pulse 0.85s ease-in-out infinite;
+    animation: sx-target-pulse 0.85s ease-in-out infinite;
     filter: brightness(1.18);
     z-index: 5;
 }
 /* Boss keeps golden aura + targeting - combine both */
-.eg-emoji-wrapper.eg-boss-emoji-wrapper.eg-compact-targeted {
+.sx-emoji-wrapper.sx-boss-emoji-wrapper.sx-compact-targeted {
     border-color: #ffd700 !important;
-    animation: eg-target-pulse 0.85s ease-in-out infinite;
+    animation: sx-target-pulse 0.85s ease-in-out infinite;
     box-shadow:
         0 0 0 3px rgba(255, 215, 0, 0.55),
         0 0 22px rgba(255, 215, 0, 1),
@@ -2341,13 +2341,13 @@
         inset 0 0 16px rgba(255, 215, 0, 0.32);
 }
 /* Enraged boss that is also targeted - targeting gold wins */
-.eg-emoji-wrapper.eg-boss-enraged.eg-compact-targeted {
+.sx-emoji-wrapper.sx-boss-enraged.sx-compact-targeted {
     border-color: #ffd700 !important;
-    animation: eg-target-pulse 0.85s ease-in-out infinite;
+    animation: sx-target-pulse 0.85s ease-in-out infinite;
 }
 
 /* Expanding halo ring outside the targeted frame - impossible to miss */
-.eg-emoji-wrapper.eg-compact-targeted::after {
+.sx-emoji-wrapper.sx-compact-targeted::after {
     content: '';
     position: absolute;
     inset: -8px;
@@ -2355,14 +2355,14 @@
     border: 2px solid rgba(255, 215, 0, 0.95);
     box-shadow: 0 0 14px rgba(255, 215, 0, 0.85), inset 0 0 10px rgba(255, 215, 0, 0.35);
     pointer-events: none;
-    animation: eg-target-halo 1.15s ease-out infinite;
+    animation: sx-target-halo 1.15s ease-out infinite;
 }
-@keyframes eg-target-halo {
+@keyframes sx-target-halo {
     0%   { transform: scale(0.88); opacity: 0.95; }
     100% { transform: scale(1.42); opacity: 0; }
 }
 
-@keyframes eg-target-pulse {
+@keyframes sx-target-pulse {
     0%, 100% {
         box-shadow:
             0 0 0 2px rgba(255, 215, 0, 0.40),
@@ -2386,12 +2386,12 @@
 /* TARGET pill removed - kept hidden as a safety net in case any caller
    still renders the legacy markup. Targeting is shown via the gold frame,
    halo and bars only. */
-.eg-target-arrow,
-.eg-monster-card-compact .eg-target-arrow,
-.eg-emoji-wrapper .eg-target-arrow {
+.sx-target-arrow,
+.sx-monster-card-compact .sx-target-arrow,
+.sx-emoji-wrapper .sx-target-arrow {
     display: none !important;
 }
-.eg-monster-card-compact .eg-target-arrow-unused {
+.sx-monster-card-compact .sx-target-arrow-unused {
     position: absolute;
     top: -28px;
     left: 50%;
@@ -2420,28 +2420,28 @@
         0 0 10px rgba(255, 40, 40, 0.95),
         0 0 18px rgba(255, 100, 0, 0.65);
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.85));
-    animation: eg-target-bounce 0.65s ease-in-out infinite;
+    animation: sx-target-bounce 0.65s ease-in-out infinite;
     pointer-events: none;
     z-index: 12;
 }
 /* Back-compat: if the pill is still rendered inside the emoji wrapper */
-.eg-emoji-wrapper .eg-target-arrow {
+.sx-emoji-wrapper .sx-target-arrow {
     top: -30px;
     z-index: 10;
 }
 /* arrow glyph inside the pill - slightly larger */
-.eg-target-arrow-icon {
+.sx-target-arrow-icon {
     font-size: 9px;
     line-height: 1;
     filter: drop-shadow(0 1px 1px rgba(0,0,0,0.9));
 }
 
-@keyframes eg-target-bounce {
+@keyframes sx-target-bounce {
     0%, 100% { transform: translateX(-50%) translateY(0) scale(1); }
     50%      { transform: translateX(-50%) translateY(-5px) scale(1.06); }
 }
 /* Boss cards are twice the size - lift the pill a bit higher */
-.eg-boss-card .eg-target-arrow {
+.sx-boss-card .sx-target-arrow {
     top: -40px;
     font-size: 13px;
     padding: 5px 12px;
@@ -2449,7 +2449,7 @@
 }
 
 /* Level overlay positioned subtly toward the bottom-left */
-.eg-level-bottom-left {
+.sx-level-bottom-left {
     position: absolute;
     bottom: -2px;
     left: -2px;
@@ -2464,7 +2464,7 @@
 }
 
 /* Clean Context Tooltip revealed on mouseover - shown BELOW the monster */
-.eg-monster-compact-tooltip {
+.sx-monster-compact-tooltip {
     display: none;
     position: absolute;
     top: 125%; /* Positions cleanly below the entire card assembly */
@@ -2481,18 +2481,18 @@
     pointer-events: none;
 }
 
-.eg-emoji-wrapper:hover .eg-monster-compact-tooltip {
+.sx-emoji-wrapper:hover .sx-monster-compact-tooltip {
     display: block;
 }
 
-.eg-tooltip-name {
+.sx-tooltip-name {
     font-weight: bold;
     font-size: 12px;
     color: #fff;
     margin-bottom: 2px;
 }
 
-.eg-tooltip-hp {
+.sx-tooltip-hp {
     font-size: 11px;
     color: #bbb;
 }
@@ -2500,13 +2500,13 @@
 
 
 /* Monsters on the far left: pin tooltip to the left edge of the emoji */
-#eg-panel-left .eg-monster-compact-tooltip {
+#sx-panel-left .sx-monster-compact-tooltip {
     left: 0;
     transform: translateX(0);
 }
 
 /* Monsters on the far right: pin tooltip to the right edge of the emoji */
-#eg-panel-right .eg-monster-compact-tooltip {
+#sx-panel-right .sx-monster-compact-tooltip {
     left: auto;
     right: 0;
     transform: translateX(0);
@@ -2514,7 +2514,7 @@
 
 /* No room below the card (bottom-docked panels): flip the tooltip above.
    Toggled on hover by the viewport clamp in endgame-encounter.js. */
-.eg-monster-compact-tooltip.eg-tip-flip {
+.sx-monster-compact-tooltip.sx-tip-flip {
     top: auto;
     bottom: 125%;
 }
@@ -2525,7 +2525,7 @@
 /* Base style for all floating spawn zones - deliberately BELOW the puzzle
    grid so overlapping art never steals cell clicks. The grid wins every
    hit-test where they intersect; cards stay clickable everywhere else. */
-.eg-floating-panel {
+.sx-floating-panel {
     position: absolute;
     z-index: 1;
     pointer-events: none; /* Let clicks pass through the empty space */
@@ -2534,27 +2534,27 @@
 }
 
     /* Re-enable clicks on the monster cards inside the floating panels */
-    .eg-floating-panel .eg-monster-card,
-    .eg-floating-panel .eg-monster-card-compact {
+    .sx-floating-panel .sx-monster-card,
+    .sx-floating-panel .sx-monster-card-compact {
         pointer-events: auto;
     }
 
 /* Hard-coded specific locations */
-#eg-panel-left {
+#sx-panel-left {
     top: 30%;
     left: 50px;
     transform: translateY(-50%);
     flex-direction: column; /* Stack cards vertically on the sides */
 }
 
-#eg-panel-right {
+#sx-panel-right {
     top: 38%;
     right: 20px;
     transform: translateY(-50%);
     flex-direction: column;
 }
 
-#eg-panel-bottom {
+#sx-panel-bottom {
     /* Relocated from bottom-left (left:20% bottom:100px) which overlapped
        column clues when moved to bottom and row clues. Now docked on the
        right side, vertically between the mid-right panel and the main
@@ -2566,7 +2566,7 @@
     flex-direction: column; /* vertical stack like the other right-side panels */
 }
 
-#eg-panel-top-corner {
+#sx-panel-top-corner {
     top: 80px; /* Below the top meta bar */
     right: 20px;
     flex-direction: column;
@@ -2579,14 +2579,14 @@
 
 
 
-.eg-player-charge-container {
+.sx-player-charge-container {
     width: 100%;
     margin-bottom: 5px; /* Spacing between the charge bar and the HUD */
     padding: 0 10px;
     box-sizing: border-box;
 }
 
-.eg-player-charge-track {
+.sx-player-charge-track {
     height: 6px;
     background: #111;
     border-radius: 3px;
@@ -2599,8 +2599,8 @@
 }
 
 /* Fully-charged manual melee strike - glow the player charge bar at 100% */
-#avatar-charge-fill.eg-charge-ready,
-#eg-player-charge-bar.eg-charge-ready {
+#avatar-charge-fill.sx-charge-ready,
+#sx-player-charge-bar.sx-charge-ready {
     background: #facc15;
     box-shadow: 0 0 8px rgba(250, 204, 21, 0.8);
 }
@@ -2617,12 +2617,12 @@
 }
 
 /* 100% pop: the readout turns gold and pulses while fully charged. */
-#avatar-charge-text.eg-charge-ready {
+#avatar-charge-text.sx-charge-ready {
     color: #facc15;
     font-weight: bold;
-    animation: eg-charge-pop 0.6s ease-in-out infinite alternate;
+    animation: sx-charge-pop 0.6s ease-in-out infinite alternate;
 }
-@keyframes eg-charge-pop {
+@keyframes sx-charge-pop {
     from { transform: scale(1); }
     to { transform: scale(1.3); }
 }
@@ -2632,16 +2632,16 @@
    damage and unleashes weapon arts per tier (200% dash, 300% sky leap,
    400% nova, 500% grand nova - see MELEE_OVERCHARGE_* in
    js/combat/encounter-charged-shot.js). */
-#avatar-charge-fill.eg-charge-overcharged,
-#eg-player-charge-bar.eg-charge-overcharged {
+#avatar-charge-fill.sx-charge-overcharged,
+#sx-player-charge-bar.sx-charge-overcharged {
     background: #fb923c;
     box-shadow: 0 0 14px rgba(251, 146, 60, 0.95);
 }
-#avatar-charge-text.eg-charge-overcharged {
+#avatar-charge-text.sx-charge-overcharged {
     color: #fb923c;
-    animation: eg-charge-overcharge-shake 0.3s linear infinite;
+    animation: sx-charge-overcharge-shake 0.3s linear infinite;
 }
-@keyframes eg-charge-overcharge-shake {
+@keyframes sx-charge-overcharge-shake {
     0%, 100% { transform: scale(1.15); }
     50% { transform: scale(1.3); }
 }
@@ -2650,42 +2650,42 @@
    step further so the climb past 100% reads at a glance - ember orange at
    200% (dash), battle red at 300% (sky leap), arcane violet at 400%
    (nova), radiant gold-white at 500% (grand nova, max glow + fastest
-   pulse). The generic .eg-charge-overcharged above stays as the base. */
-#avatar-charge-fill.eg-charge-tier1,
-#eg-player-charge-bar.eg-charge-tier1 {
+   pulse). The generic .sx-charge-overcharged above stays as the base. */
+#avatar-charge-fill.sx-charge-tier1,
+#sx-player-charge-bar.sx-charge-tier1 {
     background: #fb923c;
     box-shadow: 0 0 14px rgba(251, 146, 60, 0.95);
 }
-#avatar-charge-fill.eg-charge-tier2,
-#eg-player-charge-bar.eg-charge-tier2 {
+#avatar-charge-fill.sx-charge-tier2,
+#sx-player-charge-bar.sx-charge-tier2 {
     background: linear-gradient(90deg, #fb923c, #f43f5e);
     box-shadow: 0 0 18px rgba(244, 63, 94, 0.95);
 }
-#avatar-charge-fill.eg-charge-tier3,
-#eg-player-charge-bar.eg-charge-tier3 {
+#avatar-charge-fill.sx-charge-tier3,
+#sx-player-charge-bar.sx-charge-tier3 {
     background: linear-gradient(90deg, #f43f5e, #a855f7);
     box-shadow: 0 0 22px rgba(168, 85, 247, 0.95);
 }
-#avatar-charge-fill.eg-charge-tier4,
-#eg-player-charge-bar.eg-charge-tier4 {
+#avatar-charge-fill.sx-charge-tier4,
+#sx-player-charge-bar.sx-charge-tier4 {
     background: linear-gradient(90deg, #fbbf24, #fff7ed, #fbbf24);
     box-shadow: 0 0 28px rgba(253, 224, 71, 1), 0 0 10px rgba(255, 255, 255, 0.9);
 }
-#avatar-charge-text.eg-charge-tier1 { color: #fb923c; }
-#avatar-charge-text.eg-charge-tier2 {
+#avatar-charge-text.sx-charge-tier1 { color: #fb923c; }
+#avatar-charge-text.sx-charge-tier2 {
     color: #fb7185;
     animation-duration: 0.25s;
 }
-#avatar-charge-text.eg-charge-tier3 {
+#avatar-charge-text.sx-charge-tier3 {
     color: #c084fc;
     animation-duration: 0.2s;
 }
-#avatar-charge-text.eg-charge-tier4 {
+#avatar-charge-text.sx-charge-tier4 {
     color: #fde047;
     font-weight: bold;
-    animation: eg-charge-grand-pulse 0.35s ease-in-out infinite alternate;
+    animation: sx-charge-grand-pulse 0.35s ease-in-out infinite alternate;
 }
-@keyframes eg-charge-grand-pulse {
+@keyframes sx-charge-grand-pulse {
     from { transform: scale(1.25); text-shadow: 0 0 6px rgba(253, 224, 71, 0.9); }
     to { transform: scale(1.5); text-shadow: 0 0 16px rgba(253, 224, 71, 1), 0 0 6px #fff; }
 }
@@ -2694,16 +2694,16 @@
    no movement, no evasion/block, +50% damage taken (see
    MELEE_HOLD_VULNERABILITY_MULT). A pulsing red ring + VULNERABLE tag
    on the avatar so the tradeoff is always visible. */
-#player-avatar-wrapper.eg-melee-rooted {
+#player-avatar-wrapper.sx-melee-rooted {
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.9), 0 0 18px rgba(239, 68, 68, 0.7);
     border-radius: 10px;
-    animation: eg-rooted-pulse 0.8s ease-in-out infinite alternate;
+    animation: sx-rooted-pulse 0.8s ease-in-out infinite alternate;
 }
-@keyframes eg-rooted-pulse {
+@keyframes sx-rooted-pulse {
     from { filter: brightness(0.92); }
     to { filter: brightness(1.08); }
 }
-#eg-melee-rooted-label {
+#sx-melee-rooted-label {
     position: absolute;
     top: -8px;
     left: 50%;
@@ -2719,7 +2719,7 @@
 
 /* Battle Trance: small floating "+N mana" readout over the struck monster
    when a melee hit (non-kill) restores mana. Cosmetic - removed by JS. */
-.eg-mana-gain-float {
+.sx-mana-gain-float {
     position: absolute;
     top: 30%;
     left: 50%;
@@ -2729,30 +2729,30 @@
     font-size: 13px;
     text-shadow: 0 0 6px rgba(125, 211, 252, 0.8), 0 1px 2px #000;
     pointer-events: none;
-    animation: eg-mana-gain-rise 0.9s ease-out forwards;
+    animation: sx-mana-gain-rise 0.9s ease-out forwards;
     z-index: 5;
 }
-@keyframes eg-mana-gain-rise {
+@keyframes sx-mana-gain-rise {
     from { opacity: 1; transform: translate(-50%, 0); }
     to { opacity: 0; transform: translate(-50%, -22px); }
 }
 @media (prefers-reduced-motion: reduce) {
-    .eg-mana-gain-float { animation-duration: 0.01s; }
-    #avatar-charge-text.eg-charge-overcharged { animation: none; }
-    #avatar-charge-text.eg-charge-tier4 { animation: none; }
-    #player-avatar-wrapper.eg-melee-rooted { animation: none; }
+    .sx-mana-gain-float { animation-duration: 0.01s; }
+    #avatar-charge-text.sx-charge-overcharged { animation: none; }
+    #avatar-charge-text.sx-charge-tier4 { animation: none; }
+    #player-avatar-wrapper.sx-melee-rooted { animation: none; }
 }
 
 /* Hold-parry pause - desaturate the player charge bar while held */
-#avatar-charge-fill.eg-charge-paused,
-#eg-player-charge-bar.eg-charge-paused {
+#avatar-charge-fill.sx-charge-paused,
+#sx-player-charge-bar.sx-charge-paused {
     filter: grayscale(0.65) brightness(0.85);
     opacity: 0.72;
     box-shadow: 0 0 0 1px rgba(255, 220, 80, 0.9), 0 0 6px rgba(255, 220, 80, 0.55);
 }
 
 /* Hold-E pause - floating text on the player sprite while E is held */
-#eg-hold-pause-label {
+#sx-hold-pause-label {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -2772,9 +2772,9 @@
     z-index: 30;
     text-shadow: 0 1px 2px rgba(0,0,0,0.9);
     box-shadow: 0 2px 8px rgba(0,0,0,0.75), 0 0 12px rgba(255,220,80,0.45);
-    animation: eg-hold-pause-pulse 0.85s ease-in-out infinite alternate;
+    animation: sx-hold-pause-pulse 0.85s ease-in-out infinite alternate;
 }
-@keyframes eg-hold-pause-pulse {
+@keyframes sx-hold-pause-pulse {
     from { opacity: 0.82; transform: translate(-50%, -50%) scale(0.98); }
     to   { opacity: 1;    transform: translate(-50%, -50%) scale(1.03); }
 }
@@ -2782,7 +2782,7 @@
 /* Grand Prior defuse - floating "DEFUSING" text ABOVE the player sprite while
    standing on a bomb (same visual language as the PARRYING label, but placed
    above the head so the two never overlap when parry + defuse coincide). */
-#eg-defuse-label {
+#sx-defuse-label {
     position: absolute;
     top: 26px;
     left: 50%;
@@ -2802,16 +2802,16 @@
     z-index: 30;
     text-shadow: 0 1px 2px rgba(0,0,0,0.9);
     box-shadow: 0 2px 8px rgba(0,0,0,0.75), 0 0 12px rgba(120,240,150,0.45);
-    animation: eg-defuse-pulse 0.85s ease-in-out infinite alternate;
+    animation: sx-defuse-pulse 0.85s ease-in-out infinite alternate;
 }
-@keyframes eg-defuse-pulse {
+@keyframes sx-defuse-pulse {
     from { opacity: 0.82; transform: translateX(-50%) scale(0.98); }
     to   { opacity: 1;    transform: translateX(-50%) scale(1.03); }
 }
 
 /* Drag-painting accuracy bonus - 1-word text on the player sprite while charging */
-#eg-drag-bonus-label,
-#eg-drag-bonus-linger {
+#sx-drag-bonus-label,
+#sx-drag-bonus-linger {
     position: absolute;
     top: -14px;
     left: 50%;
@@ -2827,42 +2827,42 @@
     pointer-events: none;
     z-index: 31;
     text-shadow: 0 1px 2px rgba(0,0,0,0.9);
-    animation: eg-drag-bonus-pop 0.28s cubic-bezier(0.18,1.2,0.3,1) forwards;
+    animation: sx-drag-bonus-pop 0.28s cubic-bezier(0.18,1.2,0.3,1) forwards;
 }
 
-.eg-drag-bonus-t1 {
+.sx-drag-bonus-t1 {
     background: rgba(16, 36, 48, 0.92);
     border: 1.5px solid rgba(110, 200, 255, 0.95);
     color: #7ec8e3;
     box-shadow: 0 2px 8px rgba(0,0,0,0.7), 0 0 10px rgba(110,200,255,0.45);
 }
-.eg-drag-bonus-t2 {
+.sx-drag-bonus-t2 {
     background: rgba(40, 32, 8, 0.92);
     border: 1.5px solid rgba(255, 213, 80, 0.95);
     color: #ffd54f;
     box-shadow: 0 2px 8px rgba(0,0,0,0.75), 0 0 12px rgba(255,213,80,0.55);
 }
-.eg-drag-bonus-t3 {
+.sx-drag-bonus-t3 {
     background: rgba(48, 14, 8, 0.93);
     border: 1.5px solid rgba(255, 110, 60, 0.98);
     color: #ff8a5c;
     box-shadow: 0 2px 10px rgba(0,0,0,0.8), 0 0 14px rgba(255,110,60,0.7), 0 0 24px rgba(255,60,0,0.35);
-    animation: eg-drag-bonus-pop 0.28s cubic-bezier(0.18,1.2,0.3,1) forwards, eg-drag-bonus-pulse 0.75s ease-in-out 0.28s infinite alternate;
+    animation: sx-drag-bonus-pop 0.28s cubic-bezier(0.18,1.2,0.3,1) forwards, sx-drag-bonus-pulse 0.75s ease-in-out 0.28s infinite alternate;
 }
 
-.eg-drag-bonus-linger {
-    animation: eg-drag-bonus-linger-out 0.9s ease-in forwards;
+.sx-drag-bonus-linger {
+    animation: sx-drag-bonus-linger-out 0.9s ease-in forwards;
 }
 
-@keyframes eg-drag-bonus-pop {
+@keyframes sx-drag-bonus-pop {
     from { opacity: 0; transform: translateX(-50%) translateY(6px) scale(0.6); }
     to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 }
-@keyframes eg-drag-bonus-pulse {
+@keyframes sx-drag-bonus-pulse {
     from { transform: translateX(-50%) scale(1); filter: brightness(1); }
     to   { transform: translateX(-50%) scale(1.05); filter: brightness(1.25); }
 }
-@keyframes eg-drag-bonus-linger-out {
+@keyframes sx-drag-bonus-linger-out {
     0%   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
     70%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
     100% { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.92); }
@@ -2874,7 +2874,7 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 /* ── Status icon strips (player avatar + monster cards) ──────────────── */
-.eg-status-strip {
+.sx-status-strip {
     display: flex;
     gap: 2px;
     justify-content: center;
@@ -2882,7 +2882,7 @@
     min-height: 0;
 }
 
-.eg-player-status-strip {
+.sx-player-status-strip {
     position: absolute;
     top: -16px;
     left: 50%;
@@ -2891,17 +2891,17 @@
     pointer-events: none;
 }
 
-.eg-status-icon {
+.sx-status-icon {
     font-size: 10px;
     line-height: 1;
     padding: 2px 3px;
     border-radius: 4px;
     background: rgba(0, 0, 0, 0.75);
     border: 1px solid rgba(255, 255, 255, 0.25);
-    animation: eg-status-pulse 1s ease-in-out infinite alternate;
+    animation: sx-status-pulse 1s ease-in-out infinite alternate;
 }
 
-@keyframes eg-status-pulse {
+@keyframes sx-status-pulse {
     from { opacity: 0.75; transform: scale(0.95); }
     to   { opacity: 1;    transform: scale(1); }
 }
@@ -2914,18 +2914,18 @@
 .st-polymorph { border-color: #e879f9; box-shadow: 0 0 6px rgba(232,121,249,0.8); }
 .st-bleed      { border-color: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.9); background: rgba(80,0,0,0.85); color: #fecaca; font-weight: 700; }
 .st-poison     { border-color: #84cc16; box-shadow: 0 0 6px rgba(132,204,22,0.8); }
-.eg-status-strip .eg-status-icon { font-size: 12px; padding: 2px 4px; }
+.sx-status-strip .sx-status-icon { font-size: 12px; padding: 2px 4px; }
 
 /* Bleeding monster card: red drip badge on the card (class set from the status strip). */
-.eg-bleeding { position: relative; }
-.eg-bleeding::after {
+.sx-bleeding { position: relative; }
+.sx-bleeding::after {
     content: '🩸';
     position: absolute; top: -8px; right: -6px; z-index: 30;
     font-size: 18px; line-height: 1; pointer-events: none;
     filter: drop-shadow(0 0 5px rgba(220,38,38,0.95));
-    animation: eg-bleed-drip 1.1s ease-in infinite;
+    animation: sx-bleed-drip 1.1s ease-in infinite;
 }
-@keyframes eg-bleed-drip {
+@keyframes sx-bleed-drip {
     0%   { transform: translateY(0) scale(1); opacity: 1; }
     80%  { transform: translateY(6px) scale(0.9); opacity: 0.9; }
     100% { transform: translateY(10px) scale(0.8); opacity: 0; }
@@ -2933,89 +2933,89 @@
 
 /* ── Big on-monster ailment effects ─────────────────────────────────────
    Classes are toggled on the card by _renderMonsterStatusStrip; the overlay
-   (.eg-ail-fx) lives inside the art frame so everything scales with the monster. */
-.eg-ail-fx { position: absolute; inset: 0; pointer-events: none; z-index: 6; overflow: visible; }
-.eg-ail-fx > i { position: absolute; display: none; font-style: normal; line-height: 1; }
+   (.sx-ail-fx) lives inside the art frame so everything scales with the monster. */
+.sx-ail-fx { position: absolute; inset: 0; pointer-events: none; z-index: 6; overflow: visible; }
+.sx-ail-fx > i { position: absolute; display: none; font-style: normal; line-height: 1; }
 
 /* IGNITE: a row of flames burning along the bottom + hot glow */
-.eg-ail-ignite .eg-emoji-wrapper { box-shadow: 0 8px 18px -6px rgba(255,110,20,0.85), inset 0 -22px 22px -14px rgba(255,90,10,0.7); }
-.eg-ail-ignite .eg-fx-flame { display: block; bottom: -6%; font-size: 26px; filter: drop-shadow(0 0 6px rgba(255,120,20,0.95)); transform-origin: 50% 100%; animation: eg-fx-flicker 0.55s ease-in-out infinite alternate; }
-.eg-ail-ignite .eg-fx-flame.f1 { left: 2%; }
-.eg-ail-ignite .eg-fx-flame.f2 { left: 22%; font-size: 32px; animation-delay: -0.2s; }
-.eg-ail-ignite .eg-fx-flame.f3 { left: 42%; font-size: 36px; animation-delay: -0.4s; }
-.eg-ail-ignite .eg-fx-flame.f4 { left: 62%; font-size: 32px; animation-delay: -0.1s; }
-.eg-ail-ignite .eg-fx-flame.f5 { left: 80%; animation-delay: -0.3s; }
-@keyframes eg-fx-flicker {
+.sx-ail-ignite .sx-emoji-wrapper { box-shadow: 0 8px 18px -6px rgba(255,110,20,0.85), inset 0 -22px 22px -14px rgba(255,90,10,0.7); }
+.sx-ail-ignite .sx-fx-flame { display: block; bottom: -6%; font-size: 26px; filter: drop-shadow(0 0 6px rgba(255,120,20,0.95)); transform-origin: 50% 100%; animation: sx-fx-flicker 0.55s ease-in-out infinite alternate; }
+.sx-ail-ignite .sx-fx-flame.f1 { left: 2%; }
+.sx-ail-ignite .sx-fx-flame.f2 { left: 22%; font-size: 32px; animation-delay: -0.2s; }
+.sx-ail-ignite .sx-fx-flame.f3 { left: 42%; font-size: 36px; animation-delay: -0.4s; }
+.sx-ail-ignite .sx-fx-flame.f4 { left: 62%; font-size: 32px; animation-delay: -0.1s; }
+.sx-ail-ignite .sx-fx-flame.f5 { left: 80%; animation-delay: -0.3s; }
+@keyframes sx-fx-flicker {
     from { transform: scale(0.85, 0.9) translateY(2px); opacity: 0.8; }
     to   { transform: scale(1.1, 1.25) translateY(-5px); opacity: 1; }
 }
 
 /* SHOCKED: sparks arcing around the edges + crackling yellow outline */
-.eg-ail-shocked .eg-emoji-wrapper { animation: eg-fx-crackle 0.45s steps(2, end) infinite; }
-.eg-ail-shocked .eg-fx-zap { display: block; font-size: 24px; filter: drop-shadow(0 0 6px rgba(255,235,60,0.95)); animation: eg-fx-zap 0.6s steps(1, end) infinite; opacity: 0; }
-.eg-ail-shocked .eg-fx-zap.z1 { left: -10%; top: 8%; }
-.eg-ail-shocked .eg-fx-zap.z2 { right: -10%; top: 34%; animation-delay: -0.15s; }
-.eg-ail-shocked .eg-fx-zap.z3 { left: -8%; bottom: 8%; animation-delay: -0.3s; }
-.eg-ail-shocked .eg-fx-zap.z4 { right: -8%; top: -6%; animation-delay: -0.45s; }
-@keyframes eg-fx-zap {
+.sx-ail-shocked .sx-emoji-wrapper { animation: sx-fx-crackle 0.45s steps(2, end) infinite; }
+.sx-ail-shocked .sx-fx-zap { display: block; font-size: 24px; filter: drop-shadow(0 0 6px rgba(255,235,60,0.95)); animation: sx-fx-zap 0.6s steps(1, end) infinite; opacity: 0; }
+.sx-ail-shocked .sx-fx-zap.z1 { left: -10%; top: 8%; }
+.sx-ail-shocked .sx-fx-zap.z2 { right: -10%; top: 34%; animation-delay: -0.15s; }
+.sx-ail-shocked .sx-fx-zap.z3 { left: -8%; bottom: 8%; animation-delay: -0.3s; }
+.sx-ail-shocked .sx-fx-zap.z4 { right: -8%; top: -6%; animation-delay: -0.45s; }
+@keyframes sx-fx-zap {
     0%   { opacity: 1; transform: rotate(-20deg) scale(1.1); }
     25%  { opacity: 0; }
     50%  { opacity: 1; transform: rotate(25deg) scale(0.9); }
     75%  { opacity: 0.2; }
     100% { opacity: 1; transform: rotate(-10deg) scale(1.2); }
 }
-@keyframes eg-fx-crackle {
+@keyframes sx-fx-crackle {
     0%   { box-shadow: 0 0 10px 2px rgba(253,224,71,0.95), inset 0 0 12px rgba(253,224,71,0.55); border-color: #fde047; }
     50%  { box-shadow: 0 0 22px 5px rgba(255,255,255,0.9), inset 0 0 6px rgba(253,224,71,0.25); border-color: #fff7ae; }
 }
 
 /* CHILL / FROZEN: frost glow, drifting flakes, ice shell when frozen */
-.eg-ail-chill .eg-emoji-wrapper { box-shadow: 0 0 14px 2px rgba(103,232,249,0.75), inset 0 0 16px rgba(147,220,255,0.45); }
-.eg-ail-chill .eg-fx-frost { display: block; font-size: 16px; color: #cffafe; filter: drop-shadow(0 0 4px rgba(103,232,249,0.9)); animation: eg-fx-snow 1.8s linear infinite; }
-.eg-ail-chill .eg-fx-frost.r1 { left: 10%; top: 0; }
-.eg-ail-chill .eg-fx-frost.r2 { left: 46%; top: 0; animation-delay: -0.6s; }
-.eg-ail-chill .eg-fx-frost.r3 { left: 78%; top: 0; animation-delay: -1.2s; }
-@keyframes eg-fx-snow {
+.sx-ail-chill .sx-emoji-wrapper { box-shadow: 0 0 14px 2px rgba(103,232,249,0.75), inset 0 0 16px rgba(147,220,255,0.45); }
+.sx-ail-chill .sx-fx-frost { display: block; font-size: 16px; color: #cffafe; filter: drop-shadow(0 0 4px rgba(103,232,249,0.9)); animation: sx-fx-snow 1.8s linear infinite; }
+.sx-ail-chill .sx-fx-frost.r1 { left: 10%; top: 0; }
+.sx-ail-chill .sx-fx-frost.r2 { left: 46%; top: 0; animation-delay: -0.6s; }
+.sx-ail-chill .sx-fx-frost.r3 { left: 78%; top: 0; animation-delay: -1.2s; }
+@keyframes sx-fx-snow {
     from { transform: translateY(0) rotate(0); opacity: 1; }
     to   { transform: translateY(90px) rotate(200deg); opacity: 0; }
 }
-.eg-ail-frozen .eg-emoji-wrapper {
+.sx-ail-frozen .sx-emoji-wrapper {
     background: linear-gradient(160deg, rgba(190,235,255,0.5), rgba(120,190,255,0.3));
     border-color: #bae6fd;
     box-shadow: 0 0 20px 4px rgba(147,197,253,0.9), inset 0 0 22px rgba(224,242,254,0.8);
 }
-.eg-ail-frozen .eg-fx-frost { display: block; font-size: 18px; color: #e0f2fe; filter: drop-shadow(0 0 4px rgba(147,197,253,0.95)); }
-.eg-ail-frozen .eg-fx-frost.r1 { left: 6%; top: 6%; }
-.eg-ail-frozen .eg-fx-frost.r2 { right: 6%; top: 40%; }
-.eg-ail-frozen .eg-fx-frost.r3 { left: 40%; bottom: 4%; }
+.sx-ail-frozen .sx-fx-frost { display: block; font-size: 18px; color: #e0f2fe; filter: drop-shadow(0 0 4px rgba(147,197,253,0.95)); }
+.sx-ail-frozen .sx-fx-frost.r1 { left: 6%; top: 6%; }
+.sx-ail-frozen .sx-fx-frost.r2 { right: 6%; top: 40%; }
+.sx-ail-frozen .sx-fx-frost.r3 { left: 40%; bottom: 4%; }
 
 /* SHADOWBURN / POISON / POLYMORPH: coloured wisps rising off the monster */
-.eg-ail-shadowburn .eg-emoji-wrapper { box-shadow: 0 0 16px 3px rgba(139,92,246,0.85), inset 0 0 14px rgba(88,28,135,0.6); }
-.eg-ail-poison .eg-emoji-wrapper { box-shadow: 0 0 14px 2px rgba(132,204,22,0.8), inset 0 0 14px rgba(77,124,15,0.5); }
-.eg-ail-polymorph .eg-emoji-wrapper { animation: eg-fx-morph 1.4s linear infinite; }
-@keyframes eg-fx-morph { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(360deg); } }
-.eg-ail-shadowburn .eg-fx-wisp, .eg-ail-poison .eg-fx-wisp {
+.sx-ail-shadowburn .sx-emoji-wrapper { box-shadow: 0 0 16px 3px rgba(139,92,246,0.85), inset 0 0 14px rgba(88,28,135,0.6); }
+.sx-ail-poison .sx-emoji-wrapper { box-shadow: 0 0 14px 2px rgba(132,204,22,0.8), inset 0 0 14px rgba(77,124,15,0.5); }
+.sx-ail-polymorph .sx-emoji-wrapper { animation: sx-fx-morph 1.4s linear infinite; }
+@keyframes sx-fx-morph { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(360deg); } }
+.sx-ail-shadowburn .sx-fx-wisp, .sx-ail-poison .sx-fx-wisp {
     display: block; bottom: 6%; width: 14px; height: 14px; border-radius: 50%;
-    animation: eg-fx-rise 1.5s ease-out infinite;
+    animation: sx-fx-rise 1.5s ease-out infinite;
 }
-.eg-ail-shadowburn .eg-fx-wisp { background: radial-gradient(circle, #c4b5fd, rgba(109,40,217,0.2)); }
-.eg-ail-poison .eg-fx-wisp { background: radial-gradient(circle, #bef264, rgba(77,124,15,0.2)); }
-.eg-fx-wisp.w1 { left: 18%; }
-.eg-fx-wisp.w2 { left: 48%; animation-delay: -0.5s !important; }
-.eg-fx-wisp.w3 { left: 74%; animation-delay: -1s !important; }
-@keyframes eg-fx-rise {
+.sx-ail-shadowburn .sx-fx-wisp { background: radial-gradient(circle, #c4b5fd, rgba(109,40,217,0.2)); }
+.sx-ail-poison .sx-fx-wisp { background: radial-gradient(circle, #bef264, rgba(77,124,15,0.2)); }
+.sx-fx-wisp.w1 { left: 18%; }
+.sx-fx-wisp.w2 { left: 48%; animation-delay: -0.5s !important; }
+.sx-fx-wisp.w3 { left: 74%; animation-delay: -1s !important; }
+@keyframes sx-fx-rise {
     from { transform: translateY(0) scale(1); opacity: 0.9; }
     to   { transform: translateY(-70px) scale(0.4); opacity: 0; }
 }
 
 /* Purple DoT numbers for ailment ticks - keep RPG pop but tinted */
-.eg-dot-damage {
+.sx-dot-damage {
     color: #c084fc !important;
     filter: drop-shadow(0 0 7px rgba(192,132,252,0.85)) drop-shadow(0 0 14px rgba(160,80,255,0.6)) drop-shadow(0 2px 4px rgba(0,0,0,0.85)) !important;
 }
 
 /* ── Puzzle: lava cells ──────────────────────────────────────────────── */
-.eg-lava-overlay {
+.sx-lava-overlay {
     position: absolute;
     inset: 0;
     display: flex;
@@ -3027,16 +3027,16 @@
     border-radius: 3px;
     pointer-events: none;
     z-index: 6;
-    animation: eg-lava-pulse 1.1s ease-in-out infinite alternate;
+    animation: sx-lava-pulse 1.1s ease-in-out infinite alternate;
 }
 
-@keyframes eg-lava-pulse {
+@keyframes sx-lava-pulse {
     from { background: rgba(234,88,12,0.25); border-color: #ea580c; }
     to   { background: rgba(234,88,12,0.55); border-color: #fdba74; }
 }
 
 /* ── Puzzle: ice cells ───────────────────────────────────────────────── */
-.eg-ice-overlay {
+.sx-ice-overlay {
     position: absolute;
     inset: 0;
     display: flex;
@@ -3048,21 +3048,21 @@
     border-radius: 3px;
     pointer-events: none;
     z-index: 6;
-    animation: eg-ice-shimmer 1.4s ease-in-out infinite alternate;
+    animation: sx-ice-shimmer 1.4s ease-in-out infinite alternate;
 }
 
-@keyframes eg-ice-shimmer {
+@keyframes sx-ice-shimmer {
     from { background: rgba(103,232,249,0.18); border-color: #22d3ee; }
     to   { background: rgba(165,243,252,0.45); border-color: #cffafe; }
 }
 
 /* ── Puzzle: shocked cursor (lightning) ──────────────────────────────── */
-body.eg-cursor-shocked,
-body.eg-cursor-shocked .gc {
+body.sx-cursor-shocked,
+body.sx-cursor-shocked .gc {
     cursor: crosshair;
 }
 
-#eg-cursor-sparks {
+#sx-cursor-sparks {
     position: fixed;
     top: 0;
     left: 0;
@@ -3074,16 +3074,16 @@ body.eg-cursor-shocked .gc {
         drop-shadow(0 0 6px rgba(253, 224, 71, 1))
         drop-shadow(0 0 14px rgba(250, 204, 21, 0.9))
         drop-shadow(0 0 28px rgba(59, 130, 246, 0.7));
-    animation: eg-spark-flicker 0.12s steps(2) infinite;
+    animation: sx-spark-flicker 0.12s steps(2) infinite;
 }
 
-@keyframes eg-spark-flicker {
+@keyframes sx-spark-flicker {
     0%   { opacity: 0.65; transform: translate(-50%, -50%) rotate(-18deg) scale(0.85); }
     100% { opacity: 1;    transform: translate(-50%, -50%) rotate(20deg) scale(1.3); }
 }
 
 /* Flying lightning sparks crackling outward from the shocked cursor */
-.eg-spark-particle {
+.sx-spark-particle {
     position: fixed;
     top: 0;
     left: 0;
@@ -3092,22 +3092,22 @@ body.eg-cursor-shocked .gc {
     z-index: 99998;
     color: #fde047;
     filter: drop-shadow(0 0 4px rgba(253, 224, 71, 0.95)) drop-shadow(0 0 9px rgba(96, 165, 250, 0.8));
-    animation: eg-spark-fly var(--eg-spark-life, 0.5s) ease-out forwards;
+    animation: sx-spark-fly var(--sx-spark-life, 0.5s) ease-out forwards;
 }
 
-@keyframes eg-spark-fly {
+@keyframes sx-spark-fly {
     0% {
         opacity: 1;
         transform: translate(-50%, -50%) rotate(0deg) scale(1);
     }
     100% {
         opacity: 0;
-        transform: translate(calc(-50% + var(--eg-spark-dx, 20px)), calc(-50% + var(--eg-spark-dy, -10px))) rotate(160deg) scale(0.25);
+        transform: translate(calc(-50% + var(--sx-spark-dx, 20px)), calc(-50% + var(--sx-spark-dy, -10px))) rotate(160deg) scale(0.25);
     }
 }
 
 /* Electric ✕ burst on a cross mark stripped by the shocked cursor */
-.eg-cross-zap {
+.sx-cross-zap {
     position: fixed;
     top: 0;
     left: 0;
@@ -3120,10 +3120,10 @@ body.eg-cursor-shocked .gc {
     filter:
         drop-shadow(0 0 5px rgba(253, 224, 71, 1))
         drop-shadow(0 0 12px rgba(96, 165, 250, 0.9));
-    animation: eg-cross-zap-burst 0.65s ease-out forwards;
+    animation: sx-cross-zap-burst 0.65s ease-out forwards;
 }
 
-@keyframes eg-cross-zap-burst {
+@keyframes sx-cross-zap-burst {
     0%   { opacity: 1; transform: translate(-50%, -50%) rotate(-15deg) scale(0.4); }
     30%  { opacity: 1; transform: translate(-50%, -50%) rotate(10deg)  scale(1.3); }
     60%  { opacity: 0.9; transform: translate(-50%, -50%) rotate(-8deg) scale(1.6); }
@@ -3131,13 +3131,13 @@ body.eg-cursor-shocked .gc {
 }
 
 /* ── Puzzle: shadow clue-line blackout ───────────────────────────────── */
-.eg-shadow-clue-blackout {
+.sx-shadow-clue-blackout {
     color: transparent !important;
     text-shadow: none !important;
     position: relative;
 }
 
-.eg-shadow-clue-blackout::after {
+.sx-shadow-clue-blackout::after {
     content: '?';
     position: absolute;
     left: 50%;
@@ -3145,16 +3145,16 @@ body.eg-cursor-shocked .gc {
     transform: translate(-50%, -50%);
     color: #7c3aed;
     text-shadow: 0 0 6px rgba(124, 58, 237, 0.9);
-    animation: eg-shadow-flicker 1.6s ease-in-out infinite alternate;
+    animation: sx-shadow-flicker 1.6s ease-in-out infinite alternate;
 }
 
-@keyframes eg-shadow-flicker {
+@keyframes sx-shadow-flicker {
     from { opacity: 0.45; }
     to   { opacity: 0.9; }
 }
 
 /* ── Hit burst on creature impact (melee + projectiles) ──────────────── */
-.eg-hit-burst {
+.sx-hit-burst {
     position: fixed;
     width: 0;
     height: 0;
@@ -3162,7 +3162,7 @@ body.eg-cursor-shocked .gc {
     z-index: 500;
 }
 
-.eg-hit-ring {
+.sx-hit-ring {
     position: absolute;
     left: 0;
     top: 0;
@@ -3170,12 +3170,12 @@ body.eg-cursor-shocked .gc {
     height: 16px;
     margin: -8px 0 0 -8px;
     border-radius: 50%;
-    border: 3px solid var(--eg-hit-color, #ffffff);
+    border: 3px solid var(--sx-hit-color, #ffffff);
     opacity: 0.9;
-    animation: eg-hit-ring-expand 0.55s ease-out forwards;
+    animation: sx-hit-ring-expand 0.55s ease-out forwards;
 }
 
-@keyframes eg-hit-ring-expand {
+@keyframes sx-hit-ring-expand {
     0% {
         transform: scale(0.4);
         opacity: 0.95;
@@ -3191,24 +3191,24 @@ body.eg-cursor-shocked .gc {
     }
 }
 
-.eg-hit-spark {
+.sx-hit-spark {
     position: absolute;
     left: -4px;
     top: -4px;
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--eg-hit-color, #ffffff);
-    box-shadow: 0 0 10px var(--eg-hit-color, #ffffff);
-    animation: eg-hit-spark-fly 0.65s ease-out forwards;
+    background: var(--sx-hit-color, #ffffff);
+    box-shadow: 0 0 10px var(--sx-hit-color, #ffffff);
+    animation: sx-hit-spark-fly 0.65s ease-out forwards;
 }
 
 /* ── Perimeter patrol (endgame-monster-roam.js) ─────────────────────────
-   Roaming cards live in the fixed #eg-roam-layer on a circuit OUTSIDE the
+   Roaming cards live in the fixed #sx-roam-layer on a circuit OUTSIDE the
    #ptable box (cells + row/col clues), so they can never cover play cells
    or clue numbers. Same z as the static monster zones (1): strictly below
    the puzzle grid, which always wins clicks where boxes intersect. */
-#eg-roam-layer {
+#sx-roam-layer {
     position: fixed;
     left: 0;
     top: 0;
@@ -3218,7 +3218,7 @@ body.eg-cursor-shocked .gc {
     z-index: 1;
 }
 
-#eg-roam-layer .eg-monster-card-compact.eg-roam-card {
+#sx-roam-layer .sx-monster-card-compact.sx-roam-card {
     position: fixed;
     left: 0;
     top: 0;
@@ -3230,16 +3230,16 @@ body.eg-cursor-shocked .gc {
 
 /* Walk bob - cadence comes in via --roam-bob (fast scurrers patter,
    heavy brutes plod). Applied to the sprite so bars stay rock-steady. */
-#eg-roam-layer .eg-roam-card .eg-monster-emoji-compact {
-    animation: eg-roam-bob var(--roam-bob, 0.8s) ease-in-out infinite;
+#sx-roam-layer .sx-roam-card .sx-monster-emoji-compact {
+    animation: sx-roam-bob var(--roam-bob, 0.8s) ease-in-out infinite;
 }
 
-@keyframes eg-roam-bob {
+@keyframes sx-roam-bob {
     0%, 100% { margin-top: 0; }
     50% { margin-top: -5px; }
 }
 
-@keyframes eg-hit-spark-fly {
+@keyframes sx-hit-spark-fly {
     0% {
         transform: translate(0, 0) scale(1);
         opacity: 1;
@@ -3258,33 +3258,33 @@ body.eg-cursor-shocked .gc {
 /* ── Monsters above the grid, click-through where they overlap it ─────────
    Monster layers sit just above the puzzle scaler (z 10) and below the class
    HUD / toasts (15+), so art is never hidden behind the grid. A card that
-   overlaps the grid gets .eg-over-grid (js/combat/encounter.js): it takes no
+   overlaps the grid gets .sx-over-grid (js/combat/encounter.js): it takes no
    clicks, so every cell stays clickable, and its art turns see-through so the
    clues underneath stay readable. Cards clear of the grid stay clickable. */
-#eg-monster-wrapper,
-.eg-floating-panel {
+#sx-monster-wrapper,
+.sx-floating-panel {
     z-index: 12;
 }
 
-.eg-monster-card-compact.eg-over-grid {
+.sx-monster-card-compact.sx-over-grid {
     pointer-events: none !important;
 }
 
-.eg-monster-card-compact .eg-emoji-wrapper {
+.sx-monster-card-compact .sx-emoji-wrapper {
     transition: opacity 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
-.eg-monster-card-compact.eg-over-grid .eg-emoji-wrapper {
+.sx-monster-card-compact.sx-over-grid .sx-emoji-wrapper {
     opacity: 0.6;
 }
 
-.eg-monster-card-compact.eg-over-grid .eg-compact-bars {
+.sx-monster-card-compact.sx-over-grid .sx-compact-bars {
     opacity: 0.85;
 }
 
 /* Ailment banners above the player sprite (see _syncAilmentBanners).
    Banner height 34px + 6px gap = 40px step (AIL_BANNER_STEP_PX). */
-#eg-ail-banners {
+#sx-ail-banners {
     position: absolute;
     left: 50%;
     top: -26px;
@@ -3293,7 +3293,7 @@ body.eg-cursor-shocked .gc {
     z-index: 30;
     pointer-events: none;
 }
-.eg-ail-banner {
+.sx-ail-banner {
     --ail: #ff6b35;
     position: absolute;
     left: 0;
@@ -3307,17 +3307,17 @@ body.eg-cursor-shocked .gc {
     border: 2px solid var(--ail);
     box-shadow: 0 0 10px color-mix(in srgb, var(--ail) 55%, transparent);
     transition: transform .28s cubic-bezier(.2, .8, .3, 1), opacity .3s;
-    animation: eg-ail-banner-in .28s ease-out;
+    animation: sx-ail-banner-in .28s ease-out;
 }
-.eg-ail-banner.leaving { opacity: 0; }
-.eg-ail-banner-bar {
+.sx-ail-banner.leaving { opacity: 0; }
+.sx-ail-banner-bar {
     position: absolute;
     inset: 0 auto 0 0;
     width: 100%;
     background: color-mix(in srgb, var(--ail) 55%, transparent);
     transition: width .1s linear;
 }
-.eg-ail-banner-text {
+.sx-ail-banner-text {
     position: relative;
     height: 100%;
     display: flex;
@@ -3330,7 +3330,7 @@ body.eg-cursor-shocked .gc {
     text-shadow: 0 0 4px #000, 0 2px 3px #000;
     white-space: nowrap;
 }
-.eg-ail-banner-more {
+.sx-ail-banner-more {
     position: absolute;
     left: 0;
     bottom: 0;
@@ -3344,10 +3344,10 @@ body.eg-cursor-shocked .gc {
     font: 900 .95rem monospace;
     transition: transform .28s;
 }
-.eg-ail-banner-ignite, .eg-ail-banner-shadowburn { --ail: #ff6b35; }
-.eg-ail-banner-shadowburn { --ail: #9433c7; }
-.eg-ail-banner-bleed { --ail: #d6293a; width: 290px; margin-left: -145px; }
-.eg-ail-banner-sub {
+.sx-ail-banner-ignite, .sx-ail-banner-shadowburn { --ail: #ff6b35; }
+.sx-ail-banner-shadowburn { --ail: #9433c7; }
+.sx-ail-banner-bleed { --ail: #d6293a; width: 290px; margin-left: -145px; }
+.sx-ail-banner-sub {
     font: 900 .7rem monospace;
     letter-spacing: .08em;
     padding: 2px 6px;
@@ -3355,23 +3355,23 @@ body.eg-cursor-shocked .gc {
     background: rgba(0, 0, 0, 0.45);
     color: #ffb4bb;
 }
-.eg-ail-banner.eg-ail-moving { animation: eg-ail-bleed-pulse .55s ease-in-out infinite alternate; }
-.eg-ail-banner.eg-ail-moving .eg-ail-banner-sub { background: #d6293a; color: #fff; }
-@keyframes eg-ail-bleed-pulse {
+.sx-ail-banner.sx-ail-moving { animation: sx-ail-bleed-pulse .55s ease-in-out infinite alternate; }
+.sx-ail-banner.sx-ail-moving .sx-ail-banner-sub { background: #d6293a; color: #fff; }
+@keyframes sx-ail-bleed-pulse {
     from { box-shadow: 0 0 8px color-mix(in srgb, var(--ail) 45%, transparent); filter: brightness(1); }
     to   { box-shadow: 0 0 22px var(--ail); filter: brightness(1.35); }
 }
-.eg-ail-banner-poison { --ail: #5fcf3c; }
-.eg-ail-banner-chill, .eg-ail-banner-frozen { --ail: #60c8ff; }
-.eg-ail-banner-shocked { --ail: #fde047; }
-.eg-ail-banner-shocked .eg-ail-banner-text, .eg-ail-banner-poison .eg-ail-banner-text { color: #fff; }
-.eg-ail-banner-shadow, .eg-ail-banner-blind, .eg-ail-banner-confused { --ail: #a56bd8; }
-.eg-ail-banner-polymorph { --ail: #4ade80; }
-.eg-ail-banner-stunned { --ail: #ff9ec8; }
-@keyframes eg-ail-banner-in { from { opacity: 0; scale: .7; } to { opacity: 1; scale: 1; } }
+.sx-ail-banner-poison { --ail: #5fcf3c; }
+.sx-ail-banner-chill, .sx-ail-banner-frozen { --ail: #60c8ff; }
+.sx-ail-banner-shocked { --ail: #fde047; }
+.sx-ail-banner-shocked .sx-ail-banner-text, .sx-ail-banner-poison .sx-ail-banner-text { color: #fff; }
+.sx-ail-banner-shadow, .sx-ail-banner-blind, .sx-ail-banner-confused { --ail: #a56bd8; }
+.sx-ail-banner-polymorph { --ail: #4ade80; }
+.sx-ail-banner-stunned { --ail: #ff9ec8; }
+@keyframes sx-ail-banner-in { from { opacity: 0; scale: .7; } to { opacity: 1; scale: 1; } }
 
 /* Spawn grace period: 👣 countdown on the card, charge bar tinted teal */
-.eg-grace-badge {
+.sx-grace-badge {
     position: absolute;
     top: -6px;
     left: 50%;
@@ -3388,13 +3388,13 @@ body.eg-cursor-shocked .gc {
     pointer-events: none;
     z-index: 3;
 }
-.eg-card-grace .eg-charge-track-compact {
+.sx-card-grace .sx-charge-track-compact {
     border-color: rgba(120, 230, 210, 0.85);
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.9), 0 0 8px rgba(100, 230, 205, 0.6);
 }
 
 /* ── XP gain text over a defeated monster (classic MMO style) ───────────── */
-.eg-xp-float {
+.sx-xp-float {
     position: fixed;
     z-index: 9000;
     transform: translate(-50%, 0);
@@ -3405,9 +3405,9 @@ body.eg-cursor-shocked .gc {
     color: #d9a8ff;
     text-shadow: 0 0 6px rgba(160, 80, 255, 0.9), 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
     white-space: nowrap;
-    animation: eg-xp-float-up 1.5s ease-out forwards;
+    animation: sx-xp-float-up 1.5s ease-out forwards;
 }
-@keyframes eg-xp-float-up {
+@keyframes sx-xp-float-up {
     0%   { opacity: 0; transform: translate(-50%, 6px) scale(0.8); }
     12%  { opacity: 1; transform: translate(-50%, 0) scale(1.1); }
     70%  { opacity: 1; }
@@ -3415,7 +3415,7 @@ body.eg-cursor-shocked .gc {
 }
 
 /* ── XP bar along the bottom edge: fills the 6px gap under the dock ─────── */
-#eg-xp-bar {
+#sx-xp-bar {
     display: none;
     position: fixed;
     left: 0;
@@ -3427,7 +3427,7 @@ body.eg-cursor-shocked .gc {
     border-top: 1px solid #000;
     box-sizing: border-box;
 }
-#eg-xp-bar-fill {
+#sx-xp-bar-fill {
     height: 100%;
     width: 0;
     background: linear-gradient(180deg, #c58cff 0%, #8e3fd8 55%, #5b1fa0 100%);
@@ -3435,7 +3435,7 @@ body.eg-cursor-shocked .gc {
     transition: width 0.45s ease-out;
 }
 /* Classic-style notches: 20 divisions */
-#eg-xp-bar::after {
+#sx-xp-bar::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -3444,7 +3444,7 @@ body.eg-cursor-shocked .gc {
 }
 
 /* Bright band over the stretch of the XP bar that was just earned */
-#eg-xp-bar-gain {
+#sx-xp-bar-gain {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -3455,12 +3455,12 @@ body.eg-cursor-shocked .gc {
     background: linear-gradient(180deg, #fff 0%, #e9c9ff 50%, #b57cff 100%);
     box-shadow: 0 0 10px 2px rgba(220, 170, 255, 0.95);
 }
-#eg-xp-bar-gain.on { animation: eg-xp-gain-glow 2.4s ease-out forwards; }
-@keyframes eg-xp-gain-glow {
+#sx-xp-bar-gain.on { animation: sx-xp-gain-glow 2.4s ease-out forwards; }
+@keyframes sx-xp-gain-glow {
     0%, 35% { opacity: 1; }
     100%    { opacity: 0; }
 }
-.eg-xp-bar-text {
+.sx-xp-bar-text {
     position: fixed;
     bottom: 12px;
     z-index: 650;
@@ -3472,57 +3472,57 @@ body.eg-cursor-shocked .gc {
     color: #e9c9ff;
     text-shadow: 0 0 6px rgba(160, 80, 255, 0.95), 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
     white-space: nowrap;
-    animation: eg-xp-bar-text-rise 3.1s ease-out forwards;
+    animation: sx-xp-bar-text-rise 3.1s ease-out forwards;
 }
-@keyframes eg-xp-bar-text-rise {
+@keyframes sx-xp-bar-text-rise {
     0%   { opacity: 0; margin-bottom: -6px; }
     10%  { opacity: 1; margin-bottom: 0; }
     75%  { opacity: 1; }
     100% { opacity: 0; margin-bottom: 14px; }
 }
-body:has(#screen-game.active) #eg-xp-bar { display: block; }
+body:has(#screen-game.active) #sx-xp-bar { display: block; }
 
 /* Healing number over the player avatar */
-.eg-player-damage.eg-player-heal {
+.sx-player-damage.sx-player-heal {
     color: #4cff7a;
     filter: drop-shadow(0 0 8px rgba(60,255,120,0.9)) drop-shadow(0 3px 5px rgba(0,0,0,0.9));
 }
 
 
 /* ── Ailment visuals on the hero sprite ─────────────────────────────────
-   #eg-player-ail-fx follows the sprite (_syncPlayerSpriteFx); it reuses the
-   monster flame / spark / frost / wisp art (.eg-ail-fx > i) via the same
-   .eg-ail-<key> classes, and the sprite itself is tinted (.eg-spr-<key>). */
-.eg-player-ail-fx {
+   #sx-player-ail-fx follows the sprite (_syncPlayerSpriteFx); it reuses the
+   monster flame / spark / frost / wisp art (.sx-ail-fx > i) via the same
+   .sx-ail-<key> classes, and the sprite itself is tinted (.sx-spr-<key>). */
+.sx-player-ail-fx {
     position: fixed; z-index: 60; pointer-events: none; display: none;
 }
-.eg-player-ail-fx .eg-ail-fx { z-index: 61; }
-.eg-fx-star { font-size: 18px; color: #fde047; filter: drop-shadow(0 0 4px rgba(253,224,71,0.9)); }
-.eg-player-ail-fx.eg-ail-stunned .eg-fx-star { display: block; top: -14%; animation: eg-fx-stun-orbit 1s linear infinite; }
-.eg-player-ail-fx.eg-ail-stunned .eg-fx-star.s1 { left: 10%; }
-.eg-player-ail-fx.eg-ail-stunned .eg-fx-star.s2 { left: 42%; animation-delay: -0.33s; }
-.eg-player-ail-fx.eg-ail-stunned .eg-fx-star.s3 { left: 72%; animation-delay: -0.66s; }
-@keyframes eg-fx-stun-orbit {
+.sx-player-ail-fx .sx-ail-fx { z-index: 61; }
+.sx-fx-star { font-size: 18px; color: #fde047; filter: drop-shadow(0 0 4px rgba(253,224,71,0.9)); }
+.sx-player-ail-fx.sx-ail-stunned .sx-fx-star { display: block; top: -14%; animation: sx-fx-stun-orbit 1s linear infinite; }
+.sx-player-ail-fx.sx-ail-stunned .sx-fx-star.s1 { left: 10%; }
+.sx-player-ail-fx.sx-ail-stunned .sx-fx-star.s2 { left: 42%; animation-delay: -0.33s; }
+.sx-player-ail-fx.sx-ail-stunned .sx-fx-star.s3 { left: 72%; animation-delay: -0.66s; }
+@keyframes sx-fx-stun-orbit {
     0%   { transform: translate(-14px, 4px) scale(0.8); opacity: 0.6; }
     50%  { transform: translate(14px, -4px) scale(1.15); opacity: 1; }
     100% { transform: translate(-14px, 4px) scale(0.8); opacity: 0.6; }
 }
-.eg-player-ail-fx.eg-bleeding::after { top: 10%; right: 4%; }
-.eg-player-ail-fx.eg-ail-chill .eg-fx-frost, .eg-player-ail-fx.eg-ail-frozen .eg-fx-frost { font-size: 20px; }
+.sx-player-ail-fx.sx-bleeding::after { top: 10%; right: 4%; }
+.sx-player-ail-fx.sx-ail-chill .sx-fx-frost, .sx-player-ail-fx.sx-ail-frozen .sx-fx-frost { font-size: 20px; }
 
-#avatar-sprite-img.eg-spr-ignite, #avatar-sprite-img-simple.eg-spr-ignite {
+#avatar-sprite-img.sx-spr-ignite, #avatar-sprite-img-simple.sx-spr-ignite {
     filter: drop-shadow(0 0 6px rgba(255,110,20,0.95)) sepia(0.35) saturate(1.6);
-    animation: eg-spr-burn 0.5s ease-in-out infinite alternate;
+    animation: sx-spr-burn 0.5s ease-in-out infinite alternate;
 }
-@keyframes eg-spr-burn { from { filter: drop-shadow(0 0 4px rgba(255,110,20,0.8)) sepia(0.2) saturate(1.3); } to { filter: drop-shadow(0 0 10px rgba(255,160,40,1)) sepia(0.45) saturate(1.9) brightness(1.1); } }
-#avatar-sprite-img.eg-spr-chill, #avatar-sprite-img-simple.eg-spr-chill { filter: drop-shadow(0 0 6px rgba(103,232,249,0.9)) hue-rotate(150deg) saturate(0.8) brightness(1.1); }
-#avatar-sprite-img.eg-spr-frozen, #avatar-sprite-img-simple.eg-spr-frozen { filter: drop-shadow(0 0 10px rgba(147,197,253,1)) hue-rotate(170deg) saturate(0.5) brightness(1.35) contrast(0.9); }
-#avatar-sprite-img.eg-spr-poison, #avatar-sprite-img-simple.eg-spr-poison { filter: drop-shadow(0 0 6px rgba(132,204,22,0.95)) hue-rotate(60deg) saturate(1.4); }
-#avatar-sprite-img.eg-spr-shadowburn, #avatar-sprite-img-simple.eg-spr-shadowburn { filter: drop-shadow(0 0 8px rgba(139,92,246,0.95)) brightness(0.75) saturate(1.3); }
-#avatar-sprite-img.eg-spr-shocked, #avatar-sprite-img-simple.eg-spr-shocked { animation: eg-spr-shock 0.4s steps(2, end) infinite; }
-@keyframes eg-spr-shock { 0% { filter: drop-shadow(0 0 8px rgba(253,224,71,1)) brightness(1.4); } 50% { filter: drop-shadow(0 0 3px rgba(255,255,255,0.9)) brightness(1); } }
-#avatar-sprite-img.eg-spr-polymorph, #avatar-sprite-img-simple.eg-spr-polymorph { animation: eg-fx-morph 1.4s linear infinite; }
-#avatar-sprite-img.eg-spr-bleed, #avatar-sprite-img-simple.eg-spr-bleed { filter: drop-shadow(0 0 5px rgba(220,38,38,0.95)) saturate(1.3); }
+@keyframes sx-spr-burn { from { filter: drop-shadow(0 0 4px rgba(255,110,20,0.8)) sepia(0.2) saturate(1.3); } to { filter: drop-shadow(0 0 10px rgba(255,160,40,1)) sepia(0.45) saturate(1.9) brightness(1.1); } }
+#avatar-sprite-img.sx-spr-chill, #avatar-sprite-img-simple.sx-spr-chill { filter: drop-shadow(0 0 6px rgba(103,232,249,0.9)) hue-rotate(150deg) saturate(0.8) brightness(1.1); }
+#avatar-sprite-img.sx-spr-frozen, #avatar-sprite-img-simple.sx-spr-frozen { filter: drop-shadow(0 0 10px rgba(147,197,253,1)) hue-rotate(170deg) saturate(0.5) brightness(1.35) contrast(0.9); }
+#avatar-sprite-img.sx-spr-poison, #avatar-sprite-img-simple.sx-spr-poison { filter: drop-shadow(0 0 6px rgba(132,204,22,0.95)) hue-rotate(60deg) saturate(1.4); }
+#avatar-sprite-img.sx-spr-shadowburn, #avatar-sprite-img-simple.sx-spr-shadowburn { filter: drop-shadow(0 0 8px rgba(139,92,246,0.95)) brightness(0.75) saturate(1.3); }
+#avatar-sprite-img.sx-spr-shocked, #avatar-sprite-img-simple.sx-spr-shocked { animation: sx-spr-shock 0.4s steps(2, end) infinite; }
+@keyframes sx-spr-shock { 0% { filter: drop-shadow(0 0 8px rgba(253,224,71,1)) brightness(1.4); } 50% { filter: drop-shadow(0 0 3px rgba(255,255,255,0.9)) brightness(1); } }
+#avatar-sprite-img.sx-spr-polymorph, #avatar-sprite-img-simple.sx-spr-polymorph { animation: sx-fx-morph 1.4s linear infinite; }
+#avatar-sprite-img.sx-spr-bleed, #avatar-sprite-img-simple.sx-spr-bleed { filter: drop-shadow(0 0 5px rgba(220,38,38,0.95)) saturate(1.3); }
 
 /* DUAL-WIELD: a small hand number (1 = main hand, 2 = off-hand) to the left
    of each charge-up bar. The hand that would strike next (the fuller bar)
@@ -3541,20 +3541,20 @@ body:has(#screen-game.active) #eg-xp-bar { display: block; }
     border: 1px solid #3b4252;
     transition: color 0.12s, background 0.12s, border-color 0.12s, box-shadow 0.12s;
 }
-.avatar-charge-hand.eg-hand-next {
+.avatar-charge-hand.sx-hand-next {
     color: #1a1400;
     background: #facc15;
     border-color: #fde68a;
     box-shadow: 0 0 6px rgba(250, 204, 21, 0.85);
 }
-#avatar-charge2-fill.eg-charge-ready { background: #facc15; box-shadow: 0 0 8px rgba(250, 204, 21, 0.8); }
-#avatar-charge2-fill.eg-charge-overcharged { background: #fb923c; box-shadow: 0 0 14px rgba(251, 146, 60, 0.95); }
-#avatar-charge2-fill.eg-charge-tier2 { background: linear-gradient(90deg, #fb923c, #f43f5e); box-shadow: 0 0 18px rgba(244, 63, 94, 0.95); }
-#avatar-charge2-fill.eg-charge-tier3 { background: linear-gradient(90deg, #f43f5e, #a855f7); box-shadow: 0 0 22px rgba(168, 85, 247, 0.95); }
-#avatar-charge2-fill.eg-charge-tier4 { background: linear-gradient(90deg, #a855f7, #fde68a); box-shadow: 0 0 26px rgba(253, 230, 138, 0.95); }
-#avatar-charge2-fill.eg-charge-paused { opacity: 0.45; }
-#avatar-charge2-text.eg-charge-ready { color: #facc15; font-weight: bold; }
-#avatar-charge2-text.eg-charge-overcharged { color: #fb923c; }
+#avatar-charge2-fill.sx-charge-ready { background: #facc15; box-shadow: 0 0 8px rgba(250, 204, 21, 0.8); }
+#avatar-charge2-fill.sx-charge-overcharged { background: #fb923c; box-shadow: 0 0 14px rgba(251, 146, 60, 0.95); }
+#avatar-charge2-fill.sx-charge-tier2 { background: linear-gradient(90deg, #fb923c, #f43f5e); box-shadow: 0 0 18px rgba(244, 63, 94, 0.95); }
+#avatar-charge2-fill.sx-charge-tier3 { background: linear-gradient(90deg, #f43f5e, #a855f7); box-shadow: 0 0 22px rgba(168, 85, 247, 0.95); }
+#avatar-charge2-fill.sx-charge-tier4 { background: linear-gradient(90deg, #a855f7, #fde68a); box-shadow: 0 0 26px rgba(253, 230, 138, 0.95); }
+#avatar-charge2-fill.sx-charge-paused { opacity: 0.45; }
+#avatar-charge2-text.sx-charge-ready { color: #facc15; font-weight: bold; }
+#avatar-charge2-text.sx-charge-overcharged { color: #fb923c; }
 #player-avatar-simple #avatar-charge2-text,
 #player-avatar-wrapper #avatar-charge2-text {
     opacity: 1;

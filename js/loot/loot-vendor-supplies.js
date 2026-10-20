@@ -187,7 +187,7 @@ export function _vendorBuildCurrencyTabHTML() {
         price: _vendorCurrencyPrice(def.id),
         buyCall: `_vendorBuyCurrency('${def.id}')`,
     })).join('');
-    return `<div class="egv-cards">${cards}</div>`;
+    return `<div class="sx-vendor-cards">${cards}</div>`;
 }
 
 // Buys one currency orb and adds it to the hub stash.
@@ -228,9 +228,9 @@ export function _vendorBuildEssencesTabHTML() {
         desc: def.description,
         price: _vendorEssencePrice(def.id),
         buyCall: `_vendorBuyEssence('${def.id}')`,
-        extraClass: 'egv-essence-card',
+        extraClass: 'sx-vendor-essence-card',
     })).join('');
-    return `<div class="egv-cards">${cards}</div>`;
+    return `<div class="sx-vendor-cards">${cards}</div>`;
 }
 
 // Buys one essence and adds it to the hub stash.
@@ -274,7 +274,7 @@ export function _vendorBuildItemsTabHTML() {
         price: _vendorPuzzleItemPrice(def.rarity),
         buyCall: `_vendorBuyPuzzleItem('${def.id}')`,
     })).join('');
-    return `<div class="egv-cards">${cards}</div>`;
+    return `<div class="sx-vendor-cards">${cards}</div>`;
 }
 
 // Buys a regular puzzle item straight into the persistent main inventory.
@@ -346,31 +346,31 @@ export function _vendorBuildCharmsTabHTML(ignoreFilter) {
     const cards = ids.map(id => {
         const def = globalThis.getSkillDef(id);
         const art = globalThis.getCharmArtForSkill(id, 1);
-        const icon = art ? `<img class="eg-art-img" src="${art}" alt="" draggable="false">` : (def.icon || '💫');
+        const icon = art ? `<img class="sx-art-img" src="${art}" alt="" draggable="false">` : (def.icon || '💫');
         const ranks = VENDOR_CHARM_RANK_PRICES.map((price, i) => {
             const rank = i + 1;
             const tip = ` onmouseenter="handleSkillTipRank(event, '${id}', ${rank})" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()"`;
             if (_vendorCharmOwned(id, rank)) {
-                return `<span class="egv-charm-rank egv-charm-owned"${tip}>R${rank}<small>${t('eg_vendor_charm_owned')}</small></span>`;
+                return `<span class="sx-vendor-charm-rank sx-vendor-charm-owned"${tip}>R${rank}<small>${t('eg_vendor_charm_owned')}</small></span>`;
             }
             const need = VENDOR_CHARM_RANK_MIN_LEVEL[i];
             if (lv < need) {
-                return `<span class="egv-charm-rank egv-charm-locked"${tip}>R${rank}<small>${t('eg_vendor_charm_locked').replace('{n}', need)}</small></span>`;
+                return `<span class="sx-vendor-charm-rank sx-vendor-charm-locked"${tip}>R${rank}<small>${t('eg_vendor_charm_locked').replace('{n}', need)}</small></span>`;
             }
-            const cls = gold < price ? ' egv-charm-short' : '';
-            return `<button class="egv-charm-rank egv-charm-buy${cls}"${tip} onclick="_vendorBuyCharm('${id}', ${rank})">R${rank}<small>🪙 ${price.toLocaleString()}</small></button>`;
+            const cls = gold < price ? ' sx-vendor-charm-short' : '';
+            return `<button class="sx-vendor-charm-rank sx-vendor-charm-buy${cls}"${tip} onclick="_vendorBuyCharm('${id}', ${rank})">R${rank}<small>🪙 ${price.toLocaleString()}</small></button>`;
         }).join('');
         return `
-<div class="egv-card egv-charm-card">
-    <div class="egv-card-top" onmouseenter="handleSkillTipRank(event, '${id}', 1)" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">
-        <div class="egv-card-icon">${icon}</div>
-        <div class="egv-card-info"><div class="egv-card-name">${globalThis.getSkillName(id)}</div></div>
+<div class="sx-vendor-card sx-vendor-charm-card">
+    <div class="sx-vendor-card-top" onmouseenter="handleSkillTipRank(event, '${id}', 1)" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">
+        <div class="sx-vendor-card-icon">${icon}</div>
+        <div class="sx-vendor-card-info"><div class="sx-vendor-card-name">${globalThis.getSkillName(id)}</div></div>
     </div>
-    <div class="egv-charm-ranks">${ranks}</div>
+    <div class="sx-vendor-charm-ranks">${ranks}</div>
 </div>`;
     }).join('');
     const bar = ignoreFilter ? '' : _vendorBuildCharmFilterBarHTML();
-    return `${bar}<div class="egv-cards">${cards}</div>`;
+    return `${bar}<div class="sx-vendor-cards">${cards}</div>`;
 }
 
 // Buys one rank's charm; it goes straight into the spell book.

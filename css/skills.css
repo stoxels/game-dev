@@ -1596,17 +1596,17 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box { /* neutralized - see s
 .charm-tip .skl-tip-title { color: #f0d090; }
 
 /* -----------------------------------------------------------------------
-   9. CHARM DROPS ON THE GRID (reuses .eg-pickup-overlay)
+   9. CHARM DROPS ON THE GRID (reuses .sx-pickup-overlay)
    -----------------------------------------------------------------------
-   Compound selectors keep these wins over the base .eg-pickup-overlay rules
+   Compound selectors keep these wins over the base .sx-pickup-overlay rules
    in css/endgame/monsters.css, which loads after this file.
    ----------------------------------------------------------------------- */
 
-.eg-pickup-overlay.eg-charm-overlay { z-index: 6; }
+.sx-pickup-overlay.sx-charm-overlay { z-index: 6; }
 
-.eg-pickup-overlay.eg-charm-overlay .charm-icon { font-size: 1em; }
+.sx-pickup-overlay.sx-charm-overlay .charm-icon { font-size: 1em; }
 
-.eg-pickup-overlay.eg-charm-overlay .charm-rank-badge {
+.sx-pickup-overlay.sx-charm-overlay .charm-rank-badge {
     min-width: 11px;
     height: 11px;
     line-height: 9px;
@@ -1615,15 +1615,15 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box { /* neutralized - see s
     bottom: -3px;
 }
 
-.eg-pickup-overlay.eg-charm-overlay.eg-charm-rank-1 {
+.sx-pickup-overlay.sx-charm-overlay.sx-charm-rank-1 {
     filter: drop-shadow(0 0 4px rgba(176, 176, 176, 0.9));
 }
 
-.eg-pickup-overlay.eg-charm-overlay.eg-charm-rank-2 {
+.sx-pickup-overlay.sx-charm-overlay.sx-charm-rank-2 {
     filter: drop-shadow(0 0 6px rgba(52, 152, 219, 0.95));
 }
 
-.eg-pickup-overlay.eg-charm-overlay.eg-charm-rank-3 {
+.sx-pickup-overlay.sx-charm-overlay.sx-charm-rank-3 {
     filter: drop-shadow(0 0 7px rgba(195, 155, 211, 1));
 }
 

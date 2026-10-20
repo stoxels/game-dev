@@ -110,9 +110,9 @@
 
 /* Endgame variant: no level number / score / hint / bonus - the collected run
    loot (chips with hover tooltips) is shown instead. */
-#pause-overlay.eg-pause .pause-stats-row,
-#pause-overlay.eg-pause #top-hint,
-#pause-overlay.eg-pause #bonus-sidebar {
+#pause-overlay.sx-pause .pause-stats-row,
+#pause-overlay.sx-pause #top-hint,
+#pause-overlay.sx-pause #bonus-sidebar {
     display: none;
 }
 
@@ -122,7 +122,7 @@
     text-align: left;
 }
 
-#pause-overlay.eg-pause #pause-loot-summary {
+#pause-overlay.sx-pause #pause-loot-summary {
     display: block;
 }
 
@@ -269,6 +269,6 @@
 
 /* Make sure the leave-map confirm modal renders ABOVE the pause overlay
    when opened via the pause screen (pause overlay is z-index 9999) */
-#eg-forfeit-modal.show {
+#sx-forfeit-modal.show {
     z-index: 10000;
 }

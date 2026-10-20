@@ -47,8 +47,8 @@ export function _mechDarkHunt(monster, phase) {
     const durMs = 10000;
     const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
-    _nkEl(run, 'div', 'eg-nk-darkling');
-    const beast = _nkEl(run, 'div', 'eg-nk-dot eg-nk-nightbeast', '👹');
+    _nkEl(run, 'div', 'sx-nk-darkling');
+    const beast = _nkEl(run, 'div', 'sx-nk-dot sx-nk-nightbeast', '👹');
     const b = { x: window.innerWidth * 0.5, y: 80 };
     _nkToast('eg_mech_nightmare', '🌃 The Nightmare: Dark Hunt! Something circles in the black!');
     let e = 0, cdUntil = 0, growlAt = 0;

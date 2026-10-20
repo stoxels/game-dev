@@ -71,12 +71,12 @@ export function _mzTouch(pct, level, label) {
 
 // One CSS arcade ghost (colour via currentColor, skirt via clip-path).
 export function _mzGhostEl(run, color) {
-    const g = _nkEl(run, 'div', 'eg-mz-ghost');
+    const g = _nkEl(run, 'div', 'sx-mz-ghost');
     g.style.color = color;
     const body = document.createElement('div');
-    body.className = 'eg-mz-ghost-body';
+    body.className = 'sx-mz-ghost-body';
     const eyes = document.createElement('div');
-    eyes.className = 'eg-mz-ghost-eyes';
+    eyes.className = 'sx-mz-ghost-eyes';
     body.appendChild(eyes);
     g.appendChild(body);
     return g;
@@ -86,14 +86,14 @@ export function _mzGhostEl(run, color) {
 // so it survives the run ending in the same frame).
 export function _mzSpookBurst(x, y, big) {
     const layer = document.createElement('div');
-    layer.className = 'eg-mz-spooks' + (big ? ' eg-mz-spooks-big' : '');
+    layer.className = 'sx-mz-spooks' + (big ? ' sx-mz-spooks-big' : '');
     layer.style.left = Math.round(x) + 'px';
     layer.style.top = Math.round(y) + 'px';
     document.body.appendChild(layer);
     const colors = ['#f87171', '#f472b6', '#22d3ee', '#fb923c', '#e2e8f0'];
     for (let i = 0; i < (big ? 12 : 7); i++) {
         const s = document.createElement('div');
-        s.className = 'eg-mz-spook';
+        s.className = 'sx-mz-spook';
         s.style.background = colors[i % colors.length];
         const ang = Math.random() * Math.PI * 2;
         const dist = 22 + Math.random() * (big ? 85 : 50);
@@ -231,7 +231,7 @@ export function _mechMzDotWalls(monster, phase) {
         const dir = Math.random() < 0.5 ? 1 : -1;
         const segs = [];
         const mkSeg = (a, b) => {
-            const el = _nkEl(run, 'div', 'eg-mz-dotwall eg-mz-dotwall-warn');
+            const el = _nkEl(run, 'div', 'sx-mz-dotwall sx-mz-dotwall-warn');
             if (vertical) {
                 el.style.width = MZ_WALL_THICK + 'px';
                 el.style.height = Math.round(b - a) + 'px';
@@ -255,7 +255,7 @@ export function _mechMzDotWalls(monster, phase) {
         t += dtS * 1000;
         if (t >= warnMs && !marching) {
             marching = true;
-            walls.forEach(w => w.segs.forEach(s => s.el.classList.remove('eg-mz-dotwall-warn')));
+            walls.forEach(w => w.segs.forEach(s => s.el.classList.remove('sx-mz-dotwall-warn')));
         }
         let allDone = true;
         const pr = _nkPlayerRect();
@@ -320,7 +320,7 @@ export function _mechMzMazeWalls(monster, phase) {
         const cy = vertical ? y + len / 2 : y;
         if (pc0 && Math.hypot(cx - pc0.x, cy - pc0.y) < 160) continue;
         if (!walls.every(w => Math.hypot(w.cx - cx, w.cy - cy) > 160)) continue;
-        const el = _nkEl(run, 'div', 'eg-mz-mazewall eg-mz-mazewall-warn');
+        const el = _nkEl(run, 'div', 'sx-mz-mazewall sx-mz-mazewall-warn');
         if (vertical) {
             el.style.width = '26px';
             el.style.height = Math.round(len) + 'px';
@@ -342,7 +342,7 @@ export function _mechMzMazeWalls(monster, phase) {
         t += dtS * 1000;
         if (t >= warnMs && !risen) {
             risen = true;
-            walls.forEach(w => w.el.classList.remove('eg-mz-mazewall-warn'));
+            walls.forEach(w => w.el.classList.remove('sx-mz-mazewall-warn'));
         }
         if (risen) {
             const pr = _nkPlayerRect();
@@ -362,7 +362,7 @@ export function _mechMzMazeWalls(monster, phase) {
         }
         if (t >= warnMs + lifeMs) {
             walls.forEach(w => {
-                w.el.classList.add('eg-mz-crumble');
+                w.el.classList.add('sx-mz-crumble');
                 const el = w.el;
                 setTimeout(() => { try { el.remove(); } catch (e) {} }, 460);
             });
@@ -394,14 +394,14 @@ export function _mechMzLightsOut(monster, phase) {
     const dmgPct = MZ_EYES_DMG[p];
 
     const dark = document.createElement('div');
-    dark.className = 'eg-mz-dark';
+    dark.className = 'sx-mz-dark';
     document.body.appendChild(dark);
     run.els.push(dark);
-    requestAnimationFrame(() => dark.classList.add('eg-mz-dark-on'));
+    requestAnimationFrame(() => dark.classList.add('sx-mz-dark-on'));
 
     const eyes = [];
     for (let i = 0; i < count; i++) {
-        const el = _nkEl(run, 'div', 'eg-mz-eyes');
+        const el = _nkEl(run, 'div', 'sx-mz-eyes');
         const fromLeft = Math.random() < 0.5;
         eyes.push({
             x: fromLeft ? -60 : W + 60,
@@ -430,7 +430,7 @@ export function _mechMzLightsOut(monster, phase) {
             }
         });
         if (e >= durMs) {
-            dark.classList.remove('eg-mz-dark-on');
+            dark.classList.remove('sx-mz-dark-on');
             const d = dark;
             setTimeout(() => { try { d.remove(); } catch (err) {} }, 650);
             return false;
@@ -489,7 +489,7 @@ export function _mzMarkTarget(g, r) {
     if (g.targetEl) { try { g.targetEl.remove(); } catch (e) {} g.targetEl = null; }
     const c = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const el = document.createElement('div');
-    el.className = 'eg-mz-target';
+    el.className = 'sx-mz-target';
     el.style.width = (r * 2) + 'px';
     el.style.height = (r * 2) + 'px';
     el.style.left = Math.round(c.x - r) + 'px';
@@ -530,8 +530,8 @@ export function _mzSlam(g, monster, big) {
     }, dashS * 1000);
     g.fxRun.timers.push(id2);
     if (big) {
-        document.body.classList.add('eg-mz-flash');
-        const id3 = setTimeout(() => document.body.classList.remove('eg-mz-flash'), 700);
+        document.body.classList.add('sx-mz-flash');
+        const id3 = setTimeout(() => document.body.classList.remove('sx-mz-flash'), 700);
         g.fxRun.timers.push(id3);
     }
 }
@@ -559,9 +559,9 @@ export function _mzFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds slam ghosts, targets and cleanup timers.
@@ -570,18 +570,18 @@ export function _mzFinalStart(monster) {
 
     // CRT scanline overlay swallows the arena.
     const scan = document.createElement('div');
-    scan.className = 'eg-mz-scan';
+    scan.className = 'sx-mz-scan';
     document.body.appendChild(scan);
     g.scan = scan;
-    requestAnimationFrame(() => scan.classList.add('eg-mz-scan-on'));
+    requestAnimationFrame(() => scan.classList.add('sx-mz-scan-on'));
 
     // Retro countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-mz-cd';
+    ov.className = 'sx-mz-cd';
     ov.innerHTML =
-        '<div class="eg-mz-cd-label">👻 GAME OVER?</div>' +
-        '<div class="eg-mz-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-mz-cd-hint">The gang converges on the marked circle - NEVER stand still!</div>';
+        '<div class="sx-mz-cd-label">👻 GAME OVER?</div>' +
+        '<div class="sx-mz-cd-num sx-bmb-cd-pop">' + g.count + '</div>' +
+        '<div class="sx-mz-cd-hint">The gang converges on the marked circle - NEVER stand still!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -591,11 +591,11 @@ export function _mzFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss trembles like a ghost caught in the light.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-mz-panicking');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-mz-panicking');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     // First mark right away so beat 1 already has a circle to punish.
@@ -621,12 +621,12 @@ export function _mzFinalStart(monster) {
             return;
         }
         _mzMarkTarget(g, g.count === 1 ? MZ_CHOMP_R : MZ_TARGET_R);
-        const num = g.overlay && g.overlay.querySelector('.eg-mz-cd-num');
+        const num = g.overlay && g.overlay.querySelector('.sx-mz-cd-num');
         if (num) {
             num.textContent = g.count;
-            num.classList.remove('eg-bmb-cd-pop');
+            num.classList.remove('sx-bmb-cd-pop');
             void num.offsetWidth;
-            num.classList.add('eg-bmb-cd-pop');
+            num.classList.add('sx-bmb-cd-pop');
         }
     }, cdTick);
 }
@@ -639,12 +639,12 @@ export function _mzFinalEnd(g) {
     if (g.scan) { try { g.scan.remove(); } catch (e) {} g.scan = null; }
     if (g.targetEl) { try { g.targetEl.remove(); } catch (e) {} g.targetEl = null; }
     if (g.fxRun) { try { _nkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
-    document.body.classList.remove('eg-mz-flash');
-    document.querySelectorAll('.eg-mz-panicking').forEach(el => el.classList.remove('eg-mz-panicking'));
+    document.body.classList.remove('sx-mz-flash');
+    document.querySelectorAll('.sx-mz-panicking').forEach(el => el.classList.remove('sx-mz-panicking'));
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -666,15 +666,15 @@ export function _mzFinalEnd(g) {
 // removes every run element, overlay and body class this boss ever created.
 export function _mzTeardown() {
     if (_mzFinal) { try { _mzFinalEnd(_mzFinal); } catch (e) {} _mzFinal = null; }
-    document.querySelectorAll('.eg-mz-ghost, .eg-mz-dotwall, .eg-mz-mazewall, .eg-mz-eyes, ' +
-        '.eg-mz-dark, .eg-mz-target, .eg-mz-scan, .eg-mz-cd, .eg-mz-spooks').forEach(el => {
+    document.querySelectorAll('.sx-mz-ghost, .sx-mz-dotwall, .sx-mz-mazewall, .sx-mz-eyes, ' +
+        '.sx-mz-dark, .sx-mz-target, .sx-mz-scan, .sx-mz-cd, .sx-mz-spooks').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.body.classList.remove('eg-mz-flash');
-    document.querySelectorAll('.eg-mz-panicking').forEach(el => el.classList.remove('eg-mz-panicking'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.body.classList.remove('sx-mz-flash');
+    document.querySelectorAll('.sx-mz-panicking').forEach(el => el.classList.remove('sx-mz-panicking'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

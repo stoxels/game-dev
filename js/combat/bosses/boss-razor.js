@@ -108,7 +108,7 @@ export function _mechRzrCyclone(monster, phase) {
     _nkToast('eg_mech_rzr_cyclone', '🪃 BLADE CYCLONE - the fan flies out and comes back CROSSING! Read the return arcs!', '#fde047');
 
     const ax = W * 0.85, ay = H * 0.5;
-    const anchor = _nkEl(run, 'div', 'eg-nk-dot eg-rzr-anchor', '🪃');
+    const anchor = _nkEl(run, 'div', 'sx-nk-dot sx-rzr-anchor', '🪃');
     anchor.style.transform = 'translate(' + Math.round(ax - 26) + 'px,' + Math.round(ay - 26) + 'px)';
 
     const blades = [];
@@ -119,7 +119,7 @@ export function _mechRzrCyclone(monster, phase) {
         for (let i = 0; i < n; i++) {
             const tx = 40;
             const ty = H * (0.15 + (n === 1 ? 0.5 : i / (n - 1)) * 0.7);
-            const el = _nkEl(run, 'div', 'eg-nk-dot eg-rzr-blade', '🪃');
+            const el = _nkEl(run, 'div', 'sx-nk-dot sx-rzr-blade', '🪃');
             el.style.display = 'none';
             // Curved return: control point perpendicular to the out leg,
             // alternating sides so the arcs cross each other.
@@ -225,7 +225,7 @@ export function _mechRzrWires(monster, phase) {
             x1 = -20; y1 = H * (0.1 + Math.random() * 0.8);
             x2 = W + 20; y2 = H * (0.1 + Math.random() * 0.8);
         }
-        const el = _nkEl(run, 'div', 'eg-rzr-wire eg-rzr-wire-warn');
+        const el = _nkEl(run, 'div', 'sx-rzr-wire sx-rzr-wire-warn');
         const len = Math.hypot(x2 - x1, y2 - y1);
         const ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
         el.style.left = Math.round(x1) + 'px';
@@ -248,8 +248,8 @@ export function _mechRzrWires(monster, phase) {
             if (!w.dieAt) {
                 // Turn taut.
                 if (!holdStarted) holdStarted = now;
-                w.el.classList.remove('eg-rzr-wire-warn');
-                w.el.classList.add('eg-rzr-wire-taut');
+                w.el.classList.remove('sx-rzr-wire-warn');
+                w.el.classList.add('sx-rzr-wire-taut');
                 w.dieAt = now + RZR_WIRE_HOLD * _RZR_DEBUG_MULT;
             }
             if (now < w.dieAt) {
@@ -262,7 +262,7 @@ export function _mechRzrWires(monster, phase) {
             } else {
                 // SNAP: one sting if you linger near the line, ends whip out.
                 w.snapped = true;
-                w.el.classList.add('eg-rzr-wire-snap');
+                w.el.classList.add('sx-rzr-wire-snap');
                 const d = _ptSegDist(pc.x, pc.y, w.x1, w.y1, w.x2, w.y2);
                 if (d < RZR_WHIP_R) {
                     _rzrTouch(RZR_WIRE_WHIP[p], level, 'Wire Whip');
@@ -270,7 +270,7 @@ export function _mechRzrWires(monster, phase) {
                 // The two cut ends scythe outward (visual).
                 const ang = Math.atan2(w.y2 - w.y1, w.x2 - w.x1);
                 for (const dir of [-1, 1]) {
-                    const seg = _nkEl(run, 'div', 'eg-rzr-whip-seg');
+                    const seg = _nkEl(run, 'div', 'sx-rzr-whip-seg');
                     seg.style.left = Math.round((w.x1 + w.x2) / 2) + 'px';
                     seg.style.top = Math.round((w.y1 + w.y2) / 2) + 'px';
                     seg.style.transform = 'rotate(' + (ang * 180 / Math.PI).toFixed(2) + 'deg)';
@@ -323,12 +323,12 @@ export function _mechRzrHone(monster, phase) {
         sy = H * (0.22 + Math.random() * 0.56);
         if (Math.hypot(sx - pc0.x, sy - pc0.y) > 200) break;
     }
-    const stone = _nkEl(run, 'div', 'eg-rzr-stone', '🪨');
+    const stone = _nkEl(run, 'div', 'sx-rzr-stone', '🪨');
     stone.style.left = Math.round(sx - RZR_STONE_R) + 'px';
     stone.style.top = Math.round(sy - RZR_STONE_R) + 'px';
     stone.style.width = (RZR_STONE_R * 2) + 'px';
     stone.style.height = (RZR_STONE_R * 2) + 'px';
-    const grind = _nkEl(run, 'div', 'eg-rzr-grind');
+    const grind = _nkEl(run, 'div', 'sx-rzr-grind');
     grind.style.left = Math.round(sx - RZR_GRIND_R) + 'px';
     grind.style.top = Math.round(sy - RZR_GRIND_R) + 'px';
     grind.style.width = (RZR_GRIND_R * 2) + 'px';
@@ -357,12 +357,12 @@ export function _mechRzrHone(monster, phase) {
             && now >= state.lastHit) {
             state.lastHit = now + 450 * _RZR_DEBUG_MULT;
             state.hp--;
-            stone.classList.remove('eg-rzr-stone-hit');
+            stone.classList.remove('sx-rzr-stone-hit');
             void stone.offsetWidth;
-            stone.classList.add('eg-rzr-stone-hit');
+            stone.classList.add('sx-rzr-stone-hit');
             if (state.hp <= 0) {
                 state.shattered = true;
-                stone.classList.add('eg-rzr-stone-shattered');
+                stone.classList.add('sx-rzr-stone-shattered');
                 _rzrHeal(_nkMaxHP() * RZR_HEAL_CANCEL);
                 _nkToast('eg_mech_rzr_stone', '🪃🪨 WHETSTONE SHATTERED - the cast is cancelled! (+heal)', '#4ade80');
             }
@@ -371,14 +371,14 @@ export function _mechRzrHone(monster, phase) {
         // Hone completes → the giant scythe.
         if (!state.shattered && !state.honed && honeT >= honeMs) {
             state.honed = true;
-            stone.classList.add('eg-rzr-stone-dim');
-            grind.classList.add('eg-rzr-grind-done');
+            stone.classList.add('sx-rzr-stone-dim');
+            grind.classList.add('sx-rzr-grind-done');
             _nkToast('eg_mech_rzr_scythe', '🪃 THE GIANT SCYTHE is honed - the arena is its path!', '#f97316');
             // Lock the sweep band to your current position, alternating axis.
             state.axis = state.scythes % 2 === 0 ? 'h' : 'v';
             state.dir = state.scythes % 2 === 0 ? 1 : -1;
             state.bandY = state.axis === 'h' ? pc.y : pc.x;
-            const band = _nkEl(run, 'div', 'eg-nk-band eg-rzr-scythe-warn');
+            const band = _nkEl(run, 'div', 'sx-nk-band sx-rzr-scythe-warn');
             if (state.axis === 'h') {
                 band.style.left = '0px'; band.style.top = Math.round(state.bandY - 55) + 'px';
                 band.style.width = W + 'px'; band.style.height = '110px';
@@ -393,11 +393,11 @@ export function _mechRzrHone(monster, phase) {
         // Scythe sweep after its telegraph.
         if (state.honed && state.band && now >= state.warnUntil && !state.sweeping) {
             state.sweeping = true;
-            state.band.classList.add('eg-nk-band-hit');
+            state.band.classList.add('sx-nk-band-hit');
             _nkSlamShatter(state.band, run);
             state.bladeX = state.dir > 0 ? -80 : (state.axis === 'h' ? W : H) + 80;
             state.bladeY = state.bandY;
-            const blade = _nkEl(run, 'div', 'eg-nk-dot eg-rzr-giant', '⚔️');
+            const blade = _nkEl(run, 'div', 'sx-nk-dot sx-rzr-giant', '⚔️');
             state.bladeEl = blade;
             state.bladeHit = false;
         }
@@ -526,9 +526,9 @@ export function _rzrFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -537,10 +537,10 @@ export function _rzrFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-rzr-cd';
+    ov.className = 'sx-rzr-cd';
     ov.innerHTML =
-        '<div class="eg-rzr-cd-label">🪃 A THOUSAND EDGES</div>' +
-        '<div class="eg-rzr-cd-hint">Walk WITH the spoke clock - it REVERSES, and every reversal shaves a fan across the middle. Survive three cycles for THE LAST EDGE: only the whetstone\u2019s grind aura is safe, and it CHIPS you to stand there!</div>';
+        '<div class="sx-rzr-cd-label">🪃 A THOUSAND EDGES</div>' +
+        '<div class="sx-rzr-cd-hint">Walk WITH the spoke clock - it REVERSES, and every reversal shaves a fan across the middle. Survive three cycles for THE LAST EDGE: only the whetstone\u2019s grind aura is safe, and it CHIPS you to stand there!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -550,18 +550,18 @@ export function _rzrFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss card wears the whetted glow while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-rzr-allin');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-rzr-allin');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
 
     // ── Spoke clock: nine rotating wires + reversal fans. ─────────────────
     for (let i = 0; i < RZR_SPOKES; i++) {
-        const el = _nkEl(g.fxRun, 'div', 'eg-rzr-spoke');
+        const el = _nkEl(g.fxRun, 'div', 'sx-rzr-spoke');
         el.style.width = Math.round(g.spokeLen) + 'px';
         el.style.left = Math.round(g.cx) + 'px';
         el.style.top = Math.round(g.cy - 1) + 'px';
@@ -577,7 +577,7 @@ export function _rzrFinalStart(monster) {
         for (let i = 0; i < RZR_FAN_BLADES; i++) {
             const fromTop = Math.random() < 0.5;
             const fanRun = _nkNewRun(monster.id, true);
-            const el = _nkEl(fanRun, 'div', 'eg-nk-dot eg-rzr-blade', '🪃');
+            const el = _nkEl(fanRun, 'div', 'sx-nk-dot sx-rzr-blade', '🪃');
             const speed = 430 + i * 60;
             let x = W * (0.25 + Math.random() * 0.5), y = fromTop ? -40 : H + 40;
             const vy = fromTop ? 1 : -1;
@@ -628,12 +628,12 @@ export function _rzrFinalStart(monster) {
             if (px > RZR_POCKET_R + 30 && px < W - RZR_POCKET_R - 30
                 && py > RZR_POCKET_R + 30 && py < H - RZR_POCKET_R - 30) break;
         }
-        const pocketEl = _nkEl(g.fxRun, 'div', 'eg-rzr-grind eg-rzr-stone-safe');
+        const pocketEl = _nkEl(g.fxRun, 'div', 'sx-rzr-grind sx-rzr-stone-safe');
         pocketEl.style.left = Math.round(px - RZR_POCKET_R) + 'px';
         pocketEl.style.top = Math.round(py - RZR_POCKET_R) + 'px';
         pocketEl.style.width = (RZR_POCKET_R * 2) + 'px';
         pocketEl.style.height = (RZR_POCKET_R * 2) + 'px';
-        const stoneEl = _nkEl(g.fxRun, 'div', 'eg-rzr-stone eg-rzr-stone-safe', '🪨');
+        const stoneEl = _nkEl(g.fxRun, 'div', 'sx-rzr-stone sx-rzr-stone-safe', '🪨');
         stoneEl.style.left = Math.round(px - RZR_STONE_R) + 'px';
         stoneEl.style.top = Math.round(py - RZR_STONE_R) + 'px';
         stoneEl.style.width = (RZR_STONE_R * 2) + 'px';
@@ -643,7 +643,7 @@ export function _rzrFinalStart(monster) {
         _rzrAfter(g, 2400 * _RZR_DEBUG_MULT, () => {
             if (g.finished) return;
             // The condensing scythe: everything outside the pocket is cut.
-            document.querySelectorAll('.eg-rzr-spoke').forEach(el => el.classList.add('eg-rzr-spoke-condense'));
+            document.querySelectorAll('.sx-rzr-spoke').forEach(el => el.classList.add('sx-rzr-spoke-condense'));
             const pc = _rzrPC();
             const inPocket = Math.hypot(pc.x - px, pc.y - py) < RZR_POCKET_R;
             if (!inPocket) {
@@ -703,18 +703,18 @@ export function _rzrFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.eg-rzr-cd, .eg-rzr-spoke, .eg-rzr-stone, .eg-rzr-grind, .eg-rzr-blade, .eg-rzr-giant').forEach(el => {
+    document.querySelectorAll('.sx-rzr-cd, .sx-rzr-spoke, .sx-rzr-stone, .sx-rzr-grind, .sx-rzr-blade, .sx-rzr-giant').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.remove('eg-rzr-allin');
-        wrap.classList.remove('eg-nk-shielded');
+        wrap.classList.remove('sx-rzr-allin');
+        wrap.classList.remove('sx-nk-shielded');
     }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -732,14 +732,14 @@ export function _rzrFinalEnd(g, monster) {
 export function _rzrTeardown() {
     if (_rzrFinal) { try { _rzrFinalEnd(_rzrFinal, null); } catch (e) {} _rzrFinal = null; }
     _rzrWatcherRun = null;
-    document.querySelectorAll('.eg-rzr-blade, .eg-rzr-anchor, .eg-rzr-wire, .eg-rzr-whip-seg, ' +
-        '.eg-rzr-stone, .eg-rzr-grind, .eg-rzr-giant, .eg-rzr-spoke, .eg-rzr-cd').forEach(el => {
+    document.querySelectorAll('.sx-rzr-blade, .sx-rzr-anchor, .sx-rzr-wire, .sx-rzr-whip-seg, ' +
+        '.sx-rzr-stone, .sx-rzr-grind, .sx-rzr-giant, .sx-rzr-spoke, .sx-rzr-cd').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-rzr-allin').forEach(el => el.classList.remove('eg-rzr-allin'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.querySelectorAll('.sx-rzr-allin').forEach(el => el.classList.remove('sx-rzr-allin'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

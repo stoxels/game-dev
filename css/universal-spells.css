@@ -2,7 +2,7 @@
    UNIVERSAL SPELL EFFECTS — PREMIUM ULTRA (v9)
    Nine schools, each with *instant* silhouette + palette + motion read.
    No asset loads, no emoji in combat — pure layered CSS.
-   Roots: .eg-projectile.eg-built = 44×28 canvas, .egp fill.
+   Roots: .sx-projectile.sx-built = 44×28 canvas, .egp fill.
    All shapes aim +X; flight code rotates the root via JS.
    Forge: spell-forge.html reuses the exact same DOM builds.
    ═══════════════════════════════════════════════════════════════════ */
@@ -1005,7 +1005,7 @@
     26%{opacity:1; transform:scale(1.20) translateY(0)}
     100%{opacity:0; transform:scale(.72) translateY(-16px)}
 }
-.eg-monster-card-compact .usp-nova{ width:34px; height:34px; margin:-17px 0 0 -17px }
+.sx-monster-card-compact .usp-nova{ width:34px; height:34px; margin:-17px 0 0 -17px }
 
 /* ═══════════════════════════════════════════════════════════════════
    SELF-CAST SUPPORT — ring + floating value over avatar

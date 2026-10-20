@@ -78,7 +78,7 @@ export let _thwGrandSlamActive = false;
 export function _thwompSweep() {
     _thwGrandSlamActive = false;
     try {
-        document.querySelectorAll('.eg-thw-block, .eg-thw-ring, .eg-thw-mark, .eg-thw-stone, .eg-thw-cloud, .eg-thw-mini, .eg-thw-gs-mark, .eg-thw-shock, .eg-thw-crash').forEach(el => el.remove());
+        document.querySelectorAll('.sx-thw-block, .sx-thw-ring, .sx-thw-mark, .sx-thw-stone, .sx-thw-cloud, .sx-thw-mini, .sx-thw-gs-mark, .sx-thw-shock, .sx-thw-crash').forEach(el => el.remove());
     } catch (e) {}
 }
 
@@ -118,7 +118,7 @@ export function _thwompArenaInit(monster) {
 
     // The hovering block: big angry stone face, drifts to a new hover spot
     // after every stomp.
-    const blockEl = _nkEl(run, 'div', 'eg-thw-block', '🪨');
+    const blockEl = _nkEl(run, 'div', 'sx-thw-block', '🪨');
     const W0 = window.innerWidth, H0 = window.innerHeight;
     const block = {
         x: W0 / 2, y: H0 * 0.28,
@@ -170,7 +170,7 @@ export function _thwompArenaInit(monster) {
                 st.quakeAcc = 0;
                 b.phase = 'stomp-warn';
                 b.t = 0;
-                const ring = _nkEl(st.run, 'div', 'eg-thw-ring');
+                const ring = _nkEl(st.run, 'div', 'sx-thw-ring');
                 ring.style.left = Math.round(b.x) + 'px';
                 ring.style.top = Math.round(b.y) + 'px';
                 ring.style.width = ring.style.height = (THW_STOMP_R * 2) + 'px';
@@ -220,7 +220,7 @@ export function _thwompArenaInit(monster) {
                 const mk = cl.marks[cl.next];
                 mk.stage = 'warn';
                 mk.t = 0;
-                mk.el = _nkEl(st.run, 'div', 'eg-thw-mark');
+                mk.el = _nkEl(st.run, 'div', 'sx-thw-mark');
                 mk.el.style.left = Math.round(mk.x - 44) + 'px';
                 mk.el.style.top = Math.round(mk.y - 44) + 'px';
                 cl.next++;
@@ -232,7 +232,7 @@ export function _thwompArenaInit(monster) {
                     if (mk.t >= THW_COLLAPSE_MARK_MS) {
                         mk.stage = 'done';
                         try { mk.el.remove(); } catch (e) {}
-                        const stone = _nkEl(st.run, 'div', 'eg-thw-stone', '🪨');
+                        const stone = _nkEl(st.run, 'div', 'sx-thw-stone', '🪨');
                         stone.style.left = Math.round(mk.x) + 'px';
                         stone.style.top = Math.round(mk.y) + 'px';
                         setTimeout(() => { try { stone.remove(); } catch (e) {} }, 320);
@@ -241,7 +241,7 @@ export function _thwompArenaInit(monster) {
                             _nkAbilityHitToast(dealt, 'The Thwomp', 'Collapse');
                         }
                         // Aftershock dust cloud.
-                        const cloud = _nkEl(st.run, 'div', 'eg-thw-cloud');
+                        const cloud = _nkEl(st.run, 'div', 'sx-thw-cloud');
                         cloud.style.left = Math.round(mk.x) + 'px';
                         cloud.style.top = Math.round(mk.y) + 'px';
                         setTimeout(() => { try { cloud.remove(); } catch (e) {} }, THW_AFTERSHOCK_MS);
@@ -285,7 +285,7 @@ export function _thwompArenaInit(monster) {
                     if (mn.hopAcc >= THW_MINI_HOP_MS * 0.9 && c && Math.hypot(c.x - mn.x, c.y - mn.y) < 130) {
                         mn.phase = 'slam-warn';
                         mn.t = 0;
-                        mn.ring = _nkEl(st.run, 'div', 'eg-thw-ring mini');
+                        mn.ring = _nkEl(st.run, 'div', 'sx-thw-ring mini');
                         mn.ring.style.left = Math.round(mn.x) + 'px';
                         mn.ring.style.top = Math.round(mn.y) + 'px';
                         mn.ring.style.width = mn.ring.style.height = (THW_MINI_R * 2) + 'px';
@@ -336,11 +336,11 @@ export function _thwPickHoverSpot(b) {
 
 // Expanding shockwave ring (visual punctuation for any slam).
 export function _thwShockRing(st, x, y, r, power) {
-    const ring = _nkEl(st.run, 'div', 'eg-thw-shock');
+    const ring = _nkEl(st.run, 'div', 'sx-thw-shock');
     ring.style.left = Math.round(x) + 'px';
     ring.style.top = Math.round(y) + 'px';
-    ring.style.setProperty('--eg-thw-r', (r * 2.4) + 'px');
-    ring.style.setProperty('--eg-thw-pow', String(power));
+    ring.style.setProperty('--sx-thw-r', (r * 2.4) + 'px');
+    ring.style.setProperty('--sx-thw-pow', String(power));
     setTimeout(() => { try { ring.remove(); } catch (e) {} }, 600);
 }
 
@@ -368,7 +368,7 @@ export function _thwSiege(st, p) {
     const n = THW_MINI_N[p];
     const minis = [];
     for (let i = 0; i < n; i++) {
-        const el = _nkEl(st.run, 'div', 'eg-thw-mini', '🪨');
+        const el = _nkEl(st.run, 'div', 'sx-thw-mini', '🪨');
         const mn = {
             x: window.innerWidth * (0.2 + Math.random() * 0.6),
             y: window.innerHeight * (0.2 + Math.random() * 0.6),
@@ -398,12 +398,12 @@ export function _thwompGrandSlam(monster) {
     const run = _nkNewRun(monster ? monster.id : null, true);
     _thwGrandSlamActive = true;
     run.onKill = () => { _thwGrandSlamActive = false; };
-    const mark = _nkEl(run, 'div', 'eg-thw-gs-mark');
+    const mark = _nkEl(run, 'div', 'sx-thw-gs-mark');
     mark.style.width = mark.style.height = (THW_STOMP_R * 1.9) + 'px';
     _nkToast('eg_thwomp_gs', '🪨 GRAND SLAM! Get out from under the block!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'thwomp_slam'); } catch (e) {}
     let t = 0, stage = 'follow', x = 0, y = 0, hit = false, shocked = false;
-    const crashEl = _nkEl(run, 'div', 'eg-thw-crash', '🪨');
+    const crashEl = _nkEl(run, 'div', 'sx-thw-crash', '🪨');
     crashEl.style.opacity = '0';
     _nkLoop(run, (dtS) => {
         t += dtS * 1000;

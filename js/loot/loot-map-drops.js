@@ -204,8 +204,8 @@ export function _egSpawnMapDrop(map) {
     const el = document.getElementById(`g-${r}-${c}`);
     if (el) {
         const span = document.createElement('span');
-        span.className = `eg-pickup-overlay eg-pickup-rarity-${map.rarity || 'common'} eg-loot-overlay eg-mapdrop-overlay`;
-        span.id = `eg-mapdrop-${r}-${c}`;
+        span.className = `sx-pickup-overlay sx-pickup-rarity-${map.rarity || 'common'} sx-loot-overlay sx-mapdrop-overlay`;
+        span.id = `sx-mapdrop-${r}-${c}`;
         GAME_ART.fillElement(span, 'item', GAME_ART.artIdForItem(map), map.icon || '🗺️');
         el.appendChild(span);
     }
@@ -213,7 +213,7 @@ export function _egSpawnMapDrop(map) {
     // Auto-expire after the shared loot lifetime (pause-aware).
     const lifetime = LOOT_DROP_LIFETIME_MS;
     if (typeof _scheduleTrackedExpiry === 'function') {
-        _scheduleTrackedExpiry(_egMapDrops, key, map, lifetime, `eg-mapdrop-${r}-${c}`, _egRemoveMapDropOverlay);
+        _scheduleTrackedExpiry(_egMapDrops, key, map, lifetime, `sx-mapdrop-${r}-${c}`, _egRemoveMapDropOverlay);
     } else {
         const timer = setTimeout(() => {
             if (_egMapDrops.get(key) === map) {
@@ -223,14 +223,14 @@ export function _egSpawnMapDrop(map) {
         }, lifetime);
         if (typeof _pickupTimers !== 'undefined') globalThis._pickupTimers.push(timer);
         if (typeof _startDropExpireCountdown === 'function') {
-            _startDropExpireCountdown(`eg-mapdrop-${r}-${c}`, lifetime);
+            _startDropExpireCountdown(`sx-mapdrop-${r}-${c}`, lifetime);
         }
     }
 }
 
 export function _egRemoveMapDropOverlay(key) {
     const [r, c] = key.split('-').map(Number);
-    const span = document.getElementById(`eg-mapdrop-${r}-${c}`);
+    const span = document.getElementById(`sx-mapdrop-${r}-${c}`);
     if (span) span.remove();
 }
 
@@ -239,7 +239,7 @@ export function _egAnimateMapDropClaim(row, col, item) {
     if (!el) return;
     const centre = typeof _getElementCentre === 'function' ? _getElementCentre(el) : { x: 0, y: 0 };
     const floater = document.createElement('div');
-    floater.className = 'eg-pickup-floater';
+    floater.className = 'sx-pickup-floater';
     GAME_ART.fillElement(floater, 'item', GAME_ART.artIdForItem(item), item.icon || '🗺️');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
@@ -301,7 +301,7 @@ export function _egBankUnclaimedMapDrops() {
         if (_egAddMapToMapStash(map)) banked++;
     }
     _egMapDrops.clear();
-    document.querySelectorAll('[id^="eg-mapdrop-"]').forEach(el => el.remove());
+    document.querySelectorAll('[id^="sx-mapdrop-"]').forEach(el => el.remove());
     if (banked > 0) saveHubState();
 }
 
@@ -338,15 +338,15 @@ export function _egReplaceCarriedMapDrops(maps) {
         const el = document.getElementById(`g-${r}-${c}`);
         if (el) {
             const span = document.createElement('span');
-            span.className = `eg-pickup-overlay eg-pickup-rarity-${map.rarity || 'common'} eg-loot-overlay eg-mapdrop-overlay`;
-            span.id = `eg-mapdrop-${r}-${c}`;
+            span.className = `sx-pickup-overlay sx-pickup-rarity-${map.rarity || 'common'} sx-loot-overlay sx-mapdrop-overlay`;
+            span.id = `sx-mapdrop-${r}-${c}`;
             GAME_ART.fillElement(span, 'item', GAME_ART.artIdForItem(map), map.icon || '🗺️');
             el.appendChild(span);
         }
 
         const lifetime = typeof LOOT_DROP_LIFETIME_MS !== 'undefined' ? LOOT_DROP_LIFETIME_MS : 60000;
         if (typeof _scheduleTrackedExpiry === 'function') {
-            _scheduleTrackedExpiry(_egMapDrops, key, map, lifetime, `eg-mapdrop-${r}-${c}`, _egRemoveMapDropOverlay);
+            _scheduleTrackedExpiry(_egMapDrops, key, map, lifetime, `sx-mapdrop-${r}-${c}`, _egRemoveMapDropOverlay);
         } else {
             const timer = setTimeout(() => {
                 if (_egMapDrops.get(key) === map) {
@@ -356,7 +356,7 @@ export function _egReplaceCarriedMapDrops(maps) {
             }, lifetime);
             if (typeof _pickupTimers !== 'undefined') globalThis._pickupTimers.push(timer);
             if (typeof _startDropExpireCountdown === 'function') {
-                _startDropExpireCountdown(`eg-mapdrop-${r}-${c}`, lifetime);
+                _startDropExpireCountdown(`sx-mapdrop-${r}-${c}`, lifetime);
             }
         }
     });

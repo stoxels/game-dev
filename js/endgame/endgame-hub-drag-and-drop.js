@@ -166,17 +166,17 @@ export function _dndCreateGhost(item) {
     _dndDestroyGhost();
 
     _dndGhost = document.createElement('div');
-    _dndGhost.id = 'eg-dnd-ghost';
-    _dndGhost.className = `eg-dnd-ghost eg-rarity-${item.rarity || 'common'}`;
-    _dndGhost.innerHTML = `<span class="eg-dnd-ghost-icon">${GAME_ART.html('item', item.baseId, item.icon || '📦')}</span>`;
+    _dndGhost.id = 'sx-dnd-ghost';
+    _dndGhost.className = `sx-dnd-ghost sx-rarity-${item.rarity || 'common'}`;
+    _dndGhost.innerHTML = `<span class="sx-dnd-ghost-icon">${GAME_ART.html('item', item.baseId, item.icon || '📦')}</span>`;
     _dndGhost.style.cssText = `
         position: fixed;
         pointer-events: none;
         z-index: 9999;
         transform: translate(-50%, -50%);
         font-size: 1.6rem;
-        background: var(--eg-ghost-bg, rgba(10,10,30,0.85));
-        border: 2px solid var(--eg-ghost-border, #7878ff);
+        background: var(--sx-ghost-bg, rgba(10,10,30,0.85));
+        border: 2px solid var(--sx-ghost-border, #7878ff);
         border-radius: 8px;
         padding: 6px 10px;
         box-shadow: 0 0 14px rgba(120,120,255,0.55);
@@ -211,15 +211,15 @@ export function _dndDestroyGhost() {
 // Resolves which zone and position a chip belongs to by walking up the DOM.
 // Returns a partial _dnd descriptor, or null if no recognised zone was found.
 // Currency and map-stash cells must be checked before generic inv-cells
-// because they share the eg-inv-cell class.
+// because they share the sx-inv-cell class.
 export function _dndResolvePickupZone(chip) {
-    const currencyCell = chip.closest('.eg-currency-cell');
-    const essenceCell = chip.closest('.eg-essence-cell');
+    const currencyCell = chip.closest('.sx-currency-cell');
+    const essenceCell = chip.closest('.sx-essence-cell');
     const mapStashCell = chip.closest('.eg-map-stash-cell');
-    const equipSlot = chip.closest('.eg-equip-slot');
+    const equipSlot = chip.closest('.sx-equip-slot');
     const mapSlot = chip.closest('#eg-map-slot');
     const craftingSlot = chip.closest('[data-eg-dropzone="crafting"]');
-    const invCell = chip.closest('.eg-inv-cell');
+    const invCell = chip.closest('.sx-inv-cell');
 
     if (currencyCell) {
         const r = +currencyCell.dataset.row, c = +currencyCell.dataset.col;
@@ -419,8 +419,8 @@ export function _dndReturnDisplacedToSource(item) {
 // then returns the dragged item to its source.
 export function _dndShowRejectFlash(el) {
     Audio_Manager.playSFX('ui_error');
-    el.classList.add('eg-slot-reject');
-    setTimeout(() => el.classList.remove('eg-slot-reject'), 600);
+    el.classList.add('sx-slot-reject');
+    setTimeout(() => el.classList.remove('sx-slot-reject'), 600);
     _dndReturnToSource();
 }
 
@@ -444,7 +444,7 @@ export function _dndFinalizeDrop() {
     _renderStatsList();
     _egRenderMapSlot();
     _egRenderMapStash();
-    document.querySelectorAll('.eg-unique-cell.eg-dragover, .eg-unique-grid.eg-dragover, #eg-tab-uniques.eg-dragover').forEach(el => el.classList.remove('eg-dragover'));
+    document.querySelectorAll('.sx-unique-cell.sx-dragover, .sx-unique-grid.sx-dragover, #sx-tab-uniques.sx-dragover').forEach(el => el.classList.remove('sx-dragover'));
 }
 
 
@@ -476,16 +476,16 @@ export function _dndDrop(e) {
     // Resolve the closest droppable container for each zone type.
     // Pure inv-cells must exclude the more specific currency, essence and
     // map-stash sub-classes.
-    const invCell = target.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell):not(.eg-essence-cell)');
-    const currencyCell = target.closest('.eg-currency-cell');
-    const essenceCell = target.closest('.eg-essence-cell');
+    const invCell = target.closest('.sx-inv-cell:not(.sx-currency-cell):not(.eg-map-stash-cell):not(.sx-essence-cell)');
+    const currencyCell = target.closest('.sx-currency-cell');
+    const essenceCell = target.closest('.sx-essence-cell');
     const mapStashCell = target.closest('.eg-map-stash-cell');
-    const equipSlotEl = target.closest('.eg-equip-slot');
+    const equipSlotEl = target.closest('.sx-equip-slot');
     const mapSlotEl = target.closest('#eg-map-slot');
     const craftingSlotEl = target.closest('[data-eg-dropzone="crafting"]');
-    const uniqueCell = target.closest('.eg-unique-cell');
-    const uniqueGrid = target.closest('#eg-unique-grid');
-    const uniqueTabBtn = target.closest('#eg-tab-uniques');
+    const uniqueCell = target.closest('.sx-unique-cell');
+    const uniqueGrid = target.closest('#sx-unique-grid');
+    const uniqueTabBtn = target.closest('#sx-tab-uniques');
 
     let dropped = false;
 
@@ -504,8 +504,8 @@ export function _dndDrop(e) {
             const msg = `⚠️ This stash only holds Tier ${roman} maps (Tier ${dragTier} not allowed)`;
             if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
             else if (typeof showToast === 'function') globalThis.showToast(msg, '#e74c3c');
-            mapStashCell.classList.add('eg-slot-reject');
-            setTimeout(() => mapStashCell.classList.remove('eg-slot-reject'), 600);
+            mapStashCell.classList.add('sx-slot-reject');
+            setTimeout(() => mapStashCell.classList.remove('sx-slot-reject'), 600);
             // return to source, handled below via !dropped
         } else {
             // tier-aware drop: write into active tier's grid, expand if needed
@@ -536,8 +536,8 @@ export function _dndDrop(e) {
             if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
             else if (typeof showToast === 'function') globalThis.showToast(msg, '#e74c3c');
             if (craftingSlotEl.classList) {
-                craftingSlotEl.classList.add('eg-slot-reject');
-                setTimeout(() => craftingSlotEl.classList.remove('eg-slot-reject'), 600);
+                craftingSlotEl.classList.add('sx-slot-reject');
+                setTimeout(() => craftingSlotEl.classList.remove('sx-slot-reject'), 600);
             }
             // !dropped -> the generic tail returns the unique to its origin
         } else {
@@ -599,8 +599,8 @@ export function _dndDrop(e) {
                 dropped = true;
                 const flashTarget = uniqueCell || uniqueGrid || uniqueTabBtn;
                 if (flashTarget) {
-                    flashTarget.classList.add('eg-dragover');
-                    setTimeout(() => flashTarget.classList.remove('eg-dragover'), 300);
+                    flashTarget.classList.add('sx-dragover');
+                    setTimeout(() => flashTarget.classList.remove('sx-dragover'), 300);
                 }
                 // Auto-switch to uniques tab so the user sees the result
                 if (typeof _switchStashTab === 'function') _switchStashTab('uniques');
@@ -618,8 +618,8 @@ export function _dndDrop(e) {
         } else {
             const flashTarget = uniqueCell || uniqueGrid || uniqueTabBtn;
             if (flashTarget) {
-                flashTarget.classList.add('eg-slot-reject');
-                setTimeout(() => flashTarget.classList.remove('eg-slot-reject'), 600);
+                flashTarget.classList.add('sx-slot-reject');
+                setTimeout(() => flashTarget.classList.remove('sx-slot-reject'), 600);
             }
         }
 
@@ -655,8 +655,8 @@ export function _dndDrop(e) {
                 }
             }
             if (blocked) {
-                invCell.classList.add('eg-slot-reject');
-                setTimeout(() => invCell.classList.remove('eg-slot-reject'), 600);
+                invCell.classList.add('sx-slot-reject');
+                setTimeout(() => invCell.classList.remove('sx-slot-reject'), 600);
                 // generic return-to-source below restores the carried item
             }
         }
@@ -861,14 +861,14 @@ export function _dndQuickEquipFromStash(invCell) {
             const retry = _canEquipInSlot(item, slotId);
             if (!retry.ok) {
                 _showRequirementsToast('equip', retry, item);
-                invCell.classList.add('eg-slot-reject');
-                setTimeout(() => invCell.classList.remove('eg-slot-reject'), 600);
+                invCell.classList.add('sx-slot-reject');
+                setTimeout(() => invCell.classList.remove('sx-slot-reject'), 600);
                 return;
             }
         } else {
             _showRequirementsToast('equip', gate, item);
-            invCell.classList.add('eg-slot-reject');
-            setTimeout(() => invCell.classList.remove('eg-slot-reject'), 600);
+            invCell.classList.add('sx-slot-reject');
+            setTimeout(() => invCell.classList.remove('sx-slot-reject'), 600);
             return;
         }
     }
@@ -896,8 +896,8 @@ export function _dndQuickUnequipToStash(equipSlotEl) {
     const gate = _checkUnequipSlot(slotId);
     if (!gate.ok) {
         _showRequirementsToast('unequip', gate.missing, item.name);
-        equipSlotEl.classList.add('eg-slot-reject');
-        setTimeout(() => equipSlotEl.classList.remove('eg-slot-reject'), 600);
+        equipSlotEl.classList.add('sx-slot-reject');
+        setTimeout(() => equipSlotEl.classList.remove('sx-slot-reject'), 600);
         return;
     }
 
@@ -919,7 +919,7 @@ export function _dndQuickUnequipToStash(equipSlotEl) {
 // which zone the right-clicked chip belongs to. On the Probability Gate
 // screen, maps are quick-moved between the map stash and the map device slot.
 export function _dndHandleRightClick(e) {
-    const chip = e.target.closest('.eg-item-chip');
+    const chip = e.target.closest('.sx-item-chip');
     if (!chip) return;
     const screenEl = _dndChipScreenEl(chip);
     if (!screenEl) return;
@@ -933,8 +933,8 @@ export function _dndHandleRightClick(e) {
     // The chip may move or vanish (quick-equip/unequip) - close its tooltip.
     _clearTooltip();
 
-    const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell):not(.eg-essence-cell)');
-    const equipSlot = chip.closest('.eg-equip-slot');
+    const invCell = chip.closest('.sx-inv-cell:not(.sx-currency-cell):not(.eg-map-stash-cell):not(.sx-essence-cell)');
+    const equipSlot = chip.closest('.sx-equip-slot');
     const mapStashCell = chip.closest('.eg-map-stash-cell');
     const mapSlot = chip.closest('#eg-map-slot');
 
@@ -1046,23 +1046,23 @@ export function _dndQuickUnloadMapFromDevice() {
 // when the stack count is greater than 1.
 export function _dndBuildCurrencyChipHTML(item) {
     if (!item) return '';
-    const rarityClass = `eg-rarity-${item.rarity || 'currency'}`;
+    const rarityClass = `sx-rarity-${item.rarity || 'currency'}`;
     const itemJson = JSON.stringify(item).replace(/"/g, '&quot;');
     const badge = (item.count && item.count > 1)
-        ? `<span class="eg-stack-badge">${item.count >= 1000 ? Math.floor(item.count / 1000) + 'k' : item.count}</span>`
+        ? `<span class="sx-stack-badge">${item.count >= 1000 ? Math.floor(item.count / 1000) + 'k' : item.count}</span>`
         : '';
     return `
-<div class="eg-item-chip ${rarityClass}" draggable="true"
+<div class="sx-item-chip ${rarityClass}" draggable="true"
      onmouseenter="_showHubTooltip(${itemJson}, event)"
      onmousemove="_moveTooltip(event)"
      onmouseleave="_clearTooltip()">
-    <span class="eg-item-chip-icon">${GAME_ART.html('item', item.id, item.icon || '📦')}</span>${badge}
+    <span class="sx-item-chip-icon">${GAME_ART.html('item', item.id, item.icon || '📦')}</span>${badge}
 </div>`;
 }
 
 // Overrides the base _renderCurrencyCell from endgame-hub.js.
 // Uses _dndBuildCurrencyChipHTML so stacked currency shows the count badge.
-// Renders BOTH twin grids - hub's left tab (eg-currency-cell-*) and the
+// Renders BOTH twin grids - hub's left tab (sx-currency-cell-*) and the
 // Probability Gate's strip (eg-gate-currency-cell-*) - because both read
 // from the same _currencyStash. Empty assigned slots get a dashed placeholder.
 export function _renderCurrencyCell(row, col) {
@@ -1083,11 +1083,11 @@ export function _renderCurrencyCell(row, col) {
         // title that nothing sets any more.)
         if (item) {
             cell.innerHTML = _dndBuildCurrencyChipHTML(item);
-            cell.classList.remove('eg-currency-assigned-empty');
+            cell.classList.remove('sx-currency-assigned-empty');
             cell.removeAttribute('data-empty-icon');
         } else if (assignedId) {
             cell.innerHTML = '';
-            cell.classList.add('eg-currency-assigned-empty');
+            cell.classList.add('sx-currency-assigned-empty');
             // Empty slots preview their currency art (dimmed via CSS) once
             // loaded, else the classic emoji ::after placeholder.
             const emptyArt = (def && GAME_ART) ? GAME_ART.url('item', assignedId) : null;
@@ -1099,18 +1099,18 @@ export function _renderCurrencyCell(row, col) {
                 img.draggable = false;
                 img.loading = 'lazy';
                 img.decoding = 'async';
-                img.className = 'eg-art-img eg-empty-slot-art';
+                img.className = 'sx-art-img sx-empty-slot-art';
                 cell.appendChild(img);
             } else if (def && def.icon) {
                 cell.setAttribute('data-empty-icon', def.icon);
             }
         } else {
             cell.innerHTML = '';
-            cell.classList.remove('eg-currency-assigned-empty');
+            cell.classList.remove('sx-currency-assigned-empty');
             cell.removeAttribute('data-empty-icon');
         }
     }
-    applyToCell(document.getElementById(`eg-currency-cell-${row}-${col}`));
+    applyToCell(document.getElementById(`sx-currency-cell-${row}-${col}`));
     applyToCell(document.getElementById(`eg-gate-currency-cell-${row}-${col}`));
 }
 
@@ -1184,34 +1184,34 @@ export function addCurrency(id, amount = 1, def = null) {
 // Runs once on init - skips injection if the style tag already exists.
 // These rules can be moved to a .css file if preferred.
 export function _dndInjectStyles() {
-    if (document.getElementById('eg-dnd-styles')) return;
+    if (document.getElementById('sx-dnd-styles')) return;
 
     const style = document.createElement('style');
-    style.id = 'eg-dnd-styles';
+    style.id = 'sx-dnd-styles';
     style.textContent = `
         /* Highlight drop targets while a drag is hovering */
-        .eg-inv-cell.eg-dragover,
-        .eg-currency-cell.eg-dragover,
-        .eg-essence-cell.eg-dragover,
-        .eg-map-stash-cell.eg-dragover,
-        .eg-equip-slot.eg-dragover,
-        #eg-map-slot.eg-dragover {
+        .sx-inv-cell.sx-dragover,
+        .sx-currency-cell.sx-dragover,
+        .sx-essence-cell.sx-dragover,
+        .eg-map-stash-cell.sx-dragover,
+        .sx-equip-slot.sx-dragover,
+        #eg-map-slot.sx-dragover {
             outline: 2px solid #a0a0ff;
             background: rgba(100, 100, 255, 0.18);
         }
 
         /* Red flash when a drop is rejected (wrong slot type) */
-        .eg-slot-reject { animation: eg-reject-flash 0.6s ease-out; }
-        @keyframes eg-reject-flash {
+        .sx-slot-reject { animation: sx-reject-flash 0.6s ease-out; }
+        @keyframes sx-reject-flash {
             0%   { outline: 2px solid #ff4444; background: rgba(255,60,60,0.25); }
             100% { outline: none; background: transparent; }
         }
 
         /* Prevent text selection while dragging */
-        body.eg-dragging * { user-select: none !important; }
+        body.sx-dragging * { user-select: none !important; }
 
         /* Item chip - emoji-only, transparent background, no border or name text */
-        .eg-item-chip {
+        .sx-item-chip {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1224,27 +1224,27 @@ export function _dndInjectStyles() {
             transition: filter 0.1s, transform 0.1s;
             line-height: 1;
         }
-        .eg-item-chip:hover  { filter: brightness(1.25) drop-shadow(0 0 4px rgba(200,200,255,0.6)); }
-        .eg-item-chip:hover .eg-item-chip-icon { transform: scale(1.15); }
-        .eg-item-chip:active { cursor: grabbing; }
+        .sx-item-chip:hover  { filter: brightness(1.25) drop-shadow(0 0 4px rgba(200,200,255,0.6)); }
+        .sx-item-chip:hover .sx-item-chip-icon { transform: scale(1.15); }
+        .sx-item-chip:active { cursor: grabbing; }
 
         /* Name label hidden - tooltip panel carries that information */
-        .eg-item-chip-name { display: none; }
+        .sx-item-chip-name { display: none; }
 
         /* Emoji sized large enough to fill the cell */
-        .eg-item-chip-icon { font-size: 1.45rem; line-height: 1; user-select: none; transition: transform 0.1s; }
+        .sx-item-chip-icon { font-size: 1.45rem; line-height: 1; user-select: none; transition: transform 0.1s; }
 
         /* Rarity tints via drop-shadow on the emoji itself */
-        .eg-item-chip.eg-rarity-uncommon  .eg-item-chip-icon { filter: drop-shadow(0 0 3px #4caf50); }
-        .eg-item-chip.eg-rarity-rare      .eg-item-chip-icon { filter: drop-shadow(0 0 4px #5b9cf6); }
-        .eg-item-chip.eg-rarity-legendary .eg-item-chip-icon { filter: drop-shadow(0 0 6px #e6a817) drop-shadow(0 0 2px #fff8); }
-        .eg-item-chip.eg-rarity-currency  .eg-item-chip-icon { filter: drop-shadow(0 0 3px #b59248); }
+        .sx-item-chip.sx-rarity-uncommon  .sx-item-chip-icon { filter: drop-shadow(0 0 3px #4caf50); }
+        .sx-item-chip.sx-rarity-rare      .sx-item-chip-icon { filter: drop-shadow(0 0 4px #5b9cf6); }
+        .sx-item-chip.sx-rarity-legendary .sx-item-chip-icon { filter: drop-shadow(0 0 6px #e6a817) drop-shadow(0 0 2px #fff8); }
+        .sx-item-chip.sx-rarity-currency  .sx-item-chip-icon { filter: drop-shadow(0 0 3px #b59248); }
 
         /* Currency count suffix displayed inside the tooltip name line */
-        .eg-tooltip-count { font-weight: 700; color: #f5d98a; }
+        .sx-tooltip-count { font-weight: 700; color: #f5d98a; }
 
         /* Stack count badge - bottom-right corner of a currency cell */
-        .eg-stack-badge {
+        .sx-stack-badge {
             position: absolute;
             bottom: 1px;
             right: 2px;
@@ -1258,15 +1258,15 @@ export function _dndInjectStyles() {
         }
 
         /* Currency cells need relative positioning so the badge can be absolute */
-        .eg-currency-cell { position: relative; }
+        .sx-currency-cell { position: relative; }
 
         /* Ghost rarity glows */
-        .eg-dnd-ghost.eg-rarity-legendary { box-shadow: 0 0 18px rgba(230,168,23,0.7)  !important; }
-        .eg-dnd-ghost.eg-rarity-rare      { box-shadow: 0 0 12px rgba(91,156,246,0.6)  !important; }
-        .eg-dnd-ghost.eg-rarity-uncommon  { box-shadow: 0 0 10px rgba(76,175,80,0.55)  !important; }
+        .sx-dnd-ghost.sx-rarity-legendary { box-shadow: 0 0 18px rgba(230,168,23,0.7)  !important; }
+        .sx-dnd-ghost.sx-rarity-rare      { box-shadow: 0 0 12px rgba(91,156,246,0.6)  !important; }
+        .sx-dnd-ghost.sx-rarity-uncommon  { box-shadow: 0 0 10px rgba(76,175,80,0.55)  !important; }
 
         /* Requirement-blocked items: red glow + slightly desaturated icon */
-        .eg-item-chip.eg-req-blocked .eg-item-chip-icon {
+        .sx-item-chip.sx-req-blocked .sx-item-chip-icon {
             filter: grayscale(0.35) drop-shadow(0 0 4px rgba(231,76,60,0.9));
         }
     `;
@@ -1287,7 +1287,7 @@ export function _dndChipScreenEl(chip) {
     // _ensureCraftingBenchOverlay), so it sits outside both screen roots.
     // Treat it as a valid drag-origin container too, or items placed in the
     // bench slot could never be picked back up.
-    return chip.closest('#screen-endgame-hub') || chip.closest('#screen-endgame-gate') || chip.closest('#eg-crafting-bench-overlay');
+    return chip.closest('#screen-endgame-hub') || chip.closest('#screen-endgame-gate') || chip.closest('#sx-crafting-bench-overlay');
 }
 
 // Binds the four global listeners that power the custom DnD system.
@@ -1297,7 +1297,7 @@ export function _dndChipScreenEl(chip) {
 export function _dndBindListeners() {
     // Pick-up: left-click on any item chip inside the hub or gate screen.
     document.addEventListener('mousedown', e => {
-        const chip = e.target.closest('.eg-item-chip');
+        const chip = e.target.closest('.sx-item-chip');
         if (!chip || !_dndChipScreenEl(chip)) return;
         _dndPickUp(e, chip);
     }, true);
@@ -1307,7 +1307,7 @@ export function _dndBindListeners() {
         if (_dnd.active) {
             _dndMoveGhost(e.clientX, e.clientY);
             // Auto-scroll the stash when dragging near its top/bottom edge
-            const grid = document.getElementById('eg-inv-grid');
+            const grid = document.getElementById('sx-inv-grid');
             if (grid) {
                 const rect = grid.getBoundingClientRect();
                 const edge = 70;
@@ -1328,18 +1328,18 @@ export function _dndBindListeners() {
                 }
             }
             // Unique stash dragover highlight (only for uniques) – includes tab button when grid is hidden
-            document.getElementById('eg-unique-grid');
-            document.getElementById('eg-tab-uniques');
+            document.getElementById('sx-unique-grid');
+            document.getElementById('sx-tab-uniques');
             // clear previous
-            document.querySelectorAll('.eg-unique-cell.eg-dragover, .eg-unique-grid.eg-dragover, #eg-tab-uniques.eg-dragover').forEach(el => el.classList.remove('eg-dragover'));
+            document.querySelectorAll('.sx-unique-cell.sx-dragover, .sx-unique-grid.sx-dragover, #sx-tab-uniques.sx-dragover').forEach(el => el.classList.remove('sx-dragover'));
             if (_dnd.item && _dnd.item.isUnique) {
                 const under = document.elementFromPoint(e.clientX, e.clientY);
-                const uCell = under && under.closest ? under.closest('.eg-unique-cell') : null;
-                const uGrid = under && under.closest ? under.closest('#eg-unique-grid') : null;
-                const uTab = under && under.closest ? under.closest('#eg-tab-uniques') : null;
-                if (uCell) uCell.classList.add('eg-dragover');
-                else if (uGrid) uGrid.classList.add('eg-dragover');
-                else if (uTab) uTab.classList.add('eg-dragover');
+                const uCell = under && under.closest ? under.closest('.sx-unique-cell') : null;
+                const uGrid = under && under.closest ? under.closest('#sx-unique-grid') : null;
+                const uTab = under && under.closest ? under.closest('#sx-tab-uniques') : null;
+                if (uCell) uCell.classList.add('sx-dragover');
+                else if (uGrid) uGrid.classList.add('sx-dragover');
+                else if (uTab) uTab.classList.add('sx-dragover');
                 // Auto-hover switch: if hovering the uniques tab for a moment, show it
                 if (uTab && typeof _switchStashTab === 'function' && _stashTab !== 'uniques') {
                     // debounce – switch immediately for visual feedback
@@ -1348,14 +1348,14 @@ export function _dndBindListeners() {
             }
         } else {
             // clear stale highlights when not dragging
-            document.querySelectorAll('.eg-unique-cell.eg-dragover, .eg-unique-grid.eg-dragover, #eg-tab-uniques.eg-dragover').forEach(el => el.classList.remove('eg-dragover'));
+            document.querySelectorAll('.sx-unique-cell.sx-dragover, .sx-unique-grid.sx-dragover, #sx-tab-uniques.sx-dragover').forEach(el => el.classList.remove('sx-dragover'));
         }
     });
 
     // Drop: release the mouse button anywhere on the window.
     window.addEventListener('mouseup', e => {
         if (_dnd.active) _dndDrop(e);
-        document.querySelectorAll('.eg-unique-cell.eg-dragover, .eg-unique-grid.eg-dragover, #eg-tab-uniques.eg-dragover').forEach(el => el.classList.remove('eg-dragover'));
+        document.querySelectorAll('.sx-unique-cell.sx-dragover, .sx-unique-grid.sx-dragover, #sx-tab-uniques.sx-dragover').forEach(el => el.classList.remove('sx-dragover'));
     });
 
     // Right-click: quick-equip from stash or quick-unequip from char slot.
@@ -1367,7 +1367,7 @@ export function _dndBindListeners() {
             _dndDestroyGhost();
             _dndReturnToSource();
             _dndReset();
-            document.querySelectorAll('.eg-unique-cell.eg-dragover, .eg-unique-grid.eg-dragover, #eg-tab-uniques.eg-dragover').forEach(el => el.classList.remove('eg-dragover'));
+            document.querySelectorAll('.sx-unique-cell.sx-dragover, .sx-unique-grid.sx-dragover, #sx-tab-uniques.sx-dragover').forEach(el => el.classList.remove('sx-dragover'));
         }
     });
 }

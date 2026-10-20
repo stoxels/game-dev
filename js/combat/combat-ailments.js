@@ -17,7 +17,7 @@ export function _ailmentsReset() {
     _stopShockedCursor();
     _stopPlayerStatusBarTicker();
     _hideBlockLockoutOverlay();
-    const strip = document.getElementById('eg-player-status-strip');
+    const strip = document.getElementById('sx-player-status-strip');
     if (strip) strip.remove();
 }
 
@@ -29,6 +29,6 @@ export function _ailmentsCleanup() {
     _stopShockedCursor();
     _stopPlayerStatusBarTicker();
     _hideBlockLockoutOverlay();
-    const strip = document.getElementById('eg-player-status-strip');
+    const strip = document.getElementById('sx-player-status-strip');
     if (strip) strip.remove();
 }

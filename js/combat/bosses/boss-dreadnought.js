@@ -67,7 +67,7 @@ export function _mechBroadsides(monster, phase) {
                 const base = Math.atan2((c ? c.y : H / 2) - oy, (c ? c.x : W / 2) - ox);
                 for (let i = 0; i < fanN; i++) {
                     const a = base + (i - (fanN - 1) / 2) * 0.22;
-                    const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-shell', '💣');
+                    const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-shell', '💣');
                     orbs.push({ x: ox, y: oy, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, t: 0, hitDone: false, el });
                 }
             }
@@ -107,7 +107,7 @@ export function _mechSearchlight(monster, phase) {
     const level = monster ? monster.level : 1;
     // The lamp lags a half-second behind you - juke it, don't outrun it.
     const lamp = { x: window.innerWidth / 2, y: 100 };
-    const beam = _nkEl(run, 'div', 'eg-nk-searchlight');
+    const beam = _nkEl(run, 'div', 'sx-nk-searchlight');
     _nkToast('eg_mech_searchlight', '🛳️ The Dreadnought: Searchlight! Kill it by leaving it!');
     let e = 0, dotWarnAt = 0;
     _nkLoop(run, (dtS, now) => {

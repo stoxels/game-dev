@@ -447,7 +447,7 @@ export function _hzShowHitText(amount, colorHex) {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
-    label.className = 'eg-hz-hit-text';
+    label.className = 'sx-hz-hit-text';
     label.style.color = colorHex || '#ff6b4a';
     label.textContent = '-' + amount;
     hud.appendChild(label);

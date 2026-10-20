@@ -43,17 +43,17 @@ export function _craftingBenchTooltipHTML(entry, tier, costs, disabled, affordab
 // Binds tier hover behavior to the shared game-tooltip implementation.
 export function _craftingBenchBindTooltips(overlay) {
     overlay.addEventListener('mouseover', event => {
-        const button = event.target.closest('.eg-craft-tier');
+        const button = event.target.closest('.sx-craft-tier');
         if (!button || (event.relatedTarget && button.contains(event.relatedTarget))) return;
         if (button.dataset.tooltipHtml) showGameTooltip(button.dataset.tooltipHtml, event);
     });
     overlay.addEventListener('mousemove', event => {
-        if (event.target.closest && event.target.closest('.eg-craft-tier')) {
+        if (event.target.closest && event.target.closest('.sx-craft-tier')) {
             moveGameTooltip(event);
         }
     });
     overlay.addEventListener('mouseout', event => {
-        const button = event.target.closest ? event.target.closest('.eg-craft-tier') : null;
+        const button = event.target.closest ? event.target.closest('.sx-craft-tier') : null;
         if (button && !(event.relatedTarget && button.contains(event.relatedTarget))) {
             hideGameTooltip();
         }
@@ -72,10 +72,10 @@ function _craftingBenchCostChipsHTML(costs) {
         const have = _craftCurrencyCount(cost.id);
         const ok = have >= cost.count;
         const name = def.name || cost.id;
-        return `<span class="eg-craft-chip ${ok ? 'ok' : 'short'}" title="${name}">`
-            + `<span class="eg-craft-chip-icon">${def.icon || '🪙'}</span>`
-            + `<span class="eg-craft-chip-name">${name}</span>`
-            + `<span class="eg-craft-chip-qty">${have}<i>/</i>${cost.count}</span></span>`;
+        return `<span class="sx-craft-chip ${ok ? 'ok' : 'short'}" title="${name}">`
+            + `<span class="sx-craft-chip-icon">${def.icon || '🪙'}</span>`
+            + `<span class="sx-craft-chip-name">${name}</span>`
+            + `<span class="sx-craft-chip-qty">${have}<i>/</i>${cost.count}</span></span>`;
     }).join('');
 }
 
@@ -102,9 +102,9 @@ export function _craftingBenchCapacityHTML(item) {
         const maxSuf = CRAFTED_MOD_CAPS.maxSuf;
         const prePct = Math.round((craftedPre / maxPre) * 100);
         const sufPct = Math.round((craftedSuf / maxSuf) * 100);
-        return `<div class="eg-craft-capacity">
-            <div class="eg-craft-capacity-item"><span>Crafted Prefix:</span><div class="eg-craft-capacity-bar"><div class="eg-craft-capacity-fill" style="width:${prePct}%"></div></div><span>${craftedPre}/${maxPre}</span></div>
-            <div class="eg-craft-capacity-item"><span>Crafted Suffix:</span><div class="eg-craft-capacity-bar"><div class="eg-craft-capacity-fill" style="width:${sufPct}%"></div></div><span>${craftedSuf}/${maxSuf}</span></div>
+        return `<div class="sx-craft-capacity">
+            <div class="sx-craft-capacity-item"><span>Crafted Prefix:</span><div class="sx-craft-capacity-bar"><div class="sx-craft-capacity-fill" style="width:${prePct}%"></div></div><span>${craftedPre}/${maxPre}</span></div>
+            <div class="sx-craft-capacity-item"><span>Crafted Suffix:</span><div class="sx-craft-capacity-bar"><div class="sx-craft-capacity-fill" style="width:${sufPct}%"></div></div><span>${craftedSuf}/${maxSuf}</span></div>
         </div>`;
     }
 
@@ -112,9 +112,9 @@ export function _craftingBenchCapacityHTML(item) {
     const maxSuf = caps ? caps.maxSuf : 0;
     const prePct = maxPre > 0 ? Math.round(((regularPre + craftedPre) / maxPre) * 100) : 0;
     const sufPct = maxSuf > 0 ? Math.round(((regularSuf + craftedSuf) / maxSuf) * 100) : 0;
-    return `<div class="eg-craft-capacity">
-            <div class="eg-craft-capacity-item"><span>Prefix:</span><div class="eg-craft-capacity-bar"><div class="eg-craft-capacity-fill" style="width:${prePct}%"></div></div><span>${regularPre + craftedPre}/${maxPre} (${craftedPre} crafted)</span></div>
-            <div class="eg-craft-capacity-item"><span>Suffix:</span><div class="eg-craft-capacity-bar"><div class="eg-craft-capacity-fill" style="width:${sufPct}%"></div></div><span>${regularSuf + craftedSuf}/${maxSuf} (${craftedSuf} crafted)</span></div>
+    return `<div class="sx-craft-capacity">
+            <div class="sx-craft-capacity-item"><span>Prefix:</span><div class="sx-craft-capacity-bar"><div class="sx-craft-capacity-fill" style="width:${prePct}%"></div></div><span>${regularPre + craftedPre}/${maxPre} (${craftedPre} crafted)</span></div>
+            <div class="sx-craft-capacity-item"><span>Suffix:</span><div class="sx-craft-capacity-bar"><div class="sx-craft-capacity-fill" style="width:${sufPct}%"></div></div><span>${regularSuf + craftedSuf}/${maxSuf} (${craftedSuf} crafted)</span></div>
         </div>`;
 }
 
@@ -169,20 +169,20 @@ export function _craftingBenchBuildHTML() {
                 const state = disabled ? 'locked' : (affordable ? 'ready' : 'short');
                 const pill = disabled ? `🔒 ILVL ${tier.ilvl}` : (affordable ? '✓ READY' : '✗ MISSING');
                 if (state === 'ready') ready++;
-                tiersHTML += `<button class="eg-craft-tier ${state} ${selected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}" ${isDisabled ? 'aria-disabled="true"' : `onclick="_craftingBenchSelect('${entry.familyId}', '${entry.type}', ${tier.tier})"`} data-tooltip-html="${tooltipHTML.replace(/"/g, '&quot;')}">`
-                    + `<span class="eg-craft-tier-main">${_craftingBenchTierLabel(tier)}</span>`
-                    + `<span class="eg-craft-tier-costs">${_craftingBenchCostChipsHTML(costs)}</span>`
-                    + `<span class="eg-craft-pill ${state}">${pill}</span></button>`;
+                tiersHTML += `<button class="sx-craft-tier ${state} ${selected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}" ${isDisabled ? 'aria-disabled="true"' : `onclick="_craftingBenchSelect('${entry.familyId}', '${entry.type}', ${tier.tier})"`} data-tooltip-html="${tooltipHTML.replace(/"/g, '&quot;')}">`
+                    + `<span class="sx-craft-tier-main">${_craftingBenchTierLabel(tier)}</span>`
+                    + `<span class="sx-craft-tier-costs">${_craftingBenchCostChipsHTML(costs)}</span>`
+                    + `<span class="sx-craft-pill ${state}">${pill}</span></button>`;
             }
-            cards += `<div class="eg-craft-family ${entry.type} ${ready ? 'has-ready' : 'none-ready'}"><div class="eg-craft-family-head"><span class="eg-craft-family-badge ${entry.type}">${entry.type.toUpperCase()}</span><span class="eg-craft-family-name ${entry.type}">${label}</span><span class="eg-craft-family-count ${ready ? 'ok' : 'none'}">${ready ? `${ready}/${entry.tiers.length} craftable` : 'not craftable'}</span></div><div class="eg-craft-tiers">${tiersHTML}</div></div>`;
+            cards += `<div class="sx-craft-family ${entry.type} ${ready ? 'has-ready' : 'none-ready'}"><div class="sx-craft-family-head"><span class="sx-craft-family-badge ${entry.type}">${entry.type.toUpperCase()}</span><span class="sx-craft-family-name ${entry.type}">${label}</span><span class="sx-craft-family-count ${ready ? 'ok' : 'none'}">${ready ? `${ready}/${entry.tiers.length} craftable` : 'not craftable'}</span></div><div class="sx-craft-tiers">${tiersHTML}</div></div>`;
         }
         return cards;
     };
 
     let options = '';
-    if (prefixFamilies.length) options += `<div class="eg-craft-col prefix"><div class="eg-craft-col-head prefix">PREFIX · ${prefixFamilies.length}</div>${buildCards(prefixFamilies)}</div>`;
-    if (suffixFamilies.length) options += `<div class="eg-craft-col suffix"><div class="eg-craft-col-head suffix">SUFFIX · ${suffixFamilies.length}</div>${buildCards(suffixFamilies)}</div>`;
-    if (!options) options = `<div class="eg-craft-empty">${status}</div>`;
+    if (prefixFamilies.length) options += `<div class="sx-craft-col prefix"><div class="sx-craft-col-head prefix">PREFIX · ${prefixFamilies.length}</div>${buildCards(prefixFamilies)}</div>`;
+    if (suffixFamilies.length) options += `<div class="sx-craft-col suffix"><div class="sx-craft-col-head suffix">SUFFIX · ${suffixFamilies.length}</div>${buildCards(suffixFamilies)}</div>`;
+    if (!options) options = `<div class="sx-craft-empty">${status}</div>`;
 
     const capacityHTML = item ? _craftingBenchCapacityHTML(item) : '';
     // Footer: cost of the currently selected modifier, have / need per currency.
@@ -191,8 +191,8 @@ export function _craftingBenchBuildHTML() {
         for (const entry of families) {
             if (entry.familyId !== _craftingBenchSelection.familyId || entry.type !== _craftingBenchSelection.type) continue;
             const tier = entry.tiers.find(x => x.tier === _craftingBenchSelection.tier);
-            if (tier) selectedCostHTML = `<span class="eg-craft-selected-label">Cost</span>${_craftingBenchCostChipsHTML(_craftingBenchEffectiveCosts(entry, tier))}`;
+            if (tier) selectedCostHTML = `<span class="sx-craft-selected-label">Cost</span>${_craftingBenchCostChipsHTML(_craftingBenchEffectiveCosts(entry, tier))}`;
         }
     }
-    return `<div class="eg-craft-bench-panel"><div class="eg-craft-head"><span class="eg-craft-head-icon">⚒</span><span class="eg-craft-head-title">CRAFTING BENCH</span><button class="eg-craft-close" onclick="_closeCraftingBench()" data-tip-t="ui_close" aria-label="${t('ui_close')}">✕</button></div><h2>⚒ CRAFTING BENCH</h2><div class="eg-craft-body"><div class="eg-craft-bench-item" id="eg-crafting-bench-item" data-eg-dropzone="crafting" ondragover="egDragOver(event)"><span>${item ? _buildItemChipHTML(item, 'large') : 'Drop an equipment item here'}</span></div><div class="eg-craft-ilvl">${item ? `Item level: ${item.itemLevel || 1}` : status}</div>${capacityHTML}${valid ? '<div class="eg-craft-legend"><span class="eg-craft-pill ready">✓ READY</span> can craft now <span class="eg-craft-pill short">✗ MISSING</span> not enough currency <span class="eg-craft-pill locked">🔒 ILVL</span> item level too low</div>' : ''}<div class="eg-craft-options">${options || `<div class="eg-craft-empty">${status}</div>`}</div></div><div class="eg-craft-footer"><div class="eg-craft-selected-cost">${_craftingBenchCostHTML()}${selectedCostHTML}</div><button class="eg-craft-apply" onclick="_craftingBenchApply()" ${!_craftingBenchSelection ? 'disabled' : ''}>CRAFT SELECTED MODIFIER</button></div></div>`;
+    return `<div class="sx-craft-bench-panel"><div class="sx-craft-head"><span class="sx-craft-head-icon">⚒</span><span class="sx-craft-head-title">CRAFTING BENCH</span><button class="sx-craft-close" onclick="_closeCraftingBench()" data-tip-t="ui_close" aria-label="${t('ui_close')}">✕</button></div><h2>⚒ CRAFTING BENCH</h2><div class="sx-craft-body"><div class="sx-craft-bench-item" id="sx-crafting-bench-item" data-eg-dropzone="crafting" ondragover="egDragOver(event)"><span>${item ? _buildItemChipHTML(item, 'large') : 'Drop an equipment item here'}</span></div><div class="sx-craft-ilvl">${item ? `Item level: ${item.itemLevel || 1}` : status}</div>${capacityHTML}${valid ? '<div class="sx-craft-legend"><span class="sx-craft-pill ready">✓ READY</span> can craft now <span class="sx-craft-pill short">✗ MISSING</span> not enough currency <span class="sx-craft-pill locked">🔒 ILVL</span> item level too low</div>' : ''}<div class="sx-craft-options">${options || `<div class="sx-craft-empty">${status}</div>`}</div></div><div class="sx-craft-footer"><div class="sx-craft-selected-cost">${_craftingBenchCostHTML()}${selectedCostHTML}</div><button class="sx-craft-apply" onclick="_craftingBenchApply()" ${!_craftingBenchSelection ? 'disabled' : ''}>CRAFT SELECTED MODIFIER</button></div></div>`;
 }

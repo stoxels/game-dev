@@ -20,9 +20,9 @@ export let _pendingCurrencyUse = null; // { defId, sourceRow, sourceCol }
 
 export function _startCurrencyUse(def, row, col, chipEl) {
     _pendingCurrencyUse = { defId: def.id, sourceRow: row, sourceCol: col };
-    document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
-    if (chipEl) chipEl.classList.add('eg-currency-selected');
-    document.body.classList.add('eg-currency-use-active');
+    document.querySelectorAll('.sx-item-chip').forEach(el => el.classList.remove('sx-currency-selected'));
+    if (chipEl) chipEl.classList.add('sx-currency-selected');
+    document.body.classList.add('sx-currency-use-active');
     Audio_Manager.playSFX('currency_select');
     globalThis.showToast(t('eg_currency_selected')
         .replace('{icon}', def.icon)
@@ -32,8 +32,8 @@ export function _startCurrencyUse(def, row, col, chipEl) {
 export function _cancelCurrencyUse(silent) {
     if (!_pendingCurrencyUse) return;
     _pendingCurrencyUse = null;
-    document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
-    document.body.classList.remove('eg-currency-use-active');
+    document.querySelectorAll('.sx-item-chip').forEach(el => el.classList.remove('sx-currency-selected'));
+    document.body.classList.remove('sx-currency-use-active');
     if (!silent) {
         Audio_Manager.playSFX('currency_cancel');
         globalThis.showToast(t('eg_currency_cancelled'));
@@ -46,12 +46,12 @@ export function _cancelCurrencyUse(silent) {
 export function _refreshCurrencyUseHighlight() {
     if (!_pendingCurrencyUse) return;
     const { sourceRow, sourceCol } = _pendingCurrencyUse;
-    document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
+    document.querySelectorAll('.sx-item-chip').forEach(el => el.classList.remove('sx-currency-selected'));
     const chip = document.querySelector(
-        `.eg-currency-cell[data-row="${sourceRow}"][data-col="${sourceCol}"] .eg-item-chip`);
+        `.sx-currency-cell[data-row="${sourceRow}"][data-col="${sourceCol}"] .sx-item-chip`);
     if (chip) {
-        chip.classList.add('eg-currency-selected');
-        document.body.classList.add('eg-currency-use-active');
+        chip.classList.add('sx-currency-selected');
+        document.body.classList.add('sx-currency-use-active');
     } else {
         _cancelCurrencyUse(true);
     }
@@ -81,8 +81,8 @@ export function _applyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         Audio_Manager.playSFX('currency_apply_fail', 'player_equip_not_pickup');
         if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
         if (chipEl) {
-            chipEl.classList.add('eg-slot-reject');
-            setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
+            chipEl.classList.add('sx-slot-reject');
+            setTimeout(() => chipEl.classList.remove('sx-slot-reject'), 600);
         }
         _cancelCurrencyUse(true);
         return;
@@ -95,8 +95,8 @@ export function _applyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         Audio_Manager.playSFX('currency_apply_fail', 'player_equip_not_pickup');
         if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
         if (chipEl) {
-            chipEl.classList.add('eg-slot-reject');
-            setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
+            chipEl.classList.add('sx-slot-reject');
+            setTimeout(() => chipEl.classList.remove('sx-slot-reject'), 600);
         }
         _cancelCurrencyUse(true);
         return;
@@ -108,8 +108,8 @@ export function _applyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         Audio_Manager.playSFX('currency_apply_fail', 'player_equip_not_pickup');
         if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
         if (chipEl) {
-            chipEl.classList.add('eg-slot-reject');
-            setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
+            chipEl.classList.add('sx-slot-reject');
+            setTimeout(() => chipEl.classList.remove('sx-slot-reject'), 600);
         }
         _cancelCurrencyUse(true);
         return;

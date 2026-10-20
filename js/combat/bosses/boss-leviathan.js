@@ -49,12 +49,12 @@ export function _mechRisingTide(monster, phase) {
     const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const H = window.innerHeight;
-    const tide = _nkEl(run, 'div', 'eg-nk-tide');
+    const tide = _nkEl(run, 'div', 'sx-nk-tide');
     tide.textContent = '🌊🌊🌊';
     let tideY = H + 40; // waterline rises from below
     const debris = [];
     for (let i = 0; i < debrisN; i++) {
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-debris', '🪵');
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-debris', '🪵');
         el.style.display = 'none';
         debris.push({
             x: 40 + Math.random() * Math.max(40, window.innerWidth - 80),

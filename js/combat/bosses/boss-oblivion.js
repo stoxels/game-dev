@@ -49,9 +49,9 @@ export function _mechSingularity(monster, phase) {
     const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const cx = window.innerWidth * 0.5, cy = window.innerHeight * 0.45;
-    const core = _nkEl(run, 'div', 'eg-nk-dot eg-nk-singularity', '🌌');
+    const core = _nkEl(run, 'div', 'sx-nk-dot sx-nk-singularity', '🌌');
     core.style.transform = 'translate(' + Math.round(cx - 30) + 'px,' + Math.round(cy - 30) + 'px)';
-    const ring = _nkEl(run, 'div', 'eg-nk-ring eg-nk-ring-warn');
+    const ring = _nkEl(run, 'div', 'sx-nk-ring sx-nk-ring-warn');
     ring.style.left = Math.round(cx - coreR) + 'px';
     ring.style.top = Math.round(cy - coreR) + 'px';
     ring.style.width = coreR * 2 + 'px';
@@ -96,7 +96,7 @@ export function _mechEventBeams(monster, phase) {
     const len = Math.hypot(window.innerWidth, window.innerHeight);
     const beams = [];
     for (let i = 0; i < nBeams; i++) {
-        const el = _nkEl(run, 'div', 'eg-nk-beam eg-nk-beam-fire');
+        const el = _nkEl(run, 'div', 'sx-nk-beam sx-nk-beam-fire');
         el.style.width = Math.round(len) + 'px';
         el.style.height = halfW * 2 + 'px';
         el.style.left = Math.round(cx) + 'px';

@@ -64,24 +64,24 @@ function _vendorBuildTopbarHTML() {
 // One button per tab, with the active one highlighted.
 function _vendorBuildTabBarHTML() {
     const buttons = VENDOR_TABS.map(tab => `
-        <button class="egv-tab-btn${tab.id === _vendorActiveTab ? ' egv-tab-active' : ''}"
-                id="egv-tab-btn-${tab.id}"
+        <button class="sx-vendor-tab-btn${tab.id === _vendorActiveTab ? ' sx-vendor-tab-active' : ''}"
+                id="sx-vendor-tab-btn-${tab.id}"
                 onclick="_vendorSwitchTab('${tab.id}')">${t(tab.labelKey)}</button>`).join('');
-    return `<div class="egv-tab-bar">${buttons}</div>`;
+    return `<div class="sx-vendor-tab-bar">${buttons}</div>`;
 }
 
 // Assembles the full vendor layout:
 // topbar → gold balance → tab bar → tab content → hint text.
 function _vendorBuildFullScreenHTML() {
     return `
-<div class="egn-hub-layout egv-layout">
+<div class="egn-hub-layout sx-vendor-layout">
     ${_vendorBuildTopbarHTML()}
-    <div class="egv-body">
-        <div class="egv-gold-balance" id="egv-gold-balance"></div>
-        <div class="egv-search-row"><input type="search" id="egv-search" class="egv-search" autocomplete="off" spellcheck="false" placeholder="${t('eg_vendor_search_ph')}"></div>
+    <div class="sx-vendor-body">
+        <div class="sx-vendor-gold-balance" id="sx-vendor-gold-balance"></div>
+        <div class="sx-vendor-search-row"><input type="search" id="sx-vendor-search" class="sx-vendor-search" autocomplete="off" spellcheck="false" placeholder="${t('eg_vendor_search_ph')}"></div>
         ${_vendorBuildTabBarHTML()}
-        <div class="egv-tab-content" id="egv-tab-content"></div>
-        <div class="egv-hint" id="egv-hint"></div>
+        <div class="sx-vendor-tab-content" id="sx-vendor-tab-content"></div>
+        <div class="sx-vendor-hint" id="sx-vendor-hint"></div>
     </div>
 </div>`;
 }
@@ -94,7 +94,7 @@ function _vendorBuildFullScreenHTML() {
 // Draws the active tab's cards and its hint line. Registered with the shared
 // module so the tab modules can ask for a redraw without importing this file.
 function _vendorRenderTabContent() {
-    const contentEl = document.getElementById('egv-tab-content');
+    const contentEl = document.getElementById('sx-vendor-tab-content');
     if (!contentEl) return;
 
     if (_vendorQuery) {
@@ -103,9 +103,9 @@ function _vendorRenderTabContent() {
         _vendorRefreshGoldDisplay();
         return;
     }
-    contentEl.classList.remove('egv-searching');
-    const activeBtn = document.getElementById(`egv-tab-btn-${_vendorActiveTab}`);
-    if (activeBtn) activeBtn.classList.add('egv-tab-active');
+    contentEl.classList.remove('sx-vendor-searching');
+    const activeBtn = document.getElementById(`sx-vendor-tab-btn-${_vendorActiveTab}`);
+    if (activeBtn) activeBtn.classList.add('sx-vendor-tab-active');
 
     switch (_vendorActiveTab) {
         case 'charms': contentEl.innerHTML = _vendorBuildCharmsTabHTML(); break;
@@ -115,7 +115,7 @@ function _vendorRenderTabContent() {
         case 'base': contentEl.innerHTML = _vendorBuildBaseTabHTML(); break;
     }
 
-    const hintEl = document.getElementById('egv-hint');
+    const hintEl = document.getElementById('sx-vendor-hint');
     if (hintEl) hintEl.textContent = t(VENDOR_TAB_HINTS[_vendorActiveTab] || '');
 
     _vendorRefreshGoldDisplay();
@@ -128,26 +128,26 @@ function _vendorBuildSearchView(contentEl) {
         charms: _vendorBuildCharmsTabHTML, currency: _vendorBuildCurrencyTabHTML, essences: _vendorBuildEssencesTabHTML,
         items: _vendorBuildItemsTabHTML, base: _vendorBuildBaseTabHTML,
     };
-    contentEl.classList.add('egv-searching');
-    document.querySelectorAll('.egv-tab-btn').forEach(btn => btn.classList.remove('egv-tab-active'));
+    contentEl.classList.add('sx-vendor-searching');
+    document.querySelectorAll('.sx-vendor-tab-btn').forEach(btn => btn.classList.remove('sx-vendor-tab-active'));
     contentEl.innerHTML = VENDOR_TABS.map(tab => `
-<div class="egv-search-section">
-    <div class="egv-search-title">${t(tab.labelKey)}</div>
+<div class="sx-vendor-search-section">
+    <div class="sx-vendor-search-title">${t(tab.labelKey)}</div>
     ${builders[tab.id](true)}
-</div>`).join('') + `<div class="egv-search-none" id="egv-search-none" style="display:none">${t('eg_vendor_search_none')}</div>`;
-    const hintEl = document.getElementById('egv-hint');
+</div>`).join('') + `<div class="sx-vendor-search-none" id="sx-vendor-search-none" style="display:none">${t('eg_vendor_search_none')}</div>`;
+    const hintEl = document.getElementById('sx-vendor-hint');
     if (hintEl) hintEl.textContent = t('eg_vendor_hint_search');
 }
 
 // Shows only the cards whose text contains the query, hides empty sections.
 function _vendorApplySearch() {
-    const contentEl = document.getElementById('egv-tab-content');
+    const contentEl = document.getElementById('sx-vendor-tab-content');
     if (!contentEl) return;
     const words = _vendorQuery.toLowerCase().split(/\s+/).filter(Boolean);
     let total = 0;
-    contentEl.querySelectorAll('.egv-search-section').forEach(sec => {
+    contentEl.querySelectorAll('.sx-vendor-search-section').forEach(sec => {
         let shown = 0;
-        sec.querySelectorAll('.egv-card').forEach(card => {
+        sec.querySelectorAll('.sx-vendor-card').forEach(card => {
             const text = card.textContent.toLowerCase();
             const hit = words.every(w => text.indexOf(w) !== -1);
             card.style.display = hit ? '' : 'none';
@@ -156,7 +156,7 @@ function _vendorApplySearch() {
         sec.style.display = shown ? '' : 'none';
         total += shown;
     });
-    const none = document.getElementById('egv-search-none');
+    const none = document.getElementById('sx-vendor-search-none');
     if (none) none.style.display = total ? 'none' : '';
 }
 
@@ -164,10 +164,10 @@ function _vendorApplySearch() {
 function _vendorOnSearchInput(value) {
     const had = !!_vendorQuery;
     _vendorQuery = String(value || '').trim();
-    const contentEl = document.getElementById('egv-tab-content');
+    const contentEl = document.getElementById('sx-vendor-tab-content');
     if (!contentEl) return;
     if (!_vendorQuery) { _vendorRenderTabContent(); return; }
-    if (!had || !contentEl.classList.contains('egv-searching')) _vendorRenderTabContent();
+    if (!had || !contentEl.classList.contains('sx-vendor-searching')) _vendorRenderTabContent();
     else _vendorApplySearch();
 }
 
@@ -178,11 +178,11 @@ export function _vendorSwitchTab(tabId) {
     _vendorActiveTab = tabId;
     // Picking a tab leaves search mode.
     _vendorQuery = '';
-    const box = document.getElementById('egv-search');
+    const box = document.getElementById('sx-vendor-search');
     if (box) box.value = '';
-    document.querySelectorAll('.egv-tab-btn').forEach(btn => btn.classList.remove('egv-tab-active'));
-    const btn = document.getElementById(`egv-tab-btn-${tabId}`);
-    if (btn) btn.classList.add('egv-tab-active');
+    document.querySelectorAll('.sx-vendor-tab-btn').forEach(btn => btn.classList.remove('sx-vendor-tab-active'));
+    const btn = document.getElementById(`sx-vendor-tab-btn-${tabId}`);
+    if (btn) btn.classList.add('sx-vendor-tab-active');
     _vendorRenderTabContent();
 }
 
@@ -199,7 +199,7 @@ function _vendorCreateScreen() {
     screen.className = 'screen';
     screen.innerHTML = _vendorBuildFullScreenHTML();
     document.body.appendChild(screen);
-    const box = screen.querySelector('#egv-search');
+    const box = screen.querySelector('#sx-vendor-search');
     if (box) {
         box.addEventListener('input', () => _vendorOnSearchInput(box.value));
         box.addEventListener('keydown', (e) => {
@@ -212,9 +212,9 @@ function _vendorCreateScreen() {
 // lazily on first use). Cards rendered with emoji fallbacks before that
 // refresh here so they swap to art without needing a reload.
 if (typeof document !== 'undefined' && document.addEventListener) {
-    document.addEventListener('eg-art-loaded', function () {
+    document.addEventListener('sx-art-loaded', function () {
         try {
-            if (document.getElementById('egv-tab-content')) {
+            if (document.getElementById('sx-vendor-tab-content')) {
                 _vendorRenderTabContent();
             }
         } catch (e) { /* vendor screen not open - safe to ignore */ }
@@ -233,9 +233,9 @@ export function showEndgameVendor() {
     switchScreen('screen-endgame-vendor');
 
     // Keep the active tab highlighted across visits.
-    document.querySelectorAll('.egv-tab-btn').forEach(btn => btn.classList.remove('egv-tab-active'));
-    const activeBtn = document.getElementById(`egv-tab-btn-${_vendorActiveTab}`);
-    if (activeBtn) activeBtn.classList.add('egv-tab-active');
+    document.querySelectorAll('.sx-vendor-tab-btn').forEach(btn => btn.classList.remove('sx-vendor-tab-active'));
+    const activeBtn = document.getElementById(`sx-vendor-tab-btn-${_vendorActiveTab}`);
+    if (activeBtn) activeBtn.classList.add('sx-vendor-tab-active');
 
     _vendorRenderTabContent();
     _vendorRefreshGoldDisplay();

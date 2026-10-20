@@ -48,17 +48,17 @@ export function _bossTestToggleGodMode(checkbox) {
 // badge on the boss-test screen, and the always-visible in-game chip.
 export function _bossTestSyncGodModeUI() {
     const on = _bossTestGodModeOn;
-    document.querySelectorAll('.egbt-godmode-checkbox').forEach(cb => { cb.checked = on; });
-    const badge = document.getElementById('egbt-godmode-badge');
+    document.querySelectorAll('.sx-bosstest-godmode-checkbox').forEach(cb => { cb.checked = on; });
+    const badge = document.getElementById('sx-bosstest-godmode-badge');
     if (badge) {
         badge.textContent = on ? t('eg_boss_test_godmode_on') : t('eg_boss_test_godmode_off');
-        badge.classList.toggle('egbt-godmode-on', on);
+        badge.classList.toggle('sx-bosstest-godmode-on', on);
     }
-    let chip = document.getElementById('egbt-godmode-chip');
+    let chip = document.getElementById('sx-bosstest-godmode-chip');
     if (on) {
         if (!chip) {
             chip = document.createElement('div');
-            chip.id = 'egbt-godmode-chip';
+            chip.id = 'sx-bosstest-godmode-chip';
             chip.textContent = '🛡️ ' + t('eg_boss_test_godmode_on');
             document.body.appendChild(chip);
         }
@@ -93,7 +93,7 @@ export function showEndgameBossTest() {
     if (screen) {
         const keepSearch = window._bossTestSearch || '';
         screen.innerHTML = _bossTestBuildFullScreenHTML();
-        const searchEl = document.getElementById('egbt-search');
+        const searchEl = document.getElementById('sx-bosstest-search');
         if (searchEl && keepSearch) {
             searchEl.value = keepSearch;
             window._bossTestSearch = keepSearch;

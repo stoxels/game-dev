@@ -205,7 +205,7 @@ export function _animatePlayerProjectile(damage, targetId, row, col, sourceElOve
         sourceEl = document.getElementById('class-hud-drag-handle');
     }
 
-    const targetCard = targetId ? document.getElementById(`eg-card-${targetId}`) : null;
+    const targetCard = targetId ? document.getElementById(`sx-card-${targetId}`) : null;
 
     if (!sourceEl || !targetCard) {
         // No visual target - apply damage instantly without animation
@@ -332,8 +332,8 @@ export function _resolveProjectileImpact(damage, targetId, elements, opts) {
     const splashPct = secStats.splashPct || 0;
     if (splashPct > 0 && Math.random() * 100 < splashPct) {
         globalThis._monsters.filter(m => m.id !== targetId && m.zoneId === target.zoneId).forEach(m => {
-            const card = document.getElementById(`eg-card-${m.id}`);
-            if (card) _restartFlashClass(card, 'eg-flash-damage');
+            const card = document.getElementById(`sx-card-${m.id}`);
+            if (card) _restartFlashClass(card, 'sx-flash-damage');
             _damageTargetById(m.id, _secondaryDamage(finalDamage, 'splash', secStats), elements, secCrit);
         });
     }
@@ -372,8 +372,8 @@ export function _resolveProjectileImpact(damage, targetId, elements, opts) {
         if ((secStats.forkExtraChancePct || 0) > 0 && Math.random() * 100 < secStats.forkExtraChancePct) forks += 1;
         pickVictims(forks, hitSet, globalThis._monsters).forEach((victim) => {
             hitSet.add(victim.id);
-            const card = document.getElementById(`eg-card-${victim.id}`);
-            if (card) _restartFlashClass(card, 'eg-flash-damage');
+            const card = document.getElementById(`sx-card-${victim.id}`);
+            if (card) _restartFlashClass(card, 'sx-flash-damage');
             _damageTargetById(victim.id, _secondaryDamage(finalDamage, 'fork', secStats), elements, secCrit);
         });
     }

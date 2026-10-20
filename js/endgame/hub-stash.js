@@ -41,7 +41,7 @@ export let _stashTab = 'inventory';
 export function _getInvRows() { return _inventory ? _inventory.length : INV_INITIAL_ROWS; }
 export function _getInvCapacity() { return _getInvRows() * INV_COLS; }
 export function _rebuildInventoryGrid() {
-    const grid = document.getElementById('eg-inv-grid');
+    const grid = document.getElementById('sx-inv-grid');
     if (!grid) return;
     const scrollTop = grid.scrollTop;
     grid.innerHTML = _buildInventoryGridHTML();
@@ -53,7 +53,7 @@ export function _ensureInvRows(minRows) {
     if (!_inventory) return;
     if (_inventory.length >= minRows) return;
     for (let i = _inventory.length; i < minRows; i++) _inventory.push(Array(INV_COLS).fill(null));
-    const grid = document.getElementById('eg-inv-grid');
+    const grid = document.getElementById('sx-inv-grid');
     if (grid && grid.children.length < minRows * INV_COLS) {
         _rebuildInventoryGrid();
     }

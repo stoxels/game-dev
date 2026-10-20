@@ -89,7 +89,7 @@ export function _swHeal(amount) {
 
 // Spawn a hatching-ping: a small expanding ring where a drone peels off.
 export function _swHatchPing(run, x, y) {
-    const el = _nkEl(run, 'div', 'eg-sw-ping');
+    const el = _nkEl(run, 'div', 'sx-sw-ping');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
     setTimeout(() => { try { el.remove(); } catch (e) {} }, _SW_DEBUG_SLOW ? 2500 : 1000);
@@ -123,7 +123,7 @@ export function _mechSwSwarmArc(monster, phase) {
     const angSpd = (SW_ARC_SPEED / SW_ARC_RADIUS) / _SW_DEBUG_MULT;
     const drones = [];
     for (let i = 0; i < SW_WEDGE; i++) {
-        const el = _nkEl(run, 'div', 'eg-sw-drone', '🛸');
+        const el = _nkEl(run, 'div', 'sx-sw-drone', '🛸');
         drones.push({ off: (i - (SW_WEDGE - 1) / 2) * 55, el, x: -100, y: -100 });
     }
     let hatchling = null;                              // { el, x, y, lead }
@@ -147,7 +147,7 @@ export function _mechSwSwarmArc(monster, phase) {
             d.trailAcc = (d.trailAcc || 0) + dtS;
             if (d.trailAcc >= 0.09) {
                 d.trailAcc = 0;
-                const t = _nkEl(run, 'div', 'eg-sw-trail');
+                const t = _nkEl(run, 'div', 'sx-sw-trail');
                 t.style.left = Math.round(d.x) + 'px';
                 t.style.top = Math.round(d.y) + 'px';
                 trails.push({ x: d.x, y: d.y, el: t, age: 0 });
@@ -157,7 +157,7 @@ export function _mechSwSwarmArc(monster, phase) {
         if (!hatched && arcT > hatchAt) {
             hatched = true;
             const lead = drones[0];
-            hatchling = { el: _nkEl(run, 'div', 'eg-sw-hatch', '🐝'), x: lead.x, y: lead.y, lead: 0.55 };
+            hatchling = { el: _nkEl(run, 'div', 'sx-sw-hatch', '🐝'), x: lead.x, y: lead.y, lead: 0.55 };
             _swHatchPing(run, lead.x, lead.y);
         }
         if (hatchling) {
@@ -234,10 +234,10 @@ export function _mechSwMimicQueen(monster, phase) {
     const clouds = [];   // { x, y, el, age }
 
     spots.forEach((s, i) => {
-        const host = _nkEl(run, 'div', 'eg-sw-drone eg-sw-host', '🛸');
+        const host = _nkEl(run, 'div', 'sx-sw-drone sx-sw-host', '🛸');
         host.style.left = Math.round(s.x - 26) + 'px';
         host.style.top = Math.round(s.y - 26) + 'px';
-        const larva = _nkEl(run, 'div', 'eg-sw-larva', '👑');
+        const larva = _nkEl(run, 'div', 'sx-sw-larva', '👑');
         larva.style.left = Math.round(s.x - 24) + 'px';
         larva.style.top = Math.round(s.y - 24) + 'px';
         s.host = host; s.larva = larva; s.open = false;
@@ -245,8 +245,8 @@ export function _mechSwMimicQueen(monster, phase) {
         setTimeout(() => {
             if (!_nkRuns.has(run.id)) return;
             s.open = true;
-            host.classList.add('eg-sw-host-open');
-            larva.classList.add('eg-sw-larva-on');
+            host.classList.add('sx-sw-host-open');
+            larva.classList.add('sx-sw-larva-on');
         }, 350 + i * 260);
     });
 
@@ -291,11 +291,11 @@ export function _mechSwMimicQueen(monster, phase) {
                     const maxHP = ((typeof _nkMaxHP === 'function') ? _nkMaxHP() : 0) || 100;
                     const heal = Math.max(1, Math.round(maxHP * SW_LARVA_HEAL));
                     _swHeal(heal);
-                    _swFlareEl(run, s.x, s.y, 'eg-sw-larva-pop', '🍯');
+                    _swFlareEl(run, s.x, s.y, 'sx-sw-larva-pop', '🍯');
                     _nkToast('eg_mech_sw_real', '👑 ROYAL JELLY! +' + heal + ' HP - the queen wails in fury!', '#ffd166');
                 } else {
                     // Mimic! Stink cloud.
-                    const cl = _nkEl(run, 'div', 'eg-sw-cloud', '☠️');
+                    const cl = _nkEl(run, 'div', 'sx-sw-cloud', '☠️');
                     cl.style.left = Math.round(s.x - 60) + 'px';
                     cl.style.top = Math.round(s.y - 60) + 'px';
                     clouds.push({ x: s.x, y: s.y, el: cl, age: 0 });
@@ -356,7 +356,7 @@ export function _mechSwHiveEye(monster, phase) {
             launched++;
             launchTimer = 0;
             const target = _swPC();
-            const probe = _nkEl(run, 'div', 'eg-sw-drone eg-sw-probe', '🛸');
+            const probe = _nkEl(run, 'div', 'sx-sw-drone sx-sw-probe', '🛸');
             probe.style.left = Math.round(W / 2 - 22) + 'px';
             probe.style.top = Math.round(60) + 'px';
             blooms.push({
@@ -383,7 +383,7 @@ export function _mechSwHiveEye(monster, phase) {
                     // everything outside the clear hole goes dark.
                     try { b.probe.remove(); } catch (e) {}
                     b.state = 'bloom';
-                    const bloom = _nkEl(run, 'div', 'eg-sw-bloom');
+                    const bloom = _nkEl(run, 'div', 'sx-sw-bloom');
                     bloom.style.left = '0px';
                     bloom.style.top = '0px';
                     bloom.style.width = W + 'px';
@@ -393,7 +393,7 @@ export function _mechSwHiveEye(monster, phase) {
                     b.bloom = bloom;
                     // Drone guards circle the clear hole mouth.
                     for (let k = 0; k < 3; k++) {
-                        const gEl = _nkEl(run, 'div', 'eg-sw-guard', '🛸');
+                        const gEl = _nkEl(run, 'div', 'sx-sw-guard', '🛸');
                         b.guards.push({ el: gEl, baseAng: k * (Math.PI * 2 / 3) });
                     }
                 }
@@ -518,9 +518,9 @@ export function _swFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -529,7 +529,7 @@ export function _swFinalStart(monster) {
 
     // The whirling ball of wings.
     const ball = document.createElement('div');
-    ball.className = 'eg-sw-ball';
+    ball.className = 'sx-sw-ball';
     ball.style.left = Math.round(cx - 95) + 'px';
     ball.style.top = Math.round(cy - 95) + 'px';
     document.body.appendChild(ball);
@@ -538,10 +538,10 @@ export function _swFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-sw-cd';
+    ov.className = 'sx-sw-cd';
     ov.innerHTML =
-        '<div class="eg-sw-cd-label">🐝 THE SWARM SINGULARITY</div>' +
-        '<div class="eg-sw-cd-hint">Stand in the marked gap when the ball charges!</div>';
+        '<div class="sx-sw-cd-label">🐝 THE SWARM SINGULARITY</div>' +
+        '<div class="sx-sw-cd-hint">Stand in the marked gap when the ball charges!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -551,11 +551,11 @@ export function _swFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss card wears the swarm-crown while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-sw-enraged');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-sw-enraged');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
@@ -574,7 +574,7 @@ export function _swFinalStart(monster) {
         const gapX = Math.max(80, Math.min(W - 80, cx + Math.cos(gapAng) * gapR));
         const gapY = Math.max(150, Math.min(H - 80, cy + Math.sin(gapAng) * gapR));
         const gap = document.createElement('div');
-        gap.className = 'eg-sw-gap';
+        gap.className = 'sx-sw-gap';
         gap.style.left = Math.round(gapX - 60) + 'px';
         gap.style.top = Math.round(gapY - 60) + 'px';
         document.body.appendChild(gap);
@@ -582,7 +582,7 @@ export function _swFinalStart(monster) {
 
         // Charge telegraph: a fat line from the ball to your position.
         const line = document.createElement('div');
-        line.className = 'eg-sw-chargeline';
+        line.className = 'sx-sw-chargeline';
         const len = Math.hypot(pc.x - cx, pc.y - cy);
         line.style.width = Math.round(len) + 'px';
         line.style.height = '46px';
@@ -631,7 +631,7 @@ export function _swFinalStart(monster) {
     function _swFunnel(gg, mm, lvl) {
         if (gg.finished) return;
         _nkToast('eg_mech_sw_funnel', '🐝 THE FUNNEL - slip between the streams!', '#ffb37a');
-        const hint = document.querySelector('.eg-sw-cd-hint');
+        const hint = document.querySelector('.sx-sw-cd-hint');
         if (hint) hint.textContent = 'SLIP BETWEEN the drone streams!';
         const activeRows = [];
         let spawned = 0;
@@ -675,7 +675,7 @@ export function _swFinalStart(monster) {
             for (let c = 0; c < 8; c++) {
                 if (c === gapCell || c === gapCell + 1) continue;  // 2-cell gap
                 const el = document.createElement('div');
-                el.className = 'eg-sw-funnel-drone';
+                el.className = 'sx-sw-funnel-drone';
                 el.textContent = '🛸';
                 el.style.left = Math.round(c * cellW) + 'px';
                 el.style.top = Math.round(H * 0.08 - 40) + 'px';
@@ -724,18 +724,18 @@ export function _swFinalEnd(g, monster) {
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
     try { if (g.ball) g.ball.remove(); } catch (e) {}
     try { if (g.overlay) g.overlay.remove(); } catch (e) {}
-    document.querySelectorAll('.eg-sw-chargeline, .eg-sw-gap, .eg-sw-funnel-drone').forEach(el => {
+    document.querySelectorAll('.sx-sw-chargeline, .sx-sw-gap, .sx-sw-funnel-drone').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.remove('eg-sw-enraged');
-        wrap.classList.remove('eg-nk-shielded');
+        wrap.classList.remove('sx-sw-enraged');
+        wrap.classList.remove('sx-nk-shielded');
     }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -755,16 +755,16 @@ export function _swFinalEnd(g, monster) {
 // removes every run element, overlay and body class this boss ever created.
 export function _swTeardown() {
     if (_swFinal) { try { _swFinalEnd(_swFinal, null); } catch (e) {} _swFinal = null; }
-    document.querySelectorAll('.eg-sw-drone, .eg-sw-host, .eg-sw-larva, .eg-sw-cloud, ' +
-        '.eg-sw-trail, .eg-sw-ping, .eg-sw-probe, .eg-sw-bloom, .eg-sw-guard, ' +
-        '.eg-sw-ball, .eg-sw-cd, .eg-sw-chargeline, .eg-sw-gap, .eg-sw-funnel-drone, ' +
-        '.eg-sw-larva-pop').forEach(el => {
+    document.querySelectorAll('.sx-sw-drone, .sx-sw-host, .sx-sw-larva, .sx-sw-cloud, ' +
+        '.sx-sw-trail, .sx-sw-ping, .sx-sw-probe, .sx-sw-bloom, .sx-sw-guard, ' +
+        '.sx-sw-ball, .sx-sw-cd, .sx-sw-chargeline, .sx-sw-gap, .sx-sw-funnel-drone, ' +
+        '.sx-sw-larva-pop').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-sw-enraged').forEach(el => el.classList.remove('eg-sw-enraged'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.querySelectorAll('.sx-sw-enraged').forEach(el => el.classList.remove('sx-sw-enraged'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

@@ -232,13 +232,13 @@ export function _bossTick() {
             _bossRecalcDamage(m);
             anyNewlyEnraged = true;
 
-            const card = document.getElementById(`eg-card-${m.id}`);
-            const wrapper = card ? card.querySelector('.eg-emoji-wrapper') : null;
-            if (wrapper) wrapper.classList.add('eg-boss-enraged');
+            const card = document.getElementById(`sx-card-${m.id}`);
+            const wrapper = card ? card.querySelector('.sx-emoji-wrapper') : null;
+            if (wrapper) wrapper.classList.add('sx-boss-enraged');
             // One-shot red screen pulse (cosmetic, self-removing).
             try {
                 const flash = document.createElement('div');
-                flash.className = 'eg-rage-flash';
+                flash.className = 'sx-rage-flash';
                 document.body.appendChild(flash);
                 setTimeout(() => { try { flash.remove(); } catch (e) {} }, 1400);
             } catch (e) { /* cosmetic */ }
@@ -382,10 +382,10 @@ export function _bossPlayTransitionFeedback(monster, newPhase) {
     const label = BOSS_PHASE_NAMES[newPhase] ? t(BOSS_PHASE_NAMES[newPhase]) : t('eg_phase_badge').replace('{n}', newPhase);
     globalThis.showCombatToast(`⚡ ${monster.name}: ${label}!`);
 
-    const card = document.getElementById(`eg-card-${monster.id}`);
+    const card = document.getElementById(`sx-card-${monster.id}`);
     if (card) {
-        card.classList.add('eg-boss-transition');
-        setTimeout(() => card.classList.remove('eg-boss-transition'), 1500);
+        card.classList.add('sx-boss-transition');
+        setTimeout(() => card.classList.remove('sx-boss-transition'), 1500);
     }
 }
 
@@ -526,7 +526,7 @@ export function _bossScheduleSingleMechanic(monster, mech, phase) {
                 // Cosmetic cue for the boss-rig animations (js/combat/boss-rig-anim.js).
                 // Fire-and-forget: a listener error must never block the mechanic.
                 try {
-                    document.dispatchEvent(new CustomEvent('eg-boss-mechanic', {
+                    document.dispatchEvent(new CustomEvent('sx-boss-mechanic', {
                         detail: { monsterId: monster.id, mech: mech.name, phase },
                     }));
                 } catch (e) { /* cosmetic only */ }

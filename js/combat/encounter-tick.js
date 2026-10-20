@@ -53,9 +53,9 @@ export function _tickMonster(m) {
             }
             globalThis.showCombatToast(`😡 ${t('eg_mm_toast_enrage') || 'The Boss is enraged!'}`);
             // Card visual (a re-render picks it up from m.enraged as well).
-            const rageCard = document.getElementById(`eg-card-${m.id}`);
-            const rageWrap = rageCard ? rageCard.querySelector('.eg-emoji-wrapper') : null;
-            if (rageWrap) rageWrap.classList.add('eg-boss-enraged');
+            const rageCard = document.getElementById(`sx-card-${m.id}`);
+            const rageWrap = rageCard ? rageCard.querySelector('.sx-emoji-wrapper') : null;
+            if (rageWrap) rageWrap.classList.add('sx-boss-enraged');
             _rageScreenFlash();
         }
     }
@@ -172,7 +172,7 @@ export function _isPlayerChargePaused() {
 function _rageScreenFlash() {
     try {
         const el = document.createElement('div');
-        el.className = 'eg-rage-flash';
+        el.className = 'sx-rage-flash';
         document.body.appendChild(el);
         setTimeout(() => { try { el.remove(); } catch (e) {} }, 1400);
     } catch (e) { /* cosmetic */ }
@@ -263,19 +263,19 @@ export function _tickPlayer() {
 // ── Hold-parry charge pause - freeze own melee charge bar while held ───────
 export function _setHoldEPauseVisual(isPaused) {
     const bar = document.getElementById('avatar-charge-fill');
-    if (bar) bar.classList.toggle('eg-charge-paused', !!isPaused);
-    const alt = document.getElementById('eg-player-charge-bar');
-    if (alt) alt.classList.toggle('eg-charge-paused', !!isPaused);
+    if (bar) bar.classList.toggle('sx-charge-paused', !!isPaused);
+    const alt = document.getElementById('sx-player-charge-bar');
+    if (alt) alt.classList.toggle('sx-charge-paused', !!isPaused);
     const bar2 = document.getElementById('avatar-charge2-fill');
-    if (bar2) bar2.classList.toggle('eg-charge-paused', !!isPaused);
+    if (bar2) bar2.classList.toggle('sx-charge-paused', !!isPaused);
     // Sprite feedback - show "CHARGE PAUSED" directly on the avatar while the parry key is held
     const hud = document.getElementById('player-avatar-wrapper');
     if (hud) {
-        let lbl = document.getElementById('eg-hold-pause-label');
+        let lbl = document.getElementById('sx-hold-pause-label');
         if (isPaused) {
             if (!lbl) {
                 lbl = document.createElement('div');
-                lbl.id = 'eg-hold-pause-label';
+                lbl.id = 'sx-hold-pause-label';
                 hud.appendChild(lbl);
             }
             const raw = (typeof t === 'function') ? (t('eg_hold_paused') || t('eg_parrying')) : '';
@@ -287,16 +287,16 @@ export function _setHoldEPauseVisual(isPaused) {
         }
     } else if (!isPaused) {
         // No avatar yet - ensure stray label elsewhere is cleaned up
-        const stray = document.getElementById('eg-hold-pause-label');
+        const stray = document.getElementById('sx-hold-pause-label');
         if (stray) stray.remove();
     }
 }
 
 export function _initEgHoldEPauseHotkey() {
-    // Parry key is configurable (js/keybinds.js, action 'eg-parry', R by
+    // Parry key is configurable (js/keybinds.js, action 'sx-parry', R by
     // default). keydown starts the parry window, keyup ends it.
     const isParryKey = (e) => {
-        if (typeof keybindMatches === 'function') return globalThis.keybindMatches(e, 'eg-parry');
+        if (typeof keybindMatches === 'function') return globalThis.keybindMatches(e, 'sx-parry');
         return e.key && e.key.toLowerCase() === 'r';
     };
     document.addEventListener('keydown', (e) => {
@@ -341,33 +341,33 @@ _initEgHoldEPauseHotkey();
 
 // ── Monster-card hover tooltip viewport clamp ──────────────────────────
 // The compact card tooltip is CSS-positioned BELOW the emoji (top: 125%).
-// Cards spawned into bottom-docked panels (eg-monster-panel, eg-panel-bottom)
+// Cards spawned into bottom-docked panels (sx-monster-panel, sx-panel-bottom)
 // or the lower part of the right-side stack can push that tooltip past the
 // bottom of the screen. On hover we measure the tooltip and, when it would
-// clip the viewport, flip it above the card via .eg-tip-flip.
+// clip the viewport, flip it above the card via .sx-tip-flip.
 export const CARD_TOOLTIP_VIEW_MARGIN = 6;
 document.addEventListener('mouseover', (e) => {
-    const emoji = e.target && e.target.closest ? e.target.closest('.eg-emoji-wrapper') : null;
+    const emoji = e.target && e.target.closest ? e.target.closest('.sx-emoji-wrapper') : null;
     if (!emoji) return;
     // Cards are static while hovered - evaluate once per rendered card.
     if (emoji.dataset.egTipClamped) return;
     emoji.dataset.egTipClamped = '1';
 
-    const tip = emoji.querySelector('.eg-monster-compact-tooltip');
+    const tip = emoji.querySelector('.sx-monster-compact-tooltip');
     if (!tip) return;
 
     // Let the CSS :hover rule show the tooltip, then measure its real box.
     requestAnimationFrame(() => {
         if (!tip.isConnected) return;
         const rect = tip.getBoundingClientRect();
-        tip.classList.toggle('eg-tip-flip',
+        tip.classList.toggle('sx-tip-flip',
             rect.bottom > window.innerHeight - CARD_TOOLTIP_VIEW_MARGIN);
     });
 });
 
 // Renders the visual width of the player's charge bar (manual melee charge:
 // fills toward 100% and holds until spent by an E strike). Also owns the
-// bar's paused/ready styling centrally so leftover per-boss 'eg-charge-paused'
+// bar's paused/ready styling centrally so leftover per-boss 'sx-charge-paused'
 // toggles from the removed set-piece freeze era can't desync the visual:
 // paused reflects ONLY the live pause state (parry hold / frozen).
 export function _updatePlayerChargeBar() {
@@ -376,7 +376,7 @@ export function _updatePlayerChargeBar() {
     const lead = dual ? _getLeadHand() : 1;
     // One readout per hand (hand 2 only exists while dual-wielding). Overcharge
     // milestone look: each weapon-art tier restyles the bar + readout a step
-    // further (see eg-charge-tier1..4 in monsters.css).
+    // further (see sx-charge-tier1..4 in monsters.css).
     const paint = (hand, barIds, labelId) => {
         const pct = _getHandChargePct(hand);
         const overcharged = pct > 1.001;
@@ -389,21 +389,21 @@ export function _updatePlayerChargeBar() {
             if (!bar) return;
             // Visual fill caps at 100% - overcharge reads via the glow + label.
             bar.style.width = Math.min(100, pct * 100) + '%';
-            bar.classList.toggle('eg-charge-paused', paused);
-            bar.classList.toggle('eg-charge-ready', ready);
-            bar.classList.toggle('eg-charge-overcharged', overcharged);
-            for (let i = 1; i <= 4; i++) bar.classList.toggle('eg-charge-tier' + i, tier === i);
+            bar.classList.toggle('sx-charge-paused', paused);
+            bar.classList.toggle('sx-charge-ready', ready);
+            bar.classList.toggle('sx-charge-overcharged', overcharged);
+            for (let i = 1; i <= 4; i++) bar.classList.toggle('sx-charge-tier' + i, tier === i);
         });
         // % readout next to the avatar's charge bar (pops at 100% - see CSS).
         const label = document.getElementById(labelId);
         if (label) {
             label.textContent = `${Math.floor(pct * 100)}%`;
-            label.classList.toggle('eg-charge-ready', ready);
-            label.classList.toggle('eg-charge-overcharged', overcharged);
-            for (let i = 1; i <= 4; i++) label.classList.toggle('eg-charge-tier' + i, tier === i);
+            label.classList.toggle('sx-charge-ready', ready);
+            label.classList.toggle('sx-charge-overcharged', overcharged);
+            for (let i = 1; i <= 4; i++) label.classList.toggle('sx-charge-tier' + i, tier === i);
         }
     };
-    paint(1, ['eg-player-charge-bar', 'avatar-charge-fill'], 'avatar-charge-text');
+    paint(1, ['sx-player-charge-bar', 'avatar-charge-fill'], 'avatar-charge-text');
     // Second bar + the small hand numbers: only while dual-wielding. The
     // number of the hand that would strike next is highlighted.
     const row2 = document.getElementById('avatar-charge2-row');
@@ -412,7 +412,7 @@ export function _updatePlayerChargeBar() {
         const el = document.getElementById(id);
         if (!el) return;
         el.style.display = dual ? '' : 'none';
-        el.classList.toggle('eg-hand-next', dual && lead === i + 1);
+        el.classList.toggle('sx-hand-next', dual && lead === i + 1);
     });
     if (dual) paint(2, ['avatar-charge2-fill'], 'avatar-charge2-text');
     // Rooted-while-charging indicator: synced here centrally (10Hz) so
@@ -444,12 +444,12 @@ function _syncMeleeRootedVisual(rooted) {
         } catch (e) {}
     }
     const avatar = document.getElementById('player-avatar-wrapper');
-    if (avatar) avatar.classList.toggle('eg-melee-rooted', show);
-    let lbl = document.getElementById('eg-melee-rooted-label');
+    if (avatar) avatar.classList.toggle('sx-melee-rooted', show);
+    let lbl = document.getElementById('sx-melee-rooted-label');
     if (show) {
         if (avatar && !lbl) {
             lbl = document.createElement('div');
-            lbl.id = 'eg-melee-rooted-label';
+            lbl.id = 'sx-melee-rooted-label';
             avatar.appendChild(lbl);
         }
         if (lbl) {

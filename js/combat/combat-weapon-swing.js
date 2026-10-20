@@ -39,7 +39,7 @@ import { _isActive } from './combat-state.js';
 //  Secret-of-Mana-style: TAP to strike with whatever charge is ready,
 //  HOLD past full to overcharge (200% dash, 300% sky leap, 400% nova,
 //  500% grand nova), RELEASE to strike. Parry (hold) lives on the
-//  'eg-parry' keybind (R by default) in endgame-encounter-tick.js.
+//  'sx-parry' keybind (R by default) in endgame-encounter-tick.js.
 //------------------------------------------------------------------------
 //-------------------SWING VISUAL------------------------------------------
 //------------------------------------------------------------------------
@@ -96,7 +96,7 @@ export function _meleeImpactThump(targetId) {
         if (typeof document === 'undefined' || targetId == null) return;
         if (typeof window !== 'undefined' && window.matchMedia
             && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        const card = document.getElementById(`eg-card-${targetId}`);
+        const card = document.getElementById(`sx-card-${targetId}`);
         if (!card || typeof card.animate !== 'function') return;
         card.animate(
             [{ scale: '1' }, { scale: '0.9' }, { scale: '1.03' }, { scale: '1' }],
@@ -120,8 +120,8 @@ export function _showWeaponSwing(family, facing) {
     _swingEquippedWeapon(WEAPON_SWING_DURATION_MS[fam] || 320, heavy);
 
     const el = document.createElement('div');
-    el.className = `eg-weapon-swing eg-swing-${fam} eg-dir-${dir}${heavy ? ' eg-heavy' : ''}`;
-    el.innerHTML = '<div class="egw-rot"><div class="egw-part egw-arc"></div><div class="egw-part egw-blade"></div></div>';
+    el.className = `sx-weapon-swing sx-swing-${fam} sx-dir-${dir}${heavy ? ' sx-heavy' : ''}`;
+    el.innerHTML = '<div class="sx-swing-rot"><div class="sx-swing-part sx-swing-arc"></div><div class="sx-swing-part sx-swing-blade"></div></div>';
     avatar.appendChild(el);
     const lifetime = (WEAPON_SWING_DURATION_MS[fam] || 320) + 60;
     setTimeout(() => { try { el.remove(); } catch (e) {} }, lifetime);
@@ -199,7 +199,7 @@ function _meleeDeliverArtStrike(targetId, tier, chargePct) {
             let face = _getAttackFacing();
             try {
                 const avatar = document.getElementById('player-avatar-wrapper');
-                const card = document.getElementById(`eg-card-${targetId}`);
+                const card = document.getElementById(`sx-card-${targetId}`);
                 if (avatar && card) {
                     const a = _getElementCentre(avatar);
                     const b = _getElementCentre(card);
@@ -424,7 +424,7 @@ function _meleeReleaseHold() {
 
 export function _initEgWeaponAttackHotkey() {
     // PRESS starts the charge. The central dispatcher matches the player's
-    // (possibly rebound) eg-attack key; key repeat is ignored so holding
+    // (possibly rebound) sx-attack key; key repeat is ignored so holding
     // keeps charging instead of re-firing weak strikes.
     const pressHandler = (e) => {
         if (e && e.repeat) return false;
@@ -432,7 +432,7 @@ export function _initEgWeaponAttackHotkey() {
         return false;
     };
     if (typeof onKeybindAction === 'function') {
-        globalThis.onKeybindAction('eg-attack', pressHandler);
+        globalThis.onKeybindAction('sx-attack', pressHandler);
     } else {
         // Fallback if the keybind system loads later/never: plain E key.
         document.addEventListener('keydown', (e) => {

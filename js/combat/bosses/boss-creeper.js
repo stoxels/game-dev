@@ -80,7 +80,7 @@ export function _crpGridCenter() {
 export function _crpBoom(x, y, radius, pct, level, label) {
     const R = Math.max(10, radius);
     const layer = document.createElement('div');
-    layer.className = 'eg-crp-burst';
+    layer.className = 'sx-crp-burst';
     layer.style.left = Math.round(x - R) + 'px';
     layer.style.top = Math.round(y - R) + 'px';
     layer.style.width = (R * 2) + 'px';
@@ -88,14 +88,14 @@ export function _crpBoom(x, y, radius, pct, level, label) {
     document.body.appendChild(layer);
 
     const core = document.createElement('div');
-    core.className = 'eg-crp-core';
+    core.className = 'sx-crp-core';
     layer.appendChild(core);
     const ring = document.createElement('div');
-    ring.className = 'eg-crp-ring';
+    ring.className = 'sx-crp-ring';
     layer.appendChild(ring);
     for (let i = 0; i < 6; i++) {
         const s = document.createElement('div');
-        s.className = 'eg-crp-smoke';
+        s.className = 'sx-crp-smoke';
         const ang = Math.random() * Math.PI * 2;
         const dist = (R * 0.3) + Math.random() * (R * 0.8);
         s.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
@@ -105,7 +105,7 @@ export function _crpBoom(x, y, radius, pct, level, label) {
     }
     // Lingering scorch crater: a dark circle that fades out slowly.
     const crater = document.createElement('div');
-    crater.className = 'eg-crp-crater';
+    crater.className = 'sx-crp-crater';
     crater.style.width = Math.round(R * 1.1) + 'px';
     crater.style.height = Math.round(R * 1.1) + 'px';
     crater.style.left = Math.round(x - R * 0.55) + 'px';
@@ -126,7 +126,7 @@ export function _crpBoom(x, y, radius, pct, level, label) {
 
 // A dashed circle showing a blast's real reach (radius r) at (x, y).
 function _crpReach(run, x, y, r, cls) {
-    const el = _nkEl(run, 'div', 'eg-crp-reach' + (cls ? ' ' + cls : ''));
+    const el = _nkEl(run, 'div', 'sx-crp-reach' + (cls ? ' ' + cls : ''));
     el.style.left = Math.round(x - r) + 'px';
     el.style.top = Math.round(y - r) + 'px';
     el.style.width = el.style.height = Math.round(r * 2) + 'px';
@@ -137,9 +137,9 @@ function _crpReach(run, x, y, r, cls) {
 // the classic green cube + face as CHILD elements (scale/filter animations
 // run on the child - never on the fixed wrapper).
 export function _crpSprite(run, charged) {
-    const dot = _nkEl(run, 'div', 'eg-nk-dot eg-crp-creeper' + (charged ? ' eg-crp-charged' : ''));
+    const dot = _nkEl(run, 'div', 'sx-nk-dot sx-crp-creeper' + (charged ? ' sx-crp-charged' : ''));
     const body = document.createElement('div');
-    body.className = 'eg-crp-body';
+    body.className = 'sx-crp-body';
     dot.appendChild(body);
     return { dot, body };
 }
@@ -153,7 +153,7 @@ export function _crpFuseVisual(sprite, fuse) {
     if (fuse > 0.35) {
         // Blink faster the hotter the fuse gets.
         const blinkMs = Math.max(70, 260 - fuse * 190);
-        sprite.body.style.animation = 'eg-crp-flash ' + blinkMs + 'ms steps(2) infinite';
+        sprite.body.style.animation = 'sx-crp-flash ' + blinkMs + 'ms steps(2) infinite';
     } else {
         sprite.body.style.animation = '';
     }
@@ -163,9 +163,9 @@ export function _crpFuseVisual(sprite, fuse) {
 // 'boss_creeper'; runtime ids are suffixed). Clears the set-piece.
 export function _crpTeardown() {
     if (_crpFinal) _crpFinalEnd(_crpFinal);
-    document.body.classList.remove('eg-crp-flash');
-    document.querySelectorAll('.eg-crp-flying').forEach(el => el.classList.remove('eg-crp-flying'));
-    document.querySelectorAll('.eg-crp-finaledge, .eg-crp-finalring').forEach(el => { try { el.remove(); } catch (e) {} });
+    document.body.classList.remove('sx-crp-flash');
+    document.querySelectorAll('.sx-crp-flying').forEach(el => el.classList.remove('sx-crp-flying'));
+    document.querySelectorAll('.sx-crp-finaledge, .sx-crp-finalring').forEach(el => { try { el.remove(); } catch (e) {} });
 }
 
 
@@ -232,7 +232,7 @@ export function _mechCreeperPack(monster, phase) {
             // Creepers despawn un-blown when the pack window ends.
             if (t >= durMs) {
                 s.blown = true;
-                if (s.sprite.dot) { s.sprite.dot.classList.add('eg-crp-flee'); }
+                if (s.sprite.dot) { s.sprite.dot.classList.add('sx-crp-flee'); }
                 if (s.reach) { try { s.reach.remove(); } catch (e) {} s.reach = null; }
                 setTimeout(() => { try { s.sprite.dot.remove(); } catch (e) {} }, 600);
                 return;
@@ -251,7 +251,7 @@ export function _mechCreeperPack(monster, phase) {
             // Warm fuse: its real blast reach follows it as a dashed ring
             // (the blast is far bigger than the creeper itself).
             if (s.fuse > 0.3) {
-                if (!s.reach) s.reach = _crpReach(run, s.x, s.y, s.radius, 'eg-crp-reach-pack');
+                if (!s.reach) s.reach = _crpReach(run, s.x, s.y, s.radius, 'sx-crp-reach-pack');
                 s.reach.style.left = Math.round(s.x - s.radius) + 'px';
                 s.reach.style.top = Math.round(s.y - s.radius) + 'px';
                 s.reach.style.opacity = Math.min(1, (s.fuse - 0.3) / 0.4).toFixed(2);
@@ -300,7 +300,7 @@ export function _mechCreeperPounce(monster, phase) {
         const sprite = _crpSprite(run, false);
         // The marker is the real blast disc (it was 84px for a 140px blast).
         const R = CRP_POUNCE_BLAST_R;
-        const marker = _nkEl(run, 'div', 'eg-crp-marker');
+        const marker = _nkEl(run, 'div', 'sx-crp-marker');
         marker.style.width = (R * 2) + 'px';
         marker.style.height = (R * 2) + 'px';
         marker.style.left = Math.round(x - R) + 'px';
@@ -381,7 +381,7 @@ export function _mechTntChain(monster, phase) {
         const dist = clusterR * (0.25 + Math.random() * 0.75);
         const x = Math.max(60, Math.min(window.innerWidth - 60, cx + Math.cos(ang) * dist));
         const y = Math.max(90, Math.min(window.innerHeight - 90, cy + Math.sin(ang) * dist));
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-crp-tnt', 'TNT');
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-crp-tnt', 'TNT');
         el.style.transform = 'translate(' + Math.round(x - 24) + 'px,' + Math.round(y - 16) + 'px)';
         blocks.push({ x, y, el, dCenter: Math.hypot(x - cx, y - cy), blown: false });
     }
@@ -389,7 +389,7 @@ export function _mechTntChain(monster, phase) {
     // The whole danger area: every block's blast disc, outlined as one ring.
     let far = 0;
     blocks.forEach(b => { far = Math.max(far, b.dCenter + CRP_TNT_BLAST_R); });
-    _crpReach(run, cx, cy, far, 'eg-crp-reach-tnt');
+    _crpReach(run, cx, cy, far, 'sx-crp-reach-tnt');
 
     let t = 0;
     let boomIdx = 0;
@@ -488,14 +488,14 @@ export function _crpFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // Growing blast-radius ring (red, dashed) centred on the boss.
     const ring = document.createElement('div');
-    ring.className = 'eg-crp-finalring';
+    ring.className = 'sx-crp-finalring';
     ring.style.width = '0px';
     ring.style.height = '0px';
     ring.style.left = Math.round(g.center.x) + 'px';
@@ -505,7 +505,7 @@ export function _crpFinalStart(monster) {
     // The blast's FULL size is outlined from the first moment (the filling
     // ring alone only revealed it at the end of the countdown).
     const edge = document.createElement('div');
-    edge.className = 'eg-crp-finaledge';
+    edge.className = 'sx-crp-finaledge';
     edge.style.left = Math.round(g.center.x - g.blastR) + 'px';
     edge.style.top = Math.round(g.center.y - g.blastR) + 'px';
     edge.style.width = edge.style.height = Math.round(g.blastR * 2) + 'px';
@@ -523,20 +523,20 @@ export function _crpFinalStart(monster) {
     });
 
     // Boss swell: the card grows and pulses like a primed creeper.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-crp-flying');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-crp-flying');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-crp-cd';
+    ov.className = 'sx-crp-cd';
     ov.innerHTML =
-        '<div class="eg-crp-cd-label">💥 SSSS…</div>' +
-        '<div class="eg-crp-cd-num eg-crp-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-crp-cd-hint">The Creeper is priming - get OUT of the red ring!</div>';
+        '<div class="sx-crp-cd-label">💥 SSSS…</div>' +
+        '<div class="sx-crp-cd-num sx-crp-cd-pop">' + g.count + '</div>' +
+        '<div class="sx-crp-cd-hint">The Creeper is priming - get OUT of the red ring!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -559,12 +559,12 @@ export function _crpFinalStart(monster) {
             _crpFinalBang(g, monster);
             return;
         }
-        const num = g.overlay && g.overlay.querySelector('.eg-crp-cd-num');
+        const num = g.overlay && g.overlay.querySelector('.sx-crp-cd-num');
         if (num) {
             num.textContent = g.count;
-            num.classList.remove('eg-crp-cd-pop');
+            num.classList.remove('sx-crp-cd-pop');
             void num.offsetWidth;
-            num.classList.add('eg-crp-cd-pop');
+            num.classList.add('sx-crp-cd-pop');
         }
     }, cdTick);
 }
@@ -581,8 +581,8 @@ export function _crpFinalBang(g, monster) {
     _nkToast('eg_mech_creeper_final_bang', '💥💀 SSSS… BOOM!', '#f87171');
 
     // Screen flash at the moment of the bang.
-    document.body.classList.add('eg-crp-flash');
-    setTimeout(() => document.body.classList.remove('eg-crp-flash'), 700);
+    document.body.classList.add('sx-crp-flash');
+    setTimeout(() => document.body.classList.remove('sx-crp-flash'), 700);
 
     // Mega blast, centred on the boss (run-independent visuals).
     _crpBoom(g.center.x, g.center.y, g.blastR, CRP_FINAL_DMG, level, 'SSSS…BOOM');
@@ -611,12 +611,12 @@ export function _crpFinalEnd(g) {
     if (g.ringEl) { try { g.ringEl.remove(); } catch (e) {} g.ringEl = null; }
     if (g.edgeEl) { try { g.edgeEl.remove(); } catch (e) {} g.edgeEl = null; }
     if (g.run) { try { _nkKillRun(g.run); } catch (e) {} g.run = null; }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
-    document.body.classList.remove('eg-crp-flash');
-    document.querySelectorAll('.eg-crp-flying').forEach(el => el.classList.remove('eg-crp-flying'));
+    document.body.classList.remove('sx-crp-flash');
+    document.querySelectorAll('.sx-crp-flying').forEach(el => el.classList.remove('sx-crp-flying'));
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;

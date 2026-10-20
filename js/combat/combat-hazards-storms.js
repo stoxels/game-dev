@@ -44,7 +44,7 @@ export function _hzTickLightning(dtMs) {
 
         const pos = _hzPointOutsideGrid(HZ_LIGHTNING_RADIUS * 0.6);
         const el = document.createElement('div');
-        el.className = 'eg-hz-lightning-warning';
+        el.className = 'sx-hz-lightning-warning';
         el.style.left = pos.x + 'px';
         el.style.top = pos.y + 'px';
         _hzLayer.appendChild(el);
@@ -60,7 +60,7 @@ export function _hzTickLightning(dtMs) {
         if (strike.t > 0) continue;
 
         // Impact: bolt flash, then remove the warning ring.
-        strike.el.classList.add('eg-hz-lightning-bolt');
+        strike.el.classList.add('sx-hz-lightning-bolt');
         Audio_Manager.playSFX('hz_lightning_strike');
         const warnEl = strike.el;
         setTimeout(() => warnEl.remove(), 350);
@@ -80,11 +80,11 @@ export function _hzTickLightning(dtMs) {
 export function _hzInitBlizzard(intensity) {
     // Full-screen snow layer (visual only - never blocks clicks).
     const overlay = document.createElement('div');
-    overlay.className = 'eg-hz-blizzard';
+    overlay.className = 'sx-hz-blizzard';
     const flakes = 26;
     for (let i = 0; i < flakes; i++) {
         const flake = document.createElement('span');
-        flake.className = 'eg-hz-snowflake';
+        flake.className = 'sx-hz-snowflake';
         flake.textContent = '❄';
         flake.style.left = _hzRand(0, 100) + '%';
         flake.style.fontSize = _hzRand(8, 18) + 'px';
@@ -112,7 +112,7 @@ export function _hzSpawnIcicle() {
     const h = _hzRand(60, 115);
     const x = _hzRand(20, window.innerWidth - w - 20);
     const el = document.createElement('div');
-    el.className = 'eg-hz-icicle eg-hz-icicle-hang';
+    el.className = 'sx-hz-icicle sx-hz-icicle-hang';
     el.style.left = x + 'px';
     el.style.width = w + 'px';
     el.style.height = h + 'px';
@@ -148,16 +148,16 @@ export function _hzTickBlizzard(dtMs) {
             if (ic.t <= 0) {
                 ic.state = 'shake';
                 ic.t = HZ_ICICLE_SHAKE_MS;
-                ic.el.classList.remove('eg-hz-icicle-hang');
-                ic.el.classList.add('eg-hz-icicle-shake');
+                ic.el.classList.remove('sx-hz-icicle-hang');
+                ic.el.classList.add('sx-hz-icicle-shake');
             }
         } else if (ic.state === 'shake') {
             ic.t -= dtMs;
             if (ic.t <= 0) {
                 ic.state = 'fall';
                 Audio_Manager.playSFX('hz_icicle_fall');
-                ic.el.classList.remove('eg-hz-icicle-shake');
-                ic.el.classList.add('eg-hz-icicle-fall');
+                ic.el.classList.remove('sx-hz-icicle-shake');
+                ic.el.classList.add('sx-hz-icicle-fall');
             }
         } else {
             const prevY = ic.y;
@@ -207,13 +207,13 @@ export function _hzInitDarkness(intensity) {
 
     // Own layer above the player HUD so clouds genuinely obscure the screen.
     const darkLayer = document.createElement('div');
-    darkLayer.className = 'eg-hz-darkness-layer';
+    darkLayer.className = 'sx-hz-darkness-layer';
 
     const clouds = [];
     for (let i = 0; i < count; i++) {
         const scale = _hzRand(0.8, 1.5);
         const el = document.createElement('div');
-        el.className = 'eg-hz-cloud';
+        el.className = 'sx-hz-cloud';
         el.style.opacity = opacity.toFixed(2);
         el.style.setProperty('--hz-cloud-scale', scale.toFixed(2));
         darkLayer.appendChild(el);
@@ -291,7 +291,7 @@ export function _hzStartArcaneCharge() {
     const size = 46;
 
     const orb = document.createElement('div');
-    orb.className = 'eg-hz-arcane-orb';
+    orb.className = 'sx-hz-arcane-orb';
     orb.style.transition = `width ${chargeMs}ms linear, height ${chargeMs}ms linear`;
     orb.style.top = y + 'px';
     _hzLayer.appendChild(orb);
@@ -366,7 +366,7 @@ export function _hzFireArcaneBeam() {
 
     const w = window.innerWidth + 80;
     const el = document.createElement('div');
-    el.className = 'eg-hz-arcane-beam';
+    el.className = 'sx-hz-arcane-beam';
     Audio_Manager.playSFX('hz_arcane_beam');
     el.style.width = w + 'px';
     el.style.height = HZ_ARCANE_BEAM_HEIGHT + 'px';
@@ -400,7 +400,7 @@ export function _hzInitMeteor(intensity) {
 export function _hzSpawnMeteor(delayMs) {
     const pos = _hzPointOutsideGrid(HZ_METEOR_RADIUS * 0.6);
     const el = document.createElement('div');
-    el.className = 'eg-hz-meteor-warning';
+    el.className = 'sx-hz-meteor-warning';
     el.style.left = pos.x + 'px';
     el.style.top = pos.y + 'px';
     _hzLayer.appendChild(el);
@@ -448,7 +448,7 @@ export function _hzTickMeteor(dtMs) {
                 m.y = m.ty - m.fallDist;
                 const size = 46;
                 const fallEl = document.createElement('div');
-                fallEl.className = 'eg-hz-meteor-fall';
+                fallEl.className = 'sx-hz-meteor-fall';
                 fallEl.style.width = size + 'px';
                 fallEl.style.height = size + 'px';
                 fallEl.style.left = (m.x - size / 2) + 'px';
@@ -467,7 +467,7 @@ export function _hzTickMeteor(dtMs) {
                 Audio_Manager.playSFX('hz_meteor_impact');
                 m.fallEl.remove();
                 if (m.warnEl && m.warnEl.isConnected) {
-                    m.warnEl.classList.add('eg-hz-meteor-impact');
+                    m.warnEl.classList.add('sx-hz-meteor-impact');
                     const impactEl = m.warnEl;
                     setTimeout(() => impactEl.remove(), 350);
                 }

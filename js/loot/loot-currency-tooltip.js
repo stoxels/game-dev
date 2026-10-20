@@ -56,7 +56,7 @@ export function _showHubTooltip(item, e) {
         const ttIcon = item.icon || defForTT.icon || '📦';
         const ttDesc = item.description || defForTT.description || '';
         const isEssenceTT = item.category === 'essence' || (typeof ESSENCE_DEFS !== 'undefined' && ESSENCE_DEFS[item.id]);
-        const countLine = item.count > 1 ? ` <span class="eg-tooltip-count">×${item.count}</span>` : '';
+        const countLine = item.count > 1 ? ` <span class="sx-tooltip-count">×${item.count}</span>` : '';
         let essenceDetailHTML = '';
         if (isEssenceTT && typeof _buildEssenceDetailHTML === 'function') {
             const edef = (typeof ESSENCE_DEFS !== 'undefined' && ESSENCE_DEFS[item.id]) || defForTT;
@@ -65,13 +65,13 @@ export function _showHubTooltip(item, e) {
             }
         }
         html = `
-<div class="eg-tt-frame" style="--tt-border:#b59248;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">${GAME_ART.html('item', item.id, ttIcon)}</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${ttName}${countLine}</div>
-        <div class="eg-tt-rarity-line" style="color:#b59248;">${isEssenceTT ? t('eg_rarity_essence') : t('eg_rarity_currency')}</div>
+<div class="sx-tt-frame" style="--tt-border:#b59248;">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon">${GAME_ART.html('item', item.id, ttIcon)}</div>
+        <div class="sx-tt-name" style="color:#f5d98a;">${ttName}${countLine}</div>
+        <div class="sx-tt-rarity-line" style="color:#b59248;">${isEssenceTT ? t('eg_rarity_essence') : t('eg_rarity_currency')}</div>
     </div>
-    <div class="eg-tt-section"><div class="eg-tt-desc">${ttDesc}</div></div>
+    <div class="sx-tt-section"><div class="sx-tt-desc">${ttDesc}</div></div>
     ${essenceDetailHTML}
 </div>`;
     } else if (item.category === 'map' && typeof _egBuildMapTooltipBodyHTML === 'function') {

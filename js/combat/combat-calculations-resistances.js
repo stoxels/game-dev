@@ -54,10 +54,10 @@ export function _showResistPenaltyNotice(stage) {
     const tr = (k) => (typeof globalThis.t === 'function' ? globalThis.t(k) : k);
     const total = stage * RESIST_PENALTY_PER_STAGE;
     setTimeout(() => {
-        const old = document.getElementById('eg-resist-penalty-notice');
+        const old = document.getElementById('sx-resist-penalty-notice');
         if (old) old.remove();
         const wrap = document.createElement('div');
-        wrap.id = 'eg-resist-penalty-notice';
+        wrap.id = 'sx-resist-penalty-notice';
         wrap.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(6,4,10,0.78);';
         const box = document.createElement('div');
         box.style.cssText = 'max-width:520px;margin:16px;padding:26px 30px;border:2px solid #c0482f;border-radius:12px;background:linear-gradient(#241518,#140b0d);color:#f1ddd6;text-align:center;box-shadow:0 0 40px rgba(192,72,47,0.45);font-family:inherit;';

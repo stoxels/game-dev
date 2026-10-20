@@ -25,32 +25,32 @@ export function _vendorIconHTML(artId, fallbackEmoji) {
 
 // Builds one vendor offer card from its display and purchase details.
 export function _vendorBuildCardHTML({ icon, title, subtitle, desc, price, buyCall, extraClass = '', blockedReason = '', extraAttrs = '' }) {
-    const blockedCls = blockedReason ? ' egv-card-blocked' : '';
+    const blockedCls = blockedReason ? ' sx-vendor-card-blocked' : '';
     const blockedTitle = blockedReason ? ` data-tip="${globalThis._tipAttr(blockedReason)}"` : '';
     // Free offers (price 0) never show a gold deficit.
     const isFree = price <= 0;
     // Dim the card + show the deficit while the player cannot afford it.
     const cannotAfford = !isFree && getGold() < price;
-    const affordCls = cannotAfford ? ' egv-card-cannot-afford' : '';
+    const affordCls = cannotAfford ? ' sx-vendor-card-cannot-afford' : '';
     const affordLine = cannotAfford
-        ? `<div class="egv-price-missing">${t('eg_vendor_missing_gold').replace('{n}', (price - getGold()).toLocaleString())}</div>`
+        ? `<div class="sx-vendor-price-missing">${t('eg_vendor_missing_gold').replace('{n}', (price - getGold()).toLocaleString())}</div>`
         : '';
     return `
-<div class="egv-card${blockedCls}${affordCls} ${extraClass}"${blockedTitle}${extraAttrs}>
-    <div class="egv-card-top">
-        <div class="egv-card-icon">${icon}</div>
-        <div class="egv-card-info">
-            <div class="egv-card-name">${title}</div>
-            ${subtitle ? `<div class="egv-card-sub">${subtitle}</div>` : ''}
-            ${desc ? `<div class="egv-card-desc">${desc}</div>` : ''}
+<div class="sx-vendor-card${blockedCls}${affordCls} ${extraClass}"${blockedTitle}${extraAttrs}>
+    <div class="sx-vendor-card-top">
+        <div class="sx-vendor-card-icon">${icon}</div>
+        <div class="sx-vendor-card-info">
+            <div class="sx-vendor-card-name">${title}</div>
+            ${subtitle ? `<div class="sx-vendor-card-sub">${subtitle}</div>` : ''}
+            ${desc ? `<div class="sx-vendor-card-desc">${desc}</div>` : ''}
         </div>
     </div>
-    <div class="egv-card-bottom">
+    <div class="sx-vendor-card-bottom">
         <div>
-            <div class="egv-offer-price">${isFree ? `🪙 ${t('eg_vendor_free')}` : `🪙 ${price.toLocaleString()}`}</div>
+            <div class="sx-vendor-offer-price">${isFree ? `🪙 ${t('eg_vendor_free')}` : `🪙 ${price.toLocaleString()}`}</div>
             ${affordLine}
         </div>
-        <button class="title-btn egv-buy-btn" onclick="${buyCall}">${t('eg_vendor_buy')}</button>
+        <button class="title-btn sx-vendor-buy-btn" onclick="${buyCall}">${t('eg_vendor_buy')}</button>
     </div>
 </div>`;
 }
@@ -101,7 +101,7 @@ export function _vendorRefreshTabContent() {
 }
 // Updates the vendor's displayed gold balance when that row exists.
 export function _vendorRefreshGoldDisplay() {
-    const balanceEl = document.getElementById('egv-gold-balance');
+    const balanceEl = document.getElementById('sx-vendor-gold-balance');
     if (balanceEl) {
         balanceEl.textContent = t('eg_vendor_gold_balance').replace('{n}', getGold().toLocaleString());
     }
@@ -155,8 +155,8 @@ export function _vendorSetCharmFilter(id) {
 
 // One chip per spell type, with the chosen one highlighted.
 export function _vendorBuildCharmFilterBarHTML() {
-    const chip = (id, label) => `<button type="button" class="egv-filter-btn${_vendorCharmFilter === id ? ' egv-filter-btn-on' : ''}" onclick="_vendorSetCharmFilter('${id}')">${label}</button>`;
-    return `<div class="egv-charm-filters">${chip('all', t('eg_vendor_charm_filter_all'))}${
+    const chip = (id, label) => `<button type="button" class="sx-vendor-filter-btn${_vendorCharmFilter === id ? ' sx-vendor-filter-btn-on' : ''}" onclick="_vendorSetCharmFilter('${id}')">${label}</button>`;
+    return `<div class="sx-vendor-charm-filters">${chip('all', t('eg_vendor_charm_filter_all'))}${
         VENDOR_CHARM_FILTERS.map(f => chip(f.id, t('eg_vendor_charm_filter_' + f.id))).join('')}</div>`;
 }
 

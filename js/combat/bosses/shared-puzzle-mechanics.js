@@ -85,8 +85,8 @@ export function _applyFateMark(r, c, windowMs) {
     if (!el) return;
 
     const overlay = document.createElement('span');
-    overlay.className = 'eg-fate-overlay';
-    overlay.id = `eg-fate-${r}-${c}`;
+    overlay.className = 'sx-fate-overlay';
+    overlay.id = `sx-fate-${r}-${c}`;
     overlay.textContent = '⏳';
     el.appendChild(overlay);
 
@@ -99,7 +99,7 @@ export function _removeFateMark(key) {
     const data = _fateMarks.get(key);
     if (data) clearTimeout(data.timer);
     _fateMarks.delete(key);
-    const span = document.getElementById(`eg-fate-${key}`);
+    const span = document.getElementById(`sx-fate-${key}`);
     if (span) span.remove();
 }
 
@@ -320,13 +320,13 @@ export function _fogSpawnBank(driftMs, durationMs) {
     if (!reg) return null;
 
     const fog = document.createElement('div');
-    fog.className = 'eg-fog-bank';
-    fog.id = `eg-fog-bank-${++_fogSeq}`;
+    fog.className = 'sx-fog-bank';
+    fog.id = `sx-fog-bank-${++_fogSeq}`;
     // Layered drifting mist blobs - the fog reads as churning vapor
     // instead of a flat grey box. Positions are staggered per blob.
     ['', 'm2', 'm3'].forEach((cls, i) => {
         const m = document.createElement('div');
-        m.className = ('eg-fog-mist ' + cls).trim();
+        m.className = ('sx-fog-mist ' + cls).trim();
         m.textContent = '🌫️';
         m.style.left = (14 + i * 27) + '%';
         m.style.top = (20 + ((i * 31) % 44)) + '%';
@@ -359,7 +359,7 @@ export function _fogKillBank(bank) {
     clearTimeout(bank.expireTimer);
     if (bank.el && bank.el.isConnected) {
         const el = bank.el;
-        el.classList.add('eg-fog-out');
+        el.classList.add('sx-fog-out');
         setTimeout(() => { try { el.remove(); } catch (e) {} }, 480);
     }
     const idx = _fogBanks.indexOf(bank);
@@ -432,7 +432,7 @@ export function _restoreClueScramble() {
         });
     });
     globalThis._activeClueScramble = null;
-    document.querySelectorAll('.eg-scramble-clue').forEach(el => el.classList.remove('eg-scramble-clue'));
+    document.querySelectorAll('.sx-scramble-clue').forEach(el => el.classList.remove('sx-scramble-clue'));
 }
 
 // Picks n distinct clue lines (rows + columns), each with ≥ 2 number spans.
@@ -479,8 +479,8 @@ export function _clueScrambleReshuffle() {
         if (_scrambleLineTexts(spans)) {
             changed = true;
             spans.forEach(el => {
-                el.classList.add('eg-scramble-shake');
-                setTimeout(() => el.classList.remove('eg-scramble-shake'), 650);
+                el.classList.add('sx-scramble-shake');
+                setTimeout(() => el.classList.remove('sx-scramble-shake'), 650);
             });
         }
     });
@@ -521,7 +521,7 @@ export function _mechClueScramble(monster, phase) {
         if (spans.length < 2) return;
         const orig = spans.map(el => el.textContent);
         if (!_scrambleLineTexts(spans)) return; // all identical - nothing to do
-        spans.forEach(el => el.classList.add('eg-scramble-clue'));
+        spans.forEach(el => el.classList.add('sx-scramble-clue'));
         scrambled.push({ spans, orig });
     });
     if (scrambled.length === 0) return;
@@ -554,7 +554,7 @@ export function _removeClueScramble() {
         });
     }
     globalThis._activeClueScramble = null;
-    document.querySelectorAll('.eg-scramble-clue').forEach(el => el.classList.remove('eg-scramble-clue'));
+    document.querySelectorAll('.sx-scramble-clue').forEach(el => el.classList.remove('sx-scramble-clue'));
 }
 
 
@@ -600,8 +600,8 @@ export function _titheDrop(monster) {
     clearTimeout(monster.soulTithe.decayTimer);
     monster.soulTithe = null;
     monster.bossImmune = false;
-    const card = document.getElementById('eg-card-' + monster.id);
-    if (card) card.classList.remove('eg-nk-shielded');
+    const card = document.getElementById('sx-card-' + monster.id);
+    if (card) card.classList.remove('sx-nk-shielded');
 }
 
 // Boss mechanic handler - phase variants:
@@ -623,8 +623,8 @@ export function _mechSoulTithe(monster, phase) {
         p, collect: p >= 3, decayMs,
     };
     monster.bossImmune = true;
-    const card = document.getElementById('eg-card-' + monster.id);
-    if (card) card.classList.add('eg-nk-shielded');
+    const card = document.getElementById('sx-card-' + monster.id);
+    if (card) card.classList.add('sx-nk-shielded');
     const toastKey = p >= 3 ? 'eg_mech_tithe_debt'
         : (p >= 2 ? 'eg_mech_tithe_lapse' : 'eg_mech_tithe');
     _nkToast(toastKey, `💀 Soul Tithe! Fill ${need} correct cells to break the shield!`);
@@ -667,8 +667,8 @@ export function _titheTeardown(monsterId) {
         const m = globalThis._monsters.find(x => x.id === monsterId);
         if (m && m.soulTithe) _titheDrop(m);
     }
-    const card = document.getElementById('eg-card-' + monsterId);
-    if (card) card.classList.remove('eg-nk-shielded');
+    const card = document.getElementById('sx-card-' + monsterId);
+    if (card) card.classList.remove('sx-nk-shielded');
 }
 
 
@@ -677,9 +677,9 @@ export function _titheTeardown(monsterId) {
 // veil was active. Called by the framework's _bossCleanup typeof-guard.
 export function _removeVeil() {
     if (typeof _veilActive !== 'undefined') globalThis._veilActive = false;
-    const veil = document.getElementById('eg-grid-veil');
+    const veil = document.getElementById('sx-grid-veil');
     if (veil) {
-        veil.classList.remove('eg-blm-veil-tinted', 'eg-bay-veil-tinted', 'eg-blm-veil-open');
+        veil.classList.remove('sx-blm-veil-tinted', 'sx-bay-veil-tinted', 'sx-blm-veil-open');
         veil.style.removeProperty('--blm-wilt');
         veil.remove();
     }

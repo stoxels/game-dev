@@ -64,14 +64,14 @@ export function _mechPortalWisp(monster, phase) {
     const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const mkPortal = (fx, fy, emoji) => {
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-portal', emoji);
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-portal', emoji);
         const pt = { x: window.innerWidth * fx, y: window.innerHeight * fy, el };
         el.style.transform = 'translate(' + Math.round(pt.x - 30) + 'px,' + Math.round(pt.y - 30) + 'px)';
         return pt;
     };
     const pa = mkPortal(0.2, 0.35, '🟦');
     const pb = mkPortal(0.8, 0.7, '🟧');
-    const wisp = _nkEl(run, 'div', 'eg-nk-dot eg-nk-wisp', '👁️');
+    const wisp = _nkEl(run, 'div', 'sx-nk-dot sx-nk-wisp', '👁️');
     const w = { x: window.innerWidth * 0.5, y: 90 };
     _nkToast('eg_mech_wormhole', '🕳️ The Wormhole: Portal Wisp! Lose it through the holes!');
     let e = 0, cdUntil = 0, portalCdUntil = 0;

@@ -591,7 +591,7 @@ export function _getItemEffectiveAttackInterval(item) {
 // mods are present, matching the armour/evasion/damage local systems above.
 // Effective = base + sum of block_chance mods on that item.
 // Returns { value, base, added, modded } where modded signals the display
-// should use .eg-tt-val-modified.
+// should use .sx-tt-val-modified.
 export function _getItemEffectiveBlockChance(item) {
     const base = Number(item.blockChance) || 0;
     if (!base) return { value: 0, base: 0, added: 0, modded: false };

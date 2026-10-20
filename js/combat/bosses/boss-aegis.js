@@ -78,7 +78,7 @@ export function _agAegisGlow(on) {
     if (on) {
         if (_agGlowEl) return;
         _agGlowEl = document.createElement('div');
-        _agGlowEl.className = 'eg-ag-aegisglow';
+        _agGlowEl.className = 'sx-ag-aegisglow';
         document.body.appendChild(_agGlowEl);
     } else {
         if (_agGlowEl) { try { _agGlowEl.remove(); } catch (e) {} _agGlowEl = null; }
@@ -89,13 +89,13 @@ export function _agAegisGlow(on) {
 // so it survives the run ending in the same frame).
 export function _agDebris(x, y, big) {
     const layer = document.createElement('div');
-    layer.className = 'eg-ag-debris' + (big ? ' eg-ag-debris-big' : '');
+    layer.className = 'sx-ag-debris' + (big ? ' sx-ag-debris-big' : '');
     layer.style.left = Math.round(x) + 'px';
     layer.style.top = Math.round(y) + 'px';
     document.body.appendChild(layer);
     for (let i = 0; i < (big ? 11 : 6); i++) {
         const s = document.createElement('div');
-        s.className = 'eg-ag-shard';
+        s.className = 'sx-ag-shard';
         const ang = Math.random() * Math.PI * 2;
         const dist = 22 + Math.random() * (big ? 86 : 48);
         s.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
@@ -135,8 +135,8 @@ export function _mechAgAegisProtocol(monster, phase) {
 
     monster.aegisUp = true;
     monster.bossImmune = true;
-    const card = document.getElementById('eg-card-' + monster.id);
-    if (card) card.classList.add('eg-nk-shielded');
+    const card = document.getElementById('sx-card-' + monster.id);
+    if (card) card.classList.add('sx-nk-shielded');
     Audio_Manager.playSFX('boss_shield_up');
     // Arena glow so the shielded state reads at a glance.
     _agAegisGlow(true);
@@ -158,8 +158,8 @@ export function _mechAgAegisProtocol(monster, phase) {
         if (!alive || e > 40000) {
             boss.aegisUp = false;
             boss.bossImmune = false;
-            const c2 = document.getElementById('eg-card-' + monster.id);
-            if (c2) c2.classList.remove('eg-nk-shielded');
+            const c2 = document.getElementById('sx-card-' + monster.id);
+            if (c2) c2.classList.remove('sx-nk-shielded');
             Audio_Manager.playSFX('boss_shield_down');
             _agAegisGlow(false);
             _nkToast('eg_mech_aegis_down', '🛡️ Aegis shield down - burn the boss!', '#4ade80');
@@ -202,12 +202,12 @@ export function _mechAgShieldCharge(monster, phase) {
             : Math.max(90, Math.min(H - 90, lastY + (Math.random() * 2 - 1) * 260));
         lastY = y;
         const fromLeft = Math.random() < 0.5;
-        const warn = _nkEl(run, 'div', 'eg-ag-chargewarn');
+        const warn = _nkEl(run, 'div', 'sx-ag-chargewarn');
         warn.style.left = '0px';
         warn.style.width = W + 'px';
         warn.style.top = Math.round(y - bandH / 2) + 'px';
         warn.style.height = bandH + 'px';
-        warn.classList.add(fromLeft ? 'eg-ag-from-left' : 'eg-ag-from-right');
+        warn.classList.add(fromLeft ? 'sx-ag-from-left' : 'sx-ag-from-right');
         charges.push({ y, fromLeft, warn, el: null, at: warnMs + i * gapMs, x: 0, done: false });
     }
 
@@ -223,12 +223,12 @@ export function _mechAgShieldCharge(monster, phase) {
             if (!ch.el) {
                 if (t < ch.at) return;
                 try { ch.warn.remove(); } catch (e) {}
-                const el = _nkEl(run, 'div', 'eg-ag-charger');
+                const el = _nkEl(run, 'div', 'sx-ag-charger');
                 el.style.top = Math.round(ch.y - bandH * 0.45) + 'px';
                 el.style.height = Math.round(bandH * 0.9) + 'px';
                 ch.x = ch.fromLeft ? -110 : W + 20;
                 el.style.left = Math.round(ch.x) + 'px';
-                el.classList.add(ch.fromLeft ? 'eg-ag-from-left' : 'eg-ag-from-right');
+                el.classList.add(ch.fromLeft ? 'sx-ag-from-left' : 'sx-ag-from-right');
                 ch.el = el;
                 _agDebris(ch.fromLeft ? 40 : W - 40, ch.y, false);
                 return;
@@ -283,7 +283,7 @@ export function _mechAgSentries(monster, phase) {
     const sentries = [];
     for (let i = 0; i < count; i++) {
         const spot = edges.splice(Math.floor(Math.random() * edges.length), 1)[0] || [W / 2, 70];
-        const el = _nkEl(run, 'div', 'eg-ag-sentry');
+        const el = _nkEl(run, 'div', 'sx-ag-sentry');
         el.style.left = Math.round(spot[0] - 26) + 'px';
         el.style.top = Math.round(spot[1] - 26) + 'px';
         sentries.push({ x: spot[0], y: spot[1], el, nextFire: 900 * _AG_DEBUG_MULT + i * 500 * _AG_DEBUG_MULT });
@@ -299,7 +299,7 @@ export function _mechAgSentries(monster, phase) {
         sentries.forEach(s => {
             if (t >= s.nextFire && orbs.filter(o => !o.dead && o.home === s).length < 2) {
                 s.nextFire = t + fireGap;
-                const el = _nkEl(run, 'div', 'eg-ag-orb');
+                const el = _nkEl(run, 'div', 'sx-ag-orb');
                 el.style.left = Math.round(s.x - 13) + 'px';
                 el.style.top = Math.round(s.y - 13) + 'px';
                 const dx = c ? c.x - s.x : 1, dy = c ? c.y - s.y : 0;
@@ -368,11 +368,11 @@ export function _mechAgGuardRotor(monster, phase) {
     const px = Math.max(260, Math.min(W - 260, c.x));
     const py = Math.max(240, Math.min(H - 240, c.y));
 
-    const pivot = _nkEl(run, 'div', 'eg-ag-rotor-pivot');
+    const pivot = _nkEl(run, 'div', 'sx-ag-rotor-pivot');
     pivot.style.left = Math.round(px) + 'px';
     pivot.style.top = Math.round(py) + 'px';
     const arms = [0, 180].map(() => {
-        const el = _nkEl(run, 'div', 'eg-ag-rotor-arm');
+        const el = _nkEl(run, 'div', 'sx-ag-rotor-arm');
         el.style.left = Math.round(px) + 'px';
         el.style.top = Math.round(py - 11) + 'px';
         el.style.width = Math.round(maxR) + 'px';
@@ -491,9 +491,9 @@ export function _agFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds bastion, beams and the sweep loop.
@@ -502,17 +502,17 @@ export function _agFinalStart(monster) {
 
     // Stone citadel overlay.
     const citadel = document.createElement('div');
-    citadel.className = 'eg-ag-citadel';
+    citadel.className = 'sx-ag-citadel';
     document.body.appendChild(citadel);
     g.citadel = citadel;
-    requestAnimationFrame(() => citadel.classList.add('eg-ag-citadel-on'));
+    requestAnimationFrame(() => citadel.classList.add('sx-ag-citadel-on'));
 
     // Bastion pivot at the arena centre.
     const W = window.innerWidth, H = window.innerHeight;
     g.px = W / 2;
     g.py = H / 2;
     const bastion = document.createElement('div');
-    bastion.className = 'eg-ag-bastion';
+    bastion.className = 'sx-ag-bastion';
     bastion.style.left = Math.round(g.px - 46) + 'px';
     bastion.style.top = Math.round(g.py - 46) + 'px';
     document.body.appendChild(bastion);
@@ -523,7 +523,7 @@ export function _agFinalStart(monster) {
     const maxR = Math.hypot(W, H);
     g.beams = [0, 180].map(() => {
         const el = document.createElement('div');
-        el.className = 'eg-ag-beam';
+        el.className = 'sx-ag-beam';
         el.style.left = Math.round(g.px) + 'px';
         el.style.top = Math.round(g.py - 13) + 'px';
         el.style.width = Math.round(maxR) + 'px';
@@ -534,11 +534,11 @@ export function _agFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-ag-cd';
+    ov.className = 'sx-ag-cd';
     ov.innerHTML =
-        '<div class="eg-ag-cd-label">🛡️ THE LAST BASTION</div>' +
-        '<div class="eg-ag-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-ag-cd-hint">The bastion sweeps the field - stay off the beams!</div>';
+        '<div class="sx-ag-cd-label">🛡️ THE LAST BASTION</div>' +
+        '<div class="sx-ag-cd-num sx-bmb-cd-pop">' + g.count + '</div>' +
+        '<div class="sx-ag-cd-hint">The bastion sweeps the field - stay off the beams!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -548,11 +548,11 @@ export function _agFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss fortifies.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-ag-fortified');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-ag-fortified');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     // The sweep: beams rotate; each metronome beat they spin faster. Pause /
@@ -596,18 +596,18 @@ export function _agFinalStart(monster) {
             g.overlay = null;
             // Beams retract; the vanguard charges begin.
             g.beamOn = false;
-            g.beams.forEach(b => b.classList.add('eg-ag-beam-retract'));
+            g.beams.forEach(b => b.classList.add('sx-ag-beam-retract'));
             _nkToast('eg_mech_ag_final_bang', '🏰💀 VANGUARD CHARGE!', '#e2e8f0');
             _agVanguard(g, monster);
             return;
         }
         g.omega = AG_BEAM_OMEGAS[AG_FINAL_TICKS - g.count];
-        const num = g.overlay && g.overlay.querySelector('.eg-ag-cd-num');
+        const num = g.overlay && g.overlay.querySelector('.sx-ag-cd-num');
         if (num) {
             num.textContent = g.count;
-            num.classList.remove('eg-bmb-cd-pop');
+            num.classList.remove('sx-bmb-cd-pop');
             void num.offsetWidth;
-            num.classList.add('eg-bmb-cd-pop');
+            num.classList.add('sx-bmb-cd-pop');
         }
     }, cdTick);
 }
@@ -642,7 +642,7 @@ export function _agVanguard(g, monster) {
             if (!ln.el) {
                 if (t < ln.at) return;
                 const el = document.createElement('div');
-                el.className = 'eg-ag-vangwarn';
+                el.className = 'sx-ag-vangwarn';
                 el.style.left = '0px';
                 el.style.width = W + 'px';
                 el.style.top = Math.round(ln.y - bandH / 2) + 'px';
@@ -658,7 +658,7 @@ export function _agVanguard(g, monster) {
                 try { ln.el.warn.remove(); } catch (e) {}
                 const big = i === 2;
                 const charger = document.createElement('div');
-                charger.className = 'eg-ag-charger' + (big ? ' eg-ag-charger-big' : '');
+                charger.className = 'sx-ag-charger' + (big ? ' sx-ag-charger-big' : '');
                 charger.style.top = Math.round(ln.y - bandH * (big ? 0.5 : 0.45)) + 'px';
                 charger.style.height = Math.round(bandH * (big ? 1 : 0.9)) + 'px';
                 ln.x = ln.fromLeft ? -130 : W + 30;
@@ -675,8 +675,8 @@ export function _agVanguard(g, monster) {
                 ln.done = true;
                 try { ln.el.charger.remove(); } catch (e) {}
                 if (i === 2) {
-                    document.body.classList.add('eg-ag-flash');
-                    const fid = setTimeout(() => document.body.classList.remove('eg-ag-flash'), 700);
+                    document.body.classList.add('sx-ag-flash');
+                    const fid = setTimeout(() => document.body.classList.remove('sx-ag-flash'), 700);
                     g.fxRun.timers.push(fid);
                 }
                 return;
@@ -711,13 +711,13 @@ export function _agFinalEnd(g) {
     g.beams.forEach(b => { try { b.remove(); } catch (e) {} });
     g.beams = [];
     if (g.fxRun) { try { _nkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
-    document.body.classList.remove('eg-ag-flash');
+    document.body.classList.remove('sx-ag-flash');
     _agAegisGlow(false);
-    document.querySelectorAll('.eg-ag-fortified').forEach(el => el.classList.remove('eg-ag-fortified'));
+    document.querySelectorAll('.sx-ag-fortified').forEach(el => el.classList.remove('sx-ag-fortified'));
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -739,17 +739,17 @@ export function _agFinalEnd(g) {
 // removes every run element, overlay and body class this boss ever created.
 export function _agTeardown() {
     if (_agFinal) { try { _agFinalEnd(_agFinal); } catch (e) {} _agFinal = null; }
-    document.querySelectorAll('.eg-ag-chargewarn, .eg-ag-charger, .eg-ag-vangwarn, .eg-ag-sentry, ' +
-        '.eg-ag-orb, .eg-ag-rotor-pivot, .eg-ag-rotor-arm, .eg-ag-bastion, .eg-ag-beam, ' +
-        '.eg-ag-citadel, .eg-ag-cd, .eg-ag-debris').forEach(el => {
+    document.querySelectorAll('.sx-ag-chargewarn, .sx-ag-charger, .sx-ag-vangwarn, .sx-ag-sentry, ' +
+        '.sx-ag-orb, .sx-ag-rotor-pivot, .sx-ag-rotor-arm, .sx-ag-bastion, .sx-ag-beam, ' +
+        '.sx-ag-citadel, .sx-ag-cd, .sx-ag-debris').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.body.classList.remove('eg-ag-flash');
+    document.body.classList.remove('sx-ag-flash');
     _agAegisGlow(false);
-    document.querySelectorAll('.eg-ag-fortified').forEach(el => el.classList.remove('eg-ag-fortified'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.querySelectorAll('.sx-ag-fortified').forEach(el => el.classList.remove('sx-ag-fortified'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

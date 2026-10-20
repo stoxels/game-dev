@@ -55,7 +55,7 @@ export function _mechEmberDrift(monster, phase) {
     const level = monster ? monster.level : 1;
     const embers = [];
     for (let i = 0; i < count; i++) {
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-ember', '🔥');
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-ember', '🔥');
         el.style.display = 'none';
         embers.push({
             x: 40 + Math.random() * Math.max(40, window.innerWidth - 80),

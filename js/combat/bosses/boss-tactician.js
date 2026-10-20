@@ -114,7 +114,7 @@ export function _tacticianTeardown() {
         if (st.checkmate) { try { if (st.checkmate.els) st.checkmate.els.forEach(w => w.remove()); } catch (e) {} }
         try { if (st.run) _nkKillRun(st.run); } catch (e) {} // removes the queen
     }
-    document.querySelectorAll('.eg-tct-queen, .eg-tct-intent, .eg-tct-orb, .eg-tct-pawn, .eg-tct-pawnwarn, .eg-tct-lane, .eg-tct-beam, .eg-tct-knight, .eg-tct-leap, .eg-tct-wall').forEach(el => el.remove());
+    document.querySelectorAll('.sx-tct-queen, .sx-tct-intent, .sx-tct-orb, .sx-tct-pawn, .sx-tct-pawnwarn, .sx-tct-lane, .sx-tct-beam, .sx-tct-knight, .sx-tct-leap, .sx-tct-wall').forEach(el => el.remove());
 }
 
 
@@ -144,7 +144,7 @@ export function _tacticianArenaInit(monster) {
     st.run = run;
 
     // The Queen's Guard: the boss's arena body.
-    const el = _nkEl(run, 'div', 'eg-tct-queen', '♛');
+    const el = _nkEl(run, 'div', 'sx-tct-queen', '♛');
     el.style.width = el.style.height = (TCT_R * 2) + 'px';
     st.queen = {
         x: window.innerWidth * 0.5, y: window.innerHeight * 0.3,
@@ -254,7 +254,7 @@ export function _tacticianArenaInit(monster) {
                     pw.live = true;
                     try { pw.warnEl.remove(); } catch (e) {}
                     // The marching rank: pawns across the width except the gap.
-                    const el2 = _nkEl(st.run, 'div', 'eg-tct-pawn');
+                    const el2 = _nkEl(st.run, 'div', 'sx-tct-pawn');
                     const n = Math.max(2, Math.floor(W / 90));
                     const gapIdx = Math.floor(pw.gapX / (W / n));
                     pw.cellW = W / n;
@@ -263,7 +263,7 @@ export function _tacticianArenaInit(monster) {
                     for (let k = 0; k < n; k++) {
                         if (k === gapIdx) continue; // the safe gap
                         const pel = document.createElement('div');
-                        pel.className = 'eg-tct-pawn-cell';
+                        pel.className = 'sx-tct-pawn-cell';
                         pel.textContent = '♟️';
                         el2.appendChild(pel);
                         pw.cells.push(pel);
@@ -456,7 +456,7 @@ export function _tacticianArenaInit(monster) {
 // Declares an intent with a floating banner at the queen.
 export function _tctDeclare(st, kind, live, p) {
     const txt = kind === 'swords' ? '⚔️ VOLLEY' : kind === 'shield' ? '🛡️ TITHE' : '😡 ENRAGE';
-    const banner = _nkEl(st.run, 'div', 'eg-tct-intent', txt);
+    const banner = _nkEl(st.run, 'div', 'sx-tct-intent', txt);
     banner.style.left = Math.round(st.queen.x) + 'px';
     banner.style.top = Math.round(st.queen.y - TCT_R - 34) + 'px';
     st.intent = { kind, t: 0, banner, live, p };
@@ -475,7 +475,7 @@ export function _tctExecute(st, it, live, p, W, H) {
             for (let k = -1; k <= 1; k++) {
                 const dx = tx - ox, dy = ty - oy;
                 const base = Math.atan2(dy, dx) + k * 0.22;
-                const el = _nkEl(st.run, 'div', 'eg-tct-orb', '♞');
+                const el = _nkEl(st.run, 'div', 'sx-tct-orb', '♞');
                 st.orbs.push({ x: ox, y: oy, vx: Math.cos(base) * TCT_ORB_SPEED, vy: Math.sin(base) * TCT_ORB_SPEED, t: 0, hit: false, el });
             }
         });
@@ -494,7 +494,7 @@ export function _tctExecute(st, it, live, p, W, H) {
 // Queues a pawn rank advancing from the bottom edge.
 export function _tctQueuePawn(st, W, H) {
     const gapX = 80 + Math.random() * Math.max(80, W - 160);
-    const warnEl = _nkEl(st.run, 'div', 'eg-tct-pawnwarn');
+    const warnEl = _nkEl(st.run, 'div', 'sx-tct-pawnwarn');
     warnEl.style.left = Math.round(gapX - TCT_PAWN_GAP_W / 2) + 'px';
     warnEl.style.width = TCT_PAWN_GAP_W + 'px';
     warnEl.style.top = '0px';
@@ -516,7 +516,7 @@ export function _tctSpawnLane(st, W, H, waveIdx) {
     const c = _nkPlayerCenter();
     const y = horiz ? (c ? c.y : H * 0.4) : 0;
     const x = horiz ? 0 : (c ? c.x : W * 0.6);
-    const el = _nkEl(st.run, 'div', 'eg-tct-lane' + (horiz ? ' horiz' : ' vert'));
+    const el = _nkEl(st.run, 'div', 'sx-tct-lane' + (horiz ? ' horiz' : ' vert'));
     if (horiz) {
         el.style.top = Math.round(y - TCT_CHECK_LANE_H / 2) + 'px';
         el.style.left = '0px';
@@ -546,7 +546,7 @@ export function _tctZugzwang(st, p) {
 // One bishop diagonal beam through the queen's current square.
 export function _tctQueueBeam(st, qn, W, H) {
     const diag = Math.random() < 0.5 ? 1 : -1;
-    const el = _nkEl(st.run, 'div', 'eg-tct-beam');
+    const el = _nkEl(st.run, 'div', 'sx-tct-beam');
     // The beam is a rotated long rectangle through the queen square.
     el.style.left = Math.round(qn.x) + 'px';
     el.style.top = Math.round(qn.y) + 'px';
@@ -579,12 +579,12 @@ export function _tctQueueLeap(st, qn, W, H) {
     const cell = Math.min(W, H) / 8;
     const x = Math.max(60, Math.min(W - 60, tx + lx * cell));
     const y = Math.max(60, Math.min(H - 120, ty + ly * cell));
-    const warnEl = _nkEl(st.run, 'div', 'eg-tct-leap');
+    const warnEl = _nkEl(st.run, 'div', 'sx-tct-leap');
     warnEl.style.left = Math.round(x) + 'px';
     warnEl.style.top = Math.round(y) + 'px';
     warnEl.style.width = warnEl.style.height = Math.round(TCT_KNIGHT_R * 2) + 'px';
     warnEl.style.marginLeft = warnEl.style.marginTop = (-TCT_KNIGHT_R) + 'px';
-    const knightEl = _nkEl(st.run, 'div', 'eg-tct-knight', '♞');
+    const knightEl = _nkEl(st.run, 'div', 'sx-tct-knight', '♞');
     st.leaps.push({ x, y, fromX: qn.x, fromY: qn.y, t: 0, warnEl, knightEl });
 }
 
@@ -602,7 +602,7 @@ export function _tacticianCheckmate(monster) {
         { left: (W - TCT_CM_THICK) + 'px', top: '0px', width: TCT_CM_THICK + 'px', height: H + 'px' },
     ];
     specs.forEach(spec => {
-        const w = _nkEl(st.run, 'div', 'eg-tct-wall');
+        const w = _nkEl(st.run, 'div', 'sx-tct-wall');
         w.style.left = spec.left;
         w.style.top = spec.top;
         w.style.width = spec.width;

@@ -65,7 +65,7 @@ export function _mechSelfDestruct(monster, phase) {
     const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const bx = window.innerWidth * 0.5, by = window.innerHeight * 0.3;
-    const bomb = _nkEl(run, 'div', 'eg-nk-dot eg-nk-nuke', '🤖');
+    const bomb = _nkEl(run, 'div', 'sx-nk-dot sx-nk-nuke', '🤖');
     bomb.style.transform = 'translate(' + Math.round(bx - 30) + 'px,' + Math.round(by - 30) + 'px)';
     // Two (phase 3: three) concrete pillars between you and the blast.
     const covers = [];
@@ -74,25 +74,25 @@ export function _mechSelfDestruct(monster, phase) {
         const w = 60, h = 170;
         const x = window.innerWidth * (0.25 + 0.25 * i) + (Math.random() * 60 - 30);
         const y = window.innerHeight * 0.55 + (Math.random() * 60 - 30);
-        const el = _nkEl(run, 'div', 'eg-nk-cover');
+        const el = _nkEl(run, 'div', 'sx-nk-cover');
         el.style.left = Math.round(x) + 'px';
         el.style.top = Math.round(y) + 'px';
         el.style.width = w + 'px';
         el.style.height = h + 'px';
         covers.push({ left: x, right: x + w, top: y, bottom: y + h });
     }
-    const label = _nkEl(run, 'div', 'eg-nk-trial-label', '☢️ TAKE COVER!');
+    const label = _nkEl(run, 'div', 'sx-nk-trial-label', '☢️ TAKE COVER!');
     _nkToast('eg_mech_mech', '🤖 The Mech: Self-Destruct! Get behind cover!');
     let e = 0, done = false;
     _nkLoop(run, (dtS) => {
         e += dtS * 1000;
         const remain = Math.max(0, Math.ceil((countdownMs - e) / 1000));
         if (label) label.textContent = remain > 0 ? '☢️ ' + remain + '!' : '☢️ NOW!';
-        bomb.classList.toggle('eg-nk-fuse', true);
+        bomb.classList.toggle('sx-nk-fuse', true);
         if (!done && e >= countdownMs) {
             done = true;
             if (label) label.remove();
-            bomb.classList.add('eg-nk-boom');
+            bomb.classList.add('sx-nk-boom');
             const c = _nkPlayerCenter();
             let covered = false;
             if (c) {

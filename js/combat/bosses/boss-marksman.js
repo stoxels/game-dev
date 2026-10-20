@@ -135,7 +135,7 @@ export function _mechMarkedStrikes(monster, phase) {
             const x = c ? c.x : window.innerWidth / 2;
             const y = c ? c.y : window.innerHeight / 2;
             // Crosshair reticle: ring + cross ticks + center dot (CSS).
-            const el = _nkEl(run, 'div', 'eg-nk-mark');
+            const el = _nkEl(run, 'div', 'sx-nk-mark');
             el.style.left = Math.round(x - MARKS_RADIUS) + 'px';
             el.style.top = Math.round(y - MARKS_RADIUS) + 'px';
             el.style.width = MARKS_RADIUS * 2 + 'px';
@@ -150,7 +150,7 @@ export function _mechMarkedStrikes(monster, phase) {
                 // Release: the arrow arcs in from the OPPOSITE top corner so
                 // the concave curve crosses the screen readably.
                 m.launched = true;
-                m.arrow = _nkEl(run, 'div', 'eg-marks-arrow');
+                m.arrow = _nkEl(run, 'div', 'sx-marks-arrow');
                 m.sx = (m.x < window.innerWidth / 2) ? window.innerWidth + 50 : -50;
                 // Spawn just inside the top edge: with the quadratic ease-in
                 // the arrow would otherwise spend the first ~40% of its
@@ -173,7 +173,7 @@ export function _mechMarkedStrikes(monster, phase) {
                 if (ft >= 1) {
                     // IMPACT - this is when the damage happens.
                     m.struck = true;
-                    m.el.classList.add('eg-nk-mark-hit');
+                    m.el.classList.add('sx-nk-mark-hit');
                     try { m.arrow.remove(); } catch (e2) {}
                     if (pr && _nkCircleHit(m.x, m.y, MARKS_RADIUS, pr, 0)) {
                         const dealt = _nkHit(MARKS_DMG[p] || MARKS_DMG[1], 'lightning', level);
@@ -330,13 +330,13 @@ export function _marksGauntletBuildWalls(run, box) {
     const bw = R - L, bh = B - T;
     const h = GAUNTLET_WALL_T, half = h / 2;
     const wall = (cls, css, vertical) => {
-        const el = _nkEl(run, 'div', 'eg-gauntlet-wall ' + cls);
+        const el = _nkEl(run, 'div', 'sx-gauntlet-wall ' + cls);
         Object.assign(el.style, css);
         const span = vertical ? bh : bw;
         const n = Math.max(2, Math.floor(span / 58));
         for (let i = 0; i < n; i++) {
             const b = document.createElement('span');
-            b.className = 'eg-gauntlet-bow';
+            b.className = 'sx-gauntlet-bow';
             b.textContent = '🏹';
             el.appendChild(b);
         }
@@ -369,7 +369,7 @@ export function _marksGauntletArmBows(g, ev) {
         const frac = (bowD - min) / Math.max(1, max - min);
         if (frac < -0.05 || frac > 1.05) return;                              // outside the arrow band
         if (Math.abs(frac - ev.gapCenter) < ev.gapFrac / 2) return;           // the gap - this bow holds fire
-        bow.classList.add('eg-gauntlet-bow-arm');
+        bow.classList.add('sx-gauntlet-bow-arm');
         ev.armedEls.push(bow);
     });
 }
@@ -378,7 +378,7 @@ export function _marksGauntletArmBows(g, ev) {
 // Releases the armed glow right as the volley leaves the strings.
 export function _marksGauntletDisarmBows(g, ev) {
     if (!ev.armedEls) return;
-    ev.armedEls.forEach(el => { try { el.classList.remove('eg-gauntlet-bow-arm'); } catch (e) {} });
+    ev.armedEls.forEach(el => { try { el.classList.remove('sx-gauntlet-bow-arm'); } catch (e) {} });
     ev.armedEls = null;
 }
 
@@ -429,9 +429,9 @@ export function _marksGauntletStart(stage) {
     // Countdown UI: "ARROW GAUNTLET" + a big 5-4-3-2-1 above the arena.
     let title = 'ARROW GAUNTLET';
     try { const raw = t('eg_gauntlet_title'); if (raw && raw !== 'eg_gauntlet_title') title = raw; } catch (e) {}
-    const cdBox = _nkEl(run, 'div', 'eg-gauntlet-countdown');
+    const cdBox = _nkEl(run, 'div', 'sx-gauntlet-countdown');
     const cdTitle = document.createElement('div');
-    cdTitle.className = 'eg-gauntlet-cd-title';
+    cdTitle.className = 'sx-gauntlet-cd-title';
     cdTitle.textContent = '🏹 ' + title;
     cdBox.appendChild(cdTitle);
 
@@ -457,7 +457,7 @@ export function _marksGauntletStart(stage) {
                 g.cdShown = secs;
                 // Fresh node per tick so the pop animation re-triggers.
                 const num = document.createElement('div');
-                num.className = 'eg-gauntlet-cd-num';
+                num.className = 'sx-gauntlet-cd-num';
                 num.textContent = String(secs);
                 cdBox.appendChild(num);
                 while (cdBox.children.length > 2) cdBox.removeChild(cdBox.children[1]);
@@ -466,7 +466,7 @@ export function _marksGauntletStart(stage) {
                 // The bows snap into formation while the countdown runs -
                 // the box is sealed from this moment on.
                 g.box = _marksGauntletBuildBox(run);
-                g.wallEls = Array.from(document.querySelectorAll('.eg-gauntlet-wall'));
+                g.wallEls = Array.from(document.querySelectorAll('.sx-gauntlet-wall'));
             }
             if (g.box) _marksGauntletClampPlayer(g);
             if (g.cdTimer <= 0) {
@@ -565,7 +565,7 @@ export function _marksGauntletFireWall(g, ev) {
     for (let d = min; d <= max; d += GAUNTLET_ARROW_GAP) {
         const frac = (d - min) / Math.max(1, (max - min));
         if (Math.abs(frac - ev.gapCenter) < ev.gapFrac / 2) continue; // the gap
-        const el = _nkEl(g.run, 'div', 'eg-gauntlet-arrow');
+        const el = _nkEl(g.run, 'div', 'sx-gauntlet-arrow');
         const a = {
             t: 0, delay: Math.random() * 120, vx: 0, vy: 0, rot, el,
             x: 0, y: 0,
@@ -592,7 +592,7 @@ export function _marksGauntletEnd() {
     if (g.cdBox) { try { g.cdBox.remove(); } catch (e) {} }
     g.wallEls.forEach(el => {
         try {
-            el.classList.add('eg-gauntlet-wall-out');
+            el.classList.add('sx-gauntlet-wall-out');
             setTimeout(() => { try { el.remove(); } catch (e) {} }, 520);
         } catch (e) {}
     });

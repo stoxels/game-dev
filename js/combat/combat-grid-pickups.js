@@ -418,8 +418,8 @@ export function _renderPickupOverlay(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     const span = document.createElement('span');
-    span.className = `eg-pickup-overlay eg-pickup-rarity-${def.rarity}`;
-    span.id = `eg-pickup-${row}-${col}`;
+    span.className = `sx-pickup-overlay sx-pickup-rarity-${def.rarity}`;
+    span.id = `sx-pickup-${row}-${col}`;
     const artUrl = (def && def.id) ? GAME_ART.url('item', def.id) : null;
     if (artUrl) {
         const img = document.createElement('img');
@@ -439,7 +439,7 @@ export function _renderPickupOverlay(row, col, def) {
 // Removes the pickup overlay span from the DOM for the given key "row-col".
 export function _removePickupOverlay(key) {
     const [r, c] = key.split('-').map(Number);
-    const span = document.getElementById(`eg-pickup-${r}-${c}`);
+    const span = document.getElementById(`sx-pickup-${r}-${c}`);
     if (span) span.remove();
 }
 
@@ -452,7 +452,7 @@ export function _animatePickupClaim(row, col, def) {
     const centre = _getElementCentre(el);
 
     const floater = document.createElement('div');
-    floater.className = 'eg-pickup-floater';
+    floater.className = 'sx-pickup-floater';
     floater.innerHTML = GAME_ART.html('item', def && def.id, (def && def.emoji) || '');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
@@ -509,7 +509,7 @@ export function _schedulePickupExpiry(key, def) {
     const [r, c] = key.split('-').map(Number);
     // pickup_lifetime (tree): Heart and Mana pickups stay longer.
     const extraMs = Math.max(0, Number(_computePlayerStats().pickupLifetimeSecs) || 0) * 1000;
-    _scheduleTrackedExpiry(_pickups, key, def, PICKUP_LIFETIME_MS + extraMs, `eg-pickup-${r}-${c}`, _removePickupOverlay);
+    _scheduleTrackedExpiry(_pickups, key, def, PICKUP_LIFETIME_MS + extraMs, `sx-pickup-${r}-${c}`, _removePickupOverlay);
 }
 
 // Shows a live countdown above a drop overlay during its final
@@ -535,10 +535,10 @@ export function _startDropExpireCountdown(overlayId, lifetimeMs, knownExpiresAt)
         const remaining = entry.expiresAt - Date.now();
         if (remaining <= 0) return;
 
-        let badge = overlay.querySelector('.eg-drop-expire-timer');
+        let badge = overlay.querySelector('.sx-drop-expire-timer');
         if (!badge) {
             badge = document.createElement('span');
-            badge.className = 'eg-drop-expire-timer';
+            badge.className = 'sx-drop-expire-timer';
             overlay.appendChild(badge);
         }
         badge.textContent = Math.ceil(remaining / 1000);
@@ -554,14 +554,14 @@ export function _startDropExpireCountdown(overlayId, lifetimeMs, knownExpiresAt)
 }
 
 export function _expireCountdownStylesInjected() {
-    return !document.getElementById('eg-drop-expire-timer-styles');
+    return !document.getElementById('sx-drop-expire-timer-styles');
 }
 
 export function _injectExpireCountdownStyles() {
     const style = document.createElement('style');
-    style.id = 'eg-drop-expire-timer-styles';
+    style.id = 'sx-drop-expire-timer-styles';
     style.textContent = `
-        .eg-drop-expire-timer {
+        .sx-drop-expire-timer {
             position: absolute;
             top: -1.4em;
             left: 50%;
@@ -578,9 +578,9 @@ export function _injectExpireCountdownStyles() {
             line-height: 1.3;
             white-space: nowrap;
             pointer-events: none;
-            animation: eg-expire-tick-pulse 1s ease-in-out infinite;
+            animation: sx-expire-tick-pulse 1s ease-in-out infinite;
         }
-        @keyframes eg-expire-tick-pulse {
+        @keyframes sx-expire-tick-pulse {
             0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
             50%      { opacity: 0.55; transform: translateX(-50%) scale(0.92); }
         }
@@ -596,12 +596,12 @@ export function _injectExpireCountdownStyles() {
 function _discardShardContent(def) {
     try {
         if (def && def.artUrl) {
-            return '<img src="' + def.artUrl + '" alt="" class="eg-art-img" draggable="false">';
+            return '<img src="' + def.artUrl + '" alt="" class="sx-art-img" draggable="false">';
         }
         const artId = def && (def.artId || def.id);
         if (artId && typeof GAME_ART !== 'undefined' && GAME_ART) {
             const u = GAME_ART.url('item', artId);
-            if (u) return '<img src="' + u + '" alt="" class="eg-art-img" draggable="false">';
+            if (u) return '<img src="' + u + '" alt="" class="sx-art-img" draggable="false">';
         }
     } catch (e) {}
     return (def && def.emoji) || '';
@@ -615,7 +615,7 @@ export function _animatePickupDiscard(row, col, def) {
 
     // Left shard
     const left = document.createElement('div');
-    left.className = 'eg-pickup-broken-shard eg-pickup-broken-left';
+    left.className = 'sx-pickup-broken-shard sx-pickup-broken-left';
     left.innerHTML = content;
     left.style.left = `${centre.x}px`;
     left.style.top = `${centre.y}px`;
@@ -623,7 +623,7 @@ export function _animatePickupDiscard(row, col, def) {
 
     // Right shard
     const right = document.createElement('div');
-    right.className = 'eg-pickup-broken-shard eg-pickup-broken-right';
+    right.className = 'sx-pickup-broken-shard sx-pickup-broken-right';
     right.innerHTML = content;
     right.style.left = `${centre.x}px`;
     right.style.top = `${centre.y}px`;

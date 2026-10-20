@@ -85,10 +85,10 @@ export function _applyPlayerMeleeImpact(targetId, opts) {
     // pulse its card so the player sees who was hit, and (optional setting,
     // off by default) move the selection onto it.
     if (targetId !== globalThis._targetId) {
-        const hitCard = document.getElementById(`eg-card-${targetId}`);
+        const hitCard = document.getElementById(`sx-card-${targetId}`);
         if (hitCard) {
-            hitCard.classList.add('eg-card-melee-hit');
-            setTimeout(() => hitCard.classList.remove('eg-card-melee-hit'), 500);
+            hitCard.classList.add('sx-card-melee-hit');
+            setTimeout(() => hitCard.classList.remove('sx-card-melee-hit'), 500);
         }
         if (globalThis.SETTINGS && globalThis.SETTINGS.meleeAutoRetarget
             && typeof globalThis._selectTarget === 'function') {
@@ -227,8 +227,8 @@ export function _tryCleaveHit(targetId, dmg = _currentMeleeDamage(), elements = 
     if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('cleave');
 
     sideTargets.forEach(m => {
-        const card = document.getElementById(`eg-card-${m.id}`);
-        if (card) _restartFlashClass(card, 'eg-flash-cleave');
+        const card = document.getElementById(`sx-card-${m.id}`);
+        if (card) _restartFlashClass(card, 'sx-flash-cleave');
         const wasCrit = (typeof _lastMeleeWasCrit !== 'undefined') ? _lastMeleeWasCrit : false;
         _damageTargetById(m.id, _secondaryDamage(dmg, 'cleave', stats), elements, { isCrit: wasCrit });
     });
@@ -259,7 +259,7 @@ export function _tryMeleeSplashHit(targetId, dmg = _currentMeleeDamage(), elemen
         if (shape && shape.radius > 0) radiusPx = shape.radius;
     } catch (e) { /* keep the unscaled radius */ }
     if (!(radiusPx > 0)) return;
-    const targetCard = typeof document !== 'undefined' ? document.getElementById(`eg-card-${targetId}`) : null;
+    const targetCard = typeof document !== 'undefined' ? document.getElementById(`sx-card-${targetId}`) : null;
     if (!targetCard) return;
     let centre = null;
     try {
@@ -276,7 +276,7 @@ export function _tryMeleeSplashHit(targetId, dmg = _currentMeleeDamage(), elemen
         .filter(m => m && m.id !== targetId && (m.currentHP || 0) > 0)
         .forEach(m => {
             let card = null;
-            try { card = document.getElementById(`eg-card-${m.id}`); } catch (e) { card = null; }
+            try { card = document.getElementById(`sx-card-${m.id}`); } catch (e) { card = null; }
             if (!card) return;
             let c = null;
             try {
@@ -290,7 +290,7 @@ export function _tryMeleeSplashHit(targetId, dmg = _currentMeleeDamage(), elemen
             if (cx == null || cy == null) return;
             if (Math.hypot(cx - tx, cy - ty) > radiusPx) return;
             if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('cleave');
-            _restartFlashClass(card, 'eg-flash-cleave');
+            _restartFlashClass(card, 'sx-flash-cleave');
             _damageTargetById(m.id, dmg, elements, { isCrit: wasCrit, isMelee: true });
         });
 }
@@ -298,7 +298,7 @@ export function _tryMeleeSplashHit(targetId, dmg = _currentMeleeDamage(), elemen
 // Physically lunges the class HUD toward the targeted monster and snaps back.
 // LEGACY: manual strikes use the weapon-swing overlay plus the impact module.
 export function _animatePlayerMelee(targetId) {
-    const targetCard = document.getElementById(`eg-card-${targetId}`);
+    const targetCard = document.getElementById(`sx-card-${targetId}`);
     const avatarWrapper = document.getElementById('player-avatar-wrapper');
     const sprite = document.getElementById('avatar-sprite-img');
 
@@ -352,7 +352,7 @@ export function _animatePlayerMelee(targetId) {
 /*
 
 function _animatePlayerMelee(targetId) {
-    const targetCard = document.getElementById(`eg-card-${targetId}`);
+    const targetCard = document.getElementById(`sx-card-${targetId}`);
     const sourceHud = document.getElementById('class-hud-panel');
 
     // If UI elements are missing, deal damage instantly

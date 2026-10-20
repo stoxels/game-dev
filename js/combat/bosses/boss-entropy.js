@@ -11,7 +11,7 @@ import { _nkAbilityHitToast, _nkDodgeBusy, _nkDotTick, _nkEl, _nkFrozen, _nkHit,
 // THE LAST DEGREE finale at ≤10%: deliver 5 shards or face HEAT DEATH.
 //------------------------------------------------------------------------
 
-// Prefix discipline: everything here is _entr / eg-entr- (the _ent stem
+// Prefix discipline: everything here is _entr / sx-entr- (the _ent stem
 // collides with _enterBossArena elsewhere - do not shorten).
 
 // DEBUG: slow Entropy's timing 2.5x so manual playtests / screenshot
@@ -124,14 +124,14 @@ export let _entrHudEl = null;
 export function _entrHudApply() {
     if (!_entrHudEl) {
         _entrHudEl = document.createElement('div');
-        _entrHudEl.className = 'eg-entr-order';
+        _entrHudEl.className = 'sx-entr-order';
         _entrHudEl.innerHTML =
-            '<div class="eg-entr-order-fill"></div>' +
-            '<div class="eg-entr-order-label">ORDER</div>';
+            '<div class="sx-entr-order-fill"></div>' +
+            '<div class="sx-entr-order-label">ORDER</div>';
         document.body.appendChild(_entrHudEl);
     }
     _entrHudEl.style.setProperty('--entr-order', String(Math.round(_entrOrder)));
-    _entrHudEl.classList.toggle('eg-entr-order-low', _entrOrder < 30);
+    _entrHudEl.classList.toggle('sx-entr-order-low', _entrOrder < 30);
 }
 
 // The passive watcher: expires zones/pools/cells, ticks pool DoT and the
@@ -159,7 +159,7 @@ export function _entrEnsureOrderRun(monster) {
             if (Math.hypot(pc0.x - c.x, pc0.y - c.y) < 32) {
                 _nkDotTick(run, ENTR_BURN_DPS, dtS, level, 'cold');
                 c.burn += dtS;
-                c.el.classList.add('eg-entr-cell-burning');
+                c.el.classList.add('sx-entr-cell-burning');
                 if (c.burn >= 0.9) {
                     c.dead = true;
                     try { c.el.remove(); } catch (e) {}
@@ -167,7 +167,7 @@ export function _entrEnsureOrderRun(monster) {
                 }
             } else if (c.burn > 0) {
                 c.burn = 0;
-                c.el.classList.remove('eg-entr-cell-burning');
+                c.el.classList.remove('sx-entr-cell-burning');
             }
         }
 
@@ -249,7 +249,7 @@ export function _mechEntrDrift(monster, phase) {
                 _entrSpawnPool(b.x, b.y, ENTR_POOL_R + p * 8, poolLife);
                 _entrSpawnZone(W * (0.2 + Math.random() * 0.6), H * (0.2 + Math.random() * 0.6), zoneLife);
             } else if (!b.warnEl) {
-                b.warnEl = _nkEl(run, 'div', 'eg-entr-bloom-warn');
+                b.warnEl = _nkEl(run, 'div', 'sx-entr-bloom-warn');
                 b.warnEl.style.left = Math.round(b.x - 60) + 'px';
                 b.warnEl.style.top = Math.round(b.y - 60) + 'px';
             }
@@ -274,7 +274,7 @@ export function _entrSpawnPool(x, y, r, lifeMs) {
         return;
     }
     const el = document.createElement('div');
-    el.className = 'eg-entr-pool';
+    el.className = 'sx-entr-pool';
     const d = Math.round(r * 2);
     el.style.left = Math.round(x - r) + 'px';
     el.style.top = Math.round(y - r) + 'px';
@@ -288,7 +288,7 @@ export function _entrSpawnZone(x, y, lifeMs) {
     // Zones shrink as the cold consolidates: more pools → smaller refuge.
     const r = Math.max(55, 92 - _entrPools.length * 4);
     const el = document.createElement('div');
-    el.className = 'eg-entr-zone';
+    el.className = 'sx-entr-zone';
     const d = Math.round(r * 2);
     el.style.left = Math.round(x - r) + 'px';
     el.style.top = Math.round(y - r) + 'px';
@@ -342,7 +342,7 @@ export function _mechEntrDecay(monster, phase) {
 export function _entrSpawnCell(x, y) {
     if (_entrCells.filter(c => !c.dead).length >= ENTR_CELL_CAP) return;
     const el = document.createElement('div');
-    el.className = 'eg-entr-cell';
+    el.className = 'sx-entr-cell';
     el.style.left = Math.round(x - 23) + 'px';
     el.style.top = Math.round(y - 23) + 'px';
     document.body.appendChild(el);
@@ -364,10 +364,10 @@ export function _mechEntrDoor(monster, phase) {
     _nkToast('eg_mech_entr_door', '♾️🚪 MAXWELL\u2019S DOOR - choose your element, pay its price!', '#fdba74');
 
     const y = H * (0.3 + Math.random() * 0.4);
-    const hot = _nkEl(run, 'div', 'eg-entr-door eg-entr-door-hot', '🔥');
+    const hot = _nkEl(run, 'div', 'sx-entr-door sx-entr-door-hot', '🔥');
     hot.style.left = Math.round(W * 0.08 - 34) + 'px';
     hot.style.top = Math.round(y - 52) + 'px';
-    const cold = _nkEl(run, 'div', 'eg-entr-door eg-entr-door-cold', '❄️');
+    const cold = _nkEl(run, 'div', 'sx-entr-door sx-entr-door-cold', '❄️');
     cold.style.left = Math.round(W * 0.92 - 34) + 'px';
     cold.style.top = Math.round(H - y - 52) + 'px';
 
@@ -393,20 +393,20 @@ export function _mechEntrDoor(monster, phase) {
 export function _entrApplyHot() {
     _entrHotUntil = performance.now() + ENTR_DOOR_STATE * _ENTR_DEBUG_MULT;
     _nkToast('eg_mech_entr_hot', '🔥 FIRE-STATE - cold pools heal you, but heat scatters order!', '#fdba74');
-    _entrAura('eg-entr-hot-aura', 'hot');
+    _entrAura('sx-entr-hot-aura', 'hot');
 }
 
 export function _entrApplyCold() {
     _entrColdUntil = performance.now() + ENTR_DOOR_STATE * _ENTR_DEBUG_MULT;
     _nkToast('eg_mech_entr_cold', '❄️ COLD-STATE - pool-proof, but order drains twice as fast!', '#93c5fd');
-    _entrAura('eg-entr-cold-aura', 'cold');
+    _entrAura('sx-entr-cold-aura', 'cold');
 }
 
 export function _entrAura(cls, which) {
     const el = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     if (!el) return;
-    const other = which === 'hot' ? 'eg-entr-cold-aura' : 'eg-entr-hot-aura';
+    const other = which === 'hot' ? 'sx-entr-cold-aura' : 'sx-entr-hot-aura';
     el.classList.remove(other);
     el.classList.add(cls);
     if (which === 'hot') {
@@ -505,9 +505,9 @@ export function _entrFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -516,12 +516,12 @@ export function _entrFinalStart(monster) {
 
     // Frozen lattice overlay + singularity.
     const lattice = document.createElement('div');
-    lattice.className = 'eg-entr-lattice';
+    lattice.className = 'sx-entr-lattice';
     document.body.appendChild(lattice);
     g.fxRun.els.push(lattice);
 
     const sing = document.createElement('div');
-    sing.className = 'eg-entr-singularity';
+    sing.className = 'sx-entr-singularity';
     sing.style.left = Math.round(cx - 64) + 'px';
     sing.style.top = Math.round(cy - 64) + 'px';
     document.body.appendChild(sing);
@@ -530,14 +530,14 @@ export function _entrFinalStart(monster) {
 
     // Countdown overlay (title + live timer).
     const ov = document.createElement('div');
-    ov.className = 'eg-entr-cd';
+    ov.className = 'sx-entr-cd';
     ov.innerHTML =
-        '<div class="eg-entr-cd-label">♾️ THE LAST DEGREE</div>' +
-        '<div class="eg-entr-cd-timer">-</div>' +
-        '<div class="eg-entr-cd-hint">Collect the shards - carry the sparks to the singularity!</div>';
+        '<div class="sx-entr-cd-label">♾️ THE LAST DEGREE</div>' +
+        '<div class="sx-entr-cd-timer">-</div>' +
+        '<div class="sx-entr-cd-hint">Collect the shards - carry the sparks to the singularity!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
-    g.timerEl = ov.querySelector('.eg-entr-cd-timer');
+    g.timerEl = ov.querySelector('.sx-entr-cd-timer');
     g.fxRun.els.push(ov);
 
     _nkToast('eg_mech_entr_final_cd', '♾️💀 THE LAST DEGREE - gather the shards before absolute zero!', '#93c5fd');
@@ -546,9 +546,9 @@ export function _entrFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss card freezes over while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.add('eg-entr-allin');
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.add('sx-entr-allin');
 
     const level = monster.level || 1;
 
@@ -562,14 +562,14 @@ export function _entrFinalStart(monster) {
         const sx = W * (0.12 + Math.random() * 0.76);
         const sy = H * (0.16 + Math.random() * 0.68);
 
-        const warn = _nkEl(g.fxRun, 'div', 'eg-entr-shard-warn');
+        const warn = _nkEl(g.fxRun, 'div', 'sx-entr-shard-warn');
         warn.style.left = Math.round(sx - 30) + 'px';
         warn.style.top = Math.round(sy - 30) + 'px';
 
         _entrAfter(g, ENTR_SHARD_WARN * _ENTR_DEBUG_MULT, () => {
             if (g.finished) return;
             try { warn.remove(); } catch (e) {}
-            const shard = _nkEl(g.fxRun, 'div', 'eg-entr-shard', '✨');
+            const shard = _nkEl(g.fxRun, 'div', 'sx-entr-shard', '✨');
             shard.style.left = Math.round(sx - 22) + 'px';
             shard.style.top = Math.round(sy - 22) + 'px';
 
@@ -624,7 +624,7 @@ export function _entrDeliver(g, monster, sx, sy, level) {
     const W = window.innerWidth, H = window.innerHeight;
 
     const spark = document.createElement('div');
-    spark.className = 'eg-entr-spark';
+    spark.className = 'sx-entr-spark';
     spark.style.left = Math.round(sx - 16) + 'px';
     spark.style.top = Math.round(sy - 16) + 'px';
     spark.style.setProperty('--fly-dx', Math.round((W / 2 - sx)) + 'px');
@@ -646,12 +646,12 @@ export function _entrDeliver(g, monster, sx, sy, level) {
             }
         } catch (e) {}
         // The boss card flares as each shard lands.
-        const card = document.getElementById('eg-card-' + g.monsterId);
-        const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+        const card = document.getElementById('sx-card-' + g.monsterId);
+        const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
         if (wrap) {
-            wrap.classList.remove('eg-entr-hit');
+            wrap.classList.remove('sx-entr-hit');
             void wrap.offsetWidth;
-            wrap.classList.add('eg-entr-hit');
+            wrap.classList.add('sx-entr-hit');
         }
         if (g.delivered >= ENTR_SHARDS) {
             _entrRestart(g, monster);
@@ -678,7 +678,7 @@ export function _entrHeatDeath(g, monster, level) {
     if (g.finished) return;
     _nkToast('eg_mech_entr_heatdeath', '♾️💀 HEAT DEATH! The wave takes everything but the centre!', '#f87171');
     const wave = document.createElement('div');
-    wave.className = 'eg-entr-heatwave';
+    wave.className = 'sx-entr-heatwave';
     const W = window.innerWidth, H = window.innerHeight;
     wave.style.left = Math.round(W / 2) + 'px';
     wave.style.top = Math.round(H / 2) + 'px';
@@ -703,7 +703,7 @@ export function _entrRestart(g, monster) {
     if (g.finished) return;
     _nkToast('eg_mech_entr_spark', '♾️💥 THE UNIVERSE RESTARTS - Entropy gave everything one last spark!', '#fde68a');
     const flash = document.createElement('div');
-    flash.className = 'eg-entr-restart-flash';
+    flash.className = 'sx-entr-restart-flash';
     document.body.appendChild(flash);
     setTimeout(() => { try { flash.remove(); } catch (e) {} }, 1400);
     _entrFinalEnd(g, monster);
@@ -721,16 +721,16 @@ export function _entrFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.eg-entr-lattice, .eg-entr-singularity, .eg-entr-cd, ' +
-        '.eg-entr-shard-warn, .eg-entr-shard, .eg-entr-heatwave, .eg-entr-spark').forEach(el => {
+    document.querySelectorAll('.sx-entr-lattice, .sx-entr-singularity, .sx-entr-cd, ' +
+        '.sx-entr-shard-warn, .sx-entr-shard, .sx-entr-heatwave, .sx-entr-spark').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.remove('eg-entr-allin');
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.remove('sx-entr-allin');
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -755,20 +755,20 @@ export function _entrTeardown() {
     _entrOrder = 100;
     _entrHotUntil = 0; _entrColdUntil = 0;
     if (_entrHudEl) { try { _entrHudEl.remove(); } catch (e) {} _entrHudEl = null; }
-    document.querySelectorAll('.eg-entr-bloom-warn, .eg-entr-pool, .eg-entr-zone, .eg-entr-cell, ' +
-        '.eg-entr-door, .eg-entr-shard-warn, .eg-entr-shard, .eg-entr-spark, .eg-entr-heatwave, ' +
-        '.eg-entr-lattice, .eg-entr-singularity, .eg-entr-cd, .eg-entr-restart-flash').forEach(el => {
+    document.querySelectorAll('.sx-entr-bloom-warn, .sx-entr-pool, .sx-entr-zone, .sx-entr-cell, ' +
+        '.sx-entr-door, .sx-entr-shard-warn, .sx-entr-shard, .sx-entr-spark, .sx-entr-heatwave, ' +
+        '.sx-entr-lattice, .sx-entr-singularity, .sx-entr-cd, .sx-entr-restart-flash').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
     const avatar = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
-    if (avatar) avatar.classList.remove('eg-entr-hot-aura', 'eg-entr-cold-aura');
-    const card = document.getElementById('eg-card-boss_entropy');
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.remove('eg-entr-allin', 'eg-entr-hit');
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    if (avatar) avatar.classList.remove('sx-entr-hot-aura', 'sx-entr-cold-aura');
+    const card = document.getElementById('sx-card-boss_entropy');
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.remove('sx-entr-allin', 'sx-entr-hit');
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

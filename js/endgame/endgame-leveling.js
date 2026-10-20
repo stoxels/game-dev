@@ -451,20 +451,20 @@ export function _buildXpTiersHTML() {
 
     const fmtRange = (a, b) => t('eg_lvl_range').replace('{a}', a).replace('{b}', b);
 
-    const rows = [`<div class="eg-xp-tier"><span class="eg-xp-tier-label opt">${t('eg_lvl_tier_optimal')}</span><span>${fmtRange(r.optimalMin, r.optimalMax)}</span></div>`];
+    const rows = [`<div class="sx-xp-tier"><span class="sx-xp-tier-label opt">${t('eg_lvl_tier_optimal')}</span><span>${fmtRange(r.optimalMin, r.optimalMax)}</span></div>`];
 
     const avgParts = [];
     if (r.belowAvgMin <= r.optimalMin - 1) avgParts.push(fmtRange(r.belowAvgMin, r.optimalMin - 1));
     if (r.aboveAvgMax >= r.optimalMax + 1) avgParts.push(fmtRange(r.optimalMax + 1, r.aboveAvgMax));
     if (avgParts.length) {
-        rows.push(`<div class="eg-xp-tier"><span class="eg-xp-tier-label avg">${t('eg_lvl_tier_average')}</span><span>${avgParts.join(' · ')}</span></div>`);
+        rows.push(`<div class="sx-xp-tier"><span class="sx-xp-tier-label avg">${t('eg_lvl_tier_average')}</span><span>${avgParts.join(' · ')}</span></div>`);
     }
 
     const poorParts = [];
     if (r.belowPoorMax >= 1) poorParts.push(t('eg_lvl_range_below').replace('{n}', r.belowPoorMax));
     if (r.aboveAvgMax < c.maxLevel && r.optimalMax < c.maxLevel) poorParts.push(t('eg_lvl_range_above').replace('{n}', r.aboveAvgMax + 1));
     if (poorParts.length) {
-        rows.push(`<div class="eg-xp-tier"><span class="eg-xp-tier-label poor">${t('eg_lvl_tier_poor')}</span><span>${poorParts.join(' · ')}</span></div>`);
+        rows.push(`<div class="sx-xp-tier"><span class="sx-xp-tier-label poor">${t('eg_lvl_tier_poor')}</span><span>${poorParts.join(' · ')}</span></div>`);
     }
 
     return rows.join('');
@@ -596,12 +596,12 @@ export function _grantMonsterXP(monsterLevel, isBoss) {
 // so it outlives the card's kill animation. Cosmetic only.
 export function _showXpGainText(monsterId, xp) {
     if (!(xp > 0)) return;
-    const card = document.getElementById(`eg-card-${monsterId}`);
+    const card = document.getElementById(`sx-card-${monsterId}`);
     if (!card) return;
     const r = card.getBoundingClientRect();
     if (!r.width) return;
     const el = document.createElement('div');
-    el.className = 'eg-xp-float';
+    el.className = 'sx-xp-float';
     el.textContent = `+${xp} XP`;
     el.style.left = `${Math.round(r.left + r.width / 2)}px`;
     el.style.top = `${Math.round(r.top + r.height * 0.25)}px`;
@@ -619,8 +619,8 @@ function _xpBarPct() {
 // Highlights a just-earned XP gain on the bar: a bright band over the newly
 // filled stretch (from -> to, in percent) plus a "+N XP" label above it.
 export function _showXpBarGain(xp, from, to) {
-    const bar = document.getElementById('eg-xp-bar');
-    const gain = document.getElementById('eg-xp-bar-gain');
+    const bar = document.getElementById('sx-xp-bar');
+    const gain = document.getElementById('sx-xp-bar-gain');
     if (!bar || !gain || !(xp > 0) || bar.getBoundingClientRect().width === 0) return;
     gain.style.left = `${from}%`;
     gain.style.width = `${Math.max(0.8, to - from)}%`;
@@ -628,7 +628,7 @@ export function _showXpBarGain(xp, from, to) {
     void gain.offsetWidth;
     gain.classList.add('on');
     const el = document.createElement('div');
-    el.className = 'eg-xp-bar-text';
+    el.className = 'sx-xp-bar-text';
     el.textContent = `+${xp} XP`;
     const x = Math.round(window.innerWidth * Math.max(from, to) / 100);
     el.style.left = `${Math.min(window.innerWidth - 50, Math.max(50, x))}px`;
@@ -636,14 +636,14 @@ export function _showXpBarGain(xp, from, to) {
     setTimeout(() => el.remove(), 3200);
 }
 
-// Experience bar along the very bottom edge of the game screen (#eg-xp-bar,
+// Experience bar along the very bottom edge of the game screen (#sx-xp-bar,
 // classic MMO style). Fill width = progress to the next level; hovering it
 // shows how much XP is still missing (generic data-tip tooltip).
 let _xpBarLastKey = '';
 let _xpBarLastPct = 0;
 export function _renderXpBar() {
-    const bar = document.getElementById('eg-xp-bar');
-    const fill = document.getElementById('eg-xp-bar-fill');
+    const bar = document.getElementById('sx-xp-bar');
+    const fill = document.getElementById('sx-xp-bar-fill');
     if (!bar || !fill) return;
     const lvl = _getPlayerLevel();
     const xp = _getPlayerXP();
@@ -799,11 +799,11 @@ export function _playLevelUpReward() {
 export function _playLevelUpEffect(newLevel) {
     Audio_Manager.playSFX('level_up');
     const el = document.createElement('div');
-    el.className = 'eg-levelup-fx';
+    el.className = 'sx-levelup-fx';
     el.innerHTML = `
-<div class="eg-levelup-banner">
-    <div class="eg-levelup-title">${t('eg_lvl_banner')}</div>
-    <div class="eg-levelup-sub">${t('eg_lvl_levelup_sub').replace('{n}', newLevel)}</div>
+<div class="sx-levelup-banner">
+    <div class="sx-levelup-title">${t('eg_lvl_banner')}</div>
+    <div class="sx-levelup-sub">${t('eg_lvl_levelup_sub').replace('{n}', newLevel)}</div>
 </div>`;
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 2800);
@@ -936,18 +936,18 @@ export function _renderLevelHUD() {
     const need = _getXpForNextLevel(lvl);
     const pct = lvl >= LEVELING_CONFIG.maxLevel ? 100 : Math.min(100, (xp / need) * 100);
 
-    const chip = document.getElementById('eg-char-level-inline');
+    const chip = document.getElementById('sx-char-level-inline');
     if (chip) {
         const ptsHtml = pts > 0
-            ? `<span class="eg-lvl-chip-points">✦${pts > 99 ? '99+' : pts}</span>`
+            ? `<span class="sx-lvl-chip-points">✦${pts > 99 ? '99+' : pts}</span>`
             : '';
         chip.innerHTML = `
-<span class="eg-lvl-chip"
+<span class="sx-lvl-chip"
       onmouseenter="_showLevelBtnTooltip(event)"
       onmousemove="moveGameTooltip(event)"
       onmouseleave="hideGameTooltip()">
-    <span class="eg-lvl-chip-lvl">${t('eg_lvl_short').replace('{n}', lvl)}</span>
-    <span class="eg-lvl-chip-bar"><span class="eg-lvl-chip-bar-fill" style="width:${pct}%"></span></span>
+    <span class="sx-lvl-chip-lvl">${t('eg_lvl_short').replace('{n}', lvl)}</span>
+    <span class="sx-lvl-chip-bar"><span class="sx-lvl-chip-bar-fill" style="width:${pct}%"></span></span>
     ${ptsHtml}
 </span>`;
     }
@@ -958,9 +958,9 @@ export function _renderLevelHUD() {
     } else {
         const gateChip = document.getElementById('eg-gate-level-chip');
         if (gateChip) {
-            const ptsHtml2 = pts > 0 ? `<span class="eg-lvl-chip-points">✦${pts > 99 ? '99+' : pts}</span>` : '';
+            const ptsHtml2 = pts > 0 ? `<span class="sx-lvl-chip-points">✦${pts > 99 ? '99+' : pts}</span>` : '';
             const lvlLabel2 = (typeof t === 'function') ? t('eg_lvl_short').replace('{n}', lvl) : `Lv. ${lvl}`;
-            gateChip.innerHTML = `<span class="eg-lvl-chip" style="pointer-events:none;"><span class="eg-lvl-chip-lvl">${lvlLabel2}</span><span class="eg-lvl-chip-bar"><span class="eg-lvl-chip-bar-fill" style="width:${pct}%"></span></span>${ptsHtml2}</span>`;
+            gateChip.innerHTML = `<span class="sx-lvl-chip" style="pointer-events:none;"><span class="sx-lvl-chip-lvl">${lvlLabel2}</span><span class="sx-lvl-chip-bar"><span class="sx-lvl-chip-bar-fill" style="width:${pct}%"></span></span>${ptsHtml2}</span>`;
         }
     }
 }
@@ -984,16 +984,16 @@ export function _buildLevelBtnTooltipHTML() {
     const xpTiers = _buildXpTiersHTML();
 
     return `
-<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">✦</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${t('eg_lvl_window_title')}</div>
+<div class="sx-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon">✦</div>
+        <div class="sx-tt-name" style="color:#f5d98a;">${t('eg_lvl_window_title')}</div>
     </div>
-    <div class="eg-tt-section">
-        <div class="eg-tt-mod">${t('eg_lvl_short').replace('{n}', lvl)} · ${xpLine}</div>
+    <div class="sx-tt-section">
+        <div class="sx-tt-mod">${t('eg_lvl_short').replace('{n}', lvl)} · ${xpLine}</div>
     </div>
-    ${xpTiers ? `<div class="eg-xp-tiers">${xpTiers}</div>` : ''}
-    <div class="eg-tt-section">${t('eg_lvl_hint')}</div>
+    ${xpTiers ? `<div class="sx-xp-tiers">${xpTiers}</div>` : ''}
+    <div class="sx-tt-section">${t('eg_lvl_hint')}</div>
 </div>`;
 }
 
@@ -1008,47 +1008,47 @@ export function _showLevelBtnTooltip(e) {
 
 // Injects all leveling UI styles once (inline chip, XP tiers, effects).
 export function _injectLevelingStyles() {
-    if (document.getElementById('eg-leveling-styles')) return;
+    if (document.getElementById('sx-leveling-styles')) return;
     const style = document.createElement('style');
-    style.id = 'eg-leveling-styles';
+    style.id = 'sx-leveling-styles';
     style.textContent = `
 /* ── Topbar buttons ── */
-.eg-level-btn { position: relative; color: #f5d98a; font-size: 14px; }
+.sx-level-btn { position: relative; color: #f5d98a; font-size: 14px; }
 
 /* ── Inline level chip on the character panel ── */
-.eg-char-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-#eg-char-level-inline { cursor: help; }
-.eg-lvl-chip {
+.sx-char-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+#sx-char-level-inline { cursor: help; }
+.sx-lvl-chip {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     font-size: 11px;
     color: #c8a84b;
 }
-.eg-lvl-chip:hover .eg-lvl-chip-lvl { text-shadow: 0 0 6px rgba(245,217,138,.8); }
-.eg-lvl-chip-lvl { letter-spacing: .5px; }
-.eg-lvl-chip-bar {
+.sx-lvl-chip:hover .sx-lvl-chip-lvl { text-shadow: 0 0 6px rgba(245,217,138,.8); }
+.sx-lvl-chip-lvl { letter-spacing: .5px; }
+.sx-lvl-chip-bar {
     width: 64px; height: 6px;
     background: rgba(255,255,255,.12);
     border: 1px solid rgba(200,168,75,.45);
     border-radius: 3px;
     overflow: hidden;
 }
-.eg-lvl-chip-bar-fill { display: block; height: 100%; background: linear-gradient(90deg,#8a6d2b,#f5d98a); }
-.eg-lvl-chip-points {
+.sx-lvl-chip-bar-fill { display: block; height: 100%; background: linear-gradient(90deg,#8a6d2b,#f5d98a); }
+.sx-lvl-chip-points {
     background: #c8a84b;
     color: #1a1408;
     border-radius: 8px;
     padding: 0 5px;
     font-weight: 700;
-    animation: eg-lvl-pulse 1.6s ease-in-out infinite;
+    animation: sx-lvl-pulse 1.6s ease-in-out infinite;
 }
-@keyframes eg-lvl-pulse {
+@keyframes sx-lvl-pulse {
     0%, 100% { filter: brightness(1); }
     50% { filter: brightness(1.35); }
 }
 
-.eg-xp-tiers {
+.sx-xp-tiers {
     display: flex;
     flex-direction: column;
     gap: 3px;
@@ -1058,14 +1058,14 @@ export function _injectLevelingStyles() {
     padding: 7px 10px;
     margin-bottom: 10px;
 }
-.eg-xp-tier { display: flex; justify-content: space-between; gap: 10px; font-size: 10px; opacity: .85; }
-.eg-xp-tier-label { font-weight: 700; white-space: nowrap; }
-.eg-xp-tier-label.opt { color: #2ecc71; }
-.eg-xp-tier-label.avg { color: #f5d98a; }
-.eg-xp-tier-label.poor { color: #e06c55; }
+.sx-xp-tier { display: flex; justify-content: space-between; gap: 10px; font-size: 10px; opacity: .85; }
+.sx-xp-tier-label { font-weight: 700; white-space: nowrap; }
+.sx-xp-tier-label.opt { color: #2ecc71; }
+.sx-xp-tier-label.avg { color: #f5d98a; }
+.sx-xp-tier-label.poor { color: #e06c55; }
 
 /* ── Level-up effect ── */
-.eg-levelup-fx {
+.sx-levelup-fx {
     position: fixed;
     inset: 0;
     z-index: 10050;
@@ -1074,23 +1074,23 @@ export function _injectLevelingStyles() {
     align-items: center;
     justify-content: center;
     background: radial-gradient(circle at center, rgba(245,185,66,.28) 0%, rgba(245,185,66,.08) 35%, transparent 65%);
-    animation: eg-lvl-flash 2.8s ease-out forwards;
+    animation: sx-lvl-flash 2.8s ease-out forwards;
 }
-@keyframes eg-lvl-flash {
+@keyframes sx-lvl-flash {
     0% { opacity: 0; }
     12% { opacity: 1; }
     70% { opacity: 1; }
     100% { opacity: 0; }
 }
-.eg-levelup-banner { text-align: center; animation: eg-lvl-pop 2.8s ease-out forwards; }
-@keyframes eg-lvl-pop {
+.sx-levelup-banner { text-align: center; animation: sx-lvl-pop 2.8s ease-out forwards; }
+@keyframes sx-lvl-pop {
     0% { transform: scale(.4); opacity: 0; }
     15% { transform: scale(1.15); opacity: 1; }
     25% { transform: scale(1); }
     80% { transform: scale(1); opacity: 1; }
     100% { transform: scale(1.05) translateY(-14px); opacity: 0; }
 }
-.eg-levelup-title {
+.sx-levelup-title {
     font-family: var(--PX, monospace);
     font-size: 44px;
     font-weight: 700;
@@ -1098,7 +1098,7 @@ export function _injectLevelingStyles() {
     color: #f5d98a;
     text-shadow: 0 0 18px rgba(245,185,66,.9), 0 0 40px rgba(245,185,66,.5), 0 2px 0 #6b5316;
 }
-.eg-levelup-sub {
+.sx-levelup-sub {
     margin-top: 6px;
     font-family: var(--PX, monospace);
     font-size: 15px;

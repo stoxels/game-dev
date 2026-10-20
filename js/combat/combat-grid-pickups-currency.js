@@ -24,8 +24,8 @@ export function _renderCurrencyDropOverlay(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     const span = document.createElement('span');
-    span.className = `eg-pickup-overlay eg-pickup-rarity-currency eg-currency-drop-overlay`;
-    span.id = `eg-currency-drop-${row}-${col}`;
+    span.className = `sx-pickup-overlay sx-pickup-rarity-currency sx-currency-drop-overlay`;
+    span.id = `sx-currency-drop-${row}-${col}`;
     // Orb/essence art (images/items/, keyed by def id) when available,
     // else the emoji fallback - same pattern as the loot overlay above.
     GAME_ART.fillElement(span, 'item', def && def.id, (def && def.icon) || '💰');
@@ -34,7 +34,7 @@ export function _renderCurrencyDropOverlay(row, col, def) {
 
 export function _removeCurrencyDropOverlay(key) {
     const [r, c] = key.split('-').map(Number);
-    const span = document.getElementById(`eg-currency-drop-${r}-${c}`);
+    const span = document.getElementById(`sx-currency-drop-${r}-${c}`);
     if (span) span.remove();
 }
 
@@ -43,7 +43,7 @@ export function _animateCurrencyDropClaim(row, col, def) {
     if (!el) return;
     const centre = _getElementCentre(el);
     const floater = document.createElement('div');
-    floater.className = 'eg-pickup-floater';
+    floater.className = 'sx-pickup-floater';
     GAME_ART.fillElement(floater, 'item', def && def.id, (def && def.icon) || '💰');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
@@ -67,7 +67,7 @@ export function _spawnCurrencyDrop(def) {
     _currencyDrops.set(key, def);
     _renderCurrencyDropOverlay(r, c, def);
 
-    _scheduleTrackedExpiry(_currencyDrops, key, def, LOOT_DROP_LIFETIME_MS, `eg-currency-drop-${r}-${c}`, _removeCurrencyDropOverlay);
+    _scheduleTrackedExpiry(_currencyDrops, key, def, LOOT_DROP_LIFETIME_MS, `sx-currency-drop-${r}-${c}`, _removeCurrencyDropOverlay);
 }
 
 // Tracks a claimed currency drop for the leave-map summary screen.
@@ -171,6 +171,6 @@ export function _replaceCarriedCurrencyDrops(defs) {
         _currencyDrops.set(key, def);
         _renderCurrencyDropOverlay(r, c, def);
 
-        _scheduleTrackedExpiry(_currencyDrops, key, def, LOOT_DROP_LIFETIME_MS, `eg-currency-drop-${r}-${c}`, _removeCurrencyDropOverlay);
+        _scheduleTrackedExpiry(_currencyDrops, key, def, LOOT_DROP_LIFETIME_MS, `sx-currency-drop-${r}-${c}`, _removeCurrencyDropOverlay);
     });
 }

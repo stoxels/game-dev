@@ -150,21 +150,21 @@ export function _bossTestShowTooltip(cardEl, e) {
 // uncheck). Handlers are real functions, not string attributes, so the
 // rebind works identically in every environment.
 export function _bossTestToggleTestHP(checkbox, bossId, level, hpMult) {
-    const card = checkbox.closest('.egbt-boss-card');
+    const card = checkbox.closest('.sx-bosstest-boss-card');
     if (!card) return;
     const newHpMult = checkbox.checked ? hpMult : 1;
     card.onclick = (ev) => {
         if (ev.target.closest('button')) return;   // Fight button handles itself
         globalThis._launchBossTest(bossId, level, newHpMult);
     };
-    const btn = card.querySelector('.egbt-fight-btn');
+    const btn = card.querySelector('.sx-bosstest-fight-btn');
     if (btn) {
         btn.onclick = (ev) => {
             ev.stopPropagation();
             globalThis._launchBossTest(bossId, level, newHpMult);
         };
     }
-    const statsEl = card.querySelector('.egbt-boss-stats');
+    const statsEl = card.querySelector('.sx-bosstest-boss-stats');
     if (statsEl) {
         const def = (typeof BOSS_DEFS !== 'undefined') ? globalThis.BOSS_DEFS[bossId] : null;
         if (def) {
@@ -191,25 +191,25 @@ export function _bossTestBuildBossCardHTML(def, level) {
     const preview = _bossTestScaledPreview(def, level);
     const hpMult = _bossTestCalcTestHPMultiplier(def, level);
     return `
-<div class="egbt-boss-card" data-boss-id="${def.id}" data-boss-level="${level}"
+<div class="sx-bosstest-boss-card" data-boss-id="${def.id}" data-boss-level="${level}"
      onmouseenter="_bossTestShowTooltip(this, event)"
      onmousemove="moveGameTooltip(event)"
      onmouseleave="hideGameTooltip()"
      onclick="_launchBossTest('${def.id}', ${level})">
-    <div class="egbt-boss-emoji">${_bossTestBossIconHTML(def)}</div>
-    <div class="egbt-boss-name">${def.name || def.id}</div>
-    <div class="egbt-boss-stats">Lv ${level} · ❤️ ${preview.hp} · 🗡️ ${preview.dmg}</div>
-    <div class="egbt-boss-id">${def.id}</div>
-    <label class="egbt-test-hp-label"
+    <div class="sx-bosstest-boss-emoji">${_bossTestBossIconHTML(def)}</div>
+    <div class="sx-bosstest-boss-name">${def.name || def.id}</div>
+    <div class="sx-bosstest-boss-stats">Lv ${level} · ❤️ ${preview.hp} · 🗡️ ${preview.dmg}</div>
+    <div class="sx-bosstest-boss-id">${def.id}</div>
+    <label class="sx-bosstest-test-hp-label"
            onmousedown="event.stopPropagation()"
            onclick="event.stopPropagation();">
-        <input type="checkbox" class="egbt-test-hp-checkbox"
+        <input type="checkbox" class="sx-bosstest-test-hp-checkbox"
                onmousedown="event.stopPropagation()"
                onclick="event.stopPropagation();"
                onchange="_bossTestToggleTestHP(this, '${def.id}', ${level}, ${hpMult})">
         <span>${t('eg_boss_test_500k_hp')}</span>
     </label>
-    <button class="title-btn egbt-fight-btn"
+    <button class="title-btn sx-bosstest-fight-btn"
             onclick="event.stopPropagation(); _launchBossTest('${def.id}', ${level})">
         ${t('eg_boss_test_fight')}
     </button>
@@ -246,45 +246,45 @@ export function _bossTestBuildSectionHTML(section) {
         ? `${t('eg_boss_test_tier').replace('{n}', section.tier)} · ${t('eg_boss_test_tier_level').replace('{lv}', level)}`
         : t('eg_boss_test_unassigned');
     return `
-<div class="egbt-tier-section">
-    <div class="egbt-tier-header">${title}</div>
-    <div class="egbt-boss-grid">${section.defs.map(def => _bossTestBuildBossCardHTML(def, level)).join('')}</div>
+<div class="sx-bosstest-tier-section">
+    <div class="sx-bosstest-tier-header">${title}</div>
+    <div class="sx-bosstest-boss-grid">${section.defs.map(def => _bossTestBuildBossCardHTML(def, level)).join('')}</div>
 </div>`;
 }
 
 export function _bossTestRenderGrid() {
-    const container = document.getElementById('egbt-boss-grid');
+    const container = document.getElementById('sx-bosstest-boss-grid');
     if (!container) return;
     const sections = _bossTestBuildSections();
     const total = sections.reduce((sum, s) => sum + s.defs.length, 0);
     container.innerHTML = total > 0
         ? sections.map(_bossTestBuildSectionHTML).join('')
-        : `<div class="egbt-empty">${t('eg_boss_test_no_bosses')}</div>`;
-    const count = document.getElementById('egbt-count');
+        : `<div class="sx-bosstest-empty">${t('eg_boss_test_no_bosses')}</div>`;
+    const count = document.getElementById('sx-bosstest-count');
     if (count) count.textContent = t('eg_boss_test_count').replace('{n}', total);
 }
 
 export function _bossTestBuildFullScreenHTML() {
     return `
-<div class="egbt-hub-layout">
-    <div class="egbt-topbar">
+<div class="sx-bosstest-hub-layout">
+    <div class="sx-bosstest-topbar">
         <button class="back-btn" onclick="showEndgameNexus()">${t('btn_back')}</button>
-        <span class="egbt-topbar-title">${t('eg_boss_test_title')}</span>
-        <span class="egbt-count" id="egbt-count"></span>
+        <span class="sx-bosstest-topbar-title">${t('eg_boss_test_title')}</span>
+        <span class="sx-bosstest-count" id="sx-bosstest-count"></span>
     </div>
-    <div class="egbt-controls">
-        <input class="egbt-search" id="egbt-search" type="text"
+    <div class="sx-bosstest-controls">
+        <input class="sx-bosstest-search" id="sx-bosstest-search" type="text"
             placeholder="${t('eg_boss_test_search_placeholder')}"
             oninput="window._bossTestSearch=this.value;_bossTestRenderGrid()">
-        <label class="egbt-godmode-label" data-tip-t="eg_boss_test_godmode_hint">
-            <input type="checkbox" class="egbt-godmode-checkbox"
+        <label class="sx-bosstest-godmode-label" data-tip-t="eg_boss_test_godmode_hint">
+            <input type="checkbox" class="sx-bosstest-godmode-checkbox"
                 onchange="_bossTestToggleGodMode(this)">
             <span>${t('eg_boss_test_godmode')}</span>
         </label>
-        <span class="egbt-godmode-badge" id="egbt-godmode-badge"></span>
+        <span class="sx-bosstest-godmode-badge" id="sx-bosstest-godmode-badge"></span>
     </div>
-    <div class="egbt-hint">${t('eg_boss_test_hint')}</div>
-    <div class="egbt-boss-sections" id="egbt-boss-grid"></div>
+    <div class="sx-bosstest-hint">${t('eg_boss_test_hint')}</div>
+    <div class="sx-bosstest-boss-sections" id="sx-bosstest-boss-grid"></div>
 </div>`;
 }
 
@@ -296,102 +296,102 @@ export function _bossTestBuildFullScreenHTML() {
 // endgame-testing-screen.js - avoids needing to touch the main CSS files.
 
 export function _bossTestEnsureStyles() {
-    if (document.getElementById('egbt-boss-test-style')) return;
+    if (document.getElementById('sx-bosstest-boss-test-style')) return;
 
     const style = document.createElement('style');
-    style.id = 'egbt-boss-test-style';
+    style.id = 'sx-bosstest-boss-test-style';
     style.textContent = `
-        .egbt-hub-layout {
+        .sx-bosstest-hub-layout {
             width: 100%; height: 100%; display: flex; flex-direction: column;
             padding: 16px; box-sizing: border-box; font-family: var(--PX, monospace);
             color: var(--accent2, #e8daef); overflow-y: auto;
         }
-        .egbt-topbar {
+        .sx-bosstest-topbar {
             display: flex; align-items: center; gap: 12px;
             margin-bottom: 12px; flex-wrap: wrap;
         }
-        .egbt-topbar-title { font-size: 16px; letter-spacing: 2px; color: var(--accent, #c8a84b); }
-        .egbt-count { font-size: 11px; opacity: 0.7; }
-        .egbt-controls {
+        .sx-bosstest-topbar-title { font-size: 16px; letter-spacing: 2px; color: var(--accent, #c8a84b); }
+        .sx-bosstest-count { font-size: 11px; opacity: 0.7; }
+        .sx-bosstest-controls {
             display: flex; align-items: center; gap: 12px;
             margin-bottom: 8px; flex-wrap: wrap;
         }
-        .egbt-search {
+        .sx-bosstest-search {
             font-family: inherit; font-size: 12px; padding: 7px 10px;
             background: rgba(0,0,0,0.4); color: var(--accent2, #e8daef);
             border: 1px solid var(--border2, #444); border-radius: 4px;
             min-width: 220px;
         }
-        .egbt-search:focus { border-color: var(--accent, #c8a84b); outline: none; }
-        .egbt-hint { font-size: 10px; opacity: 0.6; margin-bottom: 12px; line-height: 1.5; }
-        .egbt-boss-sections { display: flex; flex-direction: column; gap: 18px; }
-        .egbt-tier-header {
+        .sx-bosstest-search:focus { border-color: var(--accent, #c8a84b); outline: none; }
+        .sx-bosstest-hint { font-size: 10px; opacity: 0.6; margin-bottom: 12px; line-height: 1.5; }
+        .sx-bosstest-boss-sections { display: flex; flex-direction: column; gap: 18px; }
+        .sx-bosstest-tier-header {
             font-size: 13px; letter-spacing: 2px; color: var(--accent, #c8a84b);
             border-bottom: 1px solid var(--accent, #c8a84b);
             padding-bottom: 5px; margin-bottom: 10px;
         }
-        .egbt-boss-grid {
+        .sx-bosstest-boss-grid {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
             gap: 12px;
         }
-        .egbt-boss-card {
+        .sx-bosstest-boss-card {
             background: rgba(20, 15, 5, 0.6); border: 1px solid var(--accent, #c8a84b);
             border-radius: 6px; padding: 12px; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; gap: 5px;
             text-align: center;
             transition: transform 0.15s, box-shadow 0.15s;
         }
-        .egbt-boss-card:hover {
+        .sx-bosstest-boss-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 4px 14px rgba(200, 168, 75, 0.35);
         }
-        .egbt-boss-emoji { font-size: 30px; }
-        .egbt-boss-emoji img.eg-art-img {
+        .sx-bosstest-boss-emoji { font-size: 30px; }
+        .sx-bosstest-boss-emoji img.sx-art-img {
             width: 64px; height: 64px;
             object-fit: cover; border-radius: 8px;
         }
-        .egbt-boss-name { font-size: 12px; color: var(--accent, #c8a84b); }
-        .egbt-boss-stats { font-size: 10px; opacity: 0.85; }
-        .egbt-boss-id { font-size: 9px; opacity: 0.45; word-break: break-all; }
-        .egbt-fight-btn { margin-top: 6px; font-size: 10px; padding: 6px 12px; }
-        .egbt-test-hp-label {
+        .sx-bosstest-boss-name { font-size: 12px; color: var(--accent, #c8a84b); }
+        .sx-bosstest-boss-stats { font-size: 10px; opacity: 0.85; }
+        .sx-bosstest-boss-id { font-size: 9px; opacity: 0.45; word-break: break-all; }
+        .sx-bosstest-fight-btn { margin-top: 6px; font-size: 10px; padding: 6px 12px; }
+        .sx-bosstest-test-hp-label {
             display: flex; align-items: center; gap: 4px;
             margin-top: 6px; font-size: 9px; cursor: pointer;
             color: var(--accent2, #ccc); opacity: 0.8;
         }
-        .egbt-test-hp-label input[type="checkbox"] {
+        .sx-bosstest-test-hp-label input[type="checkbox"] {
             width: 12px; height: 12px; accent-color: var(--accent, #c8a84b);
         }
-        .egbt-godmode-label {
+        .sx-bosstest-godmode-label {
             display: flex; align-items: center; gap: 4px;
             font-size: 10px; cursor: pointer; color: var(--accent2, #ccc); opacity: 0.85;
         }
-        .egbt-godmode-label input[type="checkbox"] {
+        .sx-bosstest-godmode-label input[type="checkbox"] {
             width: 12px; height: 12px; accent-color: #4ade80;
         }
-        .egbt-godmode-badge {
+        .sx-bosstest-godmode-badge {
             font-size: 9px; letter-spacing: 1px; padding: 2px 8px;
             border-radius: 8px; border: 1px solid var(--border2, #444);
             color: var(--accent2, #888); opacity: 0.6;
         }
-        .egbt-godmode-badge.egbt-godmode-on {
+        .sx-bosstest-godmode-badge.sx-bosstest-godmode-on {
             color: #4ade80; border-color: rgba(74, 222, 128, 0.6); opacity: 1;
             box-shadow: 0 0 8px rgba(74, 222, 128, 0.35);
         }
-        #egbt-godmode-chip {
+        #sx-bosstest-godmode-chip {
             position: fixed; top: 10px; right: 12px; z-index: 20000;
             pointer-events: none; font-size: 11px; letter-spacing: 1px;
             padding: 6px 12px; border-radius: 6px;
             background: rgba(6, 40, 22, 0.88); border: 1px solid #4ade80; color: #4ade80;
             box-shadow: 0 0 14px rgba(74, 222, 128, 0.45);
-            animation: egbt-godmode-chip-pulse 1.4s ease-in-out infinite alternate;
+            animation: sx-bosstest-godmode-chip-pulse 1.4s ease-in-out infinite alternate;
         }
-        @keyframes egbt-godmode-chip-pulse {
+        @keyframes sx-bosstest-godmode-chip-pulse {
             from { box-shadow: 0 0 8px rgba(74, 222, 128, 0.35); }
             to { box-shadow: 0 0 18px rgba(74, 222, 128, 0.7); }
         }
-        .egbt-empty { font-size: 12px; opacity: 0.6; grid-column: 1 / -1; text-align: center; padding: 24px; }
-        .egbt-topbar .title-btn, .egbt-fight-btn {
+        .sx-bosstest-empty { font-size: 12px; opacity: 0.6; grid-column: 1 / -1; text-align: center; padding: 24px; }
+        .sx-bosstest-topbar .title-btn, .sx-bosstest-fight-btn {
             font-family: var(--PX, monospace);
             font-size: 10px;
             letter-spacing: 1px;
@@ -403,13 +403,13 @@ export function _bossTestEnsureStyles() {
             white-space: nowrap;
             transition: all 0.12s;
         }
-        .egbt-topbar .title-btn:hover, .egbt-fight-btn:hover {
+        .sx-bosstest-topbar .title-btn:hover, .sx-bosstest-fight-btn:hover {
             border-color: var(--accent, #c8a84b);
             color: var(--accent, #c8a84b);
             background: linear-gradient(180deg, rgba(200,168,75,0.12), rgba(0,0,0,0.25)), var(--surface, #1a1a2e);
             box-shadow: 0 0 10px rgba(200, 168, 75, 0.25);
         }
-        .egbt-topbar .title-btn:active, .egbt-fight-btn:active {
+        .sx-bosstest-topbar .title-btn:active, .sx-bosstest-fight-btn:active {
             transform: translateY(1px);
             box-shadow: none;
         }

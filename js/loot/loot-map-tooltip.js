@@ -49,17 +49,17 @@ export function _egBuildMapTooltipBodyHTML(item) {
     const sectionHTML = (titleKey, entries, color) => {
         if (entries.length === 0) return '';
         return `
-    <div class="eg-tt-section">
-        <div class="eg-tt-group-title" style="color:${color};">${t(titleKey)}</div>
+    <div class="sx-tt-section">
+        <div class="sx-tt-group-title" style="color:${color};">${t(titleKey)}</div>
         ${entries.map(e => {
-            const tierBadge = hideTier ? '' : `<span class="eg-tt-mod-tier">${e.tierLabel || ''}</span>`;
-            return `<div class="eg-tt-mod" style="color:${color};"><span class="eg-tt-mod-label">${e.label}</span>${tierBadge}</div>`;
+            const tierBadge = hideTier ? '' : `<span class="sx-tt-mod-tier">${e.tierLabel || ''}</span>`;
+            return `<div class="sx-tt-mod" style="color:${color};"><span class="sx-tt-mod-label">${e.label}</span>${tierBadge}</div>`;
         }).join('')}
     </div>`;
     };
 
     const noModsHTML = (item.mods || []).length === 0
-        ? `<div class="eg-tt-section"><div class="eg-tt-desc">${t('eg_map_unmodified')}</div></div>`
+        ? `<div class="sx-tt-section"><div class="sx-tt-desc">${t('eg_map_unmodified')}</div></div>`
         : '';
 
     // ── Implicit values ──────────────────────────────────────────────
@@ -143,9 +143,9 @@ export function _egBuildMapTooltipBodyHTML(item) {
     }
     if (rw.rarity > 0) rewardLines.push(t('eg_map_reward_rarity').replace('{n}', rw.rarity));
     const rewardsHTML = rewardLines.length === 0 ? '' : `
-    <div class="eg-tt-section">
-        <div class="eg-tt-group-title" style="color:#f5d98a;">${t('eg_map_reward_title')}</div>
-        ${rewardLines.map(l => `<div class="eg-tt-mod" style="color:#f5d98a;">${l}</div>`).join('')}
+    <div class="sx-tt-section">
+        <div class="sx-tt-group-title" style="color:#f5d98a;">${t('eg_map_reward_title')}</div>
+        ${rewardLines.map(l => `<div class="sx-tt-mod" style="color:#f5d98a;">${l}</div>`).join('')}
     </div>`;
 
     // ── Atlas completion status ────────────────────────────────────────
@@ -170,18 +170,18 @@ export function _egBuildMapTooltipBodyHTML(item) {
             const reqDiff = atlasNode.difficulty
                 || (typeof egAtlasTierDifficulty === 'function' ? egAtlasTierDifficulty(atlasNode.tier) : 'normal');
             const diffColors = { easy: '#2ecc71', normal: '#3498db', hard: '#c39bd3' };
-            const diffLineHTML = `<div class="eg-tt-desc" style="color:${diffColors[reqDiff] || '#f5d98a'}; font-size:0.85em;">⚖️ ${t('eg_map_atlas_requires_diff').replace('{d}', t('diff_' + reqDiff))}</div>`;
+            const diffLineHTML = `<div class="sx-tt-desc" style="color:${diffColors[reqDiff] || '#f5d98a'}; font-size:0.85em;">⚖️ ${t('eg_map_atlas_requires_diff').replace('{d}', t('diff_' + reqDiff))}</div>`;
             let mismatchHTML = '';
             if (!completed) {
                 const runDiff = (typeof curDiff !== 'undefined' && globalThis.curDiff) ? globalThis.curDiff : 'normal';
                 if (runDiff !== reqDiff) {
-                    mismatchHTML = `<div class="eg-tt-desc" style="color:#e74c3c; font-size:0.85em;">${t('eg_map_atlas_diff_mismatch').replace('{d}', t('diff_' + runDiff))}</div>`;
+                    mismatchHTML = `<div class="sx-tt-desc" style="color:#e74c3c; font-size:0.85em;">${t('eg_map_atlas_diff_mismatch').replace('{d}', t('diff_' + runDiff))}</div>`;
                 }
             }
             atlasStatusHTML = `
-    <div class="eg-tt-section" style="border-left:2px solid ${color}; padding-left:8px;">
-        <div class="eg-tt-mod" style="color:${color}; font-weight:700;">${label}</div>
-        <div class="eg-tt-desc" style="color:#ccc; font-size:0.85em;">${regionName} · ${t('eg_map_tier_tt').replace('{n}', atlasNode.tier)}</div>
+    <div class="sx-tt-section" style="border-left:2px solid ${color}; padding-left:8px;">
+        <div class="sx-tt-mod" style="color:${color}; font-weight:700;">${label}</div>
+        <div class="sx-tt-desc" style="color:#ccc; font-size:0.85em;">${regionName} · ${t('eg_map_tier_tt').replace('{n}', atlasNode.tier)}</div>
         ${diffLineHTML}
         ${mismatchHTML}
     </div>`;
@@ -189,18 +189,18 @@ export function _egBuildMapTooltipBodyHTML(item) {
     } catch (e) { /* ignore tooltip atlas errors */ }
 
     return `
-<div class="eg-tt-frame eg-map-frame" style="--tt-border:${rc.border};">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">${GAME_ART.html('item', GAME_ART.artIdForItem(item), item.icon || '🗺️')}</div>
-        <div class="eg-tt-name" style="color:${rc.color};">${item.name || '???'}</div>
+<div class="sx-tt-frame eg-map-frame" style="--tt-border:${rc.border};">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon">${GAME_ART.html('item', GAME_ART.artIdForItem(item), item.icon || '🗺️')}</div>
+        <div class="sx-tt-name" style="color:${rc.color};">${item.name || '???'}</div>
         ${(item.baseName && item.baseName !== item.name)
-            ? `<div class="eg-tt-basename" style="opacity:.7;">${item.baseName}</div>` : ''}
-        <div class="eg-tt-rarity-line" style="color:${rc.border};">${t('eg_maps_label')} · ${t('eg_map_tier_tt').replace('{n}', item.mapTier ?? 1)}</div>
+            ? `<div class="sx-tt-basename" style="opacity:.7;">${item.baseName}</div>` : ''}
+        <div class="sx-tt-rarity-line" style="color:${rc.border};">${t('eg_maps_label')} · ${t('eg_map_tier_tt').replace('{n}', item.mapTier ?? 1)}</div>
     </div>
     ${atlasStatusHTML}
-    <div class="eg-tt-section">
-        <div class="eg-tt-group-title" style="color:#f5d98a;">${t('eg_map_implicits_title')}</div>
-        ${implicitLines.map(l => `<div class="eg-tt-implicit">${l}</div>`).join('')}
+    <div class="sx-tt-section">
+        <div class="sx-tt-group-title" style="color:#f5d98a;">${t('eg_map_implicits_title')}</div>
+        ${implicitLines.map(l => `<div class="sx-tt-implicit">${l}</div>`).join('')}
     </div>
     ${rewardsHTML}
     ${sectionHTML('eg_map_mods_monster', groups.monster, '#e67e22')}
@@ -222,16 +222,16 @@ export function _egBuildMapTooltipBodyHTML(item) {
     style.textContent = `
         /* Gate screen: spacing for the runes & orbs row between device and map stash */
         .eg-gate-currency-section { margin-top: 12px; }
-        .eg-gate-currency-section .eg-currency-strip { border: 1px solid var(--border); border-radius: 6px; }
+        .eg-gate-currency-section .sx-currency-strip { border: 1px solid var(--border); border-radius: 6px; }
         /* Map drops on the puzzle grid get a golden shimmer to stand out */
-        .eg-mapdrop-overlay {
+        .sx-mapdrop-overlay {
             text-shadow: 0 0 6px rgba(245, 217, 138, 0.9), 0 0 12px rgba(245, 217, 138, 0.5);
         }
         /* Group titles inside the map tooltip */
-        .eg-tt-group-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 2px; }
-        .eg-tt-mod { font-size: 0.85rem; padding: 1px 0; }
+        .sx-tt-group-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 2px; }
+        .sx-tt-mod { font-size: 0.85rem; padding: 1px 0; }
         /* Map tier badge on item chips */
-        .eg-item-ilvl.eg-map-tier-badge { color: #f5d98a; }
+        .sx-item-ilvl.eg-map-tier-badge { color: #f5d98a; }
     `;
     document.head.appendChild(style);
 })();

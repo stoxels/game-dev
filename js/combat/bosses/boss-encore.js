@@ -73,14 +73,14 @@ export function _enTouch(pct, level, label) {
 // survives the run ending in the same frame).
 export function _enConfetti(x, y, big) {
     const layer = document.createElement('div');
-    layer.className = 'eg-en-confetti' + (big ? ' eg-en-confetti-big' : '');
+    layer.className = 'sx-en-confetti' + (big ? ' sx-en-confetti-big' : '');
     layer.style.left = Math.round(x) + 'px';
     layer.style.top = Math.round(y) + 'px';
     document.body.appendChild(layer);
     const colors = ['#fbbf24', '#f472b6', '#a78bfa', '#4ade80', '#e2e8f0'];
     for (let i = 0; i < (big ? 12 : 7); i++) {
         const s = document.createElement('div');
-        s.className = 'eg-en-conf';
+        s.className = 'sx-en-conf';
         s.style.background = colors[i % colors.length];
         const ang = Math.random() * Math.PI * 2;
         const dist = 24 + Math.random() * (big ? 90 : 55);
@@ -97,7 +97,7 @@ export function _enConfetti(x, y, big) {
 // damage is rolled by the caller at the beat the ring launches.
 export function _enApplause(x, y, big) {
     const ring = document.createElement('div');
-    ring.className = 'eg-en-applause' + (big ? ' eg-en-applause-big' : '');
+    ring.className = 'sx-en-applause' + (big ? ' sx-en-applause-big' : '');
     ring.style.left = Math.round(x) + 'px';
     ring.style.top = Math.round(y) + 'px';
     document.body.appendChild(ring);
@@ -134,12 +134,12 @@ export function _mechEnEncoreCircles(monster, phase) {
     _nkToast('eg_mech_encore', '🎵 The Encore: Encore Circles! Be inside when the ring lands!', '#fbbf24');
 
     const queue = pts.map((q, i) => {
-        const spot = _nkEl(run, 'div', 'eg-en-spot');
+        const spot = _nkEl(run, 'div', 'sx-en-spot');
         spot.style.left = Math.round(q.x - radius) + 'px';
         spot.style.top = Math.round(q.y - radius) + 'px';
         spot.style.width = radius * 2 + 'px';
         spot.style.height = radius * 2 + 'px';
-        const ring = _nkEl(run, 'div', 'eg-en-ring');
+        const ring = _nkEl(run, 'div', 'sx-en-ring');
         return { x: q.x, y: q.y, t: -i * EN_CIRCLE_STAGGER_MS * _EN_DEBUG_MULT, judged: false, spot, ring };
     });
 
@@ -161,10 +161,10 @@ export function _mechEnEncoreCircles(monster, phase) {
                 r.ring.remove();
                 const c = _nkPlayerCenter();
                 if (c && Math.hypot(c.x - r.x, c.y - r.y) <= radius + 10) {
-                    r.spot.classList.add('eg-en-land-ok');
+                    r.spot.classList.add('sx-en-land-ok');
                     _nkToast('eg_blast_dodged', '✅ Perfect!', '#4ade80');
                 } else {
-                    r.spot.classList.add('eg-en-land-hit');
+                    r.spot.classList.add('sx-en-land-hit');
                     const dealt = _nkHit(dmgPct, 'lightning', level);
                     _nkAbilityHitToast(dealt, 'The Encore', 'Encore Circles');
                 }
@@ -212,7 +212,7 @@ export function _mechEnSoundBars(monster, phase) {
     _nkToast('eg_mech_en_bars', '🎵 The Encore: EQ SLAM - out of the lane!', '#e2e8f0');
 
     const bars = lanes.map(x => {
-        const warn = _nkEl(run, 'div', 'eg-en-eqwarn');
+        const warn = _nkEl(run, 'div', 'sx-en-eqwarn');
         warn.style.left = Math.round(x - EN_BAR_W / 2) + 'px';
         warn.style.top = Math.round(floorY - barH) + 'px';
         warn.style.width = EN_BAR_W + 'px';
@@ -227,7 +227,7 @@ export function _mechEnSoundBars(monster, phase) {
             bars.forEach(b => {
                 if (b.up) return;
                 b.up = true;
-                b.bar = _nkEl(run, 'div', 'eg-en-eq');
+                b.bar = _nkEl(run, 'div', 'sx-en-eq');
                 b.bar.style.left = Math.round(b.x - EN_BAR_W / 2) + 'px';
                 b.bar.style.top = Math.round(floorY - barH) + 'px';
                 b.bar.style.width = EN_BAR_W + 'px';
@@ -255,7 +255,7 @@ export function _mechEnSoundBars(monster, phase) {
             retracting = true;
             bars.forEach(b => {
                 if (!b.bar) return;
-                b.bar.classList.add('eg-en-eq-retract');
+                b.bar.classList.add('sx-en-eq-retract');
                 const el = b.bar; b.bar = null;
                 setTimeout(() => { try { el.remove(); } catch (e) {} }, 450);
             });
@@ -290,7 +290,7 @@ export function _mechEnStageLights(monster, phase) {
     const lights = [];
     for (let i = 0; i < count; i++) {
         const c = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-        const el = _nkEl(run, 'div', 'eg-en-light');
+        const el = _nkEl(run, 'div', 'sx-en-light');
         el.style.left = Math.round(c.x) + 'px';
         el.style.top = Math.round(c.y) + 'px';
         lights.push({ el, x: c.x, y: c.y, t: -i * 900 * _EN_DEBUG_MULT, locked: false, blasted: false });
@@ -314,11 +314,11 @@ export function _mechEnStageLights(monster, phase) {
             }
             if (!L.locked) {
                 L.locked = true;
-                L.el.classList.add('eg-en-light-locked');
+                L.el.classList.add('sx-en-light-locked');
             }
             if (L.t >= trackMs + lockMs) {
                 L.blasted = true;
-                L.el.classList.add('eg-en-light-blast');
+                L.el.classList.add('sx-en-light-blast');
                 _enConfetti(L.x, L.y, false);
                 const c = _nkPlayerCenter();
                 if (c && now >= touchCd && Math.hypot(c.x - L.x, c.y - L.y) <= EN_LIGHT_BLAST_R + 14) {
@@ -367,7 +367,7 @@ export function _mechEnBeatMines(monster, phase) {
         const x = 100 + Math.random() * Math.max(60, W - 200);
         const y = 120 + Math.random() * Math.max(60, H - 240);
         if (mines.every(m => Math.hypot(m.x - x, m.y - y) > 180)) {
-            const el = _nkEl(run, 'div', 'eg-en-mine');
+            const el = _nkEl(run, 'div', 'sx-en-mine');
             el.style.left = Math.round(x) + 'px';
             el.style.top = Math.round(y) + 'px';
             el.style.animationDuration = (EN_MINE_BEAT_MS / 1000 * _EN_DEBUG_MULT) + 's';
@@ -382,7 +382,7 @@ export function _mechEnBeatMines(monster, phase) {
             if (m.popped || t < m.popAt) return;
             m.popped = true;
             try { m.el.remove(); } catch (e) {}
-            const nova = _nkEl(run, 'div', 'eg-en-mine-pop');
+            const nova = _nkEl(run, 'div', 'sx-en-mine-pop');
             nova.style.left = Math.round(m.x) + 'px';
             nova.style.top = Math.round(m.y) + 'px';
             _enConfetti(m.x, m.y, false);
@@ -484,21 +484,21 @@ export function _enFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // House lights down.
     const bo = document.createElement('div');
-    bo.className = 'eg-en-blackout';
+    bo.className = 'sx-en-blackout';
     document.body.appendChild(bo);
     g.blackout = bo;
-    requestAnimationFrame(() => bo.classList.add('eg-en-blackout-on'));
+    requestAnimationFrame(() => bo.classList.add('sx-en-blackout-on'));
 
     // The one safe light. First placement is instant; jumps transition.
     const spot = document.createElement('div');
-    spot.className = 'eg-en-spotlight';
+    spot.className = 'sx-en-spotlight';
     spot.style.width = (EN_FINAL_SPOT_R * 2) + 'px';
     spot.style.height = (EN_FINAL_SPOT_R * 2) + 'px';
     _enPlaceSpotlight(g, spot, null);
@@ -508,20 +508,20 @@ export function _enFinalStart(monster) {
     spot.style.transition = 'left ' + jumpS + 's cubic-bezier(.2,.8,.3,1), top ' + jumpS + 's cubic-bezier(.2,.8,.3,1)';
 
     // Boss takes a bow: the card rocks like a showman milking the applause.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-en-bowing');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-en-bowing');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     // Metronome overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-en-cd';
+    ov.className = 'sx-en-cd';
     ov.innerHTML =
-        '<div class="eg-en-cd-label">🎵 CURTAIN CALL</div>' +
-        '<div class="eg-en-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-en-cd-hint">Musical chairs - be INSIDE the spotlight when each beat drops!</div>';
+        '<div class="sx-en-cd-label">🎵 CURTAIN CALL</div>' +
+        '<div class="sx-en-cd-num sx-bmb-cd-pop">' + g.count + '</div>' +
+        '<div class="sx-en-cd-hint">Musical chairs - be INSIDE the spotlight when each beat drops!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -557,12 +557,12 @@ export function _enFinalStart(monster) {
         }
         // Jump the light BEFORE the next beat (musical chairs).
         _enPlaceSpotlight(g, spot, { x: g.sx, y: g.sy });
-        const num = g.overlay && g.overlay.querySelector('.eg-en-cd-num');
+        const num = g.overlay && g.overlay.querySelector('.sx-en-cd-num');
         if (num) {
             num.textContent = g.count;
-            num.classList.remove('eg-bmb-cd-pop');
+            num.classList.remove('sx-bmb-cd-pop');
             void num.offsetWidth;
-            num.classList.add('eg-bmb-cd-pop');
+            num.classList.add('sx-bmb-cd-pop');
         }
     }, cdTick);
 }
@@ -578,8 +578,8 @@ export function _enFinalBang(g, monster) {
     _nkToast('eg_mech_en_final_bang', '🎵💀 THE OVATION!', '#e2e8f0');
 
     // Screen flash at the moment of the ovation.
-    document.body.classList.add('eg-en-flash');
-    setTimeout(() => document.body.classList.remove('eg-en-flash'), 700);
+    document.body.classList.add('sx-en-flash');
+    setTimeout(() => document.body.classList.remove('sx-en-flash'), 700);
 
     // Triple applause nova from the final spotlight (big first ring leads).
     [0, 140, 280].forEach((d, i) => {
@@ -611,12 +611,12 @@ export function _enFinalEnd(g) {
     if (g.blackout) { try { g.blackout.remove(); } catch (e) {} g.blackout = null; }
     if (g.spotlight) { try { g.spotlight.remove(); } catch (e) {} g.spotlight = null; }
     if (g.run) { try { _nkKillRun(g.run); } catch (e) {} g.run = null; }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
-    document.body.classList.remove('eg-en-flash');
-    document.querySelectorAll('.eg-en-bowing').forEach(el => el.classList.remove('eg-en-bowing'));
+    document.body.classList.remove('sx-en-flash');
+    document.querySelectorAll('.sx-en-bowing').forEach(el => el.classList.remove('sx-en-bowing'));
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -638,16 +638,16 @@ export function _enFinalEnd(g) {
 // removes every run element, overlay and body class this boss ever created.
 export function _enTeardown() {
     if (_enFinal) { try { _enFinalEnd(_enFinal); } catch (e) {} _enFinal = null; }
-    document.querySelectorAll('.eg-en-spot, .eg-en-ring, .eg-en-eqwarn, .eg-en-eq, ' +
-        '.eg-en-light, .eg-en-mine, .eg-en-mine-pop, .eg-en-applause, .eg-en-confetti, ' +
-        '.eg-en-blackout, .eg-en-spotlight, .eg-en-cd').forEach(el => {
+    document.querySelectorAll('.sx-en-spot, .sx-en-ring, .sx-en-eqwarn, .sx-en-eq, ' +
+        '.sx-en-light, .sx-en-mine, .sx-en-mine-pop, .sx-en-applause, .sx-en-confetti, ' +
+        '.sx-en-blackout, .sx-en-spotlight, .sx-en-cd').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.body.classList.remove('eg-en-flash');
-    document.querySelectorAll('.eg-en-bowing').forEach(el => el.classList.remove('eg-en-bowing'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.body.classList.remove('sx-en-flash');
+    document.querySelectorAll('.sx-en-bowing').forEach(el => el.classList.remove('sx-en-bowing'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

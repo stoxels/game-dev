@@ -102,10 +102,10 @@ export function _crashBoom(run, x, y, radius, pct, level, label) {
     // the run being killed in the same frame (the super-bomb catch / end
     // detonation). The layer still self-removes ~0.9s below.
     let layer;
-    if (run) layer = _nkEl(run, 'div', 'eg-crash-burst');
+    if (run) layer = _nkEl(run, 'div', 'sx-crash-burst');
     else {
         layer = document.createElement('div');
-        layer.className = 'eg-crash-burst';
+        layer.className = 'sx-crash-burst';
         document.body.appendChild(layer);
     }
     layer.style.left = Math.round(x - R) + 'px';
@@ -114,15 +114,15 @@ export function _crashBoom(run, x, y, radius, pct, level, label) {
     layer.style.height = (R * 2) + 'px';
 
     const core = document.createElement('div');
-    core.className = 'eg-crash-core';
+    core.className = 'sx-crash-core';
     layer.appendChild(core);
     const ring = document.createElement('div');
-    ring.className = 'eg-crash-ring';
+    ring.className = 'sx-crash-ring';
     layer.appendChild(ring);
     const sparks = 7;
     for (let i = 0; i < sparks; i++) {
         const s = document.createElement('div');
-        s.className = 'eg-crash-spark';
+        s.className = 'sx-crash-spark';
         const ang = Math.random() * Math.PI * 2;
         const dist = _crashRand(R * 0.35, R * 1.15);
         s.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
@@ -143,11 +143,11 @@ export function _crashBoom(run, x, y, radius, pct, level, label) {
 
 // Places a visible bomb dot + its dashed danger ring at (x, y).
 export function _crashArmDot(run, x, y, cls, sizePx, ringR, text) {
-    const el = _nkEl(run, 'div', 'eg-nk-dot ' + cls, text || '💣');
+    const el = _nkEl(run, 'div', 'sx-nk-dot ' + cls, text || '💣');
     el.style.width = sizePx + 'px';
     el.style.height = sizePx + 'px';
     el.style.transform = 'translate(' + Math.round(x - sizePx / 2) + 'px,' + Math.round(y - sizePx / 2) + 'px)';
-    const ring = _nkEl(run, 'div', 'eg-crash-warn');
+    const ring = _nkEl(run, 'div', 'sx-crash-warn');
     ring.style.width = (ringR * 2) + 'px';
     ring.style.height = (ringR * 2) + 'px';
     ring.style.left = Math.round(x - ringR) + 'px';
@@ -193,7 +193,7 @@ export function _mechStickyBombs(monster, phase) {
             const cy = c ? c.y : window.innerHeight / 2;
             const x = Math.max(50, Math.min(window.innerWidth - 50, cx + _crashRand(-55, 55)));
             const y = Math.max(60, Math.min(window.innerHeight - 60, cy + _crashRand(-55, 55)));
-            bombs[i] = _crashArmDot(run, x, y, 'eg-nk-bomb eg-crash-mini', 44, blastR, '💣');
+            bombs[i] = _crashArmDot(run, x, y, 'sx-nk-bomb sx-crash-mini', 44, blastR, '💣');
             bombs[i].x = x;
             bombs[i].y = y;
             bombs[i].t = 0;
@@ -209,7 +209,7 @@ export function _mechStickyBombs(monster, phase) {
             // Fuse blink for the final stretch of the fuse.
             if (b.t >= fuseMs - 450 && !b.blink) {
                 b.blink = true;
-                if (b.el) b.el.classList.add('eg-nk-fuse');
+                if (b.el) b.el.classList.add('sx-nk-fuse');
             }
             if (b.t >= fuseMs) {
                 b.exploded = true;
@@ -245,7 +245,7 @@ export function _mechBigBomb(monster, phase) {
     const dmgPct = CRASH_MEGA_DMG[p];
     const spots = _crashPickMegaSpots(count, blastR);
     const bombs = spots.map(s => {
-        const armed = _crashArmDot(run, s.x, s.y, 'eg-crash-mega', 84, blastR, '💣');
+        const armed = _crashArmDot(run, s.x, s.y, 'sx-crash-mega', 84, blastR, '💣');
         return { x: s.x, y: s.y, t: 0, exploded: false, armed };
     });
 
@@ -369,7 +369,7 @@ export function _crashChainCells(run, x, y, r, level, phase, chainDelays) {
             + i * 120;
         if (Array.isArray(chainDelays)) chainDelays.push(delay);
         const fuseEl = document.createElement('span');
-        fuseEl.className = 'eg-crash-cell-fuse';
+        fuseEl.className = 'sx-crash-cell-fuse';
         fuseEl.textContent = '💥';
         const host = document.getElementById('g-' + cell.cr + '-' + cell.cc);
         if (host) host.appendChild(fuseEl);
@@ -451,18 +451,18 @@ export function _crashMazeActive() {
 // Toggles the charge-bar pause style (visual twin of the charge freeze).
 export function _crashSetChargePause(active) {
     const bar = document.getElementById('avatar-charge-fill');
-    if (bar) bar.classList.toggle('eg-charge-paused', !!active);
-    const alt = document.getElementById('eg-player-charge-bar');
-    if (alt) alt.classList.toggle('eg-charge-paused', !!active);
+    if (bar) bar.classList.toggle('sx-charge-paused', !!active);
+    const alt = document.getElementById('sx-player-charge-bar');
+    if (alt) alt.classList.toggle('sx-charge-paused', !!active);
 }
 
 // Card shield: amber/red "immune dome" over the boss while the maze runs,
 // so the long immunity is readable at a glance (same pattern as Snail).
 export function _crashMazeSetShield(on) {
     if (!_crashMaze) return;
-    const card = document.getElementById('eg-card-' + _crashMaze.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.toggle('eg-nk-shielded', !!on);
+    const card = document.getElementById('sx-card-' + _crashMaze.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.toggle('sx-nk-shielded', !!on);
 }
 
 // Arena rect for the maze: the puzzle grid inflated by a pad (falling back
@@ -662,13 +662,13 @@ export function _crashMazeStart(monster) {
             _crashMazeGo(g, monster);
             return;
         }
-        const num = g.overlay && g.overlay.querySelector('.eg-crash-cd-num');
+        const num = g.overlay && g.overlay.querySelector('.sx-crash-cd-num');
         if (num) {
             num.textContent = g.count;
             // Restart the pop animation on each tick.
-            num.classList.remove('eg-crash-cd-pop');
+            num.classList.remove('sx-crash-cd-pop');
             void num.offsetWidth;
-            num.classList.add('eg-crash-cd-pop');
+            num.classList.add('sx-crash-cd-pop');
         }
     }, CRASH_MAZE_CD_MS);
 }
@@ -738,9 +738,9 @@ export function _crashMazeGo(g, monster) {
 
     const ARROW = { up: '↑', down: '↓', right: '→', left: '←' };
     g.path.forEach((t, i) => {
-        const floorCls = 'eg-nk-dot eg-crash-floor'
-            + (i === 0 ? ' eg-crash-floor-start' : '')
-            + (i === g.path.length - 1 ? ' eg-crash-goal' : '');
+        const floorCls = 'sx-nk-dot sx-crash-floor'
+            + (i === 0 ? ' sx-crash-floor-start' : '')
+            + (i === g.path.length - 1 ? ' sx-crash-goal' : '');
         const floor = _nkEl(run, 'div', floorCls);
         floor.style.width = (g.P * 0.9) + 'px';
         floor.style.height = (g.P * 0.9) + 'px';
@@ -753,7 +753,7 @@ export function _crashMazeGo(g, monster) {
 
     g.walls.forEach(w => {
         const size = Math.max(52, Math.round(g.P * 0.62));
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-crash-wall', '💣');
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-crash-wall', '💣');
         el.style.width = size + 'px';
         el.style.height = size + 'px';
         el.style.transform = 'translate(' + Math.round(w.x - size / 2) + 'px,' + Math.round(w.y - size / 2) + 'px)';
@@ -766,13 +766,13 @@ export function _crashMazeGo(g, monster) {
     // removes it with everything else.
     const supStart = _crashSuperPos(g, 0);
     const supSize = Math.max(96, Math.round(g.P * CRASH_SUPER_SIZE_MULT));
-    const supEl = _nkEl(run, 'div', 'eg-crash-super eg-crash-super-falling', '💣');
+    const supEl = _nkEl(run, 'div', 'sx-crash-super sx-crash-super-falling', '💣');
     supEl.style.width = supSize + 'px';
     supEl.style.height = supSize + 'px';
     supEl.style.fontSize = Math.round(supSize * 0.94) + 'px';
     supEl.style.left = Math.round(supStart.x - supSize / 2) + 'px';
     supEl.style.top = Math.round(supStart.y - CRASH_SUPER_FALL_PX - supSize / 2) + 'px';
-    const supWarn = _nkEl(run, 'div', 'eg-crash-warn eg-crash-super-warn');
+    const supWarn = _nkEl(run, 'div', 'sx-crash-warn sx-crash-super-warn');
     const warnR = g.P * 1.35;
     supWarn.style.width = (warnR * 2) + 'px';
     supWarn.style.height = (warnR * 2) + 'px';
@@ -1047,8 +1047,8 @@ export function _crashSuperLand(g, level) {
     sup.rollPx = 0;
     if (sup.warn) { try { sup.warn.remove(); } catch (e) {} sup.warn = null; }
     if (sup.el) {
-        sup.el.classList.remove('eg-crash-super-falling');
-        sup.el.classList.add('eg-crash-super-armed');
+        sup.el.classList.remove('sx-crash-super-falling');
+        sup.el.classList.add('sx-crash-super-armed');
     }
     _crashSuperMove(g);
     _crashBoom(g.run, sup.fallX, sup.fallY, g.P * 0.95, 0, level, '');
@@ -1151,12 +1151,12 @@ export function _crashTeardown() {
 // Builds the 5…1 countdown overlay at the arena centre.
 export function _crashMazeShowOverlay(g) {
     const ov = document.createElement('div');
-    ov.className = 'eg-crash-cd';
-    ov.id = 'eg-crash-cd';
+    ov.className = 'sx-crash-cd';
+    ov.id = 'sx-crash-cd';
     ov.innerHTML =
-        '<div class="eg-crash-cd-label">💣 BOMB MAZE IN</div>' +
-        '<div class="eg-crash-cd-num eg-crash-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-crash-cd-hint">Run the corridor - the bombs detonate from the start!</div>';
+        '<div class="sx-crash-cd-label">💣 BOMB MAZE IN</div>' +
+        '<div class="sx-crash-cd-num sx-crash-cd-pop">' + g.count + '</div>' +
+        '<div class="sx-crash-cd-hint">Run the corridor - the bombs detonate from the start!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
     const r = g.region;
@@ -1168,7 +1168,7 @@ export function _crashMazeShowOverlay(g) {
 export function _crashMazeShowBanner(g) {
     const r = g.region;
     const banner = document.createElement('div');
-    banner.className = 'eg-crash-run-banner';
+    banner.className = 'sx-crash-run-banner';
     banner.textContent = '💣 BOMB MAZE - RUN!';
     document.body.appendChild(banner);
     banner.style.left = Math.round(r.cx) + 'px';
@@ -1176,7 +1176,7 @@ export function _crashMazeShowBanner(g) {
     g.banner = banner;
 
     const tint = document.createElement('div');
-    tint.className = 'eg-crash-maze-tint';
+    tint.className = 'sx-crash-maze-tint';
     document.body.appendChild(tint);
     g.tint = tint;
 }

@@ -38,12 +38,12 @@ const VISIBILITY_POLL_MS = 400;
 // only while an endgame fight is running, 'menu' whenever there is an avatar
 // on screen.
 const ACTION_BUTTONS = [
-    { id: 'attack', group: 'combat', action: 'eg-attack',    icon: '⚔️',    cls: 'touch-btn-big' },
-    { id: 'parry',  group: 'combat', action: 'eg-parry',     icon: '\u{1F6E1}️', cls: 'touch-btn-big' },
+    { id: 'attack', group: 'combat', action: 'sx-attack',    icon: '⚔️',    cls: 'touch-btn-big' },
+    { id: 'parry',  group: 'combat', action: 'sx-parry',     icon: '\u{1F6E1}️', cls: 'touch-btn-big' },
     { id: 'target', group: 'combat', action: 'cycle-target', icon: '\u{1F3AF}' },
-    { id: 'sp1',    group: 'special', action: 'eg-special',   icon: 'F' },
-    { id: 'sp2',    group: 'special', action: 'eg-special-2', icon: 'G' },
-    { id: 'sp3',    group: 'special', action: 'eg-special-3', icon: 'H' },
+    { id: 'sp1',    group: 'special', action: 'sx-special',   icon: 'F' },
+    { id: 'sp2',    group: 'special', action: 'sx-special-2', icon: 'G' },
+    { id: 'sp3',    group: 'special', action: 'sx-special-3', icon: 'H' },
     // The menu group stays small: pause is always there, the toggle opens
     // the rest (`collapsible`) as a row beside it.
     { id: 'menu',   group: 'menu',   toggle: true,              icon: '⋯' },

@@ -307,7 +307,7 @@
 
 /* Puzzle-item art inside win-overlay reward cards: same size as the emoji
    it replaces so the card layout never shifts. */
-.item-reward img.eg-art-img {
+.item-reward img.sx-art-img {
     width: 1.4em;
     height: 1.4em;
     object-fit: contain;

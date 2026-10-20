@@ -88,14 +88,14 @@ export function _jsTouch(pct, level, label) {
 // survives the run ending in the same frame).
 export function _jsConfetti(x, y, big) {
     const layer = document.createElement('div');
-    layer.className = 'eg-js-confetti' + (big ? ' eg-js-confetti-big' : '');
+    layer.className = 'sx-js-confetti' + (big ? ' sx-js-confetti-big' : '');
     layer.style.left = Math.round(x) + 'px';
     layer.style.top = Math.round(y) + 'px';
     document.body.appendChild(layer);
     const colors = ['#f472b6', '#facc15', '#4ade80', '#60a5fa', '#c084fc'];
     for (let i = 0; i < (big ? 14 : 8); i++) {
         const s = document.createElement('div');
-        s.className = 'eg-js-bit';
+        s.className = 'sx-js-bit';
         s.style.background = colors[Math.floor(Math.random() * colors.length)];
         const ang = Math.random() * Math.PI * 2;
         const dist = 18 + Math.random() * (big ? 84 : 46);
@@ -132,7 +132,7 @@ export function _mechJsOrbs(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const orbs = [];
     for (let i = 0; i < count; i++) {
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-orb-jester');
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-orb-jester');
         const a = Math.random() * Math.PI * 2;
         orbs.push({
             x: 60 + Math.random() * Math.max(60, W - 120),
@@ -155,9 +155,9 @@ export function _mechJsOrbs(monster, phase) {
                 o.vx = Math.cos(a) * speed;
                 o.vy = Math.sin(a) * speed;
                 o.hop = 320;
-                o.el.classList.remove('eg-js-orb-hop');
+                o.el.classList.remove('sx-js-orb-hop');
                 void o.el.offsetWidth;
-                o.el.classList.add('eg-js-orb-hop');
+                o.el.classList.add('sx-js-orb-hop');
             });
         }
         orbs.forEach(o => {
@@ -212,7 +212,7 @@ export function _mechJsCards(monster, phase) {
             const spread = (i - (n - 1) / 2) * 130;
             const tx = Math.max(60, Math.min(W - 60, aimX + spread + (Math.random() * 40 - 20)));
             const ty = Math.max(90, Math.min(H - 90, aimY + (Math.random() * 200 - 100)));
-            const el = _nkEl(run, 'div', 'eg-js-card', suits[Math.floor(Math.random() * 4)]);
+            const el = _nkEl(run, 'div', 'sx-js-card', suits[Math.floor(Math.random() * 4)]);
             const startX = i % 2 === 0 ? -70 : W + 70;
             const startY = 90 + Math.random() * 120;
             el.style.left = Math.round(startX) + 'px';
@@ -252,7 +252,7 @@ export function _mechJsCards(monster, phase) {
                     // from the card's own birth), so volley timing never
                     // drifts with when the volley was thrown.
                     c.until = age + lifeMs;
-                    c.el.classList.add('eg-js-card-stuck');
+                    c.el.classList.add('sx-js-card-stuck');
                     c.el.style.left = Math.round(c.tx) + 'px';
                     c.el.style.top = Math.round(c.ty) + 'px';
                     c.el.style.rotate = ((Math.random() * 2 - 1) * 26) + 'deg';
@@ -267,7 +267,7 @@ export function _mechJsCards(monster, phase) {
                     }
                 }
                 if (age >= c.until) {
-                    c.el.classList.add('eg-js-card-out');
+                    c.el.classList.add('sx-js-card-out');
                     cards.splice(i, 1);
                     const rm = setTimeout(() => { try { c.el.remove(); } catch (e2) {} }, 320);
                     run.timers.push(rm);
@@ -303,7 +303,7 @@ export function _mechJsJinx(monster, phase) {
     const turn = JS_ORBIT_TURN * (p >= 3 ? 1.25 : 1);
 
     const mk = (emoji, cls, speed) => {
-        const el = _nkEl(run, 'div', 'eg-js-ball ' + cls, emoji);
+        const el = _nkEl(run, 'div', 'sx-js-ball ' + cls, emoji);
         const side = Math.floor(Math.random() * 4);
         return {
             x: side === 0 ? 50 : side === 1 ? W - 50 : W * (0.2 + Math.random() * 0.6),
@@ -313,8 +313,8 @@ export function _mechJsJinx(monster, phase) {
     };
     const balls = [];
     const nJinx = p >= 3 ? 3 : 2;
-    for (let i = 0; i < nJinx; i++) balls.push(mk('🟣', 'eg-js-ball-jinx', jinxSpeed));
-    balls.push(mk('💛', 'eg-js-ball-luck', luckSpeed));
+    for (let i = 0; i < nJinx; i++) balls.push(mk('🟣', 'sx-js-ball-jinx', jinxSpeed));
+    balls.push(mk('💛', 'sx-js-ball-luck', luckSpeed));
 
     _nkToast('eg_mech_js_jinx', '🤹 The Jester: JUGGLER\u2019S JINX - grab the gold, dodge the purple!', '#e9d5ff');
 
@@ -447,9 +447,9 @@ export function _jsFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds curtain, cards and the show timeline.
@@ -458,14 +458,14 @@ export function _jsFinalStart(monster) {
 
     // The curtain drops.
     const curtain = document.createElement('div');
-    curtain.className = 'eg-js-curtain';
+    curtain.className = 'sx-js-curtain';
     document.body.appendChild(curtain);
     g.curtain = curtain;
-    requestAnimationFrame(() => curtain.classList.add('eg-js-curtain-on'));
+    requestAnimationFrame(() => curtain.classList.add('sx-js-curtain-on'));
 
     // The card table: an evenly spaced grid of face-down cards.
     const grid = document.createElement('div');
-    grid.className = 'eg-js-table';
+    grid.className = 'sx-js-table';
     document.body.appendChild(grid);
     g.gridEl = grid;
     g.fxRun.els.push(grid);
@@ -473,7 +473,7 @@ export function _jsFinalStart(monster) {
     for (let r = 0; r < JS_CARD_ROWS; r++) {
         for (let c2 = 0; c2 < JS_CARD_COLS; c2++) {
             const el = document.createElement('div');
-            el.className = 'eg-js-card eg-js-tablecard';
+            el.className = 'sx-js-card sx-js-tablecard';
             el.style.left = Math.round(padX + (W - 2 * padX) * c2 / (JS_CARD_COLS - 1) - JS_CARD_W / 2) + 'px';
             el.style.top = Math.round(padY + (H - 2 * padY) * r / (JS_CARD_ROWS - 1) - JS_CARD_H / 2) + 'px';
             grid.appendChild(el);
@@ -483,10 +483,10 @@ export function _jsFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-js-cd';
+    ov.className = 'sx-js-cd';
     ov.innerHTML =
-        '<div class="eg-js-cd-label">🎪 THE GRAND FINALE</div>' +
-        '<div class="eg-js-cd-hint">Read the reveal - stand on the safe suit!</div>';
+        '<div class="sx-js-cd-label">🎪 THE GRAND FINALE</div>' +
+        '<div class="sx-js-cd-hint">Read the reveal - stand on the safe suit!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -496,11 +496,11 @@ export function _jsFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss bows.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-js-bowing');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-js-bowing');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
@@ -519,21 +519,21 @@ export function _jsFinalStart(monster) {
         g.cards.forEach(cd => {
             const face = Math.random() < 0.34 ? safe : suits[Math.floor(Math.random() * suits.length)];
             cd.el.textContent = face;
-            cd.el.classList.toggle('eg-js-card-red', !!reds[face]);
-            cd.el.classList.remove('eg-js-card-safe');
-            if (face === safe) cd.el.classList.add('eg-js-card-faceup');
+            cd.el.classList.toggle('sx-js-card-red', !!reds[face]);
+            cd.el.classList.remove('sx-js-card-safe');
+            if (face === safe) cd.el.classList.add('sx-js-card-faceup');
         });
-        g.cards.forEach(cd => cd.el.classList.add('eg-js-card-dealt'));
+        g.cards.forEach(cd => cd.el.classList.add('sx-js-card-dealt'));
         _nkToast('eg_mech_js_reveal', '🎪 The reveal is coming - stand on the glowing suit!', '#e9d5ff');
         _jsAfter(g, () => {
             // REVEAL: cards flip down; the SAFE suit stays lit and judges.
             const pr = _nkPlayerRect();
             let onSafe = false;
             g.cards.forEach(cd => {
-                cd.el.classList.remove('eg-js-card-faceup');
-                cd.el.classList.add('eg-js-card-down');
+                cd.el.classList.remove('sx-js-card-faceup');
+                cd.el.classList.add('sx-js-card-down');
                 if (cd.el.textContent === safe) {
-                    cd.el.classList.add('eg-js-card-safe');
+                    cd.el.classList.add('sx-js-card-safe');
                     if (pr) {
                         const pc = { x: pr.left + pr.width / 2, y: pr.top + pr.height / 2 };
                         const cx = parseFloat(cd.el.style.left) + JS_CARD_W / 2;
@@ -547,7 +547,7 @@ export function _jsFinalStart(monster) {
                 _jsTouch(JS_REVEAL_DMG, level, 'Wrong Suit');
             }
             _jsAfter(g, () => {
-                g.cards.forEach(cd => cd.el.classList.remove('eg-js-card-safe', 'eg-js-card-down'));
+                g.cards.forEach(cd => cd.el.classList.remove('sx-js-card-safe', 'sx-js-card-down'));
                 show(idx + 1);
             }, __JS_DEBUG_SLOW ? 1400 : 700);
         }, charge);
@@ -564,17 +564,17 @@ export function _jsBlackout(g, monster, level) {
     const safeSuit = ['♠', '♥', '♦', '♣'][Math.floor(Math.random() * 4)];
     g.cards.forEach(cd => {
         cd.el.textContent = '🂠';
-        cd.el.classList.add('eg-js-card-down');
-        cd.el.classList.remove('eg-js-card-safe');
+        cd.el.classList.add('sx-js-card-down');
+        cd.el.classList.remove('sx-js-card-safe');
     });
     // Light up only the safe-suit columns (2 of 6 columns per row).
     const safeCols = new Set([Math.floor(Math.random() * 3), 3 + Math.floor(Math.random() * 3)]);
     const safeCells = [];
     g.cards.forEach(cd => {
         if (safeCols.has(cd.col)) {
-            cd.el.classList.add('eg-js-card-safe');
+            cd.el.classList.add('sx-js-card-safe');
             cd.el.textContent = safeSuit;
-            cd.el.classList.remove('eg-js-card-down');
+            cd.el.classList.remove('sx-js-card-down');
             safeCells.push(cd);
         }
     });
@@ -596,7 +596,7 @@ export function _jsBlackout(g, monster, level) {
         const fromLeft = Math.random() < 0.5;
         const bandH = 110;
         const warn = document.createElement('div');
-        warn.className = 'eg-js-sweepwarn';
+        warn.className = 'sx-js-sweepwarn';
         warn.style.left = '0px';
         warn.style.width = W + 'px';
         warn.style.top = Math.round(y - bandH / 2) + 'px';
@@ -609,7 +609,7 @@ export function _jsBlackout(g, monster, level) {
             try { warn.remove(); } catch (e) {}
             if (!_jsFinal || _jsFinal !== g || g.finished) return;
             const sweep = document.createElement('div');
-            sweep.className = 'eg-js-sweep' + (fromLeft ? ' eg-js-from-left' : ' eg-js-from-right');
+            sweep.className = 'sx-js-sweep' + (fromLeft ? ' sx-js-from-left' : ' sx-js-from-right');
             sweep.style.top = Math.round(y - bandH * 0.4) + 'px';
             sweep.style.height = Math.round(bandH * 0.8) + 'px';
             document.body.appendChild(sweep);
@@ -661,11 +661,11 @@ export function _jsFinalEnd(g) {
     g.sweepEls.forEach(el => { try { el.remove(); } catch (e) {} });
     g.sweepEls = [];
     if (g.fxRun) { try { _nkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
-    document.querySelectorAll('.eg-js-bowing').forEach(el => el.classList.remove('eg-js-bowing'));
+    document.querySelectorAll('.sx-js-bowing').forEach(el => el.classList.remove('sx-js-bowing'));
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -687,15 +687,15 @@ export function _jsFinalEnd(g) {
 // removes every run element, overlay and body class this boss ever created.
 export function _jsTeardown() {
     if (_jsFinal) { try { _jsFinalEnd(_jsFinal); } catch (e) {} _jsFinal = null; }
-    document.querySelectorAll('.eg-nk-orb-jester, .eg-js-card, .eg-js-ball, ' +
-        '.eg-js-curtain, .eg-js-table, .eg-js-cd, .eg-js-sweepwarn, .eg-js-sweep, ' +
-        '.eg-js-confetti').forEach(el => {
+    document.querySelectorAll('.sx-nk-orb-jester, .sx-js-card, .sx-js-ball, ' +
+        '.sx-js-curtain, .sx-js-table, .sx-js-cd, .sx-js-sweepwarn, .sx-js-sweep, ' +
+        '.sx-js-confetti').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-js-bowing').forEach(el => el.classList.remove('eg-js-bowing'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.querySelectorAll('.sx-js-bowing').forEach(el => el.classList.remove('sx-js-bowing'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

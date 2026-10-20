@@ -81,8 +81,8 @@ function _renderGoldDropOverlay(row, col, drop) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     const span = document.createElement('span');
-    span.className = `eg-pickup-overlay eg-pickup-rarity-legendary eg-gold-drop-overlay`;
-    span.id = `eg-gold-drop-${row}-${col}`;
+    span.className = `sx-pickup-overlay sx-pickup-rarity-legendary sx-gold-drop-overlay`;
+    span.id = `sx-gold-drop-${row}-${col}`;
     // Gold coin art (images/items/, id 'gold') when available, else emoji.
     GAME_ART.fillElement(span, 'item', 'gold', '🪙');
     el.appendChild(span);
@@ -91,7 +91,7 @@ function _renderGoldDropOverlay(row, col, drop) {
 // Takes the coin art off a grid cell.
 function _removeGoldDropOverlay(key) {
     const [r, c] = key.split('-').map(Number);
-    const span = document.getElementById(`eg-gold-drop-${r}-${c}`);
+    const span = document.getElementById(`sx-gold-drop-${r}-${c}`);
     if (span) span.remove();
 }
 
@@ -101,7 +101,7 @@ export function _animateGoldDropClaim(row, col, drop) {
     if (!el) return;
     const centre = typeof _getElementCentre === 'function' ? _getElementCentre(el) : { x: 0, y: 0 };
     const floater = document.createElement('div');
-    floater.className = 'eg-pickup-floater';
+    floater.className = 'sx-pickup-floater';
     GAME_ART.fillElement(floater, 'item', 'gold', '🪙');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
@@ -135,7 +135,7 @@ export function _spawnGoldDrop(amount) {
 
     const lifetimeMs = LOOT_DROP_LIFETIME_MS;
     if (typeof _scheduleTrackedExpiry === 'function') {
-        _scheduleTrackedExpiry(_goldDrops, key, drop, lifetimeMs, `eg-gold-drop-${r}-${c}`, _removeGoldDropOverlay);
+        _scheduleTrackedExpiry(_goldDrops, key, drop, lifetimeMs, `sx-gold-drop-${r}-${c}`, _removeGoldDropOverlay);
     } else {
         const timer = setTimeout(() => {
             if (_goldDrops.get(key) === drop) {
@@ -145,7 +145,7 @@ export function _spawnGoldDrop(amount) {
         }, lifetimeMs);
         if (typeof _pickupTimers !== 'undefined') globalThis._pickupTimers.push(timer);
         if (typeof _startDropExpireCountdown === 'function') {
-            _startDropExpireCountdown(`eg-gold-drop-${r}-${c}`, lifetimeMs);
+            _startDropExpireCountdown(`sx-gold-drop-${r}-${c}`, lifetimeMs);
         }
     }
     return true;

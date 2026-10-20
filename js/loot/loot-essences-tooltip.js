@@ -25,19 +25,19 @@ export function _buildEssenceDetailHTML(def) {
         return slotType.charAt(0).toUpperCase() + slotType.slice(1);
     };
     const isDe = (typeof LANG !== 'undefined' && LANG === 'de');
-    let html = '<div class="eg-tt-section eg-tt-essence-detail">';
+    let html = '<div class="sx-tt-section sx-tt-essence-detail">';
     const titleMod = isDe ? 'Garantierter Modifikator:' : 'Guaranteed modifier:';
-    html += `<div class="eg-tt-essence-title">${titleMod}</div>`;
-    html += `<div class="eg-tt-essence-line"><span class="eg-tt-essence-mod" style="font-size:0.92rem;">${modName}</span></div>`;
+    html += `<div class="sx-tt-essence-title">${titleMod}</div>`;
+    html += `<div class="sx-tt-essence-line"><span class="sx-tt-essence-mod" style="font-size:0.92rem;">${modName}</span></div>`;
 
     const titleSlots = isDe ? 'Funktioniert auf:' : 'Works on:';
     if (slotTypes.length > 0) {
         const slotsStr = slotTypes.map(slotLabel).join(', ');
-        html += `<div class="eg-tt-essence-title" style="margin-top:6px;">${titleSlots}</div>`;
-        html += `<div class="eg-tt-essence-line"><span class="eg-tt-essence-slots">${slotsStr}</span></div>`;
+        html += `<div class="sx-tt-essence-title" style="margin-top:6px;">${titleSlots}</div>`;
+        html += `<div class="sx-tt-essence-line"><span class="sx-tt-essence-slots">${slotsStr}</span></div>`;
     } else {
         const noneStr = isDe ? 'Keine kompatiblen Basen gefunden' : 'No compatible bases found';
-        html += `<div class="eg-tt-essence-line"><span class="eg-tt-essence-slots" style="color:#e74c3c;">${noneStr}</span></div>`;
+        html += `<div class="sx-tt-essence-line"><span class="sx-tt-essence-slots" style="color:#e74c3c;">${noneStr}</span></div>`;
     }
 
     // Item level the target item must have for the modifier to be able to roll.
@@ -45,8 +45,8 @@ export function _buildEssenceDetailHTML(def) {
     if (range) {
         const lvl = range.min === range.max ? `${range.min}+` : `${range.min}+ (${range.min}–${range.max})`;
         const titleIlvl = isDe ? 'Benötigtes Itemlevel:' : 'Required item level:';
-        html += `<div class="eg-tt-essence-title" style="margin-top:6px;">${titleIlvl}</div>`;
-        html += `<div class="eg-tt-essence-line"><span class="eg-tt-essence-slots">${lvl}</span></div>`;
+        html += `<div class="sx-tt-essence-title" style="margin-top:6px;">${titleIlvl}</div>`;
+        html += `<div class="sx-tt-essence-line"><span class="sx-tt-essence-slots">${lvl}</span></div>`;
     }
 
     html += '</div>';

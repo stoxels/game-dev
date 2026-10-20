@@ -15,7 +15,7 @@ import { setPuzzleMonsterRoom } from '../grid-scaling.js';
 // What remains:
 //   - _roamShouldRoam() always returns false so _renderMonstersIntoZones
 //     keeps every normal monster in its static panel.
-//   - _roamSync/_roamTeardown only clear the legacy #eg-roam-layer (old
+//   - _roamSync/_roamTeardown only clear the legacy #sx-roam-layer (old
 //     saves / cached DOM) and stop the driver.
 //   - _tryMonsterMeleeSidestep() is the ONLY movement left: an occasional,
 //     melee-triggered sidestep to a different zone panel. Called from
@@ -26,7 +26,7 @@ import { setPuzzleMonsterRoom } from '../grid-scaling.js';
 // Loads AFTER endgame-encounter.js (calls its render helpers; encounter.js
 // calls back into _roamShouldRoam/_roamSync/_roamTeardown guarded).
 
-const ROAM_LAYER_ID = 'eg-roam-layer';
+const ROAM_LAYER_ID = 'sx-roam-layer';
 
 // Minimum time between two sidesteps of the SAME monster (ms). Keeps the
 // behaviour occasional even when the player machine-guns E.
@@ -52,7 +52,7 @@ export function _roamShouldRoam(m) {
     return false;
 }
 
-// Legacy layer cleanup. The patrol owned #eg-roam-layer; it may still exist
+// Legacy layer cleanup. The patrol owned #sx-roam-layer; it may still exist
 // in a running session after this patch. Empty it so no ghost cards linger.
 function _roamClearLegacyLayer() {
     try {
@@ -127,7 +127,7 @@ export function _tryMonsterMeleeSidestep(targetId) {
         if (m._spawnedAt && (now - m._spawnedAt) < SIDESTEP_SPAWN_GRACE_MS) return;
         const chance = _monsterSidestepChance(m);
         if (!(chance > 0) || Math.random() >= chance) return;
-        const fromZone = m.zoneId || 'eg-monster-panel';
+        const fromZone = m.zoneId || 'sx-monster-panel';
         const toZone = _pickSidestepZone(m, fromZone);
         if (!toZone || toZone === fromZone) return;
         m.zoneId = toZone;
@@ -144,9 +144,9 @@ export function _tryMonsterMeleeSidestep(targetId) {
             }
         } catch (e) {}
         try {
-            const card = document.getElementById('eg-card-' + m.id);
+            const card = document.getElementById('sx-card-' + m.id);
             if (card && typeof _restartFlashClass === 'function') {
-                _restartFlashClass(card, 'eg-flash-cleave');
+                _restartFlashClass(card, 'sx-flash-cleave');
             }
         } catch (e) {}
     } catch (e) {}
@@ -163,25 +163,25 @@ export function _tryMonsterMeleeSidestep(targetId) {
 //   left / right  = the margins beside the table
 //   top / bottom  = the bands above / below the table
 // A zone with no room for even one card is switched off (data-eg-cap="0")
-// and is never picked for a spawn. #eg-monster-panel (bottom-right dock)
+// and is never picked for a spawn. #sx-monster-panel (bottom-right dock)
 // stays the tutorial's dock and the last-resort fallback.
 
 const ZONE_GAP = 16;                       // clear space between cards and the puzzle table
 const ZONE_EDGE = 8;                       // clear space to the screen edge
 // Card model: art frame is R px wide (96 * artScale; bosses 144 * artScale), the
 // card adds ~20px of side margin and ~66px of bars / badges below the art.
-// Zones shrink their cards (--eg-zs) down to ZONE_MIN_SCALE to fit.
+// Zones shrink their cards (--sx-zs) down to ZONE_MIN_SCALE to fit.
 const ZONE_ART_DEFAULT = 125;
 const ZONE_CARD_PAD_W = 20;
 const ZONE_CARD_PAD_H = 66;
 const ZONE_MIN_SCALE = 0.55;
 const ZONE_MIN_SLOTS = 3;      // fewer card slots than this around the grid -> shrink the grid a little
-const ZONE_FALLBACK = 'eg-monster-panel';
+const ZONE_FALLBACK = 'sx-monster-panel';
 const ZONE_REGIONS = {
-    left: 'eg-panel-left',
-    right: 'eg-panel-right',
-    top: 'eg-panel-top-corner',
-    bottom: 'eg-panel-bottom'
+    left: 'sx-panel-left',
+    right: 'sx-panel-right',
+    top: 'sx-panel-top-corner',
+    bottom: 'sx-panel-bottom'
 };
 // Fixed HUD block in the top-left corner (timer, mistakes, CLUES buttons).
 const ZONE_TOPLEFT_HUD = { l: 0, t: 0, r: 272, b: 98 };
@@ -307,7 +307,7 @@ function _applyZoneRegion(key, reg, refArt) {
     // Hug the puzzle-table side of each region.
     st.alignContent = hug;
     st.alignItems = hug;
-    st.setProperty('--eg-zs', String(scale));
+    st.setProperty('--sx-zs', String(scale));
     return cap;
 }
 

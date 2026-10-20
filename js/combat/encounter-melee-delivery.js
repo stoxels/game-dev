@@ -33,7 +33,7 @@ export function _meleeDeliveryAvailable(targetId) {
         if (typeof document === 'undefined') return false;
         if (_meleeReducedMotion()) return false;
         const avatar = document.getElementById('player-avatar-wrapper');
-        const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
+        const card = (targetId != null) ? document.getElementById(`sx-card-${targetId}`) : null;
         if (!avatar || !card) return false;
         if (typeof avatar.animate !== 'function') return false;
         return true;
@@ -67,7 +67,7 @@ let _meleeParkedOffset = { x: 0, y: 0 };
 function _meleeFlyLeg(targetId, durationMs, arc, scale) {
     try {
         const avatar = document.getElementById('player-avatar-wrapper');
-        const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
+        const card = (targetId != null) ? document.getElementById(`sx-card-${targetId}`) : null;
         if (!avatar || !card || typeof avatar.animate !== 'function') return Promise.resolve();
         _meleeSnapAvatar();
         const a = _getElementCentre(avatar);
@@ -136,7 +136,7 @@ export function _meleeDashOut(targetId) {
     Audio_Manager.playSFX('art_dash_strike');
     try {
         const avatar = document.getElementById('player-avatar-wrapper');
-        const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
+        const card = (targetId != null) ? document.getElementById(`sx-card-${targetId}`) : null;
         if (!avatar || !card) return Promise.resolve();
         const a = _getElementCentre(avatar);
         const b = _getElementCentre(card);

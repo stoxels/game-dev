@@ -135,30 +135,30 @@ export function _massSellCounts() {
 _loadMassSellSettings();
 
 export function _buildItemChipHTML(item, size = 'normal') {
-    const rarityClass = item.rarity ? `eg-rarity-${item.rarity}` : '';
-    const sizeClass = size === 'large' ? 'eg-item-chip-large' : '';
+    const rarityClass = item.rarity ? `sx-rarity-${item.rarity}` : '';
+    const sizeClass = size === 'large' ? 'sx-item-chip-large' : '';
     // Items whose stat requirements cannot currently be met get a red flag
     // (see _isItemBlocked in endgame-requirements.js).
-    const blockedClass = _isItemBlocked(item) ? 'eg-req-blocked' : '';
+    const blockedClass = _isItemBlocked(item) ? 'sx-req-blocked' : '';
     // Equipment items show either item level or required character level in the top-left corner of the slot.
     const itemLevel = item.itemLevel;
     const reqLevel = (item.requirements && item.requirements.level != null) ? item.requirements.level : item.itemLevel;
     const showLevel = _showItemLevel ? itemLevel : reqLevel;
     const ilvlBadge = (item.category === 'equip' && showLevel != null)
-        ? `<span class="eg-item-ilvl">${showLevel}</span>`
+        ? `<span class="sx-item-ilvl">${showLevel}</span>`
         : '';
     // Map items show their map tier instead.
     const mapTierBadge = (item.category === 'map' && item.mapTier != null)
-        ? `<span class="eg-item-ilvl eg-map-tier-badge">${item.mapTier}</span>`
+        ? `<span class="sx-item-ilvl eg-map-tier-badge">${item.mapTier}</span>`
         : '';
-    const chipId = `egchip-${++_chipCounter}`;
+    const chipId = `sx-chip-${++_chipCounter}`;
     _chipRegistry.set(chipId, item);
     // Map items share one baseId ('atlas_map') - the art system resolves
     // the tier-specific art (map_tNN) for them.
     const artId = GAME_ART.artIdForItem(item);
 
     return `
-<div class="eg-item-chip ${rarityClass} ${sizeClass} ${blockedClass}"
+<div class="sx-item-chip ${rarityClass} ${sizeClass} ${blockedClass}"
      id="${chipId}"
      onmousedown="_handleChipMouseDown(event, '${chipId}')"
      onmouseenter="_showTooltipFromChip('${chipId}', event)"
@@ -166,8 +166,8 @@ export function _buildItemChipHTML(item, size = 'normal') {
      onmouseleave="_clearTooltip()">
     ${ilvlBadge}
     ${mapTierBadge}
-    <span class="eg-item-chip-icon">${GAME_ART.html('item', artId, item.icon || '📦')}</span>
-    <span class="eg-item-chip-name">${item.name || '???'}</span>
+    <span class="sx-item-chip-icon">${GAME_ART.html('item', artId, item.icon || '📦')}</span>
+    <span class="sx-item-chip-name">${item.name || '???'}</span>
 </div>`;
 }
 

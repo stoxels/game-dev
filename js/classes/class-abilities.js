@@ -668,8 +668,8 @@ function _spawnHeartbloomHearts(count) {
                 if (typeof globalThis._renderPickupOverlay === 'function') globalThis._renderPickupOverlay(r, c, def);
                 const lifetime = (typeof globalThis.PICKUP_LIFETIME_MS !== 'undefined') ? globalThis.PICKUP_LIFETIME_MS : 20000;
                 if (typeof globalThis._scheduleTrackedExpiry === 'function') {
-                    globalThis._scheduleTrackedExpiry(globalThis._pickups, key, def, lifetime, `eg-pickup-${r}-${c}`, (typeof globalThis._removePickupOverlay === 'function') ? globalThis._removePickupOverlay : () => {
-                        const span = document.getElementById(`eg-pickup-${r}-${c}`); if (span) span.remove();
+                    globalThis._scheduleTrackedExpiry(globalThis._pickups, key, def, lifetime, `sx-pickup-${r}-${c}`, (typeof globalThis._removePickupOverlay === 'function') ? globalThis._removePickupOverlay : () => {
+                        const span = document.getElementById(`sx-pickup-${r}-${c}`); if (span) span.remove();
                     });
                 } else if (typeof globalThis._schedulePickupExpiry === 'function') {
                     globalThis._schedulePickupExpiry(key, def);
@@ -680,8 +680,8 @@ function _spawnHeartbloomHearts(count) {
                 const el = document.getElementById(`g-${r}-${c}`);
                 if (el) {
                     const span = document.createElement('span');
-                    span.className = 'eg-pickup-overlay';
-                    span.id = `eg-pickup-${r}-${c}`;
+                    span.className = 'sx-pickup-overlay';
+                    span.id = `sx-pickup-${r}-${c}`;
                     span.textContent = def.emoji || '💚';
                     el.appendChild(span);
                 }

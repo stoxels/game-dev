@@ -85,7 +85,7 @@ const AIL_PLAYER_FIRE_DROP_INTERVAL_MS = 1000;
 const AIL_PLAYER_GROUND_DURATION_MS = 5000;
 const AIL_PLAYER_FIRE_GROUND_DMG_PCT = 8;   // % of playerMaxHP per second while standing in burning ground (fire resistance mitigates)
 const AIL_PLAYER_FIRE_GROUND_TICK_S = 1.0;
-const AIL_PLAYER_FIRE_RADIUS_PX = 41;       // matches .eg-player-ground-fire 82px circle
+const AIL_PLAYER_FIRE_RADIUS_PX = 41;       // matches .sx-player-ground-fire 82px circle
 const AIL_PLAYER_SHADOW_RADIUS_PX = 55;     // approximate radius for shadow cloud (150x85 ellipse)
 
 const MONSTER_AILMENT_CHANCE_PCT = 15;     // monster hit → player ailment
@@ -410,10 +410,10 @@ function _applyPlayerAilment(key, dps) {
 
 // Creates (or returns) the shared player status bar container.
 function _ensurePlayerStatusBar() {
-    let bar = document.getElementById('eg-player-status-bar');
+    let bar = document.getElementById('sx-player-status-bar');
     if (!bar) {
         bar = document.createElement('div');
-        bar.id = 'eg-player-status-bar';
+        bar.id = 'sx-player-status-bar';
         document.body.appendChild(bar);
     }
     return bar;
@@ -430,7 +430,7 @@ function _renderPlayerAilmentChips() {
     if (!_isActive()) { _stopPlayerStatusBarTicker(); return; }
     _syncAilmentBanners();
 
-    const bar = document.getElementById('eg-player-status-bar');
+    const bar = document.getElementById('sx-player-status-bar');
     if (!bar) {
         if (!Object.keys(_playerStatuses).length) { _stopPlayerStatusBarTicker(); return; }
         _ensurePlayerStatusBar();
@@ -442,7 +442,7 @@ function _renderPlayerAilmentChips() {
     for (const key of Object.keys(_playerStatuses)) {
         const st = _playerStatuses[key];
         const remainingMs = st.until - now;
-        let chip = document.getElementById(`eg-status-ail-${key}`);
+        let chip = document.getElementById(`sx-status-ail-${key}`);
 
         if (remainingMs <= 0) {
             if (chip) chip.remove();
@@ -452,19 +452,19 @@ function _renderPlayerAilmentChips() {
 
         if (!chip) {
             chip = document.createElement('div');
-            chip.id = `eg-status-ail-${key}`;
-            chip.className = `eg-status-chip eg-status-chip-${key}`;
+            chip.id = `sx-status-ail-${key}`;
+            chip.className = `sx-status-chip sx-status-chip-${key}`;
             chip.setAttribute('data-tip', globalThis._tipAttr(_playerAilmentTip(key)));
             chip.innerHTML = `
-                <div class="eg-lockout-icon">${AILMENT_ICONS[key] || ''}</div>
-                <div class="eg-lockout-countdown"></div>`;
+                <div class="sx-lockout-icon">${AILMENT_ICONS[key] || ''}</div>
+                <div class="sx-lockout-countdown"></div>`;
             bar.appendChild(chip);
         }
-        const cd = chip.querySelector('.eg-lockout-countdown');
+        const cd = chip.querySelector('.sx-lockout-countdown');
         if (cd) cd.textContent = `${Math.ceil(remainingMs / 1000)}`;
     }
 
-    if (!anyActive && !document.getElementById('eg-block-lockout-overlay')) {
+    if (!anyActive && !document.getElementById('sx-block-lockout-overlay')) {
         _stopPlayerStatusBarTicker();
     }
 }
@@ -474,9 +474,9 @@ function _stopPlayerStatusBarTicker() {
         clearInterval(_playerStatusBarTicker);
         _setPlayerStatusBarTicker(null);
     }
-    const bar = document.getElementById('eg-player-status-bar');
+    const bar = document.getElementById('sx-player-status-bar');
     if (bar) bar.remove();
-    const banners = document.getElementById('eg-ail-banners');
+    const banners = document.getElementById('sx-ail-banners');
     if (banners) banners.remove();
     _syncPlayerSpriteFx([]);
 }
@@ -922,7 +922,7 @@ function _dealPlayerDotDamage(rawAmount, ignoreShield, dotKeys) {
     const hud = document.getElementById('player-avatar-wrapper');
     if (hud && amount > 0) {
         const label = document.createElement('div');
-        label.className = 'eg-player-damage eg-dot-damage';
+        label.className = 'sx-player-damage sx-dot-damage';
         label.textContent = `-${amount}`;
         hud.appendChild(label);
         setTimeout(() => label.remove(), 1500);
@@ -1054,36 +1054,36 @@ function _buildStatusIconsHTML(statusMap) {
         .map(key => {
             // Crimson Dance stacks: show the stack count on the bleed chip.
             const stacks = (key === 'bleed' && statusMap[key].stacks > 1) ? `×${statusMap[key].stacks} ` : '';
-            return `<span class="eg-status-icon st-${key}" data-tip="${globalThis._tipAttr(_ailmentLabel(key))}">${AILMENT_ICONS[key] || '?'}${stacks}${Math.ceil((statusMap[key].until - now) / 1000)}</span>`;
+            return `<span class="sx-status-icon st-${key}" data-tip="${globalThis._tipAttr(_ailmentLabel(key))}">${AILMENT_ICONS[key] || '?'}${stacks}${Math.ceil((statusMap[key].until - now) / 1000)}</span>`;
         })
         .join('');
 }
 
 // Ailment key -> card class driving the big on-monster effect (CSS:
-// .eg-ail-* in css/endgame/monsters.css). Flames, lightning, frost... so the
+// .sx-ail-* in css/endgame/monsters.css). Flames, lightning, frost... so the
 // state reads at a glance without hunting for the small status chip.
 const AILMENT_CARD_FX = {
-    ignite: 'eg-ail-ignite', shocked: 'eg-ail-shocked', chill: 'eg-ail-chill',
-    frozen: 'eg-ail-frozen', shadowburn: 'eg-ail-shadowburn', poison: 'eg-ail-poison',
-    polymorph: 'eg-ail-polymorph', bleed: 'eg-bleeding',
+    ignite: 'sx-ail-ignite', shocked: 'sx-ail-shocked', chill: 'sx-ail-chill',
+    frozen: 'sx-ail-frozen', shadowburn: 'sx-ail-shadowburn', poison: 'sx-ail-poison',
+    polymorph: 'sx-ail-polymorph', bleed: 'sx-bleeding',
 };
 const AILMENT_FX_HTML =
-    '<i class="eg-fx-flame f1">🔥</i><i class="eg-fx-flame f2">🔥</i><i class="eg-fx-flame f3">🔥</i>'
-    + '<i class="eg-fx-flame f4">🔥</i><i class="eg-fx-flame f5">🔥</i>'
-    + '<i class="eg-fx-zap z1">⚡</i><i class="eg-fx-zap z2">⚡</i><i class="eg-fx-zap z3">⚡</i><i class="eg-fx-zap z4">⚡</i>'
-    + '<i class="eg-fx-frost r1">❄</i><i class="eg-fx-frost r2">❄</i><i class="eg-fx-frost r3">❄</i>'
-    + '<i class="eg-fx-wisp w1"></i><i class="eg-fx-wisp w2"></i><i class="eg-fx-wisp w3"></i>';
+    '<i class="sx-fx-flame f1">🔥</i><i class="sx-fx-flame f2">🔥</i><i class="sx-fx-flame f3">🔥</i>'
+    + '<i class="sx-fx-flame f4">🔥</i><i class="sx-fx-flame f5">🔥</i>'
+    + '<i class="sx-fx-zap z1">⚡</i><i class="sx-fx-zap z2">⚡</i><i class="sx-fx-zap z3">⚡</i><i class="sx-fx-zap z4">⚡</i>'
+    + '<i class="sx-fx-frost r1">❄</i><i class="sx-fx-frost r2">❄</i><i class="sx-fx-frost r3">❄</i>'
+    + '<i class="sx-fx-wisp w1"></i><i class="sx-fx-wisp w2"></i><i class="sx-fx-wisp w3"></i>';
 
 // Per-monster icon strip - cheap DOM update driven by _updateMonsterBars.
 function _renderMonsterStatusStrip(m) {
     if (!m || !m.statuses) return;
-    const strip = document.getElementById(`eg-status-${m.id}`);
+    const strip = document.getElementById(`sx-status-${m.id}`);
     if (!strip) return;
     const sig = _statusSignature(m.statuses);
     if (strip.dataset.sig === sig) return;
     strip.dataset.sig = sig;
     strip.innerHTML = _buildStatusIconsHTML(m.statuses);
-    const card = document.getElementById(`eg-card-${m.id}`);
+    const card = document.getElementById(`sx-card-${m.id}`);
     if (card) {
         const now = Date.now();
         Object.keys(AILMENT_CARD_FX).forEach(key => {
@@ -1092,10 +1092,10 @@ function _renderMonsterStatusStrip(m) {
         });
         // Overlay for the animated flames/sparks/frost, parked inside the art
         // frame so it follows the monster's size (flames sit on its bottom edge).
-        const wrap = card.querySelector('.eg-emoji-wrapper');
-        if (wrap && !wrap.querySelector(':scope > .eg-ail-fx')) {
+        const wrap = card.querySelector('.sx-emoji-wrapper');
+        if (wrap && !wrap.querySelector(':scope > .sx-ail-fx')) {
             const fx = document.createElement('div');
-            fx.className = 'eg-ail-fx';
+            fx.className = 'sx-ail-fx';
             fx.innerHTML = AILMENT_FX_HTML;
             wrap.appendChild(fx);
         }
@@ -1105,13 +1105,13 @@ function _renderMonsterStatusStrip(m) {
 // Player icon strip above the avatar - created lazily, refreshed per tick.
 function _refreshPlayerStatusIcons() {
     if (!_isActive()) return;
-    let strip = document.getElementById('eg-player-status-strip');
+    let strip = document.getElementById('sx-player-status-strip');
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     if (!strip) {
         strip = document.createElement('div');
-        strip.id = 'eg-player-status-strip';
-        strip.className = 'eg-status-strip eg-player-status-strip';
+        strip.id = 'sx-player-status-strip';
+        strip.className = 'sx-status-strip sx-player-status-strip';
         hud.appendChild(strip);
     }
     // Support-spell buffs (js/skills/universal-spells.js) share this strip:
@@ -1130,7 +1130,7 @@ function _refreshPlayerStatusIcons() {
 // Big readable ailment banners above the player sprite. One banner per active
 // timed ailment, stacked upward (soonest-ending nearest the sprite), each with
 // a bar that drains right-to-left as the effect runs out. Driven by the
-// 100 ms status ticker; layout/animation is pure CSS (.eg-ail-banner*).
+// 100 ms status ticker; layout/animation is pure CSS (.sx-ail-banner*).
 const AIL_BANNER_TEXT = {
     ignite: 'BURNING', bleed: 'BLEEDING', poison: 'POISONED', chill: 'CHILLED',
     frozen: 'FROZEN', shocked: 'SHOCKED', shadowburn: 'SHADOW BURN', shadow: 'BLINDED',
@@ -1142,10 +1142,10 @@ const AIL_BANNER_STEP_PX = 40;     // banner height + gap (keep in sync with CSS
 function _syncAilmentBanners() {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
-    let box = document.getElementById('eg-ail-banners');
+    let box = document.getElementById('sx-ail-banners');
     if (!box) {
         box = document.createElement('div');
-        box.id = 'eg-ail-banners';
+        box.id = 'sx-ail-banners';
         hud.appendChild(box);
     }
     const now = Date.now();
@@ -1157,7 +1157,7 @@ function _syncAilmentBanners() {
     const hidden = live.length - shown.length;
 
     // Retire banners whose ailment ended (fade out, then remove).
-    box.querySelectorAll('.eg-ail-banner:not(.leaving)').forEach(el => {
+    box.querySelectorAll('.sx-ail-banner:not(.leaving)').forEach(el => {
         if (shown.includes(el.dataset.key)) return;
         el.classList.add('leaving');
         setTimeout(() => el.remove(), 320);
@@ -1165,13 +1165,13 @@ function _syncAilmentBanners() {
 
     shown.forEach((key, idx) => {
         const st = _playerStatuses[key];
-        let el = box.querySelector(`.eg-ail-banner[data-key="${key}"]:not(.leaving)`);
+        let el = box.querySelector(`.sx-ail-banner[data-key="${key}"]:not(.leaving)`);
         if (!el) {
             el = document.createElement('div');
-            el.className = `eg-ail-banner eg-ail-banner-${key}`;
+            el.className = `sx-ail-banner sx-ail-banner-${key}`;
             el.dataset.key = key;
-            el.innerHTML = '<div class="eg-ail-banner-bar"></div>'
-                + `<div class="eg-ail-banner-text"><span class="eg-ail-banner-icon">${AILMENT_ICONS[key] || ''}</span><span class="eg-ail-banner-label"></span>${key === 'bleed' ? `<span class="eg-ail-banner-sub">x${AIL_BLEED_MOVING_MULT} MOVING</span>` : ''}</div>`;
+            el.innerHTML = '<div class="sx-ail-banner-bar"></div>'
+                + `<div class="sx-ail-banner-text"><span class="sx-ail-banner-icon">${AILMENT_ICONS[key] || ''}</span><span class="sx-ail-banner-label"></span>${key === 'bleed' ? `<span class="sx-ail-banner-sub">x${AIL_BLEED_MOVING_MULT} MOVING</span>` : ''}</div>`;
             box.appendChild(el);
         }
         el.style.transform = `translateY(${-idx * AIL_BANNER_STEP_PX}px)`;
@@ -1180,17 +1180,17 @@ function _syncAilmentBanners() {
         el.firstChild.style.width = `${Math.max(0, Math.min(100, remaining / total * 100)).toFixed(1)}%`;
         const stacks = st.stacks > 1 ? ` ×${st.stacks}` : '';
         // Bleed: pulse while the hero moves (the x3 damage is live).
-        if (key === 'bleed') el.classList.toggle('eg-ail-moving', _isAvatarMoving());
-        const label = el.querySelector('.eg-ail-banner-label');
+        if (key === 'bleed') el.classList.toggle('sx-ail-moving', _isAvatarMoving());
+        const label = el.querySelector('.sx-ail-banner-label');
         const text = AIL_BANNER_TEXT[key] + stacks;
         if (label.textContent !== text) label.textContent = text;
     });
 
-    let more = box.querySelector('.eg-ail-banner-more');
+    let more = box.querySelector('.sx-ail-banner-more');
     if (hidden > 0) {
         if (!more) {
             more = document.createElement('div');
-            more.className = 'eg-ail-banner-more';
+            more.className = 'sx-ail-banner-more';
             box.appendChild(more);
         }
         more.textContent = `+${hidden}`;
@@ -1202,11 +1202,11 @@ function _syncAilmentBanners() {
 
 // On-sprite ailment visuals: the same flames / sparks / frost / wisps the
 // monsters get, on a fixed layer that follows the hero sprite (rAF while any
-// effect is live), plus a colour tint on the sprite itself (.eg-spr-<key>).
+// effect is live), plus a colour tint on the sprite itself (.sx-spr-<key>).
 const PLAYER_FX_KEYS = {
-    ignite: 'eg-ail-ignite', shocked: 'eg-ail-shocked', chill: 'eg-ail-chill', frozen: 'eg-ail-frozen',
-    shadowburn: 'eg-ail-shadowburn', poison: 'eg-ail-poison', polymorph: 'eg-ail-polymorph',
-    bleed: 'eg-bleeding', stunned: 'eg-ail-stunned',
+    ignite: 'sx-ail-ignite', shocked: 'sx-ail-shocked', chill: 'sx-ail-chill', frozen: 'sx-ail-frozen',
+    shadowburn: 'sx-ail-shadowburn', poison: 'sx-ail-poison', polymorph: 'sx-ail-polymorph',
+    bleed: 'sx-bleeding', stunned: 'sx-ail-stunned',
 };
 let _playerFxLayer = null;
 let _playerFxRaf = null;
@@ -1240,7 +1240,7 @@ function _syncPlayerSpriteFx(liveKeys) {
     if (sig === _playerFxActive.join(',')) return;
     _playerFxActive = keys;
     _playerSpriteImgs().forEach(img => {
-        Object.keys(PLAYER_FX_KEYS).forEach(k => img.classList.toggle('eg-spr-' + k, keys.includes(k)));
+        Object.keys(PLAYER_FX_KEYS).forEach(k => img.classList.toggle('sx-spr-' + k, keys.includes(k)));
     });
     if (!keys.length) {
         if (_playerFxLayer) { _playerFxLayer.remove(); _playerFxLayer = null; }
@@ -1248,9 +1248,9 @@ function _syncPlayerSpriteFx(liveKeys) {
     }
     if (!_playerFxLayer) {
         const layer = document.createElement('div');
-        layer.id = 'eg-player-ail-fx';
-        layer.className = 'eg-player-ail-fx';
-        layer.innerHTML = '<div class="eg-ail-fx">' + AILMENT_FX_HTML + '<i class="eg-fx-star s1">✦</i><i class="eg-fx-star s2">✦</i><i class="eg-fx-star s3">✦</i></div>';
+        layer.id = 'sx-player-ail-fx';
+        layer.className = 'sx-player-ail-fx';
+        layer.innerHTML = '<div class="sx-ail-fx">' + AILMENT_FX_HTML + '<i class="sx-fx-star s1">✦</i><i class="sx-fx-star s2">✦</i><i class="sx-fx-star s3">✦</i></div>';
         document.body.appendChild(layer);
         _playerFxLayer = layer;
     }
@@ -1288,7 +1288,7 @@ function _dropPlayerGround(type) {
     const r = _getPlayerRectForAilment();
     if (!r) return;
     const el = document.createElement('div');
-    el.className = `eg-player-ground eg-player-ground-${type}`;
+    el.className = `sx-player-ground sx-player-ground-${type}`;
     el.style.left = `${r.left + r.width / 2}px`;
     el.style.top = `${r.top + r.height / 2}px`;
     document.body.appendChild(el);

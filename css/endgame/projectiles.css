@@ -7,19 +7,19 @@
    onto the atan2 flight vector, so projectiles always aim at their target.
 
    Layout contract per shape:
-     .eg-projectile.eg-built  → 44x28 root, centred on its position point
+     .sx-projectile.sx-built  → 44x28 root, centred on its position point
      .egp                     → absolute inset:0 canvas for the shape parts
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── Root sizing / centering ─────────────────────────────────────────────── */
-.eg-projectile.eg-built {
+.sx-projectile.sx-built {
     font-size: 0;
     text-shadow: none;
     width: 44px;
     height: 28px;
 }
 
-.eg-projectile.eg-built:not(.eg-proj-charging) {
+.sx-projectile.sx-built:not(.sx-proj-charging) {
     margin-left: -22px; /* centre the fixed-size box on its position point */
     margin-top: -14px;
 }
@@ -31,11 +31,11 @@
 
 /* Continuous inner tumble (outlier star / random-walker die). Applied to an
    INNER element so the outer transform stays aimed along the flight vector. */
-.egp-spin {
-    animation: egp-spin var(--egp-spin-ms, 800ms) linear infinite;
+.sx-projfx-spin {
+    animation: sx-projfx-spin var(--sx-projfx-spin-ms, 800ms) linear infinite;
 }
 
-@keyframes egp-spin {
+@keyframes sx-projfx-spin {
     from { transform: rotate(0deg); }
     to   { transform: rotate(360deg); }
 }
@@ -44,9 +44,9 @@
 /* ════════════════════════════════════════════════════════════════════════
    PROBABILIST - golden hunting dart (🎯)
    ════════════════════════════════════════════════════════════════════════ */
-.eg-proj-arrow { filter: drop-shadow(0 0 5px rgba(255, 224, 102, 0.9)); }
+.sx-proj-arrow { filter: drop-shadow(0 0 5px rgba(255, 224, 102, 0.9)); }
 
-.egp-arrow-shaft {
+.sx-projfx-arrow-shaft {
     position: absolute;
     left: 8px;
     right: 13px;
@@ -56,7 +56,7 @@
     background: linear-gradient(to bottom, #ffe082, #ff8f00);
 }
 
-.egp-arrow-head {
+.sx-projfx-arrow-head {
     position: absolute;
     left: 30px;
     top: 8px;
@@ -67,7 +67,7 @@
     border-left: 14px solid #ffca28;
 }
 
-.egp-arrow-fletch {
+.sx-projfx-arrow-fletch {
     position: absolute;
     left: 1px;
     width: 11px;
@@ -76,16 +76,16 @@
     clip-path: polygon(0 100%, 30% 0, 100% 0, 70% 100%);
 }
 
-.egp-arrow-fletch-top { top: 7px; }
-.egp-arrow-fletch-bot { top: 16px; transform: scaleY(-1); }
+.sx-projfx-arrow-fletch-top { top: 7px; }
+.sx-projfx-arrow-fletch-bot { top: 16px; transform: scaleY(-1); }
 
 
 /* ════════════════════════════════════════════════════════════════════════
    MATHMAGICIAN - arcane firebolt (🔮)
    ════════════════════════════════════════════════════════════════════════ */
-.eg-proj-fireball { filter: drop-shadow(0 0 8px rgba(255, 112, 67, 0.95)); }
+.sx-proj-fireball { filter: drop-shadow(0 0 8px rgba(255, 112, 67, 0.95)); }
 
-.egp-firebolt-tail {
+.sx-projfx-firebolt-tail {
     position: absolute;
     left: 0;
     top: 9px;
@@ -93,15 +93,15 @@
     height: 10px;
     background: linear-gradient(to right, rgba(255, 112, 67, 0), #ff7043);
     clip-path: polygon(100% 50%, 55% 0, 0 25%, 30% 50%, 0 75%, 55% 100%);
-    animation: egp-flame-flicker 180ms ease-in-out infinite alternate;
+    animation: sx-projfx-flame-flicker 180ms ease-in-out infinite alternate;
 }
 
-@keyframes egp-flame-flicker {
+@keyframes sx-projfx-flame-flicker {
     from { opacity: 0.75; }
     to   { opacity: 1; }
 }
 
-.egp-firebolt-core {
+.sx-projfx-firebolt-core {
     position: absolute;
     left: 23px;
     top: 6px;
@@ -111,19 +111,19 @@
     background: radial-gradient(circle at 35% 35%, #fffde7 0%, #ffd54f 35%, #ff7043 75%, #d84315 100%);
 }
 
-.egp-firebolt-spark {
+.sx-projfx-firebolt-spark {
     position: absolute;
     width: 3px;
     height: 3px;
     border-radius: 50%;
     background: #ffd54f;
-    animation: egp-spark-flicker 240ms ease-in-out infinite alternate;
+    animation: sx-projfx-spark-flicker 240ms ease-in-out infinite alternate;
 }
 
-.egp-firebolt-spark-1 { left: 20px; top: 3px; }
-.egp-firebolt-spark-2 { left: 18px; top: 21px; animation-delay: 120ms; }
+.sx-projfx-firebolt-spark-1 { left: 20px; top: 3px; }
+.sx-projfx-firebolt-spark-2 { left: 18px; top: 21px; animation-delay: 120ms; }
 
-@keyframes egp-spark-flicker {
+@keyframes sx-projfx-spark-flicker {
     from { opacity: 0.3; transform: scale(0.6); }
     to   { opacity: 1; transform: scale(1.2); }
 }
@@ -132,9 +132,9 @@
 /* ════════════════════════════════════════════════════════════════════════
    STATISTICIAN - thrown blade (⚔️)
    ════════════════════════════════════════════════════════════════════════ */
-.eg-proj-sword { filter: drop-shadow(0 0 5px rgba(170, 212, 245, 0.9)); }
+.sx-proj-sword { filter: drop-shadow(0 0 5px rgba(170, 212, 245, 0.9)); }
 
-.egp-sword-blade {
+.sx-projfx-sword-blade {
     position: absolute;
     left: 14px;
     top: 11px;
@@ -144,7 +144,7 @@
     clip-path: polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%, 6% 50%);
 }
 
-.egp-sword-guard {
+.sx-projfx-sword-guard {
     position: absolute;
     left: 11px;
     top: 7px;
@@ -154,7 +154,7 @@
     background: linear-gradient(to bottom, #8d6e63, #5d4037);
 }
 
-.egp-sword-hilt {
+.sx-projfx-sword-hilt {
     position: absolute;
     left: 4px;
     top: 12px;
@@ -164,7 +164,7 @@
     background: #5d4037;
 }
 
-.egp-sword-pommel {
+.sx-projfx-sword-pommel {
     position: absolute;
     left: 0;
     top: 11px;
@@ -178,9 +178,9 @@
 /* ════════════════════════════════════════════════════════════════════════
    OUTLIER - rogue shooting star (💫): streak + spinning star core
    ════════════════════════════════════════════════════════════════════════ */
-.eg-proj-dizzy { filter: drop-shadow(0 0 6px rgba(179, 136, 255, 0.95)); }
+.sx-proj-dizzy { filter: drop-shadow(0 0 6px rgba(179, 136, 255, 0.95)); }
 
-.egp-star-streak {
+.sx-projfx-star-streak {
     position: absolute;
     left: 0;
     top: 11px;
@@ -190,7 +190,7 @@
     background: linear-gradient(to right, rgba(179, 136, 255, 0), rgba(179, 136, 255, 0.95));
 }
 
-.egp-star-core {
+.sx-projfx-star-core {
     position: absolute;
     left: 23px;
     top: 5px;
@@ -204,23 +204,23 @@
 /* ════════════════════════════════════════════════════════════════════════
    ACTUARY - served contract: paper dart with wax seal (📜→✉)
    ════════════════════════════════════════════════════════════════════════ */
-.eg-proj-scroll { filter: drop-shadow(0 0 5px rgba(255, 213, 79, 0.85)); }
+.sx-proj-scroll { filter: drop-shadow(0 0 5px rgba(255, 213, 79, 0.85)); }
 
-.egp-dart-wing-under {
+.sx-projfx-dart-wing-under {
     position: absolute;
     inset: 0;
     background: #d7c49a;
     clip-path: polygon(2% 88%, 98% 48%, 26% 46%, 26% 56%);
 }
 
-.egp-dart-wing-over {
+.sx-projfx-dart-wing-over {
     position: absolute;
     inset: 0;
     background: #fff8e1;
     clip-path: polygon(2% 12%, 98% 48%, 26% 54%);
 }
 
-.egp-dart-seal {
+.sx-projfx-dart-seal {
     position: absolute;
     left: 24px;
     top: 12px;
@@ -230,7 +230,7 @@
     background: #c62828;
 }
 
-.egp-dart-trail {
+.sx-projfx-dart-trail {
     position: absolute;
     left: 0;
     top: 13px;
@@ -245,34 +245,34 @@
 /* ════════════════════════════════════════════════════════════════════════
    RECURSIONIST - fractal soul shard with self-similar echoes (♾️)
    ════════════════════════════════════════════════════════════════════════ */
-.eg-proj-infinity { filter: drop-shadow(0 0 6px rgba(100, 255, 218, 0.9)); }
+.sx-proj-infinity { filter: drop-shadow(0 0 6px rgba(100, 255, 218, 0.9)); }
 
-.egp-shard-body,
-.egp-shard-echo {
+.sx-projfx-shard-body,
+.sx-projfx-shard-echo {
     clip-path: polygon(0 50%, 32% 0, 100% 50%, 32% 100%);
 }
 
-.egp-shard-body {
+.sx-projfx-shard-body {
     position: absolute;
     left: 14px;
     top: 3px;
     width: 30px;
     height: 22px;
     background: linear-gradient(135deg, #b2fff2 0%, #64ffda 40%, #00bfa5 100%);
-    animation: egp-shard-glimmer 500ms ease-in-out infinite alternate;
+    animation: sx-projfx-shard-glimmer 500ms ease-in-out infinite alternate;
 }
 
-@keyframes egp-shard-glimmer {
+@keyframes sx-projfx-shard-glimmer {
     from { filter: brightness(0.9); }
     to   { filter: brightness(1.25); }
 }
 
-.egp-shard-echo {
+.sx-projfx-shard-echo {
     position: absolute;
     background: #64ffda;
 }
 
-.egp-shard-echo-1 {
+.sx-projfx-shard-echo-1 {
     left: 6px;
     top: 7px;
     width: 17px;
@@ -280,7 +280,7 @@
     opacity: 0.45;
 }
 
-.egp-shard-echo-2 {
+.sx-projfx-shard-echo-2 {
     left: 0;
     top: 10px;
     width: 9px;
@@ -292,9 +292,9 @@
 /* ════════════════════════════════════════════════════════════════════════
    MARKOVIAN - chain shot: iron ball towing shortening links (⛓️)
    ════════════════════════════════════════════════════════════════════════ */
-.eg-proj-chain { filter: drop-shadow(0 0 5px rgba(144, 164, 174, 0.9)); }
+.sx-proj-chain { filter: drop-shadow(0 0 5px rgba(144, 164, 174, 0.9)); }
 
-.egp-chain-ball {
+.sx-projfx-chain-ball {
     position: absolute;
     left: 29px;
     top: 7px;
@@ -304,7 +304,7 @@
     background: radial-gradient(circle at 35% 30%, #eceff1, #90a4ae 55%, #37474f 100%);
 }
 
-.egp-chain-link {
+.sx-projfx-chain-link {
     position: absolute;
     width: 11px;
     height: 9px;
@@ -313,17 +313,17 @@
     box-sizing: border-box;
 }
 
-.egp-chain-link-1 { left: 19px; top: 9px; }
-.egp-chain-link-2 { left: 10px; top: 12px; opacity: 0.8; }
-.egp-chain-link-3 { left: 2px;  top: 9px; opacity: 0.55; }
+.sx-projfx-chain-link-1 { left: 19px; top: 9px; }
+.sx-projfx-chain-link-2 { left: 10px; top: 12px; opacity: 0.8; }
+.sx-projfx-chain-link-3 { left: 2px;  top: 9px; opacity: 0.55; }
 
 
 /* ════════════════════════════════════════════════════════════════════════
    BAYESIAN - alchemical vial dart with reactive charge (🧪)
    ════════════════════════════════════════════════════════════════════════ */
-.eg-proj-brain { filter: drop-shadow(0 0 6px rgba(105, 240, 174, 0.9)); }
+.sx-proj-brain { filter: drop-shadow(0 0 6px rgba(105, 240, 174, 0.9)); }
 
-.egp-vial-glass {
+.sx-projfx-vial-glass {
     position: absolute;
     left: 17px;
     top: 8px;
@@ -336,7 +336,7 @@
     overflow: hidden;
 }
 
-.egp-vial-fluid {
+.sx-projfx-vial-fluid {
     position: absolute;
     left: 0;
     top: 0;
@@ -345,15 +345,15 @@
     margin-left: 30%; /* charge sits at the nose of the vial */
     background: linear-gradient(to bottom, #69f0ae, #00c853);
     border-radius: 0 6px 6px 0;
-    animation: egp-vial-bubble 400ms ease-in-out infinite alternate;
+    animation: sx-projfx-vial-bubble 400ms ease-in-out infinite alternate;
 }
 
-@keyframes egp-vial-bubble {
+@keyframes sx-projfx-vial-bubble {
     from { filter: brightness(0.95); }
     to   { filter: brightness(1.2); }
 }
 
-.egp-vial-shine {
+.sx-projfx-vial-shine {
     position: absolute;
     left: 2px;
     top: 2px;
@@ -363,7 +363,7 @@
     background: rgba(255, 255, 255, 0.65);
 }
 
-.egp-vial-drop {
+.sx-projfx-vial-drop {
     position: absolute;
     width: 4px;
     height: 4px;
@@ -371,16 +371,16 @@
     background: #69f0ae;
 }
 
-.egp-vial-drop-1 { left: 10px; top: 8px; opacity: 0.8; }
-.egp-vial-drop-2 { left: 3px;  top: 14px; opacity: 0.4; }
+.sx-projfx-vial-drop-1 { left: 10px; top: 8px; opacity: 0.8; }
+.sx-projfx-vial-drop-2 { left: 3px;  top: 14px; opacity: 0.4; }
 
 
 /* ════════════════════════════════════════════════════════════════════════
    RANDOM WALKER - tumbling pipped die (🎲): inner spin, aimed flight
    ════════════════════════════════════════════════════════════════════════ */
-.eg-proj-dice { filter: drop-shadow(0 0 5px rgba(255, 241, 118, 0.85)); }
+.sx-proj-dice { filter: drop-shadow(0 0 5px rgba(255, 241, 118, 0.85)); }
 
-.egp-die-streak {
+.sx-projfx-die-streak {
     position: absolute;
     left: 2px;
     top: 9px;
@@ -390,7 +390,7 @@
     background: linear-gradient(to right, transparent, rgba(255, 241, 118, 0.7));
 }
 
-.egp-die-streak::after {
+.sx-projfx-die-streak::after {
     content: '';
     position: absolute;
     left: 2px;
@@ -401,7 +401,7 @@
     background: linear-gradient(to right, transparent, rgba(255, 241, 118, 0.4));
 }
 
-.egp-die-body {
+.sx-projfx-die-body {
     position: absolute;
     left: 23px;
     top: 5px;
@@ -413,7 +413,7 @@
     box-sizing: border-box;
 }
 
-.egp-pip {
+.sx-projfx-pip {
     position: absolute;
     width: 3px;
     height: 3px;
@@ -421,20 +421,20 @@
     background: #37474f;
 }
 
-.egp-pip-tl { left: 2px;  top: 2px; }
-.egp-pip-tr { right: 2px; top: 2px; }
-.egp-pip-c  { left: 6.5px; top: 6.5px; }
-.egp-pip-bl { left: 2px;  bottom: 2px; }
-.egp-pip-br { right: 2px; bottom: 2px; }
+.sx-projfx-pip-tl { left: 2px;  top: 2px; }
+.sx-projfx-pip-tr { right: 2px; top: 2px; }
+.sx-projfx-pip-c  { left: 6.5px; top: 6.5px; }
+.sx-projfx-pip-bl { left: 2px;  bottom: 2px; }
+.sx-projfx-pip-br { right: 2px; bottom: 2px; }
 
 
 /* ════════════════════════════════════════════════════════════════════════
    DEFAULT - lightning bolt (⚡): classic bolt silhouette rotated to fly
    tip-first (the vertical glyph is turned -90° inside the aimed container)
    ════════════════════════════════════════════════════════════════════════ */
-.eg-proj-default { filter: drop-shadow(0 0 6px rgba(255, 224, 102, 0.95)); }
+.sx-proj-default { filter: drop-shadow(0 0 6px rgba(255, 224, 102, 0.95)); }
 
-.egp-bolt-body {
+.sx-projfx-bolt-body {
     position: absolute;
     left: 14px;
     top: 0;

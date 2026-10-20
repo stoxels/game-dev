@@ -41,17 +41,17 @@ export const DRAG_CHARGE_SCALE_PER_STACK = 0.18;
 export function _updateChargedProjectileVisual() {
     if (!_isActive() || globalThis._dragChargeStacks <= 0) return;
 
-    let proj = document.getElementById('eg-charging-projectile');
+    let proj = document.getElementById('sx-charging-projectile');
     if (!proj) {
         proj = document.createElement('div');
-        proj.id = 'eg-charging-projectile';
+        proj.id = 'sx-charging-projectile';
         document.body.appendChild(proj);
     }
 
     const projDef = _getProjectileDef();
-    proj.className = `eg-projectile eg-proj-charging ${projDef.cssClass}`;
+    proj.className = `sx-projectile sx-proj-charging ${projDef.cssClass}`;
     if (typeof projDef.build === 'function') {
-        proj.classList.add('eg-built');
+        proj.classList.add('sx-built');
         projDef.build(proj);
     } else {
         proj.textContent = projDef.emoji;
@@ -62,7 +62,7 @@ export function _updateChargedProjectileVisual() {
     // Emoji visuals grow via font-size; code-built shapes via a scale var
     // (the .egp box has fixed pixel dimensions).
     proj.style.fontSize = `${sizePx}px`;
-    proj.style.setProperty('--egp-charge-scale', (sizePx / DRAG_CHARGE_BASE_SIZE_PX).toFixed(3));
+    proj.style.setProperty('--sx-projfx-charge-scale', (sizePx / DRAG_CHARGE_BASE_SIZE_PX).toFixed(3));
 
     // Anchor on the stroke's start cell; fall back to the HUD handle
     const anchor = ((globalThis._dragChargeRow >= 0 && globalThis._dragChargeCol >= 0)
@@ -95,32 +95,32 @@ export function _updateDragBonusLabel() {
     const key = (typeof _getDragTierLabelKey === 'function') ? _getDragTierLabelKey(globalThis._dragChargeStacks) : null;
     const text = key && typeof t === 'function' ? t(key) : (tier === 3 ? 'PRECISE' : tier === 2 ? 'FOCUSED' : 'STEADY');
 
-    let lbl = document.getElementById('eg-drag-bonus-label');
+    let lbl = document.getElementById('sx-drag-bonus-label');
     const isNew = !lbl;
     if (!lbl) {
         lbl = document.createElement('div');
-        lbl.id = 'eg-drag-bonus-label';
+        lbl.id = 'sx-drag-bonus-label';
         avatar.appendChild(lbl);
     }
-    const tierClass = `eg-drag-bonus-t${tier}`;
+    const tierClass = `sx-drag-bonus-t${tier}`;
     if (lbl.dataset.tier !== String(tier) || isNew) {
-        lbl.className = `eg-drag-bonus ${tierClass}`;
+        lbl.className = `sx-drag-bonus ${tierClass}`;
         // trigger pop animation on tier change
         lbl.style.animation = 'none';
         void lbl.offsetWidth;
         lbl.style.animation = '';
         lbl.dataset.tier = String(tier);
     } else {
-        lbl.className = `eg-drag-bonus ${tierClass}`;
+        lbl.className = `sx-drag-bonus ${tierClass}`;
     }
     lbl.textContent = text;
     lbl.style.display = '';
 }
 
 export function _clearDragBonusLabel() {
-    const lbl = document.getElementById('eg-drag-bonus-label');
+    const lbl = document.getElementById('sx-drag-bonus-label');
     if (lbl) lbl.remove();
-    const linger = document.getElementById('eg-drag-bonus-linger');
+    const linger = document.getElementById('sx-drag-bonus-linger');
     if (linger) linger.remove();
 }
 
@@ -128,11 +128,11 @@ export function _clearDragBonusLabel() {
 // monster card (same atan2 flight vector the released shot will follow).
 // No-op when there is no live charge visual or no anchor.
 export function _aimChargingProjectile(anchor) {
-    const proj = document.getElementById('eg-charging-projectile');
+    const proj = document.getElementById('sx-charging-projectile');
     if (!proj || !anchor) return;
 
     let rot = '';
-    const targetCard = globalThis._targetId ? document.getElementById(`eg-card-${globalThis._targetId}`) : null;
+    const targetCard = globalThis._targetId ? document.getElementById(`sx-card-${globalThis._targetId}`) : null;
     if (targetCard) {
         const c = _getElementCentre(anchor);
         const t = _getElementCentre(targetCard);
@@ -140,12 +140,12 @@ export function _aimChargingProjectile(anchor) {
         rot = ` rotate(${angle.toFixed(2)}deg)`;
     }
     proj.style.transform =
-        `translate(-50%, -50%)${rot} scale(var(--egp-charge-scale, 1))`;
+        `translate(-50%, -50%)${rot} scale(var(--sx-projfx-charge-scale, 1))`;
 }
 
 // Removes the charging projectile div and resets all stroke charge state.
 export function _clearChargedProjectileVisual() {
-    const proj = document.getElementById('eg-charging-projectile');
+    const proj = document.getElementById('sx-charging-projectile');
     if (proj) proj.remove();
     if (typeof _clearDragBonusLabel === 'function') _clearDragBonusLabel();
     globalThis._dragChargeDamage = 0;
@@ -179,8 +179,8 @@ export function _releaseChargedShot() {
         const avatar = document.getElementById('player-avatar-wrapper');
         if (avatar) {
             const linger = document.createElement('div');
-            linger.id = 'eg-drag-bonus-linger';
-            linger.className = `eg-drag-bonus eg-drag-bonus-t${releaseTier} eg-drag-bonus-linger`;
+            linger.id = 'sx-drag-bonus-linger';
+            linger.className = `sx-drag-bonus sx-drag-bonus-t${releaseTier} sx-drag-bonus-linger`;
             linger.textContent = releaseLabelKey && typeof t === 'function' ? t(releaseLabelKey) : (releaseTier === 3 ? 'PRECISE' : releaseTier === 2 ? 'FOCUSED' : 'STEADY');
             avatar.appendChild(linger);
             setTimeout(() => linger.remove(), 900);
@@ -203,7 +203,7 @@ export function _releaseChargedShot() {
         const start = sourceEl ? _getElementCentre(sourceEl) : null;
         if (hud && typeof _fireProjectile === 'function' && start) {
             const end = _getElementCentre(hud);
-            _fireProjectile('🌀', 'eg-proj-player', start, end, MONSTER_PROJ_DURATION_MS, 'ease-in', () => {
+            _fireProjectile('🌀', 'sx-proj-player', start, end, MONSTER_PROJ_DURATION_MS, 'ease-in', () => {
                 const dealt = _playerTakeDamage(damage * 0.3, false, null);
                 if (dealt > 0) _applyPlayerHitFeedback(dealt);
             });
@@ -250,7 +250,7 @@ function _animatePlayerProjectile(damage, targetId, row, col) {
 
 
     const sourceHud = document.getElementById('class-hud-drag-handle');
-    const targetCard = targetId ? document.getElementById(`eg-card-${targetId}`) : null;
+    const targetCard = targetId ? document.getElementById(`sx-card-${targetId}`) : null;
 
     if (!sourceHud || !targetCard) {
         // No visual target - apply damage instantly without animation

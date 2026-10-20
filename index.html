@@ -1164,9 +1164,9 @@
                      _buildRowClueToggle() in js/grid.js and appended into
                      this slot, underneath the mistakes counter. -->
                 <div class="clue-toggle-slot" id="clue-toggle-slot"></div>
-                <div class="eg-bonus-loot-chance hidden" id="eg-bonus-loot-chance">
-                    <span class="eg-bonus-loot-chance-icon">🎁</span>
-                    <span class="eg-bonus-loot-chance-val" id="eg-bonus-loot-chance-val"></span>
+                <div class="sx-bonus-loot-chance hidden" id="sx-bonus-loot-chance">
+                    <span class="sx-bonus-loot-chance-icon">🎁</span>
+                    <span class="sx-bonus-loot-chance-val" id="sx-bonus-loot-chance-val"></span>
                 </div>
                 <!-- Unspent Probability Tree points reminder (js/start-level.js) -->
                 <div class="hud-unspent-points hidden" id="hud-unspent-points"></div>
@@ -1190,14 +1190,14 @@
                 </div>
             </div>
 
-            <div id="eg-monster-wrapper" class="eg-hidden">
-                <div id="eg-monster-panel" class="eg-spawn-zone"></div>
+            <div id="sx-monster-wrapper" class="sx-hidden">
+                <div id="sx-monster-panel" class="sx-spawn-zone"></div>
             </div>
 
-            <div id="eg-panel-left" class="eg-floating-panel eg-spawn-zone"></div>
-            <div id="eg-panel-right" class="eg-floating-panel eg-spawn-zone"></div>
-            <div id="eg-panel-bottom" class="eg-floating-panel eg-spawn-zone"></div>
-            <div id="eg-panel-top-corner" class="eg-floating-panel eg-spawn-zone"></div>
+            <div id="sx-panel-left" class="sx-floating-panel sx-spawn-zone"></div>
+            <div id="sx-panel-right" class="sx-floating-panel sx-spawn-zone"></div>
+            <div id="sx-panel-bottom" class="sx-floating-panel sx-spawn-zone"></div>
+            <div id="sx-panel-top-corner" class="sx-floating-panel sx-spawn-zone"></div>
 
             <!-- PUZZLE AREA: timer sits above the grid, inside puzzle-scaler -->
             <div class="puzzle-and-sidebar">
@@ -1226,10 +1226,10 @@
             <div id="inv-panel"></div>
         </div>
         <!-- ENDGAME OBJECTIVES - fixed left panel, zero layout impact -->
-        <div id="eg-objectives-strip" class="eg-hidden"></div>
+        <div id="sx-objectives-strip" class="sx-hidden"></div>
     </div>
     <!-- XP bar: root-level (not inside #screen-game) so it paints above the win/lose overlays; shown only while the game screen is active (css/endgame/monsters.css; js/endgame/endgame-leveling.js) -->
-    <div id="eg-xp-bar"><div id="eg-xp-bar-fill"></div><div id="eg-xp-bar-gain"></div></div>
+    <div id="sx-xp-bar"><div id="sx-xp-bar-fill"></div><div id="sx-xp-bar-gain"></div></div>
 
 
     <!-- HIGHSCORES SCREEN -->

@@ -62,8 +62,8 @@ export function _mechGuardCall(monster, phase) {
     monster.warlordGuard = true;
     monster.bossImmune = true;
     fresh.forEach(a => { a.warlordOf = monster.id; });
-    const card = document.getElementById('eg-card-' + monster.id);
-    if (card) card.classList.add('eg-nk-shielded');
+    const card = document.getElementById('sx-card-' + monster.id);
+    if (card) card.classList.add('sx-nk-shielded');
     Audio_Manager.playSFX('boss_shield_up');
     _nkToast('eg_mech_warlord', '🗡️ The Warlord: Guard Call! Break the guard to break the boss!');
     if (typeof _renderPanel === 'function') { try { _renderPanel(); } catch (e) {} }
@@ -80,8 +80,8 @@ export function _mechGuardCall(monster, phase) {
         if (!alive || e > 30000) {
             boss.warlordGuard = false;
             boss.bossImmune = false;
-            const c2 = document.getElementById('eg-card-' + monster.id);
-            if (c2) c2.classList.remove('eg-nk-shielded');
+            const c2 = document.getElementById('sx-card-' + monster.id);
+            if (c2) c2.classList.remove('sx-nk-shielded');
             Audio_Manager.playSFX('boss_shield_down');
             _nkToast('eg_tithe_broken', '🗡️ Guard broken - burn the Warlord!', '#4ade80');
             if (typeof _renderPanel === 'function') { try { _renderPanel(); } catch (e2) {} }
@@ -105,7 +105,7 @@ export function _mechTripleRings(monster, phase) {
     const cy = window.innerHeight * 0.42;
     const rMax = Math.max(window.innerWidth, window.innerHeight) * 0.7;
     const rings = [0, 1, 2].map(i => {
-        const el = _nkEl(run, 'div', 'eg-nk-ring');
+        const el = _nkEl(run, 'div', 'sx-nk-ring');
         el.style.display = 'none';
         return { delay: i * 550, r: 40, el };
     });

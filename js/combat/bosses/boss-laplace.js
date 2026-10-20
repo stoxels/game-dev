@@ -11,7 +11,7 @@ import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkKillRun,
 // 20s gauntlet loop until 3 timeline nodes break.
 //------------------------------------------------------------------------
 
-// Prefix discipline: everything here is _lap / eg-lap-.
+// Prefix discipline: everything here is _lap / sx-lap-.
 
 // DEBUG: slow Laplace's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Off for ship.
@@ -94,10 +94,10 @@ export function _lapGhostForm(ms) {
     const avatar = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     if (avatar) {
-        avatar.classList.add('eg-lap-ghost');
+        avatar.classList.add('sx-lap-ghost');
         setTimeout(() => {
             if (performance.now() >= _lapGhostUntil) {
-                try { avatar.classList.remove('eg-lap-ghost'); } catch (e) {}
+                try { avatar.classList.remove('sx-lap-ghost'); } catch (e) {}
             }
         }, ms + 60);
     }
@@ -155,9 +155,9 @@ export function _lapLancePair(run, ax, ay, bx, by, delayMs, level) {
     const ghostTravelMs = Math.max(travelMs, LAP_GHOST_LEAD * _LAP_DEBUG_MULT);
 
     // The ghost pre-run (dashed corridor, translucent head - harmless).
-    const ghost = _nkEl(run, 'div', 'eg-lap-ghost-corridor');
+    const ghost = _nkEl(run, 'div', 'sx-lap-ghost-corridor');
     _lapPlaceCorridor(ghost, ax, ay, bx, by);
-    const head = _nkEl(run, 'div', 'eg-lap-ghost-head', '👁️');
+    const head = _nkEl(run, 'div', 'sx-lap-ghost-head', '👁️');
     let t = -delayMs;   // stagger delay before the ghost even starts
     _nkLoop(run, (dtS) => {
         t += dtS * 1000;
@@ -178,9 +178,9 @@ export function _lapLancePair(run, ax, ay, bx, by, delayMs, level) {
 // The real lance: solid fire corridor, damages within width, ends with a
 // pin-blast ring at the endpoint.
 export function _lapRealLance(run, ax, ay, bx, by, travelMs, level) {
-    const corridor = _nkEl(run, 'div', 'eg-lap-lance');
+    const corridor = _nkEl(run, 'div', 'sx-lap-lance');
     _lapPlaceCorridor(corridor, ax, ay, bx, by);
-    const head = _nkEl(run, 'div', 'eg-lap-lance-head', '🔥');
+    const head = _nkEl(run, 'div', 'sx-lap-lance-head', '🔥');
     let t = 0;
     _nkLoop(run, (dtS) => {
         t += dtS * 1000;
@@ -200,7 +200,7 @@ export function _lapRealLance(run, ax, ay, bx, by, travelMs, level) {
         if (f >= 1) {
             try { corridor.remove(); head.remove(); } catch (e) {}
             // Endpoint pin-blast: the trap the ghost showed you.
-            const ring = _nkEl(run, 'div', 'eg-lap-pin-blast');
+            const ring = _nkEl(run, 'div', 'sx-lap-pin-blast');
             ring.style.left = Math.round(bx - 120) + 'px';
             ring.style.top = Math.round(by - 120) + 'px';
             const pc2 = _lapPC();
@@ -255,11 +255,11 @@ export function _mechLapBranches(monster, phase) {
         const by = Math.max(60, Math.min(H - 60, ay + Math.sin(ang) * walkLen));
 
         // Predictable path line (the phantom's walk, pre-drawn).
-        const line = _nkEl(run, 'div', 'eg-lap-walk-line');
+        const line = _nkEl(run, 'div', 'sx-lap-walk-line');
         _lapPlaceCorridor(line, ax, ay, bx, by);
         line.style.height = '2px';
 
-        const ph = _nkEl(run, 'div', 'eg-lap-phantom', '👤');
+        const ph = _nkEl(run, 'div', 'sx-lap-phantom', '👤');
         let t = 0;
         _nkLoop(run, (dtS) => {
             t += dtS;
@@ -268,7 +268,7 @@ export function _mechLapBranches(monster, phase) {
             ph.style.top = Math.round(ay + (by - ay) * f - 16) + 'px';
             if (f >= 1) {
                 try { ph.remove(); line.remove(); } catch (e) {}
-                const cell = _nkEl(run, 'div', 'eg-lap-branch', '?');
+                const cell = _nkEl(run, 'div', 'sx-lap-branch', '?');
                 cell.style.left = Math.round(bx - 26) + 'px';
                 cell.style.top = Math.round(by - 26) + 'px';
                 branches.push({ x: bx, y: by, el: cell, isTrue: i === trueIdx, resolved: false });
@@ -288,10 +288,10 @@ export function _mechLapBranches(monster, phase) {
             b.resolved = true;
             if (b.isTrue) {
                 b.el.textContent = '✅';
-                b.el.classList.add('eg-lap-branch-true');
+                b.el.classList.add('sx-lap-branch-true');
             } else {
                 b.el.textContent = '✓';
-                b.el.classList.add('eg-lap-branch-fake');
+                b.el.classList.add('sx-lap-branch-fake');
             }
         });
         _lapDelay(900 * _LAP_DEBUG_MULT, () => {
@@ -299,7 +299,7 @@ export function _mechLapBranches(monster, phase) {
             branches.forEach(b => {
                 if (b.isTrue) {
                     // The true future DETONATES as a radius blast.
-                    const ring = _nkEl(run, 'div', 'eg-lap-pin-blast');
+                    const ring = _nkEl(run, 'div', 'sx-lap-pin-blast');
                     ring.style.left = Math.round(b.x - LAP_BRANCH_R) + 'px';
                     ring.style.top = Math.round(b.y - LAP_BRANCH_R) + 'px';
                     ring.style.width = (LAP_BRANCH_R * 2) + 'px';
@@ -371,13 +371,13 @@ export function _mechLapFray(monster, phase) {
 
     // Telegraph the path with fading dots (sample every ~300ms).
     for (let i = 0; i < buf.length; i += 3) {
-        const dot = _nkEl(run, 'div', 'eg-lap-fray-dot');
+        const dot = _nkEl(run, 'div', 'sx-lap-fray-dot');
         dot.style.left = Math.round(buf[i].x - 3) + 'px';
         dot.style.top = Math.round(buf[i].y - 3) + 'px';
         setTimeout(() => { try { dot.remove(); } catch (e) {} }, dur * 1000 + 800);
     }
 
-    const clone = _nkEl(run, 'div', 'eg-lap-clone', '👣');
+    const clone = _nkEl(run, 'div', 'sx-lap-clone', '👣');
     let elapsed = 0;
     let touched = false;
     _nkLoop(run, (dtS) => {
@@ -403,8 +403,8 @@ export function _mechLapFray(monster, phase) {
             if (el) {
                 el.style.left = Math.round(p.x) + 'px';
                 el.style.top = Math.round(p.y) + 'px';
-                document.body.classList.add('eg-lap-dizzy');
-                setTimeout(() => { try { document.body.classList.remove('eg-lap-dizzy'); } catch (e) {} }, 600);
+                document.body.classList.add('sx-lap-dizzy');
+                setTimeout(() => { try { document.body.classList.remove('sx-lap-dizzy'); } catch (e) {} }, 600);
             }
             _nkToast('eg_mech_lap_swap', '👁️ Your past replaced your present - disoriented!', '#f0abfc');
             return false;
@@ -494,9 +494,9 @@ export function _lapFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -511,16 +511,16 @@ export function _lapFinalStart(monster) {
 
     // Loop overlay (title + loop counter + timer).
     const ov = document.createElement('div');
-    ov.className = 'eg-lap-cd';
+    ov.className = 'sx-lap-cd';
     ov.innerHTML =
-        '<div class="eg-lap-cd-label">👁️💀 THE CLOSED TIMELINE</div>' +
-        '<div class="eg-lap-cd-loop">LOOP 1</div>' +
-        '<div class="eg-lap-cd-timer">-</div>' +
-        '<div class="eg-lap-cd-hint">The gauntlet repeats - learn it. Break the timeline node each loop!</div>';
+        '<div class="sx-lap-cd-label">👁️💀 THE CLOSED TIMELINE</div>' +
+        '<div class="sx-lap-cd-loop">LOOP 1</div>' +
+        '<div class="sx-lap-cd-timer">-</div>' +
+        '<div class="sx-lap-cd-hint">The gauntlet repeats - learn it. Break the timeline node each loop!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
-    g.loopEl = ov.querySelector('.eg-lap-cd-loop');
-    g.timerEl = ov.querySelector('.eg-lap-cd-timer');
+    g.loopEl = ov.querySelector('.sx-lap-cd-loop');
+    g.timerEl = ov.querySelector('.sx-lap-cd-timer');
     g.fxRun.els.push(ov);
 
     _nkToast('eg_mech_lap_final_cd', '👁️💀 THE CLOSED TIMELINE - the loop begins. Learn it. Break it!', '#f0abfc');
@@ -529,9 +529,9 @@ export function _lapFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss card loops while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.add('eg-lap-allin');
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.add('sx-lap-allin');
 
     const level = monster.level || 1;
 
@@ -546,7 +546,7 @@ export function _lapFinalStart(monster) {
         // Node: spawns each loop at a NEW spot (persist until broken).
         const nx = W * (0.14 + Math.random() * 0.72);
         const ny = H * (0.16 + Math.random() * 0.68);
-        const node = _nkEl(g.fxRun, 'div', 'eg-lap-node', '⛓️');
+        const node = _nkEl(g.fxRun, 'div', 'sx-lap-node', '⛓️');
         node.style.left = Math.round(nx - 24) + 'px';
         node.style.top = Math.round(ny - 24) + 'px';
         g.nodes.push({ x: nx, y: ny, el: node, prog: 0 });
@@ -562,7 +562,7 @@ export function _lapFinalStart(monster) {
         _lapAfter(g, 7000 * _LAP_DEBUG_MULT, () => {
             if (g.finished) return;
             const cells = LAP_LOOP_BRANCH_X.map(fx => {
-                const cell = _nkEl(g.fxRun, 'div', 'eg-lap-branch', '?');
+                const cell = _nkEl(g.fxRun, 'div', 'sx-lap-branch', '?');
                 const cx = W * fx, cy = H * 0.5;
                 cell.style.left = Math.round(cx - 26) + 'px';
                 cell.style.top = Math.round(cy - 26) + 'px';
@@ -572,7 +572,7 @@ export function _lapFinalStart(monster) {
                 if (g.finished) return;
                 cells.forEach(c => {
                     c.el.textContent = c.isTrue ? '✅' : '✓';
-                    c.el.classList.add(c.isTrue ? 'eg-lap-branch-true' : 'eg-lap-branch-fake');
+                    c.el.classList.add(c.isTrue ? 'sx-lap-branch-true' : 'sx-lap-branch-fake');
                 });
                 _lapAfter(g, 900 * _LAP_DEBUG_MULT, () => {
                     if (g.finished) return;
@@ -580,7 +580,7 @@ export function _lapFinalStart(monster) {
                 cells.forEach(c => {
                     if (c.isTrue) {
                         // The true future detonates as a radius blast.
-                        const ring = _nkEl(g.fxRun, 'div', 'eg-lap-pin-blast');
+                        const ring = _nkEl(g.fxRun, 'div', 'sx-lap-pin-blast');
                         ring.style.left = Math.round(c.x - LAP_BRANCH_R) + 'px';
                         ring.style.top = Math.round(c.y - LAP_BRANCH_R) + 'px';
                         ring.style.width = (LAP_BRANCH_R * 2) + 'px';
@@ -615,7 +615,7 @@ export function _lapFinalStart(monster) {
             if (Math.hypot(pc.x - n.x, pc.y - n.y) < 40) {
                 n.prog += dtS;
                 n.el.style.setProperty('--node-prog', String(Math.min(1, n.prog / LAP_NODE_STAND)));
-                n.el.classList.add('eg-lap-node-breaking');
+                n.el.classList.add('sx-lap-node-breaking');
                 if (n.prog >= LAP_NODE_STAND) {
                     g.broken++;
                     try { n.el.remove(); } catch (e) {}
@@ -626,7 +626,7 @@ export function _lapFinalStart(monster) {
             } else if (n.prog > 0 && n.prog < LAP_NODE_STAND) {
                 // Progress decays when you leave (but slowly - merciful).
                 n.prog = Math.max(0, n.prog - dtS * 0.35);
-                if (n.prog === 0) n.el.classList.remove('eg-lap-node-breaking');
+                if (n.prog === 0) n.el.classList.remove('sx-lap-node-breaking');
             }
         }
         // Loop timer readout + deadline-driven next loop: a failure that
@@ -643,7 +643,7 @@ export function _lapFinalStart(monster) {
 // A lance crossing the whole arena at a fixed band (final variant).
 export function _lapFinalLance(g, bandY, level) {
     const W = window.innerWidth;
-    const warn = _nkEl(g.fxRun, 'div', 'eg-lap-loop-warn');
+    const warn = _nkEl(g.fxRun, 'div', 'sx-lap-loop-warn');
     warn.style.left = '0px';
     warn.style.top = Math.round(bandY - LAP_LANCE_W / 2) + 'px';
     warn.style.width = W + 'px';
@@ -651,7 +651,7 @@ export function _lapFinalLance(g, bandY, level) {
     _lapAfter(g, 1200 * _LAP_DEBUG_MULT, () => {
         if (g.finished) return;
         try { warn.remove(); } catch (e) {}
-        const fire = _nkEl(g.fxRun, 'div', 'eg-lap-lance eg-lap-lance-full');
+        const fire = _nkEl(g.fxRun, 'div', 'sx-lap-lance sx-lap-lance-full');
         fire.style.left = '0px';
         fire.style.top = Math.round(bandY - LAP_LANCE_W / 2) + 'px';
         fire.style.width = W + 'px';
@@ -670,7 +670,7 @@ export function _lapFinalPhantom(g, fixedY, isCross, level) {
     const W = window.innerWidth, H = window.innerHeight;
     const ltr = Math.random() < 0.5;
     const y = isCross ? fixedY : H * (0.2 + Math.random() * 0.6);
-    const ph = _nkEl(g.fxRun, 'div', 'eg-lap-phantom eg-lap-phantom-hunter', '👤');
+    const ph = _nkEl(g.fxRun, 'div', 'sx-lap-phantom sx-lap-phantom-hunter', '👤');
     let f = 0;
     const dur = 4 * _LAP_DEBUG_MULT;
     _nkLoop(g.fxRun, (dtS) => {
@@ -718,7 +718,7 @@ export function _lapCloseLoop(g, monster) {
     if (g.finished) return;
     _nkToast('eg_mech_lap_closed', '👁️💥 THE TIMELINE CLOSES - the Demon is trapped in its own loop!', '#a7f3d0');
     const flash = document.createElement('div');
-    flash.className = 'eg-lap-collapse';
+    flash.className = 'sx-lap-collapse';
     document.body.appendChild(flash);
     setTimeout(() => { try { flash.remove(); } catch (e) {} }, 1500);
     _lapFinalEnd(g, monster);
@@ -736,16 +736,16 @@ export function _lapFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.eg-lap-cd, .eg-lap-node, .eg-lap-branch, .eg-lap-loop-warn, ' +
-        '.eg-lap-lance, .eg-lap-phantom, .eg-lap-collapse').forEach(el => {
+    document.querySelectorAll('.sx-lap-cd, .sx-lap-node, .sx-lap-branch, .sx-lap-loop-warn, ' +
+        '.sx-lap-lance, .sx-lap-phantom, .sx-lap-collapse').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.remove('eg-lap-allin');
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.remove('sx-lap-allin');
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -766,22 +766,22 @@ export function _lapTeardown() {
     _lapRecBuf = [];
     _lapGhostUntil = 0;
     _lapFrayCd = 0;
-    document.querySelectorAll('.eg-lap-ghost-corridor, .eg-lap-ghost-head, .eg-lap-lance, ' +
-        '.eg-lap-lance-head, .eg-lap-pin-blast, .eg-lap-walk-line, .eg-lap-phantom, ' +
-        '.eg-lap-branch, .eg-lap-fray-dot, .eg-lap-clone, .eg-lap-node, .eg-lap-loop-warn, ' +
-        '.eg-lap-cd, .eg-lap-collapse').forEach(el => {
+    document.querySelectorAll('.sx-lap-ghost-corridor, .sx-lap-ghost-head, .sx-lap-lance, ' +
+        '.sx-lap-lance-head, .sx-lap-pin-blast, .sx-lap-walk-line, .sx-lap-phantom, ' +
+        '.sx-lap-branch, .sx-lap-fray-dot, .sx-lap-clone, .sx-lap-node, .sx-lap-loop-warn, ' +
+        '.sx-lap-cd, .sx-lap-collapse').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
     const avatar = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
-    if (avatar) avatar.classList.remove('eg-lap-ghost');
-    document.body.classList.remove('eg-lap-dizzy');
-    const card = document.getElementById('eg-card-boss_laplace');
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.remove('eg-lap-allin');
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    if (avatar) avatar.classList.remove('sx-lap-ghost');
+    document.body.classList.remove('sx-lap-dizzy');
+    const card = document.getElementById('sx-card-boss_laplace');
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.remove('sx-lap-allin');
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try { delete window._lapFailPunish; } catch (e) { window._lapFailPunish = undefined; }
 }

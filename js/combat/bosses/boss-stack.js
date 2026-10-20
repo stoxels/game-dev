@@ -47,7 +47,7 @@ Object.assign(BOSS_MECHANICS, {
 
 // TOP OUT finale (shared waves): the board fills to the top.
 const STK_FINALE = {
-    name: 'The Stack', title: '🧩 TOP OUT', element: null, cls: 'eg-nk-fin-stack', color: '#a5b4fc',
+    name: 'The Stack', title: '🧩 TOP OUT', element: null, cls: 'sx-nk-fin-stack', color: '#a5b4fc',
     toastKey: 'eg_stk_final',
     hint: 'The board is full - read each circle!',
     waves: [
@@ -129,7 +129,7 @@ export function _stackTeardown() {
         if (st.garbage) { try { if (st.garbage.els) st.garbage.els.forEach(g => g.remove()); } catch (e) {} }
         try { if (st.run) _nkKillRun(st.run); } catch (e) {} // removes the core
     }
-    document.querySelectorAll('.eg-stk-core, .eg-stk-cell, .eg-stk-warn, .eg-stk-row, .eg-stk-shock, .eg-stk-shock-zone, .eg-stk-garbage').forEach(el => el.remove());
+    document.querySelectorAll('.sx-stk-core, .sx-stk-cell, .sx-stk-warn, .sx-stk-row, .sx-stk-shock, .sx-stk-shock-zone, .sx-stk-garbage').forEach(el => el.remove());
 }
 
 // Removes a piece's cell elements.
@@ -164,7 +164,7 @@ export function _stackArenaInit(monster) {
     st.run = run;
 
     // The Core Stack: a T-tetromino built from 4 cells.
-    const coreEl = _nkEl(run, 'div', 'eg-stk-core');
+    const coreEl = _nkEl(run, 'div', 'sx-stk-core');
     st.core = { x: window.innerWidth * 0.5, y: window.innerHeight * 0.3,
         tx: window.innerWidth * 0.5, ty: window.innerHeight * 0.3,
         repickAt: STK_DRIFT_REPICK_MS, cdUntil: 0, cells: [], el: coreEl };
@@ -173,7 +173,7 @@ export function _stackArenaInit(monster) {
     const color = STK_COLORS[Math.floor(Math.random() * STK_COLORS.length)];
     tShape.forEach(([cx, cy]) => {
         const cell = document.createElement('div');
-        cell.className = 'eg-stk-cell core';
+        cell.className = 'sx-stk-cell core';
         cell.style.background = color;
         cell.style.width = cell.style.height = (STK_CELL - 3) + 'px';
         coreEl.appendChild(cell);
@@ -455,7 +455,7 @@ export function _stkQueuePiece(st, W, giantOverride, shock) {
     const giant = !!giantOverride;
     const pw = giant ? STK_CELL * 4 : STK_CELL * 2;
     const x = 30 + Math.random() * Math.max(60, W - pw - 60);
-    const el = _nkEl(st.run, 'div', 'eg-stk-warn' + (giant ? ' giant' : ''));
+    const el = _nkEl(st.run, 'div', 'sx-stk-warn' + (giant ? ' giant' : ''));
     el.style.left = Math.round(x) + 'px';
     el.style.width = Math.round(pw) + 'px';
     st.warns.push({ x, t: 0, warnMs: giant ? STK_HD_WARN_MS : 650, giant, shock: !!shock, el });
@@ -473,7 +473,7 @@ export function _stkMakePiece(st, x, giant, shock) {
         hitCd: 0, floorY: 0, shock: !!shock, color };
     shape.forEach(([cx, cy]) => {
         const cell = document.createElement('div');
-        cell.className = 'eg-stk-cell';
+        cell.className = 'sx-stk-cell';
         cell.style.background = color;
         cell.style.width = cell.style.height = (STK_CELL - 3) + 'px';
         run.arenaEl ? run.arenaEl.appendChild(cell) : document.body.appendChild(cell);
@@ -491,13 +491,13 @@ export function _stkLand(st, pc, pr, p) {
     const y = pc.floorY + STK_CELL;
     if (pc.shock) {
         // Giant landing: big shockwave + heavy floor terrain.
-        const el = _nkEl(st.run, 'div', 'eg-stk-shock');
+        const el = _nkEl(st.run, 'div', 'sx-stk-shock');
         el.style.left = Math.round(x) + 'px';
         el.style.top = Math.round(y) + 'px';
         st.shocks.push({ x, y, t: 0, dur: 520, r: STK_HD_SHOCK_R, dmg: STK_HD_DMG[p], fling: STK_HD_FLING[p], hit: false, el, label: 'Hard Drop' });
     } else {
         // Soft landing: small burst marker.
-        const el = _nkEl(st.run, 'div', 'eg-stk-shock soft');
+        const el = _nkEl(st.run, 'div', 'sx-stk-shock soft');
         el.style.left = Math.round(x) + 'px';
         el.style.top = Math.round(y) + 'px';
         st.shocks.push({ x, y, t: 0, dur: 380, r: STK_LAND_R, dmg: 0, fling: 0, hit: true, el, label: '' });
@@ -522,13 +522,13 @@ export function _stkLand(st, pc, pr, p) {
 
 // Ghost preview for the hard-drop gate.
 export function _stkGhost(st, x, type) {
-    const el = _nkEl(st.run, 'div', 'eg-stk-warn giant ghost');
+    const el = _nkEl(st.run, 'div', 'sx-stk-warn giant ghost');
     el.style.left = Math.round(x) + 'px';
     el.style.width = Math.round(STK_CELL * 4) + 'px';
     // The landing shockwave's reach, drawn where the giant piece will land
     // (same centre as _stkLand) - it stays until the shock has rolled.
     const H = window.innerHeight;
-    const ring = _nkEl(st.run, 'div', 'eg-stk-shock-zone');
+    const ring = _nkEl(st.run, 'div', 'sx-stk-shock-zone');
     const lx = x + STK_CELL * 2, ly = H - STK_CELL * 2 - 20 + STK_CELL;
     ring.style.left = Math.round(lx - STK_HD_SHOCK_R) + 'px';
     ring.style.top = Math.round(ly - STK_HD_SHOCK_R) + 'px';
@@ -564,7 +564,7 @@ export function _stkLineClear(st, live) {
 
 export function _stkQueueRow(st, W, H) {
     const y = 90 + Math.random() * Math.max(80, H - 260);
-    const el = _nkEl(st.run, 'div', 'eg-stk-row');
+    const el = _nkEl(st.run, 'div', 'sx-stk-row');
     el.style.left = '0px';
     el.style.top = Math.round(y) + 'px';
     el.style.width = W + 'px';
@@ -583,7 +583,7 @@ export function _stackGarbage(monster) {
     const rows = 3;
     const els = [];
     for (let i = 0; i < rows; i++) {
-        const gel = _nkEl(st.run, 'div', 'eg-stk-garbage');
+        const gel = _nkEl(st.run, 'div', 'sx-stk-garbage');
         gel.style.left = '0px';
         gel.style.width = window.innerWidth + 'px';
         // The last row fills down to the floor: everything below the crest

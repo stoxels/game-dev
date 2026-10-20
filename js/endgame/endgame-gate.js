@@ -42,10 +42,10 @@ import { STATE } from '../state.js';
 export function _egBuildMapOrbRingHTML() {
     return `
 <div class="eg-map-orb-ring">
-    <div class="eg-map-orb-rune eg-rune-top">✦</div>
-    <div class="eg-map-orb-rune eg-rune-right">✦</div>
-    <div class="eg-map-orb-rune eg-rune-bottom">✦</div>
-    <div class="eg-map-orb-rune eg-rune-left">✦</div>
+    <div class="eg-map-orb-rune sx-rune-top">✦</div>
+    <div class="eg-map-orb-rune sx-rune-right">✦</div>
+    <div class="eg-map-orb-rune sx-rune-bottom">✦</div>
+    <div class="eg-map-orb-rune sx-rune-left">✦</div>
 </div>`;
 }
 
@@ -53,10 +53,10 @@ export function _egBuildMapOrbRingHTML() {
 export function _egBuildMapSocketRowHTML() {
     return `
 <div class="eg-map-socket-row">
-    <div class="eg-map-socket eg-socket-red"></div>
-    <div class="eg-map-socket eg-socket-green"></div>
-    <div class="eg-map-socket eg-socket-blue"></div>
-    <div class="eg-map-socket eg-socket-white"></div>
+    <div class="eg-map-socket sx-socket-red"></div>
+    <div class="eg-map-socket sx-socket-green"></div>
+    <div class="eg-map-socket sx-socket-blue"></div>
+    <div class="eg-map-socket sx-socket-white"></div>
 </div>`;
 }
 
@@ -86,7 +86,7 @@ export function _egBuildMapDeviceHTML() {
         ${_egBuildMapOrbRingHTML()}
         ${_egBuildMapOrbSlotHTML()}
     </div>
-    <button class="eg-activate-btn" id="eg-activate-btn" disabled onclick="egActivateMap()">
+    <button class="sx-activate-btn" id="sx-activate-btn" disabled onclick="egActivateMap()">
         ${t('eg_activate_map')}
     </button>
 </div>`;
@@ -99,12 +99,12 @@ export function _egBuildMapDeviceHTML() {
 export function _egOnDropRulesEnter(e) {
     const lines = t('eg_drop_rules_line').split(' · ').join('<br>');
     const html = `
-<div class="eg-tt-frame" style="--tt-border:#9d93c9;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">🗺️</div>
-        <div class="eg-tt-name" style="color:#9d93c9;">${t('eg_drop_rules_title')}</div>
+<div class="sx-tt-frame" style="--tt-border:#9d93c9;">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon">🗺️</div>
+        <div class="sx-tt-name" style="color:#9d93c9;">${t('eg_drop_rules_title')}</div>
     </div>
-    <div class="eg-tt-section"><div class="eg-tt-desc">${lines}</div></div>
+    <div class="sx-tt-section"><div class="sx-tt-desc">${lines}</div></div>
 </div>`;
     if (typeof showGameTooltip === 'function') globalThis.showGameTooltip(html, e);
 }
@@ -166,16 +166,16 @@ export function _egPotentialDropEntries() {
 // Builds the scrollable list body for the potential-drops panel.
 export function _egBuildPotentialDropsBodyHTML() {
     const entries = _egPotentialDropEntries();
-    if (entries === null) return `<div class="eg-potential-drops-empty">${t('eg_potential_drops_empty')}</div>`;
-    if (entries.length === 0) return `<div class="eg-potential-drops-empty">${t('eg_potential_drops_none')}</div>`;
+    if (entries === null) return `<div class="sx-potential-drops-empty">${t('eg_potential_drops_empty')}</div>`;
+    if (entries.length === 0) return `<div class="sx-potential-drops-empty">${t('eg_potential_drops_none')}</div>`;
     return entries.map(e => {
         const glyph = e.completed ? '✔' : '○';
-        const cls = e.completed ? 'eg-potential-drop-done' : 'eg-potential-drop-todo';
+        const cls = e.completed ? 'sx-potential-drop-done' : 'sx-potential-drop-todo';
         const tierLabel = (typeof _egAtlasRoman === 'function') ? _egAtlasRoman(e.tier) : String(e.tier);
         const tierCol = (typeof _egAtlasTierGroupColor === 'function') ? _egAtlasTierGroupColor(e.tier) : '#ccc';
-        const boss = e.bossOnly ? ` <span class="eg-potential-drop-boss" data-tip-t="eg_potential_drops_boss_hint">⚔️</span>` : '';
-        const self = e.isSelf ? ` <span class="eg-potential-drop-current">${t('eg_potential_drops_current')}</span>` : '';
-        return `<div class="eg-potential-drop-row ${cls}"><span class="eg-potential-drop-status">${glyph}</span><span class="eg-potential-drop-tier" style="color:${tierCol};">${tierLabel}</span><span class="eg-potential-drop-name">${e.name}${self}</span>${boss}</div>`;
+        const boss = e.bossOnly ? ` <span class="sx-potential-drop-boss" data-tip-t="eg_potential_drops_boss_hint">⚔️</span>` : '';
+        const self = e.isSelf ? ` <span class="sx-potential-drop-current">${t('eg_potential_drops_current')}</span>` : '';
+        return `<div class="sx-potential-drop-row ${cls}"><span class="sx-potential-drop-status">${glyph}</span><span class="sx-potential-drop-tier" style="color:${tierCol};">${tierLabel}</span><span class="sx-potential-drop-name">${e.name}${self}</span>${boss}</div>`;
     }).join('');
 }
 
@@ -183,27 +183,27 @@ export function _egBuildPotentialDropsBodyHTML() {
 // button on its right, a status legend and the scrollable region list.
 export function _egBuildPotentialDropsPanelHTML() {
     return `
-<div class="eg-potential-drops" id="eg-potential-drops">
-    <div class="eg-potential-drops-head">
-        <span class="eg-potential-drops-title" id="eg-potential-drops-title"></span>
+<div class="sx-potential-drops" id="sx-potential-drops">
+    <div class="sx-potential-drops-head">
+        <span class="sx-potential-drops-title" id="sx-potential-drops-title"></span>
         <button class="eg-gate-info-btn eg-gate-info-btn-static"
                 aria-label="${t('eg_drop_rules_title')}"
                 onmouseenter="_egOnDropRulesEnter(event)"
                 onmousemove="_egOnDropRulesMove(event)"
                 onmouseleave="_egOnDropRulesLeave()">?</button>
     </div>
-    <div class="eg-potential-drops-legend">${t('eg_potential_drops_legend')}</div>
-    <div class="eg-potential-drops-list" id="eg-potential-drops-body"></div>
+    <div class="sx-potential-drops-legend">${t('eg_potential_drops_legend')}</div>
+    <div class="sx-potential-drops-list" id="sx-potential-drops-body"></div>
 </div>`;
 }
 
 // Refreshes the potential-drops panel from the current device slot.
 // No-ops while the gate screen is not in the DOM.
 export function _egRenderPotentialDrops() {
-    const body = document.getElementById('eg-potential-drops-body');
+    const body = document.getElementById('sx-potential-drops-body');
     if (!body) return;
     body.innerHTML = _egBuildPotentialDropsBodyHTML();
-    const title = document.getElementById('eg-potential-drops-title');
+    const title = document.getElementById('sx-potential-drops-title');
     if (title) {
         const entries = _egPotentialDropEntries();
         const n = Array.isArray(entries) ? entries.length : 0;
@@ -213,22 +213,22 @@ export function _egRenderPotentialDrops() {
 
 // One-time CSS injection for the potential-drops panel.
 export function _egInjectPotentialDropsStyles() {
-    if (document.getElementById('eg-potential-drops-styles')) return;
+    if (document.getElementById('sx-potential-drops-styles')) return;
     const style = document.createElement('style');
-    style.id = 'eg-potential-drops-styles';
+    style.id = 'sx-potential-drops-styles';
     style.textContent = `
-        .eg-potential-drops {
+        .sx-potential-drops {
             width: 100%; box-sizing: border-box;
             border: 1px solid var(--border); border-radius: 4px;
             background: rgba(255,255,255,0.02);
             display: flex; flex-direction: column;
             overflow: hidden;
         }
-        .eg-potential-drops-head {
+        .sx-potential-drops-head {
             display: flex; align-items: center; justify-content: space-between;
             gap: 8px; padding: 10px 12px 6px;
         }
-        .eg-potential-drops-title {
+        .sx-potential-drops-title {
             font-family: var(--PX, monospace); font-size: 12px;
             letter-spacing: 2px; color: #c8a84b;
         }
@@ -237,41 +237,41 @@ export function _egInjectPotentialDropsStyles() {
             position: static; flex-shrink: 0;
             width: 24px; height: 24px; line-height: 22px; font-size: 12px;
         }
-        .eg-potential-drops-legend {
+        .sx-potential-drops-legend {
             font-family: var(--PX, monospace); font-size: 9px;
             letter-spacing: 1px; color: #9d93c9; opacity: 0.9;
             padding: 0 12px 8px;
         }
-        .eg-potential-drops-list {
+        .sx-potential-drops-list {
             overflow-y: auto; overflow-x: hidden;
             max-height: 330px; min-height: 80px;
             padding: 0 6px 8px 12px;
             scrollbar-width: thin;
             scrollbar-color: var(--border2) transparent;
         }
-        .eg-potential-drops-list::-webkit-scrollbar { width: 8px; }
-        .eg-potential-drops-list::-webkit-scrollbar-track { background: transparent; }
-        .eg-potential-drops-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-        .eg-potential-drop-row {
+        .sx-potential-drops-list::-webkit-scrollbar { width: 8px; }
+        .sx-potential-drops-list::-webkit-scrollbar-track { background: transparent; }
+        .sx-potential-drops-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+        .sx-potential-drop-row {
             display: flex; align-items: baseline; gap: 8px;
             font-family: var(--PX, monospace); font-size: 12px;
             padding: 4px 0; color: #e8e4f0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .eg-potential-drop-row:last-child { border-bottom: none; }
-        .eg-potential-drop-status { width: 16px; flex-shrink: 0; text-align: center; }
-        .eg-potential-drop-done .eg-potential-drop-status { color: #f5d98a; }
-        .eg-potential-drop-todo .eg-potential-drop-status { color: #62626e; }
-        .eg-potential-drop-todo .eg-potential-drop-name { color: #a9a4bd; }
-        .eg-potential-drop-tier { min-width: 34px; flex-shrink: 0; text-align: right; }
-        .eg-potential-drop-name { flex: 1; line-height: 1.35; }
-        .eg-potential-drop-boss { flex-shrink: 0; }
-        .eg-potential-drop-current {
+        .sx-potential-drop-row:last-child { border-bottom: none; }
+        .sx-potential-drop-status { width: 16px; flex-shrink: 0; text-align: center; }
+        .sx-potential-drop-done .sx-potential-drop-status { color: #f5d98a; }
+        .sx-potential-drop-todo .sx-potential-drop-status { color: #62626e; }
+        .sx-potential-drop-todo .sx-potential-drop-name { color: #a9a4bd; }
+        .sx-potential-drop-tier { min-width: 34px; flex-shrink: 0; text-align: right; }
+        .sx-potential-drop-name { flex: 1; line-height: 1.35; }
+        .sx-potential-drop-boss { flex-shrink: 0; }
+        .sx-potential-drop-current {
             font-size: 9px; letter-spacing: 1px; color: #14161d;
             background: #c8a84b; border-radius: 8px;
             padding: 1px 7px; margin-left: 6px; white-space: nowrap;
         }
-        .eg-potential-drops-empty {
+        .sx-potential-drops-empty {
             font-family: var(--PX, monospace); font-size: 10px; font-style: italic;
             color: rgba(255,255,255,0.55); text-align: center; padding: 20px 10px;
         }
@@ -288,7 +288,7 @@ _egInjectPotentialDropsStyles();
 // Builds a single map stash cell div (drop target).
 export function _egBuildMapStashCellHTML(row, col) {
     return `
-<div class="eg-inv-cell eg-map-stash-cell"
+<div class="sx-inv-cell eg-map-stash-cell"
      id="eg-map-stash-cell-${row}-${col}"
      data-row="${row}" data-col="${col}"
      data-eg-dropzone="mapstash"
@@ -382,8 +382,8 @@ export function _egBuildGatePanelHTML() {
         ? t('eg_map_atlas_not_completed').replace(/^○\s*/, '★ ')
         : '★ Not yet completed on Atlas';
     return `
-<div class="eg-panel eg-panel-map">
-    <div class="eg-panel-label">${t('mg_gate_badge')}</div>
+<div class="sx-panel sx-panel-map">
+    <div class="sx-panel-label">${t('mg_gate_badge')}</div>
     <div class="eg-gate-main">
         <div class="eg-gate-side eg-gate-side-left">
             <div class="eg-gate-currency-section">
@@ -398,7 +398,7 @@ export function _egBuildGatePanelHTML() {
         </div>
     </div>
     <div class="eg-map-stash-section">
-        <div class="eg-panel-label" style="display:flex; align-items:center; gap:8px;">
+        <div class="sx-panel-label" style="display:flex; align-items:center; gap:8px;">
             <span>${t('eg_maps_label')}</span>
             <span class="eg-atlas-legend-hint">${atlasHint}</span>
         </div>
@@ -415,14 +415,14 @@ export function _egBuildGatePanelHTML() {
 //-------------------HTML HELPERS: RUNES & ORBS ROW-----------------------
 //------------------------------------------------------------------------
 // The gate screen has its OWN cell ids (eg-gate-currency-cell-*) because the
-// hub screen's cells (eg-currency-cell-*) may coexist in the DOM. Both grids
+// hub screen's cells (sx-currency-cell-*) may coexist in the DOM. Both grids
 // read from and write to the SAME _currencyStash, so amounts stay in sync;
 // _renderCurrencyCell() in endgame-hub-drag-and-drop.js updates both.
 
 // Builds a single Orbs & Shards cell for the gate screen (fixed slots).
 export function _egBuildGateCurrencyCellHTML(row, col) {
     return `
-<div class="eg-inv-cell eg-currency-cell"
+<div class="sx-inv-cell sx-currency-cell"
      id="eg-gate-currency-cell-${row}-${col}"
      data-row="${row}" data-col="${col}"
      data-eg-dropzone="currency"
@@ -449,9 +449,9 @@ export function _egBuildGateCurrencyGridHTML() {
 // Assembles the gate-side Orbs & Shards strip panel: label + currency cell grid (fixed slots).
 export function _egBuildGateCurrencyStripHTML() {
     return `
-<div class="eg-currency-strip">
-    <div class="eg-panel-label">${t('eg_runes_orbs')}</div>
-    <div class="eg-currency-row" id="eg-gate-currency-grid"
+<div class="sx-currency-strip">
+    <div class="sx-panel-label">${t('eg_runes_orbs')}</div>
+    <div class="sx-currency-row" id="eg-gate-currency-grid"
          style="grid-template-columns: repeat(${CURRENCY_COLS}, 1fr);">
         ${_egBuildGateCurrencyGridHTML()}
     </div>
@@ -466,18 +466,18 @@ export function _egOnGateCurrencyCellEnter(row, col, e) {
     const def = (typeof _currencyDefForId === 'function') ? _currencyDefForId(assignedId) : null;
     if (!def) return;
     const html = `
-<div class="eg-tt-frame" style="--tt-border:#b59248;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon" style="opacity:0.55;">${GAME_ART.html('item', assignedId, def.icon || '◻')}</div>
-        <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${def.name || assignedId}</div>
-        <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
+<div class="sx-tt-frame" style="--tt-border:#b59248;">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon" style="opacity:0.55;">${GAME_ART.html('item', assignedId, def.icon || '◻')}</div>
+        <div class="sx-tt-name" style="color:#f5d98a; opacity:0.9;">${def.name || assignedId}</div>
+        <div class="sx-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
     </div>
-    <div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:0.85;">${def.description || ''}</div></div>
+    <div class="sx-tt-section"><div class="sx-tt-desc" style="opacity:0.85;">${def.description || ''}</div></div>
 </div>`;
     if (typeof showGameTooltip === 'function') globalThis.showGameTooltip(html, e);
 }
 export function _egOnGateCurrencyCellMove(e) {
-    const cell = e.currentTarget || (e.target.closest && e.target.closest('.eg-currency-cell'));
+    const cell = e.currentTarget || (e.target.closest && e.target.closest('.sx-currency-cell'));
     if (!cell) return;
     const r = +cell.dataset.row, c = +cell.dataset.col;
     const item = _currencyStash[r] && _currencyStash[r][c];
@@ -515,20 +515,20 @@ export function _egInjectGateLevelChipStyles() {
             background: rgba(200,168,75,0.16);
             box-shadow: 0 0 8px rgba(200,168,75,0.28);
         }
-        .eg-gate-level-chip .eg-lvl-chip {
+        .eg-gate-level-chip .sx-lvl-chip {
             gap: 6px;
             font-size: 11px;
         }
-        .eg-gate-level-chip .eg-lvl-chip-bar {
+        .eg-gate-level-chip .sx-lvl-chip-bar {
             width: 72px;
             height: 6px;
         }
         /* keep chip close to title but before the right spacer */
-        .eg-topbar .eg-gate-level-chip {
+        .sx-topbar .eg-gate-level-chip {
             margin-left: 8px;
         }
         @media (max-width: 700px) {
-            .eg-gate-level-chip .eg-lvl-chip-bar { width: 48px; }
+            .eg-gate-level-chip .sx-lvl-chip-bar { width: 48px; }
         }
     `;
     document.head.appendChild(style);
@@ -547,9 +547,9 @@ export function _egRenderGateLevelChip() {
     const need = (typeof _getXpForNextLevel === 'function') ? _getXpForNextLevel(lvl) : 0;
     const pct = lvl >= maxLvl ? 100 : (need > 0 ? Math.min(100, (xp / need) * 100) : 0);
     const lvlLabel = (typeof t === 'function') ? t('eg_lvl_short').replace('{n}', lvl) : `Lv. ${lvl}`;
-    const ptsHtml = pts > 0 ? `<span class="eg-lvl-chip-points">✦${pts > 99 ? '99+' : pts}</span>` : '';
-    // inner chip is styled by the shared eg-lvl-chip rules from endgame-leveling.js
-    el.innerHTML = `<span class="eg-lvl-chip" style="pointer-events:none;"><span class="eg-lvl-chip-lvl">${lvlLabel}</span><span class="eg-lvl-chip-bar"><span class="eg-lvl-chip-bar-fill" style="width:${pct}%"></span></span>${ptsHtml}</span>`;
+    const ptsHtml = pts > 0 ? `<span class="sx-lvl-chip-points">✦${pts > 99 ? '99+' : pts}</span>` : '';
+    // inner chip is styled by the shared sx-lvl-chip rules from endgame-leveling.js
+    el.innerHTML = `<span class="sx-lvl-chip" style="pointer-events:none;"><span class="sx-lvl-chip-lvl">${lvlLabel}</span><span class="sx-lvl-chip-bar"><span class="sx-lvl-chip-bar-fill" style="width:${pct}%"></span></span>${ptsHtml}</span>`;
     // No native title fallback here: the chip's hint is the styled tooltip
     // driven from its own onmouseenter (see _egBuildGateTopbarHTML), and a
     // title attribute would render the OS popup underneath it.
@@ -559,16 +559,16 @@ export function _egRenderGateLevelChip() {
 // Atlas of Statistica button (opens the map overview screen).
 export function _egBuildGateTopbarHTML() {
     return `
-<div class="eg-topbar">
-    <button class="eg-back-btn back-btn" onclick="${_egGateBackFn}()">${t('btn_back')}</button>
-    <span class="eg-topbar-title">${t('mg_gate_badge')}</span>
+<div class="sx-topbar">
+    <button class="sx-back-btn back-btn" onclick="${_egGateBackFn}()">${t('btn_back')}</button>
+    <span class="sx-topbar-title">${t('mg_gate_badge')}</span>
     <span id="eg-gate-level-chip" class="eg-gate-level-chip"
           onmouseenter="if(typeof _showLevelBtnTooltip==='function')_showLevelBtnTooltip(event)"
           onmousemove="if(typeof moveGameTooltip==='function')moveGameTooltip(event)"
           onmouseleave="if(typeof hideGameTooltip==='function')hideGameTooltip()"></span>
-    <div class="eg-topbar-right">
-        <button class="eg-level-btn" onclick="egOpenMapModsOverlay()">🎲 ${t('eg_mm_button')}</button>
-        <button class="eg-level-btn" onclick="showEndgameAtlas()">🗺 ${t('eg_atlas_title')}</button>
+    <div class="sx-topbar-right">
+        <button class="sx-level-btn" onclick="egOpenMapModsOverlay()">🎲 ${t('eg_mm_button')}</button>
+        <button class="sx-level-btn" onclick="showEndgameAtlas()">🗺 ${t('eg_atlas_title')}</button>
     </div>
 </div>`;
 }
@@ -580,7 +580,7 @@ export function _egBuildGateTopbarHTML() {
 // even opens the atlas.
 export function _egBuildGateFullScreenHTML() {
     return `
-<div class="eg-hub-layout">
+<div class="sx-hub-layout">
     ${_egBuildGateTopbarHTML()}
     <div class="eg-gate-tier-strip-band" id="eg-gate-tier-strip"></div>
     <div class="eg-gate-body">
@@ -770,7 +770,7 @@ export function _egInjectMapStashTabStyles() {
             background: rgba(200,168,75,0.30);
             color: #f5d98a;
         }
-        /* Scrollable infinite stash grid - mirrors .eg-inv-grid */
+        /* Scrollable infinite stash grid - mirrors .sx-inv-grid */
         .eg-map-stash-section {
             display: flex;
             flex-direction: column;
@@ -807,7 +807,7 @@ _egInjectAtlasHighlightStyles();
 
 // Updates the activate button enabled/disabled state based on whether a map is loaded.
 export function _egRenderMapDeviceButton() {
-    const btn = document.getElementById('eg-activate-btn');
+    const btn = document.getElementById('sx-activate-btn');
     if (!btn) return;
     btn.disabled = !globalThis._egMapSlotItem;
 }
@@ -932,7 +932,7 @@ export function _egRenderMapStash() {
 // lazily on first use). Cells rendered with emoji fallbacks before that
 // refresh here so they swap to art without needing a reload.
 if (typeof document !== 'undefined' && document.addEventListener) {
-    document.addEventListener('eg-art-loaded', function () {
+    document.addEventListener('sx-art-loaded', function () {
         try {
             if (document.getElementById('eg-map-stash-cell-0-0')) {
                 _egRenderMapStash();
@@ -1020,24 +1020,24 @@ export function _egBuildMapModEntryHTML(mod) {
 
     let statLines = (mod.rolledStats || [])
         .filter(stat => stat && stat.label)
-        .map(stat => `<div class="eg-mm-stat" style="color:${color}">${stat.label}</div>`)
+        .map(stat => `<div class="sx-mm-stat" style="color:${color}">${stat.label}</div>`)
         .join('');
     if (!statLines) {
         const fallback = _egMapModFallbackStatLabel(mod);
         if (fallback) {
-            statLines = `<div class="eg-mm-stat" style="color:${color}">${fallback}</div>`;
+            statLines = `<div class="sx-mm-stat" style="color:${color}">${fallback}</div>`;
         }
     }
 
     return `
-<div class="eg-mm-entry" style="border-left-color:${color}">
-    <div class="eg-mm-entry-head">
-        <span class="eg-mm-cat-badge" style="background:${color}">${_egMapModsCategoryLabel(affects)}</span>
-        <span class="eg-mm-tier">${t('eg_mm_tier').replace('{n}', mod.tier || 1)}</span>
+<div class="sx-mm-entry" style="border-left-color:${color}">
+    <div class="sx-mm-entry-head">
+        <span class="sx-mm-cat-badge" style="background:${color}">${_egMapModsCategoryLabel(affects)}</span>
+        <span class="sx-mm-tier">${t('eg_mm_tier').replace('{n}', mod.tier || 1)}</span>
     </div>
     ${statLines}
-    <div class="eg-mm-desc">${t('eg_mm_desc_' + mod.familyId)}</div>
-    <div class="eg-mm-rewards">🎁 +${rewards.xp}% ${t('eg_mm_rw_xp')} · +${rewards.quantity}% ${t('eg_mm_rw_quantity')} · +${rewards.rarity}% ${t('eg_mm_rw_rarity')}</div>
+    <div class="sx-mm-desc">${t('eg_mm_desc_' + mod.familyId)}</div>
+    <div class="sx-mm-rewards">🎁 +${rewards.xp}% ${t('eg_mm_rw_xp')} · +${rewards.quantity}% ${t('eg_mm_rw_quantity')} · +${rewards.rarity}% ${t('eg_mm_rw_rarity')}</div>
 </div>`;
 }
 
@@ -1046,18 +1046,18 @@ export function _egBuildMapModsOverlayContentHTML() {
     const map = globalThis._egMapSlotItem;
 
     if (!map) {
-        return `<div class="eg-mm-empty">${t('eg_mm_no_map')}</div>`;
+        return `<div class="sx-mm-empty">${t('eg_mm_no_map')}</div>`;
     }
 
     let html = `
-<div class="eg-mm-map-head">
-    <div class="eg-mm-map-name">🗺️ ${map.name}</div>
-    <div class="eg-mm-map-tier">${(t('eg_map_tier_tt') || 'Tier {n}').replace('{n}', map.mapTier ?? 1)}</div>
+<div class="sx-mm-map-head">
+    <div class="sx-mm-map-name">🗺️ ${map.name}</div>
+    <div class="sx-mm-map-tier">${(t('eg_map_tier_tt') || 'Tier {n}').replace('{n}', map.mapTier ?? 1)}</div>
 </div>`;
 
     const mods = Array.isArray(map.mods) ? map.mods : [];
     if (mods.length === 0) {
-        html += `<div class="eg-mm-empty">${t('eg_mm_unmodified')}</div>`;
+        html += `<div class="sx-mm-empty">${t('eg_mm_unmodified')}</div>`;
         return html;
     }
 
@@ -1071,15 +1071,15 @@ export function _egEnsureMapModsOverlay() {
 
     const overlay = document.createElement('div');
     overlay.id = 'eg-map-mods-overlay';
-    overlay.className = 'eg-mm-overlay-bg';
+    overlay.className = 'sx-mm-overlay-bg';
     overlay.innerHTML = `
-<div class="eg-mm-overlay-box">
-    <button class="eg-mm-close-x" onclick="egCloseMapModsOverlay()"
+<div class="sx-mm-overlay-box">
+    <button class="sx-mm-close-x" onclick="egCloseMapModsOverlay()"
             data-tip-t="ui_close" aria-label="${t('ui_close')}">✕</button>
-    <div class="eg-mm-overlay-title">${t('eg_mm_title')}</div>
-    <div class="eg-mm-overlay-body" id="eg-mm-overlay-body"></div>
-    <div class="eg-mm-overlay-btns">
-        <button class="eg-mm-close-btn" onclick="egCloseMapModsOverlay()">${t('eg_mm_close')}</button>
+    <div class="sx-mm-overlay-title">${t('eg_mm_title')}</div>
+    <div class="sx-mm-overlay-body" id="sx-mm-overlay-body"></div>
+    <div class="sx-mm-overlay-btns">
+        <button class="sx-mm-close-btn" onclick="egCloseMapModsOverlay()">${t('eg_mm_close')}</button>
     </div>
 </div>`;
     document.body.appendChild(overlay);
@@ -1095,7 +1095,7 @@ export function _egEnsureMapModsOverlay() {
 // Opens the overlay, refreshing its content from the current device slot.
 export function egOpenMapModsOverlay() {
     _egEnsureMapModsOverlay();
-    document.getElementById('eg-mm-overlay-body').innerHTML = _egBuildMapModsOverlayContentHTML();
+    document.getElementById('sx-mm-overlay-body').innerHTML = _egBuildMapModsOverlayContentHTML();
     document.getElementById('eg-map-mods-overlay').classList.add('show');
 }
 
@@ -1123,41 +1123,41 @@ export function _egInjectMapModsOverlayStyles() {
     const style = document.createElement('style');
     style.id = 'eg-map-mods-overlay-styles';
     style.textContent = `
-.eg-mm-overlay-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+.sx-mm-overlay-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
                     z-index:10000; align-items:center; justify-content:center; }
-.eg-mm-overlay-bg.show { display:flex; }
-.eg-mm-overlay-box { width:min(560px, 92vw); max-height:80vh; display:flex; flex-direction:column;
+.sx-mm-overlay-bg.show { display:flex; }
+.sx-mm-overlay-box { width:min(560px, 92vw); max-height:80vh; display:flex; flex-direction:column;
                      background:#1a1d26; border:1px solid #c8a84b; border-radius:10px;
                      padding:18px 20px; box-shadow:0 8px 40px rgba(0,0,0,0.6); }
-.eg-mm-overlay-box { position: relative; }
-.eg-mm-close-x { position:absolute; top:8px; right:8px; width:22px; height:22px; padding:0;
+.sx-mm-overlay-box { position: relative; }
+.sx-mm-close-x { position:absolute; top:8px; right:8px; width:22px; height:22px; padding:0;
                  font-family:var(--PX, monospace); font-size:10px; line-height:1;
                  color:var(--accent2, #fff); background:transparent;
                  border:1px solid var(--border2, #656f96); border-radius:4px;
                  cursor:pointer; transition:all 0.12s; }
-.eg-mm-close-x:hover { color:#ff6b6b; border-color:rgba(255,107,107,0.6);
+.sx-mm-close-x:hover { color:#ff6b6b; border-color:rgba(255,107,107,0.6);
                        background:rgba(255,107,107,0.12); }
-.eg-mm-overlay-title { font-size:1.2em; font-weight:bold; color:#c8a84b; text-align:center;
+.sx-mm-overlay-title { font-size:1.2em; font-weight:bold; color:#c8a84b; text-align:center;
                        margin-bottom:12px; letter-spacing:1px; }
-.eg-mm-overlay-body { overflow-y:auto; flex:1; padding-right:4px; }
-.eg-mm-map-head { text-align:center; margin-bottom:12px; padding-bottom:10px;
+.sx-mm-overlay-body { overflow-y:auto; flex:1; padding-right:4px; }
+.sx-mm-map-head { text-align:center; margin-bottom:12px; padding-bottom:10px;
                   border-bottom:1px solid rgba(200,168,75,0.3); }
-.eg-mm-map-name { color:#c8a84b; font-weight:bold; font-size:1.05em; }
-.eg-mm-map-tier { color:#c8a84b; opacity:.85; font-size:.85em; margin-top:2px; }
-.eg-mm-entry { background:rgba(255,255,255,0.04); border-left:3px solid #e67e22;
+.sx-mm-map-name { color:#c8a84b; font-weight:bold; font-size:1.05em; }
+.sx-mm-map-tier { color:#c8a84b; opacity:.85; font-size:.85em; margin-top:2px; }
+.sx-mm-entry { background:rgba(255,255,255,0.04); border-left:3px solid #e67e22;
                border-radius:6px; padding:10px 12px; margin-bottom:10px; }
-.eg-mm-entry-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
-.eg-mm-cat-badge { color:#14161d; font-size:.7em; font-weight:bold; padding:2px 8px;
+.sx-mm-entry-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.sx-mm-cat-badge { color:#14161d; font-size:.7em; font-weight:bold; padding:2px 8px;
                    border-radius:10px; letter-spacing:.5px; text-transform:uppercase; }
-.eg-mm-tier { color:rgba(255,255,255,0.55); font-size:.8em; }
-.eg-mm-stat { font-weight:bold; font-size:.95em; margin-bottom:2px; }
-.eg-mm-desc { color:rgba(255,255,255,0.75); font-size:.85em; line-height:1.35; margin-top:5px; }
-.eg-mm-rewards { color:#6dbf40; font-size:.78em; margin-top:6px; }
-.eg-mm-empty { color:rgba(255,255,255,0.55); text-align:center; padding:24px 8px; font-style:italic; }
-.eg-mm-overlay-btns { text-align:center; margin-top:14px; }
-.eg-mm-close-btn { background:#c8a84b; color:#14161d; border:none; border-radius:6px;
+.sx-mm-tier { color:rgba(255,255,255,0.55); font-size:.8em; }
+.sx-mm-stat { font-weight:bold; font-size:.95em; margin-bottom:2px; }
+.sx-mm-desc { color:rgba(255,255,255,0.75); font-size:.85em; line-height:1.35; margin-top:5px; }
+.sx-mm-rewards { color:#6dbf40; font-size:.78em; margin-top:6px; }
+.sx-mm-empty { color:rgba(255,255,255,0.55); text-align:center; padding:24px 8px; font-style:italic; }
+.sx-mm-overlay-btns { text-align:center; margin-top:14px; }
+.sx-mm-close-btn { background:#c8a84b; color:#14161d; border:none; border-radius:6px;
                    padding:8px 22px; font-weight:bold; cursor:pointer; letter-spacing:1px; }
-.eg-mm-close-btn:hover { filter:brightness(1.15); }`;
+.sx-mm-close-btn:hover { filter:brightness(1.15); }`;
     document.head.appendChild(style);
 }
 
@@ -1206,7 +1206,7 @@ export function showEndgameGate(backFn) {
     // Migrate old gate screens that were built before the side-by-side
     // layout (Orbs & Shards left of the gate) or before the atlas legend / tier tabs.
     const gateScreen = document.getElementById('screen-endgame-gate');
-    if (gateScreen && (!gateScreen.querySelector('.eg-atlas-legend-hint') || !gateScreen.querySelector('.eg-gate-main') || !gateScreen.querySelector('.eg-map-stash-tabs') || !gateScreen.querySelector('.eg-gate-info-btn') || !gateScreen.querySelector('#eg-gate-level-chip') || !gateScreen.querySelector('#eg-gate-tier-strip') || !gateScreen.querySelector('#eg-potential-drops'))) {
+    if (gateScreen && (!gateScreen.querySelector('.eg-atlas-legend-hint') || !gateScreen.querySelector('.eg-gate-main') || !gateScreen.querySelector('.eg-map-stash-tabs') || !gateScreen.querySelector('.eg-gate-info-btn') || !gateScreen.querySelector('#eg-gate-level-chip') || !gateScreen.querySelector('#eg-gate-tier-strip') || !gateScreen.querySelector('#sx-potential-drops'))) {
         gateScreen.innerHTML = _egBuildGateFullScreenHTML();
     }
     _egInjectAtlasHighlightStyles();
@@ -1219,7 +1219,7 @@ export function showEndgameGate(backFn) {
 
     // The gate screen DOM is built once - keep the back button in sync
     // with the current return target.
-    const backBtn = document.querySelector('#screen-endgame-gate .eg-back-btn');
+    const backBtn = document.querySelector('#screen-endgame-gate .sx-back-btn');
     if (backBtn) backBtn.setAttribute('onclick', `${_egGateBackFn}()`);
 
     if (typeof switchScreen === 'function') {
@@ -1243,7 +1243,7 @@ export function showEndgameGate(backFn) {
                 if (section) {
                     const oldTabs = section.querySelector('.eg-map-stash-tabs');
                     if (oldTabs) oldTabs.remove();
-                    const labelEl = section.querySelector('.eg-panel-label');
+                    const labelEl = section.querySelector('.sx-panel-label');
                     if (labelEl) labelEl.insertAdjacentHTML('afterend', _egBuildMapStashTabsHTML());
                     else section.insertAdjacentHTML('afterbegin', _egBuildMapStashTabsHTML());
                 }

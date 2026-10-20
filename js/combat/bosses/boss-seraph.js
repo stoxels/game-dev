@@ -50,9 +50,9 @@ export function _mechJudgmentPillars(monster, phase) {
     const pillars = [];
     for (let i = 0; i < strikes; i++) {
         const x = 50 + Math.random() * Math.max(50, W - 100);
-        const warnEl = _nkEl(run, 'div', 'eg-nk-pillar-warn eg-nk-pillar-holy');
+        const warnEl = _nkEl(run, 'div', 'sx-nk-pillar-warn sx-nk-pillar-holy');
         warnEl.style.display = 'none';
-        const pilEl = _nkEl(run, 'div', 'eg-nk-pillar eg-nk-pillar-holy');
+        const pilEl = _nkEl(run, 'div', 'sx-nk-pillar sx-nk-pillar-holy');
         pilEl.style.display = 'none';
         pillars.push({ x, t: -i * staggerMs, stage: 'warn', hitDone: false, warnEl, pilEl });
     }
@@ -118,7 +118,7 @@ export function _mechRadiantFans(monster, phase) {
                 const base = Math.atan2((c ? c.y : 300) - ey, (c ? c.x : ex) - ex);
                 for (let i = 0; i < fanN; i++) {
                     const a = base + (i - (fanN - 1) / 2) * (fanSpread * 2 / (fanN - 1));
-                    const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-orb-spirit');
+                    const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-orb-spirit');
                     orbs.push({ x: ex, y: ey, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, t: 0, hitDone: false, el });
                 }
             }

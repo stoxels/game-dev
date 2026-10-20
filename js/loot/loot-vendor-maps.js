@@ -40,9 +40,9 @@ export function _vendorBuildMapsTabHTML() {
         desc,
         price: 0,
         buyCall: `_vendorBuyTierMap(1)`,
-        extraClass: 'egv-map-card',
+        extraClass: 'sx-vendor-map-card',
     });
-    return `<div class="egv-cards egv-cards-maps">${card}</div>`;
+    return `<div class="sx-vendor-cards sx-vendor-cards-maps">${card}</div>`;
 }
 
 // Refreshes dynamic bits on the Maps tab. All tier maps are free (price 0)
@@ -50,7 +50,7 @@ export function _vendorBuildMapsTabHTML() {
 // for save-compatibility and simply refresh the gold balance.
 export function _vendorRefreshMapsTabDynamic() {
     // Legacy single-card path (pre multi-tier): keep behaviour if that DOM still exists.
-    const priceEl = document.getElementById('egv-offer-price');
+    const priceEl = document.getElementById('sx-vendor-offer-price');
     if (priceEl) {
         if (VENDOR_T1_MAP_PRICE > 0) {
             priceEl.textContent = t('eg_vendor_price').replace('{n}', VENDOR_T1_MAP_PRICE.toLocaleString());
@@ -59,11 +59,11 @@ export function _vendorRefreshMapsTabDynamic() {
         }
     }
     const cannotAfford = getGold() < VENDOR_T1_MAP_PRICE;
-    const cardEl = document.getElementById('egv-map-offer-card');
-    if (cardEl) cardEl.classList.toggle('egv-card-cannot-afford', cannotAfford);
-    const btn = document.getElementById('egv-buy-btn');
-    if (btn) btn.classList.toggle('egv-cannot-afford', cannotAfford);
-    const missingEl = document.getElementById('egv-map-missing-gold');
+    const cardEl = document.getElementById('sx-vendor-map-offer-card');
+    if (cardEl) cardEl.classList.toggle('sx-vendor-card-cannot-afford', cannotAfford);
+    const btn = document.getElementById('sx-vendor-buy-btn');
+    if (btn) btn.classList.toggle('sx-vendor-cannot-afford', cannotAfford);
+    const missingEl = document.getElementById('sx-vendor-map-missing-gold');
     if (missingEl) {
         missingEl.style.display = cannotAfford ? '' : 'none';
         if (cannotAfford) {

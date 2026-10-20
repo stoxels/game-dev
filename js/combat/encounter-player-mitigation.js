@@ -53,7 +53,7 @@ export function _applyPlayerParryFeedback() {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
-    label.className = 'eg-player-damage eg-player-miss';
+    label.className = 'sx-player-damage sx-player-miss';
     const txt = (typeof t === 'function') ? t('eg_parried') : 'Parried!';
     label.textContent = (txt && txt !== 'eg_parried') ? txt : 'Parried!';
     hud.appendChild(label);
@@ -66,7 +66,7 @@ export function _applyPlayerDeflectFeedback() {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
-    label.className = 'eg-player-damage eg-player-miss';
+    label.className = 'sx-player-damage sx-player-miss';
     const txt = (typeof t === 'function') ? t('eg_deflected') : 'Deflected!';
     label.textContent = (txt && txt !== 'eg_deflected') ? txt : 'Deflected!';
     hud.appendChild(label);
@@ -146,11 +146,11 @@ export function _tryDeflectProjectile(attacker, isProjectile) {
     const victim = others[Math.floor(Math.random() * others.length)];
     // Visual: fire a quick projectile from player/avatar to the victim
     const playerEl = document.getElementById('player-avatar-wrapper') || document.getElementById('player-avatar-simple');
-    const targetCard = document.getElementById(`eg-card-${victim.id}`);
+    const targetCard = document.getElementById(`sx-card-${victim.id}`);
     if (playerEl && targetCard && typeof _fireProjectile === 'function') {
         const start = _getElementCentre(playerEl);
         const end = _getElementCentre(targetCard);
-        const projDef = (typeof _getProjectileDef === 'function') ? _getProjectileDef() : { emoji: '↩️', cssClass: 'eg-proj-player', duration: 300, easing: 'linear' };
+        const projDef = (typeof _getProjectileDef === 'function') ? _getProjectileDef() : { emoji: '↩️', cssClass: 'sx-proj-player', duration: 300, easing: 'linear' };
         _fireProjectile(projDef, projDef.cssClass, start, end, 320, 'linear', () => {
             const toastKey = (typeof t === 'function' ? t('eg_deflected') : 'Deflected!');
             globalThis.showCombatToast(toastKey !== 'eg_deflected' ? toastKey : `↩️ Deflected to ${victim.name || 'another monster'}!`);

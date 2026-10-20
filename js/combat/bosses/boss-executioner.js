@@ -49,14 +49,14 @@ export function _mechAxePendulum(monster, phase) {
     const level = monster ? monster.level : 1;
     const px = window.innerWidth * 0.5, py = 40;
     const armLen = window.innerHeight * 0.62;
-    const pivot = _nkEl(run, 'div', 'eg-nk-dot', '⛓️');
+    const pivot = _nkEl(run, 'div', 'sx-nk-dot', '⛓️');
     pivot.style.transform = 'translate(' + Math.round(px - 22) + 'px,' + Math.round(py - 22) + 'px)';
-    const arm = _nkEl(run, 'div', 'eg-nk-pendulum-arm');
+    const arm = _nkEl(run, 'div', 'sx-nk-pendulum-arm');
     arm.style.width = '6px';
     arm.style.height = Math.round(armLen) + 'px';
     arm.style.left = Math.round(px - 3) + 'px';
     arm.style.top = Math.round(py) + 'px';
-    const blade = _nkEl(run, 'div', 'eg-nk-dot eg-nk-pendulum', '🪓');
+    const blade = _nkEl(run, 'div', 'sx-nk-dot sx-nk-pendulum', '🪓');
     _nkToast('eg_mech_executioner', '🪓 The Executioner: Axe Pendulum! Time the swing!');
     let e = 0, cdUntil = 0;
     _nkLoop(run, (dtS, now) => {

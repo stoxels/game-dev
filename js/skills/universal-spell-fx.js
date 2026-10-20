@@ -59,7 +59,7 @@ export const USP_THEME_PROJ = {
             root.innerHTML =
                 '<div class="egp usp-p-arc">' +
                     '<div class="usp-p-arc-trail"></div>' +
-                    '<div class="usp-p-arc-ring egp-spin"></div>' +
+                    '<div class="usp-p-arc-ring sx-projfx-spin"></div>' +
                     '<div class="usp-p-arc-orb"></div>' +
                 '</div>';
         },
@@ -94,8 +94,8 @@ export const USP_THEME_PROJ = {
                 '<div class="egp usp-p-nat">' +
                     '<div class="usp-p-nat-trail"></div>' +
                     '<div class="usp-p-nat-wisp"></div>' +
-                    '<div class="usp-p-nat-leaf usp-p-nat-leaf-1 egp-spin"></div>' +
-                    '<div class="usp-p-nat-leaf usp-p-nat-leaf-2 egp-spin"></div>' +
+                    '<div class="usp-p-nat-leaf usp-p-nat-leaf-1 sx-projfx-spin"></div>' +
+                    '<div class="usp-p-nat-leaf usp-p-nat-leaf-2 sx-projfx-spin"></div>' +
                 '</div>';
         },
     },
@@ -117,7 +117,7 @@ export const USP_THEME_PROJ = {
             root.innerHTML =
                 '<div class="egp usp-p-blade">' +
                     '<div class="usp-p-blade-trail"></div>' +
-                    '<div class="usp-p-blade-tumble egp-spin">' +
+                    '<div class="usp-p-blade-tumble sx-projfx-spin">' +
                         '<div class="usp-p-blade-edge"></div>' +
                         '<div class="usp-p-blade-spine"></div>' +
                     '</div>' +
@@ -348,8 +348,8 @@ const USP_SPELL_PROJ = {
                     '<div class="usp-p-wrath-trail"></div>' +
                     '<div class="usp-p-wrath-ball">' +
                         '<div class="usp-p-wrath-glow"></div>' +
-                        '<div class="usp-p-wrath-band usp-p-wrath-band-1 egp-spin"></div>' +
-                        '<div class="usp-p-wrath-band usp-p-wrath-band-2 egp-spin"></div>' +
+                        '<div class="usp-p-wrath-band usp-p-wrath-band-1 sx-projfx-spin"></div>' +
+                        '<div class="usp-p-wrath-band usp-p-wrath-band-2 sx-projfx-spin"></div>' +
                     '</div>' +
                     '<div class="usp-p-wrath-leaf usp-p-wrath-leaf-1"></div>' +
                     '<div class="usp-p-wrath-leaf usp-p-wrath-leaf-2"></div>' +
@@ -588,7 +588,7 @@ export function _uspProjDefFor(spell) {
 // Appends a themed overlay div to a monster card; auto-removes after ms.
 function _uspCardOverlay(monsterId, className, ms) {
     try {
-        const card = document.getElementById(`eg-card-${monsterId}`);
+        const card = document.getElementById(`sx-card-${monsterId}`);
         if (!card) return null;
         const el = document.createElement('div');
         el.className = className;
@@ -1098,7 +1098,7 @@ export function _uspTelegraph(spell, monsterId, delayMs) {
 function _uspResolveStart(spell, targetCard, opts) {
     const centre = (typeof globalThis._getElementCentre === 'function') ? globalThis._getElementCentre : null;
     if (opts && opts.fromMonsterId && centre) {
-        const from = document.getElementById(`eg-card-${opts.fromMonsterId}`);
+        const from = document.getElementById(`sx-card-${opts.fromMonsterId}`);
         if (from) return centre(from);
     }
     if (opts && opts.fromSky && targetCard && centre) {
@@ -2206,7 +2206,7 @@ function _uspBeamFlash(spell, monsterId) {
     try {
         const hero = document.getElementById('player-avatar-wrapper')
             || document.getElementById('player-avatar-simple');
-        const card = document.getElementById(`eg-card-${monsterId}`);
+        const card = document.getElementById(`sx-card-${monsterId}`);
         if (!hero || !card) return;
         const centre = (el) => {
             if (typeof globalThis._getElementCentre === 'function') {
@@ -2245,7 +2245,7 @@ function _uspFlameJet(spell, monsterId) {
     try {
         const hero = document.getElementById('player-avatar-wrapper')
             || document.getElementById('player-avatar-simple');
-        const card = document.getElementById(`eg-card-${monsterId}`);
+        const card = document.getElementById(`sx-card-${monsterId}`);
         if (!hero || !card) return;
         const centre = (el) => {
             if (typeof globalThis._getElementCentre === 'function') {
@@ -2286,7 +2286,7 @@ function _uspSoulBeam(spell, monsterId) {
     try {
         const hero = document.getElementById('player-avatar-wrapper')
             || document.getElementById('player-avatar-simple');
-        const card = document.getElementById(`eg-card-${monsterId}`);
+        const card = document.getElementById(`sx-card-${monsterId}`);
         if (!hero || !card) return;
         const centre = (el) => {
             if (typeof globalThis._getElementCentre === 'function') {
@@ -2367,7 +2367,7 @@ export function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
     // whatever the behavior's default start anchor is.
     if (sigHit && sigHit.skyfall) opts.fromSky = true;
 
-    const targetCard = document.getElementById(`eg-card-${monsterId}`);
+    const targetCard = document.getElementById(`sx-card-${monsterId}`);
     const start = _uspResolveStart(spell, targetCard, opts);
 
     const impact = () => {

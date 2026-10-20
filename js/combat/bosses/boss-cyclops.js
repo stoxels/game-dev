@@ -50,7 +50,7 @@ export function _mechEyeBursts(monster, phase) {
     const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const ex = window.innerWidth * 0.5, ey = window.innerHeight * 0.35;
-    const eye = _nkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '👹');
+    const eye = _nkEl(run, 'div', 'sx-nk-dot sx-nk-anchor', '👹');
     eye.style.transform = 'translate(' + Math.round(ex - 26) + 'px,' + Math.round(ey - 26) + 'px)';
     const orbs = [];
     let fired = 0, acc = 0, orbCdUntil = 0, spin = Math.random() * 6.28;
@@ -64,7 +64,7 @@ export function _mechEyeBursts(monster, phase) {
                 spin += 0.39; // rotate the pattern so gaps move each volley
                 for (let i = 0; i < ways; i++) {
                     const a = spin + i * Math.PI * 2 / ways;
-                    const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-orb');
+                    const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-orb');
                     orbs.push({ x: ex, y: ey, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, t: 0, hitDone: false, el });
                 }
             }

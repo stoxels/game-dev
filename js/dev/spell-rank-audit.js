@@ -768,7 +768,7 @@ export function _sraFxNote(spellId) {
 //   • universal support → the .usp-support-ring + floating value label
 //   • universal movement → the .usp-move-streak trail
 // Impact / nova / DoT overlays are the spell's own classes from
-// css/universal-spells.css; class spells get the shared eg-hit-burst ring.
+// css/universal-spells.css; class spells get the shared sx-hit-burst ring.
 // Everything is position:fixed and self-removing, so nothing here depends on
 // an encounter being live.
 //------------------------------------------------------------------------
@@ -790,7 +790,7 @@ export function _sraStagePoints() {
 export function _sraClearStage() {
     _sraFxTimers.forEach((id) => clearTimeout(id));
     _sraFxTimers = [];
-    document.querySelectorAll('.eg-projectile').forEach((el) => { try { el.remove(); } catch (e) {} });
+    document.querySelectorAll('.sx-projectile').forEach((el) => { try { el.remove(); } catch (e) {} });
     document.querySelectorAll('.sra-fx').forEach((el) => { try { el.remove(); } catch (e) {} });
     if (typeof _uspAnchorMarkerClear === 'function' && typeof isUspAnchorArmed === 'function' && !isUspAnchorArmed()) {
         // Only clear a marker this screen drew; a live encounter owns its own.
@@ -816,12 +816,12 @@ export function _sraStageOverlay(className, ms) {
 export function _sraHitBurst(x, y, color, isCrit) {
     if (typeof globalThis.HIT_ELEMENT_COLORS === 'undefined') return;
     const burst = document.createElement('div');
-    burst.className = 'eg-hit-burst sra-fx';
+    burst.className = 'sx-hit-burst sra-fx';
     burst.style.left = `${x}px`;
     burst.style.top = `${y}px`;
     const ring = document.createElement('div');
-    ring.className = 'eg-hit-ring';
-    ring.style.setProperty('--eg-hit-color', color || globalThis.HIT_ELEMENT_COLORS.physical);
+    ring.className = 'sx-hit-ring';
+    ring.style.setProperty('--sx-hit-color', color || globalThis.HIT_ELEMENT_COLORS.physical);
     if (isCrit) {
         ring.style.transform = 'scale(1.35)';
         ring.style.borderWidth = '4px';
@@ -831,11 +831,11 @@ export function _sraHitBurst(x, y, color, isCrit) {
     const sparkCount = (typeof globalThis.HIT_BURST_SPARK_COUNT === 'number') ? globalThis.HIT_BURST_SPARK_COUNT : 8;
     for (let i = 0; i < sparkCount; i++) {
         const spark = document.createElement('div');
-        spark.className = 'eg-hit-spark';
-        spark.style.setProperty('--eg-hit-color', color || globalThis.HIT_ELEMENT_COLORS.physical);
+        spark.className = 'sx-hit-spark';
+        spark.style.setProperty('--sx-hit-color', color || globalThis.HIT_ELEMENT_COLORS.physical);
         const angle = (Math.PI * 2 * i) / sparkCount;
-        spark.style.setProperty('--eg-hit-dx', `${Math.cos(angle) * 22}px`);
-        spark.style.setProperty('--eg-hit-dy', `${Math.sin(angle) * 22}px`);
+        spark.style.setProperty('--sx-hit-dx', `${Math.cos(angle) * 22}px`);
+        spark.style.setProperty('--sx-hit-dy', `${Math.sin(angle) * 22}px`);
         burst.appendChild(spark);
     }
     document.body.appendChild(burst);
@@ -861,13 +861,13 @@ export function _sraClassProjDef(spellId) {
 // created is removed just after. If onfinish ALSO fires (it does for class
 // spells), both paths are no-ops and the result is identical.
 export function _sraFireFlight(projDef, start, end, dur, easing, scale, onArrive) {
-    const before = new Set(document.querySelectorAll('.eg-projectile'));
+    const before = new Set(document.querySelectorAll('.sx-projectile'));
     try {
         globalThis._fireProjectile(projDef, projDef.cssClass, start, end, dur, easing, () => {}, null, scale);
     } catch (e) {
         return null; // flight is cosmetic - never let the sandbox throw
     }
-    const created = Array.from(document.querySelectorAll('.eg-projectile')).filter((el) => !before.has(el));
+    const created = Array.from(document.querySelectorAll('.sx-projectile')).filter((el) => !before.has(el));
     _sraAfter(dur + 20, () => { if (onArrive) onArrive(); });
     _sraAfter(dur + 140, () => { created.forEach((el) => { try { el.remove(); } catch (e) {} }); });
     return created[0] || null;

@@ -133,11 +133,11 @@ export function _snailSlimeCell(r, c) {
     const cell = document.getElementById('g-' + r + '-' + c);
     if (!cell || !cell.isConnected) return;
     const ov = document.createElement('span');
-    ov.className = 'eg-snail-slime';
-    ov.id = 'eg-snail-slime-' + r + '-' + c;
+    ov.className = 'sx-snail-slime';
+    ov.id = 'sx-snail-slime-' + r + '-' + c;
     ov.textContent = '🫧';
     const fill = document.createElement('i');
-    fill.className = 'eg-snail-slime-fill';
+    fill.className = 'sx-snail-slime-fill';
     ov.appendChild(fill);
     cell.appendChild(ov);
     _snailSlimed.set(key, { el: ov, fill, r, c });
@@ -201,7 +201,7 @@ export function _snailCrashIntoCorruption(state) {
 
     // Squish + splash at the snail's position (transient, not run-owned).
     const squish = document.createElement('div');
-    squish.className = 'eg-snail-squish';
+    squish.className = 'sx-snail-squish';
     squish.textContent = '🐌💦';
     squish.style.left = Math.round(state.x) + 'px';
     squish.style.top = Math.round(state.y) + 'px';
@@ -346,9 +346,9 @@ export function _snailEnsureBroom() {
     })();
     homes.forEach((home, i) => {
         const el = document.createElement('div');
-        el.className = 'eg-snail-broom';
-        el.id = 'eg-snail-broom-' + i;
-        el.innerHTML = '<span class="eg-snail-broom-ico">🧹</span><span class="eg-snail-broom-label">🧹 ' + rawLabel + '</span>';
+        el.className = 'sx-snail-broom';
+        el.id = 'sx-snail-broom-' + i;
+        el.innerHTML = '<span class="sx-snail-broom-ico">🧹</span><span class="sx-snail-broom-label">🧹 ' + rawLabel + '</span>';
         el.style.left = Math.round(home.x) + 'px';
         el.style.top = Math.round(home.y) + 'px';
         document.body.appendChild(el);
@@ -383,8 +383,8 @@ export function _snailPickupBroom(broom) {
     broom.el.style.right = '-14px';
     broom.el.style.bottom = '10px';
     broom.el.style.zIndex = '1100';
-    broom.el.classList.add('eg-snail-broom-held');
-    const lbl = broom.el.querySelector('.eg-snail-broom-label');
+    broom.el.classList.add('sx-snail-broom-held');
+    const lbl = broom.el.querySelector('.sx-snail-broom-label');
     if (lbl) lbl.style.display = 'none';
     host.appendChild(broom.el);
     _nkToast('eg_snail_broom_picked', '🧹 You grab the broom - you move much slower!', '#a3e635');
@@ -407,8 +407,8 @@ export function _snailDropBroom() {
     _snailSyncSweepLabel(null);
     b.chargePauseShown = false;
     _snailSetChargePauseClass(false);
-    b.el.classList.remove('eg-snail-broom-held');
-    const lbl = b.el.querySelector('.eg-snail-broom-label');
+    b.el.classList.remove('sx-snail-broom-held');
+    const lbl = b.el.querySelector('.sx-snail-broom-label');
     if (lbl) lbl.style.display = '';
     document.body.appendChild(b.el);
     b.el.style.position = 'fixed';
@@ -417,8 +417,8 @@ export function _snailDropBroom() {
     b.el.style.zIndex = '';
     b.el.style.left = Math.round(b.homeX) + 'px';
     b.el.style.top = Math.round(b.homeY) + 'px';
-    b.el.classList.add('eg-snail-broom-pop');
-    setTimeout(() => { try { b.el.classList.remove('eg-snail-broom-pop'); } catch (e) {} }, 450);
+    b.el.classList.add('sx-snail-broom-pop');
+    setTimeout(() => { try { b.el.classList.remove('sx-snail-broom-pop'); } catch (e) {} }, 450);
 }
 
 
@@ -431,12 +431,12 @@ export function _snailSyncSweepLabel(pct) {
     const hud = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     if (hud) {
-        let lbl = document.getElementById('eg-snail-sweep-label');
+        let lbl = document.getElementById('sx-snail-sweep-label');
         if (show) {
             if (!lbl) {
                 lbl = document.createElement('div');
-                lbl.id = 'eg-snail-sweep-label';
-                lbl.className = 'eg-snail-sweep-label';
+                lbl.id = 'sx-snail-sweep-label';
+                lbl.className = 'sx-snail-sweep-label';
                 hud.appendChild(lbl);
             }
             const raw = (typeof t === 'function') ? t('eg_snail_sweeping') : '';
@@ -448,7 +448,7 @@ export function _snailSyncSweepLabel(pct) {
             lbl.remove();
         }
     } else if (!show) {
-        const stray = document.getElementById('eg-snail-sweep-label');
+        const stray = document.getElementById('sx-snail-sweep-label');
         if (stray) stray.remove();
     }
 }
@@ -458,9 +458,9 @@ export function _snailSyncSweepLabel(pct) {
 // used by drop/teardown after the held broom has been released).
 export function _snailSetChargePauseClass(active) {
     const bar = document.getElementById('avatar-charge-fill');
-    if (bar) bar.classList.toggle('eg-charge-paused', !!active);
-    const alt = document.getElementById('eg-player-charge-bar');
-    if (alt) alt.classList.toggle('eg-charge-paused', !!active);
+    if (bar) bar.classList.toggle('sx-charge-paused', !!active);
+    const alt = document.getElementById('sx-player-charge-bar');
+    if (alt) alt.classList.toggle('sx-charge-paused', !!active);
 }
 
 
@@ -556,7 +556,7 @@ export function _snailBroomTick() {
         b.sweepKey = key;
         b.sweepAcc += SNAIL_BROOM_TICK_MS;
         b.sweepFill = slimed.fill;
-        slimed.el.classList.add('eg-snail-slime-sweeping');
+        slimed.el.classList.add('sx-snail-slime-sweeping');
         if (slimed.fill) {
             slimed.fill.style.width = Math.min(100, (b.sweepAcc / SNAIL_SWEEP_MS) * 100) + '%';
         }
@@ -570,7 +570,7 @@ export function _snailBroomTick() {
     // Not on a slimed cell - any in-progress sweep resets.
     if (b.sweepKey) {
         const prev = _snailSlimed.get(b.sweepKey);
-        if (prev && prev.el) prev.el.classList.remove('eg-snail-slime-sweeping');
+        if (prev && prev.el) prev.el.classList.remove('sx-snail-slime-sweeping');
         if (prev && prev.fill) prev.fill.style.width = '0%';
         b.sweepKey = null;
         b.sweepFill = null;
@@ -588,8 +588,8 @@ export function _snailCleanCell(entry) {
     b.sweepKey = null;
     b.sweepAcc = 0;
     b.sweepFill = null;
-    entry.el.classList.remove('eg-snail-slime-sweeping');
-    entry.el.classList.add('eg-snail-slime-cleaned');
+    entry.el.classList.remove('sx-snail-slime-sweeping');
+    entry.el.classList.add('sx-snail-slime-cleaned');
     setTimeout(() => { try { entry.el.remove(); } catch (e) {} }, 600);
     _snailSlimed.delete(entry.r + '-' + entry.c);
     _snailSyncSweepLabel(null);
@@ -687,7 +687,7 @@ export function _mechDoomSnail(monster, phase) {
     const dmgPct = [0, 0.26, 0.30, 0.36][p];
     const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
-    const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-snail', '🐌');
+    const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-snail', '🐌');
     const state = {
         run, el,
         x: 60, y: window.innerHeight - 120,
@@ -798,15 +798,15 @@ export function _snailgeddonActive() {
 // transition, released in _snailgeddonEnd), and this bubble makes that
 // readable at a glance on top of the IMMUNE badge / blocked-hit flash. Like
 // the Jelly Ice Shell bubble it is a FIXED element repositioned every frame
-// over the card (`.eg-emoji-wrapper`), so monster-panel re-renders can't
+// over the card (`.sx-emoji-wrapper`), so monster-panel re-renders can't
 // orphan it, and it self-removes when the set-piece ends on ANY path.
 // Positions the dome over the card's emoji (hidden when the card is not
 // currently on screen). Both the synchronous first placement and the
 // per-frame driver share this, so the shield is visible the instant the
 // countdown starts - no waiting for the next animation frame.
 export function _snailgeddonPlaceShield(g, s) {
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? card.querySelector('.eg-emoji-wrapper') : null;
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? card.querySelector('.sx-emoji-wrapper') : null;
     const el = wrap || card;
     const r = el ? el.getBoundingClientRect() : null;
     if (!r || !r.width || !r.height) {
@@ -824,7 +824,7 @@ export function _snailgeddonPlaceShield(g, s) {
 export function _snailgeddonShowShield(g) {
     if (!g || g.shield) return;
     const s = document.createElement('div');
-    s.className = 'eg-snail-shield';
+    s.className = 'sx-snail-shield';
     s.style.display = 'none';
     document.body.appendChild(s);
     g.shield = s;
@@ -941,7 +941,7 @@ export function _snailRRContains(px, py, cx, cy, hx, hy, cr) {
 // never be stranded by run cleanup - it self-removes).
 export function _snailgeddonBurst(x, y) {
     const s = document.createElement('div');
-    s.className = 'eg-snail-squish';
+    s.className = 'sx-snail-squish';
     s.textContent = '🐌💨';
     s.style.left = Math.round(x) + 'px';
     s.style.top = Math.round(y) + 'px';
@@ -957,7 +957,7 @@ export function _snailgeddonPlaceOverlay(g) {
     const c = _snailGridCentre();
     ov.style.left = Math.round(c ? c.x : window.innerWidth / 2) + 'px';
     ov.style.top = Math.round(c ? c.y : window.innerHeight / 2) + 'px';
-    const num = ov.querySelector('.eg-snailgeddon-cd-num');
+    const num = ov.querySelector('.sx-snailgeddon-cd-num');
     if (num) num.textContent = g.count;
 }
 
@@ -965,19 +965,19 @@ export function _snailgeddonPlaceOverlay(g) {
 // Builds the countdown overlay (label + number + hint), localised.
 export function _snailgeddonShowOverlay(g) {
     const ov = document.createElement('div');
-    ov.className = 'eg-snailgeddon-cd';
-    ov.id = 'eg-snailgeddon-cd';
+    ov.className = 'sx-snailgeddon-cd';
+    ov.id = 'sx-snailgeddon-cd';
     ov.innerHTML =
-        '<div class="eg-snailgeddon-cd-label"></div>' +
-        '<div class="eg-snailgeddon-cd-num"></div>' +
-        '<div class="eg-snailgeddon-cd-hint"></div>';
+        '<div class="sx-snailgeddon-cd-label"></div>' +
+        '<div class="sx-snailgeddon-cd-num"></div>' +
+        '<div class="sx-snailgeddon-cd-hint"></div>';
     document.body.appendChild(ov);
     g.overlay = ov;
     const rawLabel = t('eg_snailgeddon_cd_label');
     const rawHint = t('eg_snailgeddon_hint');
-    ov.querySelector('.eg-snailgeddon-cd-label').textContent =
+    ov.querySelector('.sx-snailgeddon-cd-label').textContent =
         (rawLabel && rawLabel !== 'eg_snailgeddon_cd_label') ? rawLabel : 'SNAILGEDDON IN';
-    ov.querySelector('.eg-snailgeddon-cd-hint').textContent =
+    ov.querySelector('.sx-snailgeddon-cd-hint').textContent =
         (rawHint && rawHint !== 'eg_snailgeddon_hint') ? rawHint : 'The ring is closing - one side lags behind. Escape through the gap!';
     _snailgeddonPlaceOverlay(g);
 }
@@ -1047,7 +1047,7 @@ export function _snailgeddonStart(monster) {
             _snailgeddonGo(g, monster);
             return;
         }
-        const num = g.overlay && g.overlay.querySelector('.eg-snailgeddon-cd-num');
+        const num = g.overlay && g.overlay.querySelector('.sx-snailgeddon-cd-num');
         if (num) num.textContent = g.count;
         _snailgeddonPlaceOverlay(g); // re-centre in case the grid moved
     }, SNAILGEDDON_CD_MS);
@@ -1129,7 +1129,7 @@ export function _snailgeddonGo(g, monster) {
         const rho = Math.hypot(p.x - cx, p.y - cy);
         const slow = ((i - slowStart + N) % N) < slowArc;
         const el = _nkEl(run, 'div',
-            'eg-nk-dot eg-nk-snail eg-snailgeddon-swarm' + (slow ? ' eg-snailgeddon-slow' : ''), '🐌');
+            'sx-nk-dot sx-nk-snail sx-snailgeddon-swarm' + (slow ? ' sx-snailgeddon-slow' : ''), '🐌');
         el.style.transform = 'translate(' + Math.round(p.x - 30) + 'px,' + Math.round(p.y - 30) + 'px)';
         swarm.push({ el, a, rho, rho0: rho, mult: slow ? SNAILGEDDON_SLOW_MULT : 1, x: p.x, y: p.y, alive: true });
     }

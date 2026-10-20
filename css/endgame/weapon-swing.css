@@ -5,7 +5,7 @@
    player avatar, skinned per weapon family. This deliberately avoids
    per-character / per-class weapon sprite art: the effect is drawn from
    gradients + clip-path + box-shadow only, and rotates toward the
-   direction the player is facing (eg-dir-up/down/left/right).
+   direction the player is facing (sx-dir-up/down/left/right).
 
    Families (resolved in js/endgame/endgame-weapon-swing.js):
      sword   - broad silver slash arc
@@ -18,16 +18,16 @@
      unarmed - bare-handed jab puff (no weapon equipped)
 
    DOM contract (built by _showWeaponSwing):
-     .eg-weapon-swing.eg-swing-<family>.eg-dir-<dir>
-       > .egw-rot              (direction rotator: right 0, down 90,
+     .sx-weapon-swing.sx-swing-<family>.sx-dir-<dir>
+       > .sx-swing-rot              (direction rotator: right 0, down 90,
                                 left 180, up 270 - shape drawn aiming +x)
-         > family-specific parts (.egw-arc, .egw-blade, ...)
+         > family-specific parts (.sx-swing-arc, .sx-swing-blade, ...)
    The JS removes the node after the family duration; every animation
    below is fire-once (forwards) so no cleanup state lingers.
    ============================================================================ */
 
 /* ── Anchor / rotator ─────────────────────────────────────────────────── */
-.eg-weapon-swing {
+.sx-weapon-swing {
     position: absolute;
     left: 50%;
     /* The avatar wrapper is a column: bars on top, sprite below. ~62%
@@ -41,32 +41,32 @@
     z-index: 1001;
 }
 
-.egw-rot {
+.sx-swing-rot {
     position: absolute;
     inset: 0;
 }
 
-.eg-weapon-swing.eg-dir-right .egw-rot { transform: rotate(0deg); }
-.eg-weapon-swing.eg-dir-down  .egw-rot { transform: rotate(90deg); }
-.eg-weapon-swing.eg-dir-left  .egw-rot { transform: rotate(180deg); }
-.eg-weapon-swing.eg-dir-up    .egw-rot { transform: rotate(270deg); }
+.sx-weapon-swing.sx-dir-right .sx-swing-rot { transform: rotate(0deg); }
+.sx-weapon-swing.sx-dir-down  .sx-swing-rot { transform: rotate(90deg); }
+.sx-weapon-swing.sx-dir-left  .sx-swing-rot { transform: rotate(180deg); }
+.sx-weapon-swing.sx-dir-up    .sx-swing-rot { transform: rotate(270deg); }
 
 /* Bigger weapons sweep a wider circle (2H swords/axes/maces/staves). */
-.eg-weapon-swing.eg-heavy {
+.sx-weapon-swing.sx-heavy {
     width: 190px;
     height: 190px;
     margin-left: -95px;
     margin-top: -95px;
 }
 
-.egw-part {
+.sx-swing-part {
     position: absolute;
     pointer-events: none;
 }
 
 /* ── SWORD: broad silver slash ──────────────────────────────────────────
    A crescent arc sweeping -70° → +70° plus a bright blade streak. */
-.eg-swing-sword .egw-arc {
+.sx-swing-sword .sx-swing-arc {
     left: 8px;
     top: 8px;
     width: 134px;
@@ -77,10 +77,10 @@
     border-right-color: rgba(176, 190, 197, 0.85);
     filter: drop-shadow(0 0 6px rgba(207, 216, 220, 0.9));
     opacity: 0;
-    animation: egw-sword-sweep 300ms ease-out forwards;
+    animation: sx-swing-sword-sweep 300ms ease-out forwards;
 }
 
-.eg-heavy.eg-swing-sword .egw-arc {
+.sx-heavy.sx-swing-sword .sx-swing-arc {
     left: 10px;
     top: 10px;
     width: 170px;
@@ -88,7 +88,7 @@
     border-width: 9px;
 }
 
-.eg-swing-sword .egw-blade {
+.sx-swing-sword .sx-swing-blade {
     left: 75px;
     top: 70px;
     width: 66px;
@@ -97,16 +97,16 @@
     background: linear-gradient(to right, rgba(236, 239, 241, 0), #eceff1 55%, #ffffff);
     clip-path: polygon(0 20%, 78% 0, 100% 50%, 78% 100%, 0 80%);
     opacity: 0;
-    animation: egw-sword-streak 300ms ease-out forwards;
+    animation: sx-swing-sword-streak 300ms ease-out forwards;
 }
 
-@keyframes egw-sword-sweep {
+@keyframes sx-swing-sword-sweep {
     0%   { opacity: 0; transform: rotate(-70deg) scale(0.85); }
     25%  { opacity: 1; }
     100% { opacity: 0; transform: rotate(70deg) scale(1.05); }
 }
 
-@keyframes egw-sword-streak {
+@keyframes sx-swing-sword-streak {
     0%   { opacity: 0; transform: translateX(-18px) scaleX(0.6); }
     35%  { opacity: 1; }
     100% { opacity: 0; transform: translateX(14px) scaleX(1.1); }
@@ -114,7 +114,7 @@
 
 /* ── DAGGER: fast double thrust ─────────────────────────────────────────
    Short ice-blue needle jabbing twice - quick and stabby. */
-.eg-swing-dagger .egw-blade {
+.sx-swing-dagger .sx-swing-blade {
     left: 70px;
     top: 70px;
     width: 52px;
@@ -124,10 +124,10 @@
     clip-path: polygon(0 25%, 82% 0, 100% 50%, 82% 100%, 0 75%);
     filter: drop-shadow(0 0 5px rgba(179, 229, 252, 0.9));
     opacity: 0;
-    animation: egw-dagger-jab 240ms ease-out forwards;
+    animation: sx-swing-dagger-jab 240ms ease-out forwards;
 }
 
-.eg-swing-dagger .egw-arc {
+.sx-swing-dagger .sx-swing-arc {
     left: 96px;
     top: 66px;
     width: 12px;
@@ -135,10 +135,10 @@
     border-radius: 50%;
     background: radial-gradient(circle, #ffffff 0%, rgba(179, 229, 252, 0.9) 45%, transparent 70%);
     opacity: 0;
-    animation: egw-dagger-ping 240ms ease-out forwards;
+    animation: sx-swing-dagger-ping 240ms ease-out forwards;
 }
 
-@keyframes egw-dagger-jab {
+@keyframes sx-swing-dagger-jab {
     0%   { opacity: 0; transform: translateX(-10px) scaleX(0.5); }
     20%  { opacity: 1; transform: translateX(16px) scaleX(1); }
     40%  { opacity: 0.4; transform: translateX(2px) scaleX(0.8); }
@@ -146,7 +146,7 @@
     100% { opacity: 0; transform: translateX(26px) scaleX(1.1); }
 }
 
-@keyframes egw-dagger-ping {
+@keyframes sx-swing-dagger-ping {
     0%, 45% { opacity: 0; transform: scale(0.4); }
     60%     { opacity: 1; transform: scale(1); }
     100%    { opacity: 0; transform: scale(1.6); }
@@ -156,7 +156,7 @@
    A thick amber crescent winds back, then chops through the facing
    direction; a tapered slash line + spark burst lands at the target
    side on impact. Drawn aiming +x like every other family. */
-.eg-swing-axe .egw-arc {
+.sx-swing-axe .sx-swing-arc {
     left: 8px;
     top: 8px;
     width: 134px;
@@ -167,10 +167,10 @@
     border-top-color: rgba(255, 152, 0, 0.55);
     filter: drop-shadow(0 0 8px rgba(255, 143, 0, 0.9));
     opacity: 0;
-    animation: egw-axe-cleave 360ms cubic-bezier(0.55, 0, 0.35, 1) forwards;
+    animation: sx-swing-axe-cleave 360ms cubic-bezier(0.55, 0, 0.35, 1) forwards;
 }
 
-.eg-heavy.eg-swing-axe .egw-arc {
+.sx-heavy.sx-swing-axe .sx-swing-arc {
     left: 10px;
     top: 10px;
     width: 170px;
@@ -178,7 +178,7 @@
     border-width: 16px;
 }
 
-.eg-swing-axe .egw-blade {
+.sx-swing-axe .sx-swing-blade {
     left: 128px;
     top: 30px;
     width: 14px;
@@ -188,24 +188,24 @@
     filter: drop-shadow(0 0 9px rgba(255, 152, 0, 1));
     opacity: 0;
     transform-origin: 50% 50%;
-    animation: egw-axe-slash 360ms ease-out forwards;
+    animation: sx-swing-axe-slash 360ms ease-out forwards;
 }
 
-.eg-heavy.eg-swing-axe .egw-blade {
+.sx-heavy.sx-swing-axe .sx-swing-blade {
     left: 150px;
     top: 36px;
     height: 118px;
     width: 18px;
 }
 
-@keyframes egw-axe-cleave {
+@keyframes sx-swing-axe-cleave {
     0%   { opacity: 0; transform: rotate(-110deg) scale(0.9); }
     20%  { opacity: 1; transform: rotate(-95deg) scale(0.92); }
     70%  { opacity: 1; transform: rotate(35deg) scale(1.04); }
     100% { opacity: 0; transform: rotate(55deg) scale(1.08); }
 }
 
-@keyframes egw-axe-slash {
+@keyframes sx-swing-axe-slash {
     0%, 52% { opacity: 0; transform: scaleY(0.2) scaleX(0.6); }
     64%     { opacity: 1; transform: scaleY(1.1) scaleX(1.5); }
     100%    { opacity: 0; transform: scaleY(1.25) scaleX(0.7); }
@@ -213,7 +213,7 @@
 
 /* ── MACE: blunt slam + shockwave ───────────────────────────────────────
    Dark-iron head crashing down, ring blast radiating out. */
-.eg-swing-mace .egw-blade {
+.sx-swing-mace .sx-swing-blade {
     left: 96px;
     top: 30px;
     width: 34px;
@@ -224,10 +224,10 @@
     box-sizing: border-box;
     filter: drop-shadow(0 0 7px rgba(176, 190, 197, 0.8));
     opacity: 0;
-    animation: egw-mace-slam 400ms cubic-bezier(0.3, 0.6, 0.4, 1) forwards;
+    animation: sx-swing-mace-slam 400ms cubic-bezier(0.3, 0.6, 0.4, 1) forwards;
 }
 
-.eg-swing-mace .egw-arc {
+.sx-swing-mace .sx-swing-arc {
     left: 78px;
     top: 52px;
     width: 74px;
@@ -235,17 +235,17 @@
     border-radius: 50%;
     border: 4px solid rgba(255, 205, 112, 0.95);
     opacity: 0;
-    animation: egw-mace-shock 400ms ease-out forwards;
+    animation: sx-swing-mace-shock 400ms ease-out forwards;
 }
 
-@keyframes egw-mace-slam {
+@keyframes sx-swing-mace-slam {
     0%   { opacity: 0; transform: translateY(-26px) scale(0.8); }
     35%  { opacity: 1; transform: translateY(6px) scale(1.05); }
     55%  { opacity: 1; transform: translateY(14px) scale(1); }
     100% { opacity: 0; transform: translateY(18px) scale(0.95); }
 }
 
-@keyframes egw-mace-shock {
+@keyframes sx-swing-mace-shock {
     0%, 40% { opacity: 0; transform: scale(0.35); }
     60%     { opacity: 1; transform: scale(0.9); }
     100%    { opacity: 0; transform: scale(1.8); }
@@ -253,7 +253,7 @@
 
 /* ── WAND: arcane bolt flick ────────────────────────────────────────────
    Violet-white spark darting forward on a fading trail. */
-.eg-swing-wand .egw-blade {
+.sx-swing-wand .sx-swing-blade {
     left: 72px;
     top: 66px;
     width: 18px;
@@ -262,10 +262,10 @@
     background: radial-gradient(circle at 40% 40%, #ffffff 0%, #ce93d8 40%, #7b1fa2 100%);
     filter: drop-shadow(0 0 8px rgba(206, 147, 216, 0.95));
     opacity: 0;
-    animation: egw-wand-bolt 340ms ease-in forwards;
+    animation: sx-swing-wand-bolt 340ms ease-in forwards;
 }
 
-.eg-swing-wand .egw-arc {
+.sx-swing-wand .sx-swing-arc {
     left: 40px;
     top: 71px;
     width: 40px;
@@ -273,16 +273,16 @@
     border-radius: 4px;
     background: linear-gradient(to right, transparent, rgba(206, 147, 216, 0.9));
     opacity: 0;
-    animation: egw-wand-trail 340ms ease-in forwards;
+    animation: sx-swing-wand-trail 340ms ease-in forwards;
 }
 
-@keyframes egw-wand-bolt {
+@keyframes sx-swing-wand-bolt {
     0%   { opacity: 0; transform: translateX(0) scale(0.5); }
     25%  { opacity: 1; transform: translateX(14px) scale(1); }
     100% { opacity: 0; transform: translateX(58px) scale(0.9); }
 }
 
-@keyframes egw-wand-trail {
+@keyframes sx-swing-wand-trail {
     0%   { opacity: 0; }
     30%  { opacity: 1; }
     100% { opacity: 0; }
@@ -290,7 +290,7 @@
 
 /* ── STAFF: long spinning sweep ─────────────────────────────────────────
    Arcane-violet shaft whirling ~300° + orbiting motes. Heavy = wide. */
-.eg-swing-staff .egw-blade {
+.sx-swing-staff .sx-swing-blade {
     left: 20px;
     top: 68px;
     width: 110px;
@@ -300,14 +300,14 @@
     transform-origin: 18% 50%;
     filter: drop-shadow(0 0 8px rgba(186, 104, 200, 0.9));
     opacity: 0;
-    animation: egw-staff-spin 460ms cubic-bezier(0.35, 0.1, 0.35, 1) forwards;
+    animation: sx-swing-staff-spin 460ms cubic-bezier(0.35, 0.1, 0.35, 1) forwards;
 }
 
-.eg-heavy.eg-swing-staff .egw-blade {
+.sx-heavy.sx-swing-staff .sx-swing-blade {
     width: 150px;
 }
 
-.eg-swing-staff .egw-arc {
+.sx-swing-staff .sx-swing-arc {
     left: 100px;
     top: 62px;
     width: 20px;
@@ -315,16 +315,16 @@
     border-radius: 50%;
     background: radial-gradient(circle, #fffde7 0%, #ce93d8 55%, transparent 72%);
     opacity: 0;
-    animation: egw-staff-mote 460ms ease-out forwards;
+    animation: sx-swing-staff-mote 460ms ease-out forwards;
 }
 
-@keyframes egw-staff-spin {
+@keyframes sx-swing-staff-spin {
     0%   { opacity: 0; transform: rotate(-140deg); }
     20%  { opacity: 1; }
     100% { opacity: 0; transform: rotate(160deg); }
 }
 
-@keyframes egw-staff-mote {
+@keyframes sx-swing-staff-mote {
     0%   { opacity: 0; transform: translateX(0) scale(0.5); }
     40%  { opacity: 1; transform: translateX(26px) scale(1.1); }
     100% { opacity: 0; transform: translateX(52px) scale(0.7); }
@@ -332,7 +332,7 @@
 
 /* ── BOW: loosed arrow ──────────────────────────────────────────────────
    Slender shaft streaking far forward - the bow-bash at melee range. */
-.eg-swing-bow .egw-blade {
+.sx-swing-bow .sx-swing-blade {
     left: 70px;
     top: 71px;
     width: 62px;
@@ -340,10 +340,10 @@
     border-radius: 2px;
     background: linear-gradient(to right, rgba(255, 224, 130, 0), #ffe082 60%, #ffffff);
     opacity: 0;
-    animation: egw-bow-shot 320ms ease-in forwards;
+    animation: sx-swing-bow-shot 320ms ease-in forwards;
 }
 
-.eg-swing-bow .egw-blade::after {
+.sx-swing-bow .sx-swing-blade::after {
     content: '';
     position: absolute;
     right: -2px;
@@ -353,7 +353,7 @@
     border-left: 10px solid #ffca28;
 }
 
-.eg-swing-bow .egw-arc {
+.sx-swing-bow .sx-swing-arc {
     left: 58px;
     top: 64px;
     width: 22px;
@@ -361,22 +361,22 @@
     border-radius: 50%;
     border: 2px solid rgba(255, 224, 130, 0.8);
     opacity: 0;
-    animation: egw-bow-string 320ms ease-out forwards;
+    animation: sx-swing-bow-string 320ms ease-out forwards;
 }
 
-@keyframes egw-bow-shot {
+@keyframes sx-swing-bow-shot {
     0%   { opacity: 0; transform: translateX(-8px); }
     25%  { opacity: 1; }
     100% { opacity: 0; transform: translateX(60px); }
 }
 
-@keyframes egw-bow-string {
+@keyframes sx-swing-bow-string {
     0%   { opacity: 1; transform: scale(1); }
     100% { opacity: 0; transform: scale(0.3); }
 }
 
 /* ── UNARMED: bare-handed jab ─────────────────────────────────────────── */
-.eg-swing-unarmed .egw-blade {
+.sx-swing-unarmed .sx-swing-blade {
     left: 78px;
     top: 64px;
     width: 30px;
@@ -384,10 +384,10 @@
     border-radius: 50%;
     background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 70%);
     opacity: 0;
-    animation: egw-unarmed-jab 260ms ease-out forwards;
+    animation: sx-swing-unarmed-jab 260ms ease-out forwards;
 }
 
-@keyframes egw-unarmed-jab {
+@keyframes sx-swing-unarmed-jab {
     0%   { opacity: 0; transform: translateX(-6px) scale(0.6); }
     40%  { opacity: 1; transform: translateX(12px) scale(1); }
     100% { opacity: 0; transform: translateX(20px) scale(1.3); }
@@ -395,7 +395,7 @@
 
 /* ── Reduced motion: still show a brief flash, skip the sweep ────────── */
 @media (prefers-reduced-motion: reduce) {
-    .eg-weapon-swing .egw-part {
+    .sx-weapon-swing .sx-swing-part {
         animation-duration: 120ms !important;
     }
 }
@@ -404,10 +404,10 @@
    WEAPON-ART NOVA (overcharge tiers 400% / 500%)
    Built by _meleeNovaVisual in js/combat/encounter-charged-shot.js:
    a ring of the equipped weapon's icon bursts outward around the struck
-   monster card. Each bit flies along its own (--eg-nova-x, --eg-nova-y)
+   monster card. Each bit flies along its own (--sx-nova-x, --sx-nova-y)
    unit vector while fading out. The node is removed by JS after the burst.
    ============================================================================ */
-.eg-melee-nova {
+.sx-melee-nova {
     position: fixed;
     width: 0;
     height: 0;
@@ -415,7 +415,7 @@
     pointer-events: none;
 }
 
-.eg-melee-nova-bit {
+.sx-melee-nova-bit {
     position: absolute;
     left: 0;
     top: 0;
@@ -423,45 +423,45 @@
     line-height: 1;
     text-shadow: 0 0 8px rgba(250, 204, 21, 0.9), 0 1px 2px #000;
     opacity: 0;
-    animation: eg-melee-nova-burst 600ms ease-out forwards;
+    animation: sx-melee-nova-burst 600ms ease-out forwards;
 }
 
-.eg-melee-nova-grand .eg-melee-nova-bit {
+.sx-melee-nova-grand .sx-melee-nova-bit {
     font-size: 30px;
     text-shadow: 0 0 14px rgba(251, 191, 36, 1), 0 0 30px rgba(251, 146, 60, 0.8), 0 1px 2px #000;
     animation-duration: 850ms;
 }
 
-@keyframes eg-melee-nova-burst {
+@keyframes sx-melee-nova-burst {
     0% {
         opacity: 1;
         transform: translate(-50%, -50%) scale(0.4);
     }
     100% {
         opacity: 0;
-        transform: translate(calc(-50% + var(--eg-nova-x, 0) * 110px), calc(-50% + var(--eg-nova-y, 0) * 110px)) scale(1.25);
+        transform: translate(calc(-50% + var(--sx-nova-x, 0) * 110px), calc(-50% + var(--sx-nova-y, 0) * 110px)) scale(1.25);
     }
 }
 
 /* ── Grand-nova fullscreen flash (500% tier, built by _meleeGrandFlash) ── */
-.eg-melee-grand-flash {
+.sx-melee-grand-flash {
     position: fixed;
     inset: 0;
     z-index: 9998;
     pointer-events: none;
     background: radial-gradient(circle at 50% 55%, rgba(254, 243, 199, 0.85) 0%, rgba(251, 191, 36, 0.45) 35%, transparent 70%);
     opacity: 0;
-    animation: eg-melee-flash 700ms ease-out forwards;
+    animation: sx-melee-flash 700ms ease-out forwards;
 }
 
-@keyframes eg-melee-flash {
+@keyframes sx-melee-flash {
     0% { opacity: 0; }
     15% { opacity: 0.55; }
     100% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .eg-melee-nova-bit {
+    .sx-melee-nova-bit {
         animation-duration: 120ms !important;
     }
 }

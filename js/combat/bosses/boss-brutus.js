@@ -109,7 +109,7 @@ export function _mechGroundSlam(monster, phase) {
     // The boss card (frame + bars) IS the sprite - the whole unit rears up
     // and stomps, so nothing inside it visually detaches. Re-resolved per
     // round so a mid-fight panel rebuild never leaves a stale reference.
-    const cardId = bossId ? 'eg-card-' + bossId : null;
+    const cardId = bossId ? 'sx-card-' + bossId : null;
     let sprite = null;
     let stompMs = 0;
     const paintSprite = (yPx) => {
@@ -121,7 +121,7 @@ export function _mechGroundSlam(monster, phase) {
     };
     const resolveSprite = () => {
         const card = cardId ? document.getElementById(cardId) : null;
-        sprite = (card && card.classList.contains('eg-boss-card')) ? card : null;
+        sprite = (card && card.classList.contains('sx-boss-card')) ? card : null;
         stompMs = 0;
         return sprite;
     };
@@ -132,7 +132,7 @@ export function _mechGroundSlam(monster, phase) {
     // the sprite at rest - never frozen mid-jump. _nkKillRun fires this.
     run.onKill = () => { try { clearSprite(); } catch (e) {} };
 
-    const band = _nkEl(run, 'div', 'eg-nk-band');
+    const band = _nkEl(run, 'div', 'sx-nk-band');
     _nkToast('eg_mech_slam', '💥 Brutus: Ground Slam! Clear the band!');
 
     // Each slam runs warn → hit → rest before the next telegraph appears.
@@ -152,7 +152,7 @@ export function _mechGroundSlam(monster, phase) {
         band.style.display = '';
         band.style.top = Math.round(y - h / 2) + 'px';
         band.style.height = h + 'px';
-        band.classList.remove('eg-nk-band-hit', 'eg-slam-quake');
+        band.classList.remove('sx-nk-band-hit', 'sx-slam-quake');
         // Publish the telegraph to any roaming sacrificial zombies so they
         // shamble INTO the line - zombies still inside when it lands feed
         // Brutus and speed up his attacks.
@@ -173,7 +173,7 @@ export function _mechGroundSlam(monster, phase) {
             // and the sprite starts its downward stomp this exact frame.
             state = 'hit';
             stompMs = 0;
-            band.classList.add('eg-nk-band-hit', 'eg-slam-quake');
+            band.classList.add('sx-nk-band-hit', 'sx-slam-quake');
             _nkSlamShatter(band, run);
             // The slam lands: any sacrificial zombie that shambled into the
             // band is devoured - every victim stacks a 30s attack-speed buff.
@@ -238,7 +238,7 @@ export let _brutusFeedHudCount = -1;   // stack count the chip DOM was last (re)
 // Boss monsters get a spawn-suffixed id (boss_brutus_7), so the chip and the
 // enrage frame must target the card through the REAL id captured at spawn /
 // devour time - never the bare def id.
-export let _brutusBossCardId = null;   // 'eg-card-' + live Brutus monster id
+export let _brutusBossCardId = null;   // 'sx-card-' + live Brutus monster id
 
 export const BRUTUS_ZOMBIE_HEART_CHANCE = 0.2;      // per PLAYER kill - slam-devoured zombies drop nothing
 export const BRUTUS_ZOMBIE_LIFETIME_MS = 45000;     // shamble away in a poof if neither killed nor devoured
@@ -306,7 +306,7 @@ export function _brutusFeedHudTick() {
 
 
 // ── Feed-haste HUD chip on Brutus's card ────────────────────────────────
-// While the buff is up Brutus's emoji frame burns red-hot (eg-boss-enraged)
+// While the buff is up Brutus's emoji frame burns red-hot (sx-boss-enraged)
 // and a 🧟 chip on his card shows the live stack count, the total attack-
 // charge bonus (+30% per stack) and a drain bar counting down to the NEXT
 // stack expiry (the oldest window governs the countdown; the bar refills
@@ -323,37 +323,37 @@ export function _brutusRenderFeedHud() {
 
     // Red-hot boss frame while fed (golden targeting ring still wins when
     // the player targets Brutus - that class overrides via CSS).
-    const frame = card ? card.querySelector('.eg-emoji-wrapper') : null;
-    if (frame) frame.classList.toggle('eg-boss-enraged', n > 0);
+    const frame = card ? card.querySelector('.sx-emoji-wrapper') : null;
+    if (frame) frame.classList.toggle('sx-boss-enraged', n > 0);
 
     if (!card) return;
     if (n === 0) {
-        const old = card.querySelector('.eg-boss-feed-badge');
+        const old = card.querySelector('.sx-boss-feed-badge');
         if (old) old.style.display = 'none';
         _brutusFeedHudCount = -1;
         return;
     }
 
-    let badge = card.querySelector('.eg-boss-feed-badge');
+    let badge = card.querySelector('.sx-boss-feed-badge');
     if (!badge) {
         badge = document.createElement('div');
-        badge.className = 'eg-boss-feed-badge';
+        badge.className = 'sx-boss-feed-badge';
         badge.innerHTML =
-            '<span class="eg-boss-feed-line">' +
-                '<span class="eg-boss-feed-count">🧟 ×0</span>' +
-                '<span class="eg-boss-feed-mult">+0%</span>' +
+            '<span class="sx-boss-feed-line">' +
+                '<span class="sx-boss-feed-count">🧟 ×0</span>' +
+                '<span class="sx-boss-feed-mult">+0%</span>' +
             '</span>' +
-            '<span class="eg-boss-feed-line">' +
-                '<span class="eg-boss-feed-track"><i class="eg-boss-feed-fill"></i></span>' +
-                '<span class="eg-boss-feed-sec">0s</span>' +
+            '<span class="sx-boss-feed-line">' +
+                '<span class="sx-boss-feed-track"><i class="sx-boss-feed-fill"></i></span>' +
+                '<span class="sx-boss-feed-sec">0s</span>' +
             '</span>';
         card.appendChild(badge);
         _brutusFeedHudCount = -1; // force count/mult text below
     }
 
     if (n !== _brutusFeedHudCount) {
-        const cnt = badge.querySelector('.eg-boss-feed-count');
-        const mul = badge.querySelector('.eg-boss-feed-mult');
+        const cnt = badge.querySelector('.sx-boss-feed-count');
+        const mul = badge.querySelector('.sx-boss-feed-mult');
         if (cnt) cnt.textContent = '🧟 ×' + n;
         if (mul) mul.textContent = '+' + (n * BRUTUS_FEED_CHARGE_PCT) + '%';
         _brutusFeedHudCount = n;
@@ -365,8 +365,8 @@ export function _brutusRenderFeedHud() {
     // needle - only an actual stack drop refills the bar.
     const oldest = _brutusFeedExpiries[0];
     const remainMs = Math.max(0, oldest - now);
-    const fill = badge.querySelector('.eg-boss-feed-fill');
-    const sec = badge.querySelector('.eg-boss-feed-sec');
+    const fill = badge.querySelector('.sx-boss-feed-fill');
+    const sec = badge.querySelector('.sx-boss-feed-sec');
     if (fill) fill.style.width = Math.max(0, Math.min(100, (remainMs / BRUTUS_FEED_WINDOW_MS) * 100)) + '%';
     if (sec) sec.textContent = Math.ceil(remainMs / 1000) + 's';
 }
@@ -379,7 +379,7 @@ export function _mechSacrificialZombies(monster, phase) {
     if (!monster || typeof _buildMonster !== 'function') return;
 
     // Remember the REAL boss card id (suffixed id) for the feed-haste chip.
-    _brutusBossCardId = 'eg-card-' + monster.id;
+    _brutusBossCardId = 'sx-card-' + monster.id;
 
     // NEVER raise a wave while a ground-slam telegraph / chain is resolving:
     // zombies popping in mid-slam would be devoured within a second of
@@ -413,7 +413,7 @@ export function _mechSacrificialZombies(monster, phase) {
 
 // Builds one zombie add, registers it in _monsters (so clicking / auto-
 // attack / bar updates / kill handling all work like any other add) and
-// renders its roaming card in the fixed #eg-zombie-layer. Zombies render
+// renders its roaming card in the fixed #sx-zombie-layer. Zombies render
 // ONLY there - _renderMonstersIntoZones skips isSacrificialZombie.
 export function _brutusSpawnZombie(monster) {
     BRUTUS_ZOMBIE_DEF.name = t('eg_mon_brutus_zombie') || 'Sacrificial Zombie';
@@ -435,7 +435,7 @@ export function _brutusSpawnZombie(monster) {
     // clawing out of the ground at the screen edge - it neither shambles nor
     // can be devoured, so Brutus can never eat a zombie it just raised.
     z.walkableAt = z.bornAt + BRUTUS_ZOMBIE_RISE_MS;
-    z.zoneId = 'eg-monster-panel';     // present but unused (panel render skips zombies)
+    z.zoneId = 'sx-monster-panel';     // present but unused (panel render skips zombies)
 
     _brutusZombies.push(z);
     globalThis._monsters.push(z);
@@ -454,35 +454,35 @@ export function _brutusSpawnZombie(monster) {
 // separately by _brutusSyncZombieCard, since the roaming layer is not
 // touched by the panel rebuild that marks other monsters targeted.
 export function _brutusRenderZombieCard(z) {
-    let layer = document.getElementById('eg-zombie-layer');
+    let layer = document.getElementById('sx-zombie-layer');
     if (!layer) {
         layer = document.createElement('div');
-        layer.id = 'eg-zombie-layer';
+        layer.id = 'sx-zombie-layer';
         document.body.appendChild(layer);
     }
 
     const card = document.createElement('div');
-    card.className = 'eg-monster-card-compact';
-    card.id = 'eg-card-' + z.id;
+    card.className = 'sx-monster-card-compact';
+    card.id = 'sx-card-' + z.id;
     card.style.left = z.x + 'px';
     card.style.top = z.y + 'px';
     card.style.transform = 'translate(-50%, -50%)';
-    card.style.setProperty('--eg-art', z.artScale || 1);
+    card.style.setProperty('--sx-art', z.artScale || 1);
     card.setAttribute('onclick', "_selectTarget('" + z.id + "')");
 
     const hpPct = Math.max(0, Math.round((z.currentHP / z.maxHP) * 100));
     card.innerHTML =
-        '<div class="eg-compact-bars">' +
-            '<div class="eg-charge-track-compact"><div class="eg-charge-bar" id="eg-charge-bar-' + z.id + '" style="width:0%"></div></div>' +
-            '<div class="eg-hp-track-compact"><div class="eg-hp-bar-compact ' + _hpBarClass(hpPct) + '" id="eg-hp-bar-' + z.id + '" style="width:' + hpPct + '%"></div></div>' +
+        '<div class="sx-compact-bars">' +
+            '<div class="sx-charge-track-compact"><div class="sx-charge-bar" id="sx-charge-bar-' + z.id + '" style="width:0%"></div></div>' +
+            '<div class="sx-hp-track-compact"><div class="sx-hp-bar-compact ' + _hpBarClass(hpPct) + '" id="sx-hp-bar-' + z.id + '" style="width:' + hpPct + '%"></div></div>' +
         '</div>' +
-        '<div class="eg-status-strip" id="eg-status-' + z.id + '"></div>' +
-        '<div class="eg-emoji-wrapper">' +
-            '<span class="eg-monster-emoji-compact">' + ((typeof GAME_ART !== 'undefined' && GAME_ART.html) ? GAME_ART.html('monster', z.artId || z.baseId, z.emoji) : z.emoji) + '</span>' +
-            '<span class="eg-level-bottom-left">' + z.level + '</span>' +
-            '<div class="eg-monster-compact-tooltip">' +
-                '<div class="eg-tooltip-name">' + z.name + '</div>' +
-                '<div class="eg-tooltip-hp" id="eg-hp-label-' + z.id + '">' + z.currentHP + ' / ' + z.maxHP + ' HP</div>' +
+        '<div class="sx-status-strip" id="sx-status-' + z.id + '"></div>' +
+        '<div class="sx-emoji-wrapper">' +
+            '<span class="sx-monster-emoji-compact">' + ((typeof GAME_ART !== 'undefined' && GAME_ART.html) ? GAME_ART.html('monster', z.artId || z.baseId, z.emoji) : z.emoji) + '</span>' +
+            '<span class="sx-level-bottom-left">' + z.level + '</span>' +
+            '<div class="sx-monster-compact-tooltip">' +
+                '<div class="sx-tooltip-name">' + z.name + '</div>' +
+                '<div class="sx-tooltip-hp" id="sx-hp-label-' + z.id + '">' + z.currentHP + ' / ' + z.maxHP + ' HP</div>' +
             '</div>' +
         '</div>';
     layer.appendChild(card);
@@ -495,11 +495,11 @@ export function _brutusRenderZombieCard(z) {
 // roaming tick (cheap class toggles - the engine's panel rebuild never
 // touches roaming cards, so this is the only sync point).
 export function _brutusSyncZombieCard(z) {
-    const card = (z && z.roamingCard) || (z ? document.getElementById('eg-card-' + z.id) : null);
+    const card = (z && z.roamingCard) || (z ? document.getElementById('sx-card-' + z.id) : null);
     if (!card) return;
     const isTarget = (typeof _targetId !== 'undefined' && globalThis._targetId === z.id);
-    card.classList.toggle('eg-card-targeted', isTarget);
-    const arrow = card.querySelector('.eg-target-arrow');
+    card.classList.toggle('sx-card-targeted', isTarget);
+    const arrow = card.querySelector('.sx-target-arrow');
     if (arrow) arrow.remove();
 }
 
@@ -532,7 +532,7 @@ export function _brutusZombieTick() {
         // Player killed this zombie elsewhere (_killMonster): drop its card.
         if (!globalThis._monsters.some(m => m.id === z.id)) {
             _brutusPoof(z.x, z.y);
-            const card = document.getElementById('eg-card-' + z.id);
+            const card = document.getElementById('sx-card-' + z.id);
             if (card) card.remove();
             _brutusZombies.splice(i, 1);
             continue;
@@ -541,7 +541,7 @@ export function _brutusZombieTick() {
         // Neither killed nor devoured in time - the zombie rots away.
         if (now - z.bornAt > BRUTUS_ZOMBIE_LIFETIME_MS) {
             _brutusPoof(z.x, z.y);
-            const card = document.getElementById('eg-card-' + z.id);
+            const card = document.getElementById('sx-card-' + z.id);
             if (card) card.remove();
             const midx = globalThis._monsters.findIndex(m => m.id === z.id);
             if (midx !== -1) globalThis._monsters.splice(midx, 1);
@@ -555,7 +555,7 @@ export function _brutusZombieTick() {
         // Rise phase: the zombie is still clawing out of the ground at its
         // spawn edge - no shambling yet (and the devour gate in
         // _brutusFeedZombies won't touch it until walkableAt passes).
-        const card = z.roamingCard || document.getElementById('eg-card-' + z.id);
+        const card = z.roamingCard || document.getElementById('sx-card-' + z.id);
         if (now >= z.walkableAt) {
             // Shamble: vertical progress toward the slam band, slow horizontal
             // drift toward the middle so a wave fans out across the line.
@@ -581,7 +581,7 @@ export function _brutusZombieTick() {
 // clears only .active before calling us, so steering stops but the rect holds).
 export function _brutusFeedZombies(monster) {
     if (_brutusZombies.length === 0) return;
-    if (monster) _brutusBossCardId = 'eg-card-' + monster.id;
+    if (monster) _brutusBossCardId = 'sx-card-' + monster.id;
     const band = _brutusSlamBand;
     const now = Date.now();
     // Only zombies that actually made it onto the field can be devoured: the
@@ -617,7 +617,7 @@ export function _brutusFeedZombies(monster) {
 // kill path, which goes through _killMonster) direct removal from
 // _monsters with target reselect when needed. poof=false on teardown.
 export function _brutusRemoveZombie(z, poof) {
-    const card = document.getElementById('eg-card-' + z.id);
+    const card = document.getElementById('sx-card-' + z.id);
     if (card) card.remove();
     if (poof) _brutusPoof(z.x, z.y);
 
@@ -635,7 +635,7 @@ export function _brutusRemoveZombie(z, poof) {
 // Small 💨 burst where a zombie vanished (devoured, expired or player-killed).
 export function _brutusPoof(x, y) {
     const p = document.createElement('span');
-    p.className = 'eg-zombie-poof';
+    p.className = 'sx-zombie-poof';
     p.textContent = '💨';
     p.style.left = x + 'px';
     p.style.top = y + 'px';
@@ -661,12 +661,12 @@ export function _brutusZombieTeardown() {
     _brutusZombies.slice().forEach(z => _brutusRemoveZombie(z, false));
     _brutusZombies = [];
     _brutusFeedExpiries = [];
-    const badge = document.querySelector('.eg-boss-feed-badge');
+    const badge = document.querySelector('.sx-boss-feed-badge');
     if (badge) badge.remove();
     const card = _brutusBossCardId ? document.getElementById(_brutusBossCardId) : null;
-    const frame = card ? card.querySelector('.eg-emoji-wrapper') : null;
-    if (frame) frame.classList.remove('eg-boss-enraged');
+    const frame = card ? card.querySelector('.sx-emoji-wrapper') : null;
+    if (frame) frame.classList.remove('sx-boss-enraged');
     _brutusBossCardId = null;
-    const layer = document.getElementById('eg-zombie-layer');
+    const layer = document.getElementById('sx-zombie-layer');
     if (layer) layer.innerHTML = '';
 }

@@ -115,7 +115,7 @@ function _msAlive(monster) {
 }
 
 function _msCard(monster) {
-    return document.getElementById(`eg-card-${monster.id}`);
+    return document.getElementById(`sx-card-${monster.id}`);
 }
 
 function _msPlayerEl() {

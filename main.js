@@ -110,7 +110,7 @@ export function pauseGame() {
     const onEndgameMap = _updatePauseMenuReturnButtons();
     // Endgame variant: hide level number / score / hint / bonus, show the
     // run's collected loot (with hover tooltips) instead.
-    document.getElementById('pause-overlay').classList.toggle('eg-pause', onEndgameMap);
+    document.getElementById('pause-overlay').classList.toggle('sx-pause', onEndgameMap);
     if (onEndgameMap && typeof _renderPauseLootSummary === 'function') {
         _renderPauseLootSummary();
     }

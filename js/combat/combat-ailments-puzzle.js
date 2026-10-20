@@ -18,7 +18,7 @@ function _maybePuzzleAttack(monster) {
             ? _egGetActiveMapModValue('map_monster_puzzle_aggro') : 0);
     if (Math.random() * 100 >= aggroChance) return false;
 
-    const sourceCard = document.getElementById(`eg-card-${monster.id}`);
+    const sourceCard = document.getElementById(`sx-card-${monster.id}`);
     const grid = document.getElementById('ptable');
     if (!sourceCard || !grid || typeof _fireProjectile !== 'function') return false;
     if (typeof cur === 'undefined' || !cur || !cur.grid || !cur.grid.length) return false;
@@ -28,7 +28,7 @@ function _maybePuzzleAttack(monster) {
     if (!start || !end) return false;
 
     Audio_Manager.playSFX('monster_puzzle_attack');
-    _fireProjectile(monster.emoji, 'eg-proj-monster eg-proj-puzzle', start, end,
+    _fireProjectile(monster.emoji, 'sx-proj-monster sx-proj-puzzle', start, end,
         (typeof MONSTER_PROJ_DURATION_MS !== 'undefined') ? MONSTER_PROJ_DURATION_MS : 600,
         'ease-in',
         () => _applyPuzzleAilment(monster.element));
@@ -121,8 +121,8 @@ function _puzzleLava() {
         const el = document.getElementById(`g-${pick.r}-${pick.c}`);
         if (!el) continue;
         const span = document.createElement('span');
-        span.className = 'eg-lava-overlay';
-        span.id = `eg-lava-${pick.r}-${pick.c}`;
+        span.className = 'sx-lava-overlay';
+        span.id = `sx-lava-${pick.r}-${pick.c}`;
         span.textContent = '🌋';
         el.appendChild(span);
         cells.set(pick.key, span.id);
@@ -158,8 +158,8 @@ function _puzzleIce() {
         const el = document.getElementById(`g-${pick.r}-${pick.c}`);
         if (!el) continue;
         const span = document.createElement('span');
-        span.className = 'eg-ice-overlay';
-        span.id = `eg-ice-${pick.r}-${pick.c}`;
+        span.className = 'sx-ice-overlay';
+        span.id = `sx-ice-${pick.r}-${pick.c}`;
         span.textContent = '🧊';
         el.appendChild(span);
         cells.set(pick.key, span.id);
@@ -220,9 +220,9 @@ function _puzzleShockedCursor() {
 
 function _startShockedCursor() {
     if (_sparkFollowerEl) return;
-    document.body.classList.add('eg-cursor-shocked');
+    document.body.classList.add('sx-cursor-shocked');
     const follower = document.createElement('div');
-    follower.id = 'eg-cursor-sparks';
+    follower.id = 'sx-cursor-sparks';
     follower.textContent = '⚡';
     document.body.appendChild(follower);
     _setSparkFollowerEl(follower);
@@ -244,7 +244,7 @@ function _startShockedCursor() {
 
 function _spawnCursorSpark(x = _sparkLastX, y = _sparkLastY) {
     const spark = document.createElement('div');
-    spark.className = 'eg-spark-particle';
+    spark.className = 'sx-spark-particle';
     spark.textContent = SPARK_GLYPHS[Math.floor(Math.random() * SPARK_GLYPHS.length)];
     // Start at a small random offset so sparks ring the target point
     const ang = Math.random() * Math.PI * 2;
@@ -255,7 +255,7 @@ function _spawnCursorSpark(x = _sparkLastX, y = _sparkLastY) {
     spark.style.top = `${y + Math.sin(ang) * startR}px`;
     spark.style.fontSize = `${(9 + Math.random() * 8).toFixed(1)}px`;
     const life = 0.35 + Math.random() * 0.3;
-    spark.style.setProperty('--eg-spark-life', `${life.toFixed(2)}s`);
+    spark.style.setProperty('--sx-spark-life', `${life.toFixed(2)}s`);
     document.body.appendChild(spark);
     setTimeout(() => spark.remove(), life * 1000 + 60);
 }
@@ -270,7 +270,7 @@ function _spawnCrossZapFX(row, col) {
 
     // Big electric ✕ flashing over the cell, then burning away
     const fx = document.createElement('div');
-    fx.className = 'eg-cross-zap';
+    fx.className = 'sx-cross-zap';
     fx.textContent = '✕';
     fx.style.left = `${cx}px`;
     fx.style.top = `${cy}px`;
@@ -283,7 +283,7 @@ function _spawnCrossZapFX(row, col) {
 }
 
 function _stopShockedCursor() {
-    document.body.classList.remove('eg-cursor-shocked');
+    document.body.classList.remove('sx-cursor-shocked');
     if (_sparkSpawnTimer) { clearInterval(_sparkSpawnTimer); _setSparkSpawnTimer(null); }
     if (_sparkFollowerEl) { _sparkFollowerEl.remove(); _setSparkFollowerEl(null); }
     if (_sparkMoveHandler) { document.removeEventListener('mousemove', _sparkMoveHandler); _setSparkMoveHandler(null); }
@@ -330,7 +330,7 @@ function _applyPuzzleArcaneBomb() {
     const cell = document.getElementById(`g-${pick.r}-${pick.c}`);
     if (!cell) return;
     const icon = document.createElement('span');
-    icon.className = 'eg-arcane-bomb-overlay';
+    icon.className = 'sx-arcane-bomb-overlay';
     icon.textContent = '🔮';
     cell.appendChild(icon);
     const bomb = { type: 'arcanebomb', row: pick.r, col: pick.c, until: Date.now() + PUZZLE_EFFECT_DURATION_MS, el: icon };
@@ -359,7 +359,7 @@ function _puzzleShadowBlackout() {
     spans.forEach(span => {
         span.dataset.origText = span.textContent;
         span.textContent = '?';
-        span.classList.add('eg-shadow-clue-blackout');
+        span.classList.add('sx-shadow-clue-blackout');
     });
 
     _registerPuzzleEffect({ type: 'shadowline', line });
@@ -375,7 +375,7 @@ function _restoreLineClues(line) {
             span.textContent = span.dataset.origText;
             delete span.dataset.origText;
         }
-        span.classList.remove('eg-shadow-clue-blackout');
+        span.classList.remove('sx-shadow-clue-blackout');
     });
 }
 

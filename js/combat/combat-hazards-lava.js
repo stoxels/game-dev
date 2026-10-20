@@ -19,7 +19,7 @@ export function _hzCreateLavaPool() {
     const speed = _hzRand(HZ_LAVA_SPEED_MIN, HZ_LAVA_SPEED_MAX);
     const angle = Math.random() * Math.PI * 2;
     const el = document.createElement('div');
-    el.className = 'eg-hz-lava';
+    el.className = 'sx-hz-lava';
     const size = r * 2;
     el.style.width = size + 'px';
     el.style.height = size + 'px';
@@ -42,7 +42,7 @@ export function _hzTriggerLavaFuse(pool) {
     pool.state = 'fusing';
     Audio_Manager.playSFX('hz_lava_fuse');
     pool.fuseT = HZ_LAVA_FUSE_MS;
-    if (pool.el) pool.el.classList.add('eg-hz-lava-fuse');
+    if (pool.el) pool.el.classList.add('sx-hz-lava-fuse');
 }
 
 export function _hzDetonateLava(pool) {
@@ -61,7 +61,7 @@ export function _hzDetonateLava(pool) {
     if (_hzLayer) {
         // Fiery core that puffs up and fades
         const boom = document.createElement('div');
-        boom.className = 'eg-hz-lava eg-hz-lava-blast';
+        boom.className = 'sx-hz-lava sx-hz-lava-blast';
         const size = br * 2;
         boom.style.width = size + 'px';
         boom.style.height = size + 'px';
@@ -74,7 +74,7 @@ export function _hzDetonateLava(pool) {
 
         // Expanding ring so the 140 px blast radius is readable
         const ring = document.createElement('div');
-        ring.className = 'eg-hz-lava-explosion';
+        ring.className = 'sx-hz-lava-explosion';
         const d = HZ_LAVA_BLAST_R * 2;
         ring.style.width = d + 'px';
         ring.style.height = d + 'px';

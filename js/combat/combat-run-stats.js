@@ -286,7 +286,7 @@ import { trackAchStat, setAchStat } from '../achievements/achievements.js';
         .rs-panel.rs-side { flex: 0 1 400px; margin: 0 0 0 16px; max-height: 80vh; overflow-y: auto;
             box-sizing: border-box; align-self: center; }
         @media (max-width: 1150px) {
-            .eg-leave-map-transition.eg-has-side { flex-direction: column; overflow-y: auto; justify-content: flex-start; gap: 12px; padding: 12px 0; }
+            .sx-leave-map-transition.sx-has-side { flex-direction: column; overflow-y: auto; justify-content: flex-start; gap: 12px; padding: 12px 0; }
             .rs-panel.rs-side { margin: 0; flex: none; width: 90%; max-width: 640px; max-height: none; }
         }
         .rs-title { font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px; }
@@ -501,7 +501,7 @@ import { trackAchStat, setAchStat } from '../achievements/achievements.js';
         if (kind === 'win') { injectStyles(); renderWinColumns(peek()); return; }
 
         let anchor = null;
-        if (isMap) anchor = host && host.querySelector('#eg-leave-summary-container');
+        if (isMap) anchor = host && host.querySelector('#sx-leave-summary-container');
         else if (kind === 'win') anchor = document.getElementById('item-reward-zone');
         else anchor = document.querySelector('#ov-lose .ov-btns');
         if (!anchor || !anchor.parentNode) return;
@@ -534,7 +534,7 @@ import { trackAchStat, setAchStat } from '../achievements/achievements.js';
         }
         if (isMap) {
             panel.classList.add('rs-side');
-            host.classList.add('eg-has-side');
+            host.classList.add('sx-has-side');
             host.appendChild(panel);
         } else {
             anchor.parentNode.insertBefore(panel, anchor);

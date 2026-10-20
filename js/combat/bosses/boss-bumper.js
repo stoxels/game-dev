@@ -99,7 +99,7 @@ export function _bumpCapBallSpeed(b) {
 export function _bumperSweep() {
     _bumpSlamActive = false;
     try {
-        document.querySelectorAll('.eg-bump-bumper, .eg-bump-ball, .eg-bump-flip, .eg-bump-slam-ring, .eg-bump-slam-core, .eg-bump-rail').forEach(el => el.remove());
+        document.querySelectorAll('.sx-bump-bumper, .sx-bump-ball, .sx-bump-flip, .sx-bump-slam-ring, .sx-bump-slam-core, .sx-bump-rail').forEach(el => el.remove());
     } catch (e) {}
 }
 
@@ -140,7 +140,7 @@ export function _bumpSpawnSlings(st, run) {
         { side: 'right', x0: W - 26, y0: H - 60, ang: 222 }, // mirrored on the right
     ];
     defs.forEach(d => {
-        const el = _nkEl(run, 'div', 'eg-bump-sling ' + d.side);
+        const el = _nkEl(run, 'div', 'sx-bump-sling ' + d.side);
         el.style.left = d.x0 + 'px';
         el.style.top = d.y0 + 'px';
         el.style.width = BUMP_SLING_LEN + 'px';
@@ -225,7 +225,7 @@ export function _bumperArenaInit(monster) {
     st.run = run;
     // Pinball-table side rails: pure decoration that frames the arena for
     // the whole fight (registered on the run → auto-removed on teardown).
-    ['left', 'right', 'top'].forEach(side => _nkEl(run, 'div', 'eg-bump-rail ' + side));
+    ['left', 'right', 'top'].forEach(side => _nkEl(run, 'div', 'sx-bump-rail ' + side));
     // Slingshots: the two diagonal kickers above the bottom corners. Like a
     // real machine, they physically punt pinballs that roll into them.
     _bumpSpawnSlings(st, run);
@@ -259,7 +259,7 @@ export function _bumperArenaInit(monster) {
         // ── Roaming bumpers: drift, bounce, thwack ──
         const wantN = BUMP_BUMPER_N[p] || BUMP_BUMPER_N[1];
         while (st.bumpers.length < wantN) {
-            const el = _nkEl(run, 'div', 'eg-bump-bumper', '🎪');
+            const el = _nkEl(run, 'div', 'sx-bump-bumper', '🎪');
             const b = {
                 x: 90 + Math.random() * Math.max(120, W - 180),
                 y: 90 + Math.random() * Math.max(120, H - 180),
@@ -279,8 +279,8 @@ export function _bumperArenaInit(monster) {
             b.el.style.transform = 'translate(' + Math.round(b.x - 30) + 'px,' + Math.round(b.y - 30) + 'px)';
             if (c && pr && now >= b.cdUntil && _nkDotHit(b.el, pr, 0)) {
                 b.cdUntil = now + BUMP_THWACK_CD_MS;
-                b.el.classList.add('eg-nk-boom');
-                setTimeout(() => b.el.classList.remove('eg-nk-boom'), 300);
+                b.el.classList.add('sx-nk-boom');
+                setTimeout(() => b.el.classList.remove('sx-nk-boom'), 300);
                 _bumpFlingHit(st, b.x, b.y, BUMP_FLING[p] * (tilting ? 1.25 : 1),
                     BUMP_THWACK_DMG[p] * (tilting ? 1.3 : 1), tilting ? 'TILT Thwack' : 'Bumper Party');
             }
@@ -292,7 +292,7 @@ export function _bumperArenaInit(monster) {
         if (st.showerAcc >= sInt) {
             st.showerAcc = 0;
             const fromLeft = Math.random() < 0.5;
-            const el = _nkEl(run, 'div', 'eg-bump-ball', '🎱');
+            const el = _nkEl(run, 'div', 'sx-bump-ball', '🎱');
             st.balls.push({
                 x: fromLeft ? -BUMP_BALL_R : W + BUMP_BALL_R,
                 y: 70 + Math.random() * Math.max(120, H - 160),
@@ -323,8 +323,8 @@ export function _bumperArenaInit(monster) {
                         b.vx += (dx / d) * BUMP_BALL_BOUNCE_BOOST;
                         b.vy += (dy / d) * BUMP_BALL_BOUNCE_BOOST;
                         _bumpCapBallSpeed(b);
-                        bp.el.classList.add('eg-nk-boom');
-                        setTimeout(() => bp.el.classList.remove('eg-nk-boom'), 300);
+                        bp.el.classList.add('sx-nk-boom');
+                        setTimeout(() => bp.el.classList.remove('sx-nk-boom'), 300);
                         try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
                     }
                 }
@@ -397,12 +397,12 @@ export function _bumperFlipperFrenzy(st, now) {
     st.flip = { t: 0, slaps, nextIdx: 0, bands: [] };
     st.tiltUntil = now + BUMP_TILT_MS;
     st.bumpers.forEach(b => b.el.classList.add('tilt'));
-    document.querySelectorAll('.eg-bump-rail').forEach(r => r.classList.add('tilt'));
-    document.querySelectorAll('.eg-bump-sling').forEach(r => r.classList.add('tilt'));
+    document.querySelectorAll('.sx-bump-rail').forEach(r => r.classList.add('tilt'));
+    document.querySelectorAll('.sx-bump-sling').forEach(r => r.classList.add('tilt'));
     setTimeout(() => {
-        document.querySelectorAll('.eg-bump-bumper.tilt').forEach(b => { try { b.classList.remove('tilt'); } catch (e) {} });
-        document.querySelectorAll('.eg-bump-rail.tilt').forEach(r => { try { r.classList.remove('tilt'); } catch (e) {} });
-        document.querySelectorAll('.eg-bump-sling.tilt').forEach(r => { try { r.classList.remove('tilt'); } catch (e) {} });
+        document.querySelectorAll('.sx-bump-bumper.tilt').forEach(b => { try { b.classList.remove('tilt'); } catch (e) {} });
+        document.querySelectorAll('.sx-bump-rail.tilt').forEach(r => { try { r.classList.remove('tilt'); } catch (e) {} });
+        document.querySelectorAll('.sx-bump-sling.tilt').forEach(r => { try { r.classList.remove('tilt'); } catch (e) {} });
     }, BUMP_TILT_MS + 400);
     _nkToast('eg_bump_tilt', '⚠️ TILT! The flippers are furious - stay off the lower lanes!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
@@ -416,7 +416,7 @@ export function _bumperSpawnBand(st, slap, W, H) {
     const pivotY = H - 80;
     const len = Math.min(W * 0.62, 620);
     const angDeg = slap.side === 0 ? -32 : 212; // pointing up-inward
-    const el = _nkEl(st.run, 'div', 'eg-bump-flip');
+    const el = _nkEl(st.run, 'div', 'sx-bump-flip');
     el.style.left = pivotX + 'px';
     el.style.top = pivotY + 'px';
     el.style.width = len + 'px';
@@ -446,7 +446,7 @@ export function _bumperMultiball(st, now) {
     const n = BUMP_MULTIBALL_N[3] || 6;
     for (let i = 0; i < n; i++) {
         const a = Math.random() * Math.PI * 2;
-        const el = _nkEl(st.run, 'div', 'eg-bump-ball hot', '🎱');
+        const el = _nkEl(st.run, 'div', 'sx-bump-ball hot', '🎱');
         st.balls.push({
             x: W / 2, y: H * 0.4,
             vx: Math.cos(a) * BUMP_MULTIBALL_SPEED,
@@ -475,7 +475,7 @@ export function _bumperSlam(monster) {
     _bumpSlamActive = true;
     run.onKill = () => { _bumpSlamActive = false; };
     const c = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    const ring = _nkEl(run, 'div', 'eg-bump-slam-ring');
+    const ring = _nkEl(run, 'div', 'sx-bump-slam-ring');
     ring.style.left = c.x + 'px';
     ring.style.top = c.y + 'px';
     ring.style.width = ring.style.height = (BUMP_SLAM_R * 2) + 'px';
@@ -487,7 +487,7 @@ export function _bumperSlam(monster) {
         if (!slammed && t >= BUMP_SLAM_WARN_MS) {
             slammed = true;
             ring.classList.add('hot');
-            const core = _nkEl(run, 'div', 'eg-bump-slam-core', '🎪');
+            const core = _nkEl(run, 'div', 'sx-bump-slam-core', '🎪');
             core.style.left = c.x + 'px';
             core.style.top = c.y + 'px';
             const pr = _nkPlayerRect();

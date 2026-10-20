@@ -65,9 +65,9 @@ export function _renderLootOverlay(row, col, item) {
     if (!el) return;
     const span = document.createElement('span');
     // Uniques get an extra class for their signature golden ray/sparkle look.
-    const uniqueCls = item.isUnique ? ' eg-unique-drop' : '';
-    span.className = `eg-pickup-overlay eg-pickup-rarity-${item.rarity || 'common'} eg-loot-overlay${uniqueCls}`;
-    span.id = `eg-loot-${row}-${col}`;
+    const uniqueCls = item.isUnique ? ' sx-unique-drop' : '';
+    span.className = `sx-pickup-overlay sx-pickup-rarity-${item.rarity || 'common'} sx-loot-overlay${uniqueCls}`;
+    span.id = `sx-loot-${row}-${col}`;
     GAME_ART.fillElement(span, 'item', _lootArtId(item), item.icon || '📦');
     el.appendChild(span);
 }
@@ -75,7 +75,7 @@ export function _renderLootOverlay(row, col, item) {
 // Removes the loot overlay from the DOM.
 export function _removeLootOverlay(key) {
     const [r, c] = key.split('-').map(Number);
-    const span = document.getElementById(`eg-loot-${r}-${c}`);
+    const span = document.getElementById(`sx-loot-${r}-${c}`);
     if (span) span.remove();
 }
 
@@ -85,7 +85,7 @@ export function _animateLootClaim(row, col, item) {
     if (!el) return;
     const centre = _getElementCentre(el);
     const floater = document.createElement('div');
-    floater.className = 'eg-pickup-floater';
+    floater.className = 'sx-pickup-floater';
     GAME_ART.fillElement(floater, 'item', _lootArtId(item), item.icon || '📦');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
@@ -137,7 +137,7 @@ function _spawnLootDrop(isBoss = false, monsterLevel = 1, force = false) {
         : (item && (item.rarity === 'rare' || item.rarity === 'epic')) ? 'loot_drop_rare'
         : 'loot_drop_normal');
 
-    _scheduleTrackedExpiry(_lootDrops, key, item, LOOT_DROP_LIFETIME_MS, `eg-loot-${r}-${c}`, _removeLootOverlay);
+    _scheduleTrackedExpiry(_lootDrops, key, item, LOOT_DROP_LIFETIME_MS, `sx-loot-${r}-${c}`, _removeLootOverlay);
 }
 
 // ── Loot explosion ───────────────────────────────────────────────────────────
@@ -161,7 +161,7 @@ export function _placeLootDropForce(item) {
     _lootDrops.set(key, item);
     _renderLootOverlay(r, c, item);
 
-    _scheduleTrackedExpiry(_lootDrops, key, item, LOOT_DROP_LIFETIME_MS, `eg-loot-${r}-${c}`, _removeLootOverlay);
+    _scheduleTrackedExpiry(_lootDrops, key, item, LOOT_DROP_LIFETIME_MS, `sx-loot-${r}-${c}`, _removeLootOverlay);
     return true;
 }
 
@@ -379,7 +379,7 @@ export function _replaceCarriedLootDrops(items) {
         _lootDrops.set(key, item);
         _renderLootOverlay(r, c, item);
 
-        _scheduleTrackedExpiry(_lootDrops, key, item, LOOT_DROP_LIFETIME_MS, `eg-loot-${r}-${c}`, _removeLootOverlay);
+        _scheduleTrackedExpiry(_lootDrops, key, item, LOOT_DROP_LIFETIME_MS, `sx-loot-${r}-${c}`, _removeLootOverlay);
     });
 
     if (items.length > 0) globalThis.showToast(t('eg_loot_carried'));

@@ -88,7 +88,7 @@ export function _coloPC() { const c = _nkPlayerCenter(); return c || { x: window
 // Rock chip burst at a spot (visual only).
 export function _coloRubble(run, x, y, big) {
     for (let i = 0; i < (big ? 6 : 3); i++) {
-        const el = _nkEl(run, 'div', 'eg-colo-chip');
+        const el = _nkEl(run, 'div', 'sx-colo-chip');
         el.style.left = Math.round(x + (Math.random() * 40 - 20)) + 'px';
         el.style.top = Math.round(y + (Math.random() * 24 - 12)) + 'px';
         el.style.animationDelay = (i * 45) + 'ms';
@@ -159,11 +159,11 @@ export function _mechSeismicSlam(monster, phase) {
                 if (idx === 0 || feet[idx - 1].state === 'wave' || feet[idx - 1].state === 'done') {
                     ft.state = 'warn';
                     ft.t = 0;
-                    ft.zone = _nkEl(run, 'div', 'eg-colo-quake-zone');
+                    ft.zone = _nkEl(run, 'div', 'sx-colo-quake-zone');
                     ft.zone.style.left = Math.round(ft.x - COLO_WAVE_R) + 'px';
                     ft.zone.style.top = Math.round(ft.y - COLO_WAVE_R) + 'px';
                     ft.zone.style.width = ft.zone.style.height = (COLO_WAVE_R * 2) + 'px';
-                    ft.warned = _nkEl(run, 'div', 'eg-colo-foot-warn');
+                    ft.warned = _nkEl(run, 'div', 'sx-colo-foot-warn');
                     ft.warned.style.left = Math.round(ft.x - 78) + 'px';
                     ft.warned.style.top = Math.round(ft.y - 52) + 'px';
                 }
@@ -176,8 +176,8 @@ export function _mechSeismicSlam(monster, phase) {
                 if (ft.t >= COLO_FOOT_WARN_MS * _COLO_DEBUG_MULT) {
                     // SLAM.
                     try { ft.warned.remove(); } catch (e) {}
-                    ft.zone.classList.add('eg-colo-quake-live');
-                    ft.slamEl = _nkEl(run, 'div', 'eg-colo-foot-slam');
+                    ft.zone.classList.add('sx-colo-quake-live');
+                    ft.slamEl = _nkEl(run, 'div', 'sx-colo-foot-slam');
                     ft.slamEl.style.left = Math.round(ft.x - 78) + 'px';
                     ft.slamEl.style.top = Math.round(ft.y - 52) + 'px';
                     _coloRubble(run, ft.x, ft.y, true);
@@ -192,7 +192,7 @@ export function _mechSeismicSlam(monster, phase) {
                         _coloTouch(pct, level, dFoot < 88 ? 'Footfall' : 'Shockwave', true);
                         ft.hit = true;
                     }
-                    ft.waveEl = _nkEl(run, 'div', 'eg-nk-ring eg-colo-wave');
+                    ft.waveEl = _nkEl(run, 'div', 'sx-nk-ring sx-colo-wave');
                     ft.state = 'wave';
                     ft.t = 0;
                 }
@@ -258,11 +258,11 @@ export function _mechColoBoulders(monster, phase) {
             const tx = launched === 0 ? Math.max(60, Math.min(W - 60, pcA.x + (Math.random() * 80 - 40))) : W * (0.12 + Math.random() * 0.76);
             const ty = launched === 0 ? Math.max(60, Math.min(H - 60, pcA.y + (Math.random() * 80 - 40))) : H * (0.15 + Math.random() * 0.7);
             launched++; launchedAt = 0;
-            const mark = _nkEl(run, 'div', 'eg-colo-boulder-mark');
+            const mark = _nkEl(run, 'div', 'sx-colo-boulder-mark');
             mark.style.left = Math.round(tx - BOULDER_R) + 'px';
             mark.style.top = Math.round(ty - BOULDER_R) + 'px';
             mark.style.width = mark.style.height = (BOULDER_R * 2) + 'px';
-            const el = _nkEl(run, 'div', 'eg-colo-boulder');
+            const el = _nkEl(run, 'div', 'sx-colo-boulder');
             el.style.left = Math.round(tx - 26) + 'px';
             el.style.top = Math.round(-70) + 'px';
             boulders.push({ x: tx, y: ty, el, mark, state: 'fall', t: 0 });
@@ -293,7 +293,7 @@ export function _mechColoBoulders(monster, phase) {
                     b.frags = [];
                     for (let k = 0; k < BOULDER_FRAGS; k++) {
                         const ang = (k / BOULDER_FRAGS) * Math.PI * 2 + Math.random() * 0.5;
-                        const fel = _nkEl(run, 'div', 'eg-colo-frag');
+                        const fel = _nkEl(run, 'div', 'sx-colo-frag');
                         fel.style.left = Math.round(b.x - 9) + 'px';
                         fel.style.top = Math.round(b.y - 9) + 'px';
                         b.frags.push({ ang, dist: 0, el: fel, hit: false });
@@ -350,8 +350,8 @@ export function _mechColoGolems(monster, phase) {
     _nkToast('eg_mech_colo_golem', '🗿🧱 GRANITE GOLEMS - moving walls! Ram one 3 times to crumble it!', '#a8a29e');
     const golems = [];
     for (let i = 0; i < GOLEM_COUNT[Math.max(2, Math.min(3, Number(phase) || 2))]; i++) {
-        const el = _nkEl(run, 'div', 'eg-colo-golem');
-        el.innerHTML = '<i class="eg-colo-golem-eyes"></i>';
+        const el = _nkEl(run, 'div', 'sx-colo-golem');
+        el.innerHTML = '<i class="sx-colo-golem-eyes"></i>';
         const gx = W * (i === 0 ? 0.16 : 0.84);
         const gy = H * (0.2 + Math.random() * 0.5);
         el.style.left = Math.round(gx - 28) + 'px';
@@ -378,9 +378,9 @@ export function _mechColoGolems(monster, phase) {
             if (pr && d < 52 && now >= g.ramCd) {
                 g.ramCd = now + GOLEM_RAM_CD_MS;
                 g.hp--;
-                g.el.classList.remove('eg-colo-golem-crack1', 'eg-colo-golem-crack2');
-                if (g.hp === 2) g.el.classList.add('eg-colo-golem-crack1');
-                if (g.hp === 1) g.el.classList.add('eg-colo-golem-crack2');
+                g.el.classList.remove('sx-colo-golem-crack1', 'sx-colo-golem-crack2');
+                if (g.hp === 2) g.el.classList.add('sx-colo-golem-crack1');
+                if (g.hp === 1) g.el.classList.add('sx-colo-golem-crack2');
                 _coloRubble(run, g.x, g.y, false);
                 _nkNudgeAvatar((dx / d) * GOLEM_SHOVE_PX, (dy / d) * GOLEM_SHOVE_PX);
                 _coloTouch(COLO_GOLEM_DMG, level, 'Golem Shove');
@@ -485,9 +485,9 @@ export function _coloFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -496,25 +496,25 @@ export function _coloFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-colo-cd';
+    ov.className = 'sx-colo-cd';
     ov.innerHTML =
-        '<div class="eg-colo-cd-label">🗿 TITAN\u2019S FALL</div>' +
-        '<div class="eg-colo-cd-hint">Drag your HERO onto the glowing seal, step away, then onto it again - 3 times!</div>';
+        '<div class="sx-colo-cd-label">🗿 TITAN\u2019S FALL</div>' +
+        '<div class="sx-colo-cd-hint">Drag your HERO onto the glowing seal, step away, then onto it again - 3 times!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
     _nkToast('eg_mech_colo_final_cd', '🗿💀 TITAN\u2019S FALL - drag your hero onto the glowing seal, step away, repeat 3 times!', '#d6c8a8');
-    const hintEl = ov.querySelector('.eg-colo-cd-hint');
+    const hintEl = ov.querySelector('.sx-colo-cd-hint');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
 
     // The boss card wears the kneeling titan while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-colo-kneeling');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-colo-kneeling');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
@@ -527,8 +527,8 @@ export function _coloFinalStart(monster) {
     ];
     g.sealEls = sealSpots.map(s => {
         const el = document.createElement('div');
-        el.className = 'eg-colo-seal';
-        el.innerHTML = '<span class="eg-colo-seal-n"></span><span class="eg-colo-seal-cap">DRAG HERO HERE</span>';
+        el.className = 'sx-colo-seal';
+        el.innerHTML = '<span class="sx-colo-seal-n"></span><span class="sx-colo-seal-cap">DRAG HERO HERE</span>';
         document.body.appendChild(el);
         g.fxRun.els.push(el);
         return { el, fx: s.fx, fy: s.fy, x: 0, y: 0, hp: COLO_SEAL_HITS };
@@ -566,7 +566,7 @@ export function _coloFinalStart(monster) {
             const lanePos = vertical
                 ? W * (0.1 + Math.random() * 0.8)
                 : H * (0.1 + Math.random() * 0.8);
-            const warn = _nkEl(g.fxRun, 'div', 'eg-colo-chute-warn');
+            const warn = _nkEl(g.fxRun, 'div', 'sx-colo-chute-warn');
             if (vertical) {
                 warn.style.left = Math.round(lanePos - 44) + 'px';
                 warn.style.top = '0px';
@@ -581,7 +581,7 @@ export function _coloFinalStart(monster) {
             _coloAfter(g, COLO_CHUTE_WARN_MS * _COLO_DEBUG_MULT, () => {
                 if (g.finished) return;
                 try { warn.remove(); } catch (e) {}
-                const rocks = _nkEl(g.fxRun, 'div', 'eg-colo-chute');
+                const rocks = _nkEl(g.fxRun, 'div', 'sx-colo-chute');
                 if (vertical) {
                     rocks.style.left = Math.round(lanePos - 44) + 'px';
                     rocks.style.top = '0px';
@@ -617,12 +617,12 @@ export function _coloFinalStart(monster) {
         if (pr && g.armed && dSeal < 58) {
             g.armed = false;
             seal.hp--;
-            seal.el.classList.remove('eg-colo-seal-crack1', 'eg-colo-seal-crack2');
-            if (seal.hp === 2) seal.el.classList.add('eg-colo-seal-crack1');
-            if (seal.hp === 1) seal.el.classList.add('eg-colo-seal-crack2');
+            seal.el.classList.remove('sx-colo-seal-crack1', 'sx-colo-seal-crack2');
+            if (seal.hp === 2) seal.el.classList.add('sx-colo-seal-crack1');
+            if (seal.hp === 1) seal.el.classList.add('sx-colo-seal-crack2');
             _coloRubble(g.fxRun, seal.x, seal.y, false);
             if (seal.hp <= 0) {
-                seal.el.classList.add('eg-colo-seal-broken');
+                seal.el.classList.add('sx-colo-seal-broken');
                 _coloRubble(g.fxRun, seal.x, seal.y, true);
                 _coloShake(1.4);
                 g.seal++;
@@ -664,10 +664,10 @@ export function _coloFinalStart(monster) {
         }
         // Keep the lit-seal visuals honest.
         g.sealEls.forEach((s, i) => {
-            s.el.classList.toggle('eg-colo-seal-lit', i === g.seal);
-            const n = s.el.querySelector('.eg-colo-seal-n');
+            s.el.classList.toggle('sx-colo-seal-lit', i === g.seal);
+            const n = s.el.querySelector('.sx-colo-seal-n');
             if (n) n.textContent = i < g.seal ? '✓' : (i > g.seal ? '🔒' : (g.armed ? String(Math.max(0, s.hp)) : '↺'));
-            s.el.classList.toggle('eg-colo-seal-await', i === g.seal && !g.armed);
+            s.el.classList.toggle('sx-colo-seal-await', i === g.seal && !g.armed);
         });
         return true;
     });
@@ -682,19 +682,19 @@ export function _coloCaveIn(g, seal, level, monster) {
     if (g.finished || g.caveIn) return;
     g.caveIn = true;
     const ring = document.createElement('div');
-    ring.className = 'eg-colo-cavein-ring';
+    ring.className = 'sx-colo-cavein-ring';
     ring.style.left = Math.round(seal.x - COLO_CAVEIN_R) + 'px';
     ring.style.top = Math.round(seal.y - COLO_CAVEIN_R) + 'px';
     ring.style.width = ring.style.height = (COLO_CAVEIN_R * 2) + 'px';
-    ring.innerHTML = '<span class="eg-colo-cavein-count"></span>';
+    ring.innerHTML = '<span class="sx-colo-cavein-count"></span>';
     document.body.appendChild(ring);
     (g.activeChutes || []).forEach(ch => { try { ch.el.remove(); } catch (e) {} });
     g.activeChutes = [];
-    g.sealEls.forEach(s => s.el.classList.remove('eg-colo-seal-lit'));
-    const hint = g.overlay && g.overlay.querySelector('.eg-colo-cd-hint');
+    g.sealEls.forEach(s => s.el.classList.remove('sx-colo-seal-lit'));
+    const hint = g.overlay && g.overlay.querySelector('.sx-colo-cd-hint');
     if (hint) hint.textContent = 'CAVE-IN - get into the glowing ring!';
     _nkToast('eg_mech_colo_cavein_warn', '🗿💀 CAVE-IN - get into the glowing ring!', '#f59e0b');
-    const countEl = ring.querySelector('.eg-colo-cavein-count');
+    const countEl = ring.querySelector('.sx-colo-cavein-count');
     const t0 = performance.now();
     const warnMs = COLO_CAVEIN_WARN_MS * _COLO_DEBUG_MULT;
     const tick = () => {
@@ -703,7 +703,7 @@ export function _coloCaveIn(g, seal, level, monster) {
         if (countEl) countEl.textContent = left > 0 ? String(Math.ceil(left / 1000)) : '';
         if (left > 0) { _coloAfter(g, 100, tick); return; }
         const dust = document.createElement('div');
-        dust.className = 'eg-colo-cavein';
+        dust.className = 'sx-colo-cavein';
         dust.style.setProperty('--cx', Math.round(seal.x) + 'px');
         dust.style.setProperty('--cy', Math.round(seal.y) + 'px');
         document.body.appendChild(dust);
@@ -726,18 +726,18 @@ export function _coloFinalEnd(g, monster, collapsed) {
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
     g.sealEls.forEach(s => { try { s.el.remove(); } catch (e) {} });
-    document.querySelectorAll('.eg-colo-chute-warn, .eg-colo-chute, .eg-colo-cd, .eg-colo-cavein-ring').forEach(el => {
+    document.querySelectorAll('.sx-colo-chute-warn, .sx-colo-chute, .sx-colo-cd, .sx-colo-cavein-ring').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.remove('eg-colo-kneeling');
-        wrap.classList.remove('eg-nk-shielded');
+        wrap.classList.remove('sx-colo-kneeling');
+        wrap.classList.remove('sx-nk-shielded');
     }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -760,15 +760,15 @@ export function _coloFinalEnd(g, monster, collapsed) {
 // removes every run element, overlay and body class this boss ever created.
 export function _coloTeardown() {
     if (_coloFinal) { try { _coloFinalEnd(_coloFinal, null, false); } catch (e) {} _coloFinal = null; }
-    document.querySelectorAll('.eg-colo-foot-warn, .eg-colo-foot-slam, .eg-colo-wave, .eg-colo-quake-zone, ' +
-        '.eg-colo-boulder, .eg-colo-boulder-mark, .eg-colo-frag, .eg-colo-golem, .eg-colo-chip, ' +
-        '.eg-colo-seal, .eg-colo-chute-warn, .eg-colo-chute, .eg-colo-cd, .eg-colo-cavein, .eg-colo-cavein-ring').forEach(el => {
+    document.querySelectorAll('.sx-colo-foot-warn, .sx-colo-foot-slam, .sx-colo-wave, .sx-colo-quake-zone, ' +
+        '.sx-colo-boulder, .sx-colo-boulder-mark, .sx-colo-frag, .sx-colo-golem, .sx-colo-chip, ' +
+        '.sx-colo-seal, .sx-colo-chute-warn, .sx-colo-chute, .sx-colo-cd, .sx-colo-cavein, .sx-colo-cavein-ring').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-colo-kneeling').forEach(el => el.classList.remove('eg-colo-kneeling'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.querySelectorAll('.sx-colo-kneeling').forEach(el => el.classList.remove('sx-colo-kneeling'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

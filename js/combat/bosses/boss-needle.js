@@ -73,14 +73,14 @@ export function _ndTouch(pct, level, label) {
 // survives the run ending in the same frame).
 export function _ndThreadBurst(x, y, big) {
     const layer = document.createElement('div');
-    layer.className = 'eg-nd-threads' + (big ? ' eg-nd-threads-big' : '');
+    layer.className = 'sx-nd-threads' + (big ? ' sx-nd-threads-big' : '');
     layer.style.left = Math.round(x) + 'px';
     layer.style.top = Math.round(y) + 'px';
     document.body.appendChild(layer);
     const colors = ['#e2e8f0', '#f8fafc', '#cbd5e1', '#fbbf24'];
     for (let i = 0; i < (big ? 11 : 6); i++) {
         const s = document.createElement('div');
-        s.className = 'eg-nd-thread';
+        s.className = 'sx-nd-thread';
         s.style.background = colors[i % colors.length];
         const ang = Math.random() * Math.PI * 2;
         const dist = 22 + Math.random() * (big ? 84 : 48);
@@ -126,8 +126,8 @@ export function _mechNdNeedleGates(monster, phase) {
         });
     }
     gates.forEach(g => {
-        g.top = _nkEl(run, 'div', 'eg-nd-gateseg eg-nd-gateseg-top eg-nd-gate-warn');
-        g.bot = _nkEl(run, 'div', 'eg-nd-gateseg eg-nd-gateseg-bot eg-nd-gate-warn');
+        g.top = _nkEl(run, 'div', 'sx-nd-gateseg sx-nd-gateseg-top sx-nd-gate-warn');
+        g.bot = _nkEl(run, 'div', 'sx-nd-gateseg sx-nd-gateseg-bot sx-nd-gate-warn');
     });
 
     _nkToast('eg_mech_gates', '📌 The Needle: Spike Gates! Thread the gap!', '#e2e8f0');
@@ -137,8 +137,8 @@ export function _mechNdNeedleGates(monster, phase) {
         e += dtS * 1000;
         if (e >= warnMs) {
             gates.forEach(g => {
-                g.top.classList.remove('eg-nd-gate-warn');
-                g.bot.classList.remove('eg-nd-gate-warn');
+                g.top.classList.remove('sx-nd-gate-warn');
+                g.bot.classList.remove('sx-nd-gate-warn');
             });
         }
         const pr = _nkPlayerRect();
@@ -216,7 +216,7 @@ export function _mechNdPinDrops(monster, phase) {
         y = Math.max(100, Math.min(H - 120, y));
         if (pc0 && Math.hypot(pc0.x - x, pc0.y - y) < 130) continue;
         if (!pins.every(q => Math.hypot(q.x - x, q.y - y) > 180)) continue;
-        const warn = _nkEl(run, 'div', 'eg-nd-pinwarn');
+        const warn = _nkEl(run, 'div', 'sx-nd-pinwarn');
         warn.style.left = Math.round(x - 34) + 'px';
         warn.style.top = Math.round(y - 34) + 'px';
         pins.push({ x, y, warn, el: null, at: warnMs + pins.length * 350 * _ND_DEBUG_MULT, planted: 0, done: false });
@@ -234,7 +234,7 @@ export function _mechNdPinDrops(monster, phase) {
             if (!pin.el) {
                 // Land: the pin falls point-first and plants itself.
                 try { pin.warn.remove(); } catch (e) {}
-                const el = _nkEl(run, 'div', 'eg-nd-pin');
+                const el = _nkEl(run, 'div', 'sx-nd-pin');
                 el.style.left = Math.round(pin.x - 9) + 'px';
                 el.style.top = Math.round(pin.y - 64 - 300) + 'px';
                 el.style.rotate = (Math.random() < 0.5 ? -1 : 1) * 18 + 'deg';
@@ -257,7 +257,7 @@ export function _mechNdPinDrops(monster, phase) {
             }
             if (t >= pin.planted) {
                 pin.done = true;
-                pin.el.classList.add('eg-nd-pin-dissolve');
+                pin.el.classList.add('sx-nd-pin-dissolve');
                 const el = pin.el;
                 setTimeout(() => { try { el.remove(); } catch (e) {} }, 460);
             }
@@ -290,10 +290,10 @@ export function _mechNdStitchWave(monster, phase) {
     const dmgPct = ND_STITCH_DMG[p];
     const laneW = W / ND_WAVE_LANES;
 
-    const grid = _nkEl(run, 'div', 'eg-nd-stitchgrid');
+    const grid = _nkEl(run, 'div', 'sx-nd-stitchgrid');
     const lanes = [];
     for (let i = 0; i < ND_WAVE_LANES; i++) {
-        const el = _nkEl(run, 'div', 'eg-nd-stitchlane');
+        const el = _nkEl(run, 'div', 'sx-nd-stitchlane');
         el.style.left = Math.round(i * laneW) + 'px';
         el.style.width = Math.ceil(laneW) + 'px';
         el.style.height = H + 'px';
@@ -371,7 +371,7 @@ export function _mechNdPincushionBurst(monster, phase) {
     const cy = Math.max(180, Math.min(H - 180, c.y + (Math.random() * 2 - 1) * 140));
     const maxR = Math.hypot(W, H) * 0.62;
 
-    const orb = _nkEl(run, 'div', 'eg-nd-cushion');
+    const orb = _nkEl(run, 'div', 'sx-nd-cushion');
     orb.style.left = Math.round(cx - 34) + 'px';
     orb.style.top = Math.round(cy - 34) + 'px';
 
@@ -384,11 +384,11 @@ export function _mechNdPincushionBurst(monster, phase) {
         if (!burst) {
             if (t < warnMs) return true;
             burst = true;
-            orb.classList.add('eg-nd-cushion-burst');
+            orb.classList.add('sx-nd-cushion-burst');
             const base = Math.random() * 360;
             for (let k = 0; k < ND_CUSHION_SPOKES; k++) {
                 const ang = base + k * (360 / ND_CUSHION_SPOKES) + (Math.random() * 10 - 5);
-                const el = _nkEl(run, 'div', 'eg-nd-spoke');
+                const el = _nkEl(run, 'div', 'sx-nd-spoke');
                 spokes.push({ ang, r: 44, el, dead: false });
             }
         }
@@ -481,7 +481,7 @@ export function _ndMarkEye(g, r) {
     } while (g.lastPlayer && Math.hypot(x - g.lastPlayer.x, y - g.lastPlayer.y) < 340 && guard < 40);
     g.eye = { x, y, r };
     const eyeEl = document.createElement('div');
-    eyeEl.className = 'eg-nd-eye';
+    eyeEl.className = 'sx-nd-eye';
     eyeEl.style.width = (r * 2) + 'px';
     eyeEl.style.height = (r * 2) + 'px';
     eyeEl.style.left = Math.round(x - r) + 'px';
@@ -492,7 +492,7 @@ export function _ndMarkEye(g, r) {
     // The colossal needle: poised above, its eye-hole aligned with the safe
     // circle (the hole sits 43px from the needle's blunt left end).
     const needle = document.createElement('div');
-    needle.className = 'eg-nd-bigneedle';
+    needle.className = 'sx-nd-bigneedle';
     needle.style.width = Math.round(W * 0.7) + 'px';
     needle.style.left = Math.round(x - 43) + 'px';
     needle.style.top = '-90px';
@@ -510,8 +510,8 @@ export function _ndStab(g, monster, big) {
     const id = setTimeout(() => {
         _ndThreadBurst(e.x, e.y, big);
         if (big) {
-            document.body.classList.add('eg-nd-flash');
-            const fid = setTimeout(() => document.body.classList.remove('eg-nd-flash'), 700);
+            document.body.classList.add('sx-nd-flash');
+            const fid = setTimeout(() => document.body.classList.remove('sx-nd-flash'), 700);
             g.fxRun.timers.push(fid);
         }
         const pr = _nkPlayerRect();
@@ -553,9 +553,9 @@ export function _ndFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds needle, eye and cleanup timers.
@@ -564,18 +564,18 @@ export function _ndFinalStart(monster) {
 
     // Fabric weave over the arena.
     const fabric = document.createElement('div');
-    fabric.className = 'eg-nd-fabric';
+    fabric.className = 'sx-nd-fabric';
     document.body.appendChild(fabric);
     g.fabric = fabric;
-    requestAnimationFrame(() => fabric.classList.add('eg-nd-fabric-on'));
+    requestAnimationFrame(() => fabric.classList.add('sx-nd-fabric-on'));
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-nd-cd';
+    ov.className = 'sx-nd-cd';
     ov.innerHTML =
-        '<div class="eg-nd-cd-label">🪡 THE FINAL STITCH</div>' +
-        '<div class="eg-nd-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-nd-cd-hint">A colossal needle stabs the whole screen - only the EYE is safe!</div>';
+        '<div class="sx-nd-cd-label">🪡 THE FINAL STITCH</div>' +
+        '<div class="sx-nd-cd-num sx-bmb-cd-pop">' + g.count + '</div>' +
+        '<div class="sx-nd-cd-hint">A colossal needle stabs the whole screen - only the EYE is safe!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -585,11 +585,11 @@ export function _ndFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss sews, rocking with each stitch.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-nd-threading');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-nd-threading');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     // First eye right away so beat 1 already has somewhere to run to.
@@ -617,12 +617,12 @@ export function _ndFinalStart(monster) {
         }
         g.lastPlayer = _nkPlayerCenter();
         _ndMarkEye(g, g.count === 1 ? ND_EYE_R_FINAL : ND_EYE_R);
-        const num = g.overlay && g.overlay.querySelector('.eg-nd-cd-num');
+        const num = g.overlay && g.overlay.querySelector('.sx-nd-cd-num');
         if (num) {
             num.textContent = g.count;
-            num.classList.remove('eg-bmb-cd-pop');
+            num.classList.remove('sx-bmb-cd-pop');
             void num.offsetWidth;
-            num.classList.add('eg-bmb-cd-pop');
+            num.classList.add('sx-bmb-cd-pop');
         }
     }, cdTick);
 }
@@ -636,12 +636,12 @@ export function _ndFinalEnd(g) {
     if (g.eyeEl) { try { g.eyeEl.remove(); } catch (e) {} g.eyeEl = null; }
     if (g.needleEl) { try { g.needleEl.remove(); } catch (e) {} g.needleEl = null; }
     if (g.fxRun) { try { _nkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
-    document.body.classList.remove('eg-nd-flash');
-    document.querySelectorAll('.eg-nd-threading').forEach(el => el.classList.remove('eg-nd-threading'));
+    document.body.classList.remove('sx-nd-flash');
+    document.querySelectorAll('.sx-nd-threading').forEach(el => el.classList.remove('sx-nd-threading'));
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -663,16 +663,16 @@ export function _ndFinalEnd(g) {
 // removes every run element, overlay and body class this boss ever created.
 export function _ndTeardown() {
     if (_ndFinal) { try { _ndFinalEnd(_ndFinal); } catch (e) {} _ndFinal = null; }
-    document.querySelectorAll('.eg-nd-gateseg, .eg-nd-pinwarn, .eg-nd-pin, .eg-nd-stitchgrid, ' +
-        '.eg-nd-stitchlane, .eg-nd-cushion, .eg-nd-spoke, .eg-nd-eye, .eg-nd-bigneedle, ' +
-        '.eg-nd-fabric, .eg-nd-cd, .eg-nd-threads').forEach(el => {
+    document.querySelectorAll('.sx-nd-gateseg, .sx-nd-pinwarn, .sx-nd-pin, .sx-nd-stitchgrid, ' +
+        '.sx-nd-stitchlane, .sx-nd-cushion, .sx-nd-spoke, .sx-nd-eye, .sx-nd-bigneedle, ' +
+        '.sx-nd-fabric, .sx-nd-cd, .sx-nd-threads').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.body.classList.remove('eg-nd-flash');
-    document.querySelectorAll('.eg-nd-threading').forEach(el => el.classList.remove('eg-nd-threading'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.body.classList.remove('sx-nd-flash');
+    document.querySelectorAll('.sx-nd-threading').forEach(el => el.classList.remove('sx-nd-threading'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

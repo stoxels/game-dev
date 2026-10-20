@@ -127,7 +127,7 @@ export function _gourmetTeardown() {
         if (st.plate) { try { if (st.plate.el) st.plate.el.remove(); } catch (e) {} }
         try { if (st.run) _nkKillRun(st.run); } catch (e) {} // removes the maw
     }
-    document.querySelectorAll('.eg-gmt-mouth, .eg-gmt-aroma, .eg-gmt-food, .eg-gmt-plate, .eg-gmt-pool, .eg-gmt-warn, .eg-gmt-cloche, .eg-gmt-dish, .eg-gmt-maw').forEach(el => el.remove());
+    document.querySelectorAll('.sx-gmt-mouth, .sx-gmt-aroma, .sx-gmt-food, .sx-gmt-plate, .sx-gmt-pool, .sx-gmt-warn, .sx-gmt-cloche, .sx-gmt-dish, .sx-gmt-maw').forEach(el => el.remove());
 }
 
 
@@ -157,7 +157,7 @@ export function _gourmetArenaInit(monster) {
     st.run = run;
 
     // The Gourmand: the boss's arena body.
-    const el = _nkEl(run, 'div', 'eg-gmt-mouth', '👄');
+    const el = _nkEl(run, 'div', 'sx-gmt-mouth', '👄');
     el.style.width = el.style.height = (GMT_MOUTH_R * 2) + 'px';
     st.mouth = {
         x: window.innerWidth * 0.7, y: window.innerHeight * 0.3,
@@ -167,7 +167,7 @@ export function _gourmetArenaInit(monster) {
     el.style.transform = 'translate(' + Math.round(st.mouth.x - GMT_MOUTH_R) + 'px,' + Math.round(st.mouth.y - GMT_MOUTH_R) + 'px)';
 
     // Sizzling plate: roams and drips grease.
-    const pel = _nkEl(run, 'div', 'eg-gmt-plate', '🍳');
+    const pel = _nkEl(run, 'div', 'sx-gmt-plate', '🍳');
     pel.style.width = pel.style.height = '52px';
     st.plate = {
         x: window.innerWidth * 0.3, y: window.innerHeight * 0.6,
@@ -224,7 +224,7 @@ export function _gourmetArenaInit(monster) {
             st.inhaling = true;
             st.inhaleT = 0;
             // Aroma telegraph: dashed ring blooming around the maw.
-            const ael = _nkEl(st.run, 'div', 'eg-gmt-aroma');
+            const ael = _nkEl(st.run, 'div', 'sx-gmt-aroma');
             ael.style.left = Math.round(mh.x) + 'px';
             ael.style.top = Math.round(mh.y) + 'px';
             st.aroma = { el: ael };
@@ -304,7 +304,7 @@ export function _gourmetArenaInit(monster) {
                 cl.slammed = true;
                 try { if (cl.el) cl.el.remove(); } catch (e) {}
                 cl.el = null;
-                const el2 = _nkEl(st.run, 'div', 'eg-gmt-cloche', '🍽️');
+                const el2 = _nkEl(st.run, 'div', 'sx-gmt-cloche', '🍽️');
                 el2.style.left = Math.round(cl.x) + 'px';
                 el2.style.top = Math.round(cl.y) + 'px';
                 const pr2 = _nkPlayerRect();
@@ -350,7 +350,7 @@ export function _gourmetArenaInit(monster) {
                 if (dsh.t >= 620) {
                     dsh.warn = true;
                     try { if (dsh.warnEl) dsh.warnEl.remove(); } catch (e) {}
-                    const el4 = _nkEl(st.run, 'div', 'eg-gmt-dish', ['🍰', '🧁', '🎂'][Math.floor(Math.random() * 3)]);
+                    const el4 = _nkEl(st.run, 'div', 'sx-gmt-dish', ['🍰', '🧁', '🎂'][Math.floor(Math.random() * 3)]);
                     el4.style.left = Math.round(dsh.x) + 'px';
                     el4.style.top = '-30px';
                     dsh.el = el4;
@@ -434,7 +434,7 @@ export function _gourmetArenaInit(monster) {
 
 // A dashed warn ring (shared by cloches + devour lock styling).
 export function _gmtWarn(st, x, y, r) {
-    const el = _nkEl(st.run, 'div', 'eg-gmt-warn');
+    const el = _nkEl(st.run, 'div', 'sx-gmt-warn');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
     el.style.width = el.style.height = Math.round(r * 2) + 'px';
@@ -445,7 +445,7 @@ export function _gmtWarn(st, x, y, r) {
 
 // One food projectile from the maw's spit.
 export function _gmtSpitFood(st, x, y, vx, vy) {
-    const el = _nkEl(st.run, 'div', 'eg-gmt-food', ['🍖', '🍗', '🧀'][Math.floor(Math.random() * 3)]);
+    const el = _nkEl(st.run, 'div', 'sx-gmt-food', ['🍖', '🍗', '🧀'][Math.floor(Math.random() * 3)]);
     const food = { x, y, vx, vy, t: 0, hit: false, el };
     st.foods.push(food);
 }
@@ -453,7 +453,7 @@ export function _gmtSpitFood(st, x, y, vx, vy) {
 
 // A grease-fire pool on the table.
 export function _gmtDropPool(st, x, y, ttl) {
-    const el = _nkEl(st.run, 'div', 'eg-gmt-pool');
+    const el = _nkEl(st.run, 'div', 'sx-gmt-pool');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
     st.pools.push({ x, y, t: 0, ttl, nextTick: 0, el });
@@ -486,7 +486,7 @@ export function _gourmetBanquet(st, p) {
 
 export function _gmtDropDish(st, W) {
     const x = 60 + Math.random() * Math.max(80, W - 120);
-    const warnEl = _nkEl(st.run, 'div', 'eg-gmt-warncol');
+    const warnEl = _nkEl(st.run, 'div', 'sx-gmt-warncol');
     warnEl.style.left = Math.round(x) + 'px';
     st.dishes.push({ x, y: 0, t: 0, warn: false, warnEl, el: null, hit: false });
 }
@@ -498,7 +498,7 @@ export function _gmtDropDish(st, W) {
 export function _gourmetDevour(monster) {
     const st = _gourmetWatcher;
     if (!st || st.devour || _nkDodgeBusy() || _nkFrozen()) return;
-    const el = _nkEl(st.run, 'div', 'eg-gmt-maw');
+    const el = _nkEl(st.run, 'div', 'sx-gmt-maw');
     st.devour = { phase: 'lock', t: 0, el };
     _nkToast('eg_gmt_devour', '👄 DEVOUR! Fight the suction - get out of the ring!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'gourmet_bite'); } catch (e) {}

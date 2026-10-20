@@ -182,7 +182,7 @@ function _updateAvatarBarStack() {
         const chargeReady = chargePct >= 1;
         const chargeOver = chargePct > 1.001;
         // Milestone look per weapon-art tier (mirrors
-        // _updatePlayerChargeBar - see eg-charge-tier1..4 in CSS). The
+        // _updatePlayerChargeBar - see sx-charge-tier1..4 in CSS). The
         // bands are inlined (not imported from encounter-melee-arts.js) on
         // purpose: this file must stay import-light so its test graph never
         // pulls the whole encounter facade. Bands pinned against the real
@@ -192,15 +192,15 @@ function _updateAvatarBarStack() {
             chargeTier = (chargePct >= 5 - 0.001 ? 4 : chargePct >= 4 ? 3
                 : chargePct >= 3 ? 2 : chargePct >= 2 ? 1 : 0);
         } catch (e) { chargeTier = 0; }
-        chargeFill.classList.toggle('eg-charge-ready', chargeReady);
-        chargeFill.classList.toggle('eg-charge-overcharged', chargeOver);
-        for (let i = 1; i <= 4; i++) chargeFill.classList.toggle('eg-charge-tier' + i, chargeTier === i);
+        chargeFill.classList.toggle('sx-charge-ready', chargeReady);
+        chargeFill.classList.toggle('sx-charge-overcharged', chargeOver);
+        for (let i = 1; i <= 4; i++) chargeFill.classList.toggle('sx-charge-tier' + i, chargeTier === i);
         const chargeText = document.getElementById('avatar-charge-text');
         if (chargeText) {
             chargeText.textContent = `${Math.floor(chargePct * 100)}%`;
-            chargeText.classList.toggle('eg-charge-ready', chargeReady);
-            chargeText.classList.toggle('eg-charge-overcharged', chargeOver);
-            for (let i = 1; i <= 4; i++) chargeText.classList.toggle('eg-charge-tier' + i, chargeTier === i);
+            chargeText.classList.toggle('sx-charge-ready', chargeReady);
+            chargeText.classList.toggle('sx-charge-overcharged', chargeOver);
+            for (let i = 1; i <= 4; i++) chargeText.classList.toggle('sx-charge-tier' + i, chargeTier === i);
         }
     }
 }
@@ -1106,7 +1106,7 @@ export function _renderPlayerAvatar() {
     // Hold-parry pause - keep sprite label in sync if the avatar was recreated while the parry key is still held
     if (typeof _holdEPauseActive !== 'undefined' && typeof _setHoldEPauseVisual === 'function') {
         // Avoid redundant DOM churn: _setHoldEPauseVisual is idempotent and cheap
-        const lbl = document.getElementById('eg-hold-pause-label');
+        const lbl = document.getElementById('sx-hold-pause-label');
         const shouldShow = !!globalThis._holdEPauseActive;
         const isShowing = !!lbl && lbl.parentElement === avatar;
         if (shouldShow !== isShowing) _setHoldEPauseVisual(shouldShow);

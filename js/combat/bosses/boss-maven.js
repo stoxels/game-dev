@@ -57,7 +57,7 @@ export function _mechMemoryRite(monster, phase) {
         pts.push({ x: W * (0.25 + pts.length * 0.25), y: H * 0.5 });
     }
     pts.forEach((q, i) => {
-        q.el = _nkEl(run, 'div', 'eg-nk-mem', String(i + 1));
+        q.el = _nkEl(run, 'div', 'sx-nk-mem', String(i + 1));
         q.el.style.left = Math.round(q.x - radius) + 'px';
         q.el.style.top = Math.round(q.y - radius) + 'px';
         q.el.style.width = radius * 2 + 'px';
@@ -70,14 +70,14 @@ export function _mechMemoryRite(monster, phase) {
     _nkLoop(run, (dtS) => {
         e += dtS * 1000;
         const lit = Math.min(3, Math.floor(e / showMs));
-        pts.forEach((q, i) => q.el.classList.toggle('eg-nk-mem-on', i < lit));
+        pts.forEach((q, i) => q.el.classList.toggle('sx-nk-mem-on', i < lit));
         if (e >= showTotal) {
             const c = _nkPlayerCenter();
             if (c && next < 3) {
                 const q = pts[next];
                 if (Math.hypot(c.x - q.x, c.y - q.y) <= radius) {
                     q.locked = true;
-                    q.el.classList.add('eg-nk-mem-locked');
+                    q.el.classList.add('sx-nk-mem-locked');
                     next++;
                 }
             }

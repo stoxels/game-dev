@@ -48,14 +48,14 @@ export function _isUniqueCollected(uid) {
 }
 export function _updateUniqueTabBadge() {
     _ensureUniqueStash();
-    const btn = document.getElementById('eg-tab-uniques');
+    const btn = document.getElementById('sx-tab-uniques');
     if (!btn) return;
     const total = (typeof UNIQUE_ITEMS !== 'undefined' ? UNIQUE_ITEMS.length : 0);
     const found = globalThis._uniqueCollected.size;
-    let badge = btn.querySelector('.eg-tab-count');
+    let badge = btn.querySelector('.sx-tab-count');
     if (!badge) {
         badge = document.createElement('span');
-        badge.className = 'eg-tab-count';
+        badge.className = 'sx-tab-count';
         btn.appendChild(badge);
     }
     badge.textContent = `${found}/${total}`;

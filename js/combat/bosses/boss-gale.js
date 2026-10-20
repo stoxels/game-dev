@@ -149,7 +149,7 @@ export function _galeTeardown() {
         try { if (st.windBanner) st.windBanner.remove(); } catch (e) {}
         try { if (st.run) _nkKillRun(st.run); } catch (e) {} // removes eye + ring els too
     }
-    document.querySelectorAll('.eg-gal-eye, .eg-gal-funnel, .eg-gal-dust, .eg-gal-wind-banner, .eg-gal-streak, .eg-gal-lane, .eg-gal-twister, .eg-gal-ring, .eg-gal-lance, .eg-gal-lance-bolt').forEach(el => el.remove());
+    document.querySelectorAll('.sx-gal-eye, .sx-gal-funnel, .sx-gal-dust, .sx-gal-wind-banner, .sx-gal-streak, .sx-gal-lane, .sx-gal-twister, .sx-gal-ring, .sx-gal-lance, .sx-gal-lance-bolt').forEach(el => el.remove());
 }
 
 
@@ -180,8 +180,8 @@ export function _galeArenaInit(monster) {
     st.run = run;
 
     // The Eye: the boss's arena body.
-    const el = _nkEl(run, 'div', 'eg-gal-eye');
-    el.innerHTML = '<i class="eg-gal-eye-ring"></i><i class="eg-gal-eye-ring r2"></i><i class="eg-gal-eye-core"></i>';
+    const el = _nkEl(run, 'div', 'sx-gal-eye');
+    el.innerHTML = '<i class="sx-gal-eye-ring"></i><i class="sx-gal-eye-ring r2"></i><i class="sx-gal-eye-core"></i>';
     el.style.width = el.style.height = (GAL_EYE_R * 2) + 'px';
     st.eye = {
         x: window.innerWidth / 2, y: window.innerHeight * 0.32,
@@ -297,7 +297,7 @@ export function _galeArenaInit(monster) {
 // ── Crosswind visuals: banner + drifting wind streaks from the upwind side
 export function _galeShowWindBanner(st, dir) {
     try { if (st.windBanner) st.windBanner.remove(); } catch (e) {}
-    const el = _nkEl(st.run, 'div', 'eg-gal-wind-banner');
+    const el = _nkEl(st.run, 'div', 'sx-gal-wind-banner');
     el.textContent = dir < 0 ? '◀◀ CROSSWIND' : 'CROSSWIND ▶▶';
     st.windBanner = el;
     setTimeout(() => { try { if (st.windBanner === el) el.remove(); } catch (e) {} }, 1800);
@@ -306,7 +306,7 @@ export function _galeShowWindBanner(st, dir) {
     st.streaks = [];
     const fromLeft = dir > 0;
     for (let i = 0; i < GAL_WIND_STREAKS; i++) {
-        const sEl = _nkEl(st.run, 'div', 'eg-gal-streak');
+        const sEl = _nkEl(st.run, 'div', 'sx-gal-streak');
         sEl.style.width = (70 + Math.random() * 90) + 'px';
         const s = {
             x: fromLeft ? -40 - Math.random() * 260 : window.innerWidth + 40 + Math.random() * 260,
@@ -336,14 +336,14 @@ export function _galeTickStreaks(st, dtS) {
 
 // Layered rings that read as a spinning cone (pure CSS, see bosses2.css).
 function _galeSwirlHTML() {
-    return '<i class="eg-gal-sw s1"></i><i class="eg-gal-sw s2"></i><i class="eg-gal-sw s3"></i><i class="eg-gal-sw s4"></i>';
+    return '<i class="sx-gal-sw s1"></i><i class="sx-gal-sw s2"></i><i class="sx-gal-sw s3"></i><i class="sx-gal-sw s4"></i>';
 }
 
 
 // ── Cyclone funnels: spawn with a dust telegraph, hunt the player ────────
 export function _galeSpawnFunnel(st) {
     const W = window.innerWidth, H = window.innerHeight;
-    const dust = _nkEl(st.run, 'div', 'eg-gal-dust');
+    const dust = _nkEl(st.run, 'div', 'sx-gal-dust');
     const x = 80 + Math.random() * Math.max(60, W - 160);
     const y = 100 + Math.random() * Math.max(60, H - 200);
     dust.style.left = x + 'px';
@@ -353,7 +353,7 @@ export function _galeSpawnFunnel(st) {
     setTimeout(() => {
         try { dust.remove(); } catch (e) {}
         if (_galeWatcher !== st) return;
-        const el = _nkEl(st.run, 'div', 'eg-gal-funnel');
+        const el = _nkEl(st.run, 'div', 'sx-gal-funnel');
         el.innerHTML = _galeSwirlHTML();
         el.style.transform = 'translate(' + Math.round(funnel.x - 30) + 'px,' + Math.round(funnel.y - 30) + 'px)';
         funnel.el = el;
@@ -429,8 +429,8 @@ export function _galeTickLadder(st, dtS, pr) {
     ld.t += dtS * 1000;
     while (ld.idx < ld.lanes.length && ld.t >= ld.lanes[ld.idx].at) {
         const lane = ld.lanes[ld.idx];
-        const warnEl = _nkEl(st.run, 'div', 'eg-gal-lane');
-        warnEl.innerHTML = '<span class="eg-gal-lane-chev">▲ ▲ ▲</span>';
+        const warnEl = _nkEl(st.run, 'div', 'sx-gal-lane');
+        warnEl.innerHTML = '<span class="sx-gal-lane-chev">▲ ▲ ▲</span>';
         warnEl.style.left = (lane.x - GAL_LADDER_W / 2) + 'px';
         warnEl.style.width = GAL_LADDER_W + 'px';
         const twister = { x: lane.x, y: H + 90, warnEl, el: null, phase: 'warn', t: 0 };
@@ -445,7 +445,7 @@ export function _galeTickLadder(st, dtS, pr) {
                 tw.phase = 'rise';
                 tw.t = 0;
                 tw.warnEl.classList.add('hot');
-                tw.el = _nkEl(st.run, 'div', 'eg-gal-twister');
+                tw.el = _nkEl(st.run, 'div', 'sx-gal-twister');
                 tw.el.innerHTML = _galeSwirlHTML();
                 tw.el.style.left = (tw.x - 60) + 'px';
                 try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e) {}
@@ -514,7 +514,7 @@ export function _galeTickRings(st, dtS, c) {
         const W0 = window.innerWidth, H0 = window.innerHeight;
         const cx = c ? c.x : W0 / 2, cy = c ? c.y : H0 / 2;
         st.eye.tx = cx; st.eye.ty = cy;
-        const el = _nkEl(st.run, 'div', 'eg-gal-ring');
+        const el = _nkEl(st.run, 'div', 'sx-gal-ring');
         el.style.left = cx + 'px';
         el.style.top = cy + 'px';
         // The opening: a wedge (clockwise from 12 o'clock) with no band. Each
@@ -615,7 +615,7 @@ export function _galeLance(st, p, aim, horizontalOverride) {
     const W = window.innerWidth, H = window.innerHeight;
     const c = aim || _nkPlayerCenter() || { x: W / 2, y: H / 2 };
     const horizontal = (typeof horizontalOverride === 'boolean') ? horizontalOverride : Math.random() < 0.6;
-    const el = _nkEl(st.run, 'div', 'eg-gal-lance' + (horizontal ? ' horiz' : ' vert'));
+    const el = _nkEl(st.run, 'div', 'sx-gal-lance' + (horizontal ? ' horiz' : ' vert'));
     const fromLeft = Math.random() < 0.5;
     if (horizontal) {
         el.style.top = c.y + 'px';
@@ -629,7 +629,7 @@ export function _galeLance(st, p, aim, horizontalOverride) {
     // Arrows on the side the bolt enters from, so the direction is readable.
     const side = horizontal ? (fromLeft ? 'l' : 'r') : (fromLeft ? 't' : 'b');
     const glyph = horizontal ? (fromLeft ? '▶ ▶ ▶' : '◀ ◀ ◀') : (fromLeft ? '▼<br>▼<br>▼' : '▲<br>▲<br>▲');
-    el.innerHTML = '<span class="eg-gal-lance-arrow ' + side + '">' + glyph + '</span>';
+    el.innerHTML = '<span class="sx-gal-lance-arrow ' + side + '">' + glyph + '</span>';
     const lance = { horizontal, fixed: horizontal ? c.y : c.x, fromLeft, t: 0, el, boltEl: null, hit: false, p };
     st.lances.push(lance);
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e) {}
@@ -645,7 +645,7 @@ export function _galeTickLances(st, dtS, pr, p) {
         if (l.t < GAL_LANCE_WARN_MS) continue;
         if (!l.boltEl) {
             l.el.classList.add('hot');
-            l.boltEl = _nkEl(st.run, 'div', 'eg-gal-lance-bolt');
+            l.boltEl = _nkEl(st.run, 'div', 'sx-gal-lance-bolt');
             l.boltEl.style.left = '0px';
             l.boltEl.style.top = '0px';
             try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e) {}

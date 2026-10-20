@@ -483,14 +483,14 @@ function startGearOverlays() {
     sweep();
     pollTimer = setInterval(sweep, POLL_MS);
     window.addEventListener('resize', sweep);
-    document.addEventListener('eg-art-loaded', sweep);
+    document.addEventListener('sx-art-loaded', sweep);
 }
 
 // Test/teardown hook.
 function stopGearOverlays() {
     if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
     try { window.removeEventListener('resize', sweep); } catch (e) { /* noop */ }
-    try { document.removeEventListener('eg-art-loaded', sweep); } catch (e) { /* noop */ }
+    try { document.removeEventListener('sx-art-loaded', sweep); } catch (e) { /* noop */ }
 }
 
 // Module scripts are deferred — the DOM is parsed when this runs. Boot

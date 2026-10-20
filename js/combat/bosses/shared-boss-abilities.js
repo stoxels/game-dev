@@ -233,7 +233,7 @@ export function _corruptPickNeighbor(r, c) {
             continue; // grid only holds 0/1
         }
         if (_bossCorrupted.has(`${nr}-${nc}`)) continue;
-        if (document.getElementById(`eg-corrupt-tel-${nr}-${nc}`)) continue; // already telegraphed
+        if (document.getElementById(`sx-corrupt-tel-${nr}-${nc}`)) continue; // already telegraphed
         cands.push([nr, nc]);
     }
     if (cands.length === 0) return null;
@@ -249,8 +249,8 @@ export function _corruptTelegraphSpread(key, data, tr, tc) {
     if (!el) return;
 
     const tel = document.createElement('span');
-    tel.className = 'eg-corrupt-telegraph';
-    tel.id = `eg-corrupt-tel-${tr}-${tc}`;
+    tel.className = 'sx-corrupt-telegraph';
+    tel.id = `sx-corrupt-tel-${tr}-${tc}`;
     tel.textContent = '☣️';
     el.appendChild(tel);
 
@@ -270,7 +270,7 @@ export function _corruptSpreadLand(key) {
     if (!data || !data.pending) return;
     const { tr, tc } = data.pending;
     data.pending = null;
-    const tel = document.getElementById(`eg-corrupt-tel-${tr}-${tc}`);
+    const tel = document.getElementById(`sx-corrupt-tel-${tr}-${tc}`);
     if (tel) tel.remove();
 
     if (!_bossCorrupted.has(key)) return;          // source dispelled mid-telegraph
@@ -320,8 +320,8 @@ export function _applyCellCorruption(r, c, cfg) {
 
     const p = cfg.p;
     const overlay = document.createElement('span');
-    overlay.className = 'eg-corrupt-overlay';
-    overlay.id = `eg-corrupt-${r}-${c}`;
+    overlay.className = 'sx-corrupt-overlay';
+    overlay.id = `sx-corrupt-${r}-${c}`;
     overlay.textContent = '☣️';
     el.appendChild(overlay);
 
@@ -349,13 +349,13 @@ export function _removeCellCorruption(key) {
         clearTimeout(data.spreadTimer);
         if (data.pending) {
             clearTimeout(data.pending.landTimer);
-            const tel = document.getElementById(`eg-corrupt-tel-${data.pending.tr}-${data.pending.tc}`);
+            const tel = document.getElementById(`sx-corrupt-tel-${data.pending.tr}-${data.pending.tc}`);
             if (tel) tel.remove();
             data.pending = null;
         }
     }
     const [r, c] = key.split('-').map(Number);
-    const span = document.getElementById(`eg-corrupt-${r}-${c}`);
+    const span = document.getElementById(`sx-corrupt-${r}-${c}`);
     if (span) span.remove();
     _bossCorrupted.delete(key);
 }
@@ -493,7 +493,7 @@ export function _shiftSpawnFlyer(sr, sc, dr, dc, onLanded) {
     const startY = s.top + s.height / 2;
 
     const node = document.createElement('div');
-    node.className = 'eg-shift-fly';
+    node.className = 'sx-shift-fly';
     node.textContent = '✕';
     node.style.width = `${size}px`;
     node.style.height = `${size}px`;
@@ -578,8 +578,8 @@ export function _relocateMarks(targets) {
             if (globalThis.userGrid[dr][dc] !== 2) return;
             const el = document.getElementById(`g-${dr}-${dc}`);
             if (el) {
-                el.classList.add('eg-shift-moved');
-                setTimeout(() => el.classList.remove('eg-shift-moved'), 1600);
+                el.classList.add('sx-shift-moved');
+                setTimeout(() => el.classList.remove('sx-shift-moved'), 1600);
             }
         });
     });
@@ -636,12 +636,12 @@ export function _mechProbabilityShift(monster, phase) {
 // outlive its grid - their onLanded callbacks still commit state safely via
 // renderCell, but the node check in the flight loop stops the animation.
 export function _clearShiftGlows() {
-    document.querySelectorAll('.eg-shift-moved').forEach(el => el.classList.remove('eg-shift-moved'));
+    document.querySelectorAll('.sx-shift-moved').forEach(el => el.classList.remove('sx-shift-moved'));
     if (Array.isArray(_shiftFlyNodes)) {
         _shiftFlyNodes.forEach(n => { try { n.remove(); } catch (e) { /* ignore */ } });
         _shiftFlyNodes = [];
     }
-    document.querySelectorAll('.eg-shift-fly').forEach(el => el.remove());
+    document.querySelectorAll('.sx-shift-fly').forEach(el => el.remove());
 }
 
 
@@ -656,8 +656,8 @@ export function _removeFromRecentFills(row, col) {
 export function _flashPriorBombCell(row, col) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
-    el.classList.add('eg-prior-bomb-flash');
-    setTimeout(() => el.classList.remove('eg-prior-bomb-flash'), 600);
+    el.classList.add('sx-prior-bomb-flash');
+    setTimeout(() => el.classList.remove('sx-prior-bomb-flash'), 600);
 }
 
 
@@ -669,7 +669,7 @@ export function _priorBombBoom(x, y, radius) {
     const R = Math.max(12, radius);
 
     let layer = document.createElement('div');
-    layer.className = 'eg-crash-burst';
+    layer.className = 'sx-crash-burst';
     layer.style.left = Math.round(x - R) + 'px';
     layer.style.top = Math.round(y - R) + 'px';
     layer.style.width = (R * 2) + 'px';
@@ -677,14 +677,14 @@ export function _priorBombBoom(x, y, radius) {
     document.body.appendChild(layer);
 
     const core = document.createElement('div');
-    core.className = 'eg-crash-core';
+    core.className = 'sx-crash-core';
     layer.appendChild(core);
     const ring = document.createElement('div');
-    ring.className = 'eg-crash-ring';
+    ring.className = 'sx-crash-ring';
     layer.appendChild(ring);
     for (let i = 0; i < 7; i++) {
         const s = document.createElement('div');
-        s.className = 'eg-crash-spark';
+        s.className = 'sx-crash-spark';
         const ang = Math.random() * Math.PI * 2;
         const dist = R * (0.35 + Math.random() * 0.8);
         s.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
@@ -697,10 +697,10 @@ export function _priorBombBoom(x, y, radius) {
     // The blast is felt as well as seen - same subtle shake language the
     // screen-blast impact uses (class exists on <body>, restart-clean).
     const shakeBody = document.body;
-    shakeBody.classList.remove('eg-screen-shake');
+    shakeBody.classList.remove('sx-screen-shake');
     void shakeBody.offsetWidth;
-    shakeBody.classList.add('eg-screen-shake');
-    setTimeout(() => shakeBody.classList.remove('eg-screen-shake'), 550);
+    shakeBody.classList.add('sx-screen-shake');
+    setTimeout(() => shakeBody.classList.remove('sx-screen-shake'), 550);
 
     if (typeof Audio_Manager !== 'undefined' && Audio_Manager && typeof Audio_Manager.playSFX === 'function') {
         try { Audio_Manager.playSFX('boss_explosion', 'drifterExplosion'); } catch (e) {}
@@ -715,8 +715,8 @@ export function _priorBombDetonationFX(b) {
     const cellEl = b.cellEl && b.cellEl.isConnected ? b.cellEl
         : document.getElementById(`g-${b.r}-${b.c}`);
     if (cellEl) {
-        cellEl.classList.add('eg-pb-detonated');
-        setTimeout(() => cellEl.classList.remove('eg-pb-detonated'), 900);
+        cellEl.classList.add('sx-pb-detonated');
+        setTimeout(() => cellEl.classList.remove('sx-pb-detonated'), 900);
         const r = cellEl.getBoundingClientRect();
         if (r.width && r.height) {
             _priorBombBoom(r.left + r.width / 2, r.top + r.height / 2, Math.max(34, r.width * 1.15));
@@ -809,17 +809,17 @@ export function _syncDefuseChargePause(active) {
 
 
 // 'DEFUSING' hint label on the player sprite while standing on a bomb - the
-// same visual language as the hold-parry PARRYING label (#eg-hold-pause-label),
+// same visual language as the hold-parry PARRYING label (#sx-hold-pause-label),
 // but in defuse green and driven by the bomb tick instead of the parry key.
 // Touches the DOM only on real state changes (caller dedupes transitions).
 export function _syncDefuseLabel(show) {
     const hud = document.getElementById('player-avatar-wrapper');
     if (hud) {
-        let lbl = document.getElementById('eg-defuse-label');
+        let lbl = document.getElementById('sx-defuse-label');
         if (show) {
             if (!lbl) {
                 lbl = document.createElement('div');
-                lbl.id = 'eg-defuse-label';
+                lbl.id = 'sx-defuse-label';
                 hud.appendChild(lbl);
             }
             const raw = (typeof t === 'function') ? t('eg_defusing') : '';
@@ -830,7 +830,7 @@ export function _syncDefuseLabel(show) {
         }
     } else if (!show) {
         // No avatar yet - make sure a stray label elsewhere is cleaned up.
-        const stray = document.getElementById('eg-defuse-label');
+        const stray = document.getElementById('sx-defuse-label');
         if (stray) stray.remove();
     }
 }
@@ -854,15 +854,15 @@ export function _priorBombStanding(b, pr) {
 export function _priorBombArmCell(r, c, monsterId, fuseMs) {
     const cellEl = document.getElementById(`g-${r}-${c}`);
     if (!cellEl || !cellEl.isConnected) return;
-    if (cellEl.querySelector('.eg-prior-bomb-fuse')) return; // never double-arm
+    if (cellEl.querySelector('.sx-prior-bomb-fuse')) return; // never double-arm
 
     const fuseEl = document.createElement('span');
-    fuseEl.className = 'eg-prior-bomb-fuse';
-    fuseEl.id = `eg-pb-fuse-${r}-${c}`;
+    fuseEl.className = 'sx-prior-bomb-fuse';
+    fuseEl.id = `sx-pb-fuse-${r}-${c}`;
     fuseEl.innerHTML =
-        '<span class="eg-pb-cd">' + Math.max(1, Math.ceil(fuseMs / 1000)) + '</span>' +
-        '<span class="eg-pb-icon">💣</span>' +
-        '<span class="eg-pb-defuse"><i></i></span>';
+        '<span class="sx-pb-cd">' + Math.max(1, Math.ceil(fuseMs / 1000)) + '</span>' +
+        '<span class="sx-pb-icon">💣</span>' +
+        '<span class="sx-pb-defuse"><i></i></span>';
     cellEl.appendChild(fuseEl);
 
     _priorBombs.push({
@@ -913,8 +913,8 @@ export function _priorBombDefuse(b) {
     if (b.fuseEl) b.fuseEl.remove();
     const cellEl = document.getElementById(`g-${b.r}-${b.c}`);
     if (cellEl) {
-        cellEl.classList.add('eg-pb-defused');
-        setTimeout(() => cellEl.classList.remove('eg-pb-defused'), 1000);
+        cellEl.classList.add('sx-pb-defused');
+        setTimeout(() => cellEl.classList.remove('sx-pb-defused'), 1000);
     }
 }
 
@@ -951,8 +951,8 @@ export function _priorBombTick() {
         if (standing) {
             // Defusing: the explosion timer is PAUSED - accumulate stand time.
             b.defuseAcc += dt;
-            b.fuseEl.classList.add('eg-pb-defusing');
-            const bar = b.fuseEl.querySelector('.eg-pb-defuse');
+            b.fuseEl.classList.add('sx-pb-defusing');
+            const bar = b.fuseEl.querySelector('.sx-pb-defuse');
             if (bar) bar.style.display = 'block';
             const fill = bar ? bar.querySelector('i') : null;
             if (fill) {
@@ -964,7 +964,7 @@ export function _priorBombTick() {
                 continue;
             }
         } else {
-            b.fuseEl.classList.remove('eg-pb-defusing');
+            b.fuseEl.classList.remove('sx-pb-defusing');
             b.remainMs -= dt;
             if (b.remainMs <= 0) {
                 _priorBombExplode(b);
@@ -974,10 +974,10 @@ export function _priorBombTick() {
         }
 
         // Live countdown above the icon.
-        const cd = b.fuseEl.querySelector('.eg-pb-cd');
+        const cd = b.fuseEl.querySelector('.sx-pb-cd');
         if (cd) {
             cd.textContent = Math.max(1, Math.ceil(b.remainMs / 1000));
-            cd.classList.toggle('eg-pb-critical', b.remainMs <= 3000);
+            cd.classList.toggle('sx-pb-critical', b.remainMs <= 3000);
         }
     }
 
@@ -1008,7 +1008,7 @@ export function _clearPriorBombFuses() {
     }
     _priorBombs.forEach(b => { if (b.fuseEl) b.fuseEl.remove(); });
     _priorBombs = [];
-    document.querySelectorAll('.eg-prior-bomb-fuse').forEach(el => el.remove());
+    document.querySelectorAll('.sx-prior-bomb-fuse').forEach(el => el.remove());
     _syncDefuseChargePause(false);
 }
 
@@ -1113,7 +1113,7 @@ export function _swapApplyGroup(group) {
             const v = i < src.length ? src[i] : group.orig[k][i];
             if (v !== undefined) {
                 el.textContent = v;
-                el.classList.add('eg-swap-clue');
+                el.classList.add('sx-swap-clue');
             }
         });
     });
@@ -1138,7 +1138,7 @@ export function _restoreClueSwap() {
         });
     });
     globalThis._activeClueSwap = null;
-    document.querySelectorAll('.eg-swap-clue').forEach(el => el.classList.remove('eg-swap-clue'));
+    document.querySelectorAll('.sx-swap-clue').forEach(el => el.classList.remove('sx-swap-clue'));
 }
 
 
@@ -1290,8 +1290,8 @@ export function _applyCellFreeze(r, c, cfg) {
     const isChild = !!(cfg && cfg.child);
     const norm = (cfg && cfg.norm != null) ? cfg.norm : 0.5;
     const overlay = document.createElement('span');
-    overlay.className = 'eg-freeze-overlay';
-    overlay.id = `eg-freeze-${r}-${c}`;
+    overlay.className = 'sx-freeze-overlay';
+    overlay.id = `sx-freeze-${r}-${c}`;
     overlay.textContent = '❄️';
     el.appendChild(overlay);
 
@@ -1328,7 +1328,7 @@ export function _frozenPickNeighbor(r, c) {
             continue; // grid only holds 0/1
         }
         if (_bossFrozen.has(`${nr}-${nc}`)) continue;
-        if (document.getElementById(`eg-freeze-tel-${nr}-${nc}`)) continue; // already telegraphed
+        if (document.getElementById(`sx-freeze-tel-${nr}-${nc}`)) continue; // already telegraphed
         cands.push([nr, nc]);
     }
     if (!cands.length) return null;
@@ -1351,8 +1351,8 @@ export function _frozenTelegraphCreep(key, data, tr, tc) {
     if (!el) return;
 
     const tel = document.createElement('span');
-    tel.className = 'eg-freeze-telegraph';
-    tel.id = `eg-freeze-tel-${tr}-${tc}`;
+    tel.className = 'sx-freeze-telegraph';
+    tel.id = `sx-freeze-tel-${tr}-${tc}`;
     tel.textContent = '❄️';
     el.appendChild(tel);
 
@@ -1371,7 +1371,7 @@ export function _frozenCreepLand(key) {
     if (!data || !data.pending) return;
     const { tr, tc } = data.pending;
     data.pending = null;
-    const tel = document.getElementById(`eg-freeze-tel-${tr}-${tc}`);
+    const tel = document.getElementById(`sx-freeze-tel-${tr}-${tc}`);
     if (tel) tel.remove();
 
     if (!_bossFrozen.has(key)) return;          // source thawed mid-telegraph
@@ -1417,12 +1417,12 @@ export function _removeCellFreeze(key) {
         clearTimeout(data.creepTimer);
         if (data.pending) {
             clearTimeout(data.pending.landTimer);
-            const tel = document.getElementById(`eg-freeze-tel-${data.pending.tr}-${data.pending.tc}`);
+            const tel = document.getElementById(`sx-freeze-tel-${data.pending.tr}-${data.pending.tc}`);
             if (tel) tel.remove();
             data.pending = null;
         }
     }
-    const span = document.getElementById(`eg-freeze-${key}`);
+    const span = document.getElementById(`sx-freeze-${key}`);
     if (span) span.remove();
     _bossFrozen.delete(key);
 }
@@ -1468,7 +1468,7 @@ export function _removeGridInvert() {
     clearTimeout(globalThis._gridInvertTimer);
     globalThis._gridInvertTimer = null;
     const tbl = document.getElementById('ptable');
-    if (tbl) tbl.classList.remove('eg-grid-invert');
+    if (tbl) tbl.classList.remove('sx-grid-invert');
 }
 
 
@@ -1478,7 +1478,7 @@ export function _mechGridInvert(monster, phase) {
     const tbl = document.getElementById('ptable');
     if (!tbl) return;
 
-    tbl.classList.add('eg-grid-invert');
+    tbl.classList.add('sx-grid-invert');
 
     const duration = phase >= 3 ? 9000 : 6000;
     Audio_Manager.playSFX('grid_invert');
@@ -1648,10 +1648,10 @@ export function _blastGetPlayerRect() {
 
 // DOM helpers - each blast gets uniquely suffixed elements.
 export function _blastGetOverlay(id) {
-    let el = document.getElementById(`eg-blast-overlay-${id}`);
+    let el = document.getElementById(`sx-blast-overlay-${id}`);
     if (!el) {
         el = document.createElement('div');
-        el.id = `eg-blast-overlay-${id}`;
+        el.id = `sx-blast-overlay-${id}`;
         document.body.appendChild(el);
     }
     return el;
@@ -1669,10 +1669,10 @@ export function _blastPositionCircle(el, zone) {
 
 
 export function _blastGetCircle(id, idx, zone) {
-    let el = document.getElementById(`eg-blast-circle-${id}-${idx}`);
+    let el = document.getElementById(`sx-blast-circle-${id}-${idx}`);
     if (!el) {
         el = document.createElement('div');
-        el.id = `eg-blast-circle-${id}-${idx}`;
+        el.id = `sx-blast-circle-${id}-${idx}`;
         document.body.appendChild(el);
     }
     _blastPositionCircle(el, zone);
@@ -1681,10 +1681,10 @@ export function _blastGetCircle(id, idx, zone) {
 
 
 export function _blastGetCountdownLabel(id, zone) {
-    let el = document.getElementById(`eg-blast-countdown-${id}`);
+    let el = document.getElementById(`sx-blast-countdown-${id}`);
     if (!el) {
         el = document.createElement('div');
-        el.id = `eg-blast-countdown-${id}`;
+        el.id = `sx-blast-countdown-${id}`;
         document.body.appendChild(el);
     }
     // Mirror the real circle's position so the number sits centred inside it
@@ -1695,10 +1695,10 @@ export function _blastGetCountdownLabel(id, zone) {
 
 
 export function _blastGetGhost(id, pos, radius) {
-    let el = document.getElementById(`eg-blast-ghost-${id}`);
+    let el = document.getElementById(`sx-blast-ghost-${id}`);
     if (!el) {
         el = document.createElement('div');
-        el.id = `eg-blast-ghost-${id}`;
+        el.id = `sx-blast-ghost-${id}`;
         document.body.appendChild(el);
     }
     _blastPositionCircle(el, { x: pos.x, y: pos.y, radius });
@@ -1709,11 +1709,11 @@ export function _blastGetGhost(id, pos, radius) {
 // Bottom-centre status line for one blast (mirrors the crush-walls label).
 // Lives for the blast's duration; hidden unless the engine paints it.
 export function _blastGetStatus(id) {
-    let el = document.getElementById(`eg-blast-status-${id}`);
+    let el = document.getElementById(`sx-blast-status-${id}`);
     if (!el) {
         el = document.createElement('div');
-        el.id = `eg-blast-status-${id}`;
-        el.className = 'eg-blast-status eg-blast-status-hidden';
+        el.id = `sx-blast-status-${id}`;
+        el.className = 'sx-blast-status sx-blast-status-hidden';
         el.textContent = '';
         document.body.appendChild(el);
     }
@@ -1730,9 +1730,9 @@ export function _blastTeardown(id) {
         _activeBlasts.delete(id);
     }
     [
-        `eg-blast-overlay-${id}`, `eg-blast-countdown-${id}`, `eg-blast-ghost-${id}`,
-        `eg-blast-status-${id}`,
-        `eg-blast-circle-${id}-0`, `eg-blast-circle-${id}-1`, `eg-blast-circle-${id}-2`,
+        `sx-blast-overlay-${id}`, `sx-blast-countdown-${id}`, `sx-blast-ghost-${id}`,
+        `sx-blast-status-${id}`,
+        `sx-blast-circle-${id}-0`, `sx-blast-circle-${id}-1`, `sx-blast-circle-${id}-2`,
     ].forEach(elId => { const el = document.getElementById(elId); if (el) el.remove(); });
 }
 
@@ -1804,39 +1804,39 @@ export function _runScreenBlast(opts) {
         statusCache.mode = mode;
         statusCache.arg = arg;
         let text = '';
-        let cls = 'eg-blast-status-hidden';
-        if (mode === 'in') { text = t('eg_blast_inside'); cls = 'eg-blast-status-ok'; }
-        else if (mode === 'out') { text = t('eg_blast_get_inside'); cls = 'eg-blast-status-warn'; }
-        else if (mode === 'final') { text = t('eg_blast_lastcall'); cls = 'eg-blast-status-danger'; }
-        else if (mode === 'ok') { text = t('eg_blast_dodged'); cls = 'eg-blast-status-ok'; }
-        else if (mode === 'hit') { text = t('eg_blast_hit').replace('{n}', arg); cls = 'eg-blast-status-danger'; }
+        let cls = 'sx-blast-status-hidden';
+        if (mode === 'in') { text = t('eg_blast_inside'); cls = 'sx-blast-status-ok'; }
+        else if (mode === 'out') { text = t('eg_blast_get_inside'); cls = 'sx-blast-status-warn'; }
+        else if (mode === 'final') { text = t('eg_blast_lastcall'); cls = 'sx-blast-status-danger'; }
+        else if (mode === 'ok') { text = t('eg_blast_dodged'); cls = 'sx-blast-status-ok'; }
+        else if (mode === 'hit') { text = t('eg_blast_hit').replace('{n}', arg); cls = 'sx-blast-status-danger'; }
         statusEl.textContent = text;
-        statusEl.className = 'eg-blast-status ' + cls;
+        statusEl.className = 'sx-blast-status ' + cls;
     };
 
     // ── Warning phase: red tint fades in, all candidate zones appear ────────
     const overlay = _blastGetOverlay(id);
-    overlay.className = 'eg-blast-overlay eg-blast-warning';
+    overlay.className = 'sx-blast-overlay sx-blast-warning';
     if (opts.accent) overlay.style.setProperty('--blast-accent', accent);
 
     zones.forEach((z, i) => {
         const circle = _blastGetCircle(id, i, z);
-        circle.className = 'eg-blast-circle' + (i === realIndex ? '' : ' eg-blast-fake');
+        circle.className = 'sx-blast-circle' + (i === realIndex ? '' : ' sx-blast-fake');
         // Prior Collapse tell: the REAL zone sparkles throughout the warning
         // so the choice is always readable - never a coin flip.
-        if (opts.revealFakeAtActive && i === realIndex) circle.classList.add('eg-blast-true');
+        if (opts.revealFakeAtActive && i === realIndex) circle.classList.add('sx-blast-true');
         circle.style.setProperty('--blast-accent', accent);
     });
 
     let ghostEl = null;
     if (opts.ghost) {
         ghostEl = _blastGetGhost(id, opts.ghost, startRadius);
-        ghostEl.className = 'eg-blast-ghost';
+        ghostEl.className = 'sx-blast-ghost';
         ghostEl.style.setProperty('--blast-accent', accent);
     }
 
     const label = _blastGetCountdownLabel(id, real);
-    label.className = 'eg-blast-countdown';
+    label.className = 'sx-blast-countdown';
     label.style.setProperty('--blast-accent', accent);
     label.textContent = Math.max(1, Math.ceil(warnMs / 1000)); // counts down to impact
 
@@ -1847,7 +1847,7 @@ export function _runScreenBlast(opts) {
         if (!state.live) {
             // Warning countdown - seconds until the blast goes live.
             const remWarn = Math.max(0, Math.ceil((warnMs - (Date.now() - state.t0)) / 1000));
-            const lbl = document.getElementById(`eg-blast-countdown-${id}`);
+            const lbl = document.getElementById(`sx-blast-countdown-${id}`);
             if (lbl) lbl.textContent = remWarn;
             return;
         }
@@ -1865,24 +1865,24 @@ export function _runScreenBlast(opts) {
         }
 
         const remainingMs = Math.max(0, activeMs - elActive);
-        const lbl = document.getElementById(`eg-blast-countdown-${id}`);
+        const lbl = document.getElementById(`sx-blast-countdown-${id}`);
         if (lbl) {
             lbl.textContent = Math.ceil(remainingMs / 1000);
-            lbl.classList.toggle('eg-blast-urgent', remainingMs <= lastcallMs);
+            lbl.classList.toggle('sx-blast-urgent', remainingMs <= lastcallMs);
         }
 
         const inZone = _blastHudInZone(real);
-        const circle = document.getElementById(`eg-blast-circle-${id}-${realIndex}`);
-        if (circle && !circle.classList.contains('eg-blast-collapsed')) {
-            circle.classList.toggle('eg-blast-safe', inZone);
-            circle.classList.toggle('eg-blast-lastcall', !inZone && remainingMs <= lastcallMs);
+        const circle = document.getElementById(`sx-blast-circle-${id}-${realIndex}`);
+        if (circle && !circle.classList.contains('sx-blast-collapsed')) {
+            circle.classList.toggle('sx-blast-safe', inZone);
+            circle.classList.toggle('sx-blast-lastcall', !inZone && remainingMs <= lastcallMs);
         }
 
         // Rewrite Fate: the destination ghost charges up right before the jump,
         // so the move never lands without warning.
         if (relocateAtMs != null && ghostEl) {
             const untilJump = relocateAtMs - elActive;
-            ghostEl.classList.toggle('eg-blast-ghost-charge',
+            ghostEl.classList.toggle('sx-blast-ghost-charge',
                 untilJump > 0 && untilJump <= BLAST_CHARGE_MS);
         }
 
@@ -1896,20 +1896,20 @@ export function _runScreenBlast(opts) {
         state.activeAt = Date.now();
 
         // Bright impact flash marks the exact warning → active boundary.
-        overlay.classList.remove('eg-blast-warning');
-        overlay.classList.add('eg-blast-impact');
+        overlay.classList.remove('sx-blast-warning');
+        overlay.classList.add('sx-blast-impact');
 
         // The blast going live is felt as well as seen: a subtle whole-screen
         // shake rides the impact flash.
         const shakeBody = document.body;
-        shakeBody.classList.remove('eg-screen-shake');
+        shakeBody.classList.remove('sx-screen-shake');
         void shakeBody.offsetWidth; // restart if a shake is still running
-        shakeBody.classList.add('eg-screen-shake');
-        schedule(() => shakeBody.classList.remove('eg-screen-shake'), 550);
+        shakeBody.classList.add('sx-screen-shake');
+        schedule(() => shakeBody.classList.remove('sx-screen-shake'), 550);
 
         schedule(() => {
-            overlay.classList.remove('eg-blast-impact');
-            overlay.classList.add('eg-blast-active');
+            overlay.classList.remove('sx-blast-impact');
+            overlay.classList.add('sx-blast-active');
         }, BLAST_TRANSITION_FLASH_MS);
 
         // Prior Collapse: the fake zones visibly collapse the instant the
@@ -1918,16 +1918,16 @@ export function _runScreenBlast(opts) {
         if (opts.revealFakeAtActive) {
             zones.forEach((z, i) => {
                 if (i === realIndex) return;
-                const c = document.getElementById(`eg-blast-circle-${id}-${i}`);
+                const c = document.getElementById(`sx-blast-circle-${id}-${i}`);
                 if (c) {
-                    c.classList.add('eg-blast-collapsed');
+                    c.classList.add('sx-blast-collapsed');
                     schedule(() => c.remove(), 500);
                 }
             });
         }
 
         // Countdown now counts the hold window (it counted the warning down).
-        const lbl = document.getElementById(`eg-blast-countdown-${id}`);
+        const lbl = document.getElementById(`sx-blast-countdown-${id}`);
         if (lbl) lbl.textContent = Math.ceil(activeMs / 1000);
 
         // Rewrite Fate: mid-window jump to the pre-shown ghost position.
@@ -1935,9 +1935,9 @@ export function _runScreenBlast(opts) {
             schedule(() => {
                 real = { x: opts.ghost.x, y: opts.ghost.y, radius: real.radius };
                 const circle = _blastGetCircle(id, realIndex, real);
-                circle.classList.add('eg-blast-jump');
-                schedule(() => circle.classList.remove('eg-blast-jump'), 400);
-                const l2 = document.getElementById(`eg-blast-countdown-${id}`);
+                circle.classList.add('sx-blast-jump');
+                schedule(() => circle.classList.remove('sx-blast-jump'), 400);
+                const l2 = document.getElementById(`sx-blast-countdown-${id}`);
                 if (l2) { l2.style.left = real.x + 'px'; l2.style.top = real.y + 'px'; }
                 if (ghostEl) ghostEl.remove();
             }, relocateAtMs);
@@ -1952,8 +1952,8 @@ export function _runScreenBlast(opts) {
             }
 
             const survived = _blastHudInZone(real);
-            const circle = document.getElementById(`eg-blast-circle-${id}-${realIndex}`);
-            if (circle) circle.classList.add(survived ? 'eg-blast-survived' : 'eg-blast-hit');
+            const circle = document.getElementById(`sx-blast-circle-${id}-${realIndex}`);
+            if (circle) circle.classList.add(survived ? 'sx-blast-survived' : 'sx-blast-hit');
 
             if (!survived) {
                 // Percentage of max HP - survivable even at full health, but it
@@ -2058,13 +2058,13 @@ export function _nkTeardownBoss(bossId) {
     Array.from(_nkRuns.values()).forEach(r => {
         if (r.bossId === bossId) _nkKillRun(r);
     });
-    document.querySelectorAll('.eg-nk-shielded').forEach(el => el.classList.remove('eg-nk-shielded'));
+    document.querySelectorAll('.sx-nk-shielded').forEach(el => el.classList.remove('sx-nk-shielded'));
 }
 
 
 export function _nkTeardownAll() {
     Array.from(_nkRuns.values()).forEach(_nkKillRun);
-    document.querySelectorAll('.eg-nk-shielded').forEach(el => el.classList.remove('eg-nk-shielded'));
+    document.querySelectorAll('.sx-nk-shielded').forEach(el => el.classList.remove('sx-nk-shielded'));
 }
 
 
@@ -2348,7 +2348,7 @@ export function _nkToast(key, fallback, color) {
 // jagged fissures + rock shards + dust burst from the struck band. The burst
 // is a body-level overlay (pointer-events: none, tracked on the run's element
 // list) so pieces keep animating after the band flash fades; encounter cleanup
-// removes them with the run. CSS in bosses2.css (.eg-slam-* rules).
+// removes them with the run. CSS in bosses2.css (.sx-slam-* rules).
 
 
 // Random-walk fissures across the band: 2–3 main cracks running left → right
@@ -2399,7 +2399,7 @@ export function _nkSlamShatter(band, run) {
     const w = rect.width, h = rect.height;
 
     const burst = document.createElement('div');
-    burst.className = 'eg-slam-burst';
+    burst.className = 'sx-slam-burst';
     burst.style.left = Math.round(rect.left) + 'px';
     burst.style.top = Math.round(rect.top) + 'px';
     burst.style.width = Math.round(w) + 'px';
@@ -2410,7 +2410,7 @@ export function _nkSlamShatter(band, run) {
     // Fissures - drawn in quickly, then the whole svg fades with the burst.
     const NS = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('class', 'eg-slam-cracks');
+    svg.setAttribute('class', 'sx-slam-cracks');
     svg.setAttribute('viewBox', '0 0 ' + Math.max(10, Math.round(w)) + ' ' + Math.max(10, Math.round(h)));
     burst.appendChild(svg);
     let delay = 0;
@@ -2418,8 +2418,8 @@ export function _nkSlamShatter(band, run) {
         const path = document.createElementNS(NS, 'path');
         path.setAttribute('d', c.d);
         path.setAttribute('pathLength', '1');
-        path.classList.add('eg-slam-crack');
-        if (c.core) path.classList.add('eg-slam-crack-core');
+        path.classList.add('sx-slam-crack');
+        if (c.core) path.classList.add('sx-slam-crack-core');
         path.style.animationDelay = delay.toFixed(2) + 's';
         delay += 0.03 + Math.random() * 0.04;
         svg.appendChild(path);
@@ -2438,7 +2438,7 @@ export function _nkSlamShatter(band, run) {
         const dur = 0.7 + Math.random() * 0.5;
 
         const sh = document.createElement('div');
-        sh.className = 'eg-slam-shard';
+        sh.className = 'sx-slam-shard';
         sh.style.left = Math.round(x) + 'px';
         sh.style.top = Math.round(y) + 'px';
         sh.style.width = size.toFixed(1) + 'px';
@@ -2460,7 +2460,7 @@ export function _nkSlamShatter(band, run) {
         const x = w * ((i + 0.5 + (Math.random() - 0.5) * 0.8) / puffs);
         const y = h * (0.4 + Math.random() * 0.5);
         const du = document.createElement('div');
-        du.className = 'eg-slam-dust';
+        du.className = 'sx-slam-dust';
         du.style.left = Math.round(x) + 'px';
         du.style.top = Math.round(y) + 'px';
         du.style.width = size.toFixed(0) + 'px';
@@ -2572,9 +2572,9 @@ export function _nkFlingAvatar(dx, dy, srcX, srcY) {
     const dur = Math.max(300, Math.min(430, 260 + dist * 0.5));
     // Tumble wobble on the wrapper (its transform is otherwise unused) -
     // direction-signed via a CSS var so left/right flings tilt oppositely.
-    el.style.setProperty('--eg-fling-spin', dx >= 0 ? '1' : '-1');
-    el.style.setProperty('--eg-fling-tilt', Math.min(10, 4 + dist / 22).toFixed(1) + 'deg');
-    el.classList.add('eg-flinging');
+    el.style.setProperty('--sx-fling-spin', dx >= 0 ? '1' : '-1');
+    el.style.setProperty('--sx-fling-tilt', Math.min(10, 4 + dist / 22).toFixed(1) + 'deg');
+    el.classList.add('sx-flinging');
     // Tell the WASD ticker a glide owns the position (it must not reseed
     // from style.left - that's the TARGET - or it snaps the sprite there).
     el.dataset.egFlingActive = '1';
@@ -2591,10 +2591,10 @@ export function _nkFlingAvatar(dx, dy, srcX, srcY) {
         if (seq !== _flingSeq) return; // superseded by a newer fling
         try {
             el.style.transition = '';
-            el.classList.remove('eg-flinging');
+            el.classList.remove('sx-flinging');
             delete el.dataset.egFlingActive;
-            el.style.removeProperty('--eg-fling-spin');
-            el.style.removeProperty('--eg-fling-tilt');
+            el.style.removeProperty('--sx-fling-spin');
+            el.style.removeProperty('--sx-fling-tilt');
             el.dataset.avatarFx = el.style.left;
             el.dataset.avatarFy = el.style.top;
         } catch (e) {}
@@ -2607,20 +2607,20 @@ export function _nkFlingAvatar(dx, dy, srcX, srcY) {
 export function _flingBurst(x, y, angle) {
     try {
         const ring = document.createElement('div');
-        ring.className = 'eg-fling-ring';
+        ring.className = 'sx-fling-ring';
         ring.style.left = x + 'px';
         ring.style.top = y + 'px';
         document.body.appendChild(ring);
         setTimeout(() => ring.remove(), 500);
         for (let i = 0; i < 6; i++) {
             const s = document.createElement('div');
-            s.className = 'eg-fling-spark';
+            s.className = 'sx-fling-spark';
             s.style.left = x + 'px';
             s.style.top = y + 'px';
             const a = angle + (Math.random() - 0.5) * 2.2;
             const d = 26 + Math.random() * 30;
-            s.style.setProperty('--eg-spark-x', (Math.cos(a) * d).toFixed(0) + 'px');
-            s.style.setProperty('--eg-spark-y', (Math.sin(a) * d).toFixed(0) + 'px');
+            s.style.setProperty('--sx-spark-x', (Math.cos(a) * d).toFixed(0) + 'px');
+            s.style.setProperty('--sx-spark-y', (Math.sin(a) * d).toFixed(0) + 'px');
             document.body.appendChild(s);
             setTimeout(() => s.remove(), 520);
         }
@@ -2675,17 +2675,17 @@ export function _nkFinaleWaves(monster, cfg) {
     const run = _nkNewRun(monster.id, false);
     run.passive = true;
     monster.bossImmune = true;
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.add('eg-nk-shielded');
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.add('sx-nk-shielded');
     run.onKill = () => {
         try { monster.bossImmune = false; } catch (e) {}
-        if (wrap) wrap.classList.remove('eg-nk-shielded');
+        if (wrap) wrap.classList.remove('sx-nk-shielded');
     };
-    const banner = _nkEl(run, 'div', 'eg-nk-fin-banner ' + (cfg.cls || ''));
-    banner.innerHTML = '<div class="eg-nk-fin-title"></div><div class="eg-nk-fin-hint"></div>';
-    banner.querySelector('.eg-nk-fin-title').textContent = cfg.title;
-    const hintEl = banner.querySelector('.eg-nk-fin-hint');
+    const banner = _nkEl(run, 'div', 'sx-nk-fin-banner ' + (cfg.cls || ''));
+    banner.innerHTML = '<div class="sx-nk-fin-title"></div><div class="sx-nk-fin-hint"></div>';
+    banner.querySelector('.sx-nk-fin-title').textContent = cfg.title;
+    const hintEl = banner.querySelector('.sx-nk-fin-hint');
     hintEl.textContent = cfg.hint;
     _nkToast(cfg.toastKey || 'eg_nk_finale', cfg.title + ' - ' + cfg.hint, cfg.color);
 
@@ -2722,13 +2722,13 @@ export function _nkFinaleWaves(monster, cfg) {
                 }
             }
             countEls = zones.map(z => {
-                const el = _nkEl(run, 'div', 'eg-nk-fin-zone ' + (z.safe ? 'eg-nk-fin-safe ' : 'eg-nk-fin-danger ') + (cfg.cls || ''));
+                const el = _nkEl(run, 'div', 'sx-nk-fin-zone ' + (z.safe ? 'sx-nk-fin-safe ' : 'sx-nk-fin-danger ') + (cfg.cls || ''));
                 el.style.left = Math.round(z.x - z.r) + 'px';
                 el.style.top = Math.round(z.y - z.r) + 'px';
                 el.style.width = el.style.height = (z.r * 2) + 'px';
-                el.innerHTML = '<span class="eg-nk-fin-count"></span>';
+                el.innerHTML = '<span class="sx-nk-fin-count"></span>';
                 z.el = el;
-                return el.querySelector('.eg-nk-fin-count');
+                return el.querySelector('.sx-nk-fin-count');
             });
             hintEl.textContent = (wave.kind === 'shelter' ? 'Get INTO the green circle!' : 'Get OUT of the red circles!')
                 + '  (' + wi + '/' + waves.length + ')';
@@ -2742,7 +2742,7 @@ export function _nkFinaleWaves(monster, cfg) {
             const hit = wave.kind === 'shelter'
                 ? !zones.some(z => Math.hypot(pc.x - z.x, pc.y - z.y) < z.r)
                 : zones.some(z => Math.hypot(pc.x - z.x, pc.y - z.y) < z.r);
-            zones.forEach(z => z.el.classList.add('eg-nk-fin-strike'));
+            zones.forEach(z => z.el.classList.add('sx-nk-fin-strike'));
             if (hit) {
                 const dealt = _nkHit(wave.dmg, cfg.element || null, level);
                 _nkAbilityHitToast(dealt, cfg.name, wave.label || cfg.title);

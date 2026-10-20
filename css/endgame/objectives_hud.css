@@ -1,5 +1,5 @@
 ﻿/* ── Endgame Objectives - Top-Center Single Line ─────────────── */
-#eg-objectives-strip {
+#sx-objectives-strip {
     position: fixed;
     top: 10px;
     left: 50%;
@@ -13,12 +13,12 @@
     max-width: 92vw;
 }
 
-    #eg-objectives-strip.eg-hidden {
+    #sx-objectives-strip.sx-hidden {
         display: none !important;
     }
 
 /* The single-line pill containing the objectives */
-.eg-obj-line {
+.sx-obj-line {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -37,33 +37,33 @@
     white-space: nowrap;
 }
 
-.eg-obj-seg {
+.sx-obj-seg {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     white-space: nowrap;
 }
 
-.eg-obj-seg-val {
+.sx-obj-seg-val {
     color: #f1f5f9;
     font-weight: 800;
 }
 
-.eg-obj-seg-label {
+.sx-obj-seg-label {
     color: #94a3b8;
     font-weight: 600;
     font-size: 0.9em;
 }
 
 /* Action buttons that appear underneath / beside the line */
-.eg-obj-actions {
+.sx-obj-actions {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
 }
 
-.eg-obj-action-btn {
+.sx-obj-action-btn {
     font-size: 0.82em;
     font-weight: 800;
     padding: 7px 16px;
@@ -76,41 +76,41 @@
     pointer-events: auto;
 }
 
-.eg-obj-action-btn:active {
+.sx-obj-action-btn:active {
     transform: scale(0.97);
 }
 
 /* Enter Boss Arena - red danger pulse */
-.eg-obj-action-boss {
+.sx-obj-action-boss {
     background: linear-gradient(180deg, #3d1212, #2b0d0d);
     color: #f87171;
     border-color: #7a2d2d;
     box-shadow: 0 0 0 rgba(248, 113, 113, 0);
-    animation: eg-boss-btn-pulse 1.6s ease-in-out infinite;
+    animation: sx-boss-btn-pulse 1.6s ease-in-out infinite;
 }
 
-    .eg-obj-action-boss:hover {
+    .sx-obj-action-boss:hover {
         background: #7a2d2d;
         color: #fff;
         border-color: #f87171;
         animation-play-state: paused;
     }
 
-@keyframes eg-boss-btn-pulse {
+@keyframes sx-boss-btn-pulse {
     0%, 100% { box-shadow: 0 0 0 rgba(248, 113, 113, 0.0); }
     50%      { box-shadow: 0 0 14px rgba(248, 113, 113, 0.55); }
 }
 
 /* Complete Map - green highlighted, strong pulse when ready */
-.eg-obj-action-complete {
+.sx-obj-action-complete {
     background: linear-gradient(180deg, #143522, #0d2b1a);
     color: #4ade80;
     border-color: #2d7a4f;
     box-shadow: 0 0 10px rgba(74, 222, 128, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    animation: eg-complete-pulse 1.4s ease-in-out infinite;
+    animation: sx-complete-pulse 1.4s ease-in-out infinite;
 }
 
-    .eg-obj-action-complete:hover {
+    .sx-obj-action-complete:hover {
         background: #1e6a3a;
         color: #fff;
         border-color: #4ade80;
@@ -118,21 +118,21 @@
         animation-play-state: paused;
     }
 
-@keyframes eg-complete-pulse {
+@keyframes sx-complete-pulse {
     0%, 100% { box-shadow: 0 0 10px rgba(74, 222, 128, 0.35), inset 0 1px 0 rgba(255,255,255,0.06); transform: scale(1); }
     50%      { box-shadow: 0 0 22px rgba(74, 222, 128, 0.7), inset 0 1px 0 rgba(255,255,255,0.1); transform: scale(1.03); }
 }
 
 /* Trigger Question - blue accent pulse */
-.eg-obj-action-question {
+.sx-obj-action-question {
     background: linear-gradient(180deg, #11264a, #0a1a36);
     color: #7fb8ff;
     border-color: #2d5aa0;
     box-shadow: 0 0 10px rgba(127, 184, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    animation: eg-question-pulse 1.5s ease-in-out infinite;
+    animation: sx-question-pulse 1.5s ease-in-out infinite;
 }
 
-    .eg-obj-action-question:hover {
+    .sx-obj-action-question:hover {
         background: #1e4a8a;
         color: #fff;
         border-color: #7fb8ff;
@@ -140,13 +140,13 @@
         animation-play-state: paused;
     }
 
-@keyframes eg-question-pulse {
+@keyframes sx-question-pulse {
     0%, 100% { box-shadow: 0 0 10px rgba(127, 184, 255, 0.35), inset 0 1px 0 rgba(255,255,255,0.06); transform: scale(1); }
     50%      { box-shadow: 0 0 22px rgba(127, 184, 255, 0.7), inset 0 1px 0 rgba(255,255,255,0.1); transform: scale(1.03); }
 }
 
 /* Locked Complete Map - dim, no pulse */
-.eg-obj-action-locked {
+.sx-obj-action-locked {
     background: #1e293b;
     color: #64748b;
     border-color: #334155;
@@ -156,12 +156,12 @@
 
 /* Responsive: on very narrow screens reduce gap/padding */
 @media (max-width: 560px) {
-    .eg-obj-line {
+    .sx-obj-line {
         gap: 10px 12px;
         padding: 6px 12px;
         font-size: 0.8em;
     }
-    .eg-obj-action-btn {
+    .sx-obj-action-btn {
         font-size: 0.76em;
         padding: 6px 12px;
     }
@@ -199,7 +199,7 @@
 /* ── BOSS ARENA AVAILABLE banner ──────────
    Mirrors MAP CLEARED but in boss-red. Shown when all non-boss
    objectives are done and the arena can be entered. */
-#eg-boss-arena-available-banner {
+#sx-boss-arena-available-banner {
     position: fixed;
     z-index: 400;
     pointer-events: none;
@@ -214,11 +214,11 @@
     white-space: nowrap;
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.6);
-    animation: eg-boss-arena-pop 3s ease-out forwards;
+    animation: sx-boss-arena-pop 3s ease-out forwards;
     text-align: center;
 }
 
-@keyframes eg-boss-arena-pop {
+@keyframes sx-boss-arena-pop {
     0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
     10%  { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
     16%  { transform: translate(-50%, -50%) scale(1); }
@@ -231,7 +231,7 @@
    only 3 / 2 / 1 / 0 mistakes remain. Mirrors the
    boss-arena banner in placement/animation but
    color-shifts with severity. */
-#eg-mistakes-warning-banner {
+#sx-mistakes-warning-banner {
     position: fixed;
     z-index: 400;
     pointer-events: none;
@@ -241,42 +241,42 @@
     white-space: nowrap;
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.6);
-    animation: eg-mistakes-warning-pop 2.5s ease-out forwards;
+    animation: sx-mistakes-warning-pop 2.5s ease-out forwards;
     text-align: center;
     line-height: 1.1;
 }
 
-#eg-mistakes-warning-banner.eg-mw-3 {
+#sx-mistakes-warning-banner.sx-mw-3 {
     color: #facc15;
     text-shadow:
         0 0 14px rgba(250, 204, 21, 0.75),
         0 0 36px rgba(250, 204, 21, 0.35),
         0 3px 8px rgba(0, 0, 0, 0.85);
 }
-#eg-mistakes-warning-banner.eg-mw-2 {
+#sx-mistakes-warning-banner.sx-mw-2 {
     color: #fb923c;
     text-shadow:
         0 0 14px rgba(251, 146, 60, 0.8),
         0 0 36px rgba(251, 146, 60, 0.4),
         0 3px 8px rgba(0, 0, 0, 0.85);
 }
-#eg-mistakes-warning-banner.eg-mw-1 {
+#sx-mistakes-warning-banner.sx-mw-1 {
     color: #f87171;
     text-shadow:
         0 0 16px rgba(248, 113, 113, 0.85),
         0 0 40px rgba(248, 113, 113, 0.45),
         0 3px 8px rgba(0, 0, 0, 0.85);
 }
-#eg-mistakes-warning-banner.eg-mw-0 {
+#sx-mistakes-warning-banner.sx-mw-0 {
     color: #ff3b3b;
     text-shadow:
         0 0 18px rgba(255, 59, 59, 0.95),
         0 0 44px rgba(255, 59, 59, 0.55),
         0 3px 8px rgba(0, 0, 0, 0.9);
-    animation: eg-mistakes-warning-pop 2.5s ease-out forwards, eg-mw-shake 0.35s ease-in-out 0.15s 2;
+    animation: sx-mistakes-warning-pop 2.5s ease-out forwards, sx-mw-shake 0.35s ease-in-out 0.15s 2;
 }
 
-@keyframes eg-mistakes-warning-pop {
+@keyframes sx-mistakes-warning-pop {
     0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
     10%  { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
     16%  { transform: translate(-50%, -50%) scale(1); }
@@ -284,7 +284,7 @@
     100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
 }
 
-@keyframes eg-mw-shake {
+@keyframes sx-mw-shake {
     0%, 100% { transform: translate(-50%, -50%) scale(1) translateX(0); }
     25%  { transform: translate(-50%, -50%) scale(1) translateX(-5px); }
     75%  { transform: translate(-50%, -50%) scale(1) translateX(5px); }
@@ -295,7 +295,7 @@
    health drops below 50% / 25% / 10%. Mirrors the
    mistakes-warning banner in placement/animation but
    color-shifts with severity. */
-#eg-low-health-warning-banner {
+#sx-low-health-warning-banner {
     position: fixed;
     z-index: 400;
     pointer-events: none;
@@ -305,35 +305,35 @@
     white-space: nowrap;
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.6);
-    animation: eg-low-health-warning-pop 2.5s ease-out forwards;
+    animation: sx-low-health-warning-pop 2.5s ease-out forwards;
     text-align: center;
     line-height: 1.1;
 }
 
-#eg-low-health-warning-banner.eg-lh-50 {
+#sx-low-health-warning-banner.sx-lh-50 {
     color: #facc15;
     text-shadow:
         0 0 14px rgba(250, 204, 21, 0.75),
         0 0 36px rgba(250, 204, 21, 0.35),
         0 3px 8px rgba(0, 0, 0, 0.85);
 }
-#eg-low-health-warning-banner.eg-lh-25 {
+#sx-low-health-warning-banner.sx-lh-25 {
     color: #fb923c;
     text-shadow:
         0 0 14px rgba(251, 146, 60, 0.8),
         0 0 36px rgba(251, 146, 60, 0.4),
         0 3px 8px rgba(0, 0, 0, 0.85);
 }
-#eg-low-health-warning-banner.eg-lh-10 {
+#sx-low-health-warning-banner.sx-lh-10 {
     color: #f87171;
     text-shadow:
         0 0 16px rgba(248, 113, 113, 0.85),
         0 0 40px rgba(248, 113, 113, 0.45),
         0 3px 8px rgba(0, 0, 0, 0.85);
-    animation: eg-low-health-warning-pop 2.5s ease-out forwards, eg-lh-shake 0.35s ease-in-out 0.15s 2;
+    animation: sx-low-health-warning-pop 2.5s ease-out forwards, sx-lh-shake 0.35s ease-in-out 0.15s 2;
 }
 
-@keyframes eg-low-health-warning-pop {
+@keyframes sx-low-health-warning-pop {
     0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
     10%  { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
     16%  { transform: translate(-50%, -50%) scale(1); }
@@ -341,7 +341,7 @@
     100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
 }
 
-@keyframes eg-lh-shake {
+@keyframes sx-lh-shake {
     0%, 100% { transform: translate(-50%, -50%) scale(1) translateX(0); }
     25%  { transform: translate(-50%, -50%) scale(1) translateX(-5px); }
     75%  { transform: translate(-50%, -50%) scale(1) translateX(5px); }
@@ -352,7 +352,7 @@
     the absorption shield is fully depleted (0). Mirrors
     the mistakes/low-health banners but fires only on
     the breaking transition, not at percentage thresholds. */
-#eg-absorption-broken-banner {
+#sx-absorption-broken-banner {
     position: fixed;
     z-index: 400;
     pointer-events: none;
@@ -362,7 +362,7 @@
     white-space: nowrap;
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.6);
-    animation: eg-absorption-broken-pop 2.5s ease-out forwards, eg-absorption-broken-shake 0.35s ease-in-out 0.15s 2;
+    animation: sx-absorption-broken-pop 2.5s ease-out forwards, sx-absorption-broken-shake 0.35s ease-in-out 0.15s 2;
     text-align: center;
     line-height: 1.1;
     color: #7dd3fc;
@@ -372,7 +372,7 @@
         0 3px 8px rgba(0, 0, 0, 0.85);
 }
 
-@keyframes eg-absorption-broken-pop {
+@keyframes sx-absorption-broken-pop {
     0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
     10%  { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
     16%  { transform: translate(-50%, -50%) scale(1); }
@@ -380,7 +380,7 @@
     100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
 }
 
-@keyframes eg-absorption-broken-shake {
+@keyframes sx-absorption-broken-shake {
     0%, 100% { transform: translate(-50%, -50%) scale(1) translateX(0); }
     25%  { transform: translate(-50%, -50%) scale(1) translateX(-5px); }
     75%  { transform: translate(-50%, -50%) scale(1) translateX(5px); }
@@ -392,7 +392,7 @@
     30s remaining. Works in both endgame and normal
     levels - same placement/animation as the other
     center-grid warning banners. */
-#eg-low-time-warning-banner {
+#sx-low-time-warning-banner {
     position: fixed;
     z-index: 400;
     pointer-events: none;
@@ -402,35 +402,35 @@
     white-space: nowrap;
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.6);
-    animation: eg-low-time-warning-pop 2.5s ease-out forwards;
+    animation: sx-low-time-warning-pop 2.5s ease-out forwards;
     text-align: center;
     line-height: 1.1;
 }
 
-#eg-low-time-warning-banner.eg-lt-300 {
+#sx-low-time-warning-banner.sx-lt-300 {
     color: #facc15;
     text-shadow:
         0 0 14px rgba(250, 204, 21, 0.75),
         0 0 36px rgba(250, 204, 21, 0.35),
         0 3px 8px rgba(0, 0, 0, 0.85);
 }
-#eg-low-time-warning-banner.eg-lt-120 {
+#sx-low-time-warning-banner.sx-lt-120 {
     color: #fb923c;
     text-shadow:
         0 0 14px rgba(251, 146, 60, 0.8),
         0 0 36px rgba(251, 146, 60, 0.4),
         0 3px 8px rgba(0, 0, 0, 0.85);
 }
-#eg-low-time-warning-banner.eg-lt-30 {
+#sx-low-time-warning-banner.sx-lt-30 {
     color: #ef4444;
     text-shadow:
         0 0 18px rgba(239, 68, 68, 0.95),
         0 0 44px rgba(239, 68, 68, 0.55),
         0 3px 8px rgba(0, 0, 0, 0.9);
-    animation: eg-low-time-warning-pop 2.5s ease-out forwards, eg-lt-shake 0.35s ease-in-out 0.15s 2;
+    animation: sx-low-time-warning-pop 2.5s ease-out forwards, sx-lt-shake 0.35s ease-in-out 0.15s 2;
 }
 
-@keyframes eg-low-time-warning-pop {
+@keyframes sx-low-time-warning-pop {
     0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
     10%  { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
     16%  { transform: translate(-50%, -50%) scale(1); }
@@ -438,7 +438,7 @@
     100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
 }
 
-@keyframes eg-lt-shake {
+@keyframes sx-lt-shake {
     0%, 100% { transform: translate(-50%, -50%) scale(1) translateX(0); }
     25%  { transform: translate(-50%, -50%) scale(1) translateX(-5px); }
     75%  { transform: translate(-50%, -50%) scale(1) translateX(5px); }

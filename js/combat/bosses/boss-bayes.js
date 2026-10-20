@@ -74,15 +74,15 @@ export let _bayMeterEl = null;
 export function _bayMeterApply() {
     if (!_bayMeterEl) {
         _bayMeterEl = document.createElement('div');
-        _bayMeterEl.className = 'eg-bay-meter';
+        _bayMeterEl.className = 'sx-bay-meter';
         _bayMeterEl.innerHTML =
-            '<div class="eg-bay-meter-half eg-bay-meter-left">SAFE LEFT</div>' +
-            '<div class="eg-bay-meter-needle"></div>' +
-            '<div class="eg-bay-meter-half eg-bay-meter-right">SAFE RIGHT</div>';
+            '<div class="sx-bay-meter-half sx-bay-meter-left">SAFE LEFT</div>' +
+            '<div class="sx-bay-meter-needle"></div>' +
+            '<div class="sx-bay-meter-half sx-bay-meter-right">SAFE RIGHT</div>';
         document.body.appendChild(_bayMeterEl);
     }
     _bayMeterEl.style.setProperty('--bay-lean', String(Math.round(_bayLean)));
-    _bayMeterEl.classList.toggle('eg-bay-meter-balanced', Math.abs(_bayLean) < 10);
+    _bayMeterEl.classList.toggle('sx-bay-meter-balanced', Math.abs(_bayLean) < 10);
 }
 
 export function _bayMeterShift(delta) {
@@ -159,7 +159,7 @@ export function _mechBayBolts(monster, phase) {
     // Evidence ring on the punished side (hold it = flip the meter your way).
     const ringX = _baySideX(punished) + (Math.random() * 120 - 60);
     const ringY = H * (0.3 + Math.random() * 0.4);
-    const ring = _nkEl(run, 'div', 'eg-bay-evidence');
+    const ring = _nkEl(run, 'div', 'sx-bay-evidence');
     ring.style.left = Math.round(ringX - 70) + 'px';
     ring.style.top = Math.round(ringY - 70) + 'px';
 
@@ -183,7 +183,7 @@ export function _mechBayBolts(monster, phase) {
         columns.forEach(col => {
             if (col.struck) return;
             if (t >= col.warnAt && !col.warnEl) {
-                col.warnEl = _nkEl(run, 'div', 'eg-bay-bolt-warn');
+                col.warnEl = _nkEl(run, 'div', 'sx-bay-bolt-warn');
                 col.warnEl.style.left = Math.round(col.x - BAY_BOLT_W / 2) + 'px';
                 col.warnEl.style.top = '0px';
                 col.warnEl.style.width = BAY_BOLT_W + 'px';
@@ -192,7 +192,7 @@ export function _mechBayBolts(monster, phase) {
             if (t >= col.strikeAt) {
                 // STRIKE.
                 if (col.warnEl) { try { col.warnEl.remove(); } catch (e) {} col.warnEl = null; }
-                const bolt = _nkEl(run, 'div', 'eg-bay-bolt');
+                const bolt = _nkEl(run, 'div', 'sx-bay-bolt');
                 bolt.style.left = Math.round(col.x - BAY_BOLT_W / 2) + 'px';
                 bolt.style.top = '0px';
                 bolt.style.width = BAY_BOLT_W + 'px';
@@ -205,9 +205,9 @@ export function _mechBayBolts(monster, phase) {
                 if (pr && Math.hypot(pc.x - ringX, pc.y - ringY) < 78 && now - lastShifted > 300) {
                     lastShifted = now;
                     _bayMeterShift(punished === 'left' ? -BAY_EVIDENCE_SHIFT : BAY_EVIDENCE_SHIFT);
-                    ring.classList.remove('eg-bay-evidence-pop');
+                    ring.classList.remove('sx-bay-evidence-pop');
                     void ring.offsetWidth;
-                    ring.classList.add('eg-bay-evidence-pop');
+                    ring.classList.add('sx-bay-evidence-pop');
                 }
                 col.struck = true;
             }
@@ -250,7 +250,7 @@ export function _mechBayWisps(monster, phase) {
         const glow = side !== favoured;
         const cx = _baySideX(side) + (Math.random() * 160 - 80);
         const cy = H * (0.25 + Math.random() * 0.5);
-        const el = _nkEl(run, 'div', 'eg-bay-wisp' + (glow ? ' eg-bay-wisp-glow' : ''), '🔮');
+        const el = _nkEl(run, 'div', 'sx-bay-wisp' + (glow ? ' sx-bay-wisp-glow' : ''), '🔮');
         el.style.left = Math.round(cx - 22) + 'px';
         el.style.top = Math.round(cy - 22) + 'px';
         wisps.push({ cx, cy, r: 90 + Math.random() * 70, spd: (0.9 + Math.random() * 0.7), ph: Math.random() * Math.PI * 2, glow, el, done: false, t: 0 });
@@ -303,15 +303,15 @@ export function _activateVeil() {
     const parent = tbl.parentElement;
     if (!parent) return;
 
-    let veil = document.getElementById('eg-grid-veil');
+    let veil = document.getElementById('sx-grid-veil');
     if (!veil) {
         veil = document.createElement('div');
-        veil.id = 'eg-grid-veil';
-        veil.className = 'eg-grid-veil';
+        veil.id = 'sx-grid-veil';
+        veil.className = 'sx-grid-veil';
         parent.style.position = 'relative';
         parent.appendChild(veil);
     }
-    veil.classList.remove('eg-hidden');
+    veil.classList.remove('sx-hidden');
     globalThis.showCombatToast(t('eg_mech_grid_veil'));
 }
 
@@ -333,10 +333,10 @@ export function _mechBayVeil(monster, phase) {
     _activateVeil();
 
     // Bayes' tint layer over the shared veil + belief chip.
-    const veil = document.getElementById('eg-grid-veil');
-    if (veil) veil.classList.add('eg-bay-veil-tinted');
+    const veil = document.getElementById('sx-grid-veil');
+    if (veil) veil.classList.add('sx-bay-veil-tinted');
     const chip = document.createElement('div');
-    chip.className = 'eg-bay-veil-chip';
+    chip.className = 'sx-bay-veil-chip';
     document.body.appendChild(chip);
 
     // One passive run keeps the chip honest and clears itself with the boss.
@@ -344,11 +344,11 @@ export function _mechBayVeil(monster, phase) {
     run.passive = true;
     run.els.push(chip);
     _nkLoop(run, () => {
-        const v = document.getElementById('eg-grid-veil');
+        const v = document.getElementById('sx-grid-veil');
         if (!v) return false;   // veil removed (phase 3 never lifts it; teardown does)
         const abs = Math.abs(_bayLean);
         chip.textContent = '🔮 BELIEF → ' + (_bayLean < 0 ? 'LEFT ' : 'RIGHT ') + Math.round(abs) + '%';
-        chip.classList.toggle('eg-bay-veil-chip-clear', abs < 10);
+        chip.classList.toggle('sx-bay-veil-chip-clear', abs < 10);
         return true;
     });
 }
@@ -432,9 +432,9 @@ export function _bayFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -443,10 +443,10 @@ export function _bayFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-bay-cd';
+    ov.className = 'sx-bay-cd';
     ov.innerHTML =
-        '<div class="eg-bay-cd-label">🔮 THEOMERE\u2019S GAMBIT</div>' +
-        '<div class="eg-bay-cd-hint">Chips show TRUE danger - stand on one to gamble on its complement!</div>';
+        '<div class="sx-bay-cd-label">🔮 THEOMERE\u2019S GAMBIT</div>' +
+        '<div class="sx-bay-cd-hint">Chips show TRUE danger - stand on one to gamble on its complement!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -456,11 +456,11 @@ export function _bayFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss card wears the all-in oracle while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-bay-allin');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-bay-allin');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
@@ -469,11 +469,11 @@ export function _bayFinalStart(monster) {
     BAY_DISTRICT_ROWS.forEach(ry => {
         BAY_DISTRICT_COLS.forEach(rx => {
             const el = document.createElement('div');
-            el.className = 'eg-bay-district';
+            el.className = 'sx-bay-district';
             el.style.left = Math.round(W * rx - 105) + 'px';
             el.style.top = Math.round(H * ry - 82) + 'px';
             const chip = document.createElement('div');
-            chip.className = 'eg-bay-chip';
+            chip.className = 'sx-bay-chip';
             chip.textContent = '?';
             el.appendChild(chip);
             document.body.appendChild(el);
@@ -502,7 +502,7 @@ export function _bayFinalStart(monster) {
             d.flipped = false;
             d.shown = d.strike ? (55 + Math.floor(Math.random() * 40)) : (8 + Math.floor(Math.random() * 22));
             d.chipEl.textContent = d.shown + '%';
-            d.el.classList.remove('eg-bay-district-strike', 'eg-bay-district-flipped');
+            d.el.classList.remove('sx-bay-district-strike', 'sx-bay-district-flipped');
         });
 
         // Bayes swings its belief between waves (cosmetic pressure).
@@ -514,7 +514,7 @@ export function _bayFinalStart(monster) {
             // STRIKE the true danger districts (a flipped chip never lies -
             // the district beneath it still burns).
             g.districts.forEach(d => {
-                if (d.strike) d.el.classList.add('eg-bay-district-strike');
+                if (d.strike) d.el.classList.add('sx-bay-district-strike');
             });
             const pc = _bayPC();
             let caught = false;
@@ -530,7 +530,7 @@ export function _bayFinalStart(monster) {
                 if (g.finished) return;
                 g.districts.forEach(d => {
                     d.strike = false;
-                    d.el.classList.remove('eg-bay-district-strike');
+                    d.el.classList.remove('sx-bay-district-strike');
                     d.chipEl.textContent = '?';
                     d.shown = null;
                 });
@@ -549,7 +549,7 @@ export function _bayFinalStart(monster) {
                 d.flipped = true;
                 d.shown = 100 - d.shown;
                 d.chipEl.textContent = d.shown + '%';
-                d.el.classList.add('eg-bay-district-flipped');
+                d.el.classList.add('sx-bay-district-flipped');
                 _nkToast('eg_mech_bay_flip', '🔮 Chip flipped - you bet on the complement!', '#facc15');
                 break;  // one flip per moment - re-evaluate next frame
             }
@@ -568,7 +568,7 @@ export function _bayConcede(g, monster) {
     // Full-board reveal: every true probability laid bare.
     g.districts.forEach(d => {
         d.chipEl.textContent = d.strike ? '100%' : '0%';
-        d.el.classList.add(d.strike ? 'eg-bay-district-strike' : 'eg-bay-district-safe-reveal');
+        d.el.classList.add(d.strike ? 'sx-bay-district-strike' : 'sx-bay-district-safe-reveal');
     });
     _bayFinalEnd(g, monster);
     // The price of a lost bet: remaining HP, through the canonical path so
@@ -587,18 +587,18 @@ export function _bayFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.eg-bay-district, .eg-bay-chip, .eg-bay-cd').forEach(el => {
+    document.querySelectorAll('.sx-bay-district, .sx-bay-chip, .sx-bay-cd').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.remove('eg-bay-allin');
-        wrap.classList.remove('eg-nk-shielded');
+        wrap.classList.remove('sx-bay-allin');
+        wrap.classList.remove('sx-nk-shielded');
     }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -616,17 +616,17 @@ export function _bayFinalEnd(g, monster) {
 export function _bayTeardown() {
     if (_bayFinal) { try { _bayFinalEnd(_bayFinal, null); } catch (e) {} _bayFinal = null; }
     _bayMeterHide();
-    document.querySelectorAll('.eg-bay-bolt-warn, .eg-bay-bolt, .eg-bay-evidence, ' +
-        '.eg-bay-wisp, .eg-bay-veil-chip, .eg-bay-district, .eg-bay-chip, .eg-bay-cd').forEach(el => {
+    document.querySelectorAll('.sx-bay-bolt-warn, .sx-bay-bolt, .sx-bay-evidence, ' +
+        '.sx-bay-wisp, .sx-bay-veil-chip, .sx-bay-district, .sx-bay-chip, .sx-bay-cd').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-bay-allin').forEach(el => el.classList.remove('eg-bay-allin'));
-    const veil = document.getElementById('eg-grid-veil');
-    if (veil) veil.classList.remove('eg-bay-veil-tinted');
+    document.querySelectorAll('.sx-bay-allin').forEach(el => el.classList.remove('sx-bay-allin'));
+    const veil = document.getElementById('sx-grid-veil');
+    if (veil) veil.classList.remove('sx-bay-veil-tinted');
     _bayLean = 0;
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

@@ -125,7 +125,7 @@ export function _mechMntLabyrinth(monster, phase) {
         const wx = W * (0.14 + (i + 0.5) / wallN * 0.72);
         const wy = H * (0.16 + Math.random() * 0.62);
         const h = H * (p >= 3 ? 0.34 : 0.28);
-        const el = _nkEl(run, 'div', 'eg-mnt-wall-rise');
+        const el = _nkEl(run, 'div', 'sx-mnt-wall-rise');
         el.style.left = Math.round(wx - MNT_WALL_W / 2) + 'px';
         el.style.top = Math.round(wy - h / 2) + 'px';
         el.style.width = MNT_WALL_W + 'px';
@@ -156,8 +156,8 @@ export function _mechMntLabyrinth(monster, phase) {
             if (wl.broken) continue;
             if (!wl.solid && t >= MNT_WALL_RISE_MS * _MNT_DEBUG_MULT) {
                 wl.solid = true;
-                wl.el.classList.remove('eg-mnt-wall-rise');
-                wl.el.classList.add('eg-mnt-wall');
+                wl.el.classList.remove('sx-mnt-wall-rise');
+                wl.el.classList.add('sx-mnt-wall');
             }
         }
 
@@ -167,7 +167,7 @@ export function _mechMntLabyrinth(monster, phase) {
                 // Lane lock: your current row, alternating direction.
                 laneY = Math.max(MNT_LANE_H / 2 + 16, Math.min(H - MNT_LANE_H / 2 - 16, pc.y));
                 dir = rushIdx % 2 === 0 ? 1 : -1;
-                lineEl = _nkEl(run, 'div', 'eg-nk-band eg-mnt-lane');
+                lineEl = _nkEl(run, 'div', 'sx-nk-band sx-mnt-lane');
                 lineEl.style.top = Math.round(laneY - MNT_LANE_H / 2) + 'px';
                 lineEl.style.height = MNT_LANE_H + 'px';
             }
@@ -175,11 +175,11 @@ export function _mechMntLabyrinth(monster, phase) {
             if (t >= MNT_CHARGE_WARN_MS * _MNT_DEBUG_MULT) {
                 stage = 'dash'; t = 0;
                 if (lineEl) {
-                    lineEl.classList.add('eg-nk-band-hit');
+                    lineEl.classList.add('sx-nk-band-hit');
                     _nkSlamShatter(lineEl, run);
                 }
                 bx = dir > 0 ? -90 : W + 90;
-                bullEl = _nkEl(run, 'div', 'eg-nk-dot eg-nk-charger', '🐂');
+                bullEl = _nkEl(run, 'div', 'sx-nk-dot sx-nk-charger', '🐂');
                 hitDone = false;
             }
         } else if (stage === 'dash') {
@@ -202,8 +202,8 @@ export function _mechMntLabyrinth(monster, phase) {
                 if (laneY > wlTop - MNT_LANE_H / 2 && laneY < wlBot + MNT_LANE_H / 2
                     && Math.abs(bx - wl.x) < 40) {
                     wl.broken = true;
-                    wl.el.classList.remove('eg-mnt-wall');
-                    wl.el.classList.add('eg-mnt-wall-crumble');
+                    wl.el.classList.remove('sx-mnt-wall');
+                    wl.el.classList.add('sx-mnt-wall-crumble');
                     // Shrapnel clip: standing beside a crumbling wall stings.
                     if (pr && Math.hypot(pc.x - wl.x, pc.y - wl.y) < 120) {
                         _mntTouch(MNT_WALL_BREAK_DMG, level, 'Crumbling Wall');
@@ -228,7 +228,7 @@ export function _mechMntLabyrinth(monster, phase) {
                 stage = 'warn'; t = 0;
                 laneY = Math.max(MNT_LANE_H / 2 + 16, Math.min(H - MNT_LANE_H / 2 - 16, pc.y));
                 dir = rushIdx % 2 === 0 ? 1 : -1;
-                lineEl = _nkEl(run, 'div', 'eg-nk-band eg-mnt-lane');
+                lineEl = _nkEl(run, 'div', 'sx-nk-band sx-mnt-lane');
                 lineEl.style.top = Math.round(laneY - MNT_LANE_H / 2) + 'px';
                 lineEl.style.height = MNT_LANE_H + 'px';
             }
@@ -270,14 +270,14 @@ export function _mechMntHoofterrain(monster, phase) {
         const cx = dir > 0 ? W * (0.12 + i / (MNT_CRATERS - 1) * 0.76)
                            : W * (0.88 - i / (MNT_CRATERS - 1) * 0.76);
         const cy = laneY + (Math.random() * 60 - 30);
-        const warn = _nkEl(run, 'div', 'eg-mnt-crater-warn');
+        const warn = _nkEl(run, 'div', 'sx-mnt-crater-warn');
         warn.style.left = Math.round(cx - 44) + 'px';
         warn.style.top = Math.round(cy - 44) + 'px';
         craters.push({ x: cx, y: cy, warn, born: performance.now() + i * 260 * _MNT_DEBUG_MULT, struck: false, print: null });
     }
 
     // The dust storm drifts down the lane behind the craters.
-    const dust = _nkEl(run, 'div', 'eg-mnt-dust');
+    const dust = _nkEl(run, 'div', 'sx-mnt-dust');
     dust.style.top = Math.round(laneY - 70) + 'px';
     dust.style.height = '140px';
     let dustX = dir > 0 ? -260 : W + 260;
@@ -305,7 +305,7 @@ export function _mechMntHoofterrain(monster, phase) {
                 c.struck = true;
                 try { c.warn.remove(); } catch (e) {}
                 c.warn = null;
-                const boom = _nkEl(run, 'div', 'eg-mnt-crater-boom');
+                const boom = _nkEl(run, 'div', 'sx-mnt-crater-boom');
                 boom.style.left = Math.round(c.x - 44) + 'px';
                 boom.style.top = Math.round(c.y - 44) + 'px';
                 setTimeout(() => { try { boom.remove(); } catch (e) {} }, 500 * _MNT_DEBUG_MULT);
@@ -313,7 +313,7 @@ export function _mechMntHoofterrain(monster, phase) {
                     _mntTouch(MNT_CRATER_DMG[p], level, 'Hoof Crater');
                 }
                 // The hoofprint lingers as a small burn patch.
-                c.print = _nkEl(run, 'div', 'eg-mnt-hoofprint');
+                c.print = _nkEl(run, 'div', 'sx-mnt-hoofprint');
                 c.print.style.left = Math.round(c.x - 34) + 'px';
                 c.print.style.top = Math.round(c.y - 34) + 'px';
                 c.printUntil = now + 6000 * _MNT_DEBUG_MULT;
@@ -363,7 +363,7 @@ export function _mechMntThread(monster, phase) {
     // The thread: a horizontal lane at a random height (NOT your current row
     // - the maze is never solved twice; you must travel to it).
     const threadY = H * (0.2 + Math.random() * 0.6);
-    const thread = _nkEl(run, 'div', 'eg-mnt-thread');
+    const thread = _nkEl(run, 'div', 'sx-mnt-thread');
     thread.style.top = Math.round(threadY - 22) + 'px';
     thread.style.height = '44px';
 
@@ -375,16 +375,16 @@ export function _mechMntThread(monster, phase) {
         const inThread = pr && Math.abs(pc.y - threadY) < 22;
         if (inThread && !rewardTaken) {
             rewardTaken = true;
-            thread.classList.add('eg-mnt-thread-held');
+            thread.classList.add('sx-mnt-thread-held');
             _mntHeal(_nkMaxHP() * MNT_THREAD_HEAL);
             _nkToast('eg_mech_mnt_thread_safe', '🧵 The thread holds you - one safe crossing!', '#4ade80');
         }
         // The thread frays as its life runs out.
         if (t > MNT_THREAD_LIFE * _MNT_DEBUG_MULT * 0.7) {
-            thread.classList.add('eg-mnt-thread-fray');
+            thread.classList.add('sx-mnt-thread-fray');
         }
         if (t >= MNT_THREAD_LIFE * _MNT_DEBUG_MULT) {
-            thread.classList.add('eg-mnt-thread-snap');
+            thread.classList.add('sx-mnt-thread-snap');
             setTimeout(() => { try { thread.remove(); } catch (e) {} }, 450);
             return false;
         }
@@ -472,9 +472,9 @@ export function _mntFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -483,10 +483,10 @@ export function _mntFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-mnt-cd';
+    ov.className = 'sx-mnt-cd';
     ov.innerHTML =
-        '<div class="eg-mnt-cd-label">🐂 THE WARDEN\u2019S LABYRINTH</div>' +
-        '<div class="eg-mnt-cd-hint">Body-check the glowing MAZEWALL STONES 3× each - shattered lanes are the only safe ground for the TRAMPLE!</div>';
+        '<div class="sx-mnt-cd-label">🐂 THE WARDEN\u2019S LABYRINTH</div>' +
+        '<div class="sx-mnt-cd-hint">Body-check the glowing MAZEWALL STONES 3× each - shattered lanes are the only safe ground for the TRAMPLE!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -496,11 +496,11 @@ export function _mntFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss card wears the warden's horns while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-mnt-allin');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-mnt-allin');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
@@ -524,7 +524,7 @@ export function _mntFinalStart(monster) {
             const wx = W * (0.14 + (i + 0.5) / wallN * 0.72);
             const wy = H * (0.16 + Math.random() * 0.62);
             const h = H * 0.3;
-            const el = _nkEl(genRun, 'div', 'eg-mnt-wall-rise');
+            const el = _nkEl(genRun, 'div', 'sx-mnt-wall-rise');
             el.style.left = Math.round(wx - MNT_WALL_W / 2) + 'px';
             el.style.top = Math.round(wy - h / 2) + 'px';
             el.style.width = MNT_WALL_W + 'px';
@@ -535,7 +535,7 @@ export function _mntFinalStart(monster) {
         // A lit mazewall stone anchors one wall (body-check target).
         const stoneX = W * (0.25 + Math.random() * 0.5);
         const stoneY = H * (0.25 + Math.random() * 0.5);
-        const stoneEl = _nkEl(genRun, 'div', 'eg-mnt-stone', '🪨');
+        const stoneEl = _nkEl(genRun, 'div', 'sx-mnt-stone', '🪨');
         stoneEl.style.left = Math.round(stoneX - MNT_STONE_HIT_R) + 'px';
         stoneEl.style.top = Math.round(stoneY - MNT_STONE_HIT_R) + 'px';
         stoneEl.style.width = (MNT_STONE_HIT_R * 2) + 'px';
@@ -567,12 +567,12 @@ export function _mntFinalStart(monster) {
                 && now >= (stone.lastHit || 0)) {
                 stone.lastHit = now + 450 * _MNT_DEBUG_MULT;
                 stone.hp--;
-                stone.el.classList.remove('eg-mnt-stone-hit');
+                stone.el.classList.remove('sx-mnt-stone-hit');
                 void stone.el.offsetWidth;
-                stone.el.classList.add('eg-mnt-stone-hit');
+                stone.el.classList.add('sx-mnt-stone-hit');
                 if (stone.hp <= 0) {
                     stone.shattered = true;
-                    stone.el.classList.add('eg-mnt-stone-shattered');
+                    stone.el.classList.add('sx-mnt-stone-shattered');
                     _nkToast('eg_mech_mnt_stone', '🐂🪨 MAZEWALL STONE shattered! (' + g.stones.filter(s => s.shattered).length + '/' + MNT_STONES + ')', '#4ade80');
                 }
             }
@@ -584,11 +584,11 @@ export function _mntFinalStart(monster) {
                     stage = 'dash'; t = 0;
                     laneY = Math.max(MNT_LANE_H / 2 + 16, Math.min(H - MNT_LANE_H / 2 - 16, pc.y));
                     dir = charge % 2 === 0 ? 1 : -1;
-                    lineEl = _nkEl(genRun, 'div', 'eg-nk-band eg-mnt-lane');
+                    lineEl = _nkEl(genRun, 'div', 'sx-nk-band sx-mnt-lane');
                     lineEl.style.top = Math.round(laneY - MNT_LANE_H / 2) + 'px';
                     lineEl.style.height = MNT_LANE_H + 'px';
                     bx = dir > 0 ? -90 : W + 90;
-                    bullEl = _nkEl(genRun, 'div', 'eg-nk-dot eg-nk-charger', '🐂');
+                    bullEl = _nkEl(genRun, 'div', 'sx-nk-dot sx-nk-charger', '🐂');
                     hitDone = false;
                 }
             } else if (stage === 'dash') {
@@ -610,8 +610,8 @@ export function _mntFinalStart(monster) {
                     if (charge >= 2) {
                         // Generation ends → the walls crumble.
                         walls.forEach(wl => { try { wl.el.remove(); } catch (e) {} });
-                        stone.el.classList.remove('eg-mnt-stone');
-                        if (!stone.shattered) stone.el.classList.add('eg-mnt-stone-dim');
+                        stone.el.classList.remove('sx-mnt-stone');
+                        if (!stone.shattered) stone.el.classList.add('sx-mnt-stone-dim');
                         _mntAfter(g, 700 * _MNT_DEBUG_MULT, () => {
                             if (!g.finished) runGeneration();
                         });
@@ -647,7 +647,7 @@ export function _mntFinalStart(monster) {
         const laneEls = [];
         for (let i = 0; i < lanes; i++) {
             const isSafe = safeLanes.includes(i);
-            const el = _nkEl(g.fxRun, 'div', 'eg-mnt-trample-lane' + (isSafe ? ' eg-mnt-trample-safe' : ''));
+            const el = _nkEl(g.fxRun, 'div', 'sx-mnt-trample-lane' + (isSafe ? ' sx-mnt-trample-safe' : ''));
             el.style.left = '0px';
             el.style.top = Math.round(i * laneH) + 'px';
             el.style.width = W + 'px';
@@ -657,7 +657,7 @@ export function _mntFinalStart(monster) {
 
         _mntAfter(g, 2600 * _MNT_DEBUG_MULT, () => {
             if (g.finished) return;
-            laneEls.forEach(l => { if (!l.isSafe) l.el.classList.add('eg-mnt-trample-hot'); });
+            laneEls.forEach(l => { if (!l.isSafe) l.el.classList.add('sx-mnt-trample-hot'); });
             const pc = _mntPC();
             let caught = true;
             for (const l of laneEls) {
@@ -682,18 +682,18 @@ export function _mntFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.eg-mnt-cd, .eg-mnt-trample-lane').forEach(el => {
+    document.querySelectorAll('.sx-mnt-cd, .sx-mnt-trample-lane').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.remove('eg-mnt-allin');
-        wrap.classList.remove('eg-nk-shielded');
+        wrap.classList.remove('sx-mnt-allin');
+        wrap.classList.remove('sx-nk-shielded');
     }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -710,15 +710,15 @@ export function _mntFinalEnd(g, monster) {
 // removes every run element, overlay and body class this boss ever created.
 export function _mntTeardown() {
     if (_mntFinal) { try { _mntFinalEnd(_mntFinal, null); } catch (e) {} _mntFinal = null; }
-    document.querySelectorAll('.eg-mnt-wall-rise, .eg-mnt-wall, .eg-mnt-wall-crumble, .eg-mnt-lane, ' +
-        '.eg-mnt-crater-warn, .eg-mnt-crater-boom, .eg-mnt-hoofprint, .eg-mnt-dust, ' +
-        '.eg-mnt-thread, .eg-mnt-stone, .eg-mnt-trample-lane, .eg-mnt-cd').forEach(el => {
+    document.querySelectorAll('.sx-mnt-wall-rise, .sx-mnt-wall, .sx-mnt-wall-crumble, .sx-mnt-lane, ' +
+        '.sx-mnt-crater-warn, .sx-mnt-crater-boom, .sx-mnt-hoofprint, .sx-mnt-dust, ' +
+        '.sx-mnt-thread, .sx-mnt-stone, .sx-mnt-trample-lane, .sx-mnt-cd').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-mnt-allin').forEach(el => el.classList.remove('eg-mnt-allin'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.querySelectorAll('.sx-mnt-allin').forEach(el => el.classList.remove('sx-mnt-allin'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

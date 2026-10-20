@@ -10,7 +10,7 @@ export function _applyPlayerMissFeedback(silent) {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
-    label.className = 'eg-player-damage eg-player-miss';
+    label.className = 'sx-player-damage sx-player-miss';
     label.textContent = t('eg_miss');
     hud.appendChild(label);
     setTimeout(() => label.remove(), PLAYER_DAMAGE_NUMBER_DURATION_MS);
@@ -24,7 +24,7 @@ export function _applyPlayerBlockFeedback() {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
-    label.className = 'eg-player-damage eg-player-miss';
+    label.className = 'sx-player-damage sx-player-miss';
     label.textContent = t('eg_blocked');
     hud.appendChild(label);
     setTimeout(() => label.remove(), PLAYER_DAMAGE_NUMBER_DURATION_MS);
@@ -35,7 +35,7 @@ export function _applyPlayerBlockLockoutFeedback() {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
-    label.className = 'eg-player-damage eg-player-miss';
+    label.className = 'sx-player-damage sx-player-miss';
     label.textContent = t('eg_block_lockout');
     hud.appendChild(label);
     setTimeout(() => label.remove(), PLAYER_DAMAGE_NUMBER_DURATION_MS);
@@ -50,21 +50,21 @@ export function _showBlockLockoutOverlay(durationMs) {
         ? _ensurePlayerStatusBar()
         : document.body;
 
-    let chip = document.getElementById('eg-block-lockout-overlay');
+    let chip = document.getElementById('sx-block-lockout-overlay');
     if (!chip) {
         // Guard-broken sting, slightly after the block clang so they don't mask each other.
         setTimeout(() => Audio_Manager.playSFX('player_block_lockout'), 180);
         chip = document.createElement('div');
-        chip.id = 'eg-block-lockout-overlay';
-        chip.className = 'eg-status-chip eg-status-chip-lockout';
+        chip.id = 'sx-block-lockout-overlay';
+        chip.className = 'sx-status-chip sx-status-chip-lockout';
         chip.innerHTML = `
-            <div class="eg-lockout-icon">🛡️</div>
-            <div class="eg-lockout-countdown" id="eg-lockout-countdown">0.0</div>
-            <div class="eg-lockout-label">${t('eg_block_lockout')}</div>`;
+            <div class="sx-lockout-icon">🛡️</div>
+            <div class="sx-lockout-countdown" id="sx-lockout-countdown">0.0</div>
+            <div class="sx-lockout-label">${t('eg_block_lockout')}</div>`;
         bar.appendChild(chip);
     }
 
-    const countdownEl = document.getElementById('eg-lockout-countdown');
+    const countdownEl = document.getElementById('sx-lockout-countdown');
     if (countdownEl) countdownEl.textContent = (durationMs / 1000).toFixed(1);
 
     // Restart the update loop so an overlapping block extends cleanly.
@@ -75,7 +75,7 @@ export function _showBlockLockoutOverlay(durationMs) {
             _hideBlockLockoutOverlay();
             return;
         }
-        const el = document.getElementById('eg-lockout-countdown');
+        const el = document.getElementById('sx-lockout-countdown');
         if (el) el.textContent = (remaining / 1000).toFixed(1);
     }, 100);
 }
@@ -86,7 +86,7 @@ export function _hideBlockLockoutOverlay() {
         clearInterval(_blockLockoutOverlayTimer);
         _blockLockoutOverlayTimer = null;
     }
-    const chip = document.getElementById('eg-block-lockout-overlay');
+    const chip = document.getElementById('sx-block-lockout-overlay');
     if (chip) chip.remove();
 }
 
@@ -97,10 +97,10 @@ export function _applyPlayerHitFeedback(damageValue, isCrit, element) {
 
     // Floating damage label - crits and elemental hits get extra emphasis.
     const dmgLabel = document.createElement('div');
-    let cls = 'eg-player-damage';
-    if (isCrit) cls += ' eg-dmg-crit';
+    let cls = 'sx-player-damage';
+    if (isCrit) cls += ' sx-dmg-crit';
     if (element) {
-        const map = { fire: 'eg-dmg-fire', cold: 'eg-dmg-cold', lightning: 'eg-dmg-lightning', shadow: 'eg-dmg-shadow' };
+        const map = { fire: 'sx-dmg-fire', cold: 'sx-dmg-cold', lightning: 'sx-dmg-lightning', shadow: 'sx-dmg-shadow' };
         if (map[element]) cls += ' ' + map[element];
     }
     dmgLabel.className = cls;
@@ -153,7 +153,7 @@ globalThis.__onPlayerHeal = function (amount) {
         const hud = document.getElementById('player-avatar-wrapper');
         if (n < 1 || !hud) return;
         const label = document.createElement('div');
-        label.className = 'eg-player-damage eg-player-heal';
+        label.className = 'sx-player-damage sx-player-heal';
         label.textContent = `+${n}`;
         label.style.marginLeft = `${(Math.random() * 18 - 9).toFixed(1)}px`;
         hud.appendChild(label);

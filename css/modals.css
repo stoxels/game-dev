@@ -1058,7 +1058,7 @@
     }
 
 /* -----------------------------------------------------------------------
-   EG LEAVE-MAP CONFIRM MODAL (#eg-forfeit-modal) - built in
+   EG LEAVE-MAP CONFIRM MODAL (#sx-forfeit-modal) - built in
    js/ui-events.js (showEgForfeitConfirm), shown when the player abandons
    an endgame map run from the in-run X button / pause overlay.
    Same danger shell as the achievements-reset / passive-tree modals
@@ -1067,19 +1067,19 @@
    real carved-stone action buttons. Scoped here so the shared danger
    rules stay untouched.
    ----------------------------------------------------------------------- */
-#eg-forfeit-modal .modal-box-danger {
+#sx-forfeit-modal .modal-box-danger {
     max-width: min(720px, 120vh);
 }
 
 /* Tighten the shared block spacing - the box vertically centres its
    content itself, so the stacked section margins just waste parchment. */
-#eg-forfeit-modal .modal-section {
+#sx-forfeit-modal .modal-section {
     margin-bottom: 0;
 }
 
 /* Body text sits directly on the frame's parchment - dark ink, centred,
    comfortably large (same treatment as #pt-refund-modal / #ach-reset-modal). */
-#eg-forfeit-modal .reset-body-text {
+#sx-forfeit-modal .reset-body-text {
     font-family: var(--F);
     font-size: clamp(15px, 3.4cqw, 19px);
     line-height: 1.85;
@@ -1089,18 +1089,18 @@
 
     /* Outcome lines render on their own rows with clear ✔ kept / ✖ lost
        accents that stay legible on the parchment. */
-    #eg-forfeit-modal .eg-forfeit-keep,
-    #eg-forfeit-modal .eg-forfeit-lose {
+    #sx-forfeit-modal .sx-forfeit-keep,
+    #sx-forfeit-modal .sx-forfeit-lose {
         display: inline-block;
         margin-top: 2px;
     }
 
-    #eg-forfeit-modal .eg-forfeit-keep {
+    #sx-forfeit-modal .sx-forfeit-keep {
         color: #2c5e2c;
         font-weight: 700;
     }
 
-    #eg-forfeit-modal .eg-forfeit-lose {
+    #sx-forfeit-modal .sx-forfeit-lose {
         color: #8a1f12;
         font-weight: 700;
     }
@@ -1109,7 +1109,7 @@
    headline matches the settings / how-to-play plaques. The German title
    ("⚠ KARTE VERLASSEN?") needs more of the plaque's flat surface than the
    shared 58 % width gives it, so the plaque is widened for this dialog. */
-#eg-forfeit-modal .modal-title.text-red {
+#sx-forfeit-modal .modal-title.text-red {
     width: max(min(64%, 900px), 440px);
     color: #e05a3a;
     font-size: clamp(18px, 3.2cqw, 22px);
@@ -1118,15 +1118,15 @@
 
 /* Action buttons: real carved-stone buttons (Game-Reset/Button-Stone.png,
    same art as the achievements-reset / refund-all confirms). */
-#eg-forfeit-modal .modal-actions {
+#sx-forfeit-modal .modal-actions {
     flex-direction: column;
     align-items: center;
     gap: clamp(10px, 2cqw, 14px);
     margin-top: clamp(6px, 1.4cqw, 10px);
 }
 
-#eg-forfeit-modal .modal-actions .title-btn,
-#eg-forfeit-modal .modal-actions .back-btn {
+#sx-forfeit-modal .modal-actions .title-btn,
+#sx-forfeit-modal .modal-actions .back-btn {
     font-family: var(--PX);
     font-size: clamp(10px, 2.4cqw, 14px);
     letter-spacing: 0.5px;
@@ -1143,8 +1143,8 @@
     transition: filter 0.15s, transform 0.12s;
 }
 
-    #eg-forfeit-modal .modal-actions .title-btn:hover,
-    #eg-forfeit-modal .modal-actions .back-btn:hover {
+    #sx-forfeit-modal .modal-actions .title-btn:hover,
+    #sx-forfeit-modal .modal-actions .back-btn:hover {
         background-image: url('../images/Game-Reset/Button-Stone.webp');
         background-color: transparent;
         filter: brightness(1.22);
@@ -1152,20 +1152,20 @@
     }
 
     /* Confirm reads as the destructive action: danger-orange text on stone */
-    #eg-forfeit-modal #eg-forfeit-confirm {
+    #sx-forfeit-modal #sx-forfeit-confirm {
         color: #ffb35c;
     }
 
-    #eg-forfeit-modal #eg-forfeit-confirm:hover {
+    #sx-forfeit-modal #sx-forfeit-confirm:hover {
         color: #ffd9a8;
     }
 
     /* Cancel is the safe choice: parchment-gold instead of the danger tint */
-    #eg-forfeit-modal #eg-forfeit-cancel {
+    #sx-forfeit-modal #sx-forfeit-cancel {
         color: #ffe9a8;
     }
 
-    #eg-forfeit-modal #eg-forfeit-cancel:hover {
+    #sx-forfeit-modal #sx-forfeit-cancel:hover {
         color: #fff3cf;
     }
 

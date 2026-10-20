@@ -97,8 +97,8 @@ export function _jellyMonsterById(id) {
 export function _jellyBossCenter(monster) {
     const id = monster && monster.id;
     if (!id) return null;
-    const card = document.getElementById('eg-card-' + id);
-    const wrap = card ? card.querySelector('.eg-emoji-wrapper') : null;
+    const card = document.getElementById('sx-card-' + id);
+    const wrap = card ? card.querySelector('.sx-emoji-wrapper') : null;
     const el = wrap || card;
     if (!el) return null;
     const r = el.getBoundingClientRect();
@@ -114,9 +114,9 @@ export function _jellyBossCenter(monster) {
 // slipOk (Ice Shell blobs): if the blob lands ON an icy cell it slips on the
 // frost and launches itself at the boss instead of striking the player.
 export function _jellySpawnBlob(run, monster, x, y, restMs, warnMs, radius, dmgPct) {
-    const body = _nkEl(run, 'div', 'eg-nk-dot eg-nk-jelly', '🟢');
+    const body = _nkEl(run, 'div', 'sx-nk-dot sx-nk-jelly', '🟢');
     body.style.transform = 'translate(' + Math.round(x - 22) + 'px,' + Math.round(y - 22) + 'px)';
-    const mark = _nkEl(run, 'div', 'eg-nk-mark');
+    const mark = _nkEl(run, 'div', 'sx-nk-mark');
     mark.style.display = 'none';
     return {
         body, mark,
@@ -169,13 +169,13 @@ export function _jellyStepBlob(b, dtMs, slipOk) {
         if (f >= 1) {
             b.x = b.tx;
             b.y = b.ty;
-            b.mark.classList.add('eg-nk-mark-hit');
+            b.mark.classList.add('sx-nk-mark-hit');
             setTimeout(() => { try { b.mark.remove(); } catch (e) {} }, 450);
             // Landed on ice → the blob slips and leaps into The Jelly.
             if (slipOk && _jellyIceContains(b.tx, b.ty)) {
                 b.mode = 'slip';
                 b.t = 0;
-                b.body.classList.add('eg-nk-jelly-slip');
+                b.body.classList.add('sx-nk-jelly-slip');
                 const target = _jellyBossCenter(_jellyMonsterById(b.monsterId));
                 b.slipX = target ? target.x : window.innerWidth / 2;
                 b.slipY = target ? target.y : window.innerHeight * 0.2;
@@ -249,7 +249,7 @@ export function _jellyTopUpIce(gate, count) {
         const key = r + '-' + c;
         if (gate.ice.has(key)) return;
         const ov = document.createElement('span');
-        ov.className = 'eg-jelly-ice';
+        ov.className = 'sx-jelly-ice';
         ov.textContent = '❄️';
         ov.style.fontSize = Math.max(7, Math.min(11, Math.round(cell.offsetWidth * 0.26))) + 'px';
         cell.appendChild(ov);
@@ -299,7 +299,7 @@ export function _jellyIceContains(x, y) {
 export function _jellyClearSafeMark(g) {
     if (!g) return;
     g.ice.forEach(entry => {
-        if (entry.el) entry.el.classList.remove('eg-jelly-ice-safe');
+        if (entry.el) entry.el.classList.remove('sx-jelly-ice-safe');
     });
 }
 
@@ -344,7 +344,7 @@ export function _jellySyncSafeMark(g) {
             g.ice.forEach(entry => {
                 const cell = document.getElementById('g-' + entry.r + '-' + entry.c);
                 if (!cell || !cell.isConnected) return;
-                entry.el.classList.add('eg-jelly-ice-safe');
+                entry.el.classList.add('sx-jelly-ice-safe');
                 const r = cell.getBoundingClientRect();
                 const d = Math.hypot(r.left + r.width / 2 - c.x, r.top + r.height / 2 - c.y);
                 if (d < best) { best = d; nearest = entry; }
@@ -353,7 +353,7 @@ export function _jellySyncSafeMark(g) {
         }
     } else if (b.mode === 'warn' || b.mode === 'fly') {
         const at = _jellyIceAt(b.tx, b.ty);
-        if (at && at.el) at.el.classList.add('eg-jelly-ice-safe');
+        if (at && at.el) at.el.classList.add('sx-jelly-ice-safe');
     }
 }
 
@@ -366,11 +366,11 @@ export function _jellyBlobLockedCue() {
     g.ice.forEach(entry => {
         const el = entry.el;
         if (!el || !el.isConnected) return;
-        el.classList.remove('eg-jelly-ice-flash');
+        el.classList.remove('sx-jelly-ice-flash');
         void el.offsetWidth;   // restart the pulse on consecutive locks
-        el.classList.add('eg-jelly-ice-flash');
+        el.classList.add('sx-jelly-ice-flash');
         // Let the base glint resume once the pulse finishes.
-        setTimeout(() => { try { el.classList.remove('eg-jelly-ice-flash'); } catch (e) {} }, 950);
+        setTimeout(() => { try { el.classList.remove('sx-jelly-ice-flash'); } catch (e) {} }, 950);
     });
 }
 
@@ -398,13 +398,13 @@ export function _jellyStartShieldGate(monster) {
     };
     _jellyGate = gate;
 
-    gate.bubble = _nkEl(run, 'div', 'eg-jelly-bubble', '');
+    gate.bubble = _nkEl(run, 'div', 'sx-jelly-bubble', '');
     gate.bubble.style.display = 'none';
 
     // "STAND HERE" pill that points at the nearest icy patch while a blob
     // is in its rest phase (before it locks). Hidden by default; positioned
     // and shown by _jellySyncSafeMark, cleaned up with the run.
-    gate.guide = _nkEl(run, 'div', 'eg-jelly-guide', '❄️ STAND HERE!');
+    gate.guide = _nkEl(run, 'div', 'sx-jelly-guide', '❄️ STAND HERE!');
     gate.guide.style.display = 'none';
 
     run.onKill = () => {
@@ -477,8 +477,8 @@ export function _jellyStartShieldGate(monster) {
 export function _jellyPlaceBubble(g) {
     const b = g && g.bubble;
     if (!b) return;
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? card.querySelector('.eg-emoji-wrapper') : null;
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? card.querySelector('.sx-emoji-wrapper') : null;
     const el = wrap || card;
     const r = el ? el.getBoundingClientRect() : null;
     if (!r || !r.width || !r.height) { b.style.display = 'none'; return; }
@@ -525,7 +525,7 @@ export function _jellyShatterBurst(monster) {
     const p = _jellyBossCenter(monster)
         || { x: window.innerWidth / 2, y: window.innerHeight * 0.2 };
     const s = document.createElement('div');
-    s.className = 'eg-jelly-shatter';
+    s.className = 'sx-jelly-shatter';
     s.style.left = Math.round(p.x) + 'px';
     s.style.top = Math.round(p.y) + 'px';
     document.body.appendChild(s);
@@ -609,10 +609,10 @@ export function _mechJellyHops(monster, phase) {
     const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     let x = window.innerWidth * 0.5, y = window.innerHeight * 0.3;
-    const body = _nkEl(run, 'div', 'eg-nk-dot eg-nk-jelly', '🟢');
+    const body = _nkEl(run, 'div', 'sx-nk-dot sx-nk-jelly', '🟢');
     const queue = [];
     for (let i = 0; i < hops; i++) {
-        const mark = _nkEl(run, 'div', 'eg-nk-mark');
+        const mark = _nkEl(run, 'div', 'sx-nk-mark');
         mark.style.display = 'none';
         mark.style.width = radius * 2 + 'px';
         mark.style.height = radius * 2 + 'px';
@@ -645,7 +645,7 @@ export function _mechJellyHops(monster, phase) {
                 h.done = true;
                 x = h.tx;
                 y = h.ty;
-                h.mark.classList.add('eg-nk-mark-hit');
+                h.mark.classList.add('sx-nk-mark-hit');
                 setTimeout(() => h.mark.remove(), 400);
                 if (_nkCircleHit(h.tx, h.ty, radius, _nkPlayerRect(), 0)) {
                     const dealt = _nkHit(dmgPct, 'cold', level);

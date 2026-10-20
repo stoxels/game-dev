@@ -113,16 +113,16 @@ export function _fireflyToast(key, fallback, vals) {
 
 export function _fireflyStart(monster) {
     _fireflyTeardown(monster.id);
-    const darkness = document.createElement('div'); darkness.className = 'eg-firefly-darkness'; document.body.appendChild(darkness);
+    const darkness = document.createElement('div'); darkness.className = 'sx-firefly-darkness'; document.body.appendChild(darkness);
     // The mask punches genuine transparent holes through the darkness. A
     // coloured glow alone cannot reveal the grid beneath an opaque overlay.
     const svgNs = 'http://www.w3.org/2000/svg', svg = document.createElementNS(svgNs, 'svg');
-    const maskId = `eg-firefly-mask-${monster.id}`, defs = document.createElementNS(svgNs, 'defs');
+    const maskId = `sx-firefly-mask-${monster.id}`, defs = document.createElementNS(svgNs, 'defs');
     const mask = document.createElementNS(svgNs, 'mask'); mask.id = maskId; mask.setAttribute('maskUnits', 'userSpaceOnUse');
     const maskBase = document.createElementNS(svgNs, 'rect'); maskBase.setAttribute('fill', 'white'); mask.appendChild(maskBase);
     const veil = document.createElementNS(svgNs, 'rect'); veil.setAttribute('fill', '#000'); veil.setAttribute('mask', `url(#${maskId})`);
     defs.appendChild(mask); svg.append(defs, veil); darkness.appendChild(svg);
-    const respawnStatus = document.createElement('div'); respawnStatus.className = 'eg-firefly-respawn'; document.body.appendChild(respawnStatus);
+    const respawnStatus = document.createElement('div'); respawnStatus.className = 'sx-firefly-respawn'; document.body.appendChild(respawnStatus);
 
     const run = {
         monsterId: monster.id, darkness, svg, maskBase, veil, respawnStatus,
@@ -136,19 +136,19 @@ export function _fireflyStart(monster) {
     // glance even before reading the name tags.
     for (let i = 0; i < FIREFLY_COUNT; i++) {
         const el = document.createElement('div');
-        el.className = 'eg-nk-firefly';
+        el.className = 'sx-nk-firefly';
         // The emoji lives in an inner wrapper: flash/pulse animations scale
         // the INNER element so they can never clobber the root's inline
         // translate (animating transform on the root teleports the sprite
         // to the top-left corner for the animation's duration).
-        const glyph = document.createElement('span'); glyph.className = 'eg-firefly-glyph'; glyph.textContent = FIREFLY_EMOJIS[i % FIREFLY_EMOJIS.length]; el.appendChild(glyph);
-        const badge = document.createElement('span'); badge.className = 'eg-firefly-badge'; badge.textContent = i + 1; el.appendChild(badge);
+        const glyph = document.createElement('span'); glyph.className = 'sx-firefly-glyph'; glyph.textContent = FIREFLY_EMOJIS[i % FIREFLY_EMOJIS.length]; el.appendChild(glyph);
+        const badge = document.createElement('span'); badge.className = 'sx-firefly-badge'; badge.textContent = i + 1; el.appendChild(badge);
         // Key tag: shows the LIVE command key on whichever light is selected,
         // so "which one is targeted" and "what do I press" are the same visual.
-        const keytag = document.createElement('span'); keytag.className = 'eg-firefly-keytag'; el.appendChild(keytag);
+        const keytag = document.createElement('span'); keytag.className = 'sx-firefly-keytag'; el.appendChild(keytag);
         // Fairy name under the sprite: constant identification for the swarm.
-        const nametag = document.createElement('span'); nametag.className = 'eg-firefly-name'; nametag.textContent = _fireflyName(i); el.appendChild(nametag);
-        const light = document.createElement('div'); light.className = 'eg-firefly-light';
+        const nametag = document.createElement('span'); nametag.className = 'sx-firefly-name'; nametag.textContent = _fireflyName(i); el.appendChild(nametag);
+        const light = document.createElement('div'); light.className = 'sx-firefly-light';
         // The sprite is the drag handle; the light halo stays non-interactive.
         el.addEventListener('pointerdown', e => _fireflyDragStart(e, run, i));
         document.body.append(light, el);
@@ -166,11 +166,11 @@ export function _fireflyStart(monster) {
     if (center) run.flies.forEach(f => { f.x = center.x; f.y = center.y; });
 
     const keyLabel = (typeof keybindDisplayLabel === 'function')
-        ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('eg-special')) : 'F';
+        ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('sx-special')) : 'F';
     const cycleLabel = (typeof keybindDisplayLabel === 'function')
-        ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('eg-special-2')) : 'G';
+        ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('sx-special-2')) : 'G';
     const recallLabel = (typeof keybindDisplayLabel === 'function')
-        ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('eg-special-3')) : 'H';
+        ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('sx-special-3')) : 'H';
     run.keyLabel = keyLabel;
     run.flies.forEach(f => { f.keytag.textContent = keyLabel; });
     _fireflyToast('eg_ff_intro',
@@ -181,7 +181,7 @@ export function _fireflyStart(monster) {
     // and kept up until teardown (rebinding mid-fight re-renders the text
     // on the refresh timer below, so the labels always stay honest).
     const controls = document.createElement('div');
-    controls.className = 'eg-firefly-controls';
+    controls.className = 'sx-firefly-controls';
     controls.textContent = _fireflyText('eg_ff_controls',
         '✨ [{key}] Send Fairy · [{cycle}] Cycle Fairy · [{recall}] Recall Fairies · [Drag] Move Fairy',
         { key: keyLabel, cycle: cycleLabel, recall: recallLabel });
@@ -206,7 +206,7 @@ export function _fireflyTick(now) {
             if (fly.respawnAt && now >= fly.respawnAt) {
                 fly.hp = FIREFLY_MAX_HP; fly.respawnAt = 0; fly.target = null;
                 if (center) { fly.x = center.x; fly.y = center.y; }
-                fly.el.classList.remove('eg-firefly-hurt'); document.body.append(fly.light, fly.el);
+                fly.el.classList.remove('sx-firefly-hurt'); document.body.append(fly.light, fly.el);
                 _fireflyToast('eg_ff_return', '✨ {name} has returned to the swarm!', { name: _fireflyName(i) });
             } else return;
         }
@@ -228,14 +228,14 @@ export function _fireflyTick(now) {
         }
 
         fly.el.style.transform = `translate(${Math.round(fly.x - 15)}px,${Math.round(fly.y - 15)}px)`;
-        fly.el.classList.toggle('eg-firefly-dragging', !!(run.drag && run.drag.fly === fly));
+        fly.el.classList.toggle('sx-firefly-dragging', !!(run.drag && run.drag.fly === fly));
         fly.light.style.left = `${fly.x}px`; fly.light.style.top = `${fly.y}px`;
-        fly.el.classList.toggle('eg-firefly-selected', i === run.selected);
+        fly.el.classList.toggle('sx-firefly-selected', i === run.selected);
         // Keep the selected fairy's key tag honest if the bind changes.
         if (i === run.selected && fly.keytag.textContent !== run.keyLabel) fly.keytag.textContent = run.keyLabel;
         // Clustered tint: a neighbour inside this fairy's radius means the
         // glows merge - tint the sprite so pairing up reads at a glance.
-        fly.el.classList.toggle('eg-firefly-clustered',
+        fly.el.classList.toggle('sx-firefly-clustered',
             fly.hp > 0 && aliveFlies.some(o => o !== fly && Math.hypot(o.x - fly.x, o.y - fly.y) < FIREFLY_HOLE_R));
     });
 
@@ -259,7 +259,7 @@ export function _fireflyTick(now) {
     // simply safe; fairies never hurt their own keeper.
     if (center) {
         const lit = aliveFlies.some(fly => Math.hypot(center.x - fly.x, center.y - fly.y) <= FIREFLY_FEATHER_R);
-        run.darkness.classList.toggle('eg-firefly-dark-danger', !lit);
+        run.darkness.classList.toggle('sx-firefly-dark-danger', !lit);
         if (!lit && performance.now() - run.darkTick >= 1000) {
             run.darkTick = performance.now();
             _nkHit(FIREFLY_DARK_PCT, 'shadow', monster.level);
@@ -280,7 +280,7 @@ export function _fireflyTick(now) {
     run.respawnStatus.textContent = missing.length
         ? ((t('eg_ff_respawn_bar') || '✦ LIGHT LOST - RESPAWNING: ') + missing.join('  ·  '))
         : '';
-    run.respawnStatus.classList.toggle('eg-firefly-respawn-visible', missing.length > 0);
+    run.respawnStatus.classList.toggle('sx-firefly-respawn-visible', missing.length > 0);
 
     // Live trial feedback: markers turn green as their quota fills (the
     // YOU circle once the keeper stands in it). Quota check every 5 frames
@@ -290,13 +290,13 @@ export function _fireflyTick(now) {
     // Refresh the command-key labels occasionally (rebinds mid-fight).
     if (run.frame % 60 === 0) {
         const kl = (typeof keybindDisplayLabel === 'function')
-            ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('eg-special')) : 'F';
+            ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('sx-special')) : 'F';
         run.keyLabel = kl;
         if (run.controls) {
             const cl = (typeof keybindDisplayLabel === 'function')
-                ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('eg-special-2')) : 'G';
+                ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('sx-special-2')) : 'G';
             const rl = (typeof keybindDisplayLabel === 'function')
-                ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('eg-special-3')) : 'H';
+                ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('sx-special-3')) : 'H';
             run.controls.textContent = _fireflyText('eg_ff_controls',
                 '✨ [{key}] Send Fairy · [{cycle}] Cycle Fairy · [{recall}] Recall Fairies · [Drag] Move Fairy',
                 { key: kl, cycle: cl, recall: rl });
@@ -311,7 +311,7 @@ export function _fireflyTick(now) {
             const ok = i < trial.circles.length
                 ? fill[i] >= trial.circles[i].quota
                 : _blastHudInZone({ ...trial.targets[i], radius: FIREFLY_TRIAL_TOL + 12 });
-            el.classList.toggle('eg-firefly-target-ok', ok);
+            el.classList.toggle('sx-firefly-target-ok', ok);
         });
     }
 
@@ -370,9 +370,9 @@ export function _fireflyCommand() {
 // surface exists (same fix as the skill-hotbar P bug).
 export function _initEgFireflyHotkeys() {
     if (typeof globalThis.onKeybindAction !== 'function') return;
-    globalThis.onKeybindAction('eg-special', _fireflyCommand);
-    globalThis.onKeybindAction('eg-special-2', _fireflyCycle);
-    globalThis.onKeybindAction('eg-special-3', _fireflyRecallAll);
+    globalThis.onKeybindAction('sx-special', _fireflyCommand);
+    globalThis.onKeybindAction('sx-special-2', _fireflyCycle);
+    globalThis.onKeybindAction('sx-special-3', _fireflyRecallAll);
 }
 if (typeof document !== 'undefined' && document.readyState !== 'complete') {
     document.addEventListener('DOMContentLoaded', _initEgFireflyHotkeys);
@@ -393,10 +393,10 @@ export function _fireflyCycle() {
             run.selected = next;
             const fly = run.flies[next];
             if (fly._flashTimer) clearTimeout(fly._flashTimer);
-            fly.el.classList.remove('eg-firefly-flash');
+            fly.el.classList.remove('sx-firefly-flash');
             void fly.el.offsetWidth; // restart the animation from a clean state
-            fly.el.classList.add('eg-firefly-flash');
-            fly._flashTimer = setTimeout(() => fly.el.classList.remove('eg-firefly-flash'), 650);
+            fly.el.classList.add('sx-firefly-flash');
+            fly._flashTimer = setTimeout(() => fly.el.classList.remove('sx-firefly-flash'), 650);
             break;
         }
     }
@@ -417,11 +417,11 @@ export function _fireflyRecallAll() {
         if (fly.hp <= 0) return;
         if (fly.target != null) {
             fly.target = null; // back to the keeper's orbit
-            fly.el.classList.remove('eg-firefly-flash');
+            fly.el.classList.remove('sx-firefly-flash');
             void fly.el.offsetWidth; // restart the flash from a clean state
-            fly.el.classList.add('eg-firefly-flash');
+            fly.el.classList.add('sx-firefly-flash');
             if (fly._flashTimer) clearTimeout(fly._flashTimer);
-            fly._flashTimer = setTimeout(() => fly.el.classList.remove('eg-firefly-flash'), 650);
+            fly._flashTimer = setTimeout(() => fly.el.classList.remove('sx-firefly-flash'), 650);
             recalled++;
             lastName = _fireflyName(i);
         }
@@ -448,7 +448,7 @@ export function _fireflyDragStart(e, run, index) {
     // Capture the pointer so the release ALWAYS reaches us, even if the
     // cursor leaves the window mid-drag.
     try { fly.el.setPointerCapture(e.pointerId); } catch (err) {}
-    document.body.classList.add('eg-firefly-drag-cursor');
+    document.body.classList.add('sx-firefly-drag-cursor');
     try { document.getElementById('board').style.cursor = 'grabbing'; } catch (err) {}
 }
 
@@ -481,7 +481,7 @@ document.addEventListener('pointerup', e => {
         }
     }
     run.drag = null;
-    document.body.classList.remove('eg-firefly-drag-cursor');
+    document.body.classList.remove('sx-firefly-drag-cursor');
     try { const b = document.getElementById('board'); if (b) b.style.cursor = ''; } catch (err) {}
     e.preventDefault();
     e.stopPropagation();
@@ -493,7 +493,7 @@ document.addEventListener('pointercancel', () => {
     const run = Array.from(_fireflyRuns.values())[0];
     if (!run || !run.drag) return;
     run.drag = null;
-    document.body.classList.remove('eg-firefly-drag-cursor');
+    document.body.classList.remove('sx-firefly-drag-cursor');
     try { const b = document.getElementById('board'); if (b) b.style.cursor = ''; } catch (err) {}
 });
 
@@ -556,18 +556,18 @@ export function _fireflyBurstCast(run, monster, index) {
     x = Math.max(40, Math.min(w - 40, x));
     y = Math.max(40, Math.min(h - 40, y));
     const tell = document.createElement('div');
-    tell.className = 'eg-firefly-burst-tell';
+    tell.className = 'sx-firefly-burst-tell';
     tell.style.left = `${x}px`; tell.style.top = `${y}px`;
     document.body.appendChild(tell);
     const boom = document.createElement('div');
-    boom.className = 'eg-firefly-burst-boom';
+    boom.className = 'sx-firefly-burst-boom';
     boom.style.left = `${x}px`; boom.style.top = `${y}px`;
     document.body.appendChild(boom);
     const burst = { x, y, tell, boom, timer: null };
     run.bursts.push(burst);
     burst.timer = setTimeout(() => {
         burst.timer = null;
-        boom.classList.add('eg-firefly-burst-fire');
+        boom.classList.add('sx-firefly-burst-fire');
         const mon = globalThis._monsters.find(m => m && m.id === run.monsterId);
         if (mon) {
             const keeper = _nkPlayerCenter();
@@ -585,8 +585,8 @@ export function _fireflyBurstCast(run, monster, index) {
                     fly.el.remove(); fly.light.remove();
                     _fireflyToast('eg_ff_fairy_down', '⚠️ {name} fell to the burst - she returns in {s} seconds!', { name: _fireflyName(i), s: FIREFLY_RESPAWN_MS / 1000 });
                 } else {
-                    fly.el.classList.add('eg-firefly-chip');
-                    setTimeout(() => fly.el.classList.remove('eg-firefly-chip'), 500);
+                    fly.el.classList.add('sx-firefly-chip');
+                    setTimeout(() => fly.el.classList.remove('sx-firefly-chip'), 500);
                 }
             });
         }
@@ -667,20 +667,20 @@ export function _fireflyStartTrial(monster, phase) {
     const targets = [...layout.circles, layout.you];
     const els = layout.circles.map((c) => {
         const el = document.createElement('div');
-        el.className = 'eg-firefly-target';
+        el.className = 'sx-firefly-target';
         el.style.left = `${c.x}px`; el.style.top = `${c.y}px`;
         const unit = c.quota === 1
             ? (t('eg_ff_quota_one') || 'firefly')
             : (t('eg_ff_quota_many') || 'fireflies');
-        el.innerHTML = `<span class="eg-firefly-quota">${c.quota}×</span><span class="eg-firefly-quota-sub">${unit}</span>`;
+        el.innerHTML = `<span class="sx-firefly-quota">${c.quota}×</span><span class="sx-firefly-quota-sub">${unit}</span>`;
         document.body.appendChild(el); return el;
     });
     const you = document.createElement('div');
-    you.className = 'eg-firefly-target eg-firefly-target-you';
+    you.className = 'sx-firefly-target sx-firefly-target-you';
     you.style.left = `${layout.you.x}px`; you.style.top = `${layout.you.y}px`;
     you.textContent = (t('eg_ff_target_you') || 'YOU');
     document.body.appendChild(you); els.push(you);
-    const countdown = document.createElement('div'); countdown.className = 'eg-firefly-countdown'; document.body.appendChild(countdown);
+    const countdown = document.createElement('div'); countdown.className = 'sx-firefly-countdown'; document.body.appendChild(countdown);
     const trial = run.trial = { phase, targets, circles: layout.circles, els, countdown, until: Date.now() + seconds * 1000 };
     _nkToast(spec.key, `✨ FIREFLY ${spec.fallback} ${seconds} seconds to take position!`);
     trial.timer = setInterval(() => {
@@ -737,8 +737,8 @@ export function _fireflyResolveTrial(monster, run) {
     });
     let playerFailed = !_blastHudInZone({ ...trial.targets[trial.circles.length], radius: FIREFLY_TRIAL_TOL + 12 });
 
-    run.darkness.classList.add('eg-firefly-blast');
-    setTimeout(() => run.darkness && run.darkness.classList.remove('eg-firefly-blast'), 550);
+    run.darkness.classList.add('sx-firefly-blast');
+    setTimeout(() => run.darkness && run.darkness.classList.remove('sx-firefly-blast'), 550);
 
     if (failedLights || playerFailed) {
         // Later phases sting harder: the burst ramps with the trial severity so
@@ -786,7 +786,7 @@ export function _fireflyTeardown(monsterId) {
     run.darkness.remove(); run.respawnStatus.remove();
     if (run.controls) run.controls.remove();
     run.flies.forEach(f => { f.el.remove(); f.light.remove(); });
-    document.body.classList.remove('eg-firefly-drag-cursor');
+    document.body.classList.remove('sx-firefly-drag-cursor');
     try { const b = document.getElementById('board'); if (b) b.style.cursor = ''; } catch (err) {}
     _fireflyRuns.delete(monsterId);
 }

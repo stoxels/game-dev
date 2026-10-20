@@ -79,13 +79,13 @@ export function _glTouch(pct, level, label) {
 // body-level so it survives the run ending in the same frame).
 export function _glSpark(x, y, big) {
     const layer = document.createElement('div');
-    layer.className = 'eg-gl-sparks' + (big ? ' eg-gl-sparks-big' : '');
+    layer.className = 'sx-gl-sparks' + (big ? ' sx-gl-sparks-big' : '');
     layer.style.left = Math.round(x) + 'px';
     layer.style.top = Math.round(y) + 'px';
     document.body.appendChild(layer);
     for (let i = 0; i < (big ? 11 : 6); i++) {
         const s = document.createElement('div');
-        s.className = 'eg-gl-bolt';
+        s.className = 'sx-gl-bolt';
         const ang = Math.random() * Math.PI * 2;
         const dist = 20 + Math.random() * (big ? 80 : 44);
         s.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
@@ -130,7 +130,7 @@ export function _mechGlLattice(monster, phase) {
         axis = axis === 'h' ? 'v' : 'h';
         const lines = [];
         for (let i = 0; i < 3; i++) {
-            const el = _nkEl(run, 'div', 'eg-nk-lattice-warn ' + (axis === 'h' ? 'eg-nk-lattice-h' : 'eg-nk-lattice-v'));
+            const el = _nkEl(run, 'div', 'sx-nk-lattice-warn ' + (axis === 'h' ? 'sx-nk-lattice-h' : 'sx-nk-lattice-v'));
             let pos;
             if (axis === 'h') {
                 pos = H * (0.2 + 0.3 * i) + (Math.random() * 80 - 40);
@@ -165,8 +165,8 @@ export function _mechGlLattice(monster, phase) {
             if (l.fired) {  return; }
             if (wave.t >= l.fireAt) {
                 l.fired = true;
-                l.el.classList.remove('eg-nk-lattice-warn');
-                l.el.classList.add('eg-nk-lattice-hit');
+                l.el.classList.remove('sx-nk-lattice-warn');
+                l.el.classList.add('sx-nk-lattice-hit');
                 _glSpark(l.axis === 'h' ? W / 2 : l.pos, l.axis === 'h' ? l.pos : H / 2, false);
                 if (pr && !l.hitDone) {
                     const caught = l.axis === 'h'
@@ -223,14 +223,14 @@ export function _mechGlScramble(monster, phase) {
     const cables = [];
     for (let i = 0; i < count && spots.length; i++) {
         const spot = spots.splice(Math.floor(Math.random() * spots.length), 1)[0];
-        const tower = _nkEl(run, 'div', 'eg-gl-tower', '📡');
+        const tower = _nkEl(run, 'div', 'sx-gl-tower', '📡');
         tower.style.left = Math.round(spot[0] - 17) + 'px';
         tower.style.top = Math.round(spot[1] - 17) + 'px';
         // The cable: a thin rotated div from tower → player's CURRENT spot.
         const dx = c.x - spot[0], dy = c.y - spot[1];
         const len = Math.hypot(dx, dy) || 1;
         const ang = Math.atan2(dy, dx) * 180 / Math.PI;
-        const line = _nkEl(run, 'div', 'eg-gl-tline');
+        const line = _nkEl(run, 'div', 'sx-gl-tline');
         line.style.left = Math.round(spot[0]) + 'px';
         line.style.top = Math.round(spot[1]) + 'px';
         line.style.width = Math.round(len) + 'px';
@@ -246,8 +246,8 @@ export function _mechGlScramble(monster, phase) {
         if (!fired && t >= warnMs) {
             fired = true;
             cables.forEach(cb => {
-                cb.line.classList.add('eg-gl-tline-fire');
-                cb.tower.classList.add('eg-gl-tower-fire');
+                cb.line.classList.add('sx-gl-tline-fire');
+                cb.tower.classList.add('sx-gl-tower-fire');
             });
             _glSpark(c.x, c.y, false);
             const pr = _nkPlayerRect();
@@ -262,8 +262,8 @@ export function _mechGlScramble(monster, phase) {
         }
         if (t >= warnMs + liveMs) {
             cables.forEach(cb => {
-                cb.line.classList.add('eg-gl-tline-fade');
-                cb.tower.classList.add('eg-gl-tower-fade');
+                cb.line.classList.add('sx-gl-tline-fade');
+                cb.tower.classList.add('sx-gl-tower-fade');
             });
             const id = setTimeout(() => {
                 cables.forEach(cb => {
@@ -308,7 +308,7 @@ export function _mechGlSurge(monster, phase) {
                 ang: Math.random() * Math.PI * 2,
                 born: 0, lastX: 0, lastY: 0, nextTrail: 0, el: null, done: false,
             };
-            orb.el = _nkEl(run, 'div', 'eg-gl-orb', '⚡');
+            orb.el = _nkEl(run, 'div', 'sx-gl-orb', '⚡');
             orb.el.style.left = Math.round(orb.x - 14) + 'px';
             orb.el.style.top = Math.round(orb.y - 14) + 'px';
             chasers.push(orb);
@@ -350,7 +350,7 @@ export function _mechGlSurge(monster, phase) {
             // Shed a trail segment every ~90ms.
             if (t >= o.nextTrail && Math.hypot(o.x - o.lastX, o.y - o.lastY) > 12) {
                 o.nextTrail = t + 90;
-                const seg = _nkEl(run, 'div', 'eg-gl-trail');
+                const seg = _nkEl(run, 'div', 'sx-gl-trail');
                 const len = Math.hypot(o.x - o.lastX, o.y - o.lastY);
                 seg.style.left = Math.round(o.lastX) + 'px';
                 seg.style.top = Math.round(o.lastY) + 'px';
@@ -466,9 +466,9 @@ export function _glFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the arena, wires and the timeline.
@@ -477,20 +477,20 @@ export function _glFinalStart(monster) {
 
     // Circuit-board overlay.
     const arena = document.createElement('div');
-    arena.className = 'eg-gl-arena';
+    arena.className = 'sx-gl-arena';
     document.body.appendChild(arena);
     g.arena = arena;
-    requestAnimationFrame(() => arena.classList.add('eg-gl-arena-on'));
+    requestAnimationFrame(() => arena.classList.add('sx-gl-arena-on'));
 
     // The wire grid: evenly spaced H + V wires inside safe margins.
     const body = document.createElement('div');
-    body.className = 'eg-gl-grid';
+    body.className = 'sx-gl-grid';
     document.body.appendChild(body);
     g.gridEl = body;
     g.fxRun.els.push(body);
     for (let i = 0; i < GL_WIRE_COUNT_H; i++) {
         const el = document.createElement('div');
-        el.className = 'eg-gl-wire eg-gl-wire-h';
+        el.className = 'sx-gl-wire sx-gl-wire-h';
         const y = H * (i + 1) / (GL_WIRE_COUNT_H + 1);
         el.style.top = Math.round(y) + 'px';
         body.appendChild(el);
@@ -498,7 +498,7 @@ export function _glFinalStart(monster) {
     }
     for (let j = 0; j < GL_WIRE_COUNT_V; j++) {
         const el = document.createElement('div');
-        el.className = 'eg-gl-wire eg-gl-wire-v';
+        el.className = 'sx-gl-wire sx-gl-wire-v';
         const x = W * (j + 1) / (GL_WIRE_COUNT_V + 1);
         el.style.left = Math.round(x) + 'px';
         body.appendChild(el);
@@ -507,11 +507,11 @@ export function _glFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-gl-cd';
+    ov.className = 'sx-gl-cd';
     ov.innerHTML =
-        '<div class="eg-gl-cd-label">🔒 SYSTEM LOCKDOWN</div>' +
-        '<div class="eg-gl-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-gl-cd-hint">The grid charges - read the wires!</div>';
+        '<div class="sx-gl-cd-label">🔒 SYSTEM LOCKDOWN</div>' +
+        '<div class="sx-gl-cd-num sx-bmb-cd-pop">' + g.count + '</div>' +
+        '<div class="sx-gl-cd-hint">The grid charges - read the wires!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -521,11 +521,11 @@ export function _glFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss locks in.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-gl-locked');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-gl-locked');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
@@ -547,22 +547,22 @@ export function _glFinalStart(monster) {
         if (_nkFrozen()) return;
         if (g.phase === 'beats') {
             g.count--;
-            const num = g.overlay && g.overlay.querySelector('.eg-gl-cd-num');
+            const num = g.overlay && g.overlay.querySelector('.sx-gl-cd-num');
             if (num) {
                 num.textContent = Math.max(0, g.count);
-                num.classList.remove('eg-bmb-cd-pop');
+                num.classList.remove('sx-bmb-cd-pop');
                 void num.offsetWidth;
-                num.classList.add('eg-bmb-cd-pop');
+                num.classList.add('sx-bmb-cd-pop');
             }
             const batch = pickBatch();
-            setBatch(batch, 'eg-gl-wire-charge', true);
+            setBatch(batch, 'sx-gl-wire-charge', true);
             setTimeout(() => {
                 if (!_glFinal || _glFinal !== g || g.finished) return;
-                setBatch(batch, 'eg-gl-wire-charge', false);
-                setBatch(batch, 'eg-gl-wire-fire', true);
+                setBatch(batch, 'sx-gl-wire-charge', false);
+                setBatch(batch, 'sx-gl-wire-fire', true);
                 setTimeout(() => {
                     if (!_glFinal || _glFinal !== g || g.finished) return;
-                    setBatch(batch, 'eg-gl-wire-fire', false);
+                    setBatch(batch, 'sx-gl-wire-fire', false);
                 }, GL_BEAT_LIVE);
             }, GL_BEAT_CHARGE);
             if (g.count <= 0) {
@@ -578,11 +578,11 @@ export function _glFinalStart(monster) {
             const safeV = g.wiresV[Math.floor(Math.random() * g.wiresV.length)];
             g.safe = { x: safeV.x, y: safeH.y };
             const all = g.wiresH.concat(g.wiresV).filter(w => w !== safeH && w !== safeV);
-            setBatch(all, 'eg-gl-wire-jamcharge', true);
-            safeH.el.classList.add('eg-gl-wire-safe');
-            safeV.el.classList.add('eg-gl-wire-safe');
+            setBatch(all, 'sx-gl-wire-jamcharge', true);
+            safeH.el.classList.add('sx-gl-wire-safe');
+            safeV.el.classList.add('sx-gl-wire-safe');
             const pip = document.createElement('div');
-            pip.className = 'eg-gl-safepip';
+            pip.className = 'sx-gl-safepip';
             pip.style.left = Math.round(safeV.x) + 'px';
             pip.style.top = Math.round(safeH.y) + 'px';
             document.body.appendChild(pip);
@@ -591,12 +591,12 @@ export function _glFinalStart(monster) {
             _nkToast('eg_mech_gl_jam', '🔒💀 THE JAM - get to the safe intersection!', '#a5f3fc');
             setTimeout(() => {
                 if (!_glFinal || _glFinal !== g || g.finished) return;
-                setBatch(all, 'eg-gl-wire-jamcharge', false);
-                setBatch(all, 'eg-gl-wire-jamfire', true);
+                setBatch(all, 'sx-gl-wire-jamcharge', false);
+                setBatch(all, 'sx-gl-wire-jamfire', true);
                 _glSpark(safeV.x, safeH.y, true);
                 setTimeout(() => {
                     if (!_glFinal || _glFinal !== g || g.finished) return;
-                    setBatch(all, 'eg-gl-wire-jamfire', false);
+                    setBatch(all, 'sx-gl-wire-jamfire', false);
                     g.safeH = safeH; g.safeV = safeV;
                     g.phase = 'surge';
                     setTimeout(step, 500);
@@ -610,7 +610,7 @@ export function _glFinalStart(monster) {
             const fromLeft = sx > W / 2;
             const x0 = fromLeft ? -60 : W + 60;
             const warn = document.createElement('div');
-            warn.className = 'eg-gl-diveline';
+            warn.className = 'sx-gl-diveline';
             warn.style.left = '0px';
             warn.style.width = W + 'px';
             warn.style.top = Math.round(sy - 26) + 'px';
@@ -623,7 +623,7 @@ export function _glFinalStart(monster) {
                 if (!_glFinal || _glFinal !== g || g.finished) return;
                 try { warn.remove(); } catch (e) {}
                 const dive = document.createElement('div');
-                dive.className = 'eg-gl-dive';
+                dive.className = 'sx-gl-dive';
                 dive.textContent = '⚡';
                 dive.style.top = Math.round(sy - 24) + 'px';
                 dive.style.left = Math.round(x0) + 'px';
@@ -663,11 +663,11 @@ export function _glFinalEnd(g) {
     if (g.diveline) { try { g.diveline.remove(); } catch (e) {} g.diveline = null; }
     if (g.diveEl) { try { g.diveEl.remove(); } catch (e) {} g.diveEl = null; }
     if (g.fxRun) { try { _nkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
-    document.querySelectorAll('.eg-gl-locked').forEach(el => el.classList.remove('eg-gl-locked'));
+    document.querySelectorAll('.sx-gl-locked').forEach(el => el.classList.remove('sx-gl-locked'));
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -689,16 +689,16 @@ export function _glFinalEnd(g) {
 // removes every run element, overlay and body class this boss ever created.
 export function _glTeardown() {
     if (_glFinal) { try { _glFinalEnd(_glFinal); } catch (e) {} _glFinal = null; }
-    document.querySelectorAll('.eg-nk-lattice-warn, .eg-nk-lattice-hit, .eg-gl-tower, ' +
-        '.eg-gl-tline, .eg-gl-orb, .eg-gl-trail, .eg-gl-arena, .eg-gl-grid, ' +
-        '.eg-gl-wire, .eg-gl-cd, .eg-gl-safepip, .eg-gl-diveline, .eg-gl-dive, ' +
-        '.eg-gl-sparks').forEach(el => {
+    document.querySelectorAll('.sx-nk-lattice-warn, .sx-nk-lattice-hit, .sx-gl-tower, ' +
+        '.sx-gl-tline, .sx-gl-orb, .sx-gl-trail, .sx-gl-arena, .sx-gl-grid, ' +
+        '.sx-gl-wire, .sx-gl-cd, .sx-gl-safepip, .sx-gl-diveline, .sx-gl-dive, ' +
+        '.sx-gl-sparks').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-gl-locked').forEach(el => el.classList.remove('eg-gl-locked'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.querySelectorAll('.sx-gl-locked').forEach(el => el.classList.remove('sx-gl-locked'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

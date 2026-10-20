@@ -48,7 +48,7 @@ export function _mechSpiralStorm(monster, phase) {
     const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const ex = window.innerWidth * 0.5, ey = window.innerHeight * 0.4;
-    const anchor = _nkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '💀');
+    const anchor = _nkEl(run, 'div', 'sx-nk-dot sx-nk-anchor', '💀');
     anchor.style.transform = 'translate(' + Math.round(ex - 26) + 'px,' + Math.round(ey - 26) + 'px)';
     const orbs = [];
     let emitted = 0, emitAcc = 0, e = 0, orbCdUntil = 0;
@@ -60,7 +60,7 @@ export function _mechSpiralStorm(monster, phase) {
         while (emitted < total && emitAcc >= step) {
             emitAcc -= step;
             const a = emitted * 2.4 + e / 1000 * 2.2;
-            const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-orb');
+            const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-orb');
             orbs.push({
                 x: ex, y: ey,
                 vx: Math.cos(a) * speed, vy: Math.sin(a) * speed,
@@ -116,7 +116,7 @@ export function _mechReaperFans(monster, phase) {
                 const base = Math.atan2((c ? c.y : 300) - ey, (c ? c.x : ex) - ex);
                 for (let i = 0; i < fanN; i++) {
                     const a = base + (i - (fanN - 1) / 2) * (fanSpread * 2 / (fanN - 1));
-                    const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-orb');
+                    const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-orb');
                     orbs.push({ x: ex, y: ey, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, t: 0, hitDone: false, el });
                 }
             }

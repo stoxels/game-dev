@@ -62,12 +62,12 @@ export function _getMistakesRemaining() {
 if (typeof _clearCenterGridBanners !== 'function') {
     var _clearCenterGridBanners = function (exceptId) {
         var ids = [
-            'eg-low-time-warning-banner',
-            'eg-mistakes-warning-banner',
-            'eg-low-health-warning-banner',
-            'eg-absorption-broken-banner',
-            'eg-clock-call-banner',
-            'eg-boss-arena-available-banner',
+            'sx-low-time-warning-banner',
+            'sx-mistakes-warning-banner',
+            'sx-low-health-warning-banner',
+            'sx-absorption-broken-banner',
+            'sx-clock-call-banner',
+            'sx-boss-arena-available-banner',
             'eg-map-cleared-banner'
         ];
         for (var i = 0; i < ids.length; i++) {
@@ -182,7 +182,7 @@ function _freezeFlightFx() {
     try {
         document.getAnimations().forEach(a => {
             const el = a.effect && a.effect.target;
-            if (a.playState === 'running' && el && el.closest && el.closest('.eg-projectile, .ms-fx')) {
+            if (a.playState === 'running' && el && el.closest && el.closest('.sx-projectile, .ms-fx')) {
                 a.pause();
                 _frozenFlightAnims.add(a);
             }

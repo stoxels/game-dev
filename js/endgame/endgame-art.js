@@ -118,7 +118,7 @@ export const GAME_ART = (function () {
     // Fires whenever previously missing images resolve, so open screens
     // can swap their emoji fallbacks for the freshly found image.
     function _notify() {
-        document.dispatchEvent(new CustomEvent('eg-art-loaded'));
+        document.dispatchEvent(new CustomEvent('sx-art-loaded'));
     }
 
     function _setResolved(kind, id, ext) {
@@ -228,7 +228,7 @@ export const GAME_ART = (function () {
     function html(kind, id, fallbackEmoji) {
         const u = url(kind, id);
         if (u) {
-            return '<img src="' + u + '" alt="" class="eg-art-img" draggable="false" loading="lazy" decoding="async">';
+            return '<img src="' + u + '" alt="" class="sx-art-img" draggable="false" loading="lazy" decoding="async">';
         }
         return fallbackEmoji || '';
     }
@@ -242,7 +242,7 @@ export const GAME_ART = (function () {
             const img = document.createElement('img');
             img.src = u;
             img.alt = '';
-            img.className = 'eg-art-img';
+            img.className = 'sx-art-img';
             img.draggable = false;
             img.loading = 'lazy';
             img.decoding = 'async';
@@ -287,7 +287,7 @@ GAME_ART.preload();
 
 // Late-loading images: refresh whatever is currently on screen so the
 // emoji fallbacks get replaced without needing a reload.
-document.addEventListener('eg-art-loaded', function () {
+document.addEventListener('sx-art-loaded', function () {
     try {
         if (typeof _isActive === 'function' && _isActive()
                 && typeof _renderPanel === 'function') {
@@ -296,7 +296,7 @@ document.addEventListener('eg-art-loaded', function () {
         if (typeof _renderInventory === 'function') _renderInventory();
         if (typeof _renderEquipSlots === 'function') _renderEquipSlots();
         // Boss test screen: swap emoji fallbacks for freshly loaded boss art.
-        if (typeof _bossTestRenderGrid === 'function' && document.getElementById('egbt-boss-grid')) {
+        if (typeof _bossTestRenderGrid === 'function' && document.getElementById('sx-bosstest-boss-grid')) {
             _bossTestRenderGrid();
         }
     } catch (e) { /* screens not initialised yet - safe to ignore */ }

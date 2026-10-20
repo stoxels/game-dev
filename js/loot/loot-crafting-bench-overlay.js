@@ -10,10 +10,10 @@ import { _craftingBenchBindTooltips, _craftingBenchBuildHTML } from './loot-craf
 
 // Creates the crafting overlay once and binds its persistent listeners.
 export function _ensureCraftingBenchOverlay() {
-    if (document.getElementById('eg-crafting-bench-overlay')) return;
+    if (document.getElementById('sx-crafting-bench-overlay')) return;
     const overlay = document.createElement('div');
-    overlay.id = 'eg-crafting-bench-overlay';
-    overlay.className = 'eg-craft-overlay';
+    overlay.id = 'sx-crafting-bench-overlay';
+    overlay.className = 'sx-craft-overlay';
     overlay.innerHTML = _craftingBenchBuildHTML();
     overlay.addEventListener('click', event => {
         if (event.target === overlay) _closeCraftingBench();
@@ -26,22 +26,22 @@ export function _ensureCraftingBenchOverlay() {
 
 // Prevents native drops from navigating while the hub router owns item moves.
 export function _craftingBenchBindDrop(overlay) {
-    const slot = overlay.querySelector('#eg-crafting-bench-item');
+    const slot = overlay.querySelector('#sx-crafting-bench-item');
     slot.addEventListener('dragover', event => {
         event.preventDefault();
-        slot.classList.add('eg-craft-drop-active');
+        slot.classList.add('sx-craft-drop-active');
     });
-    slot.addEventListener('dragleave', () => slot.classList.remove('eg-craft-drop-active'));
+    slot.addEventListener('dragleave', () => slot.classList.remove('sx-craft-drop-active'));
     slot.addEventListener('drop', event => {
         event.preventDefault();
-        slot.classList.remove('eg-craft-drop-active');
+        slot.classList.remove('sx-craft-drop-active');
     });
 }
 
 // Stores each visible column's current scroll position before a rebuild.
 export function _craftingBenchSyncScrollStore(overlay) {
     if (!overlay) return;
-    overlay.querySelectorAll('.eg-craft-col').forEach(element => {
+    overlay.querySelectorAll('.sx-craft-col').forEach(element => {
         const type = element.classList.contains('prefix') ? 'prefix' : 'suffix';
         _craftingBenchScroll[type] = element.scrollTop;
     });
@@ -50,7 +50,7 @@ export function _craftingBenchSyncScrollStore(overlay) {
 // Restores each column's remembered scroll position after a rebuild.
 export function _craftingBenchRestoreScroll(overlay) {
     if (!overlay) return;
-    overlay.querySelectorAll('.eg-craft-col').forEach(element => {
+    overlay.querySelectorAll('.sx-craft-col').forEach(element => {
         const type = element.classList.contains('prefix') ? 'prefix' : 'suffix';
         const scrollTop = _craftingBenchScroll[type];
         if (typeof scrollTop === 'number') element.scrollTop = scrollTop;
@@ -59,7 +59,7 @@ export function _craftingBenchRestoreScroll(overlay) {
 
 // Rebuilds the open overlay and optionally preserves its column positions.
 export function _refreshCraftingBench(preserveScroll = false, captureCurrent = false) {
-    const overlay = document.getElementById('eg-crafting-bench-overlay');
+    const overlay = document.getElementById('sx-crafting-bench-overlay');
     if (!overlay) return;
     if (captureCurrent) _craftingBenchSyncScrollStore(overlay);
     overlay.innerHTML = _craftingBenchBuildHTML();
@@ -71,14 +71,14 @@ export function _refreshCraftingBench(preserveScroll = false, captureCurrent = f
 // Opens the crafting overlay and restores its remembered scroll position.
 export function _openCraftingBench() {
     _ensureCraftingBenchOverlay();
-    const overlay = document.getElementById('eg-crafting-bench-overlay');
+    const overlay = document.getElementById('sx-crafting-bench-overlay');
     overlay.classList.add('show');
     _refreshCraftingBench(true);
 }
 
 // Hides the crafting overlay, remembers its position, and clears selection.
 export function _closeCraftingBench() {
-    const overlay = document.getElementById('eg-crafting-bench-overlay');
+    const overlay = document.getElementById('sx-crafting-bench-overlay');
     if (overlay) {
         _craftingBenchSyncScrollStore(overlay);
         overlay.classList.remove('show');
@@ -89,7 +89,7 @@ export function _closeCraftingBench() {
 // Escape closes the visible crafting overlay before other screen handlers.
 window.addEventListener('keydown', event => {
     if (event.key !== 'Escape') return;
-    const overlay = document.getElementById('eg-crafting-bench-overlay');
+    const overlay = document.getElementById('sx-crafting-bench-overlay');
     if (overlay && overlay.classList.contains('show')) {
         _closeCraftingBench();
         event.preventDefault();

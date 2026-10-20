@@ -53,7 +53,7 @@ export function _assignRandomSpawnZone(monster) {
     if (typeof _tqIsTutorialActive === 'function' && !globalThis._parryTutorialForce) {
         try {
             if (globalThis._tqIsTutorialActive()) {
-                monster.zoneId = 'eg-monster-panel';
+                monster.zoneId = 'sx-monster-panel';
                 return;
             }
         } catch (e) {}
@@ -70,7 +70,7 @@ export function _assignRandomSpawnZone(monster) {
         zones.forEach(z => { counts[z] = 0; });
         if (typeof _monsters !== 'undefined' && globalThis._monsters.length) {
             globalThis._monsters.forEach(m => {
-                const z = m.zoneId || 'eg-monster-panel';
+                const z = m.zoneId || 'sx-monster-panel';
                 if (counts[z] == null) counts[z] = 0;
                 counts[z]++;
             });

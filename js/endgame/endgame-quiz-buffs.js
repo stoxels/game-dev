@@ -182,7 +182,7 @@ const QUIZ_AURA_FULL_STACKS = 8;
 function _syncQuizAuraIntensity() {
     const stacks = _pruneQuizDamageStacks();
     const qi = Math.min(1, Math.max(0, stacks / QUIZ_AURA_FULL_STACKS));
-    document.querySelectorAll('.eg-quiz-aura').forEach(el => {
+    document.querySelectorAll('.sx-quiz-aura').forEach(el => {
         el.style.setProperty('--qi', qi.toFixed(3));
         el.dataset.stacks = String(stacks);
     });
@@ -197,9 +197,9 @@ export function _addQuizShieldFX(durationMs) {
     // Create the aura only if it doesn't already exist - stacking should not
     // flicker the visual. Each new stack just updates intensity + the expiry
     // scheduler.
-    if (!document.querySelector('.eg-quiz-aura')) {
+    if (!document.querySelector('.sx-quiz-aura')) {
         const aura = document.createElement('div');
-        aura.className = 'eg-quiz-shield-wing eg-quiz-aura';
+        aura.className = 'sx-quiz-shield-wing sx-quiz-aura';
         hud.appendChild(aura);
     }
     _syncQuizAuraIntensity();
@@ -220,14 +220,14 @@ export function _addQuizShieldFX(durationMs) {
 
 // Removes the aura - immediately, or after a short fade-out.
 export function _removeQuizShieldFX(immediate) {
-    const wings = document.querySelectorAll('.eg-quiz-shield-wing');
+    const wings = document.querySelectorAll('.sx-quiz-shield-wing');
     if (!wings.length) return;
 
     if (immediate) {
         wings.forEach(w => w.remove());
         return;
     }
-    wings.forEach(w => w.classList.add('eg-quiz-shield-out'));
+    wings.forEach(w => w.classList.add('sx-quiz-shield-out'));
     setTimeout(() => wings.forEach(w => w.remove()), QUIZ_SHIELD_FADE_MS);
 }
 
@@ -241,21 +241,21 @@ export function _showQuizBuffBurst(type, labelText) {
 
     const rect = hud.getBoundingClientRect();
     const burst = document.createElement('div');
-    burst.className = 'eg-hit-burst';
+    burst.className = 'sx-hit-burst';
     burst.style.left = `${rect.left + rect.width / 2}px`;
     burst.style.top = `${rect.top + rect.height / 2}px`;
 
     const ring = document.createElement('div');
-    ring.className = 'eg-hit-ring';
-    ring.style.setProperty('--eg-hit-color', color);
+    ring.className = 'sx-hit-ring';
+    ring.style.setProperty('--sx-hit-color', color);
     burst.appendChild(ring);
 
     for (let i = 0; i < QUIZ_BUFF_SPARK_COUNT; i++) {
         const spark = document.createElement('div');
-        spark.className = 'eg-hit-spark';
+        spark.className = 'sx-hit-spark';
         const angle = (Math.PI * 2 * i) / QUIZ_BUFF_SPARK_COUNT + Math.random() * 0.5;
         const dist = 30 + Math.random() * 25;
-        spark.style.setProperty('--eg-hit-color', color);
+        spark.style.setProperty('--sx-hit-color', color);
         spark.style.setProperty('--spark-dx', `${(Math.cos(angle) * dist).toFixed(1)}px`);
         spark.style.setProperty('--spark-dy', `${(Math.sin(angle) * dist).toFixed(1)}px`);
         burst.appendChild(spark);
@@ -266,9 +266,9 @@ export function _showQuizBuffBurst(type, labelText) {
 
     // Floating reward label above the HUD
     const float = document.createElement('div');
-    float.className = 'eg-damage-number eg-quiz-buff-label';
+    float.className = 'sx-damage-number sx-quiz-buff-label';
     float.textContent = labelText;
-    float.style.setProperty('--eg-hit-color', color);
+    float.style.setProperty('--sx-hit-color', color);
     hud.appendChild(float);
     setTimeout(() => float.remove(), QUIZ_BUFF_FX_DURATION_MS);
 
@@ -308,9 +308,9 @@ export function _grantQuizDamageReward() {
     _addQuizShieldFX(durationMs);
 
     const label = document.createElement('div');
-    label.className = 'eg-damage-number eg-quiz-buff-label';
+    label.className = 'sx-damage-number sx-quiz-buff-label';
     label.textContent = stacks > 1 ? `+${totalPctLabel}% DMG (x${stacks})` : '+10% DMG';
-    label.style.setProperty('--eg-hit-color', QUIZ_BUFF_COLORS.damage);
+    label.style.setProperty('--sx-hit-color', QUIZ_BUFF_COLORS.damage);
     const hud = document.getElementById('player-avatar-wrapper');
     if (hud) {
         label.style.color = QUIZ_BUFF_COLORS.damage;

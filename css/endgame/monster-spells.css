@@ -91,7 +91,7 @@
 .ms-fx > * { position: absolute; left: 0; top: 0; }
 
 /* ── Projectiles (built visuals fed to _fireProjectile) ──────────────── */
-.eg-projectile.ms-proj { width: 0; height: 0; z-index: 9000; }
+.sx-projectile.ms-proj { width: 0; height: 0; z-index: 9000; }
 .ms-proj .ms-orb {
     position: absolute;
     left: -14px;

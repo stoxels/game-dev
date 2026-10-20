@@ -45,7 +45,7 @@ Object.assign(BOSS_MECHANICS, {
 
 // GRAND FINALE (shared waves): the last number of the night.
 const DAN_FINALE = {
-    name: 'The Dancer', title: '💃 GRAND FINALE', element: 'lightning', cls: 'eg-nk-fin-dance', color: '#f9a8d4',
+    name: 'The Dancer', title: '💃 GRAND FINALE', element: 'lightning', cls: 'sx-nk-fin-dance', color: '#f9a8d4',
     toastKey: 'eg_dancer_final',
     hint: 'The last number - read each circle!',
     waves: [
@@ -142,7 +142,7 @@ export function _dancerTeardown() {
         if (st.ball && st.ball.el) { try { st.ball.el.remove(); } catch (e) {} }
         try { if (st.run) _nkKillRun(st.run); } catch (e) {} // removes ball el too
     }
-    document.querySelectorAll('.eg-dan-ball, .eg-dan-ribbon, .eg-dan-petal, .eg-dan-piro, .eg-dan-piro-gap, .eg-dan-step, .eg-dan-curtain, .eg-dan-piro-warn').forEach(el => el.remove());
+    document.querySelectorAll('.sx-dan-ball, .sx-dan-ribbon, .sx-dan-petal, .sx-dan-piro, .sx-dan-piro-gap, .sx-dan-step, .sx-dan-curtain, .sx-dan-piro-warn').forEach(el => el.remove());
 }
 
 
@@ -173,7 +173,7 @@ export function _dancerArenaInit(monster) {
     st.run = run;
 
     // The mirror ball itself: rides above the floor, waltzes to new spots.
-    const el = _nkEl(run, 'div', 'eg-dan-ball', '🪩');
+    const el = _nkEl(run, 'div', 'sx-dan-ball', '🪩');
     el.style.width = el.style.height = (DAN_BALL_R * 2) + 'px';
     st.ball = {
         x: window.innerWidth / 2, y: window.innerHeight * 0.3,
@@ -297,7 +297,7 @@ export function _dancerStartSteps(st, p) {
         prev = { x, y };
     }
     const els = pts.map((q, i) => {
-        const el = _nkEl(st.run, 'div', 'eg-dan-step', String(i + 1));
+        const el = _nkEl(st.run, 'div', 'sx-dan-step', String(i + 1));
         el.style.display = 'none';
         el.style.left = Math.round(q.x - radius) + 'px';
         el.style.top = Math.round(q.y - radius) + 'px';
@@ -351,7 +351,7 @@ export function _dancerSpawnRibbon(st) {
     const W = window.innerWidth, H = window.innerHeight;
     const b = st.ball;
     const ang = Math.random() * Math.PI * 2;
-    const el = _nkEl(st.run, 'div', 'eg-dan-ribbon warn');
+    const el = _nkEl(st.run, 'div', 'sx-dan-ribbon warn');
     el.style.left = b.x + 'px';
     el.style.top = b.y + 'px';
     el.style.width = (Math.max(W, H) * 1.15) + 'px';
@@ -446,7 +446,7 @@ export function _dancerTickCurtains(st, dtS, c, pr) {
         cc.t += dtS * 1000;
         while (cc.idx < cc.drops.length && cc.t >= cc.drops[cc.idx].at) {
             const d = cc.drops[cc.idx];
-            const el = _nkEl(st.run, 'div', 'eg-dan-curtain warn');
+            const el = _nkEl(st.run, 'div', 'sx-dan-curtain warn');
             el.style.left = d.x + 'px';
             el.style.top = d.y + 'px';
             st.curtains.push({ x: d.x, y: d.y, t: 0, el, hot: false });
@@ -479,7 +479,7 @@ export function _dancerTickCurtains(st, dtS, c, pr) {
     }
     // Lingering patches pull gently toward their center (slow-zone feel).
     if (c) {
-        document.querySelectorAll('.eg-dan-curtain.stage').forEach((el) => {
+        document.querySelectorAll('.sx-dan-curtain.stage').forEach((el) => {
             const r = el.getBoundingClientRect();
             if (!r.width) return;
             const px = r.left + r.width / 2, py = r.top + r.height / 2;
@@ -554,7 +554,7 @@ export function _dancerTickPetals(st, dtS, pr) {
 export function _dancerSpawnPetal(st) {
     const W = window.innerWidth, H = window.innerHeight;
     const fromLeft = Math.random() < 0.5;
-    const el = _nkEl(st.run, 'div', 'eg-dan-petal', '🌸');
+    const el = _nkEl(st.run, 'div', 'sx-dan-petal', '🌸');
     const petal = {
         x: fromLeft ? -30 : W + 30,
         y: 60 + Math.random() * Math.max(60, H - 140),
@@ -582,7 +582,7 @@ export function _dancerPirouette(monster) {
     let pa = Math.atan2(c.x - st.ball.x, -(c.y - st.ball.y)) * 180 / Math.PI;
     const gapMid = pa + (Math.random() < 0.5 ? -1 : 1) * (25 + Math.random() * 25);
     const gapStart = ((gapMid - DAN_PIRO_GAP_DEG / 2) % 360 + 360) % 360;
-    const wedge = _nkEl(st.run, 'div', 'eg-dan-piro-gap');
+    const wedge = _nkEl(st.run, 'div', 'sx-dan-piro-gap');
     wedge.style.left = st.ball.x + 'px';
     wedge.style.top = st.ball.y + 'px';
     wedge.style.setProperty('--gap', gapStart + 'deg');
@@ -604,7 +604,7 @@ export function _dancerPiroRing(st, pi, p) {
     // kill the whole arena when the ring completes (_nkKillRun removes
     // every run element, ball included).
     const ringRun = _nkNewRun(st.monsterId, true);
-    const el = _nkEl(ringRun, 'div', 'eg-dan-piro');
+    const el = _nkEl(ringRun, 'div', 'sx-dan-piro');
     el.style.left = x + 'px';
     el.style.top = y + 'px';
     el.style.setProperty('--gap', pi.gapStart + 'deg');

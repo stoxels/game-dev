@@ -380,7 +380,7 @@ function _wireGlobalFlyoutGuard() {
     // panel when art resolves so fresh images replace the fallbacks.
     // (Subscribed here, not at top level: step9-items.test.mjs forbids
     // top-level executable statements in this family.)
-    document.addEventListener('eg-art-loaded', function () {
+    document.addEventListener('sx-art-loaded', function () {
         try {
             if (document.getElementById('inv-panel')) buildInventoryPanel();
         } catch (e) { /* panel not initialised yet - safe to ignore */ }

@@ -42,8 +42,8 @@ export function _renderItemDropOverlay(row, col, drop) {
     const def = globalThis.ITEM_DEFS[drop.defId];
     const rarityCls = _itemDropRarityClass(def && def.rarity);
     const span = document.createElement('span');
-    span.className = `eg-pickup-overlay eg-pickup-rarity-${rarityCls} eg-item-drop-overlay`;
-    span.id = `eg-item-drop-${row}-${col}`;
+    span.className = `sx-pickup-overlay sx-pickup-rarity-${rarityCls} sx-item-drop-overlay`;
+    span.id = `sx-item-drop-${row}-${col}`;
     // Puzzle items have no art in the manifest yet - wires the def id so
     // future art shows automatically, emoji fallback until then.
     GAME_ART.fillElement(span, 'item', drop && drop.defId, (def && def.icon) || '📦');
@@ -52,7 +52,7 @@ export function _renderItemDropOverlay(row, col, drop) {
 
 export function _removeItemDropOverlay(key) {
     const [r, c] = key.split('-').map(Number);
-    const span = document.getElementById(`eg-item-drop-${r}-${c}`);
+    const span = document.getElementById(`sx-item-drop-${r}-${c}`);
     if (span) span.remove();
 }
 
@@ -62,7 +62,7 @@ export function _animateItemDropClaim(row, col, drop) {
     const def = globalThis.ITEM_DEFS[drop.defId];
     const centre = _getElementCentre(el);
     const floater = document.createElement('div');
-    floater.className = 'eg-pickup-floater';
+    floater.className = 'sx-pickup-floater';
     GAME_ART.fillElement(floater, 'item', drop && drop.defId, (def && def.icon) || '📦');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
@@ -105,7 +105,7 @@ export function _spawnItemDrop(isBoss = false, force = false) {
     _itemDrops.set(key, drop);
     _renderItemDropOverlay(r, c, drop);
 
-    _scheduleTrackedExpiry(_itemDrops, key, drop, LOOT_DROP_LIFETIME_MS, `eg-item-drop-${r}-${c}`, _removeItemDropOverlay);
+    _scheduleTrackedExpiry(_itemDrops, key, drop, LOOT_DROP_LIFETIME_MS, `sx-item-drop-${r}-${c}`, _removeItemDropOverlay);
 }
 
 // Called on correct action on the cell holding a regular-item drop.
@@ -188,6 +188,6 @@ export function _replaceCarriedItemDrops(drops) {
         _itemDrops.set(key, drop);
         _renderItemDropOverlay(r, c, drop);
 
-        _scheduleTrackedExpiry(_itemDrops, key, drop, LOOT_DROP_LIFETIME_MS, `eg-item-drop-${r}-${c}`, _removeItemDropOverlay);
+        _scheduleTrackedExpiry(_itemDrops, key, drop, LOOT_DROP_LIFETIME_MS, `sx-item-drop-${r}-${c}`, _removeItemDropOverlay);
     });
 }

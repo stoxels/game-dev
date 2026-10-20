@@ -11,62 +11,62 @@ import { STATE } from '../state.js';
 // the flight vector toward the targeted creature.
 export const CLASS_PROJECTILES = {
     probabilist: {
-        cssClass: 'eg-proj-arrow', duration: 900, easing: 'linear', rotOffset: 0,
+        cssClass: 'sx-proj-arrow', duration: 900, easing: 'linear', rotOffset: 0,
         build(root) {
-            root.innerHTML = '<div class="egp egp-arrow"><div class="egp-arrow-fletch egp-arrow-fletch-top"></div><div class="egp-arrow-fletch egp-arrow-fletch-bot"></div><div class="egp-arrow-shaft"></div><div class="egp-arrow-head"></div></div>';
+            root.innerHTML = '<div class="egp sx-projfx-arrow"><div class="sx-projfx-arrow-fletch sx-projfx-arrow-fletch-top"></div><div class="sx-projfx-arrow-fletch sx-projfx-arrow-fletch-bot"></div><div class="sx-projfx-arrow-shaft"></div><div class="sx-projfx-arrow-head"></div></div>';
         },
     },
     mathmagician: {
-        cssClass: 'eg-proj-fireball', duration: 1000, easing: 'ease-in', rotOffset: 0,
+        cssClass: 'sx-proj-fireball', duration: 1000, easing: 'ease-in', rotOffset: 0,
         build(root) {
-            root.innerHTML = '<div class="egp egp-firebolt"><div class="egp-firebolt-tail"></div><div class="egp-firebolt-core"></div><div class="egp-firebolt-spark egp-firebolt-spark-1"></div><div class="egp-firebolt-spark egp-firebolt-spark-2"></div></div>';
+            root.innerHTML = '<div class="egp sx-projfx-firebolt"><div class="sx-projfx-firebolt-tail"></div><div class="sx-projfx-firebolt-core"></div><div class="sx-projfx-firebolt-spark sx-projfx-firebolt-spark-1"></div><div class="sx-projfx-firebolt-spark sx-projfx-firebolt-spark-2"></div></div>';
         },
     },
     statistician: {
-        cssClass: 'eg-proj-sword', duration: 800, easing: 'ease-out', rotOffset: 0,
+        cssClass: 'sx-proj-sword', duration: 800, easing: 'ease-out', rotOffset: 0,
         build(root) {
-            root.innerHTML = '<div class="egp egp-sword"><div class="egp-sword-pommel"></div><div class="egp-sword-hilt"></div><div class="egp-sword-guard"></div><div class="egp-sword-blade"></div></div>';
+            root.innerHTML = '<div class="egp sx-projfx-sword"><div class="sx-projfx-sword-pommel"></div><div class="sx-projfx-sword-hilt"></div><div class="sx-projfx-sword-guard"></div><div class="sx-projfx-sword-blade"></div></div>';
         },
     },
     outlier: {
-        cssClass: 'eg-proj-dizzy', duration: 1000, easing: 'linear', rotOffset: 0, spin: 700,
+        cssClass: 'sx-proj-dizzy', duration: 1000, easing: 'linear', rotOffset: 0, spin: 700,
         build(root) {
-            root.innerHTML = '<div class="egp egp-star"><div class="egp-star-streak"></div><div class="egp-star-core egp-spin"></div></div>';
+            root.innerHTML = '<div class="egp sx-projfx-star"><div class="sx-projfx-star-streak"></div><div class="sx-projfx-star-core sx-projfx-spin"></div></div>';
         },
     },
     actuary: {
-        cssClass: 'eg-proj-scroll', duration: 1000, easing: 'ease-out', rotOffset: 0,
+        cssClass: 'sx-proj-scroll', duration: 1000, easing: 'ease-out', rotOffset: 0,
         build(root) {
-            root.innerHTML = '<div class="egp egp-dart"><div class="egp-dart-wing egp-dart-wing-under"></div><div class="egp-dart-wing egp-dart-wing-over"></div><div class="egp-dart-seal"></div><div class="egp-dart-trail"></div></div>';
+            root.innerHTML = '<div class="egp sx-projfx-dart"><div class="sx-projfx-dart-wing sx-projfx-dart-wing-under"></div><div class="sx-projfx-dart-wing sx-projfx-dart-wing-over"></div><div class="sx-projfx-dart-seal"></div><div class="sx-projfx-dart-trail"></div></div>';
         },
     },
     recursionist: {
-        cssClass: 'eg-proj-infinity', duration: 1000, easing: 'linear', rotOffset: 0,
+        cssClass: 'sx-proj-infinity', duration: 1000, easing: 'linear', rotOffset: 0,
         build(root) {
-            root.innerHTML = '<div class="egp egp-shard"><div class="egp-shard-echo egp-shard-echo-2"></div><div class="egp-shard-echo egp-shard-echo-1"></div><div class="egp-shard-body"></div></div>';
+            root.innerHTML = '<div class="egp sx-projfx-shard"><div class="sx-projfx-shard-echo sx-projfx-shard-echo-2"></div><div class="sx-projfx-shard-echo sx-projfx-shard-echo-1"></div><div class="sx-projfx-shard-body"></div></div>';
         },
     },
     markovian: {
-        cssClass: 'eg-proj-chain', duration: 1100, easing: 'ease-in', rotOffset: 0,
+        cssClass: 'sx-proj-chain', duration: 1100, easing: 'ease-in', rotOffset: 0,
         build(root) {
-            root.innerHTML = '<div class="egp egp-chain"><div class="egp-chain-link egp-chain-link-3"></div><div class="egp-chain-link egp-chain-link-2"></div><div class="egp-chain-link egp-chain-link-1"></div><div class="egp-chain-ball"></div></div>';
+            root.innerHTML = '<div class="egp sx-projfx-chain"><div class="sx-projfx-chain-link sx-projfx-chain-link-3"></div><div class="sx-projfx-chain-link sx-projfx-chain-link-2"></div><div class="sx-projfx-chain-link sx-projfx-chain-link-1"></div><div class="sx-projfx-chain-ball"></div></div>';
         },
     },
     bayesian: {
-        cssClass: 'eg-proj-brain', duration: 1000, easing: 'ease-in', rotOffset: 0,
+        cssClass: 'sx-proj-brain', duration: 1000, easing: 'ease-in', rotOffset: 0,
         build(root) {
-            root.innerHTML = '<div class="egp egp-vial"><div class="egp-vial-drop egp-vial-drop-2"></div><div class="egp-vial-drop egp-vial-drop-1"></div><div class="egp-vial-glass"><div class="egp-vial-fluid"></div><div class="egp-vial-shine"></div></div></div>';
+            root.innerHTML = '<div class="egp sx-projfx-vial"><div class="sx-projfx-vial-drop sx-projfx-vial-drop-2"></div><div class="sx-projfx-vial-drop sx-projfx-vial-drop-1"></div><div class="sx-projfx-vial-glass"><div class="sx-projfx-vial-fluid"></div><div class="sx-projfx-vial-shine"></div></div></div>';
         },
     },
     random_walker: {
-        cssClass: 'eg-proj-dice', duration: 1000, easing: 'linear', rotOffset: 0, spin: 850,
+        cssClass: 'sx-proj-dice', duration: 1000, easing: 'linear', rotOffset: 0, spin: 850,
         build(root) {
-            root.innerHTML = '<div class="egp egp-die"><div class="egp-die-streak"></div><div class="egp-die-body egp-spin"><div class="egp-pip egp-pip-tl"></div><div class="egp-pip egp-pip-tr"></div><div class="egp-pip egp-pip-c"></div><div class="egp-pip egp-pip-bl"></div><div class="egp-pip egp-pip-br"></div></div></div>';
+            root.innerHTML = '<div class="egp sx-projfx-die"><div class="sx-projfx-die-streak"></div><div class="sx-projfx-die-body sx-projfx-spin"><div class="sx-projfx-pip sx-projfx-pip-tl"></div><div class="sx-projfx-pip sx-projfx-pip-tr"></div><div class="sx-projfx-pip sx-projfx-pip-c"></div><div class="sx-projfx-pip sx-projfx-pip-bl"></div><div class="sx-projfx-pip sx-projfx-pip-br"></div></div></div>';
         },
     },
     _default: {
-        cssClass: 'eg-proj-default', duration: 1000, easing: 'ease-in', rotOffset: 0,
-        build(root) { root.innerHTML = '<div class="egp egp-bolt"><div class="egp-bolt-body"></div></div>'; },
+        cssClass: 'sx-proj-default', duration: 1000, easing: 'ease-in', rotOffset: 0,
+        build(root) { root.innerHTML = '<div class="egp sx-projfx-bolt"><div class="sx-projfx-bolt-body"></div></div>'; },
     },
 };
 
@@ -102,7 +102,7 @@ export function _getElementRestCentre(el) {
 
 export function _fireProjectile(visual, cssClass, start, end, duration, easing, onArrive, orient, startScale) {
     const proj = document.createElement('div');
-    proj.className = `eg-projectile ${cssClass}`;
+    proj.className = `sx-projectile ${cssClass}`;
     proj.style.left = '0px';
     proj.style.top = '0px';
 
@@ -112,11 +112,11 @@ export function _fireProjectile(visual, cssClass, start, end, duration, easing, 
     if (typeof visual === 'string') {
         proj.textContent = visual;
     } else if (visual && typeof visual.build === 'function') {
-        proj.classList.add('eg-built');
+        proj.classList.add('sx-built');
         visual.build(proj);
         rotate = visual.rotate !== false;
         rotOffset = visual.rotOffset || 0;
-        if (visual.spin) proj.style.setProperty('--egp-spin-ms', `${visual.spin}ms`);
+        if (visual.spin) proj.style.setProperty('--sx-projfx-spin-ms', `${visual.spin}ms`);
     }
 
     document.body.appendChild(proj);

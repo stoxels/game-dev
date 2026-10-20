@@ -72,7 +72,7 @@ export function _mdTouch(pct, level, label) {
 // The gorgon's eyes: a pair of glowing serpent eyes, positioned via
 // transform, colour-coded by use (mechanic vs finale).
 export function _mdEyesEl(run, big) {
-    const el = _nkEl(run, 'div', 'eg-md-eyes' + (big ? ' eg-md-eyes-big' : ''));
+    const el = _nkEl(run, 'div', 'sx-md-eyes' + (big ? ' sx-md-eyes-big' : ''));
     return el;
 }
 
@@ -80,13 +80,13 @@ export function _mdEyesEl(run, big) {
 // it survives the run ending in the same frame).
 export function _mdShards(x, y, big) {
     const layer = document.createElement('div');
-    layer.className = 'eg-md-shards' + (big ? ' eg-md-shards-big' : '');
+    layer.className = 'sx-md-shards' + (big ? ' sx-md-shards-big' : '');
     layer.style.left = Math.round(x) + 'px';
     layer.style.top = Math.round(y) + 'px';
     document.body.appendChild(layer);
     for (let i = 0; i < (big ? 10 : 6); i++) {
         const s = document.createElement('div');
-        s.className = 'eg-md-shard';
+        s.className = 'sx-md-shard';
         const ang = Math.random() * Math.PI * 2;
         const dist = 20 + Math.random() * (big ? 80 : 46);
         s.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
@@ -121,7 +121,7 @@ export function _mechMdStoneGaze(monster, phase) {
     const dmgPct = MD_GAZE_DMG[p];
 
     const eyes = _mdEyesEl(run, false);
-    const beam = _nkEl(run, 'div', 'eg-md-gazebeam eg-md-gaze-warn');
+    const beam = _nkEl(run, 'div', 'sx-md-gazebeam sx-md-gaze-warn');
     beam.style.width = beamW + 'px';
     const fromLeft = Math.random() < 0.5;
     let x = fromLeft ? -beamW : W;
@@ -139,7 +139,7 @@ export function _mechMdStoneGaze(monster, phase) {
         }
         if (!live) {
             live = true;
-            beam.classList.remove('eg-md-gaze-warn');
+            beam.classList.remove('sx-md-gaze-warn');
         }
         x += dir * speed * dtS;
         if (x > W) { x = W; dir = -1; sweeps++; }
@@ -186,10 +186,10 @@ export function _mechMdSnakeStrikes(monster, phase) {
         const y = 130 + Math.random() * Math.max(60, H - 270);
         if (pc0 && Math.hypot(pc0.x - x, pc0.y - y) < 140) continue;
         if (!spots.every(s => Math.hypot(s.x - x, s.y - y) > 190)) continue;
-        const warn = _nkEl(run, 'div', 'eg-md-snake-warn');
+        const warn = _nkEl(run, 'div', 'sx-md-snake-warn');
         warn.style.left = Math.round(x - 64) + 'px';
         warn.style.top = Math.round(y - 64) + 'px';
-        const el = _nkEl(run, 'div', 'eg-md-snake');
+        const el = _nkEl(run, 'div', 'sx-md-snake');
         el.style.left = Math.round(x - 27) + 'px';
         el.style.top = Math.round(y - 27) + 'px';
         el.style.display = 'none';
@@ -211,7 +211,7 @@ export function _mechMdSnakeStrikes(monster, phase) {
             }
             while (s.bites < MD_SNAKE_BITES && t >= warnMs + riseMs + s.bites * biteGap) {
                 s.bites++;
-                const bite = _nkEl(run, 'div', 'eg-md-bite');
+                const bite = _nkEl(run, 'div', 'sx-md-bite');
                 bite.style.left = Math.round(s.x) + 'px';
                 bite.style.top = Math.round(s.y) + 'px';
                 const bel = bite;
@@ -226,7 +226,7 @@ export function _mechMdSnakeStrikes(monster, phase) {
             }
             if (s.bites >= MD_SNAKE_BITES && t >= warnMs + riseMs + MD_SNAKE_BITES * biteGap + 200) {
                 s.done = true;
-                s.el.classList.add('eg-md-snake-sink');
+                s.el.classList.add('sx-md-snake-sink');
                 const el = s.el;
                 setTimeout(() => { try { el.remove(); } catch (e) {} }, 460);
             }
@@ -263,7 +263,7 @@ export function _mechMdPetrifyWaves(monster, phase) {
         const c = _nkPlayerCenter() || { x: W / 2, y: H / 2 };
         const ex = Math.max(120, Math.min(W - 120, c.x + (Math.random() * 2 - 1) * 260));
         const ey = Math.max(120, Math.min(H - 120, c.y + (Math.random() * 2 - 1) * 220));
-        const el = _nkEl(run, 'div', 'eg-md-wave');
+        const el = _nkEl(run, 'div', 'sx-md-wave');
         el.style.left = Math.round(ex) + 'px';
         el.style.top = Math.round(ey) + 'px';
         waves.push({ x: ex, y: ey, r: 30, gap: Math.random() * 360, rot: (Math.random() < 0.5 ? -1 : 1) * MD_WAVE_ROT, t: -i * 800 * _MD_DEBUG_MULT, el, done: false, hit: false });
@@ -300,8 +300,8 @@ export function _mechMdPetrifyWaves(monster, phase) {
                     if (rel > MD_WAVE_GAP) {
                         touchCd = now + MD_HIT_CD_MS;
                         if (_mdTouch(dmgPct, level, 'Petrify Wave')) {
-                            document.body.classList.add('eg-md-stoneflash');
-                            const id = setTimeout(() => document.body.classList.remove('eg-md-stoneflash'), 600);
+                            document.body.classList.add('sx-md-stoneflash');
+                            const id = setTimeout(() => document.body.classList.remove('sx-md-stoneflash'), 600);
                             run.timers.push(id);
                         }
                     }
@@ -341,7 +341,7 @@ export function _mechMdCoilCage(monster, phase) {
     const cx = Math.max(240, Math.min(W - 240, c.x));
     const cy = Math.max(220, Math.min(H - 220, c.y));
 
-    const warn = _nkEl(run, 'div', 'eg-md-coil-warn');
+    const warn = _nkEl(run, 'div', 'sx-md-coil-warn');
     warn.style.left = Math.round(cx) + 'px';
     warn.style.top = Math.round(cy) + 'px';
     warn.style.width = (MD_COIL_R0 * 2) + 'px';
@@ -351,7 +351,7 @@ export function _mechMdCoilCage(monster, phase) {
 
     const segs = [];
     for (let i = 0; i < MD_COIL_SEGS; i++) {
-        const el = _nkEl(run, 'div', 'eg-md-coil-seg');
+        const el = _nkEl(run, 'div', 'sx-md-coil-seg');
         el.style.display = 'none';
         segs.push({ el });
     }
@@ -390,7 +390,7 @@ export function _mechMdCoilCage(monster, phase) {
         });
         if (f >= 1) {
             segs.forEach(s => {
-                s.el.classList.add('eg-md-crumble');
+                s.el.classList.add('sx-md-crumble');
                 const el = s.el;
                 setTimeout(() => { try { el.remove(); } catch (e) {} }, 460);
             });
@@ -456,14 +456,14 @@ export function _mdRaiseStatue(g) {
         guard++;
     } while (!g.statues.every(s => Math.abs(s.x - x) > 170) && guard < 40);
     const el = document.createElement('div');
-    el.className = 'eg-md-statue eg-md-statue-warn';
+    el.className = 'sx-md-statue sx-md-statue-warn';
     el.style.left = Math.round(x - 45) + 'px';
     el.style.top = Math.round(y) + 'px';
     document.body.appendChild(el);
     g.fxRun.els.push(el);
-    requestAnimationFrame(() => el.classList.remove('eg-md-statue-warn'));
+    requestAnimationFrame(() => el.classList.remove('sx-md-statue-warn'));
     const sh = document.createElement('div');
-    sh.className = 'eg-md-shadow';
+    sh.className = 'sx-md-shadow';
     sh.style.left = Math.round(x - 52) + 'px';
     sh.style.top = Math.round(y + 64) + 'px';
     sh.style.width = '104px';
@@ -499,17 +499,17 @@ export function _mdFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // Serpent tint over the arena.
     const tint = document.createElement('div');
-    tint.className = 'eg-md-tint';
+    tint.className = 'sx-md-tint';
     document.body.appendChild(tint);
     g.tint = tint;
-    requestAnimationFrame(() => tint.classList.add('eg-md-tint-on'));
+    requestAnimationFrame(() => tint.classList.add('sx-md-tint-on'));
 
     // FX run (passive): holds statue/shadow/gaze elements and the sweep loop.
     g.fxRun = _nkNewRun(monster.id, true);
@@ -522,11 +522,11 @@ export function _mdFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-md-cd';
+    ov.className = 'sx-md-cd';
     ov.innerHTML =
-        '<div class="eg-md-cd-label">🐍 THE STARE</div>' +
-        '<div class="eg-md-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-md-cd-hint">Statues cast safe shadows - get BEHIND one before the gaze sweeps!</div>';
+        '<div class="sx-md-cd-label">🐍 THE STARE</div>' +
+        '<div class="sx-md-cd-num sx-bmb-cd-pop">' + g.count + '</div>' +
+        '<div class="sx-md-cd-hint">Statues cast safe shadows - get BEHIND one before the gaze sweeps!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -536,11 +536,11 @@ export function _mdFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss sways, weaving her spell.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-md-charming');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-md-charming');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     // Metronome: each beat raises one statue (+ its shadow). At zero, the
@@ -551,12 +551,12 @@ export function _mdFinalStart(monster) {
         if (_nkFrozen()) return;
         _mdRaiseStatue(g);
         g.count--;
-        const num = g.overlay && g.overlay.querySelector('.eg-md-cd-num');
+        const num = g.overlay && g.overlay.querySelector('.sx-md-cd-num');
         if (num) {
             num.textContent = g.count;
-            num.classList.remove('eg-bmb-cd-pop');
+            num.classList.remove('sx-bmb-cd-pop');
             void num.offsetWidth;
-            num.classList.add('eg-bmb-cd-pop');
+            num.classList.add('sx-bmb-cd-pop');
         }
         if (g.count <= 0) {
             clearInterval(g.cdTimer);
@@ -575,12 +575,12 @@ export function _mdStartGazeSweep(g, monster) {
     const level = monster ? monster.level : 1;
 
     _nkToast('eg_mech_md_final_bang', '🐍💀 THE STARE!', '#e2e8f0');
-    document.body.classList.add('eg-md-flash');
-    const fid = setTimeout(() => document.body.classList.remove('eg-md-flash'), 700);
+    document.body.classList.add('sx-md-flash');
+    const fid = setTimeout(() => document.body.classList.remove('sx-md-flash'), 700);
     g.fxRun.timers.push(fid);
 
     const gz = document.createElement('div');
-    gz.className = 'eg-md-gazewall';
+    gz.className = 'sx-md-gazewall';
     document.body.appendChild(gz);
     g.gazeEl = gz;
     g.fxRun.els.push(gz);
@@ -620,13 +620,13 @@ export function _mdFinalEnd(g) {
     if (g.eyes) { try { g.eyes.remove(); } catch (e) {} g.eyes = null; }
     if (g.gazeEl) { try { g.gazeEl.remove(); } catch (e) {} g.gazeEl = null; }
     if (g.fxRun) { try { _nkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
-    document.body.classList.remove('eg-md-flash');
-    document.body.classList.remove('eg-md-stoneflash');
-    document.querySelectorAll('.eg-md-charming').forEach(el => el.classList.remove('eg-md-charming'));
+    document.body.classList.remove('sx-md-flash');
+    document.body.classList.remove('sx-md-stoneflash');
+    document.querySelectorAll('.sx-md-charming').forEach(el => el.classList.remove('sx-md-charming'));
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -648,17 +648,17 @@ export function _mdFinalEnd(g) {
 // removes every run element, overlay and body class this boss ever created.
 export function _mdTeardown() {
     if (_mdFinal) { try { _mdFinalEnd(_mdFinal); } catch (e) {} _mdFinal = null; }
-    document.querySelectorAll('.eg-md-eyes, .eg-md-gazebeam, .eg-md-snake, .eg-md-snake-warn, ' +
-        '.eg-md-bite, .eg-md-wave, .eg-md-coil-seg, .eg-md-coil-warn, .eg-md-statue, ' +
-        '.eg-md-shadow, .eg-md-gazewall, .eg-md-tint, .eg-md-cd, .eg-md-shards').forEach(el => {
+    document.querySelectorAll('.sx-md-eyes, .sx-md-gazebeam, .sx-md-snake, .sx-md-snake-warn, ' +
+        '.sx-md-bite, .sx-md-wave, .sx-md-coil-seg, .sx-md-coil-warn, .sx-md-statue, ' +
+        '.sx-md-shadow, .sx-md-gazewall, .sx-md-tint, .sx-md-cd, .sx-md-shards').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.body.classList.remove('eg-md-flash');
-    document.body.classList.remove('eg-md-stoneflash');
-    document.querySelectorAll('.eg-md-charming').forEach(el => el.classList.remove('eg-md-charming'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.body.classList.remove('sx-md-flash');
+    document.body.classList.remove('sx-md-stoneflash');
+    document.querySelectorAll('.sx-md-charming').forEach(el => el.classList.remove('sx-md-charming'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

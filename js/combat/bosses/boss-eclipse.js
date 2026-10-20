@@ -72,10 +72,10 @@ export function _mechUmbralDashes(monster, phase) {
             dx = tx - sx;
             dy = ty - sy;
             dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            shade = _nkEl(run, 'div', 'eg-nk-dot eg-nk-shade', '🌒');
+            shade = _nkEl(run, 'div', 'sx-nk-dot sx-nk-shade', '🌒');
             shade.style.transform = 'translate(' + Math.round(sx - 26) + 'px,' + Math.round(sy - 26) + 'px)';
             // Thin warning line from spawn toward the target.
-            lineEl = _nkEl(run, 'div', 'eg-nk-dashline');
+            lineEl = _nkEl(run, 'div', 'sx-nk-dashline');
             const ang = Math.atan2(dy, dx);
             lineEl.style.width = Math.round(dist) + 'px';
             lineEl.style.left = Math.round(sx) + 'px';

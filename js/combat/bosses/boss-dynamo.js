@@ -155,7 +155,7 @@ export function _mechSparkPillars(monster, phase) {
         }
 
         const el = _dynamoBoltEl(run, len);
-        el.classList.add('eg-bolt-warn');
+        el.classList.add('sx-bolt-warn');
         el.style.left = Math.round(ax - PILLAR_WIDTH / 2) + 'px';
         el.style.top = Math.round(ay - len / 2) + 'px';
         el.style.transform = `rotate(${rot}rad)`;
@@ -209,8 +209,8 @@ export function _mechSparkPillars(monster, phase) {
             if (pl.stage === 'warn') {
                 if (pl.t >= PILLAR_WARN_MS) {
                     pl.stage = 'active';
-                    pl.el.classList.remove('eg-bolt-warn');
-                    pl.el.classList.add('eg-bolt-active');
+                    pl.el.classList.remove('sx-bolt-warn');
+                    pl.el.classList.add('sx-bolt-active');
                 }
                 return;
             }
@@ -254,7 +254,7 @@ export function _dynamoStratifiedPositions(count, inset, span) {
 // Builds the bolt container: a fixed div holding an SVG with a glow path and
 // a bright core path (both re-jittered while the pillar lives).
 export function _dynamoBoltEl(run, len) {
-    const el = _nkEl(run, 'div', 'eg-nk-bolt');
+    const el = _nkEl(run, 'div', 'sx-nk-bolt');
     const L = Math.round(len);
     el.style.width = PILLAR_WIDTH + 'px';
     el.style.height = L + 'px';
@@ -327,8 +327,8 @@ export const DYNAMO_TICK_MS = 250;         // damage + card-sync cadence
 export const DYNAMO_CRACKLE_MS = 240;      // beam re-jitter cadence (was 130ms + full innerHTML churn)
 export const DYNAMO_JITTER_BUDGET = 2;     // conductor↔conductor arcs re-struck per crackle tick
 
-export const DYNAMO_LAYER_ID = 'eg-dynamo-layer';
-export const DYNAMO_SVG_ID = 'eg-dynamo-net';
+export const DYNAMO_LAYER_ID = 'sx-dynamo-layer';
+export const DYNAMO_SVG_ID = 'sx-dynamo-net';
 
 export let _dynamoConductors = new Map(); // monsterId → { monsterId, x, y, card }
 export let _dynamoSeq = 0;
@@ -377,7 +377,7 @@ export function _dynamoSpawnConductor(boss) {
         resistances: { lightning: 85, fire: 10, cold: 10, shadow: 10 },
         isDynamoConductor: true,
         noLoot: true,
-        zoneId: 'eg-monster-panel', // present but never rendered there
+        zoneId: 'sx-monster-panel', // present but never rendered there
     };
 
     globalThis._monsters.push(m);
@@ -429,23 +429,23 @@ export function _dynamoRenderConductorCard(m, rec) {
         ? GAME_ART.html('monster', m.artId || m.baseId, m.emoji) : m.emoji;
 
     const card = document.createElement('div');
-    card.className = 'eg-monster-card-compact eg-dynamo-conductor-card';
-    card.id = 'eg-card-' + m.id;
+    card.className = 'sx-monster-card-compact sx-dynamo-conductor-card';
+    card.id = 'sx-card-' + m.id;
     card.style.left = Math.round(rec.x) + 'px';
     card.style.top = Math.round(rec.y) + 'px';
     card.setAttribute('onclick', `_selectTarget('${m.id}')`);
     card.innerHTML =
-        '<div class="eg-compact-bars">' +
-            '<div class="eg-charge-track-compact"><div class="eg-charge-bar" id="eg-charge-bar-' + m.id + '" style="width:0%"></div></div>' +
-            '<div class="eg-hp-track-compact"><div class="eg-hp-bar-compact ' + _hpBarClass(hpPct) + '" id="eg-hp-bar-' + m.id + '" style="width:' + hpPct + '%"></div></div>' +
+        '<div class="sx-compact-bars">' +
+            '<div class="sx-charge-track-compact"><div class="sx-charge-bar" id="sx-charge-bar-' + m.id + '" style="width:0%"></div></div>' +
+            '<div class="sx-hp-track-compact"><div class="sx-hp-bar-compact ' + _hpBarClass(hpPct) + '" id="sx-hp-bar-' + m.id + '" style="width:' + hpPct + '%"></div></div>' +
         '</div>' +
-        '<div class="eg-status-strip" id="eg-status-' + m.id + '"></div>' +
-        '<div class="eg-emoji-wrapper">' +
-            '<span class="eg-monster-emoji-compact">' + art + '</span>' +
-            '<span class="eg-level-bottom-left">' + m.level + '</span>' +
-            '<div class="eg-monster-compact-tooltip">' +
-                '<div class="eg-tooltip-name">' + m.name + '</div>' +
-                '<div class="eg-tooltip-hp" id="eg-hp-label-' + m.id + '">' + m.currentHP + ' / ' + m.maxHP + ' HP</div>' +
+        '<div class="sx-status-strip" id="sx-status-' + m.id + '"></div>' +
+        '<div class="sx-emoji-wrapper">' +
+            '<span class="sx-monster-emoji-compact">' + art + '</span>' +
+            '<span class="sx-level-bottom-left">' + m.level + '</span>' +
+            '<div class="sx-monster-compact-tooltip">' +
+                '<div class="sx-tooltip-name">' + m.name + '</div>' +
+                '<div class="sx-tooltip-hp" id="sx-hp-label-' + m.id + '">' + m.currentHP + ' / ' + m.maxHP + ' HP</div>' +
             '</div>' +
         '</div>';
     layer.appendChild(card);
@@ -457,13 +457,13 @@ export function _dynamoRenderConductorCard(m, rec) {
 export function _dynamoSyncCards() {
     if (typeof _targetId === 'undefined') return;
     _dynamoConductors.forEach((rec) => {
-        const card = rec.card || document.getElementById('eg-card-' + rec.monsterId);
+        const card = rec.card || document.getElementById('sx-card-' + rec.monsterId);
         if (!card) return;
         const targeted = globalThis._targetId === rec.monsterId;
-        const pill = card.querySelector('.eg-dynamo-target-pill, .eg-target-arrow');
+        const pill = card.querySelector('.sx-dynamo-target-pill, .sx-target-arrow');
         if (pill) pill.remove();
-        const wrap = card.querySelector('.eg-emoji-wrapper');
-        if (wrap) wrap.classList.toggle('eg-compact-targeted', targeted);
+        const wrap = card.querySelector('.sx-emoji-wrapper');
+        if (wrap) wrap.classList.toggle('sx-compact-targeted', targeted);
     });
 }
 
@@ -476,7 +476,7 @@ export function _dynamoFindBoss() {
 
 // Centre of any monster's card, or null when it has no rendered card.
 export function _dynamoCardCenter(monsterId) {
-    const el = document.getElementById('eg-card-' + monsterId);
+    const el = document.getElementById('sx-card-' + monsterId);
     if (!el) return null;
     const r = el.getBoundingClientRect();
     if (!r.width && !r.height) return null;
@@ -592,8 +592,8 @@ export function _dynamoBuildNetStructure(svg, topoKey, nodes) {
     if (nodes.length >= 3) {
         const hull = _convexHull(nodes);
         if (hull && hull.length >= 3) {
-            st.fieldPoly = _dynamoSvgEl('polygon', 'eg-dynamo-field');
-            st.fieldEdge = _dynamoSvgEl('polygon', 'eg-dynamo-field-edge');
+            st.fieldPoly = _dynamoSvgEl('polygon', 'sx-dynamo-field');
+            st.fieldEdge = _dynamoSvgEl('polygon', 'sx-dynamo-field-edge');
             svg.appendChild(st.fieldPoly);
             svg.appendChild(st.fieldEdge);
         }
@@ -601,9 +601,9 @@ export function _dynamoBuildNetStructure(svg, topoKey, nodes) {
 
     _dynamoBeamSegs(nodes).forEach(([a, b], i) => {
         const key = 's' + i;
-        const halo = _dynamoSvgEl('path', 'eg-dynamo-beam-halo');
-        const mid = _dynamoSvgEl('path', 'eg-dynamo-beam-mid');
-        const core = _dynamoSvgEl('path', 'eg-dynamo-beam-core');
+        const halo = _dynamoSvgEl('path', 'sx-dynamo-beam-halo');
+        const mid = _dynamoSvgEl('path', 'sx-dynamo-beam-mid');
+        const core = _dynamoSvgEl('path', 'sx-dynamo-beam-core');
         svg.appendChild(halo); svg.appendChild(mid); svg.appendChild(core);
         st.beams.set(key, { halo, mid, core });
         st.segs.push({
@@ -744,7 +744,7 @@ export function _dynamoDamageTick() {
 
 export function _dynamoDeathBurst(x, y, small) {
     const el = document.createElement('div');
-    el.className = 'eg-dynamo-burst' + (small ? ' eg-dynamo-burst-small' : '');
+    el.className = 'sx-dynamo-burst' + (small ? ' sx-dynamo-burst-small' : '');
     el.textContent = small ? '✦' : '⚡';
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
@@ -761,7 +761,7 @@ export function _removeConductor(monsterId) {
 
     _dynamoDeathBurst(rec.x, rec.y, false);
 
-    const card = rec.card || document.getElementById('eg-card-' + monsterId);
+    const card = rec.card || document.getElementById('sx-card-' + monsterId);
     if (card) {
         card.style.pointerEvents = 'none';
         setTimeout(() => { if (card && card.parentNode) card.parentNode.removeChild(card); }, 850);
@@ -789,7 +789,7 @@ export function _clearDynamoConductors() {
     const cards = [];
     _dynamoConductors.forEach((rec) => {
         _dynamoDeathBurst(rec.x, rec.y, false);
-        const card = rec.card || document.getElementById('eg-card-' + rec.monsterId);
+        const card = rec.card || document.getElementById('sx-card-' + rec.monsterId);
         if (card) cards.push(card);
     });
     cards.forEach(c => c.remove());

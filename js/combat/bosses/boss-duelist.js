@@ -64,14 +64,14 @@ export function _mechFlurry(monster, phase) {
             const c = _nkPlayerCenter();
             sx = c ? c.x : window.innerWidth / 2;
             sy = c ? c.y : window.innerHeight / 2;
-            mark = _nkEl(run, 'div', 'eg-nk-slash');
+            mark = _nkEl(run, 'div', 'sx-nk-slash');
             mark.style.left = Math.round(sx - radius) + 'px';
             mark.style.top = Math.round(sy - radius) + 'px';
             mark.style.width = radius * 2 + 'px';
             mark.style.height = radius * 2 + 'px';
             t = 0;
         } else if (t >= warnMs) {
-            mark.classList.add('eg-nk-slash-hit');
+            mark.classList.add('sx-nk-slash-hit');
             if (_nkCircleHit(sx, sy, radius, _nkPlayerRect(), 0)) {
                 const dealt = _nkHit(dmgPct, null, level);
                 _nkAbilityHitToast(dealt, 'The Duelist', 'Flurry');

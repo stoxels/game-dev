@@ -44,7 +44,7 @@ export function _hazardsReset() {
     if (active.length === 0) return;
 
     _setHzLayer(document.createElement('div'));
-    _hzLayer.id = 'eg-hazards-layer';
+    _hzLayer.id = 'sx-hazards-layer';
     _hzLayer.style.zIndex = String(HZ_LAYER_Z);
     document.body.appendChild(_hzLayer);
 
@@ -88,9 +88,9 @@ export function _hazardsCleanup() {
         _setHzLayer(null);
     }
     // Darkness clouds live outside the main layer (higher z-index).
-    document.querySelectorAll('.eg-hz-darkness-layer').forEach(el => el.remove());
+    document.querySelectorAll('.sx-hz-darkness-layer').forEach(el => el.remove());
     // Delirium mist likewise covers the whole screen from body level.
-    document.querySelectorAll('.eg-hz-delirium').forEach(el => el.remove());
+    document.querySelectorAll('.sx-hz-delirium').forEach(el => el.remove());
 }
 
 // Hides all hazard visuals and pauses hazard ticks while a quiz modal
@@ -102,7 +102,7 @@ export function _hazardsHideForQuiz() {
     if (!_hzActive || _hzPausedForQuiz) return;
     _setHzPausedForQuiz(true);
     if (_hzLayer) _hzLayer.style.display = 'none';
-    document.querySelectorAll('.eg-hz-darkness-layer, .eg-hz-delirium').forEach(el => { el.style.display = 'none'; });
+    document.querySelectorAll('.sx-hz-darkness-layer, .sx-hz-delirium').forEach(el => { el.style.display = 'none'; });
 }
 
 // Re-shows hazard visuals and resumes ticking when the next puzzle launches
@@ -113,7 +113,7 @@ export function _hazardsShowAfterQuiz() {
     if (!_hzPausedForQuiz) return;
     _setHzPausedForQuiz(false);
     if (_hzLayer) _hzLayer.style.display = '';
-    document.querySelectorAll('.eg-hz-darkness-layer, .eg-hz-delirium').forEach(el => { el.style.display = ''; });
+    document.querySelectorAll('.sx-hz-darkness-layer, .sx-hz-delirium').forEach(el => { el.style.display = ''; });
 }
 
 // Per-tick driver - called at 10Hz from _tickLoop.

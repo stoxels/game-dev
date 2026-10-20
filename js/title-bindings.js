@@ -510,17 +510,17 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function showEgForfeitConfirm(onConfirm) {
         // Reuse existing modal infrastructure - build a one-off modal overlay.
-        let modal = document.getElementById('eg-forfeit-modal');
+        let modal = document.getElementById('sx-forfeit-modal');
         if (!modal) {
             modal = document.createElement('div');
-            modal.id = 'eg-forfeit-modal';
+            modal.id = 'sx-forfeit-modal';
             // Same stone/parchment shell as the settings / how-to-play /
             // achievements-reset modals (see css/modals.css §4 and the
-            // #eg-forfeit-modal readability pass below it).
+            // #sx-forfeit-modal readability pass below it).
             modal.className = 'modal-bg safe-center';
             modal.innerHTML = `
             <div class="modal-box modal-box-danger">
-                <button class="modal-close" id="eg-forfeit-close">✕ CLOSE</button>
+                <button class="modal-close" id="sx-forfeit-close">✕ CLOSE</button>
                 <div class="modal-title text-red">${t('scr_leave_map')}</div>
                 <div class="modal-section">
                     <p class="reset-body-text">
@@ -528,8 +528,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     </p>
                 </div>
                 <div class="modal-actions">
-                    <button class="title-btn back-btn" id="eg-forfeit-confirm">${t('scr_leave_map_confirm')}</button>
-                    <button class="title-btn back-btn" id="eg-forfeit-cancel">${t('scr_stay_in_map')}</button>
+                    <button class="title-btn back-btn" id="sx-forfeit-confirm">${t('scr_leave_map_confirm')}</button>
+                    <button class="title-btn back-btn" id="sx-forfeit-cancel">${t('scr_stay_in_map')}</button>
                 </div>
             </div>`;
             document.body.appendChild(modal);
@@ -537,14 +537,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         modal.classList.add('show');
 
-        document.getElementById('eg-forfeit-confirm').onclick = () => {
+        document.getElementById('sx-forfeit-confirm').onclick = () => {
             modal.classList.remove('show');
             onConfirm();
         };
-        document.getElementById('eg-forfeit-cancel').onclick = () => {
+        document.getElementById('sx-forfeit-cancel').onclick = () => {
             modal.classList.remove('show');
         };
-        document.getElementById('eg-forfeit-close').onclick = () => {
+        document.getElementById('sx-forfeit-close').onclick = () => {
             modal.classList.remove('show');
         };
     }

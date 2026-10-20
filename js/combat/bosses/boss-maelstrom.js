@@ -48,10 +48,10 @@ export function _mechMaelstromVortex(monster, phase) {
     const level = monster ? monster.level : 1;
     const cx = window.innerWidth * 0.5;
     const cy = window.innerHeight * 0.5;
-    const eye = _nkEl(run, 'div', 'eg-nk-dot eg-nk-vortex', '🌊');
+    const eye = _nkEl(run, 'div', 'sx-nk-dot sx-nk-vortex', '🌊');
     eye.style.transform = 'translate(' + Math.round(cx - 30) + 'px,' + Math.round(cy - 30) + 'px)';
     // Dashed preview of the nova radius, visible from the very start.
-    const nova = _nkEl(run, 'div', 'eg-nk-ring eg-nk-ring-warn');
+    const nova = _nkEl(run, 'div', 'sx-nk-ring sx-nk-ring-warn');
     nova.style.left = Math.round(cx - novaR) + 'px';
     nova.style.top = Math.round(cy - novaR) + 'px';
     nova.style.width = novaR * 2 + 'px';
@@ -74,8 +74,8 @@ export function _mechMaelstromVortex(monster, phase) {
         }
         if (!detonated) {
             detonated = true;
-            nova.classList.remove('eg-nk-ring-warn');
-            nova.classList.add('eg-nk-boom');
+            nova.classList.remove('sx-nk-ring-warn');
+            nova.classList.add('sx-nk-boom');
             const c = _nkPlayerCenter();
             if (c && Math.hypot(c.x - cx, c.y - cy) <= novaR) {
                 const dealt = _nkHit(dmgPct, 'cold', level);

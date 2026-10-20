@@ -384,13 +384,13 @@ function _enduranceFrame(now) {
     }
     if (!_enduranceLayer || !_enduranceLayer.isConnected) {
         _enduranceLayer = document.createElement('div');
-        _enduranceLayer.id = 'eg-endurance-orbs';
+        _enduranceLayer.id = 'sx-endurance-orbs';
         _enduranceLayer.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;z-index:1001;pointer-events:none;';
         document.body.appendChild(_enduranceLayer);
     }
     while (_enduranceLayer.children.length < count) {
         const orb = document.createElement('div');
-        orb.className = 'eg-endurance-orb';
+        orb.className = 'sx-endurance-orb';
         orb.style.cssText = 'position:absolute;width:16px;height:16px;border-radius:50%;'
             + 'background:radial-gradient(circle at 35% 30%,#ffe2a8 0%,#ff9b2f 45%,#c85a00 100%);'
             + 'box-shadow:0 0 8px 2px rgba(255,150,40,0.85);';

@@ -49,7 +49,7 @@ export function _mechLockOn(monster, phase) {
     const level = monster ? monster.level : 1;
     const ax = window.innerWidth * 0.85, ay = window.innerHeight * 0.25;
     const len = Math.hypot(window.innerWidth, window.innerHeight);
-    const eye = _nkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '🛰️');
+    const eye = _nkEl(run, 'div', 'sx-nk-dot sx-nk-anchor', '🛰️');
     eye.style.transform = 'translate(' + Math.round(ax - 26) + 'px,' + Math.round(ay - 26) + 'px)';
     _nkToast('eg_mech_guardian', '🛰️ The Guardian: Lock-On! Out-turn the beam!');
     let idx = 0, stage = 'idle', t = 0, ang = 0;
@@ -65,7 +65,7 @@ export function _mechLockOn(monster, phase) {
             stage = 'charge';
             t = 0;
             ang = c ? Math.atan2(c.y - ay, c.x - ax) : Math.PI;
-            beam = _nkEl(run, 'div', 'eg-nk-beam eg-nk-beam-warn eg-nk-lockline');
+            beam = _nkEl(run, 'div', 'sx-nk-beam sx-nk-beam-warn sx-nk-lockline');
             beam.style.width = Math.round(len) + 'px';
             beam.style.height = halfW * 2 + 'px';
             beam.style.left = Math.round(ax) + 'px';
@@ -84,8 +84,8 @@ export function _mechLockOn(monster, phase) {
                 stage = 'fire';
                 t = 0;
                 if (beam) {
-                    beam.classList.remove('eg-nk-beam-warn');
-                    beam.classList.add('eg-nk-beam-fire');
+                    beam.classList.remove('sx-nk-beam-warn');
+                    beam.classList.add('sx-nk-beam-fire');
                 }
                 // Snapshot judgment along the fired line.
                 const pr = _nkPlayerRect();

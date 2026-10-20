@@ -52,7 +52,7 @@ export function _mechAbyssDark(monster, phase) {
         x: start ? start.x : window.innerWidth / 2,
         y: start ? start.y : window.innerHeight / 2,
     };
-    const dark = _nkEl(run, 'div', 'eg-nk-dark');
+    const dark = _nkEl(run, 'div', 'sx-nk-dark');
     _nkToast('eg_mech_dark', '🌑 The Abyss: Fading Light! Stay in the glow!');
     let e = 0, dotWarnAt = 0;
     _nkLoop(run, (dtS, now) => {

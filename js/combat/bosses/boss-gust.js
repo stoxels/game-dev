@@ -116,16 +116,16 @@ export function _gustChargePaused() {
 export function _gustSetChargePause(active) {
     _gustWindPause = !!active;
     const bar = document.getElementById('avatar-charge-fill');
-    if (bar) bar.classList.toggle('eg-charge-paused', !!active);
-    const alt = document.getElementById('eg-player-charge-bar');
-    if (alt) alt.classList.toggle('eg-charge-paused', !!active);
+    if (bar) bar.classList.toggle('sx-charge-paused', !!active);
+    const alt = document.getElementById('sx-player-charge-bar');
+    if (alt) alt.classList.toggle('sx-charge-paused', !!active);
     const hud = document.getElementById('player-avatar-wrapper');
     if (hud) {
-        let lbl = document.getElementById('eg-gust-wind-label');
+        let lbl = document.getElementById('sx-gust-wind-label');
         if (active) {
             if (!lbl) {
                 lbl = document.createElement('div');
-                lbl.id = 'eg-gust-wind-label';
+                lbl.id = 'sx-gust-wind-label';
                 hud.appendChild(lbl);
             }
             lbl.textContent = 'WINDBLOWN';
@@ -134,7 +134,7 @@ export function _gustSetChargePause(active) {
             lbl.remove();
         }
     } else if (!active) {
-        const stray = document.getElementById('eg-gust-wind-label');
+        const stray = document.getElementById('sx-gust-wind-label');
         if (stray) stray.remove();
     }
 }
@@ -217,13 +217,13 @@ export function _gustArenaInit(monster) {
     const run = _nkNewRun(monsterId, false);
 
     // ── Spike walls (CSS sawtooths draw themselves - no children needed) ──
-    _nkEl(run, 'div', 'eg-nk-gust-spike eg-nk-gust-spike-left');
-    _nkEl(run, 'div', 'eg-nk-gust-spike eg-nk-gust-spike-right');
+    _nkEl(run, 'div', 'sx-nk-gust-spike sx-nk-gust-spike-left');
+    _nkEl(run, 'div', 'sx-nk-gust-spike sx-nk-gust-spike-right');
 
     // ── Wind overlay: full-screen streak field + drifting debris. The
     //    body classes drive the CSS; the node itself is ALWAYS visible so
     //    the overlay can fade in and out with the wind phase. ──
-    const windFx = _nkEl(run, 'div', 'eg-gust-windfx');
+    const windFx = _nkEl(run, 'div', 'sx-gust-windfx');
     for (let i = 0; i < 30; i++) {
         const d = document.createElement('i');
         d.style.top = (2 + Math.random() * 96).toFixed(2) + '%';
@@ -256,7 +256,7 @@ export function _gustArenaInit(monster) {
     _gustArena = st;
     run.onKill = () => {
         _gustSetChargePause(false);
-        document.body.classList.remove('eg-gust-wind-from-left', 'eg-gust-wind-from-right');
+        document.body.classList.remove('sx-gust-wind-from-left', 'sx-gust-wind-from-right');
         if (_gustArena && _gustArena.run === run) _gustArena = null;
     };
 
@@ -334,8 +334,8 @@ export function _gustArenaTick(st, dtS, now) {
                     wind.phase = 'off';
                     inWind = false;
                     wind.wallDiesAt = now + GUST_BREAK_FADE_MS;
-                    if (wind.wallEl) wind.wallEl.classList.add('eg-gust-break-out');
-                    document.body.classList.remove('eg-gust-wind-from-left', 'eg-gust-wind-from-right');
+                    if (wind.wallEl) wind.wallEl.classList.add('sx-gust-break-out');
+                    document.body.classList.remove('sx-gust-wind-from-left', 'sx-gust-wind-from-right');
                     st.stormWarned = false; // re-arm the lightning pre-warning
                     st.nextWindAt = st.elapsed + GUST_WIND_EVERY_MS * (0.85 + Math.random() * 0.3);
                 }
@@ -396,7 +396,7 @@ export function _gustArenaTick(st, dtS, now) {
                     const dealt = _nkHit(GUST_SPIKE_HIT[p] || 0.12, 'cold', lvl);
                     _nkAbilityHitToast(dealt, 'The Gust', side === 'l' ? 'Left Spikes' : 'Right Spikes');
                     st.spikeHotUntil = now + 500;
-                    document.body.classList.add(side === 'l' ? 'eg-gust-spike-hot-l' : 'eg-gust-spike-hot-r');
+                    document.body.classList.add(side === 'l' ? 'sx-gust-spike-hot-l' : 'sx-gust-spike-hot-r');
                 }
                 // Grind damage every moment spent inside the thorns.
                 _nkDotTick(st.run, GUST_SPIKE_DOT[p] || 0.045, dtS, lvl, 'cold');
@@ -406,7 +406,7 @@ export function _gustArenaTick(st, dtS, now) {
                     _nkToast('eg_nk_move', '⚠️ Out of the spikes!', '#f87171');
                 }
             } else if (st.spikeHotUntil && now >= st.spikeHotUntil) {
-                document.body.classList.remove('eg-gust-spike-hot-l', 'eg-gust-spike-hot-r');
+                document.body.classList.remove('sx-gust-spike-hot-l', 'sx-gust-spike-hot-r');
                 st.spikeHotUntil = 0;
             }
         }
@@ -432,10 +432,10 @@ export function _gustArenaTick(st, dtS, now) {
         }
         for (let i = st.blades.length - 1; i >= 0; i--) {
             const b = st.blades[i];
-            if (b.el.classList.contains('eg-gust-blade-tell')) {
+            if (b.el.classList.contains('sx-gust-blade-tell')) {
                 if (now >= b.fireAt) {
-                    b.el.classList.remove('eg-gust-blade-tell');
-                    b.el.classList.add(b.vx < 0 ? 'eg-gust-blade-left' : 'eg-gust-blade-right');
+                    b.el.classList.remove('sx-gust-blade-tell');
+                    b.el.classList.add(b.vx < 0 ? 'sx-gust-blade-left' : 'sx-gust-blade-right');
                 }
             } else {
                 b.x += b.vx * dtS;
@@ -489,8 +489,8 @@ export function _gustLightningWarn(st, side) {
     try {
         if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('hz_lightning_warn', 'gust_thunder');
     } catch (e) {}
-    const el = _nkEl(st.run, 'div', 'eg-gust-lightning ' +
-        (side === 1 ? 'eg-gust-lightning-left' : 'eg-gust-lightning-right'));
+    const el = _nkEl(st.run, 'div', 'sx-gust-lightning ' +
+        (side === 1 ? 'sx-gust-lightning-left' : 'sx-gust-lightning-right'));
     // The flash animation runs ~0.85 s; hard-remove afterwards so a paused
     // tab can never leave a frozen bolt on screen.
     setTimeout(() => { try { el.remove(); } catch (e) {} }, 900);
@@ -502,7 +502,7 @@ export function _gustLightningWarn(st, side) {
 // the gale starts shoving after only the short gather preview.
 export function _gustWindStart(st, side, now) {
     st.wind = { side, phase: 'warn', t: 0, ramp: 0, wallEl: null, wallDiesAt: Infinity };
-    document.body.classList.add(side === 1 ? 'eg-gust-wind-from-left' : 'eg-gust-wind-from-right');
+    document.body.classList.add(side === 1 ? 'sx-gust-wind-from-left' : 'sx-gust-wind-from-right');
     _gustWindToast(side);
     st.daggerToastShown = false; // corruption→dagger notice: once per storm front
     // Wooden windbreak spawns on the DOWNWIND edge at a random height -
@@ -511,8 +511,8 @@ export function _gustWindStart(st, side, now) {
     const H = window.innerHeight;
     const wallY = Math.max(90, Math.min(H - 90 - GUST_BREAK_H,
         H * (0.28 + Math.random() * 0.44)));
-    const wallEl = _nkEl(st.run, 'div', 'eg-gust-break ' +
-        (side === 1 ? 'eg-gust-break-right' : 'eg-gust-break-left'));
+    const wallEl = _nkEl(st.run, 'div', 'sx-gust-break ' +
+        (side === 1 ? 'sx-gust-break-right' : 'sx-gust-break-left'));
     wallEl.style.top = Math.round(wallY) + 'px';
     wallEl.style.height = GUST_BREAK_H + 'px';
     st.wind.wallEl = wallEl;
@@ -522,8 +522,8 @@ export function _gustWindStart(st, side, now) {
 
 // Spawns a wind blade: 0.5 s glint at the boss's mouth, then flight.
 export function _gustBlade(st, y) {
-    const el = _nkEl(st.run, 'div', 'eg-nk-gust-blade');
-    el.classList.add('eg-gust-blade-tell');
+    const el = _nkEl(st.run, 'div', 'sx-nk-gust-blade');
+    el.classList.add('sx-gust-blade-tell');
     el.style.transform = 'translate(' + Math.round(st.bossX - GUST_BLADE_R) + 'px,' + Math.round(y - GUST_BLADE_R) + 'px)';
     st.blades.push({
         x: st.bossX, y, vx: -GUST_BLADE_SPEED,
@@ -551,7 +551,7 @@ export function _gustFireVolley(monsterId, stage, level, bossX, bossY) {
     _nkToast('eg_mech_gust_tornado', label);
 
     const mk = (x, y) => {
-        const el = _nkEl(run, 'div', 'eg-nk-gust-tornado');
+        const el = _nkEl(run, 'div', 'sx-nk-gust-tornado');
         // Seven stacked swirl rings trace the funnel silhouette (styled in CSS).
         for (let i = 0; i < 7; i++) el.appendChild(document.createElement('i'));
         el.style.transform = 'translate(' + Math.round(x - GUST_TORNADO_W / 2) + 'px,' +
@@ -582,9 +582,9 @@ export function _gustFireVolley(monsterId, stage, level, bossX, bossY) {
         // Edge warning line first: 1.6 s of pulsing telegraph, then the
         // tornado. The direction class drives animated stripes that show
         // which way the funnel will sweep.
-        const dirCls = s.fromTop ? ' eg-gust-warn-down'
-            : (s.vx < 0 ? ' eg-gust-warn-left' : ' eg-gust-warn-right');
-        warnEl = _nkEl(run, 'div', 'eg-gust-warn' + (s.fromTop ? ' eg-gust-warn-v' : ' eg-gust-warn-h') + dirCls);
+        const dirCls = s.fromTop ? ' sx-gust-warn-down'
+            : (s.vx < 0 ? ' sx-gust-warn-left' : ' sx-gust-warn-right');
+        warnEl = _nkEl(run, 'div', 'sx-gust-warn' + (s.fromTop ? ' sx-gust-warn-v' : ' sx-gust-warn-h') + dirCls);
         // The warning band covers the tornado's full danger column, centered
         // on the entry point - the telegraph is as tall as the threat.
         if (s.fromTop) warnEl.style.left = Math.round(x - GUST_TORNADO_W / 2) + 'px';
@@ -597,8 +597,8 @@ export function _gustFireVolley(monsterId, stage, level, bossX, bossY) {
             active.vx = s.vx;
             active.vy = s.vy;
             // The funnel's arrival shakes the arena - this is a set-piece.
-            document.body.classList.add('eg-screen-shake');
-            setTimeout(() => document.body.classList.remove('eg-screen-shake'), 550);
+            document.body.classList.add('sx-screen-shake');
+            setTimeout(() => document.body.classList.remove('sx-screen-shake'), 550);
         }, GUST_TORNADO_WARN_MS);
     };
     spawnStep(0);
@@ -694,7 +694,7 @@ export function _gustDaggerLaunch(st) {
         if (typeof _removeCellCorruption !== 'function') continue;
         try { _removeCellCorruption(key); } catch (e) { continue; }
 
-        const el = _nkEl(st.run, 'div', 'eg-gust-dagger', '🗡️');
+        const el = _nkEl(st.run, 'div', 'sx-gust-dagger', '🗡️');
         if (side === -1) el.classList.add('left'); // mirrored trail
         el.style.transform = 'translate(' + Math.round(cr.left + cr.width / 2 - GUST_DAGGER_R) + 'px,' +
             Math.round(cr.top + cr.height / 2 - GUST_DAGGER_R) + 'px) rotate(' + (side === 1 ? 45 : -135) + 'deg)';
@@ -745,8 +745,8 @@ export function _gustDaggerFly(st, dtS, now, lvl) {
 // where the run map was cleared first.
 export function _gustTeardown() {
     try { _gustSetChargePause(false); } catch (e) { _gustWindPause = false; }
-    document.body.classList.remove('eg-gust-wind-from-left', 'eg-gust-wind-from-right',
-        'eg-gust-spike-hot-l', 'eg-gust-spike-hot-r');
+    document.body.classList.remove('sx-gust-wind-from-left', 'sx-gust-wind-from-right',
+        'sx-gust-spike-hot-l', 'sx-gust-spike-hot-r');
     // Shadow daggers are run-owned elements; _nkKillRun removes them with
     // the run. Clear the JS state so nothing keeps flying between fights.
     if (_gustArena) { _gustArena.daggers = []; }

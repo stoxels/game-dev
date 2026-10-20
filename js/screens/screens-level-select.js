@@ -515,9 +515,9 @@ function buildEndgameHubCard(w, wi, tip) {
     hubCard.className = 'level-card endgame-hub-card' + (isHubUnlocked ? '' : ' locked');
 
     hubCard.innerHTML = `
-        <div class="eg-hub-card-icon">🌌</div>
-        <div class="eg-hub-card-title">${t('scr_nexus_of_worlds')}</div>
-        <div class="eg-hub-card-sub">ENDGAME</div>
+        <div class="sx-hub-card-icon">🌌</div>
+        <div class="sx-hub-card-title">${t('scr_nexus_of_worlds')}</div>
+        <div class="sx-hub-card-sub">ENDGAME</div>
     `;
 
     // Tooltip and Routing events

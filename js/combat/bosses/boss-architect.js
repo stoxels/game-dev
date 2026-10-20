@@ -72,7 +72,7 @@ export function _mechRisingPlats(monster, phase) {
     const plats = [];
     const spawnPlat = () => {
         const spot = _architectNewSpot(plats.filter(q => q.state === 'safe'), PW, PH);
-        const el = _nkEl(run, 'div', 'eg-nk-plat');
+        const el = _nkEl(run, 'div', 'sx-nk-plat');
         el.style.left = Math.round(spot.x) + 'px';
         el.style.top = Math.round(spot.y) + 'px';
         el.style.width = PW + 'px';
@@ -94,7 +94,7 @@ export function _mechRisingPlats(monster, phase) {
                 const victim = safe[Math.floor(Math.random() * safe.length)];
                 victim.state = 'sinking';
                 victim.t = 0;
-                victim.el.classList.add('eg-nk-plat-sink');
+                victim.el.classList.add('sx-nk-plat-sink');
             }
         }
         // Advance sinking platforms, spawn replacements.

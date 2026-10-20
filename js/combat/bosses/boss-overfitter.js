@@ -170,7 +170,7 @@ export function _mechOvrGradient(monster, phase) {
             if (stepIdx === 0 || stepTimer >= cadence) {
                 stepTimer = 0;
                 const x = -60 + stepIdx * ((W + 120) / OVR_STEPS) + (OVR_BAND_W / 2);
-                const el = _nkEl(run, 'div', 'eg-ovr-band');
+                const el = _nkEl(run, 'div', 'sx-ovr-band');
                 el.style.left = Math.round(x - OVR_BAND_W / 2) + 'px';
                 el.style.top = '0px';
                 el.style.width = OVR_BAND_W + 'px';
@@ -188,7 +188,7 @@ export function _mechOvrGradient(monster, phase) {
         // Bands: telegraph → hot → fade.
         for (const b of bands) {
             if (b.el) {
-                if (!b.hot && now >= b.hotAt) { b.hot = true; b.el.classList.add('eg-ovr-band-hot'); }
+                if (!b.hot && now >= b.hotAt) { b.hot = true; b.el.classList.add('sx-ovr-band-hot'); }
                 if (now >= b.dieAt) { try { b.el.remove(); } catch (e) {} b.el = null; }
                 else pending = true;
             }
@@ -203,7 +203,7 @@ export function _mechOvrGradient(monster, phase) {
         if (stage === 'min-warn' || stage === 'min-boom') {
             pending = true;
             if (!minEl) {
-                minEl = _nkEl(run, 'div', 'eg-ovr-min-ring');
+                minEl = _nkEl(run, 'div', 'sx-ovr-min-ring');
                 minEl.style.left = Math.round(minPos.x - minR) + 'px';
                 minEl.style.top = Math.round(minPos.y - minR) + 'px';
                 minEl.style.width = (minR * 2) + 'px';
@@ -211,7 +211,7 @@ export function _mechOvrGradient(monster, phase) {
             }
             if (stage === 'min-warn' && now >= minBoomAt) {
                 stage = 'min-boom';
-                minEl.classList.add('eg-ovr-min-boom');
+                minEl.classList.add('sx-ovr-min-boom');
                 if (pr && _nkCircleHit(minPos.x, minPos.y, minR, pr, 0)) {
                     const dealt = _nkHit(OVR_MIN_DMG[p], 'shadow', level);
                     _nkAbilityHitToast(dealt, 'The Overfitter', 'Local Minimum');
@@ -327,7 +327,7 @@ export function _mechOvrPatternLock(monster, phase) {
             while (recT >= nextSample) {
                 nextSample += sampleMs;
                 const c = _ovrPC();
-                const el = _nkEl(run, 'div', 'eg-ovr-trail-dot');
+                const el = _nkEl(run, 'div', 'sx-ovr-trail-dot');
                 el.style.left = Math.round(c.x - 7) + 'px';
                 el.style.top = Math.round(c.y - 7) + 'px';
                 path.push({ x: c.x, y: c.y, el });
@@ -342,7 +342,7 @@ export function _mechOvrPatternLock(monster, phase) {
                     if (i > 0) acc += Math.hypot(path[i].x - path[i - 1].x, path[i].y - path[i - 1].y);
                     prefix.push(acc);
                 }
-                dart = _nkEl(run, 'div', 'eg-nk-dot eg-ovr-dart', '📈');
+                dart = _nkEl(run, 'div', 'sx-nk-dot sx-ovr-dart', '📈');
                 dist = 0;
                 _nkToast('eg_mech_ovr_replay', '🧠 REPLAY! It fires along the path YOU walked - move unlike yourself!', '#f97316');
             }
@@ -368,7 +368,7 @@ export function _mechOvrPatternLock(monster, phase) {
                 try { path[i].el.remove(); } catch (e) {}
                 path[i].el = null;
                 const isFinal = i === path.length - 1;
-                const boom = _nkEl(run, 'div', 'eg-ovr-echo' + (isFinal ? ' eg-ovr-echo-final' : ''));
+                const boom = _nkEl(run, 'div', 'sx-ovr-echo' + (isFinal ? ' sx-ovr-echo-final' : ''));
                 boom.style.left = Math.round(path[i].x - (isFinal ? 46 : OVR_ECHO_R)) + 'px';
                 boom.style.top = Math.round(path[i].y - (isFinal ? 46 : OVR_ECHO_R)) + 'px';
                 boom.style.width = (isFinal ? 92 : OVR_ECHO_R * 2) + 'px';
@@ -444,7 +444,7 @@ export function _mechOvrValidation(monster, phase) {
     }
 
     const ringEls = [a, b].map(c => {
-        const el = _nkEl(run, 'div', 'eg-ovr-val-ring');
+        const el = _nkEl(run, 'div', 'sx-ovr-val-ring');
         el.style.left = Math.round(c.x - r) + 'px';
         el.style.top = Math.round(c.y - r) + 'px';
         el.style.width = (r * 2) + 'px';
@@ -464,16 +464,16 @@ export function _mechOvrValidation(monster, phase) {
         const pr = _nkPlayerRect();
         if (Math.min(d1, d2) > OVR_VAL_CLEAR || Math.abs(d1 - d2) < OVR_VAL_TIE) {
             // Underfit - the model cannot decide. Both rings dissipate.
-            ringEls.forEach(el => el.classList.add('eg-ovr-val-fizzle'));
+            ringEls.forEach(el => el.classList.add('sx-ovr-val-fizzle'));
             _nkToast('eg_mech_ovr_underfit', '🌫️ Underfit - the model cannot decide. Nothing detonates!', '#93c5fd');
         } else {
             const nearFirst = d1 < d2;
             const hitRing = nearFirst ? a : b;
             const hitEl = nearFirst ? ringEls[0] : ringEls[1];
             const missEl = nearFirst ? ringEls[1] : ringEls[0];
-            hitEl.classList.add('eg-ovr-val-boom');
-            missEl.classList.add('eg-ovr-val-fizzle');
-            const boomEl = _nkEl(run, 'div', 'eg-ovr-val-burst');
+            hitEl.classList.add('sx-ovr-val-boom');
+            missEl.classList.add('sx-ovr-val-fizzle');
+            const boomEl = _nkEl(run, 'div', 'sx-ovr-val-burst');
             boomEl.style.left = Math.round(hitRing.x - r) + 'px';
             boomEl.style.top = Math.round(hitRing.y - r) + 'px';
             boomEl.style.width = (r * 2) + 'px';
@@ -585,9 +585,9 @@ export function _ovrFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -596,10 +596,10 @@ export function _ovrFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-ovr-cd';
+    ov.className = 'sx-ovr-cd';
     ov.innerHTML =
-        '<div class="eg-ovr-cd-label">📈 THE FINAL EPOCH</div>' +
-        '<div class="eg-ovr-cd-hint">The model memorized your every step - the heat-map is YOUR data. Hot cells detonate, cool cells are safe, and it RE-RECORDS between waves. New ground is safe ground!</div>';
+        '<div class="sx-ovr-cd-label">📈 THE FINAL EPOCH</div>' +
+        '<div class="sx-ovr-cd-hint">The model memorized your every step - the heat-map is YOUR data. Hot cells detonate, cool cells are safe, and it RE-RECORDS between waves. New ground is safe ground!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -609,11 +609,11 @@ export function _ovrFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss card wears the trained-model glow while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-ovr-allin');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-ovr-allin');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
@@ -628,7 +628,7 @@ export function _ovrFinalStart(monster) {
             let cell = g.cells[i];
             if (!cell) {
                 const el = document.createElement('div');
-                el.className = 'eg-ovr-heatcell';
+                el.className = 'sx-ovr-heatcell';
                 el.style.left = Math.round(cx * cw) + 'px';
                 el.style.top = Math.round(cy * ch) + 'px';
                 el.style.width = Math.ceil(cw) + 'px';
@@ -637,7 +637,7 @@ export function _ovrFinalStart(monster) {
                 g.cells[i] = cell = { x: cx * cw, y: cy * ch, w: cw, h: ch, el };
             }
             const lvl = n === 0 ? 0 : n < maxC * 0.33 ? 1 : n < maxC * 0.66 ? 2 : 3;
-            cell.el.className = 'eg-ovr-heatcell eg-ovr-heat-' + lvl;
+            cell.el.className = 'sx-ovr-heatcell sx-ovr-heat-' + lvl;
             cell.el.textContent = n > 0 ? String(n) : '';
         });
     };
@@ -674,7 +674,7 @@ export function _ovrFinalStart(monster) {
         }
 
         _nkToast('eg_mech_ovr_wave', '📈 EPOCH ' + wave + '/' + OVR_WAVES + ' - ' + hot.length + ' hot cells re-train! Stand on NEW ground!', '#f97316');
-        hot.forEach(i => { try { g.cells[i].el.classList.add('eg-ovr-hot'); } catch (e) {} });
+        hot.forEach(i => { try { g.cells[i].el.classList.add('sx-ovr-hot'); } catch (e) {} });
 
         _ovrAfter(g, OVR_FUSE_MS * _OVR_DEBUG_MULT, () => {
             if (g.finished) return;
@@ -683,10 +683,10 @@ export function _ovrFinalStart(monster) {
             hot.forEach(i => {
                 const cell = g.cells[i];
                 if (!cell) return;
-                cell.el.classList.add('eg-ovr-boom');
+                cell.el.classList.add('sx-ovr-boom');
                 const el = cell.el;
                 setTimeout(() => {
-                    try { el.classList.remove('eg-ovr-hot', 'eg-ovr-boom'); } catch (e) {}
+                    try { el.classList.remove('sx-ovr-hot', 'sx-ovr-boom'); } catch (e) {}
                 }, 700);
                 if (!caught && pc.x >= cell.x && pc.x <= cell.x + cell.w && pc.y >= cell.y && pc.y <= cell.y + cell.h) caught = true;
             });
@@ -711,18 +711,18 @@ export function _ovrFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.eg-ovr-cd, .eg-ovr-heatcell').forEach(el => {
+    document.querySelectorAll('.sx-ovr-cd, .sx-ovr-heatcell').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.remove('eg-ovr-allin');
-        wrap.classList.remove('eg-nk-shielded');
+        wrap.classList.remove('sx-ovr-allin');
+        wrap.classList.remove('sx-nk-shielded');
     }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -742,14 +742,14 @@ export function _ovrTeardown() {
     _ovrHistory = [];
     _ovrRecRun = null;
     _ovrWatcherRun = null;
-    document.querySelectorAll('.eg-ovr-band, .eg-ovr-min-ring, .eg-ovr-trail-dot, .eg-ovr-dart, ' +
-        '.eg-ovr-echo, .eg-ovr-val-ring, .eg-ovr-val-burst, .eg-ovr-heatcell, .eg-ovr-cd').forEach(el => {
+    document.querySelectorAll('.sx-ovr-band, .sx-ovr-min-ring, .sx-ovr-trail-dot, .sx-ovr-dart, ' +
+        '.sx-ovr-echo, .sx-ovr-val-ring, .sx-ovr-val-burst, .sx-ovr-heatcell, .sx-ovr-cd').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-ovr-allin').forEach(el => el.classList.remove('eg-ovr-allin'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.querySelectorAll('.sx-ovr-allin').forEach(el => el.classList.remove('sx-ovr-allin'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

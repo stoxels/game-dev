@@ -195,12 +195,12 @@ function _getLowTimeWarningTier(secs) {
 // only then shows the newest one.
 export function _clearCenterGridBanners(exceptId) {
     var ids = [
-        'eg-low-time-warning-banner',
-        'eg-mistakes-warning-banner',
-        'eg-low-health-warning-banner',
-        'eg-absorption-broken-banner',
-        'eg-clock-call-banner',
-        'eg-boss-arena-available-banner',
+        'sx-low-time-warning-banner',
+        'sx-mistakes-warning-banner',
+        'sx-low-health-warning-banner',
+        'sx-absorption-broken-banner',
+        'sx-clock-call-banner',
+        'sx-boss-arena-available-banner',
         'eg-map-cleared-banner'
     ];
     for (var i = 0; i < ids.length; i++) {
@@ -211,13 +211,13 @@ export function _clearCenterGridBanners(exceptId) {
 }
 
 function _showLowTimeWarningBanner(tier) {
-    if (typeof _clearCenterGridBanners === 'function') _clearCenterGridBanners('eg-low-time-warning-banner');
-    const old = document.getElementById('eg-low-time-warning-banner');
+    if (typeof _clearCenterGridBanners === 'function') _clearCenterGridBanners('sx-low-time-warning-banner');
+    const old = document.getElementById('sx-low-time-warning-banner');
     if (old) old.remove();
 
     const el = document.createElement('div');
-    el.id = 'eg-low-time-warning-banner';
-    el.className = `eg-lt-${tier}`;
+    el.id = 'sx-low-time-warning-banner';
+    el.className = `sx-lt-${tier}`;
 
     const key = `eg_low_time_warning_${tier}`;
     const raw = (typeof t === 'function') ? t(key) : '';
@@ -279,7 +279,7 @@ function _maybeShowLowTimeWarning() {
 export function _resetLowTimeWarningState() {
     _lowTimeWarningShown = { 300: false, 120: false, 30: false };
     _lowTimeLastSecs = null;
-    const banner = document.getElementById('eg-low-time-warning-banner');
+    const banner = document.getElementById('sx-low-time-warning-banner');
     if (banner) banner.remove();
 }
 

@@ -133,7 +133,7 @@ export function _meleeReachPx() {
 // (tests, teardown) - callers treat that as "cannot tell" and fail open.
 function _meleeEdgeDistance(targetId) {
     try {
-        const card = document.getElementById(`eg-card-${targetId}`);
+        const card = document.getElementById(`sx-card-${targetId}`);
         const avatar = document.getElementById('player-avatar-wrapper')
             || document.getElementById('player-avatar-simple');
         if (!card || !avatar) return null;
@@ -197,7 +197,7 @@ export function _meleeFindVictim(preferredId) {
 // Live "who will my sword hit" marker. The yellow target border belongs to
 // reveal shots and spells; when a melee swing would land on a DIFFERENT
 // monster (the selected one is out of reach, another stands next to the
-// hero) that monster's card gets .eg-card-melee-target. Called every combat
+// hero) that monster's card gets .sx-card-melee-target. Called every combat
 // tick; only touches the DOM when the marked card actually changes.
 export function _updateMeleeMarker() {
     let victim = null;
@@ -209,11 +209,11 @@ export function _updateMeleeMarker() {
             if (v != null && v !== selected) victim = v;
         }
     } catch (e) { victim = null; }
-    const marked = document.querySelectorAll('.eg-card-melee-target');
-    const wanted = victim != null ? document.getElementById(`eg-card-${victim}`) : null;
+    const marked = document.querySelectorAll('.sx-card-melee-target');
+    const wanted = victim != null ? document.getElementById(`sx-card-${victim}`) : null;
     if (marked.length === (wanted ? 1 : 0) && (!wanted || marked[0] === wanted)) return;
-    marked.forEach(el => el.classList.remove('eg-card-melee-target'));
-    if (wanted) wanted.classList.add('eg-card-melee-target');
+    marked.forEach(el => el.classList.remove('sx-card-melee-target'));
+    if (wanted) wanted.classList.add('sx-card-melee-target');
 }
 
 // Which way the swing should face: toward the monster being struck (or the
@@ -222,7 +222,7 @@ export function _updateMeleeMarker() {
 export function _meleeAimFacing(targetId) {
     try {
         if (targetId != null) {
-            const card = document.getElementById(`eg-card-${targetId}`);
+            const card = document.getElementById(`sx-card-${targetId}`);
             const avatar = document.getElementById('player-avatar-wrapper')
                 || document.getElementById('player-avatar-simple');
             if (card && avatar && typeof _getElementCentre === 'function') {

@@ -289,10 +289,10 @@ export function _sellStashItem(row, col) {
         : _rollShardForItem(item);
     if (!addShard(shardDef.id, 1)) {
         // Could not grant the shard (runes & orbs strip full) - keep the item.
-        const grid = document.getElementById('eg-inv-grid');
+        const grid = document.getElementById('sx-inv-grid');
         if (grid) {
-            grid.classList.add('eg-slot-reject');
-            setTimeout(() => grid.classList.remove('eg-slot-reject'), 600);
+            grid.classList.add('sx-slot-reject');
+            setTimeout(() => grid.classList.remove('sx-slot-reject'), 600);
         }
         return false;
     }
@@ -323,8 +323,8 @@ export function _sellMapItem(map, sourceEl) {
     if (!addShard(shardDef.id, 1)) {
         // Could not grant the fragment (runes & orbs strip full) - keep the map.
         if (sourceEl) {
-            sourceEl.classList.add('eg-slot-reject');
-            setTimeout(() => sourceEl.classList.remove('eg-slot-reject'), 600);
+            sourceEl.classList.add('sx-slot-reject');
+            setTimeout(() => sourceEl.classList.remove('sx-slot-reject'), 600);
         }
         return false;
     }
@@ -386,7 +386,7 @@ export function _sellDeviceMap() {
 document.addEventListener('mousedown', function (e) {
     if (!e.ctrlKey || e.button !== 0) return;
 
-    const chip = e.target.closest('.eg-item-chip');
+    const chip = e.target.closest('.sx-item-chip');
     const onManagedScreen = !!chip && (typeof _dndChipScreenEl === 'function'
         ? !!_dndChipScreenEl(chip)
         : !!chip.closest('#screen-endgame-hub'));
@@ -396,7 +396,7 @@ document.addEventListener('mousedown', function (e) {
     // belongs to applying the orb.
     if (typeof _pendingCurrencyUse !== 'undefined' && _pendingCurrencyUse) return;
 
-    const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell)');
+    const invCell = chip.closest('.sx-inv-cell:not(.sx-currency-cell):not(.eg-map-stash-cell)');
     const mapStashCell = chip.closest('.eg-map-stash-cell');
     const mapSlotEl = chip.closest('#eg-map-slot');
     if (!invCell && !mapStashCell && !mapSlotEl) return;

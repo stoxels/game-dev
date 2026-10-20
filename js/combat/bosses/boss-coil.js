@@ -81,7 +81,7 @@ export let _coilCobraActive = false; // a cobra strike set-piece is running
 export function _coilSweep() {
     _coilCobraActive = false;
     try {
-        document.querySelectorAll('.eg-coil-maw, .eg-coil-snake, .eg-coil-trail, .eg-coil-ring, .eg-coil-tideband, .eg-coil-charger, .eg-coil-cobra, .eg-coil-cobralash').forEach(el => el.remove());
+        document.querySelectorAll('.sx-coil-maw, .sx-coil-snake, .sx-coil-trail, .sx-coil-ring, .sx-coil-tideband, .sx-coil-charger, .sx-coil-cobra, .sx-coil-cobralash').forEach(el => el.remove());
     } catch (e) {}
 }
 
@@ -123,16 +123,16 @@ export function _coilArenaInit(monster) {
 
     // The coiled maw: a spiral of coils with a glaring head, slithering
     // around the arena and picking fresh drift targets.
-    const mawEl = _nkEl(run, 'div', 'eg-coil-maw');
+    const mawEl = _nkEl(run, 'div', 'sx-coil-maw');
     for (let i = 0; i < 6; i++) {
         const coil = document.createElement('div');
-        coil.className = 'eg-coil-loop';
+        coil.className = 'sx-coil-loop';
         coil.textContent = '🐍';
         coil.style.setProperty('--i', String(i));
         mawEl.appendChild(coil);
     }
     const head = document.createElement('div');
-    head.className = 'eg-coil-head';
+    head.className = 'sx-coil-head';
     head.textContent = '🐍';
     mawEl.appendChild(head);
     const W0 = window.innerWidth, H0 = window.innerHeight;
@@ -207,7 +207,7 @@ export function _coilArenaInit(monster) {
                 s.trailAcc = (s.trailAcc || 0) + dtS * 1000;
                 if (s.trailAcc >= 260) {
                     s.trailAcc = 0;
-                    const tr = _nkEl(st.run, 'div', 'eg-coil-trail');
+                    const tr = _nkEl(st.run, 'div', 'sx-coil-trail');
                     tr.style.left = Math.round(s.x) + 'px';
                     tr.style.top = Math.round(s.y) + 'px';
                     st.trails.push({ x: s.x, y: s.y, t: 0, el: tr });
@@ -257,7 +257,7 @@ export function _coilArenaInit(monster) {
             // Spawn the next ring when its slot comes up.
             const due = cn.spawned * (COIL_CON_WARN_MS + COIL_CON_GAP_MS);
             if (cn.spawned < cn.total && cn.t >= due) {
-                const ring = _nkEl(st.run, 'div', 'eg-coil-ring');
+                const ring = _nkEl(st.run, 'div', 'sx-coil-ring');
                 ring.style.width = ring.style.height = (cn.r0 * 2) + 'px';
                 ring.style.left = (cn.cx - cn.r0) + 'px';
                 ring.style.top = (cn.cy - cn.r0) + 'px';
@@ -294,7 +294,7 @@ export function _coilArenaInit(monster) {
                 td.t = 0;
                 try { td.bandEl.classList.add('hot'); } catch (e) {}
                 for (let i = 0; i < td.n; i++) {
-                    const el = _nkEl(st.run, 'div', 'eg-coil-charger', '🐍');
+                    const el = _nkEl(st.run, 'div', 'sx-coil-charger', '🐍');
                     const spread = (i / Math.max(1, td.n - 1) - 0.5) * 240;
                     const ch = {
                         x: td.fx, y: td.fy + spread,
@@ -331,7 +331,7 @@ export function _coilArenaInit(monster) {
                         const c2 = _nkPlayerCenter();
                         td.fy = c2 ? Math.max(90, Math.min(window.innerHeight - 90, c2.y))
                                    : 80 + Math.random() * Math.max(60, window.innerHeight - 220);
-                        const band = _nkEl(st.run, 'div', 'eg-coil-tideband');
+                        const band = _nkEl(st.run, 'div', 'sx-coil-tideband');
                         band.style.top = Math.round(td.fy - 70) + 'px';
                         band.style.height = '140px';
                         if (td.dirX === -1) band.classList.add('flip');
@@ -361,7 +361,7 @@ export function _coilPickMawSpot(mw) {
 
 
 export function _coilSpawnSnake(st) {
-    const el = _nkEl(st.run, 'div', 'eg-coil-snake', '🐍');
+    const el = _nkEl(st.run, 'div', 'sx-coil-snake', '🐍');
     // Emerge from the maw.
     const s = {
         x: st.maw.x, y: st.maw.y,
@@ -397,7 +397,7 @@ export function _coilTide(st, p) {
     const c = _nkPlayerCenter();
     const fy = c ? Math.max(90, Math.min(window.innerHeight - 90, c.y))
                  : 80 + Math.random() * Math.max(60, window.innerHeight - 220);
-    const band = _nkEl(st.run, 'div', 'eg-coil-tideband');
+    const band = _nkEl(st.run, 'div', 'sx-coil-tideband');
     band.style.top = Math.round(fy - 70) + 'px';
     band.style.height = '140px';
     if (dirX === -1) band.classList.add('flip');
@@ -428,7 +428,7 @@ export function _coilCobraStrike(monster) {
     const c = _nkPlayerCenter();
     const cy = c ? c.y : window.innerHeight / 2;
     const fromLeft = Math.random() < 0.5;
-    const lane = _nkEl(run, 'div', 'eg-coil-cobra' + (fromLeft ? '' : ' flip'));
+    const lane = _nkEl(run, 'div', 'sx-coil-cobra' + (fromLeft ? '' : ' flip'));
     lane.style.top = Math.round(cy - COIL_COBRA_H / 2) + 'px';
     lane.style.height = COIL_COBRA_H + 'px';
     _nkToast('eg_coil_cobra', '🐍 COBRA STRIKE! Get out of its lane!');

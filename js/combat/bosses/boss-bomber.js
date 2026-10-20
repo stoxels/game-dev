@@ -21,12 +21,12 @@ export const _BOMBER_DEBUG_MULT = _BOMBER_DEBUG_SLOW ? 2.5 : 1;
 // is flipped off for ship.
 if (typeof document !== 'undefined' && _BOMBER_DEBUG_SLOW) {
     const dbgStyle = document.createElement('style');
-    dbgStyle.id = 'eg-bmb-debug-slow-style';
+    dbgStyle.id = 'sx-bmb-debug-slow-style';
     dbgStyle.textContent =
-        '.eg-bmb-core{animation-duration:2.4s !important}' +
-        '.eg-bmb-ring{animation-duration:2.7s !important}' +
-        '.eg-bmb-spark{animation-duration:2.5s !important}' +
-        '.eg-bmb-shellburst{animation-duration:2.2s !important}';
+        '.sx-bmb-core{animation-duration:2.4s !important}' +
+        '.sx-bmb-ring{animation-duration:2.7s !important}' +
+        '.sx-bmb-spark{animation-duration:2.5s !important}' +
+        '.sx-bmb-shellburst{animation-duration:2.2s !important}';
     document.head.appendChild(dbgStyle);
 }
 
@@ -91,11 +91,11 @@ export function _bomberFinalActive() {
 // Applies the flying presentation: gentle idle bob on the card, a big soft
 // glow, and a ⚠ target pip under the card that tracks it every frame.
 export function _bomberApplyFlightStyle(monster) {
-    const card = document.getElementById('eg-card-' + monster.id);
+    const card = document.getElementById('sx-card-' + monster.id);
     if (!card) return;
-    card.classList.add('eg-bmb-flying');
+    card.classList.add('sx-bmb-flying');
     const pip = document.createElement('div');
-    pip.className = 'eg-bmb-targetpip';
+    pip.className = 'sx-bmb-targetpip';
     pip.textContent = '⚠';
     document.body.appendChild(pip);
     monster.egBmbPipEl = pip;
@@ -125,12 +125,12 @@ export function _bomberOnInit(monster) {
 // Enforces the live-mine cap by fizzling the oldest mine first.
 export function _bmbPlantMine(run, x, y, r, level, label, dmgPct, phase) {
     if (_bmbMines.length >= BMB_MAX_LIVE_MINES) _bmbFizzleMine(_bmbMines[0]);
-    const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-bomb eg-bmb-mine', '💣');
+    const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-bomb sx-bmb-mine', '💣');
     el.style.width = '46px';
     el.style.height = '46px';
     el.style.fontSize = '1.7rem';
     el.style.transform = 'translate(' + Math.round(x - 23) + 'px,' + Math.round(y - 23) + 'px)';
-    const ring = _nkEl(run, 'div', 'eg-bmb-minering');
+    const ring = _nkEl(run, 'div', 'sx-bmb-minering');
     ring.style.width = (r * 2) + 'px';
     ring.style.height = (r * 2) + 'px';
     ring.style.left = Math.round(x - r) + 'px';
@@ -146,7 +146,7 @@ export function _bmbDetonateMine(run, mine, hitPlayer) {
     if (!mine || mine.exploded) return;
     mine.exploded = true;
     if (mine.ring) { try { mine.ring.remove(); } catch (e) {} mine.ring = null; }
-    if (mine.el) { try { mine.el.classList.add('eg-nk-boom'); } catch (e) {} }
+    if (mine.el) { try { mine.el.classList.add('sx-nk-boom'); } catch (e) {} }
     _bmbBoom(run, mine.x, mine.y, mine.r, hitPlayer ? mine.dmgPct : 0, mine.level, mine.label);
     const idx = _bmbMines.indexOf(mine);
     if (idx !== -1) _bmbMines.splice(idx, 1);
@@ -205,7 +205,7 @@ export function _bmbMineWatch(run, hitCooldown) {
 export function _bmbBoom(run, x, y, radius, pct, level, label) {
     const R = Math.max(10, radius);
     const layer = document.createElement('div');
-    layer.className = 'eg-bmb-burst';
+    layer.className = 'sx-bmb-burst';
     document.body.appendChild(layer);
     layer.style.left = Math.round(x - R) + 'px';
     layer.style.top = Math.round(y - R) + 'px';
@@ -213,14 +213,14 @@ export function _bmbBoom(run, x, y, radius, pct, level, label) {
     layer.style.height = (R * 2) + 'px';
 
     const core = document.createElement('div');
-    core.className = 'eg-bmb-core';
+    core.className = 'sx-bmb-core';
     layer.appendChild(core);
     const ring = document.createElement('div');
-    ring.className = 'eg-bmb-ring';
+    ring.className = 'sx-bmb-ring';
     layer.appendChild(ring);
     for (let i = 0; i < 7; i++) {
         const s = document.createElement('div');
-        s.className = 'eg-bmb-spark';
+        s.className = 'sx-bmb-spark';
         const ang = Math.random() * Math.PI * 2;
         const dist = (R * 0.35) + Math.random() * (R * 0.85);
         s.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
@@ -246,9 +246,9 @@ export function _bmbTeardown() {
     _bmbClearMines();
     if (_bmbMineKeeper) { try { _bmbMineKeeper(); } catch (e) {} _bmbMineKeeper = null; }
     if (_bomberFinal) _bomberFinalEnd(_bomberFinal);
-    document.querySelectorAll('.eg-bmb-flying').forEach(el => el.classList.remove('eg-bmb-flying'));
-    document.querySelectorAll('.eg-bmb-targetpip').forEach(el => el.remove());
-    document.body.classList.remove('eg-bmb-flash');
+    document.querySelectorAll('.sx-bmb-flying').forEach(el => el.classList.remove('sx-bmb-flying'));
+    document.querySelectorAll('.sx-bmb-targetpip').forEach(el => el.remove());
+    document.body.classList.remove('sx-bmb-flash');
 }
 
 
@@ -329,7 +329,7 @@ export function _mechMineCollar(monster, phase) {
     const anchor = _bmbGridCenter();
     const orbits = [];
     for (let i = 0; i < count; i++) {
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-bomb eg-bmb-orbit', '💣');
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-bomb sx-bmb-orbit', '💣');
         el.style.width = '42px';
         el.style.height = '42px';
         el.style.fontSize = '1.5rem';
@@ -417,7 +417,7 @@ export function _mechCarpetRun(monster, phase) {
     const bombCount = Math.max(3, Math.floor(len / spacing));
 
     // Lane highlight - the carpeted band.
-    const lane = _nkEl(run, 'div', 'eg-bmb-lane');
+    const lane = _nkEl(run, 'div', 'sx-bmb-lane');
     if (horizontal) {
         lane.style.left = Math.round(path.x0) + 'px';
         lane.style.width = Math.round(path.x1 - path.x0) + 'px';
@@ -431,7 +431,7 @@ export function _mechCarpetRun(monster, phase) {
     }
 
     // The plane sprite banks along the path (translate-driven, fixed rule).
-    const plane = _nkEl(run, 'div', 'eg-nk-dot eg-bmb-plane', '🛩️');
+    const plane = _nkEl(run, 'div', 'sx-nk-dot sx-bmb-plane', '🛩️');
     plane.style.fontSize = '2.6rem';
 
     _nkToast('eg_mech_bomber_carpet', '💣 The Bomber: CARPET RUN - get out of the lane!', '#fb923c');
@@ -470,7 +470,7 @@ export function _mechCarpetRun(monster, phase) {
             if (t >= mine.fuseAt) {
                 _bmbDetonateMine(run, mine, true);
             } else if (mine.el && t >= mine.fuseAt - 450) {
-                mine.el.classList.add('eg-nk-fuse');
+                mine.el.classList.add('sx-nk-fuse');
             }
         }
 
@@ -528,7 +528,7 @@ export function _mechClusterShells(monster, phase) {
             fired.add(i);
             burstCount++;
             // Impact streak flash, then the bomblet scatter.
-            const streak = _nkEl(run, 'div', 'eg-bmb-shellburst', '☄️');
+            const streak = _nkEl(run, 'div', 'sx-bmb-shellburst', '☄️');
             streak.style.left = Math.round(s.bx) + 'px';
             streak.style.top = Math.round(s.by) + 'px';
             setTimeout(() => { try { streak.remove(); } catch (e) {} }, _BOMBER_DEBUG_SLOW ? 2400 : 800);
@@ -551,7 +551,7 @@ export function _mechClusterShells(monster, phase) {
             if (t >= mine.fuseAt) {
                 _bmbDetonateMine(run, mine, true);
             } else if (mine.el && t >= mine.fuseAt - 450) {
-                mine.el.classList.add('eg-nk-fuse');
+                mine.el.classList.add('sx-nk-fuse');
             }
         }
 
@@ -630,9 +630,9 @@ export function _bomberFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // Safe dome - clamped so at least half of it stays on-screen.
@@ -642,7 +642,7 @@ export function _bomberFinalStart(monster) {
         y: Math.round(Math.max(g.safeR * 0.5, Math.min(window.innerHeight - g.safeR * 0.5, pc.y))),
     };
     const safeEl = document.createElement('div');
-    safeEl.className = 'eg-bmb-safedome';
+    safeEl.className = 'sx-bmb-safedome';
     safeEl.style.width = (g.safeR * 2) + 'px';
     safeEl.style.height = (g.safeR * 2) + 'px';
     safeEl.style.left = Math.round(g.safe.x - g.safeR) + 'px';
@@ -652,11 +652,11 @@ export function _bomberFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-bmb-cd';
+    ov.className = 'sx-bmb-cd';
     ov.innerHTML =
-        '<div class="eg-bmb-cd-label">💣 TOTAL CARPET</div>' +
-        '<div class="eg-bmb-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-bmb-cd-hint">Get inside the SAFE dome - everything else detonates!</div>';
+        '<div class="sx-bmb-cd-label">💣 TOTAL CARPET</div>' +
+        '<div class="sx-bmb-cd-num sx-bmb-cd-pop">' + g.count + '</div>' +
+        '<div class="sx-bmb-cd-hint">Get inside the SAFE dome - everything else detonates!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -664,9 +664,9 @@ export function _bomberFinalStart(monster) {
 
     // Boss immunity + shield dome so the long hold reads at a glance.
     monster.bossImmune = true;
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
-    if (wrap) wrap.classList.add('eg-nk-shielded');
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.add('sx-nk-shielded');
 
     // Debug: extra-long ticks so screenshots can catch the dome + countdown.
     const cdTick = BMB_FINAL_CD_TICK_MS * (_BOMBER_DEBUG_SLOW ? 5 : 1);
@@ -682,12 +682,12 @@ export function _bomberFinalStart(monster) {
             _bomberFinalBang(g, monster);
             return;
         }
-        const num = g.overlay && g.overlay.querySelector('.eg-bmb-cd-num');
+        const num = g.overlay && g.overlay.querySelector('.sx-bmb-cd-num');
         if (num) {
             num.textContent = g.count;
-            num.classList.remove('eg-bmb-cd-pop');
+            num.classList.remove('sx-bmb-cd-pop');
             void num.offsetWidth;
-            num.classList.add('eg-bmb-cd-pop');
+            num.classList.add('sx-bmb-cd-pop');
         }
     }, cdTick);
 }
@@ -739,8 +739,8 @@ export function _bomberFinalBang(g, monster) {
                 const dealt = _nkHit(BMB_FINAL_WAVE_DMG, 'fire', level);
                 _nkAbilityHitToast(dealt, 'The Bomber', 'Total Carpet');
             }
-            document.body.classList.add('eg-bmb-flash');
-            setTimeout(() => document.body.classList.remove('eg-bmb-flash'), 550);
+            document.body.classList.add('sx-bmb-flash');
+            setTimeout(() => document.body.classList.remove('sx-bmb-flash'), 550);
         }
         // Afterglow sweep: a second global test 1.1s later.
         if (g.fired && !g.afterfired && now >= g.waveAt + 1100) {
@@ -749,7 +749,7 @@ export function _bomberFinalBang(g, monster) {
                 const dealt = _nkHit(BMB_FINAL_AFTERTICK_DMG, 'fire', level);
                 _nkAbilityHitToast(dealt, 'The Bomber', 'Total Carpet');
             }
-            if (g.safeEl) g.safeEl.classList.add('eg-bmb-safedome-out');
+            if (g.safeEl) g.safeEl.classList.add('sx-bmb-safedome-out');
             setTimeout(() => _bomberFinalEnd(g), 900);
         }
         return !g.faded && !(g.afterfired && now >= g.waveAt + 2000);
@@ -765,11 +765,11 @@ export function _bomberFinalEnd(g) {
     if (g.overlay) { try { g.overlay.remove(); } catch (e) {} g.overlay = null; }
     if (g.safeEl) { try { g.safeEl.remove(); } catch (e) {} g.safeEl = null; }
     if (g.run) { try { _nkKillRun(g.run); } catch (e) {} g.run = null; }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
-    document.body.classList.remove('eg-bmb-flash');
+    document.body.classList.remove('sx-bmb-flash');
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;

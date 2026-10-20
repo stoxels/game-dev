@@ -40,8 +40,8 @@ const KEYBIND_DEFAULTS = [
     // The attack swings the equipped weapon toward the facing direction
     // with a pure-CSS effect (see js/combat/combat-weapon-swing.js) -
     // no per-character/per-class weapon art needed.
-    { id: 'eg-parry',    label: 'Parry (hold)',  keys: 'r' },
-    { id: 'eg-attack',   label: 'Melee Attack (hold to charge, release to strike)', keys: 'e' },
+    { id: 'sx-parry',    label: 'Parry (hold)',  keys: 'r' },
+    { id: 'sx-attack',   label: 'Melee Attack (hold to charge, release to strike)', keys: 'e' },
 
     // Target cycling (Tab by default).
     { id: 'cycle-target', label: 'Cycle Target', keys: 'tab' },
@@ -50,12 +50,12 @@ const KEYBIND_DEFAULTS = [
     // command key); Ability 2 is The Firefly's fairy-selection cycle; Ability
     // 3 is The Firefly's recall-all. Future endgame bosses re-point these
     // SAME channels at their own mechanics WITHOUT new plumbing: any system
-    // can bind to the 'eg-special-N' action via
-    // onKeybindAction('eg-special-N', …) and the player's chosen key just
+    // can bind to the 'sx-special-N' action via
+    // onKeybindAction('sx-special-N', …) and the player's chosen key just
     // works (conflict-checked like every other binding).
-    { id: 'eg-special',   label: 'Endgame Special Ability 1', keys: 'f' },
-    { id: 'eg-special-2', label: 'Endgame Special Ability 2', keys: 'g' },
-    { id: 'eg-special-3', label: 'Endgame Special Ability 3', keys: 'h' },
+    { id: 'sx-special',   label: 'Endgame Special Ability 1', keys: 'f' },
+    { id: 'sx-special-2', label: 'Endgame Special Ability 2', keys: 'g' },
+    { id: 'sx-special-3', label: 'Endgame Special Ability 3', keys: 'h' },
 
     // Hotbar slots (keys 1-9,0 by default). Each action casts whatever
     // spell the player has dragged onto that slot (see js/skills/).
@@ -126,13 +126,13 @@ function loadKeybinds() {
         }
         // One-time migration (2026-09-11): parry moved from E to R so E
         // could become the weapon-attack key. Players with a saved layout
-        // from before eg-attack existed keep their custom parry key unless
+        // from before sx-attack existed keep their custom parry key unless
         // it is still the old 'e' default - then parry slides to 'r' and
         // the new attack takes 'e'. Fresh profiles just get the defaults.
-        if (saved && typeof saved === 'object' && !('eg-attack' in saved)) {
-            if (KEYBINDS['eg-parry'] === 'e') {
-                KEYBINDS['eg-parry'] = 'r';
-                KEYBINDS['eg-attack'] = 'e';
+        if (saved && typeof saved === 'object' && !('sx-attack' in saved)) {
+            if (KEYBINDS['sx-parry'] === 'e') {
+                KEYBINDS['sx-parry'] = 'r';
+                KEYBINDS['sx-attack'] = 'e';
                 try { saveKeybinds(); } catch { /* storage may be unavailable */ }
             }
         }

@@ -52,7 +52,7 @@ export function _mechSplitterRocks(monster, phase) {
     const level = monster ? monster.level : 1;
     const rocks = [];
     for (let i = 0; i < 3; i++) {
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-rock', '☄️');
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-rock', '☄️');
         const a = Math.random() * Math.PI * 2;
         rocks.push({
             big: true, split: false,
@@ -83,7 +83,7 @@ export function _mechSplitterRocks(monster, phase) {
             if (r.big && !r.split && r.t >= splitMs) {
                 r.split = true;
                 for (let k = 0; k < 2; k++) {
-                    const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-rock-shard', '🪨');
+                    const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-rock-shard', '🪨');
                     const a = Math.random() * Math.PI * 2;
                     rocks.push({
                         big: false, x: r.x, y: r.y,

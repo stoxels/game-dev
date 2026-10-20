@@ -9,16 +9,16 @@ import { _clearCenterGridBanners } from '../timer/timer.js';
 export function _showMistakesWarningBanner(remaining) {
     Audio_Manager.playSFX('mistakes_warning');
     // Dismiss any other center-grid banner so concurrent events don't stack
-    _clearCenterGridBanners('eg-mistakes-warning-banner');
+    _clearCenterGridBanners('sx-mistakes-warning-banner');
     // Remove any stale banner so a rapid 3→2→1 cascade always shows the newest count
-    const old = document.getElementById('eg-mistakes-warning-banner');
+    const old = document.getElementById('sx-mistakes-warning-banner');
     if (old) old.remove();
 
     const el = document.createElement('div');
-    el.id = 'eg-mistakes-warning-banner';
+    el.id = 'sx-mistakes-warning-banner';
     // Severity class drives color + shake for 0 remaining
     const sev = Math.max(0, Math.min(3, remaining));
-    el.className = `eg-mw-${sev}`;
+    el.className = `sx-mw-${sev}`;
 
     // Translation key per threshold - falls back to a plain string if missing
     const key = `eg_mistakes_warning_${sev}`;
@@ -78,7 +78,7 @@ export function _maybeShowMistakesWarning() {
 export function _resetMistakesWarningState() {
     globalThis._lastMistakesWarningShown = null;
     globalThis._lastMistakesRemaining = null;
-    const banner = document.getElementById('eg-mistakes-warning-banner');
+    const banner = document.getElementById('sx-mistakes-warning-banner');
     if (banner) banner.remove();
 }
 
@@ -101,13 +101,13 @@ export function _getLowHealthWarningTier(pct) {
 
 export function _showLowHealthWarningBanner() {
     Audio_Manager.playSFX('low_health_warning');
-    _clearCenterGridBanners('eg-low-health-warning-banner');
-    const old = document.getElementById('eg-low-health-warning-banner');
+    _clearCenterGridBanners('sx-low-health-warning-banner');
+    const old = document.getElementById('sx-low-health-warning-banner');
     if (old) old.remove();
 
     const el = document.createElement('div');
-    el.id = 'eg-low-health-warning-banner';
-    el.className = 'eg-lh-35';
+    el.id = 'sx-low-health-warning-banner';
+    el.className = 'sx-lh-35';
 
     const key = 'eg_low_health_warning_35';
     const raw = (typeof t === 'function') ? t(key) : '';
@@ -159,7 +159,7 @@ export function _maybeShowLowHealthWarning() {
 export function _resetLowHealthWarningState() {
     _lastHealthPct = null;
     _lastLowHealthWarningShown = null;
-    const banner = document.getElementById('eg-low-health-warning-banner');
+    const banner = document.getElementById('sx-low-health-warning-banner');
     if (banner) banner.remove();
 }
 
@@ -171,12 +171,12 @@ export function _resetLowHealthWarningState() {
 
 export function _showAbsorptionBrokenBanner() {
     Audio_Manager.playSFX('absorption_broken');
-    _clearCenterGridBanners('eg-absorption-broken-banner');
-    const old = document.getElementById('eg-absorption-broken-banner');
+    _clearCenterGridBanners('sx-absorption-broken-banner');
+    const old = document.getElementById('sx-absorption-broken-banner');
     if (old) old.remove();
 
     const el = document.createElement('div');
-    el.id = 'eg-absorption-broken-banner';
+    el.id = 'sx-absorption-broken-banner';
 
     const key = 'eg_absorption_broken';
     const raw = (typeof t === 'function') ? t(key) : '';
@@ -211,6 +211,6 @@ export function _maybeShowAbsorptionBroken(prevAbsorption, nextAbsorption) {
 }
 
 export function _resetAbsorptionBrokenState() {
-    const banner = document.getElementById('eg-absorption-broken-banner');
+    const banner = document.getElementById('sx-absorption-broken-banner');
     if (banner) banner.remove();
 }

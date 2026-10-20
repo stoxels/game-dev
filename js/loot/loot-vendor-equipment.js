@@ -103,7 +103,7 @@ export function _vendorBuildStarterTabHTML() {
         });
     }).join('');
 
-    return `<div class="egv-cards egv-cards-base">${cards}</div>`;
+    return `<div class="sx-vendor-cards sx-vendor-cards-base">${cards}</div>`;
 }
 
 //------------------------------------------------------------------------
@@ -174,8 +174,8 @@ export function _vendorSetWeaponTypeFilter(value) {
 // Toggles the "usable only" filter button.
 export function _vendorToggleUsableFilter() {
     _vendorBaseFilterUsable = !_vendorBaseFilterUsable;
-    const btn = document.getElementById('egv-usable-btn');
-    if (btn) btn.classList.toggle('egv-filter-btn-on', _vendorBaseFilterUsable);
+    const btn = document.getElementById('sx-vendor-usable-btn');
+    if (btn) btn.classList.toggle('sx-vendor-filter-btn-on', _vendorBaseFilterUsable);
     _vendorRenderBaseListOnly();
 }
 
@@ -187,20 +187,20 @@ export function _vendorSetDefenseFilter(value) {
 
 // Shows/hides the weapon-type dropdown to match the slot filter.
 function _vendorRefreshWeaponTypeControl() {
-    const wrap = document.getElementById('egv-weapon-type-wrap');
+    const wrap = document.getElementById('sx-vendor-weapon-type-wrap');
     if (!wrap) return;
     wrap.style.display = _vendorBaseFilterSlot === 'weapon' ? '' : 'none';
-    const sel = document.getElementById('egv-weapon-type-select');
+    const sel = document.getElementById('sx-vendor-weapon-type-select');
     if (sel) sel.value = _vendorBaseFilterWeaponType;
 }
 
 // Re-renders only the base item list + filter controls (keeps focus/state).
 export function _vendorRenderBaseListOnly() {
     _vendorHideBaseTooltip(); // hovered card may be replaced by the re-render
-    const listEl = document.getElementById('egv-base-list');
+    const listEl = document.getElementById('sx-vendor-base-list');
     if (listEl) listEl.innerHTML = _vendorBuildBaseListHTML();
     // Also refresh the filter dropdown selected state
-    const sel = document.getElementById('egv-base-filter-select');
+    const sel = document.getElementById('sx-vendor-base-filter-select');
     if (sel) sel.value = _vendorBaseFilterSlot;
     _vendorRefreshGoldDisplay();
 }
@@ -271,23 +271,23 @@ function _vendorBuildWeaponTypeOptionsHTML() {
 // Builds the filterable, non-starter equipment base list.
 export function _vendorBuildBaseTabHTML() {
     return `
-<div class="egv-base-wrap">
-    <div class="egv-base-controls">
-        <label class="egv-base-control-label">
+<div class="sx-vendor-base-wrap">
+    <div class="sx-vendor-base-controls">
+        <label class="sx-vendor-base-control-label">
             <span>${t('eg_vendor_filter_type')}</span>
-            <select id="egv-base-filter-select" onchange="_vendorSetBaseFilter(this.value)">${_vendorBuildBaseFilterOptionsHTML()}</select>
+            <select id="sx-vendor-base-filter-select" onchange="_vendorSetBaseFilter(this.value)">${_vendorBuildBaseFilterOptionsHTML()}</select>
         </label>
-        <label class="egv-base-control-label">
+        <label class="sx-vendor-base-control-label">
             <span>${t('eg_vendor_defense_type')}</span>
-            <select id="egv-defense-select" onchange="_vendorSetDefenseFilter(this.value)">${_vendorBuildDefenseOptionsHTML()}</select>
+            <select id="sx-vendor-defense-select" onchange="_vendorSetDefenseFilter(this.value)">${_vendorBuildDefenseOptionsHTML()}</select>
         </label>
-        <button type="button" id="egv-usable-btn" class="egv-filter-btn${_vendorBaseFilterUsable ? ' egv-filter-btn-on' : ''}" onclick="_vendorToggleUsableFilter()">${t('eg_vendor_usable_only')}</button>
-        <label class="egv-base-control-label" id="egv-weapon-type-wrap"${_vendorBaseFilterSlot === 'weapon' ? '' : ' style="display:none"'}>
+        <button type="button" id="sx-vendor-usable-btn" class="sx-vendor-filter-btn${_vendorBaseFilterUsable ? ' sx-vendor-filter-btn-on' : ''}" onclick="_vendorToggleUsableFilter()">${t('eg_vendor_usable_only')}</button>
+        <label class="sx-vendor-base-control-label" id="sx-vendor-weapon-type-wrap"${_vendorBaseFilterSlot === 'weapon' ? '' : ' style="display:none"'}>
             <span>${t('eg_vendor_weapon_type')}</span>
-            <select id="egv-weapon-type-select" onchange="_vendorSetWeaponTypeFilter(this.value)">${_vendorBuildWeaponTypeOptionsHTML()}</select>
+            <select id="sx-vendor-weapon-type-select" onchange="_vendorSetWeaponTypeFilter(this.value)">${_vendorBuildWeaponTypeOptionsHTML()}</select>
         </label>
     </div>
-    <div class="egv-base-list" id="egv-base-list">${_vendorBuildBaseListHTML()}</div>
+    <div class="sx-vendor-base-list" id="sx-vendor-base-list">${_vendorBuildBaseListHTML()}</div>
 </div>`;
 }
 
@@ -311,7 +311,7 @@ function _vendorBuildBaseListHTML() {
                 : '',
         });
     }).join('');
-    return `<div class="egv-cards egv-cards-base">${cards}</div>`;
+    return `<div class="sx-vendor-cards sx-vendor-cards-base">${cards}</div>`;
 }
 
 // Builds a preview/purchase item object from an equipment base type -

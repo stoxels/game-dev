@@ -62,7 +62,7 @@ export function _mechBullBarrage(monster, phase) {
             ry = Math.max(bandH / 2 + 20, Math.min(window.innerHeight - bandH / 2 - 20,
                 c ? c.y : window.innerHeight / 2));
             dir = idx % 2 === 0 ? 1 : -1;
-            lineEl = _nkEl(run, 'div', 'eg-nk-band');
+            lineEl = _nkEl(run, 'div', 'sx-nk-band');
             lineEl.style.top = Math.round(ry - bandH / 2) + 'px';
             lineEl.style.height = bandH + 'px';
             stage = 'warn';
@@ -73,11 +73,11 @@ export function _mechBullBarrage(monster, phase) {
                 stage = 'dash';
                 t = 0;
                 if (lineEl) {
-                    lineEl.classList.add('eg-nk-band-hit');
+                    lineEl.classList.add('sx-nk-band-hit');
                     _nkSlamShatter(lineEl, run); // hooves tear the ground as the rush starts
                 }
                 bx = dir > 0 ? -90 : window.innerWidth + 90;
-                bullEl = _nkEl(run, 'div', 'eg-nk-dot eg-nk-charger', '🚂');
+                bullEl = _nkEl(run, 'div', 'sx-nk-dot sx-nk-charger', '🚂');
             }
         } else if (stage === 'dash') {
             bx += dir * dashSpeed * dtS;
@@ -113,7 +113,7 @@ export function _mechThwompTrio(monster, phase) {
     const level = monster ? monster.level : 1;
     const queue = [];
     for (let i = 0; i < 3; i++) {
-        const el = _nkEl(run, 'div', 'eg-nk-mark');
+        const el = _nkEl(run, 'div', 'sx-nk-mark');
         el.style.display = 'none';
         el.style.width = radius * 2 + 'px';
         el.style.height = radius * 2 + 'px';
@@ -133,7 +133,7 @@ export function _mechThwompTrio(monster, phase) {
                 s.el.style.display = '';
                 s.el.style.left = Math.round(s.x - radius) + 'px';
                 s.el.style.top = Math.round(s.y - radius) + 'px';
-                if (s.t >= followMs) { s.stage = 'lock'; s.t = 0; s.el.classList.add('eg-nk-mark-hit'); }
+                if (s.t >= followMs) { s.stage = 'lock'; s.t = 0; s.el.classList.add('sx-nk-mark-hit'); }
             } else if (s.stage === 'lock') {
                 if (s.t >= lockMs) {
                     s.stage = 'done';

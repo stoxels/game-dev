@@ -142,10 +142,10 @@ function _playHitSound(amount, elements, isCrit) {
 
 // Appends a short floating status label (stagger/snipe/...) to a monster card.
 export function _showStatusLabel(monsterId, text) {
-    const card = document.getElementById(`eg-card-${monsterId}`);
+    const card = document.getElementById(`sx-card-${monsterId}`);
     if (!card) return;
     const label = document.createElement('div');
-    label.className = 'eg-damage-number eg-status-label';
+    label.className = 'sx-damage-number sx-status-label';
     label.textContent = text;
     // small random jitter so overlapping labels don't perfectly stack
     label.style.marginLeft = `${(Math.random() * 10 - 5).toFixed(1)}px`;
@@ -429,14 +429,14 @@ export function _tryChargedOverkillRicochet(dyingTarget, appliedDamage, hpBefore
     }
 
     Audio_Manager.playSFX('overkill_spread');
-    const sourceCard = document.getElementById(`eg-card-${dyingTarget.id}`);
-    const targetCard = document.getElementById(`eg-card-${victim.id}`);
+    const sourceCard = document.getElementById(`sx-card-${dyingTarget.id}`);
+    const targetCard = document.getElementById(`sx-card-${victim.id}`);
     if (sourceCard && targetCard) {
         const start = _getElementCentre(sourceCard);
         const end = _getElementCentre(targetCard);
         const projDef = _getProjectileDef();
         // Build a smaller visual copy of the class projectile
-        const cssExtra = 'eg-proj-ricochet';
+        const cssExtra = 'sx-proj-ricochet';
         _fireProjectile(projDef, `${projDef.cssClass} ${cssExtra}`, start, end, CHARGED_RICOCHET_DURATION_MS, 'linear', () => {
             const olabel = t('eg_overkill');
             _showStatusLabel(victim.id, olabel !== 'eg_overkill' ? olabel : 'Overkill!');

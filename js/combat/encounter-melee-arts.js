@@ -135,8 +135,8 @@ export function _meleeTierArt(targetId, tier, rawHit, elements, wasCrit, opts) {
         victims.forEach(m => {
             try {
                 const card = (typeof document !== 'undefined')
-                    ? document.getElementById(`eg-card-${m.id}`) : null;
-                if (card) _restartFlashClass(card, 'eg-flash-cleave');
+                    ? document.getElementById(`sx-card-${m.id}`) : null;
+                if (card) _restartFlashClass(card, 'sx-flash-cleave');
             } catch (e) {}
             _damageTargetById(m.id, rawHit, elements, hitOpts);
             if (typeof _meleeImpactThump === 'function') {
@@ -205,8 +205,8 @@ function _meleeTierArtSequenced(targetId, tier, rawHit, elements, wasCrit) {
             victims.forEach(m => {
                 try {
                     const card = (typeof document !== 'undefined')
-                        ? document.getElementById(`eg-card-${m.id}`) : null;
-                    if (card) _restartFlashClass(card, 'eg-flash-cleave');
+                        ? document.getElementById(`sx-card-${m.id}`) : null;
+                    if (card) _restartFlashClass(card, 'sx-flash-cleave');
                 } catch (e) {}
                 _damageTargetById(m.id, rawHit, elements, hitOpts);
                 if (typeof _meleeImpactThump === 'function') {
@@ -234,7 +234,7 @@ export function _meleeDashVisual(targetId) {
     try {
         if (typeof document === 'undefined') return;
         const avatar = document.getElementById('player-avatar-wrapper');
-        const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
+        const card = (targetId != null) ? document.getElementById(`sx-card-${targetId}`) : null;
         if (card) Audio_Manager.playSFX('art_dash_strike');
         if (!avatar || !card || typeof avatar.animate !== 'function') return;
         if (typeof window !== 'undefined' && window.matchMedia
@@ -270,7 +270,7 @@ export function _meleeLeapVisual(victimId, opts) {
     try {
         if (typeof document === 'undefined') return;
         const avatar = document.getElementById('player-avatar-wrapper');
-        const card = (victimId != null) ? document.getElementById(`eg-card-${victimId}`) : null;
+        const card = (victimId != null) ? document.getElementById(`sx-card-${victimId}`) : null;
         if (card && !(opts && opts.swingOnly)) Audio_Manager.playSFX('art_sky_leap');
         if (avatar && typeof avatar.animate === 'function' && !(opts && opts.swingOnly)) {
             let reduce = false;
@@ -308,7 +308,7 @@ export function _meleeLeapVisual(victimId, opts) {
 export function _meleeNovaVisual(targetId, grand) {
     try {
         if (typeof document === 'undefined') return;
-        const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
+        const card = (targetId != null) ? document.getElementById(`sx-card-${targetId}`) : null;
         if (!card) return;
         Audio_Manager.playSFX(grand ? 'art_grand_nova' : 'art_nova');
         let icon = '⚔️';
@@ -319,15 +319,15 @@ export function _meleeNovaVisual(targetId, grand) {
         } catch (e) {}
         const c = _getElementCentre(card);
         const el = document.createElement('div');
-        el.className = 'eg-melee-nova' + (grand ? ' eg-melee-nova-grand' : '');
+        el.className = 'sx-melee-nova' + (grand ? ' sx-melee-nova-grand' : '');
         const bits = grand ? 12 : 8;
         for (let i = 0; i < bits; i++) {
             const s = document.createElement('span');
-            s.className = 'eg-melee-nova-bit';
+            s.className = 'sx-melee-nova-bit';
             s.textContent = icon;
             const ang = (i / bits) * Math.PI * 2;
-            s.style.setProperty('--eg-nova-x', Math.cos(ang).toFixed(3));
-            s.style.setProperty('--eg-nova-y', Math.sin(ang).toFixed(3));
+            s.style.setProperty('--sx-nova-x', Math.cos(ang).toFixed(3));
+            s.style.setProperty('--sx-nova-y', Math.sin(ang).toFixed(3));
             el.appendChild(s);
         }
         el.style.left = `${c.x}px`;
@@ -345,7 +345,7 @@ export function _meleeGrandFlash() {
         if (typeof window !== 'undefined' && window.matchMedia
             && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         const el = document.createElement('div');
-        el.className = 'eg-melee-grand-flash';
+        el.className = 'sx-melee-grand-flash';
         document.body.appendChild(el);
         setTimeout(() => { try { el.remove(); } catch (e) {} }, 750);
     } catch (e) {}

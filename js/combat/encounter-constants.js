@@ -15,11 +15,11 @@ try { Object.defineProperty(globalThis, '_playerBlockLockoutUntil', { get() { re
 
 // All zone IDs where monster cards can be rendered.
 export const MONSTER_ZONES = [
-    'eg-monster-panel',
-    'eg-panel-left',
-    'eg-panel-right',
-    'eg-panel-bottom',
-    'eg-panel-top-corner'
+    'sx-monster-panel',
+    'sx-panel-left',
+    'sx-panel-right',
+    'sx-panel-bottom',
+    'sx-panel-top-corner'
 ];
 
 // Default monster count per wave if cur.maxMonsters is not set.

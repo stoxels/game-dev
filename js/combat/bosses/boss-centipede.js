@@ -90,7 +90,7 @@ export let _centStampedeActive = false; // a stampede set-piece is running
 export function _centipedeSweep() {
     _centStampedeActive = false;
     try {
-        document.querySelectorAll('.eg-cent-seg, .eg-cent-mini, .eg-cent-mound, .eg-cent-resurf, .eg-cent-ring, .eg-cent-blob, .eg-cent-pool, .eg-cent-stampede, .eg-cent-shell').forEach(el => el.remove());
+        document.querySelectorAll('.sx-cent-seg, .sx-cent-mini, .sx-cent-mound, .sx-cent-resurf, .sx-cent-ring, .sx-cent-blob, .sx-cent-pool, .sx-cent-stampede, .sx-cent-shell').forEach(el => el.remove());
     } catch (e) {}
 }
 
@@ -202,7 +202,7 @@ export function _centipedeArenaInit(monster) {
         if (_centWatcher && _centWatcher.run === run) _centWatcher = null;
         _centipedeSweep();
     };
-    st.body = _centSpawnBody(st, 'eg-cent-seg', CENT_SEGS[1], 'Colony');
+    st.body = _centSpawnBody(st, 'sx-cent-seg', CENT_SEGS[1], 'Colony');
 
     _nkLoop(run, (dtS, now) => {
         const live = (typeof _monsters !== 'undefined' && globalThis._monsters)
@@ -228,7 +228,7 @@ export function _centipedeArenaInit(monster) {
         const wantN = st.molted ? CENT_SEGS[p] + 2 : CENT_SEGS[p];
         while (st.body.parts.length < wantN) {
             const tail = st.body.parts[st.body.parts.length - 1];
-            const el = _nkEl(st.run, 'div', 'eg-cent-seg', '🟤');
+            const el = _nkEl(st.run, 'div', 'sx-cent-seg', '🟤');
             st.body.parts.push({ x: tail.x, y: tail.y, cdUntil: 0, el });
         }
         const spd = CENT_SPEED[p] * (st.molted ? CENT_MOLT_SPEED : 1);
@@ -261,7 +261,7 @@ export function _centipedeArenaInit(monster) {
                 : side === 1 ? { x: W - 70, y: 90 + Math.random() * Math.max(120, H - 200) }
                 : side === 2 ? { x: 90 + Math.random() * Math.max(120, W - 200), y: 70 }
                 : { x: 90 + Math.random() * Math.max(120, W - 200), y: H - 70 };
-            st.resurfEl = _nkEl(st.run, 'div', 'eg-cent-resurf', '🕳️');
+            st.resurfEl = _nkEl(st.run, 'div', 'sx-cent-resurf', '🕳️');
             st.resurfEl.style.left = Math.round(st.resurfAnchor.x) + 'px';
             st.resurfEl.style.top = Math.round(st.resurfAnchor.y) + 'px';
             st.resurfBaitWarned = false; // re-arm the bait hint for this mound
@@ -302,7 +302,7 @@ export function _centipedeArenaInit(monster) {
                 _nkAbilityHitToast(dealt, 'The Centipede', 'Resurface');
             }
             try { _flingBurst(anchor.x, anchor.y, -Math.PI / 2); } catch (e) {}
-            st.mini = _centSpawnBody(st, 'eg-cent-mini', CENT_MOLT_MINI_SEGS, 'Molt', anchor);
+            st.mini = _centSpawnBody(st, 'sx-cent-mini', CENT_MOLT_MINI_SEGS, 'Molt', anchor);
             if (baitLock) {
                 // Baited: committed straight charge at the player's spot.
                 st.mini.lock = { x: baitLock.x, y: baitLock.y, until: now + CENT_RESURF_BAIT_LOCK_MS };
@@ -363,7 +363,7 @@ export function _centipedeArenaInit(monster) {
                 try { b.el.remove(); } catch (e) {}
                 st.blobs.splice(i, 1);
                 // Leave a toxic pool where it lands.
-                const pool = _nkEl(st.run, 'div', 'eg-cent-pool');
+                const pool = _nkEl(st.run, 'div', 'sx-cent-pool');
                 pool.style.left = Math.round(b.x) + 'px';
                 pool.style.top = Math.round(Math.min(b.y, H - 40)) + 'px';
                 st.pools.push({ x: b.x, y: Math.min(b.y, H - 40), t: 0, el: pool });
@@ -416,7 +416,7 @@ export function _centMound(st, now) {
     const W = window.innerWidth, H = window.innerHeight;
     const x = 90 + Math.random() * Math.max(120, W - 180);
     const y = 90 + Math.random() * Math.max(120, H - 180);
-    const el = _nkEl(st.run, 'div', 'eg-cent-mound fresh', '🕳️');
+    const el = _nkEl(st.run, 'div', 'sx-cent-mound fresh', '🕳️');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
     // First hole ever → teach the mechanic once, right where it becomes
@@ -464,7 +464,7 @@ export function _centShell(st, now) {
     const plates = [];
     for (let w = 0; w < CENT_SHELL_WAVES; w++) {
         for (let i = 0; i < CENT_SHELL_N; i++) {
-            const el = _nkEl(st.run, 'div', 'eg-cent-shell', '🛡️');
+            const el = _nkEl(st.run, 'div', 'sx-cent-shell', '🛡️');
             const a0 = (i / CENT_SHELL_N) * Math.PI * 2 + w * 0.4;
             plates.push({
                 a: a0, r: 40 + w * 70, spin: 1.6 * (w % 2 ? -1 : 1),
@@ -497,7 +497,7 @@ export function _centMolt(st, now) {
         // Detach the back half into the mini.
         const cut = Math.min(CENT_MOLT_MINI_SEGS, Math.max(1, s.body.parts.length - 3));
         const detached = s.body.parts.splice(s.body.parts.length - cut, cut);
-        detached.forEach(sg => sg.el.className = 'eg-cent-mini');
+        detached.forEach(sg => sg.el.className = 'sx-cent-mini');
         s.mini = { parts: detached, label: 'Molt' };
         // Short grace so a hole that happens to open right on the fresh
         // mini can't bury it before the player ever baited it.
@@ -514,7 +514,7 @@ export function _centVenomBurst(st, now) {
     const c = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     _nkToast('eg_cent_venom', '🟢 VENOM BURST! Clear the ring - the splash leaves pools!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_venom'); } catch (e) {}
-    const ring = _nkEl(st.run, 'div', 'eg-cent-ring');
+    const ring = _nkEl(st.run, 'div', 'sx-cent-ring');
     ring.style.left = c.x + 'px';
     ring.style.top = c.y + 'px';
     ring.style.width = ring.style.height = (CENT_VENOM_R * 2) + 'px';
@@ -525,7 +525,7 @@ export function _centVenomBurst(st, now) {
         if (!s) return;
         for (let i = 0; i < CENT_VENOM_BLOBS; i++) {
             const a = (i / CENT_VENOM_BLOBS) * Math.PI * 2 + Math.random() * 0.6;
-            const el = _nkEl(s.run, 'div', 'eg-cent-blob', '🟢');
+            const el = _nkEl(s.run, 'div', 'sx-cent-blob', '🟢');
             el.style.left = '0'; el.style.top = '0';
             s.blobs.push({
                 x: c.x, y: c.y,
@@ -555,7 +555,7 @@ export function _centStampede(monster) {
     const c = _nkPlayerCenter();
     const cy = c ? c.y : window.innerHeight / 2;
     const fromLeft = Math.random() < 0.5;
-    const band = _nkEl(run, 'div', 'eg-cent-stampede' + (fromLeft ? '' : ' flip'));
+    const band = _nkEl(run, 'div', 'sx-cent-stampede' + (fromLeft ? '' : ' flip'));
     band.style.top = Math.round(cy - CENT_STAMPEDE_H / 2) + 'px';
     band.style.height = CENT_STAMPEDE_H + 'px';
     _nkToast('eg_cent_stampede', '🐛 STAMPEDE! Get out of its lane!');

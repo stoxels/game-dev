@@ -21,7 +21,7 @@ Layout Architecture:
     height: 100%;
 }
 
-.eg-hub-layout {
+.sx-hub-layout {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -30,7 +30,7 @@ Layout Architecture:
 }
 
 /* ── TOP BAR - mirrors ls-topbar ── */
-.eg-topbar {
+.sx-topbar {
     background: var(--panel);
     border-bottom: 1px solid var(--border);
     padding: 8px 18px;
@@ -41,18 +41,18 @@ Layout Architecture:
 }
 
 /* Endgame back button - the unified .back-btn stone slab (base.css).
-   .eg-back-btn keeps only the size tweak for the slim endgame topbar. */
-.eg-back-btn {
+   .sx-back-btn keeps only the size tweak for the slim endgame topbar. */
+.sx-back-btn {
     font-size: 12px;
     padding: 8px 16px;
     min-width: 110px;
 }
 
-    .eg-back-btn:hover {
+    .sx-back-btn:hover {
         filter: brightness(1.25);
     }
 
-.eg-topbar-title {
+.sx-topbar-title {
     font-family: var(--PX);
     font-size: 13px;
     color: var(--accent);
@@ -60,18 +60,18 @@ Layout Architecture:
 }
 
 /* ── TOP BAR RIGHT BUTTON GROUP ── */
-.eg-topbar-right {
+.sx-topbar-right {
     display: flex;
     gap: 8px;
     margin-left: auto;
 }
 
-    .eg-topbar-right .eg-level-btn {
+    .sx-topbar-right .sx-level-btn {
         margin-left: 0;
     }
 
 /* ── TOP BAR LEVEL BUTTON - opens the character/attribute window ── */
-.eg-level-btn {
+.sx-level-btn {
     margin-left: auto;
     position: relative;
     font-family: var(--PX);
@@ -86,31 +86,31 @@ Layout Architecture:
     white-space: nowrap;
 }
 
-    .eg-level-btn:hover {
+    .sx-level-btn:hover {
         border-color: #f5d98a;
         color: #f5d98a;
         box-shadow: 0 0 8px rgba(200, 168, 75, 0.4);
     }
 
     /* Golden frame + glow when there are unspent Convergence Points */
-    .eg-level-btn.unspent-points {
+    .sx-level-btn.unspent-points {
         border-color: #ffd700 !important;
         box-shadow: 0 0 8px rgba(255, 215, 0, 0.55);
         color: #ffd700;
     }
 
-    .eg-level-btn.unspent-points:hover {
+    .sx-level-btn.unspent-points:hover {
         border-color: #ffeb57 !important;
         box-shadow: 0 0 12px rgba(255, 215, 0, 0.85);
         color: #ffeb57;
     }
 
-    #eg-pt-point-count {
+    #sx-pt-point-count {
         color: #ffd700;
         font-weight: bold;
     }
 
-.eg-topbar-sub {
+.sx-topbar-sub {
     font-family: var(--PX);
     font-size: 8px;
     color: var(--setup-opt-inactive);
@@ -119,7 +119,7 @@ Layout Architecture:
 }
 
 /* ── TOP BAR INFO BUTTON - "?" in the top-right corner ── */
-.eg-info-btn {
+.sx-info-btn {
     margin-left: auto;
     width: 24px;
     height: 24px;
@@ -136,14 +136,14 @@ Layout Architecture:
     transition: all 0.12s;
 }
 
-    .eg-info-btn:hover {
+    .sx-info-btn:hover {
         border-color: var(--yellow, #c8a84b);
         color: var(--yellow, #c8a84b);
         box-shadow: 0 0 8px rgba(200, 168, 75, 0.4);
     }
 
 /* ── BODY: character panel + essence tab row, currency strip + stash ── */
-.eg-body {
+.sx-body {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -158,11 +158,11 @@ Layout Architecture:
    inner grids scroll internally), so no unused space appears in the
    center when the essence tab has more rows. */
 :root {
-    --eg-currency-w: clamp(155px, 16vw, 300px);
-    --eg-essence-w:  clamp(145px, 15vw, 280px);
+    --sx-currency-w: clamp(155px, 16vw, 300px);
+    --sx-essence-w:  clamp(145px, 15vw, 280px);
 }
 
-.eg-upper-row {
+.sx-upper-row {
     position: relative;
     display: flex;
     align-items: stretch;
@@ -171,20 +171,20 @@ Layout Architecture:
     min-height: 0;
 }
 
-    .eg-upper-row .eg-char-wrap {
+    .sx-upper-row .sx-char-wrap {
         flex: 1;
         min-width: 0;
         overflow: hidden;
     }
 
 /* ── LEFT COLUMN: ORBS & SHARDS (currency tab) ── */
-.eg-currency-col {
+.sx-currency-col {
     position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
     z-index: 1;
-    width: var(--eg-currency-w);
+    width: var(--sx-currency-w);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -193,7 +193,7 @@ Layout Architecture:
     box-shadow: 4px 0 10px rgba(0, 0, 0, 0.35);
 }
 
-.eg-currency-grid {
+.sx-currency-grid {
     display: grid;
     gap: 4px;
     padding: 6px 6px 8px;
@@ -205,7 +205,7 @@ Layout Architecture:
         var(--panel);
 }
 
-    .eg-currency-grid .eg-inv-cell {
+    .sx-currency-grid .sx-inv-cell {
         min-height: 32px;
         height: 38px;
         aspect-ratio: 1;
@@ -215,13 +215,13 @@ Layout Architecture:
         position: relative;
     }
 
-    .eg-currency-grid .eg-inv-cell.eg-currency-assigned-empty {
+    .sx-currency-grid .sx-inv-cell.sx-currency-assigned-empty {
         background: rgba(255,255,255,0.02);
         border-style: dashed;
         border-color: rgba(181,146,72,0.22);
     }
 
-    .eg-currency-grid .eg-inv-cell.eg-currency-assigned-empty::after {
+    .sx-currency-grid .sx-inv-cell.sx-currency-assigned-empty::after {
         content: attr(data-empty-icon);
         position: absolute;
         inset: 0;
@@ -234,13 +234,13 @@ Layout Architecture:
     }
 
 /* ── RIGHT COLUMN: ESSENCE TAB ── */
-.eg-essence-col {
+.sx-essence-col {
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     z-index: 1;
-    width: var(--eg-essence-w);
+    width: var(--sx-essence-w);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -249,21 +249,21 @@ Layout Architecture:
     box-shadow: -4px 0 10px rgba(0, 0, 0, 0.35);
 }
 
-.eg-panel-essence {
+.sx-panel-essence {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
     border-right: none;
 }
 
-.eg-essence-grid {
+.sx-essence-grid {
     display: grid;
     gap: 2px;
     padding: 4px;
     align-content: start;
 }
 
-    .eg-essence-grid .eg-inv-cell {
+    .sx-essence-grid .sx-inv-cell {
         min-height: 22px;
     }
 
@@ -271,18 +271,18 @@ Layout Architecture:
    compact screen rather than a full-width sheet.
    Left/right padding equals the flanking tab widths so the centered
    sheet is never covered, regardless of viewport. */
-.eg-char-wrap {
+.sx-char-wrap {
     display: flex;
     justify-content: center;
     min-width: 0;
     overflow: hidden;
     border-bottom: 1px solid var(--border);
-    padding-left: var(--eg-currency-w);
-    padding-right: var(--eg-essence-w);
+    padding-left: var(--sx-currency-w);
+    padding-right: var(--sx-essence-w);
     box-sizing: border-box;
 }
 
-.eg-char-wrap .eg-panel-char {
+.sx-char-wrap .sx-panel-char {
     width: 100%;
     max-width: 1140px;
     border-right: none;
@@ -290,7 +290,7 @@ Layout Architecture:
 }
 
 /* ── SHARED PANEL BASE ── */
-.eg-panel {
+.sx-panel {
     display: flex;
     flex-direction: column;
     border-right: 1px solid var(--border);
@@ -298,11 +298,11 @@ Layout Architecture:
     background: var(--panel);
 }
 
-    .eg-panel:last-child {
+    .sx-panel:last-child {
         border-right: none;
     }
 
-.eg-panel-label {
+.sx-panel-label {
     font-family: var(--PX);
     font-size: 8px;
     letter-spacing: 3px;
@@ -315,14 +315,14 @@ Layout Architecture:
 }
 
 /* ── LEFT TOP PANEL: CHARACTER ── */
-.eg-panel-char {
+.sx-panel-char {
     overflow: hidden;
 }
 
 /* Character panel*/
 /* Grid columns: offense stats | left slots | center puzzle stats | right
    slots | defense stats - offense/defense fill the former empty corners. */
-.eg-char-panel.eg-char-panel-no-model {
+.sx-char-panel.sx-char-panel-no-model {
     display: grid;
     grid-template-columns: clamp(165px, 18vw, 320px) auto minmax(0, 1fr) auto clamp(165px, 18vw, 320px);
     gap: 8px;
@@ -334,13 +334,13 @@ Layout Architecture:
     min-width: 0;
 }
 
-.eg-equip-col {
+.sx-equip-col {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.eg-equip-slot {
+.sx-equip-slot {
     background: var(--surface);
     border: 1px solid var(--border);
     width: 36px;
@@ -354,14 +354,14 @@ Layout Architecture:
     flex-shrink: 0;
 }
 
-    .eg-equip-slot.eg-dragover {
+    .sx-equip-slot.sx-dragover {
         border-color: var(--accent);
         background: rgba(102, 252, 241, 0.05);
     }
 
 
 
-.eg-equip-slot-item {
+.sx-equip-slot-item {
     width: 100%;
     height: 100%;
     display: flex;
@@ -372,7 +372,7 @@ Layout Architecture:
     flex-shrink: 0;
 }
 
-.eg-equip-slot-placeholder {
+.sx-equip-slot-placeholder {
     font-size: 16px;
     opacity: 0.25;
     line-height: 1;
@@ -380,7 +380,7 @@ Layout Architecture:
     user-select: none;
 }
 
-.eg-char-model-wrap {
+.sx-char-model-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -388,7 +388,7 @@ Layout Architecture:
     padding: 0 8px;
 }
 
-.eg-char-model {
+.sx-char-model {
     width: 110px;
     height: 190px;
     position: relative;
@@ -400,30 +400,30 @@ Layout Architecture:
     overflow: hidden;
 }
 
-.eg-char-silhouette {
+.sx-char-silhouette {
     width: 80px;
     height: 160px;
 }
 
-.eg-silhouette-svg {
+.sx-silhouette-svg {
     width: 100%;
     height: 100%;
 }
 
 /* CSS var used inside the SVG stroke attribute */
 :root {
-    --eg-silhouette: #4a5475;
+    --sx-silhouette: #4a5475;
 }
 
-.eg-char-scanline {
+.sx-char-scanline {
     position: absolute;
     inset: 0;
     background: repeating-linear-gradient( to bottom, transparent 0px, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px );
     pointer-events: none;
-    animation: eg-scan-scroll 8s linear infinite;
+    animation: sx-scan-scroll 8s linear infinite;
 }
 
-@keyframes eg-scan-scroll {
+@keyframes sx-scan-scroll {
     from {
         background-position-y: 0;
     }
@@ -433,7 +433,7 @@ Layout Architecture:
     }
 }
 
-.eg-equip-bottom-row {
+.sx-equip-bottom-row {
     display: flex;
     gap: 16px; /* was 3px */
     justify-content: center;
@@ -442,7 +442,7 @@ Layout Architecture:
     border-top: 1px solid var(--border);
 }
 
-    .eg-equip-bottom-row .eg-equip-slot {
+    .sx-equip-bottom-row .sx-equip-slot {
         width: 48px;
         height: 48px;
         max-width: none;
@@ -450,7 +450,7 @@ Layout Architecture:
     }
 
 /* ── RIGHT TOP PANEL: MAP DEVICE ── */
-.eg-panel-map {
+.sx-panel-map {
     align-items: center;
     padding-top: 0;
     border-right: none;
@@ -480,10 +480,10 @@ Layout Architecture:
     inset: 0;
     border: 1px solid rgba(102, 252, 241, 0.15);
     border-radius: 50%;
-    animation: eg-ring-spin 20s linear infinite;
+    animation: sx-ring-spin 20s linear infinite;
 }
 
-@keyframes eg-ring-spin {
+@keyframes sx-ring-spin {
     from {
         transform: rotate(0deg);
     }
@@ -501,24 +501,24 @@ Layout Architecture:
     transform: translate(-50%, -50%);
 }
 
-.eg-rune-top {
+.sx-rune-top {
     top: 4px;
     left: 50%;
 }
 
-.eg-rune-right {
+.sx-rune-right {
     top: 50%;
     right: -4px;
     transform: translate(50%, -50%);
 }
 
-.eg-rune-bottom {
+.sx-rune-bottom {
     bottom: 4px;
     left: 50%;
     transform: translate(-50%, 50%);
 }
 
-.eg-rune-left {
+.sx-rune-left {
     top: 50%;
     left: -4px;
     transform: translate(-50%, -50%);
@@ -538,7 +538,7 @@ Layout Architecture:
     z-index: 1;
 }
 
-    .eg-map-slot.eg-dragover {
+    .eg-map-slot.sx-dragover {
         border-color: var(--accent);
         background: rgba(102, 252, 241, 0.07);
         box-shadow: 0 0 18px rgba(102, 252, 241, 0.2);
@@ -573,22 +573,22 @@ Layout Architecture:
     border: 2px solid var(--border);
 }
 
-.eg-socket-red {
+.sx-socket-red {
     background: #c0392b;
     box-shadow: 0 0 5px rgba(192,57,43,0.5);
 }
 
-.eg-socket-green {
+.sx-socket-green {
     background: #27ae60;
     box-shadow: 0 0 5px rgba(39,174,96,0.5);
 }
 
-.eg-socket-blue {
+.sx-socket-blue {
     background: #2980b9;
     box-shadow: 0 0 5px rgba(41,128,185,0.5);
 }
 
-.eg-socket-white {
+.sx-socket-white {
     background: #bdc3c7;
     box-shadow: 0 0 5px rgba(189,195,199,0.5);
 }
@@ -605,7 +605,7 @@ Layout Architecture:
     letter-spacing: 1px;
 }
 
-.eg-activate-btn {
+.sx-activate-btn {
     font-family: var(--PX);
     font-size: 9px;
     padding: 10px 20px;
@@ -622,7 +622,7 @@ Layout Architecture:
     z-index: 1;
 }
 
-    .eg-activate-btn::before {
+    .sx-activate-btn::before {
         content: '';
         position: absolute;
         inset: 0;
@@ -633,15 +633,15 @@ Layout Architecture:
         z-index: -1;
     }
 
-    .eg-activate-btn:not(:disabled):hover {
+    .sx-activate-btn:not(:disabled):hover {
         color: var(--bg);
     }
 
-        .eg-activate-btn:not(:disabled):hover::before {
+        .sx-activate-btn:not(:disabled):hover::before {
             transform: scaleX(1);
         }
 
-    .eg-activate-btn:disabled {
+    .sx-activate-btn:disabled {
         border-color: var(--border);
         color: var(--border2);
         cursor: not-allowed;
@@ -652,11 +652,11 @@ Layout Architecture:
    the empty space between the "STASH" label and the action buttons without
    pushing any sibling or changing the header's height. Text truncates or
    wraps inside the overlay bounds but never expands the header. */
-.eg-stash-header {
+.sx-stash-header {
     position: relative;
 }
 
-.eg-stash-info {
+.sx-stash-info {
     position: absolute;
     left: 50%;
     top: 50%;
@@ -683,17 +683,17 @@ Layout Architecture:
     user-select: none;
 }
 
-.eg-stash-info.show {
+.sx-stash-info.show {
     opacity: 1;
 }
 
-.eg-stash-info--error { color: #ff6b6b; }
-.eg-stash-info--warn  { color: #f5d98a; }
-.eg-stash-info--info  { color: #a0a0ff; }
-.eg-stash-info--success { color: #2ecc71; }
+.sx-stash-info--error { color: #ff6b6b; }
+.sx-stash-info--warn  { color: #f5d98a; }
+.sx-stash-info--info  { color: #a0a0ff; }
+.sx-stash-info--success { color: #2ecc71; }
 
 /* ── BOTTOM PANEL: STASH (full width) ── */
-.eg-panel-inv {
+.sx-panel-inv {
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -703,7 +703,7 @@ Layout Architecture:
     min-height: 0;
 }
 
-.eg-inv-header {
+.sx-inv-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -712,22 +712,22 @@ Layout Architecture:
     user-select: none;
 }
 
-.eg-inv-sub {
+.sx-inv-sub {
     font-family: var(--PX);
     font-size: 7px;
     color: var(--setup-opt-inactive);
     letter-spacing: 2px;
 }
 
-.eg-inv-count {
+.sx-inv-count {
     font-family: var(--PX);
     font-size: 7px;
     color: var(--setup-opt-inactive);
 }
 
-.eg-inv-grid {
+.sx-inv-grid {
     display: grid;
-    grid-template-columns: repeat(var(--eg-inv-cols, 16), 1fr);
+    grid-template-columns: repeat(var(--sx-inv-cols, 16), 1fr);
     gap: 3px;
     padding: 6px 8px 8px;
     flex: 1;
@@ -742,7 +742,7 @@ Layout Architecture:
     scrollbar-gutter: stable;
 }
 
-.eg-inv-cell {
+.sx-inv-cell {
     width: 100%;
     height: 42px;
     min-height: 42px;
@@ -760,12 +760,12 @@ Layout Architecture:
     overflow: hidden;
 }
 
-    .eg-inv-cell.eg-dragover {
+    .sx-inv-cell.sx-dragover {
         border-color: var(--accent);
         background: rgba(102, 252, 241, 0.07);
     }
 
-.eg-inv-legend {
+.sx-inv-legend {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -776,34 +776,34 @@ Layout Architecture:
     user-select: none;
 }
 
-    .eg-inv-legend span {
+    .sx-inv-legend span {
         font-family: var(--PX);
         font-size: 6px;
         color: var(--setup-opt-inactive);
         letter-spacing: 1px;
     }
 
-.eg-legend-dot {
+.sx-legend-dot {
     width: 8px;
     height: 8px;
     border-radius: 2px;
     display: inline-block;
 }
 
-.eg-legend-map {
+.sx-legend-map {
     background: #1eff00;
 }
 
-.eg-legend-equip {
+.sx-legend-equip {
     background: #0070dd;
 }
 
-.eg-legend-currency {
+.sx-legend-currency {
     background: #aa9060;
 }
 
 /* ── ITEM CHIPS ── */
-.eg-item-chip {
+.sx-item-chip {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -822,7 +822,7 @@ Layout Architecture:
 }
 
 /* Item level badge - small number in the slot's top-left corner */
-.eg-item-chip .eg-item-ilvl {
+.sx-item-chip .sx-item-ilvl {
     position: absolute;
     top: 0;
     left: 1px;
@@ -834,25 +834,25 @@ Layout Architecture:
     pointer-events: none;
 }
 
-.eg-item-chip-large .eg-item-ilvl {
+.sx-item-chip-large .sx-item-ilvl {
     font-size: 11px;
 }
 
-    .eg-item-chip:active {
+    .sx-item-chip:active {
         cursor: grabbing;
     }
 
-    .eg-item-chip:hover {
+    .sx-item-chip:hover {
         border-color: rgba(255,255,255,0.2);
     }
 
-.eg-item-chip-icon {
+.sx-item-chip-icon {
     font-size: 13px;
     line-height: 1;
 }
 
 /* GAME_ART placeholder system: real images scale like the emoji they replace */
-img.eg-art-img {
+img.sx-art-img {
     width: 1em;
     height: 1em;
     max-width: none;
@@ -867,7 +867,7 @@ img.eg-art-img {
    icon box grow and have the art fill it (bounded, so auto-sized containers
    like drag ghosts and toasts can never blow up to intrinsic 600px+ size).
    Emoji fallbacks keep their 13px size, centered exactly as before. */
-.eg-item-chip-icon {
+.sx-item-chip-icon {
     flex: 1 1 auto;
     min-height: 0;
     width: 100%;
@@ -875,7 +875,7 @@ img.eg-art-img {
     align-items: center;
     justify-content: center;
 }
-.eg-item-chip-icon img.eg-art-img {
+.sx-item-chip-icon img.sx-art-img {
     width: auto;
     height: auto;
     /* fill the cell but never exceed a sane icon size in auto-sized
@@ -889,44 +889,44 @@ img.eg-art-img {
 
 /* Empty assigned slots: dimmed art placeholder instead of the emoji ::after.
    The render code removes data-empty-icon when art is available. */
-.eg-empty-slot-art {
+.sx-empty-slot-art {
     width: 68%;
     height: 68%;
     object-fit: contain;
     opacity: 0.30;
     pointer-events: none;
 }
-.eg-currency-grid .eg-inv-cell.eg-currency-assigned-empty,
-.eg-essence-grid .eg-inv-cell.eg-essence-assigned-empty,
-.eg-currency-row .eg-currency-cell.eg-currency-assigned-empty {
+.sx-currency-grid .sx-inv-cell.sx-currency-assigned-empty,
+.sx-essence-grid .sx-inv-cell.sx-essence-assigned-empty,
+.sx-currency-row .sx-currency-cell.sx-currency-assigned-empty {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 /* Empty paperdoll slots: slot art bigger than the 16px emoji placeholder */
-.eg-equip-slot-placeholder img.eg-art-img {
+.sx-equip-slot-placeholder img.sx-art-img {
     width: 24px;
     height: 24px;
     object-fit: contain;
 }
 /* The placeholder span dims emoji to 0.25 - lift that when it holds art so
    the slot icon stays readable, keeping a ghosted look via the img itself */
-.eg-equip-slot-placeholder:has(img.eg-art-img) {
+.sx-equip-slot-placeholder:has(img.sx-art-img) {
     opacity: 1;
 }
-.eg-equip-slot-placeholder:has(img.eg-art-img) img.eg-art-img {
+.sx-equip-slot-placeholder:has(img.sx-art-img) img.sx-art-img {
     opacity: 0.55;
 }
 
 /* Paperdoll slots are only 36px tall: the 5px item name under the icon
    steals a third of the art space, so hide it here (names still show in
    the inventory grid and in every tooltip) */
-.eg-equip-slot .eg-item-chip-name {
+.sx-equip-slot .sx-item-chip-name {
     display: none;
 }
 
-.eg-item-chip-name {
+.sx-item-chip-name {
     font-family: var(--PX);
     font-size: 5px;
     line-height: 1.3;
@@ -938,53 +938,53 @@ img.eg-art-img {
     display: block;
 }
 
-.eg-item-chip-large .eg-item-chip-icon {
+.sx-item-chip-large .sx-item-chip-icon {
     font-size: 22px;
 }
 
-.eg-item-chip-large .eg-item-chip-name {
+.sx-item-chip-large .sx-item-chip-name {
     font-size: 6px;
 }
 
 /* Rarity colors */
-.eg-rarity-common .eg-item-chip-name {
+.sx-rarity-common .sx-item-chip-name {
     color: #9d9d9d;
 }
 
-.eg-rarity-uncommon .eg-item-chip-name {
+.sx-rarity-uncommon .sx-item-chip-name {
     color: #1eff00;
 }
 
-.eg-rarity-rare .eg-item-chip-name {
+.sx-rarity-rare .sx-item-chip-name {
     color: #0070dd;
 }
 
-.eg-rarity-epic .eg-item-chip-name {
+.sx-rarity-epic .sx-item-chip-name {
     color: #a335ee;
 }
 
-.eg-rarity-currency .eg-item-chip-name {
+.sx-rarity-currency .sx-item-chip-name {
     color: #aa9060;
 }
 
-.eg-rarity-uncommon {
+.sx-rarity-uncommon {
     border-color: rgba(30,255,0,0.25) !important;
 }
 
-.eg-rarity-rare {
+.sx-rarity-rare {
     border-color: rgba(0,112,221,0.35) !important;
 }
 
-.eg-rarity-epic {
+.sx-rarity-epic {
     border-color: rgba(163,53,238,0.4) !important;
 }
 
 /* Stash cells are fully filled with the rarity color - suppress the
    old per-icon rarity glow inside the main stash grid */
-#eg-inv-grid .eg-item-chip.eg-rarity-uncommon .eg-item-chip-icon,
-#eg-inv-grid .eg-item-chip.eg-rarity-rare .eg-item-chip-icon,
-#eg-inv-grid .eg-item-chip.eg-rarity-legendary .eg-item-chip-icon,
-#eg-inv-grid .eg-item-chip.eg-rarity-currency .eg-item-chip-icon {
+#sx-inv-grid .sx-item-chip.sx-rarity-uncommon .sx-item-chip-icon,
+#sx-inv-grid .sx-item-chip.sx-rarity-rare .sx-item-chip-icon,
+#sx-inv-grid .sx-item-chip.sx-rarity-legendary .sx-item-chip-icon,
+#sx-inv-grid .sx-item-chip.sx-rarity-currency .sx-item-chip-icon {
     filter: none !important;
 }
 
@@ -993,7 +993,7 @@ img.eg-art-img {
     border: 1px solid var(--accent);
     box-shadow: 0 0 10px rgba(102,252,241,0.1);
     cursor: pointer;
-    animation: eg-hub-pulse 3s ease-in-out infinite;
+    animation: sx-hub-pulse 3s ease-in-out infinite;
     box-sizing: border-box;
 }
 
@@ -1003,13 +1003,13 @@ img.eg-art-img {
         background: rgba(102,252,241,0.05);
     }
 
-.eg-hub-card-icon {
+.sx-hub-card-icon {
     font-size: 38px;
     text-align: center;
     margin-bottom: 6px;
 }
 
-.eg-hub-card-title {
+.sx-hub-card-title {
     font-family: var(--PX);
     font-size: 11px;
     color: var(--accent);
@@ -1018,7 +1018,7 @@ img.eg-art-img {
     margin-bottom: 4px;
 }
 
-.eg-hub-card-sub {
+.sx-hub-card-sub {
     font-family: var(--PX);
     font-size: 7px;
     color: var(--setup-opt-inactive);
@@ -1026,7 +1026,7 @@ img.eg-art-img {
     letter-spacing: 2px;
 }
 
-@keyframes eg-hub-pulse {
+@keyframes sx-hub-pulse {
     0%, 100% {
         box-shadow: 0 0 10px rgba(102,252,241,0.1);
     }
@@ -1040,7 +1040,7 @@ img.eg-art-img {
 
 
 
-.eg-currency-grid {
+.sx-currency-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 2px;
@@ -1120,7 +1120,7 @@ img.eg-art-img {
 /* ── (TOOLTIP PANEL REMOVED - items now use the floating mouseover
        tooltip from tooltips-hud.js; see endgame-hub.js) ── */
 
-.eg-tooltip-item {
+.sx-tooltip-item {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1128,12 +1128,12 @@ img.eg-art-img {
     width: 100%;
 }
 
-.eg-tooltip-icon {
+.sx-tooltip-icon {
     font-size: 32px;
     line-height: 1;
 }
 
-.eg-tooltip-name {
+.sx-tooltip-name {
     font-family: var(--PX);
     font-size: 11px;
     letter-spacing: 2px;
@@ -1141,14 +1141,14 @@ img.eg-art-img {
     color: var(--accent);
 }
 
-.eg-tooltip-rarity {
+.sx-tooltip-rarity {
     font-family: var(--PX);
     font-size: 8px;
     letter-spacing: 2px;
     color: var(--setup-opt-inactive);
 }
 
-.eg-tooltip-type {
+.sx-tooltip-type {
     font-family: var(--PX);
     font-size: 7px;
     letter-spacing: 3px;
@@ -1157,7 +1157,7 @@ img.eg-art-img {
     padding: 2px 8px;
 }
 
-.eg-tooltip-desc {
+.sx-tooltip-desc {
     font-family: var(--PX);
     font-size: 7px;
     line-height: 1.6;
@@ -1168,7 +1168,7 @@ img.eg-art-img {
     width: 100%;
 }
 
-.eg-tooltip-stat {
+.sx-tooltip-stat {
     font-family: var(--PX);
     font-size: 8px;
     color: #1eff00;
@@ -1176,68 +1176,68 @@ img.eg-art-img {
 }
 
 /* Rarity-colored name in tooltip */
-.eg-tooltip-item.eg-rarity-common .eg-tooltip-name {
+.sx-tooltip-item.sx-rarity-common .sx-tooltip-name {
     color: #9d9d9d;
 }
 
-.eg-tooltip-item.eg-rarity-uncommon .eg-tooltip-name {
+.sx-tooltip-item.sx-rarity-uncommon .sx-tooltip-name {
     color: #1eff00;
 }
 
-.eg-tooltip-item.eg-rarity-rare .eg-tooltip-name {
+.sx-tooltip-item.sx-rarity-rare .sx-tooltip-name {
     color: #0070dd;
 }
 
-.eg-tooltip-item.eg-rarity-epic .eg-tooltip-name {
+.sx-tooltip-item.sx-rarity-epic .sx-tooltip-name {
     color: #a335ee;
 }
 
-.eg-tooltip-item.eg-rarity-currency .eg-tooltip-name {
+.sx-tooltip-item.sx-rarity-currency .sx-tooltip-name {
     color: #aa9060;
 }
 
 /* ── CURRENCY STRIP (legacy horizontal, now only used on Probability Gate) ── */
-.eg-currency-strip {
+.sx-currency-strip {
     flex-shrink: 0;
     border-bottom: 1px solid var(--border);
     background: var(--panel);
 }
 
-.eg-currency-row {
+.sx-currency-row {
     display: grid;
     gap: 4px;
     padding: 6px 8px 8px;
 }
 
 /* Fallback size for old horizontal layout - overridden inside hub currency grid */
-.eg-currency-cell {
+.sx-currency-cell {
     min-height: 0 !important;
     height: 38px !important;
     aspect-ratio: 1;
 }
 
 /* Hub uses the left-side currency COL instead of the horizontal strip - hide strip there */
-#screen-endgame-hub .eg-currency-strip {
+#screen-endgame-hub .sx-currency-strip {
     display: none !important;
 }
 
 /* ── HUB CURRENCY GRID specifics ── */
-#screen-endgame-hub .eg-currency-col .eg-panel-label {
+#screen-endgame-hub .sx-currency-col .sx-panel-label {
     border-bottom: 1px solid var(--border);
 }
-#screen-endgame-hub .eg-currency-col .eg-currency-grid {
+#screen-endgame-hub .sx-currency-col .sx-currency-grid {
     scrollbar-width: thin;
     scrollbar-color: var(--border2) transparent;
 }
 
 /* Assigned-empty styling for Probability Gate horizontal strip as well */
-.eg-currency-row .eg-currency-cell.eg-currency-assigned-empty {
+.sx-currency-row .sx-currency-cell.sx-currency-assigned-empty {
     background: rgba(255,255,255,0.02) !important;
     border-style: dashed !important;
     border-color: rgba(181,146,72,0.22) !important;
     position: relative;
 }
-.eg-currency-row .eg-currency-cell.eg-currency-assigned-empty::after {
+.sx-currency-row .sx-currency-cell.sx-currency-assigned-empty::after {
     content: attr(data-empty-icon);
     position: absolute;
     inset: 0;
@@ -1250,14 +1250,14 @@ img.eg-art-img {
 }
 
 /* ── STASH: unlimited rows - vertical scroll ── */
-.eg-panel-inv {
+.sx-panel-inv {
     max-height: none; /* override the old 260px cap */
     flex: 1;
     min-height: 0;
     overflow: hidden;
 }
 
-.eg-inv-grid {
+.sx-inv-grid {
     /* columns are set inline; just make sure it fills available space */
     flex: 1;
     overflow-y: auto;
@@ -1268,17 +1268,17 @@ img.eg-art-img {
     scrollbar-gutter: stable;
 }
 
-.eg-inv-grid::-webkit-scrollbar { width: 8px; }
-.eg-inv-grid::-webkit-scrollbar-track { background: transparent; }
-.eg-inv-grid::-webkit-scrollbar-thumb {
+.sx-inv-grid::-webkit-scrollbar { width: 8px; }
+.sx-inv-grid::-webkit-scrollbar-track { background: transparent; }
+.sx-inv-grid::-webkit-scrollbar-thumb {
     background: var(--border2);
     border-radius: 4px;
 }
-.eg-inv-grid::-webkit-scrollbar-thumb:hover { background: var(--accent2); }
+.sx-inv-grid::-webkit-scrollbar-thumb:hover { background: var(--accent2); }
 
 
 /* ── CHARACTER STATS CENTER PANEL ── */
-.eg-char-stats-panel {
+.sx-char-stats-panel {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -1295,27 +1295,27 @@ img.eg-art-img {
     scrollbar-color: var(--border2) transparent;
 }
 
-.eg-char-stats-panel::-webkit-scrollbar {
+.sx-char-stats-panel::-webkit-scrollbar {
     width: 6px;
 }
 
-.eg-char-stats-panel::-webkit-scrollbar-thumb {
+.sx-char-stats-panel::-webkit-scrollbar-thumb {
     background: var(--border2);
     border-radius: 3px;
 }
 
-.eg-char-stats-panel::-webkit-scrollbar-track {
+.sx-char-stats-panel::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.eg-char-stats-panel .eg-stats-header {
+.sx-char-stats-panel .sx-stats-header {
     position: sticky;
     top: 0;
     background: var(--panel);
     z-index: 1;
 }
 
-.eg-char-stats-panel .eg-stats-list {
+.sx-char-stats-panel .sx-stats-list {
     overflow: visible;
     flex: none;
 }
@@ -1325,7 +1325,7 @@ img.eg-art-img {
    Each block gets its own scrollbar; header stays sticky while list scrolls.
    Width is fluid so the whole character panel can shrink on small viewports
    without forcing the flanking tabs to overlap. */
-.eg-stat-block {
+.sx-stat-block {
     display: flex;
     flex-direction: column;
     gap: 3px;
@@ -1342,48 +1342,48 @@ img.eg-art-img {
     scrollbar-color: var(--border2) transparent;
 }
 
-.eg-stat-block::-webkit-scrollbar {
+.sx-stat-block::-webkit-scrollbar {
     width: 6px;
 }
 
-.eg-stat-block::-webkit-scrollbar-thumb {
+.sx-stat-block::-webkit-scrollbar-thumb {
     background: var(--border2);
     border-radius: 3px;
 }
 
-.eg-stat-block::-webkit-scrollbar-track {
+.sx-stat-block::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.eg-stat-block .eg-stats-header {
+.sx-stat-block .sx-stats-header {
     position: sticky;
     top: 0;
     background: var(--panel);
     z-index: 1;
 }
 
-#eg-stats-offense .eg-stats-list,
-#eg-stats-defense .eg-stats-list {
+#sx-stats-offense .sx-stats-list,
+#sx-stats-defense .sx-stats-list {
     overflow: visible;
     flex: none;
 }
 
-#eg-stats-offense {
+#sx-stats-offense {
     border-right: 1px solid var(--border);
 }
 
-#eg-stats-defense {
+#sx-stats-defense {
     border-left: 1px solid var(--border);
 }
 
-.eg-stats-category {
+.sx-stats-category {
     display: flex;
     flex-direction: column;
     gap: 2px;
     margin-bottom: 6px;
 }
 
-.eg-stats-category-title {
+.sx-stats-category-title {
     font-family: var(--PX);
     font-size: 8px;
     letter-spacing: 2px;
@@ -1396,7 +1396,7 @@ img.eg-art-img {
     user-select: none;
 }
 
-.eg-stats-header {
+.sx-stats-header {
     font-family: var(--PX);
     font-size: 7px;
     letter-spacing: 3px;
@@ -1408,7 +1408,7 @@ img.eg-art-img {
     user-select: none;
 }
 
-.eg-stats-list {
+.sx-stats-list {
     display: flex;
     flex-direction: column;
     gap: 3px;
@@ -1416,7 +1416,7 @@ img.eg-art-img {
     overflow-y: auto;
 }
 
-.eg-stat-row {
+.sx-stat-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1425,11 +1425,11 @@ img.eg-art-img {
     cursor: help;
 }
 
-.eg-stat-row:not(.eg-stat-placeholder):hover {
+.sx-stat-row:not(.sx-stat-placeholder):hover {
     background: rgba(255, 255, 255, 0.05);
 }
 
-.eg-stat-name {
+.sx-stat-name {
     font-family: var(--PX);
     font-size: 7px;
     color: var(--setup-opt-inactive);
@@ -1437,7 +1437,7 @@ img.eg-art-img {
     white-space: nowrap;
 }
 
-.eg-stat-value {
+.sx-stat-value {
     font-family: var(--PX);
     font-size: 7px;
     color: #1eff00;
@@ -1446,12 +1446,12 @@ img.eg-art-img {
     white-space: nowrap;
 }
 
-.eg-stat-placeholder {
+.sx-stat-placeholder {
     justify-content: center;
     margin-top: 20px;
 }
 
-    .eg-stat-placeholder .eg-stat-name {
+    .sx-stat-placeholder .sx-stat-name {
         text-align: center;
         opacity: 0.5;
     }
@@ -1462,44 +1462,44 @@ img.eg-art-img {
    breakpoints tighten gap/padding and stat blocks further. */
 @media (max-width: 1400px) {
     :root {
-        --eg-currency-w: clamp(140px, 15vw, 260px);
-        --eg-essence-w:  clamp(130px, 14vw, 240px);
+        --sx-currency-w: clamp(140px, 15vw, 260px);
+        --sx-essence-w:  clamp(130px, 14vw, 240px);
     }
-    .eg-char-panel.eg-char-panel-no-model { gap: 6px; padding: 6px; }
+    .sx-char-panel.sx-char-panel-no-model { gap: 6px; padding: 6px; }
 }
 @media (max-width: 1180px) {
     :root {
-        --eg-currency-w: clamp(125px, 14vw, 220px);
-        --eg-essence-w:  clamp(120px, 13vw, 210px);
+        --sx-currency-w: clamp(125px, 14vw, 220px);
+        --sx-essence-w:  clamp(120px, 13vw, 210px);
     }
-    .eg-char-panel.eg-char-panel-no-model {
+    .sx-char-panel.sx-char-panel-no-model {
         grid-template-columns: clamp(145px, 16vw, 260px) auto minmax(0, 1fr) auto clamp(145px, 16vw, 260px);
         gap: 4px; padding: 4px;
     }
-    .eg-stat-block { width: clamp(145px, 16vw, 260px); }
-    .eg-currency-grid .eg-inv-cell { height: 34px; min-height: 28px; }
-    .eg-essence-grid { gap: 1px; padding: 3px; }
+    .sx-stat-block { width: clamp(145px, 16vw, 260px); }
+    .sx-currency-grid .sx-inv-cell { height: 34px; min-height: 28px; }
+    .sx-essence-grid { gap: 1px; padding: 3px; }
 }
 @media (max-width: 980px) {
     :root {
-        --eg-currency-w: clamp(110px, 17vw, 190px);
-        --eg-essence-w:  clamp(105px, 16vw, 180px);
+        --sx-currency-w: clamp(110px, 17vw, 190px);
+        --sx-essence-w:  clamp(105px, 16vw, 180px);
     }
-    .eg-char-panel.eg-char-panel-no-model {
+    .sx-char-panel.sx-char-panel-no-model {
         grid-template-columns: clamp(130px, 15vw, 220px) auto minmax(0, 1fr) auto clamp(130px, 15vw, 220px);
     }
 }
 @media (max-width: 760px) {
     /* Very narrow: stack sidebars below? Keep grid but allow horizontal scroll
        on the character panel instead of overlapping. */
-    .eg-upper-row {
+    .sx-upper-row {
         overflow-x: auto;
         scrollbar-width: thin;
     }
 }
 
 /* ── ALT COMPARE TOOLTIP LABEL ── */
-.eg-compare-label {
+.sx-compare-label {
     font-family: var(--PX);
     font-size: 9px;
     letter-spacing: 2px;
@@ -1521,7 +1521,7 @@ img.eg-art-img {
     box-sizing: border-box;
 }
 
-.eg-gate-body .eg-panel-map {
+.eg-gate-body .sx-panel-map {
     width: min(1500px, 100%);
     border-right: none;
     align-items: stretch;
@@ -1568,7 +1568,7 @@ img.eg-art-img {
     width: 100%;
 }
 
-#screen-endgame-gate .eg-gate-currency-section .eg-currency-strip {
+#screen-endgame-gate .eg-gate-currency-section .sx-currency-strip {
     width: 100%;
     margin: 0 !important;
     border: 1px solid var(--border);
@@ -1595,7 +1595,7 @@ img.eg-art-img {
    scoped to #screen-endgame-gate so the hub layout is untouched. */
 
 /* Panel labels */
-#screen-endgame-gate .eg-panel-label {
+#screen-endgame-gate .sx-panel-label {
     font-size: 10px;
     letter-spacing: 3px;
     padding: 10px 14px 4px;
@@ -1625,7 +1625,7 @@ img.eg-art-img {
     font-size: 14px;
 }
 
-#screen-endgame-gate .eg-activate-btn {
+#screen-endgame-gate .sx-activate-btn {
     font-size: 11px;
     padding: 12px 24px;
     max-width: 280px;
@@ -1633,12 +1633,12 @@ img.eg-art-img {
 }
 
 /* Runes & orbs strip - sizing inside the left-side panel */
-#screen-endgame-gate .eg-currency-row {
+#screen-endgame-gate .sx-currency-row {
     gap: 4px;
     padding: 4px 12px 10px;
 }
 
-#screen-endgame-gate .eg-currency-cell {
+#screen-endgame-gate .sx-currency-cell {
     height: 38px !important;
 }
 
@@ -1657,30 +1657,30 @@ img.eg-art-img {
 }
 
 /* Item chips inside gate cells: bigger icons and readable text */
-#screen-endgame-gate .eg-inv-cell .eg-item-chip-icon {
+#screen-endgame-gate .sx-inv-cell .sx-item-chip-icon {
     font-size: 26px;
 }
 
-#screen-endgame-gate .eg-inv-cell .eg-item-chip-name {
+#screen-endgame-gate .sx-inv-cell .sx-item-chip-name {
     font-size: 8px;
 }
 
-#screen-endgame-gate .eg-inv-cell .eg-item-ilvl {
+#screen-endgame-gate .sx-inv-cell .sx-item-ilvl {
     font-size: 11px;
 }
 
 /* Map loaded in the device slot uses the large chip variant already;
    scale it up a bit more to match the bigger slot */
-#screen-endgame-gate .eg-map-slot .eg-item-chip-large .eg-item-chip-icon {
+#screen-endgame-gate .eg-map-slot .sx-item-chip-large .sx-item-chip-icon {
     font-size: 40px;
 }
 
-#screen-endgame-gate .eg-map-slot .eg-item-chip-large .eg-item-chip-name {
+#screen-endgame-gate .eg-map-slot .sx-item-chip-large .sx-item-chip-name {
     font-size: 9px;
 }
 
 /* ── STASH TABS - Inventory / Uniques ── */
-.eg-stash-tabs {
+.sx-stash-tabs {
     display: flex;
     gap: 6px;
     padding: 6px 10px 0;
@@ -1688,7 +1688,7 @@ img.eg-art-img {
     background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent);
     flex-shrink: 0;
 }
-.eg-stash-tab {
+.sx-stash-tab {
     font-family: var(--PX);
     font-size: 9px;
     letter-spacing: 1.5px;
@@ -1703,9 +1703,9 @@ img.eg-art-img {
     align-items: center;
     gap: 6px;
 }
-.eg-stash-tab:hover { background: rgba(255,255,255,0.08); color: #ddd; border-color: var(--border2); }
-.eg-stash-tab.active { background: var(--panel); color: var(--accent); border-color: var(--accent); box-shadow: 0 -2px 8px rgba(102,252,241,0.15); }
-.eg-stash-tab .eg-tab-count {
+.sx-stash-tab:hover { background: rgba(255,255,255,0.08); color: #ddd; border-color: var(--border2); }
+.sx-stash-tab.active { background: var(--panel); color: var(--accent); border-color: var(--accent); box-shadow: 0 -2px 8px rgba(102,252,241,0.15); }
+.sx-stash-tab .sx-tab-count {
     font-size: 8px;
     background: rgba(255,255,255,0.10);
     border-radius: 8px;
@@ -1714,15 +1714,15 @@ img.eg-art-img {
     text-align: center;
     opacity: 0.95;
 }
-.eg-stash-tab.active .eg-tab-count { background: rgba(102,252,241,0.18); color: var(--accent); }
+.sx-stash-tab.active .sx-tab-count { background: rgba(102,252,241,0.18); color: var(--accent); }
 
-.eg-stash-tab-body { display: none; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
-.eg-stash-tab-body.active { display: flex; }
-.eg-stash-tab-body.active .eg-inv-grid { flex: 1; }
-.eg-stash-tab-body.active .eg-unique-grid { flex: 1; }
+.sx-stash-tab-body { display: none; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+.sx-stash-tab-body.active { display: flex; }
+.sx-stash-tab-body.active .sx-inv-grid { flex: 1; }
+.sx-stash-tab-body.active .sx-unique-grid { flex: 1; }
 
 /* ── UNIQUE COLLECTION GRID ── */
-.eg-unique-hint {
+.sx-unique-hint {
     font-family: var(--PX);
     font-size: 7px;
     letter-spacing: 0.8px;
@@ -1731,14 +1731,14 @@ img.eg-art-img {
     line-height: 1.4;
     opacity: 0.9;
 }
-.eg-unique-count {
+.sx-unique-count {
     font-family: var(--PX);
     font-size: 8px;
     letter-spacing: 1px;
     color: var(--yellow);
     padding: 0 10px 6px;
 }
-.eg-unique-grid {
+.sx-unique-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 8px;
@@ -1752,9 +1752,9 @@ img.eg-art-img {
     scrollbar-color: var(--border2) transparent;
     scrollbar-gutter: stable;
 }
-.eg-unique-grid::-webkit-scrollbar { width: 8px; }
-.eg-unique-grid::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-.eg-unique-cell {
+.sx-unique-grid::-webkit-scrollbar { width: 8px; }
+.sx-unique-grid::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+.sx-unique-cell {
     background: var(--surface);
     border: 1px solid var(--border);
     display: flex;
@@ -1768,15 +1768,15 @@ img.eg-art-img {
     cursor: pointer;
     transition: border-color 0.12s, background 0.12s;
 }
-.eg-unique-cell.collected { border-color: rgba(243,156,18,0.45); background: rgba(243,156,18,0.08); }
-.eg-unique-cell.collected:hover { border-color: #f5b642; background: rgba(243,156,18,0.14); box-shadow: 0 0 10px rgba(243,156,18,0.2); }
-.eg-unique-cell.collected-empty { border-color: rgba(243,156,18,0.22); background: rgba(243,156,18,0.03); opacity: 0.9; border-style: dashed; }
-.eg-unique-cell.collected-empty:hover { border-color: rgba(245,182,66,0.45); background: rgba(243,156,18,0.07); }
-.eg-unique-cell.collected-empty .eg-unique-cell-icon { opacity: 0.45; filter: grayscale(0.3); }
-.eg-unique-cell.collected-empty .eg-unique-cell-name { color: #bfae7a; opacity: 0.9; }
-.eg-unique-cell.locked { opacity: 0.55; background: rgba(255,255,255,0.02); border-style: dashed; }
-.eg-unique-cell.locked:hover { opacity: 0.8; border-color: rgba(255,255,255,0.15); }
-.eg-unique-cell-name {
+.sx-unique-cell.collected { border-color: rgba(243,156,18,0.45); background: rgba(243,156,18,0.08); }
+.sx-unique-cell.collected:hover { border-color: #f5b642; background: rgba(243,156,18,0.14); box-shadow: 0 0 10px rgba(243,156,18,0.2); }
+.sx-unique-cell.collected-empty { border-color: rgba(243,156,18,0.22); background: rgba(243,156,18,0.03); opacity: 0.9; border-style: dashed; }
+.sx-unique-cell.collected-empty:hover { border-color: rgba(245,182,66,0.45); background: rgba(243,156,18,0.07); }
+.sx-unique-cell.collected-empty .sx-unique-cell-icon { opacity: 0.45; filter: grayscale(0.3); }
+.sx-unique-cell.collected-empty .sx-unique-cell-name { color: #bfae7a; opacity: 0.9; }
+.sx-unique-cell.locked { opacity: 0.55; background: rgba(255,255,255,0.02); border-style: dashed; }
+.sx-unique-cell.locked:hover { opacity: 0.8; border-color: rgba(255,255,255,0.15); }
+.sx-unique-cell-name {
     font-family: var(--PX);
     font-size: 8px;
     line-height: 1.3;
@@ -1794,8 +1794,8 @@ img.eg-art-img {
     word-break: break-word;
     user-select: none;
 }
-.eg-unique-cell.locked .eg-unique-cell-name { color: #888; }
-.eg-unique-cell-icon {
+.sx-unique-cell.locked .sx-unique-cell-name { color: #888; }
+.sx-unique-cell-icon {
     font-size: 28px;
     line-height: 1;
     position: relative;
@@ -1805,8 +1805,8 @@ img.eg-art-img {
     justify-content: center;
     flex: 1;
 }
-.eg-unique-cell.locked .eg-unique-cell-icon { opacity: 0.35; filter: grayscale(0.6); }
-.eg-unique-lock {
+.sx-unique-cell.locked .sx-unique-cell-icon { opacity: 0.35; filter: grayscale(0.6); }
+.sx-unique-lock {
     position: absolute;
     inset: 0;
     display: flex;
@@ -1817,7 +1817,7 @@ img.eg-art-img {
     opacity: 0.9;
     pointer-events: none;
 }
-.eg-unique-count-badge {
+.sx-unique-count-badge {
     position: absolute;
     bottom: -2px;
     right: 6px;
@@ -1832,8 +1832,8 @@ img.eg-art-img {
     box-shadow: 0 0 4px rgba(0,0,0,0.5);
     pointer-events: none;
 }
-.eg-unique-multi-tip { max-width: 96vw; }
-.eg-unique-multi-row {
+.sx-unique-multi-tip { max-width: 96vw; }
+.sx-unique-multi-row {
     display: flex;
     gap: 12px;
     align-items: flex-start;
@@ -1845,15 +1845,15 @@ img.eg-art-img {
     overflow-x: hidden;
     padding: 4px 2px 6px;
 }
-.eg-unique-multi-row .eg-tt-frame { flex: 0 0 320px; max-width: 340px; min-width: 280px; }
-#ghud-floating-tip.eg-unique-multi { max-width: 96vw; width: auto; max-height: 85vh; overflow-y: auto; }
-#ghud-floating-tip.eg-unique-multi .eg-tt-frame { margin: 0; }
+.sx-unique-multi-row .sx-tt-frame { flex: 0 0 320px; max-width: 340px; min-width: 280px; }
+#ghud-floating-tip.sx-unique-multi { max-width: 96vw; width: auto; max-height: 85vh; overflow-y: auto; }
+#ghud-floating-tip.sx-unique-multi .sx-tt-frame { margin: 0; }
 /* Drag-over highlight for uniques */
-.eg-unique-cell.eg-dragover,
-.eg-unique-grid.eg-dragover,
-#eg-tab-uniques.eg-dragover {
+.sx-unique-cell.sx-dragover,
+.sx-unique-grid.sx-dragover,
+#sx-tab-uniques.sx-dragover {
     outline: 2px solid #f5b642;
     background: rgba(245,182,66,0.12) !important;
 }
-.eg-unique-grid.eg-dragover { border: 1px dashed #f5b642; }
-#eg-tab-uniques.eg-dragover { box-shadow: 0 0 10px rgba(245,182,66,0.5); border-color: #f5b642 !important; color: #f5d98a !important; }
+.sx-unique-grid.sx-dragover { border: 1px dashed #f5b642; }
+#sx-tab-uniques.sx-dragover { box-shadow: 0 0 10px rgba(245,182,66,0.5); border-color: #f5b642 !important; color: #f5d98a !important; }

@@ -27,16 +27,16 @@ import { _isActive } from './combat-state.js';
 // `isCrit` and `elements` drive the RPG pop: crits are bigger/gold, elemental
 // dominance tints the number and its glow (shadow/fire/cold/lightning).
 export function _showDamageNumber(monsterId, amount, isCrit, elements) {
-    const card = document.getElementById(`eg-card-${monsterId}`);
+    const card = document.getElementById(`sx-card-${monsterId}`);
     if (!card) return;
 
     const dmgText = document.createElement('div');
     const domEl = _getDominantElement(elements);
-    let cls = 'eg-damage-number';
-    if (domEl && domEl !== 'physical') cls += ' eg-dmg-' + domEl;
-    else cls += ' eg-dmg-physical';
-    if (isCrit) cls += ' eg-dmg-crit';
-    else if (amount != null && amount > 0 && amount < 8) cls += ' eg-dmg-small';
+    let cls = 'sx-damage-number';
+    if (domEl && domEl !== 'physical') cls += ' sx-dmg-' + domEl;
+    else cls += ' sx-dmg-physical';
+    if (isCrit) cls += ' sx-dmg-crit';
+    else if (amount != null && amount > 0 && amount < 8) cls += ' sx-dmg-small';
     dmgText.className = cls;
     dmgText.textContent = `-${amount}`;
     // random horizontal jitter + tiny vertical stagger so rapid hits fan out
@@ -57,27 +57,27 @@ export function _restartFlashClass(card, cssClass) {
 
 // Triggers the damage flash CSS animation on the monster's card.
 export function _flashDamageCard(monsterId) {
-    const card = document.getElementById(`eg-card-${monsterId}`);
+    const card = document.getElementById(`sx-card-${monsterId}`);
     if (!card) return;
-    _restartFlashClass(card, 'eg-flash-damage');
+    _restartFlashClass(card, 'sx-flash-damage');
 }
 
 // Adds the kill flash class to the monster's card (plays the death animation).
 export function _flashKillCard(monsterId) {
-    const card = document.getElementById(`eg-card-${monsterId}`);
-    if (card) card.classList.add('eg-flash-kill');
+    const card = document.getElementById(`sx-card-${monsterId}`);
+    if (card) card.classList.add('sx-flash-kill');
 }
 
 // Shows the IMMUNE label and flashes the immunity animation on the monster's card.
 export function _flashImmune(monsterId) {
-    const card = document.getElementById(`eg-card-${monsterId}`);
+    const card = document.getElementById(`sx-card-${monsterId}`);
     if (!card) return;
 
-    _restartFlashClass(card, 'eg-flash-immune');
-    setTimeout(() => card.classList.remove('eg-flash-immune'), IMMUNE_FLASH_DURATION_MS);
+    _restartFlashClass(card, 'sx-flash-immune');
+    setTimeout(() => card.classList.remove('sx-flash-immune'), IMMUNE_FLASH_DURATION_MS);
 
     const label = document.createElement('div');
-    label.className = 'eg-damage-number eg-immune-label';
+    label.className = 'sx-damage-number sx-immune-label';
     label.textContent = t('eg_immune');
     card.appendChild(label);
     setTimeout(() => label.remove(), IMMUNE_LABEL_DURATION_MS);
@@ -100,7 +100,7 @@ export const HIT_BURST_DURATION_MS = 750;
 // its share of the hit; the dominant element picks the burst colour.
 // `isCrit` enlarges the burst.
 export function _spawnHitBurst(monsterId, elements, isCrit) {
-    const card = document.getElementById(`eg-card-${monsterId}`);
+    const card = document.getElementById(`sx-card-${monsterId}`);
     if (!card) return;
 
     let color = HIT_ELEMENT_COLORS.physical;
@@ -114,14 +114,14 @@ export function _spawnHitBurst(monsterId, elements, isCrit) {
 
     const rect = card.getBoundingClientRect();
     const burst = document.createElement('div');
-    burst.className = 'eg-hit-burst';
+    burst.className = 'sx-hit-burst';
     burst.style.left = `${rect.left + rect.width / 2}px`;
     burst.style.top = `${rect.top + rect.height / 2}px`;
 
     // Expanding shockwave ring
     const ring = document.createElement('div');
-    ring.className = 'eg-hit-ring';
-    ring.style.setProperty('--eg-hit-color', color);
+    ring.className = 'sx-hit-ring';
+    ring.style.setProperty('--sx-hit-color', color);
     burst.appendChild(ring);
 
     if (isCrit) {
@@ -135,10 +135,10 @@ export function _spawnHitBurst(monsterId, elements, isCrit) {
     const sparkCount = isCrit ? HIT_BURST_SPARK_COUNT + 8 : HIT_BURST_SPARK_COUNT;
     for (let i = 0; i < sparkCount; i++) {
         const spark = document.createElement('div');
-        spark.className = 'eg-hit-spark';
+        spark.className = 'sx-hit-spark';
         const angle = (Math.PI * 2 * i) / sparkCount + Math.random() * 0.5;
         const dist = isCrit ? 52 + Math.random() * 36 : 40 + Math.random() * 30;
-        spark.style.setProperty('--eg-hit-color', color);
+        spark.style.setProperty('--sx-hit-color', color);
         spark.style.setProperty('--spark-dx', `${(Math.cos(angle) * dist).toFixed(1)}px`);
         spark.style.setProperty('--spark-dy', `${(Math.sin(angle) * dist).toFixed(1)}px`);
         if (isCrit) spark.style.width = '10px';
@@ -160,21 +160,21 @@ export function _spawnHitBurst(monsterId, elements, isCrit) {
 
 // Returns the CSS class for an HP bar based on the percentage remaining.
 export function _hpBarClass(hpPct) {
-    if (hpPct > 60) return 'eg-hp-high';
-    if (hpPct > 30) return 'eg-hp-mid';
-    return 'eg-hp-low';
+    if (hpPct > 60) return 'sx-hp-high';
+    if (hpPct > 30) return 'sx-hp-mid';
+    return 'sx-hp-low';
 }
 
 // Builds the badge HTML for a monster's name row (level, boss phase, immune, target).
 // NOTE: _buildMonsterBadgesHTML is kept for any external callers.
 export function _buildMonsterBadgesHTML(m, isTarget) {
-    let html = `<span class="eg-level-badge">${t('eg_lv_badge').replace('{n}', m.level)}</span>`;
+    let html = `<span class="sx-level-badge">${t('eg_lv_badge').replace('{n}', m.level)}</span>`;
     if (m.isBoss && m.bossPhase)
-        html += `<span class="eg-boss-phase-badge eg-boss-phase-${m.bossPhase}">${t('eg_phase_badge').replace('{n}', m.bossPhase)}</span>`;
+        html += `<span class="sx-boss-phase-badge sx-boss-phase-${m.bossPhase}">${t('eg_phase_badge').replace('{n}', m.bossPhase)}</span>`;
     if (m.bossImmune)
-        html += `<span class="eg-boss-immune-badge">${t('eg_immune')}</span>`;
+        html += `<span class="sx-boss-immune-badge">${t('eg_immune')}</span>`;
     if (isTarget)
-        html += `<span class="eg-target-badge">${t('eg_target_badge')}</span>`;
+        html += `<span class="sx-target-badge">${t('eg_target_badge')}</span>`;
     return html;
 }
 
@@ -190,36 +190,36 @@ export function _calcBarPercentages(m) {
 export function _buildMonsterCardHTML(m) {
     const { hpPct, chargePct } = _calcBarPercentages(m);
     const isTarget = (m.id === globalThis._targetId);
-    const bossCls = m.isBoss ? ' eg-boss-card' : '';
-    const targetedCls = isTarget ? ' eg-card-targeted' : '';
+    const bossCls = m.isBoss ? ' sx-boss-card' : '';
+    const targetedCls = isTarget ? ' sx-card-targeted' : '';
     const traitCls = m.gauntletTrait ? ` ga-trait-${m.gauntletTrait}` : '';
 
     return `
-    <div class="eg-monster-card-compact${bossCls}${targetedCls}${traitCls}" id="eg-card-${m.id}" onclick="_selectTarget('${m.id}')" style="--eg-art:${m.artScale || 1}">
+    <div class="sx-monster-card-compact${bossCls}${targetedCls}${traitCls}" id="sx-card-${m.id}" onclick="_selectTarget('${m.id}')" style="--sx-art:${m.artScale || 1}">
         <!-- Bars stacked top-to-bottom: Charge bar then HP bar above the icon -->
-        <div class="eg-compact-bars">
-            <div class="eg-charge-track-compact">
-                <div class="eg-charge-bar" id="eg-charge-bar-${m.id}" style="width:${chargePct}%"></div>
+        <div class="sx-compact-bars">
+            <div class="sx-charge-track-compact">
+                <div class="sx-charge-bar" id="sx-charge-bar-${m.id}" style="width:${chargePct}%"></div>
             </div>
-            <div class="eg-hp-track-compact">
-                <div class="eg-hp-bar-compact ${_hpBarClass(hpPct)}" id="eg-hp-bar-${m.id}" style="width:${hpPct}%"></div>
+            <div class="sx-hp-track-compact">
+                <div class="sx-hp-bar-compact ${_hpBarClass(hpPct)}" id="sx-hp-bar-${m.id}" style="width:${hpPct}%"></div>
             </div>
         </div>
 
         <!-- Elemental ailment icons (ignite/chill/frozen/shocked/shadowburn) -->
-        <div class="eg-status-strip" id="eg-status-${m.id}"></div>
+        <div class="sx-status-strip" id="sx-status-${m.id}"></div>
 
         <!-- Emoji icon with level badge and hover tooltip -->
-        <div class="eg-emoji-wrapper${m.isBoss ? ' eg-boss-emoji-wrapper' : ''}${((m.enrageStacks || 0) > 0 || m.enraged) ? ' eg-boss-enraged' : ''} ${isTarget ? 'eg-compact-targeted' : ''}">
-            ${m.isBoss ? '<span class="eg-boss-crown">👑</span><span class="eg-boss-rage-fire"></span><span class="eg-boss-rage-badge">😡</span>' : ''}
-            <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${GAME_ART.html('monster', m.artId || m.baseId, m.emoji)}</span>
-            <span class="eg-level-bottom-left">${m.level}</span>
-            <span class="eg-grace-badge" id="eg-grace-${m.id}" style="display:none"></span>
+        <div class="sx-emoji-wrapper${m.isBoss ? ' sx-boss-emoji-wrapper' : ''}${((m.enrageStacks || 0) > 0 || m.enraged) ? ' sx-boss-enraged' : ''} ${isTarget ? 'sx-compact-targeted' : ''}">
+            ${m.isBoss ? '<span class="sx-boss-crown">👑</span><span class="sx-boss-rage-fire"></span><span class="sx-boss-rage-badge">😡</span>' : ''}
+            <span class="sx-monster-emoji-compact${m.isBoss ? ' sx-boss-emoji' : ''}">${GAME_ART.html('monster', m.artId || m.baseId, m.emoji)}</span>
+            <span class="sx-level-bottom-left">${m.level}</span>
+            <span class="sx-grace-badge" id="sx-grace-${m.id}" style="display:none"></span>
             ${m.gauntletTrait ? `<span class="ga-trait-badge" title="${m.gauntletTrait === 'warded' ? 'Spell Ward: takes 65% less damage from spells - melee works best' : (m.gauntletTrait === 'champion' ? 'Champion: tougher and hits harder' : 'Phased: takes 65% less damage from melee - spells work best')}">${m.gauntletTrait === 'warded' ? '🛡' : (m.gauntletTrait === 'champion' ? '👑' : '👻')}</span>` : ''}
 
-            <div class="eg-monster-compact-tooltip">
-                <div class="eg-tooltip-name">${m.name}</div>
-                <div class="eg-tooltip-hp" id="eg-hp-label-${m.id}">${m.currentHP} / ${m.maxHP} HP</div>
+            <div class="sx-monster-compact-tooltip">
+                <div class="sx-tooltip-name">${m.name}</div>
+                <div class="sx-tooltip-hp" id="sx-hp-label-${m.id}">${m.currentHP} / ${m.maxHP} HP</div>
             </div>
         </div>
 
@@ -238,8 +238,8 @@ const ART_FACES_LEFT = new Set([]);
 const FACE_DEADZONE_PX = 14;
 
 function _faceMonsterTowardPlayer(m) {
-    const card = document.getElementById(`eg-card-${m.id}`);
-    const art = card && card.querySelector('.eg-monster-emoji-compact');
+    const card = document.getElementById(`sx-card-${m.id}`);
+    const art = card && card.querySelector('.sx-monster-emoji-compact');
     const player = document.getElementById('player-avatar-wrapper');
     if (!art || !player) return;
     const c = card.getBoundingClientRect();
@@ -257,11 +257,11 @@ function _faceMonsterTowardPlayer(m) {
 
 // Grace period (firstStepUntil): 👣 countdown on the card + teal charge bar.
 function _updateGraceBadge(m) {
-    const badge = document.getElementById(`eg-grace-${m.id}`);
+    const badge = document.getElementById(`sx-grace-${m.id}`);
     if (!badge) return;
     const left = m.firstStepUntil ? m.firstStepUntil - Date.now() : 0;
     badge.style.display = left > 0 ? '' : 'none'; badge.textContent = left > 0 ? '👣 ' + Math.ceil(left / 1000) + 's' : '';
-    badge.parentElement.parentElement.classList.toggle('eg-card-grace', left > 0);
+    badge.parentElement.parentElement.classList.toggle('sx-card-grace', left > 0);
 }
 
 // Updates the HP bar, charge bar, and HP label for a single monster.
@@ -269,19 +269,19 @@ function _updateGraceBadge(m) {
 export function _updateMonsterBars(m) {
     const { hpPct, chargePct } = _calcBarPercentages(m);
 
-    const hpBar = document.getElementById(`eg-hp-bar-${m.id}`);
-    const chargeBar = document.getElementById(`eg-charge-bar-${m.id}`);
-    const hpLabel = document.getElementById(`eg-hp-label-${m.id}`);
+    const hpBar = document.getElementById(`sx-hp-bar-${m.id}`);
+    const chargeBar = document.getElementById(`sx-charge-bar-${m.id}`);
+    const hpLabel = document.getElementById(`sx-hp-label-${m.id}`);
 
     if (hpBar) {
         hpBar.style.width = hpPct + '%';
-        hpBar.className = `eg-hp-bar-compact ${_hpBarClass(hpPct)}`;
+        hpBar.className = `sx-hp-bar-compact ${_hpBarClass(hpPct)}`;
     }
     if (chargeBar) {
         chargeBar.style.width = chargePct + '%';
         // Danger glow when the attack is about to fire (>75% charged) - matches RPG pop
-        if (chargePct >= 75) chargeBar.classList.add('eg-charge-danger');
-        else chargeBar.classList.remove('eg-charge-danger');
+        if (chargePct >= 75) chargeBar.classList.add('sx-charge-danger');
+        else chargeBar.classList.remove('sx-charge-danger');
     }
     if (hpLabel) hpLabel.textContent = `${m.currentHP} / ${m.maxHP} HP`;
 
@@ -307,8 +307,8 @@ export function _hideMonsterPanel() {
     });
     // Legacy roam layer cleanup (encounter over).
     try { _roamTeardown(); } catch (e) {}
-    const wrapper = document.getElementById('eg-monster-wrapper');
-    if (wrapper) wrapper.classList.add('eg-hidden');
+    const wrapper = document.getElementById('sx-monster-wrapper');
+    if (wrapper) wrapper.classList.add('sx-hidden');
 }
 
 // Clears the HTML content of every monster zone panel.
@@ -326,17 +326,17 @@ export function _clearAllZones() {
 export function _renderMonstersIntoZones() {
     globalThis._monsters.forEach(m => {
         // Brutus's sacrificial zombies render as roaming cards in the fixed
-        // #eg-zombie-layer, not in the static monster panel.
+        // #sx-zombie-layer, not in the static monster panel.
         if (m.isSacrificialZombie) return;
         // The Dynamo's Lightning Conductors render as roaming cards in the
-        // fixed #eg-dynamo-layer (beam-network anchors must stay at their
+        // fixed #sx-dynamo-layer (beam-network anchors must stay at their
         // spawn spots) - never in the static monster panel.
         if (m.isDynamoConductor) return;
         // Legacy patrol hook (always false now): normal monsters stay put.
         // Occasional melee sidesteps (endgame-monster-roam.js) just change
         // zoneId and re-render here - no separate layer.
         if (_roamShouldRoam(m)) return;
-        const zoneEl = document.getElementById(m.zoneId || 'eg-monster-panel');
+        const zoneEl = document.getElementById(m.zoneId || 'sx-monster-panel');
         if (zoneEl) zoneEl.innerHTML += _buildMonsterCardHTML(m);
     });
 }
@@ -344,38 +344,38 @@ export function _renderMonstersIntoZones() {
 // Full panel rebuild. Only called on spawn, death, or target change -
 // never from the tick loop.
 export function _renderPanel() {
-    const wrapper = document.getElementById('eg-monster-wrapper');
+    const wrapper = document.getElementById('sx-monster-wrapper');
 
     if (!_isActive()) {
         _clearAllZones();
-        if (wrapper) wrapper.classList.add('eg-hidden');
+        if (wrapper) wrapper.classList.add('sx-hidden');
         return;
     }
 
-    if (wrapper) wrapper.classList.remove('eg-hidden');
+    if (wrapper) wrapper.classList.remove('sx-hidden');
 
     _clearAllZones();
     _renderMonstersIntoZones();
-    // Legacy patrol cleanup (clears the old #eg-roam-layer if present).
+    // Legacy patrol cleanup (clears the old #sx-roam-layer if present).
     try { _roamSync(); } catch (e) {}
     _startGridOverlapSync();
 }
 
-// Cards overlapping the grid get `eg-over-grid` (CSS: click-through and
+// Cards overlapping the grid get `sx-over-grid` (CSS: click-through and
 // see-through art) so monsters can draw above the grid without blocking
 // cells. One light interval per encounter; it stops itself afterwards.
 let _gridOverlapTimer = null;
 function _syncGridOverlap() {
     const grid = document.getElementById('ptable');
     const gr = grid ? grid.getBoundingClientRect() : null;
-    const cards = document.querySelectorAll('#eg-monster-wrapper .eg-monster-card-compact, .eg-floating-panel .eg-monster-card-compact');
+    const cards = document.querySelectorAll('#sx-monster-wrapper .sx-monster-card-compact, .sx-floating-panel .sx-monster-card-compact');
     cards.forEach(card => {
         let over = false;
         if (gr && gr.width > 0 && gr.height > 0) {
             const r = card.getBoundingClientRect();
             over = r.right > gr.left + 4 && r.left < gr.right - 4 && r.bottom > gr.top + 4 && r.top < gr.bottom - 4;
         }
-        card.classList.toggle('eg-over-grid', over);
+        card.classList.toggle('sx-over-grid', over);
     });
 }
 

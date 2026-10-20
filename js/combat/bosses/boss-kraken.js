@@ -49,11 +49,11 @@ export function _mechTentacleSweep(monster, phase) {
     const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const cx = window.innerWidth * 0.5, cy = window.innerHeight * 0.45;
-    const maw = _nkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '🦑');
+    const maw = _nkEl(run, 'div', 'sx-nk-dot sx-nk-anchor', '🦑');
     maw.style.transform = 'translate(' + Math.round(cx - 26) + 'px,' + Math.round(cy - 26) + 'px)';
     const tentacles = [];
     for (let i = 0; i < arms; i++) {
-        const el = _nkEl(run, 'div', 'eg-nk-arm');
+        const el = _nkEl(run, 'div', 'sx-nk-arm');
         el.style.width = Math.round(armLen) + 'px';
         el.style.height = armHalf * 2 + 'px';
         el.style.left = Math.round(cx) + 'px';

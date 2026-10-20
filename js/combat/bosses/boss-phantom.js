@@ -47,7 +47,7 @@ export function _mechVentAmbush(monster, phase) {
     const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const vents = [0.25, 0.5, 0.75].map(fx => {
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-vent', '🕳️');
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-vent', '🕳️');
         const v = { x: window.innerWidth * fx, y: window.innerHeight * 0.75, el };
         el.style.transform = 'translate(' + Math.round(v.x - 22) + 'px,' + Math.round(v.y - 22) + 'px)';
         return v;
@@ -65,8 +65,8 @@ export function _mechVentAmbush(monster, phase) {
                 vent = vents.slice().sort((a, b) =>
                     Math.hypot(c.x - a.x, c.y - a.y) - Math.hypot(c.x - b.x, c.y - b.y))[0];
             }
-            vent.el.classList.add('eg-nk-fuse');
-            mark = _nkEl(run, 'div', 'eg-nk-mark');
+            vent.el.classList.add('sx-nk-fuse');
+            mark = _nkEl(run, 'div', 'sx-nk-mark');
             mark.style.left = Math.round(vent.x - slashR) + 'px';
             mark.style.top = Math.round(vent.y - slashR) + 'px';
             mark.style.width = slashR * 2 + 'px';
@@ -77,12 +77,12 @@ export function _mechVentAmbush(monster, phase) {
             if (t >= warnMs) {
                 stage = 'slash';
                 t = 0;
-                vent.el.classList.remove('eg-nk-fuse');
-                const ghost = _nkEl(run, 'div', 'eg-nk-dot eg-nk-assassin', '👻');
+                vent.el.classList.remove('sx-nk-fuse');
+                const ghost = _nkEl(run, 'div', 'sx-nk-dot sx-nk-assassin', '👻');
                 ghost.style.transform = 'translate(' + Math.round(vent.x - 22) + 'px,' + Math.round(vent.y - 22) + 'px)';
                 setTimeout(() => ghost.remove(), 450);
                 if (mark) {
-                    mark.classList.add('eg-nk-mark-hit');
+                    mark.classList.add('sx-nk-mark-hit');
                     setTimeout(() => { if (mark) { mark.remove(); mark = null; } }, 400);
                 }
                 if (_nkCircleHit(vent.x, vent.y, slashR, _nkPlayerRect(), 0)) {

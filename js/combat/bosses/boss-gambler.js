@@ -119,7 +119,7 @@ export function _gamblerTeardown() {
         if (st.rr) { try { if (st.rr.el) st.rr.el.remove(); } catch (e) {} try { if (st.rr.shellEl) st.rr.shellEl.remove(); } catch (e) {} }
         try { if (st.run) _nkKillRun(st.run); } catch (e) {} // removes chips
     }
-    document.querySelectorAll('.eg-gmb-chips, .eg-gmb-card, .eg-gmb-wheel, .eg-gmb-wheel-result, .eg-gmb-symbol, .eg-gmb-burst, .eg-gmb-rr, .eg-gmb-shell').forEach(el => el.remove());
+    document.querySelectorAll('.sx-gmb-chips, .sx-gmb-card, .sx-gmb-wheel, .sx-gmb-wheel-result, .sx-gmb-symbol, .sx-gmb-burst, .sx-gmb-rr, .sx-gmb-shell').forEach(el => el.remove());
 }
 
 
@@ -147,7 +147,7 @@ export function _gamblerArenaInit(monster) {
     st.run = run;
 
     // The House Chips: the boss's arena body.
-    const el = _nkEl(run, 'div', 'eg-gmb-chips', '🎰');
+    const el = _nkEl(run, 'div', 'sx-gmb-chips', '🎰');
     el.style.width = el.style.height = (GMB_CHIP_R * 2) + 'px';
     st.chips = {
         x: window.innerWidth / 2, y: window.innerHeight * 0.3,
@@ -279,7 +279,7 @@ export function _gamblerThrowCard(st, p) {
     const c = _nkPlayerCenter();
     const tx = c ? c.x : window.innerWidth / 2;
     const ty = c ? c.y : window.innerHeight / 2;
-    const el = _nkEl(st.run, 'div', 'eg-gmb-card', ['🂡', '🂱', '🃁', '🃑'][Math.floor(Math.random() * 4)]);
+    const el = _nkEl(st.run, 'div', 'sx-gmb-card', ['🂡', '🂱', '🃁', '🃑'][Math.floor(Math.random() * 4)]);
     const dx = tx - ch.x, dy = ty - ch.y;
     const d = Math.hypot(dx, dy) || 1;
     const card = {
@@ -326,7 +326,7 @@ export const GMB_WHEEL_KEYS = ['snake', 'free', 'jackpot', 'win'];
 export function _gamblerWheel(st, live) {
     if (st.wheel) return;
     const W = window.innerWidth, H = window.innerHeight;
-    const el = _nkEl(st.run, 'div', 'eg-gmb-wheel', '🎲');
+    const el = _nkEl(st.run, 'div', 'sx-gmb-wheel', '🎲');
     el.style.left = Math.round(W / 2 - 80) + 'px';
     el.style.top = Math.round(H * 0.38 - 80) + 'px';
     st.wheel = { phase: 'spin', t: 0, wedge: -1, el, resultEl: null, live };
@@ -342,7 +342,7 @@ export function _gamblerWheelResolve(st, wl, live) {
     const face = GMB_WHEEL_FACES[GMB_WHEEL_KEYS.indexOf(key)];
     wl.el.textContent = face;
     wl.el.classList.add('landed');
-    const resultEl = _nkEl(st.run, 'div', 'eg-gmb-wheel-result');
+    const resultEl = _nkEl(st.run, 'div', 'sx-gmb-wheel-result');
     resultEl.style.left = window.innerWidth / 2 + 'px';
     resultEl.style.top = Math.round(window.innerHeight * 0.38 + 130) + 'px';
     wl.resultEl = resultEl;
@@ -403,7 +403,7 @@ export const GMB_SYMBOL_FACES = ['🍒', '🔔', '🍋', '7️⃣'];
 
 export function _gamblerSpawnSymbol(st) {
     const W = window.innerWidth;
-    const el = _nkEl(st.run, 'div', 'eg-gmb-symbol', GMB_SYMBOL_FACES[Math.floor(Math.random() * 4)]);
+    const el = _nkEl(st.run, 'div', 'sx-gmb-symbol', GMB_SYMBOL_FACES[Math.floor(Math.random() * 4)]);
     const fromLeft = Math.random() < 0.5;
     const sym = {
         x: fromLeft ? -30 : W + 30,
@@ -445,7 +445,7 @@ export function _gamblerTickSymbols(st, dtS, pr) {
 
 // Expanding coin burst from an expiring 7.
 export function _gamblerBurst(st, x, y) {
-    const el = _nkEl(st.run, 'div', 'eg-gmb-burst', '💰');
+    const el = _nkEl(st.run, 'div', 'sx-gmb-burst', '💰');
     el.style.left = x + 'px';
     el.style.top = y + 'px';
     st.bursts.push({ x, y, t: 0, hit: false, el });
@@ -481,7 +481,7 @@ export function _gamblerRoulette(monster) {
     if (!st || st.rr || _nkDodgeBusy() || _nkFrozen()) return;
     const c = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
-    const el = _nkEl(st.run, 'div', 'eg-gmb-rr', '🔫⚪⚪⚪⚪⚪⚪');
+    const el = _nkEl(st.run, 'div', 'sx-gmb-rr', '🔫⚪⚪⚪⚪⚪⚪');
     el.style.left = c.x + 'px';
     el.style.top = c.y + 'px';
     st.rr = { x: c.x, y: c.y, t: 0, chamber: 6, p, el, shellEl: null };
@@ -494,7 +494,7 @@ export function _gamblerRoulette(monster) {
 export function _gamblerShellPop(st, x, y) {
     try {
         const el = document.createElement('div');
-        el.className = 'eg-gmb-shell';
+        el.className = 'sx-gmb-shell';
         el.textContent = '🔘';
         el.style.left = x + 'px';
         el.style.top = y + 'px';

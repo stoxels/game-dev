@@ -2,7 +2,7 @@
 //-------------------BOSS RIG ANIMATIONS (ability cues)-------------------------
 //------------------------------------------------------------------------
 // Cosmetic only. When a boss mechanic fires, boss-framework.js dispatches
-// an 'eg-boss-mechanic' event; for the bosses listed in RIGS this module
+// an 'sx-boss-mechanic' event; for the bosses listed in RIGS this module
 // swaps the boss card's flat art for a small canvas that plays a skeletal
 // animation (arms raise, wings flap, shockwaves...) and then puts the
 // original <img> back. Nothing here touches combat state, timing or damage,
@@ -4079,8 +4079,8 @@ function _partImg(bossId, part) {
 const _running = {};   // monsterId -> true while an animation owns that card
 
 function _findArt(monsterId) {
-    const card = document.getElementById('eg-card-' + monsterId);
-    return card ? card.querySelector('.eg-monster-emoji-compact') : null;
+    const card = document.getElementById('sx-card-' + monsterId);
+    return card ? card.querySelector('.sx-monster-emoji-compact') : null;
 }
 
 // Draws one frame of an animation (progress u in 0..1) into a 1024px canvas
@@ -4180,7 +4180,7 @@ function _onBossMechanic(ev) {
     } catch (e) { /* purely cosmetic - never let it surface */ }
 }
 
-document.addEventListener('eg-boss-mechanic', _onBossMechanic);
+document.addEventListener('sx-boss-mechanic', _onBossMechanic);
 
 // Warm the part images shortly after boot (~170 KB total) so the very first
 // ability of a fight already has its art decoded and is not skipped.

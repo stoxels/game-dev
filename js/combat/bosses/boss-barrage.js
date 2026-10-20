@@ -139,11 +139,11 @@ export function _mechBarCurtain(monster, phase) {
     const gapC = span * (0.2 + Math.random() * 0.6);
     const gapLo = gapC - GAP / 2;
     const gapHi = gapC + GAP / 2;
-    const cls = 'eg-bar-curtain' + (fromTop ? ' eg-bar-curtain-v' : '') + (reverse ? ' eg-bar-curtain-rev' : '');
+    const cls = 'sx-bar-curtain' + (fromTop ? ' sx-bar-curtain-v' : '') + (reverse ? ' sx-bar-curtain-rev' : '');
     const pieces = [[0, gapLo], [gapHi, span]].map(([lo, hi]) => ({
         lo, hi, el: _nkEl(run, 'div', cls),
     }));
-    const gapEl = _nkEl(run, 'div', 'eg-bar-gap' + (fromTop ? ' eg-bar-gap-v' : ''), 'GAP');
+    const gapEl = _nkEl(run, 'div', 'sx-bar-gap' + (fromTop ? ' sx-bar-gap-v' : ''), 'GAP');
 
     let x = reverse ? reach : -BAR_CURTAIN_W;
     const sign = reverse ? -1 : 1;
@@ -158,7 +158,7 @@ export function _mechBarCurtain(monster, phase) {
             for (let i = 0; i < 3; i++) {
                 const along = Math.random() * span;
                 if (along > gapLo && along < gapHi) continue;
-                const el = _nkEl(run, 'div', 'eg-bar-splash');
+                const el = _nkEl(run, 'div', 'sx-bar-splash');
                 const sw = fromTop
                     ? [Math.round(along - 6), Math.round(x - 8)]
                     : [Math.round(x - 8), Math.round(along - 6)];
@@ -243,7 +243,7 @@ export function _mechBarSupplyDrop(monster, phase) {
 
     const warnEls = [];
     spots.forEach(s => {
-        const el = _nkEl(run, 'div', 'eg-bar-drop-warn');
+        const el = _nkEl(run, 'div', 'sx-bar-drop-warn');
         el.style.left = Math.round(s.x - 42) + 'px';
         el.style.top = Math.round(s.y - 42) + 'px';
         warnEls.push(el);
@@ -258,7 +258,7 @@ export function _mechBarSupplyDrop(monster, phase) {
             warnEls.forEach(el => { try { el.remove(); } catch (e) {} });
             // Landed crates → artillery jammers.
             spots.forEach(s => {
-                const el = _nkEl(run, 'div', 'eg-bar-jammer', '📦');
+                const el = _nkEl(run, 'div', 'sx-bar-jammer', '📦');
                 el.style.left = Math.round(s.x - 26) + 'px';
                 el.style.top = Math.round(s.y - 26) + 'px';
                 s.jammerEl = el;
@@ -291,7 +291,7 @@ export function _mechBarSupplyDrop(monster, phase) {
                 s.lastLob = now;
                 const targetX = pc.x + (Math.random() * 160 - 80);
                 const targetY = pc.y + (Math.random() * 160 - 80);
-                const shell = _nkEl(run, 'div', 'eg-nk-dot eg-bar-mortar', '💥');
+                const shell = _nkEl(run, 'div', 'sx-nk-dot sx-bar-mortar', '💥');
                 shell.style.left = Math.round(s.x - 9) + 'px';
                 shell.style.top = Math.round(s.y - 9) + 'px';
                 const dist = Math.hypot(targetX - s.x, targetY - s.y);
@@ -313,7 +313,7 @@ export function _mechBarSupplyDrop(monster, phase) {
                     L.done = true;
                     try { L.shell.remove(); } catch (e) {}
                     // Impact ring at the landing spot.
-                    const boom = _nkEl(run, 'div', 'eg-bar-mortar-boom');
+                    const boom = _nkEl(run, 'div', 'sx-bar-mortar-boom');
                     boom.style.left = Math.round(L.tx - 34) + 'px';
                     boom.style.top = Math.round(L.ty - 34) + 'px';
                     setTimeout(() => { try { boom.remove(); } catch (e) {} }, 500 * _BAR_DEBUG_MULT);
@@ -361,7 +361,7 @@ export function _mechBarShotShells(monster, phase) {
         const near = i < BAR_SHELL_COUNT[p] - 1;
         const x = near ? pc.x + (Math.random() * 260 - 130) : Math.random() * W;
         const y = near ? pc.y + (Math.random() * 260 - 130) : Math.random() * H;
-        const warn = _nkEl(run, 'div', 'eg-bar-shell-warn');
+        const warn = _nkEl(run, 'div', 'sx-bar-shell-warn');
         warn.style.left = Math.round(x - 46) + 'px';
         warn.style.top = Math.round(y - 46) + 'px';
         shells.push({ x, y, warn, born: performance.now(), struck: false });
@@ -378,7 +378,7 @@ export function _mechBarShotShells(monster, phase) {
             if (now - s.born >= BAR_SHELL_WARN_MS * _BAR_DEBUG_MULT) {
                 s.struck = true;
                 try { s.warn.remove(); } catch (e) {}
-                const boom = _nkEl(run, 'div', 'eg-bar-shell-boom');
+                const boom = _nkEl(run, 'div', 'sx-bar-shell-boom');
                 boom.style.left = Math.round(s.x - 52) + 'px';
                 boom.style.top = Math.round(s.y - 52) + 'px';
                 setTimeout(() => { try { boom.remove(); } catch (e) {} }, 500 * _BAR_DEBUG_MULT);
@@ -388,7 +388,7 @@ export function _mechBarShotShells(monster, phase) {
                 // Shrapnel scatter: 6 spokes per burst, keeps travelling.
                 for (let k = 0; k < 6; k++) {
                     const a = (k / 6) * Math.PI * 2 + Math.random() * 0.35;
-                    const el = _nkEl(run, 'div', 'eg-nk-dot eg-bar-shrap', '🔥');
+                    const el = _nkEl(run, 'div', 'sx-nk-dot sx-bar-shrap', '🔥');
                     shrap.push({ x: s.x, y: s.y, vx: Math.cos(a) * BAR_SHRAP_SPD, vy: Math.sin(a) * BAR_SHRAP_SPD, t: 0, hitDone: false, el });
                 }
             }
@@ -462,7 +462,7 @@ export function _mechBarBombBarrage(monster, phase) {
         const sy = H * (0.22 + Math.random() * 0.46);
         if (coverCrates.length && Math.abs(sx - coverCrates[0].x) < 260) sx = coverCrates[0].x + (sx < coverCrates[0].x ? -260 : 260);
         sx = Math.max(W * 0.1, Math.min(W * 0.9, sx));
-        const warn = _nkEl(run, 'div', 'eg-bar-drop-warn');
+        const warn = _nkEl(run, 'div', 'sx-bar-drop-warn');
         warn.style.left = Math.round(sx - 42) + 'px';
         warn.style.top = Math.round(sy - 42) + 'px';
         coverCrates.push({ x: sx, y: sy, warn, el: null, ring: null, landed: false, cover: true, dead: false, hp: BAR_CRATE_HP });
@@ -470,7 +470,7 @@ export function _mechBarBombBarrage(monster, phase) {
     _nkToast('eg_mech_bar_bombs', '💣 BOMB BARRAGE - TAKE COVER next to a crate! Bombs wear the crates down - keep moving between them!', '#ff6b35');
 
     const ringFor = (c) => {
-        const ring = _nkEl(run, 'div', 'eg-bar-cover-ring');
+        const ring = _nkEl(run, 'div', 'sx-bar-cover-ring');
         ring.style.left = Math.round(c.x - BAR_COVER_RADIUS) + 'px';
         ring.style.top = Math.round(c.y - BAR_COVER_RADIUS) + 'px';
         ring.style.width = ring.style.height = (BAR_COVER_RADIUS * 2) + 'px';
@@ -488,8 +488,8 @@ export function _mechBarBombBarrage(monster, phase) {
     const wearCrate = (c) => {
         c.hp -= 1;
         if (c.cover && c.el) {
-            c.el.classList.add('eg-bar-crate-hit');
-            setTimeout(() => { try { c.el.classList.remove('eg-bar-crate-hit'); } catch (e) {} }, 220);
+            c.el.classList.add('sx-bar-crate-hit');
+            setTimeout(() => { try { c.el.classList.remove('sx-bar-crate-hit'); } catch (e) {} }, 220);
         }
         if (c.hp <= 0) {
             c.dead = true;
@@ -518,7 +518,7 @@ export function _mechBarBombBarrage(monster, phase) {
                 if (c.landed) return;
                 c.landed = true;
                 try { c.warn.remove(); } catch (e) {}
-                c.el = _nkEl(run, 'div', 'eg-bar-jammer eg-bar-cover-crate', '📦');
+                c.el = _nkEl(run, 'div', 'sx-bar-jammer sx-bar-cover-crate', '📦');
                 c.el.style.left = Math.round(c.x - 26) + 'px';
                 c.el.style.top = Math.round(c.y - 26) + 'px';
                 c.ring = ringFor(c);
@@ -532,7 +532,7 @@ export function _mechBarBombBarrage(monster, phase) {
             const aimed = spawned % 3 === 0;
             const bx = aimed ? pc.x + (Math.random() * 60 - 30) : W * (0.05 + Math.random() * 0.9);
             const by = aimed ? pc.y + (Math.random() * 60 - 30) : H * (0.08 + Math.random() * 0.84);
-            const warn = _nkEl(run, 'div', 'eg-bar-bomb-warn', '💣');
+            const warn = _nkEl(run, 'div', 'sx-bar-bomb-warn', '💣');
             warn.style.left = Math.round(bx - BAR_BOMB_RADIUS) + 'px';
             warn.style.top = Math.round(by - BAR_BOMB_RADIUS) + 'px';
             bombs.push({ x: bx, y: by, warn, born: t });
@@ -544,7 +544,7 @@ export function _mechBarBombBarrage(monster, phase) {
             if (t - b.born < BAR_BOMB_WARN_MS * _BAR_DEBUG_MULT) continue;
             bombs.splice(i, 1);
             try { b.warn.remove(); } catch (e) {}
-            const boom = _nkEl(run, 'div', 'eg-bar-bomb-boom');
+            const boom = _nkEl(run, 'div', 'sx-bar-bomb-boom');
             boom.style.left = Math.round(b.x - BAR_BOMB_RADIUS) + 'px';
             boom.style.top = Math.round(b.y - BAR_BOMB_RADIUS) + 'px';
             setTimeout(() => { try { boom.remove(); } catch (e) {} }, 450 * _BAR_DEBUG_MULT);
@@ -668,9 +668,9 @@ export function _barFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -679,10 +679,10 @@ export function _barFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-bar-cd';
+    ov.className = 'sx-bar-cd';
     ov.innerHTML =
-        '<div class="eg-bar-cd-label">🍎 FINAL BOMBARDMENT</div>' +
-        '<div class="eg-bar-cd-hint">Three strikes - then the ALL-OUT SALVO. Run to a GREEN tile each time!</div>';
+        '<div class="sx-bar-cd-label">🍎 FINAL BOMBARDMENT</div>' +
+        '<div class="sx-bar-cd-hint">Three strikes - then the ALL-OUT SALVO. Run to a GREEN tile each time!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -692,11 +692,11 @@ export function _barFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss card wears the all-out war-machine while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-bar-allin');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-bar-allin');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
@@ -719,12 +719,12 @@ export function _barFinalStart(monster) {
         const reach1 = _barReachableTile(cols, rows, cw, rh, 2200 * _BAR_DEBUG_MULT);
         const safeCols = [reach1[0], Math.floor(Math.random() * cols)];
         const safeRows = [reach1[1], Math.floor(Math.random() * rows)];
-        g.fxRun.els.forEach(el => { try { if (el.classList && el.classList.contains('eg-bar-strike')) el.remove(); } catch (e) {} });
+        g.fxRun.els.forEach(el => { try { if (el.classList && el.classList.contains('sx-bar-strike')) el.remove(); } catch (e) {} });
         const cells = [];
         for (let c = 0; c < cols; c++) {
             for (let r = 0; r < rows; r++) {
                 const isSafe = (c === safeCols[0] && r === safeRows[0]) || (c === safeCols[1] && r === safeRows[1]);
-                const el = _nkEl(g.fxRun, 'div', 'eg-bar-strike' + (isSafe ? ' eg-bar-strike-safe' : ''));
+                const el = _nkEl(g.fxRun, 'div', 'sx-bar-strike' + (isSafe ? ' sx-bar-strike-safe' : ''));
                 el.style.left = Math.round(c * cw) + 'px';
                 el.style.top = Math.round(r * rh) + 'px';
                 el.style.width = Math.ceil(cw) + 'px';
@@ -736,7 +736,7 @@ export function _barFinalStart(monster) {
         _barAfter(g, 2200 * _BAR_DEBUG_MULT, () => {
             if (g.finished) return;
             // STRIKE: every non-safe cell erupts.
-            cells.forEach(c => { if (!c.isSafe) c.el.classList.add('eg-bar-strike-hot'); });
+            cells.forEach(c => { if (!c.isSafe) c.el.classList.add('sx-bar-strike-hot'); });
             const pc = _barPC();
             let caught = false;
             for (const c of cells) {
@@ -749,7 +749,7 @@ export function _barFinalStart(monster) {
             }
             _barAfter(g, 900 * _BAR_DEBUG_MULT, () => {
                 if (g.finished) return;
-                g.fxRun.els.forEach(el => { try { if (el.classList && el.classList.contains('eg-bar-strike')) el.remove(); } catch (e) {} });
+                g.fxRun.els.forEach(el => { try { if (el.classList && el.classList.contains('sx-bar-strike')) el.remove(); } catch (e) {} });
                 runVolley();
             });
         });
@@ -769,7 +769,7 @@ export function _barFinalStart(monster) {
         for (let c = 0; c < cols; c++) {
             for (let r = 0; r < rows; r++) {
                 const isSafe = c === safeC && r === safeR;
-                const el = _nkEl(g.fxRun, 'div', 'eg-bar-strike' + (isSafe ? ' eg-bar-strike-safe eg-bar-safe-pulse' : ''));
+                const el = _nkEl(g.fxRun, 'div', 'sx-bar-strike' + (isSafe ? ' sx-bar-strike-safe sx-bar-safe-pulse' : ''));
                 el.style.left = Math.round(c * cw) + 'px';
                 el.style.top = Math.round(r * rh) + 'px';
                 el.style.width = Math.ceil(cw) + 'px';
@@ -780,7 +780,7 @@ export function _barFinalStart(monster) {
 
         _barAfter(g, 3300 * _BAR_DEBUG_MULT, () => {
             if (g.finished) return;
-            g.salvoTiles.forEach(t => { if (!t.isSafe) t.el.classList.add('eg-bar-strike-hot'); });
+            g.salvoTiles.forEach(t => { if (!t.isSafe) t.el.classList.add('sx-bar-strike-hot'); });
             const pc = _barPC();
             let caught = true;
             for (const t of g.salvoTiles) {
@@ -809,18 +809,18 @@ export function _barFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.eg-bar-strike, .eg-bar-cd').forEach(el => {
+    document.querySelectorAll('.sx-bar-strike, .sx-bar-cd').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.remove('eg-bar-allin');
-        wrap.classList.remove('eg-nk-shielded');
+        wrap.classList.remove('sx-bar-allin');
+        wrap.classList.remove('sx-nk-shielded');
     }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -839,16 +839,16 @@ export function _barTeardown() {
     if (_barFinal) { try { _barFinalEnd(_barFinal, null); } catch (e) {} _barFinal = null; }
     _barBombRun = null;
     _barCrates.length = 0;
-    document.querySelectorAll('.eg-bar-curtain, .eg-bar-splash, .eg-bar-drop-warn, .eg-bar-jammer, ' +
-        '.eg-bar-bomb-warn, .eg-bar-bomb-boom, .eg-bar-cover-ring, ' +
-        '.eg-bar-mortar, .eg-bar-mortar-boom, .eg-bar-shell-warn, .eg-bar-shell-boom, .eg-bar-shrap, ' +
-        '.eg-bar-strike, .eg-bar-cd').forEach(el => {
+    document.querySelectorAll('.sx-bar-curtain, .sx-bar-splash, .sx-bar-drop-warn, .sx-bar-jammer, ' +
+        '.sx-bar-bomb-warn, .sx-bar-bomb-boom, .sx-bar-cover-ring, ' +
+        '.sx-bar-mortar, .sx-bar-mortar-boom, .sx-bar-shell-warn, .sx-bar-shell-boom, .sx-bar-shrap, ' +
+        '.sx-bar-strike, .sx-bar-cd').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-bar-allin').forEach(el => el.classList.remove('eg-bar-allin'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.querySelectorAll('.sx-bar-allin').forEach(el => el.classList.remove('sx-bar-allin'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

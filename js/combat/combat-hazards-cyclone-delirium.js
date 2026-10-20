@@ -26,7 +26,7 @@ export function _hzInitCyclone(intensity) {
         const angle = Math.random() * Math.PI * 2;
 
         const el = document.createElement('div');
-        el.className = 'eg-hz-cyclone';
+        el.className = 'sx-hz-cyclone';
         const size = r * 2;
         el.style.width = size + 'px';
         el.style.height = size * 1.6 + 'px';
@@ -99,7 +99,7 @@ export function _hzTickDelirium(dtMs) {
         st.nextIn -= dtMs;
         if (st.nextIn <= 0) {
             const mist = document.createElement('div');
-            mist.className = 'eg-hz-delirium';
+            mist.className = 'sx-hz-delirium';
             mist.style.animationDuration =
                 `${HZ_DELIRIUM_FADE_IN_MS}ms, ${HZ_DELIRIUM_FADE_OUT_MS}ms`;
             mist.style.animationDelay = `0ms, ${HZ_DELIRIUM_FADE_IN_MS + HZ_DELIRIUM_HOLD_MS}ms`;

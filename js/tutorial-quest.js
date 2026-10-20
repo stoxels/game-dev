@@ -420,9 +420,9 @@ function _tqFormatLine(textKey) {
         if (sbKey) line = line.replace(/\{key_spellbook\}/g, keybindDisplayLabel(sbKey));
         // Melee attack (E), target cycling (Tab) and the character sheet (B)
         // for the puzzle-3 combat lessons.
-        const atkKey = keybindKeyFor('eg-attack');
+        const atkKey = keybindKeyFor('sx-attack');
         if (atkKey) line = line.replace(/\{key_attack\}/g, keybindDisplayLabel(atkKey));
-        const parryKey = keybindKeyFor('eg-parry');
+        const parryKey = keybindKeyFor('sx-parry');
         if (parryKey) line = line.replace(/\{key_parry\}/g, keybindDisplayLabel(parryKey));
         const tgtKey = keybindKeyFor('cycle-target');
         if (tgtKey) line = line.replace(/\{key_target\}/g, keybindDisplayLabel(tgtKey));
@@ -629,7 +629,7 @@ function _tqTeardownTutorialState() {
 //----------------------MEET-THE-PROFESSOR CIRCLE--------------------------
 //------------------------------------------------------------------------
 // Opening task of puzzle 1: a golden circle appears next to the Professor
-// (same mechanic/look as the endgame safe circles, e.g. .eg-shr-safe-circle)
+// (same mechanic/look as the endgame safe circles, e.g. .sx-shr-safe-circle)
 // and the player must WALK the avatar into it. Once the avatar stands inside,
 // the circle turns green, disappears and the next Professor line plays.
 
@@ -1310,7 +1310,7 @@ function _tqStepsFor(phase) {
             { task: 'first_fill' },   // bubble vanishes on the first correct reveal
             { say: 'tq_p2_s1c', task: 'drag_shot' },   // drag-paint 4+ cells in one stroke = one bigger charged shot (skipped if the rat dies first)
             { say: 'tq_p2_s1b', task: 'kill_monster' },   // fully defeat the rat
-            { say: 'tq_p2_s2', fn: () => { _tqPointAtDrop('.eg-pickup-overlay:not(.eg-loot-overlay)'); } },   // pick the heart up (left-click only)
+            { say: 'tq_p2_s2', fn: () => { _tqPointAtDrop('.sx-pickup-overlay:not(.sx-loot-overlay)'); } },   // pick the heart up (left-click only)
             { task: 'pick_heart' },
             { fn: () => { _tqGridLocked = false; _tqP2HeartOpen = false; _tqP2HeartCell = null; _tqClearHighlights(); _tqRefreshGridLockBorder(); } },   // heart healed - free board to finish
             { say: 'tq_p2_s3', task: 'solve_puzzle' },   // excellent - finish the puzzle
@@ -1319,14 +1319,14 @@ function _tqStepsFor(phase) {
             // Sword lesson: no monster yet, board locked, sword drops on the
             // grid and is claimed with a single left-click.
             { say: 'tq_p3_s0', wait: true, fn: () => { _tqGridLocked = true; _tqActiveDemo = null; _tqRefreshGridLockBorder(); } },
-            { say: 'tq_p3_s1', fn: () => { _tqPlaceSwordDrop(); _tqPointAtDrop('.eg-loot-overlay'); } },
+            { say: 'tq_p3_s1', fn: () => { _tqPlaceSwordDrop(); _tqPointAtDrop('.sx-loot-overlay'); } },
             { task: 'pick_sword' },
             // Equip lesson: B opens the sheet over the paused run.
             { say: 'tq_p3_s2', task: 'sword_equipped', fn: () => { _tqGridLocked = true; _tqClearHighlights(); _tqRefreshGridLockBorder(); } },
             // Melee lesson: the bat arrives, grid stays sealed, blades only.
             { say: 'tq_p3_s3', task: 'melee_kill', fn: () => { _tqSpawnP3Bat(); } },
             // Charm lesson: the bat drops a Fireball charm onto the grid.
-            { say: 'tq_p3_s4', fn: () => { _tqPlaceCharmDrop(); _tqPointAtDrop('.eg-charm-overlay, [id^="eg-charm-"]'); } },
+            { say: 'tq_p3_s4', fn: () => { _tqPlaceCharmDrop(); _tqPointAtDrop('.sx-charm-overlay, [id^="sx-charm-"]'); } },
             { task: 'pick_charm' },
             // Spellbook lesson: slot the charm and Fireball appears on the
             // matching hotbar key (slot N = hotbar key N). No drag step.
@@ -1342,10 +1342,10 @@ function _tqStepsFor(phase) {
             // celebrate, not an empty field (the bounce re-runs this spawn).
             { say: 'tq_p3_s7', task: 'fireball_kill', fn: () => { _tqSpawnP3Ghost(); _tqPointAt('.skill-hotbar-slot[data-skill="' + TQ_FIREBALL_ID + '"]'); } },
             // Ghost spoils: a real Candle, claimed with the correct click.
-            { say: 'tq_p3_s8', task: 'pick_candle', fn: () => { _tqPointAtDrop('.eg-item-drop-overlay'); } },
+            { say: 'tq_p3_s8', task: 'pick_candle', fn: () => { _tqPointAtDrop('.sx-item-drop-overlay'); } },
             // The hard lesson: a Divine Orb, destroyed with the wrong click
             // on purpose - the gate switches into destroy mode (right only).
-            { say: 'tq_p3_s8b', task: 'orb_destroyed', fn: () => { _tqP3DropCell = _tqP3OrbKey; _tqP3DropButton = 2; _tqP3DropOpen = true; _tqClearHighlights(); _tqPointAtDrop('.eg-currency-drop-overlay'); } },
+            { say: 'tq_p3_s8b', task: 'orb_destroyed', fn: () => { _tqP3DropCell = _tqP3OrbKey; _tqP3DropButton = 2; _tqP3DropOpen = true; _tqClearHighlights(); _tqPointAtDrop('.sx-currency-drop-overlay'); } },
             { fn: () => { _tqGridLocked = false; _tqP3DropOpen = false; _tqP3DropCell = null; _tqClearHighlights(); _tqRefreshGridLockBorder(); } },
             { say: 'tq_p3_s9', task: 'solve_puzzle' },
             { say: 'tq_p3_s10', wait: true },
@@ -2136,7 +2136,7 @@ function _tqPointAtGearDrop() {
     let attempts = 0;
     const tryPoint = () => {
         if (_tqP2GearClaimed) return;
-        const el = document.querySelector('.eg-loot-overlay');
+        const el = document.querySelector('.sx-loot-overlay');
         if (el) { _tqHighlight(el); _tqShowPointerLine(); return; }
         if (++attempts < 40) setTimeout(tryPoint, 400);
     };

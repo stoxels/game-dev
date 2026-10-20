@@ -46,7 +46,7 @@ const WARDEN_TRI_R = 135;         // px triangle radius around the player
 
 // LOCKDOWN finale (shared waves): the totems lock the arena down.
 const WARDEN_FINALE = {
-    name: 'The Warden', title: '🗼 LOCKDOWN', element: 'lightning', cls: 'eg-nk-fin-storm', color: '#fde047',
+    name: 'The Warden', title: '🗼 LOCKDOWN', element: 'lightning', cls: 'sx-nk-fin-storm', color: '#fde047',
     toastKey: 'eg_mech_warden_final',
     hint: 'The totems lock the arena - read each circle!',
     waves: [
@@ -74,8 +74,8 @@ function _wardenSpots() {
 }
 
 function _wardenTotemEl(run, s) {
-    const el = _nkEl(run, 'div', 'eg-ward-totem');
-    el.innerHTML = '<i class="eg-ward-totem-cap"></i>';
+    const el = _nkEl(run, 'div', 'sx-ward-totem');
+    el.innerHTML = '<i class="sx-ward-totem-cap"></i>';
     el.style.left = Math.round(s.x - 18) + 'px';
     el.style.top = Math.round(s.y - 34) + 'px';
     return el;
@@ -107,8 +107,8 @@ export function _mechTotemPulse(monster, phase) {
             stage = 'warn';
             t = 0;
             hitDone = false;
-            tot.el.classList.add('eg-ward-totem-hot');
-            zoneEl = _nkEl(run, 'div', 'eg-ward-zone');
+            tot.el.classList.add('sx-ward-totem-hot');
+            zoneEl = _nkEl(run, 'div', 'sx-ward-zone');
             zoneEl.style.left = Math.round(tot.x - blastR) + 'px';
             zoneEl.style.top = Math.round(tot.y - blastR) + 'px';
             zoneEl.style.width = zoneEl.style.height = (blastR * 2) + 'px';
@@ -116,8 +116,8 @@ export function _mechTotemPulse(monster, phase) {
             if (t >= warnMs) {
                 stage = 'blast';
                 t = 0;
-                tot.el.classList.remove('eg-ward-totem-hot');
-                ringEl = _nkEl(run, 'div', 'eg-nk-ring eg-ward-ring');
+                tot.el.classList.remove('sx-ward-totem-hot');
+                ringEl = _nkEl(run, 'div', 'sx-nk-ring sx-ward-ring');
             }
         } else if (stage === 'blast') {
             const f = Math.min(1, t / expandMs);
@@ -164,12 +164,12 @@ export function _mechWardenArcs(monster, phase) {
     const base = spots.map(s => ({ a: Math.atan2(s.y - cy, s.x - cx), r: Math.hypot(s.x - cx, s.y - cy) }));
     const totemEls = spots.map(s => {
         const el = _wardenTotemEl(run, s);
-        el.classList.add('eg-ward-totem-hot');
+        el.classList.add('sx-ward-totem-hot');
         return el;
     });
     const pairs = [[0, 1], [1, 2], [2, 0]];
     const arcs = pairs.map(([a, b]) => {
-        const el = _nkEl(run, 'div', 'eg-ward-arc eg-ward-arc-warn');
+        const el = _nkEl(run, 'div', 'sx-ward-arc sx-ward-arc-warn');
         return { a, b, el };
     });
     const place = () => arcs.forEach(arc => {
@@ -189,7 +189,7 @@ export function _mechWardenArcs(monster, phase) {
         t += dtS * 1000;
         if (!live && t >= warnMs) {
             live = true;
-            arcs.forEach(a => { a.el.classList.remove('eg-ward-arc-warn'); a.el.classList.add('eg-ward-arc-live'); });
+            arcs.forEach(a => { a.el.classList.remove('sx-ward-arc-warn'); a.el.classList.add('sx-ward-arc-live'); });
         }
         if (live) {
             const f = Math.min(1, (t - warnMs) / liveMs);

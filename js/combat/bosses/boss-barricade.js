@@ -60,7 +60,7 @@ export function _mechBulletWalls(monster, phase) {
         q.y = -cell - 10;
         for (let x = 0; x < W; x += cell) {
             if (x + cell > q.gapX && x < q.gapX + gapW) continue;
-            const el = _nkEl(run, 'div', 'eg-nk-tetblock eg-nk-wallshot');
+            const el = _nkEl(run, 'div', 'sx-nk-tetblock sx-nk-wallshot');
             el.style.width = (cell - 3) + 'px';
             el.style.height = (cell - 3) + 'px';
             q.blocks.push({ x, el });

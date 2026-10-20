@@ -167,8 +167,8 @@
 }
 
 /* Puzzle-item art inside the claim banner + ledger chips: emoji-sized. */
-.qcb-rewards img.eg-art-img,
-#quest-log-modal .quest-reward-item img.eg-art-img {
+.qcb-rewards img.sx-art-img,
+#quest-log-modal .quest-reward-item img.sx-art-img {
     width: 1.3em;
     height: 1.3em;
     object-fit: contain;

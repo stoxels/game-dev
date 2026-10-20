@@ -100,8 +100,8 @@ export let _sproutLungeActive = false; // a vine lunge set-piece is running
 export function _sproutSweep() {
     _sproutLungeActive = false;
     try {
-        document.querySelectorAll('.eg-sprout-vine, .eg-sprout-dust, .eg-sprout-bramble, .eg-sprout-whip, .eg-sprout-bud, .eg-sprout-spore, .eg-sprout-mote, .eg-sprout-lunge, .eg-sprout-conn, .eg-sprout-ringlock').forEach(el => el.remove());
-        document.querySelectorAll('.eg-brambled').forEach(el => el.classList.remove('eg-brambled'));
+        document.querySelectorAll('.sx-sprout-vine, .sx-sprout-dust, .sx-sprout-bramble, .sx-sprout-whip, .sx-sprout-bud, .sx-sprout-spore, .sx-sprout-mote, .sx-sprout-lunge, .sx-sprout-conn, .sx-sprout-ringlock').forEach(el => el.remove());
+        document.querySelectorAll('.sx-brambled').forEach(el => el.classList.remove('sx-brambled'));
     } catch (e) {}
 }
 
@@ -125,19 +125,19 @@ export function _sproutVinePool() {
     const pool = [];
     for (let r = 0; r < sol.length; r++)
         for (let c = 0; c < sol[r].length; c++)
-            if (usr[r] && usr[r][c] !== sol[r][c] && !document.getElementById(`eg-vine-${r}-${c}`))
+            if (usr[r] && usr[r][c] !== sol[r][c] && !document.getElementById(`sx-vine-${r}-${c}`))
                 pool.push([r, c]);
     return pool;
 }
 
 
 export function _sproutAddVine(r, c) {
-    const key = `eg-vine-${r}-${c}`;
+    const key = `sx-vine-${r}-${c}`;
     if (document.getElementById(key)) return;
     const cell = document.getElementById(`g-${r}-${c}`);
     if (!cell) return;
     const el = document.createElement('span');
-    el.className = 'eg-sprout-vine';
+    el.className = 'sx-sprout-vine';
     el.id = key;
     el.textContent = '🌿';
     cell.appendChild(el);
@@ -152,8 +152,8 @@ export function _sproutCellIntercept(row, col) {
     const st = _sproutWatcher;
     if (!st) return false;
     // Vined cell: this click prunes the vine only.
-    if (document.getElementById(`eg-vine-${row}-${col}`)) {
-        const el = document.getElementById(`eg-vine-${row}-${col}`);
+    if (document.getElementById(`sx-vine-${row}-${col}`)) {
+        const el = document.getElementById(`sx-vine-${row}-${col}`);
         el.classList.add('prune');
         setTimeout(() => { try { el.remove(); } catch (e) {} }, 240);
         try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('sprout_prune'); } catch (e) {}
@@ -186,7 +186,7 @@ export function _sproutPollenBurst(st) {
     // Visual puff around the player.
     const c = _nkPlayerCenter();
     if (c) {
-        const puff = _nkEl(st.run, 'div', 'eg-sprout-puff');
+        const puff = _nkEl(st.run, 'div', 'sx-sprout-puff');
         puff.style.left = Math.round(c.x) + 'px';
         puff.style.top = Math.round(c.y) + 'px';
         setTimeout(() => { try { puff.remove(); } catch (e) {} }, 600);
@@ -219,7 +219,7 @@ export function _sproutVineLunge(monster) {
     const cx = angle === 0 ? W / 2 : px;
     const cy = angle === 0 ? py : H / 2;
 
-    const band = _nkEl(run, 'div', 'eg-sprout-lunge');
+    const band = _nkEl(run, 'div', 'sx-sprout-lunge');
     const len = (angle === 0 ? W + 80 : H + 80);
     band.style.width = Math.round(len) + 'px';
     band.style.height = SPROUT_LUNGE_H + 'px';
@@ -317,7 +317,7 @@ export function _sproutArenaInit(monster) {
         const vInt = SPROUT_VINE_INTERVAL_MS[p] || SPROUT_VINE_INTERVAL_MS[1];
         if (st.vineAcc >= vInt) {
             st.vineAcc = 0;
-            const alive = document.querySelectorAll('.eg-sprout-vine:not(.prune)').length;
+            const alive = document.querySelectorAll('.sx-sprout-vine:not(.prune)').length;
             const cap = SPROUT_VINE_CAP[p] || SPROUT_VINE_CAP[1];
             if (alive < cap) {
                 const pool = _sproutVinePool();
@@ -334,7 +334,7 @@ export function _sproutArenaInit(monster) {
         if (st.sporeAcc >= sInt && st.spores.length < 8) {
             st.sporeAcc = 0;
             const fromLeft = Math.random() < 0.5;
-            const el = _nkEl(run, 'div', 'eg-sprout-spore', '🟢');
+            const el = _nkEl(run, 'div', 'sx-sprout-spore', '🟢');
             st.spores.push({
                 x: fromLeft ? -20 : W + 20,
                 dir: fromLeft ? 1 : -1,
@@ -413,7 +413,7 @@ export function _sproutArenaInit(monster) {
                 b.whips.forEach(w => { if (!w.done) { try { w.el.remove(); } catch (e) {} } });
                 (b.connEls || []).forEach(el => { try { el.remove(); } catch (e) {} });
                 (b.lockEls || []).forEach(el => { try { el.remove(); } catch (e) {} });
-                document.querySelectorAll('.eg-brambled').forEach(el => el.classList.remove('eg-brambled'));
+                document.querySelectorAll('.sx-brambled').forEach(el => el.classList.remove('sx-brambled'));
                 st.bramble = null;
             }
         }
@@ -445,14 +445,14 @@ export function _sproutArenaInit(monster) {
         st.dustAcc = (st.dustAcc || 0) + dtS * 1000;
         st.dust.forEach((timer, key) => {
             if (st.dustAcc >= timer) {
-                const el = document.getElementById(`eg-dust-${key}`);
+                const el = document.getElementById(`sx-dust-${key}`);
                 if (el) { el.classList.add('fade'); setTimeout(() => { try { el.remove(); } catch (e) {} }, 300); }
                 st.dust.delete(key);
                 st.dustWarn.delete(key);
             } else if (timer - st.dustAcc < SPROUT_DUST_WARN_MS) {
                 if (!st.dustWarn.has(key)) {
                     st.dustWarn.add(key);
-                    const el = document.getElementById(`eg-dust-${key}`);
+                    const el = document.getElementById(`sx-dust-${key}`);
                     if (el) el.classList.add('expiring');
                 }
             }
@@ -488,7 +488,7 @@ export function _sproutBrambleWall(st) {
     if (!gridR) return;
     const T = 14; // bramble strip thickness
     const mk = (x, y, w, h) => {
-        const el = _nkEl(st.run, 'div', 'eg-sprout-bramble');
+        const el = _nkEl(st.run, 'div', 'sx-sprout-bramble');
         el.style.left = Math.round(x) + 'px';
         el.style.top = Math.round(y) + 'px';
         el.style.width = Math.round(w) + 'px';
@@ -509,7 +509,7 @@ export function _sproutBrambleWall(st) {
         else if (side === 1) { bx = gridR.left + Math.random() * gridR.width; by = gridR.bottom + T; rot = Math.PI / 2; } // down
         else if (side === 2) { bx = gridR.left - T; by = gridR.top + Math.random() * gridR.height; rot = Math.PI; }       // left
         else { bx = gridR.right + T; by = gridR.top + Math.random() * gridR.height; rot = 0; }                            // right
-        const el = _nkEl(st.run, 'div', 'eg-sprout-whip');
+        const el = _nkEl(st.run, 'div', 'sx-sprout-whip');
         el.style.transformOrigin = '0 50%';
         el.style.transform = 'rotate(' + rot + 'rad)';
         // Pre-lash telegraph: a coiled thorn nub marks each lash point from
@@ -535,7 +535,7 @@ export function _sproutBrambleWall(st) {
                 const cr = cell.getBoundingClientRect();
                 const cx = cr.left + cr.width / 2, cy = cr.top + cr.height / 2;
                 // Connector: a thin thorned root from the wall strip into the cell.
-                const conn = _nkEl(st.run, 'div', 'eg-sprout-conn');
+                const conn = _nkEl(st.run, 'div', 'sx-sprout-conn');
                 conn.style.animationDelay = ((i * 26) % 520) + 'ms'; // staggered grow-in wave
                 if (r === 0) {
                     conn.style.left = Math.round(cx - 2) + 'px'; conn.style.top = Math.round(gridR.top) + 'px';
@@ -552,10 +552,10 @@ export function _sproutBrambleWall(st) {
                 }
                 connEls.push(conn);
                 // Cell lock: thorn badge + green seal tint on the cell itself.
-                cell.classList.add('eg-brambled');
+                cell.classList.add('sx-brambled');
                 const lock = document.createElement('span');
-                lock.className = 'eg-sprout-ringlock';
-                lock.id = `eg-ringlock-${r}-${c}`;
+                lock.className = 'sx-sprout-ringlock';
+                lock.id = `sx-ringlock-${r}-${c}`;
                 lock.textContent = '🌵';
                 cell.appendChild(lock);
                 lockEls.push(lock);
@@ -585,7 +585,7 @@ export function _sproutGrowBud(st) {
     const cell = document.getElementById(`g-${r}-${c}`);
     if (!cell) return;
     const cr = cell.getBoundingClientRect();
-    const el = _nkEl(st.run, 'div', 'eg-sprout-bud', '🌸');
+    const el = _nkEl(st.run, 'div', 'sx-sprout-bud', '🌸');
     el.style.left = Math.round(cr.left + cr.width / 2) + 'px';
     el.style.top = Math.round(cr.top + cr.height / 2) + 'px';
     el.style.fontSize = SPROUT_BUD_R + 'px';
@@ -615,8 +615,8 @@ export function _sproutBloom(st, br, bc, tNow) {
                 const cell = document.getElementById(`g-${r}-${c}`);
                 if (!cell) continue;
                 const el = document.createElement('span');
-                el.className = 'eg-sprout-dust';
-                el.id = `eg-dust-${key}`;
+                el.className = 'sx-sprout-dust';
+                el.id = `sx-dust-${key}`;
                 el.textContent = '🌼';
                 cell.appendChild(el);
                 st.dust.set(key, tNow + SPROUT_DUST_MS);
@@ -631,7 +631,7 @@ export function _sproutBloom(st, br, bc, tNow) {
     const cy = cr ? cr.top + cr.height / 2 : window.innerHeight / 2;
     for (let i = 0; i < SPROUT_MOTE_N; i++) {
         const a = (i / SPROUT_MOTE_N) * Math.PI * 2 + Math.random() * 0.5;
-        const el = _nkEl(st.run, 'div', 'eg-sprout-mote', '🌼');
+        const el = _nkEl(st.run, 'div', 'sx-sprout-mote', '🌼');
         st.motes.push({
             x: cx, y: cy,
             vx: Math.cos(a) * SPROUT_MOTE_SPEED * (0.8 + Math.random() * 0.4),
@@ -661,7 +661,7 @@ export function _mechSproutlings(monster, phase) {
     const level = monster ? monster.level : 1;
     const minis = [];
     for (let i = 0; i < count; i++) {
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-sprout', '🌱');
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-sprout', '🌱');
         const m = {
             x: i % 2 === 0 ? 50 : window.innerWidth - 50,
             y: window.innerHeight - 60 - i * 30,

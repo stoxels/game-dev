@@ -54,7 +54,7 @@ export function _hzActivateVolatileWisp(wisp) {
     wisp.life = HZ_VOLATILE_LIFETIME_MS;
     wisp.state = 'hunt';
     const el = document.createElement('div');
-    el.className = 'eg-hz-volatile';
+    el.className = 'sx-hz-volatile';
     _hzLayer.appendChild(el);
     wisp.el = el;
 }
@@ -64,7 +64,7 @@ export function _hzDetonateVolatile(wisp) {
     wisp.state = 'dead';
     Audio_Manager.playSFX('hz_volatile_detonate');
     if (wisp.el) {
-        wisp.el.classList.add('eg-hz-volatile-blast');
+        wisp.el.classList.add('sx-hz-volatile-blast');
         const el = wisp.el;
         setTimeout(() => el.remove(), 400);
         wisp.el = null;
@@ -121,7 +121,7 @@ export function _hzTickVolatile(dtMs) {
                     w.state = 'fuse';
                     Audio_Manager.playSFX('hz_volatile_arm');
                     w.t = HZ_VOLATILE_FUSE_MS;
-                    w.el.classList.add('eg-hz-volatile-fuse');
+                    w.el.classList.add('sx-hz-volatile-fuse');
                     return;
                 }
                 w.x += (dx / dist) * w.speed * dtS;
@@ -169,7 +169,7 @@ export function _hzSpawnFrostNova() {
     y = Math.max(20, Math.min(window.innerHeight - 20, y));
 
     const el = document.createElement('div');
-    el.className = 'eg-hz-frostnova';
+    el.className = 'sx-hz-frostnova';
     el.style.left = x + 'px';
     el.style.top = y + 'px';
     _hzLayer.appendChild(el);
@@ -275,7 +275,7 @@ export function _hzCreateFirewallWallEls(variant, gapX, gapW, startY) {
     const els = [];
     if (!hasGap) {
         const el = document.createElement('div');
-        el.className = 'eg-hz-firewall';
+        el.className = 'sx-hz-firewall';
         el.style.height = h + 'px';
         el.style.transform = `translateY(${Math.round(startY)}px)`;
         el.style.display = 'none';
@@ -291,7 +291,7 @@ export function _hzCreateFirewallWallEls(variant, gapX, gapW, startY) {
         const rightW = Math.max(0, vw - rightX);
         const mkSeg = (left, width) => {
             const seg = document.createElement('div');
-            seg.className = 'eg-hz-firewall eg-hz-firewall--gap-seg';
+            seg.className = 'sx-hz-firewall sx-hz-firewall--gap-seg';
             seg.style.height = h + 'px';
             seg.style.left = left + 'px';
             seg.style.right = 'auto';
@@ -307,7 +307,7 @@ export function _hzCreateFirewallWallEls(variant, gapX, gapW, startY) {
         // If both degenerate (should not happen), fallback to single full wall.
         if (els.length === 0) {
             const el = document.createElement('div');
-            el.className = 'eg-hz-firewall';
+            el.className = 'sx-hz-firewall';
             el.style.height = h + 'px';
             el.style.transform = `translateY(${Math.round(startY)}px)`;
             el.style.display = 'none';
@@ -324,7 +324,7 @@ export function _hzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
     const els = [];
     if (!hasGap) {
         const warn = document.createElement('div');
-        warn.className = 'eg-hz-firewall-warning';
+        warn.className = 'sx-hz-firewall-warning';
         // Position at the wall's start location so the safe strip is visible.
         warn.style.top = Math.round(startY) + 'px';
         warn.style.height = h + 'px';
@@ -339,7 +339,7 @@ export function _hzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
         const rightW = Math.max(0, vw - rightX);
         const mkWarnSeg = (left, width) => {
             const seg = document.createElement('div');
-            seg.className = 'eg-hz-firewall-warning eg-hz-firewall-warning--gap-seg';
+            seg.className = 'sx-hz-firewall-warning sx-hz-firewall-warning--gap-seg';
             seg.style.top = Math.round(startY) + 'px';
             seg.style.height = h + 'px';
             seg.style.left = left + 'px';
@@ -352,7 +352,7 @@ export function _hzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
         if (rightW > 2) els.push(mkWarnSeg(rightX, rightW));
         if (els.length === 0) {
             const warn = document.createElement('div');
-            warn.className = 'eg-hz-firewall-warning';
+            warn.className = 'sx-hz-firewall-warning';
             warn.style.top = Math.round(startY) + 'px';
             warn.style.height = h + 'px';
             if (_hzLayer) _hzLayer.appendChild(warn);

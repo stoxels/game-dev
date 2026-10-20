@@ -154,11 +154,11 @@ body.gauntlet-open #puzzle-scaler-wrap { pointer-events: none; }
     pointer-events: none;
     filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.9));
 }
-.eg-monster-card-compact.ga-trait-warded .eg-emoji-wrapper {
+.sx-monster-card-compact.ga-trait-warded .sx-emoji-wrapper {
     box-shadow: 0 0 14px 2px rgba(255, 200, 70, 0.75), inset 0 0 12px rgba(255, 200, 70, 0.35);
     border-radius: 12px;
 }
-.eg-monster-card-compact.ga-trait-phased .eg-monster-emoji-compact {
+.sx-monster-card-compact.ga-trait-phased .sx-monster-emoji-compact {
     opacity: 0.62;
     filter: drop-shadow(0 0 8px rgba(150, 190, 255, 0.95)) saturate(0.7);
     animation: ga-phase 1.6s ease-in-out infinite alternate;
@@ -200,7 +200,7 @@ body.gauntlet-open #puzzle-scaler-wrap { pointer-events: none; }
 .ga-goal-ok { color: #b9ffcf; }
 .ga-goal-no { color: #8a7da0; }
 .ga-gold { color: #ffe27a; }
-.eg-monster-card-compact.ga-trait-champion .eg-emoji-wrapper {
+.sx-monster-card-compact.ga-trait-champion .sx-emoji-wrapper {
     box-shadow: 0 0 18px 4px rgba(255, 90, 90, 0.75);
     border-radius: 12px;
 }

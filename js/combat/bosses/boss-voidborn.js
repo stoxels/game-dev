@@ -63,7 +63,7 @@ export function _mechVoidChoice(monster, phase) {
     }
     const realFirst = Math.random() < 0.5;
     const mkZone = (z, real) => {
-        const el = _nkEl(run, 'div', 'eg-nk-mem' + (real ? ' eg-nk-mem-on' : ''));
+        const el = _nkEl(run, 'div', 'sx-nk-mem' + (real ? ' sx-nk-mem-on' : ''));
         el.textContent = real ? '✨' : '';
         el.style.left = Math.round(z.x - radius) + 'px';
         el.style.top = Math.round(z.y - radius) + 'px';
@@ -79,7 +79,7 @@ export function _mechVoidChoice(monster, phase) {
         e += dtS * 1000;
         if (!resolved && e >= warnMs) {
             // The false zone collapses; judgment begins.
-            (realFirst ? elB : elA).classList.add('eg-nk-mark-hit');
+            (realFirst ? elB : elA).classList.add('sx-nk-mark-hit');
             resolved = true;
         }
         if (e >= warnMs + activeMs) {
@@ -112,7 +112,7 @@ export function _mechVoidTendrils(monster, phase) {
     ];
     const tendrils = [];
     for (let i = 0; i < count; i++) {
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-tendril', '🐙');
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-tendril', '🐙');
         const cn = corners[i % corners.length];
         tendrils.push({ x: cn[0], y: cn[1], wob: Math.random() * 6.28, cdUntil: 0, el });
     }

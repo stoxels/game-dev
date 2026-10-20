@@ -100,7 +100,7 @@ export function _setEssenceFilter(slotType) {
     _essenceFilterSlotType = slotType;
     _renderEssenceStash();
     // Update the dropdown to reflect the current selection
-    const select = document.getElementById('eg-essence-filter-select');
+    const select = document.getElementById('sx-essence-filter-select');
     if (select) select.value = slotType;
 }
 
@@ -112,8 +112,8 @@ export function _setEssenceFilter(slotType) {
 // Builds a single essence tab cell div (drop target) with empty-slot hover preview.
 export function _buildEssenceCellHTML(row, col) {
     return `
-<div class="eg-inv-cell eg-essence-cell"
-     id="eg-essence-cell-${row}-${col}"
+<div class="sx-inv-cell sx-essence-cell"
+     id="sx-essence-cell-${row}-${col}"
      data-row="${row}" data-col="${col}"
      data-eg-dropzone="essence"
      onmouseenter="_onEssenceCellEnter(${row}, ${col}, event)"
@@ -147,14 +147,14 @@ export function _buildEssenceTabHTML() {
     }
 
     return `
-<div class="eg-panel eg-panel-essence">
-    <div class="eg-panel-label">
+<div class="sx-panel sx-panel-essence">
+    <div class="sx-panel-label">
         ${t('eg_essences_tab')}
-        <select id="eg-essence-filter-select" class="eg-essence-filter-select" onchange="_setEssenceFilter(this.value)" data-tip-t="eg_essence_filter_title">
+        <select id="sx-essence-filter-select" class="sx-essence-filter-select" onchange="_setEssenceFilter(this.value)" data-tip-t="eg_essence_filter_title">
             ${filterOptions}
         </select>
     </div>
-    <div class="eg-essence-grid" id="eg-essence-grid"
+    <div class="sx-essence-grid" id="sx-essence-grid"
          style="grid-template-columns: repeat(${ESSENCE_COLS}, 1fr);">
         ${cellsHTML}
     </div>
@@ -183,19 +183,19 @@ export function _onEssenceCellEnter(row, col, e) {
     let essenceDetailHTML = '';
     try { essenceDetailHTML = _buildEssenceDetailHTML(def); } catch (err) { essenceDetailHTML = ''; }
     const html = `
-<div class="eg-tt-frame" style="--tt-border:#b59248;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon" style="opacity:0.55;">${GAME_ART.html('item', assignedId, ttIcon)}</div>
-        <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${ttName}</div>
-        <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_essence')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
+<div class="sx-tt-frame" style="--tt-border:#b59248;">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon" style="opacity:0.55;">${GAME_ART.html('item', assignedId, ttIcon)}</div>
+        <div class="sx-tt-name" style="color:#f5d98a; opacity:0.9;">${ttName}</div>
+        <div class="sx-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_essence')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
     </div>
-    <div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:0.85;">${ttDesc}</div></div>
+    <div class="sx-tt-section"><div class="sx-tt-desc" style="opacity:0.85;">${ttDesc}</div></div>
     ${essenceDetailHTML}
 </div>`;
     if (typeof showGameTooltip === 'function') globalThis.showGameTooltip(html, e);
 }
 export function _onEssenceCellMove(e) {
-    const cell = e.currentTarget || (e.target.closest && e.target.closest('.eg-essence-cell'));
+    const cell = e.currentTarget || (e.target.closest && e.target.closest('.sx-essence-cell'));
     if (!cell) return;
     const r = +cell.dataset.row, c = +cell.dataset.col;
     const stash = (typeof _essenceStash !== 'undefined') ? _essenceStash : null;
@@ -210,7 +210,7 @@ export function _onEssenceCellLeave() {
 // Re-renders a single cell in the essence tab grid (fixed-slot with placeholder).
 export function _renderEssenceCell(row, col) {
     if (!_essenceStash[row]) return;
-    const cell = document.getElementById(`eg-essence-cell-${row}-${col}`);
+    const cell = document.getElementById(`sx-essence-cell-${row}-${col}`);
     if (!cell) return;
     const item = _essenceStash[row][col];
     const assignedId = _essenceIdForSlot(row, col);
@@ -230,13 +230,13 @@ export function _renderEssenceCell(row, col) {
         }
     }
 
-    cell.classList.toggle('eg-essence-filtered-out', !matchesFilter);
+    cell.classList.toggle('sx-essence-filtered-out', !matchesFilter);
     cell.style.pointerEvents = matchesFilter ? '' : 'none';
 
     // Hide filtered-out items completely (don't render chip)
     if (!matchesFilter) {
         cell.innerHTML = '';
-        cell.classList.add('eg-essence-assigned-empty');
+        cell.classList.add('sx-essence-assigned-empty');
         cell.removeAttribute('data-empty-icon');
         cell.removeAttribute('data-tip');
         return;
@@ -244,7 +244,7 @@ export function _renderEssenceCell(row, col) {
 
     if (item) {
         cell.innerHTML = _dndBuildCurrencyChipHTML(item);
-        cell.classList.remove('eg-essence-assigned-empty');
+        cell.classList.remove('sx-essence-assigned-empty');
         cell.removeAttribute('data-empty-icon');
         // The chip carries its own richer tooltip, so the cell-level one must go
         // - otherwise a leftover data-tip on the parent would keep winning the
@@ -252,7 +252,7 @@ export function _renderEssenceCell(row, col) {
         cell.removeAttribute('data-tip');
     } else if (assignedId && def) {
         cell.innerHTML = '';
-        cell.classList.add('eg-essence-assigned-empty');
+        cell.classList.add('sx-essence-assigned-empty');
         // Empty slots preview their essence art (dimmed via CSS) once
         // loaded, else the classic emoji ::after placeholder.
         const emptyArt = GAME_ART ? GAME_ART.url('item', assignedId) : null;
@@ -264,7 +264,7 @@ export function _renderEssenceCell(row, col) {
             img.draggable = false;
             img.loading = 'lazy';
             img.decoding = 'async';
-            img.className = 'eg-art-img eg-empty-slot-art';
+            img.className = 'sx-art-img sx-empty-slot-art';
             cell.appendChild(img);
         } else if (def.icon) {
             cell.setAttribute('data-empty-icon', def.icon);
@@ -272,7 +272,7 @@ export function _renderEssenceCell(row, col) {
         cell.setAttribute('data-tip', globalThis._tipAttr(def.name || assignedId));
     } else {
         cell.innerHTML = '';
-        cell.classList.remove('eg-essence-assigned-empty');
+        cell.classList.remove('sx-essence-assigned-empty');
         cell.removeAttribute('data-empty-icon');
         cell.removeAttribute('data-tip');
     }
@@ -291,9 +291,9 @@ export function _renderEssenceStash() {
 // lazily on first use). Cells rendered with emoji fallbacks before that
 // refresh here so they swap to art without needing a reload.
 if (typeof document !== 'undefined' && document.addEventListener) {
-    document.addEventListener('eg-art-loaded', function () {
+    document.addEventListener('sx-art-loaded', function () {
         try {
-            if (document.getElementById('eg-essence-cell-0-0')) {
+            if (document.getElementById('sx-essence-cell-0-0')) {
                 _renderEssenceStash();
             }
         } catch (e) { /* essence tab not open - safe to ignore */ }
@@ -306,35 +306,35 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 //----------------------------------------------------------------------
 
 (function _injectEssenceStyles() {
-    if (document.getElementById('eg-essence-styles')) return;
+    if (document.getElementById('sx-essence-styles')) return;
     const style = document.createElement('style');
-    style.id = 'eg-essence-styles';
+    style.id = 'sx-essence-styles';
     style.textContent = `
         /* Essence tab cells highlight while a drag hovers them */
-        .eg-essence-cell.eg-dragover {
+        .sx-essence-cell.sx-dragover {
             outline: 2px solid #a0a0ff;
             background: rgba(100, 100, 255, 0.18);
         }
         /* Essence icon glow */
-        .eg-item-chip.eg-rarity-essence .eg-item-chip-icon {
+        .sx-item-chip.sx-rarity-essence .sx-item-chip-icon {
             filter: drop-shadow(0 0 4px #b06ae0);
         }
         /* Essence detail in tooltip */
-        .eg-tt-essence-detail { padding-top: 6px; }
-        .eg-tt-essence-title { color: #b59248; font-weight: 700; font-size: 0.82rem; margin-bottom: 5px; letter-spacing: 0.02em; }
-        .eg-tt-essence-line { display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.78rem; line-height: 1.45; padding: 3px 0; border-bottom: 1px solid rgba(181,146,72,0.08); }
-        .eg-tt-essence-line:last-of-type { border-bottom: none; }
-        .eg-tt-essence-slots { color: #9aa0b8; flex: 1 1 55%; min-width: 140px; white-space: normal; word-break: break-word; }
-        .eg-tt-essence-mod { color: #f5d98a; font-weight: 600; white-space: normal; flex: 0 0 auto; word-break: break-word; overflow-wrap: anywhere; }
-        .eg-tt-essence-mod.eg-tt-essence-random { color: #ccc; font-style: italic; font-weight: 400; }
-        .eg-tt-essence-note { color: #7a7a8a; font-size: 0.70rem; line-height: 1.35; margin-top: 6px; font-style: italic; opacity: 0.9; }
+        .sx-tt-essence-detail { padding-top: 6px; }
+        .sx-tt-essence-title { color: #b59248; font-weight: 700; font-size: 0.82rem; margin-bottom: 5px; letter-spacing: 0.02em; }
+        .sx-tt-essence-line { display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.78rem; line-height: 1.45; padding: 3px 0; border-bottom: 1px solid rgba(181,146,72,0.08); }
+        .sx-tt-essence-line:last-of-type { border-bottom: none; }
+        .sx-tt-essence-slots { color: #9aa0b8; flex: 1 1 55%; min-width: 140px; white-space: normal; word-break: break-word; }
+        .sx-tt-essence-mod { color: #f5d98a; font-weight: 600; white-space: normal; flex: 0 0 auto; word-break: break-word; overflow-wrap: anywhere; }
+        .sx-tt-essence-mod.sx-tt-essence-random { color: #ccc; font-style: italic; font-weight: 400; }
+        .sx-tt-essence-note { color: #7a7a8a; font-size: 0.70rem; line-height: 1.35; margin-top: 6px; font-style: italic; opacity: 0.9; }
         /* Empty assigned essence slot placeholder (mirrors currency) */
-        .eg-essence-cell.eg-essence-assigned-empty {
+        .sx-essence-cell.sx-essence-assigned-empty {
             border: 1px dashed rgba(176,106,224,0.35);
             background: rgba(176,106,224,0.06);
             position: relative;
         }
-        .eg-essence-cell.eg-essence-assigned-empty::after {
+        .sx-essence-cell.sx-essence-assigned-empty::after {
             content: attr(data-empty-icon);
             position: absolute;
             left: 50%; top: 50%;
@@ -343,14 +343,14 @@ if (typeof document !== 'undefined' && document.addEventListener) {
             opacity: 0.22;
             pointer-events: none;
         }
-        .eg-essence-grid { gap: 4px; }
-        .eg-essence-cell { position: relative; min-height: 38px; }
-        .eg-panel-essence .eg-essence-grid { max-height: 560px; overflow-y: auto; padding-right: 4px; }
-        .eg-panel-essence .eg-essence-grid::-webkit-scrollbar { width: 6px; }
-        .eg-panel-essence .eg-essence-grid::-webkit-scrollbar-thumb { background: rgba(176,106,224,0.35); border-radius: 3px; }
+        .sx-essence-grid { gap: 4px; }
+        .sx-essence-cell { position: relative; min-height: 38px; }
+        .sx-panel-essence .sx-essence-grid { max-height: 560px; overflow-y: auto; padding-right: 4px; }
+        .sx-panel-essence .sx-essence-grid::-webkit-scrollbar { width: 6px; }
+        .sx-panel-essence .sx-essence-grid::-webkit-scrollbar-thumb { background: rgba(176,106,224,0.35); border-radius: 3px; }
         /* Essence filter dropdown */
-        .eg-panel-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-        .eg-essence-filter-select {
+        .sx-panel-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .sx-essence-filter-select {
             font-family: var(--PX);
             font-size: 12px;
             letter-spacing: 1px;
@@ -361,17 +361,17 @@ if (typeof document !== 'undefined' && document.addEventListener) {
             cursor: pointer;
             min-width: 100px;
         }
-        .eg-essence-filter-select:hover { border-color: var(--accent2); }
-        .eg-essence-filter-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 4px rgba(102,252,241,0.3); }
+        .sx-essence-filter-select:hover { border-color: var(--accent2); }
+        .sx-essence-filter-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 4px rgba(102,252,241,0.3); }
         /* Filtered-out essence cells (dimmed when filter is active) */
-        .eg-essence-cell.eg-essence-filtered-out {
+        .sx-essence-cell.sx-essence-filtered-out {
             opacity: 0.2;
         }
-        .eg-essence-cell.eg-essence-filtered-out.eg-essence-assigned-empty {
+        .sx-essence-cell.sx-essence-filtered-out.sx-essence-assigned-empty {
             border-color: rgba(176,106,224,0.1);
             background: rgba(176,106,224,0.02);
         }
-        .eg-essence-cell.eg-essence-filtered-out .eg-item-chip {
+        .sx-essence-cell.sx-essence-filtered-out .sx-item-chip {
             opacity: 0.3;
             filter: grayscale(1);
         }

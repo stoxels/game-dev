@@ -50,9 +50,9 @@ export function _mechThreadGrid(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const wires = [];
     [0.25, 0.5, 0.75].forEach((f, i) => {
-        const h = _nkEl(run, 'div', 'eg-nk-thread-h');
+        const h = _nkEl(run, 'div', 'sx-nk-thread-h');
         h.style.top = Math.round(H * f) + 'px';
-        const v = _nkEl(run, 'div', 'eg-nk-thread-v');
+        const v = _nkEl(run, 'div', 'sx-nk-thread-v');
         v.style.left = Math.round(W * f) + 'px';
         wires.push({ axis: 'h', pos: H * f, el: h, idx: i });
         wires.push({ axis: 'v', pos: W * f, el: v, idx: i + 3 });
@@ -61,8 +61,8 @@ export function _mechThreadGrid(monster, phase) {
         wires.forEach((w, i) => {
             const live = liveSet.has(i);
             const warn = liveSet.warn && liveSet.warn.has(i);
-            w.el.classList.toggle('eg-nk-thread-live', !!live);
-            w.el.classList.toggle('eg-nk-thread-warn', !!warn && !live);
+            w.el.classList.toggle('sx-nk-thread-live', !!live);
+            w.el.classList.toggle('sx-nk-thread-warn', !!warn && !live);
         });
     };
     _nkToast('eg_mech_weaver', '🕸️ The Weaver: Thread Grid! Read the flicker!');

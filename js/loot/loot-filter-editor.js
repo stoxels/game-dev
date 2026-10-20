@@ -22,40 +22,40 @@ export function _lootFilterEscapeHTML(s) {
 // Builds the static editor shell once and returns the existing modal if present.
 export function _ensureLootFilterModal() {
     _injectLootFilterStyles();
-    let modal = document.getElementById('eg-loot-filter-modal');
+    let modal = document.getElementById('sx-loot-filter-modal');
     if (modal) return modal;
     modal = document.createElement('div');
-    modal.id = 'eg-loot-filter-modal';
-    modal.className = 'eg-lf-modal-bg';
+    modal.id = 'sx-loot-filter-modal';
+    modal.className = 'sx-lf-modal-bg';
     modal.innerHTML = `
-<div class="eg-lf-box" id="eg-lf-box">
-    <div class="eg-lf-head">
-        <span class="eg-lf-head-icon">⚗</span>
-        <span class="eg-lf-head-title">${t('eg_loot_filter_title')}</span>
-        <button class="eg-lf-close" onclick="_lootFilterCloseModal()" data-tip-t="eg_loot_filter_close" aria-label="${t('eg_loot_filter_close')}">✕</button>
+<div class="sx-lf-box" id="sx-lf-box">
+    <div class="sx-lf-head">
+        <span class="sx-lf-head-icon">⚗</span>
+        <span class="sx-lf-head-title">${t('eg_loot_filter_title')}</span>
+        <button class="sx-lf-close" onclick="_lootFilterCloseModal()" data-tip-t="eg_loot_filter_close" aria-label="${t('eg_loot_filter_close')}">✕</button>
     </div>
-    <div class="eg-lf-body">
-        <div class="eg-lf-how">
-            <div class="eg-lf-how-title">${t('eg_loot_filter_how')}</div>
-            <div class="eg-lf-how-li"><span class="eg-lf-how-b">▸</span><span>${t('eg_loot_filter_b1')}</span></div>
-            <div class="eg-lf-how-li"><span class="eg-lf-how-b">▸</span><span>${t('eg_loot_filter_b2')}</span></div>
-            <div class="eg-lf-how-li"><span class="eg-lf-how-b">▸</span><span>${t('eg_loot_filter_b3')}</span></div>
+    <div class="sx-lf-body">
+        <div class="sx-lf-how">
+            <div class="sx-lf-how-title">${t('eg_loot_filter_how')}</div>
+            <div class="sx-lf-how-li"><span class="sx-lf-how-b">▸</span><span>${t('eg_loot_filter_b1')}</span></div>
+            <div class="sx-lf-how-li"><span class="sx-lf-how-b">▸</span><span>${t('eg_loot_filter_b2')}</span></div>
+            <div class="sx-lf-how-li"><span class="sx-lf-how-b">▸</span><span>${t('eg_loot_filter_b3')}</span></div>
         </div>
-        <div class="eg-lf-toggles">
-            <label class="eg-lf-toggle"><input type="checkbox" id="eg-lf-enabled" class="eg-lf-check"><span>${t('eg_loot_filter_enable')}</span></label>
-            <label class="eg-lf-toggle eg-lf-toggle-gold"><input type="checkbox" id="eg-lf-keep-unique" class="eg-lf-check"><span>${t('eg_loot_filter_keep_unique')}</span></label>
+        <div class="sx-lf-toggles">
+            <label class="sx-lf-toggle"><input type="checkbox" id="sx-lf-enabled" class="sx-lf-check"><span>${t('eg_loot_filter_enable')}</span></label>
+            <label class="sx-lf-toggle sx-lf-toggle-gold"><input type="checkbox" id="sx-lf-keep-unique" class="sx-lf-check"><span>${t('eg_loot_filter_keep_unique')}</span></label>
         </div>
-        <div class="eg-lf-rules-zone" id="eg-lf-rules-zone">
-            <div class="eg-lf-section-head"><span class="eg-lf-section-title">${t('eg_loot_filter_rules_section')}</span><span class="eg-lf-section-count" id="eg-lf-rules-count"></span><span class="eg-lf-section-line"></span></div>
-            <div class="eg-lf-rules" id="eg-lf-rules"></div>
-            <button class="eg-lf-add" onclick="_lootFilterAddRule()">+ ${t('eg_loot_filter_add_rule')}</button>
+        <div class="sx-lf-rules-zone" id="sx-lf-rules-zone">
+            <div class="sx-lf-section-head"><span class="sx-lf-section-title">${t('eg_loot_filter_rules_section')}</span><span class="sx-lf-section-count" id="sx-lf-rules-count"></span><span class="sx-lf-section-line"></span></div>
+            <div class="sx-lf-rules" id="sx-lf-rules"></div>
+            <button class="sx-lf-add" onclick="_lootFilterAddRule()">+ ${t('eg_loot_filter_add_rule')}</button>
         </div>
     </div>
-    <div class="eg-lf-foot">
-        <div class="eg-lf-preview" id="eg-lf-preview"></div>
-        <div class="eg-lf-btns">
-            <button class="eg-lf-btn eg-lf-save" onclick="_lootFilterSaveModal()">${t('eg_mass_sell_save')}</button>
-            <button class="eg-lf-btn" onclick="_lootFilterCloseModal()">${t('reset_cancel')}</button>
+    <div class="sx-lf-foot">
+        <div class="sx-lf-preview" id="sx-lf-preview"></div>
+        <div class="sx-lf-btns">
+            <button class="sx-lf-btn sx-lf-save" onclick="_lootFilterSaveModal()">${t('eg_mass_sell_save')}</button>
+            <button class="sx-lf-btn" onclick="_lootFilterCloseModal()">${t('reset_cancel')}</button>
         </div>
     </div>
 </div>`;
@@ -76,40 +76,40 @@ export function _lootFilterRuleHTML(rule, idx) {
     const fams = rule.slot === 'any' ? _lootFilterAllModFamilies() : _lootFilterModFamiliesForSlot(rule.slot);
     const famOpts = ['<option value="">' + t('eg_loot_filter_any') + '</option>']
         .concat(fams.map(f => `<option value="${_lootFilterEscapeHTML(f.id)}"${rule.modFamily === f.id ? ' selected' : ''}>${_lootFilterEscapeHTML(f.label)}</option>`)).join('');
-    const modFieldDim = rule.modMode === 'none' ? ' eg-lf-field-dim' : '';
+    const modFieldDim = rule.modMode === 'none' ? ' sx-lf-field-dim' : '';
     const maxT1Opts = ['<option value=""' + (rule.maxT1 == null ? ' selected' : '') + '>' + t('eg_loot_filter_any') + '</option>']
         .concat([0, 1, 2, 3, 4, 5, 6].map(n => `<option value="${n}"${rule.maxT1 === n ? ' selected' : ''}>${n}</option>`)).join('');
     return `
-<div class="eg-lf-rule${rule.enabled ? '' : ' eg-lf-rule-off'}">
-    <div class="eg-lf-rule-head">
-        <input type="checkbox" class="eg-lf-check" ${rule.enabled ? 'checked' : ''} onchange="_lootFilterSetRule(${idx}, 'enabled', this.checked)" data-tip-t="eg_loot_filter_rule_enable">
-        <span class="eg-lf-rule-title">${t('eg_loot_filter_rule')} ${idx + 1}</span>
-        <button class="eg-lf-rule-del" onclick="_lootFilterDelRule(${idx})" data-tip-t="eg_loot_filter_rule_del" aria-label="${t('eg_loot_filter_rule_del')}">✕</button>
+<div class="sx-lf-rule${rule.enabled ? '' : ' sx-lf-rule-off'}">
+    <div class="sx-lf-rule-head">
+        <input type="checkbox" class="sx-lf-check" ${rule.enabled ? 'checked' : ''} onchange="_lootFilterSetRule(${idx}, 'enabled', this.checked)" data-tip-t="eg_loot_filter_rule_enable">
+        <span class="sx-lf-rule-title">${t('eg_loot_filter_rule')} ${idx + 1}</span>
+        <button class="sx-lf-rule-del" onclick="_lootFilterDelRule(${idx})" data-tip-t="eg_loot_filter_rule_del" aria-label="${t('eg_loot_filter_rule_del')}">✕</button>
     </div>
-    <div class="eg-lf-fields">
-        <div class="eg-lf-field"><label>${t('eg_loot_filter_slot')}</label><select onchange="_lootFilterSetRule(${idx}, 'slot', this.value)">${slotOpts}</select></div>
-        <div class="eg-lf-field"><label>${t('eg_loot_filter_base')}</label><select onchange="_lootFilterSetRule(${idx}, 'baseId', this.value)">${baseOpts}</select></div>
-        <div class="eg-lf-field"><label>${t('eg_loot_filter_max_ilvl')}</label><input type="number" min="0" max="100" step="1" value="${rule.maxIlvl}" onchange="_lootFilterSetRule(${idx}, 'maxIlvl', this.value)"><span class="eg-lf-zero-hint">${t('eg_loot_filter_zero_off')}</span></div>
-        <div class="eg-lf-field"><label>${t('eg_loot_filter_max_reqlvl')}</label><input type="number" min="0" max="100" step="1" value="${rule.maxReq}" onchange="_lootFilterSetRule(${idx}, 'maxReq', this.value)"><span class="eg-lf-zero-hint">${t('eg_loot_filter_zero_off')}</span></div>
-        <div class="eg-lf-field"><label>${t('eg_loot_filter_mod_mode')}</label><select onchange="_lootFilterSetRule(${idx}, 'modMode', this.value)">${modModeOpts}</select></div>
-        <div class="eg-lf-field"><label>${t('eg_loot_filter_max_t1')}</label><select onchange="_lootFilterSetRule(${idx}, 'maxT1', this.value)">${maxT1Opts}</select></div>
-        <div class="eg-lf-field${modFieldDim}"><label>${t('eg_loot_filter_mod_family')}</label><select onchange="_lootFilterSetRule(${idx}, 'modFamily', this.value)">${famOpts}</select></div>
+    <div class="sx-lf-fields">
+        <div class="sx-lf-field"><label>${t('eg_loot_filter_slot')}</label><select onchange="_lootFilterSetRule(${idx}, 'slot', this.value)">${slotOpts}</select></div>
+        <div class="sx-lf-field"><label>${t('eg_loot_filter_base')}</label><select onchange="_lootFilterSetRule(${idx}, 'baseId', this.value)">${baseOpts}</select></div>
+        <div class="sx-lf-field"><label>${t('eg_loot_filter_max_ilvl')}</label><input type="number" min="0" max="100" step="1" value="${rule.maxIlvl}" onchange="_lootFilterSetRule(${idx}, 'maxIlvl', this.value)"><span class="sx-lf-zero-hint">${t('eg_loot_filter_zero_off')}</span></div>
+        <div class="sx-lf-field"><label>${t('eg_loot_filter_max_reqlvl')}</label><input type="number" min="0" max="100" step="1" value="${rule.maxReq}" onchange="_lootFilterSetRule(${idx}, 'maxReq', this.value)"><span class="sx-lf-zero-hint">${t('eg_loot_filter_zero_off')}</span></div>
+        <div class="sx-lf-field"><label>${t('eg_loot_filter_mod_mode')}</label><select onchange="_lootFilterSetRule(${idx}, 'modMode', this.value)">${modModeOpts}</select></div>
+        <div class="sx-lf-field"><label>${t('eg_loot_filter_max_t1')}</label><select onchange="_lootFilterSetRule(${idx}, 'maxT1', this.value)">${maxT1Opts}</select></div>
+        <div class="sx-lf-field${modFieldDim}"><label>${t('eg_loot_filter_mod_family')}</label><select onchange="_lootFilterSetRule(${idx}, 'modFamily', this.value)">${famOpts}</select></div>
     </div>
 </div>`;
 }
 
 // Renders the current working rules into the editor.
 export function _lootFilterRenderRules() {
-    const wrap = document.getElementById('eg-lf-rules');
+    const wrap = document.getElementById('sx-lf-rules');
     if (!wrap || !_lootFilterWorking) return;
     wrap.innerHTML = _lootFilterWorking.rules.length === 0
-        ? `<div class="eg-lf-empty"><span class="eg-lf-empty-icon">🗃</span>${t('eg_loot_filter_no_rules')}</div>`
+        ? `<div class="sx-lf-empty"><span class="sx-lf-empty-icon">🗃</span>${t('eg_loot_filter_no_rules')}</div>`
         : _lootFilterWorking.rules.map((r, i) => _lootFilterRuleHTML(r, i)).join('');
 }
 
 // Recalculates vendor and keep counts against the uncommitted working copy.
 export function _lootFilterUpdatePreview() {
-    const preview = document.getElementById('eg-lf-preview');
+    const preview = document.getElementById('sx-lf-preview');
     if (!preview || !_lootFilterWorking) return;
     let keep = 0, vendor = 0;
     if (typeof _inventory !== 'undefined' && _inventory) {
@@ -121,15 +121,15 @@ export function _lootFilterUpdatePreview() {
             }
         }
     }
-    preview.innerHTML = t('eg_loot_filter_preview').replace('{vendor}', `<span class="eg-lf-n-vendor">${vendor}</span>`).replace('{keep}', `<span class="eg-lf-n-keep">${keep}</span>`);
+    preview.innerHTML = t('eg_loot_filter_preview').replace('{vendor}', `<span class="sx-lf-n-vendor">${vendor}</span>`).replace('{keep}', `<span class="sx-lf-n-keep">${keep}</span>`);
 }
 
 // Rebuilds form controls from a cloned working filter.
 export function _lootFilterRenderModalContent() {
     if (!_lootFilter) _loadLootFilter();
     _lootFilterWorking = JSON.parse(JSON.stringify(_lootFilter));
-    const enabled = document.getElementById('eg-lf-enabled');
-    const keepUnique = document.getElementById('eg-lf-keep-unique');
+    const enabled = document.getElementById('sx-lf-enabled');
+    const keepUnique = document.getElementById('sx-lf-keep-unique');
     if (enabled) {
         enabled.checked = !!_lootFilterWorking.enabled;
         enabled.onchange = () => { _lootFilterWorking.enabled = enabled.checked; _lootFilterSyncChrome(); _lootFilterUpdatePreview(); };
@@ -146,32 +146,32 @@ export function _lootFilterRenderModalContent() {
 // Keeps editor chrome synchronized with the working filter.
 export function _lootFilterSyncChrome() {
     if (!_lootFilterWorking) return;
-    const box = document.getElementById('eg-lf-box');
-    if (box) box.classList.toggle('eg-lf-off', !_lootFilterWorking.enabled);
-    const count = document.getElementById('eg-lf-rules-count');
+    const box = document.getElementById('sx-lf-box');
+    if (box) box.classList.toggle('sx-lf-off', !_lootFilterWorking.enabled);
+    const count = document.getElementById('sx-lf-rules-count');
     if (count) count.textContent = `· ${_lootFilterWorking.rules.length}`;
 }
 
 // Reapplies translated static labels when the language changes.
 export function _lootFilterRenderStaticText(modal) {
-    const title = modal.querySelector('.eg-lf-head-title');
+    const title = modal.querySelector('.sx-lf-head-title');
     if (title) title.textContent = t('eg_loot_filter_title');
-    const close = modal.querySelector('.eg-lf-close');
+    const close = modal.querySelector('.sx-lf-close');
     if (close) close.setAttribute('aria-label', t('eg_loot_filter_close'));
-    const howTitle = modal.querySelector('.eg-lf-how-title');
+    const howTitle = modal.querySelector('.sx-lf-how-title');
     if (howTitle) howTitle.textContent = t('eg_loot_filter_how');
     const bullets = ['eg_loot_filter_b1', 'eg_loot_filter_b2', 'eg_loot_filter_b3'];
-    modal.querySelectorAll('.eg-lf-how-li > span:last-child').forEach((el, i) => { if (bullets[i]) el.textContent = t(bullets[i]); });
-    const toggleSpans = modal.querySelectorAll('.eg-lf-toggles .eg-lf-toggle > span');
+    modal.querySelectorAll('.sx-lf-how-li > span:last-child').forEach((el, i) => { if (bullets[i]) el.textContent = t(bullets[i]); });
+    const toggleSpans = modal.querySelectorAll('.sx-lf-toggles .sx-lf-toggle > span');
     if (toggleSpans[0]) toggleSpans[0].textContent = t('eg_loot_filter_enable');
     if (toggleSpans[1]) toggleSpans[1].textContent = t('eg_loot_filter_keep_unique');
-    const sectionTitle = modal.querySelector('.eg-lf-section-title');
+    const sectionTitle = modal.querySelector('.sx-lf-section-title');
     if (sectionTitle) sectionTitle.textContent = t('eg_loot_filter_rules_section');
-    const addBtn = modal.querySelector('.eg-lf-add');
+    const addBtn = modal.querySelector('.sx-lf-add');
     if (addBtn) addBtn.textContent = `+ ${t('eg_loot_filter_add_rule')}`;
-    const saveBtn = modal.querySelector('.eg-lf-btn.eg-lf-save');
+    const saveBtn = modal.querySelector('.sx-lf-btn.sx-lf-save');
     if (saveBtn) saveBtn.textContent = t('eg_mass_sell_save');
-    const cancelBtn = modal.querySelector('.eg-lf-foot .eg-lf-btn:not(.eg-lf-save)');
+    const cancelBtn = modal.querySelector('.sx-lf-foot .sx-lf-btn:not(.sx-lf-save)');
     if (cancelBtn) cancelBtn.textContent = t('reset_cancel');
 }
 
@@ -186,7 +186,7 @@ export function _openLootFilterModal() {
 
 // Closes the editor and discards its working copy.
 export function _lootFilterCloseModal() {
-    const modal = document.getElementById('eg-loot-filter-modal');
+    const modal = document.getElementById('sx-loot-filter-modal');
     if (modal) modal.classList.remove('show');
     _lootFilterWorking = null;
 }
@@ -248,7 +248,7 @@ export function _lootFilterDelRule(idx) {
 // Closes the editor when Escape is pressed while it is visible.
 window.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    const modal = document.getElementById('eg-loot-filter-modal');
+    const modal = document.getElementById('sx-loot-filter-modal');
     if (modal && modal.classList.contains('show')) {
         _lootFilterCloseModal();
         e.preventDefault();
@@ -263,8 +263,8 @@ export function _showLootFilterTooltip(e) {
         ? t('eg_loot_filter_state_on').replace('{n}', String(_lootFilter.rules.filter(r => r.enabled).length))
         : t('eg_loot_filter_state_off');
     globalThis.showGameTooltip(`
-<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
-    <div class="eg-tt-header"><div class="eg-tt-icon">⚗</div><div class="eg-tt-name" style="color:#f5d98a;">${t('eg_loot_filter_title')}</div></div>
-    <div class="eg-tt-section"><div class="eg-tt-desc">${state}</div></div>
+<div class="sx-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="sx-tt-header"><div class="sx-tt-icon">⚗</div><div class="sx-tt-name" style="color:#f5d98a;">${t('eg_loot_filter_title')}</div></div>
+    <div class="sx-tt-section"><div class="sx-tt-desc">${state}</div></div>
 </div>`, e);
 }

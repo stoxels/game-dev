@@ -102,21 +102,21 @@ export const CLOCK_HAND_SECONDS = {
     keyS: 'eg_clock_second', keyP: 'eg_clock_seconds', fbS: 'second', fbP: 'seconds',
     max: 59, scale: 60,
     summonPct: 0.90, dmgPct: 0.10,
-    cls: 'eg-nk-clock-second', callCls: 'eg-nk-clock-call-second',
+    cls: 'sx-nk-clock-second', callCls: 'sx-nk-clock-call-second',
     height: 6, halfW: 4,
 };
 export const CLOCK_HAND_MINUTES = {
     keyS: 'eg_clock_minute', keyP: 'eg_clock_minutes', fbS: 'minute', fbP: 'minutes',
     max: 59, scale: 60,
     summonPct: 0.60, dmgPct: 0.13,
-    cls: 'eg-nk-clock-minute', callCls: 'eg-nk-clock-call-minute',
+    cls: 'sx-nk-clock-minute', callCls: 'sx-nk-clock-call-minute',
     height: 12, halfW: 7,
 };
 export const CLOCK_HAND_HOURS = {
     keyS: 'eg_clock_hour', keyP: 'eg_clock_hours', fbS: 'hour', fbP: 'hours',
     max: 12, scale: 12,
     summonPct: 0.30, dmgPct: 0.16,
-    cls: 'eg-nk-clock-hour', callCls: 'eg-nk-clock-call-hour',
+    cls: 'sx-nk-clock-hour', callCls: 'sx-nk-clock-call-hour',
     height: 20, halfW: 11,
 };
 
@@ -146,15 +146,15 @@ export function _clockValueFromAngle(cfg, a) {
 // Builds one hand: a solid beam from the pivot (left end) to the screen
 // edge that rotates about the pivot. Returns the element.
 export function _clockMakeHand(run, cfg, cx, cy, len) {
-    const el = _nkEl(run, 'div', 'eg-nk-clock-hand');
+    const el = _nkEl(run, 'div', 'sx-nk-clock-hand');
     el.style.width = Math.round(len) + 'px';
     el.style.height = cfg.height + 'px';
     el.style.left = Math.round(cx) + 'px';
     el.style.top = Math.round(cy - cfg.height / 2) + 'px';
-    el.style.animation = 'eg-clock-hand-in 0.45s ease-out';
+    el.style.animation = 'sx-clock-hand-in 0.45s ease-out';
 
     const beam = document.createElement('div');
-    beam.className = 'eg-nk-clock-seg ' + cfg.cls;
+    beam.className = 'sx-nk-clock-seg ' + cfg.cls;
     beam.style.width = Math.round(len) + 'px';
     el.appendChild(beam);
     return { el };
@@ -179,14 +179,14 @@ export function _clockPlayerPts(pr) {
 //    colored like its beam (red seconds, cyan minutes, amber hours).
 export function _clockShowCall(plan) {
     if (typeof _clearCenterGridBanners === 'function') {
-        _clearCenterGridBanners('eg-clock-call-banner');
+        _clearCenterGridBanners('sx-clock-call-banner');
     }
     const banner = document.createElement('div');
-    banner.id = 'eg-clock-call-banner';
-    banner.className = 'eg-clock-call-banner';
+    banner.id = 'sx-clock-call-banner';
+    banner.className = 'sx-clock-call-banner';
     plan.forEach(p => {
         const line = document.createElement('div');
-        line.className = 'eg-nk-clock-call-line ' + p.cfg.callCls;
+        line.className = 'sx-nk-clock-call-line ' + p.cfg.callCls;
         line.textContent = _clockUnitLabel(p.cfg, p.value);
         banner.appendChild(line);
     });
@@ -213,7 +213,7 @@ export function _mechClockHands(monster, phase) {
     // The face element doubles as the "hands already running" flag - it is
     // removed with the run's elements when the boss dies or the encounter
     // stops, so a fresh fight always starts clean.
-    if (document.getElementById('eg-nk-clock-face')) return;
+    if (document.getElementById('sx-nk-clock-face')) return;
 
     const bossId = monster && monster.id;
     const run = _nkNewRun(bossId, false);
@@ -221,10 +221,10 @@ export function _mechClockHands(monster, phase) {
     const cx = window.innerWidth * 0.5, cy = window.innerHeight * 0.45;
     const len = Math.hypot(window.innerWidth, window.innerHeight);
 
-    // Clock face (pivot). The .eg-nk-anchor pulse animates the independent
+    // Clock face (pivot). The .sx-nk-anchor pulse animates the independent
     // `scale` property, so the inline translate below is preserved.
-    const face = _nkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '🕐');
-    face.id = 'eg-nk-clock-face';
+    const face = _nkEl(run, 'div', 'sx-nk-dot sx-nk-anchor', '🕐');
+    face.id = 'sx-nk-clock-face';
     face.style.transform = 'translate(' + Math.round(cx - 26) + 'px,' + Math.round(cy - 26) + 'px)';
 
     const roster = [CLOCK_HAND_SECONDS, CLOCK_HAND_MINUTES, CLOCK_HAND_HOURS];
@@ -387,9 +387,9 @@ export function _mechClockHands(monster, phase) {
 // as the warn run's onKill and defensively when the real freeze starts/ends.
 export function _clockClearFreezeWarn() {
     window._clockTimeFreezeWarn = false;
-    const face = document.getElementById('eg-nk-clock-face');
-    if (face) face.classList.remove('eg-clock-freeze-warn');
-    const banner = document.getElementById('eg-clock-freeze-warn-banner');
+    const face = document.getElementById('sx-nk-clock-face');
+    if (face) face.classList.remove('sx-clock-freeze-warn');
+    const banner = document.getElementById('sx-clock-freeze-warn-banner');
     if (banner) banner.remove();
 }
 
@@ -449,10 +449,10 @@ export function _clockFreezeApplyStrike(level, beams) {
 // so the incoming freeze reads instantly without a new visual language.
 export function _clockShowFreezeWarnBanner() {
     const banner = document.createElement('div');
-    banner.id = 'eg-clock-freeze-warn-banner';
-    banner.className = 'eg-clock-freeze-warn-banner';
+    banner.id = 'sx-clock-freeze-warn-banner';
+    banner.className = 'sx-clock-freeze-warn-banner';
     const line = document.createElement('div');
-    line.className = 'eg-clock-freeze-warn-line';
+    line.className = 'sx-clock-freeze-warn-line';
     line.textContent = _clockL10n('eg_clock_freeze_warn', '⏳ TIME FREEZE INCOMING!');
     banner.appendChild(line);
     document.body.appendChild(banner);
@@ -483,10 +483,10 @@ export function _clockStartTimeFreezeWarn(monster, level) {
     window._clockTimeFreezeWarn = true;
 
     if (typeof _clearCenterGridBanners === 'function') {
-        _clearCenterGridBanners('eg-clock-freeze-warn-banner');
+        _clearCenterGridBanners('sx-clock-freeze-warn-banner');
     }
-    const face = document.getElementById('eg-nk-clock-face');
-    if (face) face.classList.add('eg-clock-freeze-warn');
+    const face = document.getElementById('sx-nk-clock-face');
+    if (face) face.classList.add('sx-clock-freeze-warn');
 
     _clockShowFreezeWarnBanner();
 
@@ -531,7 +531,7 @@ export function _clockStartTimeFreeze(monster, level) {
 
     // Clear center-grid banners so the frozen arena reads clean.
     if (typeof _clearCenterGridBanners === 'function') {
-        _clearCenterGridBanners('eg-clock-freeze-banner');
+        _clearCenterGridBanners('sx-clock-freeze-banner');
     }
 
     // Own run owned by the boss id - boss death / encounter stop tears it
@@ -540,21 +540,21 @@ export function _clockStartTimeFreeze(monster, level) {
     run.onKill = _clockTimeFreezeEnd;
 
     // Full-screen cold tint (transparent centre so the grid stays readable).
-    _nkEl(run, 'div', 'eg-clock-freeze-tint');
+    _nkEl(run, 'div', 'sx-clock-freeze-tint');
 
     // Screen-edge frost: ice creeps in from every side while time is stopped
     // and flashes bright the instant the hands strike.
-    const frost = _nkEl(run, 'div', 'eg-clock-freeze-frost');
-    ['eg-frost-top', 'eg-frost-bottom', 'eg-frost-left', 'eg-frost-right'].forEach(cls => {
+    const frost = _nkEl(run, 'div', 'sx-clock-freeze-frost');
+    ['sx-frost-top', 'sx-frost-bottom', 'sx-frost-left', 'sx-frost-right'].forEach(cls => {
         const e = document.createElement('div');
-        e.className = 'eg-frost-edge ' + cls;
+        e.className = 'sx-frost-edge ' + cls;
         frost.appendChild(e);
     });
 
     // Top-centre countdown banner.
     const banner = document.createElement('div');
-    banner.id = 'eg-clock-freeze-banner';
-    banner.className = 'eg-clock-freeze-banner';
+    banner.id = 'sx-clock-freeze-banner';
+    banner.className = 'sx-clock-freeze-banner';
     banner.style.left = '50%';
     banner.style.top = '14px';
     document.body.appendChild(banner);
@@ -575,15 +575,15 @@ export function _clockStartTimeFreeze(monster, level) {
         const ax = pc.x - ux * edge;   // outer end sits just off the screen edge
         const ay = pc.y - uy * edge;
 
-        const outer = _nkEl(run, 'div', 'eg-nk-clock-freeze-beam');
+        const outer = _nkEl(run, 'div', 'sx-nk-clock-freeze-beam');
         outer.style.left = Math.round(ax) + 'px';
         outer.style.top = Math.round(ay - 1) + 'px';   // 2px tall → centre on the ray
         outer.style.width = Math.round(len) + 'px';
         outer.style.transform = 'rotate(' + Math.atan2(uy, ux) + 'rad)';
 
         const seg = document.createElement('div');
-        seg.className = 'eg-nk-clock-freeze-beam-seg';
-        seg.style.setProperty('--eg-freeze-strike-scale',
+        seg.className = 'sx-nk-clock-freeze-beam-seg';
+        seg.style.setProperty('--sx-freeze-strike-scale',
             (1 + (CLOCK_FREEZE_HOLD_PX + CLOCK_FREEZE_LUNGE_PX) / Math.max(40, len)).toFixed(3));
         outer.appendChild(seg);
 
@@ -597,19 +597,19 @@ export function _clockStartTimeFreeze(monster, level) {
     // mid-freeze puzzle transition too.
     const RING_R = CLOCK_FREEZE_RING_RADIUS;
     const RING_C = 2 * Math.PI * RING_R;
-    const ringWrap = _nkEl(run, 'div', 'eg-clock-freeze-ring-wrap');
+    const ringWrap = _nkEl(run, 'div', 'sx-clock-freeze-ring-wrap');
     ringWrap.style.left = Math.round(pc.x) + 'px';
     ringWrap.style.top = Math.round(pc.y) + 'px';
     const svgNS = 'http://www.w3.org/2000/svg';
     const svgEl = document.createElementNS(svgNS, 'svg');
-    svgEl.setAttribute('class', 'eg-clock-freeze-ring');
+    svgEl.setAttribute('class', 'sx-clock-freeze-ring');
     svgEl.setAttribute('viewBox', '0 0 200 200');
     const track = document.createElementNS(svgNS, 'circle');
-    track.setAttribute('class', 'eg-clock-freeze-ring-track');
+    track.setAttribute('class', 'sx-clock-freeze-ring-track');
     track.setAttribute('cx', '100'); track.setAttribute('cy', '100'); track.setAttribute('r', String(RING_R));
     track.setAttribute('fill', 'none'); track.setAttribute('stroke-width', '7');
     const arcEl = document.createElementNS(svgNS, 'circle');
-    arcEl.setAttribute('class', 'eg-clock-freeze-ring-arc');
+    arcEl.setAttribute('class', 'sx-clock-freeze-ring-arc');
     arcEl.setAttribute('cx', '100'); arcEl.setAttribute('cy', '100'); arcEl.setAttribute('r', String(RING_R));
     arcEl.setAttribute('fill', 'none'); arcEl.setAttribute('stroke-width', '7');
     arcEl.setAttribute('stroke-dasharray', String(RING_C));
@@ -618,7 +618,7 @@ export function _clockStartTimeFreeze(monster, level) {
     svgEl.appendChild(arcEl);
     ringWrap.appendChild(svgEl);
     const labelEl = document.createElement('div');
-    labelEl.className = 'eg-clock-freeze-ring-label';
+    labelEl.className = 'sx-clock-freeze-ring-label';
     ringWrap.appendChild(labelEl);
 
     _nkToast('eg_mech_clock_freeze',
@@ -640,17 +640,17 @@ export function _clockStartTimeFreeze(monster, level) {
     function renderBanner(secs) {
         bannerEl.innerHTML = '';
         const title = document.createElement('div');
-        title.className = 'eg-clock-freeze-banner-title';
+        title.className = 'sx-clock-freeze-banner-title';
         title.textContent = (secs < 0 ? '💥 ' : '⏸️ ')
             + _clockL10n('eg_clock_freeze_title', 'TIME FREEZE');
         bannerEl.appendChild(title);
         const count = document.createElement('div');
-        count.className = 'eg-clock-freeze-banner-count';
+        count.className = 'sx-clock-freeze-banner-count';
         count.textContent = (secs < 0)
             ? _clockL10n('eg_clock_freeze_strike', 'THE HANDS STRIKE!')
             : _clockL10n('eg_clock_freeze_count', '{n}s - finish the boss before the hands strike!', String(secs));
         bannerEl.appendChild(count);
-        bannerEl.classList.toggle('eg-clock-freeze-banner-urgent', secs >= 0 && secs <= 5);
+        bannerEl.classList.toggle('sx-clock-freeze-banner-urgent', secs >= 0 && secs <= 5);
     }
 
     renderBanner(Math.ceil(CLOCK_FREEZE_DURATION_MS / 1000));
@@ -665,16 +665,16 @@ export function _clockStartTimeFreeze(monster, level) {
             arcEl.setAttribute('stroke-dashoffset', String(RING_C * (1 - frac)));
             const rem = Math.max(0, Math.ceil((CLOCK_FREEZE_DURATION_MS - elapsedMs) / 1000));
             labelEl.textContent = String(rem);
-            ringWrap.classList.toggle('eg-clock-freeze-ring-urgent', rem <= 5);
+            ringWrap.classList.toggle('sx-clock-freeze-ring-urgent', rem <= 5);
         }
 
         // Freeze expired with the boss still standing → every beam lunges.
         if (!struck && elapsedMs >= CLOCK_FREEZE_DURATION_MS) {
             struck = true;
             _clockFreezeApplyStrike(lvl, beams);
-            beams.forEach(b => b.seg.classList.add('eg-clock-freeze-strike'));
-            frost.classList.add('eg-clock-freeze-frost-strike');
-            ringWrap.classList.add('eg-clock-freeze-ring-struck');
+            beams.forEach(b => b.seg.classList.add('sx-clock-freeze-strike'));
+            frost.classList.add('sx-clock-freeze-frost-strike');
+            ringWrap.classList.add('sx-clock-freeze-ring-struck');
             if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('absoluteZero');
             renderBanner(-1);
             return true; // keep looping so the strike animation plays out

@@ -60,8 +60,8 @@ export function _mechStillnessTrial(monster, phase) {
         stage = 'warn';
         t = 0;
         judged = false;
-        tint = _nkEl(run, 'div', blue ? 'eg-nk-trial-blue' : 'eg-nk-trial-orange');
-        label = _nkEl(run, 'div', 'eg-nk-trial-label', blue ? '💙 FREEZE!' : '🧡 MOVE!');
+        tint = _nkEl(run, 'div', blue ? 'sx-nk-trial-blue' : 'sx-nk-trial-orange');
+        label = _nkEl(run, 'div', 'sx-nk-trial-label', blue ? '💙 FREEZE!' : '🧡 MOVE!');
         _nkToast('eg_mech_stillness', blue
             ? '⚖️ The Arbiter: BLUE trial - hold perfectly still!'
             : '⚖️ The Arbiter: ORANGE trial - keep moving!');

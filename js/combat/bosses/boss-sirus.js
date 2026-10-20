@@ -125,7 +125,7 @@ export let _sirChipRun = null;   // the HUD chip's run (teardown kills it)
 export function _sirEnsureChip() {
     if (_sirChipRun) return;
     const chip = document.createElement('div');
-    chip.className = 'eg-sir-charge-chip';
+    chip.className = 'sx-sir-charge-chip';
     chip.style.display = 'none';   // hidden until the first tick shows stacks
     document.body.appendChild(chip);
     const run = _nkNewRun('boss_sirus', false);
@@ -136,7 +136,7 @@ export function _sirEnsureChip() {
         const stacks = _sirChargeNow();
         chip.style.display = stacks > 0 ? '' : 'none';
         chip.textContent = '⚡ CHARGE ' + stacks + '/' + SIR_CHARGE_MAX + ' - the storm hunts you faster';
-        chip.classList.toggle('eg-sir-charge-full', stacks >= SIR_CHARGE_MAX);
+        chip.classList.toggle('sx-sir-charge-full', stacks >= SIR_CHARGE_MAX);
         return true;
     });
 }
@@ -195,8 +195,8 @@ export function _mechSirIon(monster, phase) {
     // Fronts: { dir (+1 down, -1 up), y, gapC, startAt, el, gapEl, hit }
     const fronts = [];
     const add = (dir, gapC, startAt) => {
-        const el = _nkEl(run, 'div', 'eg-sir-ion eg-sir-ion-warn ' + (dir > 0 ? 'eg-sir-ion-down' : 'eg-sir-ion-up'));
-        const gapEl = _nkEl(run, 'div', 'eg-sir-gap ' + (dir > 0 ? 'eg-sir-gap-down' : 'eg-sir-gap-up'), dir > 0 ? '▼ TANGENT ▼' : '▲ TANGENT ▲');
+        const el = _nkEl(run, 'div', 'sx-sir-ion sx-sir-ion-warn ' + (dir > 0 ? 'sx-sir-ion-down' : 'sx-sir-ion-up'));
+        const gapEl = _nkEl(run, 'div', 'sx-sir-gap ' + (dir > 0 ? 'sx-sir-gap-down' : 'sx-sir-gap-up'), dir > 0 ? '▼ TANGENT ▼' : '▲ TANGENT ▲');
         fronts.push({ dir, y: dir > 0 ? 0 : H - band, gapC, startAt, el, gapEl, hit: false, moving: false, done: false });
     };
     const now0 = performance.now();
@@ -245,8 +245,8 @@ export function _mechSirIon(monster, phase) {
             if (f.el.style.display === 'none') continue;
             if (!f.moving && now >= f.startAt) {
                 f.moving = true;
-                f.el.classList.remove('eg-sir-ion-warn');
-                f.el.classList.add('eg-sir-ion-front');
+                f.el.classList.remove('sx-sir-ion-warn');
+                f.el.classList.add('sx-sir-ion-front');
             }
             if (!f.moving) continue;
             f.y += f.dir * spd * dtS;
@@ -307,8 +307,8 @@ export function _mechSirChain(monster, phase) {
     const riverMs = SIR_RIVER_MS * _SIR_DEBUG_MULT;
     for (let i = 0; i < nR; i++) {
         const axis = i === 0 ? 'h' : 'v';
-        const sweepEl = _nkEl(run, 'div', 'eg-sir-river eg-sir-river-sweep');
-        const poolEl = _nkEl(run, 'div', 'eg-sir-river eg-sir-river-pool');
+        const sweepEl = _nkEl(run, 'div', 'sx-sir-river sx-sir-river-sweep');
+        const poolEl = _nkEl(run, 'div', 'sx-sir-river sx-sir-river-pool');
         const pos = axis === 'h' ? H * (0.32 + Math.random() * 0.36) : W * (0.3 + Math.random() * 0.4);
         if (axis === 'h') {
             sweepEl.style.left = '0px'; sweepEl.style.top = Math.round(pos - 3) + 'px';
@@ -333,8 +333,8 @@ export function _mechSirChain(monster, phase) {
     spots.sort((a, b) => Math.hypot(b[0] - pc0.x, b[1] - pc0.y) - Math.hypot(a[0] - pc0.x, a[1] - pc0.y));
     for (let i = 0; i < nBolts; i++) {
         const [bx, by] = spots[i];
-        const el = _nkEl(run, 'div', 'eg-nk-dot eg-sir-bolt eg-sir-bolt-charging');
-        el.innerHTML = '<i class="eg-sir-bolt-arc"></i><i class="eg-sir-bolt-core"></i>';
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-sir-bolt sx-sir-bolt-charging');
+        el.innerHTML = '<i class="sx-sir-bolt-arc"></i><i class="sx-sir-bolt-core"></i>';
         el.style.transform = 'translate(' + Math.round(bx - 17) + 'px,' + Math.round(by - 17) + 'px)';
         bolts.push({
             x: bx, y: by, el, done: false,
@@ -350,7 +350,7 @@ export function _mechSirChain(monster, phase) {
             const d = r.axis === 'h' ? Math.abs(by - r.pos) : Math.abs(bx - r.pos);
             if (d < SIR_GROUND_R) return r;
         }
-        const cold = document.querySelectorAll('.eg-frozen-cell, .eg-nk-frozen-cell');
+        const cold = document.querySelectorAll('.sx-frozen-cell, .sx-nk-frozen-cell');
         for (const c of cold) {
             const cr = c.getBoundingClientRect();
             if (bx > cr.left - 10 && bx < cr.right + 10 && by > cr.top - 10 && by < cr.bottom + 10) return c;
@@ -379,7 +379,7 @@ export function _mechSirChain(monster, phase) {
             if (b.done) continue;
             pending = true;
             if (now < b.huntAt) continue;          // still charging at the edge
-            b.el.classList.remove('eg-sir-bolt-charging');
+            b.el.classList.remove('sx-sir-bolt-charging');
             b.life -= dtS * 1000;
             const spd = SIR_BOLT_SPD[p] + SIR_BOLT_PER_STACK * _sirChargeNow();
             const dx = pc.x - b.x, dy = pc.y - b.y;
@@ -400,7 +400,7 @@ export function _mechSirChain(monster, phase) {
                 b.done = true;
                 try { b.el.remove(); } catch (e) {}
                 if (boom) {
-                    const fx = _nkEl(run, 'div', 'eg-sir-ground');
+                    const fx = _nkEl(run, 'div', 'sx-sir-ground');
                     fx.style.left = Math.round(b.x - 46) + 'px';
                     fx.style.top = Math.round(b.y - 46) + 'px';
                     setTimeout(() => { try { fx.remove(); } catch (e) {} }, 600 * _SIR_DEBUG_MULT);
@@ -476,24 +476,24 @@ export function _mechSirEye(monster, phase) {
         .slice(0, SIR_EYE_HOT)
         .forEach(c => { c.hot = true; });
     cells.forEach(c => {
-        const el = _nkEl(run, 'div', 'eg-sir-cell' + (c.eye ? ' eg-sir-cell-eye eg-sir-cell-safe' : c.safe ? ' eg-sir-cell-safe' : c.hot ? ' eg-sir-cell-hot eg-sir-cell-arming' : ' eg-sir-cell-inert'));
+        const el = _nkEl(run, 'div', 'sx-sir-cell' + (c.eye ? ' sx-sir-cell-eye sx-sir-cell-safe' : c.safe ? ' sx-sir-cell-safe' : c.hot ? ' sx-sir-cell-hot sx-sir-cell-arming' : ' sx-sir-cell-inert'));
         el.style.left = Math.round(gx + c.c * cell + 4) + 'px';
         el.style.top = Math.round(gy + c.r * cell + 4) + 'px';
         el.style.width = Math.round(cell - 8) + 'px';
         el.style.height = Math.round(cell - 8) + 'px';
-        if (c.eye) el.innerHTML = '<span class="eg-sir-eye-count"></span>';
+        if (c.eye) el.innerHTML = '<span class="sx-sir-eye-count"></span>';
         c.el = el;
     });
     // The storm outside the grid: four bands around it (arming → raging).
     const storm = [
         [0, 0, W, gy], [0, gy + gh, W, H - gy - gh], [0, gy, gx, gh], [gx + gw, gy, W - gx - gw, gh],
     ].map(([l, t, w, h]) => {
-        const el = _nkEl(run, 'div', 'eg-sir-storm eg-sir-storm-arming');
+        const el = _nkEl(run, 'div', 'sx-sir-storm sx-sir-storm-arming');
         el.style.left = Math.round(l) + 'px'; el.style.top = Math.round(t) + 'px';
         el.style.width = Math.round(w) + 'px'; el.style.height = Math.round(h) + 'px';
         return el;
     });
-    const countEl = cells.find(c => c.eye).el.querySelector('.eg-sir-eye-count');
+    const countEl = cells.find(c => c.eye).el.querySelector('.sx-sir-eye-count');
 
     // Boss holds the eye: immune while the set-piece stands (released on
     // every kill path too).
@@ -510,8 +510,8 @@ export function _mechSirEye(monster, phase) {
             if (countEl) countEl.textContent = left > 0 ? String(Math.ceil(left / 1000)) : '';
             if (left <= 0) {
                 raging = true;
-                storm.forEach(el => { el.classList.remove('eg-sir-storm-arming'); el.classList.add('eg-sir-storm-live'); });
-                cells.forEach(c => { if (c.hot) c.el.classList.remove('eg-sir-cell-arming'); if (c.safe) c.el.classList.add('eg-sir-live'); });
+                storm.forEach(el => { el.classList.remove('sx-sir-storm-arming'); el.classList.add('sx-sir-storm-live'); });
+                cells.forEach(c => { if (c.hot) c.el.classList.remove('sx-sir-cell-arming'); if (c.safe) c.el.classList.add('sx-sir-live'); });
             }
         } else {
             const pc = _sirPC();
@@ -622,9 +622,9 @@ export function _sirFinalStart(monster) {
     };
     _sirFinal = g;
 
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -633,25 +633,25 @@ export function _sirFinalStart(monster) {
 
     // Banner at the top - the arena below must stay readable.
     const ov = document.createElement('div');
-    ov.className = 'eg-sir-cd';
+    ov.className = 'sx-sir-cd';
     ov.innerHTML =
-        '<div class="eg-sir-cd-label">⛈️ PERFECT STORM</div>' +
-        '<div class="eg-sir-cd-hint">RED square: get OUT. GREEN square: get IN.</div>';
+        '<div class="sx-sir-cd-label">⛈️ PERFECT STORM</div>' +
+        '<div class="sx-sir-cd-hint">RED square: get OUT. GREEN square: get IN.</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
     g.fxRun.els.push(ov);
-    const hintEl = ov.querySelector('.eg-sir-cd-hint');
+    const hintEl = ov.querySelector('.sx-sir-cd-hint');
     const hint = (txt) => { if (hintEl) hintEl.textContent = txt; };
 
     _nkToast('eg_mech_sir_final_cd', '⛈️💀 PERFECT STORM - red square = get out, green square = get in!', '#fde047');
 
     monster.bossImmune = true;
 
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-sir-allin');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-sir-allin');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
@@ -679,11 +679,11 @@ export function _sirFinalStart(monster) {
             c = _sirClampPt(pc0.x, pc0.y, side / 2);
         }
         const tgt = { l: c.x - side / 2, t: c.y - side / 2, r: c.x + side / 2, b: c.y + side / 2 };
-        const mark = _nkEl(g.fxRun, 'div', 'eg-sir-fin-mark ' + (getIn ? 'eg-sir-fin-safe' : 'eg-sir-fin-danger'));
+        const mark = _nkEl(g.fxRun, 'div', 'sx-sir-fin-mark ' + (getIn ? 'sx-sir-fin-safe' : 'sx-sir-fin-danger'));
         mark.style.left = Math.round(tgt.l) + 'px'; mark.style.top = Math.round(tgt.t) + 'px';
         mark.style.width = mark.style.height = side + 'px';
         mark.innerHTML = '<span>' + (getIn ? 'GET IN' : 'GET OUT') + '</span>';
-        const el = _nkEl(g.fxRun, 'div', 'eg-sir-box' + (getIn ? ' eg-sir-box-in' : ''));
+        const el = _nkEl(g.fxRun, 'div', 'sx-sir-box' + (getIn ? ' sx-sir-box-in' : ''));
         const t0 = performance.now();
         const wave = _nkNewRun(monster.id, false);
         wave.passive = true;
@@ -700,7 +700,7 @@ export function _sirFinalStart(monster) {
                 const dealt = _nkHit(SIR_FIN_BOX_DMG, 'lightning', level);
                 _nkAbilityHitToast(dealt, 'The Stormcaller', 'Storm Wall');
             }
-            el.classList.add('eg-sir-box-final');
+            el.classList.add('sx-sir-box-final');
             setTimeout(() => { try { el.remove(); } catch (e) {} try { mark.remove(); } catch (e) {} }, 700);
             return false;
         });
@@ -728,16 +728,16 @@ export function _sirFinalStart(monster) {
         // walking; the eye opens 180-380 px away.
         const a = Math.random() * Math.PI * 2, d = 180 + Math.random() * 200;
         const e = _sirClampPt(pc0.x + Math.cos(a) * d, pc0.y + Math.sin(a) * d, SIR_FIN_EYE_R);
-        const eye = _nkEl(g.fxRun, 'div', 'eg-sir-fin-eye eg-sir-fin-safe');
+        const eye = _nkEl(g.fxRun, 'div', 'sx-sir-fin-eye sx-sir-fin-safe');
         eye.style.left = Math.round(e.x - SIR_FIN_EYE_R) + 'px';
         eye.style.top = Math.round(e.y - SIR_FIN_EYE_R) + 'px';
         eye.style.width = eye.style.height = (SIR_FIN_EYE_R * 2) + 'px';
-        eye.innerHTML = '<span class="eg-sir-eye-count"></span>';
-        const dark = _nkEl(g.fxRun, 'div', 'eg-sir-fin-dark');
+        eye.innerHTML = '<span class="sx-sir-eye-count"></span>';
+        const dark = _nkEl(g.fxRun, 'div', 'sx-sir-fin-dark');
         dark.style.setProperty('--ex', Math.round(e.x) + 'px');
         dark.style.setProperty('--ey', Math.round(e.y) + 'px');
         dark.style.setProperty('--er', SIR_FIN_EYE_R + 'px');
-        const countEl = eye.querySelector('.eg-sir-eye-count');
+        const countEl = eye.querySelector('.sx-sir-eye-count');
         const t0 = performance.now();
         const tick = () => {
             if (g.finished) return;
@@ -751,7 +751,7 @@ export function _sirFinalStart(monster) {
             } else {
                 _nkToast('eg_mech_sir_survived', '⛈️ You rode out the perfect storm!', '#86efac');
             }
-            dark.classList.add('eg-sir-fin-flash');
+            dark.classList.add('sx-sir-fin-flash');
             _sirAfter(g, 1200 * _SIR_DEBUG_MULT, () => _sirFinalEnd(g, monster));
         };
         tick();
@@ -766,7 +766,7 @@ export function _sirFinalStart(monster) {
         if (g.teeth && now >= bulletCd) {
             const charged = _sirChargeNow() >= 3;
             bulletCd = now + (charged ? 380 : 520) * _SIR_DEBUG_MULT;
-            const el = _nkEl(g.fxRun, 'div', 'eg-nk-dot eg-sir-bullet');
+            const el = _nkEl(g.fxRun, 'div', 'sx-nk-dot sx-sir-bullet');
             // Spawned on a ring around you, flying THROUGH the spot you stand on.
             const ang = Math.random() * Math.PI * 2;
             const ring = Math.min(W, H) * 0.32;
@@ -803,19 +803,19 @@ export function _sirFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.eg-sir-cd, .eg-sir-box, .eg-sir-bullet, .eg-sir-river, .eg-sir-cell, .eg-sir-storm, ' +
-        '.eg-sir-ion, .eg-sir-gap, .eg-sir-bolt, .eg-sir-ground, .eg-sir-fin-mark, .eg-sir-fin-eye, .eg-sir-fin-dark').forEach(el => {
+    document.querySelectorAll('.sx-sir-cd, .sx-sir-box, .sx-sir-bullet, .sx-sir-river, .sx-sir-cell, .sx-sir-storm, ' +
+        '.sx-sir-ion, .sx-sir-gap, .sx-sir-bolt, .sx-sir-ground, .sx-sir-fin-mark, .sx-sir-fin-eye, .sx-sir-fin-dark').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.remove('eg-sir-allin');
-        wrap.classList.remove('eg-nk-shielded');
+        wrap.classList.remove('sx-sir-allin');
+        wrap.classList.remove('sx-nk-shielded');
     }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -836,7 +836,7 @@ export function _sirTeardown() {
     try { if (_sirChipRun) { _sirChipRun.els.forEach(el => { try { el.remove(); } catch (e) {} }); _nkKillRun(_sirChipRun); } } catch (e) {}
     _sirChipRun = null;
     _sirCharge = 0; _sirChargeUntil = 0;
-    document.querySelectorAll('.eg-sir-charge-chip').forEach(el => { try { el.remove(); } catch (e) {} });
+    document.querySelectorAll('.sx-sir-charge-chip').forEach(el => { try { el.remove(); } catch (e) {} });
     // The Storm Eye grants immunity while it stands - release it if the
     // fight ended mid-cast (teardown kills the run before its loop ends).
     try {
@@ -844,14 +844,14 @@ export function _sirTeardown() {
             globalThis._monsters.forEach(m => { if (m && m.baseId === 'boss_sirus') m.bossImmune = false; });
         }
     } catch (e) {}
-    document.querySelectorAll('.eg-sir-ion, .eg-sir-gap, .eg-sir-bolt, .eg-sir-ground, .eg-sir-storm, ' +
-        '.eg-sir-river, .eg-sir-cell, .eg-sir-box, .eg-sir-bullet, .eg-sir-cd, .eg-sir-fin-mark, .eg-sir-fin-eye, .eg-sir-fin-dark').forEach(el => {
+    document.querySelectorAll('.sx-sir-ion, .sx-sir-gap, .sx-sir-bolt, .sx-sir-ground, .sx-sir-storm, ' +
+        '.sx-sir-river, .sx-sir-cell, .sx-sir-box, .sx-sir-bullet, .sx-sir-cd, .sx-sir-fin-mark, .sx-sir-fin-eye, .sx-sir-fin-dark').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-sir-allin').forEach(el => el.classList.remove('eg-sir-allin'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.querySelectorAll('.sx-sir-allin').forEach(el => el.classList.remove('sx-sir-allin'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

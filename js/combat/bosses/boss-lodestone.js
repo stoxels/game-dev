@@ -107,7 +107,7 @@ export function _lodestoneTeardown() {
         }
         try { if (st.run) _nkKillRun(st.run); } catch (e) {} // removes the stone
     }
-    document.querySelectorAll('.eg-lds-stone, .eg-lds-filing, .eg-lds-vortex, .eg-lds-rail, .eg-lds-slug, .eg-lds-leash-line, .eg-lds-chain').forEach(el => el.remove());
+    document.querySelectorAll('.sx-lds-stone, .sx-lds-filing, .sx-lds-vortex, .sx-lds-rail, .sx-lds-slug, .sx-lds-leash-line, .sx-lds-chain').forEach(el => el.remove());
 }
 
 
@@ -137,7 +137,7 @@ export function _lodestoneArenaInit(monster) {
     st.run = run;
 
     // The Lodestone: the boss's arena body.
-    const el = _nkEl(run, 'div', 'eg-lds-stone', '🧲');
+    const el = _nkEl(run, 'div', 'sx-lds-stone', '🧲');
     el.style.width = el.style.height = (LDS_R * 2) + 'px';
     st.stone = {
         x: window.innerWidth * 0.5, y: window.innerHeight * 0.35,
@@ -298,7 +298,7 @@ export function _lodestoneArenaInit(monster) {
             try { rw.el.remove(); } catch (e) {}
             st.railWarns.splice(i, 1);
             // Launch the slug down the lane.
-            const sel = _nkEl(st.run, 'div', 'eg-lds-slug', '⚡');
+            const sel = _nkEl(st.run, 'div', 'sx-lds-slug', '⚡');
             st.slugs.push({ horiz: rw.horiz, pos: rw.pos, x: rw.horiz ? -30 : rw.pos, y: rw.horiz ? rw.pos : -30,
                 vx: rw.horiz ? LDS_RAIL_SLUG_SPEED : 0, vy: rw.horiz ? 0 : LDS_RAIL_SLUG_SPEED, t: 0, hit: false, el: sel });
             try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
@@ -353,7 +353,7 @@ export function _lodestoneArenaInit(monster) {
                     if (caught) {
                         ls.phase = 'reel';
                         ls.t = 0;
-                        const chEl = _nkEl(st.run, 'div', 'eg-lds-chain', '🔗');
+                        const chEl = _nkEl(st.run, 'div', 'sx-lds-chain', '🔗');
                         ls.chainEl = chEl;
                         _nkToast('eg_lds_leash', '🔗 MAGNETIC LEASH! Fight the reel-in!');
                         try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
@@ -413,7 +413,7 @@ export function _ldsApplyPolarity(st) {
 
 // Expanding repulsion-pulse ring on polarity flip.
 export function _ldsPulseRing(st, x, y) {
-    const el = _nkEl(st.run, 'div', 'eg-lds-pulse');
+    const el = _nkEl(st.run, 'div', 'sx-lds-pulse');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
     setTimeout(() => { try { el.remove(); } catch (e) {} }, 700);
@@ -433,7 +433,7 @@ export function _ldsGrindTick(st, vx, dtS, live) {
 
 // One magnetized filing on a spiral path.
 export function _ldsSpawnFiling(st, x, y, ang) {
-    const el = _nkEl(st.run, 'div', 'eg-lds-filing', '🔩');
+    const el = _nkEl(st.run, 'div', 'sx-lds-filing', '🔩');
     st.filings.push({ x, y, ang, rad: LDS_R, spiral: 1200, vx: 0, vy: 0, t: 0, hit: false, el });
 }
 
@@ -441,7 +441,7 @@ export function _ldsSpawnFiling(st, x, y, ang) {
 // ── 60% gate: Magnetic Vortex ────────────────────────────────────────────
 export function _ldsVortex(st) {
     if (st.vortex) return;
-    const el = _nkEl(st.run, 'div', 'eg-lds-vortex');
+    const el = _nkEl(st.run, 'div', 'sx-lds-vortex');
     st.vortex = { t: 0, el, grindAcc: 0 };
     _nkToast('eg_lds_vortex', '🌀 MAGNETIC VORTEX! Fight the pull - the stone grinds!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
@@ -463,7 +463,7 @@ export function _ldsFireRail(st, sn, pr, W, H) {
     const c = _nkPlayerCenter();
     const horiz = c ? Math.abs(c.x - sn.x) >= Math.abs(c.y - sn.y) : Math.random() < 0.5;
     const pos = horiz ? (c ? c.y : H / 2) : (c ? c.x : W / 2);
-    const el = _nkEl(st.run, 'div', 'eg-lds-rail' + (horiz ? ' horiz' : ' vert'));
+    const el = _nkEl(st.run, 'div', 'sx-lds-rail' + (horiz ? ' horiz' : ' vert'));
     if (horiz) {
         el.style.left = '0px';
         el.style.top = Math.round(pos) + 'px';
@@ -480,7 +480,7 @@ export function _lodestoneLeash(monster) {
     const st = _lodestoneWatcher;
     if (!st || st.leash || st.vortex || _nkDodgeBusy() || _nkFrozen()) return;
     const c = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    const warnEl = _nkEl(st.run, 'div', 'eg-lds-leash-line');
+    const warnEl = _nkEl(st.run, 'div', 'sx-lds-leash-line');
     _ldsPlaceLine(warnEl, st.stone.x, st.stone.y, c.x, c.y);
     st.leash = { phase: 'warn', t: 0, px: c.x, py: c.y, locked: false, warnEl, chainEl: null };
     _nkToast('eg_lds_leash_warn', '🔗 The Lodestone coils a chain - dodge the line!');

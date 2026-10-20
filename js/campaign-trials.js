@@ -671,7 +671,7 @@ export function _endCampaignTrial() {
 // _showLeaveMapTransition() rendered the default map texts.
 export function _retitleLeaveMapTransition(tr) {
     try {
-        const titleEl = document.querySelector('#eg-leave-map-transition .eg-leave-map-title');
+        const titleEl = document.querySelector('#sx-leave-map-transition .sx-leave-map-title');
         if (titleEl) {
             const key = tr.kind === 'convergence' ? 'eg_trial_complete_title' : 'eg_ascension_trial_complete_title';
             let label = (typeof t === 'function') ? t(key) : null;

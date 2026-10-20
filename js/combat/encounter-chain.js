@@ -195,7 +195,7 @@ export function _onPuzzleComplete() {
         if (typeof window !== 'undefined' && window._isBossTestRun) return;
         setTimeout(() => {
             if (!_isActive() || !_canLeaveMap()) return;
-            if (document.getElementById('eg-leave-map-overlay')) return;
+            if (document.getElementById('sx-leave-map-overlay')) return;
             const hasPendingDrops = (_lootDrops && _lootDrops.size > 0)
                 || (_currencyDrops && _currencyDrops.size > 0)
                 || (_itemDrops && _itemDrops.size > 0)
@@ -636,7 +636,7 @@ export function _enterBossArena() {
     _bossPhaseActive = true;
 
     // Dismiss the "available" banner if still visible - arena is now entered
-    const availBanner = document.getElementById('eg-boss-arena-available-banner');
+    const availBanner = document.getElementById('sx-boss-arena-available-banner');
     if (availBanner) availBanner.remove();
 
     Audio_Manager.playSFX('boss_arena_enter');
@@ -807,7 +807,7 @@ export function _onAllBossesDead() {
     if (_puzzleCompleteFired) {
         setTimeout(() => {
             if (!_isActive() || !_puzzleCompleteFired) return;
-            if (document.getElementById('eg-leave-map-overlay')) return;
+            if (document.getElementById('sx-leave-map-overlay')) return;
             _startChainCountdown();
         }, 800);
     }
@@ -1079,7 +1079,7 @@ export function _buildBonusLootTooltipHTML() {
     return html;
 }
 
-// Wires hover tooltip onto the static #eg-bonus-loot-chance element
+// Wires hover tooltip onto the static #sx-bonus-loot-chance element
 // (same pattern as the mistake-counter / timer tooltips in tooltips-hud.js).
 export function _bindBonusLootHUDTooltip(el) {
     if (!el || el.dataset.bonusTooltipBound) return;
@@ -1092,7 +1092,7 @@ export function _bindBonusLootHUDTooltip(el) {
 // Shows/hides the bonus-loot chance label under the FILL button in the
 // top-left corner HUD and refreshes its percentage text.
 export function _updateBonusLootHUD() {
-    const el = document.getElementById('eg-bonus-loot-chance');
+    const el = document.getElementById('sx-bonus-loot-chance');
     if (!el) return;
 
     if (!_isActive()) {
@@ -1101,7 +1101,7 @@ export function _updateBonusLootHUD() {
     }
 
     const pct = Math.round(_getBonusLootChance() * 100);
-    const val = document.getElementById('eg-bonus-loot-chance-val');
+    const val = document.getElementById('sx-bonus-loot-chance-val');
     if (val) val.textContent = t('eg_bonus_chance').replace('{p}', pct);
     _bindBonusLootHUDTooltip(el);
     el.classList.remove('hidden');
@@ -1253,25 +1253,25 @@ export function _getBossTotalForHUD() {
 }
 
 export function _updateObjectivesHUD() {
-    const strip = document.getElementById('eg-objectives-strip');
+    const strip = document.getElementById('sx-objectives-strip');
     if (!strip) return;
 
     // Campaign levels run monsters but have no map objectives - never show
     // the objectives strip for them.
     if (typeof _isCampaignRun === 'function' && _isCampaignRun()) {
-        strip.classList.add('eg-hidden');
+        strip.classList.add('sx-hidden');
         if (typeof PassiveTracker !== 'undefined' && PassiveTracker.refreshVisibility) PassiveTracker.refreshVisibility();
         return;
     }
 
     if (!_isActive()) {
-        strip.classList.add('eg-hidden');
+        strip.classList.add('sx-hidden');
         _updateBonusLootHUD();
         if (typeof PassiveTracker !== 'undefined' && PassiveTracker.refreshVisibility) PassiveTracker.refreshVisibility();
         return;
     }
 
-    strip.classList.remove('eg-hidden');
+    strip.classList.remove('sx-hidden');
     _updateBonusLootHUD();
     // Enforce passive tracker hide during endgame if setting enabled
     if (typeof PassiveTracker !== 'undefined' && PassiveTracker.refreshVisibility) PassiveTracker.refreshVisibility();
@@ -1284,19 +1284,19 @@ export function _updateObjectivesHUD() {
     if (req.totalMonsters > 0) {
         const count = Math.min(_chainKillCount, req.totalMonsters);
         if (count < req.totalMonsters) {
-            segs.push(`<span class="eg-obj-seg"><span class="eg-obj-seg-val">${count} / ${req.totalMonsters}</span> <span class="eg-obj-seg-label">Monsters</span></span>`);
+            segs.push(`<span class="sx-obj-seg"><span class="sx-obj-seg-val">${count} / ${req.totalMonsters}</span> <span class="sx-obj-seg-label">Monsters</span></span>`);
         }
     }
     if (req.requiredPuzzles > 0) {
         const count = Math.min(_chainPuzzleSolvedCount, req.requiredPuzzles);
         if (count < req.requiredPuzzles) {
-            segs.push(`<span class="eg-obj-seg"><span class="eg-obj-seg-val">${count} / ${req.requiredPuzzles}</span> <span class="eg-obj-seg-label">Puzzles</span></span>`);
+            segs.push(`<span class="sx-obj-seg"><span class="sx-obj-seg-val">${count} / ${req.requiredPuzzles}</span> <span class="sx-obj-seg-label">Puzzles</span></span>`);
         }
     }
     if (req.requiredQuestions > 0) {
         const count = Math.min(_questionsAnswered, req.requiredQuestions);
         if (count < req.requiredQuestions) {
-            segs.push(`<span class="eg-obj-seg"><span class="eg-obj-seg-val">${count} / ${req.requiredQuestions}</span> <span class="eg-obj-seg-label">Questions</span></span>`);
+            segs.push(`<span class="sx-obj-seg"><span class="sx-obj-seg-val">${count} / ${req.requiredQuestions}</span> <span class="sx-obj-seg-label">Questions</span></span>`);
         }
     }
     if (req.hasBoss && !_bossDefeated()) {
@@ -1304,7 +1304,7 @@ export function _updateObjectivesHUD() {
         const bossCount = Math.min(_bossKilledCount, bossTotal || 1);
         // Show boss progress even before arena entry; hide only when all bosses slain.
         if (bossTotal > 0) {
-            segs.push(`<span class="eg-obj-seg"><span class="eg-obj-seg-val">${bossCount} / ${bossTotal}</span> <span class="eg-obj-seg-label">Bosses</span></span>`);
+            segs.push(`<span class="sx-obj-seg"><span class="sx-obj-seg-val">${bossCount} / ${bossTotal}</span> <span class="sx-obj-seg-label">Bosses</span></span>`);
         }
     }
 
@@ -1325,9 +1325,9 @@ export function _updateObjectivesHUD() {
     let actionHTML = '';
     if (req.hasBoss && !_bossDefeated()) {
         if (!_bossPhaseActive && othersDone) {
-            actionHTML = `<button class="eg-obj-action-btn eg-obj-action-boss" onclick="_enterBossArena()">${t('eg_enter_boss_arena')}</button>`;
+            actionHTML = `<button class="sx-obj-action-btn sx-obj-action-boss" onclick="_enterBossArena()">${t('eg_enter_boss_arena')}</button>`;
         } else if (questionsRemain && nonQuestionObjectivesDone) {
-            actionHTML = `<button class="eg-obj-action-btn eg-obj-action-question" onclick="_triggerQuestionNow()">${t('eg_trigger_question')}</button>`;
+            actionHTML = `<button class="sx-obj-action-btn sx-obj-action-question" onclick="_triggerQuestionNow()">${t('eg_trigger_question')}</button>`;
         }
     } else if (canLeave) {
         // Campaign trials relabel the finish button (spec): convergence
@@ -1342,9 +1342,9 @@ export function _updateObjectivesHUD() {
                 else leaveLabel = (tr && tr.kind === 'ascension') ? 'Finish Ascension' : 'Finish Trial';
             }
         } catch (e) {}
-        actionHTML = `<button class="eg-obj-action-btn eg-obj-action-complete" onclick="_tryLeaveMap()">${leaveLabel}</button>`;
+        actionHTML = `<button class="sx-obj-action-btn sx-obj-action-complete" onclick="_tryLeaveMap()">${leaveLabel}</button>`;
     } else if (questionsRemain && nonQuestionObjectivesDone) {
-        actionHTML = `<button class="eg-obj-action-btn eg-obj-action-question" onclick="_triggerQuestionNow()">${t('eg_trigger_question')}</button>`;
+        actionHTML = `<button class="sx-obj-action-btn sx-obj-action-question" onclick="_triggerQuestionNow()">${t('eg_trigger_question')}</button>`;
     }
 
     // First time boss arena becomes available (non-boss done, boss not yet defeated): banner + toast.
@@ -1363,13 +1363,13 @@ export function _updateObjectivesHUD() {
     }
 
     // Render: single pill line (if any segments remain) + optional action button.
-    const lineHTML = segs.length > 0 ? `<div class="eg-obj-line">${segs.join('')}</div>` : '';
-    const actionsHTML = actionHTML ? `<div class="eg-obj-actions">${actionHTML}</div>` : '';
+    const lineHTML = segs.length > 0 ? `<div class="sx-obj-line">${segs.join('')}</div>` : '';
+    const actionsHTML = actionHTML ? `<div class="sx-obj-actions">${actionHTML}</div>` : '';
 
     // Hide strip entirely when nothing to show (no segs and no button) - avoids empty pill.
     if (!lineHTML && !actionsHTML) {
         strip.innerHTML = '';
-        strip.classList.add('eg-hidden');
+        strip.classList.add('sx-hidden');
         return;
     }
 
@@ -1417,12 +1417,12 @@ export function _showMapClearedBanner() {
 // becomes available (all non-boss objectives done). Mirrors the MAP
 // CLEARED banner in placement/animation but uses boss-red styling.
 export function _showBossArenaAvailableBanner() {
-    if (typeof _clearCenterGridBanners === 'function') _clearCenterGridBanners('eg-boss-arena-available-banner');
-    const old = document.getElementById('eg-boss-arena-available-banner');
+    if (typeof _clearCenterGridBanners === 'function') _clearCenterGridBanners('sx-boss-arena-available-banner');
+    const old = document.getElementById('sx-boss-arena-available-banner');
     if (old) old.remove();
 
     const el = document.createElement('div');
-    el.id = 'eg-boss-arena-available-banner';
+    el.id = 'sx-boss-arena-available-banner';
     el.textContent = t('eg_boss_arena_available');
     document.body.appendChild(el);
 
@@ -1462,10 +1462,10 @@ export function _objItem() { return ''; }
 //------------------------------------------------------------------------
 
 export function _showChainCountdownOverlay(secs) {
-    let el = document.getElementById('eg-chain-countdown');
+    let el = document.getElementById('sx-chain-countdown');
     if (!el) {
         el = document.createElement('div');
-        el.id = 'eg-chain-countdown';
+        el.id = 'sx-chain-countdown';
         el.style.cssText = [
             'position:fixed', 'inset:0', 'display:flex',
             'flex-direction:column', 'align-items:center', 'justify-content:center',
@@ -1477,18 +1477,18 @@ export function _showChainCountdownOverlay(secs) {
     el.innerHTML = `
         ${_buildChainBonusGainHTML()}
         <div style="font-size:1.1rem;color:#aaa;margin-bottom:0.4rem;letter-spacing:.1em;">${t('eg_countdown_solved')}</div>
-        <div id="eg-chain-countdown-num" style="font-size:4rem;font-weight:700;color:#fff;line-height:1;">${secs}</div>
+        <div id="sx-chain-countdown-num" style="font-size:4rem;font-weight:700;color:#fff;line-height:1;">${secs}</div>
         <div style="font-size:0.9rem;color:#888;margin-top:0.5rem;">${t('eg_countdown_next')}</div>`;
     el.style.display = 'flex';
 }
 
 export function _updateChainCountdownOverlay(secs) {
-    const num = document.getElementById('eg-chain-countdown-num');
+    const num = document.getElementById('sx-chain-countdown-num');
     if (num) num.textContent = secs;
 }
 
 export function _hideChainCountdownOverlay() {
-    const el = document.getElementById('eg-chain-countdown');
+    const el = document.getElementById('sx-chain-countdown');
     if (el) el.style.display = 'none';
 }
 
@@ -1549,9 +1549,9 @@ export function _chainCleanup() {
     if (typeof _clearCenterGridBanners === 'function') _clearCenterGridBanners();
     const banner = document.getElementById('eg-map-cleared-banner');
     if (banner) banner.remove();
-    const bossBanner = document.getElementById('eg-boss-arena-available-banner');
+    const bossBanner = document.getElementById('sx-boss-arena-available-banner');
     if (bossBanner) bossBanner.remove();
-    const mistakesBanner = document.getElementById('eg-mistakes-warning-banner');
+    const mistakesBanner = document.getElementById('sx-mistakes-warning-banner');
     if (mistakesBanner) mistakesBanner.remove();
 
     globalThis._runLoot = [];
@@ -1562,8 +1562,8 @@ export function _chainCleanup() {
     // _lootDrops is cleared by _stopPickupSpawner via _stopLootDrops
 
     // Hide the objectives strip
-    const strip = document.getElementById('eg-objectives-strip');
-    if (strip) strip.classList.add('eg-hidden');
+    const strip = document.getElementById('sx-objectives-strip');
+    if (strip) strip.classList.add('sx-hidden');
 
     // Hide the bonus-loot chance label in the corner HUD
     _updateBonusLootHUD();
@@ -1583,64 +1583,64 @@ export function _chainCleanup() {
 // summary - unwanted gear is already converted to shards during the run.
 export function _buildLeaveMapSummaryHTML(loot, items, maps, currency, essences, gold = 0) {
     const lootHTML = loot.map((item, i) => `
-        <div class="eg-leave-summary-chip eg-loot-chip eg-rarity-${item.rarity || 'common'}" data-loot-idx="${i}">
+        <div class="sx-leave-summary-chip sx-loot-chip sx-rarity-${item.rarity || 'common'}" data-loot-idx="${i}">
             ${GAME_ART.html('item', item.baseId, item.icon || '📦')}
-            ${item.isBonusLoot ? '<span class="eg-leave-summary-bonus">🎁</span>' : ''}
+            ${item.isBonusLoot ? '<span class="sx-leave-summary-bonus">🎁</span>' : ''}
         </div>`).join('');
 
     const itemsHTML = items.map((item, i) => `
-        <div class="eg-leave-summary-chip eg-item-pickup-chip eg-rarity-${_leaveRarityClass(item.rarity)}" data-item-idx="${i}">
+        <div class="sx-leave-summary-chip sx-item-pickup-chip sx-rarity-${_leaveRarityClass(item.rarity)}" data-item-idx="${i}">
             ${GAME_ART.html('item', item.defId, item.icon || '📦')}
         </div>`).join('');
 
     const mapsHTML = maps.map((map, i) => `
-        <div class="eg-leave-summary-chip eg-map-pickup-chip eg-rarity-${_leaveRarityClass(map.rarity)}" data-map-idx="${i}">
+        <div class="sx-leave-summary-chip eg-map-pickup-chip sx-rarity-${_leaveRarityClass(map.rarity)}" data-map-idx="${i}">
             ${GAME_ART.html('item', GAME_ART.artIdForItem(map), map.icon || '🗺️')}
         </div>`).join('');
 
     const currencyHTML = currency.map((entry, i) => `
-        <div class="eg-leave-summary-chip eg-rarity-currency" data-currency-idx="${i}">
+        <div class="sx-leave-summary-chip sx-rarity-currency" data-currency-idx="${i}">
             ${GAME_ART.html('item', entry.id, entry.icon || '💰')}
-            ${entry.count > 1 ? `<span class="eg-leave-summary-count">×${entry.count}</span>` : ''}
+            ${entry.count > 1 ? `<span class="sx-leave-summary-count">×${entry.count}</span>` : ''}
         </div>`).join('');
 
     const essencesHTML = essences.map((entry, i) => `
-        <div class="eg-leave-summary-chip eg-rarity-essence" data-essence-idx="${i}">
+        <div class="sx-leave-summary-chip sx-rarity-essence" data-essence-idx="${i}">
             ${GAME_ART.html('item', entry.id, entry.icon || '🧬')}
-            ${entry.count > 1 ? `<span class="eg-leave-summary-count">×${entry.count}</span>` : ''}
+            ${entry.count > 1 ? `<span class="sx-leave-summary-count">×${entry.count}</span>` : ''}
         </div>`).join('');
 
     const goldHTML = gold > 0 ? `
-        <div class="eg-leave-summary-chip eg-rarity-gold" data-gold-idx="0">
+        <div class="sx-leave-summary-chip sx-rarity-gold" data-gold-idx="0">
             ${GAME_ART.html('item', 'gold', '🪙')}
-            <span class="eg-leave-summary-count">×${gold.toLocaleString()}</span>
+            <span class="sx-leave-summary-count">×${gold.toLocaleString()}</span>
         </div>` : '';
 
     return `
-        <div class="eg-leave-summary-section">
-            <div class="eg-leave-summary-title">${t('eg_loot_acquired').replace('{n}', loot.length)}</div>
-            <div class="eg-leave-summary-row">${lootHTML || `<span class="eg-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
+        <div class="sx-leave-summary-section">
+            <div class="sx-leave-summary-title">${t('eg_loot_acquired').replace('{n}', loot.length)}</div>
+            <div class="sx-leave-summary-row">${lootHTML || `<span class="sx-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
         </div>
-        <div class="eg-leave-summary-section">
-            <div class="eg-leave-summary-title">${t('eg_items_acquired').replace('{n}', items.length)}</div>
-            <div class="eg-leave-summary-row">${itemsHTML || `<span class="eg-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
+        <div class="sx-leave-summary-section">
+            <div class="sx-leave-summary-title">${t('eg_items_acquired').replace('{n}', items.length)}</div>
+            <div class="sx-leave-summary-row">${itemsHTML || `<span class="sx-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
         </div>
-        <div class="eg-leave-summary-section">
-            <div class="eg-leave-summary-title">${t('eg_maps_acquired').replace('{n}', maps.length)}</div>
-            <div class="eg-leave-summary-row">${mapsHTML || `<span class="eg-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
+        <div class="sx-leave-summary-section">
+            <div class="sx-leave-summary-title">${t('eg_maps_acquired').replace('{n}', maps.length)}</div>
+            <div class="sx-leave-summary-row">${mapsHTML || `<span class="sx-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
         </div>
-        <div class="eg-leave-summary-section">
-            <div class="eg-leave-summary-title">${t('eg_runes_orbs')}</div>
-            <div class="eg-leave-summary-row">${currencyHTML || `<span class="eg-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
+        <div class="sx-leave-summary-section">
+            <div class="sx-leave-summary-title">${t('eg_runes_orbs')}</div>
+            <div class="sx-leave-summary-row">${currencyHTML || `<span class="sx-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
         </div>
-        <div class="eg-leave-summary-section">
-            <div class="eg-leave-summary-title">${t('eg_essences_acquired')}</div>
-            <div class="eg-leave-summary-row">${essencesHTML || `<span class="eg-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
+        <div class="sx-leave-summary-section">
+            <div class="sx-leave-summary-title">${t('eg_essences_acquired')}</div>
+            <div class="sx-leave-summary-row">${essencesHTML || `<span class="sx-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
         </div>
         ${goldHTML ? `
-        <div class="eg-leave-summary-section">
-            <div class="eg-leave-summary-title">${t('eg_gold_reward')}</div>
-            <div class="eg-leave-summary-row">${goldHTML}</div>
+        <div class="sx-leave-summary-section">
+            <div class="sx-leave-summary-title">${t('eg_gold_reward')}</div>
+            <div class="sx-leave-summary-row">${goldHTML}</div>
         </div>` : ''}`;
 }
 
@@ -1655,14 +1655,14 @@ export function _leaveRarityClass(rarity) {
 // runes &amp; orbs row - icon, name, rarity line and description, matching
 // the hub's currency tooltip frame.
 export function _buildCurrencyTooltipHTML(entry) {
-    const countLine = entry.count > 1 ? ` <span class="eg-tooltip-count">×${entry.count}</span>` : '';
-    return `<div class="eg-tt-frame" style="--tt-border:#b59248;">
-        <div class="eg-tt-header">
-            <div class="eg-tt-icon">${GAME_ART.html('item', entry.id, entry.icon || '💰')}</div>
-            <div class="eg-tt-name" style="color:#f5d98a;">${entry.name || '???'}${countLine}</div>
-            <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')}</div>
+    const countLine = entry.count > 1 ? ` <span class="sx-tooltip-count">×${entry.count}</span>` : '';
+    return `<div class="sx-tt-frame" style="--tt-border:#b59248;">
+        <div class="sx-tt-header">
+            <div class="sx-tt-icon">${GAME_ART.html('item', entry.id, entry.icon || '💰')}</div>
+            <div class="sx-tt-name" style="color:#f5d98a;">${entry.name || '???'}${countLine}</div>
+            <div class="sx-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')}</div>
         </div>
-        <div class="eg-tt-section"><div class="eg-tt-desc">${entry.description || ''}</div></div>
+        <div class="sx-tt-section"><div class="sx-tt-desc">${entry.description || ''}</div></div>
     </div>`;
 }
 
@@ -1670,14 +1670,14 @@ export function _buildCurrencyTooltipHTML(entry) {
 // essences row - icon, name, rarity line and description, matching
 // the hub's essence tooltip frame.
 export function _buildEssenceTooltipHTML(entry) {
-    const countLine = entry.count > 1 ? ` <span class="eg-tooltip-count">×${entry.count}</span>` : '';
-    return `<div class="eg-tt-frame" style="--tt-border:#b59248;">
-        <div class="eg-tt-header">
-            <div class="eg-tt-icon">${GAME_ART.html('item', entry.id, entry.icon || '🧬')}</div>
-            <div class="eg-tt-name" style="color:#f5d98a;">${entry.name || '???'}${countLine}</div>
-            <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_essence')}</div>
+    const countLine = entry.count > 1 ? ` <span class="sx-tooltip-count">×${entry.count}</span>` : '';
+    return `<div class="sx-tt-frame" style="--tt-border:#b59248;">
+        <div class="sx-tt-header">
+            <div class="sx-tt-icon">${GAME_ART.html('item', entry.id, entry.icon || '🧬')}</div>
+            <div class="sx-tt-name" style="color:#f5d98a;">${entry.name || '???'}${countLine}</div>
+            <div class="sx-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_essence')}</div>
         </div>
-        <div class="eg-tt-section"><div class="eg-tt-desc">${entry.description || ''}</div></div>
+        <div class="sx-tt-section"><div class="sx-tt-desc">${entry.description || ''}</div></div>
     </div>`;
 }
 
@@ -1693,13 +1693,13 @@ export function _buildLeaveItemTooltipHTML(item) {
     const def = typeof ITEM_DEFS !== 'undefined' ? globalThis.ITEM_DEFS[item.defId] : null;
     const desc = (def && typeof itemDesc === 'function') ? globalThis.itemDesc(def) : '';
 
-    return `<div class="eg-tt-frame" style="--tt-border:${rc};">
-        <div class="eg-tt-header">
-            <div class="eg-tt-icon">${GAME_ART.html('item', item.defId, item.icon || '📦')}</div>
-            <div class="eg-tt-name" style="color:${rc};">${item.name || '???'}</div>
-            <div class="eg-tt-rarity-line" style="color:${rc};">${_leaveRarityLabel(_leaveRarityClass(item.rarity))}</div>
+    return `<div class="sx-tt-frame" style="--tt-border:${rc};">
+        <div class="sx-tt-header">
+            <div class="sx-tt-icon">${GAME_ART.html('item', item.defId, item.icon || '📦')}</div>
+            <div class="sx-tt-name" style="color:${rc};">${item.name || '???'}</div>
+            <div class="sx-tt-rarity-line" style="color:${rc};">${_leaveRarityLabel(_leaveRarityClass(item.rarity))}</div>
         </div>
-        ${desc ? `<div class="eg-tt-section"><div class="eg-tt-desc">${desc}</div></div>` : ''}
+        ${desc ? `<div class="sx-tt-section"><div class="sx-tt-desc">${desc}</div></div>` : ''}
     </div>`;
 }
 
@@ -1759,7 +1759,7 @@ export function _wireLeaveMapSummaryTooltips(panel, state) {
     const ensureAboveOverlay = () => { globalThis.getGameTooltip().style.zIndex = '10001'; };
 
     panel.addEventListener('mouseover', (e) => {
-        const chip = e.target.closest('.eg-leave-summary-chip');
+        const chip = e.target.closest('.sx-leave-summary-chip');
         if (!chip) return;
         const html = buildFor(chip);
         if (!html) return;
@@ -1767,10 +1767,10 @@ export function _wireLeaveMapSummaryTooltips(panel, state) {
         globalThis.showGameTooltip(html, e);
     });
     panel.addEventListener('mousemove', (e) => {
-        if (e.target.closest('.eg-leave-summary-chip')) globalThis.moveGameTooltip(e);
+        if (e.target.closest('.sx-leave-summary-chip')) globalThis.moveGameTooltip(e);
     });
     panel.addEventListener('mouseout', (e) => {
-        if (e.target.closest('.eg-leave-summary-chip')) globalThis.hideGameTooltip();
+        if (e.target.closest('.sx-leave-summary-chip')) globalThis.hideGameTooltip();
     });
 }
 
@@ -1801,7 +1801,7 @@ export function _renderPauseLootSummary() {
     // Read-only tooltip wiring (mouseover/mousemove/mouseout only). Assigned
     // as on* properties so repeated pauses never stack duplicate listeners.
     container.onmouseover = (e) => {
-        const chip = e.target.closest('.eg-leave-summary-chip');
+        const chip = e.target.closest('.sx-leave-summary-chip');
         if (!chip) return;
         const html = _buildLeaveChipTooltipHTML(chip, state);
         if (!html) return;
@@ -1810,10 +1810,10 @@ export function _renderPauseLootSummary() {
         globalThis.showGameTooltip(html, e);
     };
     container.onmousemove = (e) => {
-        if (e.target.closest('.eg-leave-summary-chip')) globalThis.moveGameTooltip(e);
+        if (e.target.closest('.sx-leave-summary-chip')) globalThis.moveGameTooltip(e);
     };
     container.onmouseout = (e) => {
-        if (e.target.closest('.eg-leave-summary-chip')) globalThis.hideGameTooltip();
+        if (e.target.closest('.sx-leave-summary-chip')) globalThis.hideGameTooltip();
     };
 }
 
@@ -1826,11 +1826,11 @@ export function _showLeaveMapTransition(atlasResult, opts) {
     const failed = !!opts.failed;
     _injectLeaveMapTransitionStyles();
 
-    let el = document.getElementById('eg-leave-map-transition');
+    let el = document.getElementById('sx-leave-map-transition');
     if (!el) {
         el = document.createElement('div');
-        el.id = 'eg-leave-map-transition';
-        el.className = 'eg-leave-map-transition';
+        el.id = 'sx-leave-map-transition';
+        el.className = 'sx-leave-map-transition';
         document.body.appendChild(el);
     }     // Gold badge when this run cleared the region on the Atlas of Statistica
     // for the very first time (win path only).
@@ -1839,7 +1839,7 @@ export function _showLeaveMapTransition(atlasResult, opts) {
     if (isFirstClear) {
         const node = atlasResult.node;
         const tierLabel = t('eg_map_tier_tt').replace('{n}', node.tier);
-        firstClearHTML = `<div class="eg-leave-map-first-clear">✨ ${t('eg_atlas_first_clear')
+        firstClearHTML = `<div class="sx-leave-map-first-clear">✨ ${t('eg_atlas_first_clear')
             .replace('{n}', egAtlasNodeName(node))
             .replace('{t}', tierLabel)}</div>`;
     }
@@ -1854,18 +1854,18 @@ export function _showLeaveMapTransition(atlasResult, opts) {
         ? (opts.titleText || t(isTrial ? 'eg_trial_failed' : 'eg_map_failed'))
         : t('eg_map_cleared');
     const subLineHTML = (failed && opts.subText)
-        ? `<div class="eg-leave-map-subline">${opts.subText}</div>` : '';
+        ? `<div class="sx-leave-map-subline">${opts.subText}</div>` : '';
     const keepHintHTML = failed
-        ? `<div class="eg-leave-map-keep-hint">${t(isTrial ? 'eg_trial_failed_keep_hint' : 'eg_map_failed_keep_hint')}</div>` : '';
+        ? `<div class="sx-leave-map-keep-hint">${t(isTrial ? 'eg_trial_failed_keep_hint' : 'eg_map_failed_keep_hint')}</div>` : '';
 
     el.innerHTML = `
-        <div class="eg-leave-map-panel ${failed ? 'eg-leave-map-failed' : ''}">
-            <div class="eg-leave-map-title ${failed ? 'eg-title-failed' : ''}">${titleText}</div>
+        <div class="sx-leave-map-panel ${failed ? 'sx-leave-map-failed' : ''}">
+            <div class="sx-leave-map-title ${failed ? 'sx-title-failed' : ''}">${titleText}</div>
             ${subLineHTML}
             ${keepHintHTML}
             ${firstClearHTML}
-            <div id="eg-leave-summary-container"></div>
-            <button class="eg-leave-map-return-btn" id="btn-eg-leave-map-return">${t(isTrial ? 'eg_return_to_world' : 'eg_return_to_nexus')}</button>
+            <div id="sx-leave-summary-container"></div>
+            <button class="sx-leave-map-return-btn" id="btn-eg-leave-map-return">${t(isTrial ? 'eg_return_to_world' : 'eg_return_to_nexus')}</button>
         </div>`;
     el.classList.add('show');
 
@@ -1892,8 +1892,8 @@ export function _showLeaveMapTransition(atlasResult, opts) {
         gold: goldReward,
     };
 
-    const panel = el.querySelector('.eg-leave-map-panel') || el;
-    const container = document.getElementById('eg-leave-summary-container');
+    const panel = el.querySelector('.sx-leave-map-panel') || el;
+    const container = document.getElementById('sx-leave-summary-container');
     if (container) {
         container.innerHTML = _buildLeaveMapSummaryHTML(state.loot, state.items, state.maps, state.currency, state.essences, state.gold);
     }
@@ -1950,7 +1950,7 @@ export function _clearBonusLootFlags() {
 }
 
 export function _hideLeaveMapTransition() {
-    const el = document.getElementById('eg-leave-map-transition');
+    const el = document.getElementById('sx-leave-map-transition');
     if (el) el.classList.remove('show');
     if (typeof hideGameTooltip === 'function') globalThis.hideGameTooltip();
 }
@@ -2011,19 +2011,19 @@ export function _endMapDefeated(titleText, subText) {
 // Injects the overlay's CSS once - same pattern as _injectCurrencyStyles
 // / _dndInjectStyles, so nothing needs to be added to your .css files.
 export function _injectLeaveMapTransitionStyles() {
-    if (document.getElementById('eg-leave-map-transition-styles')) return;
+    if (document.getElementById('sx-leave-map-transition-styles')) return;
     const style = document.createElement('style');
-    style.id = 'eg-leave-map-transition-styles';
+    style.id = 'sx-leave-map-transition-styles';
     style.textContent = `
-        .eg-leave-map-transition {
+        .sx-leave-map-transition {
             display: none;
             position: fixed; inset: 0;
             z-index: 10000;
             background: rgba(5,5,15,0.92);
             align-items: center; justify-content: center;
         }
-        .eg-leave-map-transition.show { display: flex; }
-        .eg-leave-map-panel {
+        .sx-leave-map-transition.show { display: flex; }
+        .sx-leave-map-panel {
             background: #14141f;
             border: 2px solid #5555aa;
             border-radius: 10px;
@@ -2034,21 +2034,21 @@ export function _injectLeaveMapTransitionStyles() {
             overflow-y: auto;
             text-align: center;
         }
-        .eg-leave-map-title {
+        .sx-leave-map-title {
             font-size: 1.4rem;
             font-weight: 700;
             color: #fff;
             margin-bottom: 16px;
             letter-spacing: .05em;
         }
-        .eg-leave-map-panel.eg-leave-map-failed { border-color: #aa4455; }
-        .eg-leave-map-title.eg-title-failed { color: #ff8080; }
-        .eg-leave-map-subline {
+        .sx-leave-map-panel.sx-leave-map-failed { border-color: #aa4455; }
+        .sx-leave-map-title.sx-title-failed { color: #ff8080; }
+        .sx-leave-map-subline {
             font-size: 0.85rem;
             color: #bbb;
             margin: -8px auto 10px auto;
         }
-        .eg-leave-map-keep-hint {
+        .sx-leave-map-keep-hint {
             margin: -4px auto 16px auto;
             padding: 6px 14px;
             display: inline-block;
@@ -2058,7 +2058,7 @@ export function _injectLeaveMapTransitionStyles() {
             border: 1px solid rgba(80, 200, 120, 0.45);
             border-radius: 999px;
         }
-        .eg-leave-map-first-clear {
+        .sx-leave-map-first-clear {
             margin: -8px auto 16px auto;
             padding: 6px 14px;
             display: inline-block;
@@ -2070,8 +2070,8 @@ export function _injectLeaveMapTransitionStyles() {
             border-radius: 999px;
             text-shadow: 0 0 6px rgba(245, 217, 138, 0.4);
         }
-        .eg-leave-summary-section { margin-bottom: 18px; }
-        .eg-leave-summary-title {
+        .sx-leave-summary-section { margin-bottom: 18px; }
+        .sx-leave-summary-title {
             font-size: 0.85rem;
             color: #aaa;
             text-transform: uppercase;
@@ -2079,22 +2079,22 @@ export function _injectLeaveMapTransitionStyles() {
             margin-bottom: 8px;
             text-align: left;
         }
-        .eg-leave-summary-row {
+        .sx-leave-summary-row {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             min-height: 40px;
         }
-        .eg-leave-summary-empty { color: #666; font-size: 0.85rem; font-style: italic; }
-        .eg-leave-summary-hint {
+        .sx-leave-summary-empty { color: #666; font-size: 0.85rem; font-style: italic; }
+        .sx-leave-summary-hint {
             font-size: 0.72rem;
             color: #777;
             text-align: left;
             margin-top: 6px;
         }
-        .eg-loot-chip { cursor: pointer; }
-        .eg-loot-chip:hover { filter: brightness(1.4); }
-        .eg-leave-summary-chip {
+        .sx-loot-chip { cursor: pointer; }
+        .sx-loot-chip:hover { filter: brightness(1.4); }
+        .sx-leave-summary-chip {
             position: relative;
             width: 42px; height: 42px;
             display: flex; align-items: center; justify-content: center;
@@ -2103,23 +2103,23 @@ export function _injectLeaveMapTransitionStyles() {
             border-radius: 6px;
             font-size: 1.3rem;
         }
-        .eg-leave-summary-chip img.eg-art-img { width: 86%; height: 86%; object-fit: contain; }
-        .eg-leave-summary-chip.eg-rarity-uncommon { border-color: #2ecc71; }
-        .eg-leave-summary-chip.eg-rarity-rare { border-color: #3498db; }
-        .eg-leave-summary-chip.eg-rarity-epic { border-color: #9b59b6; }
-        .eg-leave-summary-chip.eg-rarity-legendary { border-color: #f39c12; }
-        .eg-leave-summary-chip.eg-rarity-cursed { border-color: #e74c3c; }
-        .eg-leave-summary-chip.eg-rarity-artifact { border-color: #f1c40f; }
-        .eg-leave-summary-chip.eg-rarity-currency { border-color: #b59248; }
-        .eg-leave-summary-chip.eg-rarity-essence { border-color: #b59248; }
-        .eg-leave-summary-chip.eg-rarity-gold { border-color: #f5d98a; background: rgba(245, 217, 138, 0.15); }
-        .eg-leave-summary-count {
+        .sx-leave-summary-chip img.sx-art-img { width: 86%; height: 86%; object-fit: contain; }
+        .sx-leave-summary-chip.sx-rarity-uncommon { border-color: #2ecc71; }
+        .sx-leave-summary-chip.sx-rarity-rare { border-color: #3498db; }
+        .sx-leave-summary-chip.sx-rarity-epic { border-color: #9b59b6; }
+        .sx-leave-summary-chip.sx-rarity-legendary { border-color: #f39c12; }
+        .sx-leave-summary-chip.sx-rarity-cursed { border-color: #e74c3c; }
+        .sx-leave-summary-chip.sx-rarity-artifact { border-color: #f1c40f; }
+        .sx-leave-summary-chip.sx-rarity-currency { border-color: #b59248; }
+        .sx-leave-summary-chip.sx-rarity-essence { border-color: #b59248; }
+        .sx-leave-summary-chip.sx-rarity-gold { border-color: #f5d98a; background: rgba(245, 217, 138, 0.15); }
+        .sx-leave-summary-count {
             position: absolute; bottom: 1px; right: 2px;
             font-size: 0.6rem; font-weight: 700; color: #f0e6c0;
             text-shadow: 0 0 3px #000, 0 0 6px #000;
             pointer-events: none;
         }
-        .eg-leave-summary-bonus {
+        .sx-leave-summary-bonus {
             position: absolute; top: -7px; right: -7px;
             width: 18px; height: 18px;
             display: flex; align-items: center; justify-content: center;
@@ -2130,7 +2130,7 @@ export function _injectLeaveMapTransitionStyles() {
             box-shadow: 0 0 6px rgba(245, 217, 138, 0.55);
             pointer-events: none;
         }
-        .eg-leave-summary-tooltip {
+        .sx-leave-summary-tooltip {
             display: none;
             position: absolute;
             bottom: 100%; left: 50%;
@@ -2139,8 +2139,8 @@ export function _injectLeaveMapTransitionStyles() {
             z-index: 10001;
             white-space: normal;
         }
-        .eg-leave-summary-chip:hover .eg-leave-summary-tooltip { display: block; }
-        .eg-leave-map-return-btn {
+        .sx-leave-summary-chip:hover .sx-leave-summary-tooltip { display: block; }
+        .sx-leave-map-return-btn {
             margin-top: 8px;
             padding: 10px 24px;
             font-weight: 700;
@@ -2152,7 +2152,7 @@ export function _injectLeaveMapTransitionStyles() {
             cursor: pointer;
             font-size: 0.95rem;
         }
-        .eg-leave-map-return-btn:hover { background: #6c6cc9; }
+        .sx-leave-map-return-btn:hover { background: #6c6cc9; }
     `;
     document.head.appendChild(style);
 }

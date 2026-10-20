@@ -32,8 +32,8 @@ export function _rejectEssenceUse(reasonKey, chipEl, opts = {}) {
     globalThis.showToast(msg);
     if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error', duration: opts.duration || 5000 });
     if (chipEl) {
-        chipEl.classList.add('eg-slot-reject');
-        setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
+        chipEl.classList.add('sx-slot-reject');
+        setTimeout(() => chipEl.classList.remove('sx-slot-reject'), 600);
     }
     _cancelEssenceUse(true);
 }
@@ -43,9 +43,9 @@ export function _startEssenceUse(def, row, col, chipEl) {
         _cancelCurrencyUse(true);
     }
     _pendingEssenceUse = { defId: def.id, sourceRow: row, sourceCol: col };
-    document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
-    if (chipEl) chipEl.classList.add('eg-currency-selected');
-    document.body.classList.add('eg-currency-use-active');
+    document.querySelectorAll('.sx-item-chip').forEach(el => el.classList.remove('sx-currency-selected'));
+    if (chipEl) chipEl.classList.add('sx-currency-selected');
+    document.body.classList.add('sx-currency-use-active');
     globalThis.showToast(t('eg_currency_selected')
         .replace('{icon}', def.icon)
         .replace('{name}', def.name));
@@ -54,20 +54,20 @@ export function _startEssenceUse(def, row, col, chipEl) {
 export function _cancelEssenceUse(silent) {
     if (!_pendingEssenceUse) return;
     _pendingEssenceUse = null;
-    document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
-    document.body.classList.remove('eg-currency-use-active');
+    document.querySelectorAll('.sx-item-chip').forEach(el => el.classList.remove('sx-currency-selected'));
+    document.body.classList.remove('sx-currency-use-active');
     if (!silent) globalThis.showToast(t('eg_currency_cancelled'));
 }
 
 export function _refreshEssenceUseHighlight() {
     if (!_pendingEssenceUse) return;
     const { sourceRow, sourceCol } = _pendingEssenceUse;
-    document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
+    document.querySelectorAll('.sx-item-chip').forEach(el => el.classList.remove('sx-currency-selected'));
     const chip = document.querySelector(
-        `.eg-essence-cell[data-row="${sourceRow}"][data-col="${sourceCol}"] .eg-item-chip`);
+        `.sx-essence-cell[data-row="${sourceRow}"][data-col="${sourceCol}"] .sx-item-chip`);
     if (chip) {
-        chip.classList.add('eg-currency-selected');
-        document.body.classList.add('eg-currency-use-active');
+        chip.classList.add('sx-currency-selected');
+        document.body.classList.add('sx-currency-use-active');
     } else {
         _cancelEssenceUse(true);
     }
@@ -138,8 +138,8 @@ export function _applyEssenceToItem(item, applyFn, chipEl, keepActive) {
 
 // Right-click on an essence chip: start or cancel "use mode".
 document.addEventListener('contextmenu', function (e) {
-    const chip = e.target.closest('.eg-item-chip');
-    const essenceCell = chip ? chip.closest('.eg-essence-cell') : null;
+    const chip = e.target.closest('.sx-item-chip');
+    const essenceCell = chip ? chip.closest('.sx-essence-cell') : null;
 
     if (_pendingEssenceUse) {
         if (!chip || !essenceCell) return;
@@ -178,7 +178,7 @@ document.addEventListener('mousedown', function (e) {
     if (typeof _pendingCurrencyUse !== 'undefined' && _pendingCurrencyUse) return;
     if (e.button !== 0) return;
 
-    const chip = e.target.closest('.eg-item-chip');
+    const chip = e.target.closest('.sx-item-chip');
     const onManagedScreen = !!chip && (typeof _dndChipScreenEl === 'function'
         ? !!_dndChipScreenEl(chip)
         : !!chip.closest('#screen-endgame-hub'));
@@ -187,7 +187,7 @@ document.addEventListener('mousedown', function (e) {
         return;
     }
 
-    if (chip.closest('.eg-essence-cell')) {
+    if (chip.closest('.sx-essence-cell')) {
         _cancelEssenceUse();
         return;
     }
@@ -195,8 +195,8 @@ document.addEventListener('mousedown', function (e) {
     e.preventDefault();
     e.stopImmediatePropagation();
 
-    const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell):not(.eg-essence-cell)');
-    const equipSlot = chip.closest('.eg-equip-slot');
+    const invCell = chip.closest('.sx-inv-cell:not(.sx-currency-cell):not(.eg-map-stash-cell):not(.sx-essence-cell)');
+    const equipSlot = chip.closest('.sx-equip-slot');
 
     let targetItem = null, applyFn = null;
     if (invCell) {

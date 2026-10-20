@@ -86,7 +86,7 @@ export function _buildTooltipBodyHTML(item) {
                     ? (de ? 'Schwerwaffe' : 'Heavy Weapon')
                     : (de ? 'Einhandwaffe' : 'One-Handed Weapon');
             }
-            handHTML = `<div class="eg-tt-hands">${handLabel}</div>`;
+            handHTML = `<div class="sx-tt-hands">${handLabel}</div>`;
         }
     }
 
@@ -94,7 +94,7 @@ export function _buildTooltipBodyHTML(item) {
     // Defense and damage values shown are the LOCAL-modified totals (base +    // local flat, scaled by the item's own "% increased" mods). Values
     // altered by local mods get the
 
-    // .eg-tt-val-modified highlight so the player can tell them apart from
+    // .sx-tt-val-modified highlight so the player can tell them apart from
     // the untouched base value.
     const implicitLines = [];
     const def = item.defenses || {};
@@ -107,8 +107,8 @@ export function _buildTooltipBodyHTML(item) {
     const defLine = (labelKey, stat) => {
         const { v, m } = defVal(stat);
         if ((v || 0) <= 0) return;
-        const valCls = m ? 'eg-tt-val eg-tt-val-modified' : 'eg-tt-val';
-        implicitLines.push(`<div class="eg-tt-implicit">${t(labelKey)}: <span class="${valCls}">${v}</span></div>`);
+        const valCls = m ? 'sx-tt-val sx-tt-val-modified' : 'sx-tt-val';
+        implicitLines.push(`<div class="sx-tt-implicit">${t(labelKey)}: <span class="${valCls}">${v}</span></div>`);
     };
     defLine('eg_tt_armour', 'armour');
     defLine('eg_tt_evasion', 'evasion');
@@ -118,8 +118,8 @@ export function _buildTooltipBodyHTML(item) {
         try { dmgEff = _getItemEffectiveDamage(item); } catch (e) { dmgEff = null; }
         const rangeLine = (labelKey, min, max, moddedFlag) => {
             if ((max || 0) <= 0 && (min || 0) <= 0) return;
-            const valCls = moddedFlag ? 'eg-tt-val eg-tt-val-modified' : 'eg-tt-val';
-            implicitLines.push(`<div class="eg-tt-implicit">${t(labelKey)}: <span class="${valCls}">${min}–${max}</span></div>`);
+            const valCls = moddedFlag ? 'sx-tt-val sx-tt-val-modified' : 'sx-tt-val';
+            implicitLines.push(`<div class="sx-tt-implicit">${t(labelKey)}: <span class="${valCls}">${min}–${max}</span></div>`);
         };
         if (dmgEff) {
             rangeLine('eg_stat_phys_damage', dmgEff.physMin, dmgEff.physMax, dmgEff.modded.phys);
@@ -137,8 +137,8 @@ export function _buildTooltipBodyHTML(item) {
             let atkEff = null;
             try { atkEff = _getItemEffectiveAttackInterval(item); } catch (e) { atkEff = null; }
             const interval = (atkEff && atkEff.interval != null) ? atkEff.interval : item.attackIntervalSeconds;
-            const valCls = (atkEff && atkEff.modded) ? 'eg-tt-val eg-tt-val-modified' : 'eg-tt-val';
-            implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_attack_interval')}: <span class="${valCls}">${interval}s</span></div>`);
+            const valCls = (atkEff && atkEff.modded) ? 'sx-tt-val sx-tt-val-modified' : 'sx-tt-val';
+            implicitLines.push(`<div class="sx-tt-implicit">${t('eg_tt_attack_interval')}: <span class="${valCls}">${interval}s</span></div>`);
         }
         // Innate bleed: every physical hit has a built-in chance to bleed
         // (PHYS_INNATE_BLEED_CHANCE_PCT in combat-ailments-core.js - keep
@@ -147,7 +147,7 @@ export function _buildTooltipBodyHTML(item) {
         // are not a bleed weapon and must not advertise it.
         const physMax = dmgEff ? (dmgEff.physMax || 0) : (item.damage.max || 0);
         if (physMax > 0 && item.slotType === 'weapon') {
-            implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_innate_bleed')}</div>`);
+            implicitLines.push(`<div class="sx-tt-implicit">${t('eg_tt_innate_bleed')}</div>`);
         }
     }
     if (item.blockChance) {
@@ -155,15 +155,15 @@ export function _buildTooltipBodyHTML(item) {
         try { blockEff = typeof _getItemEffectiveBlockChance === 'function' ? _getItemEffectiveBlockChance(item) : null; } catch (e) { blockEff = null; }
         const bcVal = blockEff ? blockEff.value : item.blockChance;
         const bcModded = blockEff ? blockEff.modded : false;
-        const valCls = bcModded ? 'eg-tt-val eg-tt-val-modified' : 'eg-tt-val';
-        implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_block_chance')}: <span class="${valCls}">${bcVal}%</span></div>`);
+        const valCls = bcModded ? 'sx-tt-val sx-tt-val-modified' : 'sx-tt-val';
+        implicitLines.push(`<div class="sx-tt-implicit">${t('eg_tt_block_chance')}: <span class="${valCls}">${bcVal}%</span></div>`);
     }
     // Bows have no fire button - tell the player how the bow actually shoots.
     if (item.slotType === 'ranged') {
-        implicitLines.push(`<div class="eg-tt-implicit" style="font-style:italic;opacity:0.85;">${t('eg_tt_bow_hint')}</div>`);
+        implicitLines.push(`<div class="sx-tt-implicit" style="font-style:italic;opacity:0.85;">${t('eg_tt_bow_hint')}</div>`);
     }
     const implicitHTML = implicitLines.length
-        ? `<div class="eg-tt-section">${implicitLines.join('')}</div>`
+        ? `<div class="sx-tt-section">${implicitLines.join('')}</div>`
         : '';
 
     // ── Implicit modifiers (base implicits) ────────────────
@@ -178,10 +178,10 @@ export function _buildTooltipBodyHTML(item) {
             : implicits.flatMap(imp => (imp.rolledStats||[]).map(s => ({ label: s.label, downside:false, tierLabel:'Implicit' })));
         const lines = merged.map(entry => {
             // Implicits are always beneficial - render in implicit blue (no text tag needed, color is the indicator)
-            return `<div class="eg-tt-mod eg-tt-mod-implicit"><span class="eg-tt-mod-label">${entry.label}</span></div>`;
+            return `<div class="sx-tt-mod sx-tt-mod-implicit"><span class="sx-tt-mod-label">${entry.label}</span></div>`;
         });
         if (lines.length) {
-            implicitsHTML = `<div class="eg-tt-section eg-tt-implicits-section">${lines.join('')}</div>`;
+            implicitsHTML = `<div class="sx-tt-section sx-tt-implicits-section">${lines.join('')}</div>`;
         }
     }
 
@@ -199,7 +199,7 @@ export function _buildTooltipBodyHTML(item) {
         const met = PLAYER_BASE_ATTRIBUTES.level == null
             || PLAYER_BASE_ATTRIBUTES.level >= req.level;
         const label = t('eg_req_level').replace('{n}', req.level);
-        reqParts.push(met ? label : `<span class="eg-tt-req-unmet">${label}</span>`);
+        reqParts.push(met ? label : `<span class="sx-tt-req-unmet">${label}</span>`);
         if (!met) missingParts.push(label);
     }
     [['str', 'eg_attr_str', 'str'], ['agi', 'eg_attr_agi', 'agi'], ['int', 'eg_attr_int', 'int']]
@@ -209,14 +209,14 @@ export function _buildTooltipBodyHTML(item) {
             const label = `${req[reqKey]} ${t(labelKey)}`;
             reqParts.push(have >= req[reqKey]
                 ? label
-                : `<span class="eg-tt-req-unmet">${label}</span>`);
+                : `<span class="sx-tt-req-unmet">${label}</span>`);
             if (have < req[reqKey]) missingParts.push(`${req[reqKey] - have} ${t(labelKey)}`);
         });
     const missingHTML = missingParts.length
-        ? `<div class="eg-tt-req-missing">${t('eg_req_missing')} ${missingParts.join(', ')}</div>`
+        ? `<div class="sx-tt-req-missing">${t('eg_req_missing')} ${missingParts.join(', ')}</div>`
         : '';
     const reqHTML = reqParts.length
-        ? `<div class="eg-tt-section"><div class="eg-tt-req">${t('eg_requires')} ${reqParts.join(', ')}${missingHTML}</div></div>`
+        ? `<div class="sx-tt-section"><div class="sx-tt-req">${t('eg_requires')} ${reqParts.join(', ')}${missingHTML}</div></div>`
         : '';
 
     // ── Chain-break warning ──────────────────────────────────────────
@@ -225,7 +225,7 @@ export function _buildTooltipBodyHTML(item) {
     // rely on (e.g. a +13 Int ring keeping a 45 Int chest satisfied).
     const chain = _getSwapChainBreak(item);
     const chainHTML = chain
-        ? `<div class="eg-tt-section"><div class="eg-tt-swap-warning">${t('eg_swap_breaks_warning')
+        ? `<div class="sx-tt-section"><div class="sx-tt-swap-warning">${t('eg_swap_breaks_warning')
             .replace('{equipped}', chain.occupant.name || '?')
             .replace('{list}', _getUnmetRequirementsText(chain.broken))}</div></div>`
         : '';
@@ -246,7 +246,7 @@ export function _buildTooltipBodyHTML(item) {
                 if (target) {
                     const hg = _checkHandCompatibilityInSlot(item, target);
                     if (!hg.ok && hg.handError && typeof _handErrorMessage === 'function') {
-                        handHTML2 = `<div class="eg-tt-section"><div class="eg-tt-swap-warning">${_handErrorMessage(hg.handError, item)}</div></div>`;
+                        handHTML2 = `<div class="sx-tt-section"><div class="sx-tt-swap-warning">${_handErrorMessage(hg.handError, item)}</div></div>`;
                     }
                 }
             }
@@ -264,13 +264,13 @@ export function _buildTooltipBodyHTML(item) {
         const hideTier = !!item.isUnique;
         const lines = mergedLines.map(entry => {
             // Unique downsides render in warning red instead of mod blue.
-            const cls = entry.downside ? 'eg-tt-mod eg-tt-mod-downside' : 'eg-tt-mod';
-            const tierSpan = (!hideTier && entry.tierLabel) ? `<span class="eg-tt-mod-tier">${entry.tierLabel}</span>` : '';
-            const craftedSpan = entry.crafted ? `<span class="eg-tt-mod-crafted">${t('eg_tt_crafted')}</span>` : '';
-            return `<div class="${cls}"><span class="eg-tt-mod-label">${entry.label}</span>${tierSpan}${craftedSpan}</div>`;
+            const cls = entry.downside ? 'sx-tt-mod sx-tt-mod-downside' : 'sx-tt-mod';
+            const tierSpan = (!hideTier && entry.tierLabel) ? `<span class="sx-tt-mod-tier">${entry.tierLabel}</span>` : '';
+            const craftedSpan = entry.crafted ? `<span class="sx-tt-mod-crafted">${t('eg_tt_crafted')}</span>` : '';
+            return `<div class="${cls}"><span class="sx-tt-mod-label">${entry.label}</span>${tierSpan}${craftedSpan}</div>`;
         });
         if (lines.length) {
-            modsHTML = `<div class="eg-tt-section eg-tt-mods-section">${lines.join('')}</div>`;
+            modsHTML = `<div class="sx-tt-section sx-tt-mods-section">${lines.join('')}</div>`;
         }
     }
 
@@ -284,40 +284,40 @@ export function _buildTooltipBodyHTML(item) {
         if (specials.length) {
             const lines = specials.map(s => {
                 const label = (typeof LANG !== 'undefined' && LANG === 'de') ? (s.de || s.en) : (s.en || s.de);
-                return `<div class="eg-tt-mod eg-tt-mod-implicit"><span class="eg-tt-mod-label">✨ ${label}</span></div>`;
+                return `<div class="sx-tt-mod sx-tt-mod-implicit"><span class="sx-tt-mod-label">✨ ${label}</span></div>`;
             });
-            specialHTML = `<div class="eg-tt-section eg-tt-mods-section">${lines.join('')}</div>`;
+            specialHTML = `<div class="sx-tt-section sx-tt-mods-section">${lines.join('')}</div>`;
         }
     } catch (e) { specialHTML = ''; }
 
     // ── Unique flavor text ────────────────────────────────────────────
     const flavorHTML = item.isUnique
-        ? `<div class="eg-tt-section"><div class="eg-tt-flavor">${LANG === 'de'
+        ? `<div class="sx-tt-section"><div class="sx-tt-flavor">${LANG === 'de'
             ? (item.flavorDe || item.flavorEn || '')
             : (item.flavorEn || item.flavorDe || '')}</div></div>`
         : '';
 
     // ── Item level ────────────────────────────────────────────────────
     const ilvlHTML = item.itemLevel != null
-        ? `<div class="eg-tt-ilvl">${t('eg_item_level').replace('{n}', item.itemLevel)}</div>`
+        ? `<div class="sx-tt-ilvl">${t('eg_item_level').replace('{n}', item.itemLevel)}</div>`
         : '';
 
     const mirroredHTML = item.mirrored
-        ? `<div class="eg-tt-mirrored">🪞 ${t('eg_tt_mirrored')}</div>`
+        ? `<div class="sx-tt-mirrored">🪞 ${t('eg_tt_mirrored')}</div>`
         : '';
 
     const bonusLootHTML = item.isBonusLoot
-        ? `<div class="eg-tt-mirrored" style="color:#f5d98a;">🎁 ${t('eg_bonus_chance_title')}</div>`
+        ? `<div class="sx-tt-mirrored" style="color:#f5d98a;">🎁 ${t('eg_bonus_chance_title')}</div>`
         : '';
 
     return `
-<div class="eg-tt-frame" style="--tt-border:${rc.border};">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">${GAME_ART.html('item', GAME_ART.artIdForItem(item), item.icon || '📦')}</div>
-        <div class="eg-tt-name" style="color:${rc.color};">${item.name || item.baseName || '???'}</div>
+<div class="sx-tt-frame" style="--tt-border:${rc.border};">
+    <div class="sx-tt-header">
+        <div class="sx-tt-icon">${GAME_ART.html('item', GAME_ART.artIdForItem(item), item.icon || '📦')}</div>
+        <div class="sx-tt-name" style="color:${rc.color};">${item.name || item.baseName || '???'}</div>
         ${(item.baseName && item.baseName !== item.name)
-            ? `<div class="eg-tt-basename" style="opacity:.7;">${item.baseName}</div>` : ''}
-        <div class="eg-tt-rarity-line" style="color:${rc.color};">${rarityLabel} ${slotLabel}</div>
+            ? `<div class="sx-tt-basename" style="opacity:.7;">${item.baseName}</div>` : ''}
+        <div class="sx-tt-rarity-line" style="color:${rc.color};">${rarityLabel} ${slotLabel}</div>
         ${handHTML}
     </div>
     ${implicitHTML}
@@ -475,10 +475,10 @@ export function _updateCompareTooltip() {
 // Lazily creates the compare tooltip element (visual twin of the main
 // game tooltip, but with a yellow accent edge to tell them apart).
 export function _getCompareTip() {
-    let tip = document.getElementById('eg-compare-tip');
+    let tip = document.getElementById('sx-compare-tip');
     if (!tip) {
         tip = document.createElement('div');
-        tip.id = 'eg-compare-tip';
+        tip.id = 'sx-compare-tip';
         tip.style.cssText = `
             position: fixed;
             z-index: 9999;
@@ -515,18 +515,18 @@ export function _showCompareTooltip(itemOrItems) {
     tip.style.alignItems = 'flex-start';
     tip.style.width = 'auto';
     tip.style.maxWidth = '96vw';
-    tip.innerHTML = items.map(it => `<div class="eg-compare-col" style="min-width:0;flex:0 0 auto">
-<div class="eg-compare-label">${t('eg_tt_currently_equipped')}</div>
+    tip.innerHTML = items.map(it => `<div class="sx-compare-col" style="min-width:0;flex:0 0 auto">
+<div class="sx-compare-label">${t('eg_tt_currently_equipped')}</div>
 ${_buildTooltipBodyHTML(it)}</div>`).join('');
     // Lift the frame's own narrow cap inside the compare box too.
-    tip.querySelectorAll('.eg-tt-frame').forEach(f => { f.style.maxWidth = 'none'; f.style.margin = '0'; });
+    tip.querySelectorAll('.sx-tt-frame').forEach(f => { f.style.maxWidth = 'none'; f.style.margin = '0'; });
     tip.style.opacity = '1';
     _positionCompareTooltip();
 }
 
 
 export function _hideCompareTooltip() {
-    const tip = document.getElementById('eg-compare-tip');
+    const tip = document.getElementById('sx-compare-tip');
     if (tip) tip.style.opacity = '0';
 }
 
@@ -538,11 +538,11 @@ export function _hideCompareTooltip() {
 // the main tooltip or off the screen.
 export function _positionCompareTooltip() {
     const main = document.getElementById('ghud-floating-tip');
-    const cmp = document.getElementById('eg-compare-tip');
+    const cmp = document.getElementById('sx-compare-tip');
     if (!main || !cmp || cmp.style.opacity !== '1') return;
 
     const MARGIN = 8, CHROME = 28, GAP = 12, MIN_COL = 250;
-    const cols = Array.from(cmp.querySelectorAll('.eg-compare-col'));
+    const cols = Array.from(cmp.querySelectorAll('.sx-compare-col'));
     const n = Math.max(1, cols.length);
     const natural = Number(cmp.dataset.naturalW) || 360;
     const mainRight = main.offsetLeft + main.offsetWidth;

@@ -114,7 +114,7 @@ export function _mechShrBarriers(monster, phase) {
 
     const bars = [];
     const makeBar = (y, vertical) => {
-        const el = _nkEl(run, 'div', 'eg-shr-bar eg-shr-bar-warn');
+        const el = _nkEl(run, 'div', 'sx-shr-bar sx-shr-bar-warn');
         if (vertical) {
             el.style.left = Math.round(y - 7) + 'px'; el.style.top = '0px';
             el.style.width = '14px'; el.style.height = H + 'px';
@@ -147,8 +147,8 @@ export function _mechShrBarriers(monster, phase) {
             if (!b.dieAt) {
                 // Still humming (or just turning lit).
                 if (now < b.tautAt) continue;
-                b.el.classList.remove('eg-shr-bar-warn');
-                b.el.classList.add('eg-shr-bar-lit');
+                b.el.classList.remove('sx-shr-bar-warn');
+                b.el.classList.add('sx-shr-bar-lit');
                 b.dieAt = now + SHR_LIT_MS * _SHR_DEBUG_MULT;
             }
 
@@ -162,13 +162,13 @@ export function _mechShrBarriers(monster, phase) {
             // The KNOT: the rope on the player's side holds. A vertical wall
             // segment grows from the anchor, holds 3s, then BURNS AWAY.
             b.dead = true;
-            b.el.classList.add('eg-shr-bar-knotting');
+            b.el.classList.add('sx-shr-bar-knotting');
             const fromTop = b.axis === 'h' ? (pc.y < b.pos) : (pc.x < b.pos);
             b.knotSide = fromTop ? -1 : 1;
             const len = b.axis === 'h'
                 ? (fromTop ? b.pos : H - b.pos)
                 : (fromTop ? b.pos : W - b.pos);
-            const kel = _nkEl(run, 'div', 'eg-shr-knotwall');
+            const kel = _nkEl(run, 'div', 'sx-shr-knotwall');
             if (b.axis === 'h') {
                 kel.style.left = '0px';
                 kel.style.top = Math.round(fromTop ? 0 : b.pos - SHR_KNOT_R) + 'px';
@@ -195,7 +195,7 @@ export function _mechShrBarriers(monster, phase) {
             if (sideOK && d < SHR_KNOT_R) _nkDotTick(run, SHR_KNOT_DPS[p], dtS, level, 'lightning');
             if (now >= b.knotDieAt) {
                 b.burned = true;
-                b.knotEl.classList.add('eg-shr-knotwall-burn');
+                b.knotEl.classList.add('sx-shr-knotwall-burn');
                 if (sideOK && d < SHR_KNOT_R + 8) {
                     _shrTouch(SHR_BURN_DMG[p], level, 'Knot Burn');
                 }
@@ -240,7 +240,7 @@ export function _mechShrMirrors(monster, phase) {
 
     // ── Anchor + spirit fan (the old soul, kept). ────────────────────────
     const ax = W * 0.15, ay = H * 0.5;
-    const anchor = _nkEl(run, 'div', 'eg-nk-dot eg-shr-anchor', '⛩️');
+    const anchor = _nkEl(run, 'div', 'sx-nk-dot sx-shr-anchor', '⛩️');
     anchor.style.transform = 'translate(' + Math.round(ax - 26) + 'px,' + Math.round(ay - 26) + 'px)';
     const orbs = [];
     if (p >= 2) {
@@ -249,18 +249,18 @@ export function _mechShrMirrors(monster, phase) {
         const spread = 0.35 * 2 / Math.max(1, fanN - 1);
         for (let i = 0; i < fanN; i++) {
             const a = base + (i - (fanN - 1) / 2) * spread;
-            const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-orb-spirit');
+            const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-orb-spirit');
             orbs.push({ x: ax, y: ay, vx: Math.cos(a) * SHR_FAN_SPD[p], vy: Math.sin(a) * SHR_FAN_SPD[p], hitDone: false, el });
         }
     }
 
     // ── Spirit signature: record → shatter → playback. ───────────────────
     const rec = [];
-    const trailEl = _nkEl(run, 'div', 'eg-shr-trail');
+    const trailEl = _nkEl(run, 'div', 'sx-shr-trail');
     let recUntil = performance.now() + SHR_REC_MS * _SHR_DEBUG_MULT;
     let shatterAt = recUntil + 400 * _SHR_DEBUG_MULT;
     let shone = false;
-    const shard = _nkEl(run, 'div', 'eg-shr-shard', '🔷');
+    const shard = _nkEl(run, 'div', 'sx-shr-shard', '🔷');
     let u = 0, route = null, echoes = [];
     let bandArmed = false, bandEl = null, bandHitAt = 0, endPt = null, strikeDone = false;
     shard.style.opacity = '0';   // hidden until the signature shatters
@@ -327,7 +327,7 @@ export function _mechShrMirrors(monster, phase) {
                 e.t -= dtS * 1000;
                 if (e.t <= 0) {
                     e.hit = true;
-                    const bump = _nkEl(run, 'div', 'eg-shr-echo');
+                    const bump = _nkEl(run, 'div', 'sx-shr-echo');
                     bump.style.left = Math.round(e.x - 22) + 'px';
                     bump.style.top = Math.round(e.y - 22) + 'px';
                     setTimeout(() => { try { bump.remove(); } catch (err) {} }, 320 * _SHR_DEBUG_MULT);
@@ -342,7 +342,7 @@ export function _mechShrMirrors(monster, phase) {
             if (k >= 1 && !bandArmed) {
                 bandArmed = true;
                 endPt = route[p >= 3 ? route.length - 1 : 0];
-                bandEl = _nkEl(run, 'div', 'eg-nk-band eg-shr-strike-warn');
+                bandEl = _nkEl(run, 'div', 'sx-nk-band sx-shr-strike-warn');
                 bandEl.style.left = Math.round(endPt.x - 60) + 'px';
                 bandEl.style.top = Math.round(endPt.y - 60) + 'px';
                 bandEl.style.width = '120px'; bandEl.style.height = '120px';
@@ -352,7 +352,7 @@ export function _mechShrMirrors(monster, phase) {
 
         // Strike resolution (in-loop, not a setTimeout).
         if (bandArmed && !strikeDone && now >= bandHitAt && bandEl) {
-            bandEl.classList.add('eg-nk-band-hit');
+            bandEl.classList.add('sx-nk-band-hit');
             if (endPt && Math.hypot(pc.x - endPt.x, pc.y - endPt.y) < 60) {
                 _shrTouch(SHR_STOP_DMG[p], level, 'Signature Strike');
             }
@@ -406,7 +406,7 @@ export function _mechShrWard(monster, phase) {
         sy = H * (0.22 + Math.random() * 0.56);
         if (Math.hypot(sx - pc0.x, sy - pc0.y) > 200) break;
     }
-    const ward = _nkEl(run, 'div', 'eg-shr-ward', '🧿');
+    const ward = _nkEl(run, 'div', 'sx-shr-ward', '🧿');
     ward.style.left = Math.round(sx - SHR_WARD_R) + 'px';
     ward.style.top = Math.round(sy - SHR_WARD_R) + 'px';
     ward.style.width = (SHR_WARD_R * 2) + 'px';
@@ -435,12 +435,12 @@ export function _mechShrWard(monster, phase) {
             && now >= state.lastHit) {
             state.lastHit = now + 450 * _SHR_DEBUG_MULT;
             state.hp--;
-            ward.classList.remove('eg-shr-ward-hit');
+            ward.classList.remove('sx-shr-ward-hit');
             void ward.offsetWidth;
-            ward.classList.add('eg-shr-ward-hit');
+            ward.classList.add('sx-shr-ward-hit');
             if (state.hp <= 0) {
                 state.torn = true;
-                ward.classList.add('eg-shr-ward-torn');
+                ward.classList.add('sx-shr-ward-torn');
                 _shrHeal(_nkMaxHP() * SHR_HEAL_CANCEL);
                 _nkToast('eg_mech_shr_torn', '⛩️🧿 OFUDA TORN - the chant is cancelled! (+heal)', '#4ade80');
             }
@@ -449,12 +449,12 @@ export function _mechShrWard(monster, phase) {
         // Chant completes → the Shinto Seal.
         if (!state.torn && !state.chantDone && chantT >= chantMs) {
             state.chantDone = true;
-            ward.classList.add('eg-shr-ward-dim');
+            ward.classList.add('sx-shr-ward-dim');
             _nkToast('eg_mech_shr_seal', '⛩️ THE SHINTO SEAL - the ward closes on your row!', '#f97316');
             state.axis = 'v';
             state.dir = state.seals % 2 === 0 ? 1 : -1;
             state.bandX = pc.x;
-            const band = _nkEl(run, 'div', 'eg-nk-band eg-shr-seal-warn');
+            const band = _nkEl(run, 'div', 'sx-nk-band sx-shr-seal-warn');
             band.style.left = Math.round(state.bandX - 55) + 'px'; band.style.top = '0px';
             band.style.width = '110px'; band.style.height = H + 'px';
             state.warnUntil = now + SHR_SEAL_WARN * _SHR_DEBUG_MULT;
@@ -464,11 +464,11 @@ export function _mechShrWard(monster, phase) {
         // Seal sweep after its telegraph.
         if (state.chantDone && state.band && now >= state.warnUntil && !state.sweeping) {
             state.sweeping = true;
-            state.band.classList.add('eg-nk-band-hit');
+            state.band.classList.add('sx-nk-band-hit');
             _nkSlamShatter(state.band, run);
             state.sealX = state.dir > 0 ? -80 : W + 80;
             state.sealY = state.bandX;
-            const sealEl = _nkEl(run, 'div', 'eg-nk-dot eg-shr-seal', '📜');
+            const sealEl = _nkEl(run, 'div', 'sx-nk-dot sx-shr-seal', '📜');
             state.sealEl = sealEl;
             state.sealHit = false;
         }
@@ -595,9 +595,9 @@ export function _shrFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -606,10 +606,10 @@ export function _shrFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-shr-cd';
+    ov.className = 'sx-shr-cd';
     ov.innerHTML =
-        '<div class="eg-shr-cd-label">⛩️ THOUSAND ARMS</div>' +
-        '<div class="eg-shr-cd-hint">Eight torii beams sweep the shrine and every few seconds a KNOCK comes: 20 talismans land with ONE safe cell - reach it before the grid detonates. Survive three knocks for THE THOUSANDTH ARM: only the descending circle is safe!</div>';
+        '<div class="sx-shr-cd-label">⛩️ THOUSAND ARMS</div>' +
+        '<div class="sx-shr-cd-hint">Eight torii beams sweep the shrine and every few seconds a KNOCK comes: 20 talismans land with ONE safe cell - reach it before the grid detonates. Survive three knocks for THE THOUSANDTH ARM: only the descending circle is safe!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -619,18 +619,18 @@ export function _shrFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss card wears the bound-god glow while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-shr-allin');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-shr-allin');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
 
     // ── Eight radial torii beams: the lighthouse. ────────────────────────
     for (let i = 0; i < SHR_ARMS; i++) {
-        const el = _nkEl(g.fxRun, 'div', 'eg-shr-beam');
+        const el = _nkEl(g.fxRun, 'div', 'sx-shr-beam');
         el.style.width = Math.round(g.armLen) + 'px';
         el.style.left = Math.round(g.cx) + 'px';
         el.style.top = Math.round(g.cy - 1) + 'px';
@@ -656,7 +656,7 @@ export function _shrFinalStart(monster) {
         g.gridCells = [];
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
-                const el = _nkEl(g.fxRun, 'div', 'eg-shr-talisman' + (r === safeRow && c === safeCol ? ' eg-shr-talisman-safe' : ''));
+                const el = _nkEl(g.fxRun, 'div', 'sx-shr-talisman' + (r === safeRow && c === safeCol ? ' sx-shr-talisman-safe' : ''));
                 el.style.left = Math.round(gx + c * cell + 6) + 'px';
                 el.style.top = Math.round(gy + r * cell + 6) + 'px';
                 el.style.width = Math.round(cell - 12) + 'px';
@@ -671,8 +671,8 @@ export function _shrFinalStart(monster) {
             const pc = _shrPC();
             const safeCell = g.gridCells.find(c => c.safe);
             const inSafe = safeCell && Math.hypot(pc.x - safeCell.x, pc.y - safeCell.y) < cell * 0.6;
-            document.querySelectorAll('.eg-shr-talisman').forEach(el => {
-                if (!el.classList.contains('eg-shr-talisman-safe')) el.classList.add('eg-shr-talisman-hot');
+            document.querySelectorAll('.sx-shr-talisman').forEach(el => {
+                if (!el.classList.contains('sx-shr-talisman-safe')) el.classList.add('sx-shr-talisman-hot');
             });
             if (safeCell) _nkSlamShatter(safeCell.el, g.fxRun);
             if (!inSafe) {
@@ -682,14 +682,14 @@ export function _shrFinalStart(monster) {
             // Clear the grid after the flash.
             setTimeout(() => {
                 if (g.finished) return;
-                document.querySelectorAll('.eg-shr-talisman').forEach(el => { try { el.remove(); } catch (e) {} });
+                document.querySelectorAll('.sx-shr-talisman').forEach(el => { try { el.remove(); } catch (e) {} });
             }, 500 * _SHR_DEBUG_MULT);
         });
 
         // Next knock.
         _shrAfter(g, SHR_KNOCK_MS * _SHR_DEBUG_MULT, () => {
             if (g.finished) return;
-            document.querySelectorAll('.eg-shr-talisman').forEach(el => { try { el.remove(); } catch (e) {} });
+            document.querySelectorAll('.sx-shr-talisman').forEach(el => { try { el.remove(); } catch (e) {} });
             runKnock();
         });
     };
@@ -706,7 +706,7 @@ export function _shrFinalStart(monster) {
             if (px > SHR_SAFE_R + 30 && px < W - SHR_SAFE_R - 30
                 && py > SHR_SAFE_R + 30 && py < H - SHR_SAFE_R - 30) break;
         }
-        const circleEl = _nkEl(g.fxRun, 'div', 'eg-shr-safe-circle');
+        const circleEl = _nkEl(g.fxRun, 'div', 'sx-shr-safe-circle');
         circleEl.style.left = Math.round(px - SHR_SAFE_R) + 'px';
         circleEl.style.top = Math.round(py - SHR_SAFE_R) + 'px';
         circleEl.style.width = (SHR_SAFE_R * 2) + 'px';
@@ -716,7 +716,7 @@ export function _shrFinalStart(monster) {
         _shrAfter(g, 2400 * _SHR_DEBUG_MULT, () => {
             if (g.finished) return;
             // THE THOUSANDTH ARM strikes: everything outside the circle dies.
-            document.querySelectorAll('.eg-shr-beam').forEach(el => el.classList.add('eg-shr-beam-condense'));
+            document.querySelectorAll('.sx-shr-beam').forEach(el => el.classList.add('sx-shr-beam-condense'));
             const pc = _shrPC();
             const inCircle = Math.hypot(pc.x - px, pc.y - py) < SHR_SAFE_R;
             if (!inCircle) {
@@ -768,18 +768,18 @@ export function _shrFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.eg-shr-cd, .eg-shr-beam, .eg-shr-talisman, .eg-shr-safe-circle').forEach(el => {
+    document.querySelectorAll('.sx-shr-cd, .sx-shr-beam, .sx-shr-talisman, .sx-shr-safe-circle').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.remove('eg-shr-allin');
-        wrap.classList.remove('eg-nk-shielded');
+        wrap.classList.remove('sx-shr-allin');
+        wrap.classList.remove('sx-nk-shielded');
     }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -797,15 +797,15 @@ export function _shrFinalEnd(g, monster) {
 export function _shrTeardown() {
     if (_shrFinal) { try { _shrFinalEnd(_shrFinal, null); } catch (e) {} _shrFinal = null; }
     _shrWatcherRun = null;
-    document.querySelectorAll('.eg-shr-bar, .eg-shr-knotwall, .eg-shr-anchor, .eg-shr-trail, .eg-shr-shard, ' +
-        '.eg-shr-echo, .eg-shr-strike-warn, .eg-shr-ward, .eg-shr-seal-warn, .eg-shr-seal, .eg-shr-cd, ' +
-        '.eg-shr-beam, .eg-shr-talisman, .eg-shr-safe-circle').forEach(el => {
+    document.querySelectorAll('.sx-shr-bar, .sx-shr-knotwall, .sx-shr-anchor, .sx-shr-trail, .sx-shr-shard, ' +
+        '.sx-shr-echo, .sx-shr-strike-warn, .sx-shr-ward, .sx-shr-seal-warn, .sx-shr-seal, .sx-shr-cd, ' +
+        '.sx-shr-beam, .sx-shr-talisman, .sx-shr-safe-circle').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-shr-allin').forEach(el => el.classList.remove('eg-shr-allin'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.querySelectorAll('.sx-shr-allin').forEach(el => el.classList.remove('sx-shr-allin'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

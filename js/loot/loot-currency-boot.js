@@ -45,17 +45,17 @@ if (typeof document !== 'undefined' && document.readyState !== 'complete') {
 }
 
 (function _injectCurrencyStyles() {
-    if (document.getElementById('eg-currency-styles')) return;
+    if (document.getElementById('sx-currency-styles')) return;
     const style = document.createElement('style');
-    style.id = 'eg-currency-styles';
+    style.id = 'sx-currency-styles';
     style.textContent = `
-        .eg-item-chip.eg-currency-selected {
+        .sx-item-chip.sx-currency-selected {
             outline: 2px solid #f5d98a;
             box-shadow: 0 0 10px rgba(245,217,138,0.8);
             border-radius: 6px;
         }
-        body.eg-currency-use-active .eg-item-chip { cursor: crosshair; }
-        .eg-tt-desc { color: #ccc; font-size: 0.85rem; padding: 4px 0; }
+        body.sx-currency-use-active .sx-item-chip { cursor: crosshair; }
+        .sx-tt-desc { color: #ccc; font-size: 0.85rem; padding: 4px 0; }
     `;
     document.head.appendChild(style);
 })();

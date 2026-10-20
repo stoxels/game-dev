@@ -853,7 +853,7 @@ export function _ptRefreshPendingArt() {
 }
 
 if (typeof document !== 'undefined' && document.addEventListener) {
-    document.addEventListener('eg-art-loaded', function () {
+    document.addEventListener('sx-art-loaded', function () {
         try { _ptRefreshPendingArt(); } catch (e) { /* tree not open - safe to ignore */ }
     });
 }

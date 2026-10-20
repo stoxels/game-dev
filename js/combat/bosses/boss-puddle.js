@@ -42,7 +42,7 @@ Object.assign(BOSS_MECHANICS, {
 
 // THE DELUGE finale (shared waves): the sky falls in sheets.
 const PUD_FINALE = {
-    name: 'The Puddle', title: '💧 THE DELUGE', element: 'cold', cls: 'eg-nk-fin-water', color: '#7dd3fc',
+    name: 'The Puddle', title: '💧 THE DELUGE', element: 'cold', cls: 'sx-nk-fin-water', color: '#7dd3fc',
     toastKey: 'eg_pud_final',
     hint: 'The sky falls - read each circle!',
     waves: [
@@ -108,14 +108,14 @@ export function _pudSpawnDrop(st, W) {
     } else {
         x = 12 + Math.random() * Math.max(24, W - 24);
     }
-    const el = _nkEl(st.run, 'div', 'eg-pud-drop');
+    const el = _nkEl(st.run, 'div', 'sx-pud-drop');
     st.drops.push({ x, y: -20, el });
 }
 
 
 export function _pudSpawnBubble(st, now) {
     const r = PUD_BUBBLE_R;
-    const el = _nkEl(st.run, 'div', 'eg-pud-bubble');
+    const el = _nkEl(st.run, 'div', 'sx-pud-bubble');
     const b = {
         x: r + Math.random() * Math.max(60, window.innerWidth - 2 * r),
         y: 60 + Math.random() * Math.max(60, window.innerHeight * 0.5),
@@ -138,14 +138,14 @@ export function _pudBurstBubble(st, b, now) {
     if (b.dead) return;
     b.dead = true;
     // Pop ring at the burst point.
-    const ring = _nkEl(st.run, 'div', 'eg-pud-pop');
+    const ring = _nkEl(st.run, 'div', 'sx-pud-pop');
     ring.style.left = Math.round(b.x) + 'px';
     ring.style.top = Math.round(b.y) + 'px';
     setTimeout(() => { try { ring.remove(); } catch (e) {} }, 450);
     // Shrapnel: small bubbles fly off toward BOTH screen sides.
     for (let i = 0; i < 6; i++) {
         const dir = (i % 2 === 0) ? -1 : 1;
-        const el = _nkEl(st.run, 'div', 'eg-pud-shard');
+        const el = _nkEl(st.run, 'div', 'sx-pud-shard');
         st.shards.push({
             x: b.x, y: b.y,
             vx: dir * PUD_SHARD_SPEED * (0.7 + Math.random() * 0.6),
@@ -163,19 +163,19 @@ export function _pudBurstBubble(st, b, now) {
 
 
 export function _pudSpawnFountain(st, x, now) {
-    const anchor = _nkEl(st.run, 'div', 'eg-pud-fountain');
+    const anchor = _nkEl(st.run, 'div', 'sx-pud-fountain');
     anchor.style.left = Math.round(x) + 'px';
     anchor.style.top = Math.round(st.waterY) + 'px';
     const jet = document.createElement('div');
-    jet.className = 'eg-pud-fountain-jet';
+    jet.className = 'sx-pud-fountain-jet';
     anchor.appendChild(jet);
     // Wide lacy crown that flares open as the splash matures (the umbrella
     // canopy from a droplet hitting water, with droplets draping off its rim).
     const crown = document.createElement('div');
-    crown.className = 'eg-pud-fountain-crown';
+    crown.className = 'sx-pud-fountain-crown';
     for (let i = 0; i < 5; i++) {
         const s = document.createElement('span');
-        s.className = 'eg-pud-drape d' + (i + 1);
+        s.className = 'sx-pud-drape d' + (i + 1);
         crown.appendChild(s);
     }
     anchor.appendChild(crown);
@@ -192,7 +192,7 @@ export function _pudSpawnFountain(st, x, now) {
 
 export function _pudSplash(st, x, y) {
     // No water yet - drops still leave a small ground splash.
-    const el = _nkEl(st.run, 'div', 'eg-pud-splash');
+    const el = _nkEl(st.run, 'div', 'sx-pud-splash');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
     setTimeout(() => { try { el.remove(); } catch (e) {} }, 500);
@@ -269,7 +269,7 @@ export function _puddleArenaInit(monster) {
         if (_pudWatcher && _pudWatcher.run === run) _pudWatcher = null;
     };
 
-    st.waterEl = _nkEl(run, 'div', 'eg-pud-water');
+    st.waterEl = _nkEl(run, 'div', 'sx-pud-water');
     for (let i = 0; i < PUD_BUBBLE_N; i++) _pudSpawnBubble(st, performance.now());
 
     _nkLoop(run, (dtS, now) => {
@@ -322,11 +322,11 @@ export function _puddleArenaInit(monster) {
             const fromLeft = Math.random() < 0.5;
             const wv = {
                 x: fromLeft ? -PUD_WAVE_W / 2 : W + PUD_WAVE_W / 2,
-                dir: fromLeft ? 1 : -1, t: 0, hit: false, el: _nkEl(st.run, 'div', 'eg-pud-wave' + (fromLeft ? '' : ' flip')),
+                dir: fromLeft ? 1 : -1, t: 0, hit: false, el: _nkEl(st.run, 'div', 'sx-pud-wave' + (fromLeft ? '' : ' flip')),
             };
             wv.el.style.height = (PUD_WAVE_H[st.waterBand] || PUD_WAVE_H[1]) + 'px';
             const inner = document.createElement('div');
-            inner.className = 'eg-pud-wave-inner';
+            inner.className = 'sx-pud-wave-inner';
             wv.el.appendChild(inner);
             wv.el.style.left = Math.round(wv.x) + 'px';
             wv.el.style.top = Math.round(st.waterY) + 'px';
@@ -351,7 +351,7 @@ export function _puddleArenaInit(monster) {
                 // Spray kicked up along the travelling crest (visual only).
                 if (!wv.sprayAt || now - wv.sprayAt > 130) {
                     wv.sprayAt = now;
-                    const s = _nkEl(st.run, 'div', 'eg-pud-wave-spray');
+                    const s = _nkEl(st.run, 'div', 'sx-pud-wave-spray');
                     s.style.left = Math.round(wv.x + (Math.random() * 60 - 30)) + 'px';
                     s.style.top = Math.round(st.waterY - Math.random() * 40) + 'px';
                     setTimeout(() => { try { s.remove(); } catch (e) {} }, 520);

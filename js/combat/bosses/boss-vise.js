@@ -140,7 +140,7 @@ export function _mechVisWalls(monster, phase) {
         while (distAcc >= VIS_WALL_STEP) {
             distAcc -= VIS_WALL_STEP;
             const mk = (up) => {
-                const el = pool.pop() || _nkEl(run, 'div', 'eg-vis-wblock');
+                const el = pool.pop() || _nkEl(run, 'div', 'sx-vis-wblock');
                 el.style.width = S + 'px'; el.style.height = S + 'px';
                 el.style.display = '';
                 blocks.push({ x: bossX, yUp: upY, yLo: loY, el, up });
@@ -161,7 +161,7 @@ export function _mechVisWalls(monster, phase) {
             }
             const y = b.up ? b.yUp : b.yLo;
             b.el.style.transform = 'translate(' + Math.round(b.x - S / 2) + 'px,' + Math.round(y - S / 2) + 'px)';
-            b.el.classList.toggle('eg-vis-wblock-up', b.up);
+            b.el.classList.toggle('sx-vis-wblock-up', b.up);
         }
 
         // Collision: block touch (chunk + slow) and outside-corridor DoT.
@@ -239,12 +239,12 @@ export function _mechVisBench(monster, phase) {
         const y = nSlices === 1
             ? Math.max(H * 0.15, Math.min(H * 0.85, _visPC().y))
             : H * (0.5 + (i === 0 ? -0.22 : 0.22)) + (Math.random() * 40 - 20);
-        const warn = _nkEl(run, 'div', 'eg-nk-band eg-vis-bench-warn');
+        const warn = _nkEl(run, 'div', 'sx-nk-band sx-vis-bench-warn');
         warn.style.left = '0px'; warn.style.top = Math.round(y - VIS_BENCH_BAND / 2) + 'px';
         warn.style.width = W + 'px'; warn.style.height = VIS_BENCH_BAND + 'px';
         // Jaws: two blocks crawling in from the edges.
-        const jawL = _nkEl(run, 'div', 'eg-vis-jaw');
-        const jawR = _nkEl(run, 'div', 'eg-vis-jaw');
+        const jawL = _nkEl(run, 'div', 'sx-vis-jaw');
+        const jawR = _nkEl(run, 'div', 'sx-vis-jaw');
         const h = VIS_BENCH_BAND + 26;
         [jawL, jawR].forEach(j => {
             j.style.top = Math.round(y - h / 2) + 'px';
@@ -270,7 +270,7 @@ export function _mechVisBench(monster, phase) {
                 const crawlT = Math.min(1, (now - s.warnUntil) / (VIS_BENCH_CRAWL * _VIS_DEBUG_MULT));
                 if (!s.started) {
                     s.started = true;
-                    s.warn.classList.add('eg-vis-bench-closing');
+                    s.warn.classList.add('sx-vis-bench-closing');
                 }
                 const half = W / 2;
                 const lx = -20 + (half - 20) * crawlT;
@@ -280,7 +280,7 @@ export function _mechVisBench(monster, phase) {
                 if (crawlT >= 1) {
                     // BITE: anyone in the band gets the squeeze.
                     s.bitten = true;
-                    s.warn.classList.add('eg-vis-bench-bitten');
+                    s.warn.classList.add('sx-vis-bench-bitten');
                     const pr = _nkPlayerRect();
                     if (pr && Math.abs(pc.y - s.y) < VIS_BENCH_BAND / 2 + pr.height / 2) {
                         const dealt = _nkHit(VIS_BENCH_JAW[p], 'lightning', level);
@@ -297,7 +297,7 @@ export function _mechVisBench(monster, phase) {
                 }
                 if (now >= s.strainUntil) {
                     s.done = true;
-                    [s.warn, s.jawL, s.jawR].forEach(el => el.classList.add('eg-vis-bench-done'));
+                    [s.warn, s.jawL, s.jawR].forEach(el => el.classList.add('sx-vis-bench-done'));
                     const w = s.warn, jl = s.jawL, jr = s.jawR;
                     setTimeout(() => { try { w.remove(); } catch (e) {} }, 400 * _VIS_DEBUG_MULT);
                     setTimeout(() => { try { jl.remove(); } catch (e) {} }, 400 * _VIS_DEBUG_MULT);
@@ -348,7 +348,7 @@ export function _mechVisQuench(monster, phase) {
         sy = H * (0.22 + Math.random() * 0.56);
         if (Math.hypot(sx - pc0.x, sy - pc0.y) > 200) break;
     }
-    const piece = _nkEl(run, 'div', 'eg-vis-piece', '🔥');
+    const piece = _nkEl(run, 'div', 'sx-vis-piece', '🔥');
     piece.style.left = Math.round(sx - VIS_QUEN_R) + 'px';
     piece.style.top = Math.round(sy - VIS_QUEN_R) + 'px';
     piece.style.width = (VIS_QUEN_R * 2) + 'px';
@@ -371,7 +371,7 @@ export function _mechVisQuench(monster, phase) {
         // Hammer arcs: telegraphed slams along the piece; sparks splash.
         if (!state.quenched && now >= nextHammerAt) {
             nextHammerAt = now + 1400 * _VIS_DEBUG_MULT;
-            const arc = _nkEl(run, 'div', 'eg-nk-band eg-vis-hammer-warn');
+            const arc = _nkEl(run, 'div', 'sx-nk-band sx-vis-hammer-warn');
             const vertical = Math.random() < 0.5;
             if (vertical) {
                 arc.style.left = Math.round(sx - 30) + 'px'; arc.style.top = Math.max(0, sy - 180) + 'px';
@@ -382,7 +382,7 @@ export function _mechVisQuench(monster, phase) {
             }
             state.arcEl = state.arcEl || [];
             state.arcEl.push(arc);
-            const spark = _nkEl(run, 'div', 'eg-vis-sparks');
+            const spark = _nkEl(run, 'div', 'sx-vis-sparks');
             spark.style.left = Math.round(sx - 55) + 'px';
             spark.style.top = Math.round(sy - 55) + 'px';
             spark.style.width = '110px'; spark.style.height = '110px';
@@ -390,7 +390,7 @@ export function _mechVisQuench(monster, phase) {
             const strikeAt = now + 700 * _VIS_DEBUG_MULT;
             setTimeout(() => {
                 try {
-                    arc.classList.add('eg-nk-band-hit');
+                    arc.classList.add('sx-nk-band-hit');
                     const sp = spark;
                     setTimeout(() => { try { sp.remove(); } catch (e) {} }, 900 * _VIS_DEBUG_MULT);
                 } catch (e) {}
@@ -417,12 +417,12 @@ export function _mechVisQuench(monster, phase) {
             && now >= state.lastHit) {
             state.lastHit = now + 450 * _VIS_DEBUG_MULT;
             state.hp--;
-            piece.classList.remove('eg-vis-piece-hit');
+            piece.classList.remove('sx-vis-piece-hit');
             void piece.offsetWidth;
-            piece.classList.add('eg-vis-piece-hit');
+            piece.classList.add('sx-vis-piece-hit');
             if (state.hp <= 0) {
                 state.knocked = true;
-                piece.classList.add('eg-vis-piece-shatter');
+                piece.classList.add('sx-vis-piece-shatter');
                 _visHeal(_nkMaxHP() * VIS_HEAL_CANCEL);
                 _nkToast('eg_mech_vis_shatter', '🧱💥 WORKPIECE SHATTERED - the quench is cancelled! (+heal)', '#4ade80');
             }
@@ -431,13 +431,13 @@ export function _mechVisQuench(monster, phase) {
         // Quench completes → the giant wall-block crosses at your row.
         if (!state.knocked && !state.quenched && hammerT >= quenMs) {
             state.quenched = true;
-            piece.classList.add('eg-vis-piece-quenched');
+            piece.classList.add('sx-vis-piece-quenched');
             state.sparkUntil = 0;
             if (state.sparkEl) { try { state.sparkEl.remove(); } catch (e) {} }
             _nkToast('eg_mech_vis_block', '🧱 THE QUENCH - the piece is iron now. It comes for your row!', '#f97316');
             state.dir = state.blocks % 2 === 0 ? 1 : -1;
             state.bandY = pc.y;
-            const band = _nkEl(run, 'div', 'eg-nk-band eg-vis-block-warn');
+            const band = _nkEl(run, 'div', 'sx-nk-band sx-vis-block-warn');
             band.style.left = '0px'; band.style.top = Math.round(state.bandY - 55) + 'px';
             band.style.width = W + 'px'; band.style.height = '110px';
             state.warnUntil = now + VIS_BLOCK_WARN * _VIS_DEBUG_MULT;
@@ -447,10 +447,10 @@ export function _mechVisQuench(monster, phase) {
         // Quenched block sweep after its telegraph.
         if (state.quenched && state.band && now >= state.warnUntil && !state.sweeping) {
             state.sweeping = true;
-            state.band.classList.add('eg-nk-band-hit');
+            state.band.classList.add('sx-nk-band-hit');
             _nkSlamShatter(state.band, run);
             state.blockX = state.dir > 0 ? -80 : W + 80;
-            const block = _nkEl(run, 'div', 'eg-vis-quenched-block', '⬛');
+            const block = _nkEl(run, 'div', 'sx-vis-quenched-block', '⬛');
             state.blockEl = block;
             state.blockHit = false;
         }
@@ -481,7 +481,7 @@ export function _mechVisQuench(monster, phase) {
                 state.quenched = false;
                 hammerT = 0;
                 nextHammerAt = now + 900 * _VIS_DEBUG_MULT;
-                piece.classList.remove('eg-vis-piece-quenched');
+                piece.classList.remove('sx-vis-piece-quenched');
             }
         }
 
@@ -573,9 +573,9 @@ export function _visFinalStart(monster) {
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
     // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.add('eg-charge-paused');
+        if (el) el.classList.add('sx-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
@@ -584,10 +584,10 @@ export function _visFinalStart(monster) {
 
     // Countdown overlay.
     const ov = document.createElement('div');
-    ov.className = 'eg-vis-cd';
+    ov.className = 'sx-vis-cd';
     ov.innerHTML =
-        '<div class="eg-vis-cd-label">🧱 THE FULL CLAMP</div>' +
-        '<div class="eg-vis-cd-hint">Three compression waves squeeze the arena - a corridor of SAFE SLABS lights up: reach it before each squeeze. Survive all three for THE IRON VISE: the overclench slams everything except the stress fracture!</div>';
+        '<div class="sx-vis-cd-label">🧱 THE FULL CLAMP</div>' +
+        '<div class="sx-vis-cd-hint">Three compression waves squeeze the arena - a corridor of SAFE SLABS lights up: reach it before each squeeze. Survive all three for THE IRON VISE: the overclench slams everything except the stress fracture!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -597,11 +597,11 @@ export function _visFinalStart(monster) {
     monster.bossImmune = true;
 
     // The boss card wears the cold-iron glow while the finale runs.
-    const card = document.getElementById('eg-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.add('eg-vis-allin');
-        wrap.classList.add('eg-nk-shielded');
+        wrap.classList.add('sx-vis-allin');
+        wrap.classList.add('sx-nk-shielded');
     }
 
     const level = monster.level || 1;
@@ -628,7 +628,7 @@ export function _visFinalStart(monster) {
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
                 const isSafe = safe.some(s => s.r === r && s.c === c);
-                const el = _nkEl(g.fxRun, 'div', 'eg-vis-slab' + (isSafe ? ' eg-vis-slab-safe' : ''));
+                const el = _nkEl(g.fxRun, 'div', 'sx-vis-slab' + (isSafe ? ' sx-vis-slab-safe' : ''));
                 el.style.left = Math.round(gx + c * cell + 4) + 'px';
                 el.style.top = Math.round(gy + r * cell + 4) + 'px';
                 el.style.width = Math.round(cell - 8) + 'px';
@@ -640,20 +640,20 @@ export function _visFinalStart(monster) {
             if (g.finished) return;
             const pc = _visPC();
             const inCorridor = cells.some(s => Math.hypot(pc.x - s.x, pc.y - s.y) < cell * 0.65);
-            document.querySelectorAll('.eg-vis-slab:not(.eg-vis-slab-safe)').forEach(el => el.classList.add('eg-vis-slab-hot'));
+            document.querySelectorAll('.sx-vis-slab:not(.sx-vis-slab-safe)').forEach(el => el.classList.add('sx-vis-slab-hot'));
             if (!inCorridor) {
                 const dealt = _nkHit(VIS_FIN_DMG, 'lightning', level);
                 _nkAbilityHitToast(dealt, 'The Vise', 'Compression');
             }
             _visAfter(g, 900 * _VIS_DEBUG_MULT, () => {
                 if (g.finished) return;
-                document.querySelectorAll('.eg-vis-slab').forEach(el => { try { el.remove(); } catch (e) {} });
+                document.querySelectorAll('.sx-vis-slab').forEach(el => { try { el.remove(); } catch (e) {} });
             });
         });
 
         _visAfter(g, VIS_FIN_SQUEEZE_MS * _VIS_DEBUG_MULT, () => {
             if (g.finished) return;
-            document.querySelectorAll('.eg-vis-slab').forEach(el => { try { el.remove(); } catch (e) {} });
+            document.querySelectorAll('.sx-vis-slab').forEach(el => { try { el.remove(); } catch (e) {} });
             runSqueeze();
         });
     };
@@ -670,7 +670,7 @@ export function _visFinalStart(monster) {
             py = H * (0.30 + Math.random() * 0.40);
             if (px > cell + 30 && px < W - cell - 30 && py > cell + 30 && py < H - cell - 30) break;
         }
-        const slab = _nkEl(g.fxRun, 'div', 'eg-vis-slab eg-vis-slab-safe eg-vis-slab-fracture');
+        const slab = _nkEl(g.fxRun, 'div', 'sx-vis-slab sx-vis-slab-safe sx-vis-slab-fracture');
         slab.style.left = Math.round(px - cell * 0.7) + 'px';
         slab.style.top = Math.round(py - cell * 0.7) + 'px';
         slab.style.width = Math.round(cell * 1.4) + 'px';
@@ -678,7 +678,7 @@ export function _visFinalStart(monster) {
 
         _visAfter(g, 2400 * _VIS_DEBUG_MULT, () => {
             if (g.finished) return;
-            document.querySelectorAll('.eg-vis-cd').forEach(el => el.classList.add('eg-vis-cd-slam'));
+            document.querySelectorAll('.sx-vis-cd').forEach(el => el.classList.add('sx-vis-cd-slam'));
             const pc = _visPC();
             const inSlab = Math.hypot(pc.x - px, pc.y - py) < cell * 0.85;
             if (!inSlab) {
@@ -699,18 +699,18 @@ export function _visFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.eg-vis-cd, .eg-vis-slab').forEach(el => {
+    document.querySelectorAll('.sx-vis-cd, .sx-vis-slab').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    const card = document.getElementById('eg-card-' + g.monsterId);
-    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    const card = document.getElementById('sx-card-' + g.monsterId);
+    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
-        wrap.classList.remove('eg-vis-allin');
-        wrap.classList.remove('eg-nk-shielded');
+        wrap.classList.remove('sx-vis-allin');
+        wrap.classList.remove('sx-nk-shielded');
     }
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
     try {
         const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
@@ -732,15 +732,15 @@ export function _visFinalEnd(g, monster) {
 export function _visTeardown() {
     if (_visFinal) { try { _visFinalEnd(_visFinal, null); } catch (e) {} _visFinal = null; }
     _visWatcherRun = null;
-    document.querySelectorAll('.eg-vis-wblock, .eg-vis-bench-warn, .eg-vis-jaw, .eg-vis-piece, ' +
-        '.eg-vis-hammer-warn, .eg-vis-sparks, .eg-vis-block-warn, .eg-vis-quenched-block, ' +
-        '.eg-vis-cd, .eg-vis-slab').forEach(el => {
+    document.querySelectorAll('.sx-vis-wblock, .sx-vis-bench-warn, .sx-vis-jaw, .sx-vis-piece, ' +
+        '.sx-vis-hammer-warn, .sx-vis-sparks, .sx-vis-block-warn, .sx-vis-quenched-block, ' +
+        '.sx-vis-cd, .sx-vis-slab').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
-    document.querySelectorAll('.eg-vis-allin').forEach(el => el.classList.remove('eg-vis-allin'));
-    ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
+    document.querySelectorAll('.sx-vis-allin').forEach(el => el.classList.remove('sx-vis-allin'));
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('eg-charge-paused');
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
 

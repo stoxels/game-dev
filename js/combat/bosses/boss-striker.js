@@ -84,7 +84,7 @@ export let _strkFkActive = false;  // a free kick set-piece is running
 export function _strikerSweep() {
     _strkFkActive = false;
     try {
-        document.querySelectorAll('.eg-strk-ball, .eg-strk-corner, .eg-strk-cross, .eg-strk-goal, .eg-strk-spot, .eg-strk-shot, .eg-strk-shotring, .eg-strk-fk-wall, .eg-strk-fkball, .eg-strk-fkdot, .eg-strk-fkmark, .eg-strk-penhud, .eg-strk-penline, .eg-strk-pencore, .eg-strk-pensaved, .eg-strk-kickball, .eg-strk-kickring, .eg-strk-kickcharge, .eg-strk-scorehud, .eg-strk-goalpop, .eg-strk-kickstreak, .eg-strk-ballghost, .eg-strk-keeper, .eg-strk-kickdmg').forEach(el => el.remove());
+        document.querySelectorAll('.sx-strk-ball, .sx-strk-corner, .sx-strk-cross, .sx-strk-goal, .sx-strk-spot, .sx-strk-shot, .sx-strk-shotring, .sx-strk-fk-wall, .sx-strk-fkball, .sx-strk-fkdot, .sx-strk-fkmark, .sx-strk-penhud, .sx-strk-penline, .sx-strk-pencore, .sx-strk-pensaved, .sx-strk-kickball, .sx-strk-kickring, .sx-strk-kickcharge, .sx-strk-scorehud, .sx-strk-goalpop, .sx-strk-kickstreak, .sx-strk-ballghost, .sx-strk-keeper, .sx-strk-kickdmg').forEach(el => el.remove());
     } catch (e) {}
 }
 
@@ -103,7 +103,7 @@ export function _strikerTeardown() {
 // Spawns the persistent match ball element on the run.
 // anchor (optional): spawn point for a kick-off after a goal; default centre-top.
 export function _strkSpawnBall(st, anchor) {
-    const el = _nkEl(st.run, 'div', 'eg-strk-ball kickoff', '⚽');
+    const el = _nkEl(st.run, 'div', 'sx-strk-ball kickoff', '⚽');
     const a0 = Math.random() * Math.PI * 2;
     st.ball = {
         x: (anchor && anchor.x != null) ? anchor.x : window.innerWidth / 2,
@@ -118,7 +118,7 @@ export function _strkSpawnBall(st, anchor) {
 export function _strkSpawnGoal(st) {
     const W = window.innerWidth, H = window.innerHeight;
     const fromRight = Math.random() < 0.5;
-    const el = _nkEl(st.run, 'div', 'eg-strk-goal persistent' + (fromRight ? ' flip' : ''), '🥅');
+    const el = _nkEl(st.run, 'div', 'sx-strk-goal persistent' + (fromRight ? ' flip' : ''), '🥅');
     const gy = Math.round(H * 0.5 - 130 + (Math.random() * 160 - 80));
     el.style.top = gy + 'px';
     el.style[fromRight ? 'right' : 'left'] = '0px';
@@ -147,7 +147,7 @@ export function _strkScoreGoal(st, now) {
         }, 700);
         // Return-timer HUD on the goal: a sweeping countdown ring + seconds.
         // (The ⚽ icon comes from the CSS ::before - no text content here.)
-        const timer = _nkEl(st.run, 'div', 'eg-strk-goal-timer');
+        const timer = _nkEl(st.run, 'div', 'sx-strk-goal-timer');
         timer.style.left = Math.round((st.goal.x0 + st.goal.x1) / 2) + 'px';
         timer.style.top = Math.round((st.goal.y0 + st.goal.y1) / 2) + 'px';
         st.goal.timerEl = timer;
@@ -196,7 +196,7 @@ export function _strkKickoff(st) {
         anchor = { x: (g.x0 + g.x1) / 2, y: (g.y0 + g.y1) / 2 };
         // Lob toward the pitch centre with a little spread.
         ang = Math.atan2(H / 2 - anchor.y, W / 2 - anchor.x) + (Math.random() - 0.5) * 1.1;
-        const keeper = _nkEl(st.run, 'div', 'eg-strk-keeper', '🧤');
+        const keeper = _nkEl(st.run, 'div', 'sx-strk-keeper', '🧤');
         keeper.style.left = Math.round(anchor.x) + 'px';
         keeper.style.top = Math.round(anchor.y) + 'px';
         setTimeout(() => { try { keeper.remove(); } catch (e) {} }, 1000);
@@ -229,7 +229,7 @@ export function _strkKickTrail(x, y, ang) {
     try {
         for (let i = 0; i < 5; i++) {
             const s = document.createElement('div');
-            s.className = 'eg-strk-kickstreak';
+            s.className = 'sx-strk-kickstreak';
             s.style.left = x + 'px';
             s.style.top = y + 'px';
             const a = ang + (Math.random() - 0.5) * 0.5;
@@ -247,7 +247,7 @@ export function _strkKickTrail(x, y, ang) {
 export function _strkBallGhost(x, y) {
     try {
         const g = document.createElement('div');
-        g.className = 'eg-strk-ballghost';
+        g.className = 'sx-strk-ballghost';
         g.textContent = '⚽';
         g.style.left = Math.round(x - STRK_BALL_R) + 'px';
         g.style.top = Math.round(y - STRK_BALL_R) + 'px';
@@ -432,7 +432,7 @@ export function _strkScoringStart(st, now, need, budgetMs) {
     }
     st.ballOutUntil = 0;
     const W = window.innerWidth, H = window.innerHeight;
-    const hudEl = _nkEl(st.run, 'div', 'eg-strk-scorehud');
+    const hudEl = _nkEl(st.run, 'div', 'sx-strk-scorehud');
     const sc = {
         need, goals: 0, t: 0, budget: budgetMs,
         charge: 0, charging: false,
@@ -454,10 +454,10 @@ export function _strkScoringBallSpawn(st, sc, W, H) {
     // Keep the ball clear of the goal mouth so shots have some distance.
     const x = W * (0.28 + Math.random() * 0.44);
     const y = H * (0.28 + Math.random() * 0.44);
-    const el = _nkEl(st.run, 'div', 'eg-strk-ball eg-strk-kickball', '⚽');
-    const ringEl = _nkEl(st.run, 'div', 'eg-strk-kickring');
-    const chargeEl = _nkEl(st.run, 'div', 'eg-strk-kickcharge');
-    const dmgEl = _nkEl(st.run, 'div', 'eg-strk-kickdmg');
+    const el = _nkEl(st.run, 'div', 'sx-strk-ball sx-strk-kickball', '⚽');
+    const ringEl = _nkEl(st.run, 'div', 'sx-strk-kickring');
+    const chargeEl = _nkEl(st.run, 'div', 'sx-strk-kickcharge');
+    const dmgEl = _nkEl(st.run, 'div', 'sx-strk-kickdmg');
     sc.ball = { x, y, vx: 0, vy: 0, moving: false, el };
     sc.ringEl = ringEl;
     sc.chargeEl = chargeEl;
@@ -566,7 +566,7 @@ export function _strkScoringTick(st, dtS, now, pr, W, H) {
             // strip fills, tinted along the same green→gold→orange ramp.
             if (sc.dmgEl) {
                 sc.dmgEl.textContent = '−' + _strkScoringPotentialDmg(st, sc.charge);
-                sc.dmgEl.className = 'eg-strk-kickdmg on'
+                sc.dmgEl.className = 'sx-strk-kickdmg on'
                     + (sc.charge >= 1 ? ' full' : (sc.charge >= 0.5 ? ' mid' : ''));
             }
             if (sc.charge >= 1) _strkScoringKick(st, sc, W, H); // full power auto-kick
@@ -666,7 +666,7 @@ export function _strkScoringActive() {
 export function _strkGoalPop(x, y, label) {
     try {
         const el = document.createElement('div');
-        el.className = 'eg-strk-goalpop';
+        el.className = 'sx-strk-goalpop';
         el.textContent = label || 'GOAL!';
         el.style.left = x + 'px';
         el.style.top = y + 'px';
@@ -703,10 +703,10 @@ export function _strkFreeKick(monster) {
     const cxp = sx + dx * 0.5 - (dy / d) * 120 * bendSide;
     const cyp = sy + dy * 0.5 + (dx / d) * 120 * bendSide;
     // Defender cone wall at ~35% along the straight path.
-    const wall = _nkEl(run, 'div', 'eg-strk-fk-wall');
+    const wall = _nkEl(run, 'div', 'sx-strk-fk-wall');
     for (let i = 0; i < STRK_FK_WALL_N; i++) {
         const cone = document.createElement('div');
-        cone.className = 'eg-strk-cone';
+        cone.className = 'sx-strk-cone';
         cone.textContent = '🚧';
         const t = 0.35;
         const off = (i - (STRK_FK_WALL_N - 1) / 2) * 34;
@@ -720,19 +720,19 @@ export function _strkFreeKick(monster) {
         const t = i / 12;
         const bx = (1 - t) * (1 - t) * sx + 2 * (1 - t) * t * cxp + t * t * c.x;
         const by = (1 - t) * (1 - t) * sy + 2 * (1 - t) * t * cyp + t * t * c.y;
-        const dot = _nkEl(run, 'div', 'eg-strk-fkdot');
+        const dot = _nkEl(run, 'div', 'sx-strk-fkdot');
         dot.style.left = Math.round(bx) + 'px';
         dot.style.top = Math.round(by) + 'px';
         dot.style.animationDelay = (i * 55) + 'ms';
         dots.push(dot);
     }
-    const mark = _nkEl(run, 'div', 'eg-strk-fkmark');
+    const mark = _nkEl(run, 'div', 'sx-strk-fkmark');
     mark.style.left = Math.round(c.x) + 'px';
     mark.style.top = Math.round(c.y) + 'px';
     _nkToast('eg_striker_freekick', '⚽ FREE KICK! The ball bends around the wall!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('striker_kick'); } catch (e) {}
     let t = 0, hit = false;
-    const ball = _nkEl(run, 'div', 'eg-strk-fkball', '⚽');
+    const ball = _nkEl(run, 'div', 'sx-strk-fkball', '⚽');
     ball.style.opacity = '0';
     _nkLoop(run, (dtS) => {
         t += dtS * 1000;

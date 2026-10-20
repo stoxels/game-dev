@@ -304,7 +304,7 @@ body.tq-spellbook-open .tq-aside-bubble {
 }
 
 /* Meet-the-Professor circle (puzzle 1 opener): same mechanic/look as the
-   endgame safe circles (.eg-shr-safe-circle in css/endgame/bosses2.css) -
+   endgame safe circles (.sx-shr-safe-circle in css/endgame/bosses2.css) -
    golden while waiting, green flash + shrink when the avatar stands inside. */
 .tq-meet-circle {
     position: fixed;
@@ -450,8 +450,8 @@ div.tq-hl {
    window, tree, atlas, gate) are hidden: leaving the sheet mid-lesson would
    strand the tutorial with no way back. Restored when the lesson completes
    (see _tqShowIntermission in js/tutorial-quest.js). */
-body.tq-intermission-active #screen-endgame-hub .eg-topbar .eg-back-btn,
-body.tq-intermission-active #screen-endgame-hub .eg-topbar .eg-level-btn {
+body.tq-intermission-active #screen-endgame-hub .sx-topbar .sx-back-btn,
+body.tq-intermission-active #screen-endgame-hub .sx-topbar .sx-level-btn {
     display: none !important;
 }
 

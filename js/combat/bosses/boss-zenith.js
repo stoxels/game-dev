@@ -62,8 +62,8 @@ export function _mechRoyalDecree(monster, phase) {
             stage = 'warn';
             t = 0;
             judged = false;
-            tint = _nkEl(run, 'div', blue ? 'eg-nk-trial-blue' : 'eg-nk-trial-orange');
-            label = _nkEl(run, 'div', 'eg-nk-trial-label', blue ? '💙 FREEZE!' : '🧡 MOVE!');
+            tint = _nkEl(run, 'div', blue ? 'sx-nk-trial-blue' : 'sx-nk-trial-orange');
+            label = _nkEl(run, 'div', 'sx-nk-trial-label', blue ? '💙 FREEZE!' : '🧡 MOVE!');
             return true;
         }
         t += dtS * 1000;
@@ -108,10 +108,10 @@ export function _mechCrownRings(monster, phase) {
     const cx = window.innerWidth * 0.5;
     const cy = window.innerHeight * 0.42;
     const rMax = Math.max(window.innerWidth, window.innerHeight) * 0.7;
-    const crown = _nkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '👑');
+    const crown = _nkEl(run, 'div', 'sx-nk-dot sx-nk-anchor', '👑');
     crown.style.transform = 'translate(' + Math.round(cx - 26) + 'px,' + Math.round(cy - 26) + 'px)';
     const rings = [0, 1, 2].map(i => {
-        const el = _nkEl(run, 'div', 'eg-nk-ring eg-nk-ring-crown');
+        const el = _nkEl(run, 'div', 'sx-nk-ring sx-nk-ring-crown');
         el.style.display = 'none';
         return { delay: i * 450, r: 40, el };
     });

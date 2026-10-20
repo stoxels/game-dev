@@ -39,70 +39,70 @@ import { INV_COLS, _inventory } from './hub-stash.js';
 // Builds / returns the shared mass-sell modal element (creates once).
 export function _ensureMassSellModal() {
     _injectMassSellStyles();
-    let modal = document.getElementById('eg-mass-sell-modal');
+    let modal = document.getElementById('sx-mass-sell-modal');
     if (modal) return modal;
     modal = document.createElement('div');
-    modal.id = 'eg-mass-sell-modal';
-    modal.className = 'eg-mass-sell-modal-bg';
+    modal.id = 'sx-mass-sell-modal';
+    modal.className = 'sx-mass-sell-modal-bg';
     modal.innerHTML = `
-<div class="eg-mass-sell-box" id="eg-mass-sell-box">
-    <div class="eg-ms-head">
-        <span class="eg-ms-head-icon">⚒</span>
-        <span class="eg-ms-head-title">${t('eg_mass_sell_modal_title')}</span>
-        <button class="eg-ms-close" onclick="_closeMassSellModal()"
+<div class="sx-mass-sell-box" id="sx-mass-sell-box">
+    <div class="sx-ms-head">
+        <span class="sx-ms-head-icon">⚒</span>
+        <span class="sx-ms-head-title">${t('eg_mass_sell_modal_title')}</span>
+        <button class="sx-ms-close" onclick="_closeMassSellModal()"
                 data-tip-t="eg_mass_sell_close" aria-label="${t('eg_mass_sell_close')}">✕</button>
     </div>
-    <div class="eg-ms-body">
-        <div class="eg-ms-how">
-            <div class="eg-ms-how-title">${t('eg_mass_sell_how')}</div>
-            <div class="eg-ms-how-li"><span class="eg-ms-how-b">▸</span><span>${t('eg_mass_sell_b1')}</span></div>
-            <div class="eg-ms-how-li"><span class="eg-ms-how-b">▸</span><span>${t('eg_mass_sell_b2')}</span></div>
-            <div class="eg-ms-how-li"><span class="eg-ms-how-b">▸</span><span>${t('eg_mass_sell_b3')}</span></div>
+    <div class="sx-ms-body">
+        <div class="sx-ms-how">
+            <div class="sx-ms-how-title">${t('eg_mass_sell_how')}</div>
+            <div class="sx-ms-how-li"><span class="sx-ms-how-b">▸</span><span>${t('eg_mass_sell_b1')}</span></div>
+            <div class="sx-ms-how-li"><span class="sx-ms-how-b">▸</span><span>${t('eg_mass_sell_b2')}</span></div>
+            <div class="sx-ms-how-li"><span class="sx-ms-how-b">▸</span><span>${t('eg_mass_sell_b3')}</span></div>
         </div>
-        <div class="eg-ms-section-head">
-            <span class="eg-ms-section-title">${t('eg_mass_sell_rarities_section')}</span>
-            <span class="eg-ms-section-line"></span>
+        <div class="sx-ms-section-head">
+            <span class="sx-ms-section-title">${t('eg_mass_sell_rarities_section')}</span>
+            <span class="sx-ms-section-line"></span>
         </div>
-        <div class="eg-mass-sell-rarities" id="eg-mass-sell-rarities"></div>
-        <label class="eg-ms-toggle eg-ms-toggle-gold">
-            <input type="checkbox" id="eg-mass-sell-keep-unique" class="eg-ms-check">
+        <div class="sx-mass-sell-rarities" id="sx-mass-sell-rarities"></div>
+        <label class="sx-ms-toggle sx-ms-toggle-gold">
+            <input type="checkbox" id="sx-mass-sell-keep-unique" class="sx-ms-check">
             <span>${t('eg_mass_sell_keep_unique')}</span>
         </label>
-        <div class="eg-ms-section-head">
-            <span class="eg-ms-section-title">${t('eg_mass_sell_levels_section')}</span>
-            <span class="eg-ms-section-line"></span>
+        <div class="sx-ms-section-head">
+            <span class="sx-ms-section-title">${t('eg_mass_sell_levels_section')}</span>
+            <span class="sx-ms-section-line"></span>
         </div>
-        <div class="eg-ms-level-filters">
-            <div class="eg-ms-field">
-                <label for="eg-mass-sell-min-ilvl">${t('eg_mass_sell_min_ilvl')}</label>
-                <input type="number" id="eg-mass-sell-min-ilvl" min="0" max="100" step="1" value="0">
-                <span class="eg-ms-zero-hint">${t('eg_mass_sell_zero_off')}</span>
+        <div class="sx-ms-level-filters">
+            <div class="sx-ms-field">
+                <label for="sx-mass-sell-min-ilvl">${t('eg_mass_sell_min_ilvl')}</label>
+                <input type="number" id="sx-mass-sell-min-ilvl" min="0" max="100" step="1" value="0">
+                <span class="sx-ms-zero-hint">${t('eg_mass_sell_zero_off')}</span>
             </div>
-            <div class="eg-ms-field">
-                <label for="eg-mass-sell-min-reqlvl">${t('eg_mass_sell_min_reqlvl')}</label>
-                <input type="number" id="eg-mass-sell-min-reqlvl" min="0" max="100" step="1" value="0">
-                <span class="eg-ms-zero-hint">${t('eg_mass_sell_zero_off')}</span>
+            <div class="sx-ms-field">
+                <label for="sx-mass-sell-min-reqlvl">${t('eg_mass_sell_min_reqlvl')}</label>
+                <input type="number" id="sx-mass-sell-min-reqlvl" min="0" max="100" step="1" value="0">
+                <span class="sx-ms-zero-hint">${t('eg_mass_sell_zero_off')}</span>
             </div>
         </div>
     </div>
-    <div class="eg-ms-foot">
-        <div class="eg-mass-sell-preview" id="eg-mass-sell-preview"></div>
-        <div class="eg-mass-sell-btns">
-            <button class="eg-mass-sell-btn eg-mass-sell-save" onclick="_saveMassSellModal()">${t('eg_mass_sell_save')}</button>
-            <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_closeMassSellModal()">${t('reset_cancel')}</button>
+    <div class="sx-ms-foot">
+        <div class="sx-mass-sell-preview" id="sx-mass-sell-preview"></div>
+        <div class="sx-mass-sell-btns">
+            <button class="sx-mass-sell-btn sx-mass-sell-save" onclick="_saveMassSellModal()">${t('eg_mass_sell_save')}</button>
+            <button class="sx-mass-sell-btn sx-mass-sell-cancel" onclick="_closeMassSellModal()">${t('reset_cancel')}</button>
         </div>
     </div>
 </div>
-<div class="eg-mass-sell-confirm" id="eg-mass-sell-confirm" style="display:none;">
-    <div class="eg-ms-head">
-        <span class="eg-ms-head-icon">⚒</span>
-        <span class="eg-ms-head-title">${t('eg_mass_sell_confirm_title')}</span>
+<div class="sx-mass-sell-confirm" id="sx-mass-sell-confirm" style="display:none;">
+    <div class="sx-ms-head">
+        <span class="sx-ms-head-icon">⚒</span>
+        <span class="sx-ms-head-title">${t('eg_mass_sell_confirm_title')}</span>
     </div>
-    <div class="eg-ms-confirm-body">
-        <div class="eg-mass-sell-confirm-text" id="eg-mass-sell-confirm-text"></div>
-        <div class="eg-mass-sell-btns">
-            <button class="eg-mass-sell-btn eg-mass-sell-confirm" onclick="_confirmMassSell()">${t('eg_mass_sell_confirm_btn')}</button>
-            <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_cancelMassSellConfirm()">${t('eg_mass_sell_cancel')}</button>
+    <div class="sx-ms-confirm-body">
+        <div class="sx-mass-sell-confirm-text" id="sx-mass-sell-confirm-text"></div>
+        <div class="sx-mass-sell-btns">
+            <button class="sx-mass-sell-btn sx-mass-sell-confirm" onclick="_confirmMassSell()">${t('eg_mass_sell_confirm_btn')}</button>
+            <button class="sx-mass-sell-btn sx-mass-sell-cancel" onclick="_cancelMassSellConfirm()">${t('eg_mass_sell_cancel')}</button>
         </div>
     </div>
 </div>`;
@@ -132,18 +132,18 @@ export function _rarityColor(rarity) {
 }
 
 export function _renderMassSellModalContent() {
-    const wrap = document.getElementById('eg-mass-sell-rarities');
+    const wrap = document.getElementById('sx-mass-sell-rarities');
     if (!wrap) return;
     if (!globalThis._massSellKeep) _loadMassSellSettings();
     const rows = MASS_SELL_RARITIES.map(r => {
         const checked = _massSellKeep[r] ? 'checked' : '';
         const col = _rarityColor(r);
         const label = _itemRarityLabel(r);
-        return `<label class="eg-mass-sell-row" style="--rar:${col};">
-            <input type="checkbox" class="eg-ms-check" data-rarity="${r}" ${checked}>
-            <span class="eg-mass-sell-dot"></span>
-            <span class="eg-mass-sell-rarity-name">${label}</span>
-            <span class="eg-mass-sell-keep-hint">${t('eg_mass_sell_keep_label').replace('{rarity}', label)}</span>
+        return `<label class="sx-mass-sell-row" style="--rar:${col};">
+            <input type="checkbox" class="sx-ms-check" data-rarity="${r}" ${checked}>
+            <span class="sx-mass-sell-dot"></span>
+            <span class="sx-mass-sell-rarity-name">${label}</span>
+            <span class="sx-mass-sell-keep-hint">${t('eg_mass_sell_keep_label').replace('{rarity}', label)}</span>
         </label>`;
     }).join('');
     wrap.innerHTML = rows;
@@ -151,14 +151,14 @@ export function _renderMassSellModalContent() {
     wrap.querySelectorAll('input[data-rarity]').forEach(cb => {
         cb.addEventListener('change', _updateMassSellPreview);
     });
-    const uniqCb = document.getElementById('eg-mass-sell-keep-unique');
+    const uniqCb = document.getElementById('sx-mass-sell-keep-unique');
     if (uniqCb) {
         uniqCb.checked = !!globalThis._massSellKeepUnique;
         uniqCb.onchange = _updateMassSellPreview;
     }
     // Level filters
-    const minIlvlInput = document.getElementById('eg-mass-sell-min-ilvl');
-    const minReqLvlInput = document.getElementById('eg-mass-sell-min-reqlvl');
+    const minIlvlInput = document.getElementById('sx-mass-sell-min-ilvl');
+    const minReqLvlInput = document.getElementById('sx-mass-sell-min-reqlvl');
     if (minIlvlInput) {
         minIlvlInput.value = _massSellMinItemLevel || 0;
         minIlvlInput.onchange = _updateMassSellPreview;
@@ -171,16 +171,16 @@ export function _renderMassSellModalContent() {
 }
 
 export function _updateMassSellPreview() {
-    const preview = document.getElementById('eg-mass-sell-preview');
+    const preview = document.getElementById('sx-mass-sell-preview');
     if (!preview) return;
     // read current UI state (not yet saved) for live numbers
     const tempKeep = {};
-    document.querySelectorAll('#eg-mass-sell-rarities input[data-rarity]').forEach(cb => {
+    document.querySelectorAll('#sx-mass-sell-rarities input[data-rarity]').forEach(cb => {
         tempKeep[cb.dataset.rarity] = cb.checked;
     });
-    const tempKeepUnique = !!document.getElementById('eg-mass-sell-keep-unique')?.checked;
-    const tempMinItemLevel = parseInt(document.getElementById('eg-mass-sell-min-ilvl')?.value || '0', 10);
-    const tempMinReqLevel = parseInt(document.getElementById('eg-mass-sell-min-reqlvl')?.value || '0', 10);
+    const tempKeepUnique = !!document.getElementById('sx-mass-sell-keep-unique')?.checked;
+    const tempMinItemLevel = parseInt(document.getElementById('sx-mass-sell-min-ilvl')?.value || '0', 10);
+    const tempMinReqLevel = parseInt(document.getElementById('sx-mass-sell-min-reqlvl')?.value || '0', 10);
     let keep = 0, sell = 0;
     if (_inventory) {
         for (let r = 0; r < _inventory.length; r++) {
@@ -197,8 +197,8 @@ export function _updateMassSellPreview() {
         }
     }
     preview.innerHTML = t('eg_mass_sell_preview')
-        .replace('{keep}', `<span class="eg-ms-n-keep">${keep}</span>`)
-        .replace('{sell}', `<span class="eg-ms-n-sell">${sell}</span>`);
+        .replace('{keep}', `<span class="sx-ms-n-keep">${keep}</span>`)
+        .replace('{sell}', `<span class="sx-ms-n-sell">${sell}</span>`);
     // also stash for confirm step
     preview.dataset.keep = String(keep);
     preview.dataset.sell = String(sell);
@@ -207,39 +207,39 @@ export function _updateMassSellPreview() {
 // Re-applies the static shell strings on every open so a language switch
 // mid-session is picked up (the shell markup itself is built only once).
 export function _massSellRenderStaticText(modal) {
-    const title = modal.querySelector('.eg-mass-sell-box .eg-ms-head-title');
+    const title = modal.querySelector('.sx-mass-sell-box .sx-ms-head-title');
     if (title) title.textContent = t('eg_mass_sell_modal_title');
-    const close = modal.querySelector('.eg-ms-close');
+    const close = modal.querySelector('.sx-ms-close');
     if (close) {
         // The hint is data-tip-t (resolved live at hover time), so only the
         // accessible name needs re-applying on a language switch.
         close.setAttribute('aria-label', t('eg_mass_sell_close'));
     }
-    const howTitle = modal.querySelector('.eg-ms-how-title');
+    const howTitle = modal.querySelector('.sx-ms-how-title');
     if (howTitle) howTitle.textContent = t('eg_mass_sell_how');
     const bullets = ['eg_mass_sell_b1', 'eg_mass_sell_b2', 'eg_mass_sell_b3'];
-    modal.querySelectorAll('.eg-ms-how-li > span:last-child').forEach((el, i) => {
+    modal.querySelectorAll('.sx-ms-how-li > span:last-child').forEach((el, i) => {
         if (bullets[i]) el.textContent = t(bullets[i]);
     });
-    const sections = modal.querySelectorAll('.eg-mass-sell-box .eg-ms-section-title');
+    const sections = modal.querySelectorAll('.sx-mass-sell-box .sx-ms-section-title');
     if (sections[0]) sections[0].textContent = t('eg_mass_sell_rarities_section');
     if (sections[1]) sections[1].textContent = t('eg_mass_sell_levels_section');
-    const toggleSpan = modal.querySelector('.eg-ms-toggle-gold > span');
+    const toggleSpan = modal.querySelector('.sx-ms-toggle-gold > span');
     if (toggleSpan) toggleSpan.textContent = t('eg_mass_sell_keep_unique');
-    const ilvlLabel = modal.querySelector('label[for="eg-mass-sell-min-ilvl"]');
+    const ilvlLabel = modal.querySelector('label[for="sx-mass-sell-min-ilvl"]');
     if (ilvlLabel) ilvlLabel.textContent = t('eg_mass_sell_min_ilvl');
-    const reqLabel = modal.querySelector('label[for="eg-mass-sell-min-reqlvl"]');
+    const reqLabel = modal.querySelector('label[for="sx-mass-sell-min-reqlvl"]');
     if (reqLabel) reqLabel.textContent = t('eg_mass_sell_min_reqlvl');
-    modal.querySelectorAll('.eg-ms-zero-hint').forEach(el => { el.textContent = t('eg_mass_sell_zero_off'); });
-    const saveBtn = modal.querySelector('.eg-mass-sell-btn.eg-mass-sell-save');
+    modal.querySelectorAll('.sx-ms-zero-hint').forEach(el => { el.textContent = t('eg_mass_sell_zero_off'); });
+    const saveBtn = modal.querySelector('.sx-mass-sell-btn.sx-mass-sell-save');
     if (saveBtn) saveBtn.textContent = t('eg_mass_sell_save');
-    const cancelBtn = modal.querySelector('.eg-mass-sell-box .eg-mass-sell-btn.eg-mass-sell-cancel');
+    const cancelBtn = modal.querySelector('.sx-mass-sell-box .sx-mass-sell-btn.sx-mass-sell-cancel');
     if (cancelBtn) cancelBtn.textContent = t('reset_cancel');
-    const confirmTitle = modal.querySelector('.eg-mass-sell-confirm .eg-ms-head-title');
+    const confirmTitle = modal.querySelector('.sx-mass-sell-confirm .sx-ms-head-title');
     if (confirmTitle) confirmTitle.textContent = t('eg_mass_sell_confirm_title');
-    const confirmSell = modal.querySelector('.eg-mass-sell-btn.eg-mass-sell-confirm');
+    const confirmSell = modal.querySelector('.sx-mass-sell-btn.sx-mass-sell-confirm');
     if (confirmSell) confirmSell.textContent = t('eg_mass_sell_confirm_btn');
-    const confirmCancel = modal.querySelector('.eg-mass-sell-confirm .eg-mass-sell-btn.eg-mass-sell-cancel');
+    const confirmCancel = modal.querySelector('.sx-mass-sell-confirm .sx-mass-sell-btn.sx-mass-sell-cancel');
     if (confirmCancel) confirmCancel.textContent = t('eg_mass_sell_cancel');
 }
 
@@ -249,28 +249,28 @@ export function _openMassSellModal() {
     _massSellRenderStaticText(modal);
     _renderMassSellModalContent();
     // ensure filter view is visible, confirm hidden
-    const box = modal.querySelector('.eg-mass-sell-box');
-    const confirm = document.getElementById('eg-mass-sell-confirm');
+    const box = modal.querySelector('.sx-mass-sell-box');
+    const confirm = document.getElementById('sx-mass-sell-confirm');
     if (box) box.style.display = '';
     if (confirm) confirm.style.display = 'none';
     modal.classList.add('show');
 }
 
 export function _closeMassSellModal() {
-    const modal = document.getElementById('eg-mass-sell-modal');
+    const modal = document.getElementById('sx-mass-sell-modal');
     if (modal) modal.classList.remove('show');
 }
 
 export function _saveMassSellModal() {
     // persist checkbox states
     const keep = {};
-    document.querySelectorAll('#eg-mass-sell-rarities input[data-rarity]').forEach(cb => {
+    document.querySelectorAll('#sx-mass-sell-rarities input[data-rarity]').forEach(cb => {
         keep[cb.dataset.rarity] = cb.checked;
     });
     globalThis._massSellKeep = _normaliseMassSellKeep(keep);
-    globalThis._massSellKeepUnique = !!document.getElementById('eg-mass-sell-keep-unique')?.checked;
-    globalThis._massSellMinItemLevel = Math.max(0, parseInt(document.getElementById('eg-mass-sell-min-ilvl')?.value || '0', 10));
-    globalThis._massSellMinReqLevel = Math.max(0, parseInt(document.getElementById('eg-mass-sell-min-reqlvl')?.value || '0', 10));
+    globalThis._massSellKeepUnique = !!document.getElementById('sx-mass-sell-keep-unique')?.checked;
+    globalThis._massSellMinItemLevel = Math.max(0, parseInt(document.getElementById('sx-mass-sell-min-ilvl')?.value || '0', 10));
+    globalThis._massSellMinReqLevel = Math.max(0, parseInt(document.getElementById('sx-mass-sell-min-reqlvl')?.value || '0', 10));
     _saveMassSellSettings();
     _closeMassSellModal();
     if (typeof showToast === 'function') globalThis.showToast(t('eg_mass_sell_saved'));
@@ -289,9 +289,9 @@ export function _requestMassSell() {
     // populate confirm text in the same modal (re-uses the overlay)
     _massSellRenderStaticText(modal);
     _renderMassSellModalContent();
-    const box = modal.querySelector('.eg-mass-sell-box');
-    const confirm = document.getElementById('eg-mass-sell-confirm');
-    const confirmText = document.getElementById('eg-mass-sell-confirm-text');
+    const box = modal.querySelector('.sx-mass-sell-box');
+    const confirm = document.getElementById('sx-mass-sell-confirm');
+    const confirmText = document.getElementById('sx-mass-sell-confirm-text');
     if (confirmText) {
         confirmText.textContent = t('eg_mass_sell_confirm_text')
             .replace('{n}', String(sell))
@@ -303,10 +303,10 @@ export function _requestMassSell() {
 }
 
 export function _cancelMassSellConfirm() {
-    const modal = document.getElementById('eg-mass-sell-modal');
+    const modal = document.getElementById('sx-mass-sell-modal');
     if (!modal) return;
-    const box = modal.querySelector('.eg-mass-sell-box');
-    const confirm = document.getElementById('eg-mass-sell-confirm');
+    const box = modal.querySelector('.sx-mass-sell-box');
+    const confirm = document.getElementById('sx-mass-sell-confirm');
     if (box) box.style.display = '';
     if (confirm) confirm.style.display = 'none';
     // stay open on the filter view (user can tweak and sell again) - alternatively close:
@@ -314,11 +314,11 @@ export function _cancelMassSellConfirm() {
 }
 
 export function _confirmMassSell() {
-    const modal = document.getElementById('eg-mass-sell-modal');
+    const modal = document.getElementById('sx-mass-sell-modal');
     if (modal) modal.classList.remove('show');
     // Hide confirm sub-panel for next open
-    const box = modal && modal.querySelector('.eg-mass-sell-box');
-    const confirm = document.getElementById('eg-mass-sell-confirm');
+    const box = modal && modal.querySelector('.sx-mass-sell-box');
+    const confirm = document.getElementById('sx-mass-sell-confirm');
     if (box) box.style.display = '';
     if (confirm) confirm.style.display = 'none';
     _executeMassSell();
@@ -409,33 +409,33 @@ export function _executeMassSell() {
             }
         }
         if (failed > 0) {
-            const grid = document.getElementById('eg-inv-grid');
+            const grid = document.getElementById('sx-inv-grid');
             if (grid) {
-                grid.classList.add('eg-slot-reject');
-                setTimeout(() => grid.classList.remove('eg-slot-reject'), 600);
+                grid.classList.add('sx-slot-reject');
+                setTimeout(() => grid.classList.remove('sx-slot-reject'), 600);
             }
         }
     } else if (failed > 0) {
         if (typeof showToast === 'function') globalThis.showToast(t('eg_mass_sell_failed_shard_full').replace('{n}', String(failed)));
-        const grid = document.getElementById('eg-inv-grid');
+        const grid = document.getElementById('sx-inv-grid');
         if (grid) {
-            grid.classList.add('eg-slot-reject');
-            setTimeout(() => grid.classList.remove('eg-slot-reject'), 600);
+            grid.classList.add('sx-slot-reject');
+            setTimeout(() => grid.classList.remove('sx-slot-reject'), 600);
         }
     }
 }
 
 export function _injectMassSellStyles() {
-    if (document.getElementById('eg-mass-sell-styles')) return;
+    if (document.getElementById('sx-mass-sell-styles')) return;
     const style = document.createElement('style');
-    style.id = 'eg-mass-sell-styles';
+    style.id = 'sx-mass-sell-styles';
     style.textContent = `
         /* ── stash header buttons ── */
-        .eg-stash-header {
+        .sx-stash-header {
             display: flex; align-items: center; justify-content: space-between; gap: 10px;
         }
-        .eg-stash-actions { display: flex; gap: 6px; align-items: center; }
-        .eg-stash-btn {
+        .sx-stash-actions { display: flex; gap: 6px; align-items: center; }
+        .sx-stash-btn {
             font-family: var(--PX, monospace); font-size: 9px; letter-spacing: 1px;
             padding: 5px 10px; cursor: pointer;
             border: 1px solid var(--border2, #656f96); color: var(--accent2, #fff);
@@ -443,25 +443,25 @@ export function _injectMassSellStyles() {
             transition: all 0.12s;
             white-space: nowrap;
         }
-        .eg-stash-btn:hover { color: var(--accent, #66fcf1); border-color: var(--accent, #66fcf1); }
-        .eg-stash-btn-sell { color: var(--yellow, #f5c518); border-color: rgba(245,197,24,0.55); }
-        .eg-stash-btn-sell:hover {
+        .sx-stash-btn:hover { color: var(--accent, #66fcf1); border-color: var(--accent, #66fcf1); }
+        .sx-stash-btn-sell { color: var(--yellow, #f5c518); border-color: rgba(245,197,24,0.55); }
+        .sx-stash-btn-sell:hover {
             box-shadow: 0 0 8px rgba(245,197,24,0.3); color: #fff;
             border-color: var(--yellow, #f5c518);
         }
 
         /* ── backdrop ── */
-        .eg-mass-sell-modal-bg {
+        .sx-mass-sell-modal-bg {
             display: none; position: fixed; inset: 0;
             background: rgba(5,8,14,0.78);
             backdrop-filter: blur(2px);
             z-index: 10001;
             align-items: center; justify-content: center;
         }
-        .eg-mass-sell-modal-bg.show { display: flex; }
+        .sx-mass-sell-modal-bg.show { display: flex; }
 
         /* ── shell: fixed header, scrollable body, pinned footer ── */
-        .eg-mass-sell-box {
+        .sx-mass-sell-box {
             display: flex; flex-direction: column;
             box-sizing: border-box;
             background: var(--panel, #222630);
@@ -474,7 +474,7 @@ export function _injectMassSellStyles() {
                         0 22px 48px rgba(0,0,0,0.55);
             overflow: hidden;
         }
-        .eg-mass-sell-confirm {
+        .sx-mass-sell-confirm {
             box-sizing: border-box;
             background: var(--panel, #222630);
             border: 1px solid var(--border2, #656f96);
@@ -487,37 +487,37 @@ export function _injectMassSellStyles() {
         }
 
         /* ── header ── */
-        .eg-ms-head {
+        .sx-ms-head {
             display: flex; align-items: center; gap: 10px;
             padding: 11px 14px;
             border-bottom: 1px solid var(--border, #4a5475);
             background: linear-gradient(180deg, rgba(102,252,241,0.07), rgba(102,252,241,0.02));
             flex-shrink: 0;
         }
-        .eg-ms-head-icon {
+        .sx-ms-head-icon {
             font-size: 16px; line-height: 1; color: var(--accent, #66fcf1);
             text-shadow: 0 0 8px rgba(102,252,241,0.5);
         }
-        .eg-ms-head-title {
+        .sx-ms-head-title {
             flex: 1; min-width: 0;
             font-family: var(--PX, monospace); font-size: 11px; letter-spacing: 2px;
             color: var(--accent, #66fcf1);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .eg-ms-close {
+        .sx-ms-close {
             width: 24px; height: 24px; flex-shrink: 0;
             font-family: var(--PX, monospace); font-size: 10px; line-height: 1;
             color: var(--accent2, #fff); background: transparent;
             border: 1px solid var(--border2, #656f96); border-radius: 4px;
             cursor: pointer; transition: all 0.12s;
         }
-        .eg-ms-close:hover {
+        .sx-ms-close:hover {
             color: #ff6b6b; border-color: rgba(255,107,107,0.6);
             background: rgba(255,107,107,0.12);
         }
 
         /* ── scrollable body ── */
-        .eg-ms-body {
+        .sx-ms-body {
             flex: 1; min-height: 0;
             overflow-y: auto; overflow-x: hidden;
             padding: 12px 14px;
@@ -525,62 +525,62 @@ export function _injectMassSellStyles() {
             scrollbar-width: thin;
             scrollbar-color: var(--border2, #656f96) transparent;
         }
-        .eg-ms-body::-webkit-scrollbar { width: 8px; }
-        .eg-ms-body::-webkit-scrollbar-track { background: transparent; }
-        .eg-ms-body::-webkit-scrollbar-thumb { background: var(--border2, #656f96); border-radius: 4px; }
+        .sx-ms-body::-webkit-scrollbar { width: 8px; }
+        .sx-ms-body::-webkit-scrollbar-track { background: transparent; }
+        .sx-ms-body::-webkit-scrollbar-thumb { background: var(--border2, #656f96); border-radius: 4px; }
 
         /* ── how-it-works ── */
-        .eg-ms-how {
+        .sx-ms-how {
             border: 1px solid var(--border, #4a5475);
             border-left: 3px solid var(--accent, #66fcf1);
             border-radius: 4px;
             background: rgba(102,252,241,0.04);
             padding: 8px 10px;
         }
-        .eg-ms-how-title {
+        .sx-ms-how-title {
             font-family: var(--PX, monospace); font-size: 7px; letter-spacing: 2px;
             color: var(--accent, #66fcf1); opacity: 0.9; margin-bottom: 6px;
         }
-        .eg-ms-how-li {
+        .sx-ms-how-li {
             display: flex; gap: 7px; align-items: baseline;
             font-family: var(--F, monospace); font-size: 12.5px; line-height: 1.45;
             color: var(--accent2, #fff); opacity: 0.88;
         }
-        .eg-ms-how-li + .eg-ms-how-li { margin-top: 3px; }
-        .eg-ms-how-b { color: var(--accent, #66fcf1); flex-shrink: 0; }
+        .sx-ms-how-li + .sx-ms-how-li { margin-top: 3px; }
+        .sx-ms-how-b { color: var(--accent, #66fcf1); flex-shrink: 0; }
 
         /* ── section headers ── */
-        .eg-ms-section-head { display: flex; align-items: center; gap: 8px; }
-        .eg-ms-section-title {
+        .sx-ms-section-head { display: flex; align-items: center; gap: 8px; }
+        .sx-ms-section-title {
             font-family: var(--PX, monospace); font-size: 8px; letter-spacing: 2px;
             color: var(--accent, #66fcf1);
         }
-        .eg-ms-section-line { flex: 1; height: 1px; background: var(--border, #4a5475); opacity: 0.6; }
+        .sx-ms-section-line { flex: 1; height: 1px; background: var(--border, #4a5475); opacity: 0.6; }
 
         /* ── rarity rows ── */
-        .eg-mass-sell-rarities { display: flex; flex-direction: column; gap: 4px; }
-        .eg-mass-sell-row {
+        .sx-mass-sell-rarities { display: flex; flex-direction: column; gap: 4px; }
+        .sx-mass-sell-row {
             display: flex; align-items: center; gap: 9px;
             padding: 5px 8px; border: 1px solid transparent; border-radius: 3px;
             background: transparent; cursor: pointer; user-select: none;
             font-family: var(--F, monospace); font-size: 13px; color: var(--accent2, #fff);
             transition: background 0.12s, border-color 0.12s;
         }
-        .eg-mass-sell-row:hover { background: rgba(255,255,255,0.05); border-color: var(--rar, #888); }
-        .eg-mass-sell-dot {
+        .sx-mass-sell-row:hover { background: rgba(255,255,255,0.05); border-color: var(--rar, #888); }
+        .sx-mass-sell-dot {
             width: 10px; height: 10px; border-radius: 2px; background: var(--rar);
             display: inline-block; flex-shrink: 0;
             box-shadow: 0 0 5px var(--rar);
         }
-        .eg-mass-sell-rarity-name { font-weight: 700; color: var(--rar); }
-        .eg-mass-sell-keep-hint {
+        .sx-mass-sell-rarity-name { font-weight: 700; color: var(--rar); }
+        .sx-mass-sell-keep-hint {
             margin-left: auto;
             font-family: var(--F, monospace); font-size: 11px;
             opacity: 0.55; letter-spacing: 0.5px;
         }
 
         /* ── custom checkboxes (same look as the loot filter) ── */
-        .eg-ms-check {
+        .sx-ms-check {
             appearance: none; -webkit-appearance: none;
             width: 15px; height: 15px; flex-shrink: 0; margin: 0;
             background: rgba(0,0,0,0.4);
@@ -588,37 +588,37 @@ export function _injectMassSellStyles() {
             cursor: pointer; position: relative;
             transition: all 0.12s;
         }
-        .eg-ms-check:hover { border-color: var(--accent, #66fcf1); }
-        .eg-ms-check:checked {
+        .sx-ms-check:hover { border-color: var(--accent, #66fcf1); }
+        .sx-ms-check:checked {
             background: var(--accent, #66fcf1); border-color: var(--accent, #66fcf1);
             box-shadow: 0 0 7px rgba(102,252,241,0.55);
         }
-        .eg-ms-check:checked::after {
+        .sx-ms-check:checked::after {
             content: '✓'; position: absolute; inset: 0;
             display: flex; align-items: center; justify-content: center;
             font-size: 10px; font-weight: 700; color: #0c1016;
         }
 
         /* ── gold toggle row ── */
-        .eg-ms-toggle {
+        .sx-ms-toggle {
             display: flex; align-items: center; gap: 9px;
             padding: 5px 8px; border-radius: 3px; cursor: pointer; user-select: none;
             font-family: var(--F, monospace); font-size: 13px; color: var(--accent2, #fff);
             border: 1px solid transparent;
             transition: background 0.12s, border-color 0.12s;
         }
-        .eg-ms-toggle:hover { background: rgba(102,252,241,0.05); border-color: var(--border, #4a5475); }
-        .eg-ms-toggle-gold span { color: var(--yellow, #f5c518); }
+        .sx-ms-toggle:hover { background: rgba(102,252,241,0.05); border-color: var(--border, #4a5475); }
+        .sx-ms-toggle-gold span { color: var(--yellow, #f5c518); }
 
         /* ── level filter fields ── */
-        .eg-ms-level-filters { display: flex; flex-direction: column; gap: 8px; }
-        .eg-ms-field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-        .eg-ms-field > label {
+        .sx-ms-level-filters { display: flex; flex-direction: column; gap: 8px; }
+        .sx-ms-field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+        .sx-ms-field > label {
             font-family: var(--PX, monospace); font-size: 7px; letter-spacing: 1px;
             color: var(--setup-opt-inactive, #8892a3); text-transform: uppercase;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .eg-ms-field input[type="number"] {
+        .sx-ms-field input[type="number"] {
             width: 100%; box-sizing: border-box;
             font-family: var(--F, monospace); font-size: 13px;
             color: var(--accent, #66fcf1);
@@ -627,31 +627,31 @@ export function _injectMassSellStyles() {
             padding: 4px 7px;
             transition: border-color 0.12s, box-shadow 0.12s;
         }
-        .eg-ms-field input[type="number"]:focus {
+        .sx-ms-field input[type="number"]:focus {
             outline: none; border-color: var(--accent, #66fcf1);
             box-shadow: 0 0 6px rgba(102,252,241,0.3);
         }
-        .eg-ms-zero-hint {
+        .sx-ms-zero-hint {
             font-family: var(--F, monospace); font-size: 10px; line-height: 1;
             color: var(--setup-opt-inactive, #8892a3); opacity: 0.85;
         }
 
         /* ── footer (pinned: preview + save/cancel always visible) ── */
-        .eg-ms-foot {
+        .sx-ms-foot {
             flex-shrink: 0;
             border-top: 1px solid var(--border, #4a5475);
             background: rgba(0,0,0,0.18);
             padding: 9px 14px 12px;
         }
-        .eg-mass-sell-preview {
+        .sx-mass-sell-preview {
             text-align: center; min-height: 17px; margin-bottom: 8px;
             font-family: var(--F, monospace); font-size: 13px; letter-spacing: 0.5px;
             color: var(--accent2, #fff);
         }
-        .eg-ms-n-keep { color: var(--green, #3ddc84); }
-        .eg-ms-n-sell { color: var(--orange, #ff8c42); }
-        .eg-mass-sell-btns { display: flex; gap: 10px; justify-content: center; }
-        .eg-mass-sell-btn {
+        .sx-ms-n-keep { color: var(--green, #3ddc84); }
+        .sx-ms-n-sell { color: var(--orange, #ff8c42); }
+        .sx-mass-sell-btns { display: flex; gap: 10px; justify-content: center; }
+        .sx-mass-sell-btn {
             font-family: var(--PX, monospace); font-size: 10px; letter-spacing: 1px;
             padding: 9px 20px; cursor: pointer;
             color: var(--accent2, #fff);
@@ -659,32 +659,32 @@ export function _injectMassSellStyles() {
             border: 1px solid var(--border2, #656f96); border-radius: 4px;
             transition: all 0.12s;
         }
-        .eg-mass-sell-btn:hover { border-color: var(--accent, #66fcf1); color: var(--accent, #66fcf1); }
-        .eg-mass-sell-btn.eg-mass-sell-save {
+        .sx-mass-sell-btn:hover { border-color: var(--accent, #66fcf1); color: var(--accent, #66fcf1); }
+        .sx-mass-sell-btn.sx-mass-sell-save {
             color: #0c1016; background: var(--accent, #66fcf1);
             border-color: var(--accent, #66fcf1); font-weight: 700;
         }
-        .eg-mass-sell-btn.eg-mass-sell-save:hover { box-shadow: 0 0 12px rgba(102,252,241,0.5); }
+        .sx-mass-sell-btn.sx-mass-sell-save:hover { box-shadow: 0 0 12px rgba(102,252,241,0.5); }
 
         /* ── confirm view ── */
-        .eg-ms-confirm-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
-        .eg-mass-sell-confirm-text {
+        .sx-ms-confirm-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+        .sx-mass-sell-confirm-text {
             font-family: var(--F, monospace); font-size: 13px; line-height: 1.5;
             color: var(--accent2, #fff); text-align: center;
         }
         /* Destructive action - red fill, matching the game's delete-confirm button */
-        .eg-mass-sell-btn.eg-mass-sell-confirm {
+        .sx-mass-sell-btn.sx-mass-sell-confirm {
             color: #fff; background: var(--red, #e74c3c);
             border-color: var(--red, #e74c3c); font-weight: 700;
         }
-        .eg-mass-sell-btn.eg-mass-sell-confirm:hover {
+        .sx-mass-sell-btn.sx-mass-sell-confirm:hover {
             filter: brightness(1.1); box-shadow: 0 0 10px rgba(231,76,60,0.4);
         }
 
         /* ── narrow screens ── */
         @media (max-width: 500px) {
-            .eg-ms-body { padding: 10px; }
-            .eg-ms-foot { padding: 8px 10px 10px; }
+            .sx-ms-body { padding: 10px; }
+            .sx-ms-foot { padding: 8px 10px 10px; }
         }
     `;
     document.head.appendChild(style);
