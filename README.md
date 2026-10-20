@@ -181,7 +181,7 @@ full local project folder.
 ## How it is built
 
 - **Vanilla JavaScript** - no UI framework. About 400 source files under
-  `js/`, grouped by system (`classes`, `combat`, `endgame`, `loot`,
+  `js/`, grouped by system (`classes`, `combat`, `hub`, `endgame`, `loot`,
   `probability-tree`, `skills`, `puzzle-items`, `storyline`, ...).
 - **Bundled with Vite** into one module entry that `index.html` loads;
   the game is a static site served as-is by GitHub Pages.
