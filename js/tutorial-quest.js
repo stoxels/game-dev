@@ -1430,9 +1430,9 @@ function _tqRunCurrentPhase() {
 // Opens the parry training arena; its result releases the parry_five task.
 function _tqStartParryArena() {
     try {
-        // The arena is a direct child of <body> (z-index 40), above the whole
-        // game screen - so the Professor (inside #screen-game) is moved up to
-        // <body> as well while it is open, or his bubble would sit beneath it.
+        // The arena (z-index 40) paints above the puzzle grid - so the
+        // Professor (inside #screen-game) is moved up to <body> as well
+        // while it is open, keeping his bubble above it.
         const prof = document.getElementById('tq-professor-wrap');
         if (prof && prof.parentNode !== document.body) document.body.appendChild(prof);
         startParryTutorial(() => {

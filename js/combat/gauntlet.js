@@ -604,9 +604,15 @@ function _buildOverlay() {
         </div>
         ${_ZONE_IDS.map((id, i) => `<div class="ga-zone ga-zone-${i}" id="${id}"></div>`).join('')}
         <div class="ga-center" id="ga-center"></div>`;
-    // Inside #game-main so the monster zone panels (same stacking context)
-    // can be lifted above the arena.
-    (document.getElementById('game-main') || document.body).appendChild(el);
+    // Inside the game screen (.game-main) so the monster zone panels (same
+    // stacking context) can be lifted above the arena - and so full-screen
+    // side trips from the pause menu (shop / character / tree) hide the
+    // arena with the game screen instead of it lingering over them.
+    // (There is no id="game-main" - it is a class inside #screen-game, so
+    // getElementById('game-main') always missed and fell back to body.)
+    (document.querySelector('#screen-game .game-main')
+        || document.getElementById('screen-game')
+        || document.body).appendChild(el);
     _g.overlay = el;
     _layout();
     if (!_g.resizeFn) {
