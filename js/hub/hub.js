@@ -309,7 +309,10 @@ export function _buildStashPanelHTML() {
     return `
 <div class="sx-panel sx-panel-inv">
     <div class="sx-panel-label sx-stash-header">
-        <span>${t('eg_stash_label')}</span>
+        <div class="sx-stash-tabs" id="sx-stash-tabs">
+            <button class="sx-stash-tab ${invActive ? 'active' : ''}" id="sx-tab-inventory" data-tab="inventory" onclick="_switchStashTab('inventory')">${t('eg_tab_inventory') || 'INVENTORY'}</button>
+            <button class="sx-stash-tab ${uniqActive ? 'active' : ''}" id="sx-tab-uniques" data-tab="uniques" onclick="_switchStashTab('uniques')">${t('eg_tab_uniques') || 'UNIQUES'} <span class="sx-tab-count">${foundUniques}/${totalUniques}</span></button>
+        </div>
         <div id="sx-stash-info" class="sx-stash-info" aria-live="polite"></div>
         <div class="sx-stash-actions">
             <button class="sx-stash-btn sx-stash-btn-config" id="sx-toggle-ilvl-btn"
@@ -331,10 +334,6 @@ export function _buildStashPanelHTML() {
                      onmousemove="moveGameTooltip(event)"
                      onmouseleave="hideGameTooltip()">${t('eg_mass_sell_btn')}</button>
         </div>
-    </div>
-    <div class="sx-stash-tabs" id="sx-stash-tabs">
-        <button class="sx-stash-tab ${invActive ? 'active' : ''}" id="sx-tab-inventory" data-tab="inventory" onclick="_switchStashTab('inventory')">${t('eg_tab_inventory') || 'INVENTORY'}</button>
-        <button class="sx-stash-tab ${uniqActive ? 'active' : ''}" id="sx-tab-uniques" data-tab="uniques" onclick="_switchStashTab('uniques')">${t('eg_tab_uniques') || 'UNIQUES'} <span class="sx-tab-count">${foundUniques}/${totalUniques}</span></button>
     </div>
     <div class="sx-stash-tab-body ${invActive ? 'active' : ''}" id="sx-stash-tab-inventory">
         <div class="sx-inv-grid" id="sx-inv-grid" style="grid-template-columns: repeat(${INV_COLS}, 1fr);">

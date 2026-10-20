@@ -1996,3 +1996,31 @@ img.sx-art-img {
 }
 #screen-hub .sx-unique-count { font-size: 13px; }
 #screen-hub .sx-unique-hint { font-size: 12px; }
+
+/* Tabs live in the stash header row now (the separate "INVENTORY" label is gone) */
+#screen-hub .sx-stash-header .sx-stash-tabs {
+    padding: 0;
+    gap: 10px;
+    border-bottom: none;
+    background: none;
+}
+#screen-hub .sx-stash-header { padding-top: 6px; padding-bottom: 6px; }
+
+/* Title plaque fills the whole top-bar height and is wide enough for the text */
+#screen-hub .sx-topbar { min-height: 72px; padding-top: 0; padding-bottom: 0; }
+#screen-hub .sx-topbar-title {
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0 84px;
+    font-size: 18px;
+    letter-spacing: 3px;
+}
+#screen-hub .sx-topbar-title { padding: 0 60px; font-size: 16px; letter-spacing: 2px; }
+#screen-hub .sx-level-btn { padding: 12px 12px; }
+/* One row at any width: the buttons and plaque give way before the bar wraps */
+#screen-hub .sx-topbar { flex-wrap: nowrap; }
+#screen-hub .sx-topbar-title { flex: 0 1 auto; min-width: 0; padding: 0 clamp(28px, 3.2vw, 60px); font-size: clamp(12px, 0.95vw, 16px); white-space: nowrap; }
+#screen-hub .sx-level-btn { flex: 0 1 auto; min-width: 0; padding: 12px clamp(6px, 0.8vw, 12px); font-size: clamp(9px, 0.7vw, 12px); }
+#screen-hub .sx-topbar-title { padding: 0 clamp(22px, 2.6vw, 48px); }
