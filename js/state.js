@@ -22,7 +22,7 @@ try { Object.defineProperty(globalThis, 'levelStartTime', { get() { return level
 try { Object.defineProperty(globalThis, 'luckyRewardClaimed', { get() { return luckyRewardClaimed; }, set(v) { luckyRewardClaimed = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'luckyTiles', { get() { return luckyTiles; }, set(v) { luckyTiles = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'mistakeCount', { get() { return mistakeCount; }, set(v) { mistakeCount = v; }, configurable: true }); } catch (e) {}
-try { Object.defineProperty(globalThis, 'playerCurrentHP', { get() { return playerCurrentHP; }, set(v) { const o = playerCurrentHP; playerCurrentHP = v; if (v > o && typeof globalThis.__egOnPlayerHeal === 'function') globalThis.__egOnPlayerHeal(v - o); }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, 'playerCurrentHP', { get() { return playerCurrentHP; }, set(v) { const o = playerCurrentHP; playerCurrentHP = v; if (v > o && typeof globalThis.__onPlayerHeal === 'function') globalThis.__onPlayerHeal(v - o); }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'playerCurrentMana', { get() { return playerCurrentMana; }, set(v) { playerCurrentMana = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'playerMaxHP', { get() { return playerMaxHP; }, set(v) { playerMaxHP = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'playerMaxMana', { get() { return playerMaxMana; }, set(v) { playerMaxMana = v; }, configurable: true }); } catch (e) {}
@@ -215,14 +215,14 @@ let _confidenceIntervalUsed = false;
 
 
 // --- Player HP ---
-// Base values are overwritten at level start using EG_PLAYER_STATS.baseHP.
+// Base values are overwritten at level start using PLAYER_STATS.baseHP.
 // Kept at 100 here as a safe fallback before any level loads.
 let playerMaxHP = 100;
 let playerCurrentHP = 100;
 
 
 // --- Player Mana ---
-// Base values are overwritten at level start using EG_PLAYER_STATS.baseMana
+// Base values are overwritten at level start using PLAYER_STATS.baseMana
 // plus the aggregated mana bonus from gear and attributes. Kept at 0 here so
 // no mana bar shows before any level loads.
 let playerMaxMana = 0;
@@ -578,8 +578,8 @@ export function buildFreshState() {
         egAttrAllocated: { str: 0, agi: 0, int: 0 },
         egEquipped: {},
         egInventory: _makeEgGrid(
-            typeof globalThis.EG_INV_ROWS !== 'undefined' ? globalThis.EG_INV_ROWS : 5,
-            typeof globalThis.EG_INV_COLS !== 'undefined' ? globalThis.EG_INV_COLS : 10
+            typeof globalThis.INV_ROWS !== 'undefined' ? globalThis.INV_ROWS : 5,
+            typeof globalThis.INV_COLS !== 'undefined' ? globalThis.INV_COLS : 10
         ),
         egMapStash: (function(){
             // Tiered 16× infinite stashes - each tier is its own grid
@@ -590,15 +590,15 @@ export function buildFreshState() {
             return Array.from({ length: tiers }, () => _makeEgGrid(rows, cols));
         })(),
         egCurrencyStash: _makeEgGrid(
-            typeof globalThis.EG_CURRENCY_ROWS !== 'undefined' ? globalThis.EG_CURRENCY_ROWS : 2,
-            typeof globalThis.EG_CURRENCY_COLS !== 'undefined' ? globalThis.EG_CURRENCY_COLS : 10
+            typeof globalThis.CURRENCY_ROWS !== 'undefined' ? globalThis.CURRENCY_ROWS : 2,
+            typeof globalThis.CURRENCY_COLS !== 'undefined' ? globalThis.CURRENCY_COLS : 10
         ),
         egEssenceStash: _makeEgGrid(
-            typeof globalThis.EG_ESSENCE_ROWS !== 'undefined' ? globalThis.EG_ESSENCE_ROWS : 6,
-            typeof globalThis.EG_ESSENCE_COLS !== 'undefined' ? globalThis.EG_ESSENCE_COLS : 8
+            typeof globalThis.ESSENCE_ROWS !== 'undefined' ? globalThis.ESSENCE_ROWS : 6,
+            typeof globalThis.ESSENCE_COLS !== 'undefined' ? globalThis.ESSENCE_COLS : 8
         ),
         egMapSlotItem: null,
-        // Unique Stash - ARPG-style collection tab: one slot per EG_UNIQUE_ITEMS entry
+        // Unique Stash - ARPG-style collection tab: one slot per UNIQUE_ITEMS entry
         egUniqueStash: {},
         egUniqueCollected: [],
     };
@@ -734,8 +734,8 @@ export function _migrateEndgameFields(s) {
     if (!s.egEquipped) s.egEquipped = {};
     if (!s.egInventory) {
         s.egInventory = _makeEgGrid(
-            typeof globalThis.EG_INV_ROWS !== 'undefined' ? globalThis.EG_INV_ROWS : 5,
-            typeof globalThis.EG_INV_COLS !== 'undefined' ? globalThis.EG_INV_COLS : 10
+            typeof globalThis.INV_ROWS !== 'undefined' ? globalThis.INV_ROWS : 5,
+            typeof globalThis.INV_COLS !== 'undefined' ? globalThis.INV_COLS : 10
         );
     }
     if (!s.egMapStash) {
@@ -773,14 +773,14 @@ export function _migrateEndgameFields(s) {
     }
     if (!s.egCurrencyStash) {
         s.egCurrencyStash = _makeEgGrid(
-            typeof globalThis.EG_CURRENCY_ROWS !== 'undefined' ? globalThis.EG_CURRENCY_ROWS : 2,
-            typeof globalThis.EG_CURRENCY_COLS !== 'undefined' ? globalThis.EG_CURRENCY_COLS : 10
+            typeof globalThis.CURRENCY_ROWS !== 'undefined' ? globalThis.CURRENCY_ROWS : 2,
+            typeof globalThis.CURRENCY_COLS !== 'undefined' ? globalThis.CURRENCY_COLS : 10
         );
     }
     if (!s.egEssenceStash) {
         s.egEssenceStash = _makeEgGrid(
-            typeof globalThis.EG_ESSENCE_ROWS !== 'undefined' ? globalThis.EG_ESSENCE_ROWS : 6,
-            typeof globalThis.EG_ESSENCE_COLS !== 'undefined' ? globalThis.EG_ESSENCE_COLS : 8
+            typeof globalThis.ESSENCE_ROWS !== 'undefined' ? globalThis.ESSENCE_ROWS : 6,
+            typeof globalThis.ESSENCE_COLS !== 'undefined' ? globalThis.ESSENCE_COLS : 8
         );
     }
     if (s.egMapSlotItem === undefined) s.egMapSlotItem = null;
@@ -1055,7 +1055,7 @@ export function loadStateFromSlot(slotNum) {
     // failure bound to the previous slot does not poison this one).
     window._hubStateLoaded = false;
     window._hubLoadFailed = false;
-    // Slot switch resync: the live hub mirrors (_egEquipped, _egInventory,
+    // Slot switch resync: the live hub mirrors (_equipped, _inventory,
     // currency/essence/map stashes, ...) still hold the PREVIOUS slot's data
     // until something re-runs the load. showEndgameHub does - but the
     // tutorial never opens the hub before it needs combat stats, so a fresh
@@ -1063,10 +1063,10 @@ export function loadStateFromSlot(slotNum) {
     // absorption / damage on the avatar bars, and stash grants landing in
     // the wrong mirror). Re-sync immediately, mirroring the parse-time
     // completion pattern in endgame-hub.js.
-    if (typeof globalThis._egLoadHubState === 'function') {
+    if (typeof globalThis._loadHubState === 'function') {
         window._hubLoadInProgress = true;
         try {
-            globalThis._egLoadHubState();
+            globalThis._loadHubState();
             window._hubStateLoaded = true;
         } catch (e) {
             window._hubLoadFailed = true;
@@ -1076,7 +1076,7 @@ export function loadStateFromSlot(slotNum) {
         }
     }
     // Re-sync endgame leveling (player level / attribute points) to the newly loaded save.
-    if (typeof globalThis._egLoadLevelingState === 'function') globalThis._egLoadLevelingState();
+    if (typeof globalThis._loadLevelingState === 'function') globalThis._loadLevelingState();
     save();
     return STATE;
 }

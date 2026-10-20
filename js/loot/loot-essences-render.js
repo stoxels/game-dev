@@ -8,15 +8,15 @@
 // re-renders this panel - a separate filter module would have to import
 // this one back, so the two are kept together on purpose.
 
-import { EG_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from '../endgame/endgame-art.js';
 import { _dndBuildCurrencyChipHTML } from '../endgame/endgame-hub-drag-and-drop.js';
 import { t } from '../translation/translations.js';
-import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';
-import { EG_SLOT_MOD_TABLE_MAP } from './loot-equipment-mod-tables.js';
-import { EG_ESSENCE_COLS, EG_ESSENCE_ROWS, _EG_ESSENCE_FAMILIES, _egEssenceCompatibleSlotTypes, _egEssenceIdForSlot, _egEssenceStash } from './loot-essences.js';
-import { _egEssenceDefForId, _egEssenceResolveFamilyId } from './loot-essences-defs.js';
-import { _egBuildEssenceDetailHTML } from './loot-essences-tooltip.js';
-import {_egEligibleTiers, _egFamilyAllowedOnBase} from './loot-mod-application.js';
+import { ALL_BASE_TYPES } from './equipment-base-items.js';
+import { SLOT_MOD_TABLE_MAP } from './loot-equipment-mod-tables.js';
+import { ESSENCE_COLS, ESSENCE_ROWS, _ESSENCE_FAMILIES, _essenceCompatibleSlotTypes, _essenceIdForSlot, _essenceStash } from './loot-essences.js';
+import { _essenceDefForId, _essenceResolveFamilyId } from './loot-essences-defs.js';
+import { _buildEssenceDetailHTML } from './loot-essences-tooltip.js';
+import {_eligibleTiers, _familyAllowedOnBase} from './loot-mod-application.js';
 
 
 //----------------------------------------------------------------------
@@ -25,7 +25,7 @@ import {_egEligibleTiers, _egFamilyAllowedOnBase} from './loot-mod-application.j
 
 // Which slot type the dropdown is set to: 'all', or one slotType like
 // 'shield' or 'weapon'. Only this file reads or writes it.
-let _egEssenceFilterSlotType = 'all';
+let _essenceFilterSlotType = 'all';
 
 
 //----------------------------------------------------------------------
@@ -33,12 +33,12 @@ let _egEssenceFilterSlotType = 'all';
 //----------------------------------------------------------------------
 
 // Returns all slot types that have at least one essence compatible with them
-export function _egGetEssenceFilterSlotTypes() {
+export function _getEssenceFilterSlotTypes() {
     const slotTypes = new Set();
-    for (const familyId of _EG_ESSENCE_FAMILIES) {
-        const slots = _egEssenceCompatibleSlotTypes(familyId);
+    for (const familyId of _ESSENCE_FAMILIES) {
+        const slots = _essenceCompatibleSlotTypes(familyId);
         for (const slot of slots) {
-            if (_egEssenceCanApplyToSlotType(familyId, slot)) {
+            if (_essenceCanApplyToSlotType(familyId, slot)) {
                 slotTypes.add(slot);
             }
         }
@@ -47,19 +47,19 @@ export function _egGetEssenceFilterSlotTypes() {
 }
 
 // Checks if an essence (by familyId) is compatible with the current filter
-export function _egEssenceMatchesFilter(familyId) {
-    if (_egEssenceFilterSlotType === 'all') return true;
-    const result = _egEssenceCanApplyToSlotType(familyId, _egEssenceFilterSlotType);
+export function _essenceMatchesFilter(familyId) {
+    if (_essenceFilterSlotType === 'all') return true;
+    const result = _essenceCanApplyToSlotType(familyId, _essenceFilterSlotType);
     return result;
 }
 
 // More thorough check: verifies the essence family can actually roll on at least one base of the filtered slot type
 // (considers defense gating and ilvl eligibility, not just mod table presence)
-export function _egEssenceCanApplyToSlotType(familyId, slotType) {
-    if (typeof EG_SLOT_MOD_TABLE_MAP === 'undefined') {
+export function _essenceCanApplyToSlotType(familyId, slotType) {
+    if (typeof SLOT_MOD_TABLE_MAP === 'undefined') {
         return false;
     }
-    const getter = EG_SLOT_MOD_TABLE_MAP[slotType];
+    const getter = SLOT_MOD_TABLE_MAP[slotType];
     if (!getter) {
         return false;
     }
@@ -76,19 +76,19 @@ export function _egEssenceCanApplyToSlotType(familyId, slotType) {
         return false;
     }
 
-    if (typeof EG_ALL_BASE_TYPES === 'undefined') {
+    if (typeof ALL_BASE_TYPES === 'undefined') {
         return true;
     }
 
-    for (const base of EG_ALL_BASE_TYPES) {
+    for (const base of ALL_BASE_TYPES) {
         if (base.slotType !== slotType) continue;
         const defenses = base.defenses || {};
-        if (!_egFamilyAllowedOnBase(familyId, defenses)) continue;
+        if (!_familyAllowedOnBase(familyId, defenses)) continue;
         const sections = [modTable.prefixes || {}, modTable.suffixes || {}];
         for (const sec of sections) {
             const fam = sec[familyId];
             if (!fam) continue;
-            const tiers = _egEligibleTiers(fam, base.minLevel || 1);
+            const tiers = _eligibleTiers(fam, base.minLevel || 1);
             if (tiers && tiers.length > 0) return true;
         }
     }
@@ -96,9 +96,9 @@ export function _egEssenceCanApplyToSlotType(familyId, slotType) {
 }
 
 // Sets the essence filter and re-renders the essence tab
-export function _egSetEssenceFilter(slotType) {
-    _egEssenceFilterSlotType = slotType;
-    _egRenderEssenceStash();
+export function _setEssenceFilter(slotType) {
+    _essenceFilterSlotType = slotType;
+    _renderEssenceStash();
     // Update the dropdown to reflect the current selection
     const select = document.getElementById('eg-essence-filter-select');
     if (select) select.value = slotType;
@@ -110,15 +110,15 @@ export function _egSetEssenceFilter(slotType) {
 //----------------------------------------------------------------------
 
 // Builds a single essence tab cell div (drop target) with empty-slot hover preview.
-export function _egBuildEssenceCellHTML(row, col) {
+export function _buildEssenceCellHTML(row, col) {
     return `
 <div class="eg-inv-cell eg-essence-cell"
      id="eg-essence-cell-${row}-${col}"
      data-row="${row}" data-col="${col}"
      data-eg-dropzone="essence"
-     onmouseenter="_egOnEssenceCellEnter(${row}, ${col}, event)"
-     onmousemove="_egOnEssenceCellMove(event)"
-     onmouseleave="_egOnEssenceCellLeave()"
+     onmouseenter="_onEssenceCellEnter(${row}, ${col}, event)"
+     onmousemove="_onEssenceCellMove(event)"
+     onmouseleave="_onEssenceCellLeave()"
      ondragover="egDragOver(event)"
      ondrop="egDropOnEssence(event, ${row}, ${col})"
      ondragleave="egDragLeave(event)">
@@ -126,15 +126,15 @@ export function _egBuildEssenceCellHTML(row, col) {
 }
 
 // Assembles the essence tab panel: label + the essence cell grid.
-export function _egBuildEssenceTabHTML() {
+export function _buildEssenceTabHTML() {
     let cellsHTML = '';
-    for (let r = 0; r < EG_ESSENCE_ROWS; r++) {
-        for (let c = 0; c < EG_ESSENCE_COLS; c++) {
-            cellsHTML += _egBuildEssenceCellHTML(r, c);
+    for (let r = 0; r < ESSENCE_ROWS; r++) {
+        for (let c = 0; c < ESSENCE_COLS; c++) {
+            cellsHTML += _buildEssenceCellHTML(r, c);
         }
     }
     // Build filter dropdown options
-    const slotTypes = _egGetEssenceFilterSlotTypes();
+    const slotTypes = _getEssenceFilterSlotTypes();
     const slotLabel = (st) => {
         const key = 'eg_slot_' + st;
         try { const tr = t(key); if (tr && tr !== key) return tr; } catch (e) { }
@@ -142,7 +142,7 @@ export function _egBuildEssenceTabHTML() {
     };
     let filterOptions = `<option value="all">${t('eg_essence_filter_all') || 'All'}</option>`;
     for (const st of slotTypes) {
-        const selected = _egEssenceFilterSlotType === st ? ' selected' : '';
+        const selected = _essenceFilterSlotType === st ? ' selected' : '';
         filterOptions += `<option value="${st}"${selected}>${slotLabel(st)}</option>`;
     }
 
@@ -150,12 +150,12 @@ export function _egBuildEssenceTabHTML() {
 <div class="eg-panel eg-panel-essence">
     <div class="eg-panel-label">
         ${t('eg_essences_tab')}
-        <select id="eg-essence-filter-select" class="eg-essence-filter-select" onchange="_egSetEssenceFilter(this.value)" data-tip-t="eg_essence_filter_title">
+        <select id="eg-essence-filter-select" class="eg-essence-filter-select" onchange="_setEssenceFilter(this.value)" data-tip-t="eg_essence_filter_title">
             ${filterOptions}
         </select>
     </div>
     <div class="eg-essence-grid" id="eg-essence-grid"
-         style="grid-template-columns: repeat(${EG_ESSENCE_COLS}, 1fr);">
+         style="grid-template-columns: repeat(${ESSENCE_COLS}, 1fr);">
         ${cellsHTML}
     </div>
 </div>`;
@@ -167,13 +167,13 @@ export function _egBuildEssenceTabHTML() {
 //----------------------------------------------------------------------
 
 // Empty-slot hover preview - mirrors Orbs & Shards behavior.
-export function _egOnEssenceCellEnter(row, col, e) {
-    const stash = (typeof _egEssenceStash !== 'undefined') ? _egEssenceStash : null;
+export function _onEssenceCellEnter(row, col, e) {
+    const stash = (typeof _essenceStash !== 'undefined') ? _essenceStash : null;
     const item = stash && stash[row] ? stash[row][col] : null;
     if (item) return; // occupied → chip's own onmouseenter handles tooltip
-    const assignedId = _egEssenceIdForSlot(row, col);
+    const assignedId = _essenceIdForSlot(row, col);
     if (!assignedId) return; // decorative empty cell
-    const def = _egEssenceDefForId(assignedId);
+    const def = _essenceDefForId(assignedId);
     if (!def) return;
     // Build tooltip from def (reuse currency/essence style)
     const ttName = def.name || assignedId;
@@ -181,11 +181,11 @@ export function _egOnEssenceCellEnter(row, col, e) {
     const ttDesc = def.description || '';
     // heal missing category for display
     let essenceDetailHTML = '';
-    try { essenceDetailHTML = _egBuildEssenceDetailHTML(def); } catch (err) { essenceDetailHTML = ''; }
+    try { essenceDetailHTML = _buildEssenceDetailHTML(def); } catch (err) { essenceDetailHTML = ''; }
     const html = `
 <div class="eg-tt-frame" style="--tt-border:#b59248;">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon" style="opacity:0.55;">${EG_ART.html('item', assignedId, ttIcon)}</div>
+        <div class="eg-tt-icon" style="opacity:0.55;">${GAME_ART.html('item', assignedId, ttIcon)}</div>
         <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${ttName}</div>
         <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_essence')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
     </div>
@@ -194,38 +194,38 @@ export function _egOnEssenceCellEnter(row, col, e) {
 </div>`;
     if (typeof showGameTooltip === 'function') globalThis.showGameTooltip(html, e);
 }
-export function _egOnEssenceCellMove(e) {
+export function _onEssenceCellMove(e) {
     const cell = e.currentTarget || (e.target.closest && e.target.closest('.eg-essence-cell'));
     if (!cell) return;
     const r = +cell.dataset.row, c = +cell.dataset.col;
-    const stash = (typeof _egEssenceStash !== 'undefined') ? _egEssenceStash : null;
+    const stash = (typeof _essenceStash !== 'undefined') ? _essenceStash : null;
     const item = stash && stash[r] ? stash[r][c] : null;
     if (item) return;
-    if (_egEssenceIdForSlot(r, c) && typeof moveGameTooltip === 'function') globalThis.moveGameTooltip(e);
+    if (_essenceIdForSlot(r, c) && typeof moveGameTooltip === 'function') globalThis.moveGameTooltip(e);
 }
-export function _egOnEssenceCellLeave() {
+export function _onEssenceCellLeave() {
     if (typeof hideGameTooltip === 'function') globalThis.hideGameTooltip();
 }
 
 // Re-renders a single cell in the essence tab grid (fixed-slot with placeholder).
-export function _egRenderEssenceCell(row, col) {
-    if (!_egEssenceStash[row]) return;
+export function _renderEssenceCell(row, col) {
+    if (!_essenceStash[row]) return;
     const cell = document.getElementById(`eg-essence-cell-${row}-${col}`);
     if (!cell) return;
-    const item = _egEssenceStash[row][col];
-    const assignedId = _egEssenceIdForSlot(row, col);
-    const def = assignedId ? _egEssenceDefForId(assignedId) : null;
+    const item = _essenceStash[row][col];
+    const assignedId = _essenceIdForSlot(row, col);
+    const def = assignedId ? _essenceDefForId(assignedId) : null;
 
     // Check filter compatibility
     let matchesFilter = true;
     if (!item && assignedId && def) {
-        const familyId = _egEssenceResolveFamilyId(def);
-        if (familyId && !_egEssenceMatchesFilter(familyId)) {
+        const familyId = _essenceResolveFamilyId(def);
+        if (familyId && !_essenceMatchesFilter(familyId)) {
             matchesFilter = false;
         }
     } else if (item) {
-        const familyId = _egEssenceResolveFamilyId(item);
-        if (familyId && !_egEssenceMatchesFilter(familyId)) {
+        const familyId = _essenceResolveFamilyId(item);
+        if (familyId && !_essenceMatchesFilter(familyId)) {
             matchesFilter = false;
         }
     }
@@ -255,7 +255,7 @@ export function _egRenderEssenceCell(row, col) {
         cell.classList.add('eg-essence-assigned-empty');
         // Empty slots preview their essence art (dimmed via CSS) once
         // loaded, else the classic emoji ::after placeholder.
-        const emptyArt = EG_ART ? EG_ART.url('item', assignedId) : null;
+        const emptyArt = GAME_ART ? GAME_ART.url('item', assignedId) : null;
         if (emptyArt) {
             cell.removeAttribute('data-empty-icon');
             const img = document.createElement('img');
@@ -279,10 +279,10 @@ export function _egRenderEssenceCell(row, col) {
 }
 
 // Re-renders the entire essence tab grid.
-export function _egRenderEssenceStash() {
-    for (let r = 0; r < EG_ESSENCE_ROWS; r++) {
-        for (let c = 0; c < EG_ESSENCE_COLS; c++) {
-            _egRenderEssenceCell(r, c);
+export function _renderEssenceStash() {
+    for (let r = 0; r < ESSENCE_ROWS; r++) {
+        for (let c = 0; c < ESSENCE_COLS; c++) {
+            _renderEssenceCell(r, c);
         }
     }
 }
@@ -294,7 +294,7 @@ if (typeof document !== 'undefined' && document.addEventListener) {
     document.addEventListener('eg-art-loaded', function () {
         try {
             if (document.getElementById('eg-essence-cell-0-0')) {
-                _egRenderEssenceStash();
+                _renderEssenceStash();
             }
         } catch (e) { /* essence tab not open - safe to ignore */ }
     });
@@ -305,7 +305,7 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 //--------------------------------STYLES--------------------------------
 //----------------------------------------------------------------------
 
-(function _egInjectEssenceStyles() {
+(function _injectEssenceStyles() {
     if (document.getElementById('eg-essence-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-essence-styles';

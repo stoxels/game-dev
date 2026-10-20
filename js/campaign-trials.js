@@ -2,17 +2,17 @@ import { Audio_Manager } from './audio/audio.js';
 import { trackAchStat } from './achievements/achievements.js';
 import { areAllWorldLevelsDone, grantClassChangeToken, triggerClassEventIfPending } from './classes/class-ui.js';
 import { curMods } from './difficulty-modifiers.js';
-import { EG_BOSS_DEFS } from './combat/bosses/boss-framework.js';
-import { _egCanLeaveMap, _egCancelChainCountdown, _egRollBonusMapLoot, _egShowLeaveMapTransition } from './combat/encounter-chain.js';
-import { _egBuildChainPool } from './combat/encounter-chain-pool.js';
-import { _egEnsureLoseOverlayEndgameUI } from './combat/encounter-defeat-overlay.js';
-import { _egStopEncounter } from './combat/encounter.js';
-import { _egFlushRunLootToStash } from './combat/combat-grid-pickups-loot.js';
-import { egSaveHubState } from './endgame/endgame-hub.js';
-import { EG_LEVELING_CONFIG, _egAwardXP, _egCalcXpMultiplier, _egCampaignExpectedLevel, _egGetPlayerLevel, _egGetXpForNextLevel, _egGrantCampaignLevelXP } from './endgame/endgame-leveling.js';
+import { BOSS_DEFS } from './combat/bosses/boss-framework.js';
+import { _canLeaveMap, _cancelChainCountdown, _rollBonusMapLoot, _showLeaveMapTransition } from './combat/encounter-chain.js';
+import { _buildChainPool } from './combat/encounter-chain-pool.js';
+import { _ensureLoseOverlayEndgameUI } from './combat/encounter-defeat-overlay.js';
+import { _stopEncounter } from './combat/encounter.js';
+import { _flushRunLootToStash } from './combat/combat-grid-pickups-loot.js';
+import { saveHubState } from './endgame/endgame-hub.js';
+import { LEVELING_CONFIG, _awardXP, _calcXpMultiplier, _campaignExpectedLevel, _getPlayerLevel, _getXpForNextLevel, _grantCampaignLevelXP } from './endgame/endgame-leveling.js';
 import { _egPickMapRunSeedGi } from './endgame/endgame-map-launch.js';
 import { _egBankUnclaimedMapDrops } from './loot/loot-map-drops.js';
-import { _egResetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
+import { _resetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
 import { WORLDS } from './levels/level-world-data.js';
 import { ALL, WORLD_START_GI, isNexusPointLevel, isNexusWorld } from './levels/levels.js';
 import { buildInventoryPanel } from './puzzle-item-inventory/puzzle-item-inventory-panel.js';
@@ -57,14 +57,14 @@ import { cur } from './state.js';
 // trial rewards instead of atlas progress.
 //
 // Wiring (typeof-guarded so load order never matters):
-//   world map nodes  → _egLaunchCampaignTrial(wi) / ascension via startLevel()
-//   startLevel()     → _egMaybeLaunchAscensionTrial() intercepts campaign
-//                      ascension levels into _egLaunchAscensionTrial(wi)
-//   _egTryLeaveMap() → branches to _egEndCampaignTrial() for trial runs
-//   _egPickInterstitialWorldNum() → trial world override (patched in
-//                      endgame-encounter-chain.js, reads window._egCampaignTrial)
-//   _egChainCleanup()→ _egCleanupCampaignTrialSeed() (patched call site)
-//   leave-map return → window._egTrialReturnWi branch (patched call site)
+//   world map nodes  → _launchCampaignTrial(wi) / ascension via startLevel()
+//   startLevel()     → _maybeLaunchAscensionTrial() intercepts campaign
+//                      ascension levels into _launchAscensionTrial(wi)
+//   _tryLeaveMap() → branches to _endCampaignTrial() for trial runs
+//   _pickInterstitialWorldNum() → trial world override (patched in
+//                      endgame-encounter-chain.js, reads window._campaignTrial)
+//   _chainCleanup()→ _cleanupCampaignTrialSeed() (patched call site)
+//   leave-map return → window._trialReturnWi branch (patched call site)
 //
 // Dependencies (all optional at load time, required at run time):
 //   js/levels/levels.js, js/state.js, endgame-encounter-chain.js,
@@ -76,7 +76,7 @@ import { cur } from './state.js';
 // Worlds 0..12 (campaign worlds 1..13) each own one Convergence Trial.
 // Trial number = world number (Trial 1 lives in world 1, ...). The Nexus
 // World (index 13) has no trial - its finale is the Nexus Point.
-export function _egTrialWorlds() {
+export function _trialWorlds() {
     if (typeof WORLDS === 'undefined' || !WORLDS) return [];
     const out = [];
     for (let wi = 0; wi < WORLDS.length; wi++) {
@@ -88,24 +88,24 @@ export function _egTrialWorlds() {
 }
 
 // Total number of Convergence Trials (drives the convergence modal "x / n").
-export function _egTrialCount() {
-    return _egTrialWorlds().length;
+export function _trialCount() {
+    return _trialWorlds().length;
 }
 
 // Trial id for a world index, e.g. 'trial_1'. Stable across saves.
-export function _egTrialIdForWorld(wi) {
+export function _trialIdForWorld(wi) {
     return 'trial_' + (wi + 1);
 }
 
 // Display name, e.g. 'Convergence Trial 1'.
-export function _egTrialName(wi) {
+export function _trialName(wi) {
     const label = (typeof t === 'function')
         ? t('eg_trial_name').replace('{n}', wi + 1) : null;
     return (label && label !== 'eg_trial_name') ? label : ('Convergence Trial ' + (wi + 1));
 }
 
 // Display name for an ascension trial, e.g. 'Ascension Trial - World 3'.
-export function _egAscensionTrialName(wi) {
+export function _ascensionTrialName(wi) {
     const label = (typeof t === 'function')
         ? t('eg_ascension_trial_name').replace('{n}', wi + 1) : null;
     return (label && label !== 'eg_ascension_trial_name')
@@ -113,7 +113,7 @@ export function _egAscensionTrialName(wi) {
 }
 
 // Global index of the first level of world `wi` (-1 when unknown).
-export function _egTrialWorldStartGi(wi) {
+export function _trialWorldStartGi(wi) {
     if (typeof WORLD_START_GI !== 'undefined' && WORLD_START_GI[wi] != null) return WORLD_START_GI[wi];
     if (typeof ALL === 'undefined') return -1;
     let gi = 0;
@@ -128,29 +128,29 @@ export function _egTrialWorldStartGi(wi) {
 // Uses the campaign's expected character level at the world's midpoint
 // (convergence) or final level (ascension) so the chain + boss fight land
 // on-level for a player progressing normally - full XP, fair fight.
-export function _egTrialMonsterLevel(wi, atEnd) {
+export function _trialMonsterLevel(wi, atEnd) {
     const world = (typeof WORLDS !== 'undefined' && WORLDS) ? WORLDS[wi] : null;
-    const start = _egTrialWorldStartGi(wi);
-    if (world && start >= 0 && typeof _egCampaignExpectedLevel === 'function') {
+    const start = _trialWorldStartGi(wi);
+    if (world && start >= 0 && typeof _campaignExpectedLevel === 'function') {
         const li = atEnd ? (world.data.length - 1) : Math.floor(world.data.length / 2);
-        return Math.max(1, Math.round(_egCampaignExpectedLevel(start + li)));
+        return Math.max(1, Math.round(_campaignExpectedLevel(start + li)));
     }
     // Fallback: linear spread of the campaign band across trial worlds.
-    const end = (typeof EG_LEVELING_CONFIG !== 'undefined' && EG_LEVELING_CONFIG.campaignEndLevel) || 68;
-    const n = Math.max(1, _egTrialCount() || 13);
+    const end = (typeof LEVELING_CONFIG !== 'undefined' && LEVELING_CONFIG.campaignEndLevel) || 68;
+    const n = Math.max(1, _trialCount() || 13);
     const f = atEnd ? ((wi + 1) / n) : ((wi + 0.5) / n);
     return Math.max(1, Math.round(1 + (end - 1) * Math.min(1, Math.max(0, f))));
 }
 
 // Deterministic boss pick per world (existing boss fights, reused).
 // Convergence and ascension trials in the same world get different bosses.
-export function _egTrialBossId(wi, salt) {
-    if (typeof EG_BOSS_DEFS === 'undefined' || !EG_BOSS_DEFS) return null;
-    const keys = Object.keys(EG_BOSS_DEFS);
+export function _trialBossId(wi, salt) {
+    if (typeof BOSS_DEFS === 'undefined' || !BOSS_DEFS) return null;
+    const keys = Object.keys(BOSS_DEFS);
     if (!keys.length) return null;
     // World 1's convergence trial is always The Null (kept explicit so adding
     // bosses to the roster can never reshuffle it).
-    if (wi === 0 && !salt && EG_BOSS_DEFS.boss_null) return 'boss_null';
+    if (wi === 0 && !salt && BOSS_DEFS.boss_null) return 'boss_null';
     // Spread neighbouring worlds across the roster (11 is coprime to most
     // roster sizes; modulo keeps it stable even if bosses are added later).
     return keys[Math.abs(wi * 11 + (salt || 0) * 5 + 3) % keys.length];
@@ -159,7 +159,7 @@ export function _egTrialBossId(wi, salt) {
 // Chain length grows gently with world index: short trials early (2
 // puzzles + 1 question), slightly longer later (3 + 2). Always ends in a
 // single boss - the "mini-map" feel.
-export function _egTrialChainParams(wi) {
+export function _trialChainParams(wi) {
     const late = wi >= 6;
     const veryLate = wi >= 10;
     return {
@@ -172,50 +172,50 @@ export function _egTrialChainParams(wi) {
 
 // True while the current run is a campaign trial (convergence or
 // ascension). Reads the stamp on the level (survives chain transitions
-// via _egMapDef) with a window-runtime fallback.
-export function _egIsTrialRun() {
+// via _mapDef) with a window-runtime fallback.
+export function _isTrialRun() {
     const stamped = (typeof cur !== 'undefined' && cur && cur.campaignTrial)
-        || (typeof _egMapDef !== 'undefined' && globalThis._egMapDef && globalThis._egMapDef.campaignTrial)
-        || (typeof window !== 'undefined' && window._egCampaignTrial);
+        || (typeof _mapDef !== 'undefined' && globalThis._mapDef && globalThis._mapDef.campaignTrial)
+        || (typeof window !== 'undefined' && window._campaignTrial);
     return stamped || null;
 }
 
-export function _egIsConvergenceTrialRun() {
-    const tr = _egIsTrialRun();
+export function _isConvergenceTrialRun() {
+    const tr = _isTrialRun();
     return (tr && tr.kind === 'convergence') ? tr : null;
 }
 
-export function _egIsAscensionTrialRun() {
-    const tr = _egIsTrialRun();
+export function _isAscensionTrialRun() {
+    const tr = _isTrialRun();
     return (tr && tr.kind === 'ascension') ? tr : null;
 }
 
 // Trial state guards for new saves / old saves without the arrays.
-export function _egEnsureTrialState() {
+export function _ensureTrialState() {
     if (typeof STATE === 'undefined' || !STATE) return;
     if (!Array.isArray(STATE.trialsDone)) STATE.trialsDone = [];
     if (!Array.isArray(STATE.ascensionTrialsDone)) STATE.ascensionTrialsDone = [];
 }
 
-export function _egIsTrialDone(wi) {
-    _egEnsureTrialState();
-    return STATE.trialsDone.includes(_egTrialIdForWorld(wi));
+export function _isTrialDone(wi) {
+    _ensureTrialState();
+    return STATE.trialsDone.includes(_trialIdForWorld(wi));
 }
 
-export function _egIsAscensionTrialDone(wi) {
-    _egEnsureTrialState();
+export function _isAscensionTrialDone(wi) {
+    _ensureTrialState();
     return STATE.ascensionTrialsDone.includes('asc_' + (wi + 1));
 }
 
 // Trials unlock by clearing the world's two convergence milestone levels
-// (the old 33% / 66% rule, see _egTrialTriggerLevels). World 1 Trial 1
+// (the old 33% / 66% rule, see _trialTriggerLevels). World 1 Trial 1
 // additionally needs the tutorial finished (matches level 1-1).
-export function _egIsTrialUnlocked(wi) {
+export function _isTrialUnlocked(wi) {
     if (typeof STATE === 'undefined' || !STATE) return false;
     if (wi === 0 && !STATE.tutorialDone) return false;
-    const start = _egTrialWorldStartGi(wi);
+    const start = _trialWorldStartGi(wi);
     if (start < 0 || typeof ALL === 'undefined') return false;
-    const triggers = _egTrialTriggerLevels(wi);
+    const triggers = _trialTriggerLevels(wi);
     if (!triggers) return false;
     return triggers.every((li) => STATE.done && STATE.done.includes(start + li));
 }
@@ -224,7 +224,7 @@ export function _egIsTrialUnlocked(wi) {
 // that gate this world's Convergence Trial - the classic 33% / 66% formula
 // used by the pre-Leveling-Rework convergence levels (last level excluded).
 // Returns null for worlds without a trial (Nexus World / empty data).
-export function _egTrialTriggerLevels(wi) {
+export function _trialTriggerLevels(wi) {
     const world = (typeof WORLDS !== 'undefined' && WORLDS) ? WORLDS[wi] : null;
     if (!world || !world.data || world.data.length < 2) return null;
     if (typeof isNexusWorld === 'function' && isNexusWorld(wi)) return null;
@@ -245,7 +245,7 @@ export function _egTrialTriggerLevels(wi) {
 // (a chain of puzzles + questions ending in a boss), so every launch first
 // shows a short briefing. "Begin" starts the run; "Back" returns to the level
 // select without launching anything.
-function _egTrialIntroText() {
+function _trialIntroText() {
     const de = LANG === 'de';
     return {
         convergence: de ? 'Konvergenz-Prüfung' : 'Convergence Trial',
@@ -275,11 +275,11 @@ function _egTrialIntroText() {
     };
 }
 
-function _egShowTrialIntro(wi, kind, info, onBegin) {
+function _showTrialIntro(wi, kind, info, onBegin) {
     const old = document.getElementById('trial-intro-modal');
     if (old) old.remove();
-    const tx = _egTrialIntroText();
-    const name = kind === 'convergence' ? _egTrialName(wi) : _egAscensionTrialName(wi);
+    const tx = _trialIntroText();
+    const name = kind === 'convergence' ? _trialName(wi) : _ascensionTrialName(wi);
     const steps = [];
     steps.push(`🧩 ${tx.puzzles(info.requiredPuzzles)}`);
     if (info.requiredQuestions > 0) steps.push(`❓ ${tx.questions(info.requiredQuestions)}`);
@@ -336,7 +336,7 @@ function _egShowTrialIntro(wi, kind, info, onBegin) {
 // a 15x30 grid at a new player. The cap grows with the world: world 1 stays
 // at 5x10, later worlds open up gradually; ascension trials (end of a world)
 // allow one step more.
-function _egTrialMaxCells(wi, kind) {
+function _trialMaxCells(wi, kind) {
     const step = Math.max(0, wi) + (kind === 'ascension' ? 1 : 0);
     return Math.min(400, 50 + 50 * step);
 }
@@ -345,18 +345,18 @@ function _egTrialMaxCells(wi, kind) {
 // Mirrors _egLaunchMapFromDevice() minus the map-item consumption.
 // Without opts.confirmed the player first sees the trial briefing; the run
 // starts from its "Begin" button (which calls back here with confirmed).
-export function _egLaunchTrialRun(wi, kind, opts) {
+export function _launchTrialRun(wi, kind, opts) {
     if (typeof startLevel !== 'function' || typeof ALL === 'undefined' || !ALL.length) return false;
-    if (typeof _egPickMapRunSeedGi !== 'function' && typeof _egBuildChainPool !== 'function') return false;
+    if (typeof _egPickMapRunSeedGi !== 'function' && typeof _buildChainPool !== 'function') return false;
 
-    const chain = _egTrialChainParams(wi);
-    const monsterLevel = _egTrialMonsterLevel(wi, kind === 'ascension');
-    const bossId = _egTrialBossId(wi, kind === 'ascension' ? 1 : 0);
+    const chain = _trialChainParams(wi);
+    const monsterLevel = _trialMonsterLevel(wi, kind === 'ascension');
+    const bossId = _trialBossId(wi, kind === 'ascension' ? 1 : 0);
 
     if (!(opts && opts.confirmed)) {
-        const bossDef = (typeof EG_BOSS_DEFS !== 'undefined' && EG_BOSS_DEFS && bossId) ? EG_BOSS_DEFS[bossId] : null;
+        const bossDef = (typeof BOSS_DEFS !== 'undefined' && BOSS_DEFS && bossId) ? BOSS_DEFS[bossId] : null;
         const isMonsterless = !!(typeof curMods !== 'undefined' && curMods && curMods.monsterless);
-        _egShowTrialIntro(wi, kind, {
+        _showTrialIntro(wi, kind, {
             requiredPuzzles: chain.requiredPuzzles,
             requiredQuestions: chain.requiredQuestions,
             maxMonsters: chain.maxMonsters,
@@ -366,17 +366,17 @@ export function _egLaunchTrialRun(wi, kind, opts) {
             monsterless: isMonsterless,
             timeLimitSecs: 1200,
             maxMistakes: 10,
-        }, () => _egLaunchTrialRun(wi, kind, { confirmed: true }));
+        }, () => _launchTrialRun(wi, kind, { confirmed: true }));
         return true;
     }
-    const trialId = kind === 'convergence' ? _egTrialIdForWorld(wi) : ('asc_' + (wi + 1));
+    const trialId = kind === 'convergence' ? _trialIdForWorld(wi) : ('asc_' + (wi + 1));
     // MONSTERLESS: trials stay puzzle chains with question intermissions but
     // run with no monsters and no boss finale.
     const monsterless = !!(typeof curMods !== 'undefined' && curMods && curMods.monsterless);
     const trialBossId = monsterless ? null : bossId;
     const stamp = {
         kind, wi, trialId,
-        name: kind === 'convergence' ? _egTrialName(wi) : _egAscensionTrialName(wi),
+        name: kind === 'convergence' ? _trialName(wi) : _ascensionTrialName(wi),
         monsterLevel,
         // Quiz questions come from the trial's own world (spec).
         quizWorld: wi + 1,
@@ -390,9 +390,9 @@ export function _egLaunchTrialRun(wi, kind, opts) {
         maxBosses: monsterless ? 0 : 1,
         requiredPuzzles: chain.requiredPuzzles,
         requiredQuestions: chain.requiredQuestions,
-        egTimeLimit: 1200,
-        egMaxMistakes: 10,
-        puzzlePool: { generated: true, genMode: 'mixed', genTier: 1, maxCells: _egTrialMaxCells(wi, kind) },
+        chainTimeLimit: 1200,
+        chainMaxMistakes: 10,
+        puzzlePool: { generated: true, genMode: 'mixed', genTier: 1, maxCells: _trialMaxCells(wi, kind) },
     };
 
     let gi = null;
@@ -402,7 +402,7 @@ export function _egLaunchTrialRun(wi, kind, opts) {
     if (gi === null || gi === undefined) {
         // Fallback: any non-gated story level.
         let pool = [];
-        try { pool = _egBuildChainPool(baseline.puzzlePool || {}); } catch (e) { pool = []; }
+        try { pool = _buildChainPool(baseline.puzzlePool || {}); } catch (e) { pool = []; }
         if (typeof isGatedLevel === 'function') pool = pool.filter(l => !isGatedLevel(l.gIdx));
         if (!pool.length) {
             if (typeof showToast === 'function') showToast('No puzzles available for trial.');
@@ -415,16 +415,16 @@ export function _egLaunchTrialRun(wi, kind, opts) {
     if (!level) return false;
 
     // Runtime descriptor (restored landing info + trial kind for HUD/labels).
-    window._egCampaignTrial = stamp;
-    // Return routing for the leave-map screen (survives _egChainCleanup;
+    window._campaignTrial = stamp;
+    // Return routing for the leave-map screen (survives _chainCleanup;
     // consumed by the return-button branch).
-    window._egTrialReturnWi = wi;
-    window._egTrialReturnKind = kind;
+    window._trialReturnWi = wi;
+    window._trialReturnKind = kind;
     window._egIsMapDeviceRun = false;
 
     level.isMonsterLevel = true;
     level.isMapRunSeed = true;
-    window._egMapRunSeedGi = gi;
+    window._mapRunSeedGi = gi;
     level.monsterLevel = baseline.monsterLevel;
     level.maxMonsters = baseline.maxMonsters;
     level.totalMonsters = baseline.totalMonsters;
@@ -439,11 +439,11 @@ export function _egLaunchTrialRun(wi, kind, opts) {
     level.requiredPuzzles = baseline.requiredPuzzles;
     level.requiredQuestions = baseline.requiredQuestions;
     level.puzzlePool = baseline.puzzlePool;
-    level.egTimeLimit = baseline.egTimeLimit;
-    level.egMaxMistakes = baseline.egMaxMistakes;
+    level.chainTimeLimit = baseline.chainTimeLimit;
+    level.chainMaxMistakes = baseline.chainMaxMistakes;
     level.campaignTrial = stamp;
 
-    if (typeof _egEnsureLoseOverlayEndgameUI === 'function') _egEnsureLoseOverlayEndgameUI();
+    if (typeof _ensureLoseOverlayEndgameUI === 'function') _ensureLoseOverlayEndgameUI();
 
     window._egMapDeviceLaunching = true;
     try {
@@ -456,21 +456,21 @@ export function _egLaunchTrialRun(wi, kind, opts) {
     return true;
 }
 
-export function _egLaunchCampaignTrial(wi) {
-    return _egLaunchTrialRun(wi, 'convergence');
+export function _launchCampaignTrial(wi) {
+    return _launchTrialRun(wi, 'convergence');
 }
 
-export function _egLaunchAscensionTrial(wi) {
+export function _launchAscensionTrial(wi) {
     const world = (typeof WORLDS !== 'undefined' && WORLDS) ? WORLDS[wi] : null;
     if (!world) return false;
-    return _egLaunchTrialRun(wi, 'ascension');
+    return _launchTrialRun(wi, 'ascension');
 }
 
 // startLevel() hook: campaign ascension levels (final level of a world,
 // except the Nexus Point) start their ascension trial chain instead of the
 // plain puzzle. Returns true when it launched a trial (caller must abort
 // the normal start). Never hijacks stamped/chain/suppressed launches.
-export function _egMaybeLaunchAscensionTrial(gi) {
+export function _maybeLaunchAscensionTrial(gi) {
     try {
         if (typeof ALL === 'undefined' || !ALL[gi]) return false;
         const level = ALL[gi];
@@ -482,14 +482,14 @@ export function _egMaybeLaunchAscensionTrial(gi) {
             || level.isTestMapSeed || level.isBossTestSeed) return false;
         if (typeof window !== 'undefined' && window
             && (window._egMapDeviceLaunching || window._egIsMapDeviceRun
-                || window._egIsBossTestRun || window._egSuppressEncounterStart)) return false;
+                || window._isBossTestRun || window._suppressEncounterStart)) return false;
         const wi = level.world - 1;
         const world = (typeof WORLDS !== 'undefined' && WORLDS) ? WORLDS[wi] : null;
         if (!world || !world.data || !world.data.length) return false;
         // Final level of a non-Nexus world = ascension level.
         if (level.li !== world.data.length) return false;
         if (typeof isNexusPointLevel === 'function' && isNexusPointLevel(wi, level.li - 1)) return false;
-        return _egLaunchAscensionTrial(wi);
+        return _launchAscensionTrial(wi);
     } catch (e) { return false; }
 }
 
@@ -500,9 +500,9 @@ export function _egMaybeLaunchAscensionTrial(gi) {
 
 // Convergence Trial first-clear reward: +1 passive point (same pool the
 // level-ups feed; the tree itself is wired separately) + convergence modal.
-export function _egGrantConvergenceTrialReward(wi) {
-    _egEnsureTrialState();
-    const id = _egTrialIdForWorld(wi);
+export function _grantConvergenceTrialReward(wi) {
+    _ensureTrialState();
+    const id = _trialIdForWorld(wi);
     const isFirstClear = !STATE.trialsDone.includes(id);
     if (isFirstClear) {
         STATE.trialsDone.push(id);
@@ -519,16 +519,16 @@ export function _egGrantConvergenceTrialReward(wi) {
     }
     // Flat completion XP on top of kill XP: one first-clear share of the
     // trial level's requirement (replays: reduced share), tier-banded.
-    if (typeof _egAwardXP === 'function' && typeof _egGetXpForNextLevel === 'function') {
+    if (typeof _awardXP === 'function' && typeof _getXpForNextLevel === 'function') {
         try {
-            const c = (typeof EG_LEVELING_CONFIG !== 'undefined') ? EG_LEVELING_CONFIG : {};
-            const refLevel = Math.max(1, _egTrialMonsterLevel(wi, false));
+            const c = (typeof LEVELING_CONFIG !== 'undefined') ? LEVELING_CONFIG : {};
+            const refLevel = Math.max(1, _trialMonsterLevel(wi, false));
             const frac = (c.campaignFirstClearFraction || 0.22) * (isFirstClear ? 1 : (c.campaignReplayFraction || 0.35));
             let mult = 1;
-            if (typeof _egCalcXpMultiplier === 'function' && typeof _egGetPlayerLevel === 'function') {
-                mult = _egCalcXpMultiplier(_egGetPlayerLevel(), refLevel);
+            if (typeof _calcXpMultiplier === 'function' && typeof _getPlayerLevel === 'function') {
+                mult = _calcXpMultiplier(_getPlayerLevel(), refLevel);
             }
-            _egAwardXP(Math.max(1, Math.round(_egGetXpForNextLevel(refLevel) * frac * mult)));
+            _awardXP(Math.max(1, Math.round(_getXpForNextLevel(refLevel) * frac * mult)));
         } catch (e) {}
     }
     if (typeof save === 'function') save();
@@ -540,14 +540,14 @@ export function _egGrantConvergenceTrialReward(wi) {
 // Codex of Completion on first clear, pays the ascension level's campaign
 // XP, and runs the normal world-completion class flow (class select /
 // upgrade / ascendency, or the Nexus class-change token).
-export function _egGrantAscensionTrialReward(wi) {
-    _egEnsureTrialState();
+export function _grantAscensionTrialReward(wi) {
+    _ensureTrialState();
     const world = (typeof WORLDS !== 'undefined' && WORLDS) ? WORLDS[wi] : null;
     const key = 'asc_' + (wi + 1);
     const isFirstClear = !STATE.ascensionTrialsDone.includes(key);
     let ascGi = -1;
     if (world) {
-        const start = _egTrialWorldStartGi(wi);
+        const start = _trialWorldStartGi(wi);
         if (start >= 0) ascGi = start + world.data.length - 1;
     }
     const wasDone = ascGi >= 0 && STATE.done && STATE.done.includes(ascGi);
@@ -573,15 +573,15 @@ export function _egGrantAscensionTrialReward(wi) {
         if (typeof trackAchStat === 'function') try { trackAchStat('egMapsCompleted', 1); } catch (e) {}
     }
     // Campaign XP for the ascension level itself (first clear / replay).
-    if (ascGi >= 0 && typeof _egGrantCampaignLevelXP === 'function') {
+    if (ascGi >= 0 && typeof _grantCampaignLevelXP === 'function') {
         try {
             const keepCur = (typeof cur !== 'undefined') ? cur : null;
             if (typeof ALL !== 'undefined' && ALL[ascGi]) {
-                // _egGrantCampaignLevelXP guards on `cur`: point it at the
+                // _grantCampaignLevelXP guards on `cur`: point it at the
                 // ascension level briefly (trial seeds are map seeds, which
                 // the guard would reject).
                 try { globalThis.cur = ALL[ascGi]; } catch (e) {}
-                _egGrantCampaignLevelXP(ascGi, !wasDone);
+                _grantCampaignLevelXP(ascGi, !wasDone);
                 try { globalThis.cur = keepCur; } catch (e) {}
             }
         } catch (e) {}
@@ -589,10 +589,10 @@ export function _egGrantAscensionTrialReward(wi) {
     // Resistance penalty stage 1 (-30% to all resistances): the trial that
     // opens the ascendency class selection. Only the FIRST clear counts.
     try {
-        if (isFirstClear && typeof globalThis._egAdvanceResistPenaltyStage === 'function'
+        if (isFirstClear && typeof globalThis._advanceResistPenaltyStage === 'function'
             && STATE.playerClass && !STATE.playerAscendency
             && typeof globalThis.isBaseClassMaxed === 'function' && globalThis.isBaseClassMaxed()) {
-            globalThis._egAdvanceResistPenaltyStage(1);
+            globalThis._advanceResistPenaltyStage(1);
         }
     } catch (e) {}
     // World-completion class flow (mirrors checkWorldCompletion in
@@ -615,26 +615,26 @@ export function _egGrantAscensionTrialReward(wi) {
     return isFirstClear;
 }
 
-// Trial win path - trimmed sibling of _egEndMap(): bonus-loot roll, leave
+// Trial win path - trimmed sibling of _endMap(): bonus-loot roll, leave
 // summary, loot flush, cleanup, then trial rewards + trial return routing.
 // No atlas progress, no map completion reward (no map item was consumed).
-export function _egEndCampaignTrial() {
-    const tr = _egIsTrialRun();
+export function _endCampaignTrial() {
+    const tr = _isTrialRun();
     if (!tr) return false;
-    if (typeof _egEncounterActive !== 'undefined' && !globalThis._egEncounterActive) return false;
+    if (typeof _encounterActive !== 'undefined' && !globalThis._encounterActive) return false;
     // Same gate as the map flow: objectives (kills / puzzles / questions +
     // boss) must all be done before the trial can be finished.
-    if (typeof _egCanLeaveMap === 'function' && !_egCanLeaveMap()) {
+    if (typeof _canLeaveMap === 'function' && !_canLeaveMap()) {
         if (typeof showToast === 'function') {
             const msg = (typeof t === 'function') ? t('eg_objectives_incomplete') : null;
             showToast((msg && msg !== 'eg_objectives_incomplete') ? msg : 'Objectives incomplete');
         }
         return false;
     }
-    if (typeof _egCancelChainCountdown === 'function') _egCancelChainCountdown();
+    if (typeof _cancelChainCountdown === 'function') _cancelChainCountdown();
     if (typeof window.clearActiveRandomWalkers === 'function') window.clearActiveRandomWalkers();
 
-    if (typeof _egRollBonusMapLoot === 'function') try { _egRollBonusMapLoot(); } catch (e) {}
+    if (typeof _rollBonusMapLoot === 'function') try { _rollBonusMapLoot(); } catch (e) {}
 
     if (typeof trackAchStat === 'function') {
         try {
@@ -642,20 +642,20 @@ export function _egEndCampaignTrial() {
         } catch (e) {}
     }
 
-    // Summary FIRST (blocks grid clicks instantly), mirroring _egEndMap.
-    if (typeof _egShowLeaveMapTransition === 'function') _egShowLeaveMapTransition(null);
-    _egRetitleLeaveMapTransition(tr);
+    // Summary FIRST (blocks grid clicks instantly), mirroring _endMap.
+    if (typeof _showLeaveMapTransition === 'function') _showLeaveMapTransition(null);
+    _retitleLeaveMapTransition(tr);
 
-    if (typeof _egFlushRunLootToStash === 'function') try { _egFlushRunLootToStash(); } catch (e) {}
+    if (typeof _flushRunLootToStash === 'function') try { _flushRunLootToStash(); } catch (e) {}
     if (typeof _egBankUnclaimedMapDrops === 'function') try { _egBankUnclaimedMapDrops(); } catch (e) {}
-    if (typeof egSaveHubState === 'function') try { egSaveHubState(); } catch (e) {}
+    if (typeof saveHubState === 'function') try { saveHubState(); } catch (e) {}
 
     // Trial rewards (also saves).
-    if (tr.kind === 'convergence') _egGrantConvergenceTrialReward(tr.wi);
-    else _egGrantAscensionTrialReward(tr.wi);
+    if (tr.kind === 'convergence') _grantConvergenceTrialReward(tr.wi);
+    else _grantAscensionTrialReward(tr.wi);
 
-    if (typeof _egStopEncounter === 'function') try { _egStopEncounter(); } catch (e) {}
-    if (typeof _egResetQuizDamageBuff === 'function') try { _egResetQuizDamageBuff(); } catch (e) {}
+    if (typeof _stopEncounter === 'function') try { _stopEncounter(); } catch (e) {}
+    if (typeof _resetQuizDamageBuff === 'function') try { _resetQuizDamageBuff(); } catch (e) {}
     if (typeof stopTimer === 'function') try { stopTimer(); } catch (e) {}
     if (typeof _hidePlayerAvatarSimple === 'function') try { _hidePlayerAvatarSimple(); } catch (e) {}
     if (typeof _hidePlayerAvatar === 'function') try { _hidePlayerAvatar(); } catch (e) {}
@@ -668,8 +668,8 @@ export function _egEndCampaignTrial() {
 }
 
 // Swaps the leave-map summary title/return button to trial wording after
-// _egShowLeaveMapTransition() rendered the default map texts.
-export function _egRetitleLeaveMapTransition(tr) {
+// _showLeaveMapTransition() rendered the default map texts.
+export function _retitleLeaveMapTransition(tr) {
     try {
         const titleEl = document.querySelector('#eg-leave-map-transition .eg-leave-map-title');
         if (titleEl) {
@@ -688,14 +688,14 @@ export function _egRetitleLeaveMapTransition(tr) {
 }
 
 // Strips trial stamps off the seed level + clears run state. Called from
-// _egChainCleanup() (patched call site, typeof-guarded).
-// Keeps window._egTrialReturnWi/_egTrialReturnKind: the leave-map return
+// _chainCleanup() (patched call site, typeof-guarded).
+// Keeps window._trialReturnWi/_trialReturnKind: the leave-map return
 // button consumes them AFTER cleanup already ran.
-export function _egCleanupCampaignTrialSeed() {
+export function _cleanupCampaignTrialSeed() {
     if (typeof window !== 'undefined' && window._egMapDeviceLaunching) return;
-    const seedGi = (typeof window !== 'undefined') ? window._egMapRunSeedGi : null;
-    const hadTrial = !!(typeof window !== 'undefined' && window._egCampaignTrial);
-    if (typeof window !== 'undefined') window._egCampaignTrial = null;
+    const seedGi = (typeof window !== 'undefined') ? window._mapRunSeedGi : null;
+    const hadTrial = !!(typeof window !== 'undefined' && window._campaignTrial);
+    if (typeof window !== 'undefined') window._campaignTrial = null;
     if (seedGi == null) return;
     if (typeof ALL === 'undefined' || !ALL[seedGi]) return;
     const level = ALL[seedGi];
@@ -710,13 +710,13 @@ export function _egCleanupCampaignTrialSeed() {
 // the return flags, then serves the standard post-navigation flows
 // (convergence modal → class event), mirroring goToLevelSelect().
 // Falls back to false (caller routes normally).
-export function _egRouteTrialReturn() {
+export function _routeTrialReturn() {
     if (typeof window === 'undefined') return false;
-    const wi = window._egTrialReturnWi;
+    const wi = window._trialReturnWi;
     if (wi == null || wi < 0) return false;
-    window._egTrialReturnWi = null;
-    window._egTrialReturnKind = null;
-    window._egCampaignTrial = null;
+    window._trialReturnWi = null;
+    window._trialReturnKind = null;
+    window._campaignTrial = null;
     try {
         if (typeof showWorldDetail === 'function') {
             showWorldDetail(wi);
@@ -744,7 +744,7 @@ export function _egRouteTrialReturn() {
 
 // Serves pending post-trial flows after the world screen is visible:
 // convergence modal first, then the class event (ascension trials).
-export function _egServePostTrialFlows() {
+export function _servePostTrialFlows() {
     try {
         // The world-detail routing already serves the modal → class-event
         // chain; this is only a backstop for non-standard return paths.

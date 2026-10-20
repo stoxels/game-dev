@@ -2,16 +2,16 @@ import { Audio_Manager } from '../audio/audio.js';
 import { trackAchStat } from '../achievements/achievements.js';
 import { t } from '../translation/translations.js';
 import { egAtlasChainBlueprintForMap, egAtlasMakeRng } from './endgame-atlas.js';
-import { _egPickMapRunPuzzleGi } from '../combat/encounter-chain.js';
-import { _egBuildChainPool } from '../combat/encounter-chain-pool.js';
-import { _egEnsureLoseOverlayEndgameUI } from '../combat/encounter-defeat-overlay.js';
-import { _egPlayerTakeDamage } from '../combat/encounter.js';
+import { _pickMapRunPuzzleGi } from '../combat/encounter-chain.js';
+import { _buildChainPool } from '../combat/encounter-chain-pool.js';
+import { _ensureLoseOverlayEndgameUI } from '../combat/encounter-defeat-overlay.js';
+import { _playerTakeDamage } from '../combat/encounter.js';
 import { _egRenderMapSlot } from './endgame-gate.js';
-import { egSaveHubState } from './endgame-hub.js';
+import { saveHubState } from './endgame-hub.js';
 import { _egGetMapRewardBonuses } from '../loot/loot-map-mod-rewards.js';
 import { _egRollMapSizeMix } from '../loot/loot-map-implicit-parts.js';
 import { egMapBaseDurationForTier, egMapBaseMistakesForTier, egMapBasePuzzlesForTier, egMapBaseQuestionsForTier } from '../loot/loot-map-config.js';
-import { _egIsActive } from '../combat/combat-state.js';
+import { _isActive } from '../combat/combat-state.js';
 import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -27,12 +27,12 @@ import { cur } from '../state.js';
 // While a device run is active, _egActiveMapItem holds the launched map so
 // every consumption point (monster factories, player stats, boss mechanic
 // scheduler, chain interstitials) can read its mods through the helpers
-// below. The state is cleared by _egChainCleanup() when the run ends.
+// below. The state is cleared by _chainCleanup() when the run ends.
 //
 // Dependencies (must be loaded before this file):
 //   endgame-maps.js            - EG_MAP_MOD_TABLES / mod shape
-//   endgame-hub.js             - _egMapSlotItem, egSaveHubState()
-//   endgame-encounter-chain.js - _egBuildChainPool, _egChainCleanup hook
+//   endgame-hub.js             - _egMapSlotItem, saveHubState()
+//   endgame-encounter-chain.js - _buildChainPool, _chainCleanup hook
 //
 // Entry point:
 //   egActivateMap() in endgame-gate.js → _egLaunchMapFromDevice(mapItem)
@@ -212,11 +212,11 @@ export function _egRollMonsterCritMult(monster) {
 // Quiz penalty: an incorrectly answered interstitial question burns a share
 // of maximum Life. Called from quiz.js (_resolveQuizAnswer) during map runs.
 export function _egOnQuizWrongAnswer() {
-    if (!_egIsActive()) return;
+    if (!_isActive()) return;
     const v = _egGetActiveMapModValue('map_quiz_damage');
     if (!(v > 0)) return;
     const maxHP = (typeof playerMaxHP !== 'undefined' && globalThis.playerMaxHP > 0) ? globalThis.playerMaxHP : 100;
-    const dealt = _egPlayerTakeDamage(Math.max(1, Math.round(maxHP * v / 100)), true);
+    const dealt = _playerTakeDamage(Math.max(1, Math.round(maxHP * v / 100)), true);
     globalThis.showToast(`❌ ${(typeof t === 'function' ? t('eg_mm_toast_quiz_wrong') : 'Incorrect Answer!')} (-${dealt})`);
 }
 
@@ -266,7 +266,7 @@ export function _egApplyMonsterHitMods(monster) {
 //------------------------------------------------------------------------
 
 // Applies the active map's monster-strengthening mods to a freshly built
-// monster/boss object. Called at the end of _egBuildMonster/_egBuildBoss.
+// monster/boss object. Called at the end of _buildMonster/_buildBoss.
 // Mods: life %, damage %, attack speed %, +all resistances.
 export function _egApplyMapModsToMonster(monster) {
     if (!monster || !_egActiveMapItem) return monster;
@@ -467,10 +467,10 @@ export function _egRollMapRunBaseline(map) {
         // Time limit and mistake budget scale with the same objective ramp
         // (early tiers get proportionally less; T16 ≈ 30:00 / 10 - see
         // egMapBaseDurationForTier / egMapBaseMistakesForTier).
-        egTimeLimit: (typeof egMapBaseDurationForTier === 'function')
+        chainTimeLimit: (typeof egMapBaseDurationForTier === 'function')
             ? egMapBaseDurationForTier(tier)
             : 900 + tier * 60,
-        egMaxMistakes: (typeof egMapBaseMistakesForTier === 'function')
+        chainMaxMistakes: (typeof egMapBaseMistakesForTier === 'function')
             ? egMapBaseMistakesForTier(tier)
             : 10,
         // Device runs pull from BOTH pools: story levels AND freshly
@@ -493,8 +493,8 @@ export function _egRollMapRunBaseline(map) {
     if (imp) {
         if (imp.puzzles != null) base.requiredPuzzles = Math.max(1, Math.min(20, imp.puzzles));
         if (imp.questions != null) base.requiredQuestions = Math.max(0, Math.min(20, imp.questions));
-        if (imp.mistakes != null) base.egMaxMistakes = Math.max(3, imp.mistakes);
-        if (imp.durationSeconds != null) base.egTimeLimit = Math.max(300, imp.durationSeconds);
+        if (imp.mistakes != null) base.chainMaxMistakes = Math.max(3, imp.mistakes);
+        if (imp.durationSeconds != null) base.chainTimeLimit = Math.max(300, imp.durationSeconds);
         if (imp.hasBoss != null) base.hasBoss = !!imp.hasBoss;
         if (imp.maxBosses != null) base.maxBosses = Math.max(0, Math.min(2, imp.maxBosses));
         // Ensure consistency: if hasBoss is false, maxBosses must be 0.
@@ -557,13 +557,13 @@ export function _egApplyModsToBaseline(base, map) {
                 // Percentage-based; remaining mistakes are rounded DOWN so
                 // the penalty never rounds in the player's favour.
                 if (!hasImplicits) {
-                    base.egMaxMistakes = Math.max(3, Math.floor(base.egMaxMistakes * (1 - val / 100)));
+                    base.chainMaxMistakes = Math.max(3, Math.floor(base.chainMaxMistakes * (1 - val / 100)));
                 }
                 break;
 
             case 'map_less_time':
                 if (!hasImplicits) {
-                    base.egTimeLimit = Math.max(300, Math.round(base.egTimeLimit * (1 - val / 100)));
+                    base.chainTimeLimit = Math.max(300, Math.round(base.chainTimeLimit * (1 - val / 100)));
                 }
                 break;
 
@@ -589,17 +589,17 @@ export function _egApplyModsToBaseline(base, map) {
 // size mix and the story/generated source mix. Falls back to the test-hub
 // picker / plain story pool when the shared picker is unavailable or fails.
 export function _egPickMapRunSeedGi(baseline) {
-    if (typeof _egPickMapRunPuzzleGi === 'function') {
-        const gi = _egPickMapRunPuzzleGi(baseline.puzzlePool || {});
+    if (typeof _pickMapRunPuzzleGi === 'function') {
+        const gi = _pickMapRunPuzzleGi(baseline.puzzlePool || {});
         if (gi !== null) return gi;
     }
 
     if (typeof _egtPickSeedGi === 'function') {
         return globalThis._egtPickSeedGi(baseline);
     }
-    if (typeof _egBuildChainPool !== 'function') return null;
+    if (typeof _buildChainPool !== 'function') return null;
 
-    let pool = _egBuildChainPool(baseline.puzzlePool || {});
+    let pool = _buildChainPool(baseline.puzzlePool || {});
     if (typeof isGatedLevel === 'function') {
         pool = pool.filter(level => !globalThis.isGatedLevel(level.gIdx));
     }
@@ -608,16 +608,16 @@ export function _egPickMapRunSeedGi(baseline) {
 }
 
 // Strips all stamped run fields off the seed level. Called from
-// _egChainCleanup() so the story level returns to its pristine state.
+// _chainCleanup() so the story level returns to its pristine state.
 export function _egCleanupMapRunSeedLevel() {
-    // Launch guard: _egChainCleanup also fires from _egStopEncounter during
+    // Launch guard: _chainCleanup also fires from _stopEncounter during
     // the launch's own startLevel() call (_cleanupPreviousLevel). Wiping the
     // runtime state there would kill ALL live map mods (hazards, monster
     // buffs, player penalties, rewards) before the first encounter begins.
     if (window._egMapDeviceLaunching) return;
 
-    const seedGi = window._egMapRunSeedGi;
-    window._egMapRunSeedGi = null;
+    const seedGi = window._mapRunSeedGi;
+    window._mapRunSeedGi = null;
     _egActiveMapItem = null;
 
     if (seedGi == null) return;
@@ -628,7 +628,7 @@ export function _egCleanupMapRunSeedLevel() {
     delete level.isMonsterLevel;
     ['monsterLevel', 'maxMonsters', 'totalMonsters', 'hasBoss', 'maxBosses',
      'bosses', 'requiredPuzzles', 'requiredQuestions', 'puzzlePool',
-     'egTimeLimit', 'egMaxMistakes'].forEach(key => delete level[key]);
+     'chainTimeLimit', 'chainMaxMistakes'].forEach(key => delete level[key]);
 }
 
 
@@ -647,9 +647,9 @@ export function _egLaunchMapFromDevice(mapItem) {
     // an abandoned trial (e.g. left via the pause menu) so the leave-map
     // return button routes to the Nexus again.
     if (typeof window !== 'undefined') {
-        window._egCampaignTrial = null;
-        window._egTrialReturnWi = null;
-        window._egTrialReturnKind = null;
+        window._campaignTrial = null;
+        window._trialReturnWi = null;
+        window._trialReturnKind = null;
     }
 
     const baseline = _egApplyModsToBaseline(_egRollMapRunBaseline(mapItem), mapItem);
@@ -665,13 +665,13 @@ export function _egLaunchMapFromDevice(mapItem) {
     Audio_Manager.playSFX('map_launch');
     _egActiveMapItem = mapItem;
     globalThis._egMapSlotItem = null;
-    if (typeof egSaveHubState === 'function') egSaveHubState();
+    if (typeof saveHubState === 'function') saveHubState();
     if (typeof _egRenderMapSlot === 'function') _egRenderMapSlot();
 
     const level = globalThis.ALL[gi];
     level.isMonsterLevel = true;
     level.isMapRunSeed = true;
-    window._egMapRunSeedGi = gi;
+    window._mapRunSeedGi = gi;
 
     level.monsterLevel = baseline.monsterLevel;
     level.maxMonsters = baseline.maxMonsters;
@@ -689,8 +689,8 @@ export function _egLaunchMapFromDevice(mapItem) {
     level.requiredPuzzles = baseline.requiredPuzzles;
     if (baseline.requiredQuestions > 0) level.requiredQuestions = baseline.requiredQuestions;
     if (Object.keys(baseline.puzzlePool).length > 0) level.puzzlePool = baseline.puzzlePool;
-    level.egTimeLimit = baseline.egTimeLimit;
-    level.egMaxMistakes = baseline.egMaxMistakes;
+    level.chainTimeLimit = baseline.chainTimeLimit;
+    level.chainMaxMistakes = baseline.chainMaxMistakes;
 
     // Tells goToLevelSelect() (screens.js) to route back to the Probability
     // Gate instead of the normal world/level-select screen when the run ends.
@@ -698,14 +698,14 @@ export function _egLaunchMapFromDevice(mapItem) {
 
     // Gear: warding - its once-per-map killing-blow save refreshes at the
     // start of every device-map run.
-    globalThis._egWardingUsedThisMap = false;
+    globalThis._wardingUsedThisMap = false;
 
     // Bind the endgame lose-overlay UI (no Retry - only "Return to the Nexus")
     // up front so every defeat path inside the map is covered.
-    if (typeof _egEnsureLoseOverlayEndgameUI === 'function') _egEnsureLoseOverlayEndgameUI();
+    if (typeof _ensureLoseOverlayEndgameUI === 'function') _ensureLoseOverlayEndgameUI();
 
     // Guard flag: startLevel() synchronously runs _cleanupPreviousLevel →
-    // _egStopEncounter → _egChainCleanup, which must NOT clear the runtime
+    // _stopEncounter → _chainCleanup, which must NOT clear the runtime
     // mod state during this very launch (see _egCleanupMapRunSeedLevel).
     window._egMapDeviceLaunching = true;
     try {

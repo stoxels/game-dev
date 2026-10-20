@@ -107,7 +107,7 @@ export function monsterKillScore(monster) {
 // campaign levels count - map runs earn their score when the map is cleared
 // (see awardAtlasClearScore). The tally restarts with every level start.
 export function recordMonsterKillScore(monster) {
-    if (typeof globalThis._egIsCampaignRun !== 'function' || !globalThis._egIsCampaignRun()) return;
+    if (typeof globalThis._isCampaignRun !== 'function' || !globalThis._isCampaignRun()) return;
     globalThis._runMonsterScore = (Number(globalThis._runMonsterScore) || 0) + monsterKillScore(monster);
 }
 

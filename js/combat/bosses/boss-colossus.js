@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkNudgeAvatar, _nkPlayerCenter, _nkPlayerRect, _nkRuns, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE COLOSSUS (boss_colossus)--------------------
@@ -16,10 +16,10 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 
 // DEBUG: slow the Colossus' timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Off for ship.
-export const _EG_COLO_DEBUG_SLOW = false;
-export const _EG_COLO_DEBUG_MULT = _EG_COLO_DEBUG_SLOW ? 2.5 : 1;
+export const _COLO_DEBUG_SLOW = false;
+export const _COLO_DEBUG_MULT = _COLO_DEBUG_SLOW ? 2.5 : 1;
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_colossus: {
         id: 'boss_colossus', name: 'The Colossus', emoji: '🗿',
         baseHP: 1140, baseDamage: 24, chargeMax: 13,
@@ -27,7 +27,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_colossus: {
         phases: [
             // Basic attacks stay a steady pressure (the framework floors
@@ -41,27 +41,27 @@ Object.assign(EG_BOSS_MECHANICS, {
             // Signature keeps the historic handler name (save-compat with
             // existing scheduled timers / debug docs): the old double-ring
             // slam is now the walking Stride inside it.
-            { name: 'seismic_stride', intervalBase: 20000, intervalVariance: 4500, handler: '_egMechSeismicSlam' },
-            { name: 'corrupt_cells', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechCorruptCells' },
-            { name: 'boulder_rain', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechColoBoulders', phase2Only: true },
-            { name: 'granite_golems', intervalBase: 24000, intervalVariance: 5000, handler: '_egMechColoGolems', phase2Only: true },
+            { name: 'seismic_stride', intervalBase: 20000, intervalVariance: 4500, handler: '_mechSeismicSlam' },
+            { name: 'corrupt_cells', intervalBase: 18000, intervalVariance: 4000, handler: '_mechCorruptCells' },
+            { name: 'boulder_rain', intervalBase: 21000, intervalVariance: 5000, handler: '_mechColoBoulders', phase2Only: true },
+            { name: 'granite_golems', intervalBase: 24000, intervalVariance: 5000, handler: '_mechColoGolems', phase2Only: true },
         ],
-        onPhaseEnter: _egColoOnPhaseEnter,
+        onPhaseEnter: _coloOnPhaseEnter,
     },
 });
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-export const EG_COLO_FOOT_DMG   = [0, 0.15, 0.17, 0.20]; // %maxHP footprint slam band
-export const EG_COLO_WAVE_DMG   = [0, 0.32, 0.36, 0.40]; // %maxHP for standing in the dashed circle at the slam
-export const EG_COLO_BOULDER_DMG = 0.16;                 // %maxHP boulder impact
-export const EG_COLO_FRAG_DMG   = 0.12;                  // %maxHP rolling fragment
-export const EG_COLO_GOLEM_DMG  = 0.06;                  // %maxHP golem shove (per ram)
-export const EG_COLO_CHUTE_DMG  = [0, 0, 0.10, 0.12];    // %maxHP rock chute (finale)
-export const EG_COLO_SEAL_HITS  = 3;                     // body-checks per joint seal
-export const EG_COLO_CHARGE_DMG = 0.22;                  // %maxHP failing a seal wave
-export const EG_COLO_CAVEIN_DMG = 0.35;                  // %maxHP the CAVE-IN
-export const EG_COLO_HIT_CD_MS  = 700;                   // shared touch cooldown
+export const COLO_FOOT_DMG   = [0, 0.15, 0.17, 0.20]; // %maxHP footprint slam band
+export const COLO_WAVE_DMG   = [0, 0.32, 0.36, 0.40]; // %maxHP for standing in the dashed circle at the slam
+export const COLO_BOULDER_DMG = 0.16;                 // %maxHP boulder impact
+export const COLO_FRAG_DMG   = 0.12;                  // %maxHP rolling fragment
+export const COLO_GOLEM_DMG  = 0.06;                  // %maxHP golem shove (per ram)
+export const COLO_CHUTE_DMG  = [0, 0, 0.10, 0.12];    // %maxHP rock chute (finale)
+export const COLO_SEAL_HITS  = 3;                     // body-checks per joint seal
+export const COLO_CHARGE_DMG = 0.22;                  // %maxHP failing a seal wave
+export const COLO_CAVEIN_DMG = 0.35;                  // %maxHP the CAVE-IN
+export const COLO_HIT_CD_MS  = 700;                   // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -70,34 +70,34 @@ export const EG_COLO_HIT_CD_MS  = 700;                   // shared touch cooldow
 
 // Touch damage helper shared by all Colossus hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-export let _egColoHitCd = 0;
-export function _egColoTouch(pct, level, label, force) {
+export let _coloHitCd = 0;
+export function _coloTouch(pct, level, label, force) {
     const now = performance.now();
-    if (!force && now < _egColoHitCd) return false;
-    const pr = _egNkPlayerRect();
+    if (!force && now < _coloHitCd) return false;
+    const pr = _nkPlayerRect();
     if (!pr) return false;
-    _egColoHitCd = now + EG_COLO_HIT_CD_MS;
-    const dealt = _egNkHit(pct, null, level);
-    _egNkAbilityHitToast(dealt, 'The Colossus', label);
+    _coloHitCd = now + COLO_HIT_CD_MS;
+    const dealt = _nkHit(pct, null, level);
+    _nkAbilityHitToast(dealt, 'The Colossus', label);
     return true;
 }
 
 // Player centre with a screen-centre fallback.
-export function _egColoPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _coloPC() { const c = _nkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Rock chip burst at a spot (visual only).
-export function _egColoRubble(run, x, y, big) {
+export function _coloRubble(run, x, y, big) {
     for (let i = 0; i < (big ? 6 : 3); i++) {
-        const el = _egNkEl(run, 'div', 'eg-colo-chip');
+        const el = _nkEl(run, 'div', 'eg-colo-chip');
         el.style.left = Math.round(x + (Math.random() * 40 - 20)) + 'px';
         el.style.top = Math.round(y + (Math.random() * 24 - 12)) + 'px';
         el.style.animationDelay = (i * 45) + 'ms';
-        setTimeout(() => { try { el.remove(); } catch (e) {} }, _EG_COLO_DEBUG_SLOW ? 2200 : 900);
+        setTimeout(() => { try { el.remove(); } catch (e) {} }, _COLO_DEBUG_SLOW ? 2200 : 900);
     }
 }
 
 // Screen shake: quick translate jitter on the body (finale slump feedback).
-export function _egColoShake(intensity) {
+export function _coloShake(intensity) {
     const body = document.body;
     const frames = 12;
     let i = 0;
@@ -120,38 +120,38 @@ export function _egColoShake(intensity) {
 // footprint shows its shockwave reach as a dashed circle during the
 // telegraph; the slam bites the footprint and a shockwave rolls out to that
 // circle. Step out of the circle. Phase 3: the stride runs diagonally.
-export const EG_COLO_STRIDE_STEPS = 2;      // footprints per stride
-export const EG_COLO_FOOT_WARN_MS = 1400;   // footprint telegraph
-export const EG_COLO_WAVE_SPEED = 520;      // px/s shockwave expansion (divided by mult)
-export const EG_COLO_WAVE_MAX_FRAC = 0.75;  // (legacy) old screen-wide reach - waves now stop at EG_COLO_WAVE_R
-const EG_COLO_WAVE_R = 270;                  // px shockwave reach (the dashed circle)
-const EG_COLO_STRIDE_LEN = 330;              // px between the two footprints
+export const COLO_STRIDE_STEPS = 2;      // footprints per stride
+export const COLO_FOOT_WARN_MS = 1400;   // footprint telegraph
+export const COLO_WAVE_SPEED = 520;      // px/s shockwave expansion (divided by mult)
+export const COLO_WAVE_MAX_FRAC = 0.75;  // (legacy) old screen-wide reach - waves now stop at COLO_WAVE_R
+const COLO_WAVE_R = 270;                  // px shockwave reach (the dashed circle)
+const COLO_STRIDE_LEN = 330;              // px between the two footprints
 
-export function _egMechSeismicSlam(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechSeismicSlam(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
 
     // Footprint 1 lands near you; footprint 2 one stride further, toward the
     // side with more room (horizontal, or diagonal in phase 3).
-    const pc0 = _egColoPC();
+    const pc0 = _coloPC();
     const clampX = (x) => Math.max(90, Math.min(W - 90, x));
     const clampY = (y) => Math.max(80, Math.min(H - 80, y));
     const f1 = { x: clampX(pc0.x + (Math.random() * 120 - 60)), y: clampY(pc0.y + (Math.random() * 80 - 40)) };
     const sx = f1.x < W / 2 ? 1 : -1, sy = f1.y < H / 2 ? 1 : -1;
     const dir = p >= 3 ? [0.8 * sx, 0.6 * sy] : [sx, 0];
-    const f2 = { x: clampX(f1.x + dir[0] * EG_COLO_STRIDE_LEN), y: clampY(f1.y + dir[1] * EG_COLO_STRIDE_LEN) };
-    const feet = [f1, f2].slice(0, EG_COLO_STRIDE_STEPS).map(f => ({
+    const f2 = { x: clampX(f1.x + dir[0] * COLO_STRIDE_LEN), y: clampY(f1.y + dir[1] * COLO_STRIDE_LEN) };
+    const feet = [f1, f2].slice(0, COLO_STRIDE_STEPS).map(f => ({
         x: f.x, y: f.y, state: 'wait', t: 0, warned: null, zone: null, slamEl: null, waveEl: null, r: 40,
     }));
-    _egNkToast('eg_mech_quake', '🗿 SEISMIC STRIDE - get OUT of the dashed circle before each footfall!', '#d6c8a8');
+    _nkToast('eg_mech_quake', '🗿 SEISMIC STRIDE - get OUT of the dashed circle before each footfall!', '#d6c8a8');
 
     // ONE loop drives all feet (each footprint's lifecycle is a state).
-    _egNkLoop(run, (dtS, now) => {
-        const pr = _egNkPlayerRect();
-        const pc = _egColoPC();
+    _nkLoop(run, (dtS, now) => {
+        const pr = _nkPlayerRect();
+        const pc = _coloPC();
         let pending = false;
         feet.forEach((ft, idx) => {
             // Start the next foot only after the previous one slammed.
@@ -159,11 +159,11 @@ export function _egMechSeismicSlam(monster, phase) {
                 if (idx === 0 || feet[idx - 1].state === 'wave' || feet[idx - 1].state === 'done') {
                     ft.state = 'warn';
                     ft.t = 0;
-                    ft.zone = _egNkEl(run, 'div', 'eg-colo-quake-zone');
-                    ft.zone.style.left = Math.round(ft.x - EG_COLO_WAVE_R) + 'px';
-                    ft.zone.style.top = Math.round(ft.y - EG_COLO_WAVE_R) + 'px';
-                    ft.zone.style.width = ft.zone.style.height = (EG_COLO_WAVE_R * 2) + 'px';
-                    ft.warned = _egNkEl(run, 'div', 'eg-colo-foot-warn');
+                    ft.zone = _nkEl(run, 'div', 'eg-colo-quake-zone');
+                    ft.zone.style.left = Math.round(ft.x - COLO_WAVE_R) + 'px';
+                    ft.zone.style.top = Math.round(ft.y - COLO_WAVE_R) + 'px';
+                    ft.zone.style.width = ft.zone.style.height = (COLO_WAVE_R * 2) + 'px';
+                    ft.warned = _nkEl(run, 'div', 'eg-colo-foot-warn');
                     ft.warned.style.left = Math.round(ft.x - 78) + 'px';
                     ft.warned.style.top = Math.round(ft.y - 52) + 'px';
                 }
@@ -173,26 +173,26 @@ export function _egMechSeismicSlam(monster, phase) {
             if (ft.state === 'warn') {
                 pending = true;
                 ft.t += dtS * 1000;
-                if (ft.t >= EG_COLO_FOOT_WARN_MS * _EG_COLO_DEBUG_MULT) {
+                if (ft.t >= COLO_FOOT_WARN_MS * _COLO_DEBUG_MULT) {
                     // SLAM.
                     try { ft.warned.remove(); } catch (e) {}
                     ft.zone.classList.add('eg-colo-quake-live');
-                    ft.slamEl = _egNkEl(run, 'div', 'eg-colo-foot-slam');
+                    ft.slamEl = _nkEl(run, 'div', 'eg-colo-foot-slam');
                     ft.slamEl.style.left = Math.round(ft.x - 78) + 'px';
                     ft.slamEl.style.top = Math.round(ft.y - 52) + 'px';
-                    _egColoRubble(run, ft.x, ft.y, true);
-                    _egColoShake(1);
+                    _coloRubble(run, ft.x, ft.y, true);
+                    _coloShake(1);
                     // Anyone still inside the dashed circle at the slam is
                     // punished at once (one heavy hit, +footfall bonus when
                     // standing right under the foot). The expanding ring is
                     // then purely visual.
                     const dFoot = Math.hypot(pc.x - ft.x, pc.y - ft.y);
-                    if (pr && dFoot < EG_COLO_WAVE_R) {
-                        const pct = EG_COLO_WAVE_DMG[p] + (dFoot < 88 ? EG_COLO_FOOT_DMG[p] : 0);
-                        _egColoTouch(pct, level, dFoot < 88 ? 'Footfall' : 'Shockwave', true);
+                    if (pr && dFoot < COLO_WAVE_R) {
+                        const pct = COLO_WAVE_DMG[p] + (dFoot < 88 ? COLO_FOOT_DMG[p] : 0);
+                        _coloTouch(pct, level, dFoot < 88 ? 'Footfall' : 'Shockwave', true);
                         ft.hit = true;
                     }
-                    ft.waveEl = _egNkEl(run, 'div', 'eg-nk-ring eg-colo-wave');
+                    ft.waveEl = _nkEl(run, 'div', 'eg-nk-ring eg-colo-wave');
                     ft.state = 'wave';
                     ft.t = 0;
                 }
@@ -201,8 +201,8 @@ export function _egMechSeismicSlam(monster, phase) {
             if (ft.state === 'wave') {
                 pending = true;
                 ft.t += dtS;
-                const spd = EG_COLO_WAVE_SPEED / _EG_COLO_DEBUG_MULT;
-                ft.r = Math.min(EG_COLO_WAVE_R, 40 + spd * ft.t);
+                const spd = COLO_WAVE_SPEED / _COLO_DEBUG_MULT;
+                ft.r = Math.min(COLO_WAVE_R, 40 + spd * ft.t);
                 ft.waveEl.style.left = Math.round(ft.x - ft.r) + 'px';
                 ft.waveEl.style.top = Math.round(ft.y - ft.r) + 'px';
                 ft.waveEl.style.width = Math.round(ft.r * 2) + 'px';
@@ -211,9 +211,9 @@ export function _egMechSeismicSlam(monster, phase) {
                 // the slam: the ring front still bites once.
                 if (!ft.hit && pr && Math.abs(Math.hypot(pc.x - ft.x, pc.y - ft.y) - ft.r) < 26) {
                     ft.hit = true;
-                    _egColoTouch(EG_COLO_WAVE_DMG[p] * 0.6, level, 'Shockwave');
+                    _coloTouch(COLO_WAVE_DMG[p] * 0.6, level, 'Shockwave');
                 }
-                if (ft.r >= EG_COLO_WAVE_R) {
+                if (ft.r >= COLO_WAVE_R) {
                     try { ft.slamEl.remove(); } catch (e) {}
                     try { ft.waveEl.remove(); } catch (e) {}
                     try { ft.zone.remove(); } catch (e) {}
@@ -233,50 +233,50 @@ export function _egMechSeismicSlam(monster, phase) {
 // (the impact ring) while it falls, then SHATTERS into rolling fragments
 // that keep travelling outward. The first boulder aims at you. Dodge the
 // impact ring AND the fragment lanes. Phase 3 lobs an extra boulder.
-export const EG_BOULDER_COUNT   = [0, 0, 3, 4];
-export const EG_BOULDER_FALL_MS = 1500;   // telegraph (shadow) before impact
-export const EG_BOULDER_FRAGS   = 4;      // rolling fragments per boulder
-const EG_BOULDER_R = 78;                  // px impact radius (= the shadow)
+export const BOULDER_COUNT   = [0, 0, 3, 4];
+export const BOULDER_FALL_MS = 1500;   // telegraph (shadow) before impact
+export const BOULDER_FRAGS   = 4;      // rolling fragments per boulder
+const BOULDER_R = 78;                  // px impact radius (= the shadow)
 
-export function _egMechColoBoulders(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechColoBoulders(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
-    const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_colo_boulder', '🗿🪨 BOULDER RAIN - leave the shadows, then dodge the rolling rubble!', '#d6c8a8');
+    const run = _nkNewRun(monster && monster.id, true);
+    _nkToast('eg_mech_colo_boulder', '🗿🪨 BOULDER RAIN - leave the shadows, then dodge the rolling rubble!', '#d6c8a8');
 
     // ONE loop owns every boulder and every fragment.
     const boulders = [];
     let launched = 0, launchedAt = 0;
     const launchGap = 2.2; // s between boulder launches
 
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         // Launch the next boulder (the first one aims at you).
-        if (launched < EG_BOULDER_COUNT[p] && (launched === 0 || launchedAt >= launchGap)) {
-            const pcA = _egColoPC();
+        if (launched < BOULDER_COUNT[p] && (launched === 0 || launchedAt >= launchGap)) {
+            const pcA = _coloPC();
             const tx = launched === 0 ? Math.max(60, Math.min(W - 60, pcA.x + (Math.random() * 80 - 40))) : W * (0.12 + Math.random() * 0.76);
             const ty = launched === 0 ? Math.max(60, Math.min(H - 60, pcA.y + (Math.random() * 80 - 40))) : H * (0.15 + Math.random() * 0.7);
             launched++; launchedAt = 0;
-            const mark = _egNkEl(run, 'div', 'eg-colo-boulder-mark');
-            mark.style.left = Math.round(tx - EG_BOULDER_R) + 'px';
-            mark.style.top = Math.round(ty - EG_BOULDER_R) + 'px';
-            mark.style.width = mark.style.height = (EG_BOULDER_R * 2) + 'px';
-            const el = _egNkEl(run, 'div', 'eg-colo-boulder');
+            const mark = _nkEl(run, 'div', 'eg-colo-boulder-mark');
+            mark.style.left = Math.round(tx - BOULDER_R) + 'px';
+            mark.style.top = Math.round(ty - BOULDER_R) + 'px';
+            mark.style.width = mark.style.height = (BOULDER_R * 2) + 'px';
+            const el = _nkEl(run, 'div', 'eg-colo-boulder');
             el.style.left = Math.round(tx - 26) + 'px';
             el.style.top = Math.round(-70) + 'px';
             boulders.push({ x: tx, y: ty, el, mark, state: 'fall', t: 0 });
         }
         launchedAt += dtS;
 
-        const pr = _egNkPlayerRect();
-        const pc = _egColoPC();
+        const pr = _nkPlayerRect();
+        const pc = _coloPC();
         let active = 0;
         for (const b of boulders) {
             if (b.state === 'fall') {
                 active++;
                 b.t += dtS * 1000;
-                const f = Math.min(1, b.t / (EG_BOULDER_FALL_MS * _EG_COLO_DEBUG_MULT));
+                const f = Math.min(1, b.t / (BOULDER_FALL_MS * _COLO_DEBUG_MULT));
                 const ease = f * f;
                 b.el.style.top = Math.round(-70 + (b.y - 26 + 70) * ease) + 'px';
                 b.el.style.transform = 'rotate(' + Math.round(b.t * 0.4) + 'deg)';
@@ -285,15 +285,15 @@ export function _egMechColoBoulders(monster, phase) {
                     // IMPACT: shatter into rolling fragments.
                     try { b.el.remove(); } catch (e) {}
                     try { b.mark.remove(); } catch (e) {}
-                    _egColoRubble(run, b.x, b.y, true);
-                    _egColoShake(0.7);
-                    if (pr && Math.hypot(pc.x - b.x, pc.y - b.y) < EG_BOULDER_R) {
-                        _egColoTouch(EG_COLO_BOULDER_DMG, level, 'Boulder');
+                    _coloRubble(run, b.x, b.y, true);
+                    _coloShake(0.7);
+                    if (pr && Math.hypot(pc.x - b.x, pc.y - b.y) < BOULDER_R) {
+                        _coloTouch(COLO_BOULDER_DMG, level, 'Boulder');
                     }
                     b.frags = [];
-                    for (let k = 0; k < EG_BOULDER_FRAGS; k++) {
-                        const ang = (k / EG_BOULDER_FRAGS) * Math.PI * 2 + Math.random() * 0.5;
-                        const fel = _egNkEl(run, 'div', 'eg-colo-frag');
+                    for (let k = 0; k < BOULDER_FRAGS; k++) {
+                        const ang = (k / BOULDER_FRAGS) * Math.PI * 2 + Math.random() * 0.5;
+                        const fel = _nkEl(run, 'div', 'eg-colo-frag');
                         fel.style.left = Math.round(b.x - 9) + 'px';
                         fel.style.top = Math.round(b.y - 9) + 'px';
                         b.frags.push({ ang, dist: 0, el: fel, hit: false });
@@ -304,7 +304,7 @@ export function _egMechColoBoulders(monster, phase) {
             } else if (b.state === 'frags') {
                 active++;
                 b.t += dtS;
-                const rollSpd = 210 / _EG_COLO_DEBUG_MULT;
+                const rollSpd = 210 / _COLO_DEBUG_MULT;
                 let anyAlive = false;
                 for (const fr of b.frags) {
                     if (fr.dist >= 340) { try { fr.el.remove(); } catch (e) {} continue; }
@@ -316,7 +316,7 @@ export function _egMechColoBoulders(monster, phase) {
                     fr.el.style.top = Math.round(fy - 9) + 'px';
                     if (pr && !fr.hit && Math.hypot(pc.x - fx, pc.y - fy) < 30) {
                         fr.hit = true;
-                        _egColoTouch(EG_COLO_FRAG_DMG, level, 'Rubble Roll');
+                        _coloTouch(COLO_FRAG_DMG, level, 'Rubble Roll');
                     }
                 }
                 if (!anyAlive) b.state = 'done';
@@ -335,32 +335,32 @@ export function _egMechColoBoulders(monster, phase) {
 // stages, like the Frostwright's monoliths) to crumble it early - every ram
 // shoves you back and costs a small hit, so ramming is a choice, not a
 // trap. They crumble on their own after ~9s.
-export const EG_GOLEM_COUNT     = [0, 0, 2, 2];
-export const EG_GOLEM_SPEED     = 62;      // px/s push (divided by mult)
-export const EG_GOLEM_HITS      = 3;
-export const EG_GOLEM_LIFE_MS   = 9000;
-const EG_GOLEM_RAM_CD_MS = 1200;           // per-golem: one ram (crack + shove + hit) per this
-const EG_GOLEM_SHOVE_PX  = 70;             // shove-back on a ram
+export const GOLEM_COUNT     = [0, 0, 2, 2];
+export const GOLEM_SPEED     = 62;      // px/s push (divided by mult)
+export const GOLEM_HITS      = 3;
+export const GOLEM_LIFE_MS   = 9000;
+const GOLEM_RAM_CD_MS = 1200;           // per-golem: one ram (crack + shove + hit) per this
+const GOLEM_SHOVE_PX  = 70;             // shove-back on a ram
 
-export function _egMechColoGolems(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechColoGolems(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
-    const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_colo_golem', '🗿🧱 GRANITE GOLEMS - moving walls! Ram one 3 times to crumble it!', '#a8a29e');
+    const run = _nkNewRun(monster && monster.id, true);
+    _nkToast('eg_mech_colo_golem', '🗿🧱 GRANITE GOLEMS - moving walls! Ram one 3 times to crumble it!', '#a8a29e');
     const golems = [];
-    for (let i = 0; i < EG_GOLEM_COUNT[Math.max(2, Math.min(3, Number(phase) || 2))]; i++) {
-        const el = _egNkEl(run, 'div', 'eg-colo-golem');
+    for (let i = 0; i < GOLEM_COUNT[Math.max(2, Math.min(3, Number(phase) || 2))]; i++) {
+        const el = _nkEl(run, 'div', 'eg-colo-golem');
         el.innerHTML = '<i class="eg-colo-golem-eyes"></i>';
         const gx = W * (i === 0 ? 0.16 : 0.84);
         const gy = H * (0.2 + Math.random() * 0.5);
         el.style.left = Math.round(gx - 28) + 'px';
         el.style.top = Math.round(gy - 28) + 'px';
-        golems.push({ x: gx, y: gy, el, hp: EG_GOLEM_HITS, dead: false, born: 0, ramCd: 0 });
+        golems.push({ x: gx, y: gy, el, hp: GOLEM_HITS, dead: false, born: 0, ramCd: 0 });
     }
-    _egNkLoop(run, (dtS, now) => {
-        const pr = _egNkPlayerRect();
-        const pc = _egColoPC();
+    _nkLoop(run, (dtS, now) => {
+        const pr = _nkPlayerRect();
+        const pc = _coloPC();
         let active = false;
         for (const g of golems) {
             if (g.dead) continue;
@@ -369,32 +369,32 @@ export function _egMechColoGolems(monster, phase) {
             // Slow-push toward the player, capped step.
             const dx = pc.x - g.x, dy = pc.y - g.y;
             const d = Math.hypot(dx, dy) || 1;
-            const spd = EG_GOLEM_SPEED / _EG_COLO_DEBUG_MULT;
+            const spd = GOLEM_SPEED / _COLO_DEBUG_MULT;
             g.x += (dx / d) * Math.min(Math.max(0, d - 40), spd * dtS);
             g.y += (dy / d) * Math.min(Math.max(0, d - 40), spd * dtS);
             g.el.style.left = Math.round(g.x - 28) + 'px';
             g.el.style.top = Math.round(g.y - 28) + 'px';
             // Contact = a ram: crack the golem, shove you back, small hit.
             if (pr && d < 52 && now >= g.ramCd) {
-                g.ramCd = now + EG_GOLEM_RAM_CD_MS;
+                g.ramCd = now + GOLEM_RAM_CD_MS;
                 g.hp--;
                 g.el.classList.remove('eg-colo-golem-crack1', 'eg-colo-golem-crack2');
                 if (g.hp === 2) g.el.classList.add('eg-colo-golem-crack1');
                 if (g.hp === 1) g.el.classList.add('eg-colo-golem-crack2');
-                _egColoRubble(run, g.x, g.y, false);
-                _egNkNudgeAvatar((dx / d) * EG_GOLEM_SHOVE_PX, (dy / d) * EG_GOLEM_SHOVE_PX);
-                _egColoTouch(EG_COLO_GOLEM_DMG, level, 'Golem Shove');
+                _coloRubble(run, g.x, g.y, false);
+                _nkNudgeAvatar((dx / d) * GOLEM_SHOVE_PX, (dy / d) * GOLEM_SHOVE_PX);
+                _coloTouch(COLO_GOLEM_DMG, level, 'Golem Shove');
                 if (g.hp <= 0) {
                     g.dead = true;
-                    _egColoRubble(run, g.x, g.y, true);
+                    _coloRubble(run, g.x, g.y, true);
                     try { g.el.remove(); } catch (e) {}
-                    _egNkToast('eg_mech_colo_golem_down', '🧱 Golem crumbled!', '#4ade80');
+                    _nkToast('eg_mech_colo_golem_down', '🧱 Golem crumbled!', '#4ade80');
                     continue;
                 }
             }
-            if (g.born >= EG_GOLEM_LIFE_MS * _EG_COLO_DEBUG_MULT) {
+            if (g.born >= GOLEM_LIFE_MS * _COLO_DEBUG_MULT) {
                 g.dead = true;
-                _egColoRubble(run, g.x, g.y, true);
+                _coloRubble(run, g.x, g.y, true);
                 try { g.el.remove(); } catch (e) {}
             }
         }
@@ -413,36 +413,36 @@ export function _egMechColoGolems(monster, phase) {
 // All three → collapse for good. A seal that runs out of time collapses on
 // you (22%); the third one brings the CAVE-IN: 3-2-1, then dust everywhere
 // except the glowing ring around that seal (35% outside it).
-// Charge bar frozen for the whole set-piece (gate in _egTickPlayer via
-// _egColoFinalActive).
-export const EG_COLO_FINALE_SEAL_MS   = 22000;  // ms budget per seal (incl. chutes)
-export const EG_COLO_CHUTE_PERIOD_MS  = 2600;   // a chute lane every ~2.6s
-export const EG_COLO_CHUTE_WARN_MS    = 1100;   // lane telegraph before rocks
+// Charge bar frozen for the whole set-piece (gate in _tickPlayer via
+// _coloFinalActive).
+export const COLO_FINALE_SEAL_MS   = 22000;  // ms budget per seal (incl. chutes)
+export const COLO_CHUTE_PERIOD_MS  = 2600;   // a chute lane every ~2.6s
+export const COLO_CHUTE_WARN_MS    = 1100;   // lane telegraph before rocks
 
-// Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-export let _egColoFinal = null;
+// Set while the finale runs (read by _tickPlayer's charge-freeze gate).
+export let _coloFinal = null;
 
-export function _egColoFinalActive() {
-    return !!_egColoFinal && !_egColoFinal.finished;
+export function _coloFinalActive() {
+    return !!_coloFinal && !_coloFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-export function _egColoOnPhaseEnter(monster, newPhase) {
+export function _coloOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
-    try { _egColoStartFinalWatcher(monster); } catch (e) {}
+    try { _coloStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-export function _egColoStartFinalWatcher(monster) {
-    if (!monster || _egColoFinal) return;
-    const run = _egNkNewRun(monster.id, true);
+export function _coloStartFinalWatcher(monster) {
+    if (!monster || _coloFinal) return;
+    const run = _nkNewRun(monster.id, true);
     run.passive = true;
-    _egNkLoop(run, () => {
-        if (_egColoFinal) return false;
+    _nkLoop(run, () => {
+        if (_coloFinal) return false;
         try {
             if (monster.currentHP <= monster.maxHP * 0.10) {
-                _egColoFinalStart(monster);
+                _coloFinalStart(monster);
                 return false;
             }
         } catch (e) { return false; }
@@ -452,24 +452,24 @@ export function _egColoStartFinalWatcher(monster) {
 
 // Pause-safe timeout: if the game freezes mid-wait, retry until thawed
 // instead of firing during the pause (mirrors the other finales).
-export function _egColoAfter(g, ms, fn) {
+export function _coloAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
-        if (g.finished || !_egColoFinal) return;
-        if (_egNkFrozen()) { setTimeout(step, 120); return; }
+        if (g.finished || !_coloFinal) return;
+        if (_nkFrozen()) { setTimeout(step, 120); return; }
         if (performance.now() - t0 >= ms) fn();
         else setTimeout(step, Math.min(120, ms - (performance.now() - t0)));
     };
     setTimeout(step, Math.min(120, ms));
 }
 
-export function _egColoFinalStart(monster) {
-    if (_egColoFinal || !monster) return;
+export function _coloFinalStart(monster) {
+    if (_coloFinal || !monster) return;
 
     // The mountain goes quiet: kill every other run of this boss (the
     // finale owns the arena).
-    Array.from(_egNkRuns.values()).forEach(r => {
-        if (r.bossId === monster.id) { try { _egNkKillRun(r); } catch (e) {} }
+    Array.from(_nkRuns.values()).forEach(r => {
+        if (r.bossId === monster.id) { try { _nkKillRun(r); } catch (e) {} }
     });
 
     const W = window.innerWidth || document.documentElement.clientWidth || 1280;
@@ -481,17 +481,17 @@ export function _egColoFinalStart(monster) {
         seal: 0,                   // 0..2, which seal is lit
         fxRun: null, overlay: null, sealEls: [],
     };
-    _egColoFinal = g;
+    _coloFinal = g;
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
-    // lives in _egTickPlayer; this class is the visual twin).
+    // lives in _tickPlayer; this class is the visual twin).
     ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('eg-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
-    g.fxRun = _egNkNewRun(monster.id, true);
+    g.fxRun = _nkNewRun(monster.id, true);
     g.fxRun.passive = true;
 
     // Countdown overlay.
@@ -503,7 +503,7 @@ export function _egColoFinalStart(monster) {
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_colo_final_cd', '🗿💀 TITAN\u2019S FALL - drag your hero onto the glowing seal, step away, repeat 3 times!', '#d6c8a8');
+    _nkToast('eg_mech_colo_final_cd', '🗿💀 TITAN\u2019S FALL - drag your hero onto the glowing seal, step away, repeat 3 times!', '#d6c8a8');
     const hintEl = ov.querySelector('.eg-colo-cd-hint');
 
     // Boss immunity for the whole set-piece (released at the end).
@@ -531,7 +531,7 @@ export function _egColoFinalStart(monster) {
         el.innerHTML = '<span class="eg-colo-seal-n"></span><span class="eg-colo-seal-cap">DRAG HERO HERE</span>';
         document.body.appendChild(el);
         g.fxRun.els.push(el);
-        return { el, fx: s.fx, fy: s.fy, x: 0, y: 0, hp: EG_COLO_SEAL_HITS };
+        return { el, fx: s.fx, fy: s.fy, x: 0, y: 0, hp: COLO_SEAL_HITS };
     });
     // Seal spots follow the LIVE window size (a 0-width read at launch or a
     // resize mid-fight must never strand a seal off-screen).
@@ -548,25 +548,25 @@ export function _egColoFinalStart(monster) {
 
     // ONE finale loop: lights each seal in turn, runs the body-check crack
     // clock, sweeps rock chutes, and judges the seal (break or CAVE-IN).
-    _egNkLoop(g.fxRun, (dtS, now) => {
+    _nkLoop(g.fxRun, (dtS, now) => {
         if (g.finished) return false;
         if (g.caveIn) return true;   // the CAVE-IN countdown owns the arena
-        const pr = _egNkPlayerRect();
-        const pc = _egColoPC();
+        const pr = _nkPlayerRect();
+        const pc = _coloPC();
         placeSeals();
         const seal = g.sealEls[g.seal];
         if (!seal) return false;
 
         // ── Chutes: a telegraphed lane, then rocks rain along it. ──
         g.chuteAcc = (g.chuteAcc || 0) + dtS * 1000;
-        if (g.chuteAcc >= EG_COLO_CHUTE_PERIOD_MS * _EG_COLO_DEBUG_MULT) {
+        if (g.chuteAcc >= COLO_CHUTE_PERIOD_MS * _COLO_DEBUG_MULT) {
             g.chuteAcc = 0;
             // Lane: random vertical or horizontal strip through the arena.
             const vertical = Math.random() < 0.5;
             const lanePos = vertical
                 ? W * (0.1 + Math.random() * 0.8)
                 : H * (0.1 + Math.random() * 0.8);
-            const warn = _egNkEl(g.fxRun, 'div', 'eg-colo-chute-warn');
+            const warn = _nkEl(g.fxRun, 'div', 'eg-colo-chute-warn');
             if (vertical) {
                 warn.style.left = Math.round(lanePos - 44) + 'px';
                 warn.style.top = '0px';
@@ -578,10 +578,10 @@ export function _egColoFinalStart(monster) {
                 warn.style.width = W + 'px';
                 warn.style.height = '88px';
             }
-            _egColoAfter(g, EG_COLO_CHUTE_WARN_MS * _EG_COLO_DEBUG_MULT, () => {
+            _coloAfter(g, COLO_CHUTE_WARN_MS * _COLO_DEBUG_MULT, () => {
                 if (g.finished) return;
                 try { warn.remove(); } catch (e) {}
-                const rocks = _egNkEl(g.fxRun, 'div', 'eg-colo-chute');
+                const rocks = _nkEl(g.fxRun, 'div', 'eg-colo-chute');
                 if (vertical) {
                     rocks.style.left = Math.round(lanePos - 44) + 'px';
                     rocks.style.top = '0px';
@@ -595,7 +595,7 @@ export function _egColoFinalStart(monster) {
                 }
                 // The lane bites while the rocks fall (with the touch cd).
                 g.activeChutes = g.activeChutes || [];
-                g.activeChutes.push({ vertical, lanePos, el: rocks, until: performance.now() + 1400 * _EG_COLO_DEBUG_MULT, level });
+                g.activeChutes.push({ vertical, lanePos, el: rocks, until: performance.now() + 1400 * _COLO_DEBUG_MULT, level });
             });
         }
         // Tick active chutes: contact damage + expiry.
@@ -605,7 +605,7 @@ export function _egColoFinalStart(monster) {
                 const inLane = ch.vertical
                     ? Math.abs(pc.x - ch.lanePos) < 52
                     : Math.abs(pc.y - ch.lanePos) < 52;
-                if (inLane) _egColoTouch(EG_COLO_CHUTE_DMG[3], ch.level, 'Rock Chute');
+                if (inLane) _coloTouch(COLO_CHUTE_DMG[3], ch.level, 'Rock Chute');
             }
         });
         g.activeChutes = (g.activeChutes || []).filter(ch => !ch.done);
@@ -620,18 +620,18 @@ export function _egColoFinalStart(monster) {
             seal.el.classList.remove('eg-colo-seal-crack1', 'eg-colo-seal-crack2');
             if (seal.hp === 2) seal.el.classList.add('eg-colo-seal-crack1');
             if (seal.hp === 1) seal.el.classList.add('eg-colo-seal-crack2');
-            _egColoRubble(g.fxRun, seal.x, seal.y, false);
+            _coloRubble(g.fxRun, seal.x, seal.y, false);
             if (seal.hp <= 0) {
                 seal.el.classList.add('eg-colo-seal-broken');
-                _egColoRubble(g.fxRun, seal.x, seal.y, true);
-                _egColoShake(1.4);
+                _coloRubble(g.fxRun, seal.x, seal.y, true);
+                _coloShake(1.4);
                 g.seal++;
                 if (g.seal >= g.sealEls.length) {
                     // All three seals broken: the titan collapses.
-                    _egColoFinalEnd(g, monster, true);
+                    _coloFinalEnd(g, monster, true);
                     return false;
                 }
-                _egNkToast('eg_mech_colo_seal_down', '🗿 SEAL BROKEN - the titan slumps! Next seal lit!', '#4ade80');
+                _nkToast('eg_mech_colo_seal_down', '🗿 SEAL BROKEN - the titan slumps! Next seal lit!', '#4ade80');
                 g.sealTimer = 0;
                 g.armed = false;
                 return true;
@@ -643,22 +643,22 @@ export function _egColoFinalStart(monster) {
         // the ring around the last seal, 35% if you're outside it - the
         // finale fails and the fight resumes.
         g.sealTimer = (g.sealTimer || 0) + dtS * 1000;
-        if (g.sealTimer >= EG_COLO_FINALE_SEAL_MS * _EG_COLO_DEBUG_MULT) {
+        if (g.sealTimer >= COLO_FINALE_SEAL_MS * _COLO_DEBUG_MULT) {
             g.sealTimer = 0;
-            const dealt = _egNkHit(EG_COLO_CHARGE_DMG, null, level);
-            _egNkAbilityHitToast(dealt, 'The Colossus', 'Seal Collapse');
+            const dealt = _nkHit(COLO_CHARGE_DMG, null, level);
+            _nkAbilityHitToast(dealt, 'The Colossus', 'Seal Collapse');
             g.seal++;
             g.armed = false;
             if (g.seal >= g.sealEls.length) {
-                _egColoCaveIn(g, seal, level, monster);
+                _coloCaveIn(g, seal, level, monster);
                 return true;
             }
-            _egNkToast('eg_mech_colo_seal_fail', '🗿 The seal collapsed on its own - next seal lit!', '#f59e0b');
+            _nkToast('eg_mech_colo_seal_fail', '🗿 The seal collapsed on its own - next seal lit!', '#f59e0b');
         }
 
         // Seal countdown in the banner.
         if (hintEl) {
-            const left = Math.max(0, Math.ceil((EG_COLO_FINALE_SEAL_MS * _EG_COLO_DEBUG_MULT - g.sealTimer) / 1000));
+            const left = Math.max(0, Math.ceil((COLO_FINALE_SEAL_MS * _COLO_DEBUG_MULT - g.sealTimer) / 1000));
             const step = g.armed ? 'drag your hero ONTO the glowing seal' : 'step AWAY, then back onto the seal';
             hintEl.textContent = 'Seal ' + (g.seal + 1) + '/3 - ' + step + ' (' + Math.max(0, seal.hp) + ' more) - ' + left + 's left';
         }
@@ -676,16 +676,16 @@ export function _egColoFinalStart(monster) {
 // CAVE-IN: the failed finale's punish - a 3-2-1 with a glowing safe ring
 // around the last seal, then dust wipes the arena (35% outside the ring)
 // and the fight resumes.
-const EG_COLO_CAVEIN_R = 120;
-const EG_COLO_CAVEIN_WARN_MS = 3000;
-export function _egColoCaveIn(g, seal, level, monster) {
+const COLO_CAVEIN_R = 120;
+const COLO_CAVEIN_WARN_MS = 3000;
+export function _coloCaveIn(g, seal, level, monster) {
     if (g.finished || g.caveIn) return;
     g.caveIn = true;
     const ring = document.createElement('div');
     ring.className = 'eg-colo-cavein-ring';
-    ring.style.left = Math.round(seal.x - EG_COLO_CAVEIN_R) + 'px';
-    ring.style.top = Math.round(seal.y - EG_COLO_CAVEIN_R) + 'px';
-    ring.style.width = ring.style.height = (EG_COLO_CAVEIN_R * 2) + 'px';
+    ring.style.left = Math.round(seal.x - COLO_CAVEIN_R) + 'px';
+    ring.style.top = Math.round(seal.y - COLO_CAVEIN_R) + 'px';
+    ring.style.width = ring.style.height = (COLO_CAVEIN_R * 2) + 'px';
     ring.innerHTML = '<span class="eg-colo-cavein-count"></span>';
     document.body.appendChild(ring);
     (g.activeChutes || []).forEach(ch => { try { ch.el.remove(); } catch (e) {} });
@@ -693,38 +693,38 @@ export function _egColoCaveIn(g, seal, level, monster) {
     g.sealEls.forEach(s => s.el.classList.remove('eg-colo-seal-lit'));
     const hint = g.overlay && g.overlay.querySelector('.eg-colo-cd-hint');
     if (hint) hint.textContent = 'CAVE-IN - get into the glowing ring!';
-    _egNkToast('eg_mech_colo_cavein_warn', '🗿💀 CAVE-IN - get into the glowing ring!', '#f59e0b');
+    _nkToast('eg_mech_colo_cavein_warn', '🗿💀 CAVE-IN - get into the glowing ring!', '#f59e0b');
     const countEl = ring.querySelector('.eg-colo-cavein-count');
     const t0 = performance.now();
-    const warnMs = EG_COLO_CAVEIN_WARN_MS * _EG_COLO_DEBUG_MULT;
+    const warnMs = COLO_CAVEIN_WARN_MS * _COLO_DEBUG_MULT;
     const tick = () => {
         if (g.finished) return;
         const left = warnMs - (performance.now() - t0);
         if (countEl) countEl.textContent = left > 0 ? String(Math.ceil(left / 1000)) : '';
-        if (left > 0) { _egColoAfter(g, 100, tick); return; }
+        if (left > 0) { _coloAfter(g, 100, tick); return; }
         const dust = document.createElement('div');
         dust.className = 'eg-colo-cavein';
         dust.style.setProperty('--cx', Math.round(seal.x) + 'px');
         dust.style.setProperty('--cy', Math.round(seal.y) + 'px');
         document.body.appendChild(dust);
-        setTimeout(() => { try { dust.remove(); } catch (e) {} }, _EG_COLO_DEBUG_SLOW ? 4000 : 1600);
-        _egColoShake(2);
-        const pc = _egColoPC();
-        if (Math.hypot(pc.x - seal.x, pc.y - seal.y) >= EG_COLO_CAVEIN_R) {
-            const dealt = _egNkHit(EG_COLO_CAVEIN_DMG, null, level);
-            _egNkAbilityHitToast(dealt, 'The Colossus', 'CAVE-IN');
+        setTimeout(() => { try { dust.remove(); } catch (e) {} }, _COLO_DEBUG_SLOW ? 4000 : 1600);
+        _coloShake(2);
+        const pc = _coloPC();
+        if (Math.hypot(pc.x - seal.x, pc.y - seal.y) >= COLO_CAVEIN_R) {
+            const dealt = _nkHit(COLO_CAVEIN_DMG, null, level);
+            _nkAbilityHitToast(dealt, 'The Colossus', 'CAVE-IN');
         }
-        _egNkToast('eg_mech_colo_cavein', '🗿💀 CAVE-IN! The titan shrugs you off!', '#f59e0b');
-        _egColoFinalEnd(g, monster, false);
+        _nkToast('eg_mech_colo_cavein', '🗿💀 CAVE-IN! The titan shrugs you off!', '#f59e0b');
+        _coloFinalEnd(g, monster, false);
     };
     tick();
 }
 
 // Ends the finale: collapse (seals broken) - releases immunity + charge bar.
-export function _egColoFinalEnd(g, monster, collapsed) {
+export function _coloFinalEnd(g, monster, collapsed) {
     if (!g || g.finished) return;
     g.finished = true;
-    try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
+    try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
     g.sealEls.forEach(s => { try { s.el.remove(); } catch (e) {} });
     document.querySelectorAll('.eg-colo-chute-warn, .eg-colo-chute, .eg-colo-cd, .eg-colo-cavein-ring').forEach(el => {
         try { el.remove(); } catch (e) {}
@@ -740,13 +740,13 @@ export function _egColoFinalEnd(g, monster, collapsed) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     if (collapsed) {
-        _egColoShake(2);
-        if (typeof _egNkToast === 'function') {
-            _egNkToast('eg_mech_colo_collapsed', '🗿💥 THE TITAN FALLS!', '#4ade80');
+        _coloShake(2);
+        if (typeof _nkToast === 'function') {
+            _nkToast('eg_mech_colo_collapsed', '🗿💥 THE TITAN FALLS!', '#4ade80');
         }
     }
     void monster;
@@ -756,10 +756,10 @@ export function _egColoFinalEnd(g, monster, collapsed) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop -
+// Called from _bossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-export function _egColoTeardown() {
-    if (_egColoFinal) { try { _egColoFinalEnd(_egColoFinal, null, false); } catch (e) {} _egColoFinal = null; }
+export function _coloTeardown() {
+    if (_coloFinal) { try { _coloFinalEnd(_coloFinal, null, false); } catch (e) {} _coloFinal = null; }
     document.querySelectorAll('.eg-colo-foot-warn, .eg-colo-foot-slam, .eg-colo-wave, .eg-colo-quake-zone, ' +
         '.eg-colo-boulder, .eg-colo-boulder-mark, .eg-colo-frag, .eg-colo-golem, .eg-colo-chip, ' +
         '.eg-colo-seal, .eg-colo-chute-warn, .eg-colo-chute, .eg-colo-cd, .eg-colo-cavein, .eg-colo-cavein-ring').forEach(el => {
@@ -777,27 +777,27 @@ export function _egColoTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_COLO_DEBUG.fire('stride'|'boulders'|'golems', phase) - runs one now
-//   _EG_COLO_DEBUG.final()                                   - TITAN'S FALL now
+//   _COLO_DEBUG.fire('stride'|'boulders'|'golems', phase) - runs one now
+//   _COLO_DEBUG.final()                                   - TITAN'S FALL now
 if (typeof window !== 'undefined') {
-    window._EG_COLO_DEBUG = {
+    window._COLO_DEBUG = {
         fire: (name, phase) => {
-            const monster = (typeof _egMonsters !== 'undefined')
-                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_colossus') : null;
+            const monster = (typeof _monsters !== 'undefined')
+                ? globalThis._monsters.find(m => m && m.baseId === 'boss_colossus') : null;
             if (!monster) return 'no colossus alive';
-            const fn = name === 'stride' ? _egMechSeismicSlam
-                : name === 'boulders' ? _egMechColoBoulders
-                : name === 'golems' ? _egMechColoGolems : null;
+            const fn = name === 'stride' ? _mechSeismicSlam
+                : name === 'boulders' ? _mechColoBoulders
+                : name === 'golems' ? _mechColoGolems : null;
             if (!fn) return 'unknown: ' + name;
-            if (name !== 'stride' && _egNkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for the field to clear)';
+            if (name !== 'stride' && _nkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for the field to clear)';
             fn(monster, phase || monster.bossPhase || 1);
             return 'fired ' + name;
         },
         final: () => {
-            const monster = (typeof _egMonsters !== 'undefined')
-                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_colossus') : null;
+            const monster = (typeof _monsters !== 'undefined')
+                ? globalThis._monsters.find(m => m && m.baseId === 'boss_colossus') : null;
             if (!monster) return 'no colossus alive';
-            _egColoFinalStart(monster);
+            _coloFinalStart(monster);
             return 'TITAN\u2019S FALL started';
         },
     };

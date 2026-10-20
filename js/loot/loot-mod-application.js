@@ -13,7 +13,7 @@ import { LANG } from '../translation/translations.js';
 // evasion-only base would be meaningless. Hybrid families count as local
 // for every defense stat they touch, so hybrid_armour_evasion requires the
 // base to have BOTH armour and evasion.
-export const EG_LOCAL_DEFENSE_FAMILY_STATS = {
+export const LOCAL_DEFENSE_FAMILY_STATS = {
     flat_armour: ['armour'],
     inc_armour: ['armour'],
     flat_evasion: ['evasion'],
@@ -34,8 +34,8 @@ export const EG_LOCAL_DEFENSE_FAMILY_STATS = {
 
 // Returns true when `familyId` is allowed to roll on a base with `defenses`.
 // Families not listed here are always allowed.
-export function _egFamilyAllowedOnBase(familyId, defenses) {
-    const needed = EG_LOCAL_DEFENSE_FAMILY_STATS[familyId];
+export function _familyAllowedOnBase(familyId, defenses) {
+    const needed = LOCAL_DEFENSE_FAMILY_STATS[familyId];
     if (!needed) return true;
     if (!defenses) return false;
     return needed.every(stat => (defenses[stat] || 0) > 0);
@@ -48,7 +48,7 @@ export function _egFamilyAllowedOnBase(familyId, defenses) {
 // For one mod family (e.g. flat_health), returns the subset of tiers whose
 // ilvl requirement is met by itemLevel, as weighted entries.
 
-export function _egEligibleTiers(family, itemLevel) {
+export function _eligibleTiers(family, itemLevel) {
     return family.tiers.filter(t => t.ilvl <= itemLevel);
 }
 
@@ -58,7 +58,7 @@ export function _egEligibleTiers(family, itemLevel) {
 //----------------------------------------------------------------------
 // Picks one tier from an array of tier objects using their .weight field.
 
-export function _egPickTier(tiers) {
+export function _pickTier(tiers) {
     if (!tiers || tiers.length === 0) return null;
     const total = tiers.reduce((s, t) => s + t.weight, 0);
     let roll = Math.random() * total;
@@ -75,7 +75,7 @@ export function _egPickTier(tiers) {
 //----------------------------------------------------------------------
 // Rolls an integer in [min, max] inclusive.
 
-export function _egRollInt(min, max) {
+export function _rollInt(min, max) {
     return min + Math.floor(Math.random() * (max - min + 1));
 }
 
@@ -85,7 +85,7 @@ export function _egRollInt(min, max) {
 //----------------------------------------------------------------------
 // A mod family is hybrid when its tiers use min1/max1 + min2/max2.
 
-export function _egIsHybrid(tier) {
+export function _isHybrid(tier) {
     // Dual-value mods are detected by the presence of a second range (min2).
     // Historical tables used `min`/`min2` (shield_bash, arcane_surge, channel)
     // while newer hybrids use `min1`/`min2`; treat either as hybrid so '#' and
@@ -104,16 +104,16 @@ export function _egIsHybrid(tier) {
 //   hybrid       → '#' for first stat, '@' for second stat
 //                  lines are separated by '\n' in the label string
 
-export function _egBuildRolledStats(family, tier) {
+export function _buildRolledStats(family, tier) {
     // Pick affix wording for the active language (falls back to EN).
     const label = (LANG === 'de' && family.labelDe) ? family.labelDe : family.label;
 
-    if (_egIsHybrid(tier)) {
+    if (_isHybrid(tier)) {
         const lines = label.split('\n');
         const lo1 = tier.min1 != null ? tier.min1 : tier.min;
         const hi1 = tier.max1 != null ? tier.max1 : tier.max;
-        const val1 = _egRollInt(lo1, hi1);
-        const val2 = _egRollInt(tier.min2, tier.max2);
+        const val1 = _rollInt(lo1, hi1);
+        const val2 = _rollInt(tier.min2, tier.max2);
         // NOTE: '#' must resolve to val1 and '@' to val2 on EVERY line.
         // Single-line hybrid labels ("Adds # to @ Fire Damage" or
         // "#% Chance to deal @ Physical Damage when Blocking") carry both
@@ -125,7 +125,7 @@ export function _egBuildRolledStats(family, tier) {
     }
 
     // Single-stat mod
-    const val = _egRollInt(tier.min, tier.max);
+    const val = _rollInt(tier.min, tier.max);
     return [
         { key: family.id, label: label.replace('#', val), value: val },
     ];
@@ -138,12 +138,12 @@ export function _egBuildRolledStats(family, tier) {
 // Builds the pool of (familyId → { family, eligibleTiers }) entries
 // that are available for this roll, excluding families already chosen.
 
-export function _egBuildModPool(modSection, itemLevel, chosenFamilyIds, defenses) {
+export function _buildModPool(modSection, itemLevel, chosenFamilyIds, defenses) {
     const pool = [];
     for (const [familyId, family] of Object.entries(modSection)) {
         if (chosenFamilyIds.has(familyId)) continue;           // no duplicate families
-        if (!_egFamilyAllowedOnBase(familyId, defenses)) continue; // local defense mods need the base stat
-        const tiers = _egEligibleTiers(family, itemLevel);
+        if (!_familyAllowedOnBase(familyId, defenses)) continue; // local defense mods need the base stat
+        const tiers = _eligibleTiers(family, itemLevel);
         if (tiers.length === 0) continue;                      // none eligible at this ilvl
         pool.push({ familyId, family, tiers });
     }
@@ -158,7 +158,7 @@ export function _egBuildModPool(modSection, itemLevel, chosenFamilyIds, defenses
 // for that family (higher-ilvl items get access to rarer tiers, so the
 // effective weight of a family shifts upward - this is intentional).
 
-export function _egPickModFromPool(pool) {
+export function _pickModFromPool(pool) {
     if (pool.length === 0) return null;
     // Each pool entry contributes the weight of its BEST (lowest-tier-number)
     // eligible tier, so that higher-tier items feel meaningfully different.
@@ -185,18 +185,18 @@ export function _egPickModFromPool(pool) {
 // Rolls prefixCount prefixes and suffixCount suffixes from the slot's mod table.
 // Returns an array of resolved mod objects ready to attach to the item.
 
-export function _egRollMods(prefixCount, suffixCount, modTable, itemLevel, defenses) {
+export function _rollMods(prefixCount, suffixCount, modTable, itemLevel, defenses) {
     const chosen = [];
     const chosenFamilyIds = new Set();
 
     // ── Prefixes ──────────────────────────────────────────────────────
     const prefixSection = modTable.prefixes || {};
     for (let i = 0; i < prefixCount; i++) {
-        const pool = _egBuildModPool(prefixSection, itemLevel, chosenFamilyIds, defenses);
-        const entry = _egPickModFromPool(pool);
+        const pool = _buildModPool(prefixSection, itemLevel, chosenFamilyIds, defenses);
+        const entry = _pickModFromPool(pool);
         if (!entry) break;
 
-        const tier = _egPickTier(entry.tiers);
+        const tier = _pickTier(entry.tiers);
         if (!tier) break;
 
         chosenFamilyIds.add(entry.familyId);
@@ -204,18 +204,18 @@ export function _egRollMods(prefixCount, suffixCount, modTable, itemLevel, defen
             familyId: entry.familyId,
             type: 'prefix',
             tier: tier.tier,
-            rolledStats: _egBuildRolledStats(entry.family, tier),
+            rolledStats: _buildRolledStats(entry.family, tier),
         });
     }
 
     // ── Suffixes ──────────────────────────────────────────────────────
     const suffixSection = modTable.suffixes || {};
     for (let i = 0; i < suffixCount; i++) {
-        const pool = _egBuildModPool(suffixSection, itemLevel, chosenFamilyIds, defenses);
-        const entry = _egPickModFromPool(pool);
+        const pool = _buildModPool(suffixSection, itemLevel, chosenFamilyIds, defenses);
+        const entry = _pickModFromPool(pool);
         if (!entry) break;
 
-        const tier = _egPickTier(entry.tiers);
+        const tier = _pickTier(entry.tiers);
         if (!tier) break;
 
         chosenFamilyIds.add(entry.familyId);
@@ -223,7 +223,7 @@ export function _egRollMods(prefixCount, suffixCount, modTable, itemLevel, defen
             familyId: entry.familyId,
             type: 'suffix',
             tier: tier.tier,
-            rolledStats: _egBuildRolledStats(entry.family, tier),
+            rolledStats: _buildRolledStats(entry.family, tier),
         });
     }
 

@@ -1,18 +1,18 @@
 import { LANG, t } from '../translation/translations.js';
-import { EG_ART } from './endgame-art.js';
-import { _egShowTooltip } from '../loot/loot-currency-tooltip.js';
-import { EG_SLOT_ACCEPTS, _dndFindTargetSlot } from './endgame-hub-drag-and-drop.js';
-import { _egEquipped } from './endgame-hub.js';
-import { _egBuildMergedModLines, _egGetAllEquippedItems, _egGetItemEffectiveAttackInterval, _egGetItemEffectiveBlockChance, _egGetItemEffectiveDamage, _egGetItemEffectiveDefenses } from './endgame-player-stats.js';
-import { EG_PLAYER_BASE_ATTRIBUTES, _egCheckHandCompatibilityInSlot, _egGetSwapChainBreak, _egGetUnmetRequirementsText, _egGetWeaponHands, _egHandErrorMessage, _egPreviewEquipAttributes } from '../loot/loot-requirements.js';
-import { _egGetUniqueSpecialLines, _egInferWeaponHands } from '../loot/unique-items.js';
+import { GAME_ART } from './endgame-art.js';
+import { _showHubTooltip } from '../loot/loot-currency-tooltip.js';
+import { SLOT_ACCEPTS, _dndFindTargetSlot } from './endgame-hub-drag-and-drop.js';
+import { _equipped } from './endgame-hub.js';
+import { _buildMergedModLines, _getAllEquippedItems, _getItemEffectiveAttackInterval, _getItemEffectiveBlockChance, _getItemEffectiveDamage, _getItemEffectiveDefenses } from './endgame-player-stats.js';
+import { PLAYER_BASE_ATTRIBUTES, _checkHandCompatibilityInSlot, _getSwapChainBreak, _getUnmetRequirementsText, _getWeaponHands, _handErrorMessage, _previewEquipAttributes } from '../loot/loot-requirements.js';
+import { _getUniqueSpecialLines, _inferWeaponHands } from '../loot/unique-items.js';
 
 //  endgame-hub-tooltips.js
 //  HUB TOOLTIPS - extracted 2026-09-10 from endgame-hub.js
 //  (stat-block tooltip builder, mouse tracking, Alt-compare tooltip
 //  and their event listeners). Loads AFTER endgame-hub.js; the single
-//  _egShowTooltip implementation in endgame-currency.js dispatches to
-//  _egBuildTooltipBodyHTML / _egUpdateCompareTooltip at runtime.
+//  _showHubTooltip implementation in endgame-currency.js dispatches to
+//  _buildTooltipBodyHTML / _updateCompareTooltip at runtime.
 //
 //------------------------------------------------------------------------
 //-------------------TOOLTIP----------------------------------------------
@@ -21,7 +21,7 @@ import { _egGetUniqueSpecialLines, _egInferWeaponHands } from '../loot/unique-it
 // Builds the HTML for the tooltip panel body from an item object.
 
 
-export function _egBuildTooltipBodyHTML(item) {
+export function _buildTooltipBodyHTML(item) {
     const RARITY_COLOR_MAP = {
         common: { border: '#7a7a7a', color: '#b0b0b0' },
         uncommon: { border: '#2ecc71', color: '#2ecc71' },
@@ -35,12 +35,12 @@ export function _egBuildTooltipBodyHTML(item) {
     const rarity = item.rarity || 'common';
     const rc = RARITY_COLOR_MAP[rarity] || RARITY_COLOR_MAP.common;
 
-    const EG_TT_RARITY_KEYS = {
+    const TT_RARITY_KEYS = {
         common: 'rar_common', uncommon: 'rar_uncommon', rare: 'rar_rare',
         epic: 'eg_rar_epic', legendary: 'rar_legendary', cursed: 'rar_cursed',
         artifact: 'eg_rar_artifact',
     };
-    const EG_TT_SLOT_KEYS = {
+    const TT_SLOT_KEYS = {
         head: 'eg_slot_head', shoulders: 'eg_slot_shoulders', cloak: 'eg_slot_cloak',
         chest: 'eg_slot_chest', bracers: 'eg_slot_bracers', gloves: 'eg_slot_gloves',
         belt: 'eg_slot_belt', pants: 'eg_slot_pants', boots: 'eg_slot_boots',
@@ -52,12 +52,12 @@ export function _egBuildTooltipBodyHTML(item) {
 
     const rarityLabel = item.isUnique
         ? t('rar_unique')
-        : EG_TT_RARITY_KEYS[rarity]
-            ? t(EG_TT_RARITY_KEYS[rarity])
+        : TT_RARITY_KEYS[rarity]
+            ? t(TT_RARITY_KEYS[rarity])
             : rarity.charAt(0).toUpperCase() + rarity.slice(1);
     const slotLabel = item.slotType
-        ? (EG_TT_SLOT_KEYS[item.slotType]
-            ? t(EG_TT_SLOT_KEYS[item.slotType])
+        ? (TT_SLOT_KEYS[item.slotType]
+            ? t(TT_SLOT_KEYS[item.slotType])
             : item.slotType.charAt(0).toUpperCase() + item.slotType.slice(1))
         : '';
 
@@ -67,11 +67,11 @@ export function _egBuildTooltipBodyHTML(item) {
     let handHTML = '';
     if (item.slotType === 'weapon') {
         let hands = (item.hands === 1 || item.hands === 2) ? item.hands : null;
-        if (hands == null && typeof _egGetWeaponHands === 'function') {
-            try { hands = _egGetWeaponHands(item); } catch (e) { hands = null; }
+        if (hands == null && typeof _getWeaponHands === 'function') {
+            try { hands = _getWeaponHands(item); } catch (e) { hands = null; }
         }
-        if (hands == null && typeof _egInferWeaponHands === 'function') {
-            try { hands = _egInferWeaponHands(item); } catch (e) { hands = null; }
+        if (hands == null && typeof _inferWeaponHands === 'function') {
+            try { hands = _inferWeaponHands(item); } catch (e) { hands = null; }
         }
         if (hands === 1 || hands === 2) {
             let handLabel = null;
@@ -99,7 +99,7 @@ export function _egBuildTooltipBodyHTML(item) {
     const implicitLines = [];
     const def = item.defenses || {};
     let eff = null;
-    try { eff = _egGetItemEffectiveDefenses(item); } catch (e) { eff = null; }
+    try { eff = _getItemEffectiveDefenses(item); } catch (e) { eff = null; }
     const defVal = (stat) => {
         if (eff) return { v: eff[stat], m: eff.modded && eff.modded[stat] };
         return { v: def[stat] || 0, m: false };
@@ -115,7 +115,7 @@ export function _egBuildTooltipBodyHTML(item) {
     defLine('eg_tt_absorption', 'absorption');
     if (item.damage) {
         let dmgEff = null;
-        try { dmgEff = _egGetItemEffectiveDamage(item); } catch (e) { dmgEff = null; }
+        try { dmgEff = _getItemEffectiveDamage(item); } catch (e) { dmgEff = null; }
         const rangeLine = (labelKey, min, max, moddedFlag) => {
             if ((max || 0) <= 0 && (min || 0) <= 0) return;
             const valCls = moddedFlag ? 'eg-tt-val eg-tt-val-modified' : 'eg-tt-val';
@@ -135,13 +135,13 @@ export function _egBuildTooltipBodyHTML(item) {
         // projectile channel instead.
         if (item.slotType === 'weapon') {
             let atkEff = null;
-            try { atkEff = _egGetItemEffectiveAttackInterval(item); } catch (e) { atkEff = null; }
+            try { atkEff = _getItemEffectiveAttackInterval(item); } catch (e) { atkEff = null; }
             const interval = (atkEff && atkEff.interval != null) ? atkEff.interval : item.attackIntervalSeconds;
             const valCls = (atkEff && atkEff.modded) ? 'eg-tt-val eg-tt-val-modified' : 'eg-tt-val';
             implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_attack_interval')}: <span class="${valCls}">${interval}s</span></div>`);
         }
         // Innate bleed: every physical hit has a built-in chance to bleed
-        // (EG_PHYS_INNATE_BLEED_CHANCE_PCT in combat-ailments-core.js - keep
+        // (PHYS_INNATE_BLEED_CHANCE_PCT in combat-ailments-core.js - keep
         // the number in the translation in sync). Only shown for MELEE
         // weapons that actually deal physical damage: bows (slot 'ranged')
         // are not a bleed weapon and must not advertise it.
@@ -152,7 +152,7 @@ export function _egBuildTooltipBodyHTML(item) {
     }
     if (item.blockChance) {
         let blockEff = null;
-        try { blockEff = typeof _egGetItemEffectiveBlockChance === 'function' ? _egGetItemEffectiveBlockChance(item) : null; } catch (e) { blockEff = null; }
+        try { blockEff = typeof _getItemEffectiveBlockChance === 'function' ? _getItemEffectiveBlockChance(item) : null; } catch (e) { blockEff = null; }
         const bcVal = blockEff ? blockEff.value : item.blockChance;
         const bcModded = blockEff ? blockEff.modded : false;
         const valCls = bcModded ? 'eg-tt-val eg-tt-val-modified' : 'eg-tt-val';
@@ -173,8 +173,8 @@ export function _egBuildTooltipBodyHTML(item) {
     let implicitsHTML = '';
     const implicits = Array.isArray(item.implicits) ? item.implicits : [];
     if (implicits.length > 0) {
-        const merged = (typeof _egBuildMergedModLines === 'function')
-            ? _egBuildMergedModLines(implicits)
+        const merged = (typeof _buildMergedModLines === 'function')
+            ? _buildMergedModLines(implicits)
             : implicits.flatMap(imp => (imp.rolledStats||[]).map(s => ({ label: s.label, downside:false, tierLabel:'Implicit' })));
         const lines = merged.map(entry => {
             // Implicits are always beneficial - render in implicit blue (no text tag needed, color is the indicator)
@@ -190,14 +190,14 @@ export function _egBuildTooltipBodyHTML(item) {
     // Each requirement part is compared against the attribute totals as the
     // equip gate will see them after the swap (displaced occupant removed,
     // item's own bonuses included - self-carrying). This keeps the tooltip
-    // consistent with what _egCanEquipInSlot will actually accept.
+    // consistent with what _canEquipInSlot will actually accept.
     const req = item.requirements || {};
-    const curAttrs = _egPreviewEquipAttributes(item);
+    const curAttrs = _previewEquipAttributes(item);
     const reqParts = [];
     const missingParts = [];
     if ((req.level || 0) > 0) {
-        const met = EG_PLAYER_BASE_ATTRIBUTES.level == null
-            || EG_PLAYER_BASE_ATTRIBUTES.level >= req.level;
+        const met = PLAYER_BASE_ATTRIBUTES.level == null
+            || PLAYER_BASE_ATTRIBUTES.level >= req.level;
         const label = t('eg_req_level').replace('{n}', req.level);
         reqParts.push(met ? label : `<span class="eg-tt-req-unmet">${label}</span>`);
         if (!met) missingParts.push(label);
@@ -223,11 +223,11 @@ export function _egBuildTooltipBodyHTML(item) {
     // Shown when the item's own requirements are all met but equipping it
     // would displace an item whose attribute bonuses other equipped items
     // rely on (e.g. a +13 Int ring keeping a 45 Int chest satisfied).
-    const chain = _egGetSwapChainBreak(item);
+    const chain = _getSwapChainBreak(item);
     const chainHTML = chain
         ? `<div class="eg-tt-section"><div class="eg-tt-swap-warning">${t('eg_swap_breaks_warning')
             .replace('{equipped}', chain.occupant.name || '?')
-            .replace('{list}', _egGetUnmetRequirementsText(chain.broken))}</div></div>`
+            .replace('{list}', _getUnmetRequirementsText(chain.broken))}</div></div>`
         : '';
 
     // ── Hand-conflict warning ────────────────────────────
@@ -237,16 +237,16 @@ export function _egBuildTooltipBodyHTML(item) {
     try {
         if (item && item.category === 'equip'
             && (item.slotType === 'weapon' || item.slotType === 'shield')
-            && typeof _egCheckHandCompatibilityInSlot === 'function'
+            && typeof _checkHandCompatibilityInSlot === 'function'
             && typeof _dndFindTargetSlot === 'function') {
-            const equippedList = (typeof _egGetAllEquippedItems === 'function')
-                ? _egGetAllEquippedItems() : [];
+            const equippedList = (typeof _getAllEquippedItems === 'function')
+                ? _getAllEquippedItems() : [];
             if (!equippedList.includes(item)) {
                 const target = _dndFindTargetSlot(item);
                 if (target) {
-                    const hg = _egCheckHandCompatibilityInSlot(item, target);
-                    if (!hg.ok && hg.handError && typeof _egHandErrorMessage === 'function') {
-                        handHTML2 = `<div class="eg-tt-section"><div class="eg-tt-swap-warning">${_egHandErrorMessage(hg.handError, item)}</div></div>`;
+                    const hg = _checkHandCompatibilityInSlot(item, target);
+                    if (!hg.ok && hg.handError && typeof _handErrorMessage === 'function') {
+                        handHTML2 = `<div class="eg-tt-section"><div class="eg-tt-swap-warning">${_handErrorMessage(hg.handError, item)}</div></div>`;
                     }
                 }
             }
@@ -259,7 +259,7 @@ export function _egBuildTooltipBodyHTML(item) {
     if (mods.length > 0) {
         // Mods sharing the same stat (e.g. flat Health + the Health half of
         // a hybrid roll) are merged into one combined line per stat.
-        const mergedLines = _egBuildMergedModLines(mods);
+        const mergedLines = _buildMergedModLines(mods);
         // Unique items use bespoke mods without tiers - hide tier badges.
         const hideTier = !!item.isUnique;
         const lines = mergedLines.map(entry => {
@@ -279,8 +279,8 @@ export function _egBuildTooltipBodyHTML(item) {
     // zero-line auto-mark tradeoff is visible before equipping.
     let specialHTML = '';
     try {
-        const specials = (typeof _egGetUniqueSpecialLines === 'function')
-            ? _egGetUniqueSpecialLines(item) : [];
+        const specials = (typeof _getUniqueSpecialLines === 'function')
+            ? _getUniqueSpecialLines(item) : [];
         if (specials.length) {
             const lines = specials.map(s => {
                 const label = (typeof LANG !== 'undefined' && LANG === 'de') ? (s.de || s.en) : (s.en || s.de);
@@ -313,7 +313,7 @@ export function _egBuildTooltipBodyHTML(item) {
     return `
 <div class="eg-tt-frame" style="--tt-border:${rc.border};">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon">${EG_ART.html('item', EG_ART.artIdForItem(item), item.icon || '📦')}</div>
+        <div class="eg-tt-icon">${GAME_ART.html('item', GAME_ART.artIdForItem(item), item.icon || '📦')}</div>
         <div class="eg-tt-name" style="color:${rc.color};">${item.name || item.baseName || '???'}</div>
         ${(item.baseName && item.baseName !== item.name)
             ? `<div class="eg-tt-basename" style="opacity:.7;">${item.baseName}</div>` : ''}
@@ -336,11 +336,11 @@ export function _egBuildTooltipBodyHTML(item) {
 
 
 
-// _egShowTooltip is defined ONCE, in endgame-currency.js: it renders the
+// _showHubTooltip is defined ONCE, in endgame-currency.js: it renders the
 // floating mouseover tooltip (equipment stat blocks, currency/essence/shard
 // cards, map tooltips) via the shared tooltip engine from tooltips-hud.js,
-// and drives the Alt-compare tooltip (_egUpdateCompareTooltip /
-// _egHideCompareTooltip). Historically this file and
+// and drives the Alt-compare tooltip (_updateCompareTooltip /
+// _hideCompareTooltip). Historically this file and
 // endgame-hub-drag-and-drop.js each shipped their own copy and the
 // LAST-DECLARED-WINS load-order rule picked currency's version silently -
 // the duplicates were removed (2026-09) and this is the single source.
@@ -348,35 +348,35 @@ export function _egBuildTooltipBodyHTML(item) {
 
 
 
-export function _egClearTooltip() {
-    _egShowTooltip(null);
+export function _clearTooltip() {
+    _showHubTooltip(null);
 }
 
 
 // Moves the main tooltip (and the compare tooltip with it) while the
 // cursor glides over the hovered item chip.
-export function _egMoveTooltip(e) {
+export function _moveTooltip(e) {
     globalThis.moveGameTooltip(e);
-    _egPositionCompareTooltip();
+    _positionCompareTooltip();
 }
 
 
 // ── Alt-hold compare tooltip ────────────────────────────────────────────
 
 // True while the Alt key is held down.
-export let _egAltDown = false;
+export let _altDown = false;
 
 // Last known cursor position - fallback anchor when no event is available.
-export let _egLastMouse = { x: 0, y: 0 };
+export let _lastMouse = { x: 0, y: 0 };
 
 document.addEventListener('mousemove', e => {
-    _egLastMouse.x = e.clientX;
-    _egLastMouse.y = e.clientY;
+    _lastMouse.x = e.clientX;
+    _lastMouse.y = e.clientY;
 });
 
 // True while the endgame hub or gate screen is the active screen.
 // Used to scope the Alt-key browser-menu suppression to the item UIs.
-export function _egIsItemScreenActive() {
+export function _isItemScreenActive() {
     const hub = document.getElementById('screen-endgame-hub');
     const gate = document.getElementById('screen-endgame-gate');
     return (hub && hub.classList.contains('active'))
@@ -387,10 +387,10 @@ window.addEventListener('keydown', e => {
     if (e.key === 'Alt') {
         // Suppress the browser's default Alt behaviour (Firefox/Chrome
         // focus the menu bar, which shifts the layout mid-comparison).
-        if (_egIsItemScreenActive()) e.preventDefault();
-        if (!_egAltDown) {
-            _egAltDown = true;
-            _egUpdateCompareTooltip();
+        if (_isItemScreenActive()) e.preventDefault();
+        if (!_altDown) {
+            _altDown = true;
+            _updateCompareTooltip();
         }
     }
 });
@@ -398,16 +398,16 @@ window.addEventListener('keydown', e => {
 window.addEventListener('keyup', e => {
     if (e.key === 'Alt') {
         // Firefox triggers the menu bar on Alt *release* - block that too.
-        if (_egIsItemScreenActive()) e.preventDefault();
-        _egAltDown = false;
-        _egUpdateCompareTooltip();
+        if (_isItemScreenActive()) e.preventDefault();
+        _altDown = false;
+        _updateCompareTooltip();
     }
 });
 
 // Alt state is unreliable after alt-tabbing away - reset on blur.
 window.addEventListener('blur', () => {
-    _egAltDown = false;
-    _egUpdateCompareTooltip();
+    _altDown = false;
+    _updateCompareTooltip();
 });
 
 
@@ -415,37 +415,37 @@ window.addEventListener('blur', () => {
 // Only equipment items have a matching paperdoll slot; for multi-slot
 // types (rings, earrings, weapons) the first occupied slot wins.
 // Returns null when there is nothing meaningful to compare.
-export function _egGetCompareItem(item) {
+export function _getCompareItem(item) {
     if (!item || item.category !== 'equip' || !item.slotType) return null;
-    if (typeof EG_SLOT_ACCEPTS === 'undefined') return null;
-    const ids = Object.keys(EG_SLOT_ACCEPTS)
-        .filter(id => EG_SLOT_ACCEPTS[id] === item.slotType);
+    if (typeof SLOT_ACCEPTS === 'undefined') return null;
+    const ids = Object.keys(SLOT_ACCEPTS)
+        .filter(id => SLOT_ACCEPTS[id] === item.slotType);
     for (const id of ids) {
-        if (_egEquipped[id]) return _egEquipped[id];
+        if (_equipped[id]) return _equipped[id];
     }
     return null;
 }
 
 // "Auto-compare" checkbox in the character sheet's top bar (persisted).
 // When on, hovering gear compares it without holding Alt.
-export function _egAutoCompareOn() {
-    if (typeof globalThis._egAutoCompare === 'boolean') return globalThis._egAutoCompare;
+export function _autoCompareOn() {
+    if (typeof globalThis._autoCompare === 'boolean') return globalThis._autoCompare;
     try { return localStorage.getItem('stoxels_auto_compare') === '1'; } catch (e) { return false; }
 }
 
 // Every equipped item the hovered piece could replace: both rings, both
 // earrings, and for weapons / shields / two-handers the main hand AND the
 // off-hand. Falls back to the single-slot lookup for everything else.
-export function _egGetCompareItems(item) {
+export function _getCompareItems(item) {
     if (!item || item.category !== 'equip' || !item.slotType) return [];
-    if (typeof EG_SLOT_ACCEPTS === 'undefined') return [];
+    if (typeof SLOT_ACCEPTS === 'undefined') return [];
     const hands = (item.slotType === 'weapon' || item.slotType === 'shield');
-    const ids = Object.keys(EG_SLOT_ACCEPTS).filter(id =>
-        EG_SLOT_ACCEPTS[id] === item.slotType
+    const ids = Object.keys(SLOT_ACCEPTS).filter(id =>
+        SLOT_ACCEPTS[id] === item.slotType
         || (hands && (id === 'weapon1' || id === 'weapon2')));
     const out = [];
     for (const id of ids) {
-        const eq = _egEquipped[id];
+        const eq = _equipped[id];
         if (eq && out.indexOf(eq) === -1) out.push(eq);
     }
     return out;
@@ -455,26 +455,26 @@ export function _egGetCompareItems(item) {
 // Shows or hides the compare tooltip based on the current hover target.
 // Shown while Alt is held or the sheet's Auto-compare box is checked -
 // unless the hovered item IS an equipped one.
-export function _egUpdateCompareTooltip() {
-    const hovered = globalThis._egTooltipItem;
-    const compareItems = (hovered && (_egAltDown || _egAutoCompareOn()))
-        ? _egGetCompareItems(hovered)
+export function _updateCompareTooltip() {
+    const hovered = globalThis._tooltipItem;
+    const compareItems = (hovered && (_altDown || _autoCompareOn()))
+        ? _getCompareItems(hovered)
         : [];
 
     // Don't "compare" an equipped item with itself.
     if (compareItems.indexOf(hovered) !== -1) {
-        _egHideCompareTooltip();
+        _hideCompareTooltip();
         return;
     }
 
-    if (compareItems.length) _egShowCompareTooltip(compareItems);
-    else _egHideCompareTooltip();
+    if (compareItems.length) _showCompareTooltip(compareItems);
+    else _hideCompareTooltip();
 }
 
 
 // Lazily creates the compare tooltip element (visual twin of the main
 // game tooltip, but with a yellow accent edge to tell them apart).
-export function _egGetCompareTip() {
+export function _getCompareTip() {
     let tip = document.getElementById('eg-compare-tip');
     if (!tip) {
         tip = document.createElement('div');
@@ -502,11 +502,11 @@ export function _egGetCompareTip() {
 }
 
 
-export function _egShowCompareTooltip(itemOrItems) {
+export function _showCompareTooltip(itemOrItems) {
     const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
-    const tip = _egGetCompareTip();
+    const tip = _getCompareTip();
     // Columns start as wide as the regular tooltip (same 560px cap the shared
-    // tooltip uses for equipment frames); _egPositionCompareTooltip then fits
+    // tooltip uses for equipment frames); _positionCompareTooltip then fits
     // them into the room beside it - side by side, or stacked when too tight.
     const main = document.getElementById('ghud-floating-tip');
     tip.dataset.naturalW = String(Math.min(560, (main && main.offsetWidth) || 360));
@@ -517,15 +517,15 @@ export function _egShowCompareTooltip(itemOrItems) {
     tip.style.maxWidth = '96vw';
     tip.innerHTML = items.map(it => `<div class="eg-compare-col" style="min-width:0;flex:0 0 auto">
 <div class="eg-compare-label">${t('eg_tt_currently_equipped')}</div>
-${_egBuildTooltipBodyHTML(it)}</div>`).join('');
+${_buildTooltipBodyHTML(it)}</div>`).join('');
     // Lift the frame's own narrow cap inside the compare box too.
     tip.querySelectorAll('.eg-tt-frame').forEach(f => { f.style.maxWidth = 'none'; f.style.margin = '0'; });
     tip.style.opacity = '1';
-    _egPositionCompareTooltip();
+    _positionCompareTooltip();
 }
 
 
-export function _egHideCompareTooltip() {
+export function _hideCompareTooltip() {
     const tip = document.getElementById('eg-compare-tip');
     if (tip) tip.style.opacity = '0';
 }
@@ -536,7 +536,7 @@ export function _egHideCompareTooltip() {
 // column can stay readable (>= 250px), otherwise stacked. Several equipped
 // items (main hand + off hand / shield, both rings) therefore never run under
 // the main tooltip or off the screen.
-export function _egPositionCompareTooltip() {
+export function _positionCompareTooltip() {
     const main = document.getElementById('ghud-floating-tip');
     const cmp = document.getElementById('eg-compare-tip');
     if (!main || !cmp || cmp.style.opacity !== '1') return;

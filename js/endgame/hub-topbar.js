@@ -5,13 +5,13 @@
 //------------------------------------------------------------------------
 
 // Endgame hub: topbar, item-level toggle, mass-sell/hub info tooltips.
-// The toggle flips _egShowItemLevel (declared in hub-mass-sell.js) through
+// The toggle flips _showItemLevel (declared in hub-mass-sell.js) through
 // that module's write-through globalThis accessor, then persists it.
 
 import { t } from '../translation/translations.js';
-import { _egRenderEquipSlots } from './endgame-hub.js';
-import { _egSaveMassSellSettings, _egShowItemLevel } from './hub-mass-sell.js';
-import { _egRebuildInventoryGrid } from './hub-stash.js';
+import { _renderEquipSlots } from './endgame-hub.js';
+import { _saveMassSellSettings, _showItemLevel } from './hub-mass-sell.js';
+import { _rebuildInventoryGrid } from './hub-stash.js';
 import { STATE } from '../state.js';
 
 
@@ -22,15 +22,15 @@ import { STATE } from '../state.js';
 
 // Initial state of the Auto-compare checkbox (also seeds the live flag the
 // hover tooltip reads).
-function _egAutoCompareChecked() {
+function _autoCompareChecked() {
     let on = false;
     try { on = localStorage.getItem('stoxels_auto_compare') === '1'; } catch (e) { on = false; }
-    globalThis._egAutoCompare = on;
+    globalThis._autoCompare = on;
     return on;
 }
 
 // Builds the top navigation bar with back button and hub title.
-export function _egBuildTopbarHTML() {
+export function _buildTopbarHTML() {
     return `
 <div class="eg-topbar">
     <button class="eg-back-btn back-btn" onclick="safeGoBackFromHub()">${t('btn_back')}</button>
@@ -43,18 +43,18 @@ export function _egBuildTopbarHTML() {
          onclick="showEndgameGate('showEndgameHub')">🎲 ${t('mg_gate_badge')}</button>
     <button class="eg-level-btn" id="eg-btn-export-build"
          title="Saves your gear, passive tree, spells and stats to a small file (for balance testing)"
-         onclick="_egExportBuildSnapshot()">📤 Export build</button>
+         onclick="_exportBuildSnapshot()">📤 Export build</button>
     <label class="eg-level-btn eg-autocmp-toggle" id="eg-autocmp-toggle"
          title="${t('eg_auto_compare_tip')}"
          style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
-        <input type="checkbox" id="eg-autocmp-cb" ${_egAutoCompareChecked() ? 'checked' : ''}
-         onchange="globalThis._egAutoCompare=this.checked;try{localStorage.setItem('stoxels_auto_compare',this.checked?'1':'0')}catch(e){}">
+        <input type="checkbox" id="eg-autocmp-cb" ${_autoCompareChecked() ? 'checked' : ''}
+         onchange="globalThis._autoCompare=this.checked;try{localStorage.setItem('stoxels_auto_compare',this.checked?'1':'0')}catch(e){}">
         ⚖ ${t('eg_auto_compare')}
     </label>
     <button class="eg-info-btn" id="eg-hub-info-btn" aria-label="Info"
-         onmouseenter="_egShowHubInfoTooltip(event)"
+         onmouseenter="_showHubInfoTooltip(event)"
          onmousemove="moveGameTooltip(event)"
-         onmouseleave="_egHideHubInfoTooltip()">?</button>
+         onmouseleave="_hideHubInfoTooltip()">?</button>
 </div>`;
 }
 
@@ -62,12 +62,12 @@ export function _egBuildTopbarHTML() {
 // needs to recreate this character (equipped gear with all rolled mods, the
 // allocated passive nodes, spells / hotbar / charms, level and class, and the
 // computed character sheet). Read-only - nothing in the save is changed.
-export function _egExportBuildSnapshot() {
+export function _exportBuildSnapshot() {
     try {
         const g = globalThis;
         const S = STATE || {};
         const sheet = {};
-        const stats = typeof g._egComputePlayerStats === 'function' ? (g._egComputePlayerStats() || {}) : {};
+        const stats = typeof g._computePlayerStats === 'function' ? (g._computePlayerStats() || {}) : {};
         for (const [k, v] of Object.entries(stats)) {
             if (typeof v === 'number' && Number.isFinite(v) && v !== 0) sheet[k] = Math.round(v * 100) / 100;
         }
@@ -89,7 +89,7 @@ export function _egExportBuildSnapshot() {
             passiveTreeAllocated: Array.from(S.passiveTreeAllocated || []),
             passiveTreePoints: S.passiveTreePoints,
             charmInventory: S.charmInventory,
-            equipped: g._egEquipped || S.egEquipped || {},
+            equipped: g._equipped || S.egEquipped || {},
             sheet,
             state: pick,
         };
@@ -111,7 +111,7 @@ export function _egExportBuildSnapshot() {
 // Updates the Probability Tree button highlight based on available points.
 // Shows a golden border/glow and a yellow point count when there are unspent
 // Convergence Points - mirrors renderLSPassiveTreeButton and _renderTopBarTreePoints.
-export function _egUpdatePassiveTreeButton() {
+export function _updatePassiveTreeButton() {
     const btn = document.getElementById('eg-btn-passive-tree');
     if (!btn) return;
     const points = (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;
@@ -127,39 +127,39 @@ export function _egUpdatePassiveTreeButton() {
 }
 
 // Toggles between showing item level and required character level on item chips.
-export function _egToggleItemLevelDisplay() {
-    globalThis._egShowItemLevel = !globalThis._egShowItemLevel;
-    _egSaveMassSellSettings(); // persists the toggle
-    _egRebuildInventoryGrid(); // re-render stash
-    _egRenderEquipSlots(); // re-render equipped items
-    _egUpdateItemLevelToggleButton();
+export function _toggleItemLevelDisplay() {
+    globalThis._showItemLevel = !globalThis._showItemLevel;
+    _saveMassSellSettings(); // persists the toggle
+    _rebuildInventoryGrid(); // re-render stash
+    _renderEquipSlots(); // re-render equipped items
+    _updateItemLevelToggleButton();
 }
 
 // Updates the toggle button text/icon to match current state.
-export function _egUpdateItemLevelToggleButton() {
+export function _updateItemLevelToggleButton() {
     const btn = document.getElementById('eg-toggle-ilvl-btn');
     if (btn) {
-        btn.innerHTML = `${_egShowItemLevel ? '🔢' : '👤'} ${t(_egShowItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}`;
+        btn.innerHTML = `${_showItemLevel ? '🔢' : '👤'} ${t(_showItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}`;
     }
 }
 
 // Tooltip for the item level toggle button.
-export function _egShowItemLevelToggleTooltip(e) {
+export function _showItemLevelToggleTooltip(e) {
     const html = `
 <div class="eg-tt-frame" style="--tt-border:#c8a84b;">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon">${_egShowItemLevel ? '🔢' : '👤'}</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${t(_egShowItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</div>
+        <div class="eg-tt-icon">${_showItemLevel ? '🔢' : '👤'}</div>
+        <div class="eg-tt-name" style="color:#f5d98a;">${t(_showItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</div>
     </div>
     <div class="eg-tt-section">
-        <div class="eg-tt-desc">${t(_egShowItemLevel ? 'eg_show_req_level_desc' : 'eg_show_item_level_desc')}</div>
+        <div class="eg-tt-desc">${t(_showItemLevel ? 'eg_show_req_level_desc' : 'eg_show_item_level_desc')}</div>
     </div>
 </div>`;
     globalThis.showGameTooltip(html, e);
 }
 
 // Tooltip for the mass-sell FILTER button (custom game tooltip instead of native title).
-export function _egShowMassSellConfigTooltip(e) {
+export function _showMassSellConfigTooltip(e) {
     const html = `
 <div class="eg-tt-frame" style="--tt-border:#c8a84b;">
     <div class="eg-tt-header">
@@ -174,7 +174,7 @@ export function _egShowMassSellConfigTooltip(e) {
 }
 
 // Tooltip for the MASS SELL button (custom game tooltip instead of native title).
-export function _egShowMassSellTooltip(e) {
+export function _showMassSellTooltip(e) {
     const html = `
 <div class="eg-tt-frame" style="--tt-border:#c8a84b;">
     <div class="eg-tt-header">
@@ -192,7 +192,7 @@ export function _egShowMassSellTooltip(e) {
 // Builds the tooltip body shown when hovering the "?" info button in the
 // top-right of the Nexus of Worlds screen. Uses the shared game tooltip
 // engine (tooltips-hud.js) - not the browser title tooltip.
-export function _egBuildHubInfoTooltipHTML() {
+export function _buildHubInfoTooltipHTML() {
     const line = (key) => {
         const txt = t(key);
         if (!txt) return '';
@@ -216,8 +216,8 @@ export function _egBuildHubInfoTooltipHTML() {
 </div>`;
 }
 
-export function _egShowHubInfoTooltip(e) {
-    globalThis.showGameTooltip(_egBuildHubInfoTooltipHTML(), e);
+export function _showHubInfoTooltip(e) {
+    globalThis.showGameTooltip(_buildHubInfoTooltipHTML(), e);
     // The controls list needs much more width than the shared default -
     // without this the tooltip becomes very narrow and very tall.
     // eg-controls-tip is exclusive to this tooltip; the engine's inline
@@ -228,7 +228,7 @@ export function _egShowHubInfoTooltip(e) {
 
 // Hides the hub info tooltip AND drops the widened-tip classes again so
 // other tooltips on the shared engine keep their default width.
-export function _egHideHubInfoTooltip() {
+export function _hideHubInfoTooltip() {
     const tip = document.getElementById('ghud-floating-tip');
     if (tip) tip.classList.remove('eg-wide-tip', 'eg-controls-tip');
     globalThis.hideGameTooltip();

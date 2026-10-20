@@ -10,39 +10,39 @@ import { Audio_Manager } from '../audio/audio.js';
 import { trackAchStat } from '../achievements/achievements.js';
 import { LANG, t } from '../translation/translations.js';
 import { _dndChipScreenEl } from '../endgame/endgame-hub-drag-and-drop.js';
-import { _egClearTooltip } from '../endgame/endgame-hub-tooltips.js';
-import { _egEquipped, _egInventory, _egRenderEquipSlot, _egRenderEquipSlots, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egShowStashInfo, egSaveHubState } from '../endgame/endgame-hub.js';
-import { _egCancelCurrencyUse, _egPendingCurrencyUse } from './loot-currency-use.js';
-import { EG_ESSENCE_REASON_KEYS, _egEssenceIncompatibilityReason, _egEssenceStash } from './loot-essences.js';
-import { _egApplyEssenceCraft } from './loot-essences-craft.js';
-import { EG_ESSENCE_DEFS } from './loot-essences-defs.js';
-import { _egRenderEssenceCell } from './loot-essences-render.js';
+import { _clearTooltip } from '../endgame/endgame-hub-tooltips.js';
+import { _equipped, _inventory, _renderEquipSlot, _renderEquipSlots, _renderInventory, _renderInventoryCell, _renderStatsList, _showStashInfo, saveHubState } from '../endgame/endgame-hub.js';
+import { _cancelCurrencyUse, _pendingCurrencyUse } from './loot-currency-use.js';
+import { ESSENCE_REASON_KEYS, _essenceIncompatibilityReason, _essenceStash } from './loot-essences.js';
+import { _applyEssenceCraft } from './loot-essences-craft.js';
+import { ESSENCE_DEFS } from './loot-essences-defs.js';
+import { _renderEssenceCell } from './loot-essences-render.js';
 
 
-export let _egPendingEssenceUse = null; // { defId, sourceRow, sourceCol }
+export let _pendingEssenceUse = null; // { defId, sourceRow, sourceCol }
 
 // Shared rejection path: shows a short reason toast + stash info, flashes the
 // target chip, and exits use mode. `reasonKey` is null for plain failures.
-export function _egRejectEssenceUse(reasonKey, chipEl, opts = {}) {
+export function _rejectEssenceUse(reasonKey, chipEl, opts = {}) {
     const isDe = (typeof LANG !== 'undefined' && LANG === 'de');
     const fallback = reasonKey ? (isDe ? 'Gegenstand nicht kompatibel.' : 'Item not compatible.') : (isDe ? 'Nicht anwendbar.' : 'Cannot be applied.');
     const msg = reasonKey
         ? (t(reasonKey) !== reasonKey ? t(reasonKey) : fallback)
         : fallback;
     globalThis.showToast(msg);
-    if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error', duration: opts.duration || 5000 });
+    if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error', duration: opts.duration || 5000 });
     if (chipEl) {
         chipEl.classList.add('eg-slot-reject');
         setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
     }
-    _egCancelEssenceUse(true);
+    _cancelEssenceUse(true);
 }
 
-export function _egStartEssenceUse(def, row, col, chipEl) {
-    if (typeof _egPendingCurrencyUse !== 'undefined' && _egPendingCurrencyUse) {
-        _egCancelCurrencyUse(true);
+export function _startEssenceUse(def, row, col, chipEl) {
+    if (typeof _pendingCurrencyUse !== 'undefined' && _pendingCurrencyUse) {
+        _cancelCurrencyUse(true);
     }
-    _egPendingEssenceUse = { defId: def.id, sourceRow: row, sourceCol: col };
+    _pendingEssenceUse = { defId: def.id, sourceRow: row, sourceCol: col };
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     if (chipEl) chipEl.classList.add('eg-currency-selected');
     document.body.classList.add('eg-currency-use-active');
@@ -51,17 +51,17 @@ export function _egStartEssenceUse(def, row, col, chipEl) {
         .replace('{name}', def.name));
 }
 
-export function _egCancelEssenceUse(silent) {
-    if (!_egPendingEssenceUse) return;
-    _egPendingEssenceUse = null;
+export function _cancelEssenceUse(silent) {
+    if (!_pendingEssenceUse) return;
+    _pendingEssenceUse = null;
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     document.body.classList.remove('eg-currency-use-active');
     if (!silent) globalThis.showToast(t('eg_currency_cancelled'));
 }
 
-export function _egRefreshEssenceUseHighlight() {
-    if (!_egPendingEssenceUse) return;
-    const { sourceRow, sourceCol } = _egPendingEssenceUse;
+export function _refreshEssenceUseHighlight() {
+    if (!_pendingEssenceUse) return;
+    const { sourceRow, sourceCol } = _pendingEssenceUse;
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     const chip = document.querySelector(
         `.eg-essence-cell[data-row="${sourceRow}"][data-col="${sourceCol}"] .eg-item-chip`);
@@ -69,25 +69,25 @@ export function _egRefreshEssenceUseHighlight() {
         chip.classList.add('eg-currency-selected');
         document.body.classList.add('eg-currency-use-active');
     } else {
-        _egCancelEssenceUse(true);
+        _cancelEssenceUse(true);
     }
 }
 
-export function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
-    if (!_egPendingEssenceUse) return;
-    const { sourceRow, sourceCol, defId } = _egPendingEssenceUse;
-    const def = EG_ESSENCE_DEFS[defId];
-    const stack = _egEssenceStash[sourceRow][sourceCol];
+export function _applyEssenceToItem(item, applyFn, chipEl, keepActive) {
+    if (!_pendingEssenceUse) return;
+    const { sourceRow, sourceCol, defId } = _pendingEssenceUse;
+    const def = ESSENCE_DEFS[defId];
+    const stack = _essenceStash[sourceRow][sourceCol];
 
     if (!def || !stack || stack.id !== defId) {
-        _egCancelEssenceUse(true);
+        _cancelEssenceUse(true);
         return;
     }
 
     if (!item || item.category !== 'equip' || item.isUnique) {
         // Distinct short reasons so the player knows WHY (no item name - the
         // target is what's on screen, the essence is still highlighted).
-        _egRejectEssenceUse(
+        _rejectEssenceUse(
             (item && item.isUnique) ? 'eg_essence_unique_reject'
             : (item && item.category === 'equip') ? null
             : 'eg_essence_not_equipment',
@@ -100,40 +100,40 @@ export function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
     const famList = def.guaranteedFamilies || (def.guaranteedFamily ? [def.guaranteedFamily] : []);
     const famForCheck = famList[0];
     if (famForCheck) {
-        const reason = _egEssenceIncompatibilityReason(famForCheck, item);
+        const reason = _essenceIncompatibilityReason(famForCheck, item);
         if (reason) {
-            _egRejectEssenceUse(EG_ESSENCE_REASON_KEYS[reason] || null, chipEl);
+            _rejectEssenceUse(ESSENCE_REASON_KEYS[reason] || null, chipEl);
             return;
         }
     }
 
-    const newItem = _egApplyEssenceCraft(item, def);
+    const newItem = _applyEssenceCraft(item, def);
     if (!newItem) {
         // Fallback - should already be caught by the checks above.
-        _egRejectEssenceUse(null, chipEl);
+        _rejectEssenceUse(null, chipEl);
         return;
     }
     applyFn(newItem);
 
     stack.count = (stack.count || 1) - 1;
-    if (stack.count <= 0) _egEssenceStash[sourceRow][sourceCol] = null;
-    _egRenderEssenceCell(sourceRow, sourceCol);
+    if (stack.count <= 0) _essenceStash[sourceRow][sourceCol] = null;
+    _renderEssenceCell(sourceRow, sourceCol);
 
     Audio_Manager.playSFX('essence_apply');
     if (typeof trackAchStat === 'function') try { trackAchStat('egEssencesApplied', 1); } catch(e){}
 
     if (keepActive && stack.count > 0) {
-        _egRefreshEssenceUseHighlight();
+        _refreshEssenceUseHighlight();
         globalThis.showToast(t('eg_currency_applied').replace('{name}', def.name));
-        if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
-        egSaveHubState();
+        if (typeof _renderStatsList === 'function') _renderStatsList();
+        saveHubState();
         return;
     }
 
-    _egCancelEssenceUse(true);
+    _cancelEssenceUse(true);
     globalThis.showToast(t('eg_currency_applied').replace('{name}', def.name));
-    if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
-    egSaveHubState();
+    if (typeof _renderStatsList === 'function') _renderStatsList();
+    saveHubState();
 }
 
 // Right-click on an essence chip: start or cancel "use mode".
@@ -141,18 +141,18 @@ document.addEventListener('contextmenu', function (e) {
     const chip = e.target.closest('.eg-item-chip');
     const essenceCell = chip ? chip.closest('.eg-essence-cell') : null;
 
-    if (_egPendingEssenceUse) {
+    if (_pendingEssenceUse) {
         if (!chip || !essenceCell) return;
         e.preventDefault();
         e.stopImmediatePropagation();
-        _egClearTooltip();
+        _clearTooltip();
         const pr = +essenceCell.dataset.row, pc = +essenceCell.dataset.col;
-        if (_egPendingEssenceUse.sourceRow === pr && _egPendingEssenceUse.sourceCol === pc) {
-            _egCancelEssenceUse();
+        if (_pendingEssenceUse.sourceRow === pr && _pendingEssenceUse.sourceCol === pc) {
+            _cancelEssenceUse();
         } else {
-            const item = _egEssenceStash[pr][pc];
+            const item = _essenceStash[pr][pc];
             if (item && item.category) {
-                _egStartEssenceUse(EG_ESSENCE_DEFS[item.id] || item, pr, pc, chip);
+                _startEssenceUse(ESSENCE_DEFS[item.id] || item, pr, pc, chip);
             }
         }
         return;
@@ -165,17 +165,17 @@ document.addEventListener('contextmenu', function (e) {
     e.stopImmediatePropagation();
 
     const r = +essenceCell.dataset.row, c = +essenceCell.dataset.col;
-    const item = _egEssenceStash[r][c];
+    const item = _essenceStash[r][c];
     if (!item || !item.category) return;
 
-    _egStartEssenceUse(EG_ESSENCE_DEFS[item.id] || item, r, c, chip);
+    _startEssenceUse(ESSENCE_DEFS[item.id] || item, r, c, chip);
 }, true);
 
 // Left-click while an essence is selected: apply it to the clicked equip
 // item, or cancel if the click isn't a valid target.
 document.addEventListener('mousedown', function (e) {
-    if (!_egPendingEssenceUse) return;
-    if (typeof _egPendingCurrencyUse !== 'undefined' && _egPendingCurrencyUse) return;
+    if (!_pendingEssenceUse) return;
+    if (typeof _pendingCurrencyUse !== 'undefined' && _pendingCurrencyUse) return;
     if (e.button !== 0) return;
 
     const chip = e.target.closest('.eg-item-chip');
@@ -183,12 +183,12 @@ document.addEventListener('mousedown', function (e) {
         ? !!_dndChipScreenEl(chip)
         : !!chip.closest('#screen-endgame-hub'));
     if (!onManagedScreen) {
-        _egCancelEssenceUse();
+        _cancelEssenceUse();
         return;
     }
 
     if (chip.closest('.eg-essence-cell')) {
-        _egCancelEssenceUse();
+        _cancelEssenceUse();
         return;
     }
 
@@ -201,35 +201,35 @@ document.addEventListener('mousedown', function (e) {
     let targetItem = null, applyFn = null;
     if (invCell) {
         const r = +invCell.dataset.row, c = +invCell.dataset.col;
-        targetItem = _egInventory[r][c];
-        applyFn = (newItem) => { _egInventory[r][c] = newItem; _egRenderInventoryCell(r, c); };
+        targetItem = _inventory[r][c];
+        applyFn = (newItem) => { _inventory[r][c] = newItem; _renderInventoryCell(r, c); };
     } else if (equipSlot) {
         const slotId = equipSlot.dataset.slotId;
-        targetItem = _egEquipped[slotId] || null;
+        targetItem = _equipped[slotId] || null;
         applyFn = (newItem) => {
-            _egEquipped[slotId] = newItem;
-            _egRenderEquipSlot(slotId);
-            _egRenderInventory();
-            _egRenderEquipSlots();
+            _equipped[slotId] = newItem;
+            _renderEquipSlot(slotId);
+            _renderInventory();
+            _renderEquipSlots();
         };
     } else {
-        _egCancelEssenceUse();
+        _cancelEssenceUse();
         return;
     }
 
     if (!targetItem) {
         const msg = t('eg_no_item_target');
         globalThis.showToast(msg);
-        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
-        _egCancelEssenceUse(true);
+        if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
+        _cancelEssenceUse(true);
         return;
     }
 
-    _egApplyEssenceToItem(targetItem, applyFn, chip, e.shiftKey);
+    _applyEssenceToItem(targetItem, applyFn, chip, e.shiftKey);
 }, true);
 
 document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && _egPendingEssenceUse && !(typeof _egPendingCurrencyUse !== 'undefined' && _egPendingCurrencyUse)) {
-        _egCancelEssenceUse();
+    if (e.key === 'Escape' && _pendingEssenceUse && !(typeof _pendingCurrencyUse !== 'undefined' && _pendingCurrencyUse)) {
+        _cancelEssenceUse();
     }
 });

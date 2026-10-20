@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE DUELIST (boss_duelist)---------------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_duelist: {
         id: 'boss_duelist', name: 'The Duelist', emoji: '🤺',
         baseHP: 1040, baseDamage: 25, chargeMax: 11,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_duelist: {
         phases: [
             { threshold: 1.00, chargeMax: 11, damageMultiplier: 1.00 },
@@ -29,8 +29,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'flurry', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechFlurry' },
-            { name: 'fated_cell', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechFatedCell' },
+            { name: 'flurry', intervalBase: 20000, intervalVariance: 5000, handler: '_mechFlurry' },
+            { name: 'fated_cell', intervalBase: 20000, intervalVariance: 5000, handler: '_mechFatedCell' },
         ],
     },
 });
@@ -38,18 +38,18 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // Fast slash flurries, each re-aimed at the player's live position.
 // Keep moving between slashes; the telegraph marks where NOT to stand.
-export function _egMechFlurry(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechFlurry(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const flurries = [0, 2, 2, 3][p];
     const slashGapMs = 700, warnMs = 450, radius = 80;
     const dmgPct = [0, 0.15, 0.18, 0.22][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
-    _egNkToast('eg_mech_duelist', '🤺 The Duelist: Flurry! Never be where you were!');
+    _nkToast('eg_mech_duelist', '🤺 The Duelist: Flurry! Never be where you were!');
     let f = 0, s = -1, t = 0, sx = 0, sy = 0;
     let mark = null;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         if (f >= flurries) {
             if (mark) { mark.remove(); mark = null; }
             return false;
@@ -61,10 +61,10 @@ export function _egMechFlurry(monster, phase) {
             t = 0;
         }
         if (!mark) {
-            const c = _egNkPlayerCenter();
+            const c = _nkPlayerCenter();
             sx = c ? c.x : window.innerWidth / 2;
             sy = c ? c.y : window.innerHeight / 2;
-            mark = _egNkEl(run, 'div', 'eg-nk-slash');
+            mark = _nkEl(run, 'div', 'eg-nk-slash');
             mark.style.left = Math.round(sx - radius) + 'px';
             mark.style.top = Math.round(sy - radius) + 'px';
             mark.style.width = radius * 2 + 'px';
@@ -72,9 +72,9 @@ export function _egMechFlurry(monster, phase) {
             t = 0;
         } else if (t >= warnMs) {
             mark.classList.add('eg-nk-slash-hit');
-            if (_egNkCircleHit(sx, sy, radius, _egNkPlayerRect(), 0)) {
-                const dealt = _egNkHit(dmgPct, null, level);
-                _egNkAbilityHitToast(dealt, 'The Duelist', 'Flurry');
+            if (_nkCircleHit(sx, sy, radius, _nkPlayerRect(), 0)) {
+                const dealt = _nkHit(dmgPct, null, level);
+                _nkAbilityHitToast(dealt, 'The Duelist', 'Flurry');
             }
             setTimeout(() => { if (mark) { mark.remove(); mark = null; } }, 300);
             s++;

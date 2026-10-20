@@ -230,8 +230,8 @@ export function _ptPoints() {
 }
 
 function _ptSyncBaseAttributes() {
-    if (typeof globalThis._egSyncBaseAttributes === 'function') {
-        globalThis._egSyncBaseAttributes();
+    if (typeof globalThis._syncBaseAttributes === 'function') {
+        globalThis._syncBaseAttributes();
     }
 }
 

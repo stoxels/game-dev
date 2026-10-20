@@ -1,11 +1,11 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { switchScreen } from '../screens/screens.js';
 import { t } from '../translation/translations.js';
-import { _egvBuildCharmsTabHTML, _egvBuildEssencesTabHTML, _egvBuildItemsTabHTML } from './loot-vendor-supplies.js';
-import { _egvRefreshGoldDisplay, _egvSetRenderTabContent } from './loot-vendor-shared.js';
-import { _egvEnsureStyles } from './loot-vendor-styles.js';
-import { _egvBuildBaseTabHTML } from './loot-vendor-equipment.js';
-import { _egvBuildCurrencyTabHTML } from './loot-vendor-supplies.js';
+import { _vendorBuildCharmsTabHTML, _vendorBuildEssencesTabHTML, _vendorBuildItemsTabHTML } from './loot-vendor-supplies.js';
+import { _vendorRefreshGoldDisplay, _vendorSetRenderTabContent } from './loot-vendor-shared.js';
+import { _vendorEnsureStyles } from './loot-vendor-styles.js';
+import { _vendorBuildBaseTabHTML } from './loot-vendor-equipment.js';
+import { _vendorBuildCurrencyTabHTML } from './loot-vendor-supplies.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME VENDOR---------------------------------------
@@ -24,13 +24,13 @@ import { _egvBuildCurrencyTabHTML } from './loot-vendor-supplies.js';
 //------------------------------------------------------------------------
 
 // Which tab is open. The last active tab is remembered across visits.
-let _egvActiveTab = 'charms';
+let _vendorActiveTab = 'charms';
 // Search text. While non-empty the content area shows every tab's cards in
-// one list, filtered to the matches (see _egvApplySearch).
-let _egvQuery = '';
+// one list, filtered to the matches (see _vendorApplySearch).
+let _vendorQuery = '';
 
 // The vendor tabs (maps are no longer sold - they drop in the late campaign), in display order.
-const EG_VENDOR_TABS = [
+const VENDOR_TABS = [
     { id: 'charms', labelKey: 'eg_vendor_tab_charms' },
     { id: 'currency', labelKey: 'eg_vendor_tab_currency' },
     { id: 'essences', labelKey: 'eg_vendor_tab_essences' },
@@ -39,7 +39,7 @@ const EG_VENDOR_TABS = [
 ];
 
 // Hint line shown under each tab's content, as a translation key.
-const EG_VENDOR_TAB_HINTS = {
+const VENDOR_TAB_HINTS = {
     charms: 'eg_vendor_hint_charms',
     currency: 'eg_vendor_hint_currency',
     essences: 'eg_vendor_hint_essences',
@@ -53,7 +53,7 @@ const EG_VENDOR_TAB_HINTS = {
 //------------------------------------------------------------------------
 
 // Top bar with the back button and the screen title.
-function _egvBuildTopbarHTML() {
+function _vendorBuildTopbarHTML() {
     return `
 <div class="egn-topbar">
     <button class="back-btn" onclick="goToPreviousScreen()">${t('btn_back')}</button>
@@ -62,24 +62,24 @@ function _egvBuildTopbarHTML() {
 }
 
 // One button per tab, with the active one highlighted.
-function _egvBuildTabBarHTML() {
-    const buttons = EG_VENDOR_TABS.map(tab => `
-        <button class="egv-tab-btn${tab.id === _egvActiveTab ? ' egv-tab-active' : ''}"
+function _vendorBuildTabBarHTML() {
+    const buttons = VENDOR_TABS.map(tab => `
+        <button class="egv-tab-btn${tab.id === _vendorActiveTab ? ' egv-tab-active' : ''}"
                 id="egv-tab-btn-${tab.id}"
-                onclick="_egvSwitchTab('${tab.id}')">${t(tab.labelKey)}</button>`).join('');
+                onclick="_vendorSwitchTab('${tab.id}')">${t(tab.labelKey)}</button>`).join('');
     return `<div class="egv-tab-bar">${buttons}</div>`;
 }
 
 // Assembles the full vendor layout:
 // topbar → gold balance → tab bar → tab content → hint text.
-function _egvBuildFullScreenHTML() {
+function _vendorBuildFullScreenHTML() {
     return `
 <div class="egn-hub-layout egv-layout">
-    ${_egvBuildTopbarHTML()}
+    ${_vendorBuildTopbarHTML()}
     <div class="egv-body">
         <div class="egv-gold-balance" id="egv-gold-balance"></div>
         <div class="egv-search-row"><input type="search" id="egv-search" class="egv-search" autocomplete="off" spellcheck="false" placeholder="${t('eg_vendor_search_ph')}"></div>
-        ${_egvBuildTabBarHTML()}
+        ${_vendorBuildTabBarHTML()}
         <div class="egv-tab-content" id="egv-tab-content"></div>
         <div class="egv-hint" id="egv-hint"></div>
     </div>
@@ -93,44 +93,44 @@ function _egvBuildFullScreenHTML() {
 
 // Draws the active tab's cards and its hint line. Registered with the shared
 // module so the tab modules can ask for a redraw without importing this file.
-function _egvRenderTabContent() {
+function _vendorRenderTabContent() {
     const contentEl = document.getElementById('egv-tab-content');
     if (!contentEl) return;
 
-    if (_egvQuery) {
-        _egvBuildSearchView(contentEl);
-        _egvApplySearch();
-        _egvRefreshGoldDisplay();
+    if (_vendorQuery) {
+        _vendorBuildSearchView(contentEl);
+        _vendorApplySearch();
+        _vendorRefreshGoldDisplay();
         return;
     }
     contentEl.classList.remove('egv-searching');
-    const activeBtn = document.getElementById(`egv-tab-btn-${_egvActiveTab}`);
+    const activeBtn = document.getElementById(`egv-tab-btn-${_vendorActiveTab}`);
     if (activeBtn) activeBtn.classList.add('egv-tab-active');
 
-    switch (_egvActiveTab) {
-        case 'charms': contentEl.innerHTML = _egvBuildCharmsTabHTML(); break;
-        case 'currency': contentEl.innerHTML = _egvBuildCurrencyTabHTML(); break;
-        case 'essences': contentEl.innerHTML = _egvBuildEssencesTabHTML(); break;
-        case 'items': contentEl.innerHTML = _egvBuildItemsTabHTML(); break;
-        case 'base': contentEl.innerHTML = _egvBuildBaseTabHTML(); break;
+    switch (_vendorActiveTab) {
+        case 'charms': contentEl.innerHTML = _vendorBuildCharmsTabHTML(); break;
+        case 'currency': contentEl.innerHTML = _vendorBuildCurrencyTabHTML(); break;
+        case 'essences': contentEl.innerHTML = _vendorBuildEssencesTabHTML(); break;
+        case 'items': contentEl.innerHTML = _vendorBuildItemsTabHTML(); break;
+        case 'base': contentEl.innerHTML = _vendorBuildBaseTabHTML(); break;
     }
 
     const hintEl = document.getElementById('egv-hint');
-    if (hintEl) hintEl.textContent = t(EG_VENDOR_TAB_HINTS[_egvActiveTab] || '');
+    if (hintEl) hintEl.textContent = t(VENDOR_TAB_HINTS[_vendorActiveTab] || '');
 
-    _egvRefreshGoldDisplay();
+    _vendorRefreshGoldDisplay();
 }
 
 // Search mode: every tab's cards under its own heading, so one query covers
 // charms, currency, essences, items and base items alike.
-function _egvBuildSearchView(contentEl) {
+function _vendorBuildSearchView(contentEl) {
     const builders = {
-        charms: _egvBuildCharmsTabHTML, currency: _egvBuildCurrencyTabHTML, essences: _egvBuildEssencesTabHTML,
-        items: _egvBuildItemsTabHTML, base: _egvBuildBaseTabHTML,
+        charms: _vendorBuildCharmsTabHTML, currency: _vendorBuildCurrencyTabHTML, essences: _vendorBuildEssencesTabHTML,
+        items: _vendorBuildItemsTabHTML, base: _vendorBuildBaseTabHTML,
     };
     contentEl.classList.add('egv-searching');
     document.querySelectorAll('.egv-tab-btn').forEach(btn => btn.classList.remove('egv-tab-active'));
-    contentEl.innerHTML = EG_VENDOR_TABS.map(tab => `
+    contentEl.innerHTML = VENDOR_TABS.map(tab => `
 <div class="egv-search-section">
     <div class="egv-search-title">${t(tab.labelKey)}</div>
     ${builders[tab.id](true)}
@@ -140,10 +140,10 @@ function _egvBuildSearchView(contentEl) {
 }
 
 // Shows only the cards whose text contains the query, hides empty sections.
-function _egvApplySearch() {
+function _vendorApplySearch() {
     const contentEl = document.getElementById('egv-tab-content');
     if (!contentEl) return;
-    const words = _egvQuery.toLowerCase().split(/\s+/).filter(Boolean);
+    const words = _vendorQuery.toLowerCase().split(/\s+/).filter(Boolean);
     let total = 0;
     contentEl.querySelectorAll('.egv-search-section').forEach(sec => {
         let shown = 0;
@@ -161,29 +161,29 @@ function _egvApplySearch() {
 }
 
 // Search box typing: build the combined view once, then just re-filter.
-function _egvOnSearchInput(value) {
-    const had = !!_egvQuery;
-    _egvQuery = String(value || '').trim();
+function _vendorOnSearchInput(value) {
+    const had = !!_vendorQuery;
+    _vendorQuery = String(value || '').trim();
     const contentEl = document.getElementById('egv-tab-content');
     if (!contentEl) return;
-    if (!_egvQuery) { _egvRenderTabContent(); return; }
-    if (!had || !contentEl.classList.contains('egv-searching')) _egvRenderTabContent();
-    else _egvApplySearch();
+    if (!_vendorQuery) { _vendorRenderTabContent(); return; }
+    if (!had || !contentEl.classList.contains('egv-searching')) _vendorRenderTabContent();
+    else _vendorApplySearch();
 }
 
 // Switches to another tab. Called from the generated tab-bar buttons, so the
 // name is an inline handler and must stay reachable as a global.
-export function _egvSwitchTab(tabId) {
+export function _vendorSwitchTab(tabId) {
     Audio_Manager.playSFX('ui_tab_switch');
-    _egvActiveTab = tabId;
+    _vendorActiveTab = tabId;
     // Picking a tab leaves search mode.
-    _egvQuery = '';
+    _vendorQuery = '';
     const box = document.getElementById('egv-search');
     if (box) box.value = '';
     document.querySelectorAll('.egv-tab-btn').forEach(btn => btn.classList.remove('egv-tab-active'));
     const btn = document.getElementById(`egv-tab-btn-${tabId}`);
     if (btn) btn.classList.add('egv-tab-active');
-    _egvRenderTabContent();
+    _vendorRenderTabContent();
 }
 
 //------------------------------------------------------------------------
@@ -192,18 +192,18 @@ export function _egvSwitchTab(tabId) {
 //------------------------------------------------------------------------
 
 // Builds the vendor screen the first time it is opened.
-function _egvCreateScreen() {
-    _egvEnsureStyles();
+function _vendorCreateScreen() {
+    _vendorEnsureStyles();
     const screen = document.createElement('div');
     screen.id = 'screen-endgame-vendor';
     screen.className = 'screen';
-    screen.innerHTML = _egvBuildFullScreenHTML();
+    screen.innerHTML = _vendorBuildFullScreenHTML();
     document.body.appendChild(screen);
     const box = screen.querySelector('#egv-search');
     if (box) {
-        box.addEventListener('input', () => _egvOnSearchInput(box.value));
+        box.addEventListener('input', () => _vendorOnSearchInput(box.value));
         box.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && box.value) { box.value = ''; _egvOnSearchInput(''); e.stopPropagation(); }
+            if (e.key === 'Escape' && box.value) { box.value = ''; _vendorOnSearchInput(''); e.stopPropagation(); }
         });
     }
 }
@@ -215,7 +215,7 @@ if (typeof document !== 'undefined' && document.addEventListener) {
     document.addEventListener('eg-art-loaded', function () {
         try {
             if (document.getElementById('egv-tab-content')) {
-                _egvRenderTabContent();
+                _vendorRenderTabContent();
             }
         } catch (e) { /* vendor screen not open - safe to ignore */ }
     });
@@ -223,7 +223,7 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 
 // Opens the Vendor screen on the last active tab.
 export function showEndgameVendor() {
-    if (!document.getElementById('screen-endgame-vendor')) _egvCreateScreen();
+    if (!document.getElementById('screen-endgame-vendor')) _vendorCreateScreen();
 
     // The vendor is opened from the overworld (launchAtlasVendor), which
     // pushes the screen it came from onto the history: back pops to it.
@@ -234,13 +234,13 @@ export function showEndgameVendor() {
 
     // Keep the active tab highlighted across visits.
     document.querySelectorAll('.egv-tab-btn').forEach(btn => btn.classList.remove('egv-tab-active'));
-    const activeBtn = document.getElementById(`egv-tab-btn-${_egvActiveTab}`);
+    const activeBtn = document.getElementById(`egv-tab-btn-${_vendorActiveTab}`);
     if (activeBtn) activeBtn.classList.add('egv-tab-active');
 
-    _egvRenderTabContent();
-    _egvRefreshGoldDisplay();
+    _vendorRenderTabContent();
+    _vendorRefreshGoldDisplay();
 }
 
 // The tab modules call back through the shared module to redraw; wire that up
 // now that the shell's renderer exists.
-_egvSetRenderTabContent(_egvRenderTabContent);
+_vendorSetRenderTabContent(_vendorRenderTabContent);

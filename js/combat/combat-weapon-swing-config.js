@@ -1,13 +1,13 @@
-import { _egGetElementCentre } from './combat-class-projectiles.js';
-import { _egComputePlayerStats, _egGetAllEquippedItems, _egGetDualHandWeapon } from '../endgame/endgame-player-stats.js';
-import { _egGetLeadHand } from './encounter-tick.js';
+import { _getElementCentre } from './combat-class-projectiles.js';
+import { _computePlayerStats, _getAllEquippedItems, _getDualHandWeapon } from '../endgame/endgame-player-stats.js';
+import { _getLeadHand } from './encounter-tick.js';
 
 //------------------------------------------------------------------------
 //-------------------WEAPON CONFIGURATION AND RESOLUTION----------------
 //------------------------------------------------------------------------
 
 // Manual-attack input cooldown so E can't machine-gun the melee channel.
-export const EG_WEAPON_SWING_COOLDOWN_MS = 400;
+export const WEAPON_SWING_COOLDOWN_MS = 400;
 
 // Melee reach (spell pass 1: "swing, then look at what is around you"):
 // a plain strike (<200%) connects with a monster whose card comes within
@@ -16,7 +16,7 @@ export const EG_WEAPON_SWING_COOLDOWN_MS = 400;
 // Per weapon family - a dagger is a short reach, a staff a long one. The
 // old flat rule was 340px centre-to-centre, which is ~270px to the edge of
 // a normal card, hence the sword/axe value.
-export const EG_MELEE_REACH_PX = {
+export const MELEE_REACH_PX = {
     sword: 270, dagger: 230, axe: 270, mace: 260,
     wand: 300, staff: 320, bow: 400, unarmed: 200,
 };
@@ -24,17 +24,17 @@ export const EG_MELEE_REACH_PX = {
 // Screen scale for melee range in meters (reworked node 20033 Champion's
 // Vigor grants +1): the base 340px reach is ~3.4m, so one meter reads as a
 // visible but sane step outward - roughly one extra card spacing.
-export const EG_PX_PER_METER = 100;
+export const PX_PER_METER = 100;
 
 // Per-family visual lifetime (ms) - must cover the longest CSS keyframe
 // in weapon-swing.css so the node is removed after the effect finishes.
-export const EG_WEAPON_SWING_DURATION_MS = {
+export const WEAPON_SWING_DURATION_MS = {
     sword: 320, dagger: 260, axe: 400, mace: 420,
     wand: 360, staff: 480, bow: 340, unarmed: 280,
 };
 
 // Maps an equipped weapon item to one of the CSS families.
-function _egWeaponSwingFamily(item) {
+function _weaponSwingFamily(item) {
     if (!item) return 'unarmed';
     if (item.slotType === 'ranged') return 'bow';
     const baseId = String(item.baseId || item.id || '');
@@ -56,26 +56,26 @@ function _egWeaponSwingFamily(item) {
 // Mace-like weapons for the passive tree's "Maces or Sceptres" lines:
 // maces / mauls / hammers (the 'mace' family) plus sceptres, which the
 // swing visuals file under 'wand' but which are melee-capable one-handers.
-export function _egIsMaceOrSceptre(item) {
+export function _isMaceOrSceptre(item) {
     if (!item) return false;
-    if (_egWeaponSwingFamily(item) === 'mace') return true;
+    if (_weaponSwingFamily(item) === 'mace') return true;
     const name = `${item.baseName || ''} ${item.name || ''}`.toLowerCase();
     return /sceptre|scepter|zepter/.test(name);
 }
 
 // Returns { item, family, hands, label } for the currently equipped melee
 // weapon (weapon slot). Falls back to the ranged bow, then unarmed.
-export function _egGetEquippedWeaponInfo() {
+export function _getEquippedWeaponInfo() {
     let item = null;
     try {
-        if (typeof _egGetAllEquippedItems === 'function') {
-            const all = _egGetAllEquippedItems() || [];
+        if (typeof _getAllEquippedItems === 'function') {
+            const all = _getAllEquippedItems() || [];
             item = all.find((it) => it && it.slotType === 'weapon')
                 || all.find((it) => it && it.slotType === 'ranged')
                 || null;
         }
     } catch (e) { item = null; }
-    const family = _egWeaponSwingFamily(item);
+    const family = _weaponSwingFamily(item);
     const hands = (item && item.hands === 2) ? 2 : 1;
     const label = item ? (item.baseName || item.name || '') : '';
     return { item, family, hands, label };
@@ -84,20 +84,20 @@ export function _egGetEquippedWeaponInfo() {
 // Weapon family of the blow that is swinging NOW. Dual-wielding strikes with
 // one hand at a time, so the swing visual and sound must follow that hand's
 // weapon (not always the first equipped one). `consumed` = the strike already
-// spent a charge bar and stamped _egStrikeHand; otherwise (a whiff, which
+// spent a charge bar and stamped _strikeHand; otherwise (a whiff, which
 // spends nothing) the hand that would strike is the fuller bar.
-export function _egGetStrikeWeaponFamily(consumed) {
+export function _getStrikeWeaponFamily(consumed) {
     try {
-        const hand = consumed ? (globalThis._egStrikeHand === 2 ? 2 : 1) : _egGetLeadHand();
-        const w = _egGetDualHandWeapon(hand);
-        if (w) return _egWeaponSwingFamily(w);
+        const hand = consumed ? (globalThis._strikeHand === 2 ? 2 : 1) : _getLeadHand();
+        const w = _getDualHandWeapon(hand);
+        if (w) return _weaponSwingFamily(w);
     } catch (e) { /* fall back to the single-weapon lookup */ }
-    return _egGetEquippedWeaponInfo().family;
+    return _getEquippedWeaponInfo().family;
 }
 
 // The direction the avatar is currently facing. Movement writes it to the
 // walk loop; idle keeps the last travel direction, with a down fallback.
-export function _egGetAttackFacing() {
+export function _getAttackFacing() {
     const ok = (d) => d === 'up' || d === 'down' || d === 'left' || d === 'right';
     try { if (typeof _lastFacingDir === 'string' && ok(globalThis._lastFacingDir)) return globalThis._lastFacingDir; } catch (e) {}
     try { if (typeof _walkState !== 'undefined' && globalThis._walkState && ok(globalThis._walkState.dirName)) return globalThis._walkState.dirName; } catch (e) {}
@@ -105,25 +105,25 @@ export function _egGetAttackFacing() {
 }
 
 // Facing implied by a screen-space vector.
-export function _egFacingFromVector(dx, dy) {
+export function _facingFromVector(dx, dy) {
     if (Math.abs(dx) >= Math.abs(dy)) return dx >= 0 ? 'right' : 'left';
     return dy >= 0 ? 'down' : 'up';
 }
 
 // A selected monster keeps the swing if it is within this many px of the nearest one.
-const EG_MELEE_TIE_PX = 12;
+const MELEE_TIE_PX = 12;
 
 // Current reach in px: the equipped weapon family's base reach plus
 // Champion's Vigor (reworked node 20033) bonus meters. Guarded like the
 // ailment channels - no stats, no bonus.
-export function _egMeleeReachPx() {
+export function _meleeReachPx() {
     let family = 'unarmed';
-    try { family = _egGetEquippedWeaponInfo().family || 'unarmed'; } catch (e) { family = 'unarmed'; }
-    const base = EG_MELEE_REACH_PX[family] != null ? EG_MELEE_REACH_PX[family] : EG_MELEE_REACH_PX.sword;
+    try { family = _getEquippedWeaponInfo().family || 'unarmed'; } catch (e) { family = 'unarmed'; }
+    const base = MELEE_REACH_PX[family] != null ? MELEE_REACH_PX[family] : MELEE_REACH_PX.sword;
     let bonusPx = 0;
     try {
-        const ps = (typeof _egComputePlayerStats === 'function') ? _egComputePlayerStats() : {};
-        bonusPx = (Number(ps.meleeRangeM) || 0) * EG_PX_PER_METER;
+        const ps = (typeof _computePlayerStats === 'function') ? _computePlayerStats() : {};
+        bonusPx = (Number(ps.meleeRangeM) || 0) * PX_PER_METER;
     } catch (e) { bonusPx = 0; }
     return base + bonusPx;
 }
@@ -131,14 +131,14 @@ export function _egMeleeReachPx() {
 // Distance in px from the avatar's centre to the nearest edge of a monster's
 // card (0 when the avatar stands on it). Null when either is not on screen
 // (tests, teardown) - callers treat that as "cannot tell" and fail open.
-function _egMeleeEdgeDistance(targetId) {
+function _meleeEdgeDistance(targetId) {
     try {
         const card = document.getElementById(`eg-card-${targetId}`);
         const avatar = document.getElementById('player-avatar-wrapper')
             || document.getElementById('player-avatar-simple');
         if (!card || !avatar) return null;
-        const a = (typeof _egGetElementCentre === 'function')
-            ? _egGetElementCentre(avatar)
+        const a = (typeof _getElementCentre === 'function')
+            ? _getElementCentre(avatar)
             : avatar.getBoundingClientRect();
         const ax = (a.x != null) ? a.x : a.left, ay = (a.y != null) ? a.y : a.top;
         const r = card.getBoundingClientRect();
@@ -148,8 +148,8 @@ function _egMeleeEdgeDistance(targetId) {
             return Math.hypot(ax - nx, ay - ny);
         }
         // Hidden / unmeasured card: fall back to its centre point.
-        const b = (typeof _egGetElementCentre === 'function')
-            ? _egGetElementCentre(card) : null;
+        const b = (typeof _getElementCentre === 'function')
+            ? _getElementCentre(card) : null;
         if (!b) return null;
         const bx = (b.x != null) ? b.x : b.left, by = (b.y != null) ? b.y : b.top;
         return Math.hypot(ax - bx, ay - by);
@@ -160,37 +160,37 @@ function _egMeleeEdgeDistance(targetId) {
 
 // True when the avatar stands close enough to the target to strike it.
 // Missing DOM (tests, teardown) never blocks - fail open.
-export function _egMeleeTargetInRange(targetId) {
-    const d = _egMeleeEdgeDistance(targetId);
+export function _meleeTargetInRange(targetId) {
+    const d = _meleeEdgeDistance(targetId);
     if (d == null) return true;
-    return d <= _egMeleeReachPx();
+    return d <= _meleeReachPx();
 }
 
 // "Look around": the monster a plain melee swing would actually hit. The
 // SELECTED target when it is in reach, otherwise the nearest living monster
 // in reach, otherwise null (a clean whiff - no target needed to swing).
 // Without any DOM to measure against it simply returns the preferred id.
-export function _egMeleeFindVictim(preferredId) {
-    if (preferredId != null && _egMeleeEdgeDistance(preferredId) == null) {
+export function _meleeFindVictim(preferredId) {
+    if (preferredId != null && _meleeEdgeDistance(preferredId) == null) {
         // Cannot measure the selection at all (no DOM): fail open like
-        // _egMeleeTargetInRange so headless paths keep their old behaviour.
+        // _meleeTargetInRange so headless paths keep their old behaviour.
         return preferredId;
     }
     // The nearest living monster in reach wins; the selected one only keeps
-    // the swing when it is about as close (within EG_MELEE_TIE_PX) as the nearest.
-    const reach = _egMeleeReachPx();
+    // the swing when it is about as close (within MELEE_TIE_PX) as the nearest.
+    const reach = _meleeReachPx();
     let best = null;
     let bestD = Infinity;
     let prefD = Infinity;
-    const list = Array.isArray(globalThis._egMonsters) ? globalThis._egMonsters : [];
+    const list = Array.isArray(globalThis._monsters) ? globalThis._monsters : [];
     for (const m of list) {
         if (!m || !(m.currentHP > 0)) continue;
-        const d = _egMeleeEdgeDistance(m.id);
+        const d = _meleeEdgeDistance(m.id);
         if (d == null || d > reach) continue;
         if (m.id === preferredId) prefD = d;
         if (d < bestD) { best = m.id; bestD = d; }
     }
-    if (preferredId != null && prefD <= bestD + EG_MELEE_TIE_PX) return preferredId;
+    if (preferredId != null && prefD <= bestD + MELEE_TIE_PX) return preferredId;
     return best;
 }
 
@@ -199,13 +199,13 @@ export function _egMeleeFindVictim(preferredId) {
 // monster (the selected one is out of reach, another stands next to the
 // hero) that monster's card gets .eg-card-melee-target. Called every combat
 // tick; only touches the DOM when the marked card actually changes.
-export function _egUpdateMeleeMarker() {
+export function _updateMeleeMarker() {
     let victim = null;
     try {
-        const info = _egGetEquippedWeaponInfo();
+        const info = _getEquippedWeaponInfo();
         if (info.item && info.item.slotType === 'weapon') {
-            const selected = globalThis._egTargetId || null;
-            const v = _egMeleeFindVictim(selected);
+            const selected = globalThis._targetId || null;
+            const v = _meleeFindVictim(selected);
             if (v != null && v !== selected) victim = v;
         }
     } catch (e) { victim = null; }
@@ -219,18 +219,18 @@ export function _egUpdateMeleeMarker() {
 // Which way the swing should face: toward the monster being struck (or the
 // selected one, when nothing is in reach, so the whiff points at it), else
 // the last walked direction.
-export function _egMeleeAimFacing(targetId) {
+export function _meleeAimFacing(targetId) {
     try {
         if (targetId != null) {
             const card = document.getElementById(`eg-card-${targetId}`);
             const avatar = document.getElementById('player-avatar-wrapper')
                 || document.getElementById('player-avatar-simple');
-            if (card && avatar && typeof _egGetElementCentre === 'function') {
-                const a = _egGetElementCentre(avatar);
-                const b = _egGetElementCentre(card);
-                return _egFacingFromVector(b.x - a.x, b.y - a.y);
+            if (card && avatar && typeof _getElementCentre === 'function') {
+                const a = _getElementCentre(avatar);
+                const b = _getElementCentre(card);
+                return _facingFromVector(b.x - a.x, b.y - a.y);
             }
         }
     } catch (e) { /* fall through to the walk facing */ }
-    return _egGetAttackFacing();
+    return _getAttackFacing();
 }

@@ -2,7 +2,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { _getGlobalCooldownReduction } from '../classes/class-cooldown-state.js';
-import { _egApplyDamageConversion, _egHasDamageConversion, _egLeechAbsorption, _egLeechHealMult } from '../combat/combat-calculations-resistances.js';
+import { _applyDamageConversion, _hasDamageConversion, _leechAbsorption, _leechHealMult } from '../combat/combat-calculations-resistances.js';
 import { _applyManaCostModifiers, _bloodMagicActive, _scaleAbilityManaCost, canAffordLifeCost, canAffordMana, payAbilityCost } from '../classes/class-mana.js';
 import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellManaCostOverrideForSkill, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill, isSkillCharmUnlocked, noteCharmCast } from './skill-charms.js';
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
@@ -20,7 +20,7 @@ import { STATE } from '../state.js';
 //   - lives in the SPELLBOOK under its own "Universal" section,
 //   - is dragged onto the hotbar like any other skill,
 //   - costs MANA (scaled by _scaleAbilityManaCost, Blood-Magic aware),
-//   - deals DIRECT damage to monsters via _egDamageTargetById,
+//   - deals DIRECT damage to monsters via _damageTargetById,
 //   - plays a code-drawn themed effect (see universal-spell-fx.js +
 //     css/universal-spells.css - no emoji in combat visuals).
 //
@@ -322,7 +322,7 @@ export const UNIVERSAL_SPELL_DEFS = [
 
     // ── PHYSICAL (melee strikes - thrown-blade visuals) ─────────────────
     // element 'physical' = pure physical hit: no elemental breakdown, so
-    // only monster PHYSICAL resistance mitigates it (see _egApplyTargetResistances).
+    // only monster PHYSICAL resistance mitigates it (see _applyTargetResistances).
     {
         id: 'usp_heroic_strike', icon: '🤺', theme: 'blade', element: 'physical', damageKind: 'physical',
         behavior: 'single', dmg: [11, 13], manaCost: 23, cooldownSeconds: 3, castTimeSeconds: 0.6,
@@ -921,7 +921,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // ── MOVEMENT (repositioning self-casts) ──────────────────────────────
     // No monster target and no damage: these move YOU. They exist because
     // damage against the player is resolved against the SPRITE'S HITBOX
-    // (js/combat/combat-hazards.js → _egHzPlayerRect) and bosses telegraph
+    // (js/combat/combat-hazards.js → _hzPlayerRect) and bosses telegraph
     // where they are about to land, so "be somewhere else in time" is real
     // defence. Everything here aims with the direction the sprite last
     // WALKED (js/sprite/player_sprite.js → getAvatarLastMoveDir).
@@ -1337,7 +1337,7 @@ export function _uspSupportGroupTitle() {
 // DURATION is flat per spell. Cooldowns are long relative to durations on
 // purpose: every support spell is a decision about WHEN, not a passive aura.
 //
-// CLEANUP: buffs live only inside an encounter. _egStopEncounter() and
+// CLEANUP: buffs live only inside an encounter. _stopEncounter() and
 // startLevel() call _uspClearSupportBuffs(), and the sweep respects
 // _gamePaused so pausing (spell book open) does not burn buff time.
 //------------------------------------------------------------------------
@@ -1449,8 +1449,8 @@ function _uspSupportRankMultFor(spellId, rank) {
 // limits, never a new one.
 export function _uspHealingPower() {
     try {
-        if (typeof globalThis._egComputePlayerStats === 'function') {
-            const s = globalThis._egComputePlayerStats() || {};
+        if (typeof globalThis._computePlayerStats === 'function') {
+            const s = globalThis._computePlayerStats() || {};
             return {
                 flat: Math.max(0, Number(s.healingPowerFlat) || 0),
                 incPct: Math.max(0, Number(s.healingPowerIncPct) || 0),
@@ -1480,8 +1480,8 @@ export function _uspMaxLife() {
 // Barrier has nothing to refill and says so instead of silently no-oping.
 export function _uspMaxAbsorption() {
     try {
-        if (typeof globalThis._egComputePlayerStats === 'function') {
-            return Math.max(0, Math.round(globalThis._egComputePlayerStats().absorption || 0));
+        if (typeof globalThis._computePlayerStats === 'function') {
+            return Math.max(0, Math.round(globalThis._computePlayerStats().absorption || 0));
         }
     } catch (e) { /* outside an endgame level - no shield */ }
     return 0;
@@ -1552,7 +1552,7 @@ export function _uspCalcWardCharges(spell, rank) {
 function _uspHealPlayer(amount) {
     if (typeof globalThis.playerCurrentHP !== 'undefined' && typeof globalThis.playerMaxHP !== 'undefined') {
         const before = globalThis.playerCurrentHP;
-        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, before + (globalThis._egLifeGain ? globalThis._egLifeGain(Math.max(0, Math.round(amount))) : (Math.max(0, Math.round(amount)))));
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, before + (globalThis._lifeGain ? globalThis._lifeGain(Math.max(0, Math.round(amount))) : (Math.max(0, Math.round(amount)))));
         const gained = globalThis.playerCurrentHP - before;
         if (gained > 0 && typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
         return gained;
@@ -1562,12 +1562,12 @@ function _uspHealPlayer(amount) {
 
 // Adds to the absorption shield; returns the amount actually gained.
 function _uspRestoreAbsorption(amount) {
-    if (typeof globalThis._egPlayerAbsorptionCurrent === 'undefined') return 0;
+    if (typeof globalThis._playerAbsorptionCurrent === 'undefined') return 0;
     const max = _uspMaxAbsorption();
     if (max <= 0) return 0;
-    const before = globalThis._egPlayerAbsorptionCurrent;
-    globalThis._egPlayerAbsorptionCurrent = Math.min(max, before + Math.max(0, Math.round(amount)));
-    return globalThis._egPlayerAbsorptionCurrent - before;
+    const before = globalThis._playerAbsorptionCurrent;
+    globalThis._playerAbsorptionCurrent = Math.min(max, before + Math.max(0, Math.round(amount)));
+    return globalThis._playerAbsorptionCurrent - before;
 }
 
 // ---------------------------------------------------------------------
@@ -1756,10 +1756,10 @@ export function _uspReflectThorns(attacker, incoming) {
     if (!attacker || !attacker.id) return;
     const pct = _uspBuffSum('thorns', 'thornsPct');
     if (pct <= 0 || !(incoming > 0)) return;
-    if (typeof globalThis._egDamageTargetById !== 'function') return;
+    if (typeof globalThis._damageTargetById !== 'function') return;
     const dealt = Math.max(1, Math.round(incoming * pct / 100));
     try {
-        globalThis._egDamageTargetById(attacker.id, dealt, {}, {});
+        globalThis._damageTargetById(attacker.id, dealt, {}, {});
         try { _uspRetributionFlare(); } catch (fxe) { /* flare is cosmetic */ }
         const de = (typeof LANG !== 'undefined' && LANG === 'de');
         if (typeof globalThis.showToast === 'function') globalThis.showToast(`🔥 ${de ? 'Vergeltung' : 'Retribution'} (-${dealt})`, '#ff8a65');
@@ -1900,8 +1900,8 @@ function _uspApplySupportSpell(spell) {
 
         case 'cleanse': {
             try {
-                if (typeof globalThis._egCleansePlayerAilments === 'function') {
-                    globalThis._egCleansePlayerAilments(spell.cleanses, _uspCleanseMaxLevel(spell));
+                if (typeof globalThis._cleansePlayerAilments === 'function') {
+                    globalThis._cleansePlayerAilments(spell.cleanses, _uspCleanseMaxLevel(spell));
                 }
             } catch (e) { /* ailments module not ready */ }
             _uspSupportCastFX(spell, de ? 'gereinigt' : 'cleansed', 'heal');
@@ -1912,7 +1912,7 @@ function _uspApplySupportSpell(spell) {
             const n = _uspGauntletCells(spell);
             let made = 0;
             try {
-                if (typeof globalThis._egGauntletSummonRevealCells === 'function') made = globalThis._egGauntletSummonRevealCells(n);
+                if (typeof globalThis._gauntletSummonRevealCells === 'function') made = globalThis._gauntletSummonRevealCells(n);
             } catch (e) { /* arena vanished mid-cast */ }
             return `${made} ${de ? (made === 1 ? 'Aufdeckzelle' : 'Aufdeckzellen') : (made === 1 ? 'reveal cell' : 'reveal cells')}`;
         }
@@ -1987,7 +1987,7 @@ export function getUniversalSpellSupportEstimate(spellId) {
 // The repositioning family: blink / dash / disengage / windstep / rift anchor.
 //
 // WHY THIS EXISTS - damage against the player is resolved against the
-// SPRITE'S HITBOX (js/combat/combat-hazards.js → _egHzPlayerRect), and the
+// SPRITE'S HITBOX (js/combat/combat-hazards.js → _hzPlayerRect), and the
 // game's own design note says a boss special is only avoidable by MOVEMENT
 // AND POSITION. Walking is 320px/s, so a telegraph that resolves faster than
 // that is unavoidable without a movement ability. That is the niche these
@@ -2189,16 +2189,16 @@ function _uspLeapGlide(el, fromX, fromY, toX, toY, ms, dir, arcPx, onLand) {
 // Viewport centre of a living monster's card, or null.
 function _uspMonsterCentre(id) {
     const card = document.getElementById(`eg-card-${id}`);
-    if (!card || typeof globalThis._egGetElementCentre !== 'function') return null;
+    if (!card || typeof globalThis._getElementCentre !== 'function') return null;
     const r = card.getBoundingClientRect();
     if (!r.width && !r.height) return null;
-    return globalThis._egGetElementCentre(card);
+    return globalThis._getElementCentre(card);
 }
 
 // The monster a Leap Strike jumps to: the selected one, else the nearest.
 function _uspLeapTarget(from) {
     let sel = null;
-    try { sel = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null; } catch (e) { sel = null; }
+    try { sel = (typeof globalThis._getTarget === 'function') ? globalThis._getTarget() : null; } catch (e) { sel = null; }
     if (sel && sel.currentHP > 0) {
         const c = _uspMonsterCentre(sel.id);
         if (c) return { mon: sel, c };
@@ -2344,7 +2344,7 @@ function _uspApplyMovementSpell(spell) {
             try { _uspBlinkFX(Object.assign({}, spell, { behavior: 'disengage' }), pos.x, pos.y, tx, ty, true); } catch (e) { /* takeoff dust is cosmetic */ }
             _uspLeapGlide(pos.el, pos.x, pos.y, tx, ty, ms, dir, Math.min(90, 40 + travel * 0.12), () => {
                 try {
-                    if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
+                    if (typeof globalThis._isActive === 'function' && !globalThis._isActive()) return;
                 } catch (e) { return; }
                 const land = _uspAvatarPos();
                 try { _uspLeapImpactFX(land ? land.x + off.x : tx + off.x, land ? land.y + off.y + 34 : ty + off.y + 34); } catch (e) { /* impact is cosmetic */ }
@@ -2354,8 +2354,8 @@ function _uspApplyMovementSpell(spell) {
                 if (spell.stagger) {
                     mon.staggeredUntil = Math.max(mon.staggeredUntil || 0, Date.now() + spell.stagger);
                     try {
-                        if (typeof globalThis._egShowStatusLabel === 'function') {
-                            globalThis._egShowStatusLabel(mon.id, de ? 'BENOMMEN' : 'STAGGERED');
+                        if (typeof globalThis._showStatusLabel === 'function') {
+                            globalThis._showStatusLabel(mon.id, de ? 'BENOMMEN' : 'STAGGERED');
                         }
                     } catch (e) { /* label is cosmetic */ }
                 }
@@ -2826,11 +2826,11 @@ function startUniversalSpellCooldown(spellId, secondsOverride) {
 
 function _uspRollCritMult() {
     try {
-        if (typeof globalThis._egComputePlayerStats === 'function' && typeof globalThis._egRollCrit === 'function') {
-            const critStats = globalThis._egComputePlayerStats();
+        if (typeof globalThis._computePlayerStats === 'function' && typeof globalThis._rollCrit === 'function') {
+            const critStats = globalThis._computePlayerStats();
             // Spell-only crit lines from the passive tree (spell_crit_chance /
             // spell_crit_multi) ride along as this roll's bonus.
-            return globalThis._egRollCrit(critStats, {
+            return globalThis._rollCrit(critStats, {
                 chance: critStats.spellCritChancePct || 0,
                 multiplierPct: critStats.spellCritMultiplierPct || 0,
             });
@@ -2861,7 +2861,7 @@ function _uspSpellLevelRamp(level) {
     let lv = Number(level);
     if (!Number.isFinite(lv)) {
         try {
-            lv = Number(typeof globalThis._egGetPlayerLevel === 'function' ? globalThis._egGetPlayerLevel() : STATE.playerLevel) || 1;
+            lv = Number(typeof globalThis._getPlayerLevel === 'function' ? globalThis._getPlayerLevel() : STATE.playerLevel) || 1;
         } catch (e) { lv = 1; }
     }
     if (lv <= USP_SPELL_RAMP_FROM_LEVEL) return 1;
@@ -2897,8 +2897,8 @@ function _uspPhysicalWeaponPart(spell, stats, tree) {
 }
 
 function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
-    const stats = (typeof globalThis._egComputePlayerStats === 'function')
-        ? globalThis._egComputePlayerStats() : {};
+    const stats = (typeof globalThis._computePlayerStats === 'function')
+        ? globalThis._computePlayerStats() : {};
     const tree = getUniversalSpellDamageBonus(spell);
     const isPhys = spell.damageKind === 'physical';
     const flatShare = Math.max(USP_FLAT_MIN_SHARE, Math.min(1, ((dmgMin + dmgMax) / 2) / USP_FLAT_FULL_HIT));
@@ -2955,7 +2955,7 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
     try {
         let common = 1;
         if (typeof globalThis._egMapPlayerDamageMult === 'function') common *= globalThis._egMapPlayerDamageMult();
-        if (typeof globalThis._egQuizDamageBuffMult === 'function') common *= globalThis._egQuizDamageBuffMult();
+        if (typeof globalThis._quizDamageBuffMult === 'function') common *= globalThis._quizDamageBuffMult();
         // Charm orbs applied to this spell's charm: +1% damage each
         // (js/skills/skill-charms.js).
         common *= getCharmSkillDamageMult(spell.id);
@@ -2973,8 +2973,8 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
         elements[spellElement] = amount;
     }
     // Fire conversion / fire-only (Primal Flame keystone, node 350).
-    if (_egHasDamageConversion(stats) === true) {
-        const converted = _egApplyDamageConversion(stats, spellElement === 'physical' ? amount : 0, elements);
+    if (_hasDamageConversion(stats) === true) {
+        const converted = _applyDamageConversion(stats, spellElement === 'physical' ? amount : 0, elements);
         elements = converted.elements;
         amount = Math.max(1, Math.round(converted.physical
             + elements.fire + elements.cold + elements.lightning + elements.shadow));
@@ -2983,9 +2983,9 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
     // Life leech mirrors the weapon channels (heal on spell hits too).
     try {
         if (stats.lifeLeechPct > 0 && (stats.lifeLeechAsAbsorption || 0) > 0) {
-            _egLeechAbsorption(stats, amount, stats.lifeLeechPct);
+            _leechAbsorption(stats, amount, stats.lifeLeechPct);
         } else if (stats.lifeLeechPct > 0 && typeof globalThis.playerCurrentHP !== 'undefined') {
-            const heal = Math.round(amount * (stats.lifeLeechPct / 100) * _egLeechHealMult(stats));
+            const heal = Math.round(amount * (stats.lifeLeechPct / 100) * _leechHealMult(stats));
             if (heal > 0 && typeof globalThis.playerMaxHP !== 'undefined') {
                 globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
                 if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
@@ -2995,7 +2995,7 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
 
     // Absorption leech from spell damage (passive tree: absorption_leech_spell).
     try {
-        if (stats.absorptionLeechSpellPct > 0) _egLeechAbsorption(stats, amount, stats.absorptionLeechSpellPct);
+        if (stats.absorptionLeechSpellPct > 0) _leechAbsorption(stats, amount, stats.absorptionLeechSpellPct);
     } catch (e) { /* leech is best-effort */ }
 
     return { amount, elements, isCrit };
@@ -3025,7 +3025,7 @@ export function getUniversalSpellDamageEstimate(spellId) {
     const swingHits = (spell.castKind === 'melee' && spell.melee) ? Math.max(1, Math.round(spell.melee.hits || 1)) : 0;
     if (swingHits && spell.damageKind === 'physical' && !spell.melee.noWeapon && spell.behavior !== 'aura') {
         try {
-            const stats = globalThis._egComputePlayerStats();
+            const stats = globalThis._computePlayerStats();
             const part = _uspPhysicalWeaponPart(spell, stats, getUniversalSpellDamageBonus(spell));
             swing = (part.flat / swingHits) * (1 + part.incPct / 100);
         } catch (e) { swing = 0; }
@@ -3088,8 +3088,8 @@ function _uspPlaySfx(spell) {
 
 function _uspLivingMonsters() {
     try {
-        if (typeof globalThis._egMonsters === 'undefined' || !globalThis._egMonsters) return [];
-        return globalThis._egMonsters.filter((m) => m && m.currentHP > 0);
+        if (typeof globalThis._monsters === 'undefined' || !globalThis._monsters) return [];
+        return globalThis._monsters.filter((m) => m && m.currentHP > 0);
     } catch (e) { return []; }
 }
 
@@ -3114,7 +3114,7 @@ function _uspStrike(spell, monsterId, dmgMin, dmgMax, opts) {
     try {
         _uspFireThemedProjectile(spell, monsterId, hit, fxOpts);
     } catch (e) {
-        try { globalThis._egDamageTargetById(monsterId, hit.amount, hit.elements, { isCrit: hit.isCrit, isPlayerSpell: true }); } catch (e2) {}
+        try { globalThis._damageTargetById(monsterId, hit.amount, hit.elements, { isCrit: hit.isCrit, isPlayerSpell: true }); } catch (e2) {}
     }
 }
 
@@ -3124,9 +3124,9 @@ function _uspStrike(spell, monsterId, dmgMin, dmgMax, opts) {
 // reach. Null when nothing stands in reach.
 function _uspMeleeVictimId() {
     try {
-        const sel = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null;
-        if (typeof globalThis._egMeleeFindVictim !== 'function') return sel ? sel.id : null;
-        const id = globalThis._egMeleeFindVictim(sel ? sel.id : null);
+        const sel = (typeof globalThis._getTarget === 'function') ? globalThis._getTarget() : null;
+        if (typeof globalThis._meleeFindVictim !== 'function') return sel ? sel.id : null;
+        const id = globalThis._meleeFindVictim(sel ? sel.id : null);
         return id == null ? null : id;
     } catch (e) { return null; }
 }
@@ -3138,10 +3138,10 @@ function _uspMeleeVictimId() {
 function _uspMeleeAimPoint(origin) {
     const centreOf = (id) => {
         const card = document.getElementById(`eg-card-${id}`);
-        if (!card || typeof globalThis._egGetElementCentre !== 'function') return null;
+        if (!card || typeof globalThis._getElementCentre !== 'function') return null;
         const r = card.getBoundingClientRect();
         if (!r.width && !r.height) return null;
-        return globalThis._egGetElementCentre(card);
+        return globalThis._getElementCentre(card);
     };
     const meleeId = _uspMeleeVictimId();
     if (meleeId != null) {
@@ -3149,7 +3149,7 @@ function _uspMeleeAimPoint(origin) {
         if (c) return c;
     }
     try {
-        const sel = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null;
+        const sel = (typeof globalThis._getTarget === 'function') ? globalThis._getTarget() : null;
         if (sel && sel.currentHP > 0) {
             const c = centreOf(sel.id);
             if (c) return c;
@@ -3182,7 +3182,7 @@ function _uspApplyMeleeSpell(spell) {
     // A ring is centred on the caster; a cone points at the aim point.
     const point = m.kind === 'circle' ? origin : aim;
     const live = () => {
-        try { return typeof globalThis._egIsActive !== 'function' || !!globalThis._egIsActive(); } catch (e) { return false; }
+        try { return typeof globalThis._isActive !== 'function' || !!globalThis._isActive(); } catch (e) { return false; }
     };
     const inside = () => _uspLivingMonsters().filter((mon) => {
         const card = document.getElementById(`eg-card-${mon.id}`);
@@ -3201,7 +3201,7 @@ function _uspApplyMeleeSpell(spell) {
         let bestD = Infinity;
         for (const mon of list) {
             const card = document.getElementById(`eg-card-${mon.id}`);
-            const c = card && typeof globalThis._egGetElementCentre === 'function' ? globalThis._egGetElementCentre(card) : null;
+            const c = card && typeof globalThis._getElementCentre === 'function' ? globalThis._getElementCentre(card) : null;
             const d = c ? Math.hypot(c.x - origin.x, c.y - origin.y) : Infinity;
             if (d < bestD) { best = mon; bestD = d; }
         }
@@ -3238,8 +3238,8 @@ function _uspApplyMeleeSpell(spell) {
         first.forEach((mon) => {
             mon.staggeredUntil = Math.max(mon.staggeredUntil || 0, until);
             try {
-                if (typeof globalThis._egShowStatusLabel === 'function') {
-                    globalThis._egShowStatusLabel(mon.id, (typeof LANG !== 'undefined' && LANG === 'de') ? 'BENOMMEN' : 'STAGGERED');
+                if (typeof globalThis._showStatusLabel === 'function') {
+                    globalThis._showStatusLabel(mon.id, (typeof LANG !== 'undefined' && LANG === 'de') ? 'BENOMMEN' : 'STAGGERED');
                 }
             } catch (e) { /* label is cosmetic */ }
         });
@@ -3293,7 +3293,7 @@ function _uspApplyGroundSpell(spell, point) {
     if (!shape || !point) return;
     const origin = getAvatarCentre();
     const live = () => {
-        try { return typeof globalThis._egIsActive !== 'function' || !!globalThis._egIsActive(); } catch (e) { return false; }
+        try { return typeof globalThis._isActive !== 'function' || !!globalThis._isActive(); } catch (e) { return false; }
     };
     const victims = () => _uspLivingMonsters().filter((m) => {
         const card = document.getElementById(`eg-card-${m.id}`);
@@ -3388,7 +3388,7 @@ function _uspBeginGroundTargeting(spell) {
                 if (typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused) return;
             } catch (e) { return; }
             if (!isSkillCharmUnlocked(spellId)) return;
-            if (Date.now() < (Number(globalThis._egPlayerStunnedUntil) || 0)) {
+            if (Date.now() < (Number(globalThis._playerStunnedUntil) || 0)) {
                 if (typeof globalThis.showToast === 'function') globalThis.showToast(t('eg_stunned'), '#ff6b9d');
                 return;
             }
@@ -3423,7 +3423,7 @@ function _uspNoManaToast() {
 }
 
 function _uspEncounterLive() {
-    try { return typeof globalThis._egIsActive !== 'function' || !!globalThis._egIsActive(); } catch (e) { return false; }
+    try { return typeof globalThis._isActive !== 'function' || !!globalThis._isActive(); } catch (e) { return false; }
 }
 
 function _uspPlayerDead() {
@@ -3452,7 +3452,7 @@ export function fireUniversalChannelTick(spellId, isFirst) {
     if (!living.length) return false;
     let victim = null;
     try {
-        const sel = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null;
+        const sel = (typeof globalThis._getTarget === 'function') ? globalThis._getTarget() : null;
         if (sel) victim = living.find((m) => m.id === sel.id) || null;
     } catch (e) { victim = null; }
     if (!victim) victim = living[0];
@@ -3657,7 +3657,7 @@ export function castUniversalSpell(spellId, opts) {
     // lands). Cost and cooldown are NOT consumed when the cast is refused
     // (mirrors the Fireball rule).
     let encounterOn = false;
-    try { encounterOn = (typeof globalThis._egIsActive === 'function') && globalThis._egIsActive(); } catch (e) {}
+    try { encounterOn = (typeof globalThis._isActive === 'function') && globalThis._isActive(); } catch (e) {}
     const isSupport = isUniversalSupportSpell(spell);
     const isMovement = isUniversalMovementSpell(spell);
     // Ground spells aim at a spot, not a target - they only need the fight.
@@ -3666,7 +3666,7 @@ export function castUniversalSpell(spellId, opts) {
     const isMelee = getUniversalSpellCastKind(spell) === 'melee';
     const living = _uspLivingMonsters();
     let target = null;
-    try { target = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null; } catch (e) {}
+    try { target = (typeof globalThis._getTarget === 'function') ? globalThis._getTarget() : null; } catch (e) {}
     if (!encounterOn || (!(isSupport || isMovement || isGround || isMelee || isToggle) && (living.length === 0 || !target))) {
         _uspNoTargetToast(spell);
         return false;
@@ -3737,8 +3737,8 @@ export function castUniversalSpell(spellId, opts) {
     if (spell.cleanses) {
         let plan = { removed: [], blocked: [] };
         try {
-            if (typeof globalThis._egCleansePlayerAilments === 'function') {
-                plan = globalThis._egCleansePlayerAilments(spell.cleanses, _uspCleanseMaxLevel(spell), true);
+            if (typeof globalThis._cleansePlayerAilments === 'function') {
+                plan = globalThis._cleansePlayerAilments(spell.cleanses, _uspCleanseMaxLevel(spell), true);
             }
         } catch (e) { /* ailments module not ready */ }
         if (!plan.removed.length) {
@@ -3762,7 +3762,7 @@ export function castUniversalSpell(spellId, opts) {
     // training, between waves) - before any mana or cooldown is spent.
     if (spell.gauntletOnly) {
         let inArena = false;
-        try { inArena = typeof globalThis._egGauntletFighting === 'function' && globalThis._egGauntletFighting(); } catch (e) {}
+        try { inArena = typeof globalThis._gauntletFighting === 'function' && globalThis._gauntletFighting(); } catch (e) {}
         if (!inArena) {
             Audio_Manager.playSFX('spell_fizzle');
             const msg = (typeof LANG !== 'undefined' && LANG === 'de') ? '🔎 Nur im Gauntlet nutzbar!' : '🔎 Gauntlet only!';
@@ -3863,7 +3863,7 @@ export function castUniversalSpell(spellId, opts) {
             for (let i = 0; i < n; i++) {
                 setTimeout(() => {
                     try {
-                        if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
+                        if (typeof globalThis._isActive === 'function' && !globalThis._isActive()) return;
                     } catch (e) { return; }
                     _uspStrike(spell, targetId, spell.dmg[0], spell.dmg[1], { volleyIndex: i, volleyTotal: n });
                 }, i * step);
@@ -3880,7 +3880,7 @@ export function castUniversalSpell(spellId, opts) {
                         const pool = _uspLivingMonsters();
                         if (!pool.length) return;
                         try {
-                            if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
+                            if (typeof globalThis._isActive === 'function' && !globalThis._isActive()) return;
                         } catch (e) { return; }
                         const victim = pool[Math.floor(Math.random() * pool.length)];
                         _uspStrike(spell, victim.id, spell.dmg[0], spell.dmg[1], { fromSky: true });
@@ -3892,7 +3892,7 @@ export function castUniversalSpell(spellId, opts) {
                 pool.forEach((m, i) => {
                     setTimeout(() => {
                         try {
-                            if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
+                            if (typeof globalThis._isActive === 'function' && !globalThis._isActive()) return;
                         } catch (e) { return; }
                         _uspStrike(spell, m.id, spell.dmg[0], spell.dmg[1], { isAoE: true });
                     }, i * 70);
@@ -3909,7 +3909,7 @@ export function castUniversalSpell(spellId, opts) {
             for (let i = 0; i < total; i++) {
                 setTimeout(() => {
                     try {
-                        if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
+                        if (typeof globalThis._isActive === 'function' && !globalThis._isActive()) return;
                     } catch (e) { return; }
                     if (hitAll) {
                         _uspLivingMonsters().slice(0, 8).forEach((m) => {
@@ -3949,7 +3949,7 @@ export function castUniversalSpell(spellId, opts) {
                 if (depth + 1 < maxJumps) {
                     setTimeout(() => {
                         try {
-                            if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
+                            if (typeof globalThis._isActive === 'function' && !globalThis._isActive()) return;
                         } catch (e) { return; }
                         jump(victim.id, depth + 1);
                     }, 200);
@@ -3979,13 +3979,13 @@ export function castUniversalSpell(spellId, opts) {
             } catch (e) { /* telegraph is cosmetic */ }
             setTimeout(() => {
                 try {
-                    if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
+                    if (typeof globalThis._isActive === 'function' && !globalThis._isActive()) return;
                 } catch (e) { return; }
                 if (spell.hitsAll) {
                     _uspLivingMonsters().slice(0, 8).forEach((m, i) => {
                         setTimeout(() => {
                             try {
-                                if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
+                                if (typeof globalThis._isActive === 'function' && !globalThis._isActive()) return;
                             } catch (e) { return; }
                             _uspStrike(spell, m.id, lo, hi, { fromSky: true, isAoE: true, blastPower: pw, isBig: pw >= 1.3 });
                         }, i * 70);
@@ -4008,7 +4008,7 @@ export function castUniversalSpell(spellId, opts) {
                     const pool = _uspLivingMonsters();
                     if (!pool.length) return;
                     try {
-                        if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
+                        if (typeof globalThis._isActive === 'function' && !globalThis._isActive()) return;
                     } catch (e) { return; }
                     const victim = pool[Math.floor(Math.random() * pool.length)];
                     _uspStrike(spell, victim.id, spell.dmg[0], spell.dmg[1], { wildIndex: i });

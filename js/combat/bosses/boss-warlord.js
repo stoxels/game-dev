@@ -1,8 +1,8 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { _egRenderPanel, _egSpawnMonster } from '../encounter.js';
-import { EG_MAX_CONCURRENT_MONSTERS } from '../combat-monsters.js';
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkToast } from './shared-boss-abilities.js';
+import { _renderPanel, _spawnMonster } from '../encounter.js';
+import { MAX_CONCURRENT_MONSTERS } from '../combat-monsters.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE WARLORD (boss_warlord)---------------------------
@@ -15,7 +15,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_warlord: {
         id: 'boss_warlord', name: 'The Warlord', emoji: '🗡️',
         baseHP: 1200, baseDamage: 26, chargeMax: 11,
@@ -23,7 +23,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_warlord: {
         phases: [
             { threshold: 1.00, chargeMax: 11, damageMultiplier: 1.00 },
@@ -32,9 +32,9 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 3000,
         mechanics: [
-            { name: 'guard_call', intervalBase: 20000, intervalVariance: 4000, handler: '_egMechGuardCall' },
-            { name: 'triple_rings', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechTripleRings' },
-            { name: 'soul_tithe', intervalBase: 24000, intervalVariance: 5000, handler: '_egMechSoulTithe' },
+            { name: 'guard_call', intervalBase: 20000, intervalVariance: 4000, handler: '_mechGuardCall' },
+            { name: 'triple_rings', intervalBase: 19000, intervalVariance: 4000, handler: '_mechTripleRings' },
+            { name: 'soul_tithe', intervalBase: 24000, intervalVariance: 5000, handler: '_mechSoulTithe' },
         ],
     },
 });
@@ -42,21 +42,21 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // Spawns guard monsters and turns the boss immune until they all die.
 // The shield drops early if the guards survive past the time limit.
-export function _egMechGuardCall(monster, phase) {
-    if (!monster || monster.warlordGuard || _egNkFrozen()) return;
-    if (typeof _egSpawnMonster !== 'function') return;
+export function _mechGuardCall(monster, phase) {
+    if (!monster || monster.warlordGuard || _nkFrozen()) return;
+    if (typeof _spawnMonster !== 'function') return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const count = [0, 2, 3, 3][p];
     const level = Math.max(1, Math.round(monster.level || 1));
     const pool = ['slime', 'ghost', 'rat', 'bat', 'bee'];
-    const cap = (typeof EG_MAX_CONCURRENT_MONSTERS !== 'undefined') ? EG_MAX_CONCURRENT_MONSTERS : 6;
-    const before = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.length : 0;
+    const cap = (typeof MAX_CONCURRENT_MONSTERS !== 'undefined') ? MAX_CONCURRENT_MONSTERS : 6;
+    const before = (typeof _monsters !== 'undefined') ? globalThis._monsters.length : 0;
     for (let i = 0; i < count; i++) {
-        if (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length >= cap) break;
-        _egSpawnMonster(pool[Math.floor(Math.random() * pool.length)], level);
+        if (typeof _monsters !== 'undefined' && globalThis._monsters.length >= cap) break;
+        _spawnMonster(pool[Math.floor(Math.random() * pool.length)], level);
     }
-    const fresh = (typeof _egMonsters !== 'undefined')
-        ? globalThis._egMonsters.slice(before).filter(m => !m.isBoss) : [];
+    const fresh = (typeof _monsters !== 'undefined')
+        ? globalThis._monsters.slice(before).filter(m => !m.isBoss) : [];
     if (fresh.length === 0) return;
 
     monster.warlordGuard = true;
@@ -65,26 +65,26 @@ export function _egMechGuardCall(monster, phase) {
     const card = document.getElementById('eg-card-' + monster.id);
     if (card) card.classList.add('eg-nk-shielded');
     Audio_Manager.playSFX('boss_shield_up');
-    _egNkToast('eg_mech_warlord', '🗡️ The Warlord: Guard Call! Break the guard to break the boss!');
-    if (typeof _egRenderPanel === 'function') { try { _egRenderPanel(); } catch (e) {} }
+    _nkToast('eg_mech_warlord', '🗡️ The Warlord: Guard Call! Break the guard to break the boss!');
+    if (typeof _renderPanel === 'function') { try { _renderPanel(); } catch (e) {} }
 
-    const run = _egNkNewRun(monster.id, false);
+    const run = _nkNewRun(monster.id, false);
     let e = 0;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         e += dtS * 1000;
-        const boss = (typeof _egMonsters !== 'undefined')
-            ? globalThis._egMonsters.find(m => m.id === monster.id) : null;
+        const boss = (typeof _monsters !== 'undefined')
+            ? globalThis._monsters.find(m => m.id === monster.id) : null;
         if (!boss) return false;
-        const alive = (typeof _egMonsters !== 'undefined')
-            && globalThis._egMonsters.some(m => m.warlordOf === monster.id && m.currentHP > 0);
+        const alive = (typeof _monsters !== 'undefined')
+            && globalThis._monsters.some(m => m.warlordOf === monster.id && m.currentHP > 0);
         if (!alive || e > 30000) {
             boss.warlordGuard = false;
             boss.bossImmune = false;
             const c2 = document.getElementById('eg-card-' + monster.id);
             if (c2) c2.classList.remove('eg-nk-shielded');
             Audio_Manager.playSFX('boss_shield_down');
-            _egNkToast('eg_tithe_broken', '🗡️ Guard broken - burn the Warlord!', '#4ade80');
-            if (typeof _egRenderPanel === 'function') { try { _egRenderPanel(); } catch (e2) {} }
+            _nkToast('eg_tithe_broken', '🗡️ Guard broken - burn the Warlord!', '#4ade80');
+            if (typeof _renderPanel === 'function') { try { _renderPanel(); } catch (e2) {} }
             return false;
         }
         return true;
@@ -93,27 +93,27 @@ export function _egMechGuardCall(monster, phase) {
 
 // Three expanding rings in a staggered row; standing on a ring band hurts.
 // Watch the first ring to time the gaps in the next two.
-export function _egMechTripleRings(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechTripleRings(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const expandMs = [0, 2000, 1800, 1600][p];
     const bandHalf = 24;
     const dmgPct = [0, 0.20, 0.24, 0.30][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const cx = window.innerWidth * 0.5 + (Math.random() * 160 - 80);
     const cy = window.innerHeight * 0.42;
     const rMax = Math.max(window.innerWidth, window.innerHeight) * 0.7;
     const rings = [0, 1, 2].map(i => {
-        const el = _egNkEl(run, 'div', 'eg-nk-ring');
+        const el = _nkEl(run, 'div', 'eg-nk-ring');
         el.style.display = 'none';
         return { delay: i * 550, r: 40, el };
     });
-    _egNkToast('eg_mech_rings', '🗡️ The Warlord: Triple Rings! Three gaps, three heartbeats!');
+    _nkToast('eg_mech_rings', '🗡️ The Warlord: Triple Rings! Three gaps, three heartbeats!');
     let e = 0, cdUntil = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         e += dtS * 1000;
-        const c = _egNkPlayerCenter();
+        const c = _nkPlayerCenter();
         const dist = c ? Math.hypot(c.x - cx, c.y - cy) : 9999;
         let pending = false;
         rings.forEach(rg => {
@@ -133,8 +133,8 @@ export function _egMechTripleRings(monster, phase) {
             rg.el.style.height = r * 2 + 'px';
             if (c && now >= cdUntil && Math.abs(dist - rg.r) < bandHalf) {
                 cdUntil = now + 1000;
-                const dealt = _egNkHit(dmgPct, null, level);
-                _egNkAbilityHitToast(dealt, 'The Warlord', 'Triple Rings');
+                const dealt = _nkHit(dmgPct, null, level);
+                _nkAbilityHitToast(dealt, 'The Warlord', 'Triple Rings');
             }
         });
         return pending;

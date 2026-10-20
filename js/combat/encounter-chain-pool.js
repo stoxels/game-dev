@@ -4,30 +4,30 @@ import { EG_GRID_SIZE_BUCKETS } from '../loot/loot-map-implicit-parts.js';
 //-------------------ENCOUNTER CHAIN: PUZZLE POOL CRITERIA---------------
 //------------------------------------------------------------------------
 
-let _egChainRecentGis = [];
+let _chainRecentGis = [];
 
 // ── Encounter-chain size caps (playability) ──────────────────────────
 // 15×30 is the widest comfortable map; 20 rows is allowed only when
 // columns stay ≤20. Anything beyond those on either axis, or tall+wide
 // (>15 rows && >20 cols), is too large for a fun chain step.
-const EG_CHAIN_MAX_ROWS = 20;
-const EG_CHAIN_MAX_COLS = 30;
-const EG_CHAIN_TALL_ROW_THRESHOLD = 15;
-const EG_CHAIN_MAX_COLS_WHEN_TALL = 20;
+const CHAIN_MAX_ROWS = 20;
+const CHAIN_MAX_COLS = 30;
+const CHAIN_TALL_ROW_THRESHOLD = 15;
+const CHAIN_MAX_COLS_WHEN_TALL = 20;
 
-export function _egChainPuzzleSizeAllowed(rows, cols) {
-    if (rows > EG_CHAIN_MAX_ROWS || cols > EG_CHAIN_MAX_COLS) return false;
-    if (rows > EG_CHAIN_TALL_ROW_THRESHOLD && cols > EG_CHAIN_MAX_COLS_WHEN_TALL) return false;
+export function _chainPuzzleSizeAllowed(rows, cols) {
+    if (rows > CHAIN_MAX_ROWS || cols > CHAIN_MAX_COLS) return false;
+    if (rows > CHAIN_TALL_ROW_THRESHOLD && cols > CHAIN_MAX_COLS_WHEN_TALL) return false;
     return true;
 }
 
-function _egPuzzlePassesCriteria(level, criteria) {
+function _puzzlePassesCriteria(level, criteria) {
     const rows = level.grid.length;
     const cols = level.grid[0].length;
     const cells = rows * cols;
 
     // Global encounter-chain cap: keep chains fun, never pick mega grids.
-    if (!_egChainPuzzleSizeAllowed(rows, cols)) return false;
+    if (!_chainPuzzleSizeAllowed(rows, cols)) return false;
 
     if (criteria.minCells != null && cells < criteria.minCells) return false;
     if (criteria.maxCells != null && cells > criteria.maxCells) return false;
@@ -42,7 +42,7 @@ function _egPuzzlePassesCriteria(level, criteria) {
     return true;
 }
 
-export function _egBuildChainPool(criteria) {
+export function _buildChainPool(criteria) {
     const avoidRecent = criteria.avoidRecent !== false;
 
     let pool = globalThis.ALL.filter(level =>
@@ -51,48 +51,48 @@ export function _egBuildChainPool(criteria) {
         !level.requiredKills &&
         !level.totalMonsters &&      // also exclude other map-starter levels
         !(typeof isGatedLevel === 'function' && globalThis.isGatedLevel(level.gIdx)) &&  // math gates are campaign-only
-        _egPuzzlePassesCriteria(level, criteria)
+        _puzzlePassesCriteria(level, criteria)
     );
 
-    if (avoidRecent && pool.length > _egChainRecentGis.length) {
-        const filtered = pool.filter(level => !_egChainRecentGis.includes(level.gIdx));
+    if (avoidRecent && pool.length > _chainRecentGis.length) {
+        const filtered = pool.filter(level => !_chainRecentGis.includes(level.gIdx));
         if (filtered.length > 0) pool = filtered;
     }
 
     return pool;
 }
 
-function _egPickFromPool(pool, recentWindow, rng) {
+function _pickFromPool(pool, recentWindow, rng) {
     const R = rng || Math.random;
     const picked = pool[Math.floor(R() * pool.length)];
-    _egChainRecentGis.push(picked.gIdx);
-    if (_egChainRecentGis.length > (recentWindow || 8)) _egChainRecentGis.shift();
+    _chainRecentGis.push(picked.gIdx);
+    if (_chainRecentGis.length > (recentWindow || 8)) _chainRecentGis.shift();
     return picked.gIdx;
 }
 
-export function _egTrackChainRecentGi(gi, recentWindow) {
-    _egChainRecentGis.push(gi);
-    if (_egChainRecentGis.length > (recentWindow || 8)) {
-        _egChainRecentGis.shift();
+export function _trackChainRecentGi(gi, recentWindow) {
+    _chainRecentGis.push(gi);
+    if (_chainRecentGis.length > (recentWindow || 8)) {
+        _chainRecentGis.shift();
     }
 }
 
 // Picks from the story pool honouring the given criteria; relaxes pure
 // size filters when nothing qualifies so the chain never stalls.
 // `rng` (optional seeded PRNG) makes the pick deterministic.
-export function _egPickStoryChainPuzzleGi(criteria, rng) {
-    let pool = _egBuildChainPool(criteria);
+export function _pickStoryChainPuzzleGi(criteria, rng) {
+    let pool = _buildChainPool(criteria);
 
     if (pool.length === 0 && (criteria.minCells != null || criteria.maxCells != null)) {
-        pool = _egBuildChainPool({ ...criteria, minCells: null, maxCells: null });
+        pool = _buildChainPool({ ...criteria, minCells: null, maxCells: null });
     }
 
     if (pool.length === 0) return null;
-    return _egPickFromPool(pool, criteria.recentWindow, rng);
+    return _pickFromPool(pool, criteria.recentWindow, rng);
 }
 
 // Clones the chain criteria with a grid-size bucket's cell window applied.
-export function _egBucketCriteria(criteria, bucket) {
+export function _bucketCriteria(criteria, bucket) {
     const range = (typeof EG_GRID_SIZE_BUCKETS !== 'undefined')
         ? EG_GRID_SIZE_BUCKETS[bucket] : null;
     const c = { ...criteria };
@@ -104,6 +104,6 @@ export function _egBucketCriteria(criteria, bucket) {
 }
 
 // Clears the recent-puzzle memory when a chain run is cleaned up.
-export function _egResetChainRecentGis() {
-    _egChainRecentGis = [];
+export function _resetChainRecentGis() {
+    _chainRecentGis = [];
 }

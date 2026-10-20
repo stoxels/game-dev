@@ -64,7 +64,7 @@ export function _egRollMapSizeMix(tier, largerPct) {
 
 // Every device map ends in a boss fight: the boss arena opens once all
 // other objectives (kills / puzzles / questions) are done (see
-// _egCanLeaveMap in endgame-encounter-chain.js). The status is baked as an
+// _canLeaveMap in endgame-encounter-chain.js). The status is baked as an
 // immutable implicit so tooltips can state it definitively - orbs/mods
 // MUST NOT be able to remove it.
 export function _egRollMapBossStatus(map) {
@@ -81,7 +81,7 @@ export function _egResolveMapBoss(mapItem) {
     try {
         const bp = egAtlasChainBlueprintForMap(mapItem);
         if (!bp || !bp.bossId) return null;
-        const def = (typeof EG_BOSS_DEFS !== 'undefined') ? globalThis.EG_BOSS_DEFS[bp.bossId] : null;
+        const def = (typeof BOSS_DEFS !== 'undefined') ? globalThis.BOSS_DEFS[bp.bossId] : null;
         if (!def) return null;
         return { id: bp.bossId, name: def.name || bp.bossId, emoji: def.emoji || '💀' };
     } catch (e) {

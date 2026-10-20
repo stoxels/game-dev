@@ -6,13 +6,13 @@ import { _updateMistakeCounterHUD } from '../penalty.js';
 import { questStat_mistakesRemoved } from '../inference/inference-stats.js';
 import { _charmCellHasDrop } from '../skills/skill-charms.js';
 import { t } from '../translation/translations.js';
-import { EG_ART } from '../endgame/endgame-art.js';
-import { _egGetElementCentre } from './combat-class-projectiles.js';
+import { GAME_ART } from '../endgame/endgame-art.js';
+import { _getElementCentre } from './combat-class-projectiles.js';
 import { _egActiveMapItem } from '../endgame/endgame-map-launch.js';
 import { EG_MAX_MAP_TIER } from '../loot/loot-map-config.js';
 import { _egMapDrops } from '../loot/loot-map-drops.js';
-import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
-import { _egCurrencyDrops, _egItemDrops, _egLootDrops, _egPickups } from './combat-state.js';
+import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _currencyDrops, _itemDrops, _lootDrops, _pickups } from './combat-state.js';
 import { cur } from '../state.js';
 
 
@@ -23,40 +23,40 @@ import { cur } from '../state.js';
 
 
 // Pickup spawner timing
-export const EG_PICKUP_SPAWN_INTERVAL_MIN = 8000;  // ms minimum between spawn attempts
-export const EG_PICKUP_SPAWN_INTERVAL_MAX = 18000; // ms maximum between spawn attempts
-export const EG_PICKUP_MAX_ON_BOARD = 1;     // hard cap on simultaneous pickups
-export const EG_PICKUP_LIFETIME_MS = 20000; // ms before an uncollected pickup disappears
+export const PICKUP_SPAWN_INTERVAL_MIN = 8000;  // ms minimum between spawn attempts
+export const PICKUP_SPAWN_INTERVAL_MAX = 18000; // ms maximum between spawn attempts
+export const PICKUP_MAX_ON_BOARD = 1;     // hard cap on simultaneous pickups
+export const PICKUP_LIFETIME_MS = 20000; // ms before an uncollected pickup disappears
 
 // Hearts are the character's only direct emergency healing source. Do not let
 // random pickup rolls consume the pickup slot with a non-healing item while
 // the player is critically injured.
-export const EG_PICKUP_CRITICAL_HP_RATIO = 0.5;
+export const PICKUP_CRITICAL_HP_RATIO = 0.5;
 
 // ── Monster loot drop constants ──────────────────────────────────────────────
 // Chance (0–1) that a defeated monster drops a loot item onto the grid.
-// Bosses always use EG_LOOT_DROP_CHANCE_BOSS.
-export const EG_LOOT_DROP_CHANCE_NORMAL = 0.35;  // 35% per normal monster kill
-export const EG_LOOT_DROP_CHANCE_BOSS = 1.00;  // bosses always drop
+// Bosses always use LOOT_DROP_CHANCE_BOSS.
+export const LOOT_DROP_CHANCE_NORMAL = 0.35;  // 35% per normal monster kill
+export const LOOT_DROP_CHANCE_BOSS = 1.00;  // bosses always drop
 
 // Lifetime of an uncollected loot drop on the grid (ms).
 // Intentionally longer than heart pickups - no rush to grab loot.
-export const EG_LOOT_DROP_LIFETIME_MS = 60000;
+export const LOOT_DROP_LIFETIME_MS = 60000;
 
 // How long (ms) before a drop expires its countdown timer appears above it.
 // Applies to every grid drop type: hearts, equipment, currency, items, maps.
-export const EG_DROP_EXPIRE_WARNING_MS = 7000;
+export const DROP_EXPIRE_WARNING_MS = 7000;
 
 // Hard cap: how many currency orbs may sit on the board at the same time.
-export const EG_CURRENCY_DROP_MAX_ON_BOARD = 4;
+export const CURRENCY_DROP_MAX_ON_BOARD = 4;
 
 // Seconds removed from a randomly chosen ability slot's cooldown when the
 // Arcane Surge pickup is claimed.
-export const EG_COOLDOWN_SURGE_REDUCTION_SECS = 30;
+export const COOLDOWN_SURGE_REDUCTION_SECS = 30;
 
 // Hard cap: never place a loot drop if it would push pending loot +
 // items already in the stash beyond this free-slot budget.
-// Checked via _egStashHasFreeSlot() at drop time.
+// Checked via _stashHasFreeSlot() at drop time.
 
 
 
@@ -72,10 +72,10 @@ export const EG_COOLDOWN_SURGE_REDUCTION_SECS = 30;
 //
 //   heart: +12% per tier → T16 ≈ 2.8×  (e.g. 10/25/50 → ~28/70/140 at T16)
 //   mana : + 7% per tier → T16 ≈ 2.05× (e.g. 20/50 → ~41/102 at T16, full restore unaffected)
-export const EG_HEART_TIER_SCALE_PER_TIER = 0.12;
-export const EG_MANA_TIER_SCALE_PER_TIER = 0.07;
+export const HEART_TIER_SCALE_PER_TIER = 0.12;
+export const MANA_TIER_SCALE_PER_TIER = 0.07;
 
-export function _egGetPickupTier() {
+export function _getPickupTier() {
     if (typeof _egActiveMapItem !== 'undefined' && _egActiveMapItem && _egActiveMapItem.mapTier != null) {
         const cap = (typeof EG_MAX_MAP_TIER !== 'undefined') ? EG_MAX_MAP_TIER : 16;
         const t = Math.max(1, Math.min(cap, Math.round(_egActiveMapItem.mapTier)));
@@ -84,14 +84,14 @@ export function _egGetPickupTier() {
     return 1;
 }
 
-export function _egHeartTierMult() {
-    const tier = _egGetPickupTier();
-    return 1 + EG_HEART_TIER_SCALE_PER_TIER * (tier - 1);
+export function _heartTierMult() {
+    const tier = _getPickupTier();
+    return 1 + HEART_TIER_SCALE_PER_TIER * (tier - 1);
 }
 
-export function _egManaTierMult() {
-    const tier = _egGetPickupTier();
-    return 1 + EG_MANA_TIER_SCALE_PER_TIER * (tier - 1);
+export function _manaTierMult() {
+    const tier = _getPickupTier();
+    return 1 + MANA_TIER_SCALE_PER_TIER * (tier - 1);
 }
 
 // Helper: computes the effective heart heal amount after map-tier and gear bonuses.
@@ -101,40 +101,40 @@ export function _egManaTierMult() {
 // Gear provides two stats that modify heart healing:
 //   heartHealFlat   - flat +# added to every heart (e.g. "+15 to Heart Heal Amount")
 //   heartHealIncPct - #% increased Heart Heal Amount (multiplier on the total)
-export function _egCalcHeartHeal(baseAmount) {
+export function _calcHeartHeal(baseAmount) {
     let flat = 0;
     let incPct = 0;
-    if (typeof _egComputePlayerStats === 'function') {
+    if (typeof _computePlayerStats === 'function') {
         try {
-            const s = _egComputePlayerStats();
+            const s = _computePlayerStats();
             flat = Number(s.heartHealFlat) || 0;
             incPct = Number(s.heartHealIncPct) || 0;
         } catch (e) { /* stats unavailable (e.g. outside endgame) - use base */ }
     }
-    const tierMult = _egHeartTierMult();
+    const tierMult = _heartTierMult();
     const scaledBase = Math.round(baseAmount * tierMult);
     const total = (scaledBase + flat) * (1 + incPct / 100);
     return Math.max(0, Math.round(total));
 }
 
 // Helper: computes the effective mana gain from a mana pickup after map-tier and gear bonuses.
-// Mirrors _egCalcHeartHeal but with a lower tier multiplier so mana sustain grows
+// Mirrors _calcHeartHeal but with a lower tier multiplier so mana sustain grows
 // more slowly than life sustain with map tier.
 //   manaHealFlat   - flat +# added to every mana pickup (e.g. "+15 to Mana Gain")
 //   manaHealIncPct - #% increased Mana Gained (multiplier on the total)
 //   scaledBase = round(base * tierMult)  - skipped for the full-restore orb (base == maxMana)
 //   effective  = (scaledBase + flat) * (1 + incPct/100)
-export function _egCalcManaGain(baseAmount) {
+export function _calcManaGain(baseAmount) {
     let flat = 0;
     let incPct = 0;
-    if (typeof _egComputePlayerStats === 'function') {
+    if (typeof _computePlayerStats === 'function') {
         try {
-            const s = _egComputePlayerStats();
+            const s = _computePlayerStats();
             flat = Number(s.manaHealFlat) || 0;
             incPct = Number(s.manaHealIncPct) || 0;
         } catch (e) { /* stats unavailable (e.g. outside endgame) - use base */ }
     }
-    let tierMult = _egManaTierMult();
+    let tierMult = _manaTierMult();
     // Full-restore orb (base == maxMana) should not be tier-scaled - it already
     // restores the entire pool and gainMana() clamps to max anyway. Detect it
     // so the toast reflects the true gain instead of an inflated 2× value.
@@ -151,42 +151,42 @@ export function _egCalcManaGain(baseAmount) {
 
 // Pickup definitions
 // Each entry describes one pickup type that can appear on grid tiles.
-//   id        - unique key, referenced by EG_PICKUP_WEIGHTS
+//   id        - unique key, referenced by PICKUP_WEIGHTS
 //   emoji     - shown on the tile overlay and in the claim toast
 //   label     - human-readable name (for future UI use)
 //   rarity    - 'common' | 'uncommon' | 'rare'  (controls glow CSS class)
 //   onPickup  - called with (row, col) when the player claims the pickup
 //
 // To add new pickup types (items, currency, etc.) add an entry here and a
-// corresponding weight entry in EG_PICKUP_WEIGHTS. No other code needs changing.
-export const EG_PICKUP_DEFS = {
+// corresponding weight entry in PICKUP_WEIGHTS. No other code needs changing.
+export const PICKUP_DEFS = {
     heart_small: {
         id: 'heart_small', emoji: '💛', label: () => t('eg_pickup_heart_small'), rarity: 'common',
         onPickup(row, col) {
-            const heal = _egCalcHeartHeal(10);
-            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(heal) : (heal)));
+            const heal = _calcHeartHeal(10);
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._lifeGain ? globalThis._lifeGain(heal) : (heal)));
             globalThis._renderPlayerHealth();
-            globalThis.showToast(t('eg_pickup_heal_small').replace('{n}', heal), _egRarityToastColor(this.rarity));
+            globalThis.showToast(t('eg_pickup_heal_small').replace('{n}', heal), _rarityToastColor(this.rarity));
             Audio_Manager.playSFX('heart_heals');
         },
     },
     heart_medium: {
         id: 'heart_medium', emoji: '🧡', label: () => t('eg_pickup_heart'), rarity: 'uncommon',
         onPickup(row, col) {
-            const heal = _egCalcHeartHeal(25);
-            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(heal) : (heal)));
+            const heal = _calcHeartHeal(25);
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._lifeGain ? globalThis._lifeGain(heal) : (heal)));
             globalThis._renderPlayerHealth();
-            globalThis.showToast(t('eg_pickup_heal_medium').replace('{n}', heal), _egRarityToastColor(this.rarity));
+            globalThis.showToast(t('eg_pickup_heal_medium').replace('{n}', heal), _rarityToastColor(this.rarity));
             Audio_Manager.playSFX('heart_heals');
         },
     },
     heart_large: {
         id: 'heart_large', emoji: '❤️', label: () => t('eg_pickup_heart_large'), rarity: 'rare',
         onPickup(row, col) {
-            const heal = _egCalcHeartHeal(50);
-            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(heal) : (heal)));
+            const heal = _calcHeartHeal(50);
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._lifeGain ? globalThis._lifeGain(heal) : (heal)));
             globalThis._renderPlayerHealth();
-            globalThis.showToast(t('eg_pickup_heal_large').replace('{n}', heal), _egRarityToastColor(this.rarity));
+            globalThis.showToast(t('eg_pickup_heal_large').replace('{n}', heal), _rarityToastColor(this.rarity));
             Audio_Manager.playSFX('heart_heals');
         },
     },
@@ -197,26 +197,26 @@ export const EG_PICKUP_DEFS = {
     mana_small: {
         id: 'mana_small', emoji: '💧', label: () => t('eg_pickup_mana_small'), rarity: 'common',
         onPickup(row, col) {
-            const gained = gainMana(_egCalcManaGain(20));
+            const gained = gainMana(_calcManaGain(20));
             if (gained > 0) {
                 globalThis.showToast(t('eg_pickup_mana_gain_small').replace('{n}', gained),
-                    _egRarityToastColor(this.rarity));
+                    _rarityToastColor(this.rarity));
                 Audio_Manager.playSFX('pickup_mana', 'mana_pickup');
             } else {
-                globalThis.showToast(t('eg_pickup_mana_full'), _egRarityToastColor(this.rarity));
+                globalThis.showToast(t('eg_pickup_mana_full'), _rarityToastColor(this.rarity));
             }
         },
     },
     mana_medium: {
         id: 'mana_medium', emoji: '🔵', label: () => t('eg_pickup_mana_medium'), rarity: 'uncommon',
         onPickup(row, col) {
-            const gained = gainMana(_egCalcManaGain(50));
+            const gained = gainMana(_calcManaGain(50));
             if (gained > 0) {
                 globalThis.showToast(t('eg_pickup_mana_gain_medium').replace('{n}', gained),
-                    _egRarityToastColor(this.rarity));
+                    _rarityToastColor(this.rarity));
                 Audio_Manager.playSFX('pickup_mana', 'mana_pickup');
             } else {
-                globalThis.showToast(t('eg_pickup_mana_full'), _egRarityToastColor(this.rarity));
+                globalThis.showToast(t('eg_pickup_mana_full'), _rarityToastColor(this.rarity));
             }
         },
     },
@@ -224,13 +224,13 @@ export const EG_PICKUP_DEFS = {
         id: 'mana_full', emoji: '🔮', label: () => t('eg_pickup_mana_full_orb'), rarity: 'rare',
         onPickup(row, col) {
             const before = globalThis.playerCurrentMana;
-            const gained = gainMana(_egCalcManaGain(_getPlayerMaxMana()));
+            const gained = gainMana(_calcManaGain(_getPlayerMaxMana()));
             if (gained > 0) {
                 globalThis.showToast(t('eg_pickup_mana_gain_full').replace('{n}', globalThis.playerCurrentMana - before),
-                    _egRarityToastColor(this.rarity));
+                    _rarityToastColor(this.rarity));
                 Audio_Manager.playSFX('mana_restored_full', 'mana_pickup');
             } else {
-                globalThis.showToast(t('eg_pickup_mana_full'), _egRarityToastColor(this.rarity));
+                globalThis.showToast(t('eg_pickup_mana_full'), _rarityToastColor(this.rarity));
             }
         },
     },
@@ -252,9 +252,9 @@ export const EG_PICKUP_DEFS = {
                     globalThis._setMistakeCounterText();
                 }
                 Audio_Manager.playSFX('pickup_mistake_erase');
-                globalThis.showToast(t('eg_pickup_mistake_erased'), _egRarityToastColor(this.rarity));
+                globalThis.showToast(t('eg_pickup_mistake_erased'), _rarityToastColor(this.rarity));
             } else {
-                globalThis.showToast(t('eg_pickup_mistake_none'), _egRarityToastColor(this.rarity));
+                globalThis.showToast(t('eg_pickup_mistake_none'), _rarityToastColor(this.rarity));
             }
         },
     },
@@ -269,7 +269,7 @@ export const EG_PICKUP_DEFS = {
             });
 
             if (slotsWithCooldown.length === 0) {
-                globalThis.showToast(t('eg_pickup_cooldown_none_any'), _egRarityToastColor(this.rarity));
+                globalThis.showToast(t('eg_pickup_cooldown_none_any'), _rarityToastColor(this.rarity));
                 return;
             }
 
@@ -280,7 +280,7 @@ export const EG_PICKUP_DEFS = {
             const displayName = `[${slotIndex}] ${abilityData ? _getAbilityName(abilityData) : ''}`.trim();
 
             const before = state.remaining;
-            state.remaining = Math.max(0, state.remaining - EG_COOLDOWN_SURGE_REDUCTION_SECS);
+            state.remaining = Math.max(0, state.remaining - COOLDOWN_SURGE_REDUCTION_SECS);
 
             if (state.remaining === 0) {
                 clearInterval(state.interval);
@@ -294,7 +294,7 @@ export const EG_PICKUP_DEFS = {
             globalThis.showToast(t('eg_pickup_cooldown_reduced')
                 .replace('{name}', displayName)
                 .replace('{n}', before - state.remaining),
-                _egRarityToastColor(this.rarity));
+                _rarityToastColor(this.rarity));
 
             if (state.remaining === 0 && typeof _showCooldownReadyToast === 'function') {
                 _showCooldownReadyToast(slot);
@@ -310,7 +310,7 @@ export const EG_PICKUP_DEFS = {
 
 // Weighted table for pickup type selection.
 // Increase a weight value to make that pickup more common.
-export const EG_PICKUP_WEIGHTS = [
+export const PICKUP_WEIGHTS = [
     { id: 'heart_small', weight: 60 },
     { id: 'heart_medium', weight: 30 },
     { id: 'heart_large', weight: 10 },
@@ -336,7 +336,7 @@ export const EG_PICKUP_WEIGHTS = [
 
 // Maps rarities to toast text colors so loot / pickup notifications
 // are colorized by the item's rarity.
-export function _egRarityToastColor(rarity) {
+export function _rarityToastColor(rarity) {
     return {
         common: '#b0b0b0',
         uncommon: '#2ecc71',
@@ -349,34 +349,34 @@ export function _egRarityToastColor(rarity) {
     }[rarity] || '#ffffff';
 }
 
-// Returns a random pickup def selected by weighted random from EG_PICKUP_WEIGHTS.
+// Returns a random pickup def selected by weighted random from PICKUP_WEIGHTS.
 // Passive tree "% increased chance for Hearts / Mana pickups to appear"
 // scale the weight of that pickup family in this roll only.
-export function _egPickRandomPickup() {
+export function _pickRandomPickup() {
     let heartMult = 1;
     let manaMult = 1;
-    if (typeof _egComputePlayerStats === 'function') {
+    if (typeof _computePlayerStats === 'function') {
         try {
-            const s = _egComputePlayerStats();
+            const s = _computePlayerStats();
             heartMult += (Number(s.heartSpawnIncPct) || 0) / 100;
             manaMult += (Number(s.manaSpawnIncPct) || 0) / 100;
         } catch (e) { /* stats unavailable - use base weights */ }
     }
     const weightOf = (e) => e.weight * (e.id.startsWith('heart_') ? heartMult : e.id.startsWith('mana_') ? manaMult : 1);
-    const total = EG_PICKUP_WEIGHTS.reduce((sum, e) => sum + weightOf(e), 0);
+    const total = PICKUP_WEIGHTS.reduce((sum, e) => sum + weightOf(e), 0);
     let roll = Math.random() * total;
-    for (const entry of EG_PICKUP_WEIGHTS) {
+    for (const entry of PICKUP_WEIGHTS) {
         roll -= weightOf(entry);
-        if (roll <= 0) return EG_PICKUP_DEFS[entry.id];
+        if (roll <= 0) return PICKUP_DEFS[entry.id];
     }
-    return EG_PICKUP_DEFS['heart_small']; // fallback - should never be reached
+    return PICKUP_DEFS['heart_small']; // fallback - should never be reached
 }
 
 // Returns true if the cell at (row, col) is eligible to host a pickup.
 // A cell is eligible when it is untouched, unrevealed, error-free, and not a lucky tile.
-export function _egIsCellPickupEligible(row, col) {
+export function _isCellPickupEligible(row, col) {
     const key = `${row}-${col}`;
-    if (_egPickups.has(key)) return false; // already has a pickup
+    if (_pickups.has(key)) return false; // already has a pickup
     if (globalThis.userGrid[row][col] !== 0) return false; // player has touched this cell
     if (globalThis.revealedGrid[row][col]) return false; // item-revealed
     if (globalThis.wrongGrid[row][col]) return false; // mistake-marked
@@ -385,7 +385,7 @@ export function _egIsCellPickupEligible(row, col) {
 }
 
 // Builds the full list of pickup-eligible cells and returns it as [[row, col], ...].
-export function _egBuildPickupEligiblePool() {
+export function _buildPickupEligiblePool() {
     if (!cur || !cur.grid) return [];
     const sol = cur.grid;
     const rows = sol.length;
@@ -393,7 +393,7 @@ export function _egBuildPickupEligiblePool() {
     const pool = [];
     for (let r = 0; r < rows; r++)
         for (let c = 0; c < cols; c++)
-            if (_egIsCellPickupEligible(r, c)) pool.push([r, c]);
+            if (_isCellPickupEligible(r, c)) pool.push([r, c]);
     return pool;
 }
 
@@ -401,26 +401,26 @@ export function _egBuildPickupEligiblePool() {
 // map) currently occupies the cell at (row, col). Used by every
 // spawner so two different drops can never stack on the same cell -
 // stacked overlays would leave a stuck visual behind after a claim.
-export function _egCellHasAnyDrop(row, col) {
+export function _cellHasAnyDrop(row, col) {
     const key = `${row}-${col}`;
-    return _egPickups.has(key)
-        || _egLootDrops.has(key)
-        || _egCurrencyDrops.has(key)
-        || _egItemDrops.has(key)
+    return _pickups.has(key)
+        || _lootDrops.has(key)
+        || _currencyDrops.has(key)
+        || _itemDrops.has(key)
         || (typeof _egMapDrops !== 'undefined' && _egMapDrops.has(key))
-        || (!!globalThis._egGoldDrops && globalThis._egGoldDrops.has(key))
+        || (!!globalThis._goldDrops && globalThis._goldDrops.has(key))
         || (typeof _charmCellHasDrop === 'function' && _charmCellHasDrop(row, col));
 }
 
 // Injects the pickup overlay span into the cell's DOM element.
 // Shows the pickup art (images/items/) once loaded, else the emoji.
-export function _egRenderPickupOverlay(row, col, def) {
+export function _renderPickupOverlay(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     const span = document.createElement('span');
     span.className = `eg-pickup-overlay eg-pickup-rarity-${def.rarity}`;
     span.id = `eg-pickup-${row}-${col}`;
-    const artUrl = (def && def.id) ? EG_ART.url('item', def.id) : null;
+    const artUrl = (def && def.id) ? GAME_ART.url('item', def.id) : null;
     if (artUrl) {
         const img = document.createElement('img');
         img.src = artUrl;
@@ -437,7 +437,7 @@ export function _egRenderPickupOverlay(row, col, def) {
 }
 
 // Removes the pickup overlay span from the DOM for the given key "row-col".
-export function _egRemovePickupOverlay(key) {
+export function _removePickupOverlay(key) {
     const [r, c] = key.split('-').map(Number);
     const span = document.getElementById(`eg-pickup-${r}-${c}`);
     if (span) span.remove();
@@ -446,14 +446,14 @@ export function _egRemovePickupOverlay(key) {
 // Plays the floating pickup animation when a pickup is claimed - art image
 // when the manifest covers the pickup id, else the emoji (mirrors the
 // overlay above, so the floater always matches what was sitting on the grid).
-export function _egAnimatePickupClaim(row, col, def) {
+export function _animatePickupClaim(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
-    const centre = _egGetElementCentre(el);
+    const centre = _getElementCentre(el);
 
     const floater = document.createElement('div');
     floater.className = 'eg-pickup-floater';
-    floater.innerHTML = EG_ART.html('item', def && def.id, (def && def.emoji) || '');
+    floater.innerHTML = GAME_ART.html('item', def && def.id, (def && def.emoji) || '');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
     document.body.appendChild(floater);
@@ -461,68 +461,68 @@ export function _egAnimatePickupClaim(row, col, def) {
 }
 
 // ── Tracked expiry helpers (pause-aware) ────────────────────────────────
-export function _egScheduleTrackedExpiry(map, key, value, lifetimeMs, overlayId, removeOverlayFn) {
+export function _scheduleTrackedExpiry(map, key, value, lifetimeMs, overlayId, removeOverlayFn) {
     const expiresAt = Date.now() + lifetimeMs;
     const timer = setTimeout(() => {
         // remove tracking entry first
-        const idx = globalThis._egDropExpiryEntries.findIndex(e => e.map === map && e.key === key && e.value === value);
-        if (idx !== -1) globalThis._egDropExpiryEntries.splice(idx, 1);
+        const idx = globalThis._dropExpiryEntries.findIndex(e => e.map === map && e.key === key && e.value === value);
+        if (idx !== -1) globalThis._dropExpiryEntries.splice(idx, 1);
         if (map.get(key) === value) {
             map.delete(key);
             removeOverlayFn(key);
         }
     }, lifetimeMs);
-    globalThis._egPickupTimers.push(timer);
+    globalThis._pickupTimers.push(timer);
     const entry = { map, key, value, lifetimeMs, expiresAt, timer, overlayId, removeOverlayFn, remaining: null };
-    globalThis._egDropExpiryEntries.push(entry);
-    if (overlayId) _egStartDropExpireCountdown(overlayId, lifetimeMs, expiresAt);
+    globalThis._dropExpiryEntries.push(entry);
+    if (overlayId) _startDropExpireCountdown(overlayId, lifetimeMs, expiresAt);
     return timer;
 }
 
-export function _egCancelTrackedExpiry(map, key, value) {
-    const idx = globalThis._egDropExpiryEntries.findIndex(e => e.map === map && e.key === key && e.value === value);
+export function _cancelTrackedExpiry(map, key, value) {
+    const idx = globalThis._dropExpiryEntries.findIndex(e => e.map === map && e.key === key && e.value === value);
     if (idx === -1) return;
-    const entry = globalThis._egDropExpiryEntries[idx];
+    const entry = globalThis._dropExpiryEntries[idx];
     if (entry.timer) {
         clearTimeout(entry.timer);
-        // also remove from _egPickupTimers so stop() doesn't double-clear
-        const ti = globalThis._egPickupTimers.indexOf(entry.timer);
-        if (ti !== -1) globalThis._egPickupTimers.splice(ti, 1);
+        // also remove from _pickupTimers so stop() doesn't double-clear
+        const ti = globalThis._pickupTimers.indexOf(entry.timer);
+        if (ti !== -1) globalThis._pickupTimers.splice(ti, 1);
     }
-    globalThis._egDropExpiryEntries.splice(idx, 1);
+    globalThis._dropExpiryEntries.splice(idx, 1);
     // also cancel its countdown if it was scheduled
-    if (entry.overlayId) _egCancelExpireCountdown(entry.overlayId);
+    if (entry.overlayId) _cancelExpireCountdown(entry.overlayId);
 }
 
-export function _egCancelExpireCountdown(overlayId) {
-    const idx = globalThis._egExpireCountdownEntries.findIndex(e => e.overlayId === overlayId);
+export function _cancelExpireCountdown(overlayId) {
+    const idx = globalThis._expireCountdownEntries.findIndex(e => e.overlayId === overlayId);
     if (idx === -1) return;
-    const cd = globalThis._egExpireCountdownEntries[idx];
+    const cd = globalThis._expireCountdownEntries[idx];
     if (cd.timeout) clearTimeout(cd.timeout);
     if (cd.interval) clearInterval(cd.interval);
-    globalThis._egExpireCountdownEntries.splice(idx, 1);
+    globalThis._expireCountdownEntries.splice(idx, 1);
 }
 
 // Schedules the auto-expiry timer for a placed pickup.
 // Removes both the state entry and the DOM overlay when it fires.
-export function _egSchedulePickupExpiry(key, def) {
+export function _schedulePickupExpiry(key, def) {
     const [r, c] = key.split('-').map(Number);
     // pickup_lifetime (tree): Heart and Mana pickups stay longer.
-    const extraMs = Math.max(0, Number(_egComputePlayerStats().pickupLifetimeSecs) || 0) * 1000;
-    _egScheduleTrackedExpiry(_egPickups, key, def, EG_PICKUP_LIFETIME_MS + extraMs, `eg-pickup-${r}-${c}`, _egRemovePickupOverlay);
+    const extraMs = Math.max(0, Number(_computePlayerStats().pickupLifetimeSecs) || 0) * 1000;
+    _scheduleTrackedExpiry(_pickups, key, def, PICKUP_LIFETIME_MS + extraMs, `eg-pickup-${r}-${c}`, _removePickupOverlay);
 }
 
 // Shows a live countdown above a drop overlay during its final
-// EG_DROP_EXPIRE_WARNING_MS milliseconds, so the player knows the drop is
+// DROP_EXPIRE_WARNING_MS milliseconds, so the player knows the drop is
 // about to vanish. The badge lives INSIDE the overlay span, so removing the
 // overlay (claim / discard / expiry) removes the countdown with it; the
 // polling interval self-terminates once the overlay is gone.
 // Call right after scheduling any drop's expiry timeout.
-export function _egStartDropExpireCountdown(overlayId, lifetimeMs, knownExpiresAt) {
-    if (_egExpireCountdownStylesInjected()) _egInjectExpireCountdownStyles();
+export function _startDropExpireCountdown(overlayId, lifetimeMs, knownExpiresAt) {
+    if (_expireCountdownStylesInjected()) _injectExpireCountdownStyles();
     const startedAt = (knownExpiresAt != null) ? (knownExpiresAt - lifetimeMs) : Date.now();
     const expiresAt = (knownExpiresAt != null) ? knownExpiresAt : (startedAt + lifetimeMs);
-    const delay = Math.max(0, lifetimeMs - EG_DROP_EXPIRE_WARNING_MS);
+    const delay = Math.max(0, lifetimeMs - DROP_EXPIRE_WARNING_MS);
     const delayExpiresAt = startedAt + delay;
 
     const entry = { overlayId, lifetimeMs, startedAt, expiresAt, delayExpiresAt, timeout: null, interval: null, tick: null, remaining: null, delayRemaining: null, expiryRemaining: null };
@@ -544,7 +544,7 @@ export function _egStartDropExpireCountdown(overlayId, lifetimeMs, knownExpiresA
         badge.textContent = Math.ceil(remaining / 1000);
     };
     entry.tick = tick;
-    globalThis._egExpireCountdownEntries.push(entry);
+    globalThis._expireCountdownEntries.push(entry);
 
     entry.timeout = setTimeout(() => {
         entry.timeout = null;
@@ -553,11 +553,11 @@ export function _egStartDropExpireCountdown(overlayId, lifetimeMs, knownExpiresA
     }, delay);
 }
 
-export function _egExpireCountdownStylesInjected() {
+export function _expireCountdownStylesInjected() {
     return !document.getElementById('eg-drop-expire-timer-styles');
 }
 
-export function _egInjectExpireCountdownStyles() {
+export function _injectExpireCountdownStyles() {
     const style = document.createElement('style');
     style.id = 'eg-drop-expire-timer-styles';
     style.textContent = `
@@ -593,25 +593,25 @@ export function _egInjectExpireCountdownStyles() {
 // Shard content for the destroy animation: an explicit artUrl wins
 // (charms live outside the manifest), else the manifest art for artId/id,
 // else the emoji - so the shards always match what was sitting on the grid.
-function _egDiscardShardContent(def) {
+function _discardShardContent(def) {
     try {
         if (def && def.artUrl) {
             return '<img src="' + def.artUrl + '" alt="" class="eg-art-img" draggable="false">';
         }
         const artId = def && (def.artId || def.id);
-        if (artId && typeof EG_ART !== 'undefined' && EG_ART) {
-            const u = EG_ART.url('item', artId);
+        if (artId && typeof GAME_ART !== 'undefined' && GAME_ART) {
+            const u = GAME_ART.url('item', artId);
             if (u) return '<img src="' + u + '" alt="" class="eg-art-img" draggable="false">';
         }
     } catch (e) {}
     return (def && def.emoji) || '';
 }
 
-export function _egAnimatePickupDiscard(row, col, def) {
+export function _animatePickupDiscard(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
-    const centre = _egGetElementCentre(el);
-    const content = _egDiscardShardContent(def);
+    const centre = _getElementCentre(el);
+    const content = _discardShardContent(def);
 
     // Left shard
     const left = document.createElement('div');

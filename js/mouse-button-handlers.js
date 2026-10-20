@@ -95,28 +95,28 @@ export function isEndgameLevel() {
 // Endgame: discards any pickup, loot drop, or currency drop sitting on a
 // cell. Shared by the real-mistake path and the wrong-fill path in
 // applyCell(), both of which need to invalidate a cell's drop the same way.
-function _egDiscardAllDrops(row, col) {
+function _discardAllDrops(row, col) {
     if (!isEndgameLevel()) return;
-    if (typeof globalThis._egDiscardPickup === 'function') globalThis._egDiscardPickup(row, col);
-    if (typeof globalThis._egDiscardLootDrop === 'function') globalThis._egDiscardLootDrop(row, col);
-    if (typeof globalThis._egDiscardCurrencyDrop === 'function') globalThis._egDiscardCurrencyDrop(row, col);
-    if (typeof globalThis._egDiscardItemDrop === 'function') globalThis._egDiscardItemDrop(row, col);
+    if (typeof globalThis._discardPickup === 'function') globalThis._discardPickup(row, col);
+    if (typeof globalThis._discardLootDrop === 'function') globalThis._discardLootDrop(row, col);
+    if (typeof globalThis._discardCurrencyDrop === 'function') globalThis._discardCurrencyDrop(row, col);
+    if (typeof globalThis._discardItemDrop === 'function') globalThis._discardItemDrop(row, col);
     if (typeof globalThis._egDiscardMapDrop === 'function') globalThis._egDiscardMapDrop(row, col);
-    if (typeof globalThis._egDiscardGoldDrop === 'function') globalThis._egDiscardGoldDrop(row, col);
+    if (typeof globalThis._discardGoldDrop === 'function') globalThis._discardGoldDrop(row, col);
     if (typeof globalThis._charmDiscardDrop === 'function') globalThis._charmDiscardDrop(row, col);
 }
 
 // Endgame: claims any pickup, loot drop, or currency drop sitting on a
 // cell. Shared by the correct-fill path and the right-click-mark path in
 // applyCell(), both of which claim drops on an empty-solution cell.
-export function _egCheckAllClaims(row, col) {
+export function _checkAllClaims(row, col) {
     if (!isEndgameLevel()) return;
-    if (typeof globalThis._egCheckPickupClaim === 'function') globalThis._egCheckPickupClaim(row, col);
-    if (typeof globalThis._egCheckLootClaim === 'function') globalThis._egCheckLootClaim(row, col);
-    if (typeof globalThis._egCheckCurrencyDropClaim === 'function') globalThis._egCheckCurrencyDropClaim(row, col);
-    if (typeof globalThis._egCheckItemDropClaim === 'function') globalThis._egCheckItemDropClaim(row, col);
+    if (typeof globalThis._checkPickupClaim === 'function') globalThis._checkPickupClaim(row, col);
+    if (typeof globalThis._checkLootClaim === 'function') globalThis._checkLootClaim(row, col);
+    if (typeof globalThis._checkCurrencyDropClaim === 'function') globalThis._checkCurrencyDropClaim(row, col);
+    if (typeof globalThis._checkItemDropClaim === 'function') globalThis._checkItemDropClaim(row, col);
     if (typeof globalThis._egCheckMapDropClaim === 'function') globalThis._egCheckMapDropClaim(row, col);
-    if (typeof globalThis._egCheckGoldDropClaim === 'function') globalThis._egCheckGoldDropClaim(row, col);
+    if (typeof globalThis._checkGoldDropClaim === 'function') globalThis._checkGoldDropClaim(row, col);
     if (typeof globalThis._charmCheckClaim === 'function') globalThis._charmCheckClaim(row, col);
 }
 
@@ -134,15 +134,15 @@ export function _egCheckAllClaims(row, col) {
 function checkBossCorruptionIntercept(row, col) {
     // Slimed cells (The Snail) block ALL interaction until swept clean -
     // checked first so a slimed cell can never be clicked around.
-    if (typeof globalThis._egSnailIsCellSlimed === 'function' && globalThis._egSnailIsCellSlimed(row, col)) {
+    if (typeof globalThis._snailIsCellSlimed === 'function' && globalThis._snailIsCellSlimed(row, col)) {
         globalThis.showToast(t('eg_snail_slimed_blocked'));
         return true;
     }
-    if (typeof globalThis._egIsCellCorrupted === 'function' && globalThis._egIsCellCorrupted(row, col)) {
-        globalThis._egDispelCorruption(row, col);
+    if (typeof globalThis._isCellCorrupted === 'function' && globalThis._isCellCorrupted(row, col)) {
+        globalThis._dispelCorruption(row, col);
         return true;
     }
-    if (typeof globalThis._egIsCellFrozen === 'function' && globalThis._egIsCellFrozen(row, col)) {
+    if (typeof globalThis._isCellFrozen === 'function' && globalThis._isCellFrozen(row, col)) {
         Audio_Manager.playSFX('grid_cell_frozen');
         globalThis.showToast(t('eg_cell_frozen'));
         return true;
@@ -172,7 +172,7 @@ function checkActiveAbilityIntercept(row, col) {
 // Elemental ailment puzzle effects (endgame): clicks on icy cells may slip
 // onto a random adjacent cell. See endgame-ailments.js.
 function checkElementalAilmentIntercept(row, col) {
-    if (typeof globalThis._egPuzzleIceRedirect === 'function' && globalThis._egPuzzleIceRedirect(row, col)) {
+    if (typeof globalThis._puzzleIceRedirect === 'function' && globalThis._puzzleIceRedirect(row, col)) {
         return true;
     }
     return false;
@@ -184,13 +184,13 @@ function checkSpecialIntercepts(row, col) {
     // The Marksman's Arrow Gauntlet seals the grid: no fills/marks while
     // the bows hold the arena, so a stray click can't take a mistake or
     // start a new puzzle mid-set-piece (boss-marksman.js).
-    if (typeof globalThis._egMarksGauntletActive === 'function' && globalThis._egMarksGauntletActive()) {
-        if (typeof globalThis._egMarksGauntletGridLockToast === 'function') globalThis._egMarksGauntletGridLockToast();
+    if (typeof globalThis._marksGauntletActive === 'function' && globalThis._marksGauntletActive()) {
+        if (typeof globalThis._marksGauntletGridLockToast === 'function') globalThis._marksGauntletGridLockToast();
         return true;
     }
     // The Sprout's garden: prune vines off cells, keep out of the bramble
     // ring, disturb pollen dust at your peril (boss-sprout.js).
-    if (typeof globalThis._egSproutCellIntercept === 'function' && globalThis._egSproutCellIntercept(row, col)) return true;
+    if (typeof globalThis._sproutCellIntercept === 'function' && globalThis._sproutCellIntercept(row, col)) return true;
     if (checkBossCorruptionIntercept(row, col)) return true;
     if (checkBayesianTrapIntercept(row, col)) return true;
     if (checkActiveAbilityIntercept(row, col)) return true;
@@ -359,7 +359,7 @@ function markCellWrongAndPenalize(row, col) {
     Audio_Manager.playSFX('cellWrong');
     applyPenalty(row, col);
 
-    _egDiscardAllDrops(row, col);
+    _discardAllDrops(row, col);
 }
 
 // Reset consecutive-fill streaks and notify passive systems.
@@ -369,7 +369,7 @@ function breakFillStreaksOnMistake() {
     window.LEVEL_FLAGS.streakBonusFills = 0;          // streak_bonus skill: streak reset
 
     // Endgame gear: arcane surge streak + channel stacks break on a mistake
-    if (typeof globalThis._egOnMistake === 'function') globalThis._egOnMistake();
+    if (typeof globalThis._onMistake === 'function') globalThis._onMistake();
 
     if (typeof globalThis.PassiveTracker !== 'undefined') PassiveTracker.onMistake();
 
@@ -440,9 +440,9 @@ function checkHardcoreAfterMistake() {
     // Endgame maps have their own defeat summary. Do not open the generic
     // Hardcore overlay first; its mutation observer would otherwise race
     // with the map-failed transition and reopen the overlay on return.
-    if (typeof globalThis._egIsActive === 'function' && globalThis._egIsActive() &&
-        typeof globalThis._egEndMapDefeated === 'function') {
-        globalThis._egEndMapDefeated(t('hc_fail_title'), t('hc_fail_sub'));
+    if (typeof globalThis._isActive === 'function' && globalThis._isActive() &&
+        typeof globalThis._endMapDefeated === 'function') {
+        globalThis._endMapDefeated(t('hc_fail_title'), t('hc_fail_sub'));
         return true;
     }
 
@@ -459,12 +459,12 @@ function checkHardcoreAfterMistake() {
 }
 
 // Campaign allowed-mistake cap: one mistake past the cap ends the level.
-// Maps and trials are handled by _egCheckMistakeLimit instead.
+// Maps and trials are handled by _checkMistakeLimit instead.
 // Returns true if the level was failed (caller should return).
 function checkMistakeCapAfterMistake() {
-    if (typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) return false;
-    const bonus = (typeof globalThis._egComputePlayerStats === 'function')
-        ? (globalThis._egComputePlayerStats().mistakeCount || 0) : 0;
+    if (typeof globalThis._isActive === 'function' && globalThis._isActive()) return false;
+    const bonus = (typeof globalThis._computePlayerStats === 'function')
+        ? (globalThis._computePlayerStats().mistakeCount || 0) : 0;
     const cap = campaignCapForLevel(cur, bonus);
     if (cap == null || globalThis.mistakeCount <= cap) return false;
 
@@ -628,7 +628,7 @@ function handleLuckyTileClaim(row, col) {
     showHtmlToast(toastMsg);
 
     applyCovarianceShiftReveal(row, col);
-    if (typeof globalThis._egOnLuckyTileClaimed === 'function') globalThis._egOnLuckyTileClaimed();
+    if (typeof globalThis._onLuckyTileClaimed === 'function') globalThis._onLuckyTileClaimed();
 
     if (typeof globalThis.triggerBanter === 'function') globalThis.triggerBanter('lucky_tile');
 }
@@ -667,8 +667,8 @@ function updateDragStrokeCounter(row, col) {
 // 'double' (Glass Clock) | 'none' (Long Game) | null: how time gained while a
 // correct fill is processed is treated. Long Game wins when both are owned.
 function _fillGainModeFromTree() {
-    if (typeof globalThis._egComputePlayerStats !== 'function') return null;
-    const s = globalThis._egComputePlayerStats();
+    if (typeof globalThis._computePlayerStats !== 'function') return null;
+    const s = globalThis._computePlayerStats();
     if ((Number(s.noFillTimeGain) || 0) > 0) return 'none';
     if ((Number(s.glassClockGain) || 0) > 0) return 'double';
     return null;
@@ -685,8 +685,8 @@ function _treeCorrectFillLines() {
     flags.lastCorrectFillAt = now;
     if (flags.firstStepDone) return;
     flags.firstStepDone = true;
-    const secs = typeof globalThis._egComputePlayerStats === 'function'
-        ? (Number(globalThis._egComputePlayerStats().firstStepTreeSecs) || 0) : 0;
+    const secs = typeof globalThis._computePlayerStats === 'function'
+        ? (Number(globalThis._computePlayerStats().firstStepTreeSecs) || 0) : 0;
     if (secs > 0) {
         addTimeSecs(secs);
         globalThis.showToast(`👣 +${secs}s`);
@@ -786,10 +786,10 @@ function handleCorrectFill(row, col) {
 
     // Endgame hooks
     if (isEndgameLevel()) {
-        _egCheckAllClaims(row, col);
-        if (typeof globalThis._egOnCorrectCell === 'function') globalThis._egOnCorrectCell(row, col);
+        _checkAllClaims(row, col);
+        if (typeof globalThis._onCorrectCell === 'function') globalThis._onCorrectCell(row, col);
         // Shocked-cursor ailment: reveals may strip ✕ marks from neighbours
-        if (typeof globalThis._egOnCorrectCellPuzzleFX === 'function') globalThis._egOnCorrectCellPuzzleFX(row, col);
+        if (typeof globalThis._onCorrectCellPuzzleFX === 'function') globalThis._onCorrectCellPuzzleFX(row, col);
     }
 
     updateDragStrokeCounter(row, col);
@@ -844,7 +844,7 @@ export function applyCell(row, col) {
         // Try to absorb or apply the mistake; stop processing if game-over triggered
         if (handleWrongFill(row, col)) {
             // Whether absorbed or penalised, a wrong click on an endgame pickup discards it
-            _egDiscardAllDrops(row, col);
+            _discardAllDrops(row, col);
             return;
         }
 
@@ -861,7 +861,7 @@ export function applyCell(row, col) {
 
     // Endgame: right-click mark on a correct cell discards any drop sitting there
     if (isEndgameLevel() && pval === 2 && cur.grid[row][col] === 1) {
-        _egDiscardAllDrops(row, col);
+        _discardAllDrops(row, col);
     }
 
     // Write the new value into the player grid
@@ -884,7 +884,7 @@ export function applyCell(row, col) {
 
     // Endgame: correct right-click mark on an empty-solution cell claims any drop there
     if (pval === 2 && cur.grid[row][col] === 0) {
-        _egCheckAllClaims(row, col);
+        _checkAllClaims(row, col);
     }
 
     // Refresh display (line completion rewards land here)
@@ -990,8 +990,8 @@ export function stopPainting() {
     dragCounterClear();
 
     // Endgame: release the charged projectile accumulated while drag-painting
-    if (isEndgameLevel() && typeof globalThis._egReleaseChargedShot === 'function') {
-        globalThis._egReleaseChargedShot();
+    if (isEndgameLevel() && typeof globalThis._releaseChargedShot === 'function') {
+        globalThis._releaseChargedShot();
     }
 }
 

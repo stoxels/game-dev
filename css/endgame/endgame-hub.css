@@ -851,7 +851,7 @@ Layout Architecture:
     line-height: 1;
 }
 
-/* EG_ART placeholder system: real images scale like the emoji they replace */
+/* GAME_ART placeholder system: real images scale like the emoji they replace */
 img.eg-art-img {
     width: 1em;
     height: 1em;

@@ -62,7 +62,7 @@ export function egMapBaseMistakesForTier(tier) {
 // Monster-level curve per map tier.
 //
 // The atlas now begins at the level the CAMPAIGN ends (see
-// EG_LEVELING_CONFIG.campaignEndLevel = 68), exactly like the genre's
+// LEVELING_CONFIG.campaignEndLevel = 68), exactly like the genre's
 // first maps: Tier 1 monsters are level 68, and the curve climbs gently to
 // Tier 16 at level 90. A character arriving from the campaign is therefore
 // on-level for T1 (full XP) instead of 60+ levels over it.

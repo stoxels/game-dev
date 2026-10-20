@@ -11,7 +11,7 @@
 
 // Slot type to default emoji. A base type overrides this with its own icon,
 // e.g. axes get an axe instead of the generic sword.
-export const EG_SLOT_ICONS = {
+export const SLOT_ICONS = {
     head: '👑',
     earring: '💎',
     amulet: '📿',

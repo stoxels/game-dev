@@ -149,6 +149,6 @@ export function setNexusUnlocked() {
         STATE.nexusUnlocked = true;
         if (typeof save === 'function') save();
         // World 14 cleared, endgame maps next: second -30% to all resistances.
-        if (typeof globalThis._egAdvanceResistPenaltyStage === 'function') globalThis._egAdvanceResistPenaltyStage(2);
+        if (typeof globalThis._advanceResistPenaltyStage === 'function') globalThis._advanceResistPenaltyStage(2);
     }
 }

@@ -1,6 +1,6 @@
-import { _egDamageTargetById } from '../encounter-monster-damage.js';
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+import { _damageTargetById } from '../encounter-monster-damage.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkDotTick, _nkEl, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkMaxHP, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkRuns, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: ENTROPY (boss_entropy)--------------------------
@@ -11,15 +11,15 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFroze
 // THE LAST DEGREE finale at ≤10%: deliver 5 shards or face HEAT DEATH.
 //------------------------------------------------------------------------
 
-// Prefix discipline: everything here is _egEntr / eg-entr- (the _egEnt stem
-// collides with _egEnterBossArena elsewhere - do not shorten).
+// Prefix discipline: everything here is _entr / eg-entr- (the _ent stem
+// collides with _enterBossArena elsewhere - do not shorten).
 
 // DEBUG: slow Entropy's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Off for ship.
-export const _EG_ENTR_DEBUG_SLOW = false;
-export const _EG_ENTR_DEBUG_MULT = _EG_ENTR_DEBUG_SLOW ? 2.5 : 1;
+export const _ENTR_DEBUG_SLOW = false;
+export const _ENTR_DEBUG_MULT = _ENTR_DEBUG_SLOW ? 2.5 : 1;
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_entropy: {
         id: 'boss_entropy', name: 'Entropy', emoji: '♾️',
         baseHP: 1000, baseDamage: 22, chargeMax: 13,
@@ -27,7 +27,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
 
     // boss_entropy - "The Second Law" (rework)
     // Phase 1 (100% → 60%): Heat Death Drift teaches the order economy
@@ -42,32 +42,32 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'heat_death_drift', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechEntrDrift' },
-            { name: 'recursive_decay', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechEntrDecay', phase2Only: true },
-            { name: 'maxwells_door', intervalBase: 26000, intervalVariance: 6000, handler: '_egMechEntrDoor', phase2Only: true },
+            { name: 'heat_death_drift', intervalBase: 19000, intervalVariance: 4000, handler: '_mechEntrDrift' },
+            { name: 'recursive_decay', intervalBase: 21000, intervalVariance: 5000, handler: '_mechEntrDecay', phase2Only: true },
+            { name: 'maxwells_door', intervalBase: 26000, intervalVariance: 6000, handler: '_mechEntrDoor', phase2Only: true },
         ],
-        onPhaseEnter: _egEntrOnPhaseEnter,
+        onPhaseEnter: _entrOnPhaseEnter,
     },
 });
 
 
 // ── Shared tuning ───────────────────────────────────────────────────────────
-export const EG_ENTR_POOL_DPS    = 7;     // %maxHP/s standing in a cold pool
-export const EG_ENTR_POOL_LIFE   = 12;    // s a pool lingers (phase 3: 10)
-export const EG_ENTR_ZONE_LIFE   = 9;     // s an ordered zone stays lit
-export const EG_ENTR_ORDER_FILL  = 14;    // order/s inside a zone
-export const EG_ENTR_ORDER_DRAIN = 8;     // order/s outside zones (cold door: x2)
-export const EG_ENTR_SPEED_MIN   = 0.55;  // movement floor at 0 order (never locks)
-export const EG_ENTR_BURN_DPS    = 6;     // %maxHP/s while burning out a cursed cell
-export const EG_ENTR_CELL_SPREAD = 4;     // s between cell spreads
-export const EG_ENTR_CELL_LIFE   = 14;    // s a cursed cell survives
-export const EG_ENTR_DOOR_STATE  = 8000;  // ms of elemental state from a door
-export const EG_ENTR_SHARD_DMG   = 0.20;  // boss maxHP per delivered shard
-export const EG_ENTR_SHARDS      = 5;     // shards to restart the universe
-export const EG_ENTR_FINAL_TIME  = 32;    // s before HEAT DEATH
-export const EG_ENTR_HEATDEATH   = 0.35;  // caught in the wave
-export const EG_ENTR_SINGULAR_R  = 150;   // safe radius around the singularity
-export const EG_ENTR_HIT_CD_MS   = 700;   // shared touch cooldown
+export const ENTR_POOL_DPS    = 7;     // %maxHP/s standing in a cold pool
+export const ENTR_POOL_LIFE   = 12;    // s a pool lingers (phase 3: 10)
+export const ENTR_ZONE_LIFE   = 9;     // s an ordered zone stays lit
+export const ENTR_ORDER_FILL  = 14;    // order/s inside a zone
+export const ENTR_ORDER_DRAIN = 8;     // order/s outside zones (cold door: x2)
+export const ENTR_SPEED_MIN   = 0.55;  // movement floor at 0 order (never locks)
+export const ENTR_BURN_DPS    = 6;     // %maxHP/s while burning out a cursed cell
+export const ENTR_CELL_SPREAD = 4;     // s between cell spreads
+export const ENTR_CELL_LIFE   = 14;    // s a cursed cell survives
+export const ENTR_DOOR_STATE  = 8000;  // ms of elemental state from a door
+export const ENTR_SHARD_DMG   = 0.20;  // boss maxHP per delivered shard
+export const ENTR_SHARDS      = 5;     // shards to restart the universe
+export const ENTR_FINAL_TIME  = 32;    // s before HEAT DEATH
+export const ENTR_HEATDEATH   = 0.35;  // caught in the wave
+export const ENTR_SINGULAR_R  = 150;   // safe radius around the singularity
+export const ENTR_HIT_CD_MS   = 700;   // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -75,95 +75,95 @@ export const EG_ENTR_HIT_CD_MS   = 700;   // shared touch cooldown
 //------------------------------------------------------------------------
 // Zones and pools live in module state so the drift cast (spawner), the
 // order watcher (ticker) and the finale (cleaner) all share one truth.
-export let _egEntrZones = [];    // { x, y, r, el, until }
-export let _egEntrPools = [];    // { x, y, r, el, until, dps }
-export let _egEntrCells = [];    // { x, y, el, born, dead }
-export let _egEntrOrderRun = null;
-export let _egEntrOrder = 100;   // 0..100 - the personal order meter
-export let _egEntrHotUntil = 0;  // Maxwell hot-state deadline (perf.now ms)
-export let _egEntrColdUntil = 0;
-export let _egEntrHotAuraTimer = 0;
-export let _egEntrColdAuraTimer = 0;
+export let _entrZones = [];    // { x, y, r, el, until }
+export let _entrPools = [];    // { x, y, r, el, until, dps }
+export let _entrCells = [];    // { x, y, el, born, dead }
+export let _entrOrderRun = null;
+export let _entrOrder = 100;   // 0..100 - the personal order meter
+export let _entrHotUntil = 0;  // Maxwell hot-state deadline (perf.now ms)
+export let _entrColdUntil = 0;
+export let _entrHotAuraTimer = 0;
+export let _entrColdAuraTimer = 0;
 
 // Movement hook (called from _avatarGetMoveSpeed in player_sprite.js,
-// typeof-guarded there - same pattern as _egSnailBroomHeld). Perfect
+// typeof-guarded there - same pattern as _snailBroomHeld). Perfect
 // crystal during the finale: absolute zero is perfect order.
-export function _egEntrMoveMult() {
-    if (_egEntrFinalActive()) return 1;
-    return EG_ENTR_SPEED_MIN + (1 - EG_ENTR_SPEED_MIN) * (_egEntrOrder / 100);
+export function _entrMoveMult() {
+    if (_entrFinalActive()) return 1;
+    return ENTR_SPEED_MIN + (1 - ENTR_SPEED_MIN) * (_entrOrder / 100);
 }
 
-export function _egEntrHeal(amount) {
+export function _entrHeal(amount) {
     try {
         if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
         if (globalThis.playerCurrentHP <= 0) return;
         const before = globalThis.playerCurrentHP;
-        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(amount) : (amount)));
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._lifeGain ? globalThis._lifeGain(amount) : (amount)));
         if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
     } catch (e) {}
 }
 
 // Player centre with a screen-centre fallback.
-export function _egEntrPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _entrPC() { const c = _nkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Touch damage helper shared by all Entropy hazards (per-touch cooldown).
-export let _egEntrHitCd = 0;
-export function _egEntrTouch(pct, level, label) {
+export let _entrHitCd = 0;
+export function _entrTouch(pct, level, label) {
     const now = performance.now();
-    if (now < _egEntrHitCd) return false;
-    const pr = _egNkPlayerRect();
+    if (now < _entrHitCd) return false;
+    const pr = _nkPlayerRect();
     if (!pr) return false;
-    _egEntrHitCd = now + EG_ENTR_HIT_CD_MS;
-    const dealt = _egNkHit(pct, 'cold', level);
-    _egNkAbilityHitToast(dealt, 'Entropy', label);
+    _entrHitCd = now + ENTR_HIT_CD_MS;
+    const dealt = _nkHit(pct, 'cold', level);
+    _nkAbilityHitToast(dealt, 'Entropy', label);
     return true;
 }
 
 // The order meter HUD (bottom-centre; the boss cards own the top).
-export let _egEntrHudEl = null;
-export function _egEntrHudApply() {
-    if (!_egEntrHudEl) {
-        _egEntrHudEl = document.createElement('div');
-        _egEntrHudEl.className = 'eg-entr-order';
-        _egEntrHudEl.innerHTML =
+export let _entrHudEl = null;
+export function _entrHudApply() {
+    if (!_entrHudEl) {
+        _entrHudEl = document.createElement('div');
+        _entrHudEl.className = 'eg-entr-order';
+        _entrHudEl.innerHTML =
             '<div class="eg-entr-order-fill"></div>' +
             '<div class="eg-entr-order-label">ORDER</div>';
-        document.body.appendChild(_egEntrHudEl);
+        document.body.appendChild(_entrHudEl);
     }
-    _egEntrHudEl.style.setProperty('--entr-order', String(Math.round(_egEntrOrder)));
-    _egEntrHudEl.classList.toggle('eg-entr-order-low', _egEntrOrder < 30);
+    _entrHudEl.style.setProperty('--entr-order', String(Math.round(_entrOrder)));
+    _entrHudEl.classList.toggle('eg-entr-order-low', _entrOrder < 30);
 }
 
 // The passive watcher: expires zones/pools/cells, ticks pool DoT and the
 // order meter. Created lazily by the first cast and re-created after the
 // finale's kill-other-runs sweep, so it lives until the boss dies.
-export function _egEntrEnsureOrderRun(monster) {
-    if (_egEntrOrderRun && _egNkRuns.has(_egEntrOrderRun.id)) return;
-    const run = _egNkNewRun(monster && monster.id, false);
+export function _entrEnsureOrderRun(monster) {
+    if (_entrOrderRun && _nkRuns.has(_entrOrderRun.id)) return;
+    const run = _nkNewRun(monster && monster.id, false);
     run.passive = true;
-    _egEntrOrderRun = run;
+    _entrOrderRun = run;
     const level = (monster && monster.level) || 1;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         // Expiry sweep (always - even during the finale, cells must age out).
         const t = now;
-        _egEntrZones = _egEntrZones.filter(z => { if (t >= z.until) { try { z.el.remove(); } catch (e) {} return false; } return true; });
-        _egEntrPools = _egEntrPools.filter(p => { if (t >= p.until) { try { p.el.remove(); } catch (e) {} return false; } return true; });
-        _egEntrCells = _egEntrCells.filter(c => { if (c.dead || t - c.born >= EG_ENTR_CELL_LIFE * 1000 * _EG_ENTR_DEBUG_MULT) { c.dead = true; try { c.el.remove(); } catch (e) {} return false; } return true; });
+        _entrZones = _entrZones.filter(z => { if (t >= z.until) { try { z.el.remove(); } catch (e) {} return false; } return true; });
+        _entrPools = _entrPools.filter(p => { if (t >= p.until) { try { p.el.remove(); } catch (e) {} return false; } return true; });
+        _entrCells = _entrCells.filter(c => { if (c.dead || t - c.born >= ENTR_CELL_LIFE * 1000 * _ENTR_DEBUG_MULT) { c.dead = true; try { c.el.remove(); } catch (e) {} return false; } return true; });
 
         // Burn-out lives HERE (the always-alive watcher), so standing on a
         // cell burns it out during the finale's frozen rain too, not just
         // while the decay cast is running.
-        const pc0 = _egEntrPC();
-        for (const c of _egEntrCells) {
+        const pc0 = _entrPC();
+        for (const c of _entrCells) {
             if (c.dead) continue;
             if (Math.hypot(pc0.x - c.x, pc0.y - c.y) < 32) {
-                _egNkDotTick(run, EG_ENTR_BURN_DPS, dtS, level, 'cold');
+                _nkDotTick(run, ENTR_BURN_DPS, dtS, level, 'cold');
                 c.burn += dtS;
                 c.el.classList.add('eg-entr-cell-burning');
                 if (c.burn >= 0.9) {
                     c.dead = true;
                     try { c.el.remove(); } catch (e) {}
-                    _egNkToast('eg_mech_entr_decay_out', '♾️🔥 Cell burned out!', '#fbbf24');
+                    _nkToast('eg_mech_entr_decay_out', '♾️🔥 Cell burned out!', '#fbbf24');
                 }
             } else if (c.burn > 0) {
                 c.burn = 0;
@@ -172,31 +172,31 @@ export function _egEntrEnsureOrderRun(monster) {
         }
 
         // The Last Degree: the lattice protects - no meter, no pool DoT.
-        if (_egEntrFinalActive()) { _egEntrOrder = 100; return true; }
+        if (_entrFinalActive()) { _entrOrder = 100; return true; }
 
-        const pc = _egEntrPC();
-        const inZone = _egEntrZones.some(z => Math.hypot(pc.x - z.x, pc.y - z.y) < z.r);
-        const inPool = _egEntrPools.find(p => Math.hypot(pc.x - p.x, pc.y - p.y) < p.r + 10);
+        const pc = _entrPC();
+        const inZone = _entrZones.some(z => Math.hypot(pc.x - z.x, pc.y - z.y) < z.r);
+        const inPool = _entrPools.find(p => Math.hypot(pc.x - p.x, pc.y - p.y) < p.r + 10);
 
         if (inPool) {
-            const hot = now < _egEntrHotUntil;
-            const cold = now < _egEntrColdUntil;
+            const hot = now < _entrHotUntil;
+            const cold = now < _entrColdUntil;
             if (hot) {
                 // Maxwell's fire: pools heal instead of harm.
-                _egEntrHeal(_egNkMaxHP() * 0.04 * dtS);
+                _entrHeal(_nkMaxHP() * 0.04 * dtS);
             } else if (!cold && !inZone) {
-                _egNkDotTick(run, EG_ENTR_POOL_DPS, dtS, level, 'cold');
+                _nkDotTick(run, ENTR_POOL_DPS, dtS, level, 'cold');
             }
         }
 
         if (inZone) {
-            if (now >= _egEntrHotUntil) _egEntrOrder = Math.min(100, _egEntrOrder + EG_ENTR_ORDER_FILL * dtS);
+            if (now >= _entrHotUntil) _entrOrder = Math.min(100, _entrOrder + ENTR_ORDER_FILL * dtS);
             // Hot state scatters order: zones stop refilling while it lasts.
         } else {
-            const drain = EG_ENTR_ORDER_DRAIN * (now < _egEntrColdUntil ? 2 : 1);
-            _egEntrOrder = Math.max(0, _egEntrOrder - drain * dtS);
+            const drain = ENTR_ORDER_DRAIN * (now < _entrColdUntil ? 2 : 1);
+            _entrOrder = Math.max(0, _entrOrder - drain * dtS);
         }
-        _egEntrHudApply();
+        _entrHudApply();
         return true;
     });
 }
@@ -208,36 +208,36 @@ export function _egEntrEnsureOrderRun(monster) {
 // Cold pools bloom outward and MERGE when they touch; each cast also
 // plants a lit ordered zone (smaller as the pools grow). Standing in a
 // zone = protection + order refill; pools drain %HP/s.
-export const EG_ENTR_DRIFT_BLOOMS = [0, 2, 2, 3];  // blooms per cast, by phase
-export const EG_ENTR_POOL_R       = 95;            // base pool radius
-export const EG_ENTR_BLOOM_MS     = 900;           // telegraph before eruption
+export const ENTR_DRIFT_BLOOMS = [0, 2, 2, 3];  // blooms per cast, by phase
+export const ENTR_POOL_R       = 95;            // base pool radius
+export const ENTR_BLOOM_MS     = 900;           // telegraph before eruption
 
-export function _egMechEntrDrift(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechEntrDrift(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
     void level;
     const W = window.innerWidth, H = window.innerHeight;
-    const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_entr_drift', '♾️❄️ HEAT DEATH DRIFT - the cold spreads! Find the lit zones!', '#93c5fd');
-    _egEntrEnsureOrderRun(monster);
+    const run = _nkNewRun(monster && monster.id, true);
+    _nkToast('eg_mech_entr_drift', '♾️❄️ HEAT DEATH DRIFT - the cold spreads! Find the lit zones!', '#93c5fd');
+    _entrEnsureOrderRun(monster);
 
-    const poolLife = (p >= 3 ? EG_ENTR_POOL_LIFE - 2 : EG_ENTR_POOL_LIFE) * _EG_ENTR_DEBUG_MULT * 1000;
-    const zoneLife = EG_ENTR_ZONE_LIFE * _EG_ENTR_DEBUG_MULT * 1000;
+    const poolLife = (p >= 3 ? ENTR_POOL_LIFE - 2 : ENTR_POOL_LIFE) * _ENTR_DEBUG_MULT * 1000;
+    const zoneLife = ENTR_ZONE_LIFE * _ENTR_DEBUG_MULT * 1000;
 
     // Blooms ride the loop clock (pause-safe - no bare setTimeout).
     const blooms = [];
-    for (let i = 0; i < EG_ENTR_DRIFT_BLOOMS[p]; i++) {
+    for (let i = 0; i < ENTR_DRIFT_BLOOMS[p]; i++) {
         blooms.push({
             x: W * (0.14 + Math.random() * 0.72),
             y: H * (0.18 + Math.random() * 0.64),
-            eruptAt: EG_ENTR_BLOOM_MS * _EG_ENTR_DEBUG_MULT + i * 260,
+            eruptAt: ENTR_BLOOM_MS * _ENTR_DEBUG_MULT + i * 260,
             warnEl: null, done: false,
         });
     }
 
     let t = 0;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         t += dtS * 1000;
         let pending = false;
         for (const b of blooms) {
@@ -246,10 +246,10 @@ export function _egMechEntrDrift(monster, phase) {
             if (t >= b.eruptAt) {
                 b.done = true;
                 if (b.warnEl) { try { b.warnEl.remove(); } catch (e) {} b.warnEl = null; }
-                _egEntrSpawnPool(b.x, b.y, EG_ENTR_POOL_R + p * 8, poolLife);
-                _egEntrSpawnZone(W * (0.2 + Math.random() * 0.6), H * (0.2 + Math.random() * 0.6), zoneLife);
+                _entrSpawnPool(b.x, b.y, ENTR_POOL_R + p * 8, poolLife);
+                _entrSpawnZone(W * (0.2 + Math.random() * 0.6), H * (0.2 + Math.random() * 0.6), zoneLife);
             } else if (!b.warnEl) {
-                b.warnEl = _egNkEl(run, 'div', 'eg-entr-bloom-warn');
+                b.warnEl = _nkEl(run, 'div', 'eg-entr-bloom-warn');
                 b.warnEl.style.left = Math.round(b.x - 60) + 'px';
                 b.warnEl.style.top = Math.round(b.y - 60) + 'px';
             }
@@ -260,8 +260,8 @@ export function _egMechEntrDrift(monster, phase) {
 
 // Spawn a pool; if it overlaps an existing one, MERGE into a bigger pool
 // (real entropy - the cold consolidates instead of multiplying).
-export function _egEntrSpawnPool(x, y, r, lifeMs) {
-    const near = _egEntrPools.find(q => Math.hypot(q.x - x, q.y - y) < q.r + r - 24);
+export function _entrSpawnPool(x, y, r, lifeMs) {
+    const near = _entrPools.find(q => Math.hypot(q.x - x, q.y - y) < q.r + r - 24);
     if (near) {
         const tot = near.r + r;
         const nx = (near.x * near.r + x * r) / tot;
@@ -269,8 +269,8 @@ export function _egEntrSpawnPool(x, y, r, lifeMs) {
         const nr = Math.min(170, Math.sqrt(near.r * near.r + r * r) * 1.05);
         const until = Math.max(near.until, performance.now() + lifeMs);
         try { near.el.remove(); } catch (e) {}
-        _egEntrPools = _egEntrPools.filter(q => q !== near);
-        _egEntrSpawnPool(nx, ny, nr, until - performance.now());
+        _entrPools = _entrPools.filter(q => q !== near);
+        _entrSpawnPool(nx, ny, nr, until - performance.now());
         return;
     }
     const el = document.createElement('div');
@@ -281,12 +281,12 @@ export function _egEntrSpawnPool(x, y, r, lifeMs) {
     el.style.width = d + 'px';
     el.style.height = d + 'px';
     document.body.appendChild(el);
-    _egEntrPools.push({ x, y, r, el, until: performance.now() + lifeMs, dps: EG_ENTR_POOL_DPS });
+    _entrPools.push({ x, y, r, el, until: performance.now() + lifeMs, dps: ENTR_POOL_DPS });
 }
 
-export function _egEntrSpawnZone(x, y, lifeMs) {
+export function _entrSpawnZone(x, y, lifeMs) {
     // Zones shrink as the cold consolidates: more pools → smaller refuge.
-    const r = Math.max(55, 92 - _egEntrPools.length * 4);
+    const r = Math.max(55, 92 - _entrPools.length * 4);
     const el = document.createElement('div');
     el.className = 'eg-entr-zone';
     const d = Math.round(r * 2);
@@ -295,7 +295,7 @@ export function _egEntrSpawnZone(x, y, lifeMs) {
     el.style.width = d + 'px';
     el.style.height = d + 'px';
     document.body.appendChild(el);
-    _egEntrZones.push({ x, y, r, el, until: performance.now() + lifeMs });
+    _entrZones.push({ x, y, r, el, until: performance.now() + lifeMs });
 }
 
 
@@ -305,48 +305,48 @@ export function _egEntrSpawnZone(x, y, lifeMs) {
 // Cursed cells AGE: every 4s each living cell spreads decay to an
 // orthogonal neighbour (cap 9). Stand on a cell to burn it out - the burn
 // costs a cold DoT while you stand there.
-export const EG_ENTR_DECAY_SEEDS = [0, 3, 3, 5];   // cells seeded per cast, by phase
-export const EG_ENTR_CELL_CAP    = 9;
+export const ENTR_DECAY_SEEDS = [0, 3, 3, 5];   // cells seeded per cast, by phase
+export const ENTR_CELL_CAP    = 9;
 
-export function _egMechEntrDecay(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechEntrDecay(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const W = window.innerWidth, H = window.innerHeight;
-    const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_entr_decay', '♾️🦠 RECURSIVE DECAY - the cells spread! Stand on them to burn them out!', '#86efac');
-    _egEntrEnsureOrderRun(monster);
+    const run = _nkNewRun(monster && monster.id, true);
+    _nkToast('eg_mech_entr_decay', '♾️🦠 RECURSIVE DECAY - the cells spread! Stand on them to burn them out!', '#86efac');
+    _entrEnsureOrderRun(monster);
 
-    for (let i = 0; i < EG_ENTR_DECAY_SEEDS[p]; i++) {
-        _egEntrSpawnCell(W * (0.12 + Math.random() * 0.76), H * (0.16 + Math.random() * 0.68));
+    for (let i = 0; i < ENTR_DECAY_SEEDS[p]; i++) {
+        _entrSpawnCell(W * (0.12 + Math.random() * 0.76), H * (0.16 + Math.random() * 0.68));
     }
 
     let spreadAcc = 0;
-    _egNkLoop(run, (dtS) => {
-        // Spread: every EG_ENTR_CELL_SPREAD seconds, living cells propagate.
+    _nkLoop(run, (dtS) => {
+        // Spread: every ENTR_CELL_SPREAD seconds, living cells propagate.
         // (Burn-out lives in the order watcher so it works in every state.)
         spreadAcc += dtS;
-        if (spreadAcc >= EG_ENTR_CELL_SPREAD) {
+        if (spreadAcc >= ENTR_CELL_SPREAD) {
             spreadAcc = 0;
-            const alive = _egEntrCells.filter(c => !c.dead);
-            if (alive.length && alive.length < EG_ENTR_CELL_CAP) {
+            const alive = _entrCells.filter(c => !c.dead);
+            if (alive.length && alive.length < ENTR_CELL_CAP) {
                 const src = alive[Math.floor(Math.random() * alive.length)];
                 const dirs = [[64, 0], [-64, 0], [0, 64], [0, -64]];
                 const d = dirs[Math.floor(Math.random() * dirs.length)];
-                _egEntrSpawnCell(src.x + d[0], src.y + d[1]);
+                _entrSpawnCell(src.x + d[0], src.y + d[1]);
             }
         }
-        return _egEntrCells.some(c => !c.dead);
+        return _entrCells.some(c => !c.dead);
     });
 }
 
-export function _egEntrSpawnCell(x, y) {
-    if (_egEntrCells.filter(c => !c.dead).length >= EG_ENTR_CELL_CAP) return;
+export function _entrSpawnCell(x, y) {
+    if (_entrCells.filter(c => !c.dead).length >= ENTR_CELL_CAP) return;
     const el = document.createElement('div');
     el.className = 'eg-entr-cell';
     el.style.left = Math.round(x - 23) + 'px';
     el.style.top = Math.round(y - 23) + 'px';
     document.body.appendChild(el);
-    _egEntrCells.push({ x, y, el, born: performance.now(), dead: false, burn: 0 });
+    _entrCells.push({ x, y, el, born: performance.now(), dead: false, burn: 0 });
 }
 
 
@@ -356,33 +356,33 @@ export function _egEntrSpawnCell(x, y) {
 // A hot door and a cold door at opposite edges. Entering one applies the
 // element for 8s (one use each): HOT = pools heal you (zones stop
 // refilling), COLD = pool-proof (order drains twice as fast).
-export function _egMechEntrDoor(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechEntrDoor(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     void phase;
     const W = window.innerWidth, H = window.innerHeight;
-    const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_entr_door', '♾️🚪 MAXWELL\u2019S DOOR - choose your element, pay its price!', '#fdba74');
+    const run = _nkNewRun(monster && monster.id, true);
+    _nkToast('eg_mech_entr_door', '♾️🚪 MAXWELL\u2019S DOOR - choose your element, pay its price!', '#fdba74');
 
     const y = H * (0.3 + Math.random() * 0.4);
-    const hot = _egNkEl(run, 'div', 'eg-entr-door eg-entr-door-hot', '🔥');
+    const hot = _nkEl(run, 'div', 'eg-entr-door eg-entr-door-hot', '🔥');
     hot.style.left = Math.round(W * 0.08 - 34) + 'px';
     hot.style.top = Math.round(y - 52) + 'px';
-    const cold = _egNkEl(run, 'div', 'eg-entr-door eg-entr-door-cold', '❄️');
+    const cold = _nkEl(run, 'div', 'eg-entr-door eg-entr-door-cold', '❄️');
     cold.style.left = Math.round(W * 0.92 - 34) + 'px';
     cold.style.top = Math.round(H - y - 52) + 'px';
 
     let t = 0;
-    const lifeMs = 9000 * _EG_ENTR_DEBUG_MULT;
-    _egNkLoop(run, (dtS) => {
+    const lifeMs = 9000 * _ENTR_DEBUG_MULT;
+    _nkLoop(run, (dtS) => {
         t += dtS * 1000;
-        const pc = _egEntrPC();
+        const pc = _entrPC();
         performance.now();
         if (Math.hypot(pc.x - W * 0.08, pc.y - y) < 50) {
-            _egEntrApplyHot();
+            _entrApplyHot();
             return false;
         }
         if (Math.hypot(pc.x - W * 0.92, pc.y - (H - y)) < 50) {
-            _egEntrApplyCold();
+            _entrApplyCold();
             return false;
         }
         if (t >= lifeMs) return false;
@@ -390,19 +390,19 @@ export function _egMechEntrDoor(monster, phase) {
     });
 }
 
-export function _egEntrApplyHot() {
-    _egEntrHotUntil = performance.now() + EG_ENTR_DOOR_STATE * _EG_ENTR_DEBUG_MULT;
-    _egNkToast('eg_mech_entr_hot', '🔥 FIRE-STATE - cold pools heal you, but heat scatters order!', '#fdba74');
-    _egEntrAura('eg-entr-hot-aura', 'hot');
+export function _entrApplyHot() {
+    _entrHotUntil = performance.now() + ENTR_DOOR_STATE * _ENTR_DEBUG_MULT;
+    _nkToast('eg_mech_entr_hot', '🔥 FIRE-STATE - cold pools heal you, but heat scatters order!', '#fdba74');
+    _entrAura('eg-entr-hot-aura', 'hot');
 }
 
-export function _egEntrApplyCold() {
-    _egEntrColdUntil = performance.now() + EG_ENTR_DOOR_STATE * _EG_ENTR_DEBUG_MULT;
-    _egNkToast('eg_mech_entr_cold', '❄️ COLD-STATE - pool-proof, but order drains twice as fast!', '#93c5fd');
-    _egEntrAura('eg-entr-cold-aura', 'cold');
+export function _entrApplyCold() {
+    _entrColdUntil = performance.now() + ENTR_DOOR_STATE * _ENTR_DEBUG_MULT;
+    _nkToast('eg_mech_entr_cold', '❄️ COLD-STATE - pool-proof, but order drains twice as fast!', '#93c5fd');
+    _entrAura('eg-entr-cold-aura', 'cold');
 }
 
-export function _egEntrAura(cls, which) {
+export function _entrAura(cls, which) {
     const el = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     if (!el) return;
@@ -410,11 +410,11 @@ export function _egEntrAura(cls, which) {
     el.classList.remove(other);
     el.classList.add(cls);
     if (which === 'hot') {
-        clearTimeout(_egEntrHotAuraTimer);
-        _egEntrHotAuraTimer = setTimeout(() => { try { el.classList.remove(cls); } catch (e) {} }, EG_ENTR_DOOR_STATE * _EG_ENTR_DEBUG_MULT);
+        clearTimeout(_entrHotAuraTimer);
+        _entrHotAuraTimer = setTimeout(() => { try { el.classList.remove(cls); } catch (e) {} }, ENTR_DOOR_STATE * _ENTR_DEBUG_MULT);
     } else {
-        clearTimeout(_egEntrColdAuraTimer);
-        _egEntrColdAuraTimer = setTimeout(() => { try { el.classList.remove(cls); } catch (e) {} }, EG_ENTR_DOOR_STATE * _EG_ENTR_DEBUG_MULT);
+        clearTimeout(_entrColdAuraTimer);
+        _entrColdAuraTimer = setTimeout(() => { try { el.classList.remove(cls); } catch (e) {} }, ENTR_DOOR_STATE * _ENTR_DEBUG_MULT);
     }
 }
 
@@ -427,34 +427,34 @@ export function _egEntrAura(cls, which) {
 // each touched shard's spark flies to the central singularity and pops the
 // boss for 20% of ITS maxHP through the canonical damage path. 5 shards =
 // the universe restarts (the kill). Timer fail = HEAT DEATH wave.
-export const EG_ENTR_SHARD_LIFE = 7;      // s a landed shard waits
-export const EG_ENTR_SHARD_WARN = 750;    // ms telegraph
+export const ENTR_SHARD_LIFE = 7;      // s a landed shard waits
+export const ENTR_SHARD_WARN = 750;    // ms telegraph
 
-// Set while the finale runs (read by _egTickPlayer's charge-freeze gate
-// and by _egEntrMoveMult).
-export let _egEntrFinal = null;
+// Set while the finale runs (read by _tickPlayer's charge-freeze gate
+// and by _entrMoveMult).
+export let _entrFinal = null;
 
-export function _egEntrFinalActive() {
-    return !!_egEntrFinal && !_egEntrFinal.finished;
+export function _entrFinalActive() {
+    return !!_entrFinal && !_entrFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-export function _egEntrOnPhaseEnter(monster, newPhase) {
+export function _entrOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
-    try { _egEntrStartFinalWatcher(monster); } catch (e) {}
+    try { _entrStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-export function _egEntrStartFinalWatcher(monster) {
-    if (!monster || _egEntrFinal) return;
-    const run = _egNkNewRun(monster.id, true);
+export function _entrStartFinalWatcher(monster) {
+    if (!monster || _entrFinal) return;
+    const run = _nkNewRun(monster.id, true);
     run.passive = true;
-    _egNkLoop(run, () => {
-        if (_egEntrFinal) return false;
+    _nkLoop(run, () => {
+        if (_entrFinal) return false;
         try {
             if (monster.currentHP <= monster.maxHP * 0.10) {
-                _egEntrFinalStart(monster);
+                _entrFinalStart(monster);
                 return false;
             }
         } catch (e) { return false; }
@@ -464,33 +464,33 @@ export function _egEntrStartFinalWatcher(monster) {
 
 // Pause-safe timeout: if the game freezes mid-wait, retry until thawed
 // instead of firing during the pause (mirrors the other finales).
-export function _egEntrAfter(g, ms, fn) {
+export function _entrAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
-        if (g.finished || !_egEntrFinal) return;
-        if (_egNkFrozen()) { setTimeout(step, 120); return; }
+        if (g.finished || !_entrFinal) return;
+        if (_nkFrozen()) { setTimeout(step, 120); return; }
         if (performance.now() - t0 >= ms) fn();
         else setTimeout(step, Math.min(120, ms - (performance.now() - t0)));
     };
     setTimeout(step, Math.min(120, ms));
 }
 
-export function _egEntrFinalStart(monster) {
-    if (_egEntrFinal || !monster) return;
+export function _entrFinalStart(monster) {
+    if (_entrFinal || !monster) return;
 
     // The lattice takes over: kill every other run of this boss, then
     // rebuild the order watcher so cells/pools keep aging out cleanly.
-    Array.from(_egNkRuns.values()).forEach(r => {
-        if (r.bossId === monster.id) { try { _egNkKillRun(r); } catch (e) {} }
+    Array.from(_nkRuns.values()).forEach(r => {
+        if (r.bossId === monster.id) { try { _nkKillRun(r); } catch (e) {} }
     });
-    _egEntrOrderRun = null;
+    _entrOrderRun = null;
 
     // Clean slate: the frozen lattice replaces the drift battlefield.
-    _egEntrZones.forEach(z => { try { z.el.remove(); } catch (e) {} });
-    _egEntrPools.forEach(p => { try { p.el.remove(); } catch (e) {} });
-    _egEntrCells.forEach(c => { try { c.el.remove(); } catch (e) {} });
-    _egEntrZones = []; _egEntrPools = []; _egEntrCells = [];
-    _egEntrOrder = 100;
+    _entrZones.forEach(z => { try { z.el.remove(); } catch (e) {} });
+    _entrPools.forEach(p => { try { p.el.remove(); } catch (e) {} });
+    _entrCells.forEach(c => { try { c.el.remove(); } catch (e) {} });
+    _entrZones = []; _entrPools = []; _entrCells = [];
+    _entrOrder = 100;
 
     const W = window.innerWidth, H = window.innerHeight;
     const cx = W / 2, cy = H / 2;
@@ -498,20 +498,20 @@ export function _egEntrFinalStart(monster) {
         monsterId: monster.id,
         finished: false,
         delivered: 0,
-        deadline: performance.now() + EG_ENTR_FINAL_TIME * _EG_ENTR_DEBUG_MULT * 1000,
+        deadline: performance.now() + ENTR_FINAL_TIME * _ENTR_DEBUG_MULT * 1000,
         fxRun: null, overlay: null, singularity: null, timerEl: null,
     };
-    _egEntrFinal = g;
+    _entrFinal = g;
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
-    // lives in _egTickPlayer; this class is the visual twin).
+    // lives in _tickPlayer; this class is the visual twin).
     ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('eg-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
-    g.fxRun = _egNkNewRun(monster.id, true);
+    g.fxRun = _nkNewRun(monster.id, true);
     g.fxRun.passive = true;
 
     // Frozen lattice overlay + singularity.
@@ -540,7 +540,7 @@ export function _egEntrFinalStart(monster) {
     g.timerEl = ov.querySelector('.eg-entr-cd-timer');
     g.fxRun.els.push(ov);
 
-    _egNkToast('eg_mech_entr_final_cd', '♾️💀 THE LAST DEGREE - gather the shards before absolute zero!', '#93c5fd');
+    _nkToast('eg_mech_entr_final_cd', '♾️💀 THE LAST DEGREE - gather the shards before absolute zero!', '#93c5fd');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -553,7 +553,7 @@ export function _egEntrFinalStart(monster) {
     const level = monster.level || 1;
 
     // Rebuild the order watcher (post-purge) so stray cells/pools age out.
-    _egEntrEnsureOrderRun(monster);
+    _entrEnsureOrderRun(monster);
 
     // ── Shard spawning (one unified path: initial drop, re-drops after a
     // lost shard, and follow-ups after a delivery all come through here). ──
@@ -562,29 +562,29 @@ export function _egEntrFinalStart(monster) {
         const sx = W * (0.12 + Math.random() * 0.76);
         const sy = H * (0.16 + Math.random() * 0.68);
 
-        const warn = _egNkEl(g.fxRun, 'div', 'eg-entr-shard-warn');
+        const warn = _nkEl(g.fxRun, 'div', 'eg-entr-shard-warn');
         warn.style.left = Math.round(sx - 30) + 'px';
         warn.style.top = Math.round(sy - 30) + 'px';
 
-        _egEntrAfter(g, EG_ENTR_SHARD_WARN * _EG_ENTR_DEBUG_MULT, () => {
+        _entrAfter(g, ENTR_SHARD_WARN * _ENTR_DEBUG_MULT, () => {
             if (g.finished) return;
             try { warn.remove(); } catch (e) {}
-            const shard = _egNkEl(g.fxRun, 'div', 'eg-entr-shard', '✨');
+            const shard = _nkEl(g.fxRun, 'div', 'eg-entr-shard', '✨');
             shard.style.left = Math.round(sx - 22) + 'px';
             shard.style.top = Math.round(sy - 22) + 'px';
 
             let life = 0;
-            _egNkLoop(g.fxRun, (dtS) => {
+            _nkLoop(g.fxRun, (dtS) => {
                 if (g.finished) return false;
                 life += dtS;
-                const pc = _egEntrPC();
+                const pc = _entrPC();
                 if (Math.hypot(pc.x - sx, pc.y - sy) < 40) {
-                    _egEntrDeliver(g, monster, sx, sy, level);
+                    _entrDeliver(g, monster, sx, sy, level);
                     return false;
                 }
-                if (life >= EG_ENTR_SHARD_LIFE * _EG_ENTR_DEBUG_MULT) {
+                if (life >= ENTR_SHARD_LIFE * _ENTR_DEBUG_MULT) {
                     // Lost shard: it dissolves - another falls after a beat.
-                    _egEntrAfter(g, 700 * _EG_ENTR_DEBUG_MULT, spawnShard);
+                    _entrAfter(g, 700 * _ENTR_DEBUG_MULT, spawnShard);
                     return false;
                 }
                 return true;
@@ -597,8 +597,8 @@ export function _egEntrFinalStart(monster) {
         if (g.finished) return;
         const left = g.deadline - performance.now();
         if (g.timerEl) g.timerEl.textContent = Math.max(0, Math.ceil(left / 1000)) + 's';
-        if (left <= 0) { _egEntrHeatDeath(g, monster, level); return; }
-        _egEntrAfter(g, 250, tickTimer);
+        if (left <= 0) { _entrHeatDeath(g, monster, level); return; }
+        _entrAfter(g, 250, tickTimer);
     };
     tickTimer();
 
@@ -606,19 +606,19 @@ export function _egEntrFinalStart(monster) {
     // standing on them still burns them out, and they never spread).
     const rainCells = () => {
         if (g.finished) return;
-        _egEntrSpawnCell(W * (0.12 + Math.random() * 0.76), H * (0.16 + Math.random() * 0.68));
-        _egEntrAfter(g, 6000 * _EG_ENTR_DEBUG_MULT, rainCells);
+        _entrSpawnCell(W * (0.12 + Math.random() * 0.76), H * (0.16 + Math.random() * 0.68));
+        _entrAfter(g, 6000 * _ENTR_DEBUG_MULT, rainCells);
     };
     rainCells();
 
     spawnShard();
     // Let the delivery path re-enter the unified spawner for follow-ups.
-    _egEntrSpawnShardFn = spawnShard;
+    _entrSpawnShardFn = spawnShard;
 }
 
 // A shard was touched: its spark flies to the singularity, then the boss
 // takes a 20% pop through the canonical damage path.
-export function _egEntrDeliver(g, monster, sx, sy, level) {
+export function _entrDeliver(g, monster, sx, sy, level) {
     if (g.finished) return;
     void level;
     const W = window.innerWidth, H = window.innerHeight;
@@ -630,19 +630,19 @@ export function _egEntrDeliver(g, monster, sx, sy, level) {
     spark.style.setProperty('--fly-dx', Math.round((W / 2 - sx)) + 'px');
     spark.style.setProperty('--fly-dy', Math.round((H / 2 - sy)) + 'px');
     document.body.appendChild(spark);
-    setTimeout(() => { try { spark.remove(); } catch (e) {} }, 1300 * _EG_ENTR_DEBUG_MULT);
+    setTimeout(() => { try { spark.remove(); } catch (e) {} }, 1300 * _ENTR_DEBUG_MULT);
 
-    _egNkToast('eg_mech_entr_shard', '♾️✨ Shard ' + (g.delivered + 1) + '/' + EG_ENTR_SHARDS + ' delivered - the singularity stirs!', '#fde68a');
+    _nkToast('eg_mech_entr_shard', '♾️✨ Shard ' + (g.delivered + 1) + '/' + ENTR_SHARDS + ' delivered - the singularity stirs!', '#fde68a');
 
-    _egEntrAfter(g, 1150 * _EG_ENTR_DEBUG_MULT, () => {
+    _entrAfter(g, 1150 * _ENTR_DEBUG_MULT, () => {
         if (g.finished) return;
         g.delivered++;
         // Staggered damage pop on the boss - canonical path so resistances,
         // phase checks and the death flow all apply.
         try {
-            const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
-            if (m && typeof _egDamageTargetById === 'function' && m.currentHP > 0) {
-                _egDamageTargetById(g.monsterId, m.maxHP * EG_ENTR_SHARD_DMG, ['cold'], {});
+            const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
+            if (m && typeof _damageTargetById === 'function' && m.currentHP > 0) {
+                _damageTargetById(g.monsterId, m.maxHP * ENTR_SHARD_DMG, ['cold'], {});
             }
         } catch (e) {}
         // The boss card flares as each shard lands.
@@ -653,30 +653,30 @@ export function _egEntrDeliver(g, monster, sx, sy, level) {
             void wrap.offsetWidth;
             wrap.classList.add('eg-entr-hit');
         }
-        if (g.delivered >= EG_ENTR_SHARDS) {
-            _egEntrRestart(g, monster);
+        if (g.delivered >= ENTR_SHARDS) {
+            _entrRestart(g, monster);
         } else {
-            _egEntrAfter(g, 600 * _EG_ENTR_DEBUG_MULT, () => {
-                if (!g.finished) _egEntrDropNext(g, monster);
+            _entrAfter(g, 600 * _ENTR_DEBUG_MULT, () => {
+                if (!g.finished) _entrDropNext(g, monster);
             });
         }
     });
 }
 
 // Follow-up shard after a delivery (the unified spawner lives in
-// _egEntrFinalStart as `spawnShard`; this thin re-entry keeps the delivery
+// _entrFinalStart as `spawnShard`; this thin re-entry keeps the delivery
 // path simple).
-export let _egEntrSpawnShardFn = null;
-export function _egEntrDropNext(g, monster) {
-    if (g.finished || !_egEntrSpawnShardFn) return;
-    _egEntrSpawnShardFn(g, monster);
+export let _entrSpawnShardFn = null;
+export function _entrDropNext(g, monster) {
+    if (g.finished || !_entrSpawnShardFn) return;
+    _entrSpawnShardFn(g, monster);
 }
 
 // Timer failure: HEAT DEATH - a full-screen slow wave; only the singularity
 // centre is safe.
-export function _egEntrHeatDeath(g, monster, level) {
+export function _entrHeatDeath(g, monster, level) {
     if (g.finished) return;
-    _egNkToast('eg_mech_entr_heatdeath', '♾️💀 HEAT DEATH! The wave takes everything but the centre!', '#f87171');
+    _nkToast('eg_mech_entr_heatdeath', '♾️💀 HEAT DEATH! The wave takes everything but the centre!', '#f87171');
     const wave = document.createElement('div');
     wave.className = 'eg-entr-heatwave';
     const W = window.innerWidth, H = window.innerHeight;
@@ -685,42 +685,42 @@ export function _egEntrHeatDeath(g, monster, level) {
     document.body.appendChild(wave);
     g.fxRun.els.push(wave);
 
-    _egEntrAfter(g, 2200 * _EG_ENTR_DEBUG_MULT, () => {
+    _entrAfter(g, 2200 * _ENTR_DEBUG_MULT, () => {
         if (g.finished) return;
-        const pc = _egEntrPC();
-        if (Math.hypot(pc.x - W / 2, pc.y - H / 2) > EG_ENTR_SINGULAR_R) {
-            const dealt = _egNkHit(EG_ENTR_HEATDEATH, 'cold', level);
-            _egNkAbilityHitToast(dealt, 'Entropy', 'Heat Death');
+        const pc = _entrPC();
+        if (Math.hypot(pc.x - W / 2, pc.y - H / 2) > ENTR_SINGULAR_R) {
+            const dealt = _nkHit(ENTR_HEATDEATH, 'cold', level);
+            _nkAbilityHitToast(dealt, 'Entropy', 'Heat Death');
         }
         // The wave lands, the universe keeps winding down - resume the fight.
-        _egEntrFinalEnd(g, monster);
+        _entrFinalEnd(g, monster);
     });
 }
 
 // Success: the fifth shard re-ignites the universe - the boss pays its own
 // remaining HP (through the canonical path, immunity already released).
-export function _egEntrRestart(g, monster) {
+export function _entrRestart(g, monster) {
     if (g.finished) return;
-    _egNkToast('eg_mech_entr_spark', '♾️💥 THE UNIVERSE RESTARTS - Entropy gave everything one last spark!', '#fde68a');
+    _nkToast('eg_mech_entr_spark', '♾️💥 THE UNIVERSE RESTARTS - Entropy gave everything one last spark!', '#fde68a');
     const flash = document.createElement('div');
     flash.className = 'eg-entr-restart-flash';
     document.body.appendChild(flash);
     setTimeout(() => { try { flash.remove(); } catch (e) {} }, 1400);
-    _egEntrFinalEnd(g, monster);
+    _entrFinalEnd(g, monster);
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
-        if (m && typeof _egDamageTargetById === 'function' && m.currentHP > 0) {
-            _egDamageTargetById(g.monsterId, m.currentHP, ['cold'], {});
+        const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
+        if (m && typeof _damageTargetById === 'function' && m.currentHP > 0) {
+            _damageTargetById(g.monsterId, m.currentHP, ['cold'], {});
         }
     } catch (e) {}
     void monster;
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-export function _egEntrFinalEnd(g, monster) {
+export function _entrFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
-    try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
+    try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
     document.querySelectorAll('.eg-entr-lattice, .eg-entr-singularity, .eg-entr-cd, ' +
         '.eg-entr-shard-warn, .eg-entr-shard, .eg-entr-heatwave, .eg-entr-spark').forEach(el => {
         try { el.remove(); } catch (e) {}
@@ -733,7 +733,7 @@ export function _egEntrFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -743,18 +743,18 @@ export function _egEntrFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop -
+// Called from _bossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body state this boss ever created.
-export function _egEntrTeardown() {
-    if (_egEntrFinal) { try { _egEntrFinalEnd(_egEntrFinal, null); } catch (e) {} _egEntrFinal = null; }
-    if (_egEntrOrderRun) { try { _egNkKillRun(_egEntrOrderRun); } catch (e) {} _egEntrOrderRun = null; }
-    _egEntrZones.forEach(z => { try { z.el.remove(); } catch (e) {} });
-    _egEntrPools.forEach(p => { try { p.el.remove(); } catch (e) {} });
-    _egEntrCells.forEach(c => { try { c.el.remove(); } catch (e) {} });
-    _egEntrZones = []; _egEntrPools = []; _egEntrCells = [];
-    _egEntrOrder = 100;
-    _egEntrHotUntil = 0; _egEntrColdUntil = 0;
-    if (_egEntrHudEl) { try { _egEntrHudEl.remove(); } catch (e) {} _egEntrHudEl = null; }
+export function _entrTeardown() {
+    if (_entrFinal) { try { _entrFinalEnd(_entrFinal, null); } catch (e) {} _entrFinal = null; }
+    if (_entrOrderRun) { try { _nkKillRun(_entrOrderRun); } catch (e) {} _entrOrderRun = null; }
+    _entrZones.forEach(z => { try { z.el.remove(); } catch (e) {} });
+    _entrPools.forEach(p => { try { p.el.remove(); } catch (e) {} });
+    _entrCells.forEach(c => { try { c.el.remove(); } catch (e) {} });
+    _entrZones = []; _entrPools = []; _entrCells = [];
+    _entrOrder = 100;
+    _entrHotUntil = 0; _entrColdUntil = 0;
+    if (_entrHudEl) { try { _entrHudEl.remove(); } catch (e) {} _entrHudEl = null; }
     document.querySelectorAll('.eg-entr-bloom-warn, .eg-entr-pool, .eg-entr-zone, .eg-entr-cell, ' +
         '.eg-entr-door, .eg-entr-shard-warn, .eg-entr-shard, .eg-entr-spark, .eg-entr-heatwave, ' +
         '.eg-entr-lattice, .eg-entr-singularity, .eg-entr-cd, .eg-entr-restart-flash').forEach(el => {
@@ -777,25 +777,25 @@ export function _egEntrTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_ENTR_DEBUG.fire('drift'|'decay'|'door'|'final') - run one now
-//   _EG_ENTR_DEBUG.order(n)                             - set the meter by hand
+//   _ENTR_DEBUG.fire('drift'|'decay'|'door'|'final') - run one now
+//   _ENTR_DEBUG.order(n)                             - set the meter by hand
 if (typeof window !== 'undefined') {
-    window._EG_ENTR_DEBUG = {
+    window._ENTR_DEBUG = {
         fire: (name, phase) => {
-            const monster = (typeof _egMonsters !== 'undefined')
-                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_entropy') : null;
+            const monster = (typeof _monsters !== 'undefined')
+                ? globalThis._monsters.find(m => m && m.baseId === 'boss_entropy') : null;
             if (!monster) return 'no entropy alive';
-            const fn = name === 'drift' ? _egMechEntrDrift
-                : name === 'decay' ? _egMechEntrDecay
-                : name === 'door' ? _egMechEntrDoor : null;
+            const fn = name === 'drift' ? _mechEntrDrift
+                : name === 'decay' ? _mechEntrDecay
+                : name === 'door' ? _mechEntrDoor : null;
             if (name !== 'drift' && !fn) {
-                if (name === 'final') { _egEntrFinalStart(monster); return 'THE LAST DEGREE started'; }
+                if (name === 'final') { _entrFinalStart(monster); return 'THE LAST DEGREE started'; }
                 return 'unknown: ' + name;
             }
-            if (fn && _egNkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for the field to clear)';
+            if (fn && _nkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for the field to clear)';
             fn(monster, phase || monster.bossPhase || 1);
             return 'fired ' + name;
         },
-        order: (n) => { _egEntrOrder = Math.max(0, Math.min(100, Number(n) || 0)); _egEntrHudApply(); return 'order = ' + Math.round(_egEntrOrder); },
+        order: (n) => { _entrOrder = Math.max(0, Math.min(100, Number(n) || 0)); _entrHudApply(); return 'order = ' + Math.round(_entrOrder); },
     };
 }

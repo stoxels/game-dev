@@ -1,7 +1,7 @@
 import { t } from '../../translation/translations.js';
-import { _egCellInBounds, _egRecentFills } from '../combat-state.js';
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast, _egUnfillCell } from './shared-boss-abilities.js';
+import { _cellInBounds, _recentFills } from '../combat-state.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkDotTick, _nkEl, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkMaxHP, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkRuns, _nkToast, _unfillCell } from './shared-boss-abilities.js';
 import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
@@ -16,10 +16,10 @@ import { cur } from '../../state.js';
 
 // DEBUG: slow The Overfitter's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Off for ship.
-export const _EG_OVR_DEBUG_SLOW = false;
-export const _EG_OVR_DEBUG_MULT = _EG_OVR_DEBUG_SLOW ? 2.5 : 1;
+export const _OVR_DEBUG_SLOW = false;
+export const _OVR_DEBUG_MULT = _OVR_DEBUG_SLOW ? 2.5 : 1;
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_overfitter: {
         id: 'boss_overfitter', name: 'The Overfitter', emoji: '📈',
         baseHP: 1050, baseDamage: 23, chargeMax: 12,
@@ -27,7 +27,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
 
     // boss_overfitter - "The Model That Learned Too Much" (rework)
     // Phase 1 (100% → 60%): Gradient Descent + Pattern Break
@@ -43,18 +43,18 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2800,
         mechanics: [
-            { name: 'gradient_descent', intervalBase: 19000, intervalVariance: 4500, handler: '_egMechOvrGradient' },
-            { name: 'pattern_break', intervalBase: 16000, intervalVariance: 4000, handler: '_egMechPatternBreak' },
-            { name: 'pattern_lock', intervalBase: 22000, intervalVariance: 5000, handler: '_egMechOvrPatternLock', phase2Only: true },
-            { name: 'validation_set', intervalBase: 24000, intervalVariance: 5000, handler: '_egMechOvrValidation', phase2Only: true },
+            { name: 'gradient_descent', intervalBase: 19000, intervalVariance: 4500, handler: '_mechOvrGradient' },
+            { name: 'pattern_break', intervalBase: 16000, intervalVariance: 4000, handler: '_mechPatternBreak' },
+            { name: 'pattern_lock', intervalBase: 22000, intervalVariance: 5000, handler: '_mechOvrPatternLock', phase2Only: true },
+            { name: 'validation_set', intervalBase: 24000, intervalVariance: 5000, handler: '_mechOvrValidation', phase2Only: true },
         ],
-        onPhaseEnter: _egOvrOnPhaseEnter,
+        onPhaseEnter: _ovrOnPhaseEnter,
     },
 });
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-export const EG_OVR_TOUCH_CD_MS = 700;      // shared touch cooldown
+export const OVR_TOUCH_CD_MS = 700;      // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -63,27 +63,27 @@ export const EG_OVR_TOUCH_CD_MS = 700;      // shared touch cooldown
 
 // Touch damage helper shared by all Overfitter hazards. Shadow-element boss
 // - hits go in with element 'shadow' so the toast palette stays violet.
-export let _egOvrHitCd = 0;
-export function _egOvrTouch(pct, level, label) {
+export let _ovrHitCd = 0;
+export function _ovrTouch(pct, level, label) {
     const now = performance.now();
-    if (now < _egOvrHitCd) return false;
-    const pr = _egNkPlayerRect();
+    if (now < _ovrHitCd) return false;
+    const pr = _nkPlayerRect();
     if (!pr) return false;
-    _egOvrHitCd = now + EG_OVR_TOUCH_CD_MS;
-    const dealt = _egNkHit(pct, 'shadow', level);
-    _egNkAbilityHitToast(dealt, 'The Overfitter', label);
+    _ovrHitCd = now + OVR_TOUCH_CD_MS;
+    const dealt = _nkHit(pct, 'shadow', level);
+    _nkAbilityHitToast(dealt, 'The Overfitter', label);
     return true;
 }
 
 // Player centre with a screen-centre fallback.
-export function _egOvrPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _ovrPC() { const c = _nkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Proven reward pattern (Siren echo zones / Swarm royal jelly): heals go
 // through a guarded clamp + rerender.
-export function _egOvrHeal(amount) {
+export function _ovrHeal(amount) {
     if (typeof playerCurrentHP === 'undefined') return;
     const before = globalThis.playerCurrentHP;
-    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP || before, before + (globalThis._egLifeGain ? globalThis._egLifeGain(amount) : (amount)));
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP || before, before + (globalThis._lifeGain ? globalThis._lifeGain(amount) : (amount)));
     if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 
@@ -95,22 +95,22 @@ export function _egOvrHeal(amount) {
 // player's position every 500ms from the first mechanic cast onward. The
 // ring buffer feeds the finale's heat-map (older samples fall off, so the
 // map always reflects your recent ~80s of movement).
-export let _egOvrHistory = [];
-export let _egOvrRecRun = null;
+export let _ovrHistory = [];
+export let _ovrRecRun = null;
 
-export function _egOvrEnsureRecorder(monster) {
-    if (_egOvrRecRun || !monster) return;
-    const run = _egNkNewRun(monster.id, false);
+export function _ovrEnsureRecorder(monster) {
+    if (_ovrRecRun || !monster) return;
+    const run = _nkNewRun(monster.id, false);
     run.passive = true;
-    _egOvrRecRun = run;
+    _ovrRecRun = run;
     let acc = 0;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         acc += dtS * 1000;
         if (acc >= 500) {
             acc = 0;
-            const c = _egOvrPC();
-            _egOvrHistory.push({ x: c.x, y: c.y });
-            if (_egOvrHistory.length > 160) _egOvrHistory.shift();
+            const c = _ovrPC();
+            _ovrHistory.push({ x: c.x, y: c.y });
+            if (_ovrHistory.length > 160) _ovrHistory.shift();
         }
         return true;
     });
@@ -126,42 +126,42 @@ export function _egOvrEnsureRecorder(monster) {
 // MINIMUM locks onto your position and detonates - the loss surface
 // collapses where you were standing. Phase 3: a second minimum chases your
 // CURRENT position after the first.
-export const EG_OVR_STEPS      = 6;        // stamped bands per sweep
-export const EG_OVR_BAND_W     = 130;      // band width (px)
-export const EG_OVR_BAND_DPS   = [0, 5.0, 6.0, 7.0];   // %/s standing in a hot band
-export const EG_OVR_MIN_R      = 112;      // local minimum burst radius
-export const EG_OVR_MIN_DMG    = [0, 0.24, 0.28, 0.32]; // %maxHP caught in the minimum
-export const EG_OVR_MIN_WARN_MS = 1200;    // telegraph before the minimum bursts
+export const OVR_STEPS      = 6;        // stamped bands per sweep
+export const OVR_BAND_W     = 130;      // band width (px)
+export const OVR_BAND_DPS   = [0, 5.0, 6.0, 7.0];   // %/s standing in a hot band
+export const OVR_MIN_R      = 112;      // local minimum burst radius
+export const OVR_MIN_DMG    = [0, 0.24, 0.28, 0.32]; // %maxHP caught in the minimum
+export const OVR_MIN_WARN_MS = 1200;    // telegraph before the minimum bursts
 
-export function _egMechOvrGradient(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
-    _egOvrEnsureRecorder(monster);
-    _egOvrEnsureFinalWatcher(monster);
+export function _mechOvrGradient(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
+    _ovrEnsureRecorder(monster);
+    _ovrEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_ovr_gradient', '📈 GRADIENT DESCENT - training steps march across the arena! Stay off the hot bands!', '#c084ff');
+    _nkToast('eg_mech_ovr_gradient', '📈 GRADIENT DESCENT - training steps march across the arena! Stay off the hot bands!', '#c084ff');
 
     // ── Sweep: bands stamp left → right. ─────────────────────────────────
-    const cadence = 750 * _EG_OVR_DEBUG_MULT;
-    const hotMs = 1300 * _EG_OVR_DEBUG_MULT;
-    const teleMs = 650 * _EG_OVR_DEBUG_MULT;
+    const cadence = 750 * _OVR_DEBUG_MULT;
+    const hotMs = 1300 * _OVR_DEBUG_MULT;
+    const teleMs = 650 * _OVR_DEBUG_MULT;
     let stepIdx = 0, stepTimer = 0;
     const bands = [];
 
     // ── Local minimum: locks your cast-start position. ───────────────────
-    const minR = p >= 3 ? EG_OVR_MIN_R + 14 : EG_OVR_MIN_R;
-    let minPos = { ..._egOvrPC() };
+    const minR = p >= 3 ? OVR_MIN_R + 14 : OVR_MIN_R;
+    let minPos = { ..._ovrPC() };
     let minsDone = 0;
     const minsTotal = p >= 3 ? 2 : 1;
     let minEl = null, minBoomAt = 0;
     let stage = 'sweep';   // sweep → min-warn → min-boom → (next min) → done
 
-    _egNkLoop(run, (dtS, now) => {
-        const pr = _egNkPlayerRect();
-        const pc = _egOvrPC();
+    _nkLoop(run, (dtS, now) => {
+        const pr = _nkPlayerRect();
+        const pc = _ovrPC();
         let pending = false;
 
         if (stage === 'sweep') {
@@ -169,19 +169,19 @@ export function _egMechOvrGradient(monster, phase) {
             stepTimer += dtS * 1000;
             if (stepIdx === 0 || stepTimer >= cadence) {
                 stepTimer = 0;
-                const x = -60 + stepIdx * ((W + 120) / EG_OVR_STEPS) + (EG_OVR_BAND_W / 2);
-                const el = _egNkEl(run, 'div', 'eg-ovr-band');
-                el.style.left = Math.round(x - EG_OVR_BAND_W / 2) + 'px';
+                const x = -60 + stepIdx * ((W + 120) / OVR_STEPS) + (OVR_BAND_W / 2);
+                const el = _nkEl(run, 'div', 'eg-ovr-band');
+                el.style.left = Math.round(x - OVR_BAND_W / 2) + 'px';
                 el.style.top = '0px';
-                el.style.width = EG_OVR_BAND_W + 'px';
+                el.style.width = OVR_BAND_W + 'px';
                 el.style.height = H + 'px';
                 bands.push({ x, hot: false, hotAt: now + teleMs, dieAt: now + teleMs + hotMs, el });
                 stepIdx++;
             }
-            if (stepIdx >= EG_OVR_STEPS) {
+            if (stepIdx >= OVR_STEPS) {
                 pending = true;
                 const allCool = bands.every(b => now >= b.dieAt);
-                if (allCool) { stage = 'min-warn'; minBoomAt = now + EG_OVR_MIN_WARN_MS * _EG_OVR_DEBUG_MULT; }
+                if (allCool) { stage = 'min-warn'; minBoomAt = now + OVR_MIN_WARN_MS * _OVR_DEBUG_MULT; }
             }
         }
 
@@ -192,8 +192,8 @@ export function _egMechOvrGradient(monster, phase) {
                 if (now >= b.dieAt) { try { b.el.remove(); } catch (e) {} b.el = null; }
                 else pending = true;
             }
-            if (b.hot && b.el && pr && pc.x > b.x - EG_OVR_BAND_W / 2 && pc.x < b.x + EG_OVR_BAND_W / 2) {
-                _egNkDotTick(run, EG_OVR_BAND_DPS[p], dtS, level, 'shadow');
+            if (b.hot && b.el && pr && pc.x > b.x - OVR_BAND_W / 2 && pc.x < b.x + OVR_BAND_W / 2) {
+                _nkDotTick(run, OVR_BAND_DPS[p], dtS, level, 'shadow');
             } else {
                 run.dotAcc = 0;
             }
@@ -203,7 +203,7 @@ export function _egMechOvrGradient(monster, phase) {
         if (stage === 'min-warn' || stage === 'min-boom') {
             pending = true;
             if (!minEl) {
-                minEl = _egNkEl(run, 'div', 'eg-ovr-min-ring');
+                minEl = _nkEl(run, 'div', 'eg-ovr-min-ring');
                 minEl.style.left = Math.round(minPos.x - minR) + 'px';
                 minEl.style.top = Math.round(minPos.y - minR) + 'px';
                 minEl.style.width = (minR * 2) + 'px';
@@ -212,11 +212,11 @@ export function _egMechOvrGradient(monster, phase) {
             if (stage === 'min-warn' && now >= minBoomAt) {
                 stage = 'min-boom';
                 minEl.classList.add('eg-ovr-min-boom');
-                if (pr && _egNkCircleHit(minPos.x, minPos.y, minR, pr, 0)) {
-                    const dealt = _egNkHit(EG_OVR_MIN_DMG[p], 'shadow', level);
-                    _egNkAbilityHitToast(dealt, 'The Overfitter', 'Local Minimum');
+                if (pr && _nkCircleHit(minPos.x, minPos.y, minR, pr, 0)) {
+                    const dealt = _nkHit(OVR_MIN_DMG[p], 'shadow', level);
+                    _nkAbilityHitToast(dealt, 'The Overfitter', 'Local Minimum');
                 }
-            } else if (stage === 'min-boom' && now >= minBoomAt + 550 * _EG_OVR_DEBUG_MULT) {
+            } else if (stage === 'min-boom' && now >= minBoomAt + 550 * _OVR_DEBUG_MULT) {
                 try { minEl.remove(); } catch (e) {}
                 minEl = null;
                 minsDone++;
@@ -224,7 +224,7 @@ export function _egMechOvrGradient(monster, phase) {
                     // Phase 3: the second minimum chases your CURRENT position.
                     minPos = { ...pc };
                     stage = 'min-warn';
-                    minBoomAt = now + EG_OVR_MIN_WARN_MS * _EG_OVR_DEBUG_MULT;
+                    minBoomAt = now + OVR_MIN_WARN_MS * _OVR_DEBUG_MULT;
                 } else {
                     stage = 'done';
                 }
@@ -249,13 +249,13 @@ export function _egMechOvrGradient(monster, phase) {
 // Removes a small amount of recent correct progress. Unlike Prior Bomb,
 // this targets a repeated row/column pattern when possible, telegraphing the
 // boss's adaptive behaviour while remaining recoverable.
-export function _egMechPatternBreak(monster, phase) {
+export function _mechPatternBreak(monster, phase) {
     if (!cur || !cur.grid || typeof userGrid === 'undefined') return;
-    _egOvrEnsureRecorder(monster);
-    _egOvrEnsureFinalWatcher(monster);
+    _ovrEnsureRecorder(monster);
+    _ovrEnsureFinalWatcher(monster);
     const sol = cur.grid;
-    const recent = [..._egRecentFills].reverse().filter(([r, c]) =>
-        _egCellInBounds(r, c)
+    const recent = [..._recentFills].reverse().filter(([r, c]) =>
+        _cellInBounds(r, c)
         && globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1
     );
     if (recent.length === 0) return;
@@ -276,7 +276,7 @@ export function _egMechPatternBreak(monster, phase) {
     const targets = pool.slice(0, Math.min(count, pool.length));
 
     globalThis.showCombatToast(t('eg_mech_pattern_break').replace('{n}', targets.length));
-    targets.forEach(([r, c]) => _egUnfillCell(r, c));
+    targets.forEach(([r, c]) => _unfillCell(r, c));
 }
 
 
@@ -288,26 +288,26 @@ export function _egMechPatternBreak(monster, phase) {
 // recorded sample and an OVERFIT STRIKE at your final position. Take no hit
 // during the replay and the model marks you UNLEARNED (+heal) - the reward
 // for moving unlike yourself.
-export const EG_OVR_LOCK_REC_MS   = [0, 3500, 3800, 4200]; // recording length by phase
-export const EG_OVR_LOCK_SAMPLE_MS = 250;  // sample cadence (ms)
-export const EG_OVR_ECHO_R        = 66;    // echo burst radius
-export const EG_OVR_ECHO_DMG      = 0.08;  // %maxHP per echo
-export const EG_OVR_STRIKE_DMG    = 0.18;  // %maxHP overfit strike
-export const EG_OVR_UNLEARN_HEAL  = 0.06;  // %maxHP for a clean replay
+export const OVR_LOCK_REC_MS   = [0, 3500, 3800, 4200]; // recording length by phase
+export const OVR_LOCK_SAMPLE_MS = 250;  // sample cadence (ms)
+export const OVR_ECHO_R        = 66;    // echo burst radius
+export const OVR_ECHO_DMG      = 0.08;  // %maxHP per echo
+export const OVR_STRIKE_DMG    = 0.18;  // %maxHP overfit strike
+export const OVR_UNLEARN_HEAL  = 0.06;  // %maxHP for a clean replay
 
-export function _egMechOvrPatternLock(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
-    _egOvrEnsureRecorder(monster);
-    _egOvrEnsureFinalWatcher(monster);
+export function _mechOvrPatternLock(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
+    _ovrEnsureRecorder(monster);
+    _ovrEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_ovr_lock', '🧠 PATTERN LOCK - recording your movement… the model is learning you!', '#c084ff');
+    _nkToast('eg_mech_ovr_lock', '🧠 PATTERN LOCK - recording your movement… the model is learning you!', '#c084ff');
 
     // ── Stage RECORD: sample your position, grow the live dashed trail. ──
-    const recMs = EG_OVR_LOCK_REC_MS[p] * _EG_OVR_DEBUG_MULT;
-    const sampleMs = EG_OVR_LOCK_SAMPLE_MS * _EG_OVR_DEBUG_MULT;
+    const recMs = OVR_LOCK_REC_MS[p] * _OVR_DEBUG_MULT;
+    const sampleMs = OVR_LOCK_SAMPLE_MS * _OVR_DEBUG_MULT;
     const path = [];           // [{x, y, el}]
     let recT = 0, nextSample = 0;
 
@@ -318,16 +318,16 @@ export function _egMechOvrPatternLock(monster, phase) {
     const prefix = [];         // cumulative distance to each sample
     let hitFlag = false;
 
-    _egNkLoop(run, (dtS, now) => {
-        _egOvrPC();
+    _nkLoop(run, (dtS, now) => {
+        _ovrPC();
         let pending = true;
 
         if (stage === 'record') {
             recT += dtS * 1000;
             while (recT >= nextSample) {
                 nextSample += sampleMs;
-                const c = _egOvrPC();
-                const el = _egNkEl(run, 'div', 'eg-ovr-trail-dot');
+                const c = _ovrPC();
+                const el = _nkEl(run, 'div', 'eg-ovr-trail-dot');
                 el.style.left = Math.round(c.x - 7) + 'px';
                 el.style.top = Math.round(c.y - 7) + 'px';
                 path.push({ x: c.x, y: c.y, el });
@@ -342,9 +342,9 @@ export function _egMechOvrPatternLock(monster, phase) {
                     if (i > 0) acc += Math.hypot(path[i].x - path[i - 1].x, path[i].y - path[i - 1].y);
                     prefix.push(acc);
                 }
-                dart = _egNkEl(run, 'div', 'eg-nk-dot eg-ovr-dart', '📈');
+                dart = _nkEl(run, 'div', 'eg-nk-dot eg-ovr-dart', '📈');
                 dist = 0;
-                _egNkToast('eg_mech_ovr_replay', '🧠 REPLAY! It fires along the path YOU walked - move unlike yourself!', '#f97316');
+                _nkToast('eg_mech_ovr_replay', '🧠 REPLAY! It fires along the path YOU walked - move unlike yourself!', '#f97316');
             }
             return pending;
         }
@@ -368,19 +368,19 @@ export function _egMechOvrPatternLock(monster, phase) {
                 try { path[i].el.remove(); } catch (e) {}
                 path[i].el = null;
                 const isFinal = i === path.length - 1;
-                const boom = _egNkEl(run, 'div', 'eg-ovr-echo' + (isFinal ? ' eg-ovr-echo-final' : ''));
-                boom.style.left = Math.round(path[i].x - (isFinal ? 46 : EG_OVR_ECHO_R)) + 'px';
-                boom.style.top = Math.round(path[i].y - (isFinal ? 46 : EG_OVR_ECHO_R)) + 'px';
-                boom.style.width = (isFinal ? 92 : EG_OVR_ECHO_R * 2) + 'px';
-                boom.style.height = (isFinal ? 92 : EG_OVR_ECHO_R * 2) + 'px';
-                setTimeout(() => { try { boom.remove(); } catch (e) {} }, 480 * _EG_OVR_DEBUG_MULT);
-                const pr = _egNkPlayerRect();
-                if (pr && _egNkCircleHit(path[i].x, path[i].y, isFinal ? 46 : EG_OVR_ECHO_R, pr, 0)) {
+                const boom = _nkEl(run, 'div', 'eg-ovr-echo' + (isFinal ? ' eg-ovr-echo-final' : ''));
+                boom.style.left = Math.round(path[i].x - (isFinal ? 46 : OVR_ECHO_R)) + 'px';
+                boom.style.top = Math.round(path[i].y - (isFinal ? 46 : OVR_ECHO_R)) + 'px';
+                boom.style.width = (isFinal ? 92 : OVR_ECHO_R * 2) + 'px';
+                boom.style.height = (isFinal ? 92 : OVR_ECHO_R * 2) + 'px';
+                setTimeout(() => { try { boom.remove(); } catch (e) {} }, 480 * _OVR_DEBUG_MULT);
+                const pr = _nkPlayerRect();
+                if (pr && _nkCircleHit(path[i].x, path[i].y, isFinal ? 46 : OVR_ECHO_R, pr, 0)) {
                     if (isFinal) {
-                        const dealt = _egNkHit(EG_OVR_STRIKE_DMG, 'shadow', level);
-                        _egNkAbilityHitToast(dealt, 'The Overfitter', 'Overfit Strike');
+                        const dealt = _nkHit(OVR_STRIKE_DMG, 'shadow', level);
+                        _nkAbilityHitToast(dealt, 'The Overfitter', 'Overfit Strike');
                         hitFlag = true;
-                    } else if (_egOvrTouch(EG_OVR_ECHO_DMG, level, 'Pattern Echo')) {
+                    } else if (_ovrTouch(OVR_ECHO_DMG, level, 'Pattern Echo')) {
                         hitFlag = true;
                     }
                 }
@@ -389,8 +389,8 @@ export function _egMechOvrPatternLock(monster, phase) {
             if (dist >= prefix[prefix.length - 1] + 40) {
                 // Replay finished - judge the record.
                 if (!hitFlag) {
-                    _egOvrHeal(_egNkMaxHP() * EG_OVR_UNLEARN_HEAL);
-                    _egNkToast('eg_mech_ovr_unlearned', '✅ You beat your own record - UNLEARNED!', '#4ade80');
+                    _ovrHeal(_nkMaxHP() * OVR_UNLEARN_HEAL);
+                    _nkToast('eg_mech_ovr_unlearned', '✅ You beat your own record - UNLEARNED!', '#4ade80');
                 }
                 stage = 'done';
                 pending = false;
@@ -409,26 +409,26 @@ export function _egMechOvrPatternLock(monster, phase) {
 // Two rings, one test. The model detonates the ring you are CLOSEST to -
 // it learned to aim. The other ring dissipates. Break equidistance (or get
 // near neither) and the model underfits: nothing detonates at all.
-export const EG_OVR_VAL_R        = 115;    // ring radius (px, phase < 3)
-export const EG_OVR_VAL_HOLD_MS  = 2400;   // telegraph hold
-export const EG_OVR_VAL_DMG      = [0, 0.26, 0.30, 0.34]; // %maxHP caught in the true ring
-export const EG_OVR_VAL_SPACING  = 320;    // min distance between the two rings
-export const EG_OVR_VAL_CLEAR    = 280;    // farther than this from both = underfit
-export const EG_OVR_VAL_TIE      = 44;     // |d1-d2| below this = can't decide
+export const OVR_VAL_R        = 115;    // ring radius (px, phase < 3)
+export const OVR_VAL_HOLD_MS  = 2400;   // telegraph hold
+export const OVR_VAL_DMG      = [0, 0.26, 0.30, 0.34]; // %maxHP caught in the true ring
+export const OVR_VAL_SPACING  = 320;    // min distance between the two rings
+export const OVR_VAL_CLEAR    = 280;    // farther than this from both = underfit
+export const OVR_VAL_TIE      = 44;     // |d1-d2| below this = can't decide
 
-export function _egMechOvrValidation(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
-    _egOvrEnsureRecorder(monster);
-    _egOvrEnsureFinalWatcher(monster);
+export function _mechOvrValidation(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
+    _ovrEnsureRecorder(monster);
+    _ovrEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_ovr_valid', '🧪 VALIDATION SET - two rings, and it strikes the one you are closest to! Get near neither!', '#c084ff');
+    _nkToast('eg_mech_ovr_valid', '🧪 VALIDATION SET - two rings, and it strikes the one you are closest to! Get near neither!', '#c084ff');
 
-    const r = p >= 3 ? EG_OVR_VAL_R - 20 : EG_OVR_VAL_R;
-    const pc0 = _egOvrPC();
+    const r = p >= 3 ? OVR_VAL_R - 20 : OVR_VAL_R;
+    const pc0 = _ovrPC();
     // Two ring centres: far apart, and never spawned on top of the player.
     const pick = () => {
         for (let tries = 0; tries < 24; tries++) {
@@ -439,12 +439,12 @@ export function _egMechOvrValidation(monster, phase) {
         return { x: W * 0.3, y: H * 0.3 };
     };
     let a = pick(), b = pick();
-    for (let tries = 0; tries < 24 && Math.hypot(a.x - b.x, a.y - b.y) < EG_OVR_VAL_SPACING; tries++) {
+    for (let tries = 0; tries < 24 && Math.hypot(a.x - b.x, a.y - b.y) < OVR_VAL_SPACING; tries++) {
         b = pick();
     }
 
     const ringEls = [a, b].map(c => {
-        const el = _egNkEl(run, 'div', 'eg-ovr-val-ring');
+        const el = _nkEl(run, 'div', 'eg-ovr-val-ring');
         el.style.left = Math.round(c.x - r) + 'px';
         el.style.top = Math.round(c.y - r) + 'px';
         el.style.width = (r * 2) + 'px';
@@ -453,19 +453,19 @@ export function _egMechOvrValidation(monster, phase) {
     });
 
     let valT = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         valT += dtS * 1000;
-        if (valT < EG_OVR_VAL_HOLD_MS * _EG_OVR_DEBUG_MULT) return true;
+        if (valT < OVR_VAL_HOLD_MS * _OVR_DEBUG_MULT) return true;
 
         // Verdict: which ring does the model think you belong to?
-        const pc = _egOvrPC();
+        const pc = _ovrPC();
         const d1 = Math.hypot(pc.x - a.x, pc.y - a.y);
         const d2 = Math.hypot(pc.x - b.x, pc.y - b.y);
-        const pr = _egNkPlayerRect();
-        if (Math.min(d1, d2) > EG_OVR_VAL_CLEAR || Math.abs(d1 - d2) < EG_OVR_VAL_TIE) {
+        const pr = _nkPlayerRect();
+        if (Math.min(d1, d2) > OVR_VAL_CLEAR || Math.abs(d1 - d2) < OVR_VAL_TIE) {
             // Underfit - the model cannot decide. Both rings dissipate.
             ringEls.forEach(el => el.classList.add('eg-ovr-val-fizzle'));
-            _egNkToast('eg_mech_ovr_underfit', '🌫️ Underfit - the model cannot decide. Nothing detonates!', '#93c5fd');
+            _nkToast('eg_mech_ovr_underfit', '🌫️ Underfit - the model cannot decide. Nothing detonates!', '#93c5fd');
         } else {
             const nearFirst = d1 < d2;
             const hitRing = nearFirst ? a : b;
@@ -473,20 +473,20 @@ export function _egMechOvrValidation(monster, phase) {
             const missEl = nearFirst ? ringEls[1] : ringEls[0];
             hitEl.classList.add('eg-ovr-val-boom');
             missEl.classList.add('eg-ovr-val-fizzle');
-            const boomEl = _egNkEl(run, 'div', 'eg-ovr-val-burst');
+            const boomEl = _nkEl(run, 'div', 'eg-ovr-val-burst');
             boomEl.style.left = Math.round(hitRing.x - r) + 'px';
             boomEl.style.top = Math.round(hitRing.y - r) + 'px';
             boomEl.style.width = (r * 2) + 'px';
             boomEl.style.height = (r * 2) + 'px';
-            setTimeout(() => { try { boomEl.remove(); } catch (e) {} }, 550 * _EG_OVR_DEBUG_MULT);
-            if (pr && _egNkCircleHit(hitRing.x, hitRing.y, r, pr, 0)) {
-                const dealt = _egNkHit(EG_OVR_VAL_DMG[p], 'shadow', level);
-                _egNkAbilityHitToast(dealt, 'The Overfitter', 'Validation Strike');
+            setTimeout(() => { try { boomEl.remove(); } catch (e) {} }, 550 * _OVR_DEBUG_MULT);
+            if (pr && _nkCircleHit(hitRing.x, hitRing.y, r, pr, 0)) {
+                const dealt = _nkHit(OVR_VAL_DMG[p], 'shadow', level);
+                _nkAbilityHitToast(dealt, 'The Overfitter', 'Validation Strike');
             }
         }
         setTimeout(() => {
             try { ringEls.forEach(el => el.remove()); } catch (e) {}
-        }, 600 * _EG_OVR_DEBUG_MULT);
+        }, 600 * _OVR_DEBUG_MULT);
         return false;
     });
 }
@@ -499,54 +499,54 @@ export function _egMechOvrValidation(monster, phase) {
 // as a live heat-map over the arena (hot = where you have been), then the
 // model re-trains in three waves: hot cells detonate, cool cells are safe,
 // and between waves the map RE-RECORDS - camp anywhere and your own heat
-// betrays you. Charge bar frozen (gate in _egTickPlayer via
-// _egOvrFinalActive).
-export const EG_OVR_HEAT_COLS  = 6;
-export const EG_OVR_HEAT_ROWS  = 4;
-export const EG_OVR_WAVES      = 3;
-export const EG_OVR_WAVE_DMG   = [0, 0.30, 0.32, 0.35]; // %maxHP caught by wave n
-export const EG_OVR_FUSE_MS    = 1900;   // detonation fuse per wave
-export const EG_OVR_REHEAT_MS  = 2400;   // re-record window between waves
+// betrays you. Charge bar frozen (gate in _tickPlayer via
+// _ovrFinalActive).
+export const OVR_HEAT_COLS  = 6;
+export const OVR_HEAT_ROWS  = 4;
+export const OVR_WAVES      = 3;
+export const OVR_WAVE_DMG   = [0, 0.30, 0.32, 0.35]; // %maxHP caught by wave n
+export const OVR_FUSE_MS    = 1900;   // detonation fuse per wave
+export const OVR_REHEAT_MS  = 2400;   // re-record window between waves
 
-// Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-export let _egOvrFinal = null;
+// Set while the finale runs (read by _tickPlayer's charge-freeze gate).
+export let _ovrFinal = null;
 
-export function _egOvrFinalActive() {
-    return !!_egOvrFinal && !_egOvrFinal.finished;
+export function _ovrFinalActive() {
+    return !!_ovrFinal && !_ovrFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-export function _egOvrOnPhaseEnter(monster, newPhase) {
+export function _ovrOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
-    try { _egOvrEnsureFinalWatcher(monster); } catch (e) {}
+    try { _ovrEnsureFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-export function _egOvrEnsureFinalWatcher(monster) {
-    if (!monster || _egOvrFinal || _egOvrWatcherRun) return;
-    const run = _egNkNewRun(monster.id, true);
+export function _ovrEnsureFinalWatcher(monster) {
+    if (!monster || _ovrFinal || _ovrWatcherRun) return;
+    const run = _nkNewRun(monster.id, true);
     run.passive = true;
-    _egOvrWatcherRun = run;
-    _egNkLoop(run, () => {
-        if (_egOvrFinal) return false;
+    _ovrWatcherRun = run;
+    _nkLoop(run, () => {
+        if (_ovrFinal) return false;
         try {
             if (monster.currentHP <= monster.maxHP * 0.10) {
-                _egOvrFinalStart(monster);
+                _ovrFinalStart(monster);
                 return false;
             }
         } catch (e) { return false; }
         return true;
     });
 }
-export let _egOvrWatcherRun = null;
+export let _ovrWatcherRun = null;
 
 // Pause-safe timeout (mirrors the other finales).
-export function _egOvrAfter(g, ms, fn) {
+export function _ovrAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
-        if (g.finished || !_egOvrFinal) return;
-        if (_egNkFrozen()) { setTimeout(step, 120); return; }
+        if (g.finished || !_ovrFinal) return;
+        if (_nkFrozen()) { setTimeout(step, 120); return; }
         if (performance.now() - t0 >= ms) fn();
         else setTimeout(step, Math.min(120, ms - (performance.now() - t0)));
     };
@@ -554,24 +554,24 @@ export function _egOvrAfter(g, ms, fn) {
 }
 
 // Heat bins from the live history. Returns counts + cell geometry.
-export function _egOvrHeatCounts(W, H) {
-    const counts = new Array(EG_OVR_HEAT_COLS * EG_OVR_HEAT_ROWS).fill(0);
-    const cw = W / EG_OVR_HEAT_COLS, ch = H / EG_OVR_HEAT_ROWS;
-    for (const pt of _egOvrHistory) {
-        const cx = Math.max(0, Math.min(EG_OVR_HEAT_COLS - 1, Math.floor(pt.x / cw)));
-        const cy = Math.max(0, Math.min(EG_OVR_HEAT_ROWS - 1, Math.floor(pt.y / ch)));
-        counts[cy * EG_OVR_HEAT_COLS + cx]++;
+export function _ovrHeatCounts(W, H) {
+    const counts = new Array(OVR_HEAT_COLS * OVR_HEAT_ROWS).fill(0);
+    const cw = W / OVR_HEAT_COLS, ch = H / OVR_HEAT_ROWS;
+    for (const pt of _ovrHistory) {
+        const cx = Math.max(0, Math.min(OVR_HEAT_COLS - 1, Math.floor(pt.x / cw)));
+        const cy = Math.max(0, Math.min(OVR_HEAT_ROWS - 1, Math.floor(pt.y / ch)));
+        counts[cy * OVR_HEAT_COLS + cx]++;
     }
     return counts;
 }
 
-export function _egOvrFinalStart(monster) {
-    if (_egOvrFinal || !monster) return;
+export function _ovrFinalStart(monster) {
+    if (_ovrFinal || !monster) return;
 
     // The model clears the arena for the final epoch: kill every other run
     // of this boss (the finale owns the board).
-    Array.from(_egNkRuns.values()).forEach(r => {
-        if (r.bossId === monster.id) { try { _egNkKillRun(r); } catch (e) {} }
+    Array.from(_nkRuns.values()).forEach(r => {
+        if (r.bossId === monster.id) { try { _nkKillRun(r); } catch (e) {} }
     });
 
     const W = window.innerWidth, H = window.innerHeight;
@@ -581,17 +581,17 @@ export function _egOvrFinalStart(monster) {
         cells: [],           // { x, y, w, h, el }
         fxRun: null, overlay: null,
     };
-    _egOvrFinal = g;
+    _ovrFinal = g;
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
-    // lives in _egTickPlayer; this class is the visual twin).
+    // lives in _tickPlayer; this class is the visual twin).
     ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('eg-charge-paused');
     });
 
     // FX run (passive): holds the finale timeline.
-    g.fxRun = _egNkNewRun(monster.id, true);
+    g.fxRun = _nkNewRun(monster.id, true);
     g.fxRun.passive = true;
 
     // Countdown overlay.
@@ -603,7 +603,7 @@ export function _egOvrFinalStart(monster) {
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_ovr_final_cd', '📈💀 THE FINAL EPOCH - the model memorized your every step. New ground is safe ground!', '#c084ff');
+    _nkToast('eg_mech_ovr_final_cd', '📈💀 THE FINAL EPOCH - the model memorized your every step. New ground is safe ground!', '#c084ff');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -617,14 +617,14 @@ export function _egOvrFinalStart(monster) {
     }
 
     const level = monster.level || 1;
-    const cw = W / EG_OVR_HEAT_COLS, ch = H / EG_OVR_HEAT_ROWS;
+    const cw = W / OVR_HEAT_COLS, ch = H / OVR_HEAT_ROWS;
 
     // ── Render the heat-map from live history. ───────────────────────────
     const repaint = () => {
-        const counts = _egOvrHeatCounts(W, H);
+        const counts = _ovrHeatCounts(W, H);
         const maxC = Math.max(1, ...counts);
         counts.forEach((n, i) => {
-            const cx = i % EG_OVR_HEAT_COLS, cy = Math.floor(i / EG_OVR_HEAT_COLS);
+            const cx = i % OVR_HEAT_COLS, cy = Math.floor(i / OVR_HEAT_COLS);
             let cell = g.cells[i];
             if (!cell) {
                 const el = document.createElement('div');
@@ -648,7 +648,7 @@ export function _egOvrFinalStart(monster) {
         if (g.finished) return;
         repaint();   // the map re-recorded between waves - retrain on fresh data
 
-        const counts = _egOvrHeatCounts(W, H);
+        const counts = _ovrHeatCounts(W, H);
         const maxC = Math.max(1, ...counts);
         let hot = [];
         if (wave === 1) {
@@ -664,21 +664,21 @@ export function _egOvrFinalStart(monster) {
         }
 
         if (!hot.length) {
-            _egNkToast('eg_mech_ovr_underfit', '🌫️ Underfit - the model cannot decide. Nothing detonates!', '#93c5fd');
-            if (wave >= EG_OVR_WAVES) {
-                _egOvrAfter(g, 1400 * _EG_OVR_DEBUG_MULT, () => _egOvrFinalEnd(g, monster));
+            _nkToast('eg_mech_ovr_underfit', '🌫️ Underfit - the model cannot decide. Nothing detonates!', '#93c5fd');
+            if (wave >= OVR_WAVES) {
+                _ovrAfter(g, 1400 * _OVR_DEBUG_MULT, () => _ovrFinalEnd(g, monster));
             } else {
-                _egOvrAfter(g, 1400 * _EG_OVR_DEBUG_MULT, () => runWave(wave + 1));
+                _ovrAfter(g, 1400 * _OVR_DEBUG_MULT, () => runWave(wave + 1));
             }
             return;
         }
 
-        _egNkToast('eg_mech_ovr_wave', '📈 EPOCH ' + wave + '/' + EG_OVR_WAVES + ' - ' + hot.length + ' hot cells re-train! Stand on NEW ground!', '#f97316');
+        _nkToast('eg_mech_ovr_wave', '📈 EPOCH ' + wave + '/' + OVR_WAVES + ' - ' + hot.length + ' hot cells re-train! Stand on NEW ground!', '#f97316');
         hot.forEach(i => { try { g.cells[i].el.classList.add('eg-ovr-hot'); } catch (e) {} });
 
-        _egOvrAfter(g, EG_OVR_FUSE_MS * _EG_OVR_DEBUG_MULT, () => {
+        _ovrAfter(g, OVR_FUSE_MS * _OVR_DEBUG_MULT, () => {
             if (g.finished) return;
-            const pc = _egOvrPC();
+            const pc = _ovrPC();
             let caught = false;
             hot.forEach(i => {
                 const cell = g.cells[i];
@@ -691,26 +691,26 @@ export function _egOvrFinalStart(monster) {
                 if (!caught && pc.x >= cell.x && pc.x <= cell.x + cell.w && pc.y >= cell.y && pc.y <= cell.y + cell.h) caught = true;
             });
             if (caught) {
-                const dealt = _egNkHit(EG_OVR_WAVE_DMG[wave], 'shadow', level);
-                _egNkAbilityHitToast(dealt, 'The Overfitter', 'Epoch ' + wave);
+                const dealt = _nkHit(OVR_WAVE_DMG[wave], 'shadow', level);
+                _nkAbilityHitToast(dealt, 'The Overfitter', 'Epoch ' + wave);
             }
-            if (wave < EG_OVR_WAVES) {
-                _egNkToast('eg_mech_ovr_reheat', '🔥 RE-RECORDING - your recent steps reshape the heat-map! Keep moving!', '#f97316');
-                _egOvrAfter(g, EG_OVR_REHEAT_MS * _EG_OVR_DEBUG_MULT, () => runWave(wave + 1));
+            if (wave < OVR_WAVES) {
+                _nkToast('eg_mech_ovr_reheat', '🔥 RE-RECORDING - your recent steps reshape the heat-map! Keep moving!', '#f97316');
+                _ovrAfter(g, OVR_REHEAT_MS * _OVR_DEBUG_MULT, () => runWave(wave + 1));
             } else {
-                _egOvrAfter(g, 1300 * _EG_OVR_DEBUG_MULT, () => _egOvrFinalEnd(g, monster));
+                _ovrAfter(g, 1300 * _OVR_DEBUG_MULT, () => _ovrFinalEnd(g, monster));
             }
         });
     };
 
-    _egOvrAfter(g, 1800 * _EG_OVR_DEBUG_MULT, () => runWave(1));
+    _ovrAfter(g, 1800 * _OVR_DEBUG_MULT, () => runWave(1));
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-export function _egOvrFinalEnd(g, monster) {
+export function _ovrFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
-    try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
+    try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
     document.querySelectorAll('.eg-ovr-cd, .eg-ovr-heatcell').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
@@ -725,7 +725,7 @@ export function _egOvrFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -735,13 +735,13 @@ export function _egOvrFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop -
+// Called from _bossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-export function _egOvrTeardown() {
-    if (_egOvrFinal) { try { _egOvrFinalEnd(_egOvrFinal, null); } catch (e) {} _egOvrFinal = null; }
-    _egOvrHistory = [];
-    _egOvrRecRun = null;
-    _egOvrWatcherRun = null;
+export function _ovrTeardown() {
+    if (_ovrFinal) { try { _ovrFinalEnd(_ovrFinal, null); } catch (e) {} _ovrFinal = null; }
+    _ovrHistory = [];
+    _ovrRecRun = null;
+    _ovrWatcherRun = null;
     document.querySelectorAll('.eg-ovr-band, .eg-ovr-min-ring, .eg-ovr-trail-dot, .eg-ovr-dart, ' +
         '.eg-ovr-echo, .eg-ovr-val-ring, .eg-ovr-val-burst, .eg-ovr-heatcell, .eg-ovr-cd').forEach(el => {
         try { el.remove(); } catch (e) {}
@@ -758,27 +758,27 @@ export function _egOvrTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_OVR_DEBUG.fire('gradient'|'lock'|'valid', phase) - runs one now
-//   _EG_OVR_DEBUG.final()                                - THE FINAL EPOCH now
+//   _OVR_DEBUG.fire('gradient'|'lock'|'valid', phase) - runs one now
+//   _OVR_DEBUG.final()                                - THE FINAL EPOCH now
 if (typeof window !== 'undefined') {
-    window._EG_OVR_DEBUG = {
+    window._OVR_DEBUG = {
         fire: (name, phase) => {
-            const monster = (typeof _egMonsters !== 'undefined')
-                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_overfitter') : null;
+            const monster = (typeof _monsters !== 'undefined')
+                ? globalThis._monsters.find(m => m && m.baseId === 'boss_overfitter') : null;
             if (!monster) return 'no overfitter alive';
-            const fn = name === 'gradient' ? _egMechOvrGradient
-                : name === 'lock' ? _egMechOvrPatternLock
-                : name === 'valid' ? _egMechOvrValidation : null;
+            const fn = name === 'gradient' ? _mechOvrGradient
+                : name === 'lock' ? _mechOvrPatternLock
+                : name === 'valid' ? _mechOvrValidation : null;
             if (!fn) return 'unknown: ' + name;
-            if (name !== 'valid' && _egNkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for the field to clear)';
+            if (name !== 'valid' && _nkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for the field to clear)';
             fn(monster, phase || monster.bossPhase || 1);
             return 'fired ' + name;
         },
         final: () => {
-            const monster = (typeof _egMonsters !== 'undefined')
-                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_overfitter') : null;
+            const monster = (typeof _monsters !== 'undefined')
+                ? globalThis._monsters.find(m => m && m.baseId === 'boss_overfitter') : null;
             if (!monster) return 'no overfitter alive';
-            _egOvrFinalStart(monster);
+            _ovrFinalStart(monster);
             return 'THE FINAL EPOCH started';
         },
     };

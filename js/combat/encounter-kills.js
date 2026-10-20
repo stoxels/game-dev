@@ -14,13 +14,13 @@ import { gainMana } from '../classes/class-mana.js';
 import { stopTimer } from '../timer/timer.js';
 import { addTimeSecs } from '../timer/timer-adjust.js';
 import { t } from '../translation/translations.js';
-import { EG_PANEL_RERENDER_DELAY_MS } from './encounter-constants.js';
-import { _egPlayerTakeDamage } from './encounter-damage.js';
+import { PANEL_RERENDER_DELAY_MS } from './encounter-constants.js';
+import { _playerTakeDamage } from './encounter-damage.js';
 
 
-import { _egEndMapDefeated } from './encounter-chain.js';
-import { _egGauntletOnDefeat } from './gauntlet.js';
-import { _egFlashKillCard, _egRenderPanel } from './encounter.js';
+import { _endMapDefeated } from './encounter-chain.js';
+import { _gauntletOnDefeat } from './gauntlet.js';
+import { _flashKillCard, _renderPanel } from './encounter.js';
 
 // Live binding of the current level's puzzle object (state.js exports the
 // binding itself, so this always reads the CURRENT level, not a snapshot).
@@ -30,13 +30,13 @@ import { _egFlashKillCard, _egRenderPanel } from './encounter.js';
 import { cur } from '../state.js';
 
 
-import { _egGrantMonsterXP, _egShowXpGainText } from '../endgame/endgame-leveling.js';
+import { _grantMonsterXP, _showXpGainText } from '../endgame/endgame-leveling.js';
 import { _egMapKillRecoveryMult } from '../endgame/endgame-map-launch.js';
 
-import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
-import { _egIsActive, _egIsCampaignRun } from './combat-state.js';
-import { _egGainEnduranceCharge, _egGainFrenzyCharge, _egGainOnslaught, _egGainPowerCharge } from './combat-ailments-state.js';
-import { _egHandleBossKill, _egHandleNormalMonsterKill } from './encounter-kill-rewards.js';
+import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _isActive, _isCampaignRun } from './combat-state.js';
+import { _gainEnduranceCharge, _gainFrenzyCharge, _gainOnslaught, _gainPowerCharge } from './combat-ailments-state.js';
+import { _handleBossKill, _handleNormalMonsterKill } from './encounter-kill-rewards.js';
 
 
 
@@ -46,18 +46,18 @@ import { _egHandleBossKill, _egHandleNormalMonsterKill } from './encounter-kill-
 //------------------------------------------------------------------------
 
 // Auto-selects the first remaining monster after a kill, or clears the target.
-export function _egUpdateTargetAfterKill() {
-    if (globalThis._egMonsters.length > 0) {
-        globalThis._egTargetId = globalThis._egMonsters[0].id;
+export function _updateTargetAfterKill() {
+    if (globalThis._monsters.length > 0) {
+        globalThis._targetId = globalThis._monsters[0].id;
     } else {
-        globalThis._egTargetId = null;
-        _egOnAllMonstersDead();
+        globalThis._targetId = null;
+        _onAllMonstersDead();
     }
 }
 
 // Passive-tree puzzle rewards for a kill: timer seconds (more for bosses and
 // elites), and a chance to reveal one correct / mark one wrong cell.
-function _egTreeKillPuzzleLines(dying, stats) {
+function _treeKillPuzzleLines(dying, stats) {
     if (!dying) return;
     const isElite = !!(dying.isBoss || dying.isElite || (Number(dying.baseHP) || 0) >= 110);
     const secs = (Number(stats.timeOnKill) || 0) + (isElite ? (Number(stats.timeOnElite) || 0) : 0);
@@ -71,12 +71,12 @@ function _egTreeKillPuzzleLines(dying, stats) {
 
 // Removes a monster from the encounter after its death animation fires.
 // Delegates to the appropriate normal or boss kill handler.
-export function _egKillMonster(monsterId) {
-    const dying = globalThis._egMonsters.find(m => m.id === monsterId);
+export function _killMonster(monsterId) {
+    const dying = globalThis._monsters.find(m => m.id === monsterId);
 
     // Active map run: Second Wind - the monster rises back up once instead.
     if (dying && dying.secondWindPct > 0 && !dying.secondWindUsed
-        && typeof _egIsActive === 'function' && _egIsActive()) {
+        && typeof _isActive === 'function' && _isActive()) {
         dying.secondWindUsed = true;
         if (Math.random() * 100 < dying.secondWindPct) {
             dying.currentHP = Math.max(1, Math.round((dying.maxHP || 1) * 0.25));
@@ -88,29 +88,29 @@ export function _egKillMonster(monsterId) {
 
     // Active map run: exploding monsters - deal #% of their own maximum
     // life as damage to the player on death (dodgeable / blockable).
-    if (dying && dying.explodeOnDeathPct > 0 && typeof _egIsActive === 'function' && _egIsActive()) {
+    if (dying && dying.explodeOnDeathPct > 0 && typeof _isActive === 'function' && _isActive()) {
         const blast = Math.max(1, Math.round((dying.maxHP || 0) * dying.explodeOnDeathPct / 100));
         if (blast > 0) {
             globalThis.showCombatToast(`💥 ${dying.name || ''} ${t('eg_mm_toast_explode') || 'explodes!'} (-${blast})`);
-            _egPlayerTakeDamage(blast, false, dying.element, dying.level);
+            _playerTakeDamage(blast, false, dying.element, dying.level);
             if (typeof dead !== 'undefined' && globalThis.dead) return;
         }
     }
 
-    globalThis._egBossCleanup(monsterId);
-    _egFlashKillCard(monsterId);
+    globalThis._bossCleanup(monsterId);
+    _flashKillCard(monsterId);
     if (dying) Audio_Manager.playSFX(dying.isBoss ? 'boss_killed' : 'monster_killed');
 
     // Dynamo conductors: beam-network sockets whose power source is gone.
-    // _egRemoveConductor fires the destruction burst and lets the roaming
+    // _removeConductor fires the destruction burst and lets the roaming
     // card linger briefly so the kill-flash animation can play out.
-    if (dying && dying.isDynamoConductor && typeof _egRemoveConductor === 'function') {
-        globalThis._egRemoveConductor(monsterId);
+    if (dying && dying.isDynamoConductor && typeof _removeConductor === 'function') {
+        globalThis._removeConductor(monsterId);
     }
 
-    globalThis._egMonsters = globalThis._egMonsters.filter(m => m.id !== monsterId);
+    globalThis._monsters = globalThis._monsters.filter(m => m.id !== monsterId);
 
-    _egUpdateTargetAfterKill();
+    _updateTargetAfterKill();
 
     // Endgame achievements - combat
     if (typeof trackAchStat === 'function') try {
@@ -122,13 +122,13 @@ export function _egKillMonster(monsterId) {
             const _bossBase = dying.baseId || dying.id || '';
             const _bossStatKey = 'egBossTypesSlain';
             // Use a helper stat per boss id to dedup
-            const _bossSeenKey = '_egBossSeen_' + _bossBase;
+            const _bossSeenKey = '_bossSeen_' + _bossBase;
             if (typeof ACH_STATE !== 'undefined' && ACH_STATE.stats && !ACH_STATE.stats[_bossSeenKey]) {
                 ACH_STATE.stats[_bossSeenKey] = 1;
                 if (typeof saveAchState === 'function') saveAchState();
                 // Count distinct seen keys
                 let _distinct = 0;
-                for (const k in ACH_STATE.stats) if (k.indexOf('_egBossSeen_') === 0 && ACH_STATE.stats[k]) _distinct++;
+                for (const k in ACH_STATE.stats) if (k.indexOf('_bossSeen_') === 0 && ACH_STATE.stats[k]) _distinct++;
                 if (typeof setAchStat === 'function') setAchStat(_bossStatKey, _distinct);
                 else trackAchStat(_bossStatKey, 1);
             }
@@ -138,32 +138,32 @@ export function _egKillMonster(monsterId) {
     // Score: campaign kills add to the level's combat tally (see scoring-core.js)
     if (dying && typeof globalThis.recordMonsterKillScore === 'function') globalThis.recordMonsterKillScore(dying);
 
-    if (dying && !dying.isBoss) _egHandleNormalMonsterKill(dying);
-    if (dying && dying.isBoss) _egHandleBossKill(dying);
+    if (dying && !dying.isBoss) _handleNormalMonsterKill(dying);
+    if (dying && dying.isBoss) _handleBossKill(dying);
 
     // On-kill gear stats: mana, life and absorption on kill
-    if (typeof _egComputePlayerStats === 'function') {
-        const killStats = _egComputePlayerStats();
+    if (typeof _computePlayerStats === 'function') {
+        const killStats = _computePlayerStats();
 
         // Shield batch (node 285): chance to gain an Endurance Charge on
         // kill while holding a shield (see combat-ailments-state.js).
         if (killStats.isShieldEquipped && (killStats.enduranceOnKillShieldPct || 0) > 0
             && Math.random() * 100 < killStats.enduranceOnKillShieldPct) {
-            _egGainEnduranceCharge(killStats.enduranceChargesMax, killStats.enduranceDurationPct);
+            _gainEnduranceCharge(killStats.enduranceChargesMax, killStats.enduranceDurationPct);
         }
-        globalThis._egLastKillAt = Date.now();
+        globalThis._lastKillAt = Date.now();
         if ((killStats.onslaughtOnKillPct || 0) > 0 && Math.random() * 100 < Math.min(100, killStats.onslaughtOnKillPct)) {
-            _egGainOnslaught();
+            _gainOnslaught();
         }
         if ((killStats.enduranceOnKillPct || 0) > 0 && Math.random() * 100 < Math.min(100, killStats.enduranceOnKillPct)) {
-            _egGainEnduranceCharge(killStats.enduranceChargesMax, killStats.enduranceDurationPct);
+            _gainEnduranceCharge(killStats.enduranceChargesMax, killStats.enduranceDurationPct);
         }
         // Phase B: Power / Frenzy charges on kill.
         if ((killStats.powerOnKillPct || 0) > 0 && Math.random() * 100 < Math.min(100, killStats.powerOnKillPct)) {
-            _egGainPowerCharge(killStats.powerChargesMax, killStats.powerDurationPct);
+            _gainPowerCharge(killStats.powerChargesMax, killStats.powerDurationPct);
         }
         if ((killStats.frenzyOnKillPct || 0) > 0 && Math.random() * 100 < Math.min(100, killStats.frenzyOnKillPct)) {
-            _egGainFrenzyCharge(killStats.frenzyChargesMax, killStats.frenzyDurationPct);
+            _gainFrenzyCharge(killStats.frenzyChargesMax, killStats.frenzyDurationPct);
         }
 
         if (typeof gainMana === 'function' && globalThis.playerMaxMana > 0 && (killStats.manaOnKill || 0) > 0) {
@@ -176,41 +176,41 @@ export function _egKillMonster(monsterId) {
                 ? _egMapKillRecoveryMult() : 1;
             const lifeGain = Math.round(killStats.lifeOnKill * recoveryMult);
             if (lifeGain > 0) {
-                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(lifeGain) : (lifeGain)));
+                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._lifeGain ? globalThis._lifeGain(lifeGain) : (lifeGain)));
                 if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
             }
         }
 
-        _egTreeKillPuzzleLines(dying, killStats);
+        _treeKillPuzzleLines(dying, killStats);
 
-        if ((killStats.absorptionOnKill || 0) > 0 && typeof _egIsActive === 'function' && _egIsActive()) {
+        if ((killStats.absorptionOnKill || 0) > 0 && typeof _isActive === 'function' && _isActive()) {
             const maxAbsorption = killStats.absorption;
-            if (globalThis._egPlayerAbsorptionCurrent < maxAbsorption) {
-                globalThis._egPlayerAbsorptionCurrent = Math.min(maxAbsorption, globalThis._egPlayerAbsorptionCurrent + killStats.absorptionOnKill);
+            if (globalThis._playerAbsorptionCurrent < maxAbsorption) {
+                globalThis._playerAbsorptionCurrent = Math.min(maxAbsorption, globalThis._playerAbsorptionCurrent + killStats.absorptionOnKill);
             }
         }
     }
 
     // Experience (endgame-leveling.js) - scaled by the monster's level
-    if (dying && typeof _egGrantMonsterXP === 'function') {
-        const xpGained = _egGrantMonsterXP(dying.level, !!dying.isBoss);
-        _egShowXpGainText(monsterId, xpGained);
+    if (dying && typeof _grantMonsterXP === 'function') {
+        const xpGained = _grantMonsterXP(dying.level, !!dying.isBoss);
+        _showXpGainText(monsterId, xpGained);
     }
 
-    setTimeout(() => _egRenderPanel(), EG_PANEL_RERENDER_DELAY_MS);
+    setTimeout(() => _renderPanel(), PANEL_RERENDER_DELAY_MS);
 }
 
 // Called when the last monster in the encounter is killed.
 // Currently intentionally empty - kill toasts handle all feedback.
-export function _egOnAllMonstersDead() { }
+export function _onAllMonstersDead() { }
 
 // Triggers the game-over sequence when the player's HP reaches zero.
-export function _egGameOver() {
+export function _gameOver() {
     // Gauntlet arena: dying only forfeits the bonus (the level is already won).
-    if (_egGauntletOnDefeat()) return;
+    if (_gauntletOnDefeat()) return;
     // Campaign defeat: fall back to the normal lose overlay (retry/levels)
     // instead of the endgame map-failed screen, which routes to the Nexus.
-    if (typeof _egIsCampaignRun === 'function' && _egIsCampaignRun()) {
+    if (typeof _isCampaignRun === 'function' && _isCampaignRun()) {
         globalThis.dead = true;
         if (typeof stopTimer === 'function') stopTimer();
         if (cur) window.LEVEL_FLAGS.lastFailedGi = cur.gIdx;
@@ -227,5 +227,5 @@ export function _egGameOver() {
         return;
     }
     // Central defeat handler - the player keeps the loot collected so far.
-    _egEndMapDefeated(t('eg_game_over'), t('eg_monsters_overwhelmed'));
+    _endMapDefeated(t('eg_game_over'), t('eg_monsters_overwhelmed'));
 }

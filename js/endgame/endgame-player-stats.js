@@ -1,33 +1,33 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
-import { EG_RESIST_CAP_PCT } from '../combat/combat-calculations-resistances.js';
-import { EG_DEFLECT_BASE_DMG_PCT, EG_DEFLECT_BASE_PCT, EG_PARRY_BASE_PCT, _egGetDeflectChancePct, _egGetDeflectDamagePct, _egGetDualWieldParryChancePct, _egGetParryChancePct } from '../combat/encounter.js';
-import { _egEquipped } from './endgame-hub.js';
-import { _egGetPlayerLevel, _egSyncBaseAttributes } from './endgame-leveling.js';
+import { RESIST_CAP_PCT } from '../combat/combat-calculations-resistances.js';
+import { DEFLECT_BASE_DMG_PCT, DEFLECT_BASE_PCT, PARRY_BASE_PCT, _getDeflectChancePct, _getDeflectDamagePct, _getDualWieldParryChancePct, _getParryChancePct } from '../combat/encounter.js';
+import { _equipped } from './endgame-hub.js';
+import { _getPlayerLevel, _syncBaseAttributes } from './endgame-leveling.js';
 import { _egGetActiveMapModValue, _egMapAbsorptionMult, _egMapAccuracyMult, _egMapActionSlowMult, _egMapAttackSpeedMult, _egMapBlockMult, _egMapEvasionMult, _egMapPlayerDefenceMult, _egMapSpellDamageMult } from './endgame-map-launch.js';
-import {_egRollInt} from '../loot/loot-mod-application.js';
-import { EG_MOD_TABLE_AMULET } from '../loot/loot-mod-tables-amulet.js';
-import { EG_MOD_TABLE_ARCANE } from '../loot/loot-mod-tables-arcane.js';
-import { EG_MOD_TABLE_BELT } from '../loot/loot-mod-tables-belt.js';
-import { EG_MOD_TABLE_BOOTS } from '../loot/loot-mod-tables-boots.js';
-import { EG_MOD_TABLE_BRACERS } from '../loot/loot-mod-tables-bracers.js';
-import { EG_MOD_TABLE_CHEST } from '../loot/loot-mod-tables-chest.js';
-import { EG_MOD_TABLE_CLOAK } from '../loot/loot-mod-tables-cloak.js';
-import { EG_MOD_TABLE_EARRING } from '../loot/loot-mod-tables-earring.js';
-import { EG_MOD_TABLE_GLOVES } from '../loot/loot-mod-tables-gloves.js';
-import { EG_MOD_TABLE_HEAD } from '../loot/loot-mod-tables-head.js';
-import { EG_MOD_TABLE_PANTS } from '../loot/loot-mod-tables-pants.js';
-import { EG_MOD_TABLE_RING } from '../loot/loot-mod-tables-ring.js';
-import { EG_MOD_TABLE_RANGED, EG_MOD_TABLE_SHIELD } from '../loot/loot-mod-tables-shield.js';
-import { EG_MOD_TABLE_SHOULDERS } from '../loot/loot-mod-tables-shoulders.js';
-import { EG_MOD_TABLE_TALISMAN } from '../loot/loot-mod-tables-talisman.js';
-import { EG_MOD_TABLE_WEAPON_2H } from '../loot/loot-mod-tables-weapon-2h.js';
-import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from '../loot/loot-mod-tables-weapon1.js';
-import { EG_MOD_TABLE_WEAPON2 } from '../loot/loot-mod-tables-weapon2.js';
-import { EG_PLAYER_BASE_ATTRIBUTES, _egIsDualWielding, _egIsTwoHandedWeapon } from '../loot/loot-requirements.js';
-import { EG_ONSLAUGHT_SPEED_PCT, _egOnslaughtActive, _egSetRageDecayMult, EG_ENDURANCE_ARMOUR_PER_CHARGE, EG_ENDURANCE_BASE_MAX, EG_ENDURANCE_ELEM_RES_PER_CHARGE, EG_FRENZY_BASE_MAX, EG_FRENZY_DAMAGE_PER_CHARGE, EG_FRENZY_MELEE_SPEED_PER_CHARGE, _egGetEnduranceCharges, _egGetFrenzyCharges, _egGetRage, EG_FORTIFY_BASE_MAX, EG_POWER_BASE_MAX, EG_POWER_CRIT_PER_CHARGE, _egGetFortifyStacks, _egGetPowerCharges } from '../combat/combat-ailments-state.js';
-import { EG_PX_PER_METER, _egGetEquippedWeaponInfo, _egIsMaceOrSceptre } from '../combat/combat-weapon-swing-config.js';
-import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_ABS_MIN_CHARGE_TIME, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MIN_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
+import {_rollInt} from '../loot/loot-mod-application.js';
+import { MOD_TABLE_AMULET } from '../loot/loot-mod-tables-amulet.js';
+import { MOD_TABLE_ARCANE } from '../loot/loot-mod-tables-arcane.js';
+import { MOD_TABLE_BELT } from '../loot/loot-mod-tables-belt.js';
+import { MOD_TABLE_BOOTS } from '../loot/loot-mod-tables-boots.js';
+import { MOD_TABLE_BRACERS } from '../loot/loot-mod-tables-bracers.js';
+import { MOD_TABLE_CHEST } from '../loot/loot-mod-tables-chest.js';
+import { MOD_TABLE_CLOAK } from '../loot/loot-mod-tables-cloak.js';
+import { MOD_TABLE_EARRING } from '../loot/loot-mod-tables-earring.js';
+import { MOD_TABLE_GLOVES } from '../loot/loot-mod-tables-gloves.js';
+import { MOD_TABLE_HEAD } from '../loot/loot-mod-tables-head.js';
+import { MOD_TABLE_PANTS } from '../loot/loot-mod-tables-pants.js';
+import { MOD_TABLE_RING } from '../loot/loot-mod-tables-ring.js';
+import { MOD_TABLE_RANGED, MOD_TABLE_SHIELD } from '../loot/loot-mod-tables-shield.js';
+import { MOD_TABLE_SHOULDERS } from '../loot/loot-mod-tables-shoulders.js';
+import { MOD_TABLE_TALISMAN } from '../loot/loot-mod-tables-talisman.js';
+import { MOD_TABLE_WEAPON_2H } from '../loot/loot-mod-tables-weapon-2h.js';
+import { MOD_TABLE_WEAPON1, MOD_TABLE_WEAPON_1H } from '../loot/loot-mod-tables-weapon1.js';
+import { MOD_TABLE_WEAPON2 } from '../loot/loot-mod-tables-weapon2.js';
+import { PLAYER_BASE_ATTRIBUTES, _isDualWielding, _isTwoHandedWeapon } from '../loot/loot-requirements.js';
+import { ONSLAUGHT_SPEED_PCT, _onslaughtActive, _setRageDecayMult, ENDURANCE_ARMOUR_PER_CHARGE, ENDURANCE_BASE_MAX, ENDURANCE_ELEM_RES_PER_CHARGE, FRENZY_BASE_MAX, FRENZY_DAMAGE_PER_CHARGE, FRENZY_MELEE_SPEED_PER_CHARGE, _getEnduranceCharges, _getFrenzyCharges, _getRage, FORTIFY_BASE_MAX, POWER_BASE_MAX, POWER_CRIT_PER_CHARGE, _getFortifyStacks, _getPowerCharges } from '../combat/combat-ailments-state.js';
+import { PX_PER_METER, _getEquippedWeaponInfo, _isMaceOrSceptre } from '../combat/combat-weapon-swing-config.js';
+import { MELEE_DAMAGE_MULT, PLAYER_CHARGE_TIME_MULT, PLAYER_ABS_MIN_CHARGE_TIME, PLAYER_DEFAULT_ATTACK_INTERVAL, PLAYER_MIN_ATTACK_INTERVAL, _isActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & DATA DEFINITIONS-------------------------
@@ -42,7 +42,7 @@ import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_ABS_MIN_CHA
 
 // Life Regen, + Life from Hearts
 
-export const EG_PLAYER_STATS = {
+export const PLAYER_STATS = {
     baseHP: 100, // Starting HP for all monster levels
     baseMana: 60, // Starting mana pool before gear and attribute bonuses
     baseManaRegen: 1, // Mana regenerated every 5s before gear; shows in the sheet's Mana Regen stat
@@ -50,13 +50,13 @@ export const EG_PLAYER_STATS = {
     chargePushback: 1.5, // Seconds removed from a monster's charge bar on hit
 };
 
-// ARPG-style weapon setups (see _egIsDualWielding in endgame-requirements.js):
+// ARPG-style weapon setups (see _isDualWielding in endgame-requirements.js):
 // dual-wielding two 1H weapons sums both weapons' melee damage then scales by
-// EG_DUAL_WIELD_DAMAGE_MULT (~1.4x a single 1H, below a 2H's ~1.6-1.7x), and
-// grants EG_DUAL_WIELD_PARRY_PCT base parry chance WITHOUT holding the parry key
+// DUAL_WIELD_DAMAGE_MULT (~1.4x a single 1H, below a 2H's ~1.6-1.7x), and
+// grants DUAL_WIELD_PARRY_PCT base parry chance WITHOUT holding the parry key
 // (gear parry adds on top; successful projectile parries can still deflect).
-export const EG_DUAL_WIELD_DAMAGE_MULT = 0.7;
-export const EG_DUAL_WIELD_PARRY_PCT = 15;
+export const DUAL_WIELD_DAMAGE_MULT = 0.7;
+export const DUAL_WIELD_PARRY_PCT = 15;
 
 
 
@@ -65,14 +65,14 @@ export const EG_DUAL_WIELD_PARRY_PCT = 15;
 //-------------------STAT AGGREGATION-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-// Maps every mod "key" produced by _egBuildRolledStats() (endgame-equipment-generator.js)
+// Maps every mod "key" produced by _buildRolledStats() (endgame-equipment-generator.js)
 // to the stat bucket it feeds. Hybrid mods produce keys `${familyId}_1` / `${familyId}_2`;
 // single-stat mods just use `familyId` directly.
-export const EG_STAT_KEY_MAP = {
+export const STAT_KEY_MAP = {
     // NOTE: flat_armour / inc_armour / flat_evasion / inc_evasion /
     // flat_absorption / inc_absorption (and the defense halves of the hybrid
     // families) are LOCAL modifiers - they only affect the base value of the
-    // item they roll on. They are handled by _egGetItemEffectiveDefenses()
+    // item they roll on. They are handled by _getItemEffectiveDefenses()
     // below and intentionally absent from this map.
     flat_health: { bucket: 'health', mode: 'add' },
     inc_health: { bucket: 'healthIncPct', mode: 'add' },
@@ -217,7 +217,7 @@ export const EG_STAT_KEY_MAP = {
 // these keys are routed per source slot: weapon items feed ONLY their melee
 // counterpart, ranged items feed only the shared (projectile) bucket, and
 // every other slot feeds both channels.
-export const EG_MELEE_BUCKET_MAP = {
+export const MELEE_BUCKET_MAP = {
     physFlatMin: 'meleePhysMin',
     physFlatMax: 'meleePhysMax',
     physIncPct: 'meleePhysIncPct',
@@ -244,7 +244,7 @@ export const EG_MELEE_BUCKET_MAP = {
 // Returns [{ label: string, downside: bool, tierLabel: string }] for tooltip rendering.
 // tierLabel is the affix tier badge: "P4" for prefix tier 4, "S1" for suffix tier 1,
 // and "P2+S3" when multiple mods were merged into one combined line (including hybrids).
-export function _egTryHealLegacyDualMod(mod) {
+export function _tryHealLegacyDualMod(mod) {
     // Legacy items rolled before the min/min2 -> min1/min2 fix stored a single
     // rolledStat whose label still contains the '@' placeholder and no second
     // stat was created, so the damage value was never shown and never counted
@@ -255,31 +255,31 @@ export function _egTryHealLegacyDualMod(mod) {
     // Find the family definition for this mod so we can roll the missing @ value
     let family = null;
     let tierDef = null;
-    const _egCollectModTables = () => {
+    const _collectModTables = () => {
         const out = [];
-        if (typeof EG_MOD_TABLE_HEAD !== 'undefined') out.push(EG_MOD_TABLE_HEAD);
-        if (typeof EG_MOD_TABLE_EARRING !== 'undefined') out.push(EG_MOD_TABLE_EARRING);
-        if (typeof EG_MOD_TABLE_AMULET !== 'undefined') out.push(EG_MOD_TABLE_AMULET);
-        if (typeof EG_MOD_TABLE_SHOULDERS !== 'undefined') out.push(EG_MOD_TABLE_SHOULDERS);
-        if (typeof EG_MOD_TABLE_CLOAK !== 'undefined') out.push(EG_MOD_TABLE_CLOAK);
-        if (typeof EG_MOD_TABLE_CHEST !== 'undefined') out.push(EG_MOD_TABLE_CHEST);
-        if (typeof EG_MOD_TABLE_BRACERS !== 'undefined') out.push(EG_MOD_TABLE_BRACERS);
-        if (typeof EG_MOD_TABLE_GLOVES !== 'undefined') out.push(EG_MOD_TABLE_GLOVES);
-        if (typeof EG_MOD_TABLE_BELT !== 'undefined') out.push(EG_MOD_TABLE_BELT);
-        if (typeof EG_MOD_TABLE_PANTS !== 'undefined') out.push(EG_MOD_TABLE_PANTS);
-        if (typeof EG_MOD_TABLE_BOOTS !== 'undefined') out.push(EG_MOD_TABLE_BOOTS);
-        if (typeof EG_MOD_TABLE_RING !== 'undefined') out.push(EG_MOD_TABLE_RING);
-        if (typeof EG_MOD_TABLE_ARCANE !== 'undefined') out.push(EG_MOD_TABLE_ARCANE);
-        if (typeof EG_MOD_TABLE_TALISMAN !== 'undefined') out.push(EG_MOD_TABLE_TALISMAN);
-        if (typeof EG_MOD_TABLE_WEAPON1 !== 'undefined') out.push(EG_MOD_TABLE_WEAPON1);
-        if (typeof EG_MOD_TABLE_WEAPON_1H !== 'undefined') out.push(EG_MOD_TABLE_WEAPON_1H);
-        if (typeof EG_MOD_TABLE_WEAPON_2H !== 'undefined') out.push(EG_MOD_TABLE_WEAPON_2H);
-        if (typeof EG_MOD_TABLE_WEAPON2 !== 'undefined') out.push(EG_MOD_TABLE_WEAPON2);
-        if (typeof EG_MOD_TABLE_SHIELD !== 'undefined') out.push(EG_MOD_TABLE_SHIELD);
-        if (typeof EG_MOD_TABLE_RANGED !== 'undefined') out.push(EG_MOD_TABLE_RANGED);
+        if (typeof MOD_TABLE_HEAD !== 'undefined') out.push(MOD_TABLE_HEAD);
+        if (typeof MOD_TABLE_EARRING !== 'undefined') out.push(MOD_TABLE_EARRING);
+        if (typeof MOD_TABLE_AMULET !== 'undefined') out.push(MOD_TABLE_AMULET);
+        if (typeof MOD_TABLE_SHOULDERS !== 'undefined') out.push(MOD_TABLE_SHOULDERS);
+        if (typeof MOD_TABLE_CLOAK !== 'undefined') out.push(MOD_TABLE_CLOAK);
+        if (typeof MOD_TABLE_CHEST !== 'undefined') out.push(MOD_TABLE_CHEST);
+        if (typeof MOD_TABLE_BRACERS !== 'undefined') out.push(MOD_TABLE_BRACERS);
+        if (typeof MOD_TABLE_GLOVES !== 'undefined') out.push(MOD_TABLE_GLOVES);
+        if (typeof MOD_TABLE_BELT !== 'undefined') out.push(MOD_TABLE_BELT);
+        if (typeof MOD_TABLE_PANTS !== 'undefined') out.push(MOD_TABLE_PANTS);
+        if (typeof MOD_TABLE_BOOTS !== 'undefined') out.push(MOD_TABLE_BOOTS);
+        if (typeof MOD_TABLE_RING !== 'undefined') out.push(MOD_TABLE_RING);
+        if (typeof MOD_TABLE_ARCANE !== 'undefined') out.push(MOD_TABLE_ARCANE);
+        if (typeof MOD_TABLE_TALISMAN !== 'undefined') out.push(MOD_TABLE_TALISMAN);
+        if (typeof MOD_TABLE_WEAPON1 !== 'undefined') out.push(MOD_TABLE_WEAPON1);
+        if (typeof MOD_TABLE_WEAPON_1H !== 'undefined') out.push(MOD_TABLE_WEAPON_1H);
+        if (typeof MOD_TABLE_WEAPON_2H !== 'undefined') out.push(MOD_TABLE_WEAPON_2H);
+        if (typeof MOD_TABLE_WEAPON2 !== 'undefined') out.push(MOD_TABLE_WEAPON2);
+        if (typeof MOD_TABLE_SHIELD !== 'undefined') out.push(MOD_TABLE_SHIELD);
+        if (typeof MOD_TABLE_RANGED !== 'undefined') out.push(MOD_TABLE_RANGED);
         return out;
     };
-    for (const tbl of _egCollectModTables()) {
+    for (const tbl of _collectModTables()) {
         const sections = [tbl.prefixes, tbl.suffixes];
         for (const sec of sections) {
             if (!sec || !sec[mod.familyId]) continue;
@@ -298,7 +298,7 @@ export function _egTryHealLegacyDualMod(mod) {
         mod.rolledStats[0].label = lab.replace('@', '?');
         return;
     }
-    const val2 = (typeof _egRollInt === 'function') ? _egRollInt(tierDef.min2, tierDef.max2) : Math.floor((tierDef.min2 + tierDef.max2) / 2);
+    const val2 = (typeof _rollInt === 'function') ? _rollInt(tierDef.min2, tierDef.max2) : Math.floor((tierDef.min2 + tierDef.max2) / 2);
     const val1 = mod.rolledStats[0].value;
     // Rebuild labels from the family so multi-line families (channel) split correctly
     if (family) {
@@ -317,11 +317,11 @@ export function _egTryHealLegacyDualMod(mod) {
     }
 }
 
-export function _egBuildMergedModLines(mods) {
+export function _buildMergedModLines(mods) {
     // Heal legacy dual-stat mods that were saved with a stray '@' placeholder
     // (shield_bash / arcane_surge / channel rolled with min/min2 before fix).
     if (Array.isArray(mods)) {
-        for (const m of mods) _egTryHealLegacyDualMod(m);
+        for (const m of mods) _tryHealLegacyDualMod(m);
     }
     const NUM_RE = /-?\d[\d.,]*/g;
     const groups = [];
@@ -384,9 +384,9 @@ export function _egBuildMergedModLines(mods) {
 }
 
 // Returns every non-empty equipped item as a flat array.
-export function _egGetAllEquippedItems() {
-    if (typeof _egEquipped === 'undefined') return [];
-    return Object.values(_egEquipped).filter(Boolean);
+export function _getAllEquippedItems() {
+    if (typeof _equipped === 'undefined') return [];
+    return Object.values(_equipped).filter(Boolean);
 }
 
 //------------------------------------------------------------------------
@@ -397,7 +397,7 @@ export function _egGetAllEquippedItems() {
 // item they rolled on, not the character-wide totals.
 //
 // Effective item value = round((base + localFlat) * (1 + localIncPct / 100)).
-export const EG_LOCAL_DEFENSE_FLAT_KEYS = {
+export const LOCAL_DEFENSE_FLAT_KEYS = {
     flat_armour: 'armour',
     flat_evasion: 'evasion',
     flat_absorption: 'absorption',
@@ -411,7 +411,7 @@ export const EG_LOCAL_DEFENSE_FLAT_KEYS = {
     hybrid_evasion_absorption_1: 'evasion', hybrid_evasion_absorption_2: 'absorption',
 };
 
-export const EG_LOCAL_DEFENSE_INC_KEYS = {
+export const LOCAL_DEFENSE_INC_KEYS = {
     inc_armour: 'armour',
     inc_evasion: 'evasion',
     inc_absorption: 'absorption',
@@ -421,7 +421,7 @@ export const EG_LOCAL_DEFENSE_INC_KEYS = {
 // Returns { armour, evasion, absorption, modded: { armour, evasion, absorption } }
 // where modded.<stat> is true when local mods altered that value - used by
 // the tooltip to highlight already-increased values.
-export function _egGetItemEffectiveDefenses(item) {
+export function _getItemEffectiveDefenses(item) {
     const base = item.defenses || {};
     const out = {
         armour: base.armour || 0,
@@ -435,13 +435,13 @@ export function _egGetItemEffectiveDefenses(item) {
         if (stat.value == null) return;
         const val = Number(stat.value) || 0;
         if (val === 0) return;
-        const flatStat = EG_LOCAL_DEFENSE_FLAT_KEYS[stat.key];
+        const flatStat = LOCAL_DEFENSE_FLAT_KEYS[stat.key];
         if (flatStat && out[flatStat] > 0) {
             out[flatStat] += val;
             modded[flatStat] = true;
             return;
         }
-        const incStat = EG_LOCAL_DEFENSE_INC_KEYS[stat.key];
+        const incStat = LOCAL_DEFENSE_INC_KEYS[stat.key];
         if (incStat && out[incStat] > 0) {
             inc[incStat] += val;
             modded[incStat] = true;
@@ -474,9 +474,9 @@ export function _egGetItemEffectiveDefenses(item) {
 // Effective value = round((base + localFlat) * (1 + localIncPct / 100))
 // for Physical; elemental ranges are pure local flat adds (never scaled
 // by % increased Physical), matching the combat order in
-// _egCalcPlayerDamage() where elemental damage is added AFTER the
+// _calcPlayerDamage() where elemental damage is added AFTER the
 // % increased Physical multiplier.
-export const EG_LOCAL_DAMAGE_FLAT_KEYS = {
+export const LOCAL_DAMAGE_FLAT_KEYS = {
     flat_physical_damage_1: 'physMin',
     flat_physical_damage_2: 'physMax',
     fire_damage_1: 'fireMin',       fire_damage_2: 'fireMax',
@@ -485,7 +485,7 @@ export const EG_LOCAL_DAMAGE_FLAT_KEYS = {
     shadow_damage_1: 'shadowMin',   shadow_damage_2: 'shadowMax',
 };
 
-export const EG_LOCAL_DAMAGE_INC_KEYS = {
+export const LOCAL_DAMAGE_INC_KEYS = {
     inc_physical_damage: 'physInc',
 };
 
@@ -495,7 +495,7 @@ export const EG_LOCAL_DAMAGE_INC_KEYS = {
 // modded: { phys, fire, cold, lightning, shadow } } where modded.<elem>
 // is true when local mods altered that range - used by the tooltip to
 // highlight already-increased values.
-export function _egGetItemEffectiveDamage(item) {
+export function _getItemEffectiveDamage(item) {
     const base = item.damage || {};
     const out = {
         physMin: base.min || 0,
@@ -512,13 +512,13 @@ export function _egGetItemEffectiveDamage(item) {
         if (stat.value == null) return;
         const val = Number(stat.value) || 0;
         if (val === 0) return;
-        const flatStat = EG_LOCAL_DAMAGE_FLAT_KEYS[stat.key];
+        const flatStat = LOCAL_DAMAGE_FLAT_KEYS[stat.key];
         if (flatStat) {
             out[flatStat] += val;
             modded[flatStat.replace(/(Min|Max)$/, '')] = true;
             return;
         }
-        const incKey = EG_LOCAL_DAMAGE_INC_KEYS[stat.key];
+        const incKey = LOCAL_DAMAGE_INC_KEYS[stat.key];
         if (incKey && out.physMax > 0) {
             physIncPct += val;
             modded.phys = true;
@@ -550,9 +550,9 @@ export function _egGetItemEffectiveDamage(item) {
 // The weapon's "Fully charges in Xs" implicit is reduced by its own rolled
 // "Melee charges #s faster" mod (attack_speed) - LOCAL in the same display
 // sense as the damage ranges above - then shortened by
-// EG_PLAYER_CHARGE_TIME_MULT. Clamped to EG_PLAYER_MIN_ATTACK_INTERVAL so
-// it matches the combat interval in _egGetPlayerAttackIntervalBreakdown().
-export function _egGetItemEffectiveAttackInterval(item) {
+// PLAYER_CHARGE_TIME_MULT. Clamped to PLAYER_MIN_ATTACK_INTERVAL so
+// it matches the combat interval in _getPlayerAttackIntervalBreakdown().
+export function _getItemEffectiveAttackInterval(item) {
     const base = Number(item.attackIntervalSeconds);
     if (!isFinite(base)) return { base: null, interval: null, modded: false };
 
@@ -566,11 +566,11 @@ export function _egGetItemEffectiveAttackInterval(item) {
     (Array.isArray(item.mods) ? item.mods : []).forEach(collectAS);
     (Array.isArray(item.implicits) ? item.implicits : []).forEach(collectAS);
 
-    const minInterval = (typeof EG_PLAYER_MIN_ATTACK_INTERVAL !== 'undefined')
-        ? EG_PLAYER_MIN_ATTACK_INTERVAL : 2;
+    const minInterval = (typeof PLAYER_MIN_ATTACK_INTERVAL !== 'undefined')
+        ? PLAYER_MIN_ATTACK_INTERVAL : 2;
     let interval = Math.round(Math.max(minInterval, base - reduction) * 100) / 100;
-    if (typeof EG_PLAYER_CHARGE_TIME_MULT !== 'undefined') {
-        interval = Math.round(interval * EG_PLAYER_CHARGE_TIME_MULT * 100) / 100;
+    if (typeof PLAYER_CHARGE_TIME_MULT !== 'undefined') {
+        interval = Math.round(interval * PLAYER_CHARGE_TIME_MULT * 100) / 100;
     }
     return {
         base,
@@ -592,7 +592,7 @@ export function _egGetItemEffectiveAttackInterval(item) {
 // Effective = base + sum of block_chance mods on that item.
 // Returns { value, base, added, modded } where modded signals the display
 // should use .eg-tt-val-modified.
-export function _egGetItemEffectiveBlockChance(item) {
+export function _getItemEffectiveBlockChance(item) {
     const base = Number(item.blockChance) || 0;
     if (!base) return { value: 0, base: 0, added: 0, modded: false };
     let added = 0;
@@ -615,8 +615,8 @@ export function _egGetItemEffectiveBlockChance(item) {
 // Aggregates every equipped item's implicit defenses + rolled mods into one
 // stats object. Recomputed on demand (cheap - ~19 slots, ≤6 mods each) so it
 // never goes stale after an equip/unequip.
-export function _egComputePlayerStats() {
-    const passiveTreeBonuses = _egSyncBaseAttributes() || {};
+export function _computePlayerStats() {
+    const passiveTreeBonuses = _syncBaseAttributes() || {};
     const s = {
         // Flat maximum Life from allocated passive-tree nodes (effects
         // pipeline, e.g. reworked node 20031 Anvil Guard) seeds the very
@@ -639,7 +639,7 @@ export function _egComputePlayerStats() {
         spellsCostLife: passiveTreeBonuses.spellsCostLife || 0,
         spellCostIncPct: passiveTreeBonuses.spellCostIncPct || 0,
         // Primal Flame keystone (node 350): fire conversion share and the
-        // fire-only flag, read by _egApplyDamageConversion.
+        // fire-only flag, read by _applyDamageConversion.
         damageToFirePct: passiveTreeBonuses.damageToFirePct || 0,
         onlyFireDamage: passiveTreeBonuses.onlyFireDamage || 0,
         // Colossus / ignite / fire / physical batch (see pt-effects.js).
@@ -652,10 +652,10 @@ export function _egComputePlayerStats() {
         igniteDamageMorePct: passiveTreeBonuses.igniteDamageMorePct || 0,
         physDotMorePct: passiveTreeBonuses.physDotMorePct || 0,
         physAsExtraFirePct: (passiveTreeBonuses.physAsExtraFirePct || 0)
-            + (_egFireSurgeActive() ? (passiveTreeBonuses.physAsExtraFireTimedPct || 0) : 0),
+            + (_fireSurgeActive() ? (passiveTreeBonuses.physAsExtraFireTimedPct || 0) : 0),
         crushPhysReductionPct: passiveTreeBonuses.crushPhysReductionPct || 0,
         // Projectile batch: damage multiplier + crit chance read in
-        // _egCalcPlayerDamage, speed read in _egAnimatePlayerProjectile.
+        // _calcPlayerDamage, speed read in _animatePlayerProjectile.
         // Bow-spell lines are tracked only - no Bow-tagged spell exists yet.
         projectileDamageIncPct: passiveTreeBonuses.projectileDamageIncPct || 0,
         projectileSpeedPct: passiveTreeBonuses.projectileSpeedPct || 0,
@@ -731,16 +731,16 @@ export function _egComputePlayerStats() {
         // Attributes start from the character's base pool (endgame-requirements.js)
         // so the stats panel, derived side-effects and requirement checks all
         // agree on the same totals.
-        strength: (typeof EG_PLAYER_BASE_ATTRIBUTES !== 'undefined') ? EG_PLAYER_BASE_ATTRIBUTES.str : 0,
-        agility: (typeof EG_PLAYER_BASE_ATTRIBUTES !== 'undefined') ? EG_PLAYER_BASE_ATTRIBUTES.agi : 0,
-        intelligence: (typeof EG_PLAYER_BASE_ATTRIBUTES !== 'undefined') ? EG_PLAYER_BASE_ATTRIBUTES.int : 0,
+        strength: (typeof PLAYER_BASE_ATTRIBUTES !== 'undefined') ? PLAYER_BASE_ATTRIBUTES.str : 0,
+        agility: (typeof PLAYER_BASE_ATTRIBUTES !== 'undefined') ? PLAYER_BASE_ATTRIBUTES.agi : 0,
+        intelligence: (typeof PLAYER_BASE_ATTRIBUTES !== 'undefined') ? PLAYER_BASE_ATTRIBUTES.int : 0,
         // Flat Life regeneration per second from allocated passive-tree
         // nodes (effects pipeline, e.g. reworked node 129 Horizon Tracker)
         // seeds the very same bucket gear's life_regen feeds, so tree and
-        // gear regen add up in _egTickLifeRegen().
-        lifeRegen: passiveTreeBonuses.lifeRegenFlat || 0, manaRegen: EG_PLAYER_STATS.baseManaRegen, manaRegenIncPct: passiveTreeBonuses.manaRegenIncPct || 0,
+        // gear regen add up in _tickLifeRegen().
+        lifeRegen: passiveTreeBonuses.lifeRegenFlat || 0, manaRegen: PLAYER_STATS.baseManaRegen, manaRegenIncPct: passiveTreeBonuses.manaRegenIncPct || 0,
         // Tree-sourced percentage Life regeneration per second (effects
-        // pipeline, e.g. reworked node 30206). _egTickLifeRegen() adds both
+        // pipeline, e.g. reworked node 30206). _tickLifeRegen() adds both
         // buckets together each second, scaling this one by the CURRENT
         // maximum Life.
         lifeRegenPct: passiveTreeBonuses.lifeRegenPct || 0,
@@ -749,7 +749,7 @@ export function _egComputePlayerStats() {
         // capped and obey the 75% cap / Elemental Weakness map mod exactly
         // like gear. Lightning is one of the four elements, so both sides read
         // it: gear's lightning_resist mods resolve into lightningResist (see
-        // EG_STAT_KEY_MAP above) and _egCalcPlayerResistanceReduction mitigates
+        // STAT_KEY_MAP above) and _calcPlayerResistanceReduction mitigates
         // incoming lightning hits with it.
         fireResist: passiveTreeBonuses.fireResistFlat || 0,
         coldResist: passiveTreeBonuses.coldResistFlat || 0,
@@ -765,7 +765,7 @@ export function _egComputePlayerStats() {
         lightningResistMax: passiveTreeBonuses.lightningResistMax || 0,
         shadowResistMax: 0, allResMax: 0,
         // Tree "+% to all maximum Elemental Resistances" (node 250): fire,
-        // cold and lightning only; read by _egGetPlayerResistCap.
+        // cold and lightning only; read by _getPlayerResistCap.
         allElementalResistMax: passiveTreeBonuses.allElementalResistMax || 0,
         // accuracyIncPct ("increased Accuracy Rating", effects pipeline) is
         // applied to the aggregated rating AFTER the attribute side-effects
@@ -823,25 +823,25 @@ export function _egComputePlayerStats() {
         // The % bucket is seeded by the passive tree (reworked nodes 30195
         // Lesser Melee Force +12% and 30194 Lesser Champion's Might +16%) and
         // gear "% increased Physical Damage" mods add on top via
-        // EG_MELEE_BUCKET_MAP.
+        // MELEE_BUCKET_MAP.
         meleePhysMin: 0, meleePhysMax: 0,
         meleePhysIncPct: (passiveTreeBonuses.meleePhysIncPct || 0)
             + (passiveTreeBonuses.physDamageIncPct || 0),
         // Weapon-stance split from the passive tree (melee batch, effects
         // pipeline): only ONE applies per strike - Heavy with a two-handed
         // weapon equipped, one-handed otherwise (1H + shield, dual-wield or
-        // unarmed). _egCalcPlayerMeleeDamage picks the side; both stack on
+        // unarmed). _calcPlayerMeleeDamage picks the side; both stack on
         // top of the generic meleePhysIncPct bucket above.
         meleePhys1HIncPct: passiveTreeBonuses.meleePhys1HIncPct || 0,
         meleePhysHeavyIncPct: passiveTreeBonuses.meleePhysHeavyIncPct || 0,
-        isHeavyWeaponEquipped: _egGetAllEquippedItems().some(item => typeof _egIsTwoHandedWeapon === 'function' && _egIsTwoHandedWeapon(item)),
+        isHeavyWeaponEquipped: _getAllEquippedItems().some(item => typeof _isTwoHandedWeapon === 'function' && _isTwoHandedWeapon(item)),
         // Passive tree "+% increased melee attack charge-up speed" (reworked
         // node 30197). Unlike the absolute-seconds attackSpeed bucket that
         // gear feeds, this is a percentage applied to the melee charge time
-        // by _egGetPlayerAttackIntervalBreakdown() below. Nothing else reads it.
+        // by _getPlayerAttackIntervalBreakdown() below. Nothing else reads it.
         meleeChargeSpeedPct: passiveTreeBonuses.meleeChargeSpeedPct || 0,
         // Weapon-family batch (effects pipeline, swords/axes): damage
-        // multipliers read in _egCalcPlayerMeleeDamage, charge-up speed in
+        // multipliers read in _calcPlayerMeleeDamage, charge-up speed in
         // the attack interval; isSwordEquipped / isAxeEquipped are set from
         // the equipped weapon below. Accuracy-with-swords is folded into the
         // flat accuracy pool below, so it has no stat line of its own.
@@ -853,7 +853,7 @@ export function _egComputePlayerStats() {
         intimidateMeleeAmpPct: passiveTreeBonuses.intimidateMeleeAmpPct || 0,
         // Bleed batch (effects pipeline): extra bleed chances and bleed
         // speed read in combat-ailments-core.js; regen rate in
-        // _egTickLifeRegen.
+        // _tickLifeRegen.
         bleedChanceMeleePct: passiveTreeBonuses.bleedChanceMeleePct || 0,
         bleedChanceAttackPct: passiveTreeBonuses.bleedChanceAttackPct || 0,
         poisonChanceAttackPct: passiveTreeBonuses.poisonChanceAttackPct || 0,
@@ -868,7 +868,7 @@ export function _egComputePlayerStats() {
         rageMax: passiveTreeBonuses.rageMax || 0,
         rage: 0,
         // Mace / sceptre batch (nodes 30333/30334): damage with the family
-        // (read in _egCalcPlayerMeleeDamage) and the new Area of Effect
+        // (read in _calcPlayerMeleeDamage) and the new Area of Effect
         // stat (no consumer yet - future spell targeting areas).
         meleePhysMaceIncPct: passiveTreeBonuses.meleePhysMaceIncPct || 0,
         areaOfEffectPct: passiveTreeBonuses.areaOfEffectPct || 0,
@@ -877,7 +877,7 @@ export function _egComputePlayerStats() {
         stunChanceMaceChargedPct: passiveTreeBonuses.stunChanceMaceChargedPct || 0,
         stunDurationPct: passiveTreeBonuses.stunDurationPct || 0,
         // Heavy-weapon stun batch (read in encounter-monster-damage.js and
-        // _egCalcPlayerMeleeDamage).
+        // _calcPlayerMeleeDamage).
         stunChanceHeavyPct: passiveTreeBonuses.stunChanceHeavyPct || 0,
         stunDurationHeavyPct: passiveTreeBonuses.stunDurationHeavyPct || 0,
         stunDoubleChancePct: passiveTreeBonuses.stunDoubleChancePct || 0,
@@ -1028,7 +1028,7 @@ export function _egComputePlayerStats() {
         rageDecaySlowerPct: passiveTreeBonuses.rageDecaySlowerPct || 0,
         ragePerArmourPct: passiveTreeBonuses.ragePerArmourPct || 0,
         rageWhenHitAmount: passiveTreeBonuses.rageWhenHitAmount || 0,
-        powerChargesMax: EG_POWER_BASE_MAX + (passiveTreeBonuses.powerChargesMax || 0),
+        powerChargesMax: POWER_BASE_MAX + (passiveTreeBonuses.powerChargesMax || 0),
         powerDurationPct: passiveTreeBonuses.powerDurationPct || 0,
         powerOnCritPct: passiveTreeBonuses.powerOnCritPct || 0,
         powerOnKillPct: passiveTreeBonuses.powerOnKillPct || 0,
@@ -1042,7 +1042,7 @@ export function _egComputePlayerStats() {
         blindChancePct: passiveTreeBonuses.blindChancePct || 0,
         blindEffectIncPct: passiveTreeBonuses.blindEffectIncPct || 0,
         critChanceVsBlindedPct: passiveTreeBonuses.critChanceVsBlindedPct || 0,
-        fortifyMax: EG_FORTIFY_BASE_MAX + (passiveTreeBonuses.fortifyMax || 0),
+        fortifyMax: FORTIFY_BASE_MAX + (passiveTreeBonuses.fortifyMax || 0),
         fortifyDurationPct: passiveTreeBonuses.fortifyDurationPct || 0,
         fortifyOnStunPct: passiveTreeBonuses.fortifyOnStunPct || 0,
         fortifyEffectIncPct: passiveTreeBonuses.fortifyEffectIncPct || 0,
@@ -1110,7 +1110,7 @@ export function _egComputePlayerStats() {
         fireCastSpeedPct: passiveTreeBonuses.fireCastSpeedPct || 0,
         coldCastSpeedPct: passiveTreeBonuses.coldCastSpeedPct || 0,
         // Lightning's siblings of the two buckets above. Lightning is one of the
-        // four EG_ELEMENTS, so both channels reach every channel:
+        // four DAMAGE_ELEMENTS, so both channels reach every channel:
         // lightningDamageIncPct scales the lightning share of melee strikes
         // and projectiles (combat-calculations.js, fed by the lightning damage
         // gear mods) plus every lightning-element spell (universal-spells.js), and
@@ -1126,7 +1126,7 @@ export function _egComputePlayerStats() {
         // combat-calculations.js.
         lifeLeechPct: passiveTreeBonuses.lifeLeechPct || 0,
         // Melee-only leech from the tree (nodes 30257/30258/20043); applied in
-        // _egCalcPlayerMeleeDamage on top of the gear bucket above.
+        // _calcPlayerMeleeDamage on top of the gear bucket above.
         lifeLeechMeleePct: passiveTreeBonuses.lifeLeechMeleePct || 0,
         blockChance: 0, spellBlockChance: 0,
         // Tree-sourced block recovery (effects pipeline, e.g. reworked node
@@ -1135,64 +1135,64 @@ export function _egComputePlayerStats() {
         blockRecoveryPct: passiveTreeBonuses.blockRecoveryPct || 0,
         // Tree-sourced conditional block chance (effects pipeline, e.g.
         // reworked node 30255): fires without a shield while dual-wielding
-        // or holding one. Read by the block roll in _egPlayerTakeDamage.
+        // or holding one. Read by the block roll in _playerTakeDamage.
         blockChanceTree: passiveTreeBonuses.blockChanceTree || 0,
         dodgeChance: 0, spellDodgeChance: 0,
         ignitePct: passiveTreeBonuses.igniteChancePct || 0, freezePct: passiveTreeBonuses.freezeChancePct || 0, shockPct: passiveTreeBonuses.shockChancePct || 0, blindPct: passiveTreeBonuses.blindChancePct || 0, convertPct: 0,
         ailmentDurationPct: 0, ailmentEffectPct: 0,
         // Per-ailment durations for YOUR ailments on enemies (effects
         // pipeline, e.g. reworked nodes 30252/30253): scale the monster-side
-        // ignite/bleed durations in _egApplyMonsterAilment.
+        // ignite/bleed durations in _applyMonsterAilment.
         igniteDurationPct: passiveTreeBonuses.igniteDurationPct || 0,
         bleedDurationPct: passiveTreeBonuses.bleedDurationPct || 0,
         // Shield batch (effects pipeline, e.g. reworked nodes 30374/285):
         // block chance that only exists while a shield is equipped (read in
-        // _egPlayerTakeDamage), the on-kill Endurance Charge chance (read in
-        // _egKillMonster) and the charge cap. The shield-conditional damage
+        // _playerTakeDamage), the on-kill Endurance Charge chance (read in
+        // _killMonster) and the charge cap. The shield-conditional damage
         // and defence channels are folded in below / in the item loop.
         blockChanceShieldPct: passiveTreeBonuses.blockChanceShieldPct || 0,
         enduranceOnKillShieldPct: passiveTreeBonuses.enduranceOnKillShieldPct || 0,
-        enduranceChargesMax: EG_ENDURANCE_BASE_MAX + (passiveTreeBonuses.enduranceChargesMax || 0),
+        enduranceChargesMax: ENDURANCE_BASE_MAX + (passiveTreeBonuses.enduranceChargesMax || 0),
         enduranceCharges: 0,
         // Frenzy Charges (combat-ailments-state.js): cap and duration scaler
         // from the tree; the live count and charge-derived bonuses are
         // folded in below.
-        frenzyChargesMax: EG_FRENZY_BASE_MAX + (passiveTreeBonuses.frenzyChargesMax || 0),
+        frenzyChargesMax: FRENZY_BASE_MAX + (passiveTreeBonuses.frenzyChargesMax || 0),
         frenzyCharges: 0,
         frenzyDurationPct: passiveTreeBonuses.frenzyDurationPct || 0,
         evasionPerFrenzyChargePct: passiveTreeBonuses.evasionPerFrenzyChargePct || 0,
         frenzyDamageMorePct: 0,
         // Endurance batch (nodes 30344/30341): charge duration scaler and
         // per-charge Life regen, read in combat-ailments-state.js and
-        // _egTickLifeRegen.
+        // _tickLifeRegen.
         enduranceDurationPct: passiveTreeBonuses.enduranceDurationPct || 0,
         lifeRegenPerEndurancePct: passiveTreeBonuses.lifeRegenPerEndurancePct || 0,
         isShieldEquipped: false,
         // Impale (heavy-weapon batch, effects pipeline, e.g. reworked nodes
         // 30268/240/8): chance, effect and duration scalers read by
-        // _egApplyImpaleToHit in combat-ailments-core.js. Only heavy melee
+        // _applyImpaleToHit in combat-ailments-core.js. Only heavy melee
         // hits can impale, so the chance is meaningless without the stance.
         impaleChanceHeavyPct: passiveTreeBonuses.impaleChanceHeavyPct || 0,
         impaleEffectHeavyPct: passiveTreeBonuses.impaleEffectHeavyPct || 0,
         impaleEffectFreshPct: passiveTreeBonuses.impaleEffectFreshPct || 0,
         impaleDurationPct: passiveTreeBonuses.impaleDurationPct || 0,
         // Retaliation ward (node 20036): a bleeding attacker cannot bleed you,
-        // a burning one cannot ignite you - see _egTryRetaliationWard in
+        // a burning one cannot ignite you - see _tryRetaliationWard in
         // combat-ailments-core.js.
         retaliationWardBleed: passiveTreeBonuses.retaliationWardBleed || 0,
         retaliationWardIgnite: passiveTreeBonuses.retaliationWardIgnite || 0,
         // Champion's Vigor (reworked node 20033, legacy-table wired): bonus
         // melee strike range in meters, the melee splash base radius in px
         // it unlocks, and the increased AoE % scaling that radius - see
-        // _egMeleeTargetInRange and _egTryMeleeSplashHit.
+        // _meleeTargetInRange and _tryMeleeSplashHit.
         meleeRangeM: passiveTreeBonuses.meleeRangeM || 0,
-        meleeSplashBasePx: (passiveTreeBonuses.meleeSplashBaseM || 0) * EG_PX_PER_METER,
+        meleeSplashBasePx: (passiveTreeBonuses.meleeSplashBaseM || 0) * PX_PER_METER,
         meleeAoEPct: passiveTreeBonuses.meleeAoEPct || 0,
         attackSpeed: 0, cleavePct: 0, piercePct: 0, snipePct: 0, chainPct: 0, splashPct: 0,
         // Passive-tree percentage attack speed (reworked notable 20032):
         // the seconds-based attackSpeed bucket above stays gear-only; this
         // one shortens the melee charge proportionally in
-        // _egGetPlayerAttackIntervalBreakdown().
+        // _getPlayerAttackIntervalBreakdown().
         attackSpeedPct: passiveTreeBonuses.attackSpeedPct || 0,
         multishotPct: 0, pushbackFlat: 0, overkillPct: 0, staggerPct: 0, preemptiveDodgePct: 0,
         firstStepSeconds: 0, groundedChancePct: 0, groundedReductionPct: 0,
@@ -1200,7 +1200,7 @@ export function _egComputePlayerStats() {
         // Flat physical retaliation against melee attackers from allocated
         // passive-tree nodes (effects pipeline, e.g. reworked node 13
         // Enhanced Rewards). Read by the flat-reflect hook in
-        // _egPlayerTakeDamage (encounter-damage.js), next to Retribution.
+        // _playerTakeDamage (encounter-damage.js), next to Retribution.
         reflectPhysFlat: passiveTreeBonuses.reflectPhysFlat || 0,
         channelDamagePerStack: 0, channelMaxStacks: 0,
         arcaneSurgeStreak: Infinity, arcaneSurgeMana: 0, manaToDamagePct: 0,
@@ -1213,11 +1213,11 @@ export function _egComputePlayerStats() {
         absorptionRegenRatePct: passiveTreeBonuses.absorptionRegenRatePct || 0, fasterAbsorptionRegenStart: 0,
     };
 
-    _egGetAllEquippedItems().forEach(item => {
+    _getAllEquippedItems().forEach(item => {
         if (item.defenses) {
             // Use the LOCAL-modified values (base + flat, scaled by the
-            // item's own "% increased" mods) - see _egGetItemEffectiveDefenses.
-            const eff = _egGetItemEffectiveDefenses(item);
+            // item's own "% increased" mods) - see _getItemEffectiveDefenses.
+            const eff = _getItemEffectiveDefenses(item);
             // Shield batch (e.g. reworked node 30376): "% increased Defences
             // from equipped Shield" multiplies ONLY the shield's own
             // Armour / Evasion / Absorption, before the global % increased
@@ -1252,7 +1252,7 @@ export function _egComputePlayerStats() {
         function applyStatsFromList(list) {
             (Array.isArray(list) ? list : []).forEach(mod => {
                 (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {
-                    const entry = EG_STAT_KEY_MAP[stat.key];
+                    const entry = STAT_KEY_MAP[stat.key];
                     if (!entry || stat.value == null) return;
                     const val = Number(stat.value) || 0;
                     // Legacy uniques stored percent-style values (e.g. -19.5 for
@@ -1263,7 +1263,7 @@ export function _egComputePlayerStats() {
                         s.attackSpeedPct += val;
                         return;
                     }
-                    const meleeBucket = EG_MELEE_BUCKET_MAP[entry.bucket];
+                    const meleeBucket = MELEE_BUCKET_MAP[entry.bucket];
                     if (meleeBucket) {
                         if (item.slotType !== 'ranged') s[meleeBucket] += val;
                         if (item.slotType !== 'weapon') s[entry.bucket] += val;
@@ -1286,7 +1286,7 @@ export function _egComputePlayerStats() {
     // both the projectile and melee physical buckets (the tree's generic
     // physDamageIncPct does the same); "melee attack" damage only the melee
     // bucket.
-    s.isShieldEquipped = _egGetAllEquippedItems().some(item => item.slotType === 'shield');
+    s.isShieldEquipped = _getAllEquippedItems().some(item => item.slotType === 'shield');
     if (s.isShieldEquipped) {
         const attackShield = passiveTreeBonuses.attackPhysShieldIncPct || 0;
         s.physIncPct += attackShield;
@@ -1295,11 +1295,11 @@ export function _egComputePlayerStats() {
 
     // Dual-wield balance (ARPG-style): two 1H weapons sum their base damage
     // and melee mods, then the strike total is scaled by
-    // EG_DUAL_WIELD_DAMAGE_MULT (0.7) so dual-wield lands ~1.4x a single 1H -
+    // DUAL_WIELD_DAMAGE_MULT (0.7) so dual-wield lands ~1.4x a single 1H -
     // below a 2H weapon's ~1.6-1.7x, trading raw damage for the parry bonus.
     // % increased multipliers are NOT scaled (only flat ranges are).
-    if (typeof _egIsDualWielding === 'function' && _egIsDualWielding()) {
-        const dw = (typeof EG_DUAL_WIELD_DAMAGE_MULT !== 'undefined') ? EG_DUAL_WIELD_DAMAGE_MULT : 0.7;
+    if (typeof _isDualWielding === 'function' && _isDualWielding()) {
+        const dw = (typeof DUAL_WIELD_DAMAGE_MULT !== 'undefined') ? DUAL_WIELD_DAMAGE_MULT : 0.7;
         s.isDualWielding = true;
         // Dual-wield tree lines fold into the shared channels while two
         // one-handed weapons are equipped (accuracy is applied further down).
@@ -1321,11 +1321,11 @@ export function _egComputePlayerStats() {
     // Manual-melee balance (Secret-of-Mana-style): manual strikes land far
     // less often than the old auto-strikes did, so the whole melee channel
     // (base ranges + "to Melee Strikes" mods, both channels for unscoped
-    // slots) hits EG_MELEE_DAMAGE_MULT times harder. Applied here so the
+    // slots) hits MELEE_DAMAGE_MULT times harder. Applied here so the
     // char-sheet ranges and combat agree. % increased multipliers are NOT
     // scaled (only flat ranges are).
-    if (typeof EG_MELEE_DAMAGE_MULT !== 'undefined' && EG_MELEE_DAMAGE_MULT !== 1) {
-        const mm = EG_MELEE_DAMAGE_MULT;
+    if (typeof MELEE_DAMAGE_MULT !== 'undefined' && MELEE_DAMAGE_MULT !== 1) {
+        const mm = MELEE_DAMAGE_MULT;
         for (const k of ['meleePhysMin', 'meleePhysMax',
             'meleeFireMin', 'meleeFireMax', 'meleeColdMin', 'meleeColdMax',
             'meleeLightningMin', 'meleeLightningMax', 'meleeShadowMin', 'meleeShadowMax']) {
@@ -1351,10 +1351,10 @@ export function _egComputePlayerStats() {
     // Timed armour pulse from the passive tree (effects pipeline, e.g.
     // reworked node 337 Umbral Survey): flat Armour while a block landed in
     // the last 10 seconds. The timestamp lives on globalThis and is
-    // refreshed by every successful block in _egPlayerTakeDamage, so the
+    // refreshed by every successful block in _playerTakeDamage, so the
     // pulse lapses on its own without any expiry bookkeeping here.
     if ((passiveTreeBonuses.blockArmorPulse || 0) > 0
-        && Date.now() - (globalThis._egLastBlockAt || 0) < 10000) {
+        && Date.now() - (globalThis._lastBlockAt || 0) < 10000) {
         s.armourFlat += passiveTreeBonuses.blockArmorPulse;
     }
     // Streak armour (armour_per_streak): flat Armour per 10 correct fills in a
@@ -1366,32 +1366,32 @@ export function _egComputePlayerStats() {
     // timer, see combat-ailments-state.js) each add flat Armour and
     // all-elemental resistance. Flat Armour joins the pool BEFORE the %
     // increased multiplier below, like every other flat source.
-    s.enduranceCharges = Math.max(_egGetEnduranceCharges(), Math.floor(Number(s.enduranceMin) || 0));
-    s.rage = _egGetRage();
+    s.enduranceCharges = Math.max(_getEnduranceCharges(), Math.floor(Number(s.enduranceMin) || 0));
+    s.rage = _getRage();
     // Rage tree extras: slower fade, Armour per Rage.
-    _egSetRageDecayMult(1 + Math.max(0, s.rageDecaySlowerPct || 0) / 100);
+    _setRageDecayMult(1 + Math.max(0, s.rageDecaySlowerPct || 0) / 100);
     if (s.rage > 0 && (s.ragePerArmourPct || 0) > 0) s.armourIncPct += s.rage * s.ragePerArmourPct;
     if (s.enduranceCharges > 0) {
-        s.armourFlat += EG_ENDURANCE_ARMOUR_PER_CHARGE * s.enduranceCharges;
-        s.allElementalResist += EG_ENDURANCE_ELEM_RES_PER_CHARGE * s.enduranceCharges;
+        s.armourFlat += ENDURANCE_ARMOUR_PER_CHARGE * s.enduranceCharges;
+        s.allElementalResist += ENDURANCE_ELEM_RES_PER_CHARGE * s.enduranceCharges;
     }
     // Frenzy Charges: melee charge-up speed, projectile damage and the
     // tree's evasion-per-charge line scale with the live count.
-    s.frenzyCharges = _egGetFrenzyCharges();
+    s.frenzyCharges = _getFrenzyCharges();
     if (s.frenzyCharges > 0) {
-        s.meleeChargeSpeedPct += EG_FRENZY_MELEE_SPEED_PER_CHARGE * s.frenzyCharges;
-        s.frenzyDamageMorePct = EG_FRENZY_DAMAGE_PER_CHARGE * s.frenzyCharges;
+        s.meleeChargeSpeedPct += FRENZY_MELEE_SPEED_PER_CHARGE * s.frenzyCharges;
+        s.frenzyDamageMorePct = FRENZY_DAMAGE_PER_CHARGE * s.frenzyCharges;
         s.evasionIncPct += (s.evasionPerFrenzyChargePct || 0) * s.frenzyCharges;
     }
     // Power Charges: crit chance (attacks and spells) and the tree's damage-per-charge line.
-    s.powerCharges = _egGetPowerCharges();
+    s.powerCharges = _getPowerCharges();
     if (s.powerCharges > 0) {
-        s.critChance += EG_POWER_CRIT_PER_CHARGE * s.powerCharges;
-        s.spellCritChancePct = (s.spellCritChancePct || 0) + EG_POWER_CRIT_PER_CHARGE * s.powerCharges;
+        s.critChance += POWER_CRIT_PER_CHARGE * s.powerCharges;
+        s.spellCritChancePct = (s.spellCritChancePct || 0) + POWER_CRIT_PER_CHARGE * s.powerCharges;
         s.damageIncPct = (s.damageIncPct || 0) + (s.powerDamagePerChargePct || 0) * s.powerCharges;
     }
     // Fortification: live stack count; the defences line applies while any stack is up.
-    s.fortifyStacks = _egGetFortifyStacks();
+    s.fortifyStacks = _getFortifyStacks();
     if (s.fortifyStacks > 0 && (s.fortifiedDefencePct || 0) > 0) {
         s.armourIncPct += s.fortifiedDefencePct;
         s.evasionIncPct += s.fortifiedDefencePct;
@@ -1423,21 +1423,21 @@ export function _egComputePlayerStats() {
     if (s.isHeavyWeaponEquipped) s.critMultiplierPct += s.critMultiHeavy || 0;
     {
         const nowMs = Date.now();
-        if (nowMs - (Number(globalThis._egLastKillAt) || 0) < 4000) s.areaOfEffectPct += s.aoeRecentKillPct || 0;
-        if (nowMs - (Number(globalThis._egLastHitTakenAt) || 0) < 4000) s.armourIncPct += s.armourIfHitPct || 0;
+        if (nowMs - (Number(globalThis._lastKillAt) || 0) < 4000) s.areaOfEffectPct += s.aoeRecentKillPct || 0;
+        if (nowMs - (Number(globalThis._lastHitTakenAt) || 0) < 4000) s.armourIncPct += s.armourIfHitPct || 0;
         else s.evasionIncPct += s.evasionIfNotHitPct || 0;
         if ((s.dmgFullAbsorptionPct || 0) > 0) {
             const absMax = Math.round((s.absorptionFlat || 0) * (1 + (s.absorptionIncPct || 0) / 100));
-            if (absMax > 0 && (Number(globalThis._egPlayerAbsorptionCurrent) || 0) >= absMax) s.damageIncPct += s.dmgFullAbsorptionPct;
+            if (absMax > 0 && (Number(globalThis._playerAbsorptionCurrent) || 0) >= absMax) s.damageIncPct += s.dmgFullAbsorptionPct;
         }
     }
     // Weapon family of the equipped melee weapon (swing-config resolver:
     // icon/name based, unknown melee weapons count as swords). Gates the
     // sword/axe tree lines; +accuracy with swords joins the flat pool here
     // so "increased Accuracy Rating" scales it like every other source.
-    const weaponInfo = _egGetEquippedWeaponInfo();
+    const weaponInfo = _getEquippedWeaponInfo();
     const weaponFamily = weaponInfo.family;
-    s.isMaceEquipped = _egIsMaceOrSceptre(weaponInfo.item);
+    s.isMaceEquipped = _isMaceOrSceptre(weaponInfo.item);
     s.isSwordEquipped = weaponFamily === 'sword';
     s.isAxeEquipped = weaponFamily === 'axe';
     s.isDaggerEquipped = weaponFamily === 'dagger';
@@ -1448,12 +1448,12 @@ export function _egComputePlayerStats() {
     // Phase C-2: wand / bow conditional lines, Onslaught, recent-crit leech.
     if (s.isWandEquipped) s.physAsExtraLightningPct = (s.physAsExtraLightningPct || 0) + (s.wandPhysAsLightningPct || 0);
     if (s.isBowEquipped) s.areaOfEffectPct += s.bowAoePct || 0;
-    if (Date.now() - (Number(globalThis._egLastCritAt) || 0) < 4000) {
+    if (Date.now() - (Number(globalThis._lastCritAt) || 0) < 4000) {
         s.lifeLeechEffectIncPct = (s.lifeLeechEffectIncPct || 0) + (s.leechEffectRecentCritPct || 0);
     }
-    if (_egOnslaughtActive()) {
+    if (_onslaughtActive()) {
         const onsMult = 1 + Math.max(0, s.onslaughtEffectPct || 0) / 100;
-        const onsSpeed = EG_ONSLAUGHT_SPEED_PCT * onsMult;
+        const onsSpeed = ONSLAUGHT_SPEED_PCT * onsMult;
         s.movementSpeedPct += onsSpeed;
         s.meleeChargeSpeedPct += onsSpeed;
         s.castSpeedPct += onsSpeed;
@@ -1490,8 +1490,8 @@ export function _egComputePlayerStats() {
 
     // Level-up bonus: every level beyond 1 grants a permanent
     // +5 maximum Life and +2 maximum Mana.
-    const lvlForBonus = (typeof _egGetPlayerLevel === 'function')
-        ? Math.max(1, Number(_egGetPlayerLevel()) || 1) : 1;
+    const lvlForBonus = (typeof _getPlayerLevel === 'function')
+        ? Math.max(1, Number(_getPlayerLevel()) || 1) : 1;
     s.health += (lvlForBonus - 1) * 5;
     s.mana += (lvlForBonus - 1) * 2;
 
@@ -1510,7 +1510,7 @@ export function _egComputePlayerStats() {
     // Blood Magic keystone: all Mana is removed (the pool is also zeroed in
     // class-mana.js, base Mana included). "More" Life is NOT applied here:
     // it multiplies the whole pool (base + gear + tree) where the maximum
-    // is composed - _resetPlayerHP, _egSyncOverlayGearPools, level-up.
+    // is composed - _resetPlayerHP, _syncOverlayGearPools, level-up.
     if (s.manaRemoved > 0) s.mana = 0;
 
     // Cleansed Thoughts: Shadow Resistance is doubled (before the cap).
@@ -1575,17 +1575,17 @@ export function _egComputePlayerStats() {
 // attackIntervalSeconds implicit ("Fully charges in Xs"); the summed
 // attack_speed mod values ("Melee charges #s faster") are then subtracted,
 // clamped to a minimum so charging can't be spammed, and the result is
-// shortened globally by EG_PLAYER_CHARGE_TIME_MULT for manual pacing.
+// shortened globally by PLAYER_CHARGE_TIME_MULT for manual pacing.
 // Full breakdown for display: { base, reduction, interval } where interval
 // is the effective time-to-full-charge.
 // weaponOverride: dual-wielding charges one bar per hand, each on its own
-// weapon's base time (see _egGetPlayerAttackIntervalForHand).
-export function _egGetPlayerAttackIntervalBreakdown(weaponOverride) {
-    const defBase = EG_PLAYER_DEFAULT_ATTACK_INTERVAL;
+// weapon's base time (see _getPlayerAttackIntervalForHand).
+export function _getPlayerAttackIntervalBreakdown(weaponOverride) {
+    const defBase = PLAYER_DEFAULT_ATTACK_INTERVAL;
     let base = defBase;
     // Only the melee weapon slot defines the manual-strike charge time -
     // ranged weapons scale the input-driven projectile channel instead.
-    const weapon = weaponOverride || _egGetAllEquippedItems().find(it => it.slotType === 'weapon');
+    const weapon = weaponOverride || _getAllEquippedItems().find(it => it.slotType === 'weapon');
     if (weapon) {
         if (weapon.attackIntervalSeconds != null) {
             base = Number(weapon.attackIntervalSeconds) || defBase;
@@ -1594,14 +1594,14 @@ export function _egGetPlayerAttackIntervalBreakdown(weaponOverride) {
             base = Math.round((defBase / (Number(weapon.attacksPerSecond) || 1)) * 100) / 100;
         }
     }
-    const stats = _egComputePlayerStats();
+    const stats = _computePlayerStats();
     const reduction = stats.attackSpeed || 0;
-    let interval = Math.round(Math.max(EG_PLAYER_MIN_ATTACK_INTERVAL, base - reduction) * 100) / 100;
+    let interval = Math.round(Math.max(PLAYER_MIN_ATTACK_INTERVAL, base - reduction) * 100) / 100;
 
     // Manual pacing: the old auto-strike intervals become time-to-full-charge,
     // shortened globally so manual combat feels responsive.
-    if (typeof EG_PLAYER_CHARGE_TIME_MULT !== 'undefined') {
-        interval = Math.round(interval * EG_PLAYER_CHARGE_TIME_MULT * 100) / 100;
+    if (typeof PLAYER_CHARGE_TIME_MULT !== 'undefined') {
+        interval = Math.round(interval * PLAYER_CHARGE_TIME_MULT * 100) / 100;
     }
 
     // Passive-tree percentage attack-speed channels - the manual melee charge
@@ -1624,7 +1624,7 @@ export function _egGetPlayerAttackIntervalBreakdown(weaponOverride) {
         interval = Math.round(interval * (1 + Math.min(-chargeSpeedPct, 100) / 100) * 10000) / 10000;
     }
     // Never let stacked bonuses reach 0s (no charge = no attacks at all).
-    interval = Math.max(EG_PLAYER_ABS_MIN_CHARGE_TIME, interval);
+    interval = Math.max(PLAYER_ABS_MIN_CHARGE_TIME, interval);
 
     // Active map run: Temporal Chains - you act #% slower.
     if (typeof _egMapActionSlowMult === 'function') {
@@ -1635,44 +1635,44 @@ export function _egGetPlayerAttackIntervalBreakdown(weaponOverride) {
     return { base, reduction, interval };
 }
 
-export function _egGetPlayerAttackInterval() {
-    return _egGetPlayerAttackIntervalBreakdown().interval;
+export function _getPlayerAttackInterval() {
+    return _getPlayerAttackIntervalBreakdown().interval;
 }
 
 // The weapon in a hand while dual-wielding (1 = main hand, 2 = off-hand);
 // null when not dual-wielding or the hand is empty.
-export function _egGetDualHandWeapon(hand) {
-    if (typeof _egIsDualWielding !== 'function' || !_egIsDualWielding()) return null;
-    if (typeof _egEquipped === 'undefined' || !_egEquipped) return null;
-    return (hand === 2 ? _egEquipped.weapon2 : _egEquipped.weapon1) || null;
+export function _getDualHandWeapon(hand) {
+    if (typeof _isDualWielding !== 'function' || !_isDualWielding()) return null;
+    if (typeof _equipped === 'undefined' || !_equipped) return null;
+    return (hand === 2 ? _equipped.weapon2 : _equipped.weapon1) || null;
 }
 
 // Full-charge time of one hand's bar while dual-wielding: that weapon's own
 // base time plus the shared attack-speed mods. Falls back to the single bar's
 // interval when the hand has no weapon.
-export function _egGetPlayerAttackIntervalForHand(hand) {
-    const weapon = _egGetDualHandWeapon(hand);
-    return _egGetPlayerAttackIntervalBreakdown(weapon || undefined).interval;
+export function _getPlayerAttackIntervalForHand(hand) {
+    const weapon = _getDualHandWeapon(hand);
+    return _getPlayerAttackIntervalBreakdown(weapon || undefined).interval;
 }
 
 // Share (0..1) of the dual-wield strike total that one hand's blow carries,
 // weighted by each weapon's base damage (even split when unknown). The two
 // shares add up to 1, so landing both hands once deals the same total as the
 // old single combined strike - the second bar adds rhythm, not extra damage.
-export function _egDualHandShare(hand) {
+export function _dualHandShare(hand) {
     const avg = (w) => (w && w.damage) ? ((Number(w.damage.min) || 0) + (Number(w.damage.max) || 0)) / 2 : 0;
-    const a = avg(_egGetDualHandWeapon(1));
-    const b = avg(_egGetDualHandWeapon(2));
+    const a = avg(_getDualHandWeapon(1));
+    const b = avg(_getDualHandWeapon(2));
     if (!(a > 0) || !(b > 0)) return 0.5;
     return (hand === 2 ? b : a) / (a + b);
 }
 
 // Damage multiplier of the strike that is landing now: 1 normally, the struck
 // hand's share while dual-wielding (the hand is stamped by the charge bar's
-// _egConsumePlayerCharge at key-press time).
-export function _egStrikeHandMult() {
-    if (typeof _egIsDualWielding !== 'function' || !_egIsDualWielding()) return 1;
-    return _egDualHandShare(globalThis._egStrikeHand === 2 ? 2 : 1);
+// _consumePlayerCharge at key-press time).
+export function _strikeHandMult() {
+    if (typeof _isDualWielding !== 'function' || !_isDualWielding()) return 1;
+    return _dualHandShare(globalThis._strikeHand === 2 ? 2 : 1);
 }
 
 
@@ -1684,20 +1684,20 @@ export function _egStrikeHandMult() {
 // Armour mitigation is damage-relative (ARPG-style): the same armour value
 // mitigates many small hits strongly but large hits weakly, so it never
 // trivially caps once gear values grow and stays relevant at every level.
-export const EG_ARMOUR_DAMAGE_FACTOR = 12;   // reduction% = armour / (armour + factor * rawDamage) - was 10, raised so armour is less dominant at high tiers (more challenging when lacking)
-export const EG_ARMOUR_MAX_REDUCTION = 0.75; // hard cap on mitigation
+export const ARMOUR_DAMAGE_FACTOR = 12;   // reduction% = armour / (armour + factor * rawDamage) - was 10, raised so armour is less dominant at high tiers (more challenging when lacking)
+export const ARMOUR_MAX_REDUCTION = 0.75; // hard cap on mitigation
 
-// Returns armour's % reduction (0..EG_ARMOUR_MAX_REDUCTION) against a hit of
+// Returns armour's % reduction (0..ARMOUR_MAX_REDUCTION) against a hit of
 // the given raw size. Used by both the combat path and stat tooltips so the
 // displayed value always matches what combat actually rolls.
-export function _egCalcArmourReductionPct(armour, rawDamage) {
+export function _calcArmourReductionPct(armour, rawDamage) {
     const armourVal = Math.max(0, Number(armour) || 0);
     const dmg = Math.max(1, Number(rawDamage) || 1);
-    return Math.min(EG_ARMOUR_MAX_REDUCTION, armourVal / (armourVal + EG_ARMOUR_DAMAGE_FACTOR * dmg));
+    return Math.min(ARMOUR_MAX_REDUCTION, armourVal / (armourVal + ARMOUR_DAMAGE_FACTOR * dmg));
 }
 
-export function _egCalcArmourMitigation(rawDamage, armour) {
-    const reductionPct = _egCalcArmourReductionPct(armour, rawDamage);
+export function _calcArmourMitigation(rawDamage, armour) {
+    const reductionPct = _calcArmourReductionPct(armour, rawDamage);
     return rawDamage * (1 - reductionPct);
 }
 
@@ -1705,22 +1705,22 @@ export function _egCalcArmourMitigation(rawDamage, armour) {
 // 75%. The benchmark constant scales with the ATTACKER's level (ARPG-style):
 // higher-level monsters are harder to dodge, so evasion keeps requiring
 // upgrades instead of permanently sitting at the cap once gear values grow.
-export const EG_EVASION_DODGE_K = 200;        // dodge% = evasion / (evasion + K) at monster level 1
-export const EG_EVASION_LEVEL_GROWTH = 1.035; // per-level growth of the evasion benchmark (was 1.045 - retuned so 350 evasion = ~11% dodge at 90, ~50% at 30; was too punishing at 1.045, too generous at 1.03)
-export const EG_EVASION_DODGE_CAP_PCT = 75;
+export const EVASION_DODGE_K = 200;        // dodge% = evasion / (evasion + K) at monster level 1
+export const EVASION_LEVEL_GROWTH = 1.035; // per-level growth of the evasion benchmark (was 1.045 - retuned so 350 evasion = ~11% dodge at 90, ~50% at 30; was too punishing at 1.045, too generous at 1.03)
+export const EVASION_DODGE_CAP_PCT = 75;
 
-export function _egCalcEvasionDodgeChance(evasion, monsterLevel) {
+export function _calcEvasionDodgeChance(evasion, monsterLevel) {
     if (!evasion) return 0;
     const lvl = Math.max(1, Number(monsterLevel) || 1);
-    const k = EG_EVASION_DODGE_K * Math.pow(EG_EVASION_LEVEL_GROWTH, lvl - 1);
-    return Math.min(EG_EVASION_DODGE_CAP_PCT, (evasion / (evasion + k)) * 100);
+    const k = EVASION_DODGE_K * Math.pow(EVASION_LEVEL_GROWTH, lvl - 1);
+    return Math.min(EVASION_DODGE_CAP_PCT, (evasion / (evasion + k)) * 100);
 }
 
 // Accuracy vs monster level → % chance for the player's attacks to miss.
 // Miss chance scales linearly with the target's level and inversely with
 // accuracy, clamped to a floor (never perfectly accurate) and a ceiling
 // (attacks always have a chance to land). Applied identically to melee
-// strikes and projectiles - see _egRollPlayerMiss in endgame-encounter.js.
+// strikes and projectiles - see _rollPlayerMiss in endgame-encounter.js.
 //
 // Every character additionally gains INNATE accuracy with their own level
 // (ARPG-style level scaling), so a fresh, under-geared character is not
@@ -1729,16 +1729,16 @@ export function _egCalcEvasionDodgeChance(evasion, monsterLevel) {
 // gear lets you comfortably fight content ABOVE your level. Fighting
 // higher-level monsters without that investment now gets noticeably shaky
 // (retuned: higher scale so gear matters for T16; innate slightly lowered).
-export const EG_ACCURACY_MISS_SCALE = 185;   // miss% = scale * monsterLevel / effectiveAccuracy (was 150)
-export const EG_ACCURACY_MISS_MIN_PCT = 5;   // never perfectly reliable
-export const EG_ACCURACY_MISS_MAX_PCT = 60;  // attacks always retain some threat
-export const EG_ACCURACY_INNATE_BASE = 25;       // innate accuracy at player level 1 (was 30)
-export const EG_ACCURACY_INNATE_PER_LEVEL = 13;  // extra innate accuracy per player level (was 15)
+export const ACCURACY_MISS_SCALE = 185;   // miss% = scale * monsterLevel / effectiveAccuracy (was 150)
+export const ACCURACY_MISS_MIN_PCT = 5;   // never perfectly reliable
+export const ACCURACY_MISS_MAX_PCT = 60;  // attacks always retain some threat
+export const ACCURACY_INNATE_BASE = 25;       // innate accuracy at player level 1 (was 30)
+export const ACCURACY_INNATE_PER_LEVEL = 13;  // extra innate accuracy per player level (was 15)
 
-export function _egGetInnateAccuracy() {
-    const lvl = (typeof _egGetPlayerLevel === 'function')
-        ? Math.max(1, Number(_egGetPlayerLevel()) || 1) : 1;
-    return EG_ACCURACY_INNATE_BASE + EG_ACCURACY_INNATE_PER_LEVEL * (lvl - 1);
+export function _getInnateAccuracy() {
+    const lvl = (typeof _getPlayerLevel === 'function')
+        ? Math.max(1, Number(_getPlayerLevel()) || 1) : 1;
+    return ACCURACY_INNATE_BASE + ACCURACY_INNATE_PER_LEVEL * (lvl - 1);
 }
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -1750,72 +1750,72 @@ export function _egGetInnateAccuracy() {
 //  miss reduction guarantees the bonus is felt even at high innate
 //  accuracy where extra accuracy alone would be marginal.
 // ──────────────────────────────────────────────────────────────────────────
-export const EG_DRAG_ACCURACY_T1 = 6;   // >5 correct
-export const EG_DRAG_ACCURACY_T2 = 11;  // >10 correct
-export const EG_DRAG_ACCURACY_T3 = 16;  // >15 correct
+export const DRAG_ACCURACY_T1 = 6;   // >5 correct
+export const DRAG_ACCURACY_T2 = 11;  // >10 correct
+export const DRAG_ACCURACY_T3 = 16;  // >15 correct
 
-export const EG_DRAG_ACCURACY_BONUS_T1 = 40;
-export const EG_DRAG_ACCURACY_BONUS_T2 = 85;
-export const EG_DRAG_ACCURACY_BONUS_T3 = 145;
+export const DRAG_ACCURACY_BONUS_T1 = 40;
+export const DRAG_ACCURACY_BONUS_T2 = 85;
+export const DRAG_ACCURACY_BONUS_T3 = 145;
 
-export const EG_DRAG_MISS_REDUCTION_T1 = 6;   // percentage points
-export const EG_DRAG_MISS_REDUCTION_T2 = 12;
-export const EG_DRAG_MISS_REDUCTION_T3 = 19;
+export const DRAG_MISS_REDUCTION_T1 = 6;   // percentage points
+export const DRAG_MISS_REDUCTION_T2 = 12;
+export const DRAG_MISS_REDUCTION_T3 = 19;
 
-export function _egGetDragAccuracyBonus(stacks) {
+export function _getDragAccuracyBonus(stacks) {
     const n = Number(stacks) || 0;
-    if (n >= EG_DRAG_ACCURACY_T3) return EG_DRAG_ACCURACY_BONUS_T3;
-    if (n >= EG_DRAG_ACCURACY_T2) return EG_DRAG_ACCURACY_BONUS_T2;
-    if (n >= EG_DRAG_ACCURACY_T1) return EG_DRAG_ACCURACY_BONUS_T1;
+    if (n >= DRAG_ACCURACY_T3) return DRAG_ACCURACY_BONUS_T3;
+    if (n >= DRAG_ACCURACY_T2) return DRAG_ACCURACY_BONUS_T2;
+    if (n >= DRAG_ACCURACY_T1) return DRAG_ACCURACY_BONUS_T1;
     return 0;
 }
 
-export function _egGetDragMissReduction(stacks) {
+export function _getDragMissReduction(stacks) {
     const n = Number(stacks) || 0;
-    if (n >= EG_DRAG_ACCURACY_T3) return EG_DRAG_MISS_REDUCTION_T3;
-    if (n >= EG_DRAG_ACCURACY_T2) return EG_DRAG_MISS_REDUCTION_T2;
-    if (n >= EG_DRAG_ACCURACY_T1) return EG_DRAG_MISS_REDUCTION_T1;
+    if (n >= DRAG_ACCURACY_T3) return DRAG_MISS_REDUCTION_T3;
+    if (n >= DRAG_ACCURACY_T2) return DRAG_MISS_REDUCTION_T2;
+    if (n >= DRAG_ACCURACY_T1) return DRAG_MISS_REDUCTION_T1;
     return 0;
 }
 
-export function _egGetDragTier(stacks) {
+export function _getDragTier(stacks) {
     const n = Number(stacks) || 0;
-    if (n >= EG_DRAG_ACCURACY_T3) return 3;
-    if (n >= EG_DRAG_ACCURACY_T2) return 2;
-    if (n >= EG_DRAG_ACCURACY_T1) return 1;
+    if (n >= DRAG_ACCURACY_T3) return 3;
+    if (n >= DRAG_ACCURACY_T2) return 2;
+    if (n >= DRAG_ACCURACY_T1) return 1;
     return 0;
 }
 
-export function _egGetDragTierLabelKey(stacks) {
-    const tier = _egGetDragTier(stacks);
+export function _getDragTierLabelKey(stacks) {
+    const tier = _getDragTier(stacks);
     if (tier === 3) return 'eg_drag_t3';
     if (tier === 2) return 'eg_drag_t2';
     if (tier === 1) return 'eg_drag_t1';
     return null;
 }
 
-export function _egCalcAccuracyMissChance(accuracy, monsterLevel, dragStacks) {
+export function _calcAccuracyMissChance(accuracy, monsterLevel, dragStacks) {
     const lvl = Math.max(1, Number(monsterLevel) || 1);
-    const bonus = _egGetDragAccuracyBonus(dragStacks);
-    const acc = Math.max(0, Number(accuracy) || 0) + _egGetInnateAccuracy() + bonus;
-    if (acc <= 0) return EG_ACCURACY_MISS_MAX_PCT;
-    const raw = (EG_ACCURACY_MISS_SCALE * lvl) / acc;
-    let miss = Math.max(EG_ACCURACY_MISS_MIN_PCT, Math.min(EG_ACCURACY_MISS_MAX_PCT, raw));
-    const reduction = _egGetDragMissReduction(dragStacks);
-    if (reduction > 0) miss = Math.max(EG_ACCURACY_MISS_MIN_PCT, miss - reduction);
+    const bonus = _getDragAccuracyBonus(dragStacks);
+    const acc = Math.max(0, Number(accuracy) || 0) + _getInnateAccuracy() + bonus;
+    if (acc <= 0) return ACCURACY_MISS_MAX_PCT;
+    const raw = (ACCURACY_MISS_SCALE * lvl) / acc;
+    let miss = Math.max(ACCURACY_MISS_MIN_PCT, Math.min(ACCURACY_MISS_MAX_PCT, raw));
+    const reduction = _getDragMissReduction(dragStacks);
+    if (reduction > 0) miss = Math.max(ACCURACY_MISS_MIN_PCT, miss - reduction);
     return miss;
 }
 
 // Rolls a crit for the current hit. Returns the damage multiplier (1 = no crit).
 // `bonus` ({ chance, multiplierPct }) adds scoped extras to this one roll
 // (e.g. the Mace / Sceptre melee crit lines) without touching the stats.
-export function _egRollCrit(stats, bonus) {
+export function _rollCrit(stats, bonus) {
     // Precise Technique: never deal Critical Strikes.
     if ((Number(stats.neverCrit) || 0) > 0) return 1;
     const chance = (stats.critChance || 0) + ((bonus && bonus.chance) || 0);
     if (chance > 0 && Math.random() * 100 < chance) {
         if (globalThis.RunStats) globalThis.RunStats.critTrial(chance, true);
-        globalThis._egLastCritAt = Date.now();
+        globalThis._lastCritAt = Date.now();
         // Elemental Overload / Perfect Agony: the crit counts (ailments, "recently" lines)
         // but deals no extra damage. 1.0001 keeps the `> 1` crit tests true.
         if ((Number(stats.critsNoExtraDamage) || 0) > 0) return 1.0001;
@@ -1828,18 +1828,18 @@ export function _egRollCrit(stats, bonus) {
 
 // Timed fire window of the Searing Surge notable (node 217): active for 5
 // seconds out of every 10 seconds of the encounter, the first window opening
-// after the first 10 seconds. The encounter clock is window._egEncounterStartAt
-// (set in _egResetEncounterState, shifted by pauses in the tick support).
-export function _egFireSurgeActive(now = Date.now()) {
-    const start = Number(globalThis._egEncounterStartAt) || 0;
+// after the first 10 seconds. The encounter clock is window._encounterStartAt
+// (set in _resetEncounterState, shifted by pauses in the tick support).
+export function _fireSurgeActive(now = Date.now()) {
+    const start = Number(globalThis._encounterStartAt) || 0;
     if (!start) return false;
     const elapsed = now - start;
     return elapsed >= 10000 && (elapsed % 10000) < 5000;
 }
 
-// _egGetElementalDamageBonus (rolls the total flat elemental damage bonus
+// _getElementalDamageBonus (rolls the total flat elemental damage bonus
 // for one hit) is defined ONCE, in endgame-combat-calculations.js (it sums
-// _egRollElementalBreakdown - identical math). The copy that used to live
+// _rollElementalBreakdown - identical math). The copy that used to live
 // here was removed 2026-09; it was silently shadowed by the later file via
 // load order, so behaviour is unchanged.
 
@@ -1854,26 +1854,26 @@ export function _egFireSurgeActive(now = Date.now()) {
 // gear: absorption_regen_rate increases the refill speed (%).
 
 // Base delay before regeneration starts (reduced by fasterAbsorptionRegenStart).
-export const EG_ABSORPTION_REGEN_BASE_DELAY_MS = 18000; // was 12000 - 200 dmg hits at L41 every ~6s can no longer fully regen (needs 18s quiet)
+export const ABSORPTION_REGEN_BASE_DELAY_MS = 18000; // was 12000 - 200 dmg hits at L41 every ~6s can no longer fully regen (needs 18s quiet)
 
 // Base share of max Absorption restored per regen tick (scaled by absorptionRegenRatePct).
-export const EG_ABSORPTION_REGEN_BASE_STEP_PCT = 0.04; // was 0.06 - 5s to full (was 3.3s), so even after delay a full shield takes longer
+export const ABSORPTION_REGEN_BASE_STEP_PCT = 0.04; // was 0.06 - 5s to full (was 3.3s), so even after delay a full shield takes longer
 
-export function _egCancelAbsorptionRegen() {
-    if (globalThis._egPlayerAbsorptionRegenDelayTimer) { clearTimeout(globalThis._egPlayerAbsorptionRegenDelayTimer); globalThis._egPlayerAbsorptionRegenDelayTimer = null; }
-    if (globalThis._egPlayerAbsorptionRegenInterval) { clearInterval(globalThis._egPlayerAbsorptionRegenInterval); globalThis._egPlayerAbsorptionRegenInterval = null; }
+export function _cancelAbsorptionRegen() {
+    if (globalThis._playerAbsorptionRegenDelayTimer) { clearTimeout(globalThis._playerAbsorptionRegenDelayTimer); globalThis._playerAbsorptionRegenDelayTimer = null; }
+    if (globalThis._playerAbsorptionRegenInterval) { clearInterval(globalThis._playerAbsorptionRegenInterval); globalThis._playerAbsorptionRegenInterval = null; }
 }
 
 // Called on every hit taken - interrupts any in-progress regen and restarts the delay.
-export function _egScheduleAbsorptionRegen() {
-    const stats = _egComputePlayerStats();
+export function _scheduleAbsorptionRegen() {
+    const stats = _computePlayerStats();
     // Wicked Ward: a regeneration that already began is not interrupted by damage.
-    if ((Number(stats.absorptionRegenUninterrupted) || 0) > 0 && globalThis._egPlayerAbsorptionRegenInterval) return;
-    _egCancelAbsorptionRegen();
+    if ((Number(stats.absorptionRegenUninterrupted) || 0) > 0 && globalThis._playerAbsorptionRegenInterval) return;
+    _cancelAbsorptionRegen();
 
     // Ghost Reaver keystone: Absorption does not recharge on its own.
     if ((Number(stats.absorptionNoRecharge) || 0) > 0) return;
-    let delayMs = Math.max(0, EG_ABSORPTION_REGEN_BASE_DELAY_MS - (stats.fasterAbsorptionRegenStart || 0) * 1000);
+    let delayMs = Math.max(0, ABSORPTION_REGEN_BASE_DELAY_MS - (stats.fasterAbsorptionRegenStart || 0) * 1000);
     // Infinite Focus: regeneration begins a fixed number of seconds after damage.
     if ((Number(stats.absorptionRegenDelaySecs) || 0) > 0) delayMs = stats.absorptionRegenDelaySecs * 1000;
     // Active map run: Absorption recharges #% slower.
@@ -1884,37 +1884,37 @@ export function _egScheduleAbsorptionRegen() {
     const rateMult = (1 + Math.min(100, stats.absorptionRegenRatePct || 0) / 100)
         * Math.max(0, 1 - Math.min(100, Number(stats.absorptionRegenLessPct) || 0) / 100);
 
-    globalThis._egPlayerAbsorptionRegenDelayTimer = setTimeout(() => {
-        if (_egIsActive() && globalThis._egPlayerAbsorptionCurrent < _egComputePlayerStats().absorption) {
+    globalThis._playerAbsorptionRegenDelayTimer = setTimeout(() => {
+        if (_isActive() && globalThis._playerAbsorptionCurrent < _computePlayerStats().absorption) {
             Audio_Manager.playSFX('absorption_regen');
         }
         // Vital Conduit keystone: the missing Absorption at the moment the
         // recharge starts is the budget that is paid out as Life instead.
         let lifeBudget = null;
-        globalThis._egPlayerAbsorptionRegenInterval = setInterval(() => {
-            if (!_egIsActive()) { _egCancelAbsorptionRegen(); return; }
-            const live = _egComputePlayerStats();
+        globalThis._playerAbsorptionRegenInterval = setInterval(() => {
+            if (!_isActive()) { _cancelAbsorptionRegen(); return; }
+            const live = _computePlayerStats();
             const max = live.absorption;
             // Overcharge: no regeneration while you are attacking (a hit landed in the last 2s).
             if ((Number(live.absorptionStopsWhileAttacking) || 0) > 0
-                && Date.now() - (Number(globalThis._egLastPlayerAttackAt) || 0) < 2000) return;
+                && Date.now() - (Number(globalThis._lastPlayerAttackAt) || 0) < 2000) return;
             const toLife = (Number(live.absorptionRechargesLife) || 0) > 0;
-            if (!toLife && globalThis._egPlayerAbsorptionCurrent >= max) { _egCancelAbsorptionRegen(); return; }
-            const step = Math.max(1, Math.round(max * EG_ABSORPTION_REGEN_BASE_STEP_PCT * rateMult));
+            if (!toLife && globalThis._playerAbsorptionCurrent >= max) { _cancelAbsorptionRegen(); return; }
+            const step = Math.max(1, Math.round(max * ABSORPTION_REGEN_BASE_STEP_PCT * rateMult));
             if (toLife) {
-                if (lifeBudget === null) lifeBudget = Math.max(0, max - globalThis._egPlayerAbsorptionCurrent);
+                if (lifeBudget === null) lifeBudget = Math.max(0, max - globalThis._playerAbsorptionCurrent);
                 const noRegen = _egGetActiveMapModValue('map_no_regeneration') > 0;
                 if (noRegen || lifeBudget <= 0 || globalThis.playerCurrentHP >= globalThis.playerMaxHP) {
-                    _egCancelAbsorptionRegen();
+                    _cancelAbsorptionRegen();
                     return;
                 }
                 const heal = Math.min(step, lifeBudget);
                 lifeBudget -= heal;
-                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(heal) : (heal)));
+                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._lifeGain ? globalThis._lifeGain(heal) : (heal)));
                 if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
                 return;
             }
-            globalThis._egPlayerAbsorptionCurrent = Math.min(max, globalThis._egPlayerAbsorptionCurrent + step);
+            globalThis._playerAbsorptionCurrent = Math.min(max, globalThis._playerAbsorptionCurrent + step);
         }, 200);
     }, delayMs);
 }
@@ -1929,10 +1929,10 @@ export function _egScheduleAbsorptionRegen() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 // Human-readable labels + unit suffix for each stat bucket produced by
-// _egComputePlayerStats(). Buckets not listed here are either internal/derived
+// _computePlayerStats(). Buckets not listed here are either internal/derived
 // (armour/evasion/absorption totals, physFlatMin/Max, elemental dmg pairs)
-// and are handled explicitly by _egBuildStatLine() instead.
-export const EG_STAT_DISPLAY_LABELS = {
+// and are handled explicitly by _buildStatLine() instead.
+export const STAT_DISPLAY_LABELS = {
     health: { label: t('eg_stat_health'), suffix: '' },
     healthIncPct: { label: t('eg_stat_inc_health'), suffix: '%' },
     mana: { label: t('eg_stat_mana'), suffix: '' },
@@ -1984,7 +1984,7 @@ export const EG_STAT_DISPLAY_LABELS = {
     physIncPct: { label: t('eg_stat_inc_phys_dmg'), suffix: '%' },
     // Melee-only sibling of physIncPct: passive tree node 30195 plus gear
     // % physical mods on melee slots. Scaled onto melee strikes only
-    // (see _egCalcPlayerMeleeDamage); the projectile channel never reads it.
+    // (see _calcPlayerMeleeDamage); the projectile channel never reads it.
     meleePhysIncPct: { label: t('eg_stat_inc_melee_phys_dmg'), suffix: '%' },
     igniteDurationPct: { label: t('eg_stat_ignite_duration'), suffix: '%' },
     bleedDurationPct: { label: t('eg_stat_bleed_duration'), suffix: '%' },
@@ -2350,7 +2350,7 @@ export const EG_STAT_DISPLAY_LABELS = {
 };
 
 // Rounds a value for display: whole numbers stay whole, decimals get 1 digit.
-export function _egFormatStatValue(val) {
+export function _formatStatValue(val) {
     const rounded = Math.round(val * 10) / 10;
     return Number.isInteger(rounded) ? rounded : rounded.toFixed(1);
 }
@@ -2367,12 +2367,12 @@ export function _egFormatStatValue(val) {
 //   puzzle  - center column between the paperdoll slots (mistakes/time,
 //             quiz helpers)
 // Buckets not listed in any category are silently omitted from display.
-export const EG_STAT_LAYOUT = {
+export const STAT_LAYOUT = {
     offense: [
         { catKey: 'eg_statcat_attributes', buckets: ['strength', 'agility', 'intelligence'] },
         { catKey: 'eg_statcat_crit', buckets: ['critChance', 'critMultiplierPct'] },
         // Manual melee charge channel - independent from the projectile
-        // channel above; fed only by the weapon slot (see _egComputePlayerStats).
+        // channel above; fed only by the weapon slot (see _computePlayerStats).
         // 'dualWield' heads the section while two 1H weapons are equipped so
         // the combined-at-70% ranges below read correctly.
         { catKey: 'eg_statcat_melee', buckets: [
@@ -2410,8 +2410,8 @@ export const EG_STAT_LAYOUT = {
             'fatePct', 'castingAilmentAvoidPct', 'bleedAvoidPct', 'poisonAvoidPct', 'shockAvoidPct', 'igniteAvoidPct', 'chillAvoidPct', 'elementalAilmentAvoidPct'] },
         { catKey: 'eg_statcat_resistances', buckets: [
             // 'allElementalResist' is deliberately NOT listed: it is folded
-            // into the fire/cold/lightning lines by _egBuildStatLine, which is
-            // the same value _egCalcPlayerResistanceReduction mitigates with.
+            // into the fire/cold/lightning lines by _buildStatLine, which is
+            // the same value _calcPlayerResistanceReduction mitigates with.
             'fireResist', 'coldResist', 'lightningResist', 'shadowResist',] },
         { catKey: 'eg_statcat_recovery', buckets: [
             'absorptionRegenRatePct', 'fasterAbsorptionRegenStart',
@@ -2428,28 +2428,28 @@ export const EG_STAT_LAYOUT = {
 
 // Builds a single display line for a stat bucket. Handles the derived /
 // combined pseudo-buckets (armour/evasion/absorption totals and the damage
-// ranges) explicitly; everything else falls through to EG_STAT_DISPLAY_LABELS.
+// ranges) explicitly; everything else falls through to STAT_DISPLAY_LABELS.
 // Returns null when the stat's aggregated value is zero.
-export function _egBuildStatLine(bucket, stats) {
+export function _buildStatLine(bucket, stats) {
     let line = null;
 
     switch (bucket) {
         // Derived defensive totals (flat + % increased already applied)
         case 'armour':
-            if (stats.armour > 0) line = { label: t('eg_tt_armour'), value: `${_egFormatStatValue(stats.armour)}` };
+            if (stats.armour > 0) line = { label: t('eg_tt_armour'), value: `${_formatStatValue(stats.armour)}` };
             break;
         case 'evasion':
-            if (stats.evasion > 0) line = { label: t('eg_tt_evasion'), value: `${_egFormatStatValue(stats.evasion)}` };
+            if (stats.evasion > 0) line = { label: t('eg_tt_evasion'), value: `${_formatStatValue(stats.evasion)}` };
             break;
         case 'absorption':
-            if (stats.absorption > 0) line = { label: t('eg_tt_absorption'), value: `${_egFormatStatValue(stats.absorption)}` };
+            if (stats.absorption > 0) line = { label: t('eg_tt_absorption'), value: `${_formatStatValue(stats.absorption)}` };
             break;
 
         // Dual-wield indicator (pseudo-bucket): rendered only while two 1H
         // weapons are equipped. The melee ranges below already reflect the
         // combined-at-70% scaling - this line says why.
         case 'dualWield': {
-            if (typeof _egIsDualWielding !== 'function' || !_egIsDualWielding()) return null;
+            if (typeof _isDualWielding !== 'function' || !_isDualWielding()) return null;
             line = { label: t('eg_stat_dual_wield'), value: t('eg_stat_dual_wield_value') };
             break;
         }
@@ -2459,9 +2459,9 @@ export function _egBuildStatLine(bucket, stats) {
         // pacing (always present - shown first in the "Melee Strikes"
         // category).
         case 'attackInterval': {
-            if (typeof _egGetPlayerAttackIntervalBreakdown !== 'function') return null;
-            const { interval } = _egGetPlayerAttackIntervalBreakdown();
-            const value = `${_egFormatStatValue(interval)}s`;
+            if (typeof _getPlayerAttackIntervalBreakdown !== 'function') return null;
+            const { interval } = _getPlayerAttackIntervalBreakdown();
+            const value = `${_formatStatValue(interval)}s`;
             line = { label: t('eg_stat_attack_interval'), value };
             break;
         }
@@ -2469,14 +2469,14 @@ export function _egBuildStatLine(bucket, stats) {
         // Physical + elemental damage ranges (projectile channel)
         case 'physRange':
             if (stats.physFlatMin > 0 || stats.physFlatMax > 0) {
-                line = { label: t('eg_stat_phys_damage'), value: `${_egFormatStatValue(stats.physFlatMin)}–${_egFormatStatValue(stats.physFlatMax)}` };
+                line = { label: t('eg_stat_phys_damage'), value: `${_formatStatValue(stats.physFlatMin)}–${_formatStatValue(stats.physFlatMax)}` };
             }
             break;
         // Melee-only damage ranges - same labels, grouped under the
         // "Melee Strikes" category so the two channels stay distinct
         case 'meleePhysRange':
             if (stats.meleePhysMin > 0 || stats.meleePhysMax > 0) {
-                line = { label: t('eg_stat_phys_damage'), value: `${_egFormatStatValue(stats.meleePhysMin)}–${_egFormatStatValue(stats.meleePhysMax)}` };
+                line = { label: t('eg_stat_phys_damage'), value: `${_formatStatValue(stats.meleePhysMin)}–${_formatStatValue(stats.meleePhysMax)}` };
             }
             break;
         case 'meleeFireRange': case 'meleeColdRange': case 'meleeLightningRange': case 'meleeShadowRange':
@@ -2495,7 +2495,7 @@ export function _egBuildStatLine(bucket, stats) {
             if (stats[minKey] > 0 || stats[maxKey] > 0) {
                 const base = bucket.startsWith('melee') ? bucket.charAt(5).toLowerCase() + bucket.slice(6) : bucket;
                 const labelKey = { fireRange: 'eg_stat_fire_damage', coldRange: 'eg_stat_cold_damage', lightningRange: 'eg_stat_lightning_damage', shadowRange: 'eg_stat_shadow_damage' }[base];
-                line = { label: t(labelKey), value: `${_egFormatStatValue(stats[minKey])}–${_egFormatStatValue(stats[maxKey])}` };
+                line = { label: t(labelKey), value: `${_formatStatValue(stats[minKey])}–${_formatStatValue(stats[maxKey])}` };
             }
             break;
         }
@@ -2509,40 +2509,40 @@ export function _egBuildStatLine(bucket, stats) {
         // the held value in parentheses, mirroring the combat precedence.
         case 'parryChancePct': {
             const gear = stats.parryChancePct || 0;
-            const held = (typeof _egGetParryChancePct === 'function')
-                ? _egGetParryChancePct()
-                : ((typeof EG_PARRY_BASE_PCT !== 'undefined' ? EG_PARRY_BASE_PCT : 50) + gear);
-            const dual = (typeof _egIsDualWielding === 'function' && _egIsDualWielding());
+            const held = (typeof _getParryChancePct === 'function')
+                ? _getParryChancePct()
+                : ((typeof PARRY_BASE_PCT !== 'undefined' ? PARRY_BASE_PCT : 50) + gear);
+            const dual = (typeof _isDualWielding === 'function' && _isDualWielding());
             if (dual) {
-                const auto = (typeof _egGetDualWieldParryChancePct === 'function')
-                    ? _egGetDualWieldParryChancePct()
-                    : ((typeof EG_DUAL_WIELD_PARRY_PCT !== 'undefined' ? EG_DUAL_WIELD_PARRY_PCT : 15) + gear);
+                const auto = (typeof _getDualWieldParryChancePct === 'function')
+                    ? _getDualWieldParryChancePct()
+                    : ((typeof DUAL_WIELD_PARRY_PCT !== 'undefined' ? DUAL_WIELD_PARRY_PCT : 15) + gear);
                 let suffix = 'while holding [R]';
                 try { const s = t('eg_stat_parry_held_suffix'); if (s && s !== 'eg_stat_parry_held_suffix') suffix = s; } catch (e) {}
-                line = { label: t('eg_stat_parry'), value: `${_egFormatStatValue(auto)}% (${_egFormatStatValue(held)}% ${suffix})` };
+                line = { label: t('eg_stat_parry'), value: `${_formatStatValue(auto)}% (${_formatStatValue(held)}% ${suffix})` };
             } else {
-                line = { label: t('eg_stat_parry'), value: `${_egFormatStatValue(held)}%` };
+                line = { label: t('eg_stat_parry'), value: `${_formatStatValue(held)}%` };
             }
             break;
         }
         case 'deflectChancePct': {
-            const total = (typeof _egGetDeflectChancePct === 'function')
-                ? _egGetDeflectChancePct()
-                : ((typeof EG_DEFLECT_BASE_PCT !== 'undefined' ? EG_DEFLECT_BASE_PCT : 5) + (stats.deflectChancePct || 0));
-            line = { label: t('eg_stat_deflect_chance'), value: `${_egFormatStatValue(total)}%` };
+            const total = (typeof _getDeflectChancePct === 'function')
+                ? _getDeflectChancePct()
+                : ((typeof DEFLECT_BASE_PCT !== 'undefined' ? DEFLECT_BASE_PCT : 5) + (stats.deflectChancePct || 0));
+            line = { label: t('eg_stat_deflect_chance'), value: `${_formatStatValue(total)}%` };
             break;
         }
         case 'deflectDamagePct': {
-            const total = (typeof _egGetDeflectDamagePct === 'function')
-                ? _egGetDeflectDamagePct()
-                : ((typeof EG_DEFLECT_BASE_DMG_PCT !== 'undefined' ? EG_DEFLECT_BASE_DMG_PCT : 30) + (stats.deflectDamagePct || 0));
-            line = { label: t('eg_stat_deflect_damage'), value: `${_egFormatStatValue(total)}%` };
+            const total = (typeof _getDeflectDamagePct === 'function')
+                ? _getDeflectDamagePct()
+                : ((typeof DEFLECT_BASE_DMG_PCT !== 'undefined' ? DEFLECT_BASE_DMG_PCT : 30) + (stats.deflectDamagePct || 0));
+            line = { label: t('eg_stat_deflect_damage'), value: `${_formatStatValue(total)}%` };
             break;
         }
 
         // Elemental resistances - shown as the CAPPED (effective) value;
         // the uncapped gear total + the current cap are revealed on hover
-        // (see _egBuildStatDescTooltipHTML in endgame-hub.js). The cap is
+        // (see _buildStatDescTooltipHTML in endgame-hub.js). The cap is
         // 75% base, raised by "increased maximum Resistance" uniques.
         case 'fireResist': case 'coldResist': case 'lightningResist': case 'shadowResist': {
             const element = bucket.replace('Resist', '');
@@ -2551,16 +2551,16 @@ export function _egBuildStatLine(bucket, stats) {
             // elements. It is folded in here so
             // the sheet never under-reports the mitigation the player gets.
             // Shadow resistance is explicitly out of its scope, and
-            // _egCalcPlayerResistanceReduction uses the same split.
+            // _calcPlayerResistanceReduction uses the same split.
             const allElem = (element === 'shadow') ? 0 : Math.max(0, stats.allElementalResist || 0);
-            const penalty = (typeof globalThis._egGetResistPenaltyPct === 'function') ? globalThis._egGetResistPenaltyPct() : 0;
+            const penalty = (typeof globalThis._getResistPenaltyPct === 'function') ? globalThis._getResistPenaltyPct() : 0;
             const total = (stats[bucket] || 0) + allElem - penalty;
             const allElemMax = (element === 'shadow') ? 0 : (stats.allElementalResistMax || 0);
             if (!total && !penalty && !(stats[bucket.replace('Resist', 'ResistMax')] || 0) && !stats.allResMax && !allElemMax) return null;
-            const cap = (typeof EG_RESIST_CAP_PCT !== 'undefined' ? EG_RESIST_CAP_PCT : 75)
+            const cap = (typeof RESIST_CAP_PCT !== 'undefined' ? RESIST_CAP_PCT : 75)
                 + Math.max(0, (stats[element + 'ResistMax'] || 0) + (stats.allResMax || 0) + allElemMax);
             const shown = Math.min(Math.max(-100, total), cap);
-            line = { label: EG_STAT_DISPLAY_LABELS[bucket].label, value: `${_egFormatStatValue(shown)}%` };
+            line = { label: STAT_DISPLAY_LABELS[bucket].label, value: `${_formatStatValue(shown)}%` };
             line.resTotal = Math.max(-100, total);
             line.resPenalty = penalty;
             line.resCap = cap;
@@ -2568,14 +2568,14 @@ export function _egBuildStatLine(bucket, stats) {
         }
 
         default: {
-            const meta = EG_STAT_DISPLAY_LABELS[bucket];
+            const meta = STAT_DISPLAY_LABELS[bucket];
             if (!meta) return null;
             const val = stats[bucket];
             if (!val || val === 0) return null;
             // Attributes are absolute totals (base + gear), not bonuses -
             // no "+" prefix so the number matches requirement checks.
             const isAttribute = bucket === 'strength' || bucket === 'agility' || bucket === 'intelligence';
-            line = { label: meta.label, value: `${isAttribute ? '' : '+'}${_egFormatStatValue(val)}${meta.suffix}` };
+            line = { label: meta.label, value: `${isAttribute ? '' : '+'}${_formatStatValue(val)}${meta.suffix}` };
         }
     }
 
@@ -2601,15 +2601,15 @@ export function _egBuildStatLine(bucket, stats) {
 }
 
 // Aggregates all non-zero stats into the three screen regions defined by
-// EG_STAT_LAYOUT. Returns { offense: [...], defense: [...], puzzle: [...] }
+// STAT_LAYOUT. Returns { offense: [...], defense: [...], puzzle: [...] }
 // where each side is an array of { title, lines: [{ label, value, descKey }] }.
-export function _egBuildGroupedStats(stats) {
+export function _buildGroupedStats(stats) {
     const out = { offense: [], defense: [], puzzle: [] };
 
-    Object.entries(EG_STAT_LAYOUT).forEach(([side, categories]) => {
+    Object.entries(STAT_LAYOUT).forEach(([side, categories]) => {
         categories.forEach(cat => {
             const lines = cat.buckets
-                .map(b => _egBuildStatLine(b, stats))
+                .map(b => _buildStatLine(b, stats))
                 .filter(Boolean);
             if (lines.length > 0) out[side].push({ title: t(cat.catKey), lines });
         });

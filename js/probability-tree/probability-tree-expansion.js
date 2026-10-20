@@ -7,7 +7,7 @@ import { addTimeSecs, previewGainSecs, subtractTimeSecs } from '../timer/timer-a
 import { t } from '../translation/translations.js';
 import { _executeFieldScan } from '../classes/class-probabilist.js';
 import { ptHasSkill } from './probability-tree-state-points.js';
-import { _egGetTreeTimerStartSecs } from '../endgame/endgame-leveling.js';
+import { _getTreeTimerStartSecs } from '../endgame/endgame-leveling.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
 
@@ -162,7 +162,7 @@ export function _ptxRunExpansion() {
         updClues(r, c);
         // Endgame: fire a projectile from this auto-reveal toward the targeted monster.
         // Queued if the encounter hasn't started yet (start-of-puzzle passives).
-        if (typeof globalThis._egOnProgrammaticReveal === 'function') globalThis._egOnProgrammaticReveal([`g-${r}-${c}`]);
+        if (typeof globalThis._onProgrammaticReveal === 'function') globalThis._onProgrammaticReveal([`g-${r}-${c}`]);
         globalThis.checkWin();
         return true;
     }
@@ -249,8 +249,8 @@ export function _ptxRunExpansion() {
 
     // Live passive-tree stat channel (0 while the stats module is not loaded).
     function _ptxTreeStat(key) {
-        if (typeof globalThis._egComputePlayerStats !== 'function') return 0;
-        return Number((globalThis._egComputePlayerStats() || {})[key]) || 0;
+        if (typeof globalThis._computePlayerStats !== 'function') return 0;
+        return Number((globalThis._computePlayerStats() || {})[key]) || 0;
     }
 
     const PENALTY_MODS = [
@@ -887,10 +887,10 @@ export function _ptxRunExpansion() {
             ON_START.forEach(fn => { try { fn(); } catch (e) { /* keep other effects alive */ } });
         } catch (e) { /* ignore */ }
         // Chain guarantee: ON_START must run on every chained puzzle in a map.
-        // Do not gate this patch behind _egSuppressEncounterStop - that flag
+        // Do not gate this patch behind _suppressEncounterStop - that flag
         // preserves timer/HP across chain puzzles but reveal/mark passives
         // (skyward_survey, entropy_observer, etc.) intentionally re-roll
-        // per puzzle. See _egTransitionToChainPuzzle hardening.
+        // per puzzle. See _transitionToChainPuzzle hardening.
         return result;
     });
 
@@ -898,7 +898,7 @@ export function _ptxRunExpansion() {
 
     patch('_initTimer', function (orig, args) {
         const result = orig(...args);
-        if (window._egSuppressEncounterStop || !cur) return result;
+        if (window._suppressEncounterStop || !cur) return result;
 
         const FLATS = [
             ['small_lesser_adaptive_correction', 10],
@@ -909,7 +909,7 @@ export function _ptxRunExpansion() {
         let add = 0;
         FLATS.forEach(([key, val]) => { if (has(key)) add += val; });
         // Time Margin nodes (timer_start_secs effect, pt-effects.js).
-        add += _egGetTreeTimerStartSecs();
+        add += _getTreeTimerStartSecs();
 
         if (STATE.ptxSavingsSecs > 0) {
             add += STATE.ptxSavingsSecs;

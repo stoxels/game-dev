@@ -10,7 +10,7 @@
 
 import { trackAchStat } from '../../achievements/achievements.js';
 import { Audio_Manager } from '../../audio/audio.js';
-import { _egOnProgrammaticReveal } from '../../combat/combat-class-projectiles-reveal.js';
+import { _onProgrammaticReveal } from '../../combat/combat-class-projectiles-reveal.js';
 import { renderCell, updClues } from '../../grid.js';
 import { PT } from '../../probability-tree/probability-tree.js';
 import { questStat_primerRowsColsRevealed, updateQuestStats } from '../../inference/inference-stats.js';
@@ -101,7 +101,7 @@ function _primerRevealCell(r, c, sol) {
     else if (globalThis.userGrid[r][c] === 0) { globalThis.userGrid[r][c] = 2; }
     renderCell(r, c);
     updClues(r, c);
-    if (wasRevealed && typeof _egOnProgrammaticReveal === 'function') _egOnProgrammaticReveal([`g-${r}-${c}`]);
+    if (wasRevealed && typeof _onProgrammaticReveal === 'function') _onProgrammaticReveal([`g-${r}-${c}`]);
 }
 
 // Applies the headstart reveal to every cell in the given row.

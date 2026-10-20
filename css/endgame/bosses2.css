@@ -196,7 +196,7 @@
 /* Electric arcs: layered flat strokes - wide faint halo, mid glow, hot
    white-gold core. The JS creates halo/mid/core paths; SVG filters are gone
    (blur/drop-shadow over the full-viewport SVG forced huge repaints).
-   Re-struck by _egDynamoRebuildNet. */
+   Re-struck by _dynamoRebuildNet. */
 .eg-dynamo-beam-halo {
     fill: none;
     stroke: rgba(250, 204, 21, 0.1);
@@ -390,7 +390,7 @@
 /* Shared ground-shatter visuals for band-style mechanics (Brutus ground
    slam, Juggernaut/Minotaur bull rushes). When a band telegraph resolves,
    the struck band itself quakes (Brutus) while a body-level burst
-   (fissures + rock shards + dust, see _egNkSlamShatter in
+   (fissures + rock shards + dust, see _nkSlamShatter in
    shared-boss-abilities.js) makes the ground look like it is shattering
    across the whole targeted line. Every overlay here ignores pointers so
    clicks always reach the grid. */
@@ -534,7 +534,7 @@
 /* The Clock - Time Freeze telegraph: ~2.5s before the freeze the clock
    face flares gold and the hands halt (the warn flag freezes them too),
    plus a center "TIME FREEZE INCOMING" callout. See
-   _egClockStartTimeFreezeWarn in boss-clock.js. */
+   _clockStartTimeFreezeWarn in boss-clock.js. */
 .eg-nk-clock-face.eg-clock-freeze-warn {
     animation: eg-clock-freeze-warn-glow 0.45s ease-in-out infinite alternate;
 }
@@ -569,7 +569,7 @@
    avatar is locked, and a ring of beams rushes in from all sides to hover
    just short of the player. If the boss isn't slain in 30s every beam
    lunges through the player (~90% max HP total). See boss-clock.js
-   (_egClockStartTimeFreeze). */
+   (_clockStartTimeFreeze). */
 .eg-clock-freeze-tint {
     position: fixed; inset: 0;
     pointer-events: none; z-index: 9000;
@@ -3569,7 +3569,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 @keyframes eg-gust-warn-sweep-l { from { background-position: 0 0; } to { background-position: -48px 0; } }
 @keyframes eg-gust-warn-sweep-d { from { background-position: 0 0; } to { background-position: 0 48px; } }
 /* Lightning pre-warning: ~2 s before a storm front rolls in, a jagged bolt
-   strikes down the windward edge (see _egGustLightningWarn). The container
+   strikes down the windward edge (see _gustLightningWarn). The container
    is an invisible strike zone; the ::before bolt flickers in and fades,
    the ::after paints a soft glow down the whole edge. */
 .eg-gust-lightning {
@@ -4174,7 +4174,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 @keyframes eg-coil-lash { 0% { filter: brightness(2.2); } 100% { filter: brightness(1); } }
 
 /* ── Knockback fling: animated player bounce + impact burst ───────── */
-/* The glide is a CSS transition on left/top set by _egNkFlingAvatar; the
+/* The glide is a CSS transition on left/top set by _nkFlingAvatar; the
    wobble rides the wrapper transform (otherwise unused by the game). */
 .eg-flinging {
     animation: eg-fling-wobble 0.42s ease-out 1;
@@ -11746,7 +11746,7 @@ body.eg-shp-flash::after {
 }
 
 /* ============================================================
-   SHARED FINALE WAVES (_egNkFinaleWaves) - compact trial bosses.
+   SHARED FINALE WAVES (_nkFinaleWaves) - compact trial bosses.
    Banner at the top, green shelter / red strike circles with a
    3-2-1. Per-boss accent via --nk-fin on the modifier class.
    ============================================================ */

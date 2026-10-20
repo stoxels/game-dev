@@ -503,17 +503,17 @@ function _canFireInstantAbility(slot) {
         }
         // Also ensure there is at least one eligible cell - otherwise toast and abort
         // so the cooldown isn't wasted on a no-op.
-        const pool = (typeof globalThis._egBuildPickupEligiblePool === 'function') ? globalThis._egBuildPickupEligiblePool() : null;
+        const pool = (typeof globalThis._buildPickupEligiblePool === 'function') ? globalThis._buildPickupEligiblePool() : null;
         if (pool && pool.length === 0) {
             globalThis.showToast('💚 No free cells to spawn hearts!', '#ff6b9d');
             return false;
         }
-        // Fallback manual check when _egBuildPickupEligiblePool not yet available
+        // Fallback manual check when _buildPickupEligiblePool not yet available
         if (!pool && cur && cur.grid) {
             let freeCount = 0;
             for (let r = 0; r < cur.grid.length; r++)
                 for (let c = 0; c < cur.grid[0].length; c++)
-                    if (typeof globalThis._egIsCellPickupEligible === 'function' ? globalThis._egIsCellPickupEligible(r, c) : (globalThis.userGrid[r][c] === 0 && !globalThis.revealedGrid[r][c] && !globalThis.wrongGrid[r][c])) freeCount++;
+                    if (typeof globalThis._isCellPickupEligible === 'function' ? globalThis._isCellPickupEligible(r, c) : (globalThis.userGrid[r][c] === 0 && !globalThis.revealedGrid[r][c] && !globalThis.wrongGrid[r][c])) freeCount++;
             if (freeCount === 0) {
                 globalThis.showToast('💚 No free cells to spawn hearts!', '#ff6b9d');
                 return false;
@@ -555,7 +555,7 @@ function _fireInstantBaseAbility(slot) {
 // that ability's passive-node damage bonuses (see combat-class-projectiles-reveal.js).
 function _noteBaseAbilityCast(slot) {
     if (!STATE.playerClass) return;
-    window._egLastBaseCast = { id: `${STATE.playerClass}_${slot}`, at: Date.now() };
+    window._lastBaseCast = { id: `${STATE.playerClass}_${slot}`, at: Date.now() };
 }
 
 // Starts a base ability's cooldown and applies the class-wheel nodes that
@@ -617,25 +617,25 @@ function _fireInstantAscendencyAbility(slot) {
 // Picks a random heart pickup def weighted like normal hearts:
 // 60% small, 30% medium, 10% large. Falls back to small if defs missing.
 function _pickRandomHeartDef() {
-    if (typeof globalThis.EG_PICKUP_DEFS === 'undefined') return null;
+    if (typeof globalThis.PICKUP_DEFS === 'undefined') return null;
     const roll = Math.random() * 100;
-    if (roll < 60) return globalThis.EG_PICKUP_DEFS.heart_small;
-    if (roll < 90) return globalThis.EG_PICKUP_DEFS.heart_medium;
-    return globalThis.EG_PICKUP_DEFS.heart_large;
+    if (roll < 60) return globalThis.PICKUP_DEFS.heart_small;
+    if (roll < 90) return globalThis.PICKUP_DEFS.heart_medium;
+    return globalThis.PICKUP_DEFS.heart_large;
 }
 
 // Spawns `count` hearts onto eligible grid cells, bypassing the normal
-// EG_PICKUP_MAX_ON_BOARD cap so all 3 appear at once. Each heart gets
+// PICKUP_MAX_ON_BOARD cap so all 3 appear at once. Each heart gets
 // the standard lifetime/expiry handling.
 function _spawnHeartbloomHearts(count) {
     let spawned = 0;
     for (let i = 0; i < count; i++) {
         let pool = [];
-        if (typeof globalThis._egBuildPickupEligiblePool === 'function') {
-            pool = globalThis._egBuildPickupEligiblePool().filter(([r, c]) => {
-                if (typeof globalThis._egCellHasAnyDrop === 'function') return !globalThis._egCellHasAnyDrop(r, c);
+        if (typeof globalThis._buildPickupEligiblePool === 'function') {
+            pool = globalThis._buildPickupEligiblePool().filter(([r, c]) => {
+                if (typeof globalThis._cellHasAnyDrop === 'function') return !globalThis._cellHasAnyDrop(r, c);
                 const key = `${r}-${c}`;
-                if (typeof globalThis._egPickups !== 'undefined' && globalThis._egPickups.has(key)) return false;
+                if (typeof globalThis._pickups !== 'undefined' && globalThis._pickups.has(key)) return false;
                 return true;
             });
         } else if (cur && cur.grid) {
@@ -644,11 +644,11 @@ function _spawnHeartbloomHearts(count) {
             for (let r = 0; r < rows; r++)
                 for (let c = 0; c < cols; c++) {
                     const key = `${r}-${c}`;
-                    const hasPickup = (typeof globalThis._egPickups !== 'undefined' && globalThis._egPickups.has(key));
-                    const hasAnyDrop = (typeof globalThis._egCellHasAnyDrop === 'function') ? globalThis._egCellHasAnyDrop(r, c) : hasPickup;
+                    const hasPickup = (typeof globalThis._pickups !== 'undefined' && globalThis._pickups.has(key));
+                    const hasAnyDrop = (typeof globalThis._cellHasAnyDrop === 'function') ? globalThis._cellHasAnyDrop(r, c) : hasPickup;
                     if (hasAnyDrop) continue;
-                    if (typeof globalThis._egIsCellPickupEligible === 'function') {
-                        if (!globalThis._egIsCellPickupEligible(r, c)) continue;
+                    if (typeof globalThis._isCellPickupEligible === 'function') {
+                        if (!globalThis._isCellPickupEligible(r, c)) continue;
                     } else {
                         if (globalThis.userGrid[r][c] !== 0 || globalThis.revealedGrid[r][c] || globalThis.wrongGrid[r][c]) continue;
                         if (typeof globalThis.luckyTiles !== 'undefined' && globalThis.luckyTiles && globalThis.luckyTiles.has(key)) continue;
@@ -659,20 +659,20 @@ function _spawnHeartbloomHearts(count) {
 
         if (pool.length === 0) break;
         const [r, c] = pool[Math.floor(Math.random() * pool.length)];
-        const def = _pickRandomHeartDef() || (typeof globalThis.EG_PICKUP_DEFS !== 'undefined' ? globalThis.EG_PICKUP_DEFS.heart_small : { id: 'heart_small', emoji: '💚', rarity: 'common' });
+        const def = _pickRandomHeartDef() || (typeof globalThis.PICKUP_DEFS !== 'undefined' ? globalThis.PICKUP_DEFS.heart_small : { id: 'heart_small', emoji: '💚', rarity: 'common' });
         if (!def) break;
         const key = `${r}-${c}`;
         try {
-            if (typeof globalThis._egPickups !== 'undefined') {
-                globalThis._egPickups.set(key, def);
-                if (typeof globalThis._egRenderPickupOverlay === 'function') globalThis._egRenderPickupOverlay(r, c, def);
-                const lifetime = (typeof globalThis.EG_PICKUP_LIFETIME_MS !== 'undefined') ? globalThis.EG_PICKUP_LIFETIME_MS : 20000;
-                if (typeof globalThis._egScheduleTrackedExpiry === 'function') {
-                    globalThis._egScheduleTrackedExpiry(globalThis._egPickups, key, def, lifetime, `eg-pickup-${r}-${c}`, (typeof globalThis._egRemovePickupOverlay === 'function') ? globalThis._egRemovePickupOverlay : () => {
+            if (typeof globalThis._pickups !== 'undefined') {
+                globalThis._pickups.set(key, def);
+                if (typeof globalThis._renderPickupOverlay === 'function') globalThis._renderPickupOverlay(r, c, def);
+                const lifetime = (typeof globalThis.PICKUP_LIFETIME_MS !== 'undefined') ? globalThis.PICKUP_LIFETIME_MS : 20000;
+                if (typeof globalThis._scheduleTrackedExpiry === 'function') {
+                    globalThis._scheduleTrackedExpiry(globalThis._pickups, key, def, lifetime, `eg-pickup-${r}-${c}`, (typeof globalThis._removePickupOverlay === 'function') ? globalThis._removePickupOverlay : () => {
                         const span = document.getElementById(`eg-pickup-${r}-${c}`); if (span) span.remove();
                     });
-                } else if (typeof globalThis._egSchedulePickupExpiry === 'function') {
-                    globalThis._egSchedulePickupExpiry(key, def);
+                } else if (typeof globalThis._schedulePickupExpiry === 'function') {
+                    globalThis._schedulePickupExpiry(key, def);
                 }
             } else {
                 // Fallback when endgame pickup system not loaded (e.g. outside endgame map)
@@ -974,14 +974,14 @@ function _startConvergentSeries() {
 // Fires `count` reveal-strength projectiles at the current target from random
 // grid cells (Convergent Series: each absorbed mistake). No-op outside combat.
 function _fireTreeProjectilesFromGrid(count) {
-    if (typeof globalThis._egOnProgrammaticReveal !== 'function' || !cur || !cur.grid) return;
+    if (typeof globalThis._onProgrammaticReveal !== 'function' || !cur || !cur.grid) return;
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
     const ids = [];
     for (let i = 0; i < count; i++) {
         ids.push(`g-${Math.floor(Math.random() * rows)}-${Math.floor(Math.random() * cols)}`);
     }
-    globalThis._egOnProgrammaticReveal(ids, 'ability');
+    globalThis._onProgrammaticReveal(ids, 'ability');
 }
 
 
@@ -1084,14 +1084,14 @@ function _bayesianRevealOneCell() {
 // applyClassPassiveOnLevelStart - called at the start of each level.
 //   Resets all per-level state, then applies the class passive starting bonus.
 //   Must fire on EVERY puzzle, including chained puzzles inside a map
-//   (endgame encounter chain). See _egTransitionToChainPuzzle.
+//   (endgame encounter chain). See _transitionToChainPuzzle.
 export function applyClassPassiveOnLevelStart() {
     _resetClassLevelState();
 
     if (!STATE.playerClass || globalThis.isClassless()) {
         // Still mark that class passives were considered for this Gi so the
         // chain guarantee does not re-fire unnecessarily.
-        window._egClassPassiveAppliedForGi = cur ? cur.gIdx : null;
+        window._classPassiveAppliedForGi = cur ? cur.gIdx : null;
         return;
     }
 
@@ -1099,7 +1099,7 @@ export function applyClassPassiveOnLevelStart() {
 
     if (STATE.playerClass === 'mathmagician') _applyMathmagicianPassive(effect);
     if (STATE.playerClass === 'probabilist') _applyProbabilistPassive(effect);
-    window._egClassPassiveAppliedForGi = cur ? cur.gIdx : null;
+    window._classPassiveAppliedForGi = cur ? cur.gIdx : null;
 }
 
 
@@ -1257,9 +1257,9 @@ function _handleMathmagicianFreezeBonus() {
 
     // Zero Sum (combat): correct fills during Absolute Zero
     // chill the targeted monster.
-    if (ptHasSkill('zero_sum') && typeof globalThis._egApplyMonsterAilment === 'function') {
-        const targetMon = (globalThis._egMonsters || []).find(m => m.id === globalThis._egTargetId);
-        if (targetMon && targetMon.currentHP > 0) globalThis._egApplyMonsterAilment(targetMon, 'chill');
+    if (ptHasSkill('zero_sum') && typeof globalThis._applyMonsterAilment === 'function') {
+        const targetMon = (globalThis._monsters || []).find(m => m.id === globalThis._targetId);
+        if (targetMon && targetMon.currentHP > 0) globalThis._applyMonsterAilment(targetMon, 'chill');
     }
 
     if (ptHasSkill('god_of_math')) {
@@ -1316,8 +1316,8 @@ function _handleStatisticianStreak(effect, row, col) {
     }
     // quick_fill_streak (tree): a fill within 1 second of the previous one counts
     // for more; the fractional share is carried over until it adds a whole count.
-    if (window.LEVEL_FLAGS.quickFill && typeof globalThis._egComputePlayerStats === 'function') {
-        const quickPct = Number(globalThis._egComputePlayerStats().quickFillStreakPct) || 0;
+    if (window.LEVEL_FLAGS.quickFill && typeof globalThis._computePlayerStats === 'function') {
+        const quickPct = Number(globalThis._computePlayerStats().quickFillStreakPct) || 0;
         if (quickPct > 0) {
             window.LEVEL_FLAGS.quickFillFrac = (Number(window.LEVEL_FLAGS.quickFillFrac) || 0) + quickPct / 100;
             const whole = Math.floor(window.LEVEL_FLAGS.quickFillFrac);

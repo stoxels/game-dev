@@ -1,11 +1,11 @@
 import { curMods } from './difficulty-modifiers.js';
-import { _egGetMaxAllowedMistakes } from './combat/encounter-tick-support.js';
+import { _getMaxAllowedMistakes } from './combat/encounter-tick-support.js';
 import { _egActiveMapItem } from './endgame/endgame-map-launch.js';
 import { _egGetMapRewardBonuses } from './loot/loot-map-mod-rewards.js';
 import { _egMapModAffects } from './loot/loot-map-mod-tables.js';
 import { _egResolveMapBoss } from './loot/loot-map-implicit-parts.js';
-import { _egBuildMergedModLines } from './endgame/endgame-player-stats.js';
-import { _egIsActive } from './combat/combat-state.js';
+import { _buildMergedModLines } from './endgame/endgame-player-stats.js';
+import { _isActive } from './combat/combat-state.js';
 import { ALL, lvText } from './levels/levels.js';
 import { ptHasSkill } from './probability-tree/probability-tree-state-points.js';
 import { _getAsymptoticMasteryReduction, _getPenaltySecondsAtCount } from './penalty.js';
@@ -251,8 +251,8 @@ function _buildMistakesTooltipHTML() {
         html += `<br>${t('cg_tt_erased')} <b>${globalThis._levelMistakesErased}</b>`;
     }
     // Endgame: show remaining vs max when a limit exists (hardcore already shown above)
-    if (!isHardcore && typeof _egIsActive === 'function' && _egIsActive() && typeof _egGetMaxAllowedMistakes === 'function') {
-        const max = _egGetMaxAllowedMistakes();
+    if (!isHardcore && typeof _isActive === 'function' && _isActive() && typeof _getMaxAllowedMistakes === 'function') {
+        const max = _getMaxAllowedMistakes();
         if (max != null) {
             const remaining = Math.max(0, max - (typeof mistakeCount !== 'undefined' ? globalThis.mistakeCount : 0));
             html += `<br><span style="opacity:.7;">${t('eg_stat_allowed_mistakes') || 'Allowed'}: <b>${max}</b> - ${remaining} ${t('eg_mistakes_warning_1') ? '' : 'remaining'}</span>`;
@@ -301,7 +301,7 @@ function _buildActiveMapModsHTML(map) {
     const hideTier = !!(map && map.isUnique);
     byColor.forEach((mods, key) => {
         const color = colors[key] || '#e67e22';
-        _egBuildMergedModLines(mods).forEach(entry => {
+        _buildMergedModLines(mods).forEach(entry => {
             hasMods = true;
             const tier = (!hideTier && entry.tierLabel) ? ` <span style="opacity:0.65; font-size:0.85em; border:1px solid rgba(255,255,255,0.18); border-radius:3px; padding:0 3px; margin-left:4px; color:${color};">${entry.tierLabel}</span>` : '';
             html += `<br><span style="color:${color}">${entry.label}${tier}</span>`;

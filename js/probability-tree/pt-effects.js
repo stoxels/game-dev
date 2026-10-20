@@ -11,7 +11,7 @@
 // One effect = ONE stat channel + ONE localised template line. Composite
 // nodes simply list several effects (one per advertised line, matching the
 // rework rule "one stat per line"). The stat channels accumulate through
-// the generic scan in endgame-leveling.js (_egGetPassiveTreeTravelBonuses)
+// the generic scan in endgame-leveling.js (_getPassiveTreeTravelBonuses)
 // and the tooltip text is generated in both languages by
 // ptResolveNodeDesc(), so no hand-written descEn/descDe and no per-node
 // bonus-table entry are needed.
@@ -44,7 +44,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     life_regen_pct: { channel: 'lifeRegenPct', en: 'Regenerate {v}% of Life per second', de: 'Regeneriere {v}% des Lebens pro Sekunde' },
     // Flat Life regeneration per second (reworked node 129 Horizon
     // Tracker): rides the same lifeRegen bucket gear's life_regen feeds,
-    // so tree and gear regen add up in _egTickLifeRegen().
+    // so tree and gear regen add up in _tickLifeRegen().
     life_regen_flat: { channel: 'lifeRegenFlat', en: 'Regenerate {v} Life per second', de: 'Regeneriere {v} Leben pro Sekunde' },
     // Flat physical retaliation against melee attackers (reworked node 13
     // Enhanced Rewards): unlike the buff-gated percentage Retribution in
@@ -54,7 +54,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // Block chance that works without a shield, as long as the stance fits:
     // dual-wielding or holding a shield (ward batch, e.g. reworked node
     // 30255). Attacks only - spells still use spell block. Stacks on top of
-    // gear block chance inside the 75% cap in _egPlayerTakeDamage.
+    // gear block chance inside the 75% cap in _playerTakeDamage.
     block_dualshield: { channel: 'blockChanceTree', en: '+{v}% Chance to Block Attack Damage while dual wielding or Holding a Shield', de: '+{v}% Chance, Angriffsschaden mit zwei Waffen oder Schild zu blocken' },
     // Block recovery (ward batch, e.g. reworked node 30254): rides the very
     // same bucket gear's block_recovery feeds, so tree and gear shorten the
@@ -62,12 +62,12 @@ export const PT_EFFECT_DEFS = Object.freeze({
     block_recovery: { channel: 'blockRecoveryPct', en: '{v}% increased Block Recovery', de: '{v}% erhöhte Blockerholung' },
     // Timed armour pulse (reworked node 337 Warding Stance): flat Armour
     // granted while a block landed in the last 10 seconds - see the pulse
-    // in _egComputePlayerStats, fed by globalThis._egLastBlockAt which the
-    // block branch of _egPlayerTakeDamage refreshes on every block.
+    // in _computePlayerStats, fed by globalThis._lastBlockAt which the
+    // block branch of _playerTakeDamage refreshes on every block.
     block_pulse: { channel: 'blockArmorPulse', en: '+{v} Armour for 10 seconds after Blocking', de: '+{v} Rüstung für 10 Sekunden nach dem Blocken' },
     // Per-ailment durations for YOUR ailments on enemies (tithe batch, e.g.
     // reworked nodes 30252/30253): scale the monster-side durations in
-    // _egApplyMonsterAilment. Bleed itself is a full ailment (see
+    // _applyMonsterAilment. Bleed itself is a full ailment (see
     // combat-ailments-core.js): physical hits innately bleed, both sides tick.
     ignite_duration: { channel: 'igniteDurationPct', en: '{v}% increased Ignite Duration on enemies', de: '{v}% erhöhte Entzündungsdauer bei Gegnern' },
     bleed_duration: { channel: 'bleedDurationPct', en: '{v}% increased Duration of Bleeds on enemies', de: '{v}% erhöhte Blutungsdauer bei Gegnern' },
@@ -80,10 +80,10 @@ export const PT_EFFECT_DEFS = Object.freeze({
 
     // Shield batch (reworked nodes 30375/30374/30376/285). Every line is
     // conditional on a shield being equipped. Wiring: blockChanceShieldPct
-    // in _egPlayerTakeDamage; the physical-damage lines folded into the
+    // in _playerTakeDamage; the physical-damage lines folded into the
     // physical buckets and shieldDefencePct applied to the shield's own
-    // defences, both in _egComputePlayerStats; Endurance Charges in
-    // combat-ailments-state.js (gained in _egKillMonster).
+    // defences, both in _computePlayerStats; Endurance Charges in
+    // combat-ailments-state.js (gained in _killMonster).
     block_shield: { channel: 'blockChanceShieldPct', en: '+{v}% Chance to Block Attack Damage while Holding a Shield', de: '+{v}% Chance, Angriffsschaden mit Schild zu blocken' },
     melee_phys_shield: { channel: 'meleePhysShieldIncPct', en: '{v}% increased physical melee Damage while Holding a Shield', de: '{v}% erhöhter physischer Nahkampfschaden mit Schild' },
     attack_phys_shield: { channel: 'attackPhysShieldIncPct', en: '{v}% increased physical attack Damage while Holding a Shield', de: '{v}% erhöhter physischer Angriffsschaden mit Schild' },
@@ -92,8 +92,8 @@ export const PT_EFFECT_DEFS = Object.freeze({
 
     // Endurance batch (reworked nodes 30344/20067/30341): charge duration
     // (applied when a charge is gained, combat-ailments-state.js), the charge
-    // cap (added onto EG_ENDURANCE_BASE_MAX in _egComputePlayerStats) and
-    // Life regeneration per live charge (_egTickLifeRegen).
+    // cap (added onto ENDURANCE_BASE_MAX in _computePlayerStats) and
+    // Life regeneration per live charge (_tickLifeRegen).
     endurance_duration: { channel: 'enduranceDurationPct', en: '{v}% increased Endurance Charge Duration', de: '{v}% erhöhte Dauer von Ausdauerladungen' },
     endurance_max: { channel: 'enduranceChargesMax', en: '+{v} to maximum Endurance Charges', de: '+{v} auf maximale Ausdauerladungen' },
     endurance_regen: { channel: 'lifeRegenPerEndurancePct', en: 'Regenerate {v}% of Life per second per Endurance Charge', de: 'Regeneriere {v}% des Lebens pro Sekunde pro Ausdauerladung' },
@@ -102,7 +102,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // hit with a Heavy (two-handed) weapon can impale the enemy, storing 10%
     // of the hit's physical damage; the next 5 hits on it (within 8s) each
     // deal that stored amount again as extra physical damage. Wired in
-    // _egApplyImpaleToHit (combat-ailments-core.js).
+    // _applyImpaleToHit (combat-ailments-core.js).
     impale_chance_heavy: { channel: 'impaleChanceHeavyPct', en: '{v}% Chance to impale enemies on Hit with Heavy weapons', de: '{v}% Chance, Gegner bei Treffern mit schweren Waffen aufzuspießen' },
     impale_effect_heavy: { channel: 'impaleEffectHeavyPct', en: '{v}% increased Effect of Impales you inflict with Heavy weapons', de: '{v}% erhöhte Wirkung von Aufspießungen, die du mit schweren Waffen verursachst' },
     // Only applies while the enemy carries no impale at the moment the new
@@ -117,15 +117,15 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // strike - Heavy when a two-handed weapon is equipped, one-handed
     // otherwise (1H + shield, dual-wield, or unarmed). Both stack on top of
     // the generic melee_phys_inc above. Stance is read in
-    // _egCalcPlayerMeleeDamage via stats.isHeavyWeaponEquipped.
+    // _calcPlayerMeleeDamage via stats.isHeavyWeaponEquipped.
     melee_phys_1h: { channel: 'meleePhys1HIncPct', en: '{v}% increased physical melee Damage with one-handed weapons', de: '{v}% erhöhter physischer Nahkampfschaden mit einhändigen Waffen' },
     melee_phys_heavy: { channel: 'meleePhysHeavyIncPct', en: '{v}% increased physical melee Damage with Heavy weapons', de: '{v}% erhöhter physischer Nahkampfschaden mit schweren Waffen' },
     // Weapon-family batch (sword/axe nodes 30270/30271/30274/147/30272/30273/
     // 227 and 30281/30280/30339/30340/125). The family comes from the
-    // equipped weapon (_egGetEquippedWeaponInfo): the damage lines are a
-    // separate multiplier in _egCalcPlayerMeleeDamage, the charge-up line is
+    // equipped weapon (_getEquippedWeaponInfo): the damage lines are a
+    // separate multiplier in _calcPlayerMeleeDamage, the charge-up line is
     // added to the melee charge speed, the accuracy line to the flat
-    // accuracy pool, all in _egComputePlayerStats / the interval breakdown.
+    // accuracy pool, all in _computePlayerStats / the interval breakdown.
     melee_phys_sword: { channel: 'meleePhysSwordIncPct', en: '{v}% increased physical melee Damage with Swords', de: '{v}% erhöhter physischer Nahkampfschaden mit Schwertern' },
     melee_phys_axe: { channel: 'meleePhysAxeIncPct', en: '{v}% increased physical melee Damage with Axes', de: '{v}% erhöhter physischer Nahkampfschaden mit Äxten' },
     sword_charge_speed: { channel: 'swordChargeSpeedPct', en: '{v}% increased melee attack charge-up speed while wielding a Sword', de: '{v}% erhöhte Nahkampf-Aufladegeschwindigkeit mit Schwert' },
@@ -137,9 +137,9 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // Stun (mace batch, nodes 360/30331/30332). A stun is the game's existing
     // stagger: the monster's charge timer is paused (staggeredUntil). The
     // chance is rolled on melee hits with a Mace or Sceptre struck at
-    // EG_MACE_STUN_MIN_CHARGE (90%) or more on the charge-up bar
-    // (_egDamageTargetById); the duration line scales every stun and
-    // stagger you inflict (_egApplyHitToMonster).
+    // MACE_STUN_MIN_CHARGE (90%) or more on the charge-up bar
+    // (_damageTargetById); the duration line scales every stun and
+    // stagger you inflict (_applyHitToMonster).
     stun_chance_mace_charged: { channel: 'stunChanceMaceChargedPct', en: '{v}% Chance to Stun enemies on Hit with a Mace or Sceptre at 90% or more charge', de: '{v}% Chance, Gegner bei Treffern mit Streitkolben oder Zepter bei mindestens 90% Aufladung zu betäuben' },
     stun_duration: { channel: 'stunDurationPct', en: '{v}% increased Stun Duration on enemies', de: '{v}% erhöhte Betäubungsdauer bei Gegnern' },
     // Heavy-weapon stun batch (nodes 30248/30249/30250/20037): heavy means a
@@ -147,7 +147,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // Chance and duration extend the shared stun (= stagger) effect above;
     // stun_double_chance doubles the length of a stun when one is applied,
     // melee_double_damage_chance doubles a whole melee strike (rolled next
-    // to the crit roll in _egCalcPlayerMeleeDamage).
+    // to the crit roll in _calcPlayerMeleeDamage).
     stun_chance_heavy: { channel: 'stunChanceHeavyPct', en: '{v}% Chance to Stun enemies on Hit with Heavy weapons', de: '{v}% Chance, Gegner bei Treffern mit schweren Waffen zu betäuben' },
     stun_duration_heavy: { channel: 'stunDurationHeavyPct', en: '{v}% increased Stun Duration with Heavy weapons', de: '{v}% erhöhte Betäubungsdauer mit schweren Waffen' },
     stun_double_chance: { channel: 'stunDoubleChancePct', en: '{v}% Chance to double Stun Duration', de: '{v}% Chance, die Betäubungsdauer zu verdoppeln' },
@@ -163,41 +163,41 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // meleeAoEPct bucket (cleave radius in encounter-melee-impact.js).
     melee_aoe_pct: { channel: 'meleeAoEPct', en: 'Melee skills have {v}% increased Area of Effect', de: 'Nahkampffertigkeiten haben {v}% vergrößerten Wirkungsbereich' },
     // Corpse explosion (node 20045): rolled when a melee strike kills; the
-    // dying enemy deals EG_MELEE_EXPLODE_LIFE_SHARE of its maximum Life as
+    // dying enemy deals MELEE_EXPLODE_LIFE_SHARE of its maximum Life as
     // physical damage to the other enemies in its spawn zone
-    // (_egDamageTargetById). The 10% is fixed and part of the tooltip text.
+    // (_damageTargetById). The 10% is fixed and part of the tooltip text.
     melee_kill_explode: { channel: 'meleeKillExplodeChancePct', en: 'Enemies killed by melee skills have a {v}% Chance to explode, dealing 10% of their Life as physical Damage to nearby enemies', de: 'Von Nahkampffertigkeiten getötete Gegner explodieren mit {v}% Chance und verursachen 10% ihres Lebens als physischen Schaden bei Gegnern in der Nähe' },
     axe_charge_speed: { channel: 'axeChargeSpeedPct', en: '{v}% increased melee attack charge-up speed while wielding an Axe', de: '{v}% erhöhte Nahkampf-Aufladegeschwindigkeit mit Axt' },
     // Rage (axe notable 369): a new stacking resource. Melee hits with an
     // Axe grant rage_on_hit_axe Rage (capped at rage_max); every Rage is a
     // multiplicative "more" step of rage_effect % on melee damage
-    // (_egCalcPlayerMeleeDamage). One Rage fades per second once 5 seconds
+    // (_calcPlayerMeleeDamage). One Rage fades per second once 5 seconds
     // passed without being hit or gaining Rage (combat-ailments-state.js).
     rage_on_hit_axe: { channel: 'rageOnHitAxe', en: 'Gain {v} Rage on Hit with Axes', de: 'Erhalte {v} Wut bei Treffern mit Äxten' },
     rage_effect: { channel: 'rageMeleeMorePct', en: 'Each point of Rage grants {v}% more melee Damage', de: 'Jeder Wutpunkt gewährt {v}% mehr Nahkampfschaden' },
     rage_max: { channel: 'rageMax', en: 'Maximum Rage is {v}', de: 'Maximale Wut beträgt {v}' },
     accuracy_sword: { channel: 'accuracySwordFlat', en: '+{v} to Accuracy Rating with Swords', de: '+{v} Präzision mit Schwertern' },
     // Armour pierce (node 147): rolled per player hit in
-    // _egDamageTargetById; a successful roll skips the target's POSITIVE
+    // _damageTargetById; a successful roll skips the target's POSITIVE
     // physical resistance for that hit (vulnerability still amplifies).
     ignore_phys_reduction: { channel: 'ignorePhysReductionPct', en: 'Hits have {v}% Chance to ignore enemy physical Damage reduction', de: 'Treffer haben {v}% Chance, die physische Schadensreduktion von Gegnern zu ignorieren' },
     // Intimidate (node 125): new status. Chance is rolled on melee hits
-    // (_egRollIntimidate); an intimidated enemy takes intimidateMeleeAmpPct
-    // % more melee damage for the duration (_egApplyIntimidateAmp), where the
+    // (_rollIntimidate); an intimidated enemy takes intimidateMeleeAmpPct
+    // % more melee damage for the duration (_applyIntimidateAmp), where the
     // amplification itself is the separate intimidate_amp line.
     intimidate_melee: { channel: 'intimidateChanceMeleePct', en: '{v}% Chance to Intimidate enemies for 10 seconds on Hit with melee attacks', de: '{v}% Chance, Gegner bei Nahkampftreffern für 10 Sekunden einzuschüchtern' },
     intimidate_amp: { channel: 'intimidateMeleeAmpPct', en: 'Intimidated enemies take {v}% increased melee Damage', de: 'Eingeschüchterte Gegner erleiden {v}% erhöhten Nahkampfschaden' },
 
     // Bleed batch (reworked nodes 30284/30285/30283/251): extra chances for
     // your attacks to cause Bleeding (rolled per hit in
-    // _egRollPlayerHitAilments, sized from the hit's physical share) and a
-    // speed-up of the bleeds you inflict (_egApplyMonsterAilment: same total
+    // _rollPlayerHitAilments, sized from the hit's physical share) and a
+    // speed-up of the bleeds you inflict (_applyMonsterAilment: same total
     // damage, faster ticks, shorter duration).
     bleed_chance_melee: { channel: 'bleedChanceMeleePct', en: 'Melee attacks have a {v}% Chance to cause Bleeding', de: 'Nahkampfangriffe haben {v}% Chance, Blutung zu verursachen' },
     bleed_chance_attack: { channel: 'bleedChanceAttackPct', en: 'Attacks have a {v}% Chance to cause Bleeding', de: 'Angriffe haben {v}% Chance, Blutung zu verursachen' },
     bleed_speed: { channel: 'bleedSpeedPct', en: 'Bleeding you inflict deals Damage {v}% faster', de: 'Von dir verursachte Blutung verursacht Schaden {v}% schneller' },
     // Life regeneration rate (reworked node 111): multiplies the whole
-    // per-second regeneration (flat + percentage) in _egTickLifeRegen.
+    // per-second regeneration (flat + percentage) in _tickLifeRegen.
     life_regen_rate: { channel: 'lifeRegenRatePct', en: '{v}% increased Life Regeneration rate', de: '{v}% erhöhte Lebensregenerationsrate' },
 
     // Maximum Fire Resistance (reworked node 20068 Resolute Advance): seeds
@@ -206,7 +206,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     fire_res_max: { channel: 'fireResistMax', en: '+{v}% to maximum Fire Resistance', de: '+{v}% auf maximalen Feuerwiderstand' },
     // Maximum resistances (resistance batch, nodes 30308/30312/250): feed
     // the same cap buckets gear's max_*_res mods feed (see
-    // _egGetPlayerResistCap). all_elemental_res_max raises fire, cold and
+    // _getPlayerResistCap). all_elemental_res_max raises fire, cold and
     // lightning only - shadow is excluded, exactly like allElementalResist.
     cold_res_max: { channel: 'coldResistMax', en: '+{v}% to maximum Cold Resistance', de: '+{v}% auf maximalen Kältewiderstand' },
     lightning_res_max: { channel: 'lightningResistMax', en: '+{v}% to maximum Lightning Resistance', de: '+{v}% auf maximalen Blitzwiderstand' },
@@ -219,11 +219,11 @@ export const PT_EFFECT_DEFS = Object.freeze({
 
     // Projectile batch (nodes 97/30867/30866/30865/20101/30868/30869/30864/
     // 30856/30855/30858/30859/20102). "Projectile" = every shot the player
-    // fires from a revealed cell (the _egCalcPlayerDamage channel).
+    // fires from a revealed cell (the _calcPlayerDamage channel).
     // projectile_damage_inc multiplies the whole roll (physical + elemental,
-    // before crit) in _egCalcPlayerDamage; projectile_crit_chance is added to
+    // before crit) in _calcPlayerDamage; projectile_crit_chance is added to
     // the crit chance of that same roll; projectile_speed shortens every
-    // player projectile's flight time (_egAnimatePlayerProjectile).
+    // player projectile's flight time (_animatePlayerProjectile).
     projectile_damage_inc: { channel: 'projectileDamageIncPct', en: '{v}% increased Projectile Damage', de: '{v}% erhöhter Projektilschaden' },
     // Added to the crit multiplier (base 150%) of projectile rolls only.
     projectile_crit_multi: { channel: 'projectileCritMultiplierPct', en: '+{v}% to Critical Strike Multiplier with Projectiles', de: '+{v}% auf den kritischen Schadensmultiplikator mit Projektilen' },
@@ -238,11 +238,11 @@ export const PT_EFFECT_DEFS = Object.freeze({
     bow_spell_dot_inc: { channel: 'bowSpellDotIncPct', en: 'Bow spells deal {v}% increased Damage over Time', de: 'Bogenzauber verursachen {v}% erhöhten Schaden über Zeit' },
 
     // Flat bonus to every Heart pickup (node 248): rides the heartHealFlat
-    // bucket gear's heart_heal feeds (_egCalcHeartHeal).
+    // bucket gear's heart_heal feeds (_calcHeartHeal).
     heart_heal_flat: { channel: 'heartHealFlat', en: 'Hearts heal for {v} more Life', de: 'Herzen heilen {v} mehr Leben' },
     // Mana on projectile hit (node 400): every projectile that connects
     // (after the accuracy roll) grants this much Mana, see
-    // _egResolveProjectileImpact.
+    // _resolveProjectileImpact.
     mana_on_projectile_hit: { channel: 'manaOnProjectileHitPct', en: 'Gain {v} Mana whenever you hit with a Projectile', de: 'Erhalte {v} Mana, wenn du mit einem Projektil triffst' },
     // Bow spells (nodes 31008/31009/400): tracked only until Bow-tagged spells
     // exist (the spell cost code should read stats.bowSpellManaCostReducedPct).
@@ -254,7 +254,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     evasion_per_frenzy: { channel: 'evasionPerFrenzyChargePct', en: '{v}% increased Evasion Rating per Frenzy Charge', de: '{v}% erhöhte Ausweichwertung pro Raserei-Ladung' },
     // Life on projectile hit (nodes 30881/30880/20110): rolled for every
     // projectile that connects (after the accuracy roll) in
-    // _egResolveProjectileImpact. The burst amount is fixed (300) and part
+    // _resolveProjectileImpact. The burst amount is fixed (300) and part
     // of the tooltip text; the value is the chance.
     life_on_projectile_hit: { channel: 'lifeOnProjectileHit', en: 'Gain {v} Life whenever a Projectile hits an enemy', de: 'Erhalte {v} Leben, wenn ein Projektil einen Gegner trifft' },
     life_burst_on_projectile_hit: { channel: 'lifeBurstOnProjectileHitChancePct', en: '{v}% Chance to gain 300 Life when a Projectile hits an enemy', de: '{v}% Chance, 300 Leben zu erhalten, wenn ein Projektil einen Gegner trifft' },
@@ -273,7 +273,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     mana_on_kill_flat: { channel: 'manaOnKillFlat', en: 'Gain {v} Mana per Enemy Killed', de: 'Erhalte {v} Mana pro getötetem Gegner' },
     // Leech / crit / shadow resistance (nodes 30888/20109/30889/20111/30884).
     // life_leech_attack feeds the shared lifeLeechPct (melee AND projectile
-    // hits); life_leech_effect_inc scales every leech heal (_egLeechHealMult);
+    // hits); life_leech_effect_inc scales every leech heal (_leechHealMult);
     // crit_chance_flat adds to the base crit chance (melee + projectile).
     life_leech_attack: { channel: 'lifeLeechPct', en: '+{v}% of Attack Damage leeched as Life', de: '+{v}% des Angriffsschadens als Leben entzogen' },
     life_leech_effect_inc: { channel: 'lifeLeechEffectIncPct', en: '{v}% increased Life recovered from Leech', de: '{v}% erhöhtes durch Lebensentzug erhaltenes Leben' },
@@ -297,25 +297,25 @@ export const PT_EFFECT_DEFS = Object.freeze({
     spell_crit_chance: { channel: 'spellCritChancePct', en: '+{v}% to Critical Strike Chance with Spells', de: '+{v}% auf die kritische Trefferchance mit Zaubern' },
     spell_crit_multi: { channel: 'spellCritMultiplierPct', en: '+{v}% to Critical Strike Multiplier with Spells', de: '+{v}% auf den kritischen Schadensmultiplikator mit Zaubern' },
     // Chill effect (node 31491): scales the slow of chills YOU inflict on
-    // enemies (_egGetMonsterChargeMultiplier). Absorption leech (nodes
+    // enemies (_getMonsterChargeMultiplier). Absorption leech (nodes
     // 30128/387): spell hits leech a share of their damage as Absorption
-    // (_egLeechAbsorption); the effect line scales every such recovery.
+    // (_leechAbsorption); the effect line scales every such recovery.
     chill_effect_inc_pct: { channel: 'chillEffectIncPct', en: '{v}% increased Effect of Chill', de: '{v}% erhöhte Wirkung von Unterkühlung' },
     absorption_leech_spell: { channel: 'absorptionLeechSpellPct', en: '+{v}% of Spell Damage leeched as Absorption', de: '+{v}% des Zauberschadens als Absorption entzogen' },
     absorption_leech_effect_inc: { channel: 'absorptionLeechEffectIncPct', en: '{v}% increased Absorption recovered from Leech', de: '{v}% erhöhte durch Entzug erhaltene Absorption' },
     // Gain X% of physical Damage as extra Shadow (node 20218): mirrors
-    // phys_as_fire; handled in _egApplyDamageConversion (extra, not converted).
+    // phys_as_fire; handled in _applyDamageConversion (extra, not converted).
     phys_as_shadow: { channel: 'physAsExtraShadowPct', en: 'Gain {v}% of physical Damage as extra Shadow Damage', de: 'Erhalte {v}% des physischen Schadens als zusätzlichen Schattenschaden' },
     // Life Recoup (nodes 30950/30949/20120): a share of the Life damage you
     // take is paid back as Life over about 4 seconds (pool filled in
-    // _egPlayerTakeDamage, drained in _egTickLifeRegen).
+    // _playerTakeDamage, drained in _tickLifeRegen).
     life_recoup_pct: { channel: 'lifeRecoupPct', en: '{v}% of Damage taken Recouped as Life', de: '{v}% des erlittenen Schadens werden als Leben zurückgewonnen' },
     // Damage with Daggers (node 30941): multiplier over the whole melee hit
     // while a dagger is the equipped weapon family.
     dagger_damage_inc: { channel: 'daggerDamageIncPct', en: '{v}% increased melee Damage with Daggers', de: '{v}% erhöhter Nahkampfschaden mit Dolchen' },
     // Ghost Reaver keystone (node 219): every Life leech (melee, projectile,
-    // spell) refills Absorption instead of Life (_egLeechAbsorption), and the
-    // Absorption recharge is switched off (_egScheduleAbsorptionRegen).
+    // spell) refills Absorption instead of Life (_leechAbsorption), and the
+    // Absorption recharge is switched off (_scheduleAbsorptionRegen).
     leech_as_absorption: { channel: 'lifeLeechAsAbsorption', flag: true, en: 'Life Leech recovers Absorption instead of Life', de: 'Lebensentzug stellt stattdessen Absorption wieder her' },
     absorption_no_recharge: { channel: 'absorptionNoRecharge', flag: true, en: 'Cannot Recharge Absorption', de: 'Absorption kann sich nicht aufladen' },
     // Dagger charge-up speed (nodes 30942-30944/20119): shortens the melee
@@ -330,7 +330,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     crit_dot_multi: { channel: 'critDotMultiPct', en: '+{v}% to the Damage over Time Multiplier for Ailments from Critical Strikes', de: '+{v}% auf den Schaden-über-Zeit-Multiplikator für Statuseffekte durch kritische Treffer' },
     // Damage over Time (nodes 20112/30919/30924/...): scales the stored dps of
     // every DoT ailment you inflict (ignite, bleed, poison) once, when it is
-    // applied (_egAilmentDamageMult).
+    // applied (_ailmentDamageMult).
     dot_inc_pct: { channel: 'dotIncPct', en: '{v}% increased Damage over Time', de: '{v}% erhöhter Schaden über Zeit' },
     // Skill Effect Duration (nodes 20112/339): tracked on the stat sheet for
     // the buff spells to come - they read stats.skillEffectDurationPct.
@@ -341,7 +341,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     life_on_melee_hit: { channel: 'lifeOnMeleeHit', en: 'Gain {v} Life whenever a Melee strike hits an enemy', de: 'Erhalte {v} Leben, wenn ein Nahkampfschlag einen Gegner trifft' },
     life_on_attack_hit: { channel: 'lifeOnAttackHit', en: 'Gain {v} Life per Enemy hit with Attacks', de: 'Erhalte {v} Leben pro getroffenem Gegner mit Angriffen' },
     // Poison (nodes 30834/30835): shadow damage over time, see
-    // combat-ailments-core.js (_egRollPlayerHitAilments).
+    // combat-ailments-core.js (_rollPlayerHitAilments).
     poison_chance_attack: { channel: 'poisonChanceAttackPct', en: '{v}% Chance to Poison on Hit with Attacks', de: '{v}% Chance, bei Angriffstreffern zu vergiften' },
     poison_dot_multi: { channel: 'poisonDotMultiPct', en: '+{v}% to the Damage over Time Multiplier for Poison', de: '+{v}% auf den Schaden-über-Zeit-Multiplikator für Gift' },
     // Grid pickup spawn weights (nodes 30917/20103): scale the weight of the
@@ -352,9 +352,9 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // enemy can stun the player yet.
     stun_avoid: { channel: 'stunAvoidPct', en: '{v}% Chance to avoid being Stunned', de: '{v}% Chance, nicht betäubt zu werden' },
     // Mana batch (nodes 30861/30862/226): pickups ride the existing
-    // manaHealIncPct bucket gear's inc_mana_heal feeds (_egCalcManaGain);
+    // manaHealIncPct bucket gear's inc_mana_heal feeds (_calcManaGain);
     // the melee line is the ONLY built-in source of mana on melee hits
-    // (_egApplyPlayerMeleeImpact: strike must be above 50% charge).
+    // (_applyPlayerMeleeImpact: strike must be above 50% charge).
     mana_pickup_effect: { channel: 'manaHealIncPct', en: 'Mana pickups have {v}% increased effect', de: 'Mana-Pickups haben {v}% erhöhte Wirkung' },
     mana_on_melee_hit_charged: { channel: 'manaOnMeleeHitChargedPct', en: 'Gain {v} Mana when you hit an enemy with a melee attack above 50% charge-up', de: 'Erhalte {v} Mana, wenn du einen Gegner mit einem Nahkampfangriff über 50% Aufladung triffst' },
     // Melee crit (node 305): added to the crit chance of melee strikes only.
@@ -369,7 +369,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // Life leech from the tree (grit batch, nodes 30257/30258/20043): MELEE
     // attacks only. It is a separate channel from the gear leech bucket
     // (lifeLeechPct, which heals off every hit including spells and
-    // projectiles) and is applied only in _egCalcPlayerMeleeDamage
+    // projectiles) and is applied only in _calcPlayerMeleeDamage
     // (combat-calculations.js). Supports fractions (0.4).
     life_leech_melee: { channel: 'lifeLeechMeleePct', en: '+{v}% of melee attack Damage leeched as Life', de: '+{v}% des Nahkampfangriffsschadens als Leben entzogen' },
     cast_speed_pct: { channel: 'castSpeedPct', en: '{v}% increased Cast Speed', de: '{v}% erhöhte Zaubergeschwindigkeit' },
@@ -391,13 +391,13 @@ export const PT_EFFECT_DEFS = Object.freeze({
     cast_speed_cold: { channel: 'coldCastSpeedPct', en: '{v}% increased Cast Speed with Cold Skills', de: '{v}% erhöhte Zaubergeschwindigkeit mit Kältezaubern' },
     cast_speed_lightning: { channel: 'lightningCastSpeedPct', en: '{v}% increased Cast Speed with Lightning Skills', de: '{v}% erhöhte Zaubergeschwindigkeit mit Blitzzaubern' },
     // While holding a cast-time spell button, an incoming ailment is avoided
-    // with this chance (_egTryAvoidAilmentWhileCasting, nodes 130/31477/31480).
+    // with this chance (_tryAvoidAilmentWhileCasting, nodes 130/31477/31480).
     // Chance to avoid being Bled / Poisoned by monster hits
-    // (_egTryAvoidPlayerAilmentStat in combat-ailments-core.js; nodes 31071...).
+    // (_tryAvoidPlayerAilmentStat in combat-ailments-core.js; nodes 31071...).
     avoid_bleed_pct: { channel: 'bleedAvoidPct', en: '{v}% chance to Avoid Bleeding', de: '{v}% Chance, Blutung zu vermeiden' },
     avoid_poison_pct: { channel: 'poisonAvoidPct', en: '{v}% chance to Avoid being Poisoned', de: '{v}% Chance, Vergiftung zu vermeiden' },
     // Elemental ailment avoidance (nodes 30766/30767/30764/30765/20156):
-    // rolled in _egRollMonsterHitAilment after the base ailment chance.
+    // rolled in _rollMonsterHitAilment after the base ailment chance.
     avoid_shock_pct: { channel: 'shockAvoidPct', en: '{v}% chance to Avoid being Shocked', de: '{v}% Chance, nicht geschockt zu werden' },
     avoid_ignite_pct: { channel: 'igniteAvoidPct', en: '{v}% chance to Avoid being Ignited', de: '{v}% Chance, nicht entzündet zu werden' },
     avoid_chill_pct: { channel: 'chillAvoidPct', en: '{v}% chance to Avoid being Chilled or Frozen', de: '{v}% Chance, nicht unterkühlt oder eingefroren zu werden' },
@@ -607,7 +607,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     absorption_regen_delay: { channel: 'absorptionRegenDelaySecs', en: 'Absorption regeneration begins {v} seconds after taking damage', de: 'Absorptionsregeneration beginnt {v} Sekunden nach erlittenem Schaden' },
     avoid_ailment_casting: { channel: 'castingAilmentAvoidPct', en: '{v}% Chance to Avoid Ailments while Casting', de: '{v}% Chance, Statuseffekte beim Zaubern zu vermeiden' },
     // Level-start timer bonus (nodes 31211/31215/31216): read by the _initTimer
-    // patch in probability-tree-expansion.js via _egGetTreeTimerStartSecs().
+    // patch in probability-tree-expansion.js via _getTreeTimerStartSecs().
     timer_start_secs: { channel: 'timerStartSecs', en: '+{v} seconds added to the Timer', de: '+{v} Sekunden zum Timer hinzugefügt' },
     // Puzzle budget (campaign levels, maps and trials): time_added shares the
     // timer_start_secs channel (_initTimer patch in probability-tree-expansion.js),
@@ -659,24 +659,24 @@ export const PT_EFFECT_DEFS = Object.freeze({
     item_effect: { channel: 'itemEffectPct', en: 'Puzzle Items are {v}% more effective', de: 'Rätselgegenstände sind {v}% effektiver' },
     // Champion's Vigor (node 20033): extra melee strike range, and the melee
     // splash it unlocks (radius in meters, converted to px in
-    // _egComputePlayerStats; scaled by melee_aoe_pct in _egTryMeleeSplashHit).
+    // _computePlayerStats; scaled by melee_aoe_pct in _tryMeleeSplashHit).
     melee_range_m: { channel: 'meleeRangeM', en: '+{v} meter to melee strike range', de: '+{v} Meter Nahkampf-Reichweite' },
     melee_splash_m: { channel: 'meleeSplashBaseM', en: 'Melee attacks also hit enemies within {v} meters of the target', de: 'Nahkampfangriffe treffen auch Gegner im Umkreis von {v} Metern um das Ziel' },
     // Retaliation ward (node 20036): flag effects without a number. A
     // bleeding attacker cannot bleed you / a burning one cannot ignite you
-    // (_egTryRetaliationWard in combat-ailments-core.js).
+    // (_tryRetaliationWard in combat-ailments-core.js).
     ward_bleed_retaliation: { channel: 'retaliationWardBleed', flag: true, en: 'Bleeding enemies cannot inflict Bleeding on you', de: 'Blutende Gegner können dir keine Blutung zufügen' },
     ward_ignite_retaliation: { channel: 'retaliationWardIgnite', flag: true, en: 'Ignited enemies cannot inflict Ignite on you', de: 'Brennende Gegner können dich nicht entzünden' },
     // Primal Flame keystone (node 350): damageToFirePct converts that share of
     // physical, cold and lightning Damage to Fire; onlyFireDamage then drops
-    // everything non-fire that is left (_egApplyDamageConversion in
+    // everything non-fire that is left (_applyDamageConversion in
     // combat-calculations-resistances.js, applied by the melee, projectile
     // and spell hit rolls plus flat player hits).
     damage_to_fire_pct: { channel: 'damageToFirePct', en: '{v}% of physical, cold and lightning Damage is converted to Fire Damage', de: '{v}% des physischen, Kälte- und Blitzschadens wird in Feuerschaden umgewandelt' },
     only_fire_damage: { channel: 'onlyFireDamage', flag: true, en: 'You cannot deal non-Fire Damage', de: 'Du kannst keinen Schaden außer Feuerschaden verursachen' },
     // Blood Magic keystone (node 40001). "More" life is a separate
     // multiplier applied after every % increased source where max HP is
-    // composed; the two flags are read through _egGetTreeChannel() by
+    // composed; the two flags are read through _getTreeChannel() by
     // class-mana.js (max Mana 0, costs paid in Life) and the cost increase
     // scales every spell/ability cost there too.
     life_more_pct: { channel: 'healthMorePct', en: '{v}% more maximum Life', de: '{v}% mehr maximales Leben' },
@@ -688,17 +688,17 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // Both are ADDITIVE like the gear mods of the same name: the chance is
     // added to critChance, the multiplier to critMultiplierPct (base 150%).
     // They only count for melee strikes with a Mace or Sceptre equipped
-    // (_egCalcPlayerMeleeDamage -> _egRollCrit bonus argument).
+    // (_calcPlayerMeleeDamage -> _rollCrit bonus argument).
     crit_chance_mace: { channel: 'critChanceMeleeMacePct', en: '+{v}% to melee Critical Strike Chance with Maces or Sceptres', de: '+{v}% auf die kritische Nahkampf-Trefferchance mit Streitkolben oder Zeptern' },
     crit_multi_mace: { channel: 'critMultiplierMeleeMacePct', en: '+{v}% to melee Critical Strike Multiplier with Maces or Sceptres', de: '+{v}% auf den kritischen Nahkampf-Schadensmultiplikator mit Streitkolben oder Zeptern' },
     // Damage-over-time multipliers (nodes 30355/95, 30306/30309): applied to
     // the stored damage-per-second of the ailment when it is inflicted
-    // (_egApplyMonsterAilment). Bleeding is the physical damage over time.
+    // (_applyMonsterAilment). Bleeding is the physical damage over time.
     ignite_damage_more: { channel: 'igniteDamageMorePct', en: 'Ignites you inflict deal {v}% more Damage', de: 'Von dir verursachte Entzündungen verursachen {v}% mehr Schaden' },
     phys_dot_more: { channel: 'physDotMorePct', en: 'You deal {v}% more physical Damage over Time', de: 'Du verursachst {v}% mehr physischen Schaden über Zeit' },
     // Physical damage gained as Fire (nodes 30356/217): added to the fire
     // share of every hit from the hit's physical share, AFTER the fire-only
-    // drop of the Primal Flame keystone (_egApplyDamageConversion). The
+    // drop of the Primal Flame keystone (_applyDamageConversion). The
     // timed variant is active for 5 seconds out of every 10 seconds of the
     // encounter, counted from the second the encounter starts (stats seed).
     phys_as_fire: { channel: 'physAsExtraFirePct', en: 'Gain {v}% of physical Damage as extra Fire Damage', de: 'Erhalte {v}% des physischen Schadens als zusätzlichen Feuerschaden' },
@@ -707,10 +707,10 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // for 5 seconds; a crushed enemy's physical Damage reduction is lowered
     // by the value (it can drop below 0 and then amplifies physical hits).
     // Vital Conduit keystone (node 291): a "less" multiplier on the whole
-    // per-second Life regeneration (_egTickLifeRegen), a "less" multiplier on
-    // every Life leech heal (_egLeechHealMult in the melee, projectile and
+    // per-second Life regeneration (_tickLifeRegen), a "less" multiplier on
+    // every Life leech heal (_leechHealMult in the melee, projectile and
     // spell hit rolls) and a flag that sends the Absorption recharge to Life
-    // (_egScheduleAbsorptionRegen).
+    // (_scheduleAbsorptionRegen).
     life_regen_less: { channel: 'lifeRegenLessPct', en: '{v}% less Life Regeneration rate', de: '{v}% weniger Lebensregenerationsrate' },
     life_leech_less: { channel: 'lifeLeechLessPct', en: '{v}% less Life recovered from Life leech effects', de: '{v}% weniger Leben durch Lebensentzug' },
     absorption_recharge_life: { channel: 'absorptionRechargesLife', flag: true, en: 'Absorption recharge restores Life instead of Absorption', de: 'Absorptionsaufladung stellt stattdessen Leben wieder her' },

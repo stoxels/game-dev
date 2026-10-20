@@ -1118,8 +1118,8 @@ function _getWorldStoxelProgressText(wi) {
  */
 function _getWorldConvergenceText(wi) {
     // Trial system present: "claimed 1/1" style readout.
-    if (typeof globalThis._egTrialIdForWorld === 'function' && typeof STATE !== 'undefined' && STATE) {
-        const id = globalThis._egTrialIdForWorld(wi);
+    if (typeof globalThis._trialIdForWorld === 'function' && typeof STATE !== 'undefined' && STATE) {
+        const id = globalThis._trialIdForWorld(wi);
         const done = STATE.trialsDone && STATE.trialsDone.includes(id);
         const key = done ? 'scr_world_trial_done' : 'scr_world_trial_todo';
         let label = (typeof t === 'function') ? t(key) : null;
@@ -1894,7 +1894,7 @@ export function _wireTopBarButtons(p = 'mv') {
     if (treeBtn) treeBtn.onclick = () => showPassiveTree();
     // Character sheet floats over this screen (same overlay as the B key, so
     // Back / B return here); the shop's Back also returns to this screen.
-    if (charBtn) charBtn.onclick = () => { if (typeof globalThis._egOpenCharSheetOverlay === 'function') globalThis._egOpenCharSheetOverlay(thisScreen); };
+    if (charBtn) charBtn.onclick = () => { if (typeof globalThis._openCharSheetOverlay === 'function') globalThis._openCharSheetOverlay(thisScreen); };
     if (shopBtn) shopBtn.onclick = () => launchAtlasVendor(thisScreen);
     if (settingsBtn) settingsBtn.onclick = () => { globalThis.loadSettingsUI(); showModal('settings-modal'); };
     if (changeBtn) changeBtn.onclick = () => { if (typeof globalThis.showClassChange === 'function') globalThis.showClassChange(); };

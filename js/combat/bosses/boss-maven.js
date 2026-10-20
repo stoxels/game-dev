@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MNEMONIC (boss_maven)---------------------------
@@ -11,7 +11,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_maven: {
         id: 'boss_maven', name: 'The Mnemonic', emoji: '🔢',
         baseHP: 980, baseDamage: 22, chargeMax: 12,
@@ -19,7 +19,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_maven: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -28,8 +28,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'memory_rite', intervalBase: 23000, intervalVariance: 5000, handler: '_egMechMemoryRite' },
-            { name: 'clue_swap', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechClueSwap' },
+            { name: 'memory_rite', intervalBase: 23000, intervalVariance: 5000, handler: '_mechMemoryRite' },
+            { name: 'clue_swap', intervalBase: 18000, intervalVariance: 4000, handler: '_mechClueSwap' },
         ],
     },
 });
@@ -37,13 +37,13 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // Three numbered circles shown in order, then walked in that order.
 // Each missed circle adds to the parting zap; a clean run ends silent.
-export function _egMechMemoryRite(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechMemoryRite(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const radius = p >= 3 ? 62 : 70;
     const showMs = 950, visitMs = 8000;
     const zapPct = 0.18;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const pts = [];
@@ -57,22 +57,22 @@ export function _egMechMemoryRite(monster, phase) {
         pts.push({ x: W * (0.25 + pts.length * 0.25), y: H * 0.5 });
     }
     pts.forEach((q, i) => {
-        q.el = _egNkEl(run, 'div', 'eg-nk-mem', String(i + 1));
+        q.el = _nkEl(run, 'div', 'eg-nk-mem', String(i + 1));
         q.el.style.left = Math.round(q.x - radius) + 'px';
         q.el.style.top = Math.round(q.y - radius) + 'px';
         q.el.style.width = radius * 2 + 'px';
         q.el.style.height = radius * 2 + 'px';
         q.locked = false;
     });
-    _egNkToast('eg_mech_memory', '🔢 The Mnemonic: Memory Rite! Visit the circles in order!');
+    _nkToast('eg_mech_memory', '🔢 The Mnemonic: Memory Rite! Visit the circles in order!');
     let e = 0, next = 0;
     const showTotal = showMs * 3;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         e += dtS * 1000;
         const lit = Math.min(3, Math.floor(e / showMs));
         pts.forEach((q, i) => q.el.classList.toggle('eg-nk-mem-on', i < lit));
         if (e >= showTotal) {
-            const c = _egNkPlayerCenter();
+            const c = _nkPlayerCenter();
             if (c && next < 3) {
                 const q = pts[next];
                 if (Math.hypot(c.x - q.x, c.y - q.y) <= radius) {
@@ -85,10 +85,10 @@ export function _egMechMemoryRite(monster, phase) {
         if (e >= showTotal + visitMs || next >= 3) {
             const missing = 3 - next;
             if (missing <= 0) {
-                _egNkToast('eg_memory_done', '✅ Rite complete!', '#4ade80');
+                _nkToast('eg_memory_done', '✅ Rite complete!', '#4ade80');
             } else {
-                const dealt = _egNkHit(Math.min(0.4, zapPct * missing), 'shadow', level);
-                _egNkAbilityHitToast(dealt, 'The Mnemonic', 'Memory Rite');
+                const dealt = _nkHit(Math.min(0.4, zapPct * missing), 'shadow', level);
+                _nkAbilityHitToast(dealt, 'The Mnemonic', 'Memory Rite');
             }
             return false;
         }

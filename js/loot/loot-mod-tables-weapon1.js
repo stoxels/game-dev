@@ -2,7 +2,7 @@
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
+//  which evals every MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------WEAPON 1 (MAIN HAND / MELEE) MODIFIER TABLE----------
@@ -35,7 +35,7 @@
 // damage, no precision, no quiz exclusives, no absorption regen.
 // Accuracy applies here - melee strikes can miss.
 
-export const EG_MOD_TABLE_WEAPON1 = {
+export const MOD_TABLE_WEAPON1 = {
     prefixes: {
 
         // --- ATTACK SPEED ---
@@ -453,12 +453,12 @@ export const EG_MOD_TABLE_WEAPON1 = {
 
 // One-handed melee table (main-hand + dual-wield off-hand). Identical to the
 // legacy WEAPON1 pool - kept as an alias so old references keep working.
-export const EG_MOD_TABLE_WEAPON_1H = EG_MOD_TABLE_WEAPON1;
+export const MOD_TABLE_WEAPON_1H = MOD_TABLE_WEAPON1;
 
 // 1H-exclusive: Parry (dual-wield defense identity). Two-handed weapons are
 // pure offense and can never roll this - choosing 2H means giving up parry,
 // exactly like giving up block by dropping the shield.
-EG_MOD_TABLE_WEAPON_1H.suffixes.parry = {
+MOD_TABLE_WEAPON_1H.suffixes.parry = {
     id: 'parry',
     label: '#% Chance to Parry Attacks while holding [R]', labelDe: '#% Chance, Angriffe beim Halten von [R] zu parieren',
     tiers: [

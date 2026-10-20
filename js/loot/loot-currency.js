@@ -8,23 +8,23 @@
 // to t() below so a language switch restyles every orb at once.
 
 import { t } from '../translation/translations.js';
-import { EG_MOD_CAPS, _egRollModCounts } from './loot-equipment-generator.js';
-import { _egGetModTable } from './loot-equipment-mod-tables.js';
-import { _egAddOneModToItem, _egRemoveOneModFromItem, _egRerollItemMods, _egRerollItemModValues } from './loot-currency-item-edits.js';
-import { _egRerollImplicits } from './loot-implicits.js';
-import {_egBuildItemName} from './loot-mod-naming.js';
-import { EG_UNIQUE_ITEMS, _egBuildUniqueItem } from './unique-items.js';
+import { ITEM_MOD_CAPS, _rollModCounts } from './loot-equipment-generator.js';
+import { _getModTable } from './loot-equipment-mod-tables.js';
+import { _addOneModToItem, _removeOneModFromItem, _rerollItemMods, _rerollItemModValues } from './loot-currency-item-edits.js';
+import { _rerollImplicits } from './loot-implicits.js';
+import {_buildItemName} from './loot-mod-naming.js';
+import { UNIQUE_ITEMS, _buildUniqueItem } from './unique-items.js';
 
 
-export const EG_CURRENCY_DEFS = {
+export const CURRENCY_DEFS = {
 
     orb_transmutation: {
         id: 'orb_transmutation', name: t('eg_orb_transmutation'), icon: '🔷',
         description: t('eg_orb_transmutation_desc'),
         canApply(item) { return item.rarity === 'common'; },
         apply(item) {
-            const { prefixCount, suffixCount } = _egRollModCounts('uncommon');
-            return _egRerollItemMods(item, 'uncommon', prefixCount, suffixCount);
+            const { prefixCount, suffixCount } = _rollModCounts('uncommon');
+            return _rerollItemMods(item, 'uncommon', prefixCount, suffixCount);
         },
     },
 
@@ -33,8 +33,8 @@ export const EG_CURRENCY_DEFS = {
         description: t('eg_orb_alteration_desc'),
         canApply(item) { return item.rarity === 'uncommon'; },
         apply(item) {
-            const { prefixCount, suffixCount } = _egRollModCounts('uncommon');
-            return _egRerollItemMods(item, 'uncommon', prefixCount, suffixCount);
+            const { prefixCount, suffixCount } = _rollModCounts('uncommon');
+            return _rerollItemMods(item, 'uncommon', prefixCount, suffixCount);
         },
         // Shift-chaining can immediately fill a one-modifier result with an
         // Augmentation Orb instead of consuming another Alteration Orb.
@@ -49,8 +49,8 @@ export const EG_CURRENCY_DEFS = {
         description: t('eg_orb_augmentation_desc'),
         canApply(item) { return item.rarity === 'uncommon' && (item.mods || []).length === 1; },
         apply(item) {
-            const updated = _egAddOneModToItem(item, 'uncommon');
-            const name = _egBuildItemName(updated.baseName || updated.name, updated.rarity, updated.mods);
+            const updated = _addOneModToItem(item, 'uncommon');
+            const name = _buildItemName(updated.baseName || updated.name, updated.rarity, updated.mods);
             return { ...updated, name };
         },
     },
@@ -60,8 +60,8 @@ export const EG_CURRENCY_DEFS = {
         description: t('eg_orb_regal_desc'),
         canApply(item) { return item.rarity === 'uncommon'; },
         apply(item) {
-            const updated = _egAddOneModToItem({ ...item, rarity: 'rare' }, 'rare');
-            const name = _egBuildItemName(updated.baseName || updated.name, 'rare', updated.mods);
+            const updated = _addOneModToItem({ ...item, rarity: 'rare' }, 'rare');
+            const name = _buildItemName(updated.baseName || updated.name, 'rare', updated.mods);
             return { ...updated, rarity: 'rare', name };
         },
     },
@@ -75,8 +75,8 @@ export const EG_CURRENCY_DEFS = {
             return item.rarity === 'common' || (item.rarity === 'rare' && !item.isUnique);
         },
         apply(item) {
-            const { prefixCount, suffixCount } = _egRollModCounts('rare');
-            return _egRerollItemMods(item, 'rare', prefixCount, suffixCount);
+            const { prefixCount, suffixCount } = _rollModCounts('rare');
+            return _rerollItemMods(item, 'rare', prefixCount, suffixCount);
         },
         requiresExtraCurrency(item) {
             return item.rarity === 'rare' && !item.isUnique ? 'orb_scouring' : null;
@@ -88,8 +88,8 @@ export const EG_CURRENCY_DEFS = {
         description: t('eg_orb_chaos_desc'),
         canApply(item) { return item.rarity === 'rare'; },
         apply(item) {
-            const { prefixCount, suffixCount } = _egRollModCounts('rare');
-            return _egRerollItemMods(item, 'rare', prefixCount, suffixCount);
+            const { prefixCount, suffixCount } = _rollModCounts('rare');
+            return _rerollItemMods(item, 'rare', prefixCount, suffixCount);
         },
     },
 
@@ -107,11 +107,11 @@ export const EG_CURRENCY_DEFS = {
         description: t('eg_orb_exalted_desc'),
         canApply(item) {
             if (item.rarity !== 'rare' && item.rarity !== 'epic') return false;
-            return (item.mods || []).length < EG_MOD_CAPS.epic.maxTotal;
+            return (item.mods || []).length < ITEM_MOD_CAPS.epic.maxTotal;
         },
         apply(item) {
-            const updated = _egAddOneModToItem({ ...item, rarity: 'epic' }, 'epic');
-            const name = _egBuildItemName(updated.baseName || updated.name, 'epic', updated.mods);
+            const updated = _addOneModToItem({ ...item, rarity: 'epic' }, 'epic');
+            const name = _buildItemName(updated.baseName || updated.name, 'epic', updated.mods);
             return { ...updated, rarity: 'epic', name };
         },
     },
@@ -122,7 +122,7 @@ export const EG_CURRENCY_DEFS = {
         description: t('eg_orb_divine_desc'),
         canApply(item) { return (item.mods || []).length > 0 && !item.isUnique; },
         apply(item) {
-            return _egRerollItemModValues(item, _egGetModTable(item));
+            return _rerollItemModValues(item, _getModTable(item));
         },
     },
 
@@ -136,8 +136,8 @@ export const EG_CURRENCY_DEFS = {
             return item.rarity === 'common' || (item.rarity === 'epic' && !item.isUnique);
         },
         apply(item) {
-            const { prefixCount, suffixCount } = _egRollModCounts('epic');
-            return _egRerollItemMods(item, 'epic', prefixCount, suffixCount);
+            const { prefixCount, suffixCount } = _rollModCounts('epic');
+            return _rerollItemMods(item, 'epic', prefixCount, suffixCount);
         },
         requiresExtraCurrency(item) {
             return item.rarity === 'epic' && !item.isUnique ? 'orb_scouring' : null;
@@ -150,11 +150,11 @@ export const EG_CURRENCY_DEFS = {
         description: t('eg_orb_elevation_desc'),
         canApply(item) {
             if (item.rarity !== 'rare') return false;
-            return (item.mods || []).length < EG_MOD_CAPS.epic.maxTotal;
+            return (item.mods || []).length < ITEM_MOD_CAPS.epic.maxTotal;
         },
         apply(item) {
-            const updated = _egAddOneModToItem({ ...item, rarity: 'epic' }, 'epic');
-            const name = _egBuildItemName(updated.baseName || updated.name, 'epic', updated.mods);
+            const updated = _addOneModToItem({ ...item, rarity: 'epic' }, 'epic');
+            const name = _buildItemName(updated.baseName || updated.name, 'epic', updated.mods);
             return { ...updated, rarity: 'epic', name };
         },
     },
@@ -165,8 +165,8 @@ export const EG_CURRENCY_DEFS = {
         description: t('eg_orb_cataclysm_desc'),
         canApply(item) { return item.rarity === 'epic'; },
         apply(item) {
-            const { prefixCount, suffixCount } = _egRollModCounts('epic');
-            return _egRerollItemMods(item, 'epic', prefixCount, suffixCount);
+            const { prefixCount, suffixCount } = _rollModCounts('epic');
+            return _rerollItemMods(item, 'epic', prefixCount, suffixCount);
         },
     },
 
@@ -181,19 +181,19 @@ export const EG_CURRENCY_DEFS = {
             // same slotType with required level <= source item's level.
             const UNIQUE_CHANCE = 0.025;
             if (Math.random() < UNIQUE_CHANCE
-                && typeof _egGetAncientOrbEligibleUniques === 'function'
-                && typeof _egBuildUniqueItem === 'function') {
-                const elig = _egGetAncientOrbEligibleUniques(item);
+                && typeof _getAncientOrbEligibleUniques === 'function'
+                && typeof _buildUniqueItem === 'function') {
+                const elig = _getAncientOrbEligibleUniques(item);
                 if (elig.length > 0) {
                     const def = elig[Math.floor(Math.random() * elig.length)];
                     const lvl = item.itemLevel || (item.requirements && item.requirements.level) || def.minLevel || 1;
-                    return _egBuildUniqueItem(def, lvl);
+                    return _buildUniqueItem(def, lvl);
                 }
             }
             const roll = Math.random();
             const rarity = roll < 0.60 ? 'uncommon' : (roll < 0.90 ? 'rare' : 'epic');
-            const { prefixCount, suffixCount } = _egRollModCounts(rarity);
-            return _egRerollItemMods(item, rarity, prefixCount, suffixCount);
+            const { prefixCount, suffixCount } = _rollModCounts(rarity);
+            return _rerollItemMods(item, rarity, prefixCount, suffixCount);
         },
     },
 
@@ -203,7 +203,7 @@ export const EG_CURRENCY_DEFS = {
         description: t('eg_orb_annulment_desc'),
         canApply(item) { return (item.mods || []).length > 0 && !item.isUnique; },
         apply(item) {
-            return _egRemoveOneModFromItem(item);
+            return _removeOneModFromItem(item);
         },
     },
 
@@ -217,7 +217,7 @@ export const EG_CURRENCY_DEFS = {
                 && Array.isArray(item.implicits) && item.implicits.length > 0;
         },
         apply(item) {
-            if (typeof _egRerollImplicits === 'function') return _egRerollImplicits(item);
+            if (typeof _rerollImplicits === 'function') return _rerollImplicits(item);
             return item;
         },
     },
@@ -250,14 +250,14 @@ export const EG_CURRENCY_DEFS = {
         description: t('eg_orb_bloom_desc'),
         canApply(item) {
             if (item.category !== 'equip' || item.isUnique) return false;
-            if (item.rarity === 'rare') return (item.mods || []).length < EG_MOD_CAPS.rare.maxTotal;
-            if (item.rarity === 'uncommon') return (item.mods || []).length < EG_MOD_CAPS.uncommon.maxTotal;
+            if (item.rarity === 'rare') return (item.mods || []).length < ITEM_MOD_CAPS.rare.maxTotal;
+            if (item.rarity === 'uncommon') return (item.mods || []).length < ITEM_MOD_CAPS.uncommon.maxTotal;
             return false;
         },
         apply(item) {
             // stays at the same rarity - only the mod count grows
-            const updated = _egAddOneModToItem(item, item.rarity);
-            const name = _egBuildItemName(updated.baseName || updated.name, updated.rarity, updated.mods);
+            const updated = _addOneModToItem(item, item.rarity);
+            const name = _buildItemName(updated.baseName || updated.name, updated.rarity, updated.mods);
             return { ...updated, name };
         },
     },
@@ -269,25 +269,25 @@ export const EG_CURRENCY_DEFS = {
         description: t('eg_orb_ancient_desc'),
         canApply(item) {
             if (item.category !== 'equip' || item.isUnique) return false;
-            const elig = (typeof _egGetAncientOrbEligibleUniques === 'function')
-                ? _egGetAncientOrbEligibleUniques(item) : [];
+            const elig = (typeof _getAncientOrbEligibleUniques === 'function')
+                ? _getAncientOrbEligibleUniques(item) : [];
             return elig.length > 0;
         },
         apply(item) {
-            const elig = (typeof _egGetAncientOrbEligibleUniques === 'function')
-                ? _egGetAncientOrbEligibleUniques(item) : [];
+            const elig = (typeof _getAncientOrbEligibleUniques === 'function')
+                ? _getAncientOrbEligibleUniques(item) : [];
             if (elig.length === 0) return item;
             const def = elig[Math.floor(Math.random() * elig.length)];
             const lvl = item.itemLevel || (item.requirements && item.requirements.level) || def.minLevel || 1;
-            if (typeof _egBuildUniqueItem === 'function') {
-                return _egBuildUniqueItem(def, lvl);
+            if (typeof _buildUniqueItem === 'function') {
+                return _buildUniqueItem(def, lvl);
             }
             return item;
         },
     },
 };
 
-for (const [id, def] of Object.entries(EG_CURRENCY_DEFS)) {
+for (const [id, def] of Object.entries(CURRENCY_DEFS)) {
     const nameKey = id === 'mirror_of_kalandra' ? 'eg_orb_mirror' : `eg_${id}`;
     Object.defineProperties(def, {
         name: { enumerable: true, get: () => t(nameKey) },
@@ -296,14 +296,14 @@ for (const [id, def] of Object.entries(EG_CURRENCY_DEFS)) {
 }
 
 // Helper: eligible uniques for Ancient Orb - same slotType and required level <= source
-export function _egGetAncientOrbEligibleUniques(item) {
-    if (!item || typeof EG_UNIQUE_ITEMS === 'undefined' || !Array.isArray(EG_UNIQUE_ITEMS)) return [];
+export function _getAncientOrbEligibleUniques(item) {
+    if (!item || typeof UNIQUE_ITEMS === 'undefined' || !Array.isArray(UNIQUE_ITEMS)) return [];
     const slot = item.slotType;
     if (!slot) return [];
     const srcLevel = (item.requirements && typeof item.requirements.level === 'number')
         ? item.requirements.level
         : (typeof item.itemLevel === 'number' ? item.itemLevel : 1);
-    return EG_UNIQUE_ITEMS.filter(u => {
+    return UNIQUE_ITEMS.filter(u => {
         if (u.slotType !== slot) return false;
         const reqLevel = (u.requirements && typeof u.requirements.level === 'number')
             ? u.requirements.level

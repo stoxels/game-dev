@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkNudgeAvatar, _nkPlayerCenter, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MAELSTROM (boss_maelstrom)-----------------------
@@ -11,7 +11,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 // are referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_maelstrom: {
         id: 'boss_maelstrom', name: 'The Maelstrom', emoji: '🌊',
         baseHP: 1020, baseDamage: 24, chargeMax: 11,
@@ -19,7 +19,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_maelstrom: {
         phases: [
             { threshold: 1.00, chargeMax: 11, damageMultiplier: 1.00 },
@@ -28,8 +28,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'vortex_nova', intervalBase: 22000, intervalVariance: 5000, handler: '_egMechMaelstromVortex' },
-            { name: 'corrupt_cells', intervalBase: 17000, intervalVariance: 4000, handler: '_egMechCorruptCells' },
+            { name: 'vortex_nova', intervalBase: 22000, intervalVariance: 5000, handler: '_mechMaelstromVortex' },
+            { name: 'corrupt_cells', intervalBase: 17000, intervalVariance: 4000, handler: '_mechCorruptCells' },
         ],
     },
 });
@@ -37,38 +37,38 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // A vortex pulls the player in, then detonates a nova at its eye.
 // Fight the pull early so the blast radius cannot reach you.
-export function _egMechMaelstromVortex(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechMaelstromVortex(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const pullMs = 4500;
     const pullSpeed = [0, 120, 145, 170][p];
     const novaR = [0, 170, 180, 190][p];
     const dmgPct = [0, 0.26, 0.30, 0.36][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const cx = window.innerWidth * 0.5;
     const cy = window.innerHeight * 0.5;
-    const eye = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-vortex', '🌊');
+    const eye = _nkEl(run, 'div', 'eg-nk-dot eg-nk-vortex', '🌊');
     eye.style.transform = 'translate(' + Math.round(cx - 30) + 'px,' + Math.round(cy - 30) + 'px)';
     // Dashed preview of the nova radius, visible from the very start.
-    const nova = _egNkEl(run, 'div', 'eg-nk-ring eg-nk-ring-warn');
+    const nova = _nkEl(run, 'div', 'eg-nk-ring eg-nk-ring-warn');
     nova.style.left = Math.round(cx - novaR) + 'px';
     nova.style.top = Math.round(cy - novaR) + 'px';
     nova.style.width = novaR * 2 + 'px';
     nova.style.height = novaR * 2 + 'px';
-    _egNkToast('eg_mech_vortex', '🌊 The Maelstrom: Vortex! Fight the pull, then clear the nova!');
+    _nkToast('eg_mech_vortex', '🌊 The Maelstrom: Vortex! Fight the pull, then clear the nova!');
     let e = 0, detonated = false;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         e += dtS * 1000;
         if (e < pullMs) {
-            const c = _egNkPlayerCenter();
+            const c = _nkPlayerCenter();
             if (c) {
                 const dx = cx - c.x, dy = cy - c.y;
                 const d = Math.sqrt(dx * dx + dy * dy) || 1;
                 // Pull weakens very close to the eye so you can never be
                 // sucked into the exact center against your will.
                 const falloff = Math.min(1, d / 120);
-                _egNkNudgeAvatar((dx / d) * pullSpeed * falloff * dtS, (dy / d) * pullSpeed * falloff * dtS);
+                _nkNudgeAvatar((dx / d) * pullSpeed * falloff * dtS, (dy / d) * pullSpeed * falloff * dtS);
             }
             return true;
         }
@@ -76,12 +76,12 @@ export function _egMechMaelstromVortex(monster, phase) {
             detonated = true;
             nova.classList.remove('eg-nk-ring-warn');
             nova.classList.add('eg-nk-boom');
-            const c = _egNkPlayerCenter();
+            const c = _nkPlayerCenter();
             if (c && Math.hypot(c.x - cx, c.y - cy) <= novaR) {
-                const dealt = _egNkHit(dmgPct, 'cold', level);
-                _egNkAbilityHitToast(dealt, 'The Maelstrom', 'Vortex Nova');
+                const dealt = _nkHit(dmgPct, 'cold', level);
+                _nkAbilityHitToast(dealt, 'The Maelstrom', 'Vortex Nova');
             } else {
-                _egNkToast('eg_blast_dodged', '✅ You dodged the blast!', '#4ade80');
+                _nkToast('eg_blast_dodged', '✅ You dodged the blast!', '#4ade80');
             }
         }
         return e < pullMs + 600;

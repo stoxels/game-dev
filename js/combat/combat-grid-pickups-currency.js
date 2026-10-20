@@ -1,26 +1,26 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { EG_ART } from '../endgame/endgame-art.js';
-import { _egGetElementCentre } from './combat-class-projectiles.js';
-import { egAddCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
-import { egAddEssence } from '../loot/loot-essences-stash.js';
+import { GAME_ART } from '../endgame/endgame-art.js';
+import { _getElementCentre } from './combat-class-projectiles.js';
+import { addCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
+import { addEssence } from '../loot/loot-essences-stash.js';
 import {
-    EG_CURRENCY_DROP_MAX_ON_BOARD,
-    EG_LOOT_DROP_LIFETIME_MS,
-    _egAnimatePickupDiscard,
-    _egBuildPickupEligiblePool,
-    _egCancelTrackedExpiry,
-    _egCellHasAnyDrop,
-    _egRarityToastColor,
-    _egScheduleTrackedExpiry,
+    CURRENCY_DROP_MAX_ON_BOARD,
+    LOOT_DROP_LIFETIME_MS,
+    _animatePickupDiscard,
+    _buildPickupEligiblePool,
+    _cancelTrackedExpiry,
+    _cellHasAnyDrop,
+    _rarityToastColor,
+    _scheduleTrackedExpiry,
 } from './combat-grid-pickups.js';
-import { _egCurrencyDrops, _egIsActive } from './combat-state.js';
+import { _currencyDrops, _isActive } from './combat-state.js';
 
 // Same idea as loot drops (above), but for currency orbs. Orbs land on
 // the grid and must be claimed by filling the correct cell - they no
 // longer go straight into the currency strip on kill.
 
-export function _egRenderCurrencyDropOverlay(row, col, def) {
+export function _renderCurrencyDropOverlay(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     const span = document.createElement('span');
@@ -28,90 +28,90 @@ export function _egRenderCurrencyDropOverlay(row, col, def) {
     span.id = `eg-currency-drop-${row}-${col}`;
     // Orb/essence art (images/items/, keyed by def id) when available,
     // else the emoji fallback - same pattern as the loot overlay above.
-    EG_ART.fillElement(span, 'item', def && def.id, (def && def.icon) || '💰');
+    GAME_ART.fillElement(span, 'item', def && def.id, (def && def.icon) || '💰');
     el.appendChild(span);
 }
 
-export function _egRemoveCurrencyDropOverlay(key) {
+export function _removeCurrencyDropOverlay(key) {
     const [r, c] = key.split('-').map(Number);
     const span = document.getElementById(`eg-currency-drop-${r}-${c}`);
     if (span) span.remove();
 }
 
-export function _egAnimateCurrencyDropClaim(row, col, def) {
+export function _animateCurrencyDropClaim(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
-    const centre = _egGetElementCentre(el);
+    const centre = _getElementCentre(el);
     const floater = document.createElement('div');
     floater.className = 'eg-pickup-floater';
-    EG_ART.fillElement(floater, 'item', def && def.id, (def && def.icon) || '💰');
+    GAME_ART.fillElement(floater, 'item', def && def.id, (def && def.icon) || '💰');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
     document.body.appendChild(floater);
     setTimeout(() => floater.remove(), 800);
 }
 
-// Called by _egTryDropCurrency() in endgame-currency.js instead of
+// Called by _tryDropCurrency() in endgame-currency.js instead of
 // adding the orb straight to the stash.
-export function _egSpawnCurrencyDrop(def) {
-    if (!_egIsActive() || !def) return;
-    if (_egCurrencyDrops.size >= EG_CURRENCY_DROP_MAX_ON_BOARD) return;
+export function _spawnCurrencyDrop(def) {
+    if (!_isActive() || !def) return;
+    if (_currencyDrops.size >= CURRENCY_DROP_MAX_ON_BOARD) return;
 
-    const pool = _egBuildPickupEligiblePool();
-    const filtered = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
+    const pool = _buildPickupEligiblePool();
+    const filtered = pool.filter(([r, c]) => !_cellHasAnyDrop(r, c));
     if (filtered.length === 0) return;
 
     const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
     const key = `${r}-${c}`;
 
-    _egCurrencyDrops.set(key, def);
-    _egRenderCurrencyDropOverlay(r, c, def);
+    _currencyDrops.set(key, def);
+    _renderCurrencyDropOverlay(r, c, def);
 
-    _egScheduleTrackedExpiry(_egCurrencyDrops, key, def, EG_LOOT_DROP_LIFETIME_MS, `eg-currency-drop-${r}-${c}`, _egRemoveCurrencyDropOverlay);
+    _scheduleTrackedExpiry(_currencyDrops, key, def, LOOT_DROP_LIFETIME_MS, `eg-currency-drop-${r}-${c}`, _removeCurrencyDropOverlay);
 }
 
 // Tracks a claimed currency drop for the leave-map summary screen.
 // Aggregates by currency id so stacks show one chip with a count.
-export function _egTrackRunCurrency(def) {
-    const existing = globalThis._egRunCurrency.find(e => e.id === def.id);
+export function _trackRunCurrency(def) {
+    const existing = globalThis._runCurrency.find(e => e.id === def.id);
     if (existing) existing.count++;
-    else globalThis._egRunCurrency.push({ id: def.id, name: def.name, icon: def.icon, description: def.description, count: 1 });
+    else globalThis._runCurrency.push({ id: def.id, name: def.name, icon: def.icon, description: def.description, count: 1 });
 }
 
 // Tracks a claimed essence drop for the leave-map summary screen.
 // Aggregates by essence id so stacks show one chip with a count.
-export function _egTrackRunEssence(def) {
-    const existing = globalThis._egRunEssences.find(e => e.id === def.id);
+export function _trackRunEssence(def) {
+    const existing = globalThis._runEssences.find(e => e.id === def.id);
     if (existing) existing.count++;
-    else globalThis._egRunEssences.push({ id: def.id, name: def.name, icon: def.icon, description: def.description, count: 1 });
+    else globalThis._runEssences.push({ id: def.id, name: def.name, icon: def.icon, description: def.description, count: 1 });
 }
 
 
-// Called on correct-cell-fill (mirrors _egCheckLootClaim). Adds the orb
-// to the currency stash via egAddCurrency() and returns true if claimed.
-export function _egCheckCurrencyDropClaim(row, col) {
-    if (!_egIsActive()) return false;
+// Called on correct-cell-fill (mirrors _checkLootClaim). Adds the orb
+// to the currency stash via addCurrency() and returns true if claimed.
+export function _checkCurrencyDropClaim(row, col) {
+    if (!_isActive()) return false;
     const key = `${row}-${col}`;
-    const def = _egCurrencyDrops.get(key);
+    const def = _currencyDrops.get(key);
     if (!def) return false;
 
-    _egCancelTrackedExpiry(_egCurrencyDrops, key, def);
-    _egCurrencyDrops.delete(key);
-    _egRemoveCurrencyDropOverlay(key);
-    _egAnimateCurrencyDropClaim(row, col, def);
+    _cancelTrackedExpiry(_currencyDrops, key, def);
+    _currencyDrops.delete(key);
+    _removeCurrencyDropOverlay(key);
+    _animateCurrencyDropClaim(row, col, def);
 
     // Essences are claimed through the same drop pipeline but stack in the
     // essence tab instead of the runes & orbs strip.
     const isEssence = def.category === 'essence';
     const added = isEssence
-        ? egAddEssence(def.id, 1, {
+        ? addEssence(def.id, 1, {
             name: def.name,
             icon: def.icon,
             rarity: 'essence',
             category: 'essence',
             description: def.description,
         })
-        : egAddCurrency(def.id, 1, {
+        : addCurrency(def.id, 1, {
             name: def.name,
             icon: def.icon,
             rarity: 'currency',
@@ -120,57 +120,57 @@ export function _egCheckCurrencyDropClaim(row, col) {
         });
 
     if (isEssence) {
-        _egTrackRunEssence(def);
+        _trackRunEssence(def);
     } else {
-        _egTrackRunCurrency(def);
+        _trackRunCurrency(def);
     }
 
     if (added) globalThis.showToast(t('eg_currency_acquired')
         .replace('{icon}', def.icon)
-        .replace('{name}', def.name), _egRarityToastColor('currency'));
+        .replace('{name}', def.name), _rarityToastColor('currency'));
     Audio_Manager.playSFX(isEssence ? 'pickup_essence' : 'pickup_currency', 'player_equip_pickup');
     return true;
 }
 
-// Called on wrong-action-on-cell (mirrors _egDiscardLootDrop).
-export function _egDiscardCurrencyDrop(row, col) {
-    if (!_egIsActive()) return;
+// Called on wrong-action-on-cell (mirrors _discardLootDrop).
+export function _discardCurrencyDrop(row, col) {
+    if (!_isActive()) return;
     const key = `${row}-${col}`;
-    if (!_egCurrencyDrops.has(key)) return;
-    const def = _egCurrencyDrops.get(key);
-    _egCancelTrackedExpiry(_egCurrencyDrops, key, def);
-    _egCurrencyDrops.delete(key);
-    _egRemoveCurrencyDropOverlay(key);
-    _egAnimatePickupDiscard(row, col, { emoji: def.icon || '💰', id: def.id });
+    if (!_currencyDrops.has(key)) return;
+    const def = _currencyDrops.get(key);
+    _cancelTrackedExpiry(_currencyDrops, key, def);
+    _currencyDrops.delete(key);
+    _removeCurrencyDropOverlay(key);
+    _animatePickupDiscard(row, col, { emoji: def.icon || '💰', id: def.id });
 
     Audio_Manager.playSFX('player_equip_not_pickup');
 }
 
-// Clears all active currency drops (called by _egStopPickupSpawner).
-export function _egStopCurrencyDrops() {
-    Array.from(_egCurrencyDrops.entries()).forEach(([key, def]) => _egCancelTrackedExpiry(_egCurrencyDrops, key, def));
-    _egCurrencyDrops.forEach((def, key) => _egRemoveCurrencyDropOverlay(key));
-    _egCurrencyDrops.clear();
+// Clears all active currency drops (called by _stopPickupSpawner).
+export function _stopCurrencyDrops() {
+    Array.from(_currencyDrops.entries()).forEach(([key, def]) => _cancelTrackedExpiry(_currencyDrops, key, def));
+    _currencyDrops.forEach((def, key) => _removeCurrencyDropOverlay(key));
+    _currencyDrops.clear();
 }
 
 // Carries an unclaimed currency drop into the next chained puzzle
-// (mirrors _egReplaceCarriedLootDrops).
-export function _egReplaceCarriedCurrencyDrops(defs) {
+// (mirrors _replaceCarriedLootDrops).
+export function _replaceCarriedCurrencyDrops(defs) {
     if (!defs || defs.length === 0) return;
 
     defs.forEach(def => {
-        if (_egCurrencyDrops.size >= EG_CURRENCY_DROP_MAX_ON_BOARD) return;
+        if (_currencyDrops.size >= CURRENCY_DROP_MAX_ON_BOARD) return;
 
-        const pool = _egBuildPickupEligiblePool();
-        const filtered = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
+        const pool = _buildPickupEligiblePool();
+        const filtered = pool.filter(([r, c]) => !_cellHasAnyDrop(r, c));
         if (filtered.length === 0) return;
 
         const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
         const key = `${r}-${c}`;
 
-        _egCurrencyDrops.set(key, def);
-        _egRenderCurrencyDropOverlay(r, c, def);
+        _currencyDrops.set(key, def);
+        _renderCurrencyDropOverlay(r, c, def);
 
-        _egScheduleTrackedExpiry(_egCurrencyDrops, key, def, EG_LOOT_DROP_LIFETIME_MS, `eg-currency-drop-${r}-${c}`, _egRemoveCurrencyDropOverlay);
+        _scheduleTrackedExpiry(_currencyDrops, key, def, LOOT_DROP_LIFETIME_MS, `eg-currency-drop-${r}-${c}`, _removeCurrencyDropOverlay);
     });
 }

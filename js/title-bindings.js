@@ -560,18 +560,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // Tutorial quest is mandatory: the LEVELS exits are hidden mid-lesson,
         // and this guard covers any programmatic path (keyboard, stale overlay).
         if (cur && cur.isTutorialQuest) return;
-        if (cur && cur.isMonsterLevel && !cur.campaignMonsters && typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) {
+        if (cur && cur.isMonsterLevel && !cur.campaignMonsters && typeof globalThis._isActive === 'function' && globalThis._isActive()) {
             showEgForfeitConfirm(() => {
                 globalThis.unpauseGame();
                 cleanupActiveGameSystems();
                 stopTimer();
                 // Keep the run's collected loot even on a forfeit - the
-                // consumed map is penalty enough (mirrors _egEndMapDefeated).
-                if (typeof globalThis._egFlushRunLootToStash === 'function') globalThis._egFlushRunLootToStash();
+                // consumed map is penalty enough (mirrors _endMapDefeated).
+                if (typeof globalThis._flushRunLootToStash === 'function') globalThis._flushRunLootToStash();
                 if (typeof globalThis._egBankUnclaimedMapDrops === 'function') globalThis._egBankUnclaimedMapDrops();
-                if (typeof globalThis.egSaveHubState === 'function') globalThis.egSaveHubState();
-                if (typeof globalThis._egStopEncounter === 'function') globalThis._egStopEncounter();
-                if (typeof globalThis._egResetQuizDamageBuff === 'function') globalThis._egResetQuizDamageBuff();
+                if (typeof globalThis.saveHubState === 'function') globalThis.saveHubState();
+                if (typeof globalThis._stopEncounter === 'function') globalThis._stopEncounter();
+                if (typeof globalThis._resetQuizDamageBuff === 'function') globalThis._resetQuizDamageBuff();
                 safeCall('_hidePlayerAvatarSimple');
                 safeCall('_hidePlayerAvatar');
                 goToLevelSelect();
@@ -585,8 +585,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // ALWAYS tear down a running encounter (campaign monster levels too -
         // they don't take the forfeit branch above but must not keep ticking,
         // attacking, or re-rendering the player sprite after we leave).
-        if (typeof globalThis._egStopEncounter === 'function') globalThis._egStopEncounter();
-        if (typeof globalThis._egResetQuizDamageBuff === 'function') globalThis._egResetQuizDamageBuff();
+        if (typeof globalThis._stopEncounter === 'function') globalThis._stopEncounter();
+        if (typeof globalThis._resetQuizDamageBuff === 'function') globalThis._resetQuizDamageBuff();
         safeCall('_hidePlayerAvatarSimple');
         safeCall('_hidePlayerAvatar');
         goToLevelSelect();
@@ -603,18 +603,18 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function onReturnToNexusFromGame() {
         if (cur && cur.isTutorialQuest) return;
-        if (cur && cur.isMonsterLevel && !cur.campaignMonsters && typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) {
+        if (cur && cur.isMonsterLevel && !cur.campaignMonsters && typeof globalThis._isActive === 'function' && globalThis._isActive()) {
             showEgForfeitConfirm(() => {
                 globalThis.unpauseGame();
                 cleanupActiveGameSystems();
                 stopTimer();
                 // Keep the run's collected loot even on a forfeit - the
-                // consumed map is penalty enough (mirrors _egEndMapDefeated).
-                if (typeof globalThis._egFlushRunLootToStash === 'function') globalThis._egFlushRunLootToStash();
+                // consumed map is penalty enough (mirrors _endMapDefeated).
+                if (typeof globalThis._flushRunLootToStash === 'function') globalThis._flushRunLootToStash();
                 if (typeof globalThis._egBankUnclaimedMapDrops === 'function') globalThis._egBankUnclaimedMapDrops();
-                if (typeof globalThis.egSaveHubState === 'function') globalThis.egSaveHubState();
-                if (typeof globalThis._egStopEncounter === 'function') globalThis._egStopEncounter();
-                if (typeof globalThis._egResetQuizDamageBuff === 'function') globalThis._egResetQuizDamageBuff();
+                if (typeof globalThis.saveHubState === 'function') globalThis.saveHubState();
+                if (typeof globalThis._stopEncounter === 'function') globalThis._stopEncounter();
+                if (typeof globalThis._resetQuizDamageBuff === 'function') globalThis._resetQuizDamageBuff();
                 safeCall('_hidePlayerAvatarSimple');
                 safeCall('_hidePlayerAvatar');
                 globalThis.showEndgameNexus();
@@ -626,8 +626,8 @@ document.addEventListener('DOMContentLoaded', () => {
         cleanupActiveGameSystems();
         stopTimer();
         // ALWAYS tear down a running encounter (see onGoToLevelsFromGame).
-        if (typeof globalThis._egStopEncounter === 'function') globalThis._egStopEncounter();
-        if (typeof globalThis._egResetQuizDamageBuff === 'function') globalThis._egResetQuizDamageBuff();
+        if (typeof globalThis._stopEncounter === 'function') globalThis._stopEncounter();
+        if (typeof globalThis._resetQuizDamageBuff === 'function') globalThis._resetQuizDamageBuff();
         safeCall('_hidePlayerAvatarSimple');
         safeCall('_hidePlayerAvatar');
         globalThis.showEndgameNexus();

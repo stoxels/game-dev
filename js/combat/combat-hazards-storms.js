@@ -1,55 +1,55 @@
 import { Audio_Manager } from '../audio/audio.js';
-import { _egApplyPlayerAilment } from './combat-ailments-core.js';
-import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _applyPlayerAilment } from './combat-ailments-core.js';
+import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
 import {
-    EG_HZ_ARCANE_BASE_DMG_PCT, EG_HZ_ARCANE_BEAM_HEIGHT, EG_HZ_ARCANE_BEAM_TRAVEL_MS,
-    EG_HZ_ARCANE_CHARGE_MAX_MS, EG_HZ_ARCANE_CHARGE_MIN_MS, EG_HZ_ARCANE_INTERVAL_MAX_MS,
-    EG_HZ_ARCANE_INTERVAL_MIN_MS, EG_HZ_ARCANE_POLYMORPH_CHANCE_PCT,
-    EG_HZ_ICICLE_BASE_DMG_PCT, EG_HZ_ICICLE_FALL_SPEED, EG_HZ_ICICLE_SHAKE_MS,
-    EG_HZ_ICICLE_SPAWN_MAX_MS, EG_HZ_ICICLE_SPAWN_MIN_MS, EG_HZ_LIGHTNING_BASE_DMG_PCT,
-    EG_HZ_LIGHTNING_INTERVAL_MAX_MS, EG_HZ_LIGHTNING_INTERVAL_MIN_MS, EG_HZ_LIGHTNING_RADIUS,
-    EG_HZ_LIGHTNING_WARNING_MS, EG_HZ_METEOR_BASE_DMG_PCT, EG_HZ_METEOR_FALL_MS,
-    EG_HZ_METEOR_IGNITE_CHANCE_PCT, EG_HZ_METEOR_INTERVAL_MAX_MS, EG_HZ_METEOR_INTERVAL_MIN_MS,
-    EG_HZ_METEOR_RADIUS, EG_HZ_METEOR_VOLLEY_MAX, EG_HZ_METEOR_VOLLEY_MIN, EG_HZ_METEOR_WARNING_MS,
-    _egHzActive, _egHzApplyCircleHit, _egHzDamage, _egHzLayer, _egHzMult, _egHzPlayerHitbox,
-    _egHzPointOutsideGrid, _egHzRand, _egHzRectsOverlap,
+    HZ_ARCANE_BASE_DMG_PCT, HZ_ARCANE_BEAM_HEIGHT, HZ_ARCANE_BEAM_TRAVEL_MS,
+    HZ_ARCANE_CHARGE_MAX_MS, HZ_ARCANE_CHARGE_MIN_MS, HZ_ARCANE_INTERVAL_MAX_MS,
+    HZ_ARCANE_INTERVAL_MIN_MS, HZ_ARCANE_POLYMORPH_CHANCE_PCT,
+    HZ_ICICLE_BASE_DMG_PCT, HZ_ICICLE_FALL_SPEED, HZ_ICICLE_SHAKE_MS,
+    HZ_ICICLE_SPAWN_MAX_MS, HZ_ICICLE_SPAWN_MIN_MS, HZ_LIGHTNING_BASE_DMG_PCT,
+    HZ_LIGHTNING_INTERVAL_MAX_MS, HZ_LIGHTNING_INTERVAL_MIN_MS, HZ_LIGHTNING_RADIUS,
+    HZ_LIGHTNING_WARNING_MS, HZ_METEOR_BASE_DMG_PCT, HZ_METEOR_FALL_MS,
+    HZ_METEOR_IGNITE_CHANCE_PCT, HZ_METEOR_INTERVAL_MAX_MS, HZ_METEOR_INTERVAL_MIN_MS,
+    HZ_METEOR_RADIUS, HZ_METEOR_VOLLEY_MAX, HZ_METEOR_VOLLEY_MIN, HZ_METEOR_WARNING_MS,
+    _hzActive, _hzApplyCircleHit, _hzDamage, _hzLayer, _hzMult, _hzPlayerHitbox,
+    _hzPointOutsideGrid, _hzRand, _hzRectsOverlap,
 } from './combat-hazards.js';
 import {
-    _egHzArcane, _egHzBlizzard, _egHzDarkness, _egHzLightning, _egHzMeteor,
-    _egSetHzArcane, _egSetHzBlizzard, _egSetHzDarkness, _egSetHzLightning, _egSetHzMeteor,
+    _hzArcane, _hzBlizzard, _hzDarkness, _hzLightning, _hzMeteor,
+    _setHzArcane, _setHzBlizzard, _setHzDarkness, _setHzLightning, _setHzMeteor,
 } from './combat-hazards.js';
 
 //------------------------------------------------------------------------
 //-------------------LIGHTNING STORM--------------------------------------
 //------------------------------------------------------------------------
 
-export function _egHzInitLightning(intensity) {
-    _egSetHzLightning({
+export function _hzInitLightning(intensity) {
+    _setHzLightning({
         pending: [],
-        nextIn: _egHzRand(2500, 5000),
+        nextIn: _hzRand(2500, 5000),
         intervalScale: 1 - Math.min(0.45, intensity / 220),
-        dmgMult: _egHzMult(intensity),
+        dmgMult: _hzMult(intensity),
     });
 }
 
-export function _egHzTickLightning(dtMs) {
-    const st = _egHzLightning;
+export function _hzTickLightning(dtMs) {
+    const st = _hzLightning;
 
     st.nextIn -= dtMs;
     if (st.nextIn <= 0) {
-        st.nextIn = _egHzRand(
-            EG_HZ_LIGHTNING_INTERVAL_MIN_MS,
-            EG_HZ_LIGHTNING_INTERVAL_MAX_MS
+        st.nextIn = _hzRand(
+            HZ_LIGHTNING_INTERVAL_MIN_MS,
+            HZ_LIGHTNING_INTERVAL_MAX_MS
         ) * st.intervalScale;
 
-        const pos = _egHzPointOutsideGrid(EG_HZ_LIGHTNING_RADIUS * 0.6);
+        const pos = _hzPointOutsideGrid(HZ_LIGHTNING_RADIUS * 0.6);
         const el = document.createElement('div');
         el.className = 'eg-hz-lightning-warning';
         el.style.left = pos.x + 'px';
         el.style.top = pos.y + 'px';
-        _egHzLayer.appendChild(el);
+        _hzLayer.appendChild(el);
         Audio_Manager.playSFX('hz_lightning_warn');
-        st.pending.push({ x: pos.x, y: pos.y, t: EG_HZ_LIGHTNING_WARNING_MS, el });
+        st.pending.push({ x: pos.x, y: pos.y, t: HZ_LIGHTNING_WARNING_MS, el });
     }
 
     for (let i = st.pending.length - 1; i >= 0; i--) {
@@ -66,9 +66,9 @@ export function _egHzTickLightning(dtMs) {
         setTimeout(() => warnEl.remove(), 350);
         st.pending.splice(i, 1);
 
-        const pr = _egHzPlayerHitbox();
-        _egHzApplyCircleHit(strike.x, strike.y, EG_HZ_LIGHTNING_RADIUS, pr,
-            EG_HZ_LIGHTNING_BASE_DMG_PCT * st.dmgMult, 'lightning', '#ffe66b', 'shocked');
+        const pr = _hzPlayerHitbox();
+        _hzApplyCircleHit(strike.x, strike.y, HZ_LIGHTNING_RADIUS, pr,
+            HZ_LIGHTNING_BASE_DMG_PCT * st.dmgMult, 'lightning', '#ffe66b', 'shocked');
     }
 }
 
@@ -77,7 +77,7 @@ export function _egHzTickLightning(dtMs) {
 //-------------------BLIZZARD---------------------------------------------
 //------------------------------------------------------------------------
 
-export function _egHzInitBlizzard(intensity) {
+export function _hzInitBlizzard(intensity) {
     // Full-screen snow layer (visual only - never blocks clicks).
     const overlay = document.createElement('div');
     overlay.className = 'eg-hz-blizzard';
@@ -86,58 +86,58 @@ export function _egHzInitBlizzard(intensity) {
         const flake = document.createElement('span');
         flake.className = 'eg-hz-snowflake';
         flake.textContent = '❄';
-        flake.style.left = _egHzRand(0, 100) + '%';
-        flake.style.fontSize = _egHzRand(8, 18) + 'px';
-        flake.style.opacity = _egHzRand(0.35, 0.85).toFixed(2);
-        flake.style.animationDuration = _egHzRand(5, 11) + 's';
-        flake.style.animationDelay = (-_egHzRand(0, 10)) + 's';
+        flake.style.left = _hzRand(0, 100) + '%';
+        flake.style.fontSize = _hzRand(8, 18) + 'px';
+        flake.style.opacity = _hzRand(0.35, 0.85).toFixed(2);
+        flake.style.animationDuration = _hzRand(5, 11) + 's';
+        flake.style.animationDelay = (-_hzRand(0, 10)) + 's';
         overlay.appendChild(flake);
     }
-    _egHzLayer.appendChild(overlay);
+    _hzLayer.appendChild(overlay);
     Audio_Manager.playSFX('hz_blizzard_loop');
 
     const maxIcicles = Math.min(6, 3 + Math.round(intensity / 40));
-    _egSetHzBlizzard({
+    _setHzBlizzard({
         overlay,
         icicles: [],
-        spawnIn: _egHzRand(1500, 3000),
+        spawnIn: _hzRand(1500, 3000),
         maxIcicles,
         spawnScale: 1 - Math.min(0.5, intensity / 200),
-        dmgMult: _egHzMult(intensity),
+        dmgMult: _hzMult(intensity),
     });
 }
 
-export function _egHzSpawnIcicle() {
-    const w = _egHzRand(28, 44);
-    const h = _egHzRand(60, 115);
-    const x = _egHzRand(20, window.innerWidth - w - 20);
+export function _hzSpawnIcicle() {
+    const w = _hzRand(28, 44);
+    const h = _hzRand(60, 115);
+    const x = _hzRand(20, window.innerWidth - w - 20);
     const el = document.createElement('div');
     el.className = 'eg-hz-icicle eg-hz-icicle-hang';
     el.style.left = x + 'px';
     el.style.width = w + 'px';
     el.style.height = h + 'px';
-    _egHzLayer.appendChild(el);
+    _hzLayer.appendChild(el);
     return {
         x, w, h, el,
         state: 'hang',
-        t: _egHzRand(3500, 9000),
+        t: _hzRand(3500, 9000),
         y: 0,
         hitDone: false,
     };
 }
 
-export function _egHzTickBlizzard(dtMs) {
-    const st = _egHzBlizzard;
+export function _hzTickBlizzard(dtMs) {
+    const st = _hzBlizzard;
 
     st.spawnIn -= dtMs;
     if (st.spawnIn <= 0) {
-        st.spawnIn = _egHzRand(EG_HZ_ICICLE_SPAWN_MIN_MS, EG_HZ_ICICLE_SPAWN_MAX_MS)
+        st.spawnIn = _hzRand(HZ_ICICLE_SPAWN_MIN_MS, HZ_ICICLE_SPAWN_MAX_MS)
             * st.spawnScale;
-        if (st.icicles.length < st.maxIcicles) st.icicles.push(_egHzSpawnIcicle());
+        if (st.icicles.length < st.maxIcicles) st.icicles.push(_hzSpawnIcicle());
     }
 
     const dtS = dtMs / 1000;
-    const pr = _egHzPlayerHitbox();
+    const pr = _hzPlayerHitbox();
 
     for (let i = st.icicles.length - 1; i >= 0; i--) {
         const ic = st.icicles[i];
@@ -147,7 +147,7 @@ export function _egHzTickBlizzard(dtMs) {
             ic.t -= dtMs;
             if (ic.t <= 0) {
                 ic.state = 'shake';
-                ic.t = EG_HZ_ICICLE_SHAKE_MS;
+                ic.t = HZ_ICICLE_SHAKE_MS;
                 ic.el.classList.remove('eg-hz-icicle-hang');
                 ic.el.classList.add('eg-hz-icicle-shake');
             }
@@ -161,7 +161,7 @@ export function _egHzTickBlizzard(dtMs) {
             }
         } else {
             const prevY = ic.y;
-            ic.y += EG_HZ_ICICLE_FALL_SPEED * dtS;
+            ic.y += HZ_ICICLE_FALL_SPEED * dtS;
             ic.el.style.transform = `translateY(${Math.round(ic.y)}px)`;
 
             if (pr && !ic.hitDone) {
@@ -170,13 +170,13 @@ export function _egHzTickBlizzard(dtMs) {
                     left: ic.x, right: ic.x + ic.w,
                     top: Math.min(prevY, ic.y), bottom: Math.max(prevY + ic.h, ic.y + ic.h),
                 };
-                if (_egHzRectsOverlap(swept, pr)) {
+                if (_hzRectsOverlap(swept, pr)) {
                     ic.hitDone = true;
-                    const dealt = _egHzDamage(
-                        EG_HZ_ICICLE_BASE_DMG_PCT * st.dmgMult, 'cold', '#8fd8ff'
+                    const dealt = _hzDamage(
+                        HZ_ICICLE_BASE_DMG_PCT * st.dmgMult, 'cold', '#8fd8ff'
                     );
-                    if (dealt > 0 && typeof _egApplyPlayerAilment === 'function') {
-                        _egApplyPlayerAilment('chill');
+                    if (dealt > 0 && typeof _applyPlayerAilment === 'function') {
+                        _applyPlayerAilment('chill');
                     }
                 }
             }
@@ -194,11 +194,11 @@ export function _egHzTickBlizzard(dtMs) {
 //-------------------DARKNESS CLOUDS--------------------------------------
 //------------------------------------------------------------------------
 
-export function _egHzInitDarkness(intensity) {
+export function _hzInitDarkness(intensity) {
     // Shadow Resistance thins the clouds (min opacity floor keeps them fair).
     let shadowResist = 0;
     try {
-        shadowResist = Math.max(0, _egComputePlayerStats().shadowResist || 0);
+        shadowResist = Math.max(0, _computePlayerStats().shadowResist || 0);
     } catch (e) { /* stats unavailable → ignore */ }
     const opacity = Math.max(0.55,
         Math.min(0.95, 0.7 + intensity * 0.004 - (shadowResist / 100) * 0.15));
@@ -211,16 +211,16 @@ export function _egHzInitDarkness(intensity) {
 
     const clouds = [];
     for (let i = 0; i < count; i++) {
-        const scale = _egHzRand(0.8, 1.5);
+        const scale = _hzRand(0.8, 1.5);
         const el = document.createElement('div');
         el.className = 'eg-hz-cloud';
         el.style.opacity = opacity.toFixed(2);
         el.style.setProperty('--hz-cloud-scale', scale.toFixed(2));
         darkLayer.appendChild(el);
         const cloud = {
-            x: _egHzRand(-100, window.innerWidth),
-            y: _egHzRand(0, Math.max(1, window.innerHeight - 160)),
-            vx: (i % 2 === 0 ? 1 : -1) * _egHzRand(6, 14), // gentle drift
+            x: _hzRand(-100, window.innerWidth),
+            y: _hzRand(0, Math.max(1, window.innerHeight - 160)),
+            vx: (i % 2 === 0 ? 1 : -1) * _hzRand(6, 14), // gentle drift
             el,
         };
         // Place immediately so clouds never flash at the top-left corner
@@ -231,14 +231,14 @@ export function _egHzInitDarkness(intensity) {
     }
     document.body.appendChild(darkLayer);
     Audio_Manager.playSFX('hz_darkness_spawn');
-    _egSetHzDarkness({ clouds, layer: darkLayer, blinded: false });
+    _setHzDarkness({ clouds, layer: darkLayer, blinded: false });
 }
 
-export function _egHzTickDarkness(dtMs) {
+export function _hzTickDarkness(dtMs) {
     const dtS = dtMs / 1000;
     const vw = window.innerWidth;
-    const pr = _egHzPlayerHitbox();
-    _egHzDarkness.clouds.forEach(c => {
+    const pr = _hzPlayerHitbox();
+    _hzDarkness.clouds.forEach(c => {
         c.x += c.vx * dtS;
         // Wrap around the screen edges so clouds keep circulating slowly.
         if (c.vx > 0 && c.x > vw + 120) c.x = -260;
@@ -251,7 +251,7 @@ export function _egHzTickDarkness(dtMs) {
     // Test the sprite hitbox against every cloud so standing in any part of a
     // cloud reliably applies the blindness effect to player attacks.
     if (pr) {
-        _egHzDarkness.blinded = _egHzDarkness.clouds.some(c => {
+        _hzDarkness.blinded = _hzDarkness.clouds.some(c => {
             const scale = Number(c.el.style.getPropertyValue('--hz-cloud-scale')) || 1;
             const cloudRect = {
                 left: c.x,
@@ -259,15 +259,15 @@ export function _egHzTickDarkness(dtMs) {
                 right: c.x + 260 * scale,
                 bottom: c.y + 110 * scale,
             };
-            return _egHzRectsOverlap(pr, cloudRect);
+            return _hzRectsOverlap(pr, cloudRect);
         });
     } else {
-        _egHzDarkness.blinded = false;
+        _hzDarkness.blinded = false;
     }
 }
 
-export function _egIsPlayerInDarknessCloud() {
-    return !!(_egHzActive && _egHzDarkness && _egHzDarkness.blinded);
+export function _isPlayerInDarknessCloud() {
+    return !!(_hzActive && _hzDarkness && _hzDarkness.blinded);
 }
 
 
@@ -275,26 +275,26 @@ export function _egIsPlayerInDarknessCloud() {
 //-------------------ARCANE STORM-----------------------------------------
 //------------------------------------------------------------------------
 
-export function _egHzInitArcane(intensity) {
-    _egSetHzArcane({
+export function _hzInitArcane(intensity) {
+    _setHzArcane({
         charge: null,
         beam: null,
-        nextIn: _egHzRand(4000, 7000),
+        nextIn: _hzRand(4000, 7000),
         intervalScale: 1 - Math.min(0.4, intensity / 250),
-        dmgMult: _egHzMult(intensity),
+        dmgMult: _hzMult(intensity),
     });
 }
 
-export function _egHzStartArcaneCharge() {
-    const y = _egHzRand(120, Math.max(140, window.innerHeight - 180));
-    const chargeMs = _egHzRand(EG_HZ_ARCANE_CHARGE_MIN_MS, EG_HZ_ARCANE_CHARGE_MAX_MS);
+export function _hzStartArcaneCharge() {
+    const y = _hzRand(120, Math.max(140, window.innerHeight - 180));
+    const chargeMs = _hzRand(HZ_ARCANE_CHARGE_MIN_MS, HZ_ARCANE_CHARGE_MAX_MS);
     const size = 46;
 
     const orb = document.createElement('div');
     orb.className = 'eg-hz-arcane-orb';
     orb.style.transition = `width ${chargeMs}ms linear, height ${chargeMs}ms linear`;
     orb.style.top = y + 'px';
-    _egHzLayer.appendChild(orb);
+    _hzLayer.appendChild(orb);
     // Start small, then grow to full charge size over the charge duration.
     requestAnimationFrame(() => {
         orb.style.width = '90px';
@@ -302,23 +302,23 @@ export function _egHzStartArcaneCharge() {
     });
 
     Audio_Manager.playSFX('hz_arcane_charge');
-    _egHzArcane.charge = { y, t: chargeMs, total: chargeMs, orb, size };
+    _hzArcane.charge = { y, t: chargeMs, total: chargeMs, orb, size };
 }
 
-export function _egHzTickArcane(dtMs) {
-    const st = _egHzArcane;
+export function _hzTickArcane(dtMs) {
+    const st = _hzArcane;
 
     // ── Charging phase ────────────────────────────────────────────────
     if (st.charge) {
         st.charge.t -= dtMs;
-        if (st.charge.t <= 0) _egHzFireArcaneBeam();
+        if (st.charge.t <= 0) _hzFireArcaneBeam();
     } else {
         st.nextIn -= dtMs;
         if (st.nextIn <= 0) {
-            st.nextIn = _egHzRand(
-                EG_HZ_ARCANE_INTERVAL_MIN_MS, EG_HZ_ARCANE_INTERVAL_MAX_MS
+            st.nextIn = _hzRand(
+                HZ_ARCANE_INTERVAL_MIN_MS, HZ_ARCANE_INTERVAL_MAX_MS
             ) * st.intervalScale;
-            _egHzStartArcaneCharge();
+            _hzStartArcaneCharge();
         }
     }
 
@@ -329,22 +329,22 @@ export function _egHzTickArcane(dtMs) {
         b.x -= b.speed * (dtMs / 1000);
         b.el.style.transform = `translateX(${Math.round(b.x)}px)`;
 
-        const pr = _egHzPlayerHitbox();
+        const pr = _hzPlayerHitbox();
         if (pr && !b.hitDone) {
             // Swept horizontal interval so 240px/tick doesn't tunnel over 70px hitbox
             const sweptLeft = Math.min(b.x, prevX);
             const sweptRight = Math.max(b.x + b.w, prevX + b.w);
             if (sweptRight >= pr.left && sweptLeft <= pr.right) {
-                const bandTop = b.y - EG_HZ_ARCANE_BEAM_HEIGHT / 2;
-                const bandBottom = b.y + EG_HZ_ARCANE_BEAM_HEIGHT / 2;
+                const bandTop = b.y - HZ_ARCANE_BEAM_HEIGHT / 2;
+                const bandBottom = b.y + HZ_ARCANE_BEAM_HEIGHT / 2;
                 if (pr.bottom > bandTop && pr.top < bandBottom) {
                     b.hitDone = true;
-                    const dealt = _egHzDamage(
-                        EG_HZ_ARCANE_BASE_DMG_PCT * st.dmgMult, 'shadow', '#c77dff'
+                    const dealt = _hzDamage(
+                        HZ_ARCANE_BASE_DMG_PCT * st.dmgMult, 'shadow', '#c77dff'
                     );
-                    if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
-                        && Math.random() * 100 < EG_HZ_ARCANE_POLYMORPH_CHANCE_PCT) {
-                        _egApplyPlayerAilment('polymorph');
+                    if (dealt > 0 && typeof _applyPlayerAilment === 'function'
+                        && Math.random() * 100 < HZ_ARCANE_POLYMORPH_CHANCE_PCT) {
+                        _applyPlayerAilment('polymorph');
                     }
                 }
             }
@@ -357,8 +357,8 @@ export function _egHzTickArcane(dtMs) {
     }
 }
 
-export function _egHzFireArcaneBeam() {
-    const st = _egHzArcane;
+export function _hzFireArcaneBeam() {
+    const st = _hzArcane;
     if (!st.charge) return;
     const y = st.charge.y;
     if (st.charge.orb) st.charge.orb.remove();
@@ -369,14 +369,14 @@ export function _egHzFireArcaneBeam() {
     el.className = 'eg-hz-arcane-beam';
     Audio_Manager.playSFX('hz_arcane_beam');
     el.style.width = w + 'px';
-    el.style.height = EG_HZ_ARCANE_BEAM_HEIGHT + 'px';
-    el.style.top = (y - EG_HZ_ARCANE_BEAM_HEIGHT / 2) + 'px';
-    _egHzLayer.appendChild(el);
+    el.style.height = HZ_ARCANE_BEAM_HEIGHT + 'px';
+    el.style.top = (y - HZ_ARCANE_BEAM_HEIGHT / 2) + 'px';
+    _hzLayer.appendChild(el);
 
     st.beam = {
         el, w, y,
         x: window.innerWidth - 20,
-        speed: (window.innerWidth + 100) / (EG_HZ_ARCANE_BEAM_TRAVEL_MS / 1000),
+        speed: (window.innerWidth + 100) / (HZ_ARCANE_BEAM_TRAVEL_MS / 1000),
         hitDone: false,
     };
 }
@@ -388,25 +388,25 @@ export function _egHzFireArcaneBeam() {
 // Meteor volleys: every interval a salvo of meteors telegraphs
 // impact circles, then slams down from above. Fire damage, may ignite.
 
-export function _egHzInitMeteor(intensity) {
-    _egSetHzMeteor({
+export function _hzInitMeteor(intensity) {
+    _setHzMeteor({
         pending: [],
-        nextIn: _egHzRand(3000, 6000),
+        nextIn: _hzRand(3000, 6000),
         intervalScale: 1 - Math.min(0.45, intensity / 220),
-        dmgMult: _egHzMult(intensity),
+        dmgMult: _hzMult(intensity),
     });
 }
 
-export function _egHzSpawnMeteor(delayMs) {
-    const pos = _egHzPointOutsideGrid(EG_HZ_METEOR_RADIUS * 0.6);
+export function _hzSpawnMeteor(delayMs) {
+    const pos = _hzPointOutsideGrid(HZ_METEOR_RADIUS * 0.6);
     const el = document.createElement('div');
     el.className = 'eg-hz-meteor-warning';
     el.style.left = pos.x + 'px';
     el.style.top = pos.y + 'px';
-    _egHzLayer.appendChild(el);
-    _egHzMeteor.pending.push({
+    _hzLayer.appendChild(el);
+    _hzMeteor.pending.push({
         x: pos.x, ty: pos.y,
-        t: EG_HZ_METEOR_WARNING_MS + delayMs,
+        t: HZ_METEOR_WARNING_MS + delayMs,
         warnEl: el,
         state: 'warn',
         fallEl: null,
@@ -415,24 +415,24 @@ export function _egHzSpawnMeteor(delayMs) {
     });
 }
 
-export function _egHzTickMeteor(dtMs) {
-    const st = _egHzMeteor;
+export function _hzTickMeteor(dtMs) {
+    const st = _hzMeteor;
 
     st.nextIn -= dtMs;
     if (st.nextIn <= 0) {
-        st.nextIn = _egHzRand(
-            EG_HZ_METEOR_INTERVAL_MIN_MS,
-            EG_HZ_METEOR_INTERVAL_MAX_MS
+        st.nextIn = _hzRand(
+            HZ_METEOR_INTERVAL_MIN_MS,
+            HZ_METEOR_INTERVAL_MAX_MS
         ) * st.intervalScale;
 
         // One salvo: several meteors with slightly staggered impacts.
-        const count = EG_HZ_METEOR_VOLLEY_MIN +
-            Math.floor(Math.random() * (EG_HZ_METEOR_VOLLEY_MAX - EG_HZ_METEOR_VOLLEY_MIN + 1));
-        for (let i = 0; i < count; i++) _egHzSpawnMeteor(i * 160);
+        const count = HZ_METEOR_VOLLEY_MIN +
+            Math.floor(Math.random() * (HZ_METEOR_VOLLEY_MAX - HZ_METEOR_VOLLEY_MIN + 1));
+        for (let i = 0; i < count; i++) _hzSpawnMeteor(i * 160);
     }
 
     const dtS = dtMs / 1000;
-    const pr = _egHzPlayerHitbox();
+    const pr = _hzPlayerHitbox();
 
     for (let i = st.pending.length - 1; i >= 0; i--) {
         const m = st.pending[i];
@@ -453,13 +453,13 @@ export function _egHzTickMeteor(dtMs) {
                 fallEl.style.height = size + 'px';
                 fallEl.style.left = (m.x - size / 2) + 'px';
                 fallEl.style.top = (m.y - size / 2) + 'px';
-                _egHzLayer.appendChild(fallEl);
+                _hzLayer.appendChild(fallEl);
                 m.fallEl = fallEl;
             }
         } else {
             // Falling phase - descend towards the target, then detonate.
             if (!m.fallEl || !m.fallEl.isConnected) { st.pending.splice(i, 1); continue; }
-            m.y += (m.fallDist / (EG_HZ_METEOR_FALL_MS / 1000)) * dtS;
+            m.y += (m.fallDist / (HZ_METEOR_FALL_MS / 1000)) * dtS;
             m.fallEl.style.top = (m.y - 23) + 'px';
 
             if (m.y >= m.ty) {
@@ -473,9 +473,9 @@ export function _egHzTickMeteor(dtMs) {
                 }
                 st.pending.splice(i, 1);
 
-                _egHzApplyCircleHit(m.x, m.y, EG_HZ_METEOR_RADIUS, pr,
-                    EG_HZ_METEOR_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42',
-                    Math.random() * 100 < EG_HZ_METEOR_IGNITE_CHANCE_PCT ? 'ignite' : null);
+                _hzApplyCircleHit(m.x, m.y, HZ_METEOR_RADIUS, pr,
+                    HZ_METEOR_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42',
+                    Math.random() * 100 < HZ_METEOR_IGNITE_CHANCE_PCT ? 'ignite' : null);
             }
         }
     }

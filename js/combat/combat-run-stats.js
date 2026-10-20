@@ -10,14 +10,14 @@
 //
 // Read-only observer: nothing here changes combat. Hooks call
 // globalThis.RunStats.* (typeof-guarded) from encounter-damage.js,
-// encounter-monster-damage.js, endgame-player-stats.js (_egRollCrit),
+// encounter-monster-damage.js, endgame-player-stats.js (_rollCrit),
 // encounter-kills.js (campaign defeat), timer.js (time up),
 // scoring-rewards.js (win overlay) and encounter-chain.js (map summary).
 //
 // Side-effect module (no exports): it publishes globalThis.RunStats, which
 // the other combat modules reach through globalThis (no import cycles).
 import { t } from '../translation/translations.js';
-import { _egAddGold } from '../loot/loot-gold.js';
+import { _addGold } from '../loot/loot-gold.js';
 import { trackAchStat, setAchStat } from '../achievements/achievements.js';
 
 (function () {
@@ -525,7 +525,7 @@ import { trackAchStat, setAchStat } from '../achievements/achievements.js';
             if (kind === 'map-win') {
                 reward = {
                     give() {
-                        _egAddGold(REWARD_GOLD);
+                        _addGold(REWARD_GOLD);
                         return tr('rs_reward_gold', { n: REWARD_GOLD });
                     },
                 };

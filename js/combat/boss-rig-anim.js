@@ -4190,7 +4190,7 @@ setTimeout(() => {
 
 // Review hook for the rigging tool (dev/scratch/rigger): draw frame u of an
 // animation into any 1024px canvas. Not used by the game itself.
-globalThis.EG_BOSS_RIG_REVIEW = {
+globalThis.BOSS_RIG_REVIEW = {
     anims: () => Object.keys(POSES),
     render(ctx, bossId, animName, u) {
         const rig = RIGS[bossId];

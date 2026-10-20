@@ -7,7 +7,7 @@
 //   3. Tune baseHP / baseDamage / chargeMax / element / resistances
 //   4. Define phases (threshold 1.00 → 0.00) + immunityDuration
 //   5. Schedule mechanics: shared ones by handler-name string, unique ones
-//      as new _egMech<Name> functions in this file
+//      as new _mech<Name> functions in this file
 //   6. Add the file to tools/module-manifest.json (exports + `bridge` for
 //      every `handler:` name string - dev/scratch/gen-bosses-bridges.mjs
 //      derives both), then run the full gate (lint + tests +
@@ -20,7 +20,7 @@
 // typo fails silently (mechanic never fires) - double-check the names.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     // boss_template: {
     //     id: 'boss_template', name: 'Template', emoji: '❓',
     //     baseHP: 1000, baseDamage: 22, chargeMax: 12,
@@ -28,7 +28,7 @@ Object.assign(EG_BOSS_DEFS, {
     // },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     // boss_template: {
     //     phases: [
     //         { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.0 },
@@ -38,14 +38,14 @@ Object.assign(EG_BOSS_MECHANICS, {
     //     immunityDuration: 2500,
     //     mechanics: [
     //         // Shared example (defined in shared-boss-abilities.js):
-    //         // { name: 'corrupt_cells', intervalBase: 17000, intervalVariance: 4000, handler: '_egMechCorruptCells' },
-    //         // Unique example (define _egMechTemplateSlam below):
-    //         // { name: 'template_slam', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechTemplateSlam' },
+    //         // { name: 'corrupt_cells', intervalBase: 17000, intervalVariance: 4000, handler: '_mechCorruptCells' },
+    //         // Unique example (define _mechTemplateSlam below):
+    //         // { name: 'template_slam', intervalBase: 19000, intervalVariance: 4000, handler: '_mechTemplateSlam' },
     //     ],
     // },
 });
 
-// function _egMechTemplateSlam(monster, phase) {
-//     // Unique boss mechanic goes here. Use the _egNk* helpers from
+// function _mechTemplateSlam(monster, phase) {
+//     // Unique boss mechanic goes here. Use the _nk* helpers from
 //     // shared-boss-abilities.js for dodge-style mechanics.
 // }

@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { EG_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from '../endgame/endgame-art.js';
 import { _ptAllocated, _ptBuildAdjacency, _ptGetNodeVisualState, _ptIsDeallocatable, _ptLang, _ptOnNodeClick, _ptPoints, _ptRefreshPointsDisplay, ensurePassiveTreeRoot } from './probability-tree-state-points.js';
 import { getPassiveTreeRootId, isPassiveTreeStartNode } from './probability-tree.js';
 import { getPassiveTreeNodeProposal, isPassiveTreeNodeReworked } from './probability-tree-rework.js';
@@ -781,7 +781,7 @@ export function _ptAppendNodeIcon(node, skill, def, isKeystone, scale) {
 
     const artKey = (def && def.statKey) || (skill && skill.statKey) || null;
     const legacyArtKey = artKey && artKey.startsWith('travel_') ? artKey.slice(7) : null;
-    const artUrl = artKey ? (EG_ART.url('item', artKey) || (legacyArtKey && EG_ART.url('item', legacyArtKey))) : null;
+    const artUrl = artKey ? (GAME_ART.url('item', artKey) || (legacyArtKey && GAME_ART.url('item', legacyArtKey))) : null;
     if (artUrl) {
         _ptAppendImageIcon(node, artUrl, isKeystone, true);
         return;
@@ -844,7 +844,7 @@ export function _ptRefreshPendingArt() {
         if (!el.isConnected) return;
         const key = el.getAttribute('data-pt-art-pending');
         const legacyKey = key && key.startsWith('travel_') ? key.slice(7) : null;
-        const u = key ? (EG_ART.url('item', key) || (legacyKey && EG_ART.url('item', legacyKey))) : null;
+        const u = key ? (GAME_ART.url('item', key) || (legacyKey && GAME_ART.url('item', legacyKey))) : null;
         if (!u) return;
         el.removeAttribute('data-pt-art-pending');
         while (el.firstChild) el.removeChild(el.firstChild);

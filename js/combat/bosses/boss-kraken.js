@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerRect, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerRect, _nkToast, _ptSegDist } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE KRAKEN (boss_kraken)-----------------------------
@@ -11,7 +11,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_kraken: {
         id: 'boss_kraken', name: 'The Kraken', emoji: '🦑',
         baseHP: 1100, baseDamage: 24, chargeMax: 12,
@@ -19,7 +19,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_kraken: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -28,8 +28,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'tentacle_sweep', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechTentacleSweep' },
-            { name: 'fog_bank', intervalBase: 22000, intervalVariance: 5000, handler: '_egMechFogBank' },
+            { name: 'tentacle_sweep', intervalBase: 21000, intervalVariance: 5000, handler: '_mechTentacleSweep' },
+            { name: 'fog_bank', intervalBase: 22000, intervalVariance: 5000, handler: '_mechFogBank' },
         ],
     },
 });
@@ -37,8 +37,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // Rotating tentacle arms around a central maw; touching an arm burns.
 // Count the rotation speed and step through as each arm passes.
-export function _egMechTentacleSweep(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechTentacleSweep(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const arms = [0, 2, 2, 3][p];
     const omega = [0, 0.5, 0.62, 0.78][p];
@@ -46,25 +46,25 @@ export function _egMechTentacleSweep(monster, phase) {
     const armHalf = 30;
     const dmgPct = [0, 0.18, 0.22, 0.27][p];
     const durMs = 9000;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const cx = window.innerWidth * 0.5, cy = window.innerHeight * 0.45;
-    const maw = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '🦑');
+    const maw = _nkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '🦑');
     maw.style.transform = 'translate(' + Math.round(cx - 26) + 'px,' + Math.round(cy - 26) + 'px)';
     const tentacles = [];
     for (let i = 0; i < arms; i++) {
-        const el = _egNkEl(run, 'div', 'eg-nk-arm');
+        const el = _nkEl(run, 'div', 'eg-nk-arm');
         el.style.width = Math.round(armLen) + 'px';
         el.style.height = armHalf * 2 + 'px';
         el.style.left = Math.round(cx) + 'px';
         el.style.top = Math.round(cy - armHalf) + 'px';
         tentacles.push({ off: i * Math.PI * 2 / arms, el });
     }
-    _egNkToast('eg_mech_kraken', '🦑 The Kraken: Tentacle Sweep! Mind the arms!');
+    _nkToast('eg_mech_kraken', '🦑 The Kraken: Tentacle Sweep! Mind the arms!');
     let e = 0, cdUntil = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         e += dtS * 1000;
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         const pts = pr ? [
             [pr.left + pr.width / 2, pr.top + pr.height / 2],
             [pr.left, pr.top], [pr.right, pr.top],
@@ -76,10 +76,10 @@ export function _egMechTentacleSweep(monster, phase) {
             if (pts && now >= cdUntil) {
                 const bx = cx + Math.cos(a) * armLen, by = cy + Math.sin(a) * armLen;
                 for (const pt of pts) {
-                    if (_egPtSegDist(pt[0], pt[1], cx, cy, bx, by) < armHalf + 6) {
+                    if (_ptSegDist(pt[0], pt[1], cx, cy, bx, by) < armHalf + 6) {
                         cdUntil = now + 1000;
-                        const dealt = _egNkHit(dmgPct, 'cold', level);
-                        _egNkAbilityHitToast(dealt, 'The Kraken', 'Tentacle Sweep');
+                        const dealt = _nkHit(dmgPct, 'cold', level);
+                        _nkAbilityHitToast(dealt, 'The Kraken', 'Tentacle Sweep');
                         break;
                     }
                 }

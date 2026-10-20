@@ -75,7 +75,7 @@
 }
 
 /* Essence tooltip - "Guaranteed modifier" / "Works on" section.
-   These classes are built dynamically by _egBuildEssenceDetailHTML() but
+   These classes are built dynamically by _buildEssenceDetailHTML() but
    previously had no rules at all, so long modifier descriptions (unlike
    the short 2-3 word names most families use) had nothing forcing them
    to stay inside the frame. */

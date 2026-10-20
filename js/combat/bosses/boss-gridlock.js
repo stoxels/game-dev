@@ -1,6 +1,6 @@
-import { _egRenderPanel } from '../encounter.js';
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+import { _renderPanel } from '../encounter.js';
+import { BOSS_DEFS, BOSS_MECHANICS, _bossScheduleMechanics } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkRuns, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE GRIDLOCK (boss_gridlock)--------------------
@@ -11,10 +11,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 // on the intersection, then step off for the surge dive.
 //------------------------------------------------------------------------
 
-export const _EG_GL_DEBUG_SLOW = false;
-export const _EG_GL_DEBUG_MULT = _EG_GL_DEBUG_SLOW ? 2.5 : 1;
+export const _GL_DEBUG_SLOW = false;
+export const _GL_DEBUG_MULT = _GL_DEBUG_SLOW ? 2.5 : 1;
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_gridlock: {
         id: 'boss_gridlock', name: 'The Gridlock', emoji: '📡',
         baseHP: 1020, baseDamage: 23, chargeMax: 12,
@@ -22,7 +22,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_gridlock: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -31,30 +31,30 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'laser_lattice', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechGlLattice' },
-            { name: 'probability_shift', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechProbabilityShift' },
-            { name: 'signal_scramble', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechGlScramble', phase2Only: true },
-            { name: 'surge_chaser', intervalBase: 24000, intervalVariance: 6000, handler: '_egMechGlSurge', phase2Only: true },
+            { name: 'laser_lattice', intervalBase: 19000, intervalVariance: 4000, handler: '_mechGlLattice' },
+            { name: 'probability_shift', intervalBase: 18000, intervalVariance: 4000, handler: '_mechProbabilityShift' },
+            { name: 'signal_scramble', intervalBase: 21000, intervalVariance: 5000, handler: '_mechGlScramble', phase2Only: true },
+            { name: 'surge_chaser', intervalBase: 24000, intervalVariance: 6000, handler: '_mechGlSurge', phase2Only: true },
         ],
-        onPhaseEnter: _egGlOnPhaseEnter,
+        onPhaseEnter: _glOnPhaseEnter,
     },
 });
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-export const EG_GL_LATTICE_WAVES = [0, 2, 3, 4];      // waves per cast, per phase
-export const EG_GL_LATTICE_DMG   = [0, 0.12, 0.14, 0.17]; // %maxHP per live beam
-export const EG_GL_LATTICE_STAGGER = 260;             // ms between a wave's lines firing
-export const EG_GL_TOWER_COUNT   = [0, 4, 5, 6];      // signal towers per cast
-export const EG_GL_TOWER_DMG     = [0, 0.10, 0.12, 0.14]; // %maxHP per cable
-export const EG_GL_ORB_SPEED     = 150;               // px/s surge-orb seek speed
-export const EG_GL_ORB_DMG       = [0, 0, 0.11, 0.13];// %maxHP orb contact
-export const EG_GL_TRAIL_DMG     = 0.09;              // %maxHP live-trail contact
-export const EG_GL_TRAIL_LIFE    = 1200;              // ms a trail segment stays hot
-export const EG_GL_WIRE_DMG      = 0.10;              // %maxHP beat wire contact
-export const EG_GL_JAM_DMG       = 0.14;              // %maxHP JAM wire contact
-export const EG_GL_SURGE_DMG     = 0.30;              // %maxHP the surge dive
-export const EG_GL_HIT_CD_MS     = 700;               // shared touch cooldown
+export const GL_LATTICE_WAVES = [0, 2, 3, 4];      // waves per cast, per phase
+export const GL_LATTICE_DMG   = [0, 0.12, 0.14, 0.17]; // %maxHP per live beam
+export const GL_LATTICE_STAGGER = 260;             // ms between a wave's lines firing
+export const GL_TOWER_COUNT   = [0, 4, 5, 6];      // signal towers per cast
+export const GL_TOWER_DMG     = [0, 0.10, 0.12, 0.14]; // %maxHP per cable
+export const GL_ORB_SPEED     = 150;               // px/s surge-orb seek speed
+export const GL_ORB_DMG       = [0, 0, 0.11, 0.13];// %maxHP orb contact
+export const GL_TRAIL_DMG     = 0.09;              // %maxHP live-trail contact
+export const GL_TRAIL_LIFE    = 1200;              // ms a trail segment stays hot
+export const GL_WIRE_DMG      = 0.10;              // %maxHP beat wire contact
+export const GL_JAM_DMG       = 0.14;              // %maxHP JAM wire contact
+export const GL_SURGE_DMG     = 0.30;              // %maxHP the surge dive
+export const GL_HIT_CD_MS     = 700;               // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -63,21 +63,21 @@ export const EG_GL_HIT_CD_MS     = 700;               // shared touch cooldown
 
 // Touch damage helper shared by all Gridlock hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-export let _egGlHitCd = 0;
-export function _egGlTouch(pct, level, label) {
+export let _glHitCd = 0;
+export function _glTouch(pct, level, label) {
     const now = performance.now();
-    if (now < _egGlHitCd) return false;
-    const pr = _egNkPlayerRect();
+    if (now < _glHitCd) return false;
+    const pr = _nkPlayerRect();
     if (!pr) return false;
-    _egGlHitCd = now + EG_GL_HIT_CD_MS;
-    const dealt = _egNkHit(pct, 'lightning', level);
-    _egNkAbilityHitToast(dealt, 'The Gridlock', label);
+    _glHitCd = now + GL_HIT_CD_MS;
+    const dealt = _nkHit(pct, 'lightning', level);
+    _nkAbilityHitToast(dealt, 'The Gridlock', label);
     return true;
 }
 
 // Electric spark burst where a beam/cable/orb event lands (visual only,
 // body-level so it survives the run ending in the same frame).
-export function _egGlSpark(x, y, big) {
+export function _glSpark(x, y, big) {
     const layer = document.createElement('div');
     layer.className = 'eg-gl-sparks' + (big ? ' eg-gl-sparks-big' : '');
     layer.style.left = Math.round(x) + 'px';
@@ -93,11 +93,11 @@ export function _egGlSpark(x, y, big) {
         s.style.animationDelay = (Math.random() * 90) + 'ms';
         layer.appendChild(s);
     }
-    setTimeout(() => { try { layer.remove(); } catch (e) {} }, _EG_GL_DEBUG_SLOW ? 1800 : 900);
+    setTimeout(() => { try { layer.remove(); } catch (e) {} }, _GL_DEBUG_SLOW ? 1800 : 900);
 }
 
 // Point-to-segment distance (px) - hit-tests cables and trails.
-export function _egGlDistToSeg(px, py, x0, y0, x1, y1) {
+export function _glDistToSeg(px, py, x0, y0, x1, y1) {
     const dx = x1 - x0, dy = y1 - y0;
     const len2 = dx * dx + dy * dy;
     const t = len2 ? Math.max(0, Math.min(1, ((px - x0) * dx + (py - y0) * dy) / len2)) : 0;
@@ -112,17 +112,17 @@ export function _egGlDistToSeg(px, py, x0, y0, x1, y1) {
 // STAGGER-FIRE ~260ms apart, so each wave sweeps across the screen instead
 // of popping all at once - clear the lit lane whose turn is coming, and
 // mind the NEXT line while the first is still hot.
-export function _egMechGlLattice(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechGlLattice(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
-    const waves = EG_GL_LATTICE_WAVES[p];
-    const warnMs = 900 * _EG_GL_DEBUG_MULT;
-    const activeMs = 500 * _EG_GL_DEBUG_MULT;
-    const gapMs = 800 * _EG_GL_DEBUG_MULT;
-    const stagger = EG_GL_LATTICE_STAGGER * _EG_GL_DEBUG_MULT;
+    const waves = GL_LATTICE_WAVES[p];
+    const warnMs = 900 * _GL_DEBUG_MULT;
+    const activeMs = 500 * _GL_DEBUG_MULT;
+    const gapMs = 800 * _GL_DEBUG_MULT;
+    const stagger = GL_LATTICE_STAGGER * _GL_DEBUG_MULT;
     const thick = 14;
-    const dmgPct = EG_GL_LATTICE_DMG[p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const dmgPct = GL_LATTICE_DMG[p];
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     let axis = Math.random() < 0.5 ? 'h' : 'v';
@@ -130,7 +130,7 @@ export function _egMechGlLattice(monster, phase) {
         axis = axis === 'h' ? 'v' : 'h';
         const lines = [];
         for (let i = 0; i < 3; i++) {
-            const el = _egNkEl(run, 'div', 'eg-nk-lattice-warn ' + (axis === 'h' ? 'eg-nk-lattice-h' : 'eg-nk-lattice-v'));
+            const el = _nkEl(run, 'div', 'eg-nk-lattice-warn ' + (axis === 'h' ? 'eg-nk-lattice-h' : 'eg-nk-lattice-v'));
             let pos;
             if (axis === 'h') {
                 pos = H * (0.2 + 0.3 * i) + (Math.random() * 80 - 40);
@@ -152,30 +152,30 @@ export function _egMechGlLattice(monster, phase) {
         return { lines, t: 0 };
     };
     let left = waves, wave = null;
-    _egNkToast('eg_mech_lattice', '📡 The Gridlock: Laser Lattice! Clear the lit lanes!');
-    _egNkLoop(run, (dtS, now) => {
+    _nkToast('eg_mech_lattice', '📡 The Gridlock: Laser Lattice! Clear the lit lanes!');
+    _nkLoop(run, (dtS, now) => {
         if (!wave && left > 0) {
             left--;
             wave = mkWave();
         }
         if (!wave) return false;
         wave.t += dtS * 1000;
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         wave.lines.forEach(l => {
             if (l.fired) {  return; }
             if (wave.t >= l.fireAt) {
                 l.fired = true;
                 l.el.classList.remove('eg-nk-lattice-warn');
                 l.el.classList.add('eg-nk-lattice-hit');
-                _egGlSpark(l.axis === 'h' ? W / 2 : l.pos, l.axis === 'h' ? l.pos : H / 2, false);
+                _glSpark(l.axis === 'h' ? W / 2 : l.pos, l.axis === 'h' ? l.pos : H / 2, false);
                 if (pr && !l.hitDone) {
                     const caught = l.axis === 'h'
                         ? (pr.bottom > l.pos - thick / 2 && pr.top < l.pos + thick / 2)
                         : (pr.right > l.pos - thick / 2 && pr.left < l.pos + thick / 2);
                     if (caught) {
                         l.hitDone = true;
-                        const dealt = _egNkHit(dmgPct, 'lightning', level);
-                        _egNkAbilityHitToast(dealt, 'The Gridlock', 'Laser Lattice');
+                        const dealt = _nkHit(dmgPct, 'lightning', level);
+                        _nkAbilityHitToast(dealt, 'The Gridlock', 'Laser Lattice');
                     }
                 }
             } else {
@@ -199,19 +199,19 @@ export function _egMechGlLattice(monster, phase) {
 // The Gridlock plants signal towers around the field; every tower draws a
 // dashed cable to YOUR position at cast time - then all cables fire
 // together. The starburst aims at where you were: break the geometry.
-export const EG_GL_SCRAMBLE_WARN = 1150;
-export const EG_GL_SCRAMBLE_LIVE = 420;
+export const GL_SCRAMBLE_WARN = 1150;
+export const GL_SCRAMBLE_LIVE = 420;
 
-export function _egMechGlScramble(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechGlScramble(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const W = window.innerWidth, H = window.innerHeight;
-    const count = EG_GL_TOWER_COUNT[p];
-    const warnMs = EG_GL_SCRAMBLE_WARN * _EG_GL_DEBUG_MULT;
-    const liveMs = EG_GL_SCRAMBLE_LIVE * _EG_GL_DEBUG_MULT;
-    const dmgPct = EG_GL_TOWER_DMG[p];
+    const count = GL_TOWER_COUNT[p];
+    const warnMs = GL_SCRAMBLE_WARN * _GL_DEBUG_MULT;
+    const liveMs = GL_SCRAMBLE_LIVE * _GL_DEBUG_MULT;
+    const dmgPct = GL_TOWER_DMG[p];
 
     // Towers: spread across the edges + two interior anchors.
     const spots = [
@@ -219,18 +219,18 @@ export function _egMechGlScramble(monster, phase) {
         [64, H * 0.55], [W - 64, H * 0.55],
         [W / 2, H - 80],
     ];
-    const c = _egNkPlayerCenter() || { x: W / 2, y: H / 2 };
+    const c = _nkPlayerCenter() || { x: W / 2, y: H / 2 };
     const cables = [];
     for (let i = 0; i < count && spots.length; i++) {
         const spot = spots.splice(Math.floor(Math.random() * spots.length), 1)[0];
-        const tower = _egNkEl(run, 'div', 'eg-gl-tower', '📡');
+        const tower = _nkEl(run, 'div', 'eg-gl-tower', '📡');
         tower.style.left = Math.round(spot[0] - 17) + 'px';
         tower.style.top = Math.round(spot[1] - 17) + 'px';
         // The cable: a thin rotated div from tower → player's CURRENT spot.
         const dx = c.x - spot[0], dy = c.y - spot[1];
         const len = Math.hypot(dx, dy) || 1;
         const ang = Math.atan2(dy, dx) * 180 / Math.PI;
-        const line = _egNkEl(run, 'div', 'eg-gl-tline');
+        const line = _nkEl(run, 'div', 'eg-gl-tline');
         line.style.left = Math.round(spot[0]) + 'px';
         line.style.top = Math.round(spot[1]) + 'px';
         line.style.width = Math.round(len) + 'px';
@@ -238,10 +238,10 @@ export function _egMechGlScramble(monster, phase) {
         cables.push({ x0: spot[0], y0: spot[1], x1: c.x, y1: c.y, tower, line });
     }
 
-    _egNkToast('eg_mech_gl_scramble', '📡 The Gridlock: SIGNAL SCRAMBLE - break the cables!', '#a5f3fc');
+    _nkToast('eg_mech_gl_scramble', '📡 The Gridlock: SIGNAL SCRAMBLE - break the cables!', '#a5f3fc');
 
     let t = 0, fired = false;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         t += dtS * 1000;
         if (!fired && t >= warnMs) {
             fired = true;
@@ -249,14 +249,14 @@ export function _egMechGlScramble(monster, phase) {
                 cb.line.classList.add('eg-gl-tline-fire');
                 cb.tower.classList.add('eg-gl-tower-fire');
             });
-            _egGlSpark(c.x, c.y, false);
-            const pr = _egNkPlayerRect();
+            _glSpark(c.x, c.y, false);
+            const pr = _nkPlayerRect();
             if (pr) {
                 const pc = { x: pr.left + pr.width / 2, y: pr.top + pr.height / 2 };
-                const caught = cables.some(cb => _egGlDistToSeg(pc.x, pc.y, cb.x0, cb.y0, cb.x1, cb.y1) < 16);
+                const caught = cables.some(cb => _glDistToSeg(pc.x, pc.y, cb.x0, cb.y0, cb.x1, cb.y1) < 16);
                 if (caught) {
-                    const dealt = _egNkHit(dmgPct, 'lightning', level);
-                    _egNkAbilityHitToast(dealt, 'The Gridlock', 'Signal Scramble');
+                    const dealt = _nkHit(dmgPct, 'lightning', level);
+                    _nkAbilityHitToast(dealt, 'The Gridlock', 'Signal Scramble');
                 }
             }
         }
@@ -285,19 +285,19 @@ export function _egMechGlScramble(monster, phase) {
 // A roaming ⚡ orb homes slowly and sheds a LIVE CABLE TRAIL behind it -
 // kiting it wires the arena against you. Trail segments fade after ~1.2s;
 // the orb despawns after its patrol. Phase 3 spawns a second chaser.
-export const EG_GL_SURGE_LIFE = 7500;
-export const EG_GL_SURGE_TURN = 2.2;   // rad/s steering cap (readability)
+export const GL_SURGE_LIFE = 7500;
+export const GL_SURGE_TURN = 2.2;   // rad/s steering cap (readability)
 
-export function _egMechGlSurge(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechGlSurge(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const W = window.innerWidth, H = window.innerHeight;
-    const orbSpeed = EG_GL_ORB_SPEED / _EG_GL_DEBUG_MULT;
-    const trailLife = EG_GL_TRAIL_LIFE * _EG_GL_DEBUG_MULT;
-    const life = EG_GL_SURGE_LIFE * _EG_GL_DEBUG_MULT;
-    const orbDmg = EG_GL_ORB_DMG[p];
+    const orbSpeed = GL_ORB_SPEED / _GL_DEBUG_MULT;
+    const trailLife = GL_TRAIL_LIFE * _GL_DEBUG_MULT;
+    const life = GL_SURGE_LIFE * _GL_DEBUG_MULT;
+    const orbDmg = GL_ORB_DMG[p];
 
     const spawnChaser = (delayMs) => {
         const delayId = setTimeout(() => {
@@ -308,7 +308,7 @@ export function _egMechGlSurge(monster, phase) {
                 ang: Math.random() * Math.PI * 2,
                 born: 0, lastX: 0, lastY: 0, nextTrail: 0, el: null, done: false,
             };
-            orb.el = _egNkEl(run, 'div', 'eg-gl-orb', '⚡');
+            orb.el = _nkEl(run, 'div', 'eg-gl-orb', '⚡');
             orb.el.style.left = Math.round(orb.x - 14) + 'px';
             orb.el.style.top = Math.round(orb.y - 14) + 'px';
             chasers.push(orb);
@@ -319,15 +319,15 @@ export function _egMechGlSurge(monster, phase) {
     const chasers = [];
     const trails = [];
     const nOrbs = p >= 3 ? 2 : 1;
-    for (let i = 0; i < nOrbs; i++) spawnChaser(i * 2000 * _EG_GL_DEBUG_MULT);
+    for (let i = 0; i < nOrbs; i++) spawnChaser(i * 2000 * _GL_DEBUG_MULT);
 
-    _egNkToast('eg_mech_gl_surge', '📡 The Gridlock: SURGE CHASER - the trail is live!', '#a5f3fc');
+    _nkToast('eg_mech_gl_surge', '📡 The Gridlock: SURGE CHASER - the trail is live!', '#a5f3fc');
 
     let t = 0, touchCd = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         t += dtS * 1000;
-        const c = _egNkPlayerCenter();
-        const pr = _egNkPlayerRect();
+        const c = _nkPlayerCenter();
+        const pr = _nkPlayerRect();
         let active = false;
         chasers.forEach(o => {
             if (o.done) return;
@@ -337,7 +337,7 @@ export function _egMechGlSurge(monster, phase) {
             if (c) {
                 const want = Math.atan2(c.y - o.y, c.x - o.x);
                 let diff = ((want - o.ang + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
-                const turn = EG_GL_SURGE_TURN * dtS;
+                const turn = GL_SURGE_TURN * dtS;
                 o.ang += Math.max(-turn, Math.min(turn, diff));
             }
             o.x += Math.cos(o.ang) * orbSpeed * dtS;
@@ -350,7 +350,7 @@ export function _egMechGlSurge(monster, phase) {
             // Shed a trail segment every ~90ms.
             if (t >= o.nextTrail && Math.hypot(o.x - o.lastX, o.y - o.lastY) > 12) {
                 o.nextTrail = t + 90;
-                const seg = _egNkEl(run, 'div', 'eg-gl-trail');
+                const seg = _nkEl(run, 'div', 'eg-gl-trail');
                 const len = Math.hypot(o.x - o.lastX, o.y - o.lastY);
                 seg.style.left = Math.round(o.lastX) + 'px';
                 seg.style.top = Math.round(o.lastY) + 'px';
@@ -360,16 +360,16 @@ export function _egMechGlSurge(monster, phase) {
                 trails.push({ x0: o.lastX, y0: o.lastY, x1: o.x, y1: o.y, el: seg, until: t + trailLife });
                 o.lastX = o.x; o.lastY = o.y;
             }
-            if (pr && now >= touchCd && _egNkCircleHit(o.x, o.y, 15, pr, 0)) {
-                touchCd = now + EG_GL_HIT_CD_MS;
-                const dealt = _egNkHit(orbDmg, 'lightning', level);
-                _egNkAbilityHitToast(dealt, 'The Gridlock', 'Surge Chaser');
-                _egGlSpark(o.x, o.y, false);
+            if (pr && now >= touchCd && _nkCircleHit(o.x, o.y, 15, pr, 0)) {
+                touchCd = now + GL_HIT_CD_MS;
+                const dealt = _nkHit(orbDmg, 'lightning', level);
+                _nkAbilityHitToast(dealt, 'The Gridlock', 'Surge Chaser');
+                _glSpark(o.x, o.y, false);
             }
             if (t - o.born > life) {
                 o.done = true;
                 try { o.el.remove(); } catch (e2) {}
-                _egGlSpark(o.x, o.y, true);
+                _glSpark(o.x, o.y, true);
             }
         });
         // Live trails bite.
@@ -382,10 +382,10 @@ export function _egMechGlSurge(monster, phase) {
             }
             if (pr && now >= touchCd) {
                 const pc = { x: pr.left + pr.width / 2, y: pr.top + pr.height / 2 };
-                if (_egGlDistToSeg(pc.x, pc.y, tr.x0, tr.y0, tr.x1, tr.y1) < 11) {
-                    touchCd = now + EG_GL_HIT_CD_MS;
-                    const dealt = _egNkHit(EG_GL_TRAIL_DMG, 'lightning', level);
-                    _egNkAbilityHitToast(dealt, 'The Gridlock', 'Live Cable');
+                if (_glDistToSeg(pc.x, pc.y, tr.x0, tr.y0, tr.x1, tr.y1) < 11) {
+                    touchCd = now + GL_HIT_CD_MS;
+                    const dealt = _nkHit(GL_TRAIL_DMG, 'lightning', level);
+                    _nkAbilityHitToast(dealt, 'The Gridlock', 'Live Cable');
                 }
             }
         }
@@ -402,39 +402,39 @@ export function _egMechGlSurge(monster, phase) {
 // wire fires at once EXCEPT one horizontal + one vertical, whose
 // intersection is the only safe cell (marked with a pip). Then the SURGE
 // DIVE: a ⚡ orb dives the safe cell - step off it. Charge bar frozen for
-// the whole set-piece (gate in _egTickPlayer via _egGlFinalActive).
-export const EG_GL_FINAL_BEATS = 3;
-export const EG_GL_BEAT_CHARGE = 1000;   // ms telegraph per beat batch
-export const EG_GL_BEAT_LIVE = 520;      // ms a beat batch stays hot
-export const EG_GL_JAM_CHARGE = 1300;    // ms THE JAM telegraph
-export const EG_GL_JAM_LIVE = 750;       // ms THE JAM stays hot
-export const EG_GL_WIRE_COUNT_H = 5;     // horizontal wires
-export const EG_GL_WIRE_COUNT_V = 7;     // vertical wires
+// the whole set-piece (gate in _tickPlayer via _glFinalActive).
+export const GL_FINAL_BEATS = 3;
+export const GL_BEAT_CHARGE = 1000;   // ms telegraph per beat batch
+export const GL_BEAT_LIVE = 520;      // ms a beat batch stays hot
+export const GL_JAM_CHARGE = 1300;    // ms THE JAM telegraph
+export const GL_JAM_LIVE = 750;       // ms THE JAM stays hot
+export const GL_WIRE_COUNT_H = 5;     // horizontal wires
+export const GL_WIRE_COUNT_V = 7;     // vertical wires
 
-// Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-export let _egGlFinal = null;
+// Set while the finale runs (read by _tickPlayer's charge-freeze gate).
+export let _glFinal = null;
 
-export function _egGlFinalActive() {
-    return !!_egGlFinal && !_egGlFinal.finished;
+export function _glFinalActive() {
+    return !!_glFinal && !_glFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-export function _egGlOnPhaseEnter(monster, newPhase) {
+export function _glOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
-    try { _egGlStartFinalWatcher(monster); } catch (e) {}
+    try { _glStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-export function _egGlStartFinalWatcher(monster) {
-    if (!monster || _egGlFinal) return;
-    const run = _egNkNewRun(monster.id, true);
+export function _glStartFinalWatcher(monster) {
+    if (!monster || _glFinal) return;
+    const run = _nkNewRun(monster.id, true);
     run.passive = true;
-    _egNkLoop(run, () => {
-        if (_egGlFinal) return false;
+    _nkLoop(run, () => {
+        if (_glFinal) return false;
         try {
             if (monster.currentHP <= monster.maxHP * 0.10) {
-                _egGlFinalStart(monster);
+                _glFinalStart(monster);
                 return false;
             }
         } catch (e) { return false; }
@@ -442,37 +442,37 @@ export function _egGlStartFinalWatcher(monster) {
     });
 }
 
-export function _egGlFinalStart(monster) {
-    if (_egGlFinal || !monster) return;
+export function _glFinalStart(monster) {
+    if (_glFinal || !monster) return;
 
     // The gates close: kill every other run of this boss (the finale takes
     // over the whole arena).
-    Array.from(_egNkRuns.values()).forEach(r => {
-        if (r.bossId === monster.id) { try { _egNkKillRun(r); } catch (e) {} }
+    Array.from(_nkRuns.values()).forEach(r => {
+        if (r.bossId === monster.id) { try { _nkKillRun(r); } catch (e) {} }
     });
 
     const W = window.innerWidth, H = window.innerHeight;
     const g = {
         monsterId: monster.id,
         finished: false,
-        count: EG_GL_FINAL_BEATS,
+        count: GL_FINAL_BEATS,
         beat: 0,
         phase: 'beats',           // beats → jam → surge → done
         wiresH: [], wiresV: [],
         arena: null, overlay: null, pip: null, diveEl: null, diveline: null,
         fxRun: null, cdTimer: null,
     };
-    _egGlFinal = g;
+    _glFinal = g;
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
-    // lives in _egTickPlayer; this class is the visual twin).
+    // lives in _tickPlayer; this class is the visual twin).
     ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('eg-charge-paused');
     });
 
     // FX run (passive): holds the arena, wires and the timeline.
-    g.fxRun = _egNkNewRun(monster.id, true);
+    g.fxRun = _nkNewRun(monster.id, true);
     g.fxRun.passive = true;
 
     // Circuit-board overlay.
@@ -488,18 +488,18 @@ export function _egGlFinalStart(monster) {
     document.body.appendChild(body);
     g.gridEl = body;
     g.fxRun.els.push(body);
-    for (let i = 0; i < EG_GL_WIRE_COUNT_H; i++) {
+    for (let i = 0; i < GL_WIRE_COUNT_H; i++) {
         const el = document.createElement('div');
         el.className = 'eg-gl-wire eg-gl-wire-h';
-        const y = H * (i + 1) / (EG_GL_WIRE_COUNT_H + 1);
+        const y = H * (i + 1) / (GL_WIRE_COUNT_H + 1);
         el.style.top = Math.round(y) + 'px';
         body.appendChild(el);
         g.wiresH.push({ y, el });
     }
-    for (let j = 0; j < EG_GL_WIRE_COUNT_V; j++) {
+    for (let j = 0; j < GL_WIRE_COUNT_V; j++) {
         const el = document.createElement('div');
         el.className = 'eg-gl-wire eg-gl-wire-v';
-        const x = W * (j + 1) / (EG_GL_WIRE_COUNT_V + 1);
+        const x = W * (j + 1) / (GL_WIRE_COUNT_V + 1);
         el.style.left = Math.round(x) + 'px';
         body.appendChild(el);
         g.wiresV.push({ x, el });
@@ -515,7 +515,7 @@ export function _egGlFinalStart(monster) {
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_gl_final_cd', '🔒💀 SYSTEM LOCKDOWN - read the grid!', '#a5f3fc');
+    _nkToast('eg_mech_gl_final_cd', '🔒💀 SYSTEM LOCKDOWN - read the grid!', '#a5f3fc');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -541,10 +541,10 @@ export function _egGlFinalStart(monster) {
 
     // The timeline: beats → THE JAM → SURGE DIVE → stand down. Pause /
     // death / inactive hold the timeline (debug: extra-long beats).
-    const beatTick = EG_GL_BEAT_CHARGE * (_EG_GL_DEBUG_SLOW ? 8 : 1);
+    const beatTick = GL_BEAT_CHARGE * (_GL_DEBUG_SLOW ? 8 : 1);
     const step = () => {
-        if (!_egGlFinal || _egGlFinal !== g || g.finished) return;
-        if (_egNkFrozen()) return;
+        if (!_glFinal || _glFinal !== g || g.finished) return;
+        if (_nkFrozen()) return;
         if (g.phase === 'beats') {
             g.count--;
             const num = g.overlay && g.overlay.querySelector('.eg-gl-cd-num');
@@ -557,17 +557,17 @@ export function _egGlFinalStart(monster) {
             const batch = pickBatch();
             setBatch(batch, 'eg-gl-wire-charge', true);
             setTimeout(() => {
-                if (!_egGlFinal || _egGlFinal !== g || g.finished) return;
+                if (!_glFinal || _glFinal !== g || g.finished) return;
                 setBatch(batch, 'eg-gl-wire-charge', false);
                 setBatch(batch, 'eg-gl-wire-fire', true);
                 setTimeout(() => {
-                    if (!_egGlFinal || _egGlFinal !== g || g.finished) return;
+                    if (!_glFinal || _glFinal !== g || g.finished) return;
                     setBatch(batch, 'eg-gl-wire-fire', false);
-                }, EG_GL_BEAT_LIVE);
-            }, EG_GL_BEAT_CHARGE);
+                }, GL_BEAT_LIVE);
+            }, GL_BEAT_CHARGE);
             if (g.count <= 0) {
                 g.phase = 'jamprep';
-                setTimeout(step, EG_GL_BEAT_LIVE + 350);
+                setTimeout(step, GL_BEAT_LIVE + 350);
                 return;
             }
         } else if (g.phase === 'jamprep') {
@@ -588,20 +588,20 @@ export function _egGlFinalStart(monster) {
             document.body.appendChild(pip);
             g.pip = pip;
             g.fxRun.els.push(pip);
-            _egNkToast('eg_mech_gl_jam', '🔒💀 THE JAM - get to the safe intersection!', '#a5f3fc');
+            _nkToast('eg_mech_gl_jam', '🔒💀 THE JAM - get to the safe intersection!', '#a5f3fc');
             setTimeout(() => {
-                if (!_egGlFinal || _egGlFinal !== g || g.finished) return;
+                if (!_glFinal || _glFinal !== g || g.finished) return;
                 setBatch(all, 'eg-gl-wire-jamcharge', false);
                 setBatch(all, 'eg-gl-wire-jamfire', true);
-                _egGlSpark(safeV.x, safeH.y, true);
+                _glSpark(safeV.x, safeH.y, true);
                 setTimeout(() => {
-                    if (!_egGlFinal || _egGlFinal !== g || g.finished) return;
+                    if (!_glFinal || _glFinal !== g || g.finished) return;
                     setBatch(all, 'eg-gl-wire-jamfire', false);
                     g.safeH = safeH; g.safeV = safeV;
                     g.phase = 'surge';
                     setTimeout(step, 500);
-                }, EG_GL_JAM_LIVE);
-            }, EG_GL_JAM_CHARGE);
+                }, GL_JAM_LIVE);
+            }, GL_JAM_CHARGE);
         } else if (g.phase === 'surge') {
             // SURGE DIVE: a ⚡ orb dives the safe cell - step off it.
             g.phase = 'done';
@@ -618,9 +618,9 @@ export function _egGlFinalStart(monster) {
             document.body.appendChild(warn);
             g.diveline = warn;
             g.fxRun.els.push(warn);
-            _egNkToast('eg_mech_gl_dive', '⚡ SURGE DIVE - off the safe cell!', '#a5f3fc');
+            _nkToast('eg_mech_gl_dive', '⚡ SURGE DIVE - off the safe cell!', '#a5f3fc');
             setTimeout(() => {
-                if (!_egGlFinal || _egGlFinal !== g || g.finished) return;
+                if (!_glFinal || _glFinal !== g || g.finished) return;
                 try { warn.remove(); } catch (e) {}
                 const dive = document.createElement('div');
                 dive.className = 'eg-gl-dive';
@@ -635,24 +635,24 @@ export function _egGlFinalStart(monster) {
                 dive.style.transition = 'left ' + Math.round(dur) + 'ms linear';
                 requestAnimationFrame(() => { dive.style.left = Math.round(fromLeft ? sx + 60 : sx - 60) + 'px'; });
                 setTimeout(() => {
-                    if (!_egGlFinal || _egGlFinal !== g || g.finished) return;
-                    _egGlSpark(sx, sy, true);
-                    const pr = _egNkPlayerRect();
+                    if (!_glFinal || _glFinal !== g || g.finished) return;
+                    _glSpark(sx, sy, true);
+                    const pr = _nkPlayerRect();
                     if (pr) {
                         const pc = { x: pr.left + pr.width / 2, y: pr.top + pr.height / 2 };
                         if (Math.hypot(pc.x - sx, pc.y - sy) < 62) {
-                            _egGlTouch(EG_GL_SURGE_DMG, level, 'SYSTEM LOCKDOWN');
+                            _glTouch(GL_SURGE_DMG, level, 'SYSTEM LOCKDOWN');
                         }
                     }
-                    setTimeout(() => _egGlFinalEnd(g), _EG_GL_DEBUG_SLOW ? 5500 : 1200);
+                    setTimeout(() => _glFinalEnd(g), _GL_DEBUG_SLOW ? 5500 : 1200);
                 }, dur);
-            }, EG_GL_JAM_CHARGE * 0.7);
+            }, GL_JAM_CHARGE * 0.7);
         }
     };
     g.cdTimer = setInterval(step, beatTick);
 }
 
-export function _egGlFinalEnd(g) {
+export function _glFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
@@ -662,33 +662,33 @@ export function _egGlFinalEnd(g) {
     if (g.pip) { try { g.pip.remove(); } catch (e) {} g.pip = null; }
     if (g.diveline) { try { g.diveline.remove(); } catch (e) {} g.diveline = null; }
     if (g.diveEl) { try { g.diveEl.remove(); } catch (e) {} g.diveEl = null; }
-    if (g.fxRun) { try { _egNkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
+    if (g.fxRun) { try { _nkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
     ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.remove('eg-charge-paused');
     });
     document.querySelectorAll('.eg-gl-locked').forEach(el => el.classList.remove('eg-gl-locked'));
 
-    const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
+    const m = (g.monsterId && typeof _monsters !== 'undefined')
+        ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
-        if (typeof _egBossScheduleMechanics === 'function') {
-            try { _egBossScheduleMechanics(m, 3); } catch (e) {}
+        if (typeof _bossScheduleMechanics === 'function') {
+            try { _bossScheduleMechanics(m, 3); } catch (e) {}
         }
-        if (typeof _egRenderPanel === 'function') { try { _egRenderPanel(); } catch (e2) {} }
+        if (typeof _renderPanel === 'function') { try { _renderPanel(); } catch (e2) {} }
     }
-    if (_egGlFinal === g) _egGlFinal = null;
+    if (_glFinal === g) _glFinal = null;
 }
 
 
 //------------------------------------------------------------------------
 //-------------------TEARDOWN-----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop -
+// Called from _bossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-export function _egGlTeardown() {
-    if (_egGlFinal) { try { _egGlFinalEnd(_egGlFinal); } catch (e) {} _egGlFinal = null; }
+export function _glTeardown() {
+    if (_glFinal) { try { _glFinalEnd(_glFinal); } catch (e) {} _glFinal = null; }
     document.querySelectorAll('.eg-nk-lattice-warn, .eg-nk-lattice-hit, .eg-gl-tower, ' +
         '.eg-gl-tline, .eg-gl-orb, .eg-gl-trail, .eg-gl-arena, .eg-gl-grid, ' +
         '.eg-gl-wire, .eg-gl-cd, .eg-gl-safepip, .eg-gl-diveline, .eg-gl-dive, ' +
@@ -707,27 +707,27 @@ export function _egGlTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_GL_DEBUG.fire('lattice'|'scramble'|'surge', phase) - runs one now
-//   _EG_GL_DEBUG.final()                                   - LOCKDOWN now
+//   _GL_DEBUG.fire('lattice'|'scramble'|'surge', phase) - runs one now
+//   _GL_DEBUG.final()                                   - LOCKDOWN now
 if (typeof window !== 'undefined') {
-    window._EG_GL_DEBUG = {
+    window._GL_DEBUG = {
         fire: (name, phase) => {
-            const monster = (typeof _egMonsters !== 'undefined')
-                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_gridlock') : null;
+            const monster = (typeof _monsters !== 'undefined')
+                ? globalThis._monsters.find(m => m && m.baseId === 'boss_gridlock') : null;
             if (!monster) return 'no gridlock alive';
-            const fn = name === 'lattice' ? _egMechGlLattice
-                : name === 'scramble' ? _egMechGlScramble
-                : name === 'surge' ? _egMechGlSurge : null;
+            const fn = name === 'lattice' ? _mechGlLattice
+                : name === 'scramble' ? _mechGlScramble
+                : name === 'surge' ? _mechGlSurge : null;
             if (!fn) return 'unknown: ' + name;
-            if (name !== 'lattice' && _egNkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for the field to clear)';
+            if (name !== 'lattice' && _nkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for the field to clear)';
             fn(monster, phase || monster.bossPhase || 1);
             return 'fired ' + name;
         },
         final: () => {
-            const monster = (typeof _egMonsters !== 'undefined')
-                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_gridlock') : null;
+            const monster = (typeof _monsters !== 'undefined')
+                ? globalThis._monsters.find(m => m && m.baseId === 'boss_gridlock') : null;
             if (!monster) return 'no gridlock alive';
-            _egGlFinalStart(monster);
+            _glFinalStart(monster);
             return 'SYSTEM LOCKDOWN started';
         },
     };

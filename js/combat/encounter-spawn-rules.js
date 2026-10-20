@@ -7,9 +7,9 @@
 import { cur } from '../state.js';
 
 
-import { EG_DEFAULT_MONSTER_CAP, _egGetDefaultMonsterCap } from './encounter-constants.js';
+import { DEFAULT_MONSTER_CAP, _getDefaultMonsterCap } from './encounter-constants.js';
 import { EG_ENDGAME_MONSTER_LEVEL_CAP, EG_MAP_TIER_MONSTER_LEVELS, _egRollMapTier } from '../loot/loot-map-config.js';
-import { EG_MONSTER_DEFS } from './combat-monsters-data.js';
+import { MONSTER_DEFS } from './combat-monsters-data.js';
 
 
 
@@ -19,7 +19,7 @@ import { EG_MONSTER_DEFS } from './combat-monsters-data.js';
 //------------------------------------------------------------------------
 
 // Returns true if every filled cell in the solution has been correctly placed.
-export function _egIsPuzzleSolved() {
+export function _isPuzzleSolved() {
     if (!cur || !globalThis.userGrid) return false;
     for (let r = 0; r < cur.grid.length; r++)
         for (let c = 0; c < cur.grid[0].length; c++)
@@ -38,17 +38,17 @@ export function _egIsPuzzleSolved() {
 // between map tiers (e.g. T13 71 → T14 78 is +7). The pool is -down .. +up
 // where `down` is fixed and `up` scales with the distance to the next tier
 // so monsters sometimes roll close to the next tier's base level.
-// Below EG_EARLY_VARIANCE_FREE_LEVEL variance only rolls downward so fresh
+// Below EARLY_VARIANCE_FREE_LEVEL variance only rolls downward so fresh
 // characters never face monsters above their map's base level.
-export const EG_EARLY_VARIANCE_FREE_LEVEL = 8;
-export const EG_MONSTER_VARIANCE_DOWN = 2;
-export const EG_MONSTER_VARIANCE_UP_MIN = 2;
-export const EG_MONSTER_VARIANCE_UP_MAX = 6;
+export const EARLY_VARIANCE_FREE_LEVEL = 8;
+export const MONSTER_VARIANCE_DOWN = 2;
+export const MONSTER_VARIANCE_UP_MIN = 2;
+export const MONSTER_VARIANCE_UP_MAX = 6;
 
-export function _egRollMonsterLevel(baseLevel) {
+export function _rollMonsterLevel(baseLevel) {
     const base = Math.max(1, Math.round(Number(baseLevel) || 1));
     // Early tiers: only downward variance (protect new players).
-    if (base < EG_EARLY_VARIANCE_FREE_LEVEL) {
+    if (base < EARLY_VARIANCE_FREE_LEVEL) {
         const down = -Math.floor(Math.random() * 3); // -2..0
         return Math.max(1, base + down);
     }
@@ -74,9 +74,9 @@ export function _egRollMonsterLevel(baseLevel) {
             }
         }
     }
-    const upCap = Math.max(EG_MONSTER_VARIANCE_UP_MIN,
-        Math.min(EG_MONSTER_VARIANCE_UP_MAX, Math.round(gap * 0.85) || EG_MONSTER_VARIANCE_UP_MIN));
-    const down = EG_MONSTER_VARIANCE_DOWN;
+    const upCap = Math.max(MONSTER_VARIANCE_UP_MIN,
+        Math.min(MONSTER_VARIANCE_UP_MAX, Math.round(gap * 0.85) || MONSTER_VARIANCE_UP_MIN));
+    const down = MONSTER_VARIANCE_DOWN;
     // Uniform -down .. +upCap → average slightly above base, so maps feel
     // a touch harder but regularly spike toward next tier (e.g. T13 71 → 69-77).
     const variance = -down + Math.floor(Math.random() * (down + upCap + 1));
@@ -88,35 +88,35 @@ export function _egRollMonsterLevel(baseLevel) {
 // Chained-puzzle levels reuse regular puzzle defs that carry no monsterLevel
 // of their own - in that case respect the original map def's monster level
 // so monsters keep spawning at the map's intended level across the chain.
-export function _egGetEncounterBaseLevel() {
+export function _getEncounterBaseLevel() {
     if (cur && cur.monsterLevel != null && cur.monsterLevel > 0) return cur.monsterLevel;
-    if (typeof _egMapDef !== 'undefined' && globalThis._egMapDef
-        && globalThis._egMapDef.monsterLevel != null && globalThis._egMapDef.monsterLevel > 0) {
-        return globalThis._egMapDef.monsterLevel;
+    if (typeof _mapDef !== 'undefined' && globalThis._mapDef
+        && globalThis._mapDef.monsterLevel != null && globalThis._mapDef.monsterLevel > 0) {
+        return globalThis._mapDef.monsterLevel;
     }
     return 1;
 }
 
 // Builds a fixed monster list from cur.monsters, levelling each entry.
 // Used when the map explicitly defines which monsters should appear.
-export function _egBuildFixedNormalList(baseLevel, cap) {
+export function _buildFixedNormalList(baseLevel, cap) {
     return cur.monsters.slice(0, cap).map(entry => ({
         id: entry.id,
-        level: entry.level != null ? entry.level : _egRollMonsterLevel(baseLevel),
+        level: entry.level != null ? entry.level : _rollMonsterLevel(baseLevel),
     }));
 }
 
 // Builds a randomised monster list by shuffling all non-boss defs.
 // Count is random in [1, cap]. Used when the map has no explicit monster list.
 // Tier-weighted so high-level maps (T14-T16) prefer T3 hard-hitters over T1 fodder.
-export function _egCategorizeMonsterTier(def) {
+export function _categorizeMonsterTier(def) {
     // T3: tanky / hard-hitting (high HP or high damage)
     if ((def.baseHP || 0) >= 110 || (def.baseDamage || 0) >= 15) return 3;
     // T2: medium
     if ((def.baseHP || 0) >= 55 || (def.baseDamage || 0) >= 7) return 2;
     return 1;
 }
-export function _egPickWeightedMonster(allDefs, baseLevel) {
+export function _pickWeightedMonster(allDefs, baseLevel) {
     const lvl = Number(baseLevel) || 1;
     // At L90: 65% T3, 25% T2, 10% T1; at L1: inverse.
     let w1 = 1.0, w2 = 1.0, w3 = 1.0;
@@ -125,7 +125,7 @@ export function _egPickWeightedMonster(allDefs, baseLevel) {
     else if (lvl >= 15) { w1 = 1.0; w2 = 1.0; w3 = 0.5; }
     else { w1 = 1.5; w2 = 0.7; w3 = 0.2; }
     const pool = allDefs.map(d => {
-        const tier = _egCategorizeMonsterTier(d);
+        const tier = _categorizeMonsterTier(d);
         const w = tier === 3 ? w3 : tier === 2 ? w2 : w1;
         return { def: d, w };
     });
@@ -137,8 +137,8 @@ export function _egPickWeightedMonster(allDefs, baseLevel) {
     }
     return pool[pool.length - 1].def;
 }
-export function _egBuildRandomNormalList(baseLevel, cap) {
-    const allNonBoss = Object.values(EG_MONSTER_DEFS);
+export function _buildRandomNormalList(baseLevel, cap) {
+    const allNonBoss = Object.values(MONSTER_DEFS);
     if (allNonBoss.length === 0) return [];
 
     const maxCount = Math.min(cap, allNonBoss.length);
@@ -154,38 +154,38 @@ export function _egBuildRandomNormalList(baseLevel, cap) {
     const used = new Set();
     for (let i = 0; i < count; i++) {
         // Prefer unique picks but allow repeats if pool exhausted
-        let def = _egPickWeightedMonster(allNonBoss, baseLevel);
+        let def = _pickWeightedMonster(allNonBoss, baseLevel);
         let attempts = 0;
         while (used.has(def.id) && attempts < 8) {
-            def = _egPickWeightedMonster(allNonBoss, baseLevel);
+            def = _pickWeightedMonster(allNonBoss, baseLevel);
             attempts++;
         }
         used.add(def.id);
         picked.push(def);
     }
-    return picked.map(d => ({ id: d.id, level: _egRollMonsterLevel(baseLevel) }));
+    return picked.map(d => ({ id: d.id, level: _rollMonsterLevel(baseLevel) }));
 }
 
 // Builds the normal (non-boss) part of the spawn list for the current encounter.
 // Delegates to fixed or random list builders depending on cur.monsters.
 // cur.maxMonsters caps the total count (0 = boss-only encounter).
-export function _egBuildNormalSpawnList(baseLevel) {
-    const fallbackCap = (typeof _egGetDefaultMonsterCap === 'function') ? _egGetDefaultMonsterCap(baseLevel) : EG_DEFAULT_MONSTER_CAP;
+export function _buildNormalSpawnList(baseLevel) {
+    const fallbackCap = (typeof _getDefaultMonsterCap === 'function') ? _getDefaultMonsterCap(baseLevel) : DEFAULT_MONSTER_CAP;
     const cap = (cur.maxMonsters != null && cur.maxMonsters >= 0) ? cur.maxMonsters : fallbackCap;
     if (cap === 0) return [];
 
     if (cur.monsters && cur.monsters.length > 0) {
-        return _egBuildFixedNormalList(baseLevel, cap);
+        return _buildFixedNormalList(baseLevel, cap);
     }
-    return _egBuildRandomNormalList(baseLevel, cap);
+    return _buildRandomNormalList(baseLevel, cap);
 }
 
 // Builds a boss list from an explicit list of boss entries on a map def object.
-// Shared by both _egBuildBossSpawnList (cur) and _egBuildBossSpawnListFromDef (mapDef).
-export function _egBuildFixedBossList(bosses, bossCap, baseLevel) {
+// Shared by both _buildBossSpawnList (cur) and _buildBossSpawnListFromDef (mapDef).
+export function _buildFixedBossList(bosses, bossCap, baseLevel) {
     return bosses.slice(0, bossCap).map(entry => ({
         id: entry.id,
-        level: entry.level != null ? entry.level : _egRollMonsterLevel(baseLevel),
+        level: entry.level != null ? entry.level : _rollMonsterLevel(baseLevel),
         // Preserve the optional HP multiplier (e.g. 500k HP test
         // mode) so it survives the stamp → spawn-list → arena queue path.
         // Only max HP is scaled - boss damage stays at its normal value.
@@ -194,32 +194,32 @@ export function _egBuildFixedBossList(bosses, bossCap, baseLevel) {
     }));
 }
 
-// Picks one random boss from EG_BOSS_DEFS and returns it as a one-entry list.
+// Picks one random boss from BOSS_DEFS and returns it as a one-entry list.
 // Used when hasBoss is true but no explicit boss list is defined.
-export function _egBuildRandomBossList(baseLevel) {
-    const allBossDefs = Object.values(globalThis.EG_BOSS_DEFS);
+export function _buildRandomBossList(baseLevel) {
+    const allBossDefs = Object.values(globalThis.BOSS_DEFS);
     if (allBossDefs.length === 0) return [];
     const picked = allBossDefs[Math.floor(Math.random() * allBossDefs.length)];
-    return [{ id: picked.id, level: _egRollMonsterLevel(baseLevel), isBossSpawn: true }];
+    return [{ id: picked.id, level: _rollMonsterLevel(baseLevel), isBossSpawn: true }];
 }
 
 // Builds the boss part of the spawn list for the current encounter (reads from cur).
 // Uses cur.bosses if provided; otherwise picks one random boss when cur.hasBoss is true.
 // cur.maxBosses caps the count (defaults to 1).
-export function _egBuildBossSpawnList(baseLevel) {
+export function _buildBossSpawnList(baseLevel) {
     const hasBossFlag = cur.hasBoss;
     const explicitBosses = cur.bosses && cur.bosses.length > 0;
     if (!hasBossFlag && !explicitBosses) return [];
 
     const bossCap = (cur.maxBosses != null && cur.maxBosses > 0) ? cur.maxBosses : 1;
 
-    if (explicitBosses) return _egBuildFixedBossList(cur.bosses, bossCap, baseLevel);
-    return _egBuildRandomBossList(baseLevel);
+    if (explicitBosses) return _buildFixedBossList(cur.bosses, bossCap, baseLevel);
+    return _buildRandomBossList(baseLevel);
 }
 
-// Like _egBuildBossSpawnList but reads from an explicit mapDef object instead of cur.
-// Used by _egEnterBossArena so it always reads from the original map def.
-export function _egBuildBossSpawnListFromDef(mapDef, baseLevel) {
+// Like _buildBossSpawnList but reads from an explicit mapDef object instead of cur.
+// Used by _enterBossArena so it always reads from the original map def.
+export function _buildBossSpawnListFromDef(mapDef, baseLevel) {
     if (!mapDef) return [];
     const hasBossFlag = mapDef.hasBoss;
     const explicitBosses = mapDef.bosses && mapDef.bosses.length > 0;
@@ -227,15 +227,15 @@ export function _egBuildBossSpawnListFromDef(mapDef, baseLevel) {
 
     const bossCap = (mapDef.maxBosses != null && mapDef.maxBosses > 0) ? mapDef.maxBosses : 1;
 
-    if (explicitBosses) return _egBuildFixedBossList(mapDef.bosses, bossCap, baseLevel);
-    return _egBuildRandomBossList(baseLevel);
+    if (explicitBosses) return _buildFixedBossList(mapDef.bosses, bossCap, baseLevel);
+    return _buildRandomBossList(baseLevel);
 }
 
 // Returns the full ordered spawn list for this encounter: normal monsters only.
 // NOTE: Bosses never spawn inside regular puzzles. On boss maps they are
 //       fought in dedicated boss-arena puzzles at the end of the run
-//       (see _egEnterBossArena in endgame-encounter-chain.js).
-export function _egBuildSpawnList() {
-    const baseLevel = _egGetEncounterBaseLevel();
-    return _egBuildNormalSpawnList(baseLevel);
+//       (see _enterBossArena in endgame-encounter-chain.js).
+export function _buildSpawnList() {
+    const baseLevel = _getEncounterBaseLevel();
+    return _buildNormalSpawnList(baseLevel);
 }

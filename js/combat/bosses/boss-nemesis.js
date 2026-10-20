@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkDotHit, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE NEMESIS (boss_nemesis)---------------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_nemesis: {
         id: 'boss_nemesis', name: 'The Nemesis', emoji: '💀',
         baseHP: 1200, baseDamage: 26, chargeMax: 11,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_nemesis: {
         phases: [
             { threshold: 1.00, chargeMax: 11, damageMultiplier: 1.00 },
@@ -29,38 +29,38 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 3000,
         mechanics: [
-            { name: 'spiral_storm', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechSpiralStorm' },
-            { name: 'reaper_fans', intervalBase: 20000, intervalVariance: 4000, handler: '_egMechReaperFans' },
-            { name: 'soul_tithe', intervalBase: 23000, intervalVariance: 5000, handler: '_egMechSoulTithe' },
+            { name: 'spiral_storm', intervalBase: 18000, intervalVariance: 4000, handler: '_mechSpiralStorm' },
+            { name: 'reaper_fans', intervalBase: 20000, intervalVariance: 4000, handler: '_mechReaperFans' },
+            { name: 'soul_tithe', intervalBase: 23000, intervalVariance: 5000, handler: '_mechSoulTithe' },
         ],
     },
 });
 
 
-export function _egMechSpiralStorm(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechSpiralStorm(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const total = [0, 32, 38, 46][p];
     const emitMs = 2600;
     const speed = [0, 150, 170, 195][p];
     const lifeMs = 8000;
     const dmgPct = [0, 0.05, 0.06, 0.075][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const ex = window.innerWidth * 0.5, ey = window.innerHeight * 0.4;
-    const anchor = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '💀');
+    const anchor = _nkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '💀');
     anchor.style.transform = 'translate(' + Math.round(ex - 26) + 'px,' + Math.round(ey - 26) + 'px)';
     const orbs = [];
     let emitted = 0, emitAcc = 0, e = 0, orbCdUntil = 0;
-    _egNkToast('eg_mech_nemesis', '💀 The Nemesis: Spiral Storm! There is no rest!');
-    _egNkLoop(run, (dtS, now) => {
+    _nkToast('eg_mech_nemesis', '💀 The Nemesis: Spiral Storm! There is no rest!');
+    _nkLoop(run, (dtS, now) => {
         e += dtS * 1000;
         emitAcc += dtS * 1000;
         const step = emitMs / total;
         while (emitted < total && emitAcc >= step) {
             emitAcc -= step;
             const a = emitted * 2.4 + e / 1000 * 2.2;
-            const el = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-orb');
+            const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-orb');
             orbs.push({
                 x: ex, y: ey,
                 vx: Math.cos(a) * speed, vy: Math.sin(a) * speed,
@@ -68,7 +68,7 @@ export function _egMechSpiralStorm(monster, phase) {
             });
             emitted++;
         }
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         for (let i = orbs.length - 1; i >= 0; i--) {
             const o = orbs[i];
             o.t += dtS * 1000;
@@ -80,19 +80,19 @@ export function _egMechSpiralStorm(monster, phase) {
                 continue;
             }
             o.el.style.transform = 'translate(' + Math.round(o.x - 9) + 'px,' + Math.round(o.y - 9) + 'px)';
-            if (!o.hitDone && pr && now >= orbCdUntil && _egNkDotHit(o.el, pr, 2)) {
+            if (!o.hitDone && pr && now >= orbCdUntil && _nkDotHit(o.el, pr, 2)) {
                 o.hitDone = true;
                 orbCdUntil = now + 450;
-                const dealt = _egNkHit(dmgPct, 'shadow', level);
-                _egNkAbilityHitToast(dealt, 'The Nemesis', 'Spiral Storm');
+                const dealt = _nkHit(dmgPct, 'shadow', level);
+                _nkAbilityHitToast(dealt, 'The Nemesis', 'Spiral Storm');
             }
         }
         return emitted < total || orbs.length > 0;
     });
 }
 
-export function _egMechReaperFans(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechReaperFans(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const volleys = [0, 3, 4, 4][p];
     const fanN = 5, fanSpread = 0.4;
@@ -100,28 +100,28 @@ export function _egMechReaperFans(monster, phase) {
     const speed = [0, 170, 190, 215][p];
     const lifeMs = 7000;
     const dmgPct = [0, 0.055, 0.065, 0.08][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const ex = window.innerWidth * 0.5, ey = 80;
     const orbs = [];
     let fired = 0, acc = 0, orbCdUntil = 0;
-    _egNkToast('eg_mech_reaper', '💀 The Nemesis: Reaper Fans! Pausing is death!');
-    _egNkLoop(run, (dtS, now) => {
+    _nkToast('eg_mech_reaper', '💀 The Nemesis: Reaper Fans! Pausing is death!');
+    _nkLoop(run, (dtS, now) => {
         if (fired < volleys) {
             acc += dtS * 1000;
             if (acc >= (fired === 0 ? 400 : volleyGapMs)) {
                 acc = 0;
                 fired++;
-                const c = _egNkPlayerCenter();
+                const c = _nkPlayerCenter();
                 const base = Math.atan2((c ? c.y : 300) - ey, (c ? c.x : ex) - ex);
                 for (let i = 0; i < fanN; i++) {
                     const a = base + (i - (fanN - 1) / 2) * (fanSpread * 2 / (fanN - 1));
-                    const el = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-orb');
+                    const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-orb');
                     orbs.push({ x: ex, y: ey, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, t: 0, hitDone: false, el });
                 }
             }
         }
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         for (let i = orbs.length - 1; i >= 0; i--) {
             const o = orbs[i];
             o.t += dtS * 1000;
@@ -133,11 +133,11 @@ export function _egMechReaperFans(monster, phase) {
                 continue;
             }
             o.el.style.transform = 'translate(' + Math.round(o.x - 9) + 'px,' + Math.round(o.y - 9) + 'px)';
-            if (!o.hitDone && pr && now >= orbCdUntil && _egNkDotHit(o.el, pr, 2)) {
+            if (!o.hitDone && pr && now >= orbCdUntil && _nkDotHit(o.el, pr, 2)) {
                 o.hitDone = true;
                 orbCdUntil = now + 500;
-                const dealt = _egNkHit(dmgPct, 'shadow', level);
-                _egNkAbilityHitToast(dealt, 'The Nemesis', 'Reaper Fans');
+                const dealt = _nkHit(dmgPct, 'shadow', level);
+                _nkAbilityHitToast(dealt, 'The Nemesis', 'Reaper Fans');
             }
         }
         return fired < volleys || orbs.length > 0;

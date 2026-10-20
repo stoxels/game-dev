@@ -276,11 +276,11 @@ export function _escapeToastHtml(s) {
 
 // Returns the HTML for a puzzle item's icon: the real item art image once
 // the items manifest has resolved, otherwise the emoji fallback from the
-// def. Same source the inventory slots use (EG_ART), read lazily off
+// def. Same source the inventory slots use (GAME_ART), read lazily off
 // globalThis so this module stays cycle-free.
 export function puzzleItemIconHtml(def) {
     try {
-        const art = globalThis.EG_ART;
+        const art = globalThis.GAME_ART;
         if (art && typeof art.html === 'function') return art.html('item', def.id, def.icon);
     } catch (e) { /* art system not ready - fall through to emoji */ }
     return _escapeToastHtml((def && def.icon) || '');

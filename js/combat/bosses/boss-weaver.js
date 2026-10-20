@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE WEAVER (boss_weaver)-----------------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_weaver: {
         id: 'boss_weaver', name: 'The Weaver', emoji: '🕸️',
         baseHP: 1060, baseDamage: 24, chargeMax: 12,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_weaver: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -29,8 +29,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'thread_grid', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechThreadGrid' },
-            { name: 'prior_bomb', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechPriorBomb' },
+            { name: 'thread_grid', intervalBase: 21000, intervalVariance: 5000, handler: '_mechThreadGrid' },
+            { name: 'prior_bomb', intervalBase: 19000, intervalVariance: 4000, handler: '_mechPriorBomb' },
         ],
     },
 });
@@ -38,21 +38,21 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // A wire grid that warns which threads go live, then electrifies them.
 // Stand clear of the flickering threads before each cycle turns live.
-export function _egMechThreadGrid(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechThreadGrid(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const cycles = [0, 3, 4, 5][p];
     const warnMs = 700, liveMs = [0, 2200, 1900, 1600][p];
     const thick = 12;
     const dmgPct = [0, 0.15, 0.18, 0.22][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const wires = [];
     [0.25, 0.5, 0.75].forEach((f, i) => {
-        const h = _egNkEl(run, 'div', 'eg-nk-thread-h');
+        const h = _nkEl(run, 'div', 'eg-nk-thread-h');
         h.style.top = Math.round(H * f) + 'px';
-        const v = _egNkEl(run, 'div', 'eg-nk-thread-v');
+        const v = _nkEl(run, 'div', 'eg-nk-thread-v');
         v.style.left = Math.round(W * f) + 'px';
         wires.push({ axis: 'h', pos: H * f, el: h, idx: i });
         wires.push({ axis: 'v', pos: W * f, el: v, idx: i + 3 });
@@ -65,7 +65,7 @@ export function _egMechThreadGrid(monster, phase) {
             w.el.classList.toggle('eg-nk-thread-warn', !!warn && !live);
         });
     };
-    _egNkToast('eg_mech_weaver', '🕸️ The Weaver: Thread Grid! Read the flicker!');
+    _nkToast('eg_mech_weaver', '🕸️ The Weaver: Thread Grid! Read the flicker!');
     let cycle = 0, stage = 'warn', t = 0, liveSet = new Set(), nextSet = new Set();
     const pickSet = () => {
         // Alternate even/odd wires, phase 3 sometimes electrifies everything.
@@ -78,7 +78,7 @@ export function _egMechThreadGrid(monster, phase) {
     nextSet = pickSet();
     nextSet.warn = nextSet;
     paint(nextSet);
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         if (cycle >= cycles) return false;
         t += dtS * 1000;
         if (stage === 'warn' && t >= warnMs) {
@@ -88,7 +88,7 @@ export function _egMechThreadGrid(monster, phase) {
             liveSet.warn = null;
             paint(liveSet);
         } else if (stage === 'live') {
-            const pr = _egNkPlayerRect();
+            const pr = _nkPlayerRect();
             if (pr) {
                 const caught = wires.some((w, i) => {
                     if (!liveSet.has(i)) return false;
@@ -98,8 +98,8 @@ export function _egMechThreadGrid(monster, phase) {
                 });
                 if (caught && now >= (paint.cd || 0)) {
                     paint.cd = now + 900;
-                    const dealt = _egNkHit(dmgPct, 'shadow', level);
-                    _egNkAbilityHitToast(dealt, 'The Weaver', 'Thread Grid');
+                    const dealt = _nkHit(dmgPct, 'shadow', level);
+                    _nkAbilityHitToast(dealt, 'The Weaver', 'Thread Grid');
                 }
             }
             if (t >= liveMs) {

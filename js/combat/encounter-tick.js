@@ -1,15 +1,15 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { _egGetMonsterChargeMultiplier, _egGetPlayerChargeMultiplier, _egRefreshPlayerStatusIcons, _egTickAilments } from './combat-ailments-core.js';
-import { _egMaybeShowLowHealthWarning } from './encounter-overlays.js';
-import { EG_MELEE_OVERCHARGE_RATIO, _egFireMonsterAttack, _egMeleeTierForCharge, _egOverchargeRateForTier, _egUpdateBars } from './encounter.js';
-import { _egHazardsTick } from './combat-hazards-lifecycle.js';
+import { _getMonsterChargeMultiplier, _getPlayerChargeMultiplier, _refreshPlayerStatusIcons, _tickAilments } from './combat-ailments-core.js';
+import { _maybeShowLowHealthWarning } from './encounter-overlays.js';
+import { MELEE_OVERCHARGE_RATIO, _fireMonsterAttack, _meleeTierForCharge, _overchargeRateForTier, _updateBars } from './encounter.js';
+import { _hazardsTick } from './combat-hazards-lifecycle.js';
 import { _egGetActiveMapModValue } from '../endgame/endgame-map-launch.js';
-import { _egGetPlayerAttackInterval, _egGetPlayerAttackIntervalForHand } from '../endgame/endgame-player-stats.js';
-import { _egIsDualWielding } from '../loot/loot-requirements.js';
-import { _egIsActive } from './combat-state.js';
-import { _egUpdateMeleeMarker } from './combat-weapon-swing-config.js';
-import { _egCheckMistakeLimit, _egTickLifeRegen } from './encounter-tick-support.js';
+import { _getPlayerAttackInterval, _getPlayerAttackIntervalForHand } from '../endgame/endgame-player-stats.js';
+import { _isDualWielding } from '../loot/loot-requirements.js';
+import { _isActive } from './combat-state.js';
+import { _updateMeleeMarker } from './combat-weapon-swing-config.js';
+import { _checkMistakeLimit, _tickLifeRegen } from './encounter-tick-support.js';
 
 //  endgame-encounter-tick.js
 //  COMBAT TICK LOOP - extracted 2026-09-10 from endgame-encounter.js
@@ -23,7 +23,7 @@ import { _egCheckMistakeLimit, _egTickLifeRegen } from './encounter-tick-support
 
 // Advances a single monster's charge bar by one tick (0.1s at 10Hz).
 // Fires the monster's attack when the charge bar fills completely.
-export function _egTickMonster(m) {
+export function _tickMonster(m) {
     // Brutus's sacrificial zombies never attack - they only shamble into the
     // ground-slam band; their movement is driven by the roaming tick in
     // boss-brutus.js, so skip charge/attack entirely.
@@ -56,7 +56,7 @@ export function _egTickMonster(m) {
             const rageCard = document.getElementById(`eg-card-${m.id}`);
             const rageWrap = rageCard ? rageCard.querySelector('.eg-emoji-wrapper') : null;
             if (rageWrap) rageWrap.classList.add('eg-boss-enraged');
-            _egRageScreenFlash();
+            _rageScreenFlash();
         }
     }
 
@@ -76,13 +76,13 @@ export function _egTickMonster(m) {
     // The Marksman's Arrow Gauntlet: the boss's own attack charge freezes -
     // the bow volley IS his attack while the gauntlet holds the arena
     // (boss-marksman.js).
-    if (m.isBoss && typeof _egMarksGauntletChargePaused === 'function' && globalThis._egMarksGauntletChargePaused()) return;
+    if (m.isBoss && typeof _marksGauntletChargePaused === 'function' && globalThis._marksGauntletChargePaused()) return;
     // Ailments: frozen monsters don't charge, chilled ones charge at 50%
-    const chargeMult = (typeof _egGetMonsterChargeMultiplier === 'function') ? _egGetMonsterChargeMultiplier(m) : 1;
+    const chargeMult = (typeof _getMonsterChargeMultiplier === 'function') ? _getMonsterChargeMultiplier(m) : 1;
     m.currentCharge += 0.1 * chargeMult;
     if (m.currentCharge >= m.chargeMax) {
         m.currentCharge = 0;
-        _egFireMonsterAttack(m);
+        _fireMonsterAttack(m);
     }
 }
 
@@ -90,86 +90,86 @@ export function _egTickMonster(m) {
 // (equipping/unequipping a speed item, buffs) the stored amount must be
 // rescaled or the bar jumps: a full 100% bar on a slow 20s interval would
 // become 400% once the interval drops to 5s. Keeps the bar's % constant.
-let _egLastChargeMax = 0;
-function _egSyncChargeToInterval(max) {
-    if (_egLastChargeMax > 0 && max > 0 && Math.abs(max - _egLastChargeMax) > 1e-6) {
-        globalThis._egPlayerCurrentCharge = (globalThis._egPlayerCurrentCharge || 0) * (max / _egLastChargeMax);
+let _lastChargeMax = 0;
+function _syncChargeToInterval(max) {
+    if (_lastChargeMax > 0 && max > 0 && Math.abs(max - _lastChargeMax) > 1e-6) {
+        globalThis._playerCurrentCharge = (globalThis._playerCurrentCharge || 0) * (max / _lastChargeMax);
     }
-    _egLastChargeMax = max;
+    _lastChargeMax = max;
 }
 
 // Current charge % (0..5) of the manual melee bar. 1 = fully charged and
 // ready for a full-damage strike; above 1 the strike OVERCHARGES through
 // the weapon-art tiers (2 = dash, 3 = sky leap, 4 = nova, 5 = grand nova -
-// see EG_MELEE_OVERCHARGE_* in encounter-melee-arts.js).
+// see MELEE_OVERCHARGE_* in encounter-melee-arts.js).
 // Returns 0 outside encounters with no max.
-export function _egGetPlayerChargePct() {
-    if (_egDualOn()) return Math.max(_egGetHandChargePct(1), _egGetHandChargePct(2));
-    return _egGetHandChargePct(1);
+export function _getPlayerChargePct() {
+    if (_dualOn()) return Math.max(_getHandChargePct(1), _getHandChargePct(2));
+    return _getHandChargePct(1);
 }
 
 // DUAL-WIELD: two one-handed weapons run two independent charge bars (hand 1
 // = main hand, hand 2 = off-hand), each on its own weapon's charge time.
-// One attack key strikes with whichever bar is fuller (_egGetLeadHand); the
+// One attack key strikes with whichever bar is fuller (_getLeadHand); the
 // other keeps charging untouched.
-function _egDualOn() {
-    try { return typeof _egIsDualWielding === 'function' && !!_egIsDualWielding(); } catch (e) { return false; }
+function _dualOn() {
+    try { return typeof _isDualWielding === 'function' && !!_isDualWielding(); } catch (e) { return false; }
 }
 
-let _egLastChargeMax2 = 0;
-function _egHandMax(hand) {
-    if (_egDualOn()) {
-        const m = _egGetPlayerAttackIntervalForHand(hand);
+let _lastChargeMax2 = 0;
+function _handMax(hand) {
+    if (_dualOn()) {
+        const m = _getPlayerAttackIntervalForHand(hand);
         return m > 0 ? m : 0;
     }
-    return (typeof _egGetPlayerAttackInterval === 'function') ? _egGetPlayerAttackInterval() : 0;
+    return (typeof _getPlayerAttackInterval === 'function') ? _getPlayerAttackInterval() : 0;
 }
 
 // Charge % (0..5) of one hand's bar. Hand 2 is only meaningful while dual-wielding.
-export function _egGetHandChargePct(hand) {
-    const max = _egHandMax(hand === 2 ? 2 : 1);
+export function _getHandChargePct(hand) {
+    const max = _handMax(hand === 2 ? 2 : 1);
     if (!max || max <= 0) return 0;
-    const cap = (typeof EG_MELEE_OVERCHARGE_RATIO === 'number') ? EG_MELEE_OVERCHARGE_RATIO : 1;
+    const cap = (typeof MELEE_OVERCHARGE_RATIO === 'number') ? MELEE_OVERCHARGE_RATIO : 1;
     if (hand === 2) {
-        if (_egLastChargeMax2 > 0 && Math.abs(max - _egLastChargeMax2) > 1e-6) {
-            globalThis._egPlayerCurrentCharge2 = (globalThis._egPlayerCurrentCharge2 || 0) * (max / _egLastChargeMax2);
+        if (_lastChargeMax2 > 0 && Math.abs(max - _lastChargeMax2) > 1e-6) {
+            globalThis._playerCurrentCharge2 = (globalThis._playerCurrentCharge2 || 0) * (max / _lastChargeMax2);
         }
-        _egLastChargeMax2 = max;
-        return Math.min(cap, Math.max(0, (globalThis._egPlayerCurrentCharge2 || 0) / max));
+        _lastChargeMax2 = max;
+        return Math.min(cap, Math.max(0, (globalThis._playerCurrentCharge2 || 0) / max));
     }
-    _egSyncChargeToInterval(max);
-    return Math.min(cap, Math.max(0, globalThis._egPlayerCurrentCharge / max));
+    _syncChargeToInterval(max);
+    return Math.min(cap, Math.max(0, globalThis._playerCurrentCharge / max));
 }
 
 // The hand a strike would use right now: the fuller bar (ties go to hand 1).
-export function _egGetLeadHand() {
-    if (!_egDualOn()) return 1;
-    return _egGetHandChargePct(2) > _egGetHandChargePct(1) + 1e-9 ? 2 : 1;
+export function _getLeadHand() {
+    if (!_dualOn()) return 1;
+    return _getHandChargePct(2) > _getHandChargePct(1) + 1e-9 ? 2 : 1;
 }
 
 // Spends the current charge and returns the consumed % (0..1). Manual
 // melee strikes (E) call this at key-press time; the strike then deals
 // that share of full damage (linear, Secret-of-Mana-style). Dual-wielding
-// spends only the leading hand's bar (the hand is left in _egStrikeHand).
-export function _egConsumePlayerCharge() {
-    const hand = _egGetLeadHand();
-    const pct = _egGetHandChargePct(hand);
-    if (hand === 2) globalThis._egPlayerCurrentCharge2 = 0;
-    else globalThis._egPlayerCurrentCharge = 0;
-    globalThis._egStrikeHand = hand;
+// spends only the leading hand's bar (the hand is left in _strikeHand).
+export function _consumePlayerCharge() {
+    const hand = _getLeadHand();
+    const pct = _getHandChargePct(hand);
+    if (hand === 2) globalThis._playerCurrentCharge2 = 0;
+    else globalThis._playerCurrentCharge = 0;
+    globalThis._strikeHand = hand;
     return pct;
 }
 
 // True while melee charging is paused: holding the parry key, or frozen
-// solid. Chilled only slows charging (see _egGetPlayerChargeMultiplier).
-export function _egIsPlayerChargePaused() {
-    if (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) return true;
-    if (typeof _egGetPlayerChargeMultiplier === 'function' && _egGetPlayerChargeMultiplier() === 0) return true;
+// solid. Chilled only slows charging (see _getPlayerChargeMultiplier).
+export function _isPlayerChargePaused() {
+    if (typeof _holdEPauseActive !== 'undefined' && globalThis._holdEPauseActive) return true;
+    if (typeof _getPlayerChargeMultiplier === 'function' && _getPlayerChargeMultiplier() === 0) return true;
     return false;
 }
 
 // One-shot red screen pulse when a boss turns enraged (cosmetic, self-removing).
-function _egRageScreenFlash() {
+function _rageScreenFlash() {
     try {
         const el = document.createElement('div');
         el.className = 'eg-rage-flash';
@@ -184,33 +184,33 @@ function _egRageScreenFlash() {
 // while HOLDING the attack key past full OVERCHARGES through the
 // weapon-art tiers (see combat-weapon-swing.js): the release strike spends
 // the whole bar. The full-charge time comes from the equipped weapon (see
-// _egGetPlayerAttackInterval).
+// _getPlayerAttackInterval).
 // OVERCHARGE: past 100% the held bar keeps filling up to
-// EG_MELEE_OVERCHARGE_RATIO (500%) - a strike released in a tier band
+// MELEE_OVERCHARGE_RATIO (500%) - a strike released in a tier band
 // deals proportionally more damage (200% = 2x hit, 500% = 5x) AND
 // unleashes that tier's weapon art (dash / sky leap / nova / grand nova).
 // NOTE: boss set-piece charge pauses were removed with the manual system -
 // the bar is a charge-up, not free DPS, so finales no longer freeze it.
 // Only the parry hold and ailments (frozen/chill) still gate charging.
-export function _egTickPlayer() {
+export function _tickPlayer() {
     // Hold-parry pause: while the parry key (R by default) is held during an
     // endgame encounter, freeze the player's own melee charge bar.
-    if (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) {
-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    if (typeof _holdEPauseActive !== 'undefined' && globalThis._holdEPauseActive) {
+        if (typeof _isActive === 'function' && _isActive()) return;
         // If not in an active encounter, fall through (no effect outside endgame)
     }
     // Ailments: frozen stops the charge bar entirely, chilled slows it to
-    // half speed (see _egGetPlayerChargeMultiplier in endgame-ailments.js).
-    const chargeMult = (typeof _egGetPlayerChargeMultiplier === 'function') ? _egGetPlayerChargeMultiplier() : 1;
+    // half speed (see _getPlayerChargeMultiplier in endgame-ailments.js).
+    const chargeMult = (typeof _getPlayerChargeMultiplier === 'function') ? _getPlayerChargeMultiplier() : 1;
     if (chargeMult <= 0) return;
-    const dual = _egDualOn();
-    const max1 = _egHandMax(1);
+    const dual = _dualOn();
+    const max1 = _handMax(1);
     if (!max1 || max1 <= 0) return;
-    _egGetHandChargePct(1); // keeps the stored charge in step with the full-charge time
-    const overchargeCap = (typeof EG_MELEE_OVERCHARGE_RATIO === 'number') ? EG_MELEE_OVERCHARGE_RATIO : 1;
-    const holding = !!globalThis._egMeleeHoldActive;
+    _getHandChargePct(1); // keeps the stored charge in step with the full-charge time
+    const overchargeCap = (typeof MELEE_OVERCHARGE_RATIO === 'number') ? MELEE_OVERCHARGE_RATIO : 1;
+    const holding = !!globalThis._meleeHoldActive;
     // Only the leading hand follows a held key into overcharge.
-    const lead = dual ? _egGetLeadHand() : 1;
+    const lead = dual ? _getLeadHand() : 1;
     const advance = (key, max, isHeld) => {
         if (!isHeld) {
             // SoM auto-charge: no held key, no overcharge - refill toward 100%
@@ -223,45 +223,45 @@ export function _egTickPlayer() {
         // Holding: charge (from wherever the bar stands) past full into
         // OVERCHARGE, up to the cap, and hold there until released. Each
         // crossed milestone slows the climb (see
-        // EG_MELEE_OVERCHARGE_RATE_PER_TIER) - the 500% grand nova takes
+        // MELEE_OVERCHARGE_RATE_PER_TIER) - the 500% grand nova takes
         // patience, like a Secret-of-Mana weapon level.
         let bandRate = 1;
         try {
-            bandRate = _egOverchargeRateForTier(
-                _egMeleeTierForCharge(Math.min((globalThis[key] || 0) / max, overchargeCap)));
+            bandRate = _overchargeRateForTier(
+                _meleeTierForCharge(Math.min((globalThis[key] || 0) / max, overchargeCap)));
         } catch (e) { bandRate = 1; }
         globalThis[key] = Math.min(max * overchargeCap, (globalThis[key] || 0) + 0.1 * chargeMult * bandRate); // Ticks at 10Hz
     };
-    advance('_egPlayerCurrentCharge', max1, holding && lead === 1);
+    advance('_playerCurrentCharge', max1, holding && lead === 1);
     if (dual) {
-        const max2 = _egHandMax(2);
+        const max2 = _handMax(2);
         if (max2 > 0) {
-            _egGetHandChargePct(2);
-            advance('_egPlayerCurrentCharge2', max2, holding && lead === 2);
+            _getHandChargePct(2);
+            advance('_playerCurrentCharge2', max2, holding && lead === 2);
         }
     } else {
-        globalThis._egPlayerCurrentCharge2 = 0;
+        globalThis._playerCurrentCharge2 = 0;
     }
     // Charge-level feedback: crossing 100% / 200% / 300% / 400% / 500%
     // plays a rising tick so auto-ready and each overcharge tier feels
     // like charging up.
     try {
-        const pct = _egGetPlayerChargePct();
+        const pct = _getPlayerChargePct();
         const level = pct >= overchargeCap - 0.001 ? 5 : pct >= 4 ? 4 : pct >= 3 ? 3 : pct >= 2 ? 2 : pct >= 1 ? 1 : 0;
-        if (level > (globalThis._egMeleeChargeLevel || 0)) {
-            globalThis._egMeleeChargeLevel = level;
+        if (level > (globalThis._meleeChargeLevel || 0)) {
+            globalThis._meleeChargeLevel = level;
             if (typeof Audio_Manager !== 'undefined' && Audio_Manager && typeof Audio_Manager.playSFX === 'function') {
                 // 100% = ready ping; 200%+ = overcharge tier-up. The hum
                 // loop runs while holding past full (stopped on release).
                 Audio_Manager.playSFX(level === 1 ? 'charge_ready' : 'charge_tier_up', 'drifterLevelUp');
-                if (level >= 2 && globalThis._egMeleeHoldActive) Audio_Manager.playSFX('charge_loop');
+                if (level >= 2 && globalThis._meleeHoldActive) Audio_Manager.playSFX('charge_loop');
             }
         }
     } catch (e) {}
 }
 
 // ── Hold-parry charge pause - freeze own melee charge bar while held ───────
-export function _egSetHoldEPauseVisual(isPaused) {
+export function _setHoldEPauseVisual(isPaused) {
     const bar = document.getElementById('avatar-charge-fill');
     if (bar) bar.classList.toggle('eg-charge-paused', !!isPaused);
     const alt = document.getElementById('eg-player-charge-bar');
@@ -303,37 +303,37 @@ export function _initEgHoldEPauseHotkey() {
         if (!e || !isParryKey(e)) return;
         if (e.repeat) return;
         // The Snail: pressing the parry key drops a held broom (it respawns outside the grid).
-        if (typeof _egSnailDropBroom === 'function') {
-            try { globalThis._egSnailDropBroom(); } catch (err) {}
+        if (typeof _snailDropBroom === 'function') {
+            try { globalThis._snailDropBroom(); } catch (err) {}
         }
         const tag = document.activeElement?.tagName;
         if (tag === 'INPUT' || tag === 'TEXTAREA') return;
         if (document.querySelector('.modal-bg.show')) return;
-        if (typeof _egIsActive === 'function' && !_egIsActive()) return;
-        if (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) return;
-        globalThis._egHoldEPauseActive = true;
-        _egSetHoldEPauseVisual(true);
+        if (typeof _isActive === 'function' && !_isActive()) return;
+        if (typeof _holdEPauseActive !== 'undefined' && globalThis._holdEPauseActive) return;
+        globalThis._holdEPauseActive = true;
+        _setHoldEPauseVisual(true);
     });
     document.addEventListener('keyup', (e) => {
         if (!e || !isParryKey(e)) return;
-        if (typeof _egHoldEPauseActive !== 'undefined' && !globalThis._egHoldEPauseActive) {
-            _egSetHoldEPauseVisual(false);
+        if (typeof _holdEPauseActive !== 'undefined' && !globalThis._holdEPauseActive) {
+            _setHoldEPauseVisual(false);
             return;
         }
-        globalThis._egHoldEPauseActive = false;
-        _egSetHoldEPauseVisual(false);
+        globalThis._holdEPauseActive = false;
+        _setHoldEPauseVisual(false);
     });
     window.addEventListener('blur', () => {
-        if (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) {
-            globalThis._egHoldEPauseActive = false;
-            _egSetHoldEPauseVisual(false);
+        if (typeof _holdEPauseActive !== 'undefined' && globalThis._holdEPauseActive) {
+            globalThis._holdEPauseActive = false;
+            _setHoldEPauseVisual(false);
         }
     });
     // Also clear on encounter stop / visibility loss
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden && typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) {
-            globalThis._egHoldEPauseActive = false;
-            _egSetHoldEPauseVisual(false);
+        if (document.hidden && typeof _holdEPauseActive !== 'undefined' && globalThis._holdEPauseActive) {
+            globalThis._holdEPauseActive = false;
+            _setHoldEPauseVisual(false);
         }
     });
 }
@@ -345,7 +345,7 @@ _initEgHoldEPauseHotkey();
 // or the lower part of the right-side stack can push that tooltip past the
 // bottom of the screen. On hover we measure the tooltip and, when it would
 // clip the viewport, flip it above the card via .eg-tip-flip.
-export const EG_CARD_TOOLTIP_VIEW_MARGIN = 6;
+export const CARD_TOOLTIP_VIEW_MARGIN = 6;
 document.addEventListener('mouseover', (e) => {
     const emoji = e.target && e.target.closest ? e.target.closest('.eg-emoji-wrapper') : null;
     if (!emoji) return;
@@ -361,7 +361,7 @@ document.addEventListener('mouseover', (e) => {
         if (!tip.isConnected) return;
         const rect = tip.getBoundingClientRect();
         tip.classList.toggle('eg-tip-flip',
-            rect.bottom > window.innerHeight - EG_CARD_TOOLTIP_VIEW_MARGIN);
+            rect.bottom > window.innerHeight - CARD_TOOLTIP_VIEW_MARGIN);
     });
 });
 
@@ -370,19 +370,19 @@ document.addEventListener('mouseover', (e) => {
 // bar's paused/ready styling centrally so leftover per-boss 'eg-charge-paused'
 // toggles from the removed set-piece freeze era can't desync the visual:
 // paused reflects ONLY the live pause state (parry hold / frozen).
-export function _egUpdatePlayerChargeBar() {
-    const dual = _egDualOn();
-    const paused = _egIsPlayerChargePaused();
-    const lead = dual ? _egGetLeadHand() : 1;
+export function _updatePlayerChargeBar() {
+    const dual = _dualOn();
+    const paused = _isPlayerChargePaused();
+    const lead = dual ? _getLeadHand() : 1;
     // One readout per hand (hand 2 only exists while dual-wielding). Overcharge
     // milestone look: each weapon-art tier restyles the bar + readout a step
     // further (see eg-charge-tier1..4 in monsters.css).
     const paint = (hand, barIds, labelId) => {
-        const pct = _egGetHandChargePct(hand);
+        const pct = _getHandChargePct(hand);
         const overcharged = pct > 1.001;
         const ready = pct >= 1 && !paused;
         let tier = 0;
-        try { tier = (typeof _egMeleeTierForCharge === 'function') ? _egMeleeTierForCharge(pct) : 0; }
+        try { tier = (typeof _meleeTierForCharge === 'function') ? _meleeTierForCharge(pct) : 0; }
         catch (e) { tier = 0; }
         barIds.forEach(id => {
             const bar = document.getElementById(id);
@@ -417,30 +417,30 @@ export function _egUpdatePlayerChargeBar() {
     if (dual) paint(2, ['avatar-charge2-fill'], 'avatar-charge2-text');
     // Rooted-while-charging indicator: synced here centrally (10Hz) so
     // hold-begin, hold-cancel and strike-release can never desync it.
-    try { _egSyncMeleeRootedVisual(!!globalThis._egMeleeHoldActive); } catch (e) {}
+    try { _syncMeleeRootedVisual(!!globalThis._meleeHoldActive); } catch (e) {}
 }
 
 // Delay before the rooted warning appears: quick taps must never flash
 // it - only a committed hold earns the ring + tag. Pure - unit-tested.
-export const EG_MELEE_ROOTED_INDICATOR_DELAY_MS = 2000;
+export const MELEE_ROOTED_INDICATOR_DELAY_MS = 2000;
 
 // Rooted indicator for a charged melee hold: the avatar wears a warning
 // ring + VULNERABLE tag while the attack key is held (no movement, no
-// evasion/block, amplified damage taken - see _egPlayerTakeDamage). The
+// evasion/block, amplified damage taken - see _playerTakeDamage). The
 // indicator only appears once the hold is committed (held longer than
-// EG_MELEE_ROOTED_INDICATOR_DELAY_MS) - taps are too short to ever show
+// MELEE_ROOTED_INDICATOR_DELAY_MS) - taps are too short to ever show
 // it. Best-effort; never throws.
-function _egSyncMeleeRootedVisual(rooted) {
+function _syncMeleeRootedVisual(rooted) {
     if (typeof document === 'undefined') return;
     let show = !!rooted;
     if (show) {
         // Taps must not flash the warning: compare against the hold-start
-        // stamp written by _egMeleeBeginHold (missing/zero stamp = show
+        // stamp written by _meleeBeginHold (missing/zero stamp = show
         // immediately - fail visible, never fail silent).
         try {
-            const since = (typeof _egMeleeHoldStartAt !== 'undefined')
-                ? globalThis._egMeleeHoldStartAt : 0;
-            if (since) show = (Date.now() - since) >= EG_MELEE_ROOTED_INDICATOR_DELAY_MS;
+            const since = (typeof _meleeHoldStartAt !== 'undefined')
+                ? globalThis._meleeHoldStartAt : 0;
+            if (since) show = (Date.now() - since) >= MELEE_ROOTED_INDICATOR_DELAY_MS;
         } catch (e) {}
     }
     const avatar = document.getElementById('player-avatar-wrapper');
@@ -465,36 +465,36 @@ function _egSyncMeleeRootedVisual(rooted) {
 
 
 // Runs at 10Hz. Advances every monster's charge bar and fires their attack
-// when the bar fills. Also calls _egBossTick for per-tick boss logic.
-export function _egTickLoop() {
-    if (!_egIsActive()) return;
+// when the bar fills. Also calls _bossTick for per-tick boss logic.
+export function _tickLoop() {
+    if (!_isActive()) return;
     if (typeof dead !== 'undefined' && globalThis.dead) return;
     if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;
 
-    _egCheckMistakeLimit();
-    _egUpdateMeleeMarker();
-    _egMaybeShowLowHealthWarning();
+    _checkMistakeLimit();
+    _updateMeleeMarker();
+    _maybeShowLowHealthWarning();
 
-    globalThis._egBossTick();
-    if (typeof _egTickAilments === 'function') _egTickAilments();
-    if (typeof _egHazardsTick === 'function') _egHazardsTick();
-    globalThis._egMonsters.forEach(_egTickMonster);
+    globalThis._bossTick();
+    if (typeof _tickAilments === 'function') _tickAilments();
+    if (typeof _hazardsTick === 'function') _hazardsTick();
+    globalThis._monsters.forEach(_tickMonster);
 
     // Gear: lifeRegen - heals the player once per second
-    globalThis._egHealSilent = true;
-    try { _egTickLifeRegen(); } finally { globalThis._egHealSilent = false; }
+    globalThis._healSilent = true;
+    try { _tickLifeRegen(); } finally { globalThis._healSilent = false; }
 
     // Player mechanics
-    _egTickPlayer();
+    _tickPlayer();
     // Keep the manual melee charge bar (width + paused/ready styling) live.
-    if (typeof _egUpdatePlayerChargeBar === 'function') _egUpdatePlayerChargeBar();
-    if (typeof _egRefreshPlayerStatusIcons === 'function') _egRefreshPlayerStatusIcons();
+    if (typeof _updatePlayerChargeBar === 'function') _updatePlayerChargeBar();
+    if (typeof _refreshPlayerStatusIcons === 'function') _refreshPlayerStatusIcons();
     // Don't resurrect the sprite after defeat - the tick may have set
     // dead = true mid-iteration (DoT / hazard kill).
     if (typeof dead !== 'undefined' && globalThis.dead) return;
-    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+    if (typeof _isActive === 'function' && !_isActive()) return;
     globalThis._renderPlayerAvatar();
     //_renderPlayerCharge();
 
-    _egUpdateBars();
+    _updateBars();
 }

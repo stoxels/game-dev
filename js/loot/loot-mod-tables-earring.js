@@ -2,7 +2,7 @@
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
+//  which evals every MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------EARRING MODIFIER TABLE-------------------------------
@@ -13,7 +13,7 @@
 // equivalents to reflect the slot's secondary status.
 // Both earring slots (earring1, earring2) share this same table.
 
-export const EG_MOD_TABLE_EARRING = {
+export const MOD_TABLE_EARRING = {
     prefixes: {
 
         // --- LIFE & MANA ---

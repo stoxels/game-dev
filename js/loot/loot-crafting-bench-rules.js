@@ -1,32 +1,32 @@
-import { _egCurrencyDefForId, _egCurrencySlotForId, _egCurrencyStash } from '../endgame/endgame-hub.js';
-import { _egCraftingBenchCostFor } from './loot-crafting-costs.js';
-import { EG_MOD_CAPS } from './loot-equipment-generator.js';
-import { _egGetModTable } from './loot-equipment-mod-tables.js';
-import {_egFamilyAllowedOnBase} from './loot-mod-application.js';
-import { EG_CRAFTED_MOD_CAPS } from './loot-crafting-bench-state.js';
+import { _currencyDefForId, _currencySlotForId, _currencyStash } from '../endgame/endgame-hub.js';
+import { _craftingBenchCostFor } from './loot-crafting-costs.js';
+import { ITEM_MOD_CAPS } from './loot-equipment-generator.js';
+import { _getModTable } from './loot-equipment-mod-tables.js';
+import {_familyAllowedOnBase} from './loot-mod-application.js';
+import { CRAFTED_MOD_CAPS } from './loot-crafting-bench-state.js';
 
 //------------------------------------------------------------------------
 //-------------------COSTS & CURRENCY--------------------------------------
 //------------------------------------------------------------------------
 
 // Returns whether the stash contains every currency stack in a cost list.
-export function _egCraftingBenchCanAfford(costs) {
-    return costs.every(cost => _egCraftCurrencyCount(cost.id) >= cost.count);
+export function _craftingBenchCanAfford(costs) {
+    return costs.every(cost => _craftCurrencyCount(cost.id) >= cost.count);
 }
 
 // Formats a cost list for the compact tier button label.
-export function _egCraftingBenchCostLabel(costs) {
+export function _craftingBenchCostLabel(costs) {
     return costs.map(cost => {
-        const def = _egCurrencyDefForId(cost.id) || {};
+        const def = _currencyDefForId(cost.id) || {};
         const icon = def.icon || '🪙';
         return `${icon}×${cost.count}`;
     }).join(' + ');
 }
 
 // Formats a cost list for the tier button's explanatory tooltip.
-export function _egCraftingBenchCostTooltip(costs) {
+export function _craftingBenchCostTooltip(costs) {
     return costs.map(cost => {
-        const def = _egCurrencyDefForId(cost.id) || {};
+        const def = _currencyDefForId(cost.id) || {};
         const icon = def.icon || '🪙';
         const name = def.name || cost.id;
         return `${cost.count}x ${icon} ${name}`;
@@ -34,8 +34,8 @@ export function _egCraftingBenchCostTooltip(costs) {
 }
 
 // Adds one Scouring Orb when a craft replaces an existing crafted modifier.
-export function _egCraftingBenchEffectiveCosts(entry, tier) {
-    const base = _egCraftingBenchCostFor(entry.familyId, tier.tier);
+export function _craftingBenchEffectiveCosts(entry, tier) {
+    const base = _craftingBenchCostFor(entry.familyId, tier.tier);
     if (!entry.isReplace) return base;
     const costs = base.map(cost => ({ ...cost }));
     const scour = costs.find(cost => cost.id === 'orb_scouring');
@@ -45,10 +45,10 @@ export function _egCraftingBenchEffectiveCosts(entry, tier) {
 }
 
 // Counts the currency assigned to one crafting currency id.
-export function _egCraftCurrencyCount(id) {
-    const pos = _egCurrencySlotForId(id);
-    return pos && _egCurrencyStash[pos.r] && _egCurrencyStash[pos.r][pos.c]
-        ? (_egCurrencyStash[pos.r][pos.c].count || 0) : 0;
+export function _craftCurrencyCount(id) {
+    const pos = _currencySlotForId(id);
+    return pos && _currencyStash[pos.r] && _currencyStash[pos.r][pos.c]
+        ? (_currencyStash[pos.r][pos.c].count || 0) : 0;
 }
 
 //------------------------------------------------------------------------
@@ -56,23 +56,23 @@ export function _egCraftCurrencyCount(id) {
 //------------------------------------------------------------------------
 
 // Counts crafted modifiers of one prefix/suffix type on an item.
-export function _egCountCraftedMods(item, type) {
+export function _countCraftedMods(item, type) {
     return (item.mods || []).filter(mod => mod.type === type && mod.crafted === true).length;
 }
 
 // Counts naturally rolled modifiers of one prefix/suffix type on an item.
-export function _egCountRegularMods(item, type) {
+export function _countRegularMods(item, type) {
     return (item.mods || []).filter(mod => mod.type === type && mod.crafted !== true).length;
 }
 
 // Summarizes capacity and whether a type can be added or re-rolled.
-export function _egCraftingBenchTypeState(item, type) {
-    const crafted = _egCountCraftedMods(item, type);
-    const regular = _egCountRegularMods(item, type);
-    const caps = EG_MOD_CAPS[item.rarity];
+export function _craftingBenchTypeState(item, type) {
+    const crafted = _countCraftedMods(item, type);
+    const regular = _countRegularMods(item, type);
+    const caps = ITEM_MOD_CAPS[item.rarity];
     let maxForType;
     if (item.rarity === 'common') {
-        maxForType = EG_CRAFTED_MOD_CAPS[type === 'prefix' ? 'maxPre' : 'maxSuf'];
+        maxForType = CRAFTED_MOD_CAPS[type === 'prefix' ? 'maxPre' : 'maxSuf'];
     } else {
         maxForType = caps ? (type === 'prefix' ? caps.maxPre : caps.maxSuf) : 0;
     }
@@ -82,19 +82,19 @@ export function _egCraftingBenchTypeState(item, type) {
 }
 
 // Returns whether an item is ordinary equipment with a craftable affix type.
-export function _egCraftingBenchCanUseItem(item) {
+export function _craftingBenchCanUseItem(item) {
     if (!item || item.category !== 'equip' || item.isUnique) return false;
     if (!item.slotType) return false;
-    const table = _egGetModTable(item);
+    const table = _getModTable(item);
     if (!table) return false;
-    return _egCraftingBenchTypeState(item, 'prefix').craftable
-        || _egCraftingBenchTypeState(item, 'suffix').craftable;
+    return _craftingBenchTypeState(item, 'prefix').craftable
+        || _craftingBenchTypeState(item, 'suffix').craftable;
 }
 
 // Builds the eligible prefix/suffix families and tiers for an item.
-export function _egCraftingBenchFamilies(item) {
+export function _craftingBenchFamilies(item) {
     if (!item || !item.slotType) return [];
-    const table = _egGetModTable(item);
+    const table = _getModTable(item);
     if (!table) return [];
 
     const naturalFamilies = new Set((item.mods || [])
@@ -105,13 +105,13 @@ export function _egCraftingBenchFamilies(item) {
 
     const result = [];
     for (const type of ['prefix', 'suffix']) {
-        const state = _egCraftingBenchTypeState(item, type);
+        const state = _craftingBenchTypeState(item, type);
         if (!state.craftable) continue;
         const section = table[type + 'es'] || {};
 
         for (const [familyId, family] of Object.entries(section)) {
             if (naturalFamilies.has(familyId)) continue;
-            if (!_egFamilyAllowedOnBase(familyId, defenses)) continue;
+            if (!_familyAllowedOnBase(familyId, defenses)) continue;
 
             const tiers = (family.tiers || [])
                 .map(tier => ({ ...tier, eligible: tier.ilvl <= itemLevel }))

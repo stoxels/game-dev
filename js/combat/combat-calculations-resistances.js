@@ -5,20 +5,20 @@
 
 // Resistances (player and monster side) never reduce more than this share.
 // The player cap can be raised ABOVE this base by "increased maximum
-// Resistance" bonuses from unique items (see _egGetPlayerResistCap).
-export const EG_RESIST_CAP_PCT = 75;
+// Resistance" bonuses from unique items (see _getPlayerResistCap).
+export const RESIST_CAP_PCT = 75;
 
 // Effective resistance cap for one player element: base cap plus the
 // aggregated max-resist bonuses (per-element + the all-elements bucket).
 // Monsters have no max-resist sources - they are hard-capped at the base.
-export function _egGetPlayerResistCap(stats, element) {
+export function _getPlayerResistCap(stats, element) {
     // allElementalResistMax (tree) covers fire/cold/lightning, never shadow.
     const allElemMax = element === 'shadow' ? 0 : ((stats.allElementalResistMax) || 0);
     const extra = ((stats[element + 'ResistMax']) || 0) + ((stats.allResMax) || 0) + allElemMax;
-    return EG_RESIST_CAP_PCT + Math.max(0, extra);
+    return RESIST_CAP_PCT + Math.max(0, extra);
 }
 
-export const EG_ELEMENTS = ['fire', 'cold', 'lightning', 'shadow'];
+export const DAMAGE_ELEMENTS = ['fire', 'cold', 'lightning', 'shadow'];
 
 // Campaign resistance penalty (ARPG style): -30% to ALL four
 // resistances once the Ascension Trial that opens the ascendency class is
@@ -26,33 +26,33 @@ export const EG_ELEMENTS = ['fire', 'cold', 'lightning', 'shadow'];
 // cleared, right before the endgame maps (stage 2), -60% in total. It is
 // subtracted from the uncapped total, so it can push a resistance below 0
 // (the player then takes MORE damage of that element).
-export const EG_RESIST_PENALTY_PER_STAGE = 30;
-export const EG_RESIST_PENALTY_MAX_STAGE = 2;
-export const EG_RESIST_FLOOR_PCT = -100;
+export const RESIST_PENALTY_PER_STAGE = 30;
+export const RESIST_PENALTY_MAX_STAGE = 2;
+export const RESIST_FLOOR_PCT = -100;
 
-export function _egGetResistPenaltyPct() {
+export function _getResistPenaltyPct() {
     const s = globalThis.STATE;
-    const stage = Math.max(0, Math.min(EG_RESIST_PENALTY_MAX_STAGE, Number(s && s.resistPenaltyStage) || 0));
-    return stage * EG_RESIST_PENALTY_PER_STAGE;
+    const stage = Math.max(0, Math.min(RESIST_PENALTY_MAX_STAGE, Number(s && s.resistPenaltyStage) || 0));
+    return stage * RESIST_PENALTY_PER_STAGE;
 }
 
 // Raises the penalty to `stage` (never lowers it) and tells the player once.
-export function _egAdvanceResistPenaltyStage(stage) {
+export function _advanceResistPenaltyStage(stage) {
     const s = globalThis.STATE;
     if (!s) return false;
-    const target = Math.min(EG_RESIST_PENALTY_MAX_STAGE, Math.max(0, Number(stage) || 0));
+    const target = Math.min(RESIST_PENALTY_MAX_STAGE, Math.max(0, Number(stage) || 0));
     if ((Number(s.resistPenaltyStage) || 0) >= target) return false;
     s.resistPenaltyStage = target;
     if (typeof globalThis.save === 'function') globalThis.save();
-    _egShowResistPenaltyNotice(target);
+    _showResistPenaltyNotice(target);
     return true;
 }
 
 // Modal notice: what was lost, the new total, and that it can be offset.
-export function _egShowResistPenaltyNotice(stage) {
+export function _showResistPenaltyNotice(stage) {
     if (typeof document === 'undefined') return;
     const tr = (k) => (typeof globalThis.t === 'function' ? globalThis.t(k) : k);
-    const total = stage * EG_RESIST_PENALTY_PER_STAGE;
+    const total = stage * RESIST_PENALTY_PER_STAGE;
     setTimeout(() => {
         const old = document.getElementById('eg-resist-penalty-notice');
         if (old) old.remove();
@@ -81,7 +81,7 @@ export function _egShowResistPenaltyNotice(stage) {
 }
 
 // Per-element flat damage roll for one hit. Returns { fire, cold, lightning, shadow }.
-export function _egRollElementalBreakdown(stats) {
+export function _rollElementalBreakdown(stats) {
     const roll = (min, max) => (min > 0 || max > 0) ? min + Math.random() * (max - min) : 0;
     return {
         fire: roll(stats.fireDmgMin, stats.fireDmgMax),
@@ -92,8 +92,8 @@ export function _egRollElementalBreakdown(stats) {
 }
 
 // Total flat elemental damage bonus of one hit (sum of the breakdown).
-export function _egGetElementalDamageBonus(stats) {
-    const e = _egRollElementalBreakdown(stats);
+export function _getElementalDamageBonus(stats) {
+    const e = _rollElementalBreakdown(stats);
     return e.fire + e.cold + e.lightning + e.shadow;
 }
 
@@ -106,7 +106,7 @@ export function _egGetElementalDamageBonus(stats) {
 // { physical, elements } and hands the inputs back untouched when neither
 // channel is active.
 // True when any conversion / only-element / extra-as channel is active.
-export function _egHasDamageConversion(stats) {
+export function _hasDamageConversion(stats) {
     if (!stats) return false;
     return ['damageToFirePct', 'onlyFireDamage', 'damageToColdPct', 'onlyColdDamage', 'damageToLightningPct', 'onlyLightningDamage',
         'physAsExtraFirePct', 'physAsExtraShadowPct', 'physAsExtraColdPct', 'physAsExtraLightningPct']
@@ -117,7 +117,7 @@ export function _egHasDamageConversion(stats) {
 // elemental, the element's own increase and any caller-supplied generic increase
 // all ADD into one bucket. `passed` is either a fire multiplier (legacy number) or
 // { fire, cold, lightning, shadow } multipliers the caller already built that way.
-function _egExtraMults(stats, passed) {
+function _extraMults(stats, passed) {
     const add = (k) => Math.max(0, Number(stats && stats.elementalDamageIncPct) || 0) + Math.max(0, Number(stats && stats[k]) || 0);
     const d = {
         fire: 1 + add('fireDamageIncPct') / 100,
@@ -130,14 +130,14 @@ function _egExtraMults(stats, passed) {
     return d;
 }
 
-export function _egApplyDamageConversion(stats, physical, elements, multsArg = 1) {
+export function _applyDamageConversion(stats, physical, elements, multsArg = 1) {
     const el = elements || {};
-    const mults = _egExtraMults(stats, multsArg);
+    const mults = _extraMults(stats, multsArg);
     const fireMult = mults.fire;
     // Cold / lightning keystones (Bitter Frost, Roiling Tempest) use the general path.
     if ((Number(stats && stats.damageToColdPct) || 0) > 0 || (Number(stats && stats.onlyColdDamage) || 0) > 0
         || (Number(stats && stats.damageToLightningPct) || 0) > 0 || (Number(stats && stats.onlyLightningDamage) || 0) > 0) {
-        return _egApplyDamageConversionGeneral(stats, physical, el, mults);
+        return _applyDamageConversionGeneral(stats, physical, el, mults);
     }
     const share = Math.max(0, Math.min(100, Number(stats && stats.damageToFirePct) || 0)) / 100;
     const fireOnly = (Number(stats && stats.onlyFireDamage) || 0) > 0;
@@ -174,7 +174,7 @@ export function _egApplyDamageConversion(stats, physical, elements, multsArg = 1
 // General conversion: fire, then cold, then lightning conversion (each moves its
 // share of every other part), then the only-element drop. Extras survive when
 // their element is the allowed one. Used when a cold / lightning keystone is active.
-function _egApplyDamageConversionGeneral(stats, physical, el, mults) {
+function _applyDamageConversionGeneral(stats, physical, el, mults) {
     const fireMult = mults.fire;
     const pct = (k) => Math.max(0, Math.min(100, Number(stats[k]) || 0)) / 100;
     const only = ((Number(stats.onlyFireDamage) || 0) > 0) ? 'fire'
@@ -211,21 +211,21 @@ function _egApplyDamageConversionGeneral(stats, physical, el, mults) {
 
 // Returns an element breakdown scaled by `factor` (used when only a % of the
 // original hit is dealt, e.g. reveal projectiles).
-export function _egScaleElements(elements, factor) {
+export function _scaleElements(elements, factor) {
     if (!elements) return null;
     const out = {};
-    EG_ELEMENTS.forEach(el => { out[el] = (elements[el] || 0) * factor; });
+    DAMAGE_ELEMENTS.forEach(el => { out[el] = (elements[el] || 0) * factor; });
     return out;
 }
 
 // How long a Crushed enemy stays crushed (node 331).
-export const EG_CRUSH_DURATION_S = 5;
+export const CRUSH_DURATION_S = 5;
 
 // Multiplier on the stored damage-per-second of an ailment the player
 // inflicts: Ignite uses igniteDamageMorePct, Bleeding (the physical damage
 // over time) physDotMorePct, Poison (the shadow damage over time)
 // poisonDotMultiPct. Every other ailment is untouched.
-export function _egAilmentDamageMult(key, stats) {
+export function _ailmentDamageMult(key, stats) {
     const pct = key === 'ignite' ? Number(stats && stats.igniteDamageMorePct)
         : key === 'bleed' ? Number(stats && stats.physDotMorePct)
         : key === 'poison' ? Number(stats && stats.poisonDotMultiPct) : 0;
@@ -237,7 +237,7 @@ export function _egAilmentDamageMult(key, stats) {
 }
 
 // Multiplier on every Life leech heal (Vital Conduit keystone: lifeLeechLessPct).
-export function _egLeechHealMult(stats) {
+export function _leechHealMult(stats) {
     return Math.max(0, 1 - Math.max(0, Number(stats && stats.lifeLeechLessPct) || 0) / 100)
         * (1 + Math.max(0, Number(stats && stats.lifeLeechEffectIncPct) || 0) / 100);
 }
@@ -246,7 +246,7 @@ export function _egLeechHealMult(stats) {
 // refills the Absorption layer instantly, scaled by the leech-effect line.
 // Sub-point amounts accumulate so 0.3% leeches are not rounded away.
 let _absorptionLeechRemainder = 0;
-export function _egLeechAbsorption(stats, dmg, pct) {
+export function _leechAbsorption(stats, dmg, pct) {
     const max = Number(stats && stats.absorption) || 0;
     if (!(pct > 0) || !(dmg > 0) || max <= 0) return 0;
     const effect = 1 + Math.max(0, Number(stats.absorptionLeechEffectIncPct) || 0) / 100;
@@ -254,30 +254,30 @@ export function _egLeechAbsorption(stats, dmg, pct) {
     const whole = Math.floor(raw);
     _absorptionLeechRemainder = raw - whole;
     if (whole <= 0) return 0;
-    const cur = Number(globalThis._egPlayerAbsorptionCurrent) || 0;
-    globalThis._egPlayerAbsorptionCurrent = Math.min(max, cur + whole);
+    const cur = Number(globalThis._playerAbsorptionCurrent) || 0;
+    globalThis._playerAbsorptionCurrent = Math.min(max, cur + whole);
     return whole;
 }
 
 // Secondary hits (pierce, chain, fork, splash, multishot, cleave) deal only a share
 // of the primary hit; the tree's "Damage of Secondary hits" line restores it.
-export const EG_SECONDARY_EFFECTIVENESS = Object.freeze({
+export const SECONDARY_EFFECTIVENESS = Object.freeze({
     pierce: 0.7, chain: 0.7, fork: 0.6, multishot: 0.6, splash: 0.5, cleave: 0.5,
 });
 // Each further chain bounce keeps this share of the previous bounce.
-export const EG_CHAIN_FALLOFF = 0.85;
+export const CHAIN_FALLOFF = 0.85;
 
-export function _egSecondaryDamage(base, kind, stats, bounce = 0) {
-    const eff = EG_SECONDARY_EFFECTIVENESS[kind] || 1;
+export function _secondaryDamage(base, kind, stats, bounce = 0) {
+    const eff = SECONDARY_EFFECTIVENESS[kind] || 1;
     const inc = 1 + Math.max(0, Number(stats && stats.secondaryDamagePct) || 0) / 100;
-    const fall = kind === 'chain' ? Math.pow(EG_CHAIN_FALLOFF, Math.max(0, bounce)) : 1;
+    const fall = kind === 'chain' ? Math.pow(CHAIN_FALLOFF, Math.max(0, bounce)) : 1;
     return Math.max(1, Math.round(base * eff * inc * fall));
 }
 
 // Mana leech (tree, attack hits): `pct` of the hit's damage becomes Mana, scaled by the
 // leech-effect line. Sub-point amounts accumulate like the Absorption leech.
 let _manaLeechRemainder = 0;
-export function _egLeechMana(stats, dmg, pct) {
+export function _leechMana(stats, dmg, pct) {
     if (!(pct > 0) || !(dmg > 0) || typeof globalThis.gainMana !== 'function' || !(globalThis.playerMaxMana > 0)) return 0;
     const effect = 1 + Math.max(0, Number(stats && stats.manaLeechEffectPct) || 0) / 100;
     const raw = dmg * (pct / 100) * effect + _manaLeechRemainder;
@@ -291,11 +291,11 @@ export function _egLeechMana(stats, dmg, pct) {
 // `elements` maps each element to the raw elemental damage carried by the hit
 // (proportional to `amount`); everything else counts as physical. Positive
 // resistances reduce; NEGATIVE resistances AMPLIFY (vulnerability) - both
-// clamped to ±EG_RESIST_CAP_PCT. An optional `physical` resistance (heavy
+// clamped to ±RESIST_CAP_PCT. An optional `physical` resistance (heavy
 // armor) reduces only the physical share and applies even when the hit
 // carries no elemental breakdown at all. Monsters without these keys keep
 // their previous behaviour exactly. Returns the post-resistance total.
-export function _egApplyTargetResistances(amount, target, elements, opts) {
+export function _applyTargetResistances(amount, target, elements, opts) {
     if (!target) return amount;
     // Spellproof monsters: player SPELL/projectile hits (opts.isPlayerSpell)
     // are heavily reduced; player MELEE strikes (opts.isMelee) hit at full
@@ -316,12 +316,12 @@ export function _egApplyTargetResistances(amount, target, elements, opts) {
     const crushed = (target.crushedUntil > Date.now()) ? Math.max(0, Number(target.crushPhysRedPct) || 0) : 0;
     if (!target.resistances && !(crushed > 0)) return amount;
     const res = target.resistances || {};
-    const clampRes = (v) => Math.max(-EG_RESIST_CAP_PCT, Math.min(EG_RESIST_CAP_PCT, Number(v) || 0));
+    const clampRes = (v) => Math.max(-RESIST_CAP_PCT, Math.min(RESIST_CAP_PCT, Number(v) || 0));
     let physRes = (typeof res.physical === 'number') ? clampRes(res.physical) : 0;
     // Armour pierce (node 147): this hit skips positive physical reduction;
     // a negative value (vulnerability) still amplifies.
     if (opts && opts.ignorePhysReduction) physRes = Math.min(0, physRes);
-    if (crushed > 0) physRes = Math.max(-EG_RESIST_CAP_PCT, physRes - crushed);
+    if (crushed > 0) physRes = Math.max(-RESIST_CAP_PCT, physRes - crushed);
 
     // Split the hit into its elemental (resisted / amplified) and physical
     // (armored) shares. A missing, empty or oversized breakdown means the
@@ -329,13 +329,13 @@ export function _egApplyTargetResistances(amount, target, elements, opts) {
     let physical = amount;
     let elemental = 0;
     if (elements) {
-        const elemTotal = EG_ELEMENTS.reduce((sum, el) => sum + (elements[el] || 0), 0);
+        const elemTotal = DAMAGE_ELEMENTS.reduce((sum, el) => sum + (elements[el] || 0), 0);
         if (elemTotal > 0 && elemTotal <= amount) {
             // Scale the stored breakdown to the actual hit size in case the
             // caller applied multipliers after the roll (crit, reveal %, etc.).
             const factor = elemTotal / amount;
             let mitigated = 0;
-            EG_ELEMENTS.forEach(el => {
+            DAMAGE_ELEMENTS.forEach(el => {
                 const part = (elements[el] || 0) * factor;
                 if (part <= 0) return;
                 // Penetration (opts.penetration, ARPG port phase A) lowers the
@@ -354,7 +354,7 @@ export function _egApplyTargetResistances(amount, target, elements, opts) {
 // Reduces an elemental monster hit by the player's matching resistance %
 // plus the flat Arcane Resistance (which applies to ALL elemental damage).
 // Non-elemental hits pass through untouched. Returns the reduced amount.
-export function _egCalcPlayerResistanceReduction(amount, stats, element) {
+export function _calcPlayerResistanceReduction(amount, stats, element) {
     if (!element || amount <= 0) return amount;
     // Active map run: Elemental Weakness - #% reduced all Resistances.
     const resistMult = (typeof globalThis._egMapResistMult === 'function') ? globalThis._egMapResistMult() : 1;
@@ -363,16 +363,16 @@ export function _egCalcPlayerResistanceReduction(amount, stats, element) {
     // shadow resistance, and it still obeys the per-element cap below like any
     // other source. Lightning is a full element, covered here like fire and cold.
     const allElem = Math.max(0, stats.allElementalResist || 0);
-    const penalty = _egGetResistPenaltyPct();
+    const penalty = _getResistPenaltyPct();
     const resMap = {
         fire: ((stats.fireResist || 0) + allElem) * resistMult - penalty,
         cold: ((stats.coldResist || 0) + allElem) * resistMult - penalty,
         lightning: ((stats.lightningResist || 0) + allElem) * resistMult - penalty,
         shadow: (stats.shadowResist || 0) * resistMult - penalty,
     };
-    const cap = (typeof _egGetPlayerResistCap === 'function')
-        ? _egGetPlayerResistCap(stats, element) : EG_RESIST_CAP_PCT;
-    const resPct = Math.min(cap, Math.max(EG_RESIST_FLOOR_PCT, resMap[element] || 0));
+    const cap = (typeof _getPlayerResistCap === 'function')
+        ? _getPlayerResistCap(stats, element) : RESIST_CAP_PCT;
+    const resPct = Math.min(cap, Math.max(RESIST_FLOOR_PCT, resMap[element] || 0));
     let reduced = amount * (1 - resPct / 100);
     return reduced;
 }

@@ -8,9 +8,9 @@ import { getSkillDef, getSkillDesc, getSkillLevel, getSkillName, rebuildHotbarFr
 import { _sbSpellSchoolKey, buildSpellbookHeadHTML, isSpellbookOpen, renderSpellbook } from './skill-spellbook.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { STATE } from '../state.js';
-// NOTE: the endgame helpers this file calls best-effort (_egIsActive,
-// _egBuildPickupEligiblePool, _egGetElementCentre, _egAnimatePickupDiscard,
-// _egGetPlayerLevel, _tqIsTutorialActive) deliberately stay on the
+// NOTE: the endgame helpers this file calls best-effort (_isActive,
+// _buildPickupEligiblePool, _getElementCentre, _animatePickupDiscard,
+// _getPlayerLevel, _tqIsTutorialActive) deliberately stay on the
 // globalThis bridge: importing combat/loot modules from here creates cycle
 // edges that TDZ-break top-level const reads in endgame-leveling.js (the
 // cycle-TDZ audit in dev/scratch flags exactly this).
@@ -268,8 +268,8 @@ export function getCharmRankMinPlayerLevel(rank) {
 // Live player level for requirement checks (endgame leveling when present).
 function _charmGetPlayerLevel() {
     try {
-        if (typeof globalThis._egGetPlayerLevel === 'function') {
-            const lv = Math.round(Number(globalThis._egGetPlayerLevel()) || 0);
+        if (typeof globalThis._getPlayerLevel === 'function') {
+            const lv = Math.round(Number(globalThis._getPlayerLevel()) || 0);
             if (lv >= 1) return lv;
         }
     } catch (e) { /* fall through to STATE */ }
@@ -293,7 +293,7 @@ export function charmRankMeetsPlayerLevel(rank) {
 // Charm drops currently sitting on the grid: "row-col" → charm object.
 // Kept in its own map so the shared drop helpers (expiry, pause/resume,
 // cell-collision checks) can treat it like loot/currency/maps.
-export let _egCharmDrops = new Map();
+export let _charmDrops = new Map();
 
 // Charm drag operation: { charmKey, fromSlot, moved, startX, startY } | null.
 let _charmDragState = null;
@@ -1433,7 +1433,7 @@ export function initCharmPanelInteractions(host) {
 // True when a charm drop occupies the cell (used by the shared
 // drop-collision and stop/cleanup helpers).
 export function _charmCellHasDrop(row, col) {
-    return _egCharmDrops.has(`${row}-${col}`);
+    return _charmDrops.has(`${row}-${col}`);
 }
 
 // Pool of skills a monster can drop a charm for. Class and ascendency
@@ -1491,10 +1491,10 @@ function _charmRollDropKey(isBoss, monsterLevel) {
 // `monsterLevel` gates the drop rank via getCharmRankMaxForMonsterLevel -
 // bosses share the same cap, they only guarantee a drop within it.
 // `force` skips the chance roll (the kill handler already picked charms as
-// this creature's one drop - see _egRollKillDropBucket).
+// this creature's one drop - see _rollKillDropBucket).
 export function _charmTryMonsterDrop(isBoss, monsterLevel, force = false) {
-    if (typeof globalThis._egIsActive !== 'function' || !globalThis._egIsActive()) return false;
-    if (_egCharmDrops.size >= CHARM_DROP_MAX_ON_BOARD) return false;
+    if (typeof globalThis._isActive !== 'function' || !globalThis._isActive()) return false;
+    if (_charmDrops.size >= CHARM_DROP_MAX_ON_BOARD) return false;
 
     const chance = isBoss ? CHARM_DROP_CHANCE_BOSS : CHARM_DROP_CHANCE_NORMAL;
     if (!force && Math.random() > chance) return false;
@@ -1504,18 +1504,18 @@ export function _charmTryMonsterDrop(isBoss, monsterLevel, force = false) {
     const parsed = _charmParseKey(dropKey);
     if (!parsed) return false;
 
-    if (typeof globalThis._egBuildPickupEligiblePool !== 'function') return false;
-    const pool = (typeof globalThis._egBuildPickupEligiblePool === 'function') ? globalThis._egBuildPickupEligiblePool() : [];
-    const free = pool.filter(([r, c]) => !globalThis._egCellHasAnyDrop(r, c));
+    if (typeof globalThis._buildPickupEligiblePool !== 'function') return false;
+    const pool = (typeof globalThis._buildPickupEligiblePool === 'function') ? globalThis._buildPickupEligiblePool() : [];
+    const free = pool.filter(([r, c]) => !globalThis._cellHasAnyDrop(r, c));
     if (!free.length) return false;
 
     const [r, c] = free[Math.floor(Math.random() * free.length)];
     const key = `${r}-${c}`;
     const charm = _charmMake(parsed.skillId, parsed.rank);
 
-    _egCharmDrops.set(key, charm);
+    _charmDrops.set(key, charm);
     _charmRenderOverlay(r, c, charm);
-    globalThis._egScheduleTrackedExpiry(_egCharmDrops, key, charm, CHARM_DROP_LIFETIME_MS, `eg-charm-${r}-${c}`, _charmRemoveOverlay);
+    globalThis._scheduleTrackedExpiry(_charmDrops, key, charm, CHARM_DROP_LIFETIME_MS, `eg-charm-${r}-${c}`, _charmRemoveOverlay);
     return true;
 }
 
@@ -1540,8 +1540,8 @@ function _charmRemoveOverlay(key) {
 // else the emoji glyph (mirrors _charmIconMarkup).
 function _charmAnimateClaim(row, col, charm) {
     const el = document.getElementById(`g-${row}-${col}`);
-    if (!el || typeof globalThis._egGetElementCentre !== 'function') return;
-    const centre = globalThis._egGetElementCentre(el);
+    if (!el || typeof globalThis._getElementCentre !== 'function') return;
+    const centre = globalThis._getElementCentre(el);
     const floater = document.createElement('div');
     floater.className = 'eg-pickup-floater charm-floater';
     const art = charm && _charmArtUrl(charm.skillId, charm.rank);
@@ -1556,13 +1556,13 @@ function _charmAnimateClaim(row, col, charm) {
 
 // Player made a CORRECT action on a cell holding a charm → collect it.
 export function _charmCheckClaim(row, col) {
-    if (typeof globalThis._egIsActive !== 'function' || !globalThis._egIsActive()) return false;
+    if (typeof globalThis._isActive !== 'function' || !globalThis._isActive()) return false;
     const key = `${row}-${col}`;
-    const charm = _egCharmDrops.get(key);
+    const charm = _charmDrops.get(key);
     if (!charm) return false;
 
-    globalThis._egCancelTrackedExpiry(_egCharmDrops, key, charm);
-    _egCharmDrops.delete(key);
+    globalThis._cancelTrackedExpiry(_charmDrops, key, charm);
+    _charmDrops.delete(key);
     _charmRemoveOverlay(key);
     _charmAnimateClaim(row, col, charm);
 
@@ -1584,15 +1584,15 @@ export function _charmCheckClaim(row, col) {
 
 // Player made a WRONG action on a cell holding a charm → it is destroyed.
 export function _charmDiscardDrop(row, col) {
-    if (typeof globalThis._egIsActive !== 'function' || !globalThis._egIsActive()) return;
+    if (typeof globalThis._isActive !== 'function' || !globalThis._isActive()) return;
     const key = `${row}-${col}`;
-    if (!_egCharmDrops.has(key)) return;
-    const charm = _egCharmDrops.get(key);
-    globalThis._egCancelTrackedExpiry(_egCharmDrops, key, charm);
-    _egCharmDrops.delete(key);
+    if (!_charmDrops.has(key)) return;
+    const charm = _charmDrops.get(key);
+    globalThis._cancelTrackedExpiry(_charmDrops, key, charm);
+    _charmDrops.delete(key);
     _charmRemoveOverlay(key);
-    if (typeof globalThis._egAnimatePickupDiscard === 'function') {
-        try { globalThis._egAnimatePickupDiscard(row, col, { emoji: CHARM_BASE_ICON, artUrl: charm && _charmArtUrl(charm.skillId, charm.rank) }); } catch (e) { /* anim best-effort */ }
+    if (typeof globalThis._animatePickupDiscard === 'function') {
+        try { globalThis._animatePickupDiscard(row, col, { emoji: CHARM_BASE_ICON, artUrl: charm && _charmArtUrl(charm.skillId, charm.rank) }); } catch (e) { /* anim best-effort */ }
     }
     if (Audio_Manager.playSFX) {
         try { Audio_Manager.playSFX('player_equip_not_pickup'); } catch (e) { /* audio best-effort */ }
@@ -1602,30 +1602,30 @@ export function _charmDiscardDrop(row, col) {
 // Revealed cells can no longer be filled, so any charm sitting there would
 // be permanently unclaimable - auto-collect it instead.
 export function _charmAutoClaimOnReveal(row, col) {
-    if (_egCharmDrops.has(`${row}-${col}`)) _charmCheckClaim(row, col);
+    if (_charmDrops.has(`${row}-${col}`)) _charmCheckClaim(row, col);
 }
 
 // Clears every charm drop from the board (encounter stop).
 export function _charmStopDrops() {
-    Array.from(_egCharmDrops.entries()).forEach(([key, charm]) => {
-        globalThis._egCancelTrackedExpiry(_egCharmDrops, key, charm);
+    Array.from(_charmDrops.entries()).forEach(([key, charm]) => {
+        globalThis._cancelTrackedExpiry(_charmDrops, key, charm);
     });
-    _egCharmDrops.forEach((charm, key) => _charmRemoveOverlay(key));
-    _egCharmDrops.clear();
+    _charmDrops.forEach((charm, key) => _charmRemoveOverlay(key));
+    _charmDrops.clear();
 }
 
 // Re-places carried charm drops after a chain transition.
 export function _charmReplaceCarriedDrops(charms) {
     if (!Array.isArray(charms) || !charms.length) return;
     for (const charm of charms) {
-        const pool = (typeof globalThis._egBuildPickupEligiblePool === 'function') ? globalThis._egBuildPickupEligiblePool() : [];
-        const free = pool.filter(([r, c]) => !globalThis._egCellHasAnyDrop(r, c));
+        const pool = (typeof globalThis._buildPickupEligiblePool === 'function') ? globalThis._buildPickupEligiblePool() : [];
+        const free = pool.filter(([r, c]) => !globalThis._cellHasAnyDrop(r, c));
         if (!free.length) break;
         const [r, c] = free[Math.floor(Math.random() * free.length)];
         const key = `${r}-${c}`;
-        _egCharmDrops.set(key, charm);
+        _charmDrops.set(key, charm);
         _charmRenderOverlay(r, c, charm);
-        globalThis._egScheduleTrackedExpiry(_egCharmDrops, key, charm, CHARM_DROP_LIFETIME_MS, `eg-charm-${r}-${c}`, _charmRemoveOverlay);
+        globalThis._scheduleTrackedExpiry(_charmDrops, key, charm, CHARM_DROP_LIFETIME_MS, `eg-charm-${r}-${c}`, _charmRemoveOverlay);
     }
 }
 

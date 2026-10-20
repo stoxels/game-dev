@@ -1,21 +1,21 @@
 import { trackAchStat } from './achievements/achievements.js';
 import { Audio_Manager } from './audio/audio.js';
-import { _egMaybeLaunchAscensionTrial } from './campaign-trials.js';
+import { _maybeLaunchAscensionTrial } from './campaign-trials.js';
 import { applyClassPassiveOnLevelStart } from './classes/class-abilities.js';
 import { buildClassHUD } from './classes/class-hud.js';
 import { _resetPlayerMana } from './classes/class-mana.js';
 import { _varianceShield_removeBubble } from './classes/class-mathmagician-variance-shield.js';
 import { CAMPAIGN_BUDGET_ACTIVE, DIFF_CFG, campaignBaseTimeSecs, campaignCapForLevel, curDiff, curMods } from './difficulty-modifiers.js';
-import { _egOnPuzzleComplete, _egPuzzleCompleteFired, _egUpdateObjectivesHUD } from './combat/encounter-chain.js';
-import { _egMaybeShowMistakesWarning } from './combat/encounter-overlays.js';
-import { _egGetMaxAllowedMistakes } from './combat/encounter-tick-support.js';
-import { _egPrepareCampaignEncounter } from './combat/encounter-campaign-spawns.js';
-import { _egStartEncounter, _egStopEncounter } from './combat/encounter.js';
+import { _onPuzzleComplete, _puzzleCompleteFired, _updateObjectivesHUD } from './combat/encounter-chain.js';
+import { _maybeShowMistakesWarning } from './combat/encounter-overlays.js';
+import { _getMaxAllowedMistakes } from './combat/encounter-tick-support.js';
+import { _prepareCampaignEncounter } from './combat/encounter-campaign-spawns.js';
+import { _startEncounter, _stopEncounter } from './combat/encounter.js';
 import { _egActiveMapItem, _egMapPlayerLifeMult, _egMapTimeGainMult } from './endgame/endgame-map-launch.js';
-import { EG_PLAYER_STATS, _egComputePlayerStats } from './endgame/endgame-player-stats.js';
-import { _egResetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
-import { _egIsActive, _egIsCampaignRun } from './combat/combat-state.js';
-import { _egApplyUniqueZeroLineAutomark } from './loot/unique-items.js';
+import { PLAYER_STATS, _computePlayerStats } from './endgame/endgame-player-stats.js';
+import { _resetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
+import { _isActive, _isCampaignRun } from './combat/combat-state.js';
+import { _applyUniqueZeroLineAutomark } from './loot/unique-items.js';
 import { _adjacencyMatrixRefreshAll, buildGrid } from './grid.js';
 import { keybindDisplayLabel, keybindKeyFor } from './keybinds.js';
 import { ALL, lvText } from './levels/levels.js';
@@ -108,7 +108,7 @@ function _initGrids() {
 
 // Resets all simple gameplay flags and numeric counters to their default values.
 function _resetGameplayFlags() {
-    const isChainTransition = !!window._egSuppressEncounterStop;
+    const isChainTransition = !!window._suppressEncounterStop;
 
     globalThis._gamePaused = false;
     if (!isChainTransition) globalThis.mistakeCount = 0;
@@ -128,7 +128,7 @@ function _resetGameplayFlags() {
     // puzzle transitions during the 30s window - only clear timerFrozen
     // when the freeze isn't running (or on a genuinely fresh level).
     globalThis.timerFrozen = isChainTransition
-        && (typeof window !== 'undefined' && !!window._egClockTimeFreezeActive);
+        && (typeof window !== 'undefined' && !!window._clockTimeFreezeActive);
     globalThis.quizAnsweredCorrectly = false;
     globalThis.consecutiveCorrectFills = 0;
     globalThis._lawOfLargeNumbersNext = null;
@@ -163,8 +163,8 @@ function _resetLevelTrackers() {
 // Resets player HP to full, based on base HP plus any gear health bonus.
 // Reduced by the active map's "% reduced maximum Life" mod during device runs.
 function _resetPlayerHP() {
-    const baseHP = (typeof EG_PLAYER_STATS !== 'undefined') ? EG_PLAYER_STATS.baseHP : 100;
-    const stats = (typeof _egComputePlayerStats === 'function') ? _egComputePlayerStats() : null;
+    const baseHP = (typeof PLAYER_STATS !== 'undefined') ? PLAYER_STATS.baseHP : 100;
+    const stats = (typeof _computePlayerStats === 'function') ? _computePlayerStats() : null;
     const gearHealthBonus = stats ? stats.health : 0;
     let maxHP = baseHP + gearHealthBonus;
     // "% more maximum Life" (Blood Magic keystone) multiplies the whole pool.
@@ -187,17 +187,17 @@ function _cleanupPreviousLevel() {
     resetOverfittingTracker();
 
     // Stop any active endgame encounter from the previous level
-    if (typeof _egStopEncounter === 'function') _egStopEncounter();
-    if (!window._egSuppressEncounterStop && typeof window.clearActiveRandomWalkers === 'function') window.clearActiveRandomWalkers();
-    // Ensure quiz damage buff does not leak across maps when _egStopEncounter
+    if (typeof _stopEncounter === 'function') _stopEncounter();
+    if (!window._suppressEncounterStop && typeof window.clearActiveRandomWalkers === 'function') window.clearActiveRandomWalkers();
+    // Ensure quiz damage buff does not leak across maps when _stopEncounter
     // was suppressed (chain transitions preserve it intentionally, but any
     // non-chain start must clear it: winning / losing / restarting a map).
-    if (!window._egSuppressEncounterStop && typeof _egResetQuizDamageBuff === 'function') {
-        _egResetQuizDamageBuff();
+    if (!window._suppressEncounterStop && typeof _resetQuizDamageBuff === 'function') {
+        _resetQuizDamageBuff();
     }
 
     // Support-spell buffs (js/skills/universal-spells.js) do not carry across
-    // puzzles. Cleared explicitly rather than relying on _egStopEncounter(),
+    // puzzles. Cleared explicitly rather than relying on _stopEncounter(),
     // which chain transitions intentionally suppress.
     if (typeof _uspClearSupportBuffs === 'function') _uspClearSupportBuffs();
 
@@ -218,7 +218,7 @@ function _cleanupPreviousLevel() {
     if (typeof _applyLowHealthVignette === 'function') _applyLowHealthVignette();
 
     // Only reset HP/mana if this is a fresh start, not a chained puzzle transition
-    const isChainTransition = !!window._egSuppressEncounterStop;
+    const isChainTransition = !!window._suppressEncounterStop;
     if (!isChainTransition) {
         _resetPlayerHP();
         if (typeof _resetPlayerMana === 'function') _resetPlayerMana();
@@ -243,20 +243,20 @@ function _calcBaseTime() {
     const cfg = DIFF_CFG[curDiff];
     let baseTimer;
 
-    if (cur.isMonsterLevel && cur.egTimeLimit != null) {
-        const gearBonus = (typeof _egComputePlayerStats === 'function')
-            ? (_egComputePlayerStats().timeAdded || 0) : 0;
+    if (cur.isMonsterLevel && cur.chainTimeLimit != null) {
+        const gearBonus = (typeof _computePlayerStats === 'function')
+            ? (_computePlayerStats().timeAdded || 0) : 0;
         // The map-run "% less Time gained" modifier also scales the gear
         // time_added bonus (an item effect) - preserved from the old
         // per-site handling; see _applyBaseTimer() below for the raw add.
         const gearMult = (typeof _egMapTimeGainMult === 'function') ? _egMapTimeGainMult() : 1;
-        baseTimer = cur.egTimeLimit + Math.round(gearBonus * gearMult);
+        baseTimer = cur.chainTimeLimit + Math.round(gearBonus * gearMult);
     } else {
         // Campaign level: grid-size base time once the puzzle budget is
         // active, today's authored timer until then. Gear time_added counts
         // in both cases (tree time_added is added in the _initTimer patch).
-        const gearBonus = (typeof _egComputePlayerStats === 'function')
-            ? (_egComputePlayerStats().timeAdded || 0) : 0;
+        const gearBonus = (typeof _computePlayerStats === 'function')
+            ? (_computePlayerStats().timeAdded || 0) : 0;
         const authored = (CAMPAIGN_BUDGET_ACTIVE && !cur.isTutorialQuest && cur.grid && cur.grid[0])
             ? campaignBaseTimeSecs(cur.grid.length * cur.grid[0].length)
             : (cur.timer || cfg.timerStart);
@@ -297,7 +297,7 @@ function _applyExpectedValueBonus() {
 // Calculates and sets timerSecs from the base time plus all passive bonuses.
 // keystone_dead_reckoning (264) grants +30% of the timer, also blocked by gamblers_ruin.
 export function _initTimer() {
-    if (window._egSuppressEncounterStop) {
+    if (window._suppressEncounterStop) {
         // Chain puzzle - keep low-time banner state but sync the tracker to
         // the preserved timer so the next drain is detected correctly.
         if (typeof _lowTimeLastSecs !== 'undefined') globalThis._lowTimeLastSecs = globalThis.timerSecs;
@@ -365,14 +365,14 @@ function _updateModTags() {
 
 
 // Allowed-mistake cap of the running CAMPAIGN level (null = no cap).
-// Maps and trials keep egMaxMistakes (_egGetMaxAllowedMistakes); hardcore
+// Maps and trials keep chainMaxMistakes (_getMaxAllowedMistakes); hardcore
 // is handled separately (0 allowed). Base cap by difficulty and grid
 // size + tree + gear allowed mistakes. The same rule is applied by
 // checkMistakeCapAfterMistake in mouse-button-handlers.js.
 function getCampaignMistakeCap() {
-    if (typeof _egIsActive === 'function' && _egIsActive()) return null;
-    const bonus = (typeof _egComputePlayerStats === 'function')
-        ? (_egComputePlayerStats().mistakeCount || 0) : 0;
+    if (typeof _isActive === 'function' && _isActive()) return null;
+    const bonus = (typeof _computePlayerStats === 'function')
+        ? (_computePlayerStats().mistakeCount || 0) : 0;
     return campaignCapForLevel(cur, bonus);
 }
 
@@ -389,16 +389,16 @@ export function _setMistakeCounterText(suffix = '') {
     let maxMistakes = null;
     if (isHardcore) {
         // Hardcore overrides everything - 0 allowed, both in and out of endgame.
-        // _egGetMaxAllowedMistakes already returns 0 for active maps; for
-        // campaign (no egMaxMistakes) we synthesize 0 here so the HUD still
+        // _getMaxAllowedMistakes already returns 0 for active maps; for
+        // campaign (no chainMaxMistakes) we synthesize 0 here so the HUD still
         // reads "Mistakes: 0 / 0".
-        if (typeof _egIsActive === 'function' && _egIsActive() && typeof _egGetMaxAllowedMistakes === 'function') {
-            maxMistakes = _egGetMaxAllowedMistakes(); // 0
+        if (typeof _isActive === 'function' && _isActive() && typeof _getMaxAllowedMistakes === 'function') {
+            maxMistakes = _getMaxAllowedMistakes(); // 0
         } else {
             maxMistakes = 0;
         }
-    } else if (typeof _egIsActive === 'function' && typeof _egGetMaxAllowedMistakes === 'function' && _egIsActive()) {
-        maxMistakes = _egGetMaxAllowedMistakes();
+    } else if (typeof _isActive === 'function' && typeof _getMaxAllowedMistakes === 'function' && _isActive()) {
+        maxMistakes = _getMaxAllowedMistakes();
     } else {
         maxMistakes = getCampaignMistakeCap();
     }
@@ -411,7 +411,7 @@ export function _setMistakeCounterText(suffix = '') {
     mc.classList.toggle('hc-zero', !!isHardcore && maxMistakes === 0);
 
     // Endgame: maybe show the 3/2/1/0 mistakes-remaining center overlay
-    if (typeof _egMaybeShowMistakesWarning === 'function') _egMaybeShowMistakesWarning();
+    if (typeof _maybeShowMistakesWarning === 'function') _maybeShowMistakesWarning();
 }
 
 
@@ -507,7 +507,7 @@ function _navigateToGameScreen() {
 // If a Scout's Primer item was activated during the previous level,
 // consumes the pending flag and opens the primer question modal now.
 // During an endgame map chain this is evaluated on EVERY puzzle start
-// (via _doStartLevel called from _egTransitionToChainPuzzle), so a
+// (via _doStartLevel called from _transitionToChainPuzzle), so a
 // mid-map Primer use correctly fires on the next chain puzzle.
 function _checkPrimerPending() {
     if (!STATE.primerPending) return;
@@ -611,15 +611,15 @@ export function _doStartLevel(gi) {
     // uniques mark all-empty rows/columns incorrect at level start. Runs
     // after passives so manual passive marks are never overwritten, and on
     // every chain puzzle via _doStartLevel.
-    if (typeof _egApplyUniqueZeroLineAutomark === 'function') {
-        try { _egApplyUniqueZeroLineAutomark(); } catch (e) {}
+    if (typeof _applyUniqueZeroLineAutomark === 'function') {
+        try { _applyUniqueZeroLineAutomark(); } catch (e) {}
     }
     // Flag that puzzle-start passives (auto-reveal / auto-mark) have fired for this Gi.
-    // _egTransitionToChainPuzzle checks this flag after _doStartLevel to guarantee
+    // _transitionToChainPuzzle checks this flag after _doStartLevel to guarantee
     // every chained puzzle in a map re-triggers passives even if a future refactor
-    // gates _applyPassiveStartEffects behind _egSuppressEncounterStop.
-    window._egPassiveAppliedForGi = cur ? cur.gIdx : gi;
-    window._egClassPassiveAppliedForGi = cur ? cur.gIdx : gi;
+    // gates _applyPassiveStartEffects behind _suppressEncounterStop.
+    window._passiveAppliedForGi = cur ? cur.gIdx : gi;
+    window._classPassiveAppliedForGi = cur ? cur.gIdx : gi;
 
     // 5. Deferred overlay effects (needs grid DOM to exist)
     // adjacency_matrix (302): populate neighbour-count overlays after passives are applied
@@ -668,25 +668,25 @@ export function _doStartLevel(gi) {
 
     // Step 8 - Monster encounter.
     //   • Campaign levels (every story level) get a light monster pack:
-    //     _egPrepareCampaignEncounter stamps the level (isMonsterLevel,
+    //     _prepareCampaignEncounter stamps the level (isMonsterLevel,
     //     monster list, HP/damage budget) so the shared combat loop can run
     //     WITHOUT the endgame chain/objectives machinery.
     //   • Endgame map levels were already stamped by _egLaunchMapFromDevice.
     //   • MONSTERLESS: campaign levels skip the encounter entirely (the
     //     preparer refuses); trial chains still start it so the puzzle
     //     chain + question intermissions run, just with nothing to fight.
-    if (cur && !globalThis.dead && typeof _egPrepareCampaignEncounter === 'function'
-        && !window._egSuppressEncounterStart) {
-        _egPrepareCampaignEncounter();
+    if (cur && !globalThis.dead && typeof _prepareCampaignEncounter === 'function'
+        && !window._suppressEncounterStart) {
+        _prepareCampaignEncounter();
     }
     if (cur && cur.isMonsterLevel
         && (cur.campaignTrial || !curMods.monsterless)
-        && typeof _egStartEncounter === 'function'
-        && !window._egSuppressEncounterStart) {
-        _egStartEncounter();
+        && typeof _startEncounter === 'function'
+        && !window._suppressEncounterStart) {
+        _startEncounter();
         // Map objectives only belong to real endgame runs.
-        if (typeof _egIsCampaignRun !== 'function' || !_egIsCampaignRun()) {
-            _egUpdateObjectivesHUD();
+        if (typeof _isCampaignRun !== 'function' || !_isCampaignRun()) {
+            _updateObjectivesHUD();
         }
         _renderPlayerHealth();
     }
@@ -695,25 +695,25 @@ export function _doStartLevel(gi) {
     // start-of-level passive reveals (e.g. central_tendency,
     // probabilistic_start, Syla's affinity … stacking to cover the whole
     // board). checkWin() was intentionally suppressed above while
-    // _egIsActive was still false - now that the encounter is live, hand
+    // _isActive was still false - now that the encounter is live, hand
     // the solved puzzle to the encounter chain (question modal → countdown
     // → next puzzle) instead of leaving a dead solved grid.
     if (window._egIsMapDeviceRun && cur && cur.isMonsterLevel
-        && typeof _egIsActive === 'function' && _egIsActive()
+        && typeof _isActive === 'function' && _isActive()
         && typeof isPuzzleSolved === 'function' && isPuzzleSolved()
-        && typeof _egOnPuzzleComplete === 'function'
-        && (typeof _egPuzzleCompleteFired === 'undefined' || !_egPuzzleCompleteFired)) {
+        && typeof _onPuzzleComplete === 'function'
+        && (typeof _puzzleCompleteFired === 'undefined' || !_puzzleCompleteFired)) {
         if (!globalThis.dead) {
             globalThis.dead = true;
             if (typeof stopTimer === 'function') stopTimer();
         }
-        _egOnPuzzleComplete();
+        _onPuzzleComplete();
     }
 
     // 9. Background music
     // Tutorial quest levels keep the random tutorial track started on entry;
     // boss-arena chain puzzles keep the boss theme started by
-    // _egSpawnNextArenaBoss - both skip the normal campaign track here.
+    // _spawnNextArenaBoss - both skip the normal campaign track here.
     if (cur && (cur.isTutorialQuest || cur.isBossArena)) {
         // music already set by the entry point - do not override
     } else {
@@ -728,8 +728,8 @@ function startLevel(gi) {
     // Leveling Rework: campaign ascension levels are entered as mini-map
     // trial chains (boss finale) instead of plain puzzles. The hook is
     // self-guarding (stamped/chain/suppressed launches are never hijacked).
-    if (typeof _egMaybeLaunchAscensionTrial === 'function') {
-        try { if (_egMaybeLaunchAscensionTrial(gi)) return; } catch (e) {}
+    if (typeof _maybeLaunchAscensionTrial === 'function') {
+        try { if (_maybeLaunchAscensionTrial(gi)) return; } catch (e) {}
     }
     if (isGatedLevel(gi) && !isMathGatePassed(gi)) {
         tryStartGatedLevel(gi, () => _doStartLevel(gi));

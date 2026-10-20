@@ -1,33 +1,33 @@
 import { Audio_Manager } from '../audio/audio.js';
-import { _egIsActive } from './combat-state.js';
-import { EG_HZ_LAYER_Z, _egHzIntensity, _egHzActive, _egHzLayer, _egHzPausedForQuiz, _egHzLava, _egHzLightning, _egHzBlizzard, _egHzDarkness, _egHzArcane, _egHzMeteor, _egHzVolatile, _egHzFrostNova, _egHzFirewall, _egHzCyclone, _egHzDelirium } from './combat-hazards.js';
-import { _egSetHzActive, _egSetHzLayer, _egSetHzPausedForQuiz, _egSetHzLava, _egSetHzLightning, _egSetHzBlizzard, _egSetHzDarkness, _egSetHzArcane, _egSetHzMeteor, _egSetHzVolatile, _egSetHzFrostNova, _egSetHzFirewall, _egSetHzCyclone, _egSetHzDelirium } from './combat-hazards.js';
-import { _egHzInitLava, _egHzTickLava } from './combat-hazards-lava.js';
-import { _egHzInitLightning, _egHzTickLightning, _egHzInitBlizzard, _egHzTickBlizzard, _egHzInitDarkness, _egHzTickDarkness, _egHzInitArcane, _egHzTickArcane, _egHzInitMeteor, _egHzTickMeteor } from './combat-hazards-storms.js';
-import { _egHzInitVolatile, _egHzTickVolatile, _egHzInitFrostNova, _egHzTickFrostNova, _egHzInitFirewall, _egHzTickFirewall } from './combat-hazards-auras.js';
-import { _egHzInitCyclone, _egHzTickCyclone, _egHzInitDelirium, _egHzTickDelirium } from './combat-hazards-cyclone-delirium.js';
+import { _isActive } from './combat-state.js';
+import { HZ_LAYER_Z, _hzIntensity, _hzActive, _hzLayer, _hzPausedForQuiz, _hzLava, _hzLightning, _hzBlizzard, _hzDarkness, _hzArcane, _hzMeteor, _hzVolatile, _hzFrostNova, _hzFirewall, _hzCyclone, _hzDelirium } from './combat-hazards.js';
+import { _setHzActive, _setHzLayer, _setHzPausedForQuiz, _setHzLava, _setHzLightning, _setHzBlizzard, _setHzDarkness, _setHzArcane, _setHzMeteor, _setHzVolatile, _setHzFrostNova, _setHzFirewall, _setHzCyclone, _setHzDelirium } from './combat-hazards.js';
+import { _hzInitLava, _hzTickLava } from './combat-hazards-lava.js';
+import { _hzInitLightning, _hzTickLightning, _hzInitBlizzard, _hzTickBlizzard, _hzInitDarkness, _hzTickDarkness, _hzInitArcane, _hzTickArcane, _hzInitMeteor, _hzTickMeteor } from './combat-hazards-storms.js';
+import { _hzInitVolatile, _hzTickVolatile, _hzInitFrostNova, _hzTickFrostNova, _hzInitFirewall, _hzTickFirewall } from './combat-hazards-auras.js';
+import { _hzInitCyclone, _hzTickCyclone, _hzInitDelirium, _hzTickDelirium } from './combat-hazards-cyclone-delirium.js';
 
 //------------------------------------------------------------------------
 //-------------------LIFECYCLE-------------------------------------------
 //------------------------------------------------------------------------
 
 // Starts all hazards present on the active map. Called from
-// _egResetEncounterState when an encounter begins.
-export function _egHazardsReset() {
-    _egHazardsCleanup();
-    if (!_egIsActive()) return;
+// _resetEncounterState when an encounter begins.
+export function _hazardsReset() {
+    _hazardsCleanup();
+    if (!_isActive()) return;
 
-    const lavaI = _egHzIntensity('map_hazard_lava');
-    const lightningI = _egHzIntensity('map_hazard_lightning');
-    const blizzardI = _egHzIntensity('map_hazard_blizzard');
-    const darknessI = _egHzIntensity('map_hazard_darkness');
-    const arcaneI = _egHzIntensity('map_hazard_arcane');
-    const meteorI = _egHzIntensity('map_hazard_meteor');
-    const volatileI = _egHzIntensity('map_hazard_volatile');
-    const frostNovaI = _egHzIntensity('map_hazard_frostnova');
-    const firewallI = _egHzIntensity('map_hazard_firewall');
-    const cycloneI = _egHzIntensity('map_hazard_cyclone');
-    const deliriumI = _egHzIntensity('map_hazard_delirium');
+    const lavaI = _hzIntensity('map_hazard_lava');
+    const lightningI = _hzIntensity('map_hazard_lightning');
+    const blizzardI = _hzIntensity('map_hazard_blizzard');
+    const darknessI = _hzIntensity('map_hazard_darkness');
+    const arcaneI = _hzIntensity('map_hazard_arcane');
+    const meteorI = _hzIntensity('map_hazard_meteor');
+    const volatileI = _hzIntensity('map_hazard_volatile');
+    const frostNovaI = _hzIntensity('map_hazard_frostnova');
+    const firewallI = _hzIntensity('map_hazard_firewall');
+    const cycloneI = _hzIntensity('map_hazard_cyclone');
+    const deliriumI = _hzIntensity('map_hazard_delirium');
 
     const active = [];
     if (lavaI > 0) active.push('🌋');
@@ -43,49 +43,49 @@ export function _egHazardsReset() {
     if (deliriumI > 0) active.push('🌫️');
     if (active.length === 0) return;
 
-    _egSetHzLayer(document.createElement('div'));
-    _egHzLayer.id = 'eg-hazards-layer';
-    _egHzLayer.style.zIndex = String(EG_HZ_LAYER_Z);
-    document.body.appendChild(_egHzLayer);
+    _setHzLayer(document.createElement('div'));
+    _hzLayer.id = 'eg-hazards-layer';
+    _hzLayer.style.zIndex = String(HZ_LAYER_Z);
+    document.body.appendChild(_hzLayer);
 
-    if (lavaI > 0) _egHzInitLava(lavaI);
-    if (lightningI > 0) _egHzInitLightning(lightningI);
-    if (blizzardI > 0) _egHzInitBlizzard(blizzardI);
-    if (darknessI > 0) _egHzInitDarkness(darknessI);
-    if (arcaneI > 0) _egHzInitArcane(arcaneI);
-    if (meteorI > 0) _egHzInitMeteor(meteorI);
-    if (volatileI > 0) _egHzInitVolatile(volatileI);
-    if (frostNovaI > 0) _egHzInitFrostNova(frostNovaI);
-    if (firewallI > 0) _egHzInitFirewall(firewallI);
-    if (cycloneI > 0) _egHzInitCyclone(cycloneI);
-    if (deliriumI > 0) _egHzInitDelirium(deliriumI);
+    if (lavaI > 0) _hzInitLava(lavaI);
+    if (lightningI > 0) _hzInitLightning(lightningI);
+    if (blizzardI > 0) _hzInitBlizzard(blizzardI);
+    if (darknessI > 0) _hzInitDarkness(darknessI);
+    if (arcaneI > 0) _hzInitArcane(arcaneI);
+    if (meteorI > 0) _hzInitMeteor(meteorI);
+    if (volatileI > 0) _hzInitVolatile(volatileI);
+    if (frostNovaI > 0) _hzInitFrostNova(frostNovaI);
+    if (firewallI > 0) _hzInitFirewall(firewallI);
+    if (cycloneI > 0) _hzInitCyclone(cycloneI);
+    if (deliriumI > 0) _hzInitDelirium(deliriumI);
 
-    _egSetHzActive(true);
-    _egSetHzPausedForQuiz(false);
-    if (_egHzLayer) _egHzLayer.style.display = '';
+    _setHzActive(true);
+    _setHzPausedForQuiz(false);
+    if (_hzLayer) _hzLayer.style.display = '';
     globalThis.showCombatToast(`☠️ Elemental Hazards active: ${active.join(' ')}`);
 }
 
 // Tears down every hazard DOM node and state. Safe to call anytime.
-export function _egHazardsCleanup() {
+export function _hazardsCleanup() {
     Audio_Manager.stopSFX('hz_blizzard_loop');
     Audio_Manager.stopSFX('hz_cyclone_loop');
-    _egSetHzActive(false);
-    _egSetHzPausedForQuiz(false);
-    _egSetHzLava(null);
-    _egSetHzLightning(null);
-    _egSetHzBlizzard(null);
-    _egSetHzDarkness(null);
-    _egSetHzArcane(null);
-    _egSetHzMeteor(null);
-    _egSetHzVolatile(null);
-    _egSetHzFrostNova(null);
-    _egSetHzFirewall(null);
-    _egSetHzCyclone(null);
-    _egSetHzDelirium(null);
-    if (_egHzLayer) {
-        _egHzLayer.remove();
-        _egSetHzLayer(null);
+    _setHzActive(false);
+    _setHzPausedForQuiz(false);
+    _setHzLava(null);
+    _setHzLightning(null);
+    _setHzBlizzard(null);
+    _setHzDarkness(null);
+    _setHzArcane(null);
+    _setHzMeteor(null);
+    _setHzVolatile(null);
+    _setHzFrostNova(null);
+    _setHzFirewall(null);
+    _setHzCyclone(null);
+    _setHzDelirium(null);
+    if (_hzLayer) {
+        _hzLayer.remove();
+        _setHzLayer(null);
     }
     // Darkness clouds live outside the main layer (higher z-index).
     document.querySelectorAll('.eg-hz-darkness-layer').forEach(el => el.remove());
@@ -96,42 +96,42 @@ export function _egHazardsCleanup() {
 // Hides all hazard visuals and pauses hazard ticks while a quiz modal
 // is visible so the question remains readable and the player is not
 // damaged by invisible hazards.
-export function _egHazardsHideForQuiz() {
+export function _hazardsHideForQuiz() {
     Audio_Manager.stopSFX('hz_blizzard_loop');
     Audio_Manager.stopSFX('hz_cyclone_loop');
-    if (!_egHzActive || _egHzPausedForQuiz) return;
-    _egSetHzPausedForQuiz(true);
-    if (_egHzLayer) _egHzLayer.style.display = 'none';
+    if (!_hzActive || _hzPausedForQuiz) return;
+    _setHzPausedForQuiz(true);
+    if (_hzLayer) _hzLayer.style.display = 'none';
     document.querySelectorAll('.eg-hz-darkness-layer, .eg-hz-delirium').forEach(el => { el.style.display = 'none'; });
 }
 
 // Re-shows hazard visuals and resumes ticking when the next puzzle launches
 // (or after a standalone interstitial question is dismissed).
-export function _egHazardsShowAfterQuiz() {
-    if (_egHzBlizzard) Audio_Manager.playSFX('hz_blizzard_loop');
-    if (_egHzCyclone) Audio_Manager.playSFX('hz_cyclone_loop');
-    if (!_egHzPausedForQuiz) return;
-    _egSetHzPausedForQuiz(false);
-    if (_egHzLayer) _egHzLayer.style.display = '';
+export function _hazardsShowAfterQuiz() {
+    if (_hzBlizzard) Audio_Manager.playSFX('hz_blizzard_loop');
+    if (_hzCyclone) Audio_Manager.playSFX('hz_cyclone_loop');
+    if (!_hzPausedForQuiz) return;
+    _setHzPausedForQuiz(false);
+    if (_hzLayer) _hzLayer.style.display = '';
     document.querySelectorAll('.eg-hz-darkness-layer, .eg-hz-delirium').forEach(el => { el.style.display = ''; });
 }
 
-// Per-tick driver - called at 10Hz from _egTickLoop.
-export function _egHazardsTick() {
-    if (!_egHzActive) return;
-    if (_egHzPausedForQuiz) return;
+// Per-tick driver - called at 10Hz from _tickLoop.
+export function _hazardsTick() {
+    if (!_hzActive) return;
+    if (_hzPausedForQuiz) return;
     if (typeof dead !== 'undefined' && globalThis.dead) return;
     const dtMs = 100;
 
-    if (_egHzLava) _egHzTickLava(dtMs);
-    if (_egHzLightning) _egHzTickLightning(dtMs);
-    if (_egHzBlizzard) _egHzTickBlizzard(dtMs);
-    if (_egHzDarkness) _egHzTickDarkness(dtMs);
-    if (_egHzArcane) _egHzTickArcane(dtMs);
-    if (_egHzMeteor) _egHzTickMeteor(dtMs);
-    if (_egHzVolatile) _egHzTickVolatile(dtMs);
-    if (_egHzFrostNova) _egHzTickFrostNova(dtMs);
-    if (_egHzFirewall) _egHzTickFirewall(dtMs);
-    if (_egHzCyclone) _egHzTickCyclone(dtMs);
-    if (_egHzDelirium) _egHzTickDelirium(dtMs);
+    if (_hzLava) _hzTickLava(dtMs);
+    if (_hzLightning) _hzTickLightning(dtMs);
+    if (_hzBlizzard) _hzTickBlizzard(dtMs);
+    if (_hzDarkness) _hzTickDarkness(dtMs);
+    if (_hzArcane) _hzTickArcane(dtMs);
+    if (_hzMeteor) _hzTickMeteor(dtMs);
+    if (_hzVolatile) _hzTickVolatile(dtMs);
+    if (_hzFrostNova) _hzTickFrostNova(dtMs);
+    if (_hzFirewall) _hzTickFirewall(dtMs);
+    if (_hzCyclone) _hzTickCyclone(dtMs);
+    if (_hzDelirium) _hzTickDelirium(dtMs);
 }

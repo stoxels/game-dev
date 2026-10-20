@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkEl, _nkFlingAvatar, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkNudgeAvatar, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE LODESTONE (boss_lodestone)------------------
@@ -8,13 +8,13 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFli
 // Living-magnet siege - POLARITY moves you: drifting stone with radial pull,
 // flipping N/S REPULSION PULSES, shrapnel filings, MAGNETIC VORTEX at 60%,
 // RAILGUN lanes at 30%, and the MAGNETIC LEASH reel-in charge attack. One
-// _egNkLoop drives every state machine.
+// _nkLoop drives every state machine.
 //
 // Shared mechanics (probability_shift) live in shared-boss-abilities.js and
 // are referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_lodestone: {
         id: 'boss_lodestone', name: 'The Lodestone', emoji: '🧲',
         baseHP: 1050, baseDamage: 21, chargeMax: 12,
@@ -22,7 +22,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_lodestone: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -34,68 +34,68 @@ Object.assign(EG_BOSS_MECHANICS, {
             // Kept for schedule compatibility - the persistent watcher now
             // owns the drag/flip cadence; the handler no-ops (same shim
             // pattern as the other reworked bosses).
-            { name: 'polarity_field', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechPolarityField' },
-            { name: 'probability_shift', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechProbabilityShift' },
+            { name: 'polarity_field', intervalBase: 21000, intervalVariance: 5000, handler: '_mechPolarityField' },
+            { name: 'probability_shift', intervalBase: 18000, intervalVariance: 4000, handler: '_mechProbabilityShift' },
         ],
-        onInit: _egLodestoneArenaInit,
+        onInit: _lodestoneArenaInit,
     },
 });
 
 
 // ── Magnetism tuning ─────────────────────────────────────────────────────
 // The Lodestone (boss body)
-export const EG_LDS_R = 46;                          // stone visual radius
-export const EG_LDS_DRIFT_SPEED = [0, 20, 30, 42];   // px/s per phase
-export const EG_LDS_DRIFT_REPICK_MS = 5600;
-export const EG_LDS_CLAMP_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the stone
-export const EG_LDS_CLAMP_CD_MS = 1000;
-export const EG_LDS_CLAMP_FLING = [0, 140, 165, 190]; // INTO the stone
+export const LDS_R = 46;                          // stone visual radius
+export const LDS_DRIFT_SPEED = [0, 20, 30, 42];   // px/s per phase
+export const LDS_DRIFT_REPICK_MS = 5600;
+export const LDS_CLAMP_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the stone
+export const LDS_CLAMP_CD_MS = 1000;
+export const LDS_CLAMP_FLING = [0, 140, 165, 190]; // INTO the stone
 // Polarity drag + flip pulse
-export const EG_LDS_ATTRACT_SPEED = [0, 40, 55, 70]; // px/s radial pull
-export const EG_LDS_FLIP_MS = [0, 7000, 6000, 5000]; // polarity cycle
-export const EG_LDS_PULSE_SPEED = [0, 260, 300, 340]; // repulsion shove (one-shot)
+export const LDS_ATTRACT_SPEED = [0, 40, 55, 70]; // px/s radial pull
+export const LDS_FLIP_MS = [0, 7000, 6000, 5000]; // polarity cycle
+export const LDS_PULSE_SPEED = [0, 260, 300, 340]; // repulsion shove (one-shot)
 // Shrapnel filings
-export const EG_LDS_FILINGS_EVERY_MS = [0, 5200, 4300, 3400];
-export const EG_LDS_FILING_SPEED = 250;
-export const EG_LDS_FILING_DMG = 0.04;               // %maxHP per filing
+export const LDS_FILINGS_EVERY_MS = [0, 5200, 4300, 3400];
+export const LDS_FILING_SPEED = 250;
+export const LDS_FILING_DMG = 0.04;               // %maxHP per filing
 // Magnetic Vortex (60% gate)
-export const EG_LDS_VORTEX_MS = 4500;
-export const EG_LDS_VORTEX_PULL = [0, 170, 200, 235]; // px/s hard drag
-export const EG_LDS_VORTEX_GRIND_R = 140;            // grind zone around the stone
-export const EG_LDS_VORTEX_GRIND_PCT = 4;            // %maxHP per second inside
+export const LDS_VORTEX_MS = 4500;
+export const LDS_VORTEX_PULL = [0, 170, 200, 235]; // px/s hard drag
+export const LDS_VORTEX_GRIND_R = 140;            // grind zone around the stone
+export const LDS_VORTEX_GRIND_PCT = 4;            // %maxHP per second inside
 // Railgun (30% gate)
-export const EG_LDS_RAIL_N = 3;                      // lanes per gate
-export const EG_LDS_RAIL_GAP_MS = 1400;
-export const EG_LDS_RAIL_WARN_MS = 1100;
-export const EG_LDS_RAIL_SLUG_SPEED = 700;           // px/s
-export const EG_LDS_RAIL_DMG = [0, 0.14, 0.17, 0.20];
-export const EG_LDS_RAIL_FLING = [0, 170, 195, 220];
+export const LDS_RAIL_N = 3;                      // lanes per gate
+export const LDS_RAIL_GAP_MS = 1400;
+export const LDS_RAIL_WARN_MS = 1100;
+export const LDS_RAIL_SLUG_SPEED = 700;           // px/s
+export const LDS_RAIL_DMG = [0, 0.14, 0.17, 0.20];
+export const LDS_RAIL_FLING = [0, 170, 195, 220];
 // Magnetic Leash (charge attack)
-export const EG_LDS_LEASH_WARN_MS = 900;             // line telegraph (tracks 0.4s)
-export const EG_LDS_LEASH_CORRIDOR = 44;             // px from the chain line
-export const EG_LDS_LEASH_REEL_MS = 1600;
-export const EG_LDS_LEASH_REEL_SPEED = [0, 230, 265, 300]; // px/s reel-in
-export const EG_LDS_LEASH_CLAMP_R = 150;             // clamp radius at chain end
-export const EG_LDS_LEASH_DMG = [0, 0.17, 0.20, 0.24];
-export const EG_LDS_LEASH_FLING = [0, 180, 205, 230];
+export const LDS_LEASH_WARN_MS = 900;             // line telegraph (tracks 0.4s)
+export const LDS_LEASH_CORRIDOR = 44;             // px from the chain line
+export const LDS_LEASH_REEL_MS = 1600;
+export const LDS_LEASH_REEL_SPEED = [0, 230, 265, 300]; // px/s reel-in
+export const LDS_LEASH_CLAMP_R = 150;             // clamp radius at chain end
+export const LDS_LEASH_DMG = [0, 0.17, 0.20, 0.24];
+export const LDS_LEASH_FLING = [0, 180, 205, 230];
 
 
-export let _egLodestoneWatcher = null; // per-fight magnetic state
+export let _lodestoneWatcher = null; // per-fight magnetic state
 
 // Phase lookup helper - resolves the boss's current phase (default 1).
-export function _egLdsPhase(st) {
-    if (typeof _egMonsters !== 'undefined') {
-        const m = globalThis._egMonsters.find(x => x && x.id === st.monsterId);
+export function _ldsPhase(st) {
+    if (typeof _monsters !== 'undefined') {
+        const m = globalThis._monsters.find(x => x && x.id === st.monsterId);
         if (m) return Math.max(1, Math.min(3, Number(m.bossPhase) || 1));
     }
     return 1;
 }
 
 // Removes every magnetic overlay (registered in boss-framework teardown).
-export function _egLodestoneTeardown() {
-    if (_egLodestoneWatcher) {
-        const st = _egLodestoneWatcher;
-        _egLodestoneWatcher = null;
+export function _lodestoneTeardown() {
+    if (_lodestoneWatcher) {
+        const st = _lodestoneWatcher;
+        _lodestoneWatcher = null;
         (st.filings || []).forEach(f => { try { if (f.el) f.el.remove(); } catch (e) {} });
         (st.slugs || []).forEach(s => { try { if (s.el) s.el.remove(); } catch (e) {} });
         (st.railWarns || []).forEach(w => { try { if (w.el) w.el.remove(); } catch (e) {} });
@@ -105,15 +105,15 @@ export function _egLodestoneTeardown() {
             try { if (st.leash.warnEl) st.leash.warnEl.remove(); } catch (e) {}
             try { if (st.leash.chainEl) st.leash.chainEl.remove(); } catch (e) {}
         }
-        try { if (st.run) _egNkKillRun(st.run); } catch (e) {} // removes the stone
+        try { if (st.run) _nkKillRun(st.run); } catch (e) {} // removes the stone
     }
     document.querySelectorAll('.eg-lds-stone, .eg-lds-filing, .eg-lds-vortex, .eg-lds-rail, .eg-lds-slug, .eg-lds-leash-line, .eg-lds-chain').forEach(el => el.remove());
 }
 
 
 // ── Persistent arena: the stone, the field, the filings ─────────────────
-export function _egLodestoneArenaInit(monster) {
-    if (_egLodestoneWatcher) return;
+export function _lodestoneArenaInit(monster) {
+    if (_lodestoneWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
         monsterId, level: monster ? monster.level : 1,
@@ -128,40 +128,40 @@ export function _egLodestoneArenaInit(monster) {
         gate60Done: false, gate30Done: false,
         everLive: false, bornAt: performance.now(),
     };
-    _egLodestoneWatcher = st;
+    _lodestoneWatcher = st;
 
     // Persistent watcher FIRST (elements must hang off a run).
-    const run = _egNkNewRun(monsterId, true);
+    const run = _nkNewRun(monsterId, true);
     run.passive = true;
-    run.onKill = () => { if (_egLodestoneWatcher === st) _egLodestoneWatcher = null; };
+    run.onKill = () => { if (_lodestoneWatcher === st) _lodestoneWatcher = null; };
     st.run = run;
 
     // The Lodestone: the boss's arena body.
-    const el = _egNkEl(run, 'div', 'eg-lds-stone', '🧲');
-    el.style.width = el.style.height = (EG_LDS_R * 2) + 'px';
+    const el = _nkEl(run, 'div', 'eg-lds-stone', '🧲');
+    el.style.width = el.style.height = (LDS_R * 2) + 'px';
     st.stone = {
         x: window.innerWidth * 0.5, y: window.innerHeight * 0.35,
         tx: window.innerWidth * 0.5, ty: window.innerHeight * 0.35,
-        repickAt: EG_LDS_DRIFT_REPICK_MS, cdUntil: 0, el,
+        repickAt: LDS_DRIFT_REPICK_MS, cdUntil: 0, el,
     };
-    el.style.transform = 'translate(' + Math.round(st.stone.x - EG_LDS_R) + 'px,' + Math.round(st.stone.y - EG_LDS_R) + 'px)';
-    _egLdsApplyPolarity(st);
+    el.style.transform = 'translate(' + Math.round(st.stone.x - LDS_R) + 'px,' + Math.round(st.stone.y - LDS_R) + 'px)';
+    _ldsApplyPolarity(st);
 
     if (monster) st.everLive = true;
 
-    _egNkLoop(run, (dtS, now) => {
-        if (_egLodestoneWatcher !== st) return false;
-        const live = globalThis._egMonsters ? globalThis._egMonsters.find(m => m.id === st.monsterId) : null;
+    _nkLoop(run, (dtS, now) => {
+        if (_lodestoneWatcher !== st) return false;
+        const live = globalThis._monsters ? globalThis._monsters.find(m => m.id === st.monsterId) : null;
         if (!live) return false;
         const W = window.innerWidth, H = window.innerHeight;
-        const c = _egNkPlayerCenter();
-        const pr = _egNkPlayerRect();
+        const c = _nkPlayerCenter();
+        const pr = _nkPlayerRect();
         const p = Math.max(1, Math.min(3, Number(live.bossPhase) || 1));
 
         // ── HP gates ──
         const hpPct = live.maxHP > 0 ? live.currentHP / live.maxHP : 1;
-        if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _egLdsVortex(st); }
-        if (!st.gate30Done && hpPct <= 0.30) { st.gate30Done = true; _egLdsRailgun(st, live); }
+        if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _ldsVortex(st); }
+        if (!st.gate30Done && hpPct <= 0.30) { st.gate30Done = true; _ldsRailgun(st, live); }
 
         // ── The Lodestone: drift + MAGNETIC CLAMP on touch ──
         const sn = st.stone;
@@ -170,56 +170,56 @@ export function _egLodestoneArenaInit(monster) {
             sn.repickAt -= dtS * 1000;
             const sdx = sn.tx - sn.x, sdy = sn.ty - sn.y;
             const sd = Math.hypot(sdx, sdy) || 1;
-            const sstep = EG_LDS_DRIFT_SPEED[p] * dtS;
+            const sstep = LDS_DRIFT_SPEED[p] * dtS;
             if (sd <= sstep || sn.repickAt <= 0) {
                 sn.tx = 100 + Math.random() * Math.max(60, W - 200);
                 sn.ty = 100 + Math.random() * Math.max(60, H - 220);
-                sn.repickAt = EG_LDS_DRIFT_REPICK_MS;
+                sn.repickAt = LDS_DRIFT_REPICK_MS;
             } else {
                 sn.x += (sdx / sd) * sstep;
                 sn.y += (sdy / sd) * sstep;
             }
         }
-        sn.el.style.transform = 'translate(' + Math.round(sn.x - EG_LDS_R) + 'px,' + Math.round(sn.y - EG_LDS_R) + 'px)';
-        if (c && pr && now >= sn.cdUntil && !st.leash && _egNkCircleHit(sn.x, sn.y, EG_LDS_R * 0.9, pr, 0)) {
-            sn.cdUntil = now + EG_LDS_CLAMP_CD_MS;
+        sn.el.style.transform = 'translate(' + Math.round(sn.x - LDS_R) + 'px,' + Math.round(sn.y - LDS_R) + 'px)';
+        if (c && pr && now >= sn.cdUntil && !st.leash && _nkCircleHit(sn.x, sn.y, LDS_R * 0.9, pr, 0)) {
+            sn.cdUntil = now + LDS_CLAMP_CD_MS;
             const dx = sn.x - c.x, dy = sn.y - c.y; // INTO the stone: magnetism pulls.
             const d = Math.hypot(dx, dy) || 1;
-            _egNkFlingAvatar((dx / d) * EG_LDS_CLAMP_FLING[p], (dy / d) * EG_LDS_CLAMP_FLING[p], sn.x, sn.y);
-            const dealt = _egNkHit(EG_LDS_CLAMP_DMG[p], 'lightning', st.level);
-            _egNkAbilityHitToast(dealt, 'The Lodestone', 'Magnetic Clamp');
+            _nkFlingAvatar((dx / d) * LDS_CLAMP_FLING[p], (dy / d) * LDS_CLAMP_FLING[p], sn.x, sn.y);
+            const dealt = _nkHit(LDS_CLAMP_DMG[p], 'lightning', st.level);
+            _nkAbilityHitToast(dealt, 'The Lodestone', 'Magnetic Clamp');
             try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e2) {}
         }
 
         // ── Polarity cycle: attraction between flips, pulse on flip ──
         st.flipAcc += dtS * 1000;
-        if (!vortexing && st.flipAcc >= EG_LDS_FLIP_MS[p]) {
+        if (!vortexing && st.flipAcc >= LDS_FLIP_MS[p]) {
             st.flipAcc = 0;
             st.polarity = st.polarity === 'N' ? 'S' : 'N';
-            _egLdsApplyPolarity(st);
+            _ldsApplyPolarity(st);
             // REPULSION PULSE: one hard shove away from the stone.
             if (c) {
                 const dx = c.x - sn.x, dy = c.y - sn.y;
                 const d = Math.hypot(dx, dy) || 1;
-                if (typeof _egNkNudgeAvatar === 'function') {
-                    _egNkNudgeAvatar((dx / d) * EG_LDS_PULSE_SPEED[p] * 0.35, (dy / d) * EG_LDS_PULSE_SPEED[p] * 0.35);
+                if (typeof _nkNudgeAvatar === 'function') {
+                    _nkNudgeAvatar((dx / d) * LDS_PULSE_SPEED[p] * 0.35, (dy / d) * LDS_PULSE_SPEED[p] * 0.35);
                 }
-                _egLdsPulseRing(st, sn.x, sn.y);
+                _ldsPulseRing(st, sn.x, sn.y);
             }
-            _egNkToast('eg_lds_flip', st.polarity === 'N' ? '🧲 POLARITY FLIP - N! Repulsion pulse!' : '🧲 POLARITY FLIP - S! Repulsion pulse!');
+            _nkToast('eg_lds_flip', st.polarity === 'N' ? '🧲 POLARITY FLIP - N! Repulsion pulse!' : '🧲 POLARITY FLIP - S! Repulsion pulse!');
             try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
         } else if (!vortexing && !st.leash && c) {
             // Gentle attraction toward the stone between flips.
             const dx = sn.x - c.x, dy = sn.y - c.y;
             const d = Math.hypot(dx, dy) || 1;
-            if (d > EG_LDS_R + 40) _egNkNudgeAvatar((dx / d) * EG_LDS_ATTRACT_SPEED[p] * dtS, (dy / d) * EG_LDS_ATTRACT_SPEED[p] * dtS);
+            if (d > LDS_R + 40) _nkNudgeAvatar((dx / d) * LDS_ATTRACT_SPEED[p] * dtS, (dy / d) * LDS_ATTRACT_SPEED[p] * dtS);
         }
 
         // ── Shrapnel filings: spiral out, then launch ──
         st.filingsAcc += dtS * 1000;
-        if (!vortexing && st.filingsAcc >= EG_LDS_FILINGS_EVERY_MS[p]) {
+        if (!vortexing && st.filingsAcc >= LDS_FILINGS_EVERY_MS[p]) {
             st.filingsAcc = 0;
-            _egLdsSpawnFiling(st, sn.x, sn.y, Math.random() * Math.PI * 2);
+            _ldsSpawnFiling(st, sn.x, sn.y, Math.random() * Math.PI * 2);
         }
         for (let i = st.filings.length - 1; i >= 0; i--) {
             const f = st.filings[i];
@@ -233,18 +233,18 @@ export function _egLodestoneArenaInit(monster) {
                 f.y = sn.y + Math.sin(f.ang) * f.rad;
                 if (f.spiral <= 0) {
                     // Launch radially outward at the current angle.
-                    f.vx = Math.cos(f.ang) * EG_LDS_FILING_SPEED;
-                    f.vy = Math.sin(f.ang) * EG_LDS_FILING_SPEED;
+                    f.vx = Math.cos(f.ang) * LDS_FILING_SPEED;
+                    f.vy = Math.sin(f.ang) * LDS_FILING_SPEED;
                 }
             } else {
                 f.x += f.vx * dtS;
                 f.y += f.vy * dtS;
             }
             f.el.style.transform = 'translate(' + Math.round(f.x - 11) + 'px,' + Math.round(f.y - 11) + 'px) rotate(' + Math.round(f.t / 25) + 'deg)';
-            if (pr && !f.hit && _egNkCircleHit(f.x, f.y, 14, pr, 0)) {
+            if (pr && !f.hit && _nkCircleHit(f.x, f.y, 14, pr, 0)) {
                 f.hit = true;
-                const dealt = _egNkHit(EG_LDS_FILING_DMG, 'lightning', st.level);
-                _egNkAbilityHitToast(dealt, 'The Lodestone', 'Shrapnel Filings');
+                const dealt = _nkHit(LDS_FILING_DMG, 'lightning', st.level);
+                _nkAbilityHitToast(dealt, 'The Lodestone', 'Shrapnel Filings');
                 try { f.el.remove(); } catch (e) {}
                 st.filings.splice(i, 1);
                 continue;
@@ -265,26 +265,26 @@ export function _egLodestoneArenaInit(monster) {
             if (c && !st.leash) {
                 const dx = sn.x - c.x, dy = sn.y - c.y;
                 const d = Math.hypot(dx, dy) || 1;
-                _egNkNudgeAvatar((dx / d) * EG_LDS_VORTEX_PULL[p] * dtS, (dy / d) * EG_LDS_VORTEX_PULL[p] * dtS);
-                if (d < EG_LDS_VORTEX_GRIND_R + EG_LDS_R) {
-                    _egLdsGrindTick(st, vx, dtS, live);
+                _nkNudgeAvatar((dx / d) * LDS_VORTEX_PULL[p] * dtS, (dy / d) * LDS_VORTEX_PULL[p] * dtS);
+                if (d < LDS_VORTEX_GRIND_R + LDS_R) {
+                    _ldsGrindTick(st, vx, dtS, live);
                 }
             }
-            if (vx.t >= EG_LDS_VORTEX_MS) {
+            if (vx.t >= LDS_VORTEX_MS) {
                 try { vx.el.remove(); } catch (e) {}
                 st.vortex = null;
-                _egNkToast('eg_lds_vortex_end', '🌀 The field settles.', '#93c5fd');
+                _nkToast('eg_lds_vortex_end', '🌀 The field settles.', '#93c5fd');
             }
         }
 
         // ── Railgun (30% gate): warn → slug per lane ──
         if (st.railgun) {
             st.railTimer += dtS * 1000;
-            if (st.railgun.fired < EG_LDS_RAIL_N && st.railTimer >= st.railgun.fired * EG_LDS_RAIL_GAP_MS) {
-                _egLdsFireRail(st, sn, pr, W, H);
+            if (st.railgun.fired < LDS_RAIL_N && st.railTimer >= st.railgun.fired * LDS_RAIL_GAP_MS) {
+                _ldsFireRail(st, sn, pr, W, H);
                 st.railgun.fired++;
             }
-            if (st.railgun.fired >= EG_LDS_RAIL_N) st.railgun = null;
+            if (st.railgun.fired >= LDS_RAIL_N) st.railgun = null;
         }
         // Rail warns: when their warn elapses they launch their slug.
         for (let i = st.railWarns.length - 1; i >= 0; i--) {
@@ -298,9 +298,9 @@ export function _egLodestoneArenaInit(monster) {
             try { rw.el.remove(); } catch (e) {}
             st.railWarns.splice(i, 1);
             // Launch the slug down the lane.
-            const sel = _egNkEl(st.run, 'div', 'eg-lds-slug', '⚡');
+            const sel = _nkEl(st.run, 'div', 'eg-lds-slug', '⚡');
             st.slugs.push({ horiz: rw.horiz, pos: rw.pos, x: rw.horiz ? -30 : rw.pos, y: rw.horiz ? rw.pos : -30,
-                vx: rw.horiz ? EG_LDS_RAIL_SLUG_SPEED : 0, vy: rw.horiz ? 0 : EG_LDS_RAIL_SLUG_SPEED, t: 0, hit: false, el: sel });
+                vx: rw.horiz ? LDS_RAIL_SLUG_SPEED : 0, vy: rw.horiz ? 0 : LDS_RAIL_SLUG_SPEED, t: 0, hit: false, el: sel });
             try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
         }
         // Slugs travel down their lanes.
@@ -310,13 +310,13 @@ export function _egLodestoneArenaInit(monster) {
             s.x += s.vx * dtS;
             s.y += s.vy * dtS;
             s.el.style.transform = 'translate(' + Math.round(s.x - 16) + 'px,' + Math.round(s.y - 16) + 'px)';
-            if (pr && !s.hit && _egNkCircleHit(s.x, s.y, 18, pr, 0)) {
+            if (pr && !s.hit && _nkCircleHit(s.x, s.y, 18, pr, 0)) {
                 s.hit = true;
                 const dx = (c ? c.x : s.x) - (st.stone.x), dy = (c ? c.y : s.y) - (st.stone.y);
                 const d = Math.hypot(dx, dy) || 1;
-                _egNkFlingAvatar((dx / d) * EG_LDS_RAIL_FLING[p], (dy / d) * EG_LDS_RAIL_FLING[p], s.x, s.y);
-                const dealt = _egNkHit(EG_LDS_RAIL_DMG[p], 'lightning', st.level);
-                _egNkAbilityHitToast(dealt, 'The Lodestone', 'Railgun');
+                _nkFlingAvatar((dx / d) * LDS_RAIL_FLING[p], (dy / d) * LDS_RAIL_FLING[p], s.x, s.y);
+                const dealt = _nkHit(LDS_RAIL_DMG[p], 'lightning', st.level);
+                _nkAbilityHitToast(dealt, 'The Lodestone', 'Railgun');
                 try { s.el.remove(); } catch (e) {}
                 st.slugs.splice(i, 1);
                 continue;
@@ -333,63 +333,63 @@ export function _egLodestoneArenaInit(monster) {
             ls.t += dtS * 1000;
             if (ls.phase === 'warn') {
                 // The line tracks the player briefly, then locks.
-                if (ls.t < EG_LDS_LEASH_WARN_MS * 0.45) {
-                    const c6 = _egNkPlayerCenter();
-                    if (c6) { ls.px = c6.x; ls.py = c6.y; _egLdsPlaceLine(ls.warnEl, sn.x, sn.y, ls.px, ls.py); }
+                if (ls.t < LDS_LEASH_WARN_MS * 0.45) {
+                    const c6 = _nkPlayerCenter();
+                    if (c6) { ls.px = c6.x; ls.py = c6.y; _ldsPlaceLine(ls.warnEl, sn.x, sn.y, ls.px, ls.py); }
                 } else if (!ls.locked) {
                     ls.locked = true;
                     ls.warnEl.classList.add('locked');
                 }
-                if (ls.t >= EG_LDS_LEASH_WARN_MS) {
+                if (ls.t >= LDS_LEASH_WARN_MS) {
                     // Chain fires: did the player stand in the corridor?
-                    const c7 = _egNkPlayerCenter();
+                    const c7 = _nkPlayerCenter();
                     let caught = false;
                     if (c7) {
-                        const seg = _egLdsDistToSegment(c7.x, c7.y, sn.x, sn.y, ls.px, ls.py);
-                        caught = seg <= EG_LDS_LEASH_CORRIDOR;
+                        const seg = _ldsDistToSegment(c7.x, c7.y, sn.x, sn.y, ls.px, ls.py);
+                        caught = seg <= LDS_LEASH_CORRIDOR;
                     }
                     try { ls.warnEl.remove(); } catch (e) {}
                     ls.warnEl = null;
                     if (caught) {
                         ls.phase = 'reel';
                         ls.t = 0;
-                        const chEl = _egNkEl(st.run, 'div', 'eg-lds-chain', '🔗');
+                        const chEl = _nkEl(st.run, 'div', 'eg-lds-chain', '🔗');
                         ls.chainEl = chEl;
-                        _egNkToast('eg_lds_leash', '🔗 MAGNETIC LEASH! Fight the reel-in!');
+                        _nkToast('eg_lds_leash', '🔗 MAGNETIC LEASH! Fight the reel-in!');
                         try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
                     } else {
                         // Missed: the chain sticks harmlessly.
-                        _egNkToast('eg_lds_miss', '💨 The chain snaps past you.', '#93c5fd');
+                        _nkToast('eg_lds_miss', '💨 The chain snaps past you.', '#93c5fd');
                         try { if (ls.chainEl) ls.chainEl.remove(); } catch (e) {}
                         st.leash = null;
                     }
                 }
             } else if (ls.phase === 'reel') {
                 // Reel the player toward the stone.
-                const c8 = _egNkPlayerCenter();
+                const c8 = _nkPlayerCenter();
                 if (c8) {
                     const dx = sn.x - c8.x, dy = sn.y - c8.y;
                     const d = Math.hypot(dx, dy) || 1;
-                    _egNkNudgeAvatar((dx / d) * EG_LDS_LEASH_REEL_SPEED[p] * dtS, (dy / d) * EG_LDS_LEASH_REEL_SPEED[p] * dtS);
-                    if (ls.chainEl) _egLdsPlaceLine(ls.chainEl, sn.x, sn.y, c8.x, c8.y);
+                    _nkNudgeAvatar((dx / d) * LDS_LEASH_REEL_SPEED[p] * dtS, (dy / d) * LDS_LEASH_REEL_SPEED[p] * dtS);
+                    if (ls.chainEl) _ldsPlaceLine(ls.chainEl, sn.x, sn.y, c8.x, c8.y);
                 }
-                if (ls.t >= EG_LDS_LEASH_REEL_MS) {
+                if (ls.t >= LDS_LEASH_REEL_MS) {
                     // Chain end: clamp check.
-                    const c9 = _egNkPlayerCenter();
-                    const pr9 = _egNkPlayerRect();
+                    const c9 = _nkPlayerCenter();
+                    const pr9 = _nkPlayerRect();
                     let clamped = false;
                     if (c9 && pr9) {
                         const dd = Math.hypot(c9.x - sn.x, c9.y - sn.y);
-                        clamped = dd <= EG_LDS_LEASH_CLAMP_R;
+                        clamped = dd <= LDS_LEASH_CLAMP_R;
                     }
                     if (clamped) {
                         const dx = sn.x - (c9 ? c9.x : sn.x), dy = sn.y - (c9 ? c9.y : sn.y);
                         const d = Math.hypot(dx, dy) || 1;
-                        _egNkFlingAvatar((dx / d) * EG_LDS_LEASH_FLING[p], (dy / d) * EG_LDS_LEASH_FLING[p], sn.x, sn.y);
-                        const dealt = _egNkHit(EG_LDS_LEASH_DMG[p], 'lightning', st.level);
-                        _egNkAbilityHitToast(dealt, 'The Lodestone', 'Leash Clamp');
+                        _nkFlingAvatar((dx / d) * LDS_LEASH_FLING[p], (dy / d) * LDS_LEASH_FLING[p], sn.x, sn.y);
+                        const dealt = _nkHit(LDS_LEASH_DMG[p], 'lightning', st.level);
+                        _nkAbilityHitToast(dealt, 'The Lodestone', 'Leash Clamp');
                     } else {
-                        _egNkToast('eg_lds_broke', '💪 You broke the leash!', '#4ade80');
+                        _nkToast('eg_lds_broke', '💪 You broke the leash!', '#4ade80');
                     }
                     try { if (ls.chainEl) ls.chainEl.remove(); } catch (e) {}
                     st.leash = null;
@@ -404,7 +404,7 @@ export function _egLodestoneArenaInit(monster) {
 
 
 // Polarity visuals: N = red face, S = blue face (classic magnet ends).
-export function _egLdsApplyPolarity(st) {
+export function _ldsApplyPolarity(st) {
     if (!st.stone || !st.stone.el) return;
     st.stone.el.classList.toggle('pol-n', st.polarity === 'N');
     st.stone.el.classList.toggle('pol-s', st.polarity === 'S');
@@ -412,8 +412,8 @@ export function _egLdsApplyPolarity(st) {
 
 
 // Expanding repulsion-pulse ring on polarity flip.
-export function _egLdsPulseRing(st, x, y) {
-    const el = _egNkEl(st.run, 'div', 'eg-lds-pulse');
+export function _ldsPulseRing(st, x, y) {
+    const el = _nkEl(st.run, 'div', 'eg-lds-pulse');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
     setTimeout(() => { try { el.remove(); } catch (e) {} }, 700);
@@ -421,49 +421,49 @@ export function _egLdsPulseRing(st, x, y) {
 
 
 // Vortex grind DoT: chunked lightning ticks while pressed against the stone.
-export function _egLdsGrindTick(st, vx, dtS, live) {
+export function _ldsGrindTick(st, vx, dtS, live) {
     vx.grindAcc = (vx.grindAcc || 0) + dtS * 1000;
     if (vx.grindAcc >= 500) {
         vx.grindAcc = 0;
-        const dealt = _egNkHit(EG_LDS_VORTEX_GRIND_PCT / 200, 'lightning', st.level);
-        _egNkAbilityHitToast(dealt, 'The Lodestone', 'Field Grind');
+        const dealt = _nkHit(LDS_VORTEX_GRIND_PCT / 200, 'lightning', st.level);
+        _nkAbilityHitToast(dealt, 'The Lodestone', 'Field Grind');
     }
 }
 
 
 // One magnetized filing on a spiral path.
-export function _egLdsSpawnFiling(st, x, y, ang) {
-    const el = _egNkEl(st.run, 'div', 'eg-lds-filing', '🔩');
-    st.filings.push({ x, y, ang, rad: EG_LDS_R, spiral: 1200, vx: 0, vy: 0, t: 0, hit: false, el });
+export function _ldsSpawnFiling(st, x, y, ang) {
+    const el = _nkEl(st.run, 'div', 'eg-lds-filing', '🔩');
+    st.filings.push({ x, y, ang, rad: LDS_R, spiral: 1200, vx: 0, vy: 0, t: 0, hit: false, el });
 }
 
 
 // ── 60% gate: Magnetic Vortex ────────────────────────────────────────────
-export function _egLdsVortex(st) {
+export function _ldsVortex(st) {
     if (st.vortex) return;
-    const el = _egNkEl(st.run, 'div', 'eg-lds-vortex');
+    const el = _nkEl(st.run, 'div', 'eg-lds-vortex');
     st.vortex = { t: 0, el, grindAcc: 0 };
-    _egNkToast('eg_lds_vortex', '🌀 MAGNETIC VORTEX! Fight the pull - the stone grinds!');
+    _nkToast('eg_lds_vortex', '🌀 MAGNETIC VORTEX! Fight the pull - the stone grinds!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
 }
 
 
 // ── 30% gate: Railgun ────────────────────────────────────────────────────
-export function _egLdsRailgun(st, live) {
+export function _ldsRailgun(st, live) {
     if (st.railgun) return;
     st.railgun = { fired: 0 };
     st.railTimer = 0;
-    _egNkToast('eg_lds_railgun', '⚡ RAILGUN! Clear the magnetic rails!');
+    _nkToast('eg_lds_railgun', '⚡ RAILGUN! Clear the magnetic rails!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
 }
 
 
 // One rail lane: full-screen telegraph through the stone aimed at the player.
-export function _egLdsFireRail(st, sn, pr, W, H) {
-    const c = _egNkPlayerCenter();
+export function _ldsFireRail(st, sn, pr, W, H) {
+    const c = _nkPlayerCenter();
     const horiz = c ? Math.abs(c.x - sn.x) >= Math.abs(c.y - sn.y) : Math.random() < 0.5;
     const pos = horiz ? (c ? c.y : H / 2) : (c ? c.x : W / 2);
-    const el = _egNkEl(st.run, 'div', 'eg-lds-rail' + (horiz ? ' horiz' : ' vert'));
+    const el = _nkEl(st.run, 'div', 'eg-lds-rail' + (horiz ? ' horiz' : ' vert'));
     if (horiz) {
         el.style.left = '0px';
         el.style.top = Math.round(pos) + 'px';
@@ -471,25 +471,25 @@ export function _egLdsFireRail(st, sn, pr, W, H) {
         el.style.left = Math.round(pos) + 'px';
         el.style.top = '0px';
     }
-    st.railWarns.push({ horiz, pos, t: 0, warnMs: EG_LDS_RAIL_WARN_MS, hot: false, el });
+    st.railWarns.push({ horiz, pos, t: 0, warnMs: LDS_RAIL_WARN_MS, hot: false, el });
 }
 
 
 // ── Charge attack: Magnetic Leash ────────────────────────────────────────
-export function _egLodestoneLeash(monster) {
-    const st = _egLodestoneWatcher;
-    if (!st || st.leash || st.vortex || _egNkDodgeBusy() || _egNkFrozen()) return;
-    const c = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    const warnEl = _egNkEl(st.run, 'div', 'eg-lds-leash-line');
-    _egLdsPlaceLine(warnEl, st.stone.x, st.stone.y, c.x, c.y);
+export function _lodestoneLeash(monster) {
+    const st = _lodestoneWatcher;
+    if (!st || st.leash || st.vortex || _nkDodgeBusy() || _nkFrozen()) return;
+    const c = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const warnEl = _nkEl(st.run, 'div', 'eg-lds-leash-line');
+    _ldsPlaceLine(warnEl, st.stone.x, st.stone.y, c.x, c.y);
     st.leash = { phase: 'warn', t: 0, px: c.x, py: c.y, locked: false, warnEl, chainEl: null };
-    _egNkToast('eg_lds_leash_warn', '🔗 The Lodestone coils a chain - dodge the line!');
+    _nkToast('eg_lds_leash_warn', '🔗 The Lodestone coils a chain - dodge the line!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
 }
 
 
 // Positions a zero-size element as a line from (x1,y1) to (x2,y2).
-export function _egLdsPlaceLine(el, x1, y1, x2, y2) {
+export function _ldsPlaceLine(el, x1, y1, x2, y2) {
     const dx = x2 - x1, dy = y2 - y1;
     const len = Math.hypot(dx, dy);
     const ang = Math.atan2(dy, dx);
@@ -501,7 +501,7 @@ export function _egLdsPlaceLine(el, x1, y1, x2, y2) {
 
 
 // Point-to-segment distance (for the leash corridor check).
-export function _egLdsDistToSegment(px, py, x1, y1, x2, y2) {
+export function _ldsDistToSegment(px, py, x1, y1, x2, y2) {
     const dx = x2 - x1, dy = y2 - y1;
     const lenSq = dx * dx + dy * dy;
     let t = lenSq > 0 ? ((px - x1) * dx + (py - y1) * dy) / lenSq : 0;
@@ -517,4 +517,4 @@ export function _egLdsDistToSegment(px, py, x1, y1, x2, y2) {
 // The old scheduled mechanic is now the persistent drag/flip cadence -
 // keep the handler name alive so any stale schedule entry no-ops instead
 // of erroring.
-export function _egMechPolarityField(monster, phase) { void monster; void phase; }
+export function _mechPolarityField(monster, phase) { void monster; void phase; }

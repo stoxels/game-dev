@@ -1,16 +1,16 @@
 import { showModal, switchScreen } from '../screens/screens.js';
-import { EG_ART } from './endgame-art.js';
+import { GAME_ART } from './endgame-art.js';
 import { LANG, t } from '../translation/translations.js';
 import { _egAtlasBuildTierProgressHTML, _egAtlasEnsureStyles, _egAtlasRoman, _egAtlasTierGroupColor } from './endgame-atlas-ui.js';
 import { _egAtlasResolveNodeForMap, egAtlasDropNodeIds, egAtlasIsCompleted, egAtlasNodeById, egAtlasNodeName } from './endgame-atlas.js';
-import { _egChainTransitioning } from '../combat/encounter-chain.js';
-import { _egClearTooltip } from './endgame-hub-tooltips.js';
-import { EG_CURRENCY_COLS, EG_CURRENCY_ROWS, EG_MAP_STASH_COLS, EG_MAP_STASH_INITIAL_ROWS, EG_MAP_TIER_COUNT, EG_MAP_TIER_ROMANS, _egBuildItemChipHTML, _egCurrencyDefForId, _egCurrencyIdForSlot, _egCurrencyStash, _egGetCellFill, _egGetMapStashRowsForTier, _egGetMapTierGrid, _egMapStash, _egRenderCurrencyStash, egSaveHubState, ensureEndgameHubScreen } from './endgame-hub.js';
-import { EG_LEVELING_CONFIG, _egGetPlayerLevel, _egGetPlayerXP, _egGetUnspentPoints, _egGetXpForNextLevel } from './endgame-leveling.js';
+import { _chainTransitioning } from '../combat/encounter-chain.js';
+import { _clearTooltip } from './endgame-hub-tooltips.js';
+import { CURRENCY_COLS, CURRENCY_ROWS, EG_MAP_STASH_COLS, EG_MAP_STASH_INITIAL_ROWS, EG_MAP_TIER_COUNT, EG_MAP_TIER_ROMANS, _buildItemChipHTML, _currencyDefForId, _currencyIdForSlot, _currencyStash, _getCellFill, _egGetMapStashRowsForTier, _egGetMapTierGrid, _egMapStash, _renderCurrencyStash, saveHubState, ensureEndgameHubScreen } from './endgame-hub.js';
+import { LEVELING_CONFIG, _getPlayerLevel, _getPlayerXP, _getUnspentPoints, _getXpForNextLevel } from './endgame-leveling.js';
 import { _egLaunchMapFromDevice } from './endgame-map-launch.js';
 import { EG_MAP_MOD_TABLES, _egMapModAffects } from '../loot/loot-map-mod-tables.js';
 import { _egGetMapModRewards } from '../loot/loot-map-mod-rewards.js';
-import { EG_SCREEN_NAV, _egResolveBackFn } from '../combat/combat-state-navigation.js';
+import { SCREEN_NAV, _resolveBackFn } from '../combat/combat-state-navigation.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -22,7 +22,7 @@ import { STATE } from '../state.js';
 //
 // The underlying state (_egMapSlotItem, _egMapStash) lives in
 // endgame-hub.js and is persisted together with the rest of the hub
-// state via egSaveHubState() / _egLoadHubState().
+// state via saveHubState() / _loadHubState().
 //
 // Dependencies (must be loaded before this file):
 //   endgame-hub.js              - state vars, chip builder, persistence
@@ -354,7 +354,7 @@ export function _egUpdateMapStashTabCounts() {
 export function _egSwitchMapStashTier(tier) {
     const t = Math.max(1, Math.min(16, Math.round(tier || 1)));
     globalThis._egMapStashActiveTier = t;
-    if (typeof egSaveHubState === 'function') try { egSaveHubState(); } catch(e){}
+    if (typeof saveHubState === 'function') try { saveHubState(); } catch(e){}
     // update tab active state
     const tabs = document.getElementById('eg-map-stash-tabs');
     if (tabs) {
@@ -376,7 +376,7 @@ export function _egSwitchMapStashTier(tier) {
 // Assembles the gate panel: Orbs & Shards on the left, Probability Gate
 // centered, and the map stash grid below. The maps label carries a legend
 // hint for the gold atlas-incomplete highlight. Orbs & Shards stays in sync
-// with the hub's currency strip via the shared _egCurrencyStash.
+// with the hub's currency strip via the shared _currencyStash.
 export function _egBuildGatePanelHTML() {
     const atlasHint = (typeof t === 'function' && t('eg_map_atlas_not_completed') !== 'eg_map_atlas_not_completed')
         ? t('eg_map_atlas_not_completed').replace(/^○\s*/, '★ ')
@@ -416,8 +416,8 @@ export function _egBuildGatePanelHTML() {
 //------------------------------------------------------------------------
 // The gate screen has its OWN cell ids (eg-gate-currency-cell-*) because the
 // hub screen's cells (eg-currency-cell-*) may coexist in the DOM. Both grids
-// read from and write to the SAME _egCurrencyStash, so amounts stay in sync;
-// _egRenderCurrencyCell() in endgame-hub-drag-and-drop.js updates both.
+// read from and write to the SAME _currencyStash, so amounts stay in sync;
+// _renderCurrencyCell() in endgame-hub-drag-and-drop.js updates both.
 
 // Builds a single Orbs & Shards cell for the gate screen (fixed slots).
 export function _egBuildGateCurrencyCellHTML(row, col) {
@@ -438,8 +438,8 @@ export function _egBuildGateCurrencyCellHTML(row, col) {
 // Builds the full gate-side runes & orbs grid.
 export function _egBuildGateCurrencyGridHTML() {
     let html = '';
-    for (let r = 0; r < EG_CURRENCY_ROWS; r++) {
-        for (let c = 0; c < EG_CURRENCY_COLS; c++) {
+    for (let r = 0; r < CURRENCY_ROWS; r++) {
+        for (let c = 0; c < CURRENCY_COLS; c++) {
             html += _egBuildGateCurrencyCellHTML(r, c);
         }
     }
@@ -452,23 +452,23 @@ export function _egBuildGateCurrencyStripHTML() {
 <div class="eg-currency-strip">
     <div class="eg-panel-label">${t('eg_runes_orbs')}</div>
     <div class="eg-currency-row" id="eg-gate-currency-grid"
-         style="grid-template-columns: repeat(${EG_CURRENCY_COLS}, 1fr);">
+         style="grid-template-columns: repeat(${CURRENCY_COLS}, 1fr);">
         ${_egBuildGateCurrencyGridHTML()}
     </div>
 </div>`;
 }
 
 export function _egOnGateCurrencyCellEnter(row, col, e) {
-    const item = _egCurrencyStash[row] && _egCurrencyStash[row][col];
+    const item = _currencyStash[row] && _currencyStash[row][col];
     if (item) return;
-    const assignedId = (typeof _egCurrencyIdForSlot === 'function') ? _egCurrencyIdForSlot(row, col) : null;
+    const assignedId = (typeof _currencyIdForSlot === 'function') ? _currencyIdForSlot(row, col) : null;
     if (!assignedId) return;
-    const def = (typeof _egCurrencyDefForId === 'function') ? _egCurrencyDefForId(assignedId) : null;
+    const def = (typeof _currencyDefForId === 'function') ? _currencyDefForId(assignedId) : null;
     if (!def) return;
     const html = `
 <div class="eg-tt-frame" style="--tt-border:#b59248;">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon" style="opacity:0.55;">${EG_ART.html('item', assignedId, def.icon || '◻')}</div>
+        <div class="eg-tt-icon" style="opacity:0.55;">${GAME_ART.html('item', assignedId, def.icon || '◻')}</div>
         <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${def.name || assignedId}</div>
         <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
     </div>
@@ -480,9 +480,9 @@ export function _egOnGateCurrencyCellMove(e) {
     const cell = e.currentTarget || (e.target.closest && e.target.closest('.eg-currency-cell'));
     if (!cell) return;
     const r = +cell.dataset.row, c = +cell.dataset.col;
-    const item = _egCurrencyStash[r] && _egCurrencyStash[r][c];
+    const item = _currencyStash[r] && _currencyStash[r][c];
     if (item) return;
-    if ((typeof _egCurrencyIdForSlot === 'function') && _egCurrencyIdForSlot(r,c) && typeof moveGameTooltip === 'function') globalThis.moveGameTooltip(e);
+    if ((typeof _currencyIdForSlot === 'function') && _currencyIdForSlot(r,c) && typeof moveGameTooltip === 'function') globalThis.moveGameTooltip(e);
 }
 export function _egOnGateCurrencyCellLeave() {
     if (typeof hideGameTooltip === 'function') globalThis.hideGameTooltip();
@@ -536,15 +536,15 @@ export function _egInjectGateLevelChipStyles() {
 _egInjectGateLevelChipStyles();
 
 // Refreshes the level chip in the gate topbar. Reuses the same XP/percentage
-// logic as _egRenderLevelHUD (endgame-leveling.js) so the gate stays in sync.
+// logic as _renderLevelHUD (endgame-leveling.js) so the gate stays in sync.
 export function _egRenderGateLevelChip() {
     const el = document.getElementById('eg-gate-level-chip');
     if (!el) return;
-    const lvl = (typeof _egGetPlayerLevel === 'function') ? _egGetPlayerLevel() : ((typeof STATE !== 'undefined' && STATE && STATE.playerLevel) || 1);
-    const pts = (typeof _egGetUnspentPoints === 'function') ? _egGetUnspentPoints() : ((typeof STATE !== 'undefined' && STATE && STATE.egAttrPoints) || 0);
-    const xp = (typeof _egGetPlayerXP === 'function') ? _egGetPlayerXP() : ((typeof STATE !== 'undefined' && STATE && STATE.playerXP) || 0);
-    const maxLvl = (typeof EG_LEVELING_CONFIG !== 'undefined' && EG_LEVELING_CONFIG.maxLevel) || 100;
-    const need = (typeof _egGetXpForNextLevel === 'function') ? _egGetXpForNextLevel(lvl) : 0;
+    const lvl = (typeof _getPlayerLevel === 'function') ? _getPlayerLevel() : ((typeof STATE !== 'undefined' && STATE && STATE.playerLevel) || 1);
+    const pts = (typeof _getUnspentPoints === 'function') ? _getUnspentPoints() : ((typeof STATE !== 'undefined' && STATE && STATE.egAttrPoints) || 0);
+    const xp = (typeof _getPlayerXP === 'function') ? _getPlayerXP() : ((typeof STATE !== 'undefined' && STATE && STATE.playerXP) || 0);
+    const maxLvl = (typeof LEVELING_CONFIG !== 'undefined' && LEVELING_CONFIG.maxLevel) || 100;
+    const need = (typeof _getXpForNextLevel === 'function') ? _getXpForNextLevel(lvl) : 0;
     const pct = lvl >= maxLvl ? 100 : (need > 0 ? Math.min(100, (xp / need) * 100) : 0);
     const lvlLabel = (typeof t === 'function') ? t('eg_lvl_short').replace('{n}', lvl) : `Lv. ${lvl}`;
     const ptsHtml = pts > 0 ? `<span class="eg-lvl-chip-points">✦${pts > 99 ? '99+' : pts}</span>` : '';
@@ -563,7 +563,7 @@ export function _egBuildGateTopbarHTML() {
     <button class="eg-back-btn back-btn" onclick="${_egGateBackFn}()">${t('btn_back')}</button>
     <span class="eg-topbar-title">${t('mg_gate_badge')}</span>
     <span id="eg-gate-level-chip" class="eg-gate-level-chip"
-          onmouseenter="if(typeof _egShowLevelBtnTooltip==='function')_egShowLevelBtnTooltip(event)"
+          onmouseenter="if(typeof _showLevelBtnTooltip==='function')_showLevelBtnTooltip(event)"
           onmousemove="if(typeof moveGameTooltip==='function')moveGameTooltip(event)"
           onmouseleave="if(typeof hideGameTooltip==='function')hideGameTooltip()"></span>
     <div class="eg-topbar-right">
@@ -820,7 +820,7 @@ export function _egRenderMapSlot() {
     if (!inner) return;
 
     inner.innerHTML = globalThis._egMapSlotItem
-        ? _egBuildItemChipHTML(globalThis._egMapSlotItem, 'large')
+        ? _buildItemChipHTML(globalThis._egMapSlotItem, 'large')
         : `<span class="eg-map-slot-empty-text">${t('eg_insert_map')}</span>`;
 
     _egRenderMapDeviceButton();
@@ -860,10 +860,10 @@ export function _egRenderMapStashCell(row, col) {
         if (typeof _egGetMapTierGrid === 'function') item = _egGetMapTierGrid(tier)[row][col];
         else if (Array.isArray(_egMapStash) && Array.isArray(_egMapStash[row])) item = _egMapStash[row][col];
     } catch(e) { item = null; }
-    cell.innerHTML = item ? _egBuildItemChipHTML(item) : '';
+    cell.innerHTML = item ? _buildItemChipHTML(item) : '';
 
-    if (item && typeof _egGetCellFill === 'function') {
-        const fill = _egGetCellFill(item);
+    if (item && typeof _getCellFill === 'function') {
+        const fill = _getCellFill(item);
         cell.style.background = fill;
         // Atlas-incomplete highlight overrides the rarity border with gold;
         // keep the rarity fill but use the animated gold border instead.
@@ -901,9 +901,9 @@ export function _egRenderMapStashForTier(tier) {
                 if (typeof _egGetMapTierGrid === 'function') item = _egGetMapTierGrid(t)[r][c];
                 else if (Array.isArray(_egMapStash) && Array.isArray(_egMapStash[r])) item = _egMapStash[r][c];
             } catch(e) { item = null; }
-            cell.innerHTML = item ? _egBuildItemChipHTML(item) : '';
-            if (item && typeof _egGetCellFill === 'function') {
-                const fill = _egGetCellFill(item);
+            cell.innerHTML = item ? _buildItemChipHTML(item) : '';
+            if (item && typeof _getCellFill === 'function') {
+                const fill = _getCellFill(item);
                 cell.style.background = fill;
                 if (_egIsMapAtlasIncomplete(item)) {
                     _egInjectAtlasHighlightStyles();
@@ -951,7 +951,7 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 // the map, applies its rolled modifiers and launches the encounter chain.
 export function egActivateMap() {
     if (!globalThis._egMapSlotItem) return;
-    if (_egChainTransitioning) return;
+    if (_chainTransitioning) return;
 
     if (typeof _egLaunchMapFromDevice === 'function') {
         _egLaunchMapFromDevice(globalThis._egMapSlotItem);
@@ -974,7 +974,7 @@ export function egActivateMap() {
 // modifier on the map currently inserted into the Map Device is doing:
 // rolled stat line, tier, a plain-language effect description and the
 // reward bonuses granted by that modifier.
-// Follows the create-once + .show toggle pattern of _egEnsureDeleteModal()
+// Follows the create-once + .show toggle pattern of _ensureDeleteModal()
 // in endgame-hub.js.
 
 // Category colors - same scheme as the map tooltips (tooltips-hud.js).
@@ -1168,7 +1168,7 @@ export function _egInjectMapModsOverlayStyles() {
 
 // Creates and injects the gate screen DOM element on first call.
 // Also ensures the hub screen exists so its delegated DnD/currency
-// listeners (_egBindDragEvents) are active for the gate as well.
+// listeners (_bindDragEvents) are active for the gate as well.
 export function _egCreateGateScreen() {
     if (typeof ensureEndgameHubScreen === 'function') ensureEndgameHubScreen();
     _egInjectAtlasHighlightStyles();
@@ -1191,7 +1191,7 @@ export function ensureEndgameGateScreen() {
 
 // Name of the global function the BACK button calls - set by
 // showEndgameGate(backFn). Defaults to the Nexus of Worlds.
-export let _egGateBackFn = EG_SCREEN_NAV.nexus;
+export let _egGateBackFn = SCREEN_NAV.nexus;
 
 // Transitions to the Probability Gate screen and refreshes all rendered zones.
 // This is the main entry point called from elsewhere in the codebase.
@@ -1199,8 +1199,8 @@ export let _egGateBackFn = EG_SCREEN_NAV.nexus;
 // 'showEndgameHub') overrides where the BACK button returns to - used
 // when the gate is opened from the endgame hub character sheet.
 export function showEndgameGate(backFn) {
-    if (typeof backFn === 'string') _egGateBackFn = _egResolveBackFn(backFn, EG_SCREEN_NAV.nexus);
-    else _egGateBackFn = EG_SCREEN_NAV.nexus;
+    if (typeof backFn === 'string') _egGateBackFn = _resolveBackFn(backFn, SCREEN_NAV.nexus);
+    else _egGateBackFn = SCREEN_NAV.nexus;
     ensureEndgameGateScreen();
 
     // Migrate old gate screens that were built before the side-by-side
@@ -1229,7 +1229,7 @@ export function showEndgameGate(backFn) {
         document.getElementById('screen-endgame-gate').style.display = 'block';
     }
 
-    globalThis._egLoadHubState();
+    globalThis._loadHubState();
     // Re-sync tier tabs + grid to persisted active tier (may have changed via migration)
     try {
         const activeTier = globalThis._egMapStashActiveTier || 1;
@@ -1260,8 +1260,8 @@ export function showEndgameGate(backFn) {
     } catch(e) {}
     _egRenderMapSlot();
     _egRenderMapStash();
-    _egRenderCurrencyStash();
+    _renderCurrencyStash();
     _egRenderGateLevelChip();
     _egRenderGateTierStrip();
-    _egClearTooltip();
+    _clearTooltip();
 }

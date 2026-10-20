@@ -4,14 +4,14 @@
 
 // Compatibility facade for the currency tab's historical module surface.
 export {
-    EG_CURRENCY_COLS,
-    EG_CURRENCY_ROWS,
-    EG_CURRENCY_SLOT_MAP,
-    EG_CURRENCY_SLOT_REVERSE,
-    _egCurrencyDefForId,
-    _egCurrencyIdForSlot,
-    _egCurrencySlotForId,
+    CURRENCY_COLS,
+    CURRENCY_ROWS,
+    CURRENCY_SLOT_MAP,
+    CURRENCY_SLOT_REVERSE,
+    _currencyDefForId,
+    _currencyIdForSlot,
+    _currencySlotForId,
 } from './hub-currency-layout.js';
 
-export { _egCurrencyStash } from './hub-currency-state.js';
-export { _egBuildCraftingBenchSlotHTML } from './hub-currency-ui.js';
+export { _currencyStash } from './hub-currency-state.js';
+export { _buildCraftingBenchSlotHTML } from './hub-currency-ui.js';

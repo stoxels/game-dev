@@ -10,12 +10,12 @@
 
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { _egClearTooltip } from './endgame-hub-tooltips.js';
-import { _egRenderInventory, _egUpdateInvCount } from './endgame-hub.js';
-import { EG_SHARD_DEFS, _egRollShardForItem, egAddShard } from '../loot/loot-shards.js';
-import { egSaveHubState } from './hub-save.js';
-import { EG_MASS_SELL_RARITIES, _egIsProtectedFromMassSell, _egLoadMassSellSettings, _egMassSellCounts, _egMassSellKeep, _egMassSellMinItemLevel, _egMassSellMinReqLevel, _egNormaliseMassSellKeep, _egSaveMassSellSettings } from './hub-mass-sell.js';
-import { EG_INV_COLS, _egInventory } from './hub-stash.js';
+import { _clearTooltip } from './endgame-hub-tooltips.js';
+import { _renderInventory, _updateInvCount } from './endgame-hub.js';
+import { SHARD_DEFS, _rollShardForItem, addShard } from '../loot/loot-shards.js';
+import { saveHubState } from './hub-save.js';
+import { MASS_SELL_RARITIES, _isProtectedFromMassSell, _loadMassSellSettings, _massSellCounts, _massSellKeep, _massSellMinItemLevel, _massSellMinReqLevel, _normaliseMassSellKeep, _saveMassSellSettings } from './hub-mass-sell.js';
+import { INV_COLS, _inventory } from './hub-stash.js';
 
 
 
@@ -37,8 +37,8 @@ import { EG_INV_COLS, _egInventory } from './hub-stash.js';
 //      confirmation and a single save.
 
 // Builds / returns the shared mass-sell modal element (creates once).
-export function _egEnsureMassSellModal() {
-    _egInjectMassSellStyles();
+export function _ensureMassSellModal() {
+    _injectMassSellStyles();
     let modal = document.getElementById('eg-mass-sell-modal');
     if (modal) return modal;
     modal = document.createElement('div');
@@ -49,7 +49,7 @@ export function _egEnsureMassSellModal() {
     <div class="eg-ms-head">
         <span class="eg-ms-head-icon">⚒</span>
         <span class="eg-ms-head-title">${t('eg_mass_sell_modal_title')}</span>
-        <button class="eg-ms-close" onclick="_egCloseMassSellModal()"
+        <button class="eg-ms-close" onclick="_closeMassSellModal()"
                 data-tip-t="eg_mass_sell_close" aria-label="${t('eg_mass_sell_close')}">✕</button>
     </div>
     <div class="eg-ms-body">
@@ -88,8 +88,8 @@ export function _egEnsureMassSellModal() {
     <div class="eg-ms-foot">
         <div class="eg-mass-sell-preview" id="eg-mass-sell-preview"></div>
         <div class="eg-mass-sell-btns">
-            <button class="eg-mass-sell-btn eg-mass-sell-save" onclick="_egSaveMassSellModal()">${t('eg_mass_sell_save')}</button>
-            <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_egCloseMassSellModal()">${t('reset_cancel')}</button>
+            <button class="eg-mass-sell-btn eg-mass-sell-save" onclick="_saveMassSellModal()">${t('eg_mass_sell_save')}</button>
+            <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_closeMassSellModal()">${t('reset_cancel')}</button>
         </div>
     </div>
 </div>
@@ -101,18 +101,18 @@ export function _egEnsureMassSellModal() {
     <div class="eg-ms-confirm-body">
         <div class="eg-mass-sell-confirm-text" id="eg-mass-sell-confirm-text"></div>
         <div class="eg-mass-sell-btns">
-            <button class="eg-mass-sell-btn eg-mass-sell-confirm" onclick="_egConfirmMassSell()">${t('eg_mass_sell_confirm_btn')}</button>
-            <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_egCancelMassSellConfirm()">${t('eg_mass_sell_cancel')}</button>
+            <button class="eg-mass-sell-btn eg-mass-sell-confirm" onclick="_confirmMassSell()">${t('eg_mass_sell_confirm_btn')}</button>
+            <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_cancelMassSellConfirm()">${t('eg_mass_sell_cancel')}</button>
         </div>
     </div>
 </div>`;
     // Clicking the dimmed backdrop closes the modal (but not clicks inside the box).
-    modal.addEventListener('click', (e) => { if (e.target === modal) _egCloseMassSellModal(); });
+    modal.addEventListener('click', (e) => { if (e.target === modal) _closeMassSellModal(); });
     document.body.appendChild(modal);
     return modal;
 }
 
-export function _egRarityLabel(rarity) {
+export function _itemRarityLabel(rarity) {
     const keys = {
         common: 'rar_common', uncommon: 'rar_uncommon', rare: 'rar_rare',
         epic: 'eg_rar_epic', legendary: 'rar_legendary', cursed: 'rar_cursed',
@@ -123,7 +123,7 @@ export function _egRarityLabel(rarity) {
     return rarity.charAt(0).toUpperCase() + rarity.slice(1);
 }
 
-export function _egRarityColor(rarity) {
+export function _rarityColor(rarity) {
     const map = {
         common: '#b0b0b0', uncommon: '#2ecc71', rare: '#3498db',
         epic: '#c39bd3', legendary: '#f5b642', cursed: '#e74c3c', artifact: '#f1c40f',
@@ -131,14 +131,14 @@ export function _egRarityColor(rarity) {
     return map[rarity] || '#ccc';
 }
 
-export function _egRenderMassSellModalContent() {
+export function _renderMassSellModalContent() {
     const wrap = document.getElementById('eg-mass-sell-rarities');
     if (!wrap) return;
-    if (!globalThis._egMassSellKeep) _egLoadMassSellSettings();
-    const rows = EG_MASS_SELL_RARITIES.map(r => {
-        const checked = _egMassSellKeep[r] ? 'checked' : '';
-        const col = _egRarityColor(r);
-        const label = _egRarityLabel(r);
+    if (!globalThis._massSellKeep) _loadMassSellSettings();
+    const rows = MASS_SELL_RARITIES.map(r => {
+        const checked = _massSellKeep[r] ? 'checked' : '';
+        const col = _rarityColor(r);
+        const label = _itemRarityLabel(r);
         return `<label class="eg-mass-sell-row" style="--rar:${col};">
             <input type="checkbox" class="eg-ms-check" data-rarity="${r}" ${checked}>
             <span class="eg-mass-sell-dot"></span>
@@ -149,28 +149,28 @@ export function _egRenderMassSellModalContent() {
     wrap.innerHTML = rows;
     // wire preview updates
     wrap.querySelectorAll('input[data-rarity]').forEach(cb => {
-        cb.addEventListener('change', _egUpdateMassSellPreview);
+        cb.addEventListener('change', _updateMassSellPreview);
     });
     const uniqCb = document.getElementById('eg-mass-sell-keep-unique');
     if (uniqCb) {
-        uniqCb.checked = !!globalThis._egMassSellKeepUnique;
-        uniqCb.onchange = _egUpdateMassSellPreview;
+        uniqCb.checked = !!globalThis._massSellKeepUnique;
+        uniqCb.onchange = _updateMassSellPreview;
     }
     // Level filters
     const minIlvlInput = document.getElementById('eg-mass-sell-min-ilvl');
     const minReqLvlInput = document.getElementById('eg-mass-sell-min-reqlvl');
     if (minIlvlInput) {
-        minIlvlInput.value = _egMassSellMinItemLevel || 0;
-        minIlvlInput.onchange = _egUpdateMassSellPreview;
+        minIlvlInput.value = _massSellMinItemLevel || 0;
+        minIlvlInput.onchange = _updateMassSellPreview;
     }
     if (minReqLvlInput) {
-        minReqLvlInput.value = _egMassSellMinReqLevel || 0;
-        minReqLvlInput.onchange = _egUpdateMassSellPreview;
+        minReqLvlInput.value = _massSellMinReqLevel || 0;
+        minReqLvlInput.onchange = _updateMassSellPreview;
     }
-    _egUpdateMassSellPreview();
+    _updateMassSellPreview();
 }
 
-export function _egUpdateMassSellPreview() {
+export function _updateMassSellPreview() {
     const preview = document.getElementById('eg-mass-sell-preview');
     if (!preview) return;
     // read current UI state (not yet saved) for live numbers
@@ -182,10 +182,10 @@ export function _egUpdateMassSellPreview() {
     const tempMinItemLevel = parseInt(document.getElementById('eg-mass-sell-min-ilvl')?.value || '0', 10);
     const tempMinReqLevel = parseInt(document.getElementById('eg-mass-sell-min-reqlvl')?.value || '0', 10);
     let keep = 0, sell = 0;
-    if (_egInventory) {
-        for (let r = 0; r < _egInventory.length; r++) {
-            for (let c = 0; c < EG_INV_COLS; c++) {
-                const it = _egInventory[r][c];
+    if (_inventory) {
+        for (let r = 0; r < _inventory.length; r++) {
+            for (let c = 0; c < INV_COLS; c++) {
+                const it = _inventory[r][c];
                 if (!it) continue;
                 const rarity = (it.rarity || 'common').toLowerCase();
                 const protectedByRarity = !!tempKeep[rarity];
@@ -206,7 +206,7 @@ export function _egUpdateMassSellPreview() {
 
 // Re-applies the static shell strings on every open so a language switch
 // mid-session is picked up (the shell markup itself is built only once).
-export function _egMassSellRenderStaticText(modal) {
+export function _massSellRenderStaticText(modal) {
     const title = modal.querySelector('.eg-mass-sell-box .eg-ms-head-title');
     if (title) title.textContent = t('eg_mass_sell_modal_title');
     const close = modal.querySelector('.eg-ms-close');
@@ -243,11 +243,11 @@ export function _egMassSellRenderStaticText(modal) {
     if (confirmCancel) confirmCancel.textContent = t('eg_mass_sell_cancel');
 }
 
-export function _egOpenMassSellModal() {
-    _egLoadMassSellSettings();
-    const modal = _egEnsureMassSellModal();
-    _egMassSellRenderStaticText(modal);
-    _egRenderMassSellModalContent();
+export function _openMassSellModal() {
+    _loadMassSellSettings();
+    const modal = _ensureMassSellModal();
+    _massSellRenderStaticText(modal);
+    _renderMassSellModalContent();
     // ensure filter view is visible, confirm hidden
     const box = modal.querySelector('.eg-mass-sell-box');
     const confirm = document.getElementById('eg-mass-sell-confirm');
@@ -256,39 +256,39 @@ export function _egOpenMassSellModal() {
     modal.classList.add('show');
 }
 
-export function _egCloseMassSellModal() {
+export function _closeMassSellModal() {
     const modal = document.getElementById('eg-mass-sell-modal');
     if (modal) modal.classList.remove('show');
 }
 
-export function _egSaveMassSellModal() {
+export function _saveMassSellModal() {
     // persist checkbox states
     const keep = {};
     document.querySelectorAll('#eg-mass-sell-rarities input[data-rarity]').forEach(cb => {
         keep[cb.dataset.rarity] = cb.checked;
     });
-    globalThis._egMassSellKeep = _egNormaliseMassSellKeep(keep);
-    globalThis._egMassSellKeepUnique = !!document.getElementById('eg-mass-sell-keep-unique')?.checked;
-    globalThis._egMassSellMinItemLevel = Math.max(0, parseInt(document.getElementById('eg-mass-sell-min-ilvl')?.value || '0', 10));
-    globalThis._egMassSellMinReqLevel = Math.max(0, parseInt(document.getElementById('eg-mass-sell-min-reqlvl')?.value || '0', 10));
-    _egSaveMassSellSettings();
-    _egCloseMassSellModal();
+    globalThis._massSellKeep = _normaliseMassSellKeep(keep);
+    globalThis._massSellKeepUnique = !!document.getElementById('eg-mass-sell-keep-unique')?.checked;
+    globalThis._massSellMinItemLevel = Math.max(0, parseInt(document.getElementById('eg-mass-sell-min-ilvl')?.value || '0', 10));
+    globalThis._massSellMinReqLevel = Math.max(0, parseInt(document.getElementById('eg-mass-sell-min-reqlvl')?.value || '0', 10));
+    _saveMassSellSettings();
+    _closeMassSellModal();
     if (typeof showToast === 'function') globalThis.showToast(t('eg_mass_sell_saved'));
 }
 
 // ── Sell execution ───────────────────────────────────────────────────
-export function _egRequestMassSell() {
-    _egLoadMassSellSettings();
-    const { keep, sell } = _egMassSellCounts();
+export function _requestMassSell() {
+    _loadMassSellSettings();
+    const { keep, sell } = _massSellCounts();
     if (sell === 0) {
         if (typeof showToast === 'function') globalThis.showToast(t('eg_mass_sell_nothing_to_sell'));
         else alert(t('eg_mass_sell_nothing_to_sell'));
         return;
     }
-    const modal = _egEnsureMassSellModal();
+    const modal = _ensureMassSellModal();
     // populate confirm text in the same modal (re-uses the overlay)
-    _egMassSellRenderStaticText(modal);
-    _egRenderMassSellModalContent();
+    _massSellRenderStaticText(modal);
+    _renderMassSellModalContent();
     const box = modal.querySelector('.eg-mass-sell-box');
     const confirm = document.getElementById('eg-mass-sell-confirm');
     const confirmText = document.getElementById('eg-mass-sell-confirm-text');
@@ -302,7 +302,7 @@ export function _egRequestMassSell() {
     modal.classList.add('show');
 }
 
-export function _egCancelMassSellConfirm() {
+export function _cancelMassSellConfirm() {
     const modal = document.getElementById('eg-mass-sell-modal');
     if (!modal) return;
     const box = modal.querySelector('.eg-mass-sell-box');
@@ -310,10 +310,10 @@ export function _egCancelMassSellConfirm() {
     if (box) box.style.display = '';
     if (confirm) confirm.style.display = 'none';
     // stay open on the filter view (user can tweak and sell again) - alternatively close:
-    // _egCloseMassSellModal();
+    // _closeMassSellModal();
 }
 
-export function _egConfirmMassSell() {
+export function _confirmMassSell() {
     const modal = document.getElementById('eg-mass-sell-modal');
     if (modal) modal.classList.remove('show');
     // Hide confirm sub-panel for next open
@@ -321,19 +321,19 @@ export function _egConfirmMassSell() {
     const confirm = document.getElementById('eg-mass-sell-confirm');
     if (box) box.style.display = '';
     if (confirm) confirm.style.display = 'none';
-    _egExecuteMassSell();
+    _executeMassSell();
 }
 
-export function _egExecuteMassSell() {
-    if (!globalThis._egInventory) return;
-    _egLoadMassSellSettings();
+export function _executeMassSell() {
+    if (!globalThis._inventory) return;
+    _loadMassSellSettings();
     // Snapshot targets first so mutation during iteration is safe.
     const targets = [];
-    for (let r = 0; r < _egInventory.length; r++) {
-        for (let c = 0; c < EG_INV_COLS; c++) {
-            const it = _egInventory[r][c];
+    for (let r = 0; r < _inventory.length; r++) {
+        for (let c = 0; c < INV_COLS; c++) {
+            const it = _inventory[r][c];
             if (!it) continue;
-            if (_egIsProtectedFromMassSell(it)) continue;
+            if (_isProtectedFromMassSell(it)) continue;
             targets.push({ r, c, item: it });
         }
     }
@@ -346,52 +346,52 @@ export function _egExecuteMassSell() {
 
     // Re-use the per-item shard logic: noSellValue → destroy without shard,
     // otherwise roll a shard. We batch the side-effects (single save, single
-    // render pass at the end) instead of calling _egSellStashItem per cell
+    // render pass at the end) instead of calling _sellStashItem per cell
     // which would toast + save each time.
     for (const { r, c, item } of targets) {
         // Item may have been moved/cleared already if a previous failure left
         // it - verify the slot still holds the same item.
-        if (_egInventory[r][c] !== item) continue;
+        if (_inventory[r][c] !== item) continue;
         if (item.noSellValue) {
-            _egInventory[r][c] = null;
+            _inventory[r][c] = null;
             sold++; noValue++;
             continue;
         }
         // Try to grant a shard; if the shard stash is blocked the spec says
-        // to keep the item and flash - mirror _egSellStashItem behaviour.
+        // to keep the item and flash - mirror _sellStashItem behaviour.
         // Unique items always grant an Ancient Shard.
         let shardDef = null;
         try {
-            if (item.isUnique && typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS.shard_ancient) {
-                shardDef = EG_SHARD_DEFS.shard_ancient;
+            if (item.isUnique && typeof SHARD_DEFS !== 'undefined' && SHARD_DEFS.shard_ancient) {
+                shardDef = SHARD_DEFS.shard_ancient;
             } else {
-                shardDef = (typeof _egRollShardForItem === 'function') ? _egRollShardForItem(item) : null;
+                shardDef = (typeof _rollShardForItem === 'function') ? _rollShardForItem(item) : null;
             }
         } catch (e) { shardDef = null; }
         if (!shardDef) {
             // shard system unavailable - treat as no-value destroy so the
             // inventory does not get stuck
-            _egInventory[r][c] = null;
+            _inventory[r][c] = null;
             sold++; noValue++;
             continue;
         }
         let granted = false;
         try {
-            granted = (typeof egAddShard === 'function') ? egAddShard(shardDef.id, 1) : false;
+            granted = (typeof addShard === 'function') ? addShard(shardDef.id, 1) : false;
         } catch (e) { granted = false; }
         if (!granted) {
             failed++;
             continue;
         }
-        _egInventory[r][c] = null;
+        _inventory[r][c] = null;
         sold++;
     }
 
     if (sold > 0) {
-        _egRenderInventory();
-        _egUpdateInvCount();
-        _egClearTooltip();
-        egSaveHubState();
+        _renderInventory();
+        _updateInvCount();
+        _clearTooltip();
+        saveHubState();
         if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
             try { Audio_Manager.playSFX('mass_sell_confirm', 'player_equip_pickup'); } catch (e) {}
         }
@@ -425,7 +425,7 @@ export function _egExecuteMassSell() {
     }
 }
 
-export function _egInjectMassSellStyles() {
+export function _injectMassSellStyles() {
     if (document.getElementById('eg-mass-sell-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-mass-sell-styles';

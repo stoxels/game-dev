@@ -1,4 +1,4 @@
-import { _egValidateAllBossHandlers } from './boss-framework.js';
+import { _validateAllBossHandlers } from './boss-framework.js';
 //------------------------------------------------------------------------
 //-------------------ATLAS BOSS ROSTER (86 regions → 86 bosses)------------
 //------------------------------------------------------------------------
@@ -118,9 +118,9 @@ export const EG_ATLAS_REGION_BOSSES = {
 // do not exist yet, so window[handler] would spuriously miss them all.
 if (typeof document !== 'undefined' && document.readyState !== 'complete') {
     document.addEventListener('DOMContentLoaded', () => {
-        if (typeof _egValidateAllBossHandlers === 'function') _egValidateAllBossHandlers();
+        if (typeof _validateAllBossHandlers === 'function') _validateAllBossHandlers();
     });
-} else if (typeof _egValidateAllBossHandlers === 'function') {
-    _egValidateAllBossHandlers();
+} else if (typeof _validateAllBossHandlers === 'function') {
+    _validateAllBossHandlers();
 }
 

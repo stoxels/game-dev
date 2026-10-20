@@ -1,5 +1,5 @@
 import { save, STATE } from '../state.js';
-import { egSaveHubState } from '../endgame/endgame-hub.js';
+import { saveHubState } from '../endgame/endgame-hub.js';
 
 //------------------------------------------------------------------------
 //-------------------LOOT FILTER STATE--------------------------------------
@@ -7,13 +7,13 @@ import { egSaveHubState } from '../endgame/endgame-hub.js';
 
 // Live filter state. Kept in STATE.egLootFilter:
 //   { enabled: bool, keepUnique: bool, rules: [rule, ...] }
-export let _egLootFilter = null;
+export let _lootFilter = null;
 
 // Rebind the module binding for editor code that commits a working copy.
-try { Object.defineProperty(globalThis, '_egLootFilter', { get() { return _egLootFilter; }, set(v) { _egLootFilter = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_lootFilter', { get() { return _lootFilter; }, set(v) { _lootFilter = v; }, configurable: true }); } catch (e) {}
 
 // Returns the safe default filter configuration.
-export function _eglfDefaultState() {
+export function _lootFilterDefaultState() {
     return {
         enabled: false,
         keepUnique: true,
@@ -22,7 +22,7 @@ export function _eglfDefaultState() {
 }
 
 // Normalizes one persisted or editor-created rule.
-export function _eglfNormaliseRule(raw) {
+export function _lootFilterNormaliseRule(raw) {
     const r = (raw && typeof raw === 'object') ? raw : {};
     return {
         id: (typeof r.id === 'string' && r.id) ? r.id : `lf_${Date.now()}_${Math.floor(Math.random() * 100000)}`,
@@ -38,34 +38,34 @@ export function _eglfNormaliseRule(raw) {
 }
 
 // Normalizes a persisted filter while preserving legacy minimum fields.
-export function _eglfNormaliseState(raw) {
-    const def = _eglfDefaultState();
+export function _lootFilterNormaliseState(raw) {
+    const def = _lootFilterDefaultState();
     if (!raw || typeof raw !== 'object') return def;
     return {
         enabled: raw.enabled === true,
         keepUnique: raw.keepUnique !== false,
-        rules: Array.isArray(raw.rules) ? raw.rules.map(_eglfNormaliseRule) : [],
+        rules: Array.isArray(raw.rules) ? raw.rules.map(_lootFilterNormaliseRule) : [],
     };
 }
 
 // Loads the filter from the global state, or creates its safe default.
-export function _egLoadLootFilter() {
+export function _loadLootFilter() {
     if (typeof globalThis.STATE !== 'undefined' && globalThis.STATE.egLootFilter) {
-        _egLootFilter = _eglfNormaliseState(globalThis.STATE.egLootFilter);
+        _lootFilter = _lootFilterNormaliseState(globalThis.STATE.egLootFilter);
     } else {
-        _egLootFilter = _eglfDefaultState();
+        _lootFilter = _lootFilterDefaultState();
     }
-    return _egLootFilter;
+    return _lootFilter;
 }
 
 // Persists the live filter and refreshes the hub mirror.
-export function _egSaveLootFilter() {
+export function _saveLootFilter() {
     if (typeof STATE !== 'undefined') {
-        STATE.egLootFilter = JSON.parse(JSON.stringify(_egLootFilter));
+        STATE.egLootFilter = JSON.parse(JSON.stringify(_lootFilter));
         if (typeof save === 'function') try { save(); } catch (e) {}
     }
-    if (typeof egSaveHubState === 'function') try { egSaveHubState(); } catch (e) {}
+    if (typeof saveHubState === 'function') try { saveHubState(); } catch (e) {}
 }
 
 // Load immediately so run-time claims see the persisted filter.
-_egLoadLootFilter();
+_loadLootFilter();

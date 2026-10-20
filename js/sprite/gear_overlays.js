@@ -27,9 +27,9 @@
 // missing data or images (G5) — worst case an item simply doesn't draw.
 //------------------------------------------------------------------------
 
-import { EG_ART } from '../endgame/endgame-art.js';
-import { _egEquipped } from '../endgame/hub-stash.js';
-import { _egGetWeaponHands } from '../loot/loot-requirements.js';
+import { GAME_ART } from '../endgame/endgame-art.js';
+import { _equipped } from '../endgame/hub-stash.js';
+import { _getWeaponHands } from '../loot/loot-requirements.js';
 import { GEAR_GRIP_DATA } from './gear-overlays-data.js';
 import { resolvePlacement, placeItem } from './grip-render.js';
 
@@ -123,7 +123,7 @@ function framesFor(info) {
 
 function readLoadout() {
     let eq = null;
-    try { eq = _egEquipped || null; } catch (e) { eq = null; }
+    try { eq = _equipped || null; } catch (e) { eq = null; }
     if (!eq) return null;
     const main = eq.weapon1 || null;
     const off = eq.weapon2 || null;
@@ -132,7 +132,7 @@ function readLoadout() {
     if (!mainId && !offId) return null;
     let mainIsTwoHanded = TWO_HANDED.has(mainId);
     if (main && main.slotType === 'weapon' && !mainIsTwoHanded) {
-        try { mainIsTwoHanded = _egGetWeaponHands(main) === 2; } catch (e) { /* table miss */ }
+        try { mainIsTwoHanded = _getWeaponHands(main) === 2; } catch (e) { /* table miss */ }
     }
     if (mainIsTwoHanded) return { mainId, offId: null, offRole: null, mode: '2h' };
     const offRole = off ? (off.slotType === 'shield' ? 'shield' : (off.slotType === 'weapon' ? 'weapon' : null)) : null;
@@ -305,7 +305,7 @@ function isMirrored(img) {
 //------------------------------------------------------------------------
 
 function itemUrl(baseId) {
-    try { return EG_ART.url('item', baseId) || null; } catch (e) { return null; }
+    try { return GAME_ART.url('item', baseId) || null; } catch (e) { return null; }
 }
 
 // Draw one slot. Returns the placement (for the fist patch) or null.

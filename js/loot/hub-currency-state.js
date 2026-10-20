@@ -1,11 +1,11 @@
-import { EG_CURRENCY_COLS, EG_CURRENCY_ROWS } from './hub-currency-layout.js';
+import { CURRENCY_COLS, CURRENCY_ROWS } from './hub-currency-layout.js';
 
 //------------------------------------------------------------------------
 //-------------------CURRENCY STASH STATE----------------------------------
 //------------------------------------------------------------------------
 
 // Live currency stash grid; null represents an empty cell.
-export let _egCurrencyStash = Array.from({ length: EG_CURRENCY_ROWS }, () => Array(EG_CURRENCY_COLS).fill(null));
+export let _currencyStash = Array.from({ length: CURRENCY_ROWS }, () => Array(CURRENCY_COLS).fill(null));
 
 // Keep legacy global writes connected to the module binding.
-try { Object.defineProperty(globalThis, '_egCurrencyStash', { get() { return _egCurrencyStash; }, set(v) { _egCurrencyStash = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_currencyStash', { get() { return _currencyStash; }, set(v) { _currencyStash = v; }, configurable: true }); } catch (e) {}

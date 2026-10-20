@@ -284,7 +284,7 @@ function avatarVisible() {
 
 function combatActive() {
     try {
-        return typeof globalThis._egIsActive === 'function' && !!globalThis._egIsActive();
+        return typeof globalThis._isActive === 'function' && !!globalThis._isActive();
     } catch { return false; }
 }
 

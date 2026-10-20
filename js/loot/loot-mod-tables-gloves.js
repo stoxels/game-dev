@@ -2,7 +2,7 @@
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
+//  which evals every MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------GLOVES MODIFIER TABLE--------------------------------
@@ -21,7 +21,7 @@
 // no chain/splash, no spell damage multiplier, no crit, no status effect
 // chance applications (those are bracers), no precision (that's chest).
 
-export const EG_MOD_TABLE_GLOVES = {
+export const MOD_TABLE_GLOVES = {
     prefixes: {
 
         // --- LIFE & MANA ---

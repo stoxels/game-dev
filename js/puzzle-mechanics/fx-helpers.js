@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { cur } from '../state.js';
-import { EG_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from '../endgame/endgame-art.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - FX HELPERS----------------------
@@ -95,7 +95,7 @@ export function _fxMakeIcon(parent, emoji, cx, cy, fontSize, animationCss, remov
 
 // Creates a centered icon for a puzzle item at (cx, cy) inside `parent`,
 // showing the item's ART image (images/puzzle_items/<id>.webp, resolved
-// through the same EG_ART resolver the inventory uses) instead of the
+// through the same GAME_ART resolver the inventory uses) instead of the
 // emoji. Falls back to the item's emoji when no art exists for the id.
 //
 // `size` is the box size in px; the art scales to fit (art keeps its own
@@ -106,8 +106,8 @@ export function _fxMakeIcon(parent, emoji, cx, cy, fontSize, animationCss, remov
 export function _fxMakeItemIcon(parent, defId, fallbackEmoji, cx, cy, size, animationCss, removeAfterMs) {
     const el = document.createElement('div');
     el.className = 'fx-item-icon';
-    const url = (typeof EG_ART !== 'undefined' && EG_ART)
-        ? EG_ART.url('item', defId) : null;
+    const url = (typeof GAME_ART !== 'undefined' && GAME_ART)
+        ? GAME_ART.url('item', defId) : null;
     if (url) {
         el.classList.add('fx-item-art');
         const img = document.createElement('img');

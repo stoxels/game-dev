@@ -7,18 +7,18 @@
 // misses falls back to a title-cased family id, hybrids joined by " + ".
 
 import { LANG } from '../translation/translations.js';
-import { EG_SLOT_MOD_TABLE_MAP } from './loot-equipment-mod-tables.js';
+import { SLOT_MOD_TABLE_MAP } from './loot-equipment-mod-tables.js';
 
 
 // Helper: humanized fallback name when translation key missing
-export function _egEssenceFallbackName(familyId) {
-    const disp = (typeof _egEssenceFamilyDisplayName === 'function')
-        ? _egEssenceFamilyDisplayName(familyId) : familyId;
+export function _essenceFallbackName(familyId) {
+    const disp = (typeof _essenceFamilyDisplayName === 'function')
+        ? _essenceFamilyDisplayName(familyId) : familyId;
     return 'Essence of ' + disp;
 }
-export function _egEssenceFallbackNameDe(familyId) {
-    const disp = (typeof _egEssenceFamilyDisplayName === 'function')
-        ? _egEssenceFamilyDisplayName(familyId) : familyId;
+export function _essenceFallbackNameDe(familyId) {
+    const disp = (typeof _essenceFamilyDisplayName === 'function')
+        ? _essenceFamilyDisplayName(familyId) : familyId;
     return 'Essenz der ' + disp;
 }
 
@@ -30,7 +30,7 @@ export function _egEssenceFallbackNameDe(familyId) {
 // Human-readable family display (EN/DE). Prefer the mod's own label stripped of
 // placeholders, fall back to a title-cased familyId.  Hybrid families are
 // joined with " + ".
-export function _egEssenceFamilyDisplayName(familyId) {
+export function _essenceFamilyDisplayName(familyId) {
     let raw = null;
     let rawDe = null;
     // This runs at module-eval time (the def build calls it) while the
@@ -40,7 +40,7 @@ export function _egEssenceFamilyDisplayName(familyId) {
     // to the curated names below; at runtime the table is ready and the
     // enriched lookup applies.
     let modTableMap = null;
-    try { modTableMap = EG_SLOT_MOD_TABLE_MAP; } catch (e) { modTableMap = null; }
+    try { modTableMap = SLOT_MOD_TABLE_MAP; } catch (e) { modTableMap = null; }
     if (modTableMap) {
         for (const getter of Object.values(modTableMap)) {
             let tbl = null;

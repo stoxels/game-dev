@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkSlamShatter, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkSlamShatter, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE JUGGERNAUT (boss_juggernaut)---------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_juggernaut: {
         id: 'boss_juggernaut', name: 'The Juggernaut', emoji: '🚂',
         baseHP: 1240, baseDamage: 28, chargeMax: 12,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_juggernaut: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -29,23 +29,23 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 3000,
         mechanics: [
-            { name: 'bull_barrage', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechBullBarrage' },
-            { name: 'thwomp_trio', intervalBase: 20000, intervalVariance: 4000, handler: '_egMechThwompTrio' },
-            { name: 'prior_bomb', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechPriorBomb' },
+            { name: 'bull_barrage', intervalBase: 18000, intervalVariance: 4000, handler: '_mechBullBarrage' },
+            { name: 'thwomp_trio', intervalBase: 20000, intervalVariance: 4000, handler: '_mechThwompTrio' },
+            { name: 'prior_bomb', intervalBase: 19000, intervalVariance: 4000, handler: '_mechPriorBomb' },
         ],
     },
 });
 
 
-export function _egMechBullBarrage(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechBullBarrage(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const rushes = [0, 4, 5, 5][p];
     const warnMs = [0, 800, 700, 600][p];
     const dashSpeed = 1050;
     const bandH = 90;
     const dmgPct = [0, 0.22, 0.26, 0.32][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     let idx = 0, stage = 'idle', t = 0, dir = 1, ry = 0, bx = 0;
     let lineEl = null, bullEl = null, hitDone = false;
@@ -53,16 +53,16 @@ export function _egMechBullBarrage(monster, phase) {
         if (lineEl) { lineEl.remove(); lineEl = null; }
         if (bullEl) { bullEl.remove(); bullEl = null; }
     };
-    _egNkToast('eg_mech_juggernaut', '🚂 The Juggernaut: Bull Barrage! No breath between horns!');
-    _egNkLoop(run, (dtS) => {
+    _nkToast('eg_mech_juggernaut', '🚂 The Juggernaut: Bull Barrage! No breath between horns!');
+    _nkLoop(run, (dtS) => {
         if (idx >= rushes) { clear(); return false; }
         t += dtS * 1000;
         if (stage === 'idle') {
-            const c = _egNkPlayerCenter();
+            const c = _nkPlayerCenter();
             ry = Math.max(bandH / 2 + 20, Math.min(window.innerHeight - bandH / 2 - 20,
                 c ? c.y : window.innerHeight / 2));
             dir = idx % 2 === 0 ? 1 : -1;
-            lineEl = _egNkEl(run, 'div', 'eg-nk-band');
+            lineEl = _nkEl(run, 'div', 'eg-nk-band');
             lineEl.style.top = Math.round(ry - bandH / 2) + 'px';
             lineEl.style.height = bandH + 'px';
             stage = 'warn';
@@ -74,21 +74,21 @@ export function _egMechBullBarrage(monster, phase) {
                 t = 0;
                 if (lineEl) {
                     lineEl.classList.add('eg-nk-band-hit');
-                    _egNkSlamShatter(lineEl, run); // hooves tear the ground as the rush starts
+                    _nkSlamShatter(lineEl, run); // hooves tear the ground as the rush starts
                 }
                 bx = dir > 0 ? -90 : window.innerWidth + 90;
-                bullEl = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-charger', '🚂');
+                bullEl = _nkEl(run, 'div', 'eg-nk-dot eg-nk-charger', '🚂');
             }
         } else if (stage === 'dash') {
             bx += dir * dashSpeed * dtS;
             if (bullEl) bullEl.style.transform = 'translate(' + Math.round(bx - 35) + 'px,' + Math.round(ry - 35) + 'px)';
             if (!hitDone) {
-                const pr = _egNkPlayerRect();
+                const pr = _nkPlayerRect();
                 if (pr && pr.right > bx - 35 && pr.left < bx + 35
                     && pr.bottom > ry - bandH / 2 && pr.top < ry + bandH / 2) {
                     hitDone = true;
-                    const dealt = _egNkHit(dmgPct, null, level);
-                    _egNkAbilityHitToast(dealt, 'The Juggernaut', 'Bull Barrage');
+                    const dealt = _nkHit(dmgPct, null, level);
+                    _nkAbilityHitToast(dealt, 'The Juggernaut', 'Bull Barrage');
                 }
             }
             if (dir > 0 ? bx > window.innerWidth + 90 : bx < -90) {
@@ -102,25 +102,25 @@ export function _egMechBullBarrage(monster, phase) {
     });
 }
 
-export function _egMechThwompTrio(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechThwompTrio(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const followMs = [0, 900, 750, 600][p];
     const lockMs = [0, 450, 400, 350][p];
     const radius = 105;
     const dmgPct = [0, 0.24, 0.28, 0.34][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const queue = [];
     for (let i = 0; i < 3; i++) {
-        const el = _egNkEl(run, 'div', 'eg-nk-mark');
+        const el = _nkEl(run, 'div', 'eg-nk-mark');
         el.style.display = 'none';
         el.style.width = radius * 2 + 'px';
         el.style.height = radius * 2 + 'px';
         queue.push({ x: 0, y: 0, t: -i * 1300, stage: 'follow', el });
     }
-    _egNkToast('eg_mech_trio', '🚂 The Juggernaut: Thwomp Trio! Short fuses!');
-    _egNkLoop(run, (dtS) => {
+    _nkToast('eg_mech_trio', '🚂 The Juggernaut: Thwomp Trio! Short fuses!');
+    _nkLoop(run, (dtS) => {
         let pending = false;
         queue.forEach(s => {
             if (s.stage === 'done') return;
@@ -128,7 +128,7 @@ export function _egMechThwompTrio(monster, phase) {
             s.t += dtS * 1000;
             if (s.t < 0) return;
             if (s.stage === 'follow') {
-                const c = _egNkPlayerCenter();
+                const c = _nkPlayerCenter();
                 if (c) { s.x = c.x; s.y = c.y; }
                 s.el.style.display = '';
                 s.el.style.left = Math.round(s.x - radius) + 'px';
@@ -138,9 +138,9 @@ export function _egMechThwompTrio(monster, phase) {
                 if (s.t >= lockMs) {
                     s.stage = 'done';
                     s.el.remove();
-                    if (_egNkCircleHit(s.x, s.y, radius, _egNkPlayerRect(), 0)) {
-                        const dealt = _egNkHit(dmgPct, null, level);
-                        _egNkAbilityHitToast(dealt, 'The Juggernaut', 'Thwomp Trio');
+                    if (_nkCircleHit(s.x, s.y, radius, _nkPlayerRect(), 0)) {
+                        const dealt = _nkHit(dmgPct, null, level);
+                        _nkAbilityHitToast(dealt, 'The Juggernaut', 'Thwomp Trio');
                     }
                 }
             }

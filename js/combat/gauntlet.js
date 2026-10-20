@@ -19,28 +19,28 @@ import { stopTimer } from '../timer/timer.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { updateClassHUDManaBar } from '../classes/class-mana.js';
 import { _renderPlayerAvatar, _setAvatarPos } from '../sprite/player_sprite.js';
-import { _egCampaignMonsterLevel } from '../endgame/endgame-leveling.js';
-import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _campaignMonsterLevel } from '../endgame/endgame-leveling.js';
+import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _uspClearSupportBuffs } from '../skills/universal-spells.js';
-import { _egIsActive } from './combat-state.js';
-import { _egCalcPlayerDamage } from './combat-calculations.js';
-import { _egAddGold } from '../loot/loot-gold.js';
-import { _egPlayerTakeDamage } from './encounter-damage.js';
-import { _egApplyPlayerHitFeedback } from './encounter-monster-attack-feedback.js';
-import { _egAilmentsCleanup } from './combat-ailments.js';
-import { _egHazardsCleanup } from './combat-hazards-lifecycle.js';
-import { _egStopPickupSpawner } from './combat-grid-pickups-spawner.js';
-import { EG_CAMPAIGN_MONSTER_CONFIG, _egBuildCampaignMonsterList, _egCampaignRefDamage, _egEarlyEaseBlend } from './encounter-campaign-spawns.js';
-import { EG_MONSTER_ZONES } from './encounter-constants.js';
-import { _egCancelSpawnTimers, _egStartTickLoop } from './encounter-lifecycle.js';
-import { _egSpawnMonster } from './encounter-monster-spawning.js';
-import { _egRenderPanel } from './encounter.js';
+import { _isActive } from './combat-state.js';
+import { _calcPlayerDamage } from './combat-calculations.js';
+import { _addGold } from '../loot/loot-gold.js';
+import { _playerTakeDamage } from './encounter-damage.js';
+import { _applyPlayerHitFeedback } from './encounter-monster-attack-feedback.js';
+import { _ailmentsCleanup } from './combat-ailments.js';
+import { _hazardsCleanup } from './combat-hazards-lifecycle.js';
+import { _stopPickupSpawner } from './combat-grid-pickups-spawner.js';
+import { CAMPAIGN_MONSTER_CONFIG, _buildCampaignMonsterList, _campaignRefDamage, _earlyEaseBlend } from './encounter-campaign-spawns.js';
+import { MONSTER_ZONES } from './encounter-constants.js';
+import { _cancelSpawnTimers, _startTickLoop } from './encounter-lifecycle.js';
+import { _spawnMonster } from './encounter-monster-spawning.js';
+import { _renderPanel } from './encounter.js';
 
 //------------------------------------------------------------------------
 //-------------------TUNING-----------------------------------------------
 //------------------------------------------------------------------------
 
-export const EG_GAUNTLET_CONFIG = {
+export const GAUNTLET_CONFIG = {
     minMonsters: 12,
     maxMonsters: 18,
     monstersBase: 12,         // total monsters = base + level * perLevel
@@ -78,7 +78,7 @@ export const EG_GAUNTLET_CONFIG = {
     maxMonstersCap: 24,
     // Early-game ease (playtest: world 1-4 gauntlet was "impossible" on a
     // new character). Applies at low monster levels and fades out linearly
-    // with the campaign's early-ease window (EG_CAMPAIGN_MONSTER_CONFIG.
+    // with the campaign's early-ease window (CAMPAIGN_MONSTER_CONFIG.
     // earlyEaseLevels), so later gauntlets are unchanged.
     earlyCountMult: 0.35,        // monster-count multiplier at monster level 1
     earlyMinMonsters: 4,         // never fewer than this
@@ -133,7 +133,7 @@ export const EG_GAUNTLET_CONFIG = {
 // Parry tutorial (tutorial quest, final lesson): a stripped-down arena with
 // three unkillable monsters in three different spots. The player only has to
 // parry a few attacks by holding the parry key - no kills, no waves, no gold.
-export const EG_PARRY_TUTORIAL_CONFIG = {
+export const PARRY_TUTORIAL_CONFIG = {
     targetParries: 5,
     monsterCount: 3,
     zoneIndexes: [1, 5, 7],   // top-centre, bottom-left, bottom-right arena spots
@@ -160,7 +160,7 @@ const _g = {
     overlay: null,
     resizeFn: null,
     fighting: false,
-    zones: null,      // original EG_MONSTER_ZONES while the arena owns the cards
+    zones: null,      // original MONSTER_ZONES while the arena owns the cards
     tier: 'normal',
     modifier: null,   // 'lava' | 'shrink' | 'shrine'
     hazards: [],      // { x, y } arena-local centres of lava pools / the shrine
@@ -181,21 +181,21 @@ const _g = {
 //-------------------PUBLIC QUERIES---------------------------------------
 //------------------------------------------------------------------------
 
-export function _egGauntletActive() {
+export function _gauntletActive() {
     return _g.active;
 }
 
 // Melee hooks read by encounter-melee-impact.js. Active only inside an arena.
 // pre(): damage multiplier (spell-then-melee combo). post(): mana refund.
 function _installMeleeHooks() {
-    globalThis._egGauntletMeleeHooks = {
+    globalThis._gauntletMeleeHooks = {
         pre(targetId) {
             if (!_g.fighting) return 1;
-            const m = (globalThis._egMonsters || []).find(x => x.id === targetId);
+            const m = (globalThis._monsters || []).find(x => x.id === targetId);
             if (!m || !m._lastSpellHitAt) return 1;
-            if (Date.now() - m._lastSpellHitAt > EG_GAUNTLET_CONFIG.comboWindowMs) return 1;
+            if (Date.now() - m._lastSpellHitAt > GAUNTLET_CONFIG.comboWindowMs) return 1;
             m._lastSpellHitAt = 0;
-            return EG_GAUNTLET_CONFIG.comboMult;
+            return GAUNTLET_CONFIG.comboMult;
         },
         post(targetId, chargePct, wasCombo) {
             if (!_g.fighting) return;
@@ -211,9 +211,9 @@ function _installMeleeHooks() {
     // second: tapping E (a weak hit still pushed back a full amount) or
     // standing in an aura (a tick every second on every monster) can then
     // slow an attack bar but never freeze it.
-    globalThis._egGauntletPushback = (target, amount) => {
+    globalThis._gauntletPushback = (target, amount) => {
         if (!_g.fighting) return amount;
-        const cfg = EG_GAUNTLET_CONFIG;
+        const cfg = GAUNTLET_CONFIG;
         const now = Date.now();
         if (!target._gaPbAt || now - target._gaPbAt >= 1000) { target._gaPbAt = now; target._gaPbSpent = 0; }
         const room = Math.max(0, cfg.pushbackPerSecMax - (target._gaPbSpent || 0));
@@ -226,7 +226,7 @@ _installMeleeHooks();
 
 // True while a real Gauntlet fight is running (not the parry training and not
 // the briefing / between-wave moments). Gauntlet-only spells gate on this.
-export function _egGauntletFighting() {
+export function _gauntletFighting() {
     return !!(_g.active && _g.fighting && !_g.parryMode && _g.overlay);
 }
 
@@ -236,8 +236,8 @@ export function _egGauntletFighting() {
 // The cells are plain decoration - they never touch the puzzle grid and are
 // gone right after the volley. Returns how many cells were created.
 const _SUMMON_CELL_PX = 44;
-export function _egGauntletSummonRevealCells(count) {
-    if (!_egGauntletFighting()) return 0;
+export function _gauntletSummonRevealCells(count) {
+    if (!_gauntletFighting()) return 0;
     const n = Math.max(1, Math.min(10, Math.round(Number(count) || 1)));
     const arena = _g.overlay;
     const w = arena.clientWidth;
@@ -269,8 +269,8 @@ export function _egGauntletSummonRevealCells(count) {
     // Let the cells materialise, then shoot from them and fade them out.
     setTimeout(() => {
         const live = cells.filter(c => c.isConnected).map(c => c.id);
-        if (live.length && typeof globalThis._egOnProgrammaticReveal === 'function') {
-            globalThis._egOnProgrammaticReveal(live, 'ability');
+        if (live.length && typeof globalThis._onProgrammaticReveal === 'function') {
+            globalThis._onProgrammaticReveal(live, 'ability');
         }
         cells.forEach(c => c.classList.add('ga-summon-fire'));
         setTimeout(() => cells.forEach(c => c.remove()), 700);
@@ -280,10 +280,10 @@ export function _egGauntletSummonRevealCells(count) {
 
 // True when the current level's gauntlet bonus can actually be played
 // (monsterless runs have no beasts, so the bonus cannot be earned there).
-export function _egGauntletPlayable() {
+export function _gauntletPlayable() {
     if (!cur || cur.bonusType !== 'gauntlet') return false;
     if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return false;
-    return !!(cur.isMonsterLevel && _egIsActive());
+    return !!(cur.isMonsterLevel && _isActive());
 }
 
 //------------------------------------------------------------------------
@@ -304,7 +304,7 @@ function _later(fn, ms) {
 }
 
 function _alive() {
-    return (globalThis._egMonsters || []).filter(m => m.currentHP > 0).length;
+    return (globalThis._monsters || []).filter(m => m.currentHP > 0).length;
 }
 
 // Typical damage of one player action: the larger of an average projectile
@@ -314,19 +314,19 @@ function _avgHit() {
     let sum = 0;
     const n = 6;
     for (let i = 0; i < n; i++) {
-        try { sum += Number(_egCalcPlayerDamage()) || 0; } catch (e) { /* sample failed */ }
+        try { sum += Number(_calcPlayerDamage()) || 0; } catch (e) { /* sample failed */ }
     }
     const proj = Math.max(5, sum / n);
     let best = proj;
     try {
-        const st = _egComputePlayerStats() || {};
+        const st = _computePlayerStats() || {};
         const mid = (a, b) => ((Number(a) || 0) + (Number(b) || 0)) / 2;
         const melee = (mid(st.meleePhysMin, st.meleePhysMax)
             + mid(st.meleeFireMin, st.meleeFireMax) + mid(st.meleeColdMin, st.meleeColdMax)
             + mid(st.meleeLightningMin, st.meleeLightningMax) + mid(st.meleeShadowMin, st.meleeShadowMax))
             * (1 + (Number(st.meleePhysIncPct) || 0) / 100);
-        const spell = ((Number(st.spellDamageFlat) || 0) + 22 * (function(){const lv=Number(typeof globalThis._egGetPlayerLevel==='function'?globalThis._egGetPlayerLevel():0)||1;return lv<=50?1:Math.pow(75,Math.min(1,(lv-50)/40));})()) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
-        const share = EG_GAUNTLET_CONFIG.powerHitShare;
+        const spell = ((Number(st.spellDamageFlat) || 0) + 22 * (function(){const lv=Number(typeof globalThis._getPlayerLevel==='function'?globalThis._getPlayerLevel():0)||1;return lv<=50?1:Math.pow(75,Math.min(1,(lv-50)/40));})()) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
+        const share = GAUNTLET_CONFIG.powerHitShare;
         best = Math.max(best, melee * share, spell * share);
     } catch (e) { /* stats optional */ }
     return Math.max(5, best);
@@ -335,15 +335,15 @@ function _avgHit() {
 // HP each monster may have so the whole gauntlet stays within what the
 // character can really deal: a few spell casts plus sustained melee.
 function _earlyHpBudgetEach() {
-    const cfg = EG_GAUNTLET_CONFIG;
+    const cfg = GAUNTLET_CONFIG;
     try {
-        const st = _egComputePlayerStats() || {};
+        const st = _computePlayerStats() || {};
         const mid = (a, b) => ((Number(a) || 0) + (Number(b) || 0)) / 2;
         const melee = (mid(st.meleePhysMin, st.meleePhysMax)
             + mid(st.meleeFireMin, st.meleeFireMax) + mid(st.meleeColdMin, st.meleeColdMax)
             + mid(st.meleeLightningMin, st.meleeLightningMax) + mid(st.meleeShadowMin, st.meleeShadowMax))
             * (1 + (Number(st.meleePhysIncPct) || 0) / 100);
-        const spell = ((Number(st.spellDamageFlat) || 0) + 22 * (function(){const lv=Number(typeof globalThis._egGetPlayerLevel==='function'?globalThis._egGetPlayerLevel():0)||1;return lv<=50?1:Math.pow(75,Math.min(1,(lv-50)/40));})()) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
+        const spell = ((Number(st.spellDamageFlat) || 0) + 22 * (function(){const lv=Number(typeof globalThis._getPlayerLevel==='function'?globalThis._getPlayerLevel():0)||1;return lv<=50?1:Math.pow(75,Math.min(1,(lv-50)/40));})()) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
         const spellPool = (_g.totalMonsters > 0 ? spell : 0) * cfg.earlySpellCasts;
         const meleePool = Math.max(5, melee) / cfg.earlyMeleeIntervalSec * cfg.earlyFightSec;
         const total = Math.max(1, _g.totalMonsters || 1);
@@ -352,12 +352,12 @@ function _earlyHpBudgetEach() {
 }
 
 function _tierCfg() {
-    return EG_GAUNTLET_CONFIG.tiers[_g.tier] || EG_GAUNTLET_CONFIG.tiers.normal;
+    return GAUNTLET_CONFIG.tiers[_g.tier] || GAUNTLET_CONFIG.tiers.normal;
 }
 
 function _planWaves(level) {
-    const cfg = EG_GAUNTLET_CONFIG;
-    const early = _egEarlyEaseBlend(level);
+    const cfg = GAUNTLET_CONFIG;
+    const early = _earlyEaseBlend(level);
     let base = Math.max(cfg.minMonsters, Math.min(cfg.maxMonsters,
         Math.round(cfg.monstersBase + level * cfg.monstersPerLevel)));
     if (early > 0) {
@@ -410,7 +410,7 @@ function _layout() {
             bottom: r.top + r.height - 6,
         };
         if (_g.modifier === 'shrink') {
-            const cfg = EG_GAUNTLET_CONFIG;
+            const cfg = GAUNTLET_CONFIG;
             const k = Math.min(1, (Date.now() - _g.startedAt) / cfg.shrinkMs);
             const f = 1 - (1 - cfg.shrinkMinFactor) * k;
             const cx = (b.left + b.right) / 2;
@@ -440,7 +440,7 @@ function _layout() {
                 b = { ...b, top: b.top - topInset, bottom: b.bottom + bottomInset };
             }
         }
-        globalThis._egAvatarBounds = b;
+        globalThis._avatarBounds = b;
     }
 }
 
@@ -468,7 +468,7 @@ function _randomFloorSpot(r, avoidCentre) {
 }
 
 function _setupModifier() {
-    const cfg = EG_GAUNTLET_CONFIG;
+    const cfg = GAUNTLET_CONFIG;
     const r = _arenaRect();
     _g.hazards = [];
     if (!_g.overlay || !_g.modifier) return;
@@ -514,7 +514,7 @@ function _playerCentreLocal() {
 
 function _modifierTick() {
     if (!_g.modifier || !_g.fighting) return;
-    const cfg = EG_GAUNTLET_CONFIG;
+    const cfg = GAUNTLET_CONFIG;
     const now = Date.now();
     // Paused: the pools stand still, deal nothing, and the clocks below do not
     // advance (their stamps are pushed forward each tick so no time is "owed").
@@ -557,8 +557,8 @@ function _modifierTick() {
         if (inLava && now - _g.lavaAt >= cfg.lavaTickMs) {
             _g.lavaAt = now;
             const raw = Math.max(1, Math.round((Number(cur.campaignMonsterDamage) || 5) * cfg.lavaDamageMult));
-            const dealt = _egPlayerTakeDamage(raw, true, 'fire', Number(cur.monsterLevel) || 1, { isEnvironment: true });
-            if (dealt > 0) _egApplyPlayerHitFeedback(dealt, false, 'fire');
+            const dealt = _playerTakeDamage(raw, true, 'fire', Number(cur.monsterLevel) || 1, { isEnvironment: true });
+            if (dealt > 0) _applyPlayerHitFeedback(dealt, false, 'fire');
         }
     } else if (_g.modifier === 'shrine') {
         const h = _g.hazards[0];
@@ -634,7 +634,7 @@ function _hud() {
     const l = document.getElementById('ga-left');
     if (w) w.textContent = `${_tr('Wave', 'Welle')} ${Math.min(_g.wave, _g.waves.length)}/${_g.waves.length}`;
     if (_g.parryMode) {
-        const cfgP = EG_PARRY_TUTORIAL_CONFIG;
+        const cfgP = PARRY_TUTORIAL_CONFIG;
         if (w) w.textContent = '';
         if (l) l.textContent = `${_tr('Parries', 'Paraden')}: ${Math.min(_g.parries, cfgP.targetParries)}/${cfgP.targetParries}`;
         return;
@@ -652,7 +652,7 @@ function _hud() {
 // Entry point from the win flow. onDone(success) fires once the arena has
 // closed (including skip, defeat and abort).
 export function startGauntlet(onDone) {
-    if (_g.active || !_egGauntletPlayable()) { onDone(false); return; }
+    if (_g.active || !_gauntletPlayable()) { onDone(false); return; }
     _g.active = true;
     _g.onDone = onDone;
     _g.level = cur;
@@ -668,13 +668,13 @@ export function startGauntlet(onDone) {
 
     // The puzzle is over: freeze its clock and sweep the puzzle pack away.
     stopTimer();
-    _egCancelSpawnTimers();
-    try { _egStopPickupSpawner(); } catch (e) { /* spawner optional */ }
-    globalThis._egMonsters = [];
-    globalThis._egTargetId = null;
-    _egRenderPanel();
+    _cancelSpawnTimers();
+    try { _stopPickupSpawner(); } catch (e) { /* spawner optional */ }
+    globalThis._monsters = [];
+    globalThis._targetId = null;
+    _renderPanel();
 
-    const lvl = Math.max(1, Number(_egCampaignMonsterLevel(cur.gIdx)) || 1);
+    const lvl = Math.max(1, Number(_campaignMonsterLevel(cur.gIdx)) || 1);
     _g.tier = 'normal';
     _g.modifier = _MODIFIERS[Math.floor(Math.random() * _MODIFIERS.length)];
     _g.meleeStrikes = 0;
@@ -711,11 +711,11 @@ export function startParryTutorial(onDone) {
         dmgTarget: cur.campaignMonsterDamage,
     };
     stopTimer();
-    _egCancelSpawnTimers();
-    try { _egStopPickupSpawner(); } catch (e) { /* spawner optional */ }
-    globalThis._egMonsters = [];
-    globalThis._egTargetId = null;
-    _egRenderPanel();
+    _cancelSpawnTimers();
+    try { _stopPickupSpawner(); } catch (e) { /* spawner optional */ }
+    globalThis._monsters = [];
+    globalThis._targetId = null;
+    _renderPanel();
 
     _buildOverlay();
     document.body.classList.add('gauntlet-open');
@@ -723,7 +723,7 @@ export function startParryTutorial(onDone) {
 }
 
 function _beginParry() {
-    const cfg = EG_PARRY_TUTORIAL_CONFIG;
+    const cfg = PARRY_TUTORIAL_CONFIG;
     _setCenter('');
     const maxHP = Number(globalThis.playerMaxHP) || 0;
     if (maxHP > 0) globalThis.playerCurrentHP = Math.max(globalThis.playerCurrentHP, Math.round(maxHP * 0.8));
@@ -731,20 +731,20 @@ function _beginParry() {
     cur.campaignMonsterDamage = cfg.monsterDamage;
     cur.monsterLevel = 1;
     cur.gauntlet = true;
-    globalThis._egGauntletFlag = true;
-    globalThis._egGauntletMaxConcurrent = cfg.monsterCount;
+    globalThis._gauntletFlag = true;
+    globalThis._gauntletMaxConcurrent = cfg.monsterCount;
     // Held parry always lands here, and every parry is counted.
-    globalThis._egParryTutorialForce = true;
-    globalThis._egOnPlayerParry = () => {
+    globalThis._parryTutorialForce = true;
+    globalThis._onPlayerParry = () => {
         if (!_g.parryMode || !_g.fighting) return;
         _g.parries++;
         _hud();
     };
 
     // Cards render in three fixed arena spots.
-    _g.zones = EG_MONSTER_ZONES.slice();
-    EG_MONSTER_ZONES.length = 0;
-    cfg.zoneIndexes.forEach(i => EG_MONSTER_ZONES.push(_ZONE_IDS[i]));
+    _g.zones = MONSTER_ZONES.slice();
+    MONSTER_ZONES.length = 0;
+    cfg.zoneIndexes.forEach(i => MONSTER_ZONES.push(_ZONE_IDS[i]));
     _g.fighting = true;
 
     const avatar = document.getElementById('player-avatar-wrapper');
@@ -760,7 +760,7 @@ function _beginParry() {
     _g.startedAt = Date.now();
     _g.lastHp = Number(globalThis.playerCurrentHP) || 0;
     globalThis.dead = false;
-    _egStartTickLoop();
+    _startTickLoop();
     _hud();
     _parryTopUp(true);
     _g.poll = setInterval(_tick, 300);
@@ -768,22 +768,22 @@ function _beginParry() {
 
 // Keeps exactly monsterCount monsters standing (they are not meant to die).
 function _parryTopUp(staggered) {
-    const cfg = EG_PARRY_TUTORIAL_CONFIG;
+    const cfg = PARRY_TUTORIAL_CONFIG;
     const missing = cfg.monsterCount - _alive() - _g.pending;
     for (let i = 0; i < missing; i++) {
         _g.pending++;
         _later(() => {
             _g.pending = Math.max(0, _g.pending - 1);
             if (!_g.active || !_g.parryMode) return;
-            const before = new Set((globalThis._egMonsters || []).map(m => m.id));
-            _egSpawnMonster(cfg.monsterId, 1);
-            (globalThis._egMonsters || []).forEach(m => { if (!before.has(m.id)) m.noLoot = true; });
+            const before = new Set((globalThis._monsters || []).map(m => m.id));
+            _spawnMonster(cfg.monsterId, 1);
+            (globalThis._monsters || []).forEach(m => { if (!before.has(m.id)) m.noLoot = true; });
         }, staggered ? 400 + i * 600 : 200);
     }
 }
 
 function _parryTick() {
-    const cfg = EG_PARRY_TUTORIAL_CONFIG;
+    const cfg = PARRY_TUTORIAL_CONFIG;
     // Training can never kill the player: life is held above a floor.
     const maxHP = Number(globalThis.playerMaxHP) || 0;
     const floor = Math.round(maxHP * cfg.keepHpPct);
@@ -796,7 +796,7 @@ function _parryTick() {
 }
 
 function _goldFor(lvl, challengesMet) {
-    const cfg = EG_GAUNTLET_CONFIG;
+    const cfg = GAUNTLET_CONFIG;
     const base = cfg.goldBase + cfg.goldPerLevel * lvl;
     return Math.round(base * _tierCfg().gold * (1 + cfg.challengeGoldShare * challengesMet));
 }
@@ -840,7 +840,7 @@ function _renderIntro(lvl) {
 
 function _begin() {
     if (!_g.active) return;
-    const cfg = EG_GAUNTLET_CONFIG;
+    const cfg = GAUNTLET_CONFIG;
     _setCenter('');
 
     // Fighting form: life / mana topped up, absorption refilled.
@@ -853,12 +853,12 @@ function _begin() {
         globalThis.playerCurrentMana = Math.max(globalThis.playerCurrentMana || 0, Math.round(maxMana * cfg.startManaPct));
         try { updateClassHUDManaBar(); } catch (e) { /* HUD optional */ }
     }
-    try { globalThis._egPlayerAbsorptionCurrent = _egComputePlayerStats().absorption; } catch (e) { /* stats optional */ }
+    try { globalThis._playerAbsorptionCurrent = _computePlayerStats().absorption; } catch (e) { /* stats optional */ }
 
     // Monster budget: HP from the player's own hit strength, damage from
     // the campaign curve, so the fight scales with both world and gear.
-    const lvl = Math.max(1, Number(_egCampaignMonsterLevel(cur.gIdx)) || 1);
-    const early = _egEarlyEaseBlend(lvl);
+    const lvl = Math.max(1, Number(_campaignMonsterLevel(cur.gIdx)) || 1);
+    const early = _earlyEaseBlend(lvl);
     const hits = (cfg.hitsToKillBase + cfg.hitsToKillPerLevel * lvl) * (1 - (1 - cfg.earlyHitsMult) * early);
     const tier = _tierCfg();
     let hpEach = Math.round(_avgHit() * hits * tier.hpMult);
@@ -866,21 +866,21 @@ function _begin() {
         const budgetEach = _earlyHpBudgetEach() * tier.hpMult;
         if (budgetEach > 0 && budgetEach < hpEach) hpEach = Math.round(hpEach - (hpEach - budgetEach) * early);
     }
-    cur.campaignMonsterHp = Math.max(EG_CAMPAIGN_MONSTER_CONFIG.minHp, hpEach);
-    const levelDamage = _egCampaignRefDamage(lvl) * cfg.damageCampaignShare;
+    cur.campaignMonsterHp = Math.max(CAMPAIGN_MONSTER_CONFIG.minHp, hpEach);
+    const levelDamage = _campaignRefDamage(lvl) * cfg.damageCampaignShare;
     const easeDmg = 1 - (1 - cfg.earlyDamageMult) * early;
     cur.campaignMonsterDamage = Math.max(1, Math.round(levelDamage * tier.dmgMult * easeDmg));
     cur.monsterLevel = lvl;
     cur.gauntlet = true;
-    globalThis._egGauntletFlag = true;
-    globalThis._egGauntletMaxConcurrent = Math.max(1, Math.round(
+    globalThis._gauntletFlag = true;
+    globalThis._gauntletMaxConcurrent = Math.max(1, Math.round(
         cfg.maxConcurrent - (cfg.maxConcurrent - cfg.earlyConcurrent) * early));
 
     // The arena owns the monster cards: they render in its own zone, so they
     // are visible above the sealed grid instead of behind it.
-    _g.zones = EG_MONSTER_ZONES.slice();
-    EG_MONSTER_ZONES.length = 0;
-    _ZONE_IDS.forEach(z => EG_MONSTER_ZONES.push(z));
+    _g.zones = MONSTER_ZONES.slice();
+    MONSTER_ZONES.length = 0;
+    _ZONE_IDS.forEach(z => MONSTER_ZONES.push(z));
     _g.fighting = true;
 
     // Bring the sprite into the arena and keep it there.
@@ -900,7 +900,7 @@ function _begin() {
     _setupModifier();
 
     globalThis.dead = false;
-    _egStartTickLoop();
+    _startTickLoop();
     Audio_Manager.playSFX('boss_arrive');
     _spawnNextWave();
     _g.poll = setInterval(_tick, 300);
@@ -910,7 +910,7 @@ function _begin() {
 // Wave 2+ monsters may roll a counter-trait. At most one warded and one
 // phased monster per wave keeps every wave winnable with mixed tools.
 function _applyTrait(m) {
-    const cfg = EG_GAUNTLET_CONFIG;
+    const cfg = GAUNTLET_CONFIG;
     if ((Number(cur && cur.monsterLevel) || 1) < cfg.traitFreeBelowLevel) return;
     const chance = _g.wave >= 3 ? cfg.traitChanceWave3 : (_g.wave === 2 ? cfg.traitChanceWave2 : 0);
     if (!(chance > 0) || m.isBoss || Math.random() >= chance) return;
@@ -922,23 +922,23 @@ function _applyTrait(m) {
     m.gauntletTrait = trait;
     if (trait === 'warded') m.spellproofPct = cfg.wardedSpellReductionPct;
     else m.meleeproofPct = cfg.phasedMeleeReductionPct;
-    try { _egRenderPanel(); } catch (e) { /* panel optional */ }
+    try { _renderPanel(); } catch (e) { /* panel optional */ }
 }
 
 // Final-wave mini-boss: a much tougher elite with a crown. Not a framework
 // boss, so it uses the normal attack / monster-spell loop (elites cast more).
 function _makeChampion(m) {
-    const cfg = EG_GAUNTLET_CONFIG;
+    const cfg = GAUNTLET_CONFIG;
     m.gauntletTrait = 'champion';
     m.isElite = true;
-    const earlyChamp = _egEarlyEaseBlend(Number(cur && cur.monsterLevel) || 1);
+    const earlyChamp = _earlyEaseBlend(Number(cur && cur.monsterLevel) || 1);
     const champMult = cfg.championHpMult - (cfg.championHpMult - cfg.earlyChampionHpMult) * earlyChamp;
     m.maxHP = Math.round(m.maxHP * champMult);
     m.currentHP = m.maxHP;
     m.damageValue = Math.round((Number(m.damageValue) || 1) * cfg.championDmgMult);
     m.artScale = Math.max(Number(m.artScale) || 1, 1.35);
     if (m.name) m.name = `👑 ${m.name}`;
-    try { _egRenderPanel(); } catch (e) { /* panel optional */ }
+    try { _renderPanel(); } catch (e) { /* panel optional */ }
 }
 
 function _spawnNextWave() {
@@ -949,7 +949,7 @@ function _spawnNextWave() {
     _g.traitsThisWave = {};
     if (_g.wave === 1) _g.championMade = false;
     const lvl = Math.max(1, Number(cur.monsterLevel) || 1);
-    const list = _egBuildCampaignMonsterList(count, lvl);
+    const list = _buildCampaignMonsterList(count, lvl);
     _g.pending = list.length;
     _setCenter(`<div class="ga-banner">${_tr('WAVE', 'WELLE')} ${_g.wave}</div>`, 'ga-flash');
     _later(() => _setCenter(''), 1300);
@@ -957,10 +957,10 @@ function _spawnNextWave() {
         _later(() => {
             _g.pending = Math.max(0, _g.pending - 1);
             if (!_g.active) return;
-            const before = new Set((globalThis._egMonsters || []).map(m => m.id));
-            _egSpawnMonster(entry.id, entry.level || lvl);
+            const before = new Set((globalThis._monsters || []).map(m => m.id));
+            _spawnMonster(entry.id, entry.level || lvl);
             // Arena kills pay XP but never litter the sealed grid with drops.
-            (globalThis._egMonsters || []).forEach(m => {
+            (globalThis._monsters || []).forEach(m => {
                 if (before.has(m.id)) return;
                 m.noLoot = true;
                 if (_g.wave >= _g.waves.length && !_g.championMade) {
@@ -971,7 +971,7 @@ function _spawnNextWave() {
                 }
             });
             _hud();
-        }, 500 + i * EG_GAUNTLET_CONFIG.waveSpawnStaggerMs);
+        }, 500 + i * GAUNTLET_CONFIG.waveSpawnStaggerMs);
     });
     _hud();
 }
@@ -993,7 +993,7 @@ function _tick() {
     if (!_g.active) return;
     _syncArenaVisibility();
     // The player left the level / the encounter was torn down: abort quietly.
-    if (cur !== _g.level || !_egIsActive()) { _finish(false, 'aborted'); return; }
+    if (cur !== _g.level || !_isActive()) { _finish(false, 'aborted'); return; }
     if (globalThis.playerCurrentHP <= 0 && !_g.parryMode) { _finish(false, 'defeat'); return; }
     _layout();
     _hud();
@@ -1006,10 +1006,10 @@ function _tick() {
     // kill gives mana back; fades out with the other early eases.
     const aliveNow = _alive();
     if (_g.lastAlive != null && aliveNow < _g.lastAlive) {
-        const early = _egEarlyEaseBlend(Number(cur && cur.monsterLevel) || 1);
+        const early = _earlyEaseBlend(Number(cur && cur.monsterLevel) || 1);
         const maxMana = Number(globalThis.playerMaxMana) || 0;
         if (early > 0 && maxMana > 0) {
-            const gain = maxMana * EG_GAUNTLET_CONFIG.earlyManaPerKillPct * early * (_g.lastAlive - aliveNow);
+            const gain = maxMana * GAUNTLET_CONFIG.earlyManaPerKillPct * early * (_g.lastAlive - aliveNow);
             globalThis.playerCurrentMana = Math.min(maxMana, (Number(globalThis.playerCurrentMana) || 0) + gain);
             try { updateClassHUDManaBar(); } catch (e) { /* HUD optional */ }
         }
@@ -1019,7 +1019,7 @@ function _tick() {
     if (_g.wave >= _g.waves.length) { _finish(true); return; }
     const now = Date.now();
     if (!_g.breakUntil) {
-        _g.breakUntil = now + EG_GAUNTLET_CONFIG.waveBreakMs;
+        _g.breakUntil = now + GAUNTLET_CONFIG.waveBreakMs;
         _setCenter(`<div class="ga-banner ga-cleared">${_tr('Wave cleared', 'Welle besiegt')}</div>`, 'ga-flash');
         return;
     }
@@ -1029,8 +1029,8 @@ function _tick() {
     }
 }
 
-// Called by _egGameOver when the player's HP hits zero mid-gauntlet.
-export function _egGauntletOnDefeat() {
+// Called by _gameOver when the player's HP hits zero mid-gauntlet.
+export function _gauntletOnDefeat() {
     if (!_g.active) return false;
     _finish(false, 'defeat');
     return true;
@@ -1048,21 +1048,21 @@ function _finish(success, reason) {
 
     // Give the monster zones and free movement back.
     _g.fighting = false;
-    globalThis._egAvatarBounds = null;
+    globalThis._avatarBounds = null;
     if (_g.zones) {
-        EG_MONSTER_ZONES.length = 0;
-        _g.zones.forEach(z => EG_MONSTER_ZONES.push(z));
+        MONSTER_ZONES.length = 0;
+        _g.zones.forEach(z => MONSTER_ZONES.push(z));
         _g.zones = null;
     }
 
     // Field cleanup (the encounter itself is torn down by normal navigation).
-    _egCancelSpawnTimers();
-    globalThis._egMonsters = [];
-    globalThis._egTargetId = null;
-    try { _egAilmentsCleanup(); } catch (e) { /* cleanup is best-effort */ }
-    try { _egHazardsCleanup(); } catch (e) { /* cleanup is best-effort */ }
+    _cancelSpawnTimers();
+    globalThis._monsters = [];
+    globalThis._targetId = null;
+    try { _ailmentsCleanup(); } catch (e) { /* cleanup is best-effort */ }
+    try { _hazardsCleanup(); } catch (e) { /* cleanup is best-effort */ }
     try { _uspClearSupportBuffs(); } catch (e) { /* cleanup is best-effort */ }
-    try { _egRenderPanel(); } catch (e) { /* panel optional */ }
+    try { _renderPanel(); } catch (e) { /* panel optional */ }
 
     if (cur) {
         cur.gauntlet = false;
@@ -1071,7 +1071,7 @@ function _finish(success, reason) {
             if (_g.pre.dmgTarget === undefined) delete cur.campaignMonsterDamage; else cur.campaignMonsterDamage = _g.pre.dmgTarget;
         }
     }
-    globalThis._egGauntletFlag = false;
+    globalThis._gauntletFlag = false;
     globalThis.dead = true;
 
     // A lost gauntlet leaves the player as they were before it started.
@@ -1095,8 +1095,8 @@ function _finish(success, reason) {
 
     if (reason === 'aborted') {
         _g.parryMode = false;
-        globalThis._egParryTutorialForce = false;
-        globalThis._egOnPlayerParry = null;
+        globalThis._parryTutorialForce = false;
+        globalThis._onPlayerParry = null;
         finish(false);
         return;
     }
@@ -1107,7 +1107,7 @@ function _finish(success, reason) {
     if (success && _g.parryMode) {
         winHtml = `<div class="ga-banner ga-win">🛡 ${_tr('PARRY MASTERED!', 'PARADE GEMEISTERT!')}</div>`;
     } else if (success) {
-        const cfg = EG_GAUNTLET_CONFIG;
+        const cfg = GAUNTLET_CONFIG;
         const elapsedMs = Date.now() - _g.startedAt;
         const goals = [
             { ok: !_g.damaged, label: _tr('Untouched', 'Unberührt') },
@@ -1117,7 +1117,7 @@ function _finish(success, reason) {
         const metCount = goals.filter(x => x.ok).length;
         const lvlNow = Math.max(1, Number(cur && cur.monsterLevel) || 1);
         const gold = _goldFor(lvlNow, metCount);
-        try { _egAddGold(gold); } catch (e) { /* gold optional */ }
+        try { _addGold(gold); } catch (e) { /* gold optional */ }
         winHtml = `<div class="ga-banner ga-win">⚔ ${_tr('GAUNTLET CLEARED!', 'GAUNTLET GEMEISTERT!')}</div>
             <div class="ga-goals">${goals.map(x => `<span class="${x.ok ? 'ga-goal-ok' : 'ga-goal-no'}">${x.ok ? '✔' : '✖'} ${x.label}</span>`).join('')}
             <span class="ga-gold">💰 +${gold} ${_tr('gold', 'Gold')}</span></div>`;
@@ -1128,8 +1128,8 @@ function _finish(success, reason) {
     'ga-flash ga-result');
     const wasParry = _g.parryMode;
     _g.parryMode = false;
-    globalThis._egParryTutorialForce = false;
-    globalThis._egOnPlayerParry = null;
-    setTimeout(() => finish(success), wasParry ? EG_PARRY_TUTORIAL_CONFIG.resultBannerMs
-        : (success ? EG_GAUNTLET_CONFIG.resultBannerMs + 1200 : EG_GAUNTLET_CONFIG.resultBannerMs));
+    globalThis._parryTutorialForce = false;
+    globalThis._onPlayerParry = null;
+    setTimeout(() => finish(success), wasParry ? PARRY_TUTORIAL_CONFIG.resultBannerMs
+        : (success ? GAUNTLET_CONFIG.resultBannerMs + 1200 : GAUNTLET_CONFIG.resultBannerMs));
 }

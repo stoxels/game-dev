@@ -1,4 +1,4 @@
-import { _egBuildChainPool } from '../combat/encounter-chain-pool.js';
+import { _buildChainPool } from '../combat/encounter-chain-pool.js';
 import { ALL } from '../levels/levels.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { isGatedLevel } from '../quiz-exercise/mathgate.js';
@@ -21,11 +21,11 @@ import { t } from '../translation/translations.js';
       1. picks a random eligible puzzle from ALL as the seed level
       2. stamps the map's parameters onto that level object
       3. calls startLevel() on it, which (via start-level.js) sees
-          isMonsterLevel === true and kicks off _egStartEncounter()
+          isMonsterLevel === true and kicks off _startEncounter()
       4. the existing chain system in endgame-encounter-chain.js takes it
          from there (spawns, boss threshold, puzzle chaining, loot, etc.)
 
-    The seed level is flagged isTestMapSeed so _egChainCleanup() (extended
+    The seed level is flagged isTestMapSeed so _chainCleanup() (extended
     in endgame-encounter-chain.js) strips all the injected fields back off
     it once the run ends - it returns to being a normal story puzzle.
     ========================================================================
@@ -39,7 +39,7 @@ import { t } from '../translation/translations.js';
 //------------------------------------------------------------------------
 
 // Five test maps, roughly increasing in difficulty/juice (ARPG-map style).
-// puzzlePool criteria are the same shape _egBuildChainPool() already
+// puzzlePool criteria are the same shape _buildChainPool() already
 // understands (minCells/maxCells/minRows/maxRows/minCols/maxCols/worlds/
 // excludeWorlds) - see endgame-encounter-chain.js.
 // DISABLED: Old test maps up to level 160 - might revisit in future, but for now we
@@ -65,8 +65,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 3,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 100 },
-        egTimeLimit: 900,     // 15 min baseline, in seconds
-        egMaxMistakes: 5,
+        chainTimeLimit: 900,     // 15 min baseline, in seconds
+        chainMaxMistakes: 5,
     },
 
 
@@ -83,8 +83,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 3,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 150 },
-        egTimeLimit: 900,     // 10 min baseline, in seconds
-        egMaxMistakes: 5,
+        chainTimeLimit: 900,     // 10 min baseline, in seconds
+        chainMaxMistakes: 5,
     },
 
     {
@@ -100,8 +100,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 3,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 150 },
-        egTimeLimit: 900,     // 10 min baseline, in seconds
-        egMaxMistakes: 5,
+        chainTimeLimit: 900,     // 10 min baseline, in seconds
+        chainMaxMistakes: 5,
     },
 
     {
@@ -117,8 +117,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 3,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 150 },
-        egTimeLimit: 900,     // 10 min baseline, in seconds
-        egMaxMistakes: 5,
+        chainTimeLimit: 900,     // 10 min baseline, in seconds
+        chainMaxMistakes: 5,
     },
 
     {
@@ -134,8 +134,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 3,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 150 },
-        egTimeLimit: 900,     // 10 min baseline, in seconds
-        egMaxMistakes: 7,
+        chainTimeLimit: 900,     // 10 min baseline, in seconds
+        chainMaxMistakes: 7,
     },
 
     {
@@ -151,8 +151,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 3,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 150 },
-        egTimeLimit: 900,     // 10 min baseline, in seconds
-        egMaxMistakes: 7,
+        chainTimeLimit: 900,     // 10 min baseline, in seconds
+        chainMaxMistakes: 7,
     },
 
     {
@@ -168,8 +168,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 3,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 150 },
-        egTimeLimit: 900,     // 10 min baseline, in seconds
-        egMaxMistakes: 7,
+        chainTimeLimit: 900,     // 10 min baseline, in seconds
+        chainMaxMistakes: 7,
     },
 
     {
@@ -185,8 +185,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 3,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 150 },
-        egTimeLimit: 900,     // 10 min baseline, in seconds
-        egMaxMistakes: 7,
+        chainTimeLimit: 900,     // 10 min baseline, in seconds
+        chainMaxMistakes: 7,
     },
 
 
@@ -203,8 +203,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 3,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 150 },
-        egTimeLimit: 900,
-        egMaxMistakes: 8,
+        chainTimeLimit: 900,
+        chainMaxMistakes: 8,
     },
 
     {
@@ -220,8 +220,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 3,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 150 },
-        egTimeLimit: 900,
-        egMaxMistakes: 8,
+        chainTimeLimit: 900,
+        chainMaxMistakes: 8,
     },
 
     {
@@ -237,8 +237,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 3,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 150 },
-        egTimeLimit: 1200,
-        egMaxMistakes: 9,
+        chainTimeLimit: 1200,
+        chainMaxMistakes: 9,
     },
 
     {
@@ -254,8 +254,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 3,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 150 },
-        egTimeLimit: 1200,
-        egMaxMistakes: 9,
+        chainTimeLimit: 1200,
+        chainMaxMistakes: 9,
     },
 
 
@@ -272,8 +272,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 5,
         requiredQuestions: 1,
         puzzlePool: { minCells: 10, maxCells: 150 },
-        egTimeLimit: 600,     // 10 min baseline, in seconds
-        egMaxMistakes: 5,
+        chainTimeLimit: 600,     // 10 min baseline, in seconds
+        chainMaxMistakes: 5,
     },
     {
         id: 'bayesian_depths',
@@ -288,8 +288,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 6,
         requiredQuestions: 1,
         puzzlePool: { minCells: 10, maxCells: 200 },
-        egTimeLimit: 600,     // 10 min baseline, in seconds
-        egMaxMistakes: 5,
+        chainTimeLimit: 600,     // 10 min baseline, in seconds
+        chainMaxMistakes: 5,
     },
     {
         id: 'null_hypothesis_void',
@@ -304,8 +304,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 8,
         requiredQuestions: 1,
         puzzlePool: { minCells: 10, maxCells: 300 },
-        egTimeLimit: 900,     // 15 min baseline, in seconds
-        egMaxMistakes: 5,
+        chainTimeLimit: 900,     // 15 min baseline, in seconds
+        chainMaxMistakes: 5,
     },
     {
         id: 'nexus_crucible',
@@ -321,8 +321,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 10,
         requiredQuestions: 2,
         puzzlePool: { minCells: 10 },
-        egTimeLimit: 1200,     // 20 min baseline, in seconds
-        egMaxMistakes: 10,
+        chainTimeLimit: 1200,     // 20 min baseline, in seconds
+        chainMaxMistakes: 10,
     },
 
     {
@@ -338,8 +338,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 4,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 200 },
-        egTimeLimit: 1200,
-        egMaxMistakes: 9,
+        chainTimeLimit: 1200,
+        chainMaxMistakes: 9,
     },
 
     {
@@ -355,8 +355,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 6,
         requiredQuestions: 1,
         puzzlePool: { minCells: 10, maxCells: 200 },
-        egTimeLimit: 1200,
-        egMaxMistakes: 8,
+        chainTimeLimit: 1200,
+        chainMaxMistakes: 8,
     },
 
     {
@@ -372,8 +372,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 4,
         requiredQuestions: 0,
         puzzlePool: { minCells: 20, maxCells: 250 },
-        egTimeLimit: 1200,
-        egMaxMistakes: 10,
+        chainTimeLimit: 1200,
+        chainMaxMistakes: 10,
     },
 
     {
@@ -389,8 +389,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 5,
         requiredQuestions: 0,
         puzzlePool: { minCells: 20, maxCells: 250 },
-        egTimeLimit: 1200,
-        egMaxMistakes: 10,
+        chainTimeLimit: 1200,
+        chainMaxMistakes: 10,
     },
 
     {
@@ -406,8 +406,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 7,
         requiredQuestions: 1,
         puzzlePool: { minCells: 20, maxCells: 300 },
-        egTimeLimit: 1500,
-        egMaxMistakes: 8,
+        chainTimeLimit: 1500,
+        chainMaxMistakes: 8,
     },
 
     {
@@ -423,8 +423,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 5,
         requiredQuestions: 0,
         puzzlePool: { minCells: 20, maxCells: 300 },
-        egTimeLimit: 1500,
-        egMaxMistakes: 10,
+        chainTimeLimit: 1500,
+        chainMaxMistakes: 10,
     },
 
     {
@@ -440,8 +440,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 5,
         requiredQuestions: 0,
         puzzlePool: { minCells: 20, maxCells: 300 },
-        egTimeLimit: 1500,
-        egMaxMistakes: 10,
+        chainTimeLimit: 1500,
+        chainMaxMistakes: 10,
     },
 
     {
@@ -457,8 +457,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 8,
         requiredQuestions: 1,
         puzzlePool: { minCells: 20, maxCells: 350 },
-        egTimeLimit: 1500,
-        egMaxMistakes: 9,
+        chainTimeLimit: 1500,
+        chainMaxMistakes: 9,
     },
 
     {
@@ -474,8 +474,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 6,
         requiredQuestions: 0,
         puzzlePool: { minCells: 30, maxCells: 350 },
-        egTimeLimit: 1500,
-        egMaxMistakes: 10,
+        chainTimeLimit: 1500,
+        chainMaxMistakes: 10,
     },
 
     {
@@ -491,8 +491,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 6,
         requiredQuestions: 0,
         puzzlePool: { minCells: 30, maxCells: 350 },
-        egTimeLimit: 1500,
-        egMaxMistakes: 10,
+        chainTimeLimit: 1500,
+        chainMaxMistakes: 10,
     },
 
     {
@@ -508,8 +508,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 8,
         requiredQuestions: 1,
         puzzlePool: { minCells: 30, maxCells: 400 },
-        egTimeLimit: 1800,
-        egMaxMistakes: 9,
+        chainTimeLimit: 1800,
+        chainMaxMistakes: 9,
     },
 
     {
@@ -525,8 +525,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 6,
         requiredQuestions: 0,
         puzzlePool: { minCells: 30, maxCells: 400 },
-        egTimeLimit: 1800,
-        egMaxMistakes: 10,
+        chainTimeLimit: 1800,
+        chainMaxMistakes: 10,
     },
 
     {
@@ -542,8 +542,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 7,
         requiredQuestions: 0,
         puzzlePool: { minCells: 30, maxCells: 400 },
-        egTimeLimit: 1800,
-        egMaxMistakes: 10,
+        chainTimeLimit: 1800,
+        chainMaxMistakes: 10,
     },
 
     {
@@ -559,8 +559,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 9,
         requiredQuestions: 1,
         puzzlePool: { minCells: 40, maxCells: 450 },
-        egTimeLimit: 1800,
-        egMaxMistakes: 9,
+        chainTimeLimit: 1800,
+        chainMaxMistakes: 9,
     },
 
     {
@@ -576,8 +576,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 7,
         requiredQuestions: 0,
         puzzlePool: { minCells: 40, maxCells: 450 },
-        egTimeLimit: 1800,
-        egMaxMistakes: 10,
+        chainTimeLimit: 1800,
+        chainMaxMistakes: 10,
     },
 
     {
@@ -594,8 +594,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 9,
         requiredQuestions: 2,
         puzzlePool: { minCells: 40, maxCells: 500 },
-        egTimeLimit: 2100,
-        egMaxMistakes: 9,
+        chainTimeLimit: 2100,
+        chainMaxMistakes: 9,
     },
 
     {
@@ -611,8 +611,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 8,
         requiredQuestions: 0,
         puzzlePool: { minCells: 40, maxCells: 500 },
-        egTimeLimit: 2100,
-        egMaxMistakes: 10,
+        chainTimeLimit: 2100,
+        chainMaxMistakes: 10,
     },
 
     {
@@ -628,8 +628,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 8,
         requiredQuestions: 0,
         puzzlePool: { minCells: 50, maxCells: 500 },
-        egTimeLimit: 2100,
-        egMaxMistakes: 10,
+        chainTimeLimit: 2100,
+        chainMaxMistakes: 10,
     },
 
     {
@@ -645,8 +645,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 10,
         requiredQuestions: 2,
         puzzlePool: { minCells: 50, maxCells: 550 },
-        egTimeLimit: 2100,
-        egMaxMistakes: 9,
+        chainTimeLimit: 2100,
+        chainMaxMistakes: 9,
     },
 
     {
@@ -663,8 +663,8 @@ export const EG_TEST_MAPS = [
         requiredPuzzles: 12,
         requiredQuestions: 3,
         puzzlePool: { minCells: 50 },
-        egTimeLimit: 2400,
-        egMaxMistakes: 12,
+        chainTimeLimit: 2400,
+        chainMaxMistakes: 12,
     },
 
     DISABLED LEGACY TEST MAPS END */
@@ -676,14 +676,14 @@ export const EG_TEST_MAPS = [
 //------------------------------------------------------------------------
 
 // Picks a random eligible puzzle (gi) to seed a test map run.
-// Reuses _egBuildChainPool() from endgame-encounter-chain.js so the same
+// Reuses _buildChainPool() from endgame-encounter-chain.js so the same
 // exclusion rules apply (no sandbox levels, no already-map-flagged levels).
 // Additionally excludes math-gated levels, since test runs bypass the
 // normal gate-check flow entirely.
 export function _egtPickSeedGi(mapDef) {
-    if (typeof _egBuildChainPool !== 'function') return null;
+    if (typeof _buildChainPool !== 'function') return null;
 
-    let pool = _egBuildChainPool(mapDef.puzzlePool || {});
+    let pool = _buildChainPool(mapDef.puzzlePool || {});
     if (typeof isGatedLevel === 'function') {
         pool = pool.filter(level => !isGatedLevel(level.gIdx));
     }
@@ -711,7 +711,7 @@ export function _egLaunchTestMap(mapId) {
 
     const level = ALL[gi];
     level.isMonsterLevel = true;
-    level.isTestMapSeed = true;   // cleaned up automatically by _egChainCleanup()
+    level.isTestMapSeed = true;   // cleaned up automatically by _chainCleanup()
     level.monsterLevel = mapDef.monsterLevel;
     // Low tiers ramp gently (3/3/4/5 enemies for tiers 1-4), full cap of 6
     // from tier 5 onwards. Higher tiers keep their map-defined cap.
@@ -724,12 +724,12 @@ export function _egLaunchTestMap(mapId) {
     level.requiredPuzzles = mapDef.requiredPuzzles;
     level.requiredQuestions = mapDef.requiredQuestions;
     level.puzzlePool = mapDef.puzzlePool;
-    level.egTimeLimit = mapDef.egTimeLimit;
-    level.egMaxMistakes = mapDef.egMaxMistakes;
+    level.chainTimeLimit = mapDef.chainTimeLimit;
+    level.chainMaxMistakes = mapDef.chainMaxMistakes;
 
     // Tells goToLevelSelect() (screens.js) to route back to this hub
     // instead of the normal world/level-select screen when the run ends.
-    window._egIsTestRun = true;
+    window._isTestRun = true;
 
     globalThis.startLevel(gi);
 }

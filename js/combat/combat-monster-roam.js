@@ -1,7 +1,7 @@
 import { t } from '../translation/translations.js';
-import { EG_MONSTER_ZONES, _egRenderPanel, _egRestartFlashClass } from './encounter.js';
-import { _egShowStatusLabel } from './encounter-monster-damage.js';
-import { _egIsActive } from './combat-state.js';
+import { MONSTER_ZONES, _renderPanel, _restartFlashClass } from './encounter.js';
+import { _showStatusLabel } from './encounter-monster-damage.js';
+import { _isActive } from './combat-state.js';
 import { setPuzzleMonsterRoom } from '../grid-scaling.js';
 
 // endgame-monster-roam.js
@@ -13,89 +13,89 @@ import { setPuzzleMonsterRoom } from '../grid-scaling.js';
 // motion is gone by design - monsters sit still in their spawn zone panel.
 //
 // What remains:
-//   - _egRoamShouldRoam() always returns false so _egRenderMonstersIntoZones
+//   - _roamShouldRoam() always returns false so _renderMonstersIntoZones
 //     keeps every normal monster in its static panel.
-//   - _egRoamSync/_egRoamTeardown only clear the legacy #eg-roam-layer (old
+//   - _roamSync/_roamTeardown only clear the legacy #eg-roam-layer (old
 //     saves / cached DOM) and stop the driver.
-//   - _egTryMonsterMeleeSidestep() is the ONLY movement left: an occasional,
+//   - _tryMonsterMeleeSidestep() is the ONLY movement left: an occasional,
 //     melee-triggered sidestep to a different zone panel. Called from
-//     _egApplyPlayerMeleeImpact after a successful hit, so standing still
+//     _applyPlayerMeleeImpact after a successful hit, so standing still
 //     and spamming E sometimes forces the player to walk back into range.
 //     Chance is lore-weighted (vermin dart, brutes plod) with a per-monster
 //     cooldown so it feels alive but never jittery.
 // Loads AFTER endgame-encounter.js (calls its render helpers; encounter.js
-// calls back into _egRoamShouldRoam/_egRoamSync/_egRoamTeardown guarded).
+// calls back into _roamShouldRoam/_roamSync/_roamTeardown guarded).
 
-const EG_ROAM_LAYER_ID = 'eg-roam-layer';
+const ROAM_LAYER_ID = 'eg-roam-layer';
 
 // Minimum time between two sidesteps of the SAME monster (ms). Keeps the
 // behaviour occasional even when the player machine-guns E.
-const EG_SIDESTEP_COOLDOWN_MS = 5000;
+const SIDESTEP_COOLDOWN_MS = 5000;
 // Grace period after spawn during which a monster never sidesteps (ms) -
 // it should first be targetable where it appeared.
-const EG_SIDESTEP_SPAWN_GRACE_MS = 3500;
+const SIDESTEP_SPAWN_GRACE_MS = 3500;
 
 // Lore-weighted sidestep chance per successful melee hit. Small vermin dart
 // around, medium beasts shift sometimes, heavy brutes barely move.
-const EG_SIDESTEP_NIMBLE = new Set([
+const SIDESTEP_NIMBLE = new Set([
     'rat', 'bat', 'bee', 'mosquito', 'ant', 'moth', 'spider', 'ladybug',
     'frog', 'beetle', 'owl'
 ]);
-const EG_SIDESTEP_HEAVY = new Set([
+const SIDESTEP_HEAVY = new Set([
     'golem', 'golem_iron', 'ogre', 'troll', 'rhino', 'bison', 'zombie',
     'oni', 'volcano', 'meteor', 'moon', 'brain'
 ]);
 
 // Permanent patrol is disabled - monsters hold ground in static panels.
 // Always false so the zone renderer never skips normal monsters.
-export function _egRoamShouldRoam(m) {
+export function _roamShouldRoam(m) {
     return false;
 }
 
 // Legacy layer cleanup. The patrol owned #eg-roam-layer; it may still exist
 // in a running session after this patch. Empty it so no ghost cards linger.
-function _egRoamClearLegacyLayer() {
+function _roamClearLegacyLayer() {
     try {
-        const layer = document.getElementById(EG_ROAM_LAYER_ID);
+        const layer = document.getElementById(ROAM_LAYER_ID);
         if (layer) layer.innerHTML = '';
     } catch (e) { /* DOM not ready - nothing to clear */ }
     try {
-        if (typeof _egMonsters !== 'undefined') {
-            globalThis._egMonsters.forEach(m => { if (m) m.isRoaming = false; });
+        if (typeof _monsters !== 'undefined') {
+            globalThis._monsters.forEach(m => { if (m) m.isRoaming = false; });
         }
     } catch (e) {}
 }
 
-// Called from _egRenderPanel after the static zones render. No roaming cards
+// Called from _renderPanel after the static zones render. No roaming cards
 // are built anymore - just make sure the legacy layer stays empty.
-export function _egRoamSync() {
-    _egRoamClearLegacyLayer();
-    _egStartZoneLayoutSync();
+export function _roamSync() {
+    _roamClearLegacyLayer();
+    _startZoneLayoutSync();
 }
 
 // Removes every legacy roaming card and stops any old driver. Called from
-// _egHideMonsterPanel (encounter over) and safe to call anytime.
-export function _egRoamTeardown() {
-    _egRoamClearLegacyLayer();
-    _egZoneBandAsked = false;
+// _hideMonsterPanel (encounter over) and safe to call anytime.
+export function _roamTeardown() {
+    _roamClearLegacyLayer();
+    _zoneBandAsked = false;
 }
 
 // No-op kept so any stale rAF handle from a pre-patch session settles.
 // The patrol tick is gone; monsters no longer move on their own.
 // SUSPECTED DEAD: retained for legacy-session compatibility; no current caller.
-function _egRoamEnsureTick() {}
+function _roamEnsureTick() {}
 // SUSPECTED DEAD: retained for legacy-session compatibility; no current caller.
-function _egRoamTick() {}
+function _roamTick() {}
 
 // Returns the sidestep chance (0..1) for one successful melee hit on `m`.
 // Nimble vermin dart often, heavies plod, everyone else sits in between.
 // Ranged monsters strafe a touch more - they dislike blades up close.
-function _egMonsterSidestepChance(m) {
+function _monsterSidestepChance(m) {
     const baseId = (m && (m.baseId || m.id || '')) + '';
     const key = baseId.split('_')[0];
     let chance = 0.20;
-    if (EG_SIDESTEP_NIMBLE.has(baseId) || EG_SIDESTEP_NIMBLE.has(key)) chance = 0.32;
-    else if (EG_SIDESTEP_HEAVY.has(baseId) || EG_SIDESTEP_HEAVY.has(key)) chance = 0.10;
+    if (SIDESTEP_NIMBLE.has(baseId) || SIDESTEP_NIMBLE.has(key)) chance = 0.32;
+    else if (SIDESTEP_HEAVY.has(baseId) || SIDESTEP_HEAVY.has(key)) chance = 0.10;
     if (m && m.attackType === 'ranged') chance += 0.05;
     if (m && m.isBoss) chance = 0;
     return Math.max(0, Math.min(0.45, chance));
@@ -103,8 +103,8 @@ function _egMonsterSidestepChance(m) {
 
 // Picks a new zone panel for a sidestep: a different panel than `fromZone`
 // that still has room, so cards never pile up.
-function _egPickSidestepZone(monster, fromZone) {
-    return _egPickRoomyZone(fromZone, monster && monster.id);
+function _pickSidestepZone(monster, fromZone) {
+    return _pickRoomyZone(fromZone, monster && monster.id);
 }
 
 // The ONLY monster movement left: after a successful melee hit, sometimes
@@ -112,11 +112,11 @@ function _egPickSidestepZone(monster, fromZone) {
 // different zone panel. Re-renders the panel, keeps the target locked, and
 // flashes a small status label so the hop reads as a dodge, not a glitch.
 // No-ops for bosses, tutorial runs, dead targets and single-zone layouts.
-export function _egTryMonsterMeleeSidestep(targetId) {
+export function _tryMonsterMeleeSidestep(targetId) {
     try {
-        if (typeof _egMonsters === 'undefined') return;
-        if (typeof _egIsActive === 'function' && !_egIsActive()) return;
-        const m = globalThis._egMonsters.find(x => x && x.id === targetId);
+        if (typeof _monsters === 'undefined') return;
+        if (typeof _isActive === 'function' && !_isActive()) return;
+        const m = globalThis._monsters.find(x => x && x.id === targetId);
         if (!m || m.currentHP <= 0) return;
         if (m.isBoss || m.isSacrificialZombie || m.isDynamoConductor) return;
         try {
@@ -124,29 +124,29 @@ export function _egTryMonsterMeleeSidestep(targetId) {
         } catch (e) {}
         const now = (typeof Date !== 'undefined' && Date.now) ? Date.now() : 0;
         if (m._sidestepCdUntil && now < m._sidestepCdUntil) return;
-        if (m._spawnedAt && (now - m._spawnedAt) < EG_SIDESTEP_SPAWN_GRACE_MS) return;
-        const chance = _egMonsterSidestepChance(m);
+        if (m._spawnedAt && (now - m._spawnedAt) < SIDESTEP_SPAWN_GRACE_MS) return;
+        const chance = _monsterSidestepChance(m);
         if (!(chance > 0) || Math.random() >= chance) return;
         const fromZone = m.zoneId || 'eg-monster-panel';
-        const toZone = _egPickSidestepZone(m, fromZone);
+        const toZone = _pickSidestepZone(m, fromZone);
         if (!toZone || toZone === fromZone) return;
         m.zoneId = toZone;
-        m._sidestepCdUntil = now + EG_SIDESTEP_COOLDOWN_MS
+        m._sidestepCdUntil = now + SIDESTEP_COOLDOWN_MS
             + Math.floor(Math.random() * 2500);
-        if (typeof _egRenderPanel === 'function') _egRenderPanel();
+        if (typeof _renderPanel === 'function') _renderPanel();
         // Small "sidestep!" label on the fresh card so the move reads.
         try {
             const label = (typeof t === 'function' ? t('eg_melee_sidestep') : '') || 'sidesteps!';
-            if (label && label !== 'eg_melee_sidestep' && typeof _egShowStatusLabel === 'function') {
-                _egShowStatusLabel(m.id, '↔ ' + label);
-            } else if (typeof _egShowStatusLabel === 'function') {
-                _egShowStatusLabel(m.id, '↔ …');
+            if (label && label !== 'eg_melee_sidestep' && typeof _showStatusLabel === 'function') {
+                _showStatusLabel(m.id, '↔ ' + label);
+            } else if (typeof _showStatusLabel === 'function') {
+                _showStatusLabel(m.id, '↔ …');
             }
         } catch (e) {}
         try {
             const card = document.getElementById('eg-card-' + m.id);
-            if (card && typeof _egRestartFlashClass === 'function') {
-                _egRestartFlashClass(card, 'eg-flash-cleave');
+            if (card && typeof _restartFlashClass === 'function') {
+                _restartFlashClass(card, 'eg-flash-cleave');
             }
         } catch (e) {}
     } catch (e) {}
@@ -166,33 +166,33 @@ export function _egTryMonsterMeleeSidestep(targetId) {
 // and is never picked for a spawn. #eg-monster-panel (bottom-right dock)
 // stays the tutorial's dock and the last-resort fallback.
 
-const EG_ZONE_GAP = 16;                       // clear space between cards and the puzzle table
-const EG_ZONE_EDGE = 8;                       // clear space to the screen edge
+const ZONE_GAP = 16;                       // clear space between cards and the puzzle table
+const ZONE_EDGE = 8;                       // clear space to the screen edge
 // Card model: art frame is R px wide (96 * artScale; bosses 144 * artScale), the
 // card adds ~20px of side margin and ~66px of bars / badges below the art.
-// Zones shrink their cards (--eg-zs) down to EG_ZONE_MIN_SCALE to fit.
-const EG_ZONE_ART_DEFAULT = 125;
-const EG_ZONE_CARD_PAD_W = 20;
-const EG_ZONE_CARD_PAD_H = 66;
-const EG_ZONE_MIN_SCALE = 0.55;
-const EG_ZONE_MIN_SLOTS = 3;      // fewer card slots than this around the grid -> shrink the grid a little
-const EG_ZONE_FALLBACK = 'eg-monster-panel';
-const EG_ZONE_REGIONS = {
+// Zones shrink their cards (--eg-zs) down to ZONE_MIN_SCALE to fit.
+const ZONE_ART_DEFAULT = 125;
+const ZONE_CARD_PAD_W = 20;
+const ZONE_CARD_PAD_H = 66;
+const ZONE_MIN_SCALE = 0.55;
+const ZONE_MIN_SLOTS = 3;      // fewer card slots than this around the grid -> shrink the grid a little
+const ZONE_FALLBACK = 'eg-monster-panel';
+const ZONE_REGIONS = {
     left: 'eg-panel-left',
     right: 'eg-panel-right',
     top: 'eg-panel-top-corner',
     bottom: 'eg-panel-bottom'
 };
 // Fixed HUD block in the top-left corner (timer, mistakes, CLUES buttons).
-const EG_ZONE_TOPLEFT_HUD = { l: 0, t: 0, r: 272, b: 98 };
+const ZONE_TOPLEFT_HUD = { l: 0, t: 0, r: 272, b: 98 };
 // Elements that must stay clear (read live, only when visible).
-const EG_ZONE_OBSTACLE_SELECTORS = ['#inv-panel', '.skill-hotbar', '#zoom-bar', '#hud-level-name', '#class-hud-panel'];
+const ZONE_OBSTACLE_SELECTORS = ['#inv-panel', '.skill-hotbar', '#zoom-bar', '#hud-level-name', '#class-hud-panel'];
 
-let _egZoneLayoutTimer = null;
-let _egZoneLayoutSig = '';
-let _egZoneBandAsked = false;     // the grid was already shrunk once this encounter to make room
+let _zoneLayoutTimer = null;
+let _zoneLayoutSig = '';
+let _zoneBandAsked = false;     // the grid was already shrunk once this encounter to make room
 
-function _egZoneRect(el, pad) {
+function _zoneRect(el, pad) {
     if (!el) return null;
     const r = el.getBoundingClientRect();
     if (!(r.width > 0 && r.height > 0)) return null;
@@ -200,7 +200,7 @@ function _egZoneRect(el, pad) {
 }
 
 // Cuts `o` out of `reg`, keeping whichever remaining side is largest.
-function _egClipRegion(reg, o) {
+function _clipRegion(reg, o) {
     if (!reg) return null;
     if (o.r <= reg.l || o.l >= reg.r || o.b <= reg.t || o.t >= reg.b) return reg;
     const cands = [
@@ -220,46 +220,46 @@ function _egClipRegion(reg, o) {
 
 // Art size (px) of the biggest monster that is alive, or a typical size when
 // none is spawned yet. Bosses use the larger boss frame.
-function _egZoneRefArt() {
-    let r = EG_ZONE_ART_DEFAULT;
-    (globalThis._egMonsters || []).forEach(m => {
+function _zoneRefArt() {
+    let r = ZONE_ART_DEFAULT;
+    (globalThis._monsters || []).forEach(m => {
         if (!m || m.isSacrificialZombie || m.isDynamoConductor) return;
         r = Math.max(r, (m.isBoss ? 144 : 96) * (Number(m.artScale) || 1));
     });
     return Math.round(r);
 }
 
-function _egZoneLayoutAllowed() {
-    if (typeof EG_MONSTER_ZONES === 'undefined') return false;
-    // The gauntlet arena swaps EG_MONSTER_ZONES for its own ga-zone-* spots.
-    if (!Object.values(EG_ZONE_REGIONS).some(z => EG_MONSTER_ZONES.includes(z))) return false;
+function _zoneLayoutAllowed() {
+    if (typeof MONSTER_ZONES === 'undefined') return false;
+    // The gauntlet arena swaps MONSTER_ZONES for its own ga-zone-* spots.
+    if (!Object.values(ZONE_REGIONS).some(z => MONSTER_ZONES.includes(z))) return false;
     // The tutorial parks its monster in the bottom dock on purpose.
     try {
-        if (typeof _tqIsTutorialActive === 'function' && !globalThis._egParryTutorialForce
+        if (typeof _tqIsTutorialActive === 'function' && !globalThis._parryTutorialForce
             && globalThis._tqIsTutorialActive()) return false;
     } catch (e) {}
     return true;
 }
 
 // Computes the free regions around the puzzle table: { left, right, top, bottom }.
-function _egComputeFreeRegions(table, vw, vh) {
-    const E = EG_ZONE_EDGE;
-    const G = EG_ZONE_GAP;
+function _computeFreeRegions(table, vw, vh) {
+    const E = ZONE_EDGE;
+    const G = ZONE_GAP;
     const regions = {
         left: { l: E, t: Math.max(E, table.t), r: table.l - G, b: Math.min(vh - E, table.b) },
         right: { l: table.r + G, t: Math.max(E, table.t), r: vw - E, b: Math.min(vh - E, table.b) },
         top: { l: E, t: E, r: vw - E, b: table.t - G },
         bottom: { l: E, t: table.b + G, r: vw - E, b: vh - E }
     };
-    const obstacles = [EG_ZONE_TOPLEFT_HUD];
-    EG_ZONE_OBSTACLE_SELECTORS.forEach(sel => {
-        const r = _egZoneRect(document.querySelector(sel), 4);
+    const obstacles = [ZONE_TOPLEFT_HUD];
+    ZONE_OBSTACLE_SELECTORS.forEach(sel => {
+        const r = _zoneRect(document.querySelector(sel), 4);
         if (r) obstacles.push(r);
     });
     Object.keys(regions).forEach(k => {
         let reg = regions[k];
         if (reg.r <= reg.l || reg.b <= reg.t) reg = null;
-        obstacles.forEach(o => { reg = _egClipRegion(reg, o); });
+        obstacles.forEach(o => { reg = _clipRegion(reg, o); });
         regions[k] = reg;
     });
     return regions;
@@ -267,19 +267,19 @@ function _egComputeFreeRegions(table, vw, vh) {
 
 // Stretches one panel over its free region, shrinking its cards when the
 // region is tight. Returns how many cards fit (0 = zone switched off).
-function _egApplyZoneRegion(key, reg, refArt) {
-    const el = document.getElementById(EG_ZONE_REGIONS[key]);
+function _applyZoneRegion(key, reg, refArt) {
+    const el = document.getElementById(ZONE_REGIONS[key]);
     if (!el) return 0;
     let scale = 0;
     let cap = 0;
     if (reg) {
-        const fitW = (reg.r - reg.l - EG_ZONE_CARD_PAD_W) / refArt;
-        const fitH = (reg.b - reg.t - EG_ZONE_CARD_PAD_H) / refArt;
+        const fitW = (reg.r - reg.l - ZONE_CARD_PAD_W) / refArt;
+        const fitH = (reg.b - reg.t - ZONE_CARD_PAD_H) / refArt;
         scale = Math.min(1, fitW, fitH);
-        if (scale >= EG_ZONE_MIN_SCALE) {
+        if (scale >= ZONE_MIN_SCALE) {
             scale = Math.floor(scale * 100) / 100;
-            const cols = Math.floor((reg.r - reg.l) / (refArt * scale + EG_ZONE_CARD_PAD_W));
-            const rows = Math.floor((reg.b - reg.t) / (refArt * scale + EG_ZONE_CARD_PAD_H));
+            const cols = Math.floor((reg.r - reg.l) / (refArt * scale + ZONE_CARD_PAD_W));
+            const rows = Math.floor((reg.b - reg.t) / (refArt * scale + ZONE_CARD_PAD_H));
             cap = Math.max(0, cols) * Math.max(0, rows);
         }
     }
@@ -312,9 +312,9 @@ function _egApplyZoneRegion(key, reg, refArt) {
 }
 
 // Zones that can currently take a card, with their capacity.
-function _egUsableZoneCaps() {
+function _usableZoneCaps() {
     const caps = [];
-    EG_MONSTER_ZONES.forEach(z => {
+    MONSTER_ZONES.forEach(z => {
         const el = document.getElementById(z);
         const raw = el && el.dataset ? el.dataset.egCap : undefined;
         if (raw === undefined) { caps.push({ id: z, cap: 99 }); return; }   // not ours (arena zone) - always usable
@@ -327,19 +327,19 @@ function _egUsableZoneCaps() {
 // Picks the usable zone with the most free room (random tie-break) so cards
 // fan out over the free space instead of stacking. `exceptId` skips a zone
 // (sidestep), `exceptMonsterId` ignores that monster when counting.
-export function _egPickRoomyZone(exceptId, exceptMonsterId) {
-    try { _egLayoutSpawnZones({ noRender: true }); } catch (e) {}
-    let caps = _egUsableZoneCaps().filter(c => c.id !== EG_ZONE_FALLBACK);
-    if (!caps.length) caps = [{ id: EG_ZONE_FALLBACK, cap: 1 }];
+export function _pickRoomyZone(exceptId, exceptMonsterId) {
+    try { _layoutSpawnZones({ noRender: true }); } catch (e) {}
+    let caps = _usableZoneCaps().filter(c => c.id !== ZONE_FALLBACK);
+    if (!caps.length) caps = [{ id: ZONE_FALLBACK, cap: 1 }];
     if (exceptId) {
         const others = caps.filter(c => c.id !== exceptId);
         if (!others.length) return null;
         caps = others;
     }
     const counts = {};
-    (globalThis._egMonsters || []).forEach(m => {
+    (globalThis._monsters || []).forEach(m => {
         if (!m || m.id === exceptMonsterId) return;
-        const z = m.zoneId || EG_ZONE_FALLBACK;
+        const z = m.zoneId || ZONE_FALLBACK;
         counts[z] = (counts[z] || 0) + 1;
     });
     const score = c => ((counts[c.id] || 0) + 1) / c.cap;
@@ -350,68 +350,68 @@ export function _egPickRoomyZone(exceptId, exceptMonsterId) {
 
 // Lays the four floating panels over the free space around the puzzle table
 // and moves any card whose zone just lost its room. Cheap when nothing moved.
-export function _egLayoutSpawnZones(opts) {
-    if (!_egZoneLayoutAllowed()) return;
-    const table = _egZoneRect(document.getElementById('ptable'), 0);
+export function _layoutSpawnZones(opts) {
+    if (!_zoneLayoutAllowed()) return;
+    const table = _zoneRect(document.getElementById('ptable'), 0);
     if (!table) return;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const sig = [table.l, table.t, table.r, table.b, vw, vh].map(Math.round).join(',')
-        + '|' + EG_ZONE_OBSTACLE_SELECTORS.map(s => {
-            const r = _egZoneRect(document.querySelector(s), 0);
+        + '|' + ZONE_OBSTACLE_SELECTORS.map(s => {
+            const r = _zoneRect(document.querySelector(s), 0);
             return r ? [r.l, r.t, r.r, r.b].map(Math.round).join('.') : '-';
         }).join(',');
-    const refArt = _egZoneRefArt();
+    const refArt = _zoneRefArt();
     const key = sig + '|' + refArt;
-    const leftEl = document.getElementById(EG_ZONE_REGIONS.left);
-    if (key === _egZoneLayoutSig && leftEl && leftEl.dataset.egCap !== undefined) return;
-    _egZoneLayoutSig = key;
+    const leftEl = document.getElementById(ZONE_REGIONS.left);
+    if (key === _zoneLayoutSig && leftEl && leftEl.dataset.egCap !== undefined) return;
+    _zoneLayoutSig = key;
 
-    const regions = _egComputeFreeRegions(table, vw, vh);
-    Object.keys(EG_ZONE_REGIONS).forEach(k => _egApplyZoneRegion(k, regions[k], refArt));
+    const regions = _computeFreeRegions(table, vw, vh);
+    Object.keys(ZONE_REGIONS).forEach(k => _applyZoneRegion(k, regions[k], refArt));
 
     // A grid that fills the whole screen leaves no room for any card: shrink it
     // a little (once per encounter) so a band above it can hold them.
-    const totalCap = Object.values(EG_ZONE_REGIONS).reduce((n, z) => n + (Number(document.getElementById(z).dataset.egCap) || 0), 0);
-    if (totalCap < EG_ZONE_MIN_SLOTS && !_egZoneBandAsked) {
-        _egZoneBandAsked = true;
-        const band = Math.min(210, EG_ZONE_EDGE + Math.round(refArt * 0.8) + EG_ZONE_CARD_PAD_H + EG_ZONE_GAP + 6);
+    const totalCap = Object.values(ZONE_REGIONS).reduce((n, z) => n + (Number(document.getElementById(z).dataset.egCap) || 0), 0);
+    if (totalCap < ZONE_MIN_SLOTS && !_zoneBandAsked) {
+        _zoneBandAsked = true;
+        const band = Math.min(210, ZONE_EDGE + Math.round(refArt * 0.8) + ZONE_CARD_PAD_H + ZONE_GAP + 6);
         setPuzzleMonsterRoom(true, band);
-        _egZoneLayoutSig = '';        // measure again on the next tick, the grid just moved
+        _zoneLayoutSig = '';        // measure again on the next tick, the grid just moved
     }
 
     // Cards whose zone lost its room (zoom / resize) hop to a zone that has room.
     let moved = false;
-    const usable = _egUsableZoneCaps().filter(c => c.id !== EG_ZONE_FALLBACK);
-    (globalThis._egMonsters || []).forEach(m => {
+    const usable = _usableZoneCaps().filter(c => c.id !== ZONE_FALLBACK);
+    (globalThis._monsters || []).forEach(m => {
         if (!m || m.isSacrificialZombie || m.isDynamoConductor || !m.zoneId) return;
-        const ours = Object.values(EG_ZONE_REGIONS).includes(m.zoneId) || m.zoneId === EG_ZONE_FALLBACK;
+        const ours = Object.values(ZONE_REGIONS).includes(m.zoneId) || m.zoneId === ZONE_FALLBACK;
         if (!ours) return;
-        const here = m.zoneId === EG_ZONE_FALLBACK ? null : document.getElementById(m.zoneId);
+        const here = m.zoneId === ZONE_FALLBACK ? null : document.getElementById(m.zoneId);
         if (here && Number(here.dataset.egCap) > 0) return;
         if (!usable.length) return;
-        const to = _egPickRoomyZone(m.zoneId, m.id);
+        const to = _pickRoomyZone(m.zoneId, m.id);
         if (to && to !== m.zoneId) { m.zoneId = to; moved = true; }
     });
-    if (moved && !(opts && opts.noRender) && typeof _egRenderPanel === 'function') _egRenderPanel();
+    if (moved && !(opts && opts.noRender) && typeof _renderPanel === 'function') _renderPanel();
 }
 
 // Light poll while an encounter runs: re-lays the zones when the puzzle zoom,
 // window size or HUD changes. Stops itself when the encounter is over.
-function _egStartZoneLayoutSync() {
+function _startZoneLayoutSync() {
     // Wide, short puzzles leave their free space above AND below the grid, too
     // thin for a card each - gather it into one band above the grid.
     try {
-        if (_egZoneLayoutAllowed()) setPuzzleMonsterRoom(true);
+        if (_zoneLayoutAllowed()) setPuzzleMonsterRoom(true);
     } catch (e) {}
-    try { _egLayoutSpawnZones(); } catch (e) {}
-    if (_egZoneLayoutTimer) return;
-    _egZoneLayoutTimer = setInterval(() => {
-        if (typeof _egIsActive === 'function' && !_egIsActive()) {
-            clearInterval(_egZoneLayoutTimer);
-            _egZoneLayoutTimer = null;
+    try { _layoutSpawnZones(); } catch (e) {}
+    if (_zoneLayoutTimer) return;
+    _zoneLayoutTimer = setInterval(() => {
+        if (typeof _isActive === 'function' && !_isActive()) {
+            clearInterval(_zoneLayoutTimer);
+            _zoneLayoutTimer = null;
             return;
         }
-        try { _egLayoutSpawnZones(); } catch (e) {}
+        try { _layoutSpawnZones(); } catch (e) {}
     }, 250);
 }

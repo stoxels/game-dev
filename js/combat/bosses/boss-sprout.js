@@ -1,8 +1,8 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { t } from '../../translation/translations.js';
-import { _egHzGridRect } from '../combat-hazards.js';
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRectsOverlap, _egNkToast } from './shared-boss-abilities.js';
+import { _hzGridRect } from '../combat-hazards.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkDotHit, _nkEl, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkRectsOverlap, _nkToast } from './shared-boss-abilities.js';
 import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
@@ -15,27 +15,27 @@ import { cur } from '../../state.js';
 //
 // The Sprout is the game's only lightning attacker: every one of its hits -
 // vine lunge, spores, bramble whips, pollen motes and dust bursts - is
-// tagged EG_SPROUT_ELEMENT, so the player's Lightning Resistance actually
+// tagged SPROUT_ELEMENT, so the player's Lightning Resistance actually
 // reduces them. It replaced the old element: null (untyped physical) tag;
 // with 0 Lightning Resistance both tags deal identical damage, so this only
 // becomes a real difference once the passive tree's Verdant Covenant node
-// (110) is allocated. Lightning is one of the four EG_ELEMENTS, so these hits
+// (110) is allocated. Lightning is one of the four DAMAGE_ELEMENTS, so these hits
 // ride the full elemental resistance path: Lightning Resistance and the
 // "all elemental resistances" bonus both reduce them, under the shared 75% cap.
 //------------------------------------------------------------------------
 
-// Incoming-damage element for every Sprout hit (see _egCalcPlayerResistanceReduction).
-export const EG_SPROUT_ELEMENT = 'lightning';
+// Incoming-damage element for every Sprout hit (see _calcPlayerResistanceReduction).
+export const SPROUT_ELEMENT = 'lightning';
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_sprout: {
         id: 'boss_sprout', name: 'The Sprout', emoji: '🌱',
         baseHP: 900, baseDamage: 18, chargeMax: 13,
-        element: EG_SPROUT_ELEMENT, resistances: { fire: 10, cold: 10, lightning: 10, shadow: 10 }
+        element: SPROUT_ELEMENT, resistances: { fire: 10, cold: 10, lightning: 10, shadow: 10 }
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_sprout: {
         phases: [
             { threshold: 1.00, chargeMax: 13, damageMultiplier: 1.00 },
@@ -44,61 +44,61 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2000,
         mechanics: [
-            { name: 'sproutlings', intervalBase: 19000, intervalVariance: 5000, handler: '_egMechSproutlings' },
-            { name: 'prior_bomb', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechPriorBomb' },
+            { name: 'sproutlings', intervalBase: 19000, intervalVariance: 5000, handler: '_mechSproutlings' },
+            { name: 'prior_bomb', intervalBase: 20000, intervalVariance: 5000, handler: '_mechPriorBomb' },
         ],
-        onInit: _egSproutArenaInit,
+        onInit: _sproutArenaInit,
     },
 });
 
 
 // ── Garden tuning ───────────────────────────────────────────────────────
 // Root Network (vines on cells)
-export const EG_SPROUT_VINE_INTERVAL_MS = [0, 4500, 3600, 2800]; // per boss phase
-export const EG_SPROUT_VINE_CAP = [0, 3, 5, 7];     // vines alive at once per phase
-export const EG_SPROUT_VINE_LIFETIME_MS = 12000;    // withers on its own
+export const SPROUT_VINE_INTERVAL_MS = [0, 4500, 3600, 2800]; // per boss phase
+export const SPROUT_VINE_CAP = [0, 3, 5, 7];     // vines alive at once per phase
+export const SPROUT_VINE_LIFETIME_MS = 12000;    // withers on its own
 // Spore Drift (screen hazard)
-export const EG_SPROUT_SPORE_INTERVAL_MS = [0, 3200, 2400, 1800];
-export const EG_SPROUT_SPORE_DMG = 0.025;   // %maxHP per spore (lightning)
-export const EG_SPROUT_SPORE_CD_MS = 500;   // global spore-hit cooldown
-export const EG_SPROUT_SPORE_SPEED = [0, 70, 90, 110]; // px/s drift
+export const SPROUT_SPORE_INTERVAL_MS = [0, 3200, 2400, 1800];
+export const SPROUT_SPORE_DMG = 0.025;   // %maxHP per spore (lightning)
+export const SPROUT_SPORE_CD_MS = 500;   // global spore-hit cooldown
+export const SPROUT_SPORE_SPEED = [0, 70, 90, 110]; // px/s drift
 // Bramble Wall (60% gate)
-export const EG_SPROUT_BRAMBLE_MS = 10000;  // wall lifetime
-export const EG_SPROUT_WHIP_DMG = 0.12;     // %maxHP per whip (lightning)
-export const EG_SPROUT_WHIP_LEN = 230;      // px a lash reaches beyond the grid edge
-export const EG_SPROUT_WHIP_OUT_MS = 500;   // extend time
-export const EG_SPROUT_WHIP_HOLD_MS = 800;  // fully extended
-export const EG_SPROUT_WHIP_BACK_MS = 400;  // retract
-export const EG_SPROUT_WHIP_TIMES = [1400, 4600, 7800]; // lash moments inside the wall
+export const SPROUT_BRAMBLE_MS = 10000;  // wall lifetime
+export const SPROUT_WHIP_DMG = 0.12;     // %maxHP per whip (lightning)
+export const SPROUT_WHIP_LEN = 230;      // px a lash reaches beyond the grid edge
+export const SPROUT_WHIP_OUT_MS = 500;   // extend time
+export const SPROUT_WHIP_HOLD_MS = 800;  // fully extended
+export const SPROUT_WHIP_BACK_MS = 400;  // retract
+export const SPROUT_WHIP_TIMES = [1400, 4600, 7800]; // lash moments inside the wall
 // Blooming Doom (30% gate)
-export const EG_SPROUT_BUD_MS = 3200;       // bud growth (telegraph)
-export const EG_SPROUT_BUD_R = 34;          // bud visual radius
-export const EG_SPROUT_MOTE_N = 8;          // pollen motes per bloom
-export const EG_SPROUT_MOTE_SPEED = 260;    // px/s
-export const EG_SPROUT_MOTE_DMG = 0.025;    // %maxHP per mote (lightning)
-export const EG_SPROUT_MOTE_CD_MS = 450;    // global mote-hit cooldown
-export const EG_SPROUT_MOTE_LIFE_MS = 2200;
-export const EG_SPROUT_DUST_MS = 6500;      // pollen dust on cells
-export const EG_SPROUT_DUST_BURST = 0.06;   // %maxHP when a dusted cell is disturbed
-export const EG_SPROUT_DUST_BURST_CD_MS = 1200; // min gap between bursts (naive sweeps bleed, not die)
-export const EG_SPROUT_DUST_WARN_MS = 1600; // dust visibly blinks this long before clearing
-export const EG_SPROUT_REBLOOM_MS = 8000;   // next bud after a bloom (phase 3)
-export const EG_SPROUT_BUDS_MAX = 3;        // buds per fight at most
+export const SPROUT_BUD_MS = 3200;       // bud growth (telegraph)
+export const SPROUT_BUD_R = 34;          // bud visual radius
+export const SPROUT_MOTE_N = 8;          // pollen motes per bloom
+export const SPROUT_MOTE_SPEED = 260;    // px/s
+export const SPROUT_MOTE_DMG = 0.025;    // %maxHP per mote (lightning)
+export const SPROUT_MOTE_CD_MS = 450;    // global mote-hit cooldown
+export const SPROUT_MOTE_LIFE_MS = 2200;
+export const SPROUT_DUST_MS = 6500;      // pollen dust on cells
+export const SPROUT_DUST_BURST = 0.06;   // %maxHP when a dusted cell is disturbed
+export const SPROUT_DUST_BURST_CD_MS = 1200; // min gap between bursts (naive sweeps bleed, not die)
+export const SPROUT_DUST_WARN_MS = 1600; // dust visibly blinks this long before clearing
+export const SPROUT_REBLOOM_MS = 8000;   // next bud after a bloom (phase 3)
+export const SPROUT_BUDS_MAX = 3;        // buds per fight at most
 // Vine Lunge (the boss's charge-bar attack)
-export const EG_SPROUT_LUNGE_WARN_MS = 1050; // telegraph before the whip
-export const EG_SPROUT_LUNGE_STRIKE_MS = 350; // the tendril is live (hot)
-export const EG_SPROUT_LUNGE_FADE_MS = 700;  // tendril retracts
-export const EG_SPROUT_LUNGE_H = 56;         // tendril band width (px)
-export const EG_SPROUT_LUNGE_DMG = [0, 0.11, 0.14, 0.17]; // %maxHP by boss phase
+export const SPROUT_LUNGE_WARN_MS = 1050; // telegraph before the whip
+export const SPROUT_LUNGE_STRIKE_MS = 350; // the tendril is live (hot)
+export const SPROUT_LUNGE_FADE_MS = 700;  // tendril retracts
+export const SPROUT_LUNGE_H = 56;         // tendril band width (px)
+export const SPROUT_LUNGE_DMG = [0, 0.11, 0.14, 0.17]; // %maxHP by boss phase
 
 
-export let _egSproutWatcher = null; // per-fight garden state
-export let _egSproutLungeActive = false; // a vine lunge set-piece is running
+export let _sproutWatcher = null; // per-fight garden state
+export let _sproutLungeActive = false; // a vine lunge set-piece is running
 
 
 // Sweep every garden overlay off the grid and screen. Safe to call twice.
-export function _egSproutSweep() {
-    _egSproutLungeActive = false;
+export function _sproutSweep() {
+    _sproutLungeActive = false;
     try {
         document.querySelectorAll('.eg-sprout-vine, .eg-sprout-dust, .eg-sprout-bramble, .eg-sprout-whip, .eg-sprout-bud, .eg-sprout-spore, .eg-sprout-mote, .eg-sprout-lunge, .eg-sprout-conn, .eg-sprout-ringlock').forEach(el => el.remove());
         document.querySelectorAll('.eg-brambled').forEach(el => el.classList.remove('eg-brambled'));
@@ -106,19 +106,19 @@ export function _egSproutSweep() {
 }
 
 
-// Called from _egBossCleanup (boss-framework.js) on boss death / stop.
-export function _egSproutTeardown() {
-    const st = _egSproutWatcher;
-    _egSproutWatcher = null;
-    if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
+// Called from _bossCleanup (boss-framework.js) on boss death / stop.
+export function _sproutTeardown() {
+    const st = _sproutWatcher;
+    _sproutWatcher = null;
+    if (st && st.run) { try { _nkKillRun(st.run); } catch (e) {} }
     // Always sweep: on boss death the run's onKill may have nulled the
     // watcher BEFORE this runs - the overlays must go either way.
-    _egSproutSweep();
+    _sproutSweep();
 }
 
 
 // Unsolved cells (player value ≠ solution value) - the vine pool.
-export function _egSproutVinePool() {
+export function _sproutVinePool() {
     if (typeof cur === 'undefined' || !cur || !cur.grid) return [];
     const sol = cur.grid, usr = (typeof userGrid !== 'undefined') ? globalThis.userGrid : null;
     if (!usr) return [];
@@ -131,7 +131,7 @@ export function _egSproutVinePool() {
 }
 
 
-export function _egSproutAddVine(r, c) {
+export function _sproutAddVine(r, c) {
     const key = `eg-vine-${r}-${c}`;
     if (document.getElementById(key)) return;
     const cell = document.getElementById(`g-${r}-${c}`);
@@ -141,15 +141,15 @@ export function _egSproutAddVine(r, c) {
     el.id = key;
     el.textContent = '🌿';
     cell.appendChild(el);
-    setTimeout(() => { try { el.remove(); } catch (e) {} }, EG_SPROUT_VINE_LIFETIME_MS);
+    setTimeout(() => { try { el.remove(); } catch (e) {} }, SPROUT_VINE_LIFETIME_MS);
 }
 
 
 // Click intercept (mouse-button-handlers.js): prune vines, block brambled
 // ring cells, and burst pollen when a dusted cell is disturbed.
 // Returns true when the click is consumed (no fill/mark happens).
-export function _egSproutCellIntercept(row, col) {
-    const st = _egSproutWatcher;
+export function _sproutCellIntercept(row, col) {
+    const st = _sproutWatcher;
     if (!st) return false;
     // Vined cell: this click prunes the vine only.
     if (document.getElementById(`eg-vine-${row}-${col}`)) {
@@ -170,23 +170,23 @@ export function _egSproutCellIntercept(row, col) {
     }
     // Pollen dust: disturbing the cell bursts pollen around the player.
     // Returns false - the fill/mark itself still happens (tempo pressure).
-    if (st.dust.has(`${row}-${col}`)) _egSproutPollenBurst(st);
+    if (st.dust.has(`${row}-${col}`)) _sproutPollenBurst(st);
     return false;
 }
 
 
-export function _egSproutPollenBurst(st) {
+export function _sproutPollenBurst(st) {
     const now = performance.now();
     if (now < st.dustCd) return;
-    st.dustCd = now + EG_SPROUT_DUST_BURST_CD_MS;
+    st.dustCd = now + SPROUT_DUST_BURST_CD_MS;
     const level = st.level;
-    const dealt = _egNkHit(EG_SPROUT_DUST_BURST, EG_SPROUT_ELEMENT, level);
-    _egNkAbilityHitToast(dealt, 'The Sprout', 'Pollen');
+    const dealt = _nkHit(SPROUT_DUST_BURST, SPROUT_ELEMENT, level);
+    _nkAbilityHitToast(dealt, 'The Sprout', 'Pollen');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('sprout_bloom'); } catch (e) {}
     // Visual puff around the player.
-    const c = _egNkPlayerCenter();
+    const c = _nkPlayerCenter();
     if (c) {
-        const puff = _egNkEl(st.run, 'div', 'eg-sprout-puff');
+        const puff = _nkEl(st.run, 'div', 'eg-sprout-puff');
         puff.style.left = Math.round(c.x) + 'px';
         puff.style.top = Math.round(c.y) + 'px';
         setTimeout(() => { try { puff.remove(); } catch (e) {} }, 600);
@@ -202,58 +202,58 @@ export function _egSproutPollenBurst(st) {
 // then whips - Brutus's Ground Slam pattern, but a line instead of a band.
 // Own dodge-type run: dodge-busy holds so no other mechanic overlaps, and
 // pause-safe (the telegraph freezes with the rest of the game).
-export function _egSproutVineLunge(monster) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _sproutVineLunge(monster) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
     const level = monster ? monster.level : 1;
-    const dmgPct = EG_SPROUT_LUNGE_DMG[p] || EG_SPROUT_LUNGE_DMG[1];
-    const run = _egNkNewRun(monster ? monster.id : 'boss_sprout', true);
-    run.onKill = () => { _egSproutLungeActive = false; };
-    _egSproutLungeActive = true;
+    const dmgPct = SPROUT_LUNGE_DMG[p] || SPROUT_LUNGE_DMG[1];
+    const run = _nkNewRun(monster ? monster.id : 'boss_sprout', true);
+    run.onKill = () => { _sproutLungeActive = false; };
+    _sproutLungeActive = true;
 
     // Aim: full-screen band through the player's CURRENT center.
-    const c = _egNkPlayerCenter();
+    const c = _nkPlayerCenter();
     const W = window.innerWidth, H = window.innerHeight;
     const angle = (Math.random() < 0.5 ? 0 : Math.PI / 2); // horizontal or vertical
     const px = c ? c.x : W / 2, py = c ? c.y : H / 2;
     const cx = angle === 0 ? W / 2 : px;
     const cy = angle === 0 ? py : H / 2;
 
-    const band = _egNkEl(run, 'div', 'eg-sprout-lunge');
+    const band = _nkEl(run, 'div', 'eg-sprout-lunge');
     const len = (angle === 0 ? W + 80 : H + 80);
     band.style.width = Math.round(len) + 'px';
-    band.style.height = EG_SPROUT_LUNGE_H + 'px';
+    band.style.height = SPROUT_LUNGE_H + 'px';
     band.style.left = Math.round(cx - len / 2) + 'px';
-    band.style.top = Math.round(cy - EG_SPROUT_LUNGE_H / 2) + 'px';
+    band.style.top = Math.round(cy - SPROUT_LUNGE_H / 2) + 'px';
     if (angle !== 0) {
         // Vertical tendril: rotate the horizontal band 90° around its center.
         band.style.transformOrigin = '50% 50%';
         band.style.transform = 'rotate(90deg)';
     }
 
-    _egNkToast('eg_sprout_lunge', '🌱 The Sprout LUNGES - a thorned tendril whips across the screen!');
+    _nkToast('eg_sprout_lunge', '🌱 The Sprout LUNGES - a thorned tendril whips across the screen!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('sprout_thorn'); } catch (e) {}
 
     // warn → strike → fade (Brutus slam state machine).
     let t = 0, state = 'warn';
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         t += dtS * 1000;
-        if (state === 'warn' && t >= EG_SPROUT_LUNGE_WARN_MS) {
+        if (state === 'warn' && t >= SPROUT_LUNGE_WARN_MS) {
             state = 'strike';
             band.classList.add('hit'); // hot tendril
-            const pr = _egNkPlayerRect();
+            const pr = _nkPlayerRect();
             const b = band.getBoundingClientRect();
-            if (pr && _egNkRectsOverlap(
+            if (pr && _nkRectsOverlap(
                 { left: b.left, right: b.right, top: b.top, bottom: b.bottom }, pr)) {
-                const dealt = _egNkHit(dmgPct, null, level);
-                _egNkAbilityHitToast(dealt, 'The Sprout', 'Vine Lunge');
+                const dealt = _nkHit(dmgPct, null, level);
+                _nkAbilityHitToast(dealt, 'The Sprout', 'Vine Lunge');
             }
-        } else if (state === 'strike' && t >= EG_SPROUT_LUNGE_WARN_MS + EG_SPROUT_LUNGE_STRIKE_MS) {
+        } else if (state === 'strike' && t >= SPROUT_LUNGE_WARN_MS + SPROUT_LUNGE_STRIKE_MS) {
             state = 'fade';
             band.classList.add('fade'); // retract
-        } else if (state === 'fade' && t >= EG_SPROUT_LUNGE_WARN_MS + EG_SPROUT_LUNGE_STRIKE_MS + EG_SPROUT_LUNGE_FADE_MS) {
+        } else if (state === 'fade' && t >= SPROUT_LUNGE_WARN_MS + SPROUT_LUNGE_STRIKE_MS + SPROUT_LUNGE_FADE_MS) {
             try { band.remove(); } catch (e) {}
-            _egSproutLungeActive = false;
+            _sproutLungeActive = false;
             return false; // end the set-piece
         }
         return true;
@@ -263,8 +263,8 @@ export function _egSproutVineLunge(monster) {
 
 // ── the persistent garden watcher ───────────────────────────────────────
 
-export function _egSproutArenaInit(monster) {
-    if (_egSproutWatcher) return;
+export function _sproutArenaInit(monster) {
+    if (_sproutWatcher) return;
     const monsterId = monster ? monster.id : null;
     const level = monster ? monster.level : 1;
     const st = {
@@ -276,25 +276,25 @@ export function _egSproutArenaInit(monster) {
         gate60Done: false, gate30Done: false, budsGrown: 0, rebloomAt: 0,
         everLive: false, bornAt: performance.now(),
     };
-    _egSproutWatcher = st;
-    _egNkToast('eg_sprout_intro', '🌱 The Sprout: The garden is overgrowing your puzzle!');
+    _sproutWatcher = st;
+    _nkToast('eg_sprout_intro', '🌱 The Sprout: The garden is overgrowing your puzzle!');
     // Tier-scaled clock: the bramble whip's 500ms extend telegraph and the
     // wall/bloom pacing breathe with tier, like the Marksman's aim and the
     // lunge. `now`-stamp hit cooldowns stay real-time (fairness floor).
     // Passive run: the watcher lives the whole fight, so it must not hog
-    // _egNkDodgeBusy() - sproutlings, the lunge, and other set-pieces
+    // _nkDodgeBusy() - sproutlings, the lunge, and other set-pieces
     // check that flag to avoid stacking on an active dodge set-piece.
-    const run = _egNkNewRun(monsterId, true);
+    const run = _nkNewRun(monsterId, true);
     run.passive = true;
     st.run = run;
     run.onKill = () => {
-        if (_egSproutWatcher && _egSproutWatcher.run === run) _egSproutWatcher = null;
-        _egSproutSweep(); // boss died → clear the garden immediately
+        if (_sproutWatcher && _sproutWatcher.run === run) _sproutWatcher = null;
+        _sproutSweep(); // boss died → clear the garden immediately
     };
 
-    _egNkLoop(run, (dtS, now) => {
-        const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
-            ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+    _nkLoop(run, (dtS, now) => {
+        const live = (typeof _monsters !== 'undefined' && globalThis._monsters)
+            ? (globalThis._monsters.find(m => m && m.id === st.monsterId) || null) : null;
         // Boss not registered yet → wait for it (spawn races the arena init);
         // boss vanished AFTER being live → the fight is over, tear down.
         if (!live) {
@@ -304,43 +304,43 @@ export function _egSproutArenaInit(monster) {
         st.everLive = true;
 
         const W = window.innerWidth, H = window.innerHeight;
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         const p = Math.max(1, Math.min(3, Number(live.bossPhase) || 1));
 
         // ── HP gates ──
         const hpPct = live.currentHP / live.maxHP;
-        if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _egSproutBrambleWall(st); }
+        if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _sproutBrambleWall(st); }
         if (!st.gate30Done && hpPct <= 0.30) { st.gate30Done = true; st.rebloomAt = 0.01; }
 
         // ── Root Network: vines claim unsolved cells ──
         st.vineAcc += dtS * 1000;
-        const vInt = EG_SPROUT_VINE_INTERVAL_MS[p] || EG_SPROUT_VINE_INTERVAL_MS[1];
+        const vInt = SPROUT_VINE_INTERVAL_MS[p] || SPROUT_VINE_INTERVAL_MS[1];
         if (st.vineAcc >= vInt) {
             st.vineAcc = 0;
             const alive = document.querySelectorAll('.eg-sprout-vine:not(.prune)').length;
-            const cap = EG_SPROUT_VINE_CAP[p] || EG_SPROUT_VINE_CAP[1];
+            const cap = SPROUT_VINE_CAP[p] || SPROUT_VINE_CAP[1];
             if (alive < cap) {
-                const pool = _egSproutVinePool();
+                const pool = _sproutVinePool();
                 if (pool.length) {
                     const [r, c] = pool[Math.floor(Math.random() * pool.length)];
-                    _egSproutAddVine(r, c);
+                    _sproutAddVine(r, c);
                 }
             }
         }
 
         // ── Spore Drift: puffballs waft across the screen ──
         st.sporeAcc += dtS * 1000;
-        const sInt = EG_SPROUT_SPORE_INTERVAL_MS[p] || EG_SPROUT_SPORE_INTERVAL_MS[1];
+        const sInt = SPROUT_SPORE_INTERVAL_MS[p] || SPROUT_SPORE_INTERVAL_MS[1];
         if (st.sporeAcc >= sInt && st.spores.length < 8) {
             st.sporeAcc = 0;
             const fromLeft = Math.random() < 0.5;
-            const el = _egNkEl(run, 'div', 'eg-sprout-spore', '🟢');
+            const el = _nkEl(run, 'div', 'eg-sprout-spore', '🟢');
             st.spores.push({
                 x: fromLeft ? -20 : W + 20,
                 dir: fromLeft ? 1 : -1,
                 y: 80 + Math.random() * Math.max(120, H - 220),
                 phase: Math.random() * 6.28,
-                spd: EG_SPROUT_SPORE_SPEED[p] || EG_SPROUT_SPORE_SPEED[1],
+                spd: SPROUT_SPORE_SPEED[p] || SPROUT_SPORE_SPEED[1],
                 cdUntil: 0, el, life: 14000, // internal-clock lifetime
             });
         }
@@ -350,11 +350,11 @@ export function _egSproutArenaInit(monster) {
             s.phase += dtS * 2.2;
             const y = s.y + Math.sin(s.phase) * 26; // wavy drift
             s.el.style.transform = 'translate(' + Math.round(s.x) + 'px,' + Math.round(y) + 'px)';
-            if (pr && now >= st.sporeCd && _egNkCircleHit(s.x, y, 10, pr, 0)) {
-                st.sporeCd = now + EG_SPROUT_SPORE_CD_MS;
+            if (pr && now >= st.sporeCd && _nkCircleHit(s.x, y, 10, pr, 0)) {
+                st.sporeCd = now + SPROUT_SPORE_CD_MS;
                 s.cdUntil = now + 900;
-                const dealt = _egNkHit(EG_SPROUT_SPORE_DMG, EG_SPROUT_ELEMENT, level);
-                _egNkAbilityHitToast(dealt, 'The Sprout', 'Spores');
+                const dealt = _nkHit(SPROUT_SPORE_DMG, SPROUT_ELEMENT, level);
+                _nkAbilityHitToast(dealt, 'The Sprout', 'Spores');
             }
             if ((s.dir === 1 && s.x > W + 30) || (s.dir === -1 && s.x < -30) || (s.life -= dtS * 1000) <= 0) {
                 try { s.el.remove(); } catch (e) {}
@@ -373,14 +373,14 @@ export function _egSproutArenaInit(monster) {
                 if (t < 0) return;
                 if (w.el.classList.contains('coiled')) w.el.classList.remove('coiled');
                 let len = 0;
-                if (t < EG_SPROUT_WHIP_OUT_MS) {
-                    const k = t / EG_SPROUT_WHIP_OUT_MS;
-                    len = EG_SPROUT_WHIP_LEN * (1 - Math.pow(1 - k, 2));
-                } else if (t < EG_SPROUT_WHIP_OUT_MS + EG_SPROUT_WHIP_HOLD_MS) {
-                    len = EG_SPROUT_WHIP_LEN * (0.96 + 0.04 * Math.sin(t / 90)); // strain
-                } else if (t < EG_SPROUT_WHIP_OUT_MS + EG_SPROUT_WHIP_HOLD_MS + EG_SPROUT_WHIP_BACK_MS) {
-                    const k = (t - EG_SPROUT_WHIP_OUT_MS - EG_SPROUT_WHIP_HOLD_MS) / EG_SPROUT_WHIP_BACK_MS;
-                    len = EG_SPROUT_WHIP_LEN * (1 - k * k);
+                if (t < SPROUT_WHIP_OUT_MS) {
+                    const k = t / SPROUT_WHIP_OUT_MS;
+                    len = SPROUT_WHIP_LEN * (1 - Math.pow(1 - k, 2));
+                } else if (t < SPROUT_WHIP_OUT_MS + SPROUT_WHIP_HOLD_MS) {
+                    len = SPROUT_WHIP_LEN * (0.96 + 0.04 * Math.sin(t / 90)); // strain
+                } else if (t < SPROUT_WHIP_OUT_MS + SPROUT_WHIP_HOLD_MS + SPROUT_WHIP_BACK_MS) {
+                    const k = (t - SPROUT_WHIP_OUT_MS - SPROUT_WHIP_HOLD_MS) / SPROUT_WHIP_BACK_MS;
+                    len = SPROUT_WHIP_LEN * (1 - k * k);
                 } else {
                     w.done = true;
                     try { w.el.remove(); } catch (e) {}
@@ -400,15 +400,15 @@ export function _egSproutArenaInit(monster) {
                         left: Math.min(w.bx, tipX) - 6, right: Math.max(w.bx, tipX) + 6,
                         top: Math.min(w.by, tipY) - 6, bottom: Math.max(w.by, tipY) + 6,
                     };
-                    if (_egNkRectsOverlap(rect, pr)) {
+                    if (_nkRectsOverlap(rect, pr)) {
                         w.hit = true;
-                        const dealt = _egNkHit(EG_SPROUT_WHIP_DMG, EG_SPROUT_ELEMENT, level);
-                        _egNkAbilityHitToast(dealt, 'The Sprout', 'Bramble');
+                        const dealt = _nkHit(SPROUT_WHIP_DMG, SPROUT_ELEMENT, level);
+                        _nkAbilityHitToast(dealt, 'The Sprout', 'Bramble');
                         try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('sprout_thorn'); } catch (e) {}
                     }
                 }
             });
-            if (b.t >= EG_SPROUT_BRAMBLE_MS) {
+            if (b.t >= SPROUT_BRAMBLE_MS) {
                 b.strips.forEach(el => { try { el.remove(); } catch (e) {} });
                 b.whips.forEach(w => { if (!w.done) { try { w.el.remove(); } catch (e) {} } });
                 (b.connEls || []).forEach(el => { try { el.remove(); } catch (e) {} });
@@ -422,20 +422,20 @@ export function _egSproutArenaInit(monster) {
         if (st.bud) {
             const bd = st.bud;
             bd.t += dtS * 1000;
-            const k = Math.min(1, bd.t / EG_SPROUT_BUD_MS);
+            const k = Math.min(1, bd.t / SPROUT_BUD_MS);
             bd.el.style.transform = 'translate(-50%,-50%) scale(' + (0.15 + 0.85 * k).toFixed(3) + ')';
             bd.el.style.opacity = String(0.5 + 0.5 * k);
-            if (bd.t >= EG_SPROUT_BUD_MS) {
+            if (bd.t >= SPROUT_BUD_MS) {
                 // BLOOM: dust the region + pollen motes everywhere.
                 try { bd.el.remove(); } catch (e) {}
                 st.bud = null;
-                _egSproutBloom(st, bd.r, bd.c, 0);
+                _sproutBloom(st, bd.r, bd.c, 0);
                 st.budsGrown++;
-                st.rebloomAt = EG_SPROUT_REBLOOM_MS;
+                st.rebloomAt = SPROUT_REBLOOM_MS;
             }
-        } else if (st.gate30Done && st.budsGrown < EG_SPROUT_BUDS_MAX && st.rebloomAt > 0) {
+        } else if (st.gate30Done && st.budsGrown < SPROUT_BUDS_MAX && st.rebloomAt > 0) {
             st.rebloomAcc = (st.rebloomAcc || 0) + dtS * 1000;
-            if (st.rebloomAt <= st.rebloomAcc) { st.rebloomAt = 0; _egSproutGrowBud(st); }
+            if (st.rebloomAt <= st.rebloomAcc) { st.rebloomAt = 0; _sproutGrowBud(st); }
         }
 
         // Pollen dust expiry - blinks while about to clear so "wait it out"
@@ -449,7 +449,7 @@ export function _egSproutArenaInit(monster) {
                 if (el) { el.classList.add('fade'); setTimeout(() => { try { el.remove(); } catch (e) {} }, 300); }
                 st.dust.delete(key);
                 st.dustWarn.delete(key);
-            } else if (timer - st.dustAcc < EG_SPROUT_DUST_WARN_MS) {
+            } else if (timer - st.dustAcc < SPROUT_DUST_WARN_MS) {
                 if (!st.dustWarn.has(key)) {
                     st.dustWarn.add(key);
                     const el = document.getElementById(`eg-dust-${key}`);
@@ -464,10 +464,10 @@ export function _egSproutArenaInit(monster) {
             m.x += m.vx * dtS;
             m.y += m.vy * dtS;
             m.el.style.transform = 'translate(' + Math.round(m.x) + 'px,' + Math.round(m.y) + 'px)';
-            if (pr && now >= st.moteCd && _egNkCircleHit(m.x, m.y, 8, pr, 0)) {
-                st.moteCd = now + EG_SPROUT_MOTE_CD_MS;
-                const dealt = _egNkHit(EG_SPROUT_MOTE_DMG, EG_SPROUT_ELEMENT, level);
-                _egNkAbilityHitToast(dealt, 'The Sprout', 'Pollen');
+            if (pr && now >= st.moteCd && _nkCircleHit(m.x, m.y, 8, pr, 0)) {
+                st.moteCd = now + SPROUT_MOTE_CD_MS;
+                const dealt = _nkHit(SPROUT_MOTE_DMG, SPROUT_ELEMENT, level);
+                _nkAbilityHitToast(dealt, 'The Sprout', 'Pollen');
             }
             if (m.x < -30 || m.x > W + 30 || m.y < -30 || m.y > H + 30 || (m.life -= dtS * 1000) <= 0) {
                 try { m.el.remove(); } catch (e) {}
@@ -482,13 +482,13 @@ export function _egSproutArenaInit(monster) {
 
 // ── 60% gate: Bramble Wall ──────────────────────────────────────────────
 
-export function _egSproutBrambleWall(st) {
+export function _sproutBrambleWall(st) {
     if (st.bramble) return;
-    const gridR = (typeof _egHzGridRect === 'function') ? _egHzGridRect() : null;
+    const gridR = (typeof _hzGridRect === 'function') ? _hzGridRect() : null;
     if (!gridR) return;
     const T = 14; // bramble strip thickness
     const mk = (x, y, w, h) => {
-        const el = _egNkEl(st.run, 'div', 'eg-sprout-bramble');
+        const el = _nkEl(st.run, 'div', 'eg-sprout-bramble');
         el.style.left = Math.round(x) + 'px';
         el.style.top = Math.round(y) + 'px';
         el.style.width = Math.round(w) + 'px';
@@ -502,14 +502,14 @@ export function _egSproutBrambleWall(st) {
         mk(gridR.right, gridR.top, T, gridR.height),            // right edge
     ];
     // Three thorned whips lash outward from random grid-edge points.
-    const whips = EG_SPROUT_WHIP_TIMES.map(at => {
+    const whips = SPROUT_WHIP_TIMES.map(at => {
         const side = Math.floor(Math.random() * 4);
         let bx, by, rot;
         if (side === 0) { bx = gridR.left + Math.random() * gridR.width; by = gridR.top - T; rot = -Math.PI / 2; }       // up
         else if (side === 1) { bx = gridR.left + Math.random() * gridR.width; by = gridR.bottom + T; rot = Math.PI / 2; } // down
         else if (side === 2) { bx = gridR.left - T; by = gridR.top + Math.random() * gridR.height; rot = Math.PI; }       // left
         else { bx = gridR.right + T; by = gridR.top + Math.random() * gridR.height; rot = 0; }                            // right
-        const el = _egNkEl(st.run, 'div', 'eg-sprout-whip');
+        const el = _nkEl(st.run, 'div', 'eg-sprout-whip');
         el.style.transformOrigin = '0 50%';
         el.style.transform = 'rotate(' + rot + 'rad)';
         // Pre-lash telegraph: a coiled thorn nub marks each lash point from
@@ -535,7 +535,7 @@ export function _egSproutBrambleWall(st) {
                 const cr = cell.getBoundingClientRect();
                 const cx = cr.left + cr.width / 2, cy = cr.top + cr.height / 2;
                 // Connector: a thin thorned root from the wall strip into the cell.
-                const conn = _egNkEl(st.run, 'div', 'eg-sprout-conn');
+                const conn = _nkEl(st.run, 'div', 'eg-sprout-conn');
                 conn.style.animationDelay = ((i * 26) % 520) + 'ms'; // staggered grow-in wave
                 if (r === 0) {
                     conn.style.left = Math.round(cx - 2) + 'px'; conn.style.top = Math.round(gridR.top) + 'px';
@@ -564,15 +564,15 @@ export function _egSproutBrambleWall(st) {
         }
     }
     st.bramble = { t: 0, strips, whips, connEls, lockEls };
-    _egNkToast('eg_sprout_bramble', '🌿 Bramble Wall! The edges are overgrown - mind the thorns!');
+    _nkToast('eg_sprout_bramble', '🌿 Bramble Wall! The edges are overgrown - mind the thorns!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('sprout_thorn'); } catch (e) {}
 }
 
 
 // ── 30% gate: Blooming Doom ─────────────────────────────────────────────
 
-export function _egSproutGrowBud(st) {
-    const pool = _egSproutVinePool();
+export function _sproutGrowBud(st) {
+    const pool = _sproutVinePool();
     const all = [];
     if (typeof cur !== 'undefined' && cur && cur.grid) {
         for (let r = 0; r < cur.grid.length; r++)
@@ -585,17 +585,17 @@ export function _egSproutGrowBud(st) {
     const cell = document.getElementById(`g-${r}-${c}`);
     if (!cell) return;
     const cr = cell.getBoundingClientRect();
-    const el = _egNkEl(st.run, 'div', 'eg-sprout-bud', '🌸');
+    const el = _nkEl(st.run, 'div', 'eg-sprout-bud', '🌸');
     el.style.left = Math.round(cr.left + cr.width / 2) + 'px';
     el.style.top = Math.round(cr.top + cr.height / 2) + 'px';
-    el.style.fontSize = EG_SPROUT_BUD_R + 'px';
+    el.style.fontSize = SPROUT_BUD_R + 'px';
     el.style.transform = 'translate(-50%,-50%) scale(0.15)';
     st.bud = { r, c, t: 0, el };
-    _egNkToast('eg_sprout_bud', '🌸 A doom bud is swelling - something is about to bloom!');
+    _nkToast('eg_sprout_bud', '🌸 A doom bud is swelling - something is about to bloom!');
 }
 
 
-export function _egSproutBloom(st, br, bc, tNow) {
+export function _sproutBloom(st, br, bc, tNow) {
     // Dust deadlines are stored relative to the run's internal (tier-scaled)
     // clock, and the accumulator resets here so this bloom's dust counts its
     // full 6.5s from now (buds are 8s apart, so earlier dust has always
@@ -619,7 +619,7 @@ export function _egSproutBloom(st, br, bc, tNow) {
                 el.id = `eg-dust-${key}`;
                 el.textContent = '🌼';
                 cell.appendChild(el);
-                st.dust.set(key, tNow + EG_SPROUT_DUST_MS);
+                st.dust.set(key, tNow + SPROUT_DUST_MS);
                 dusted++;
             }
         }
@@ -629,17 +629,17 @@ export function _egSproutBloom(st, br, bc, tNow) {
     const cr = cell ? cell.getBoundingClientRect() : null;
     const cx = cr ? cr.left + cr.width / 2 : window.innerWidth / 2;
     const cy = cr ? cr.top + cr.height / 2 : window.innerHeight / 2;
-    for (let i = 0; i < EG_SPROUT_MOTE_N; i++) {
-        const a = (i / EG_SPROUT_MOTE_N) * Math.PI * 2 + Math.random() * 0.5;
-        const el = _egNkEl(st.run, 'div', 'eg-sprout-mote', '🌼');
+    for (let i = 0; i < SPROUT_MOTE_N; i++) {
+        const a = (i / SPROUT_MOTE_N) * Math.PI * 2 + Math.random() * 0.5;
+        const el = _nkEl(st.run, 'div', 'eg-sprout-mote', '🌼');
         st.motes.push({
             x: cx, y: cy,
-            vx: Math.cos(a) * EG_SPROUT_MOTE_SPEED * (0.8 + Math.random() * 0.4),
-            vy: Math.sin(a) * EG_SPROUT_MOTE_SPEED * (0.8 + Math.random() * 0.4),
-            born: 0, life: EG_SPROUT_MOTE_LIFE_MS, el,
+            vx: Math.cos(a) * SPROUT_MOTE_SPEED * (0.8 + Math.random() * 0.4),
+            vy: Math.sin(a) * SPROUT_MOTE_SPEED * (0.8 + Math.random() * 0.4),
+            born: 0, life: SPROUT_MOTE_LIFE_MS, el,
         });
     }
-    _egNkToast('eg_sprout_bloom', '🌼 The doom bud bursts - ' + dusted + ' cells are dusted! Fill them and the pollen finds you!');
+    _nkToast('eg_sprout_bloom', '🌼 The doom bud bursts - ' + dusted + ' cells are dusted! Fill them and the pollen finds you!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('sprout_bloom'); } catch (e) {}
 }
 
@@ -650,18 +650,18 @@ export function _egSproutBloom(st, br, bc, tNow) {
 // The classic chase - a pack of sproutlings scuttles after the player for
 // a while. Kept from the original fight, now phase-scaled and with the
 // polished leaf-wiggle visual.
-export function _egMechSproutlings(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechSproutlings(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const count = [0, 6, 7, 8][p];
     const speed = [0, 55, 65, 78][p];
     const dmgPct = [0, 0.035, 0.04, 0.05][p];
     const durMs = 10000;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const minis = [];
     for (let i = 0; i < count; i++) {
-        const el = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-sprout', '🌱');
+        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-sprout', '🌱');
         const m = {
             x: i % 2 === 0 ? 50 : window.innerWidth - 50,
             y: window.innerHeight - 60 - i * 30,
@@ -669,12 +669,12 @@ export function _egMechSproutlings(monster, phase) {
         };
         minis.push(m);
     }
-    _egNkToast('eg_mech_sprout', '🌱 The Sprout: Sproutlings! They just want a hug!');
+    _nkToast('eg_mech_sprout', '🌱 The Sprout: Sproutlings! They just want a hug!');
     let e = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         e += dtS * 1000;
-        const c = _egNkPlayerCenter();
-        const pr = _egNkPlayerRect();
+        const c = _nkPlayerCenter();
+        const pr = _nkPlayerRect();
         minis.forEach(m => {
             if (c) {
                 const dx = c.x - m.x, dy = c.y - m.y;
@@ -683,9 +683,9 @@ export function _egMechSproutlings(monster, phase) {
                 m.y += (dy / d) * speed * dtS;
             }
             m.el.style.transform = 'translate(' + Math.round(m.x - 14) + 'px,' + Math.round(m.y - 14) + 'px)';
-            if (pr && now >= m.cdUntil && _egNkDotHit(m.el, pr, 2)) {
+            if (pr && now >= m.cdUntil && _nkDotHit(m.el, pr, 2)) {
                 m.cdUntil = now + 700;
-                _egNkHit(dmgPct, EG_SPROUT_ELEMENT, level);
+                _nkHit(dmgPct, SPROUT_ELEMENT, level);
             }
         });
         return e < durMs;

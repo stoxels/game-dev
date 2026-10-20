@@ -22,7 +22,7 @@ function _goldNow() {
 }
 
 // Returns the current gold balance.
-export function egGetGold() {
+export function getGold() {
     return _goldNow();
 }
 
@@ -47,12 +47,12 @@ function _refreshTopBarGold() {
 }
 
 // Kept for callers that only want to persist the current balance.
-export function _egSyncGoldToState() {
+export function _syncGoldToState() {
     _setGold(_goldNow());
 }
 
 // Adds gold to the balance (negative amounts are ignored) and records the earning.
-export function _egAddGold(amount) {
+export function _addGold(amount) {
     amount = Math.max(0, Math.round(amount));
     _setGold(_goldNow() + amount);
     if (typeof trackAchStat === 'function') try { trackAchStat('egGoldEarned', amount); } catch(e){}
@@ -60,7 +60,7 @@ export function _egAddGold(amount) {
 
 // Attempts to spend `amount` gold. Returns false (without changing anything)
 // when the balance is insufficient.
-export function egSpendGold(amount) {
+export function spendGold(amount) {
     amount = Math.round(amount);
     if (amount < 0 || _goldNow() < amount) return false;
     _setGold(_goldNow() - amount);

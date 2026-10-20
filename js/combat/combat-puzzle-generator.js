@@ -1,5 +1,5 @@
-import { _egChainPuzzleSizeAllowed } from './encounter-chain-pool.js';
-import { EG_GEN_BUCKETS, EG_GEN_FONT_STACK, EG_GEN_RANDOM_REVEALS, EG_GEN_SIZES, EG_GEN_SYMBOLS } from './combat-puzzle-generator-data.js';
+import { _chainPuzzleSizeAllowed } from './encounter-chain-pool.js';
+import { GEN_BUCKETS, GEN_FONT_STACK, GEN_RANDOM_REVEALS, GEN_SIZES, GEN_SYMBOLS } from './combat-puzzle-generator-data.js';
 
 //------------------------------------------------------------------------
 //-------------------COMBAT PUZZLE GENERATOR------------------------------
@@ -16,12 +16,12 @@ import { EG_GEN_BUCKETS, EG_GEN_FONT_STACK, EG_GEN_RANDOM_REVEALS, EG_GEN_SIZES,
 //   'mixed'  - per puzzle: 70% symbol / 30% random
 //
 // Generated levels are appended to ALL and flagged with isGeneratedPuzzle
-// so _egBuildChainPool() never leaks them into the story pool. They carry
+// so _buildChainPool() never leaks them into the story pool. They carry
 // a real world number (random 1..WORLDS.length) so backgrounds, BGM and
 // all cur.world consumers keep working unchanged.
 //
 // Entry point:
-//   _egCreateGeneratedLevel(opts) → gi | null
+//   _createGeneratedLevel(opts) → gi | null
 //     opts: { mode:'symbol'|'random'|'mixed', tier:Number, minCells:Number }
 //------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ import { EG_GEN_BUCKETS, EG_GEN_FONT_STACK, EG_GEN_RANDOM_REVEALS, EG_GEN_SIZES,
 // resolution, then downsamples pixel coverage into a rows×cols binary grid.
 // Tries progressively lower coverage thresholds until the fill ratio lands
 // in a comfortable nonogram band; returns null when nothing was drawable.
-function _egRasterizeSymbolGrid(ch, rows, cols) {
+function _rasterizeSymbolGrid(ch, rows, cols) {
     if (typeof document === 'undefined') return null;
 
     const SS = 6;                       // supersample factor per grid cell
@@ -49,7 +49,7 @@ function _egRasterizeSymbolGrid(ch, rows, cols) {
     // Fit the glyph: start large, measure, then scale so it fills ~92% of
     // the box on its dominant axis.
     let fontSize = Math.min(W, H);
-    ctx.font = fontSize + 'px ' + EG_GEN_FONT_STACK;
+    ctx.font = fontSize + 'px ' + GEN_FONT_STACK;
     const m = ctx.measureText(ch);
     const gw = Math.max(1, m.width);
     const gh = Math.max(1,
@@ -57,7 +57,7 @@ function _egRasterizeSymbolGrid(ch, rows, cols) {
         (m.actualBoundingBoxDescent || fontSize * 0.25));
     const fit = Math.min((W * 0.92) / gw, (H * 0.92) / gh);
     fontSize = Math.max(10, Math.floor(fontSize * fit));
-    ctx.font = fontSize + 'px ' + EG_GEN_FONT_STACK;
+    ctx.font = fontSize + 'px ' + GEN_FONT_STACK;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#ffffff';
@@ -107,7 +107,7 @@ function _egRasterizeSymbolGrid(ch, rows, cols) {
 
 // One cellular-automata smoothing pass: cells with many filled neighbours
 // solidify, isolated cells vanish - turns noisy walks into organic blobs.
-function _egSmoothStructure(grid, rows, cols) {
+function _smoothStructure(grid, rows, cols) {
     const out = Array.from({ length: rows }, () => new Array(cols).fill(0));
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -125,7 +125,7 @@ function _egSmoothStructure(grid, rows, cols) {
 }
 
 // Counts fill stats used to accept/reject a candidate structure.
-function _egStructureStats(grid, rows, cols) {
+function _structureStats(grid, rows, cols) {
     let filled = 0;
     let liveRows = 0;
     let liveCols = 0;
@@ -149,7 +149,7 @@ function _egStructureStats(grid, rows, cols) {
 // Generates one random structure: drunkard-walk blobs with directional
 // momentum, CA smoothing, optional mirroring. Returns null if no valid
 // candidate is found within the retry budget.
-function _egGenerateRandomStructure(rows, cols, rng) {
+function _generateRandomStructure(rows, cols, rng) {
     const R = rng || Math.random;
     const cells = rows * cols;
 
@@ -185,8 +185,8 @@ function _egGenerateRandomStructure(rows, cols, rng) {
         }
 
         // Organic refinement
-        grid = _egSmoothStructure(grid, rows, cols);
-        if (R() < 0.5) grid = _egSmoothStructure(grid, rows, cols);
+        grid = _smoothStructure(grid, rows, cols);
+        if (R() < 0.5) grid = _smoothStructure(grid, rows, cols);
 
         // Optional symmetry - mirrored halves feel far more "designed"
         const symRoll = R();
@@ -201,7 +201,7 @@ function _egGenerateRandomStructure(rows, cols, rng) {
         }
 
         // Acceptance check: sane density and enough clue-bearing lines
-        const s = _egStructureStats(grid, rows, cols);
+        const s = _structureStats(grid, rows, cols);
         const ratio = s.filled / cells;
         if (ratio < 0.20 || ratio > 0.70) continue;
         if (s.liveRows < rows * 0.7 || s.liveCols < cols * 0.7) continue;
@@ -211,7 +211,7 @@ function _egGenerateRandomStructure(rows, cols, rng) {
     // Fallback: seeded scatter + heavy smoothing - always yields something
     let grid = Array.from({ length: rows }, () =>
         Array.from({ length: cols }, () => R() < 0.42 ? 1 : 0));
-    grid = _egSmoothStructure(_egSmoothStructure(grid, rows, cols), rows, cols);
+    grid = _smoothStructure(_smoothStructure(grid, rows, cols), rows, cols);
     return grid;
 }
 
@@ -226,12 +226,12 @@ function _egGenerateRandomStructure(rows, cols, rng) {
 // arenas to keep the fight on a small board.
 // Biases toward bigger grids as the map tier climbs. Falls back to the
 // closest eligible size when no size sits inside the window.
-function _egPickGeneratedSize(tier, minCells, bucket, maxRows, maxCols, rng, maxCells) {
+function _pickGeneratedSize(tier, minCells, bucket, maxRows, maxCols, rng, maxCells) {
     let lo = minCells || 0;
     let hi = (maxCells != null && maxCells > 0) ? maxCells : Infinity;
-    if (bucket && EG_GEN_BUCKETS[bucket]) {
-        lo = Math.max(lo, EG_GEN_BUCKETS[bucket][0]);
-        hi = Math.min(hi, EG_GEN_BUCKETS[bucket][1]);
+    if (bucket && GEN_BUCKETS[bucket]) {
+        lo = Math.max(lo, GEN_BUCKETS[bucket][0]);
+        hi = Math.min(hi, GEN_BUCKETS[bucket][1]);
     }
 
     const fits = s => {
@@ -243,13 +243,13 @@ function _egPickGeneratedSize(tier, minCells, bucket, maxRows, maxCols, rng, max
     // Keep generated puzzles inside the fun window even when the caller
     // did not pass explicit maxRows/maxCols (e.g. regular chain buckets).
     const chainOk = s => {
-        if (typeof _egChainPuzzleSizeAllowed === 'function') return _egChainPuzzleSizeAllowed(s.rows, s.cols);
+        if (typeof _chainPuzzleSizeAllowed === 'function') return _chainPuzzleSizeAllowed(s.rows, s.cols);
         if (s.rows > 20 || s.cols > 30) return false;
         if (s.rows > 15 && s.cols > 20) return false;
         return true;
     };
 
-    let list = EG_GEN_SIZES.filter(s => {
+    let list = GEN_SIZES.filter(s => {
         const cells = s.rows * s.cols;
         return cells >= lo && cells <= hi && fits(s) && chainOk(s);
     });
@@ -257,10 +257,10 @@ function _egPickGeneratedSize(tier, minCells, bucket, maxRows, maxCols, rng, max
     // Nothing inside the window (e.g. tiny bucket + high minCells floor):
     // use the smallest size that still satisfies the floor.
     if (!list.length) {
-        const above = EG_GEN_SIZES
+        const above = GEN_SIZES
             .filter(s => s.rows * s.cols >= lo && fits(s) && chainOk(s))
             .sort((a, b) => (a.rows * a.cols) - (b.rows * b.cols));
-        list = above.length ? [above[0]] : [EG_GEN_SIZES.filter(chainOk).slice(-1)[0] || EG_GEN_SIZES[EG_GEN_SIZES.length - 1]];
+        list = above.length ? [above[0]] : [GEN_SIZES.filter(chainOk).slice(-1)[0] || GEN_SIZES[GEN_SIZES.length - 1]];
     }
 
     const weights = list.map((s, i) => 1 + i * Math.min(0.6, tier * 0.08));
@@ -274,9 +274,9 @@ function _egPickGeneratedSize(tier, minCells, bucket, maxRows, maxCols, rng, max
 }
 
 // Chooses a symbol description from the shared symbol pool.
-function _egPickRandomSymbol(rng) {
+function _pickRandomSymbol(rng) {
     const R = rng || Math.random;
-    return EG_GEN_SYMBOLS[Math.floor(R() * EG_GEN_SYMBOLS.length)];
+    return GEN_SYMBOLS[Math.floor(R() * GEN_SYMBOLS.length)];
 }
 
 // Builds one generated puzzle level, appends it to ALL and returns its gi.
@@ -286,7 +286,7 @@ function _egPickRandomSymbol(rng) {
 // flavour text, world) derives from it, so the same seed always produces
 // the same grid - used by the atlas chain blueprints for per-map chains.
 // Returns null only if even the random fallback failed.
-export function _egCreateGeneratedLevel(opts) {
+export function _createGeneratedLevel(opts) {
     if (typeof ALL === 'undefined') return null;
     opts = opts || {};
     const tier = Math.max(1, opts.tier || 1);
@@ -297,7 +297,7 @@ export function _egCreateGeneratedLevel(opts) {
     let effMode = mode;
     if (mode === 'mixed') effMode = R() < 0.7 ? 'symbol' : 'random';
 
-    const size = _egPickGeneratedSize(tier, opts.minCells, opts.bucket, opts.maxRows, opts.maxCols, rng, opts.maxCells);
+    const size = _pickGeneratedSize(tier, opts.minCells, opts.bucket, opts.maxRows, opts.maxCols, rng, opts.maxCells);
 
     let grid = null;
     let symbolMeta = null;
@@ -306,14 +306,14 @@ export function _egCreateGeneratedLevel(opts) {
         // Try a few different glyphs - exotic characters may render empty
         // depending on installed fonts.
         for (let attempt = 0; attempt < 4 && !grid; attempt++) {
-            symbolMeta = _egPickRandomSymbol(rng);
-            grid = _egRasterizeSymbolGrid(symbolMeta.ch, size.rows, size.cols);
+            symbolMeta = _pickRandomSymbol(rng);
+            grid = _rasterizeSymbolGrid(symbolMeta.ch, size.rows, size.cols);
         }
         if (!grid) effMode = 'random';
     }
 
     if (!grid) {
-        grid = _egGenerateRandomStructure(size.rows, size.cols, rng);
+        grid = _generateRandomStructure(size.rows, size.cols, rng);
         symbolMeta = null;
     }
     if (!grid) return null;
@@ -342,7 +342,7 @@ export function _egCreateGeneratedLevel(opts) {
     } else {
         level.hint = 'Stochastic Pattern';
         level.hintDE = 'Stochastisches Muster';
-        const flavor = EG_GEN_RANDOM_REVEALS[Math.floor(R() * EG_GEN_RANDOM_REVEALS.length)];
+        const flavor = GEN_RANDOM_REVEALS[Math.floor(R() * GEN_RANDOM_REVEALS.length)];
         level.reveal = flavor.en;
         level.revealDE = flavor.de;
         level.bonusHint = 'Finish without mistakes';

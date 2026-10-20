@@ -46,7 +46,7 @@ let _lastNaturalH = 0;
 
 // True while a monster encounter runs on this level: only when the grid is so
 // big that no monster zone fits around it does the grid shrink a little to
-// leave room above (it stays centred; see _egLayoutSpawnZones in
+// leave room above (it stays centred; see _layoutSpawnZones in
 // combat/combat-monster-roam.js). Reset per level.
 let monsterRoom = false;
 // Extra px of height kept free above the grid while monsterRoom is on (0 = none).

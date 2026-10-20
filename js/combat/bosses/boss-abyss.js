@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkDodgeBusy, _nkDotTick, _nkEl, _nkFrozen, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE ABYSS (boss_abyss)-------------------------------
@@ -12,7 +12,7 @@ import { _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkLoop, _egNkNew
 // are referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_abyss: {
         id: 'boss_abyss', name: 'The Abyss', emoji: '🌑',
         baseHP: 1060, baseDamage: 21, chargeMax: 12,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_abyss: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -29,8 +29,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'fading_light', intervalBase: 22000, intervalVariance: 5000, handler: '_egMechAbyssDark' },
-            { name: 'frozen_cells', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechFrozenCells' },
+            { name: 'fading_light', intervalBase: 22000, intervalVariance: 5000, handler: '_mechAbyssDark' },
+            { name: 'frozen_cells', intervalBase: 18000, intervalVariance: 4000, handler: '_mechFrozenCells' },
         ],
     },
 });
@@ -38,28 +38,28 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // Darkness covers the screen except a shrinking circle that trails behind.
 // Stay inside the glow; smooth lines keep the lagging light with you.
-export function _egMechAbyssDark(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechAbyssDark(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const r0 = 280, r1 = 100;
     const followSpeed = 260; // px/s - slower than a sprinting avatar
     const dotPct = [0, 9, 11, 13][p];
     const durMs = 9000;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
-    const start = _egNkPlayerCenter();
+    const start = _nkPlayerCenter();
     const light = {
         x: start ? start.x : window.innerWidth / 2,
         y: start ? start.y : window.innerHeight / 2,
     };
-    const dark = _egNkEl(run, 'div', 'eg-nk-dark');
-    _egNkToast('eg_mech_dark', '🌑 The Abyss: Fading Light! Stay in the glow!');
+    const dark = _nkEl(run, 'div', 'eg-nk-dark');
+    _nkToast('eg_mech_dark', '🌑 The Abyss: Fading Light! Stay in the glow!');
     let e = 0, dotWarnAt = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         e += dtS * 1000;
         const f = Math.min(1, e / durMs);
         const r = Math.round(r0 + (r1 - r0) * f);
-        const c = _egNkPlayerCenter();
+        const c = _nkPlayerCenter();
         if (c) {
             const dx = c.x - light.x, dy = c.y - light.y;
             const d = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -73,10 +73,10 @@ export function _egMechAbyssDark(monster, phase) {
         if (c) {
             const d = Math.hypot(c.x - light.x, c.y - light.y);
             if (d > r) {
-                _egNkDotTick(run, dotPct, dtS, level, 'shadow');
+                _nkDotTick(run, dotPct, dtS, level, 'shadow');
                 if (now - dotWarnAt > 2500) {
                     dotWarnAt = now;
-                    _egNkToast('eg_nk_move', '⚠️ Back into the light!', '#a78bfa');
+                    _nkToast('eg_nk_move', '⚠️ Back into the light!', '#a78bfa');
                 }
             } else {
                 run.dotAcc = 0;

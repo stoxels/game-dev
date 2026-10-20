@@ -1,6 +1,6 @@
-import { _egRenderPanel } from '../encounter.js';
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+import { _renderPanel } from '../encounter.js';
+import { BOSS_DEFS, BOSS_MECHANICS, _bossScheduleMechanics } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkRuns, _nkToast } from './shared-boss-abilities.js';
 import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
@@ -12,10 +12,10 @@ import { cur } from '../../state.js';
 // mega-detonates. Be outside the ring.
 //------------------------------------------------------------------------
 
-export const _EG_CRP_DEBUG_SLOW = false;
-export const _EG_CRP_DEBUG_MULT = _EG_CRP_DEBUG_SLOW ? 2.5 : 1;
+export const _CRP_DEBUG_SLOW = false;
+export const _CRP_DEBUG_MULT = _CRP_DEBUG_SLOW ? 2.5 : 1;
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_creeper: {
         id: 'boss_creeper', name: 'The Creeper', emoji: '💥',
         baseHP: 1020, baseDamage: 23, chargeMax: 12,
@@ -23,7 +23,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_creeper: {
         phases: [
             // Basic attacks stay a steady pressure (the framework floors
@@ -34,22 +34,22 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'creeper_pack', intervalBase: 17000, intervalVariance: 4000, handler: '_egMechCreeperPack' },
-            { name: 'fuse_pounce', intervalBase: 15000, intervalVariance: 4000, handler: '_egMechCreeperPounce' },
-            { name: 'tnt_chain', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechTntChain', phase2Only: true },
+            { name: 'creeper_pack', intervalBase: 17000, intervalVariance: 4000, handler: '_mechCreeperPack' },
+            { name: 'fuse_pounce', intervalBase: 15000, intervalVariance: 4000, handler: '_mechCreeperPounce' },
+            { name: 'tnt_chain', intervalBase: 21000, intervalVariance: 5000, handler: '_mechTntChain', phase2Only: true },
         ],
-        onPhaseEnter: _egCrpOnPhaseEnter,
+        onPhaseEnter: _crpOnPhaseEnter,
     },
 });
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-export const EG_CRP_PACK_DMG = [0, 0.20, 0.24, 0.28];      // per creeper blast, by phase
-export const EG_CRP_PACK_DMG_CHARGED = 0.34;               // charged creeper blast (P3)
-export const EG_CRP_TNT_DMG = [0, 0, 0.15, 0.18];          // per TNT block, by phase
-export const EG_CRP_POUNCE_DMG = [0, 0.17, 0.20, 0.23];    // per pounce blast, by phase
-export const EG_CRP_FINAL_DMG = 0.32;                      // SSSS…BOOM mega blast
-export const EG_CRP_HIT_CD_MS = 700;                       // shared blast-hit cooldown
+export const CRP_PACK_DMG = [0, 0.20, 0.24, 0.28];      // per creeper blast, by phase
+export const CRP_PACK_DMG_CHARGED = 0.34;               // charged creeper blast (P3)
+export const CRP_TNT_DMG = [0, 0, 0.15, 0.18];          // per TNT block, by phase
+export const CRP_POUNCE_DMG = [0, 0.17, 0.20, 0.23];    // per pounce blast, by phase
+export const CRP_FINAL_DMG = 0.32;                      // SSSS…BOOM mega blast
+export const CRP_HIT_CD_MS = 700;                       // shared blast-hit cooldown
 
 
 //------------------------------------------------------------------------
@@ -57,7 +57,7 @@ export const EG_CRP_HIT_CD_MS = 700;                       // shared blast-hit c
 //------------------------------------------------------------------------
 
 // Center of the playable grid (from corner cells), or viewport fallback.
-export function _egCrpGridCenter() {
+export function _crpGridCenter() {
     if (typeof cur !== 'undefined' && cur && cur.grid && cur.grid.length && cur.grid[0]) {
         const a = document.getElementById('g-0-0');
         const b = document.getElementById('g-' + (cur.grid.length - 1) + '-' + (cur.grid[0].length - 1));
@@ -77,7 +77,7 @@ export function _egCrpGridCenter() {
 // body-level (run-independent) so the visuals survive the run ending in
 // the same frame - the layer self-removes. pct > 0 damages the player when
 // their hitbox overlaps the blast disc.
-export function _egCrpBoom(x, y, radius, pct, level, label) {
+export function _crpBoom(x, y, radius, pct, level, label) {
     const R = Math.max(10, radius);
     const layer = document.createElement('div');
     layer.className = 'eg-crp-burst';
@@ -111,22 +111,22 @@ export function _egCrpBoom(x, y, radius, pct, level, label) {
     crater.style.left = Math.round(x - R * 0.55) + 'px';
     crater.style.top = Math.round(y - R * 0.55) + 'px';
     document.body.appendChild(crater);
-    setTimeout(() => { try { crater.remove(); } catch (e) {} }, _EG_CRP_DEBUG_SLOW ? 6000 : 4200);
+    setTimeout(() => { try { crater.remove(); } catch (e) {} }, _CRP_DEBUG_SLOW ? 6000 : 4200);
 
-    setTimeout(() => { try { layer.remove(); } catch (e) {} }, _EG_CRP_DEBUG_SLOW ? 2600 : 950);
+    setTimeout(() => { try { layer.remove(); } catch (e) {} }, _CRP_DEBUG_SLOW ? 2600 : 950);
 
     if (pct > 0) {
-        const pr = _egNkPlayerRect();
-        if (pr && _egNkCircleHit(x, y, R, pr, 0)) {
-            const dealt = _egNkHit(pct, 'fire', level);
-            _egNkAbilityHitToast(dealt, 'The Creeper', label);
+        const pr = _nkPlayerRect();
+        if (pr && _nkCircleHit(x, y, R, pr, 0)) {
+            const dealt = _nkHit(pct, 'fire', level);
+            _nkAbilityHitToast(dealt, 'The Creeper', label);
         }
     }
 }
 
 // A dashed circle showing a blast's real reach (radius r) at (x, y).
-function _egCrpReach(run, x, y, r, cls) {
-    const el = _egNkEl(run, 'div', 'eg-crp-reach' + (cls ? ' ' + cls : ''));
+function _crpReach(run, x, y, r, cls) {
+    const el = _nkEl(run, 'div', 'eg-crp-reach' + (cls ? ' ' + cls : ''));
     el.style.left = Math.round(x - r) + 'px';
     el.style.top = Math.round(y - r) + 'px';
     el.style.width = el.style.height = Math.round(r * 2) + 'px';
@@ -136,8 +136,8 @@ function _egCrpReach(run, x, y, r, cls) {
 // Builds one creeper sprite: a fixed outer dot (translate-positioned) with
 // the classic green cube + face as CHILD elements (scale/filter animations
 // run on the child - never on the fixed wrapper).
-export function _egCrpSprite(run, charged) {
-    const dot = _egNkEl(run, 'div', 'eg-nk-dot eg-crp-creeper' + (charged ? ' eg-crp-charged' : ''));
+export function _crpSprite(run, charged) {
+    const dot = _nkEl(run, 'div', 'eg-nk-dot eg-crp-creeper' + (charged ? ' eg-crp-charged' : ''));
     const body = document.createElement('div');
     body.className = 'eg-crp-body';
     dot.appendChild(body);
@@ -146,7 +146,7 @@ export function _egCrpSprite(run, charged) {
 
 // Updates a creeper sprite from its fuse (0..1): swell + white flash as the
 // fuse climbs. All style writes go on the body child.
-export function _egCrpFuseVisual(sprite, fuse) {
+export function _crpFuseVisual(sprite, fuse) {
     if (!sprite.body) return;
     const swell = 1 + fuse * 0.4;
     sprite.body.style.scale = swell.toFixed(3);
@@ -161,8 +161,8 @@ export function _egCrpFuseVisual(sprite, fuse) {
 
 // Teardown - registered in boss-framework.js cleanup chain (startsWith
 // 'boss_creeper'; runtime ids are suffixed). Clears the set-piece.
-export function _egCrpTeardown() {
-    if (_egCrpFinal) _egCrpFinalEnd(_egCrpFinal);
+export function _crpTeardown() {
+    if (_crpFinal) _crpFinalEnd(_crpFinal);
     document.body.classList.remove('eg-crp-flash');
     document.querySelectorAll('.eg-crp-flying').forEach(el => el.classList.remove('eg-crp-flying'));
     document.querySelectorAll('.eg-crp-finaledge, .eg-crp-finalring').forEach(el => { try { el.remove(); } catch (e) {} });
@@ -178,37 +178,37 @@ export function _egCrpTeardown() {
 // follows it as a dashed ring. Fuse ≥ 1 → detonation. Standing
 // still = surrounded by simultaneous booms; perfect kiting = they cool off
 // and wander away when the pack window ends.
-export const EG_CRP_PACK_COUNT = [0, 2, 3, 4];
-export const EG_CRP_PACK_SPEED = [0, 80, 95, 112];
-export const EG_CRP_PACK_HEAT_RATE = [0, 0.40, 0.50, 0.62];    // fuse/s inside range
-export const EG_CRP_PACK_COOL_RATE = 0.35;                     // fuse/s outside range
-export const EG_CRP_PACK_RANGE = 130;
-export const EG_CRP_PACK_BLAST_R = [0, 150, 170, 190];
-export const EG_CRP_PACK_DUR_MS = 14000;
+export const CRP_PACK_COUNT = [0, 2, 3, 4];
+export const CRP_PACK_SPEED = [0, 80, 95, 112];
+export const CRP_PACK_HEAT_RATE = [0, 0.40, 0.50, 0.62];    // fuse/s inside range
+export const CRP_PACK_COOL_RATE = 0.35;                     // fuse/s outside range
+export const CRP_PACK_RANGE = 130;
+export const CRP_PACK_BLAST_R = [0, 150, 170, 190];
+export const CRP_PACK_DUR_MS = 14000;
 
-export function _egMechCreeperPack(monster, phase) {
-    if (_egNkFrozen()) return;
+export function _mechCreeperPack(monster, phase) {
+    if (_nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(monster && monster.id, true);
-    // Field mechanic: passive so it never trips _egNkDodgeBusy() - packs
+    const run = _nkNewRun(monster && monster.id, true);
+    // Field mechanic: passive so it never trips _nkDodgeBusy() - packs
     // overlap TNT chains and pounces instead of starving them (same fix as
     // the Bomber's Mine Collar).
     run.passive = true;
-    const speed = EG_CRP_PACK_SPEED[p];
-    const heatRate = EG_CRP_PACK_HEAT_RATE[p];
-    const blastR = EG_CRP_PACK_BLAST_R[p];
-    const durMs = EG_CRP_PACK_DUR_MS * _EG_CRP_DEBUG_MULT;
-    const dmgPct = EG_CRP_PACK_DMG[p];
+    const speed = CRP_PACK_SPEED[p];
+    const heatRate = CRP_PACK_HEAT_RATE[p];
+    const blastR = CRP_PACK_BLAST_R[p];
+    const durMs = CRP_PACK_DUR_MS * _CRP_DEBUG_MULT;
+    const dmgPct = CRP_PACK_DMG[p];
 
-    _egNkToast('eg_mech_creeper_pack', '💥 The Creeper: CREEPER PACK - mind the fuses!', '#22c55e');
+    _nkToast('eg_mech_creeper_pack', '💥 The Creeper: CREEPER PACK - mind the fuses!', '#22c55e');
 
     const creepers = [];
-    for (let i = 0; i < EG_CRP_PACK_COUNT[p]; i++) {
+    for (let i = 0; i < CRP_PACK_COUNT[p]; i++) {
         // One CHARGED creeper joins the pack in phase 3 (blue aura, faster,
         // bigger boom) - the Minecraft lightning-charged homage.
-        const charged = p >= 3 && i === EG_CRP_PACK_COUNT[p] - 1;
-        const sprite = _egCrpSprite(run, charged);
+        const charged = p >= 3 && i === CRP_PACK_COUNT[p] - 1;
+        const sprite = _crpSprite(run, charged);
         const side = i % 4;
         const x = side === 0 ? 60 : side === 2 ? window.innerWidth - 60 : Math.random() * window.innerWidth;
         const y = side === 1 ? 90 : side === 3 ? window.innerHeight - 120 : Math.random() * (window.innerHeight - 200) + 90;
@@ -217,15 +217,15 @@ export function _egMechCreeperPack(monster, phase) {
             rate: heatRate * (charged ? 1.6 : 1),
             speed: speed * (charged ? 1.25 : 1),
             radius: blastR + (charged ? 55 : 0),
-            dmg: charged ? EG_CRP_PACK_DMG_CHARGED : dmgPct,
+            dmg: charged ? CRP_PACK_DMG_CHARGED : dmgPct,
         });
     }
 
     let t = 0;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         t += dtS * 1000;
         let pending = false;
-        const c = _egNkPlayerCenter();
+        const c = _nkPlayerCenter();
 
         creepers.forEach(s => {
             if (s.blown) return;
@@ -243,15 +243,15 @@ export function _egMechCreeperPack(monster, phase) {
                 const d = Math.sqrt(dx * dx + dy * dy) || 1;
                 s.x += (dx / d) * s.speed * dtS;
                 s.y += (dy / d) * s.speed * dtS;
-                s.fuse += (d < EG_CRP_PACK_RANGE ? s.rate : -EG_CRP_PACK_COOL_RATE) * dtS;
+                s.fuse += (d < CRP_PACK_RANGE ? s.rate : -CRP_PACK_COOL_RATE) * dtS;
                 s.fuse = Math.max(0, Math.min(1, s.fuse));
             }
             if (s.sprite.dot) s.sprite.dot.style.transform = 'translate(' + Math.round(s.x - 22) + 'px,' + Math.round(s.y - 22) + 'px)';
-            _egCrpFuseVisual(s.sprite, s.fuse);
+            _crpFuseVisual(s.sprite, s.fuse);
             // Warm fuse: its real blast reach follows it as a dashed ring
             // (the blast is far bigger than the creeper itself).
             if (s.fuse > 0.3) {
-                if (!s.reach) s.reach = _egCrpReach(run, s.x, s.y, s.radius, 'eg-crp-reach-pack');
+                if (!s.reach) s.reach = _crpReach(run, s.x, s.y, s.radius, 'eg-crp-reach-pack');
                 s.reach.style.left = Math.round(s.x - s.radius) + 'px';
                 s.reach.style.top = Math.round(s.y - s.radius) + 'px';
                 s.reach.style.opacity = Math.min(1, (s.fuse - 0.3) / 0.4).toFixed(2);
@@ -259,7 +259,7 @@ export function _egMechCreeperPack(monster, phase) {
             if (s.fuse >= 1) {
                 s.blown = true;
                 if (s.reach) { try { s.reach.remove(); } catch (e) {} s.reach = null; }
-                _egCrpBoom(s.x, s.y, s.radius, s.dmg, level, 'Creeper Pack');
+                _crpBoom(s.x, s.y, s.radius, s.dmg, level, 'Creeper Pack');
                 setTimeout(() => { try { s.sprite.dot.remove(); } catch (e) {} }, 300);
             }
         });
@@ -275,39 +275,39 @@ export function _egMechCreeperPack(monster, phase) {
 // A creeper leaps from above onto your CURRENT position: a shadow marker
 // grows while it falls, it lands, hisses (fast white blink + swell) for a
 // short fuse, then blows. One pounce per trigger; two staggered in P3.
-export const EG_CRP_POUNCE_FALL_MS = 550;
-export const EG_CRP_POUNCE_FUSE_MS = 1500;
-export const EG_CRP_POUNCE_BLAST_R = 140;
+export const CRP_POUNCE_FALL_MS = 550;
+export const CRP_POUNCE_FUSE_MS = 1500;
+export const CRP_POUNCE_BLAST_R = 140;
 
-export function _egMechCreeperPounce(monster, phase) {
-    if (_egNkFrozen()) return;
+export function _mechCreeperPounce(monster, phase) {
+    if (_nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const pounces = p >= 3 ? 2 : 1;
-    const gapMs = p >= 3 ? 2500 * _EG_CRP_DEBUG_MULT : 0;
-    const fallMs = EG_CRP_POUNCE_FALL_MS * _EG_CRP_DEBUG_MULT;
-    const fuseMs = EG_CRP_POUNCE_FUSE_MS * _EG_CRP_DEBUG_MULT;
-    const dmgPct = EG_CRP_POUNCE_DMG[p];
+    const gapMs = p >= 3 ? 2500 * _CRP_DEBUG_MULT : 0;
+    const fallMs = CRP_POUNCE_FALL_MS * _CRP_DEBUG_MULT;
+    const fuseMs = CRP_POUNCE_FUSE_MS * _CRP_DEBUG_MULT;
+    const dmgPct = CRP_POUNCE_DMG[p];
 
-    _egNkToast('eg_mech_creeper_pounce', '💥 The Creeper: FUSE POUNCE - move from your spot!', '#22c55e');
+    _nkToast('eg_mech_creeper_pounce', '💥 The Creeper: FUSE POUNCE - move from your spot!', '#22c55e');
 
     for (let i = 0; i < pounces; i++) {
         const at = i * gapMs;
-        const pc = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+        const pc = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
         const x = Math.max(70, Math.min(window.innerWidth - 70, pc.x));
         const y = Math.max(110, Math.min(window.innerHeight - 110, pc.y));
-        const sprite = _egCrpSprite(run, false);
+        const sprite = _crpSprite(run, false);
         // The marker is the real blast disc (it was 84px for a 140px blast).
-        const R = EG_CRP_POUNCE_BLAST_R;
-        const marker = _egNkEl(run, 'div', 'eg-crp-marker');
+        const R = CRP_POUNCE_BLAST_R;
+        const marker = _nkEl(run, 'div', 'eg-crp-marker');
         marker.style.width = (R * 2) + 'px';
         marker.style.height = (R * 2) + 'px';
         marker.style.left = Math.round(x - R) + 'px';
         marker.style.top = Math.round(y - R) + 'px';
 
         const state = { phase: 'wait', t: -at };
-        _egNkLoop(run, (dtS) => {
+        _nkLoop(run, (dtS) => {
             if (state.phase === 'done') return false;
             state.t += dtS * 1000;
             let t2 = state.t;
@@ -330,10 +330,10 @@ export function _egMechCreeperPounce(monster, phase) {
                 return true;
             }
             if (state.phase === 'hiss') {
-                _egCrpFuseVisual(sprite, Math.min(1, t2 / fuseMs) * 1.15);
+                _crpFuseVisual(sprite, Math.min(1, t2 / fuseMs) * 1.15);
                 if (t2 >= fuseMs) {
                     state.phase = 'done';
-                    _egCrpBoom(x, y, EG_CRP_POUNCE_BLAST_R, dmgPct, level, 'Fuse Pounce');
+                    _crpBoom(x, y, CRP_POUNCE_BLAST_R, dmgPct, level, 'Fuse Pounce');
                     setTimeout(() => {
                         try { sprite.dot.remove(); marker.remove(); } catch (e) {}
                     }, 200);
@@ -353,27 +353,27 @@ export function _egMechCreeperPounce(monster, phase) {
 // blocks flash faster and faster during the wind-up, then detonate in a
 // rolling CHAIN REACTION outward from the centre block (~85 ms steps).
 // The blast wave travels visibly - leave the cluster entirely.
-export const EG_CRP_TNT_COUNT = [0, 0, 6, 9];
-export const EG_CRP_TNT_CLUSTER_R = [0, 0, 190, 230];
-export const EG_CRP_TNT_WINDUP_MS = 2100;
-export const EG_CRP_TNT_CASCADE_MS = 85;
-export const EG_CRP_TNT_BLAST_R = 110;
+export const CRP_TNT_COUNT = [0, 0, 6, 9];
+export const CRP_TNT_CLUSTER_R = [0, 0, 190, 230];
+export const CRP_TNT_WINDUP_MS = 2100;
+export const CRP_TNT_CASCADE_MS = 85;
+export const CRP_TNT_BLAST_R = 110;
 
-export function _egMechTntChain(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechTntChain(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(monster && monster.id, true);
-    const count = EG_CRP_TNT_COUNT[p];
-    const clusterR = EG_CRP_TNT_CLUSTER_R[p];
-    const windupMs = EG_CRP_TNT_WINDUP_MS * _EG_CRP_DEBUG_MULT;
-    const dmgPct = EG_CRP_TNT_DMG[p];
-    const pc = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const run = _nkNewRun(monster && monster.id, true);
+    const count = CRP_TNT_COUNT[p];
+    const clusterR = CRP_TNT_CLUSTER_R[p];
+    const windupMs = CRP_TNT_WINDUP_MS * _CRP_DEBUG_MULT;
+    const dmgPct = CRP_TNT_DMG[p];
+    const pc = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     // Cluster centre biased toward the player, clamped on-screen.
     const cx = Math.max(clusterR * 0.7, Math.min(window.innerWidth - clusterR * 0.7, pc.x + (Math.random() * 2 - 1) * 60));
     const cy = Math.max(clusterR * 0.7 + 40, Math.min(window.innerHeight - clusterR * 0.7 - 30, pc.y + (Math.random() * 2 - 1) * 60));
 
-    _egNkToast('eg_mech_creeper_tnt', '💥 The Creeper: TNT CHAIN - get out of the cluster!', '#f87171');
+    _nkToast('eg_mech_creeper_tnt', '💥 The Creeper: TNT CHAIN - get out of the cluster!', '#f87171');
 
     const blocks = [];
     for (let i = 0; i < count; i++) {
@@ -381,19 +381,19 @@ export function _egMechTntChain(monster, phase) {
         const dist = clusterR * (0.25 + Math.random() * 0.75);
         const x = Math.max(60, Math.min(window.innerWidth - 60, cx + Math.cos(ang) * dist));
         const y = Math.max(90, Math.min(window.innerHeight - 90, cy + Math.sin(ang) * dist));
-        const el = _egNkEl(run, 'div', 'eg-nk-dot eg-crp-tnt', 'TNT');
+        const el = _nkEl(run, 'div', 'eg-nk-dot eg-crp-tnt', 'TNT');
         el.style.transform = 'translate(' + Math.round(x - 24) + 'px,' + Math.round(y - 16) + 'px)';
         blocks.push({ x, y, el, dCenter: Math.hypot(x - cx, y - cy), blown: false });
     }
     blocks.sort((a, b) => a.dCenter - b.dCenter);
     // The whole danger area: every block's blast disc, outlined as one ring.
     let far = 0;
-    blocks.forEach(b => { far = Math.max(far, b.dCenter + EG_CRP_TNT_BLAST_R); });
-    _egCrpReach(run, cx, cy, far, 'eg-crp-reach-tnt');
+    blocks.forEach(b => { far = Math.max(far, b.dCenter + CRP_TNT_BLAST_R); });
+    _crpReach(run, cx, cy, far, 'eg-crp-reach-tnt');
 
     let t = 0;
     let boomIdx = 0;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         t += dtS * 1000;
 
         // Wind-up: flash accelerates; CSS handles the blink rate ramp.
@@ -406,16 +406,16 @@ export function _egMechTntChain(monster, phase) {
         }
 
         // Chain reaction: centre block first, cascading outward.
-        while (boomIdx < blocks.length && t >= windupMs + boomIdx * EG_CRP_TNT_CASCADE_MS) {
+        while (boomIdx < blocks.length && t >= windupMs + boomIdx * CRP_TNT_CASCADE_MS) {
             const b = blocks[boomIdx];
             boomIdx++;
             if (b.blown) continue;
             b.blown = true;
             if (b.el) { try { b.el.remove(); } catch (e) {} b.el = null; }
-            _egCrpBoom(b.x, b.y, EG_CRP_TNT_BLAST_R, dmgPct, level, 'TNT Chain');
+            _crpBoom(b.x, b.y, CRP_TNT_BLAST_R, dmgPct, level, 'TNT Chain');
         }
         // Keep the run alive for the tail of the last blasts.
-        return boomIdx < blocks.length || t < windupMs + blocks.length * EG_CRP_TNT_CASCADE_MS + 800;
+        return boomIdx < blocks.length || t < windupMs + blocks.length * CRP_TNT_CASCADE_MS + 800;
     });
 }
 
@@ -427,35 +427,35 @@ export function _egMechTntChain(monster, phase) {
 // while a huge red blast ring grows around it. At zero: MEGA detonation
 // (huge radius + screen flash + a long-lasting crater) and the immunity
 // releases. The auto-attack charge bar freezes for the whole set-piece
-// (gate in _egTickPlayer, endgame-encounter.js - _egCrpFinalActive).
-export const EG_CRP_FINAL_CD_TICK_MS = 1000;
-export const EG_CRP_FINAL_CD_TICKS = 3;
-export const EG_CRP_FINAL_BLAST_R_PCT = 0.42;              // of min(vw, vh)
+// (gate in _tickPlayer, endgame-encounter.js - _crpFinalActive).
+export const CRP_FINAL_CD_TICK_MS = 1000;
+export const CRP_FINAL_CD_TICKS = 3;
+export const CRP_FINAL_BLAST_R_PCT = 0.42;              // of min(vw, vh)
 
-// Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-export let _egCrpFinal = null;
+// Set while the finale runs (read by _tickPlayer's charge-freeze gate).
+export let _crpFinal = null;
 
-export function _egCrpFinalActive() {
-    return !!_egCrpFinal && !_egCrpFinal.finished;
+export function _crpFinalActive() {
+    return !!_crpFinal && !_crpFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-export function _egCrpOnPhaseEnter(monster, newPhase) {
+export function _crpOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
-    try { _egCrpStartFinalWatcher(monster); } catch (e) {}
+    try { _crpStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-export function _egCrpStartFinalWatcher(monster) {
-    if (!monster || _egCrpFinal) return;
-    const run = _egNkNewRun(monster.id, true);
+export function _crpStartFinalWatcher(monster) {
+    if (!monster || _crpFinal) return;
+    const run = _nkNewRun(monster.id, true);
     run.passive = true;
-    _egNkLoop(run, () => {
-        if (_egCrpFinal) return false;
+    _nkLoop(run, () => {
+        if (_crpFinal) return false;
         try {
             if (monster.currentHP <= monster.maxHP * 0.10) {
-                _egCrpFinalStart(monster);
+                _crpFinalStart(monster);
                 return false;
             }
         } catch (e) { return false; }
@@ -463,31 +463,31 @@ export function _egCrpStartFinalWatcher(monster) {
     });
 }
 
-export function _egCrpFinalStart(monster) {
-    if (_egCrpFinal || !monster) return;
+export function _crpFinalStart(monster) {
+    if (_crpFinal || !monster) return;
 
     // The arena goes quiet: kill every other run of this boss.
-    Array.from(_egNkRuns.values()).forEach(r => {
-        if (r.bossId === monster.id) { try { _egNkKillRun(r); } catch (e) {} }
+    Array.from(_nkRuns.values()).forEach(r => {
+        if (r.bossId === monster.id) { try { _nkKillRun(r); } catch (e) {} }
     });
 
     const g = {
         monsterId: monster.id,
         finished: false,
-        count: EG_CRP_FINAL_CD_TICKS,
+        count: CRP_FINAL_CD_TICKS,
         overlay: null,
         ringEl: null,
         run: null,
         cdTimer: null,
         bangAt: 0,
         boomed: false,
-        center: _egCrpGridCenter(),
-        blastR: Math.min(window.innerWidth, window.innerHeight) * EG_CRP_FINAL_BLAST_R_PCT,
+        center: _crpGridCenter(),
+        blastR: Math.min(window.innerWidth, window.innerHeight) * CRP_FINAL_BLAST_R_PCT,
     };
-    _egCrpFinal = g;
+    _crpFinal = g;
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
-    // lives in _egTickPlayer; this class is the visual twin).
+    // lives in _tickPlayer; this class is the visual twin).
     ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('eg-charge-paused');
@@ -513,7 +513,7 @@ export function _egCrpFinalStart(monster) {
     g.edgeEl = edge;
     // Animate to full size over the countdown (debug-stretched so it can
     // be screenshot mid-growth).
-    const growS = _EG_CRP_DEBUG_SLOW ? 8 : 2.8;
+    const growS = _CRP_DEBUG_SLOW ? 8 : 2.8;
     requestAnimationFrame(() => {
         ring.style.transition = 'width ' + growS + 's ease-in, height ' + growS + 's ease-in, margin ' + growS + 's ease-in';
         ring.style.width = Math.round(g.blastR * 2) + 'px';
@@ -540,23 +540,23 @@ export function _egCrpFinalStart(monster) {
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_creeper_final_cd', '💥 SSSS… BOOM INCOMING - flee the red ring!', '#f87171');
+    _nkToast('eg_mech_creeper_final_cd', '💥 SSSS… BOOM INCOMING - flee the red ring!', '#f87171');
 
     // Boss immunity so the set-piece reads as a hold (released at the end).
     monster.bossImmune = true;
 
     // Debug: extra-long ticks so screenshots can catch the ring + countdown.
-    const cdTick = EG_CRP_FINAL_CD_TICK_MS * (_EG_CRP_DEBUG_SLOW ? 10 : 1);
+    const cdTick = CRP_FINAL_CD_TICK_MS * (_CRP_DEBUG_SLOW ? 10 : 1);
     g.cdTimer = setInterval(() => {
-        if (!_egCrpFinal || _egCrpFinal !== g || g.finished) return;
-        if (_egNkFrozen()) return;   // pause / death / inactive hold the count
+        if (!_crpFinal || _crpFinal !== g || g.finished) return;
+        if (_nkFrozen()) return;   // pause / death / inactive hold the count
         g.count--;
         if (g.count <= 0) {
             clearInterval(g.cdTimer);
             g.cdTimer = null;
             try { g.overlay.remove(); } catch (e) {}
             g.overlay = null;
-            _egCrpFinalBang(g, monster);
+            _crpFinalBang(g, monster);
             return;
         }
         const num = g.overlay && g.overlay.querySelector('.eg-crp-cd-num');
@@ -571,26 +571,26 @@ export function _egCrpFinalStart(monster) {
 
 // The BOOM: one gigantic blast around the boss position + screen flash +
 // a long crater. Damage test once, globally (outside the ring = hit).
-export function _egCrpFinalBang(g, monster) {
+export function _crpFinalBang(g, monster) {
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(g.monsterId, true);
+    const run = _nkNewRun(g.monsterId, true);
     g.run = run;
-    run.onKill = () => { if (_egCrpFinal === g) { try { _egCrpFinalEnd(g); } catch (e) {} } };
+    run.onKill = () => { if (_crpFinal === g) { try { _crpFinalEnd(g); } catch (e) {} } };
     g.bangAt = performance.now();
 
-    _egNkToast('eg_mech_creeper_final_bang', '💥💀 SSSS… BOOM!', '#f87171');
+    _nkToast('eg_mech_creeper_final_bang', '💥💀 SSSS… BOOM!', '#f87171');
 
     // Screen flash at the moment of the bang.
     document.body.classList.add('eg-crp-flash');
     setTimeout(() => document.body.classList.remove('eg-crp-flash'), 700);
 
     // Mega blast, centred on the boss (run-independent visuals).
-    _egCrpBoom(g.center.x, g.center.y, g.blastR, EG_CRP_FINAL_DMG, level, 'SSSS…BOOM');
+    _crpBoom(g.center.x, g.center.y, g.blastR, CRP_FINAL_DMG, level, 'SSSS…BOOM');
 
     // Small shockwave ring expanding past the blast edge (visual only).
     for (let i = 1; i <= 3; i++) {
         const id = setTimeout(() => {
-            _egCrpBoom(g.center.x + (Math.random() * 2 - 1) * g.blastR * 0.6,
+            _crpBoom(g.center.x + (Math.random() * 2 - 1) * g.blastR * 0.6,
                 g.center.y + (Math.random() * 2 - 1) * g.blastR * 0.6,
                 g.blastR * (0.4 + i * 0.18), 0, level, '');
         }, i * 160);
@@ -599,18 +599,18 @@ export function _egCrpFinalBang(g, monster) {
 
     // Wind down, then hand control back to the boss (debug: linger long
     // enough for the blast visuals to be captured).
-    const id2 = setTimeout(() => _egCrpFinalEnd(g), _EG_CRP_DEBUG_SLOW ? 7000 : 1400);
+    const id2 = setTimeout(() => _crpFinalEnd(g), _CRP_DEBUG_SLOW ? 7000 : 1400);
     run.timers.push(id2);
 }
 
-export function _egCrpFinalEnd(g) {
+export function _crpFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
     if (g.overlay) { try { g.overlay.remove(); } catch (e) {} g.overlay = null; }
     if (g.ringEl) { try { g.ringEl.remove(); } catch (e) {} g.ringEl = null; }
     if (g.edgeEl) { try { g.edgeEl.remove(); } catch (e) {} g.edgeEl = null; }
-    if (g.run) { try { _egNkKillRun(g.run); } catch (e) {} g.run = null; }
+    if (g.run) { try { _nkKillRun(g.run); } catch (e) {} g.run = null; }
     ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.remove('eg-charge-paused');
@@ -618,16 +618,16 @@ export function _egCrpFinalEnd(g) {
     document.body.classList.remove('eg-crp-flash');
     document.querySelectorAll('.eg-crp-flying').forEach(el => el.classList.remove('eg-crp-flying'));
 
-    const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
+    const m = (g.monsterId && typeof _monsters !== 'undefined')
+        ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
-        if (typeof _egBossScheduleMechanics === 'function') {
-            try { _egBossScheduleMechanics(m, 3); } catch (e) {}
+        if (typeof _bossScheduleMechanics === 'function') {
+            try { _bossScheduleMechanics(m, 3); } catch (e) {}
         }
-        if (typeof _egRenderPanel === 'function') { try { _egRenderPanel(); } catch (e) {} }
+        if (typeof _renderPanel === 'function') { try { _renderPanel(); } catch (e) {} }
     }
-    if (_egCrpFinal === g) _egCrpFinal = null;
+    if (_crpFinal === g) _crpFinal = null;
 }
 
 
@@ -635,27 +635,27 @@ export function _egCrpFinalEnd(g) {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_CRP_DEBUG.fire('pack'|'chain'|'pounce') - runs one mechanic now
-//   _EG_CRP_DEBUG.final()                       - SSSS…BOOM now
+//   _CRP_DEBUG.fire('pack'|'chain'|'pounce') - runs one mechanic now
+//   _CRP_DEBUG.final()                       - SSSS…BOOM now
 if (typeof window !== 'undefined') {
-    window._EG_CRP_DEBUG = {
+    window._CRP_DEBUG = {
         fire: (name, phase) => {
-            const monster = (typeof _egMonsters !== 'undefined')
-                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_creeper') : null;
+            const monster = (typeof _monsters !== 'undefined')
+                ? globalThis._monsters.find(m => m && m.baseId === 'boss_creeper') : null;
             if (!monster) return 'no creeper alive';
-            const fn = name === 'pack' ? _egMechCreeperPack
-                : name === 'chain' ? _egMechTntChain
-                : name === 'pounce' ? _egMechCreeperPounce : null;
+            const fn = name === 'pack' ? _mechCreeperPack
+                : name === 'chain' ? _mechTntChain
+                : name === 'pounce' ? _mechCreeperPounce : null;
             if (!fn) return 'unknown: ' + name;
-            if (name === 'chain' && _egNkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for pounces to land)';
+            if (name === 'chain' && _nkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for pounces to land)';
             fn(monster, phase || monster.bossPhase || 1);
             return 'fired ' + name;
         },
         final: () => {
-            const monster = (typeof _egMonsters !== 'undefined')
-                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_creeper') : null;
+            const monster = (typeof _monsters !== 'undefined')
+                ? globalThis._monsters.find(m => m && m.baseId === 'boss_creeper') : null;
             if (!monster) return 'no creeper alive';
-            _egCrpFinalStart(monster);
+            _crpFinalStart(monster);
             return 'SSSS…BOOM started';
         },
     };

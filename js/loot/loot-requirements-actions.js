@@ -1,30 +1,30 @@
 import { t } from '../translation/translations.js';
 import { _dndFindTargetSlot } from '../endgame/endgame-hub-drag-and-drop.js';
-import { EG_INV_COLS, _egEnsureInvRows, _egEquipped, _egFindFreeInvCell, _egInventory, _egRenderEquipSlot, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egShowStashInfo, _egUpdateInvCount, egSaveHubState } from '../endgame/endgame-hub.js';
-import { _egGetAllEquippedItems } from '../endgame/endgame-player-stats.js';
-import { _egCanEquipInSlot, _egCheckMoveAllowed, _egCheckUnequipSlot, _egComputeLoadoutAttributes, _egFindUnmetRequirements, _egGetUnmetRequirementsText } from './loot-requirements-core.js';
-import { _egHandErrorMessage, _egHealWeaponHands, _egIsOneHandedWeapon, _egIsTwoHandedWeapon, _egCheckHandCompatibilityInSlot } from './loot-requirements-weapons.js';
+import { INV_COLS, _ensureInvRows, _equipped, _findFreeInvCell, _inventory, _renderEquipSlot, _renderInventory, _renderInventoryCell, _renderStatsList, _showStashInfo, _updateInvCount, saveHubState } from '../endgame/endgame-hub.js';
+import { _getAllEquippedItems } from '../endgame/endgame-player-stats.js';
+import { _canEquipInSlot, _checkMoveAllowed, _checkUnequipSlot, _computeLoadoutAttributes, _findUnmetRequirements, _getUnmetRequirementsText } from './loot-requirements-core.js';
+import { _handErrorMessage, _healWeaponHands, _isOneHandedWeapon, _isTwoHandedWeapon, _checkHandCompatibilityInSlot } from './loot-requirements-weapons.js';
 
 //------------------------------------------------------------------------
 //-------------------REQUIREMENTS ACTIONS----------------------------------
 //------------------------------------------------------------------------
 
 // Shows standard rejection feedback for an equip or unequip attempt.
-export function _egShowRequirementsToast(context, missingOrGate, item) {
+export function _showRequirementsToast(context, missingOrGate, item) {
     const itemName = (item && item.name) || item || '?';
     const handError = (missingOrGate && missingOrGate.handError)
         ? missingOrGate.handError
         : (item && item.handError ? item.handError : null);
-    if (handError && typeof _egHandErrorMessage === 'function') {
-        const msg = _egHandErrorMessage(handError, typeof item === 'object' ? item : { name: itemName });
+    if (handError && typeof _handErrorMessage === 'function') {
+        const msg = _handErrorMessage(handError, typeof item === 'object' ? item : { name: itemName });
         if (typeof showToast === 'function') globalThis.showToast(msg, '#e74c3c');
-        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
+        if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
         return;
     }
     const missing = Array.isArray(missingOrGate) ? missingOrGate : (missingOrGate && missingOrGate.missing) || [];
-    const list = _egGetUnmetRequirementsText(missing);
+    const list = _getUnmetRequirementsText(missing);
     let msg;
-    const chain = context === 'equip' ? _egGetSwapChainBreak(item) : null;
+    const chain = context === 'equip' ? _getSwapChainBreak(item) : null;
     if (chain) {
         msg = t('eg_cannot_equip_chainbreak')
             .replace('{name}', itemName)
@@ -36,59 +36,59 @@ export function _egShowRequirementsToast(context, missingOrGate, item) {
             : t('eg_cannot_equip').replace('{name}', itemName).replace('{list}', list);
     }
     if (typeof showToast === 'function') globalThis.showToast(msg, '#e74c3c');
-    if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
+    if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
 }
 
 // Computes attributes shown by the equip tooltip for a prospective item.
-export function _egPreviewEquipAttributes(item) {
-    const equipped = _egGetAllEquippedItems();
-    if (equipped.includes(item)) return _egComputeLoadoutAttributes(equipped);
+export function _previewEquipAttributes(item) {
+    const equipped = _getAllEquippedItems();
+    if (equipped.includes(item)) return _computeLoadoutAttributes(equipped);
     const target = (typeof _dndFindTargetSlot === 'function') ? _dndFindTargetSlot(item) : null;
-    if (!target) return _egComputeLoadoutAttributes(equipped);
-    const sim = equipped.filter(i => i !== _egEquipped[target]);
-    return _egComputeLoadoutAttributes(sim.concat(item));
+    if (!target) return _computeLoadoutAttributes(equipped);
+    const sim = equipped.filter(i => i !== _equipped[target]);
+    return _computeLoadoutAttributes(sim.concat(item));
 }
 
 // Explains a rejection caused by the displaced item's contribution to the loadout.
-export function _egGetSwapChainBreak(item) {
+export function _getSwapChainBreak(item) {
     if (!item || item.category !== 'equip' || !item.requirements) return null;
-    if (typeof _egEquipped === 'undefined') return null;
-    const equippedList = Object.values(_egEquipped).filter(Boolean);
+    if (typeof _equipped === 'undefined') return null;
+    const equippedList = Object.values(_equipped).filter(Boolean);
     if (equippedList.includes(item)) return null;
     const target = (typeof _dndFindTargetSlot === 'function') ? _dndFindTargetSlot(item) : null;
     if (!target) return null;
-    const gate = _egCanEquipInSlot(item, target);
+    const gate = _canEquipInSlot(item, target);
     if (gate.ok) return null;
     if ((gate.missing || []).some(u => u.item === item)) return null;
     const broken = (gate.missing || []).filter(u => u.item !== item && equippedList.includes(u.item));
-    const occupant = _egEquipped[target];
+    const occupant = _equipped[target];
     if (!broken.length || !occupant) return null;
     return { occupant, broken };
 }
 
 // Returns true when an item should be flagged as unwearable in the UI.
-export function _egIsItemBlocked(item) {
+export function _isItemBlocked(item) {
     if (!item || item.category !== 'equip' || !item.requirements) return false;
-    if (typeof _egEquipped === 'undefined') return false;
-    const equippedList = Object.values(_egEquipped).filter(Boolean);
+    if (typeof _equipped === 'undefined') return false;
+    const equippedList = Object.values(_equipped).filter(Boolean);
     if (equippedList.includes(item)) {
-        if (_egFindUnmetRequirements(equippedList).some(u => u.item === item)) return true;
+        if (_findUnmetRequirements(equippedList).some(u => u.item === item)) return true;
         try {
-            const slotId = Object.keys(_egEquipped).find(k => _egEquipped[k] === item);
-            if (slotId && typeof _egCheckHandCompatibilityInSlot === 'function'
-                && !_egCheckHandCompatibilityInSlot(item, slotId).ok) return true;
+            const slotId = Object.keys(_equipped).find(k => _equipped[k] === item);
+            if (slotId && typeof _checkHandCompatibilityInSlot === 'function'
+                && !_checkHandCompatibilityInSlot(item, slotId).ok) return true;
         } catch (e) {}
         return false;
     }
     const target = (typeof _dndFindTargetSlot === 'function') ? _dndFindTargetSlot(item) : null;
     if (!target) return false;
-    const gate = _egCanEquipInSlot(item, target);
+    const gate = _canEquipInSlot(item, target);
     if (gate.ok) return false;
     if (gate.handError === 'two_handed_blocks_offhand' && target === 'weapon1') {
         try {
-            const offGate = _egCheckUnequipSlot('weapon2');
+            const offGate = _checkUnequipSlot('weapon2');
             if (offGate.ok) {
-                const retry = _egCheckMoveAllowed(sim => {
+                const retry = _checkMoveAllowed(sim => {
                     Object.keys(sim).forEach(k => { if (sim[k] === item) delete sim[k]; });
                     delete sim.weapon2;
                     delete sim.weapon1;
@@ -105,45 +105,45 @@ export function _egIsItemBlocked(item) {
 // `avoid` ({r, c}) is a stash cell that must NOT receive the off-hand: while a
 // drag is in flight the dragged item's origin cell is empty but reserved for
 // the weapon it displaces - using it would overwrite (lose) the off-hand.
-export function _egTryAutoUnequipOffhandForTwoHander(avoid) {
-    if (typeof _egEquipped === 'undefined' || !_egEquipped.weapon2) return true;
+export function _tryAutoUnequipOffhandForTwoHander(avoid) {
+    if (typeof _equipped === 'undefined' || !_equipped.weapon2) return true;
     try {
-        const gate = _egCheckUnequipSlot('weapon2');
+        const gate = _checkUnequipSlot('weapon2');
         if (!gate.ok) {
-            _egShowRequirementsToast('unequip', gate, _egEquipped.weapon2.name || '?');
+            _showRequirementsToast('unequip', gate, _equipped.weapon2.name || '?');
             return false;
         }
     } catch (e) {}
-    const off = _egEquipped.weapon2;
+    const off = _equipped.weapon2;
     try {
-        if (typeof _egFindFreeInvCell === 'function' && typeof _egInventory !== 'undefined' && _egInventory) {
+        if (typeof _findFreeInvCell === 'function' && typeof _inventory !== 'undefined' && _inventory) {
             let pos = null;
             if (avoid && Number.isInteger(avoid.r) && Number.isInteger(avoid.c)) {
-                for (let r = 0; r < _egInventory.length && !pos; r++) {
-                    if (!Array.isArray(_egInventory[r])) continue;
-                    for (let c = 0; c < _egInventory[r].length; c++) {
-                        if (_egInventory[r][c] || (r === avoid.r && c === avoid.c)) continue;
+                for (let r = 0; r < _inventory.length && !pos; r++) {
+                    if (!Array.isArray(_inventory[r])) continue;
+                    for (let c = 0; c < _inventory[r].length; c++) {
+                        if (_inventory[r][c] || (r === avoid.r && c === avoid.c)) continue;
                         pos = { r, c };
                         break;
                     }
                 }
             }
-            if (!pos) pos = _egFindFreeInvCell();
+            if (!pos) pos = _findFreeInvCell();
             if (avoid && pos.r === avoid.r && pos.c === avoid.c) {
                 // Only the reserved cell was free: take a fresh row instead.
-                const nr = _egInventory.length;
-                if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(nr + 1);
+                const nr = _inventory.length;
+                if (typeof _ensureInvRows === 'function') _ensureInvRows(nr + 1);
                 pos = { r: nr, c: 0 };
             }
-            if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(pos.r + 1);
-            _egInventory[pos.r][pos.c] = off;
-            delete _egEquipped.weapon2;
-            if (typeof _egRenderEquipSlot === 'function') _egRenderEquipSlot('weapon2');
-            if (typeof _egRenderInventoryCell === 'function') _egRenderInventoryCell(pos.r, pos.c);
-            if (typeof _egRenderInventory === 'function') _egRenderInventory();
-            if (typeof _egUpdateInvCount === 'function') _egUpdateInvCount();
-            if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
-            if (typeof egSaveHubState === 'function') egSaveHubState();
+            if (typeof _ensureInvRows === 'function') _ensureInvRows(pos.r + 1);
+            _inventory[pos.r][pos.c] = off;
+            delete _equipped.weapon2;
+            if (typeof _renderEquipSlot === 'function') _renderEquipSlot('weapon2');
+            if (typeof _renderInventoryCell === 'function') _renderInventoryCell(pos.r, pos.c);
+            if (typeof _renderInventory === 'function') _renderInventory();
+            if (typeof _updateInvCount === 'function') _updateInvCount();
+            if (typeof _renderStatsList === 'function') _renderStatsList();
+            if (typeof saveHubState === 'function') saveHubState();
             return true;
         }
     } catch (e) {}
@@ -151,42 +151,42 @@ export function _egTryAutoUnequipOffhandForTwoHander(avoid) {
 }
 
 // Repairs illegal weapon combinations in legacy saves.
-export function _egMigrateIllegalHandsToStash() {
+export function _migrateIllegalHandsToStash() {
     const moved = [];
     try {
-        if (typeof _egEquipped === 'undefined' || !_egEquipped) return moved;
-        if (typeof _egInventory === 'undefined' || !Array.isArray(_egInventory)) return moved;
+        if (typeof _equipped === 'undefined' || !_equipped) return moved;
+        if (typeof _inventory === 'undefined' || !Array.isArray(_inventory)) return moved;
         try {
-            if (_egEquipped.weapon1) _egHealWeaponHands(_egEquipped.weapon1);
-            if (_egEquipped.weapon2) _egHealWeaponHands(_egEquipped.weapon2);
+            if (_equipped.weapon1) _healWeaponHands(_equipped.weapon1);
+            if (_equipped.weapon2) _healWeaponHands(_equipped.weapon2);
         } catch (e) {}
         const moveSlotToStash = (slotId) => {
-            const it = _egEquipped[slotId];
+            const it = _equipped[slotId];
             if (!it) return false;
             let pos = null;
-            for (let r = 0; r < _egInventory.length && !pos; r++) {
-                if (!Array.isArray(_egInventory[r])) continue;
-                for (let c = 0; c < _egInventory[r].length; c++) {
-                    if (!_egInventory[r][c]) { pos = { r, c }; break; }
+            for (let r = 0; r < _inventory.length && !pos; r++) {
+                if (!Array.isArray(_inventory[r])) continue;
+                for (let c = 0; c < _inventory[r].length; c++) {
+                    if (!_inventory[r][c]) { pos = { r, c }; break; }
                 }
             }
             if (!pos) {
                 try {
-                    if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(_egInventory.length + 1);
-                    else _egInventory.push(Array(typeof EG_INV_COLS !== 'undefined' ? EG_INV_COLS : 24).fill(null));
+                    if (typeof _ensureInvRows === 'function') _ensureInvRows(_inventory.length + 1);
+                    else _inventory.push(Array(typeof INV_COLS !== 'undefined' ? INV_COLS : 24).fill(null));
                 } catch (e) { return false; }
-                pos = { r: _egInventory.length - 1, c: 0 };
+                pos = { r: _inventory.length - 1, c: 0 };
             }
             try {
-                _egInventory[pos.r][pos.c] = it;
-                delete _egEquipped[slotId];
+                _inventory[pos.r][pos.c] = it;
+                delete _equipped[slotId];
                 moved.push({ slotId, item: it });
                 return true;
             } catch (e) { return false; }
         };
-        if (_egEquipped.weapon1 && _egEquipped.weapon1.slotType === 'shield') moveSlotToStash('weapon1');
-        if (_egEquipped.weapon2 && _egEquipped.weapon2.slotType === 'weapon' && !_egIsOneHandedWeapon(_egEquipped.weapon2)) moveSlotToStash('weapon2');
-        if (_egEquipped.weapon1 && _egIsTwoHandedWeapon(_egEquipped.weapon1) && _egEquipped.weapon2) moveSlotToStash('weapon2');
+        if (_equipped.weapon1 && _equipped.weapon1.slotType === 'shield') moveSlotToStash('weapon1');
+        if (_equipped.weapon2 && _equipped.weapon2.slotType === 'weapon' && !_isOneHandedWeapon(_equipped.weapon2)) moveSlotToStash('weapon2');
+        if (_equipped.weapon1 && _isTwoHandedWeapon(_equipped.weapon1) && _equipped.weapon2) moveSlotToStash('weapon2');
     } catch (e) {}
     return moved;
 }

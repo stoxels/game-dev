@@ -1,10 +1,10 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { switchScreen } from '../screens/screens.js';
 import { t } from '../translation/translations.js';
-import { EG_ART } from './endgame-art.js';
+import { GAME_ART } from './endgame-art.js';
 import { EG_ATLAS_MAX_TIER, EG_ATLAS_NODES, egAtlasAdjacentBonusPercent, egAtlasChainBlueprint, egAtlasIsCompleted, egAtlasIsUnlocked, egAtlasNodeById, egAtlasNodeName, egAtlasProgress } from './endgame-atlas.js';
 import { EG_MAP_TIER_ROMANS, _egMapStash } from './endgame-hub.js';
-import { EG_SCREEN_NAV, _egResolveBackFn } from '../combat/combat-state-navigation.js';
+import { SCREEN_NAV, _resolveBackFn } from '../combat/combat-state-navigation.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -57,7 +57,7 @@ export const EG_ATLAS_LABEL_H = 15;        // reserved space above a node for it
 
 // Name of the global function the BACK button calls - set by
 // showEndgameAtlas(backFn). Defaults to the Probability Gate.
-export let _egAtlasBackFn = EG_SCREEN_NAV.gate;
+export let _egAtlasBackFn = SCREEN_NAV.gate;
 
 export let _egAtlasSelectedNodeId = null;
 export let _egAtlasSearchQuery = '';
@@ -142,7 +142,7 @@ export function _egAtlasNodeBoss(node) {
     try {
         const bp = egAtlasChainBlueprint(node);
         if (!bp || !bp.bossId) return null;
-        const def = (typeof EG_BOSS_DEFS !== 'undefined') ? globalThis.EG_BOSS_DEFS[bp.bossId] : null;
+        const def = (typeof BOSS_DEFS !== 'undefined') ? globalThis.BOSS_DEFS[bp.bossId] : null;
         if (!def) return null;
         return { id: bp.bossId, name: def.name || bp.bossId, emoji: def.emoji || '💀' };
     } catch (e) {
@@ -214,7 +214,7 @@ export function _egAtlasBuildNodeTooltipHTML(nodeId) {
     if (!node) return '';
     const boss = _egAtlasNodeBoss(node);
     const bossIcon = boss
-        ? ((typeof EG_ART !== 'undefined' && EG_ART.html) ? EG_ART.html('monster', boss.id, boss.emoji) : boss.emoji)
+        ? ((typeof GAME_ART !== 'undefined' && GAME_ART.html) ? GAME_ART.html('monster', boss.id, boss.emoji) : boss.emoji)
         : null;
     const bossLabel = boss ? `${bossIcon} ${boss.name}` : t('eg_map_has_boss');
     return `
@@ -794,8 +794,8 @@ export function ensureEndgameAtlasScreen() {
 // 'showEndgameHub') overrides where the BACK button returns to - used
 // when the atlas is opened from the endgame hub character sheet.
 export function showEndgameAtlas(backFn) {
-    if (typeof backFn === 'string') _egAtlasBackFn = _egResolveBackFn(backFn, EG_SCREEN_NAV.gate);
-    else _egAtlasBackFn = EG_SCREEN_NAV.gate;
+    if (typeof backFn === 'string') _egAtlasBackFn = _resolveBackFn(backFn, SCREEN_NAV.gate);
+    else _egAtlasBackFn = SCREEN_NAV.gate;
     ensureEndgameAtlasScreen();
 
     if (typeof switchScreen === 'function') {

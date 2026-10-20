@@ -11,13 +11,13 @@ import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
 import { WORLDS } from '../levels/level-world-data.js';
 import { setNexusUnlocked, lvText, ALL } from '../levels/levels.js';
 import { _charIs } from '../sprite/player_sprite.js';
-import { _egTrialTriggerLevels, _egIsTrialUnlocked, _egIsTrialDone, _egLaunchCampaignTrial } from '../campaign-trials.js';
+import { _trialTriggerLevels, _isTrialUnlocked, _isTrialDone, _launchCampaignTrial } from '../campaign-trials.js';
 import { showEndgameNexus } from '../endgame/endgame-nexus.js';
 import { checkWorldCompleteAch } from '../achievements/achievements.js';
 import { isMonsterless } from '../difficulty-modifiers.js';
 import { isConvergenceLevel } from './scoring-core.js';
-import { _egCampaignMonsterLevel } from '../endgame/endgame-leveling.js';
-import { _egRollScriptedLootKind, egGrantScriptedLoot } from '../loot/loot-map-completion-reward.js';
+import { _campaignMonsterLevel } from '../endgame/endgame-leveling.js';
+import { _egRollScriptedLootKind, grantScriptedLoot } from '../loot/loot-map-completion-reward.js';
 
 // Live end-of-level state shared across the concatenated core (owned by
 // start-level.js / state.js / difficulty-modifiers.js as module-let
@@ -281,7 +281,7 @@ let _bonusLootItem = null;
 // Builds the card for an equipment / core / essence bonus reward, or '' when
 // the grant failed (the caller then falls back to a puzzle item).
 function grantBonusLoot(gi) {
-    const loot = egGrantScriptedLoot(_egRollScriptedLootKind(), _egCampaignMonsterLevel(gi));
+    const loot = grantScriptedLoot(_egRollScriptedLootKind(), _campaignMonsterLevel(gi));
     if (!loot) return '';
     const color = BONUS_LOOT_COLORS[loot.rarity] || '#d0d0d0';
     const count = loot.count > 1 ? ` ×${loot.count}` : '';
@@ -365,9 +365,9 @@ function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel, isNe
         const lootCard = irz.querySelector('#bonus-loot-card');
         if (lootCard && _bonusLootItem) {
             const item = _bonusLootItem;
-            lootCard.addEventListener('mouseenter', e => globalThis._egShowTooltip(item, e));
-            lootCard.addEventListener('mousemove', e => globalThis._egMoveTooltip(e));
-            lootCard.addEventListener('mouseleave', () => globalThis._egClearTooltip());
+            lootCard.addEventListener('mouseenter', e => globalThis._showHubTooltip(item, e));
+            lootCard.addEventListener('mousemove', e => globalThis._moveTooltip(e));
+            lootCard.addEventListener('mouseleave', () => globalThis._clearTooltip());
         }
         irz.querySelectorAll('[data-reward-defid]').forEach(el => {
             attachItemTooltip(el, el.dataset.rewardDefid);
@@ -426,9 +426,9 @@ function _updateConvergenceTrialWinButton(gi) {
     try {
         wi = cur.world - 1;
         const level = ALL[gi];
-        const triggers = _egTrialTriggerLevels(wi);
+        const triggers = _trialTriggerLevels(wi);
         const isTrigger = !!(level && triggers && triggers.includes(level.li - 1));
-        show = isTrigger && _egIsTrialUnlocked(wi) && !_egIsTrialDone(wi);
+        show = isTrigger && _isTrialUnlocked(wi) && !_isTrialDone(wi);
     } catch (e) { show = false; }
 
     let btn = document.getElementById('btn-enter-trial-win');
@@ -438,7 +438,7 @@ function _updateConvergenceTrialWinButton(gi) {
         btn.className = 'ob y';
         btn.addEventListener('click', () => {
             hideResultOverlays();
-            _egLaunchCampaignTrial(Number(btn.dataset.wi));
+            _launchCampaignTrial(Number(btn.dataset.wi));
         });
         target.appendChild(btn);
     }

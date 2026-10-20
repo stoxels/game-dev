@@ -6,7 +6,7 @@ import { _egnEnsureStyles } from '../endgame/endgame-nexus.js';
 //------------------------------------------------------------------------
 
 // Injects the vendor stylesheet once, after the shared Nexus styles exist.
-export function _egvEnsureStyles() {
+export function _vendorEnsureStyles() {
     // The vendor topbar reuses the Nexus topbar styles.
     _egnEnsureStyles();
     if (document.getElementById('egv-vendor-style')) return;

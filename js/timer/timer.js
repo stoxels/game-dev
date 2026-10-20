@@ -175,7 +175,7 @@ export function _applyLowHealthVignette() {
 // Mirrors the endgame mistake/health/shield banners but fires for the
 // countdown timer at 300s (5 min), 120s (2 min) and 30s remaining.
 // Works in both endgame and normal levels - driven purely by timerSecs
-// and independent of _egIsActive.
+// and independent of _isActive.
 let _lowTimeWarningShown = { 300: false, 120: false, 30: false };
 let _lowTimeLastSecs = null;
 
@@ -193,7 +193,7 @@ function _getLowTimeWarningTier(secs) {
 // the banners would otherwise stack on top of each other and become
 // unreadable, so every show-function first dismisses any other banner and
 // only then shows the newest one.
-export function _egClearCenterGridBanners(exceptId) {
+export function _clearCenterGridBanners(exceptId) {
     var ids = [
         'eg-low-time-warning-banner',
         'eg-mistakes-warning-banner',
@@ -211,7 +211,7 @@ export function _egClearCenterGridBanners(exceptId) {
 }
 
 function _showLowTimeWarningBanner(tier) {
-    if (typeof _egClearCenterGridBanners === 'function') _egClearCenterGridBanners('eg-low-time-warning-banner');
+    if (typeof _clearCenterGridBanners === 'function') _clearCenterGridBanners('eg-low-time-warning-banner');
     const old = document.getElementById('eg-low-time-warning-banner');
     if (old) old.remove();
 
@@ -368,17 +368,17 @@ export function pauseTimer() {
 export function timesUp() {
     // Endgame map runs must never show the generic lose overlay with a
     // Retry button - the player keeps loot and returns via the map-failed
-    // screen (_egEndMapDefeated). Intercept timer defeats directly here
+    // screen (_endMapDefeated). Intercept timer defeats directly here
     // instead of relying on the async MutationObserver fallback in
     // endgame-encounter.js, which would otherwise flash the overlay first.
-    // Campaign / story mode is unaffected (guard checks _egIsMapRun, which
+    // Campaign / story mode is unaffected (guard checks _isMapRun, which
     // excludes the campaign's own monster levels).
-    if (typeof globalThis._egIsMapRun === 'function' && globalThis._egIsMapRun()) {
-        if (typeof globalThis._egEndMapDefeated === 'function') {
+    if (typeof globalThis._isMapRun === 'function' && globalThis._isMapRun()) {
+        if (typeof globalThis._endMapDefeated === 'function') {
             if (cur) window.LEVEL_FLAGS.lastFailedGi = cur.gIdx;
             const title = (typeof t === 'function') ? t('eg_map_failed') : 'Map Failed';
             const sub = (typeof t === 'function') ? t('ov_lose') : "TIME'S UP!";
-            const handled = globalThis._egEndMapDefeated(title, sub);
+            const handled = globalThis._endMapDefeated(title, sub);
             if (handled !== false) return;
         }
     }
@@ -703,11 +703,11 @@ export function startTimer() {
     _initSkillTimers();
     _initProceduralSystems();
     // Chain-puzzle continuity: timer is preserved across puzzles in an
-    // endgame map run (window._egSuppressEncounterStop). Keep the already-
+    // endgame map run (window._suppressEncounterStop). Keep the already-
     // shown tiers but sync the drain tracker so the next countdown step is
     // detected correctly. Fresh levels are reset by _initTimer in
     // start-level.js before the first updTimer, so no reset is needed here.
-    if (window._egSuppressEncounterStop) {
+    if (window._suppressEncounterStop) {
         _lowTimeLastSecs = timerSecs;
     }
 

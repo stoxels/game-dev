@@ -436,7 +436,7 @@ export const PassiveTracker = (() => {
     function _shouldHideForEndgame() {
         try {
             if (typeof globalThis.SETTINGS === 'undefined' || !globalThis.SETTINGS.hidePassiveTrackerInEndgame) return false;
-            if (typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) return true;
+            if (typeof globalThis._isActive === 'function' && globalThis._isActive()) return true;
             if (typeof isEndgameLevel === 'function' && isEndgameLevel()) return true;
             if (typeof cur !== 'undefined' && cur && cur.isMonsterLevel) return true;
             return false;

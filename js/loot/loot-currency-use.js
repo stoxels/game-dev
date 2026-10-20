@@ -10,16 +10,16 @@ import { Audio_Manager } from '../audio/audio.js';
 import { trackAchStat } from '../achievements/achievements.js';
 import { t } from '../translation/translations.js';
 import { _egRenderMapStashCell, _egUpdateMapStashTabCounts } from '../endgame/endgame-gate.js';
-import { _egRenderCurrencyCell } from '../endgame/endgame-hub-drag-and-drop.js';
-import { EG_INV_COLS, EG_MAP_STASH_COLS, _egAddItemToStash, _egCurrencyStash, _egEnsureInvRows, _egFindFreeMapCellForTier, _egGetInvRows, _egGetMapTierGrid, _egInventory, _egMapStash, _egRebuildMapStashGrid, _egRenderInventoryCell, _egRenderStatsList, _egShowStashInfo, _egUpdateInvCount, egSaveHubState } from '../endgame/endgame-hub.js';
-import { EG_CURRENCY_DEFS } from './loot-currency.js';
+import { _renderCurrencyCell } from '../endgame/endgame-hub-drag-and-drop.js';
+import { INV_COLS, EG_MAP_STASH_COLS, _addItemToStash, _currencyStash, _ensureInvRows, _egFindFreeMapCellForTier, _getInvRows, _egGetMapTierGrid, _inventory, _egMapStash, _egRebuildMapStashGrid, _renderInventoryCell, _renderStatsList, _showStashInfo, _updateInvCount, saveHubState } from '../endgame/endgame-hub.js';
+import { CURRENCY_DEFS } from './loot-currency.js';
 import { EG_MAP_CURRENCY_RULES } from './loot-map-orbs.js';
 
 
-export let _egPendingCurrencyUse = null; // { defId, sourceRow, sourceCol }
+export let _pendingCurrencyUse = null; // { defId, sourceRow, sourceCol }
 
-export function _egStartCurrencyUse(def, row, col, chipEl) {
-    _egPendingCurrencyUse = { defId: def.id, sourceRow: row, sourceCol: col };
+export function _startCurrencyUse(def, row, col, chipEl) {
+    _pendingCurrencyUse = { defId: def.id, sourceRow: row, sourceCol: col };
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     if (chipEl) chipEl.classList.add('eg-currency-selected');
     document.body.classList.add('eg-currency-use-active');
@@ -29,9 +29,9 @@ export function _egStartCurrencyUse(def, row, col, chipEl) {
         .replace('{name}', def.name));
 }
 
-export function _egCancelCurrencyUse(silent) {
-    if (!_egPendingCurrencyUse) return;
-    _egPendingCurrencyUse = null;
+export function _cancelCurrencyUse(silent) {
+    if (!_pendingCurrencyUse) return;
+    _pendingCurrencyUse = null;
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     document.body.classList.remove('eg-currency-use-active');
     if (!silent) {
@@ -43,9 +43,9 @@ export function _egCancelCurrencyUse(silent) {
 // Keeps use-mode active after an application (shift-click chaining).
 // The currency cell may have been re-rendered by the application,
 // so the chip element is re-acquired from the DOM.
-export function _egRefreshCurrencyUseHighlight() {
-    if (!_egPendingCurrencyUse) return;
-    const { sourceRow, sourceCol } = _egPendingCurrencyUse;
+export function _refreshCurrencyUseHighlight() {
+    if (!_pendingCurrencyUse) return;
+    const { sourceRow, sourceCol } = _pendingCurrencyUse;
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     const chip = document.querySelector(
         `.eg-currency-cell[data-row="${sourceRow}"][data-col="${sourceCol}"] .eg-item-chip`);
@@ -53,18 +53,18 @@ export function _egRefreshCurrencyUseHighlight() {
         chip.classList.add('eg-currency-selected');
         document.body.classList.add('eg-currency-use-active');
     } else {
-        _egCancelCurrencyUse(true);
+        _cancelCurrencyUse(true);
     }
 }
 
-export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
-    if (!_egPendingCurrencyUse) return;
-    const { sourceRow, sourceCol, defId } = _egPendingCurrencyUse;
-    const def = EG_CURRENCY_DEFS[defId];
-    const stack = _egCurrencyStash[sourceRow][sourceCol];
+export function _applyCurrencyToItem(item, applyFn, chipEl, keepActive) {
+    if (!_pendingCurrencyUse) return;
+    const { sourceRow, sourceCol, defId } = _pendingCurrencyUse;
+    const def = CURRENCY_DEFS[defId];
+    const stack = _currencyStash[sourceRow][sourceCol];
 
     if (!def || !stack || stack.id !== defId) {
-        _egCancelCurrencyUse(true);
+        _cancelCurrencyUse(true);
         return;
     }
 
@@ -79,12 +79,12 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
         globalThis.showToast(msg);
         Audio_Manager.playSFX('currency_apply_fail', 'player_equip_not_pickup');
-        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
+        if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
             setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
         }
-        _egCancelCurrencyUse(true);
+        _cancelCurrencyUse(true);
         return;
     }
 
@@ -93,12 +93,12 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
         globalThis.showToast(msg);
         Audio_Manager.playSFX('currency_apply_fail', 'player_equip_not_pickup');
-        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
+        if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
             setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
         }
-        _egCancelCurrencyUse(true);
+        _cancelCurrencyUse(true);
         return;
     }
 
@@ -106,12 +106,12 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
         globalThis.showToast(msg);
         Audio_Manager.playSFX('currency_apply_fail', 'player_equip_not_pickup');
-        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
+        if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
             setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
         }
-        _egCancelCurrencyUse(true);
+        _cancelCurrencyUse(true);
         return;
     }
 
@@ -142,23 +142,23 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
                 }
                 // Consume one mirror from the stack.
                 stack.count = (stack.count || 1) - 1;
-                if (stack.count <= 0) _egCurrencyStash[sourceRow][sourceCol] = null;
-                _egRenderCurrencyCell(sourceRow, sourceCol);
+                if (stack.count <= 0) _currencyStash[sourceRow][sourceCol] = null;
+                _renderCurrencyCell(sourceRow, sourceCol);
                 if (keepActive && stack.count > 0) {
-                    _egRefreshCurrencyUseHighlight();
+                    _refreshCurrencyUseHighlight();
                     globalThis.showToast(t('eg_mirror_created').replace('{name}', copy.name));
-                    egSaveHubState();
+                    saveHubState();
                     return;
                 }
-                _egCancelCurrencyUse(true);
+                _cancelCurrencyUse(true);
                 globalThis.showToast(t('eg_mirror_created').replace('{name}', copy.name));
-                egSaveHubState();
+                saveHubState();
                 return;
             } catch(e) { /* fallback below */ }
         }
-        const cols = EG_INV_COLS;
-        const grid = _egInventory;
-        const rows = (typeof _egGetInvRows === 'function' ? _egGetInvRows() : grid.length);
+        const cols = INV_COLS;
+        const grid = _inventory;
+        const rows = (typeof _getInvRows === 'function' ? _getInvRows() : grid.length);
 
         let freeR = -1, freeC = -1;
         outer:
@@ -169,54 +169,54 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         }
         // Unlimited main stash: grow if needed
         if (freeR === -1) {
-            if (typeof _egAddItemToStash === 'function') {
+            if (typeof _addItemToStash === 'function') {
                 const copy = JSON.parse(JSON.stringify(item));
                 copy.mirrored = true;
-                _egAddItemToStash(copy);
+                _addItemToStash(copy);
                 // consume mirror below - handled after early return path
                 // consume and update source
                 stack.count = (stack.count || 1) - 1;
-                if (stack.count <= 0) _egCurrencyStash[sourceRow][sourceCol] = null;
-                _egRenderCurrencyCell(sourceRow, sourceCol);
+                if (stack.count <= 0) _currencyStash[sourceRow][sourceCol] = null;
+                _renderCurrencyCell(sourceRow, sourceCol);
                 if (keepActive && stack.count > 0) {
-                    _egRefreshCurrencyUseHighlight();
+                    _refreshCurrencyUseHighlight();
                     globalThis.showToast(t('eg_mirror_created').replace('{name}', copy.name));
-                    egSaveHubState();
+                    saveHubState();
                     return;
                 }
-                _egCancelCurrencyUse(true);
+                _cancelCurrencyUse(true);
                 globalThis.showToast(t('eg_mirror_created').replace('{name}', copy.name));
-                egSaveHubState();
+                saveHubState();
                 return;
             }
             // fallback expand
-            if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(grid.length + 1);
-            else grid.push(Array(EG_INV_COLS).fill(null));
+            if (typeof _ensureInvRows === 'function') _ensureInvRows(grid.length + 1);
+            else grid.push(Array(INV_COLS).fill(null));
             freeR = grid.length - 1; freeC = 0;
         }
 
         const copy = JSON.parse(JSON.stringify(item));
         copy.mirrored = true;
         grid[freeR][freeC] = copy;
-        _egRenderInventoryCell(freeR, freeC);
-        if (typeof _egUpdateInvCount === 'function') _egUpdateInvCount();
+        _renderInventoryCell(freeR, freeC);
+        if (typeof _updateInvCount === 'function') _updateInvCount();
 
         // Consume one mirror from the stack.
         stack.count = (stack.count || 1) - 1;
-        if (stack.count <= 0) _egCurrencyStash[sourceRow][sourceCol] = null;
-        _egRenderCurrencyCell(sourceRow, sourceCol);
+        if (stack.count <= 0) _currencyStash[sourceRow][sourceCol] = null;
+        _renderCurrencyCell(sourceRow, sourceCol);
 
         // Shift-click chaining: keep the mirror selected while stacks remain.
         if (keepActive && stack.count > 0) {
-            _egRefreshCurrencyUseHighlight();
+            _refreshCurrencyUseHighlight();
             globalThis.showToast(t('eg_mirror_created').replace('{name}', copy.name));
-            egSaveHubState();
+            saveHubState();
             return;
         }
 
-        _egCancelCurrencyUse(true);
+        _cancelCurrencyUse(true);
         globalThis.showToast(t('eg_mirror_created').replace('{name}', copy.name));
-        egSaveHubState();
+        saveHubState();
         return;
     }
 
@@ -229,9 +229,9 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     let extraRow = -1, extraCol = -1;
     if (extraCurrencyId) {
         outerExtra:
-        for (let r = 0; r < _egCurrencyStash.length; r++) {
-            for (let c = 0; c < (_egCurrencyStash[r] || []).length; c++) {
-                const candidate = _egCurrencyStash[r][c];
+        for (let r = 0; r < _currencyStash.length; r++) {
+            for (let c = 0; c < (_currencyStash[r] || []).length; c++) {
+                const candidate = _currencyStash[r][c];
                 if (candidate && candidate.id === extraCurrencyId && (candidate.count || 0) > 0) {
                     extraStack = candidate; extraRow = r; extraCol = c;
                     break outerExtra;
@@ -242,7 +242,7 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
             const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
             globalThis.showToast(msg);
         Audio_Manager.playSFX('currency_apply_fail', 'player_equip_not_pickup');
-            _egCancelCurrencyUse(true);
+            _cancelCurrencyUse(true);
             return;
         }
     }
@@ -258,36 +258,36 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         let fallbackStack = null;
         let fallbackRow = -1, fallbackCol = -1;
         outerFallback:
-        for (let r = 0; r < _egCurrencyStash.length; r++) {
-            for (let c = 0; c < (_egCurrencyStash[r] || []).length; c++) {
-                const candidate = _egCurrencyStash[r][c];
+        for (let r = 0; r < _currencyStash.length; r++) {
+            for (let c = 0; c < (_currencyStash[r] || []).length; c++) {
+                const candidate = _currencyStash[r][c];
                 if (candidate && candidate.id === chainFallbackId && (candidate.count || 0) > 0) {
                     fallbackStack = candidate; fallbackRow = r; fallbackCol = c;
                     break outerFallback;
                 }
             }
         }
-        if (fallbackStack && typeof EG_CURRENCY_DEFS[chainFallbackId].apply === 'function'
-            && EG_CURRENCY_DEFS[chainFallbackId].canApply(newItem)) {
-            const completedItem = EG_CURRENCY_DEFS[chainFallbackId].apply(newItem);
+        if (fallbackStack && typeof CURRENCY_DEFS[chainFallbackId].apply === 'function'
+            && CURRENCY_DEFS[chainFallbackId].canApply(newItem)) {
+            const completedItem = CURRENCY_DEFS[chainFallbackId].apply(newItem);
             applyFn(completedItem);
             fallbackStack.count--;
-            if (fallbackStack.count <= 0) _egCurrencyStash[fallbackRow][fallbackCol] = null;
-            _egRenderCurrencyCell(fallbackRow, fallbackCol);
+            if (fallbackStack.count <= 0) _currencyStash[fallbackRow][fallbackCol] = null;
+            _renderCurrencyCell(fallbackRow, fallbackCol);
         }
     }
 
     // Consume the bundled Scouring Orb, if any.
     if (extraStack) {
         extraStack.count--;
-        if (extraStack.count <= 0) _egCurrencyStash[extraRow][extraCol] = null;
-        _egRenderCurrencyCell(extraRow, extraCol);
+        if (extraStack.count <= 0) _currencyStash[extraRow][extraCol] = null;
+        _renderCurrencyCell(extraRow, extraCol);
     }
 
     // Consume one orb from the stack.
     stack.count = (stack.count || 1) - 1;
-    if (stack.count <= 0) _egCurrencyStash[sourceRow][sourceCol] = null;
-    _egRenderCurrencyCell(sourceRow, sourceCol);
+    if (stack.count <= 0) _currencyStash[sourceRow][sourceCol] = null;
+    _renderCurrencyCell(sourceRow, sourceCol);
 
     if (typeof trackAchStat === 'function') try {
         trackAchStat('egCurrencyApplied', 1);
@@ -299,15 +299,15 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     // Shift-click chaining: keep the orb selected so further shift-clicks
     // re-use it on the next target until the stack runs out.
     if (keepActive && stack.count > 0) {
-        _egRefreshCurrencyUseHighlight();
+        _refreshCurrencyUseHighlight();
         globalThis.showToast(t('eg_currency_applied').replace('{name}', def.name));
-        if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
-        egSaveHubState();
+        if (typeof _renderStatsList === 'function') _renderStatsList();
+        saveHubState();
         return;
     }
 
-    _egCancelCurrencyUse(true);
+    _cancelCurrencyUse(true);
     globalThis.showToast(t('eg_currency_applied').replace('{name}', def.name));
-    if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
-    egSaveHubState();
+    if (typeof _renderStatsList === 'function') _renderStatsList();
+    saveHubState();
 }

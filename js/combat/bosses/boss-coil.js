@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkDotTick, _nkEl, _nkFlingAvatar, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE COIL (boss_coil)----------------------------
@@ -13,7 +13,7 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _eg
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_coil: {
         id: 'boss_coil', name: 'The Coil', emoji: '🐍',
         baseHP: 1020, baseDamage: 23, chargeMax: 12,
@@ -21,7 +21,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_coil: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -30,75 +30,75 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'frozen_cells', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechFrozenCells', phase2Only: true },
+            { name: 'frozen_cells', intervalBase: 18000, intervalVariance: 4000, handler: '_mechFrozenCells', phase2Only: true },
         ],
-        onInit: _egCoilArenaInit,
+        onInit: _coilArenaInit,
     },
 });
 
 
 // ── Coil tuning ─────────────────────────────────────────────────────────
 // The coiled maw
-export const EG_COIL_R = 56;                        // maw radius (visual + bite hit)
-export const EG_COIL_SLITHER = [0, 40, 52, 66];     // px/s drift per phase
-export const EG_COIL_BITE_DMG = [0, 0.05, 0.06, 0.08]; // %maxHP per bite
-export const EG_COIL_BITE_CD_MS = 900;              // per-touch cooldown
-export const EG_COIL_BITE_FLING = [0, 150, 175, 200]; // px fling per bite
+export const COIL_R = 56;                        // maw radius (visual + bite hit)
+export const COIL_SLITHER = [0, 40, 52, 66];     // px/s drift per phase
+export const COIL_BITE_DMG = [0, 0.05, 0.06, 0.08]; // %maxHP per bite
+export const COIL_BITE_CD_MS = 900;              // per-touch cooldown
+export const COIL_BITE_FLING = [0, 150, 175, 200]; // px fling per bite
 // Seeker serpents + venom trails
-export const EG_COIL_SNAKE_INTERVAL_MS = [0, 5200, 4100, 3100]; // spawn cadence
-export const EG_COIL_SNAKE_ALIVE_MAX = [0, 2, 3, 4]; // concurrent serpent cap
-export const EG_COIL_SNAKE_SPEED = [0, 85, 100, 118]; // px/s hunt speed
-export const EG_COIL_SNAKE_TRIGGER_R = 95;          // start fusing when this close
-export const EG_COIL_FUSE_MS = 800;                 // blinking fuse time
-export const EG_COIL_BLAST_R = 105;                 // detonation radius
-export const EG_COIL_BLAST_DMG = [0, 0.12, 0.14, 0.17]; // %maxHP per blast (shadow)
-export const EG_COIL_TRAIL_LIFE_MS = 3400;          // venom trail lingers
-export const EG_COIL_TRAIL_DPS = 4;                 // %maxHP/s standing on a trail
+export const COIL_SNAKE_INTERVAL_MS = [0, 5200, 4100, 3100]; // spawn cadence
+export const COIL_SNAKE_ALIVE_MAX = [0, 2, 3, 4]; // concurrent serpent cap
+export const COIL_SNAKE_SPEED = [0, 85, 100, 118]; // px/s hunt speed
+export const COIL_SNAKE_TRIGGER_R = 95;          // start fusing when this close
+export const COIL_FUSE_MS = 800;                 // blinking fuse time
+export const COIL_BLAST_R = 105;                 // detonation radius
+export const COIL_BLAST_DMG = [0, 0.12, 0.14, 0.17]; // %maxHP per blast (shadow)
+export const COIL_TRAIL_LIFE_MS = 3400;          // venom trail lingers
+export const COIL_TRAIL_DPS = 4;                 // %maxHP/s standing on a trail
 // Constrictor (60% gate)
-export const EG_COIL_CON_RING_N = [0, 3, 4, 5];     // contracting ring waves
-export const EG_COIL_CON_WARN_MS = 1250;            // per-ring telegraph
-export const EG_COIL_CON_CONTRACT_MS = 1100;        // ring contracts over this
-export const EG_COIL_CON_DMG = 0.13;                // %maxHP per ring hit (shadow)
-export const EG_COIL_CON_GAP_MS = 700;              // between rings
+export const COIL_CON_RING_N = [0, 3, 4, 5];     // contracting ring waves
+export const COIL_CON_WARN_MS = 1250;            // per-ring telegraph
+export const COIL_CON_CONTRACT_MS = 1100;        // ring contracts over this
+export const COIL_CON_DMG = 0.13;                // %maxHP per ring hit (shadow)
+export const COIL_CON_GAP_MS = 700;              // between rings
 // Serpent tide (30% gate)
-export const EG_COIL_TIDE_N = 3;                    // tides in the set-piece
-export const EG_COIL_TIDE_WARN_MS = 1100;           // edge band telegraph
-export const EG_COIL_TIDE_CHARGERS = [0, 5, 6, 8];  // chargers per tide
-export const EG_COIL_TIDE_SPEED = 300;              // px/s charger speed
-export const EG_COIL_TIDE_DMG = 0.09;               // %maxHP per charger hit
+export const COIL_TIDE_N = 3;                    // tides in the set-piece
+export const COIL_TIDE_WARN_MS = 1100;           // edge band telegraph
+export const COIL_TIDE_CHARGERS = [0, 5, 6, 8];  // chargers per tide
+export const COIL_TIDE_SPEED = 300;              // px/s charger speed
+export const COIL_TIDE_DMG = 0.09;               // %maxHP per charger hit
 // Cobra strike (charge attack)
-export const EG_COIL_COBRA_WARN_MS = 1050;          // hood-shadow lane telegraph
-export const EG_COIL_COBRA_STRIKE_MS = 380;         // the lash is live
-export const EG_COIL_COBRA_H = 92;                  // lane width
-export const EG_COIL_COBRA_DMG = [0, 0.13, 0.15, 0.18]; // %maxHP by phase
+export const COIL_COBRA_WARN_MS = 1050;          // hood-shadow lane telegraph
+export const COIL_COBRA_STRIKE_MS = 380;         // the lash is live
+export const COIL_COBRA_H = 92;                  // lane width
+export const COIL_COBRA_DMG = [0, 0.13, 0.15, 0.18]; // %maxHP by phase
 
 
-export let _egCoilWatcher = null;      // per-fight nest state
-export let _egCoilCobraActive = false; // a cobra strike set-piece is running
+export let _coilWatcher = null;      // per-fight nest state
+export let _coilCobraActive = false; // a cobra strike set-piece is running
 
 
 // Sweep every coil overlay off the screen. Safe to call twice.
-export function _egCoilSweep() {
-    _egCoilCobraActive = false;
+export function _coilSweep() {
+    _coilCobraActive = false;
     try {
         document.querySelectorAll('.eg-coil-maw, .eg-coil-snake, .eg-coil-trail, .eg-coil-ring, .eg-coil-tideband, .eg-coil-charger, .eg-coil-cobra, .eg-coil-cobralash').forEach(el => el.remove());
     } catch (e) {}
 }
 
 
-// Called from _egBossCleanup (boss-framework.js) on boss death / stop.
-export function _egCoilTeardown() {
-    const st = _egCoilWatcher;
-    _egCoilWatcher = null;
-    if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
+// Called from _bossCleanup (boss-framework.js) on boss death / stop.
+export function _coilTeardown() {
+    const st = _coilWatcher;
+    _coilWatcher = null;
+    if (st && st.run) { try { _nkKillRun(st.run); } catch (e) {} }
     // Always sweep: on boss death the run's onKill may have nulled the
     // watcher BEFORE this runs - the overlays must go either way.
-    _egCoilSweep();
+    _coilSweep();
 }
 
 
-export function _egCoilArenaInit(monster) {
-    if (_egCoilWatcher) return;
+export function _coilArenaInit(monster) {
+    if (_coilWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
         monsterId, level: monster ? monster.level : 1,
@@ -109,21 +109,21 @@ export function _egCoilArenaInit(monster) {
         gate60Done: false, gate30Done: false,
         everLive: false, bornAt: performance.now(),
     };
-    _egCoilWatcher = st;
-    _egNkToast('eg_coil_intro', '🐍 The Coil: The pit wakes - the nest is crawling!');
+    _coilWatcher = st;
+    _nkToast('eg_coil_intro', '🐍 The Coil: The pit wakes - the nest is crawling!');
     // Tier-scaled clock: every telegraph breathes with tier.
-    // Passive run: lives the whole fight without hogging _egNkDodgeBusy().
-    const run = _egNkNewRun(monsterId, true);
+    // Passive run: lives the whole fight without hogging _nkDodgeBusy().
+    const run = _nkNewRun(monsterId, true);
     run.passive = true;
     st.run = run;
     run.onKill = () => {
-        if (_egCoilWatcher && _egCoilWatcher.run === run) _egCoilWatcher = null;
-        _egCoilSweep();
+        if (_coilWatcher && _coilWatcher.run === run) _coilWatcher = null;
+        _coilSweep();
     };
 
     // The coiled maw: a spiral of coils with a glaring head, slithering
     // around the arena and picking fresh drift targets.
-    const mawEl = _egNkEl(run, 'div', 'eg-coil-maw');
+    const mawEl = _nkEl(run, 'div', 'eg-coil-maw');
     for (let i = 0; i < 6; i++) {
         const coil = document.createElement('div');
         coil.className = 'eg-coil-loop';
@@ -143,11 +143,11 @@ export function _egCoilArenaInit(monster) {
         el: mawEl,
     };
     st.maw = maw;
-    _egCoilPickMawSpot(maw);
+    _coilPickMawSpot(maw);
 
-    _egNkLoop(run, (dtS, now) => {
-        const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
-            ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+    _nkLoop(run, (dtS, now) => {
+        const live = (typeof _monsters !== 'undefined' && globalThis._monsters)
+            ? (globalThis._monsters.find(m => m && m.id === st.monsterId) || null) : null;
         // Boss not registered yet → wait for it (spawn races the arena init);
         // boss vanished AFTER being live → the fight is over, tear down.
         if (!live) {
@@ -156,41 +156,41 @@ export function _egCoilArenaInit(monster) {
         }
         st.everLive = true;
 
-        const pr = _egNkPlayerRect();
-        const c = _egNkPlayerCenter();
+        const pr = _nkPlayerRect();
+        const c = _nkPlayerCenter();
         const p = Math.max(1, Math.min(3, Number(live.bossPhase) || 1));
 
         // ── HP gates ──
         const hpPct = live.maxHP > 0 ? live.currentHP / live.maxHP : 1;
-        if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _egCoilConstrictor(st, p); }
-        if (!st.gate30Done && hpPct <= 0.30) { st.gate30Done = true; _egCoilTide(st, p); }
+        if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _coilConstrictor(st, p); }
+        if (!st.gate30Done && hpPct <= 0.30) { st.gate30Done = true; _coilTide(st, p); }
 
         // ── The coiled maw ──
         const mw = st.maw;
         const mdx = mw.hx - mw.x, mdy = mw.hy - mw.y;
         const md = Math.hypot(mdx, mdy) || 1;
-        const mstep = EG_COIL_SLITHER[p] * dtS;
-        if (md <= mstep) { _egCoilPickMawSpot(mw); }
+        const mstep = COIL_SLITHER[p] * dtS;
+        if (md <= mstep) { _coilPickMawSpot(mw); }
         else { mw.x += (mdx / md) * mstep; mw.y += (mdy / md) * mstep; }
-        mw.el.style.transform = 'translate(' + Math.round(mw.x - EG_COIL_R) + 'px,' + Math.round(mw.y - EG_COIL_R) + 'px)';
-        if (pr && c && now >= mw.biteCd && _egNkCircleHit(mw.x, mw.y, EG_COIL_R * 0.85, pr, 0)) {
-            mw.biteCd = now + EG_COIL_BITE_CD_MS;
+        mw.el.style.transform = 'translate(' + Math.round(mw.x - COIL_R) + 'px,' + Math.round(mw.y - COIL_R) + 'px)';
+        if (pr && c && now >= mw.biteCd && _nkCircleHit(mw.x, mw.y, COIL_R * 0.85, pr, 0)) {
+            mw.biteCd = now + COIL_BITE_CD_MS;
             const bdx = c.x - mw.x, bdy = c.y - mw.y;
             const bd = Math.hypot(bdx, bdy) || 1;
             // Animated fling (contact at the maw): glide + tumble + burst.
-            _egNkFlingAvatar((bdx / bd) * EG_COIL_BITE_FLING[p], (bdy / bd) * EG_COIL_BITE_FLING[p], mw.x, mw.y);
-            const dealt = _egNkHit(EG_COIL_BITE_DMG[p], 'shadow', st.level);
-            _egNkAbilityHitToast(dealt, 'The Coil', 'Bite');
+            _nkFlingAvatar((bdx / bd) * COIL_BITE_FLING[p], (bdy / bd) * COIL_BITE_FLING[p], mw.x, mw.y);
+            const dealt = _nkHit(COIL_BITE_DMG[p], 'shadow', st.level);
+            _nkAbilityHitToast(dealt, 'The Coil', 'Bite');
             try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('coil_hiss'); } catch (e) {}
         }
 
         // ── Seeker serpents ──
         st.snakeAcc += dtS * 1000;
-        const sInt = EG_COIL_SNAKE_INTERVAL_MS[p];
-        const aliveMax = EG_COIL_SNAKE_ALIVE_MAX[p];
+        const sInt = COIL_SNAKE_INTERVAL_MS[p];
+        const aliveMax = COIL_SNAKE_ALIVE_MAX[p];
         if (st.snakeAcc >= sInt && st.snakes.length < aliveMax) {
             st.snakeAcc = 0;
-            _egCoilSpawnSnake(st);
+            _coilSpawnSnake(st);
         }
         for (let i = st.snakes.length - 1; i >= 0; i--) {
             const s = st.snakes[i];
@@ -199,33 +199,33 @@ export function _egCoilArenaInit(monster) {
                 if (c) {
                     const dx = c.x - s.x, dy = c.y - s.y;
                     const d = Math.hypot(dx, dy) || 1;
-                    s.x += (dx / d) * EG_COIL_SNAKE_SPEED[p] * dtS;
-                    s.y += (dy / d) * EG_COIL_SNAKE_SPEED[p] * dtS;
+                    s.x += (dx / d) * COIL_SNAKE_SPEED[p] * dtS;
+                    s.y += (dy / d) * COIL_SNAKE_SPEED[p] * dtS;
                 }
                 s.el.style.transform = 'translate(' + Math.round(s.x - 22) + 'px,' + Math.round(s.y - 22) + 'px)';
                 // Venom trail smear (spaced dots along the path).
                 s.trailAcc = (s.trailAcc || 0) + dtS * 1000;
                 if (s.trailAcc >= 260) {
                     s.trailAcc = 0;
-                    const tr = _egNkEl(st.run, 'div', 'eg-coil-trail');
+                    const tr = _nkEl(st.run, 'div', 'eg-coil-trail');
                     tr.style.left = Math.round(s.x) + 'px';
                     tr.style.top = Math.round(s.y) + 'px';
                     st.trails.push({ x: s.x, y: s.y, t: 0, el: tr });
                 }
                 const dist = c ? Math.hypot(c.x - s.x, c.y - s.y) : 9999;
-                if (dist < EG_COIL_SNAKE_TRIGGER_R || s.t >= 9000) {
+                if (dist < COIL_SNAKE_TRIGGER_R || s.t >= 9000) {
                     s.state = 'fuse';
                     s.t = 0;
                     s.el.classList.add('fuse');
                     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('coil_hiss'); } catch (e) {}
                 }
             } else if (s.state === 'fuse') {
-                if (s.t >= EG_COIL_FUSE_MS) {
+                if (s.t >= COIL_FUSE_MS) {
                     s.state = 'dead';
                     s.el.classList.add('boom');
-                    if (pr && _egNkCircleHit(s.x, s.y, EG_COIL_BLAST_R, pr, 0)) {
-                        const dealt = _egNkHit(EG_COIL_BLAST_DMG[p], 'shadow', st.level);
-                        _egNkAbilityHitToast(dealt, 'The Coil', 'Serpent Blast');
+                    if (pr && _nkCircleHit(s.x, s.y, COIL_BLAST_R, pr, 0)) {
+                        const dealt = _nkHit(COIL_BLAST_DMG[p], 'shadow', st.level);
+                        _nkAbilityHitToast(dealt, 'The Coil', 'Serpent Blast');
                     }
                     setTimeout(() => { try { s.el.remove(); } catch (e) {} }, 300);
                     st.snakes.splice(i, 1);
@@ -237,12 +237,12 @@ export function _egCoilArenaInit(monster) {
             for (let i = st.trails.length - 1; i >= 0; i--) {
                 const tr = st.trails[i];
                 tr.t += dtS * 1000;
-                if (pr && _egNkCircleHit(tr.x, tr.y, 26, pr, 0)) {
-                    _egNkDotTick(st.run, EG_COIL_TRAIL_DPS, dtS, st.level, 'shadow');
+                if (pr && _nkCircleHit(tr.x, tr.y, 26, pr, 0)) {
+                    _nkDotTick(st.run, COIL_TRAIL_DPS, dtS, st.level, 'shadow');
                 }
-                if (tr.t >= EG_COIL_TRAIL_LIFE_MS) {
+                if (tr.t >= COIL_TRAIL_LIFE_MS) {
                     tr.el.classList.add('fade');
-                    if (tr.t >= EG_COIL_TRAIL_LIFE_MS + 350) {
+                    if (tr.t >= COIL_TRAIL_LIFE_MS + 350) {
                         try { tr.el.remove(); } catch (e) {}
                         st.trails.splice(i, 1);
                     }
@@ -255,9 +255,9 @@ export function _egCoilArenaInit(monster) {
             const cn = st.con;
             cn.t += dtS * 1000;
             // Spawn the next ring when its slot comes up.
-            const due = cn.spawned * (EG_COIL_CON_WARN_MS + EG_COIL_CON_GAP_MS);
+            const due = cn.spawned * (COIL_CON_WARN_MS + COIL_CON_GAP_MS);
             if (cn.spawned < cn.total && cn.t >= due) {
-                const ring = _egNkEl(st.run, 'div', 'eg-coil-ring');
+                const ring = _nkEl(st.run, 'div', 'eg-coil-ring');
                 ring.style.width = ring.style.height = (cn.r0 * 2) + 'px';
                 ring.style.left = (cn.cx - cn.r0) + 'px';
                 ring.style.top = (cn.cy - cn.r0) + 'px';
@@ -270,15 +270,15 @@ export function _egCoilArenaInit(monster) {
                 if (rg.done) return;
                 any = true;
                 rg.t += dtS * 1000;
-                const k = Math.min(1, rg.t / EG_COIL_CON_CONTRACT_MS);
+                const k = Math.min(1, rg.t / COIL_CON_CONTRACT_MS);
                 const r = cn.r0 * (1 - k) + 30 * k;
                 rg.el.style.width = rg.el.style.height = (r * 2) + 'px';
                 rg.el.style.left = (cn.cx - r) + 'px';
                 rg.el.style.top = (cn.cy - r) + 'px';
                 if (!rg.hitDone && pr && Math.abs(Math.hypot(c.x - cn.cx, c.y - cn.cy) - r) < 34) {
                     rg.hitDone = true;
-                    const dealt = _egNkHit(EG_COIL_CON_DMG, 'shadow', st.level);
-                    _egNkAbilityHitToast(dealt, 'The Coil', 'Constrictor');
+                    const dealt = _nkHit(COIL_CON_DMG, 'shadow', st.level);
+                    _nkAbilityHitToast(dealt, 'The Coil', 'Constrictor');
                 }
                 if (k >= 1) { rg.done = true; try { rg.el.remove(); } catch (e) {} }
             });
@@ -289,16 +289,16 @@ export function _egCoilArenaInit(monster) {
         if (st.tide) {
             const td = st.tide;
             td.t += dtS * 1000;
-            if (td.phase === 'warn' && td.t >= EG_COIL_TIDE_WARN_MS) {
+            if (td.phase === 'warn' && td.t >= COIL_TIDE_WARN_MS) {
                 td.phase = 'charge';
                 td.t = 0;
                 try { td.bandEl.classList.add('hot'); } catch (e) {}
                 for (let i = 0; i < td.n; i++) {
-                    const el = _egNkEl(st.run, 'div', 'eg-coil-charger', '🐍');
+                    const el = _nkEl(st.run, 'div', 'eg-coil-charger', '🐍');
                     const spread = (i / Math.max(1, td.n - 1) - 0.5) * 240;
                     const ch = {
                         x: td.fx, y: td.fy + spread,
-                        vx: td.dirX * EG_COIL_TIDE_SPEED, vy: 0,
+                        vx: td.dirX * COIL_TIDE_SPEED, vy: 0,
                         el, hit: false,
                     };
                     td.chargers.push(ch);
@@ -309,10 +309,10 @@ export function _egCoilArenaInit(monster) {
                     const ch = td.chargers[i];
                     ch.x += ch.vx * dtS;
                     ch.el.style.transform = 'translate(' + Math.round(ch.x - 18) + 'px,' + Math.round(ch.y - 18) + 'px)';
-                    if (pr && !ch.hit && _egNkCircleHit(ch.x, ch.y, 18, pr, 0)) {
+                    if (pr && !ch.hit && _nkCircleHit(ch.x, ch.y, 18, pr, 0)) {
                         ch.hit = true;
-                        const dealt = _egNkHit(EG_COIL_TIDE_DMG, 'shadow', st.level);
-                        _egNkAbilityHitToast(dealt, 'The Coil', 'Serpent Tide');
+                        const dealt = _nkHit(COIL_TIDE_DMG, 'shadow', st.level);
+                        _nkAbilityHitToast(dealt, 'The Coil', 'Serpent Tide');
                     }
                     const off = ch.x < -50 || ch.x > window.innerWidth + 50;
                     if (off || ch.hit) { try { ch.el.remove(); } catch (e) {} td.chargers.splice(i, 1); }
@@ -320,7 +320,7 @@ export function _egCoilArenaInit(monster) {
                 if (td.chargers.length === 0) {
                     try { td.bandEl.remove(); } catch (e) {}
                     td.tide++;
-                    if (td.tide >= EG_COIL_TIDE_N) {
+                    if (td.tide >= COIL_TIDE_N) {
                         st.tide = null;
                     } else {
                         td.phase = 'warn';
@@ -328,10 +328,10 @@ export function _egCoilArenaInit(monster) {
                         td.dirX = Math.random() < 0.5 ? 1 : -1;
                         td.fx = td.dirX === 1 ? -30 : window.innerWidth + 30;
                         // Re-aim each tide at the player's live row.
-                        const c2 = _egNkPlayerCenter();
+                        const c2 = _nkPlayerCenter();
                         td.fy = c2 ? Math.max(90, Math.min(window.innerHeight - 90, c2.y))
                                    : 80 + Math.random() * Math.max(60, window.innerHeight - 220);
-                        const band = _egNkEl(st.run, 'div', 'eg-coil-tideband');
+                        const band = _nkEl(st.run, 'div', 'eg-coil-tideband');
                         band.style.top = Math.round(td.fy - 70) + 'px';
                         band.style.height = '140px';
                         if (td.dirX === -1) band.classList.add('flip');
@@ -347,7 +347,7 @@ export function _egCoilArenaInit(monster) {
 
 
 // Picks a fresh maw drift spot a good distance from the current one.
-export function _egCoilPickMawSpot(mw) {
+export function _coilPickMawSpot(mw) {
     const W = window.innerWidth, H = window.innerHeight;
     const pad = 120;
     let x = W / 2, y = H / 2;
@@ -360,8 +360,8 @@ export function _egCoilPickMawSpot(mw) {
 }
 
 
-export function _egCoilSpawnSnake(st) {
-    const el = _egNkEl(st.run, 'div', 'eg-coil-snake', '🐍');
+export function _coilSpawnSnake(st) {
+    const el = _nkEl(st.run, 'div', 'eg-coil-snake', '🐍');
     // Emerge from the maw.
     const s = {
         x: st.maw.x, y: st.maw.y,
@@ -373,40 +373,40 @@ export function _egCoilSpawnSnake(st) {
 
 // ── 60% gate: Constrictor ───────────────────────────────────────────────
 // Huge spiral rings contract toward the arena center - stand in the gaps.
-export function _egCoilConstrictor(st, p) {
+export function _coilConstrictor(st, p) {
     if (st.con) return; // re-entry guard: never orphan a running set-piece
-    const c = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const c = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const r0 = Math.hypot(window.innerWidth, window.innerHeight) * 0.42;
     st.con = {
         t: 0, spawned: 0,
-        total: EG_COIL_CON_RING_N[p],
+        total: COIL_CON_RING_N[p],
         r0, cx: c.x, cy: c.y,
         rings: [],
     };
-    _egNkToast('eg_coil_constrictor', '🐍 CONSTRICTOR! Stand between the rings!');
+    _nkToast('eg_coil_constrictor', '🐍 CONSTRICTOR! Stand between the rings!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('coil_hiss'); } catch (e) {}
 }
 
 
 // ── 30% gate: Serpent Tide ──────────────────────────────────────────────
-export function _egCoilTide(st, p) {
+export function _coilTide(st, p) {
     if (st.tide) return; // re-entry guard: never orphan a running set-piece
     const dirX = Math.random() < 0.5 ? 1 : -1;
     const fx = dirX === 1 ? -30 : window.innerWidth + 30;
     // Aim the tide lane at the player's live row - a real threat to dodge.
-    const c = _egNkPlayerCenter();
+    const c = _nkPlayerCenter();
     const fy = c ? Math.max(90, Math.min(window.innerHeight - 90, c.y))
                  : 80 + Math.random() * Math.max(60, window.innerHeight - 220);
-    const band = _egNkEl(st.run, 'div', 'eg-coil-tideband');
+    const band = _nkEl(st.run, 'div', 'eg-coil-tideband');
     band.style.top = Math.round(fy - 70) + 'px';
     band.style.height = '140px';
     if (dirX === -1) band.classList.add('flip');
     st.tide = {
         phase: 'warn', t: 0, tide: 0,
-        n: EG_COIL_TIDE_CHARGERS[p],
+        n: COIL_TIDE_CHARGERS[p],
         dirX, fx, fy, bandEl: band, chargers: [],
     };
-    _egNkToast('eg_coil_tide', '🐍 SERPENT TIDE! The pit boils - dodge the chargers!');
+    _nkToast('eg_coil_tide', '🐍 SERPENT TIDE! The pit boils - dodge the chargers!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('coil_hiss'); } catch (e) {}
 }
 
@@ -416,39 +416,39 @@ export function _egCoilTide(st, p) {
 //------------------------------------------------------------------------
 // A wide hood-shadow telegraphs a lane through your position, then the
 // maw rears up and strikes across it in one lightning lash.
-// Wired from _egFireMonsterAttack (endgame-encounter.js).
+// Wired from _fireMonsterAttack (endgame-encounter.js).
 
-export function _egCoilCobraStrike(monster) {
-    if (_egCoilCobraActive || _egNkDodgeBusy() || _egNkFrozen()) return;
+export function _coilCobraStrike(monster) {
+    if (_coilCobraActive || _nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(monster ? monster.id : null, true);
-    _egCoilCobraActive = true;
-    run.onKill = () => { _egCoilCobraActive = false; };
-    const c = _egNkPlayerCenter();
+    const run = _nkNewRun(monster ? monster.id : null, true);
+    _coilCobraActive = true;
+    run.onKill = () => { _coilCobraActive = false; };
+    const c = _nkPlayerCenter();
     const cy = c ? c.y : window.innerHeight / 2;
     const fromLeft = Math.random() < 0.5;
-    const lane = _egNkEl(run, 'div', 'eg-coil-cobra' + (fromLeft ? '' : ' flip'));
-    lane.style.top = Math.round(cy - EG_COIL_COBRA_H / 2) + 'px';
-    lane.style.height = EG_COIL_COBRA_H + 'px';
-    _egNkToast('eg_coil_cobra', '🐍 COBRA STRIKE! Get out of its lane!');
+    const lane = _nkEl(run, 'div', 'eg-coil-cobra' + (fromLeft ? '' : ' flip'));
+    lane.style.top = Math.round(cy - COIL_COBRA_H / 2) + 'px';
+    lane.style.height = COIL_COBRA_H + 'px';
+    _nkToast('eg_coil_cobra', '🐍 COBRA STRIKE! Get out of its lane!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('coil_hiss'); } catch (e) {}
     let t = 0, hit = false;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         t += dtS * 1000;
-        if (t >= EG_COIL_COBRA_WARN_MS && !hit) {
+        if (t >= COIL_COBRA_WARN_MS && !hit) {
             lane.classList.add('strike');
-            const pr = _egNkPlayerRect();
+            const pr = _nkPlayerRect();
             if (pr) {
-                const top = cy - EG_COIL_COBRA_H / 2, bottom = cy + EG_COIL_COBRA_H / 2;
+                const top = cy - COIL_COBRA_H / 2, bottom = cy + COIL_COBRA_H / 2;
                 if (pr.bottom > top && pr.top < bottom) {
                     hit = true;
-                    const dealt = _egNkHit(EG_COIL_COBRA_DMG[p], 'shadow', level);
-                    _egNkAbilityHitToast(dealt, 'The Coil', 'Cobra Strike');
+                    const dealt = _nkHit(COIL_COBRA_DMG[p], 'shadow', level);
+                    _nkAbilityHitToast(dealt, 'The Coil', 'Cobra Strike');
                 }
             }
         }
-        if (t >= EG_COIL_COBRA_WARN_MS + EG_COIL_COBRA_STRIKE_MS) return false;
+        if (t >= COIL_COBRA_WARN_MS + COIL_COBRA_STRIKE_MS) return false;
         return true;
     });
 }
@@ -459,4 +459,4 @@ export function _egCoilCobraStrike(monster) {
 //------------------------------------------------------------------------
 // The old scheduled Seeker Snakes are now the persistent nest - keep the
 // handler name alive so any stale schedule entry no-ops instead of erroring.
-export function _egMechSeekerSnakes() { void 0; }
+export function _mechSeekerSnakes() { void 0; }

@@ -1,11 +1,11 @@
 import { updateClassHUDManaBar } from '../classes/class-mana.js';
-import { _egEntrMoveMult } from '../combat/bosses/boss-entropy.js';
-import { _egSnailBroomHeld } from '../combat/bosses/boss-snail.js';
-import { _egPlayerHasAilment } from '../combat/combat-ailments-core.js';
-import { _egGetHandChargePct, _egGetPlayerChargePct, _egSetHoldEPauseVisual } from
+import { _entrMoveMult } from '../combat/bosses/boss-entropy.js';
+import { _snailBroomHeld } from '../combat/bosses/boss-snail.js';
+import { _playerHasAilment } from '../combat/combat-ailments-core.js';
+import { _getHandChargePct, _getPlayerChargePct, _setHoldEPauseVisual } from
 '../combat/encounter-tick.js';
-import { _egComputePlayerStats, _egGetPlayerAttackInterval } from '../endgame/endgame-player-stats.js';
-import { EG_PLAYER_DEFAULT_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
+import { _computePlayerStats, _getPlayerAttackInterval } from '../endgame/endgame-player-stats.js';
+import { PLAYER_DEFAULT_ATTACK_INTERVAL, _isActive } from '../combat/combat-state.js';
 import { keybindKeyFor, keybindMatches } from '../keybinds.js';
 import { _refreshQuestionModalFlag } from '../screens/screens.js';
 import { _uspMovementSpeedMult } from '../skills/universal-spells.js';
@@ -97,7 +97,7 @@ export function _avatarBarsHTML(barWidth = '100%') {
                     </div>
                 </div>
 
-                <!-- attack charge-up bar (with % readout to the bar's right - see _egUpdatePlayerChargeBar).
+                <!-- attack charge-up bar (with % readout to the bar's right - see _updatePlayerChargeBar).
                      NOTE: no inline background here - the fill wears the
                      player-charge-bar-color class so the stylesheet owns its
                      color (an inline background would beat every tier/ready
@@ -110,7 +110,7 @@ export function _avatarBarsHTML(barWidth = '100%') {
                     <span id="avatar-charge-text" class="avatar-bar-num avatar-charge-num" style="flex-shrink: 0; min-width: 4ch; margin-bottom: 0;">0%</span>
                 </div>
                 <!-- dual-wield only: second charge-up bar for the off-hand weapon
-                     (shown by _egUpdatePlayerChargeBar while two 1H weapons are equipped) -->
+                     (shown by _updatePlayerChargeBar while two 1H weapons are equipped) -->
                 <div id="avatar-charge2-row" style="width: 100%; margin-bottom: 8px; display: none; align-items: center; gap: 4px; margin-top: -4px;">
                     <span id="avatar-charge-hand2" class="avatar-charge-hand">2</span>
                     <div style="background: #111; width: 100%; height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid #000; box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);">
@@ -138,8 +138,8 @@ function _updateAvatarBarStack() {
         hpFill.style.width = hpPct + '%';
     }    // Absorption shield - hidden entirely unless the player actually has
     // some (gear absorption > 0 AND current charge above zero).
-    const absCur = (typeof _egPlayerAbsorptionCurrent === 'number') ? globalThis._egPlayerAbsorptionCurrent : 0;
-    const maxAbsorption = (typeof _egComputePlayerStats === 'function') ? (_egComputePlayerStats().absorption || 0) : 0;
+    const absCur = (typeof _playerAbsorptionCurrent === 'number') ? globalThis._playerAbsorptionCurrent : 0;
+    const maxAbsorption = (typeof _computePlayerStats === 'function') ? (_computePlayerStats().absorption || 0) : 0;
     const shieldWrap = document.getElementById('avatar-shield-wrap');
     const shieldFill = document.getElementById('avatar-shield-fill');
     const shieldText = document.getElementById('avatar-shield-text');
@@ -154,7 +154,7 @@ function _updateAvatarBarStack() {
         }
     }
 
-    // Manual melee charge - mirrors _egUpdatePlayerChargeBar (the central
+    // Manual melee charge - mirrors _updatePlayerChargeBar (the central
     // owner of the bar's paused styling): the bar auto-fills toward 100%
     // and overcharges through the weapon-art tiers while the attack key is
     // held (up to 500% + orange tier glow). This sync runs AFTER the tick's
@@ -164,16 +164,16 @@ function _updateAvatarBarStack() {
     const chargeFill = document.getElementById('avatar-charge-fill');
     if (chargeFill) {
         let chargePct = 0;
-        if (typeof _egGetHandChargePct === 'function') {
+        if (typeof _getHandChargePct === 'function') {
             // Per-hand reading: hand 1's own bar (dual-wielding has a second bar).
-            try { chargePct = _egGetHandChargePct(1); } catch (e) { chargePct = 0; }
-        } else if (typeof _egGetPlayerChargePct === 'function') {
-            try { chargePct = _egGetPlayerChargePct(); } catch (e) { chargePct = 0; }
+            try { chargePct = _getHandChargePct(1); } catch (e) { chargePct = 0; }
+        } else if (typeof _getPlayerChargePct === 'function') {
+            try { chargePct = _getPlayerChargePct(); } catch (e) { chargePct = 0; }
         } else {
-            const chargeCur = (typeof _egPlayerCurrentCharge === 'number') ? globalThis._egPlayerCurrentCharge : 0;
-            const chargeMax = (typeof _egGetPlayerAttackInterval === 'function')
-                ? _egGetPlayerAttackInterval()
-                : (typeof EG_PLAYER_DEFAULT_ATTACK_INTERVAL === 'number' ? EG_PLAYER_DEFAULT_ATTACK_INTERVAL : 10);
+            const chargeCur = (typeof _playerCurrentCharge === 'number') ? globalThis._playerCurrentCharge : 0;
+            const chargeMax = (typeof _getPlayerAttackInterval === 'function')
+                ? _getPlayerAttackInterval()
+                : (typeof PLAYER_DEFAULT_ATTACK_INTERVAL === 'number' ? PLAYER_DEFAULT_ATTACK_INTERVAL : 10);
             chargePct = (chargeMax > 0) ? chargeCur / chargeMax : 0;
         }
         chargePct = Math.min(5, Math.max(0, chargePct));
@@ -182,11 +182,11 @@ function _updateAvatarBarStack() {
         const chargeReady = chargePct >= 1;
         const chargeOver = chargePct > 1.001;
         // Milestone look per weapon-art tier (mirrors
-        // _egUpdatePlayerChargeBar - see eg-charge-tier1..4 in CSS). The
+        // _updatePlayerChargeBar - see eg-charge-tier1..4 in CSS). The
         // bands are inlined (not imported from encounter-melee-arts.js) on
         // purpose: this file must stay import-light so its test graph never
         // pulls the whole encounter facade. Bands pinned against the real
-        // _egMeleeTierForCharge in dev/tests/melee-hold-charge.test.mjs.
+        // _meleeTierForCharge in dev/tests/melee-hold-charge.test.mjs.
         let chargeTier = 0;
         try {
             chargeTier = (chargePct >= 5 - 0.001 ? 4 : chargePct >= 4 ? 3
@@ -267,7 +267,7 @@ export function _renderPlayerAvatarSimple() {
         if (_hideSimple) _hideSimple.style.display = 'none';
         return;
     }
-    if (typeof _egIsActive === 'function' && _egIsActive()) return; // monster levels use full avatar
+    if (typeof _isActive === 'function' && _isActive()) return; // monster levels use full avatar
     // Remove the full endgame avatar if switching from a monster level
     const full = document.getElementById('player-avatar-wrapper');
     if (full) full.remove();
@@ -501,29 +501,29 @@ function _removePlayerAvatarSimple() {
 export const AVATAR_MOVE_SPEED_PX_PER_SEC = 320;
 
 // Boots movement-speed modifier. Reads live gear via
-// _egComputePlayerStats().movementSpeedPct (only rolled on boots, 10-35%).
+// _computePlayerStats().movementSpeedPct (only rolled on boots, 10-35%).
 // Outside endgame or with no boots equipped this stays at 1.0x.
 export function _avatarGetMoveSpeed() {
     let base = AVATAR_MOVE_SPEED_PX_PER_SEC;
     try {
-        if (typeof _egComputePlayerStats === 'function') {
-            const pct = _egComputePlayerStats().movementSpeedPct || 0;
+        if (typeof _computePlayerStats === 'function') {
+            const pct = _computePlayerStats().movementSpeedPct || 0;
             if (pct) base *= (1 + pct / 100);
         }
     } catch (e) {}
     // The Snail's broom: sweeping slows the player to a crawl so the Doom
     // Snail can catch up while a slimed cell is being cleaned (see
-    // boss-snail.js - EG_SNAIL_BROOM_SPEED_MULT lives on window).
-    if (typeof _egSnailBroomHeld === 'function' && _egSnailBroomHeld()) {
-        base *= (typeof window.EG_SNAIL_BROOM_SPEED_MULT === 'number')
-            ? window.EG_SNAIL_BROOM_SPEED_MULT : 0.10;
+    // boss-snail.js - SNAIL_BROOM_SPEED_MULT lives on window).
+    if (typeof _snailBroomHeld === 'function' && _snailBroomHeld()) {
+        base *= (typeof window.SNAIL_BROOM_SPEED_MULT === 'number')
+            ? window.SNAIL_BROOM_SPEED_MULT : 0.10;
     }
     // Entropy's order economy: outside the ordered zones the cold makes you
     // progressively sluggish (never locked - floors at 55%). Perfect crystal
     // order during the finale restores full speed (see boss-entropy.js -
-    // _egEntrMoveMult reads the order meter).
-    if (typeof _egEntrMoveMult === 'function') {
-        const entrMult = _egEntrMoveMult();
+    // _entrMoveMult reads the order meter).
+    if (typeof _entrMoveMult === 'function') {
+        const entrMult = _entrMoveMult();
         if (entrMult < 1) base *= entrMult;
         else if (entrMult > 1) base = Math.min(base, AVATAR_MOVE_SPEED_PX_PER_SEC * 1.05) * entrMult;
     }
@@ -581,21 +581,21 @@ function _avatarMoveUiBlocked() {
         }
     }
     // The Clock's Time Freeze locks the avatar in place for the whole window.
-    if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) return true;
+    if (typeof window !== 'undefined' && window._clockTimeFreezeActive) return true;
     // Dev-testing harness (js/dev/dev-testing.js) explicitly freezes the avatar
     // for scripted movement tests; never set in normal play.
     if (typeof window !== 'undefined' && window.LEVEL_FLAGS && window.LEVEL_FLAGS.devTestActive
         && window.LEVEL_FLAGS.devTestFreezeAvatar) return true;
-    if (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) return true;
+    if (typeof _holdEPauseActive !== 'undefined' && globalThis._holdEPauseActive) return true;
     // Charging a melee hold roots the hero in place (Secret-of-Mana risk /
     // reward for the overcharge arts): no voluntary movement until the
     // strike is released. Covers BOTH key registration (below) and the
     // displacement loop, so held keys neither queue nor lurch on release.
-    if (typeof _egMeleeHoldActive !== 'undefined' && globalThis._egMeleeHoldActive) return true;
-    if (typeof _egPlayerHasAilment === 'function' && _egPlayerHasAilment('frozen')) return true;
+    if (typeof _meleeHoldActive !== 'undefined' && globalThis._meleeHoldActive) return true;
+    if (typeof _playerHasAilment === 'function' && _playerHasAilment('frozen')) return true;
     // Stunned: the hero cannot move (attacks and spells are already blocked
-    // while stunned - see _egStunPlayer in combat-ailments-core.js).
-    if (typeof _egPlayerHasAilment === 'function' && _egPlayerHasAilment('stunned')) return true;
+    // while stunned - see _stunPlayer in combat-ailments-core.js).
+    if (typeof _playerHasAilment === 'function' && _playerHasAilment('stunned')) return true;
     return false;
 }
 
@@ -671,7 +671,7 @@ export function _avatarMoveTick(ts) {
             if (dirHint) _avatarLastMoveDir = dirHint;
             _setAvatarPos(el, fx, fy, dirHint);
         }
-    } else if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) {
+    } else if (typeof window !== 'undefined' && window._clockTimeFreezeActive) {
         // Drop keys that were held when Time Freeze started so the avatar
         // doesn't lurch forward the instant the freeze lifts.
         _avatarMoveState.held.clear();
@@ -958,7 +958,7 @@ export function _setAvatarPos(el, x, y, direction) {
     let maxX = window.innerWidth - w - 4;
     let maxY = window.innerHeight - h - 4;
     // Arena modals (gauntlet) confine the sprite to their own rectangle.
-    const bounds = globalThis._egAvatarBounds;
+    const bounds = globalThis._avatarBounds;
     if (bounds) {
         minX = Math.max(minX, bounds.left);
         minY = Math.max(minY, bounds.top);
@@ -1104,12 +1104,12 @@ export function _renderPlayerAvatar() {
     if (typeof _applyLowHealthVignette === 'function') _applyLowHealthVignette();
 
     // Hold-parry pause - keep sprite label in sync if the avatar was recreated while the parry key is still held
-    if (typeof _egHoldEPauseActive !== 'undefined' && typeof _egSetHoldEPauseVisual === 'function') {
-        // Avoid redundant DOM churn: _egSetHoldEPauseVisual is idempotent and cheap
+    if (typeof _holdEPauseActive !== 'undefined' && typeof _setHoldEPauseVisual === 'function') {
+        // Avoid redundant DOM churn: _setHoldEPauseVisual is idempotent and cheap
         const lbl = document.getElementById('eg-hold-pause-label');
-        const shouldShow = !!globalThis._egHoldEPauseActive;
+        const shouldShow = !!globalThis._holdEPauseActive;
         const isShowing = !!lbl && lbl.parentElement === avatar;
-        if (shouldShow !== isShowing) _egSetHoldEPauseVisual(shouldShow);
+        if (shouldShow !== isShowing) _setHoldEPauseVisual(shouldShow);
         else if (shouldShow && lbl) {
             // Ensure text stays translated if language was switched while held
             const raw = (typeof t === 'function') ? (t('eg_hold_paused') || t('eg_parrying')) : '';

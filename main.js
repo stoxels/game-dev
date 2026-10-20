@@ -1,7 +1,7 @@
 import { Audio_Manager } from './js/audio/audio.js';
 import { _bayesTrapsCleanup } from './js/classes/class-bayesian.js';
-import { _egRenderPauseLootSummary } from './js/combat/encounter-chain.js';
-import { _egOnPause, _egOnResume } from './js/combat/encounter-tick-support.js';
+import { _renderPauseLootSummary } from './js/combat/encounter-chain.js';
+import { _onPause, _onResume } from './js/combat/encounter-tick-support.js';
 import { closeHubToGame, isHubGameOverlay } from './js/endgame/endgame-hub.js';
 import { scalePuzzle } from './js/grid-scaling.js';
 import { stopPainting } from './js/mouse-button-handlers.js';
@@ -106,13 +106,13 @@ export function pauseGame() {
     if (_gamePaused || globalThis.dead) return;
     _gamePaused = true;
     pauseTimer(); // defined in timer.js
-    if (typeof _egOnPause === 'function') _egOnPause();
+    if (typeof _onPause === 'function') _onPause();
     const onEndgameMap = _updatePauseMenuReturnButtons();
     // Endgame variant: hide level number / score / hint / bonus, show the
     // run's collected loot (with hover tooltips) instead.
     document.getElementById('pause-overlay').classList.toggle('eg-pause', onEndgameMap);
-    if (onEndgameMap && typeof _egRenderPauseLootSummary === 'function') {
-        _egRenderPauseLootSummary();
+    if (onEndgameMap && typeof _renderPauseLootSummary === 'function') {
+        _renderPauseLootSummary();
     }
     document.getElementById('pause-overlay').classList.add('show');
 }
@@ -122,7 +122,7 @@ export function unpauseGame() {
     if (!_gamePaused) return;
     _gamePaused = false;
     document.getElementById('pause-overlay').classList.remove('show');
-    if (typeof _egOnResume === 'function') _egOnResume();
+    if (typeof _onResume === 'function') _onResume();
     resumeTimer(); // defined in timer.js
 }
 

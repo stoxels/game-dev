@@ -2,7 +2,7 @@
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
+//  which evals every MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------SHOULDERS MODIFIER TABLE-----------------------------
@@ -13,7 +13,7 @@
 // Values match helmet scale since both are major armour slots.
 // No elemental damage, no crit, no status effect chances, no leech.
 
-export const EG_MOD_TABLE_SHOULDERS = {
+export const MOD_TABLE_SHOULDERS = {
     prefixes: {
 
         // --- LIFE & MANA ---

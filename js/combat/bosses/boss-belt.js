@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkDodgeBusy, _nkDotHit, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BELT (boss_belt)---------------------------------
@@ -12,7 +12,7 @@ import { _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop,
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_belt: {
         id: 'boss_belt', name: 'The Belt', emoji: '☄️',
         baseHP: 1080, baseDamage: 24, chargeMax: 12,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_belt: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -29,8 +29,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'splitter_rocks', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechSplitterRocks' },
-            { name: 'fated_cell', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechFatedCell' },
+            { name: 'splitter_rocks', intervalBase: 21000, intervalVariance: 5000, handler: '_mechSplitterRocks' },
+            { name: 'fated_cell', intervalBase: 20000, intervalVariance: 5000, handler: '_mechFatedCell' },
         ],
     },
 });
@@ -38,8 +38,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // Slow bouncing rocks that each split into two fast shards mid-flight.
 // Dodge the big ones early; the shards fade on their own soon after.
-export function _egMechSplitterRocks(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechSplitterRocks(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const bigSpeed = [0, 70, 85, 100][p];
     const shardSpeed = [0, 190, 220, 250][p];
@@ -48,11 +48,11 @@ export function _egMechSplitterRocks(monster, phase) {
     const bigDmg = [0, 0.13, 0.15, 0.18][p];
     const shardDmg = [0, 0.07, 0.08, 0.10][p];
     const durMs = 11000;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const rocks = [];
     for (let i = 0; i < 3; i++) {
-        const el = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-rock', '☄️');
+        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-rock', '☄️');
         const a = Math.random() * Math.PI * 2;
         rocks.push({
             big: true, split: false,
@@ -62,12 +62,12 @@ export function _egMechSplitterRocks(monster, phase) {
             t: 0, life: durMs, cdUntil: 0, el,
         });
     }
-    _egNkToast('eg_mech_belt', '☄️ The Belt: Splitter Rocks! They multiply!');
+    _nkToast('eg_mech_belt', '☄️ The Belt: Splitter Rocks! They multiply!');
     let e = 0;
     const radiusOf = (r) => r.big ? 30 : 14;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         e += dtS * 1000;
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         for (let i = rocks.length - 1; i >= 0; i--) {
             const r = rocks[i];
             r.t += dtS * 1000;
@@ -83,7 +83,7 @@ export function _egMechSplitterRocks(monster, phase) {
             if (r.big && !r.split && r.t >= splitMs) {
                 r.split = true;
                 for (let k = 0; k < 2; k++) {
-                    const el = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-rock-shard', '🪨');
+                    const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-rock-shard', '🪨');
                     const a = Math.random() * Math.PI * 2;
                     rocks.push({
                         big: false, x: r.x, y: r.y,
@@ -92,9 +92,9 @@ export function _egMechSplitterRocks(monster, phase) {
                     });
                 }
             }
-            if (pr && now >= r.cdUntil && _egNkDotHit(r.el, pr, 0)) {
+            if (pr && now >= r.cdUntil && _nkDotHit(r.el, pr, 0)) {
                 r.cdUntil = now + 800;
-                _egNkHit(r.big ? bigDmg : shardDmg, null, level);
+                _nkHit(r.big ? bigDmg : shardDmg, null, level);
             }
             if (r.life <= 0) {
                 r.el.remove();

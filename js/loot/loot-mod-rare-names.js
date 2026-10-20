@@ -13,7 +13,7 @@ import { LANG } from '../translation/translations.js';
 // Each entry is [englishWord, germanWord]. The base type is still shown
 // separately via .baseName, exactly like the genre handles rare names.
 
-export const EG_RARE_NAME_WORDS_FIRST = [
+export const RARE_NAME_WORDS_FIRST = [
     ['Blood', 'Blut'],
     ['Storm', 'Sturm'],
     ['Ash', 'Asche'],
@@ -44,7 +44,7 @@ export const EG_RARE_NAME_WORDS_FIRST = [
     ['Pale', 'Blass'],
     ['Silent', 'Still'],
 ];
-export const EG_RARE_NAME_WORDS_SECOND = [
+export const RARE_NAME_WORDS_SECOND = [
     ['Bane', 'Fluch'],
     ['Song', 'Lied'],
     ['Grip', 'Griff'],
@@ -77,8 +77,8 @@ export const EG_RARE_NAME_WORDS_SECOND = [
     ['Maw', 'Rachen'],
 ];
 
-export function _egPickRareItemName() {
-    const first = EG_RARE_NAME_WORDS_FIRST[Math.floor(Math.random() * EG_RARE_NAME_WORDS_FIRST.length)];
-    const second = EG_RARE_NAME_WORDS_SECOND[Math.floor(Math.random() * EG_RARE_NAME_WORDS_SECOND.length)];
+export function _pickRareItemName() {
+    const first = RARE_NAME_WORDS_FIRST[Math.floor(Math.random() * RARE_NAME_WORDS_FIRST.length)];
+    const second = RARE_NAME_WORDS_SECOND[Math.floor(Math.random() * RARE_NAME_WORDS_SECOND.length)];
     return (LANG === 'de') ? `${first[1]} ${second[1]}` : `${first[0]} ${second[0]}`;
 }

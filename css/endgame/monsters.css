@@ -311,7 +311,7 @@
 
 .eg-proj-ricochet.eg-built {
     /* built visuals are 44x28 fixed; extra shrink via the flight scale
-       (EG_CHARGED_RICOCHET_SCALE) already makes it smaller - this just
+       (CHARGED_RICOCHET_SCALE) already makes it smaller - this just
        softens the glow for the secondary shot */
     filter: brightness(1.15) drop-shadow(0 0 4px rgba(255, 220, 100, 0.8));
 }
@@ -1345,7 +1345,7 @@
    unfilled. Same hue family as the armed fuse so the state reads as
    "the fuse went off here", NOT "you defused this" (that one is green).
    The fireball/ring/sparks of the blast itself are spawned by
-   _egPriorBombBoom in shared-boss-abilities.js. */
+   _priorBombBoom in shared-boss-abilities.js. */
 .eg-pb-detonated {
     animation: eg-pb-detonated-flash 0.9s ease-out forwards !important;
 }
@@ -1363,8 +1363,8 @@
 }
 
 /* ── Shifted Mark Flyer (Probability Shift P2+) ─── */
-/* Floating ✕ spawned by _egShiftSpawnFlyer: travels fixed-position from the
-   old cell to the new one over EG_SHIFT_FLY_MS (1.5s). Driven by rAF
+/* Floating ✕ spawned by _shiftSpawnFlyer: travels fixed-position from the
+   old cell to the new one over SHIFT_FLY_MS (1.5s). Driven by rAF
    transforms in JS - this class only provides the look (same dim-red cross
    as .gc.marked::after, plus a golden halo so it reads while moving). */
 .eg-shift-fly {
@@ -1550,7 +1550,7 @@
 /* ── Void Surge: safe-zone circle ────────────────────────────────────────── */
 #eg-void-surge-circle {
     position: fixed;
-    width: 160px; /* diameter = EG_VOID_SURGE_SAFE_RADIUS * 2 */
+    width: 160px; /* diameter = VOID_SURGE_SAFE_RADIUS * 2 */
     height: 160px;
     margin-left: -80px; /* centre on the x/y coordinates */
     margin-top: -80px;
@@ -2121,7 +2121,7 @@
 /* Monster art floats free - no passive frame (frames were an emoji-era
    leftover). The border stays transparent until the monster is targeted
    or enraged, so highlights never cause layout shift. Size varies per
-   spawn via --eg-art (see _egBuildMonster artScale). */
+   spawn via --eg-art (see _buildMonster artScale). */
 .eg-emoji-wrapper {
     position: relative;
     width: calc(96px * var(--eg-art, 1) * var(--eg-zs, 1));
@@ -2630,7 +2630,7 @@
 /* OVERCHARGE (hold past 100%): the bar and readout turn fiery orange and
    the glow intensifies - a strike released in this state deals up to 5x
    damage and unleashes weapon arts per tier (200% dash, 300% sky leap,
-   400% nova, 500% grand nova - see EG_MELEE_OVERCHARGE_* in
+   400% nova, 500% grand nova - see MELEE_OVERCHARGE_* in
    js/combat/encounter-charged-shot.js). */
 #avatar-charge-fill.eg-charge-overcharged,
 #eg-player-charge-bar.eg-charge-overcharged {
@@ -2692,7 +2692,7 @@
 
 /* ROOTED WHILE CHARGING: holding the attack key plants the hero's feet -
    no movement, no evasion/block, +50% damage taken (see
-   EG_MELEE_HOLD_VULNERABILITY_MULT). A pulsing red ring + VULNERABLE tag
+   MELEE_HOLD_VULNERABILITY_MULT). A pulsing red ring + VULNERABLE tag
    on the avatar so the tradeoff is always visible. */
 #player-avatar-wrapper.eg-melee-rooted {
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.9), 0 0 18px rgba(239, 68, 68, 0.7);
@@ -2932,7 +2932,7 @@
 }
 
 /* ── Big on-monster ailment effects ─────────────────────────────────────
-   Classes are toggled on the card by _egRenderMonsterStatusStrip; the overlay
+   Classes are toggled on the card by _renderMonsterStatusStrip; the overlay
    (.eg-ail-fx) lives inside the art frame so everything scales with the monster. */
 .eg-ail-fx { position: absolute; inset: 0; pointer-events: none; z-index: 6; overflow: visible; }
 .eg-ail-fx > i { position: absolute; display: none; font-style: normal; line-height: 1; }
@@ -3282,8 +3282,8 @@ body.eg-cursor-shocked .gc {
     opacity: 0.85;
 }
 
-/* Ailment banners above the player sprite (see _egSyncAilmentBanners).
-   Banner height 34px + 6px gap = 40px step (EG_AIL_BANNER_STEP_PX). */
+/* Ailment banners above the player sprite (see _syncAilmentBanners).
+   Banner height 34px + 6px gap = 40px step (AIL_BANNER_STEP_PX). */
 #eg-ail-banners {
     position: absolute;
     left: 50%;
@@ -3490,7 +3490,7 @@ body:has(#screen-game.active) #eg-xp-bar { display: block; }
 
 
 /* ── Ailment visuals on the hero sprite ─────────────────────────────────
-   #eg-player-ail-fx follows the sprite (_egSyncPlayerSpriteFx); it reuses the
+   #eg-player-ail-fx follows the sprite (_syncPlayerSpriteFx); it reuses the
    monster flame / spark / frost / wisp art (.eg-ail-fx > i) via the same
    .eg-ail-<key> classes, and the sprite itself is tinted (.eg-spr-<key>). */
 .eg-player-ail-fx {

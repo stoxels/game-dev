@@ -1,11 +1,11 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { _egPendingCurrencyUse } from './loot-currency-use.js';
+import { _pendingCurrencyUse } from './loot-currency-use.js';
 import { _egRenderMapSlot, _egRenderMapStashCell } from '../endgame/endgame-gate.js';
-import { _dndChipScreenEl, _egRenderCurrencyCell, egAddCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
-import { _egClearTooltip } from '../endgame/endgame-hub-tooltips.js';
-import { EG_CURRENCY_COLS, _egCurrencySlotForId, _egCurrencyStash, _egGetMapTierGrid, _egInventory, _egMapStash, _egRenderInventoryCell, _egUpdateInvCount, egSaveHubState } from '../endgame/endgame-hub.js';
+import { _dndChipScreenEl, _renderCurrencyCell, addCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
+import { _clearTooltip } from '../endgame/endgame-hub-tooltips.js';
+import { CURRENCY_COLS, _currencySlotForId, _currencyStash, _egGetMapTierGrid, _inventory, _egMapStash, _renderInventoryCell, _updateInvCount, saveHubState } from '../endgame/endgame-hub.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME ORB SHARDS (SELL SYSTEM)---------------------
@@ -24,8 +24,8 @@ import { EG_CURRENCY_COLS, _egCurrencySlotForId, _egCurrencyStash, _egGetMapTier
 // counter).
 //
 // Load AFTER endgame-hub.js and endgame-hub-drag-and-drop.js (needs
-// _egInventory, _egRenderInventoryCell, egAddCurrency, egSaveHubState,
-// showToast) and AFTER endgame-currency.js (needs _egPendingCurrencyUse).
+// _inventory, _renderInventoryCell, addCurrency, saveHubState,
+// showToast) and AFTER endgame-currency.js (needs _pendingCurrencyUse).
 //------------------------------------------------------------------------
 
 
@@ -36,10 +36,10 @@ import { EG_CURRENCY_COLS, _egCurrencySlotForId, _egCurrencyStash, _egGetMapTier
 // Each shard maps 1:1 to its parent orb. name/description are resolved
 // through t() so translations stay in translations-strings.js.
 
-export const EG_SHARD_STACK_MAX = 10;
-export const EG_SHARD_HORIZON_STACK_MAX = 3;
+export const SHARD_STACK_MAX = 10;
+export const SHARD_HORIZON_STACK_MAX = 3;
 
-export const EG_SHARD_DEFS = {
+export const SHARD_DEFS = {
     shard_transmutation: {
         id: 'shard_transmutation', orbId: 'orb_transmutation',
         icon: '🔸', orbIcon: '🔷',
@@ -71,7 +71,7 @@ export const EG_SHARD_DEFS = {
         icon: '🧭', orbIcon: '🌌',
         name: t('eg_shard_horizon'),
         description: t('eg_shard_horizon_desc'),
-        stackSize: EG_SHARD_HORIZON_STACK_MAX,
+        stackSize: SHARD_HORIZON_STACK_MAX,
     },
     shard_ascension: {
         id: 'shard_ascension', orbId: 'orb_ascension',
@@ -99,7 +99,7 @@ export const EG_SHARD_DEFS = {
     },
 };
 
-for (const [id, def] of Object.entries(EG_SHARD_DEFS)) {
+for (const [id, def] of Object.entries(SHARD_DEFS)) {
     const nameKey = `eg_${id}`;
     Object.defineProperties(def, {
         name: { enumerable: true, get: () => t(nameKey) },
@@ -117,7 +117,7 @@ for (const [id, def] of Object.entries(EG_SHARD_DEFS)) {
 // effectiveWeight = weight * (1 + statCount * statScale).
 // The epic-affecting shards (ascension / elevation / cataclysm) have the
 // highest scaling so stat-rich items yield better shards more often.
-export const EG_SHARD_ROLL_TABLE = [
+export const SHARD_ROLL_TABLE = [
     { id: 'shard_transmutation', weight: 220, statScale: 0.00 },
     { id: 'shard_alchemy',       weight: 200, statScale: 0.06 },
     { id: 'shard_chaos',         weight: 90,  statScale: 0.14 },
@@ -129,7 +129,7 @@ export const EG_SHARD_ROLL_TABLE = [
 
 // Counts the total number of rolled stats on an item (each mod carries one
 // or more rolledStats entries; hybrid mods roll two stats at once).
-export function _egCountItemStats(item) {
+export function _countItemStats(item) {
     if (!item || !Array.isArray(item.mods)) return 0;
     let count = 0;
     for (const mod of item.mods) {
@@ -140,10 +140,10 @@ export function _egCountItemStats(item) {
 
 // Rolls a random shard def for the given item. Higher stat counts shift
 // probability toward the better (epic-grade) shards.
-export function _egRollShardForItem(item) {
-    const statCount = _egCountItemStats(item);
+export function _rollShardForItem(item) {
+    const statCount = _countItemStats(item);
 
-    const weights = EG_SHARD_ROLL_TABLE.map(entry => ({
+    const weights = SHARD_ROLL_TABLE.map(entry => ({
         id: entry.id,
         w: entry.weight * (1 + statCount * entry.statScale),
     }));
@@ -152,9 +152,9 @@ export function _egRollShardForItem(item) {
     let roll = Math.random() * total;
     for (const entry of weights) {
         roll -= entry.w;
-        if (roll <= 0) return EG_SHARD_DEFS[entry.id];
+        if (roll <= 0) return SHARD_DEFS[entry.id];
     }
-    return EG_SHARD_DEFS.shard_transmutation;
+    return SHARD_DEFS.shard_transmutation;
 }
 
 
@@ -163,29 +163,29 @@ export function _egRollShardForItem(item) {
 //------------------------------------------------------------------------
 
 // Adds `amount` of a shard type to its FIXED currency slot with a stack cap of
-// EG_SHARD_STACK_MAX (3 for Horizon Fragments). Every full stack
-// automatically converts into the shard's parent orb via egAddCurrency()
+// SHARD_STACK_MAX (3 for Horizon Fragments). Every full stack
+// automatically converts into the shard's parent orb via addCurrency()
 // (which merges into its own fixed orb slot). Returns true when granted.
-export function egAddShard(id, amount = 1, def = null) {
-    const shardDef = def || EG_SHARD_DEFS[id];
+export function addShard(id, amount = 1, def = null) {
+    const shardDef = def || SHARD_DEFS[id];
     if (!shardDef) return false;
-    const stackMax = shardDef.stackSize || EG_SHARD_STACK_MAX;
-    const pos = (typeof _egCurrencySlotForId === 'function') ? _egCurrencySlotForId(id) : null;
+    const stackMax = shardDef.stackSize || SHARD_STACK_MAX;
+    const pos = (typeof _currencySlotForId === 'function') ? _currencySlotForId(id) : null;
     if (!pos) {
         console.warn(`[Shards] No fixed slot for "${id}".`);
         return false;
     }
     const r = pos.r, c = pos.c;
-    if (!_egCurrencyStash[r]) _egCurrencyStash[r] = Array(EG_CURRENCY_COLS).fill(null);
-    const cell = _egCurrencyStash[r][c];
+    if (!_currencyStash[r]) _currencyStash[r] = Array(CURRENCY_COLS).fill(null);
+    const cell = _currencyStash[r][c];
     if (cell && cell.id === id) {
         cell.count = (cell.count || 0) + amount;
         while (cell.count >= stackMax) {
             cell.count -= stackMax;
-            _egConvertShardsToOrb(shardDef);
+            _convertShardsToOrb(shardDef);
         }
-        if (cell.count <= 0) _egCurrencyStash[r][c] = null;
-        _egRenderCurrencyCell(r, c);
+        if (cell.count <= 0) _currencyStash[r][c] = null;
+        _renderCurrencyCell(r, c);
         return true;
     }
     if (cell && cell.id !== id) {
@@ -200,7 +200,7 @@ export function egAddShard(id, amount = 1, def = null) {
         orbsFromNew++;
     }
     if (count > 0) {
-        _egCurrencyStash[r][c] = {
+        _currencyStash[r][c] = {
             id,
             name: shardDef.name,
             icon: shardDef.icon,
@@ -210,15 +210,15 @@ export function egAddShard(id, amount = 1, def = null) {
             count: count,
         };
     } else {
-        _egCurrencyStash[r][c] = null;
+        _currencyStash[r][c] = null;
     }
-    _egRenderCurrencyCell(r, c);
-    for (let i = 0; i < orbsFromNew; i++) _egConvertShardsToOrb(shardDef);
+    _renderCurrencyCell(r, c);
+    for (let i = 0; i < orbsFromNew; i++) _convertShardsToOrb(shardDef);
     return true;
 }
 
 // Resolves the translation key of a shard's parent orb name.
-export function _egShardOrbNameKey(orbId) {
+export function _shardOrbNameKey(orbId) {
     switch (orbId) {
         case 'orb_transmutation': return 'eg_orb_transmutation';
         case 'orb_alchemy':       return 'eg_orb_alchemy';
@@ -234,10 +234,10 @@ export function _egShardOrbNameKey(orbId) {
 }
 
 // Consumes one full shard stack and grants the parent orb. The orb is
-// added through egAddCurrency so an existing orb stack just increments.
-export function _egConvertShardsToOrb(shardDef) {
-    const nameKey = _egShardOrbNameKey(shardDef.orbId);
-    egAddCurrency(shardDef.orbId, 1, {
+// added through addCurrency so an existing orb stack just increments.
+export function _convertShardsToOrb(shardDef) {
+    const nameKey = _shardOrbNameKey(shardDef.orbId);
+    addCurrency(shardDef.orbId, 1, {
         id: shardDef.orbId,
         name: nameKey ? t(nameKey) : shardDef.orbId,
         icon: shardDef.orbIcon,
@@ -245,7 +245,7 @@ export function _egConvertShardsToOrb(shardDef) {
         category: 'currency',
         description: nameKey ? t(nameKey + '_desc') : '',
     });
-    const stackMax = shardDef.stackSize || EG_SHARD_STACK_MAX;
+    const stackMax = shardDef.stackSize || SHARD_STACK_MAX;
     Audio_Manager.playSFX('shard_convert');
     globalThis.showToast(t('eg_shards_converted')
         .replace('{count}', String(stackMax))
@@ -263,18 +263,18 @@ export function _egConvertShardsToOrb(shardDef) {
 // Destroys the stash item in the given cell and grants one rolled shard.
 // Selling a UNIQUE item always grants an Ancient Shard (10 → Ancient Orb).
 // No confirmation popup - the sale is instant. Returns true on success.
-export function _egSellStashItem(row, col) {
-    const item = _egInventory[row][col];
+export function _sellStashItem(row, col) {
+    const item = _inventory[row][col];
     if (!item) return false;
 
     // Free starter gear has no sell value: it is destroyed without
     // granting a shard (blocks the free-buy → sell-for-shard exploit).
     if (item.noSellValue) {
-        _egInventory[row][col] = null;
-        _egRenderInventoryCell(row, col);
-        _egUpdateInvCount();
-        _egClearTooltip();
-        egSaveHubState();
+        _inventory[row][col] = null;
+        _renderInventoryCell(row, col);
+        _updateInvCount();
+        _clearTooltip();
+        saveHubState();
 
         if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
             Audio_Manager.playSFX('player_equip_pickup');
@@ -284,10 +284,10 @@ export function _egSellStashItem(row, col) {
     }
 
     // Unique items → Ancient Shard (bypasses the random roll).
-    const shardDef = (item.isUnique && EG_SHARD_DEFS.shard_ancient)
-        ? EG_SHARD_DEFS.shard_ancient
-        : _egRollShardForItem(item);
-    if (!egAddShard(shardDef.id, 1)) {
+    const shardDef = (item.isUnique && SHARD_DEFS.shard_ancient)
+        ? SHARD_DEFS.shard_ancient
+        : _rollShardForItem(item);
+    if (!addShard(shardDef.id, 1)) {
         // Could not grant the shard (runes & orbs strip full) - keep the item.
         const grid = document.getElementById('eg-inv-grid');
         if (grid) {
@@ -298,11 +298,11 @@ export function _egSellStashItem(row, col) {
     }
 
     // Item is consumed - clear its cell and close any open tooltip.
-    _egInventory[row][col] = null;
-    _egRenderInventoryCell(row, col);
-    _egUpdateInvCount();
-    _egClearTooltip();
-    egSaveHubState();
+    _inventory[row][col] = null;
+    _renderInventoryCell(row, col);
+    _updateInvCount();
+    _clearTooltip();
+    saveHubState();
 
     Audio_Manager.playSFX('item_sell');
     globalThis.showToast(t('eg_sell_item_sold')
@@ -316,11 +316,11 @@ export function _egSellStashItem(row, col) {
 // Destroys a map item and grants exactly one Horizon Fragment (the
 // map-only sell currency). Shared by map-stash and map-device sells.
 // Returns true on success.
-export function _egSellMapItem(map, sourceEl) {
+export function _sellMapItem(map, sourceEl) {
     if (!map) return false;
 
-    const shardDef = EG_SHARD_DEFS.shard_horizon;
-    if (!egAddShard(shardDef.id, 1)) {
+    const shardDef = SHARD_DEFS.shard_horizon;
+    if (!addShard(shardDef.id, 1)) {
         // Could not grant the fragment (runes & orbs strip full) - keep the map.
         if (sourceEl) {
             sourceEl.classList.add('eg-slot-reject');
@@ -329,7 +329,7 @@ export function _egSellMapItem(map, sourceEl) {
         return false;
     }
 
-    _egClearTooltip();
+    _clearTooltip();
     Audio_Manager.playSFX('item_sell');
     globalThis.showToast(t('eg_sell_item_sold')
         .replace('{name}', map.name || '???')
@@ -350,29 +350,29 @@ export function _egSellMapStashItem(row, col) {
 
     const cellEl = document.querySelector(
         `.eg-map-stash-cell[data-row="${row}"][data-col="${col}"]`);
-    if (!_egSellMapItem(map, cellEl)) return false;
+    if (!_sellMapItem(map, cellEl)) return false;
 
     try {
         if (typeof _egGetMapTierGrid === 'function') _egGetMapTierGrid(activeTier)[row][col] = null;
         else _egMapStash[row][col] = null;
     } catch(e) {}
     _egRenderMapStashCell(row, col);
-    egSaveHubState();
+    saveHubState();
     return true;
 }
 
 // Sells the map currently loaded into the Probability Gate device slot
 // for one Horizon Fragment.
-export function _egSellDeviceMap() {
+export function _sellDeviceMap() {
     const map = globalThis._egMapSlotItem;
     if (!map) return false;
 
     const slotEl = document.getElementById('eg-map-slot');
-    if (!_egSellMapItem(map, slotEl)) return false;
+    if (!_sellMapItem(map, slotEl)) return false;
 
     globalThis._egMapSlotItem = null;
     _egRenderMapSlot();
-    egSaveHubState();
+    saveHubState();
     return true;
 }
 
@@ -394,7 +394,7 @@ document.addEventListener('mousedown', function (e) {
 
     // Don't sell while an orb "use mode" selection is active - the click
     // belongs to applying the orb.
-    if (typeof _egPendingCurrencyUse !== 'undefined' && _egPendingCurrencyUse) return;
+    if (typeof _pendingCurrencyUse !== 'undefined' && _pendingCurrencyUse) return;
 
     const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell)');
     const mapStashCell = chip.closest('.eg-map-stash-cell');
@@ -405,12 +405,12 @@ document.addEventListener('mousedown', function (e) {
     e.stopImmediatePropagation();
 
     if (mapSlotEl) {
-        _egSellDeviceMap();
+        _sellDeviceMap();
         return;
     }
     if (mapStashCell) {
         _egSellMapStashItem(+mapStashCell.dataset.row, +mapStashCell.dataset.col);
         return;
     }
-    _egSellStashItem(+invCell.dataset.row, +invCell.dataset.col);
+    _sellStashItem(+invCell.dataset.row, +invCell.dataset.col);
 }, true);

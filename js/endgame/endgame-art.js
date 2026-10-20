@@ -1,7 +1,7 @@
-import { _egbtRenderGrid } from '../combat/combat-boss-test-ui.js';
-import { _egRenderPanel } from '../combat/encounter.js';
-import { _egRenderEquipSlots, _egRenderInventory } from './endgame-hub.js';
-import { _egIsActive } from '../combat/combat-state.js';
+import { _bossTestRenderGrid } from '../combat/combat-boss-test-ui.js';
+import { _renderPanel } from '../combat/encounter.js';
+import { _renderEquipSlots, _renderInventory } from './endgame-hub.js';
+import { _isActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------PLACEHOLDER ART SYSTEM-------------------------------
@@ -41,7 +41,7 @@ import { _egIsActive } from '../combat/combat-state.js';
 // emoji icon currently used, so nothing breaks while art is missing.
 
 
-export const EG_ART = (function () {
+export const GAME_ART = (function () {
 
     const ART_PATHS = {
         monster: 'images/endgame/monsters/',
@@ -283,21 +283,21 @@ export const EG_ART = (function () {
 })();
 
 
-EG_ART.preload();
+GAME_ART.preload();
 
 // Late-loading images: refresh whatever is currently on screen so the
 // emoji fallbacks get replaced without needing a reload.
 document.addEventListener('eg-art-loaded', function () {
     try {
-        if (typeof _egIsActive === 'function' && _egIsActive()
-                && typeof _egRenderPanel === 'function') {
-            _egRenderPanel();
+        if (typeof _isActive === 'function' && _isActive()
+                && typeof _renderPanel === 'function') {
+            _renderPanel();
         }
-        if (typeof _egRenderInventory === 'function') _egRenderInventory();
-        if (typeof _egRenderEquipSlots === 'function') _egRenderEquipSlots();
+        if (typeof _renderInventory === 'function') _renderInventory();
+        if (typeof _renderEquipSlots === 'function') _renderEquipSlots();
         // Boss test screen: swap emoji fallbacks for freshly loaded boss art.
-        if (typeof _egbtRenderGrid === 'function' && document.getElementById('egbt-boss-grid')) {
-            _egbtRenderGrid();
+        if (typeof _bossTestRenderGrid === 'function' && document.getElementById('egbt-boss-grid')) {
+            _bossTestRenderGrid();
         }
     } catch (e) { /* screens not initialised yet - safe to ignore */ }
 });

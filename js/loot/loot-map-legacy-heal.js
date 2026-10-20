@@ -97,14 +97,14 @@ export function _egMigrateMapBossImplicits() {
 function _egBootHealMapBossImplicits() {
     _egMigrateMapBossImplicits();
     // Wrap future loads so slot switches also heal.
-    // NOTE (module era): _egLoadHubState is NOT imported here, so the bare
+    // NOTE (module era): _loadHubState is NOT imported here, so the bare
     // typeof guard would always be false (module scope has no access to the
     // concatenated/global scope). Read it as a globalThis member instead:
     // hub.js exposes a live write-through accessor for exactly this, so the
     // patch below propagates to import-based callers too.
     try {
-        if (typeof globalThis._egLoadHubState === 'function' && !globalThis._egLoadHubState._bossPatched) {
-            const orig = globalThis._egLoadHubState;
+        if (typeof globalThis._loadHubState === 'function' && !globalThis._loadHubState._bossPatched) {
+            const orig = globalThis._loadHubState;
             const patched = function() {
                 const ret = orig.apply(this, arguments);
                 try { _egMigrateMapBossImplicits(); } catch (e) {}
@@ -113,7 +113,7 @@ function _egBootHealMapBossImplicits() {
             patched._bossPatched = true;
             // Preserve the patched flag on the original for idempotency checks
             orig._bossPatched = true;
-            globalThis._egLoadHubState = patched;
+            globalThis._loadHubState = patched;
         }
     } catch (e) { /* ignore */ }
 }

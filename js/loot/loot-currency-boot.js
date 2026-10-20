@@ -6,25 +6,25 @@
 // rules the currency strip needs (selected chip, use-mode cursor,
 // tooltip description). The heal is deferred to DOMContentLoaded on
 // purpose: this module evaluates inside an import cycle, so running it
-// here would read a not-yet-initialized _egCurrencyStash (typeof THROWS
+// here would read a not-yet-initialized _currencyStash (typeof THROWS
 // on TDZ bindings) and silently skip.
 
-import { _egCurrencyStash, _egHealCurrencyItem } from '../endgame/endgame-hub.js';
-import { EG_CURRENCY_DEFS } from './loot-currency.js';
-import { EG_SHARD_DEFS } from './loot-shards.js';
+import { _currencyStash, _healCurrencyItem } from '../endgame/endgame-hub.js';
+import { CURRENCY_DEFS } from './loot-currency.js';
+import { SHARD_DEFS } from './loot-shards.js';
 
 
-function _egBootHealExistingCurrencyStash() {
+function _bootHealExistingCurrencyStash() {
     try {
-        if (typeof _egCurrencyStash !== 'undefined' && Array.isArray(_egCurrencyStash)) {
-            for (let r = 0; r < _egCurrencyStash.length; r++) {
-                if (!Array.isArray(_egCurrencyStash[r])) continue;
-                for (let c = 0; c < _egCurrencyStash[r].length; c++) {
-                    const it = _egCurrencyStash[r][c];
+        if (typeof _currencyStash !== 'undefined' && Array.isArray(_currencyStash)) {
+            for (let r = 0; r < _currencyStash.length; r++) {
+                if (!Array.isArray(_currencyStash[r])) continue;
+                for (let c = 0; c < _currencyStash[r].length; c++) {
+                    const it = _currencyStash[r][c];
                     if (!it) continue;
-                    if (typeof _egHealCurrencyItem === 'function') _egHealCurrencyItem(it);
+                    if (typeof _healCurrencyItem === 'function') _healCurrencyItem(it);
                     else if (!it.description || !it.category) {
-                        const d = EG_CURRENCY_DEFS[it.id] || (typeof EG_SHARD_DEFS !== 'undefined' ? EG_SHARD_DEFS[it.id] : null);
+                        const d = CURRENCY_DEFS[it.id] || (typeof SHARD_DEFS !== 'undefined' ? SHARD_DEFS[it.id] : null);
                         if (d) {
                             if (!it.description) it.description = d.description;
                             if (!it.category) it.category = d.category || 'currency';
@@ -39,12 +39,12 @@ function _egBootHealExistingCurrencyStash() {
     } catch (e) { /* ignore */ }
 }
 if (typeof document !== 'undefined' && document.readyState !== 'complete') {
-    document.addEventListener('DOMContentLoaded', _egBootHealExistingCurrencyStash);
+    document.addEventListener('DOMContentLoaded', _bootHealExistingCurrencyStash);
 } else {
-    _egBootHealExistingCurrencyStash();
+    _bootHealExistingCurrencyStash();
 }
 
-(function _egInjectCurrencyStyles() {
+(function _injectCurrencyStyles() {
     if (document.getElementById('eg-currency-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-currency-styles';

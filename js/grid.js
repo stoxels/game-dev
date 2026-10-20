@@ -922,10 +922,10 @@ function _handleRegressionReward(row, col, rowDone, colDone, sol) {
 // _handleLineResourceRewards - the puzzle <-> combat crossover: every row or
 //   column the player completes for the first time this level pays out the
 //   tree's life_on_line / absorption_on_line / mana_on_line / charge_on_line
-//   resources (see _egOnLinesCompleted in combat-grid-pickups-claims.js).
+//   resources (see _onLinesCompleted in combat-grid-pickups-claims.js).
 //   Same guards as the regression reward: genuine player fill, once per line.
 function _handleLineResourceRewards(row, col, rowDone, colDone, sol) {
-    if (typeof globalThis._egOnLinesCompleted !== 'function') return;
+    if (typeof globalThis._onLinesCompleted !== 'function') return;
     const cellWasPlayerFilled = (sol[row][col] === 1) && (globalThis.userGrid[row][col] === 1) && !globalThis.revealedGrid[row][col];
     if (!cellWasPlayerFilled) return;
     if (!window._lineResourceRewardedLines) window._lineResourceRewardedLines = new Set();
@@ -939,7 +939,7 @@ function _handleLineResourceRewards(row, col, rowDone, colDone, sol) {
         window._lineResourceRewardedLines.add(`c${col}`);
         fresh++;
     }
-    if (fresh > 0) globalThis._egOnLinesCompleted(fresh);
+    if (fresh > 0) globalThis._onLinesCompleted(fresh);
 }
 
 
@@ -1215,8 +1215,8 @@ export function renderCell(row, col) {
         el.classList.add('filled', 'revealed');
         // Revealed cells can't be filled manually - auto-claim any drop
         // (loot / currency / item / heart pickup) sitting on this cell.
-        if (typeof globalThis._egAutoClaimDropsOnReveal === 'function') {
-            globalThis._egAutoClaimDropsOnReveal(row, col);
+        if (typeof globalThis._autoClaimDropsOnReveal === 'function') {
+            globalThis._autoClaimDropsOnReveal(row, col);
         }
         return;
     }
@@ -1231,8 +1231,8 @@ export function renderCell(row, col) {
         // sitting there. Covers ability / item / passive / proc marks so the
         // player no longer has to erase and re-mark the same cell to pick up.
         if (cur && cur.grid && cur.grid[row][col] === 0) {
-            if (typeof globalThis.isEndgameLevel === 'function' && globalThis.isEndgameLevel() && typeof globalThis._egCheckAllClaims === 'function') {
-                globalThis._egCheckAllClaims(row, col);
+            if (typeof globalThis.isEndgameLevel === 'function' && globalThis.isEndgameLevel() && typeof globalThis._checkAllClaims === 'function') {
+                globalThis._checkAllClaims(row, col);
             }
         }
     } else if (cellState === 3) el.classList.add('questioned');

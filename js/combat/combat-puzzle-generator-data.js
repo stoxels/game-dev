@@ -12,7 +12,7 @@
 // Glyphs that can be drawn as puzzle shapes. en/de names are used for the
 // level hint + reveal text so both languages read naturally.
 
-export const EG_GEN_SYMBOLS = [
+export const GEN_SYMBOLS = [
     // Greek letters
     { ch: 'α', en: 'Alpha',        de: 'Alpha' },
     { ch: 'β', en: 'Beta',         de: 'Beta' },
@@ -583,7 +583,7 @@ export const EG_GEN_SYMBOLS = [
 // Encounter-chain caps: 15×30 is the widest allowed, 20×20 is the max when
 // rows >15 (>15 rows && >20 cols is banned). Sizes beyond that are kept
 // out of the pool so chains stay fun.
-export const EG_GEN_SIZES = [
+export const GEN_SIZES = [
     { rows: 5,  cols: 5 },   //   25 cells → small
     { rows: 5,  cols: 10 },  //   50 cells → small
     { rows: 10, cols: 10 },  //  100 cells → medium
@@ -604,19 +604,19 @@ export const EG_GEN_SIZES = [
 
 // Grid-size buckets (same thresholds as EG_GRID_SIZE_BUCKETS in
 // endgame-maps.js). A requested bucket constrains which sizes are drawn.
-export const EG_GEN_BUCKETS = {
+export const GEN_BUCKETS = {
     small:   [1, 99],
     medium:  [100, 199],
     large:   [200, 399],
     massive: [400, Infinity],
 };
 
-export const EG_GEN_FONT_STACK =
+export const GEN_FONT_STACK =
     '"Segoe UI Symbol","Segoe UI Emoji","Noto Sans Symbols2","Noto Sans Symbols",Arial,serif';
 
 
 //------------------------------------------------------------------------
-export const EG_GEN_RANDOM_REVEALS = [
+export const GEN_RANDOM_REVEALS = [
     { en: 'A pattern woven by pure chance - order emerged anyway.', de: 'Ein vom reinen Zufall gewebtes Muster - und trotzdem entstand Ordnung.' },
     { en: 'The noise condensed into structure, exactly once.', de: 'Das Rauschen verdichtete sich zu einer Struktur - genau einmalig.' },
     { en: 'No sigil, no symbol: just randomness given form.', de: 'Kein Sigill, kein Symbol: nur Zufall, der Gestalt annimmt.' },

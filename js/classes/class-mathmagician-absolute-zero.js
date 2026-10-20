@@ -316,8 +316,8 @@ export function _executeArcaneFreeze(durationMs) {
     window._zeroSumFills = 0;
     // Frozen Assets (combat): every enemy on screen freezes for as long as
     // the timer does - frozen monsters' attacks stop charging.
-    if (ptHasSkill('frozen_assets') && typeof globalThis._egFreezeAllMonsters === 'function') {
-        globalThis._egFreezeAllMonsters(effectiveDuration / 1000);
+    if (ptHasSkill('frozen_assets') && typeof globalThis._freezeAllMonsters === 'function') {
+        globalThis._freezeAllMonsters(effectiveDuration / 1000);
     }
     // Tracks correct fills during freeze (for frozen_resilience passive);
     // the counter itself is owned by the timer-freeze mechanic.

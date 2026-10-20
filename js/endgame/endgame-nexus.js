@@ -161,7 +161,7 @@ export function ensureEndgameNexusScreen() {
 export function showEndgameNexus() {
     // Leaving any boss-test context behind - a forfeit to the Nexus must
     // not leak the flag into a later campaign run's goToLevelSelect().
-    window._egIsBossTestRun = false;
+    window._isBossTestRun = false;
     ensureEndgameNexusScreen();
     switchScreen('screen-endgame-nexus');
     if (typeof trackAchStat === 'function') try { trackAchStat('egNexusVisits', 1); } catch (e) {}

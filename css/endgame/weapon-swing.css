@@ -17,7 +17,7 @@
      bow     - loosed arrow
      unarmed - bare-handed jab puff (no weapon equipped)
 
-   DOM contract (built by _egShowWeaponSwing):
+   DOM contract (built by _showWeaponSwing):
      .eg-weapon-swing.eg-swing-<family>.eg-dir-<dir>
        > .egw-rot              (direction rotator: right 0, down 90,
                                 left 180, up 270 - shape drawn aiming +x)
@@ -402,7 +402,7 @@
 
 /* ============================================================================
    WEAPON-ART NOVA (overcharge tiers 400% / 500%)
-   Built by _egMeleeNovaVisual in js/combat/encounter-charged-shot.js:
+   Built by _meleeNovaVisual in js/combat/encounter-charged-shot.js:
    a ring of the equipped weapon's icon bursts outward around the struck
    monster card. Each bit flies along its own (--eg-nova-x, --eg-nova-y)
    unit vector while fading out. The node is removed by JS after the burst.
@@ -443,7 +443,7 @@
     }
 }
 
-/* ── Grand-nova fullscreen flash (500% tier, built by _egMeleeGrandFlash) ── */
+/* ── Grand-nova fullscreen flash (500% tier, built by _meleeGrandFlash) ── */
 .eg-melee-grand-flash {
     position: fixed;
     inset: 0;

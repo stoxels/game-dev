@@ -1,6 +1,6 @@
-import { _egRenderPanel } from '../encounter.js';
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+import { _renderPanel } from '../encounter.js';
+import { BOSS_DEFS, BOSS_MECHANICS, _bossScheduleMechanics } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkRuns, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SHAPER (boss_shaper)------------------------
@@ -12,10 +12,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 
 // DEBUG: stretch telegraphs/windups 2.5x for screenshots. Off for ship.
-export const _EG_SHP_DEBUG_SLOW = false;
-export const _EG_SHP_DEBUG_MULT = _EG_SHP_DEBUG_SLOW ? 2.5 : 1;
+export const _SHP_DEBUG_SLOW = false;
+export const _SHP_DEBUG_MULT = _SHP_DEBUG_SLOW ? 2.5 : 1;
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_shaper: {
         id: 'boss_shaper', name: 'The Frostwright', emoji: '❄️',
         baseHP: 1060, baseDamage: 22, chargeMax: 12,
@@ -23,7 +23,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_shaper: {
         phases: [
             // Basic attacks stay a steady pressure (the framework floors
@@ -34,25 +34,25 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'glacier_rift', intervalBase: 19000, intervalVariance: 4500, handler: '_egMechShpRift' },
-            { name: 'soul_tithe', intervalBase: 23000, intervalVariance: 5000, handler: '_egMechSoulTithe' },
-            { name: 'frost_monoliths', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechShpMonoliths', phase2Only: true },
-            { name: 'ice_walker', intervalBase: 24000, intervalVariance: 6000, handler: '_egMechShpWalker', phase2Only: true },
+            { name: 'glacier_rift', intervalBase: 19000, intervalVariance: 4500, handler: '_mechShpRift' },
+            { name: 'soul_tithe', intervalBase: 23000, intervalVariance: 5000, handler: '_mechSoulTithe' },
+            { name: 'frost_monoliths', intervalBase: 21000, intervalVariance: 5000, handler: '_mechShpMonoliths', phase2Only: true },
+            { name: 'ice_walker', intervalBase: 24000, intervalVariance: 6000, handler: '_mechShpWalker', phase2Only: true },
         ],
-        onPhaseEnter: _egShpOnPhaseEnter,
+        onPhaseEnter: _shpOnPhaseEnter,
     },
 });
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-export const EG_SHP_POOL_DMG      = [0, 9, 11, 13];   // %maxHP/s in an ice pool (paid as hits on the touch cooldown)
-export const EG_SHP_FRONT_DMG     = [0, 0.11, 0.13, 0.16]; // %maxHP rift-front eruption
-export const EG_SHP_WALL_DMG      = 0.10;             // %maxHP frost wall contact
-export const EG_SHP_WALKER_DMG    = [0, 0, 0.10, 0.12]; // %maxHP walker contact
-export const EG_SHP_SHARD_DMG     = 0.08;             // %maxHP shard shrapnel
-export const EG_SHP_ARM_DMG       = 0.12;             // %maxHP finale arm sweep
-export const EG_SHP_BREAK_DMG     = 0.35;             // %maxHP MONOLITH BREAK wave
-export const EG_SHP_HIT_CD_MS     = 700;              // shared touch cooldown
+export const SHP_POOL_DMG      = [0, 9, 11, 13];   // %maxHP/s in an ice pool (paid as hits on the touch cooldown)
+export const SHP_FRONT_DMG     = [0, 0.11, 0.13, 0.16]; // %maxHP rift-front eruption
+export const SHP_WALL_DMG      = 0.10;             // %maxHP frost wall contact
+export const SHP_WALKER_DMG    = [0, 0, 0.10, 0.12]; // %maxHP walker contact
+export const SHP_SHARD_DMG     = 0.08;             // %maxHP shard shrapnel
+export const SHP_ARM_DMG       = 0.12;             // %maxHP finale arm sweep
+export const SHP_BREAK_DMG     = 0.35;             // %maxHP MONOLITH BREAK wave
+export const SHP_HIT_CD_MS     = 700;              // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -61,21 +61,21 @@ export const EG_SHP_HIT_CD_MS     = 700;              // shared touch cooldown
 
 // Touch damage helper shared by all Frostwright hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-export let _egShpHitCd = 0;
-export function _egShpTouch(pct, level, label) {
+export let _shpHitCd = 0;
+export function _shpTouch(pct, level, label) {
     const now = performance.now();
-    if (now < _egShpHitCd) return false;
-    const pr = _egNkPlayerRect();
+    if (now < _shpHitCd) return false;
+    const pr = _nkPlayerRect();
     if (!pr) return false;
-    _egShpHitCd = now + EG_SHP_HIT_CD_MS;
-    const dealt = _egNkHit(pct, 'cold', level);
-    _egNkAbilityHitToast(dealt, 'The Frostwright', label);
+    _shpHitCd = now + SHP_HIT_CD_MS;
+    const dealt = _nkHit(pct, 'cold', level);
+    _nkAbilityHitToast(dealt, 'The Frostwright', label);
     return true;
 }
 
 // Ice-shard burst where a shatter/eruption lands (visual only, body-level
 // so it survives the run ending in the same frame).
-export function _egShpShards(x, y, big) {
+export function _shpShards(x, y, big) {
     const layer = document.createElement('div');
     layer.className = 'eg-shp-shards' + (big ? ' eg-shp-shards-big' : '');
     layer.style.left = Math.round(x) + 'px';
@@ -92,14 +92,14 @@ export function _egShpShards(x, y, big) {
         s.style.animationDelay = (Math.random() * 100) + 'ms';
         layer.appendChild(s);
     }
-    setTimeout(() => { try { layer.remove(); } catch (e) {} }, _EG_SHP_DEBUG_SLOW ? 1900 : 950);
+    setTimeout(() => { try { layer.remove(); } catch (e) {} }, _SHP_DEBUG_SLOW ? 1900 : 950);
 }
 
 // Lingering ice pools ACROSS casts (the rift's aftermath). Entries expire
 // by timestamp; capped so recasts cannot pave the whole screen.
-export let _egShpPools = []; // { x, y, radius, until }
-export function _egShpPrunePools(now) {
-    _egShpPools = _egShpPools.filter(z => z.until > now);
+export let _shpPools = []; // { x, y, radius, until }
+export function _shpPrunePools(now) {
+    _shpPools = _shpPools.filter(z => z.until > now);
 }
 
 
@@ -113,27 +113,27 @@ export function _egShpPrunePools(now) {
 // the front passes. Where the front settles, LINGERING ICE POOLS form in
 // the lanes (0.8s grace while they freeze over) and hurt while you stand
 // in them - step out once the front is gone.
-export const EG_SHP_RIFT_FRONT_MS = 2200;
-export const EG_SHP_POOL_LIFE = 7000;
+export const SHP_RIFT_FRONT_MS = 2200;
+export const SHP_POOL_LIFE = 7000;
 
-export function _egMechShpRift(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechShpRift(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const W = window.innerWidth, H = window.innerHeight;
-    const frontMs = EG_SHP_RIFT_FRONT_MS * _EG_SHP_DEBUG_MULT;
-    const poolLife = EG_SHP_POOL_LIFE * _EG_SHP_DEBUG_MULT;
-    const frontDmg = EG_SHP_FRONT_DMG[p];
-    const poolDot = EG_SHP_POOL_DMG[p] / 100;
+    const frontMs = SHP_RIFT_FRONT_MS * _SHP_DEBUG_MULT;
+    const poolLife = SHP_POOL_LIFE * _SHP_DEBUG_MULT;
+    const frontDmg = SHP_FRONT_DMG[p];
+    const poolDot = SHP_POOL_DMG[p] / 100;
 
     // The front sweeps from a random side; fissures: 3 gaps the player can
     // slip through (the band is not uniformly lethal across its sweep).
     const fromLeft = Math.random() < 0.5;
-    const warnMs = 1100 * _EG_SHP_DEBUG_MULT;
+    const warnMs = 1100 * _SHP_DEBUG_MULT;
     const bandH = 180;
     // One lane always within reach (≤160px above/below you), two more apart.
-    const pc0 = _egNkPlayerCenter() || { x: W / 2, y: H / 2 };
+    const pc0 = _nkPlayerCenter() || { x: W / 2, y: H / 2 };
     const gaps = [Math.max(110, Math.min(H - 110, pc0.y + (Math.random() * 320 - 160)))];
     for (let tries = 0; gaps.length < 3 && tries < 40; tries++) {
         const g = 110 + Math.random() * (H - 220);
@@ -142,35 +142,35 @@ export function _egMechShpRift(monster, phase) {
     gaps.sort((a, b) => a - b);
 
     // Telegraph: fissure lines across the sweep axis + arrows on the origin.
-    const warn = _egNkEl(run, 'div', 'eg-shp-riftwarn');
+    const warn = _nkEl(run, 'div', 'eg-shp-riftwarn');
     warn.style.top = '0px';
     warn.style.width = W + 'px';
     warn.style.height = H + 'px';
     gaps.forEach(g => {
         // The safe lane: as tall as the real safe band (±52px).
-        const line = _egNkEl(run, 'div', 'eg-shp-fissure', fromLeft ? 'SAFE LANE ▶' : '◀ SAFE LANE');
+        const line = _nkEl(run, 'div', 'eg-shp-fissure', fromLeft ? 'SAFE LANE ▶' : '◀ SAFE LANE');
         line.style.top = Math.round(g - 52) + 'px';
         line.style.left = '0px';
         line.style.width = W + 'px';
     });
 
-    _egNkToast('eg_mech_shp_rift', '❄️ GLACIER RIFT - stand in a glowing SAFE LANE while the front passes!', '#7dd3fc');
+    _nkToast('eg_mech_shp_rift', '❄️ GLACIER RIFT - stand in a glowing SAFE LANE while the front passes!', '#7dd3fc');
 
     const poolEls = new Map();  // zone → its element (persistent per pool)
     let t = 0, erupted = false, frontX = fromLeft ? 0 : W;
     let dotWarnAt = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         t += dtS * 1000;
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         if (!erupted && t >= warnMs) {
             erupted = true;
-            const front = _egNkEl(run, 'div', 'eg-shp-front' + (fromLeft ? ' eg-shp-from-left' : ' eg-shp-from-right'));
+            const front = _nkEl(run, 'div', 'eg-shp-front' + (fromLeft ? ' eg-shp-from-left' : ' eg-shp-from-right'));
             front.style.top = '0px';
             front.style.height = H + 'px';
             front.style.width = bandH + 'px';
             front.style.left = Math.round(fromLeft ? -bandH : W) + 'px';
             run.frontEl = front;
-            _egShpShards(fromLeft ? 30 : W - 30, H / 2, false);
+            _shpShards(fromLeft ? 30 : W - 30, H / 2, false);
         }
         if (erupted && run.frontEl) {
             const dur = frontMs;
@@ -184,26 +184,26 @@ export function _egMechShpRift(monster, phase) {
                     ? (pc.x > frontX && pc.x < frontX + bandH)
                     : (pc.x > frontX && pc.x < frontX + bandH);
                 const inGap = gaps.some(g => Math.abs(pc.y - g) < 52);
-                if (inBand && !inGap && now >= _egShpHitCd) {
-                    _egShpHitCd = now + EG_SHP_HIT_CD_MS;
-                    _egShpTouch(frontDmg, level, 'Glacier Rift');
+                if (inBand && !inGap && now >= _shpHitCd) {
+                    _shpHitCd = now + SHP_HIT_CD_MS;
+                    _shpTouch(frontDmg, level, 'Glacier Rift');
                 }
             }
             if (k >= 1) {
                 // The front settles → lingering ice pools between the gaps.
-                _egShpPrunePools(now);
-                const room = Math.max(0, 5 - _egShpPools.length);
+                _shpPrunePools(now);
+                const room = Math.max(0, 5 - _shpPools.length);
                 const seeds = gaps.slice(0, Math.min(gaps.length, room));
                 seeds.forEach(g => {
-                    const el = _egNkEl(run, 'div', 'eg-shp-pool');
+                    const el = _nkEl(run, 'div', 'eg-shp-pool');
                     el.style.width = '190px';
                     el.style.height = '190px';
                     el.style.transform = 'translate(' + Math.round(W / 2 - 95) + 'px,' + Math.round(g - 95) + 'px)';
                     el.classList.add('eg-shp-pool-forming');
-                    const fid = setTimeout(() => el.classList.remove('eg-shp-pool-forming'), 800 * _EG_SHP_DEBUG_MULT);
+                    const fid = setTimeout(() => el.classList.remove('eg-shp-pool-forming'), 800 * _SHP_DEBUG_MULT);
                     run.timers.push(fid);
-                    const zone = { x: W / 2, y: g, radius: 95, until: now + poolLife, armAt: now + 800 * _EG_SHP_DEBUG_MULT };
-                    _egShpPools.push(zone);
+                    const zone = { x: W / 2, y: g, radius: 95, until: now + poolLife, armAt: now + 800 * _SHP_DEBUG_MULT };
+                    _shpPools.push(zone);
                     poolEls.set(zone, el);
                 });
                 try { run.frontEl.remove(); } catch (e) {}
@@ -212,7 +212,7 @@ export function _egMechShpRift(monster, phase) {
         }
         // Pools drain while you stand in them; visuals persist per pool
         // (created once at settle-time), then fade out on expiry.
-        _egShpPrunePools(now);
+        _shpPrunePools(now);
         Array.from(poolEls.entries()).forEach(([z, el]) => {
             if (z.until <= now) {
                 el.classList.add('eg-shp-pool-out');
@@ -224,12 +224,12 @@ export function _egMechShpRift(monster, phase) {
         if (pr) {
             // A real hit per touch cooldown (flash + number), not a silent DoT.
             const pc = { x: pr.left + pr.width / 2, y: pr.top + pr.height / 2 };
-            const inside = _egShpPools.some(z => now >= (z.armAt || 0) && Math.hypot(pc.x - z.x, pc.y - z.y) < z.radius);
+            const inside = _shpPools.some(z => now >= (z.armAt || 0) && Math.hypot(pc.x - z.x, pc.y - z.y) < z.radius);
             if (inside) {
-                _egShpTouch(poolDot * (EG_SHP_HIT_CD_MS / 1000), level, 'Ice Pool');
+                _shpTouch(poolDot * (SHP_HIT_CD_MS / 1000), level, 'Ice Pool');
                 if (now - dotWarnAt > 3000) {
                     dotWarnAt = now;
-                    _egNkToast('eg_nk_move', '⚠️ Move!', '#7dd3fc');
+                    _nkToast('eg_nk_move', '⚠️ Move!', '#7dd3fc');
                 }
             }
         }
@@ -247,19 +247,19 @@ export function _egMechShpRift(monster, phase) {
 // growing wall of frost that slowly SHRINKS the arena toward the centre.
 // Break the monoliths (3 hits each) to stop their walls. Walls despawn
 // when their monolith dies; unbroken walls retract after the cast ends.
-export const EG_SHP_MONO_COUNT  = [0, 0, 2, 3];
-export const EG_SHP_MONO_HITS   = 3;
-export const EG_SHP_WALL_GROW   = 130;    // px/s the wall extends
-export const EG_SHP_MONO_LIFE   = 9000;
+export const SHP_MONO_COUNT  = [0, 0, 2, 3];
+export const SHP_MONO_HITS   = 3;
+export const SHP_WALL_GROW   = 130;    // px/s the wall extends
+export const SHP_MONO_LIFE   = 9000;
 
-export function _egMechShpMonoliths(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechShpMonoliths(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const W = window.innerWidth, H = window.innerHeight;
-    const count = EG_SHP_MONO_COUNT[p];
-    const lifeMs = EG_SHP_MONO_LIFE * _EG_SHP_DEBUG_MULT;
+    const count = SHP_MONO_COUNT[p];
+    const lifeMs = SHP_MONO_LIFE * _SHP_DEBUG_MULT;
 
     // Monolith spots: near the screen edges (inset a bit), spread apart.
     const spots = [];
@@ -270,33 +270,33 @@ export function _egMechShpMonoliths(monster, phase) {
         spots.push(cands.splice(Math.floor(Math.random() * cands.length), 1)[0]);
     }
 
-    _egNkToast('eg_mech_shp_monos', '❄️ The Frostwright: FROST MONOLITHS - break them to stop the walls!', '#7dd3fc');
+    _nkToast('eg_mech_shp_monos', '❄️ The Frostwright: FROST MONOLITHS - break them to stop the walls!', '#7dd3fc');
 
     const monos = spots.map(spot => {
-        const el = _egNkEl(run, 'div', 'eg-shp-mono', '🗿');
+        const el = _nkEl(run, 'div', 'eg-shp-mono', '🗿');
         el.style.left = Math.round(spot[0] - 24) + 'px';
         el.style.top = Math.round(spot[1] - 24) + 'px';
         // Wall grows from the monolith toward the arena centre.
         const dx = W / 2 - spot[0], dy = H / 2 - spot[1];
         const len = Math.hypot(dx, dy) || 1;
         const ang = Math.atan2(dy, dx) * 180 / Math.PI;
-        const wall = _egNkEl(run, 'div', 'eg-shp-wall');
+        const wall = _nkEl(run, 'div', 'eg-shp-wall');
         wall.style.left = Math.round(spot[0]) + 'px';
         wall.style.top = Math.round(spot[1]) + 'px';
         wall.style.width = '0px';
         wall.style.rotate = ang + 'deg';
-        return { x: spot[0], y: spot[1], el, wall, len, hp: EG_SHP_MONO_HITS, dead: false };
+        return { x: spot[0], y: spot[1], el, wall, len, hp: SHP_MONO_HITS, dead: false };
     });
 
     let t = 0, touchCd = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         t += dtS * 1000;
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         let active = false;
         monos.forEach(m => {
             if (m.dead) return;
             active = true;
-            const grown = Math.min(m.len, t * EG_SHP_WALL_GROW);
+            const grown = Math.min(m.len, t * SHP_WALL_GROW);
             m.wall.style.width = Math.round(grown) + 'px';
             // Wall contact bites (point-to-segment against the player box).
             if (pr && now >= touchCd) {
@@ -307,8 +307,8 @@ export function _egMechShpMonoliths(monster, phase) {
                 const len2 = dxs * dxs + dys * dys;
                 const tt = len2 ? Math.max(0, Math.min(1, ((pc.x - m.x) * dxs + (pc.y - m.y) * dys) / len2)) : 0;
                 if (Math.hypot(pc.x - (m.x + dxs * tt), pc.y - (m.y + dys * tt)) < 14) {
-                    touchCd = now + EG_SHP_HIT_CD_MS;
-                    _egShpTouch(EG_SHP_WALL_DMG, level, 'Frost Wall');
+                    touchCd = now + SHP_HIT_CD_MS;
+                    _shpTouch(SHP_WALL_DMG, level, 'Frost Wall');
                 }
             }
         });
@@ -317,7 +317,7 @@ export function _egMechShpMonoliths(monster, phase) {
             monos.forEach(m => {
                 if (!m.dead) {
                     m.dead = true;
-                    _egShpShards(m.x, m.y, false);
+                    _shpShards(m.x, m.y, false);
                     try { m.el.remove(); } catch (e) {}
                     try { m.wall.remove(); } catch (e) {}
                 }
@@ -331,10 +331,10 @@ export function _egMechShpMonoliths(monster, phase) {
     // thing (they are arena objects), so we shatter them when the player
     // touches them 3 times while DODGING - body-check the ice. Each touch
     // (with a cooldown) cracks a stage; the 3rd shatters it.
-    const crackLoop = _egNkNewRun(monster && monster.id, true);
+    const crackLoop = _nkNewRun(monster && monster.id, true);
     let crackCd = 0;
-    _egNkLoop(crackLoop, (dtS, now) => {
-        const pr = _egNkPlayerRect();
+    _nkLoop(crackLoop, (dtS, now) => {
+        const pr = _nkPlayerRect();
         if (pr && now >= crackCd) {
             const pc = { x: pr.left + pr.width / 2, y: pr.top + pr.height / 2 };
             for (const m of monos) {
@@ -345,13 +345,13 @@ export function _egMechShpMonoliths(monster, phase) {
                     m.el.classList.remove('eg-shp-mono-crack1', 'eg-shp-mono-crack2');
                     if (m.hp === 2) m.el.classList.add('eg-shp-mono-crack1');
                     if (m.hp === 1) m.el.classList.add('eg-shp-mono-crack2');
-                    _egShpShards(m.x, m.y, false);
+                    _shpShards(m.x, m.y, false);
                     if (m.hp <= 0) {
                         m.dead = true;
-                        _egShpShards(m.x, m.y, true);
+                        _shpShards(m.x, m.y, true);
                         try { m.el.remove(); } catch (e) {}
                         try { m.wall.remove(); } catch (e) {}
-                        _egNkToast('eg_mech_shp_mono_down', '❄️ Monolith shattered - the wall recedes!', '#4ade80');
+                        _nkToast('eg_mech_shp_mono_down', '❄️ Monolith shattered - the wall recedes!', '#4ade80');
                     }
                     break;
                 }
@@ -369,20 +369,20 @@ export function _egMechShpMonoliths(monster, phase) {
 // A sculpted ice sentinel (⛄) stalks you, trailing a freezing wake. It
 // shatters on contact - dealing its hit AND spawning shard shrapnel that
 // scatters outward. Phase 3 spawns two walkers.
-export const EG_SHP_WALKER_SPEED = 165;
-export const EG_SHP_WALKER_TURN = 1.9;
-export const EG_SHP_WALKER_LIFE = 9000;
-export const EG_SHP_SHARD_COUNT = 6;
+export const SHP_WALKER_SPEED = 165;
+export const SHP_WALKER_TURN = 1.9;
+export const SHP_WALKER_LIFE = 9000;
+export const SHP_SHARD_COUNT = 6;
 
-export function _egMechShpWalker(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechShpWalker(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const W = window.innerWidth, H = window.innerHeight;
-    const speed = EG_SHP_WALKER_SPEED / _EG_SHP_DEBUG_MULT;
-    const lifeMs = EG_SHP_WALKER_LIFE * _EG_SHP_DEBUG_MULT;
-    const dmgPct = EG_SHP_WALKER_DMG[p];
+    const speed = SHP_WALKER_SPEED / _SHP_DEBUG_MULT;
+    const lifeMs = SHP_WALKER_LIFE * _SHP_DEBUG_MULT;
+    const dmgPct = SHP_WALKER_DMG[p];
 
     const mk = (delayMs) => {
         const delayId = setTimeout(() => {
@@ -392,7 +392,7 @@ export function _egMechShpWalker(monster, phase) {
                 y: side === 2 ? 50 : side === 3 ? H - 50 : H * (0.2 + Math.random() * 0.6),
                 ang: Math.random() * Math.PI * 2, born: 0, el: null, dead: false,
             };
-            wk.el = _egNkEl(run, 'div', 'eg-shp-walker', '⛄');
+            wk.el = _nkEl(run, 'div', 'eg-shp-walker', '⛄');
             wk.el.style.left = Math.round(wk.x - 18) + 'px';
             wk.el.style.top = Math.round(wk.y - 18) + 'px';
             walkers.push(wk);
@@ -402,30 +402,30 @@ export function _egMechShpWalker(monster, phase) {
 
     const walkers = [];
     const n = p >= 3 ? 2 : 1;
-    for (let i = 0; i < n; i++) mk(i * 1800 * _EG_SHP_DEBUG_MULT);
+    for (let i = 0; i < n; i++) mk(i * 1800 * _SHP_DEBUG_MULT);
 
-    _egNkToast('eg_mech_shp_walker', '❄️ The Frostwright: ICE WALKER - it shatters on contact!', '#7dd3fc');
+    _nkToast('eg_mech_shp_walker', '❄️ The Frostwright: ICE WALKER - it shatters on contact!', '#7dd3fc');
 
     const shards = [];   // { x, y, vx, vy, el, born, dead }
     let t = 0, touchCd = 0, shardTouchCd = 0;
     const shatter = (wk) => {
         wk.dead = true;
         try { wk.el.remove(); } catch (e) {}
-        _egShpShards(wk.x, wk.y, false);
-        for (let i = 0; i < EG_SHP_SHARD_COUNT; i++) {
-            const a = (i / EG_SHP_SHARD_COUNT) * Math.PI * 2 + Math.random() * 0.5;
-            const spd = (230 + Math.random() * 90) / _EG_SHP_DEBUG_MULT;
-            const el = _egNkEl(run, 'div', 'eg-shp-shardlet', '❄');
+        _shpShards(wk.x, wk.y, false);
+        for (let i = 0; i < SHP_SHARD_COUNT; i++) {
+            const a = (i / SHP_SHARD_COUNT) * Math.PI * 2 + Math.random() * 0.5;
+            const spd = (230 + Math.random() * 90) / _SHP_DEBUG_MULT;
+            const el = _nkEl(run, 'div', 'eg-shp-shardlet', '❄');
             el.style.left = Math.round(wk.x - 8) + 'px';
             el.style.top = Math.round(wk.y - 8) + 'px';
             shards.push({ x: wk.x, y: wk.y, vx: Math.cos(a) * spd, vy: Math.sin(a) * spd, el, born: t });
         }
     };
 
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         t += dtS * 1000;
-        const c = _egNkPlayerCenter();
-        const pr = _egNkPlayerRect();
+        const c = _nkPlayerCenter();
+        const pr = _nkPlayerRect();
         let active = false;
         walkers.forEach(wk => {
             if (wk.dead) return;
@@ -435,7 +435,7 @@ export function _egMechShpWalker(monster, phase) {
             if (c) {
                 const want = Math.atan2(c.y - wk.y, c.x - wk.x);
                 let diff = ((want - wk.ang + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
-                const max = EG_SHP_WALKER_TURN * dtS;
+                const max = SHP_WALKER_TURN * dtS;
                 wk.ang += Math.max(-max, Math.min(max, diff));
             }
             wk.x += Math.cos(wk.ang) * speed * dtS;
@@ -445,9 +445,9 @@ export function _egMechShpWalker(monster, phase) {
             wk.el.style.left = Math.round(wk.x - 18) + 'px';
             wk.el.style.top = Math.round(wk.y - 18) + 'px';
             // Contact: the walker shatters - hit + shrapnel.
-            if (pr && now >= touchCd && _egNkCircleHit(wk.x, wk.y, 20, pr, 0)) {
-                touchCd = now + EG_SHP_HIT_CD_MS;
-                _egShpTouch(dmgPct, level, 'Ice Walker');
+            if (pr && now >= touchCd && _nkCircleHit(wk.x, wk.y, 20, pr, 0)) {
+                touchCd = now + SHP_HIT_CD_MS;
+                _shpTouch(dmgPct, level, 'Ice Walker');
                 shatter(wk);
                 return;
             }
@@ -460,11 +460,11 @@ export function _egMechShpWalker(monster, phase) {
             s.y += s.vy * dtS;
             s.el.style.left = Math.round(s.x - 8) + 'px';
             s.el.style.top = Math.round(s.y - 8) + 'px';
-            if (pr && now >= shardTouchCd && _egNkCircleHit(s.x, s.y, 9, pr, 0)) {
-                shardTouchCd = now + EG_SHP_HIT_CD_MS;
+            if (pr && now >= shardTouchCd && _nkCircleHit(s.x, s.y, 9, pr, 0)) {
+                shardTouchCd = now + SHP_HIT_CD_MS;
                 s.dead = true;
                 try { s.el.remove(); } catch (e) {}
-                _egShpTouch(EG_SHP_SHARD_DMG, level, 'Ice Shrapnel');
+                _shpTouch(SHP_SHARD_DMG, level, 'Ice Shrapnel');
                 continue;
             }
             if (s.dead || t - s.born > 1400 || s.x < -30 || s.x > W + 30 || s.y < -30 || s.y > H + 30) {
@@ -488,36 +488,36 @@ export function _egMechShpWalker(monster, phase) {
 // core lights at once. Shatter all three before the last beat (~19s) to
 // break the sculpture - otherwise the MONOLITH BREAK: a 3-2-1, then a
 // full-screen ice shockwave (only the ring at the centre is safe).
-export const EG_SHP_FINAL_BEATS = 3;
-export const EG_SHP_CORE_HITS = 3;          // player touches to shatter a core
-export const EG_SHP_CORE_TOUCH_CD = 420;    // ms between crack touches
-export const EG_SHP_ARM_OMEGAS = [70, 100, 135]; // deg/s per beat
-export const EG_SHP_BEAT_MS = 5200;
+export const SHP_FINAL_BEATS = 3;
+export const SHP_CORE_HITS = 3;          // player touches to shatter a core
+export const SHP_CORE_TOUCH_CD = 420;    // ms between crack touches
+export const SHP_ARM_OMEGAS = [70, 100, 135]; // deg/s per beat
+export const SHP_BEAT_MS = 5200;
 
-// Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-export let _egShpFinal = null;
+// Set while the finale runs (read by _tickPlayer's charge-freeze gate).
+export let _shpFinal = null;
 
-export function _egShpFinalActive() {
-    return !!_egShpFinal && !_egShpFinal.finished;
+export function _shpFinalActive() {
+    return !!_shpFinal && !_shpFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-export function _egShpOnPhaseEnter(monster, newPhase) {
+export function _shpOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
-    try { _egShpStartFinalWatcher(monster); } catch (e) {}
+    try { _shpStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-export function _egShpStartFinalWatcher(monster) {
-    if (!monster || _egShpFinal) return;
-    const run = _egNkNewRun(monster.id, true);
+export function _shpStartFinalWatcher(monster) {
+    if (!monster || _shpFinal) return;
+    const run = _nkNewRun(monster.id, true);
     run.passive = true;
-    _egNkLoop(run, () => {
-        if (_egShpFinal) return false;
+    _nkLoop(run, () => {
+        if (_shpFinal) return false;
         try {
             if (monster.currentHP <= monster.maxHP * 0.10) {
-                _egShpFinalStart(monster);
+                _shpFinalStart(monster);
                 return false;
             }
         } catch (e) { return false; }
@@ -525,41 +525,41 @@ export function _egShpStartFinalWatcher(monster) {
     });
 }
 
-export function _egShpFinalStart(monster) {
-    if (_egShpFinal || !monster) return;
+export function _shpFinalStart(monster) {
+    if (_shpFinal || !monster) return;
 
     // The forge goes quiet: kill every other run of this boss (the finale
     // owns the arena).
-    Array.from(_egNkRuns.values()).forEach(r => {
-        if (r.bossId === monster.id) { try { _egNkKillRun(r); } catch (e) {} }
+    Array.from(_nkRuns.values()).forEach(r => {
+        if (r.bossId === monster.id) { try { _nkKillRun(r); } catch (e) {} }
     });
-    _egShpPools = [];
+    _shpPools = [];
 
     const W = window.innerWidth, H = window.innerHeight;
     const g = {
         monsterId: monster.id,
         finished: false,
-        count: EG_SHP_FINAL_BEATS,
+        count: SHP_FINAL_BEATS,
         beat: 0,
         coresUp: 3,
         arm: Math.random() * 360,
-        omega: EG_SHP_ARM_OMEGAS[0],
+        omega: SHP_ARM_OMEGAS[0],
         px: W / 2, py: H / 2,
         monolith: null, arms: [],
         cores: [],          // { ang, el, hp, lit, shattered }
         overlay: null, fxRun: null, beatTimer: null,
     };
-    _egShpFinal = g;
+    _shpFinal = g;
 
     // Freeze the auto-attack charge bar for the whole set-piece (the gate
-    // lives in _egTickPlayer; this class is the visual twin).
+    // lives in _tickPlayer; this class is the visual twin).
     ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('eg-charge-paused');
     });
 
     // FX run (passive): holds monolith, arms and the sweep loop.
-    g.fxRun = _egNkNewRun(monster.id, true);
+    g.fxRun = _nkNewRun(monster.id, true);
     g.fxRun.passive = true;
 
     // Colossal monolith at the arena centre.
@@ -596,7 +596,7 @@ export function _egShpFinalStart(monster) {
         el.style.top = Math.round(g.py + Math.sin(ang * Math.PI / 180) * 120 - 20) + 'px';
         document.body.appendChild(el);
         g.fxRun.els.push(el);
-        return { ang, el, hp: EG_SHP_CORE_HITS, lit: false, shattered: false };
+        return { ang, el, hp: SHP_CORE_HITS, lit: false, shattered: false };
     });
 
     // Countdown overlay.
@@ -609,7 +609,7 @@ export function _egShpFinalStart(monster) {
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_shp_final_cd', '⛄💀 THE SHAPED WINTER - shatter the cores!', '#7dd3fc');
+    _nkToast('eg_mech_shp_final_cd', '⛄💀 THE SHAPED WINTER - shatter the cores!', '#7dd3fc');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -629,12 +629,12 @@ export function _egShpFinalStart(monster) {
     const litCore = () => g.cores.find(c2 => c2.lit && !c2.shattered) || null;
 
     // One loop drives everything: arms sweep, cores light, player cracks.
-    _egNkLoop(g.fxRun, (dtS, now) => {
+    _nkLoop(g.fxRun, (dtS, now) => {
         if (g.finished) return false;
         g.arm += g.omega * dtS;
         g.arms.forEach((el, i) => { el.style.rotate = (g.arm + i * 120) + 'deg'; });
-        const c = _egNkPlayerCenter();
-        _egNkPlayerRect();
+        const c = _nkPlayerCenter();
+        _nkPlayerRect();
 
         // Arm sweep damage (outside the monolith hub; the lit core shelters).
         const lit0 = litCore();
@@ -652,8 +652,8 @@ export function _egShpFinalStart(monster) {
                     const diff = ((pa - (g.arm + i * 120)) % 360 + 360) % 360;
                     const off = Math.abs(Math.sin(diff * Math.PI / 180)) * d;
                     if ((diff < 90 || diff > 270) && off < 11 + 14) {
-                        touchCd = now + EG_SHP_HIT_CD_MS;
-                        _egShpTouch(EG_SHP_ARM_DMG, level, 'Frost Arm');
+                        touchCd = now + SHP_HIT_CD_MS;
+                        _shpTouch(SHP_ARM_DMG, level, 'Frost Arm');
                         break;
                     }
                 }
@@ -667,23 +667,23 @@ export function _egShpFinalStart(monster) {
             const cx = g.px + Math.cos(lc.ang * Math.PI / 180) * 120;
             const cy = g.py + Math.sin(lc.ang * Math.PI / 180) * 120;
             if (Math.hypot(c.x - cx, c.y - cy) < 58) {
-                coreTouchCd = now + EG_SHP_CORE_TOUCH_CD;
+                coreTouchCd = now + SHP_CORE_TOUCH_CD;
                 lc.hp--;
                 lc.el.classList.remove('eg-shp-core-crack1', 'eg-shp-core-crack2');
                 if (lc.hp === 2) lc.el.classList.add('eg-shp-core-crack1');
                 if (lc.hp === 1) lc.el.classList.add('eg-shp-core-crack2');
-                _egShpShards(cx, cy, false);
+                _shpShards(cx, cy, false);
                 if (lc.hp <= 0) {
                     lc.shattered = true;
                     lc.lit = false;
                     lc.el.classList.add('eg-shp-core-shattered');
-                    _egShpShards(cx, cy, true);
+                    _shpShards(cx, cy, true);
                     g.coresUp--;
                     if (g.coresUp <= 0) {
-                        _egShpFinalEnd(g, true);
+                        _shpFinalEnd(g, true);
                         return false;
                     }
-                    _egNkToast('eg_mech_shp_core_down', '❄️ Core shattered - ' + g.coresUp + ' to go!', '#4ade80');
+                    _nkToast('eg_mech_shp_core_down', '❄️ Core shattered - ' + g.coresUp + ' to go!', '#4ade80');
                     // The next core lights at once - no waiting for a beat.
                     const nx = g.cores.find(c2 => !c2.shattered);
                     g.cores.forEach(c2 => { c2.lit = c2 === nx; c2.el.classList.toggle('eg-shp-core-lit', c2 === nx); });
@@ -696,26 +696,26 @@ export function _egShpFinalStart(monster) {
     });
 
     // Beat driver: the first beat lights a core, every beat speeds the arms
-    // up; after EG_SHP_FINAL_BEATS beats with cores left → the MONOLITH
+    // up; after SHP_FINAL_BEATS beats with cores left → the MONOLITH
     // BREAK. (The old driver broke the monolith on the 3rd beat, when only
     // two cores had ever been lit - shattering all three was impossible.)
     // The big number in the banner is the cores left.
-    const beatMs = EG_SHP_BEAT_MS * (_EG_SHP_DEBUG_SLOW ? 8 : 1);
+    const beatMs = SHP_BEAT_MS * (_SHP_DEBUG_SLOW ? 8 : 1);
     const numEl = g.overlay && g.overlay.querySelector('.eg-shp-cd-num');
     if (numEl) numEl.textContent = g.coresUp;
     const lightNext = () => {
-        if (!_egShpFinal || _egShpFinal !== g || g.finished) return;
-        if (_egNkFrozen()) { setTimeout(lightNext, 200); return; }
+        if (!_shpFinal || _shpFinal !== g || g.finished) return;
+        if (_nkFrozen()) { setTimeout(lightNext, 200); return; }
         g.beat++;
-        if (g.beat > EG_SHP_FINAL_BEATS) {
-            _egShpBreak(g, level);
+        if (g.beat > SHP_FINAL_BEATS) {
+            _shpBreak(g, level);
             return;
         }
-        g.omega = EG_SHP_ARM_OMEGAS[Math.min(EG_SHP_ARM_OMEGAS.length - 1, g.beat - 1)];
+        g.omega = SHP_ARM_OMEGAS[Math.min(SHP_ARM_OMEGAS.length - 1, g.beat - 1)];
         if (!g.cores.some(c2 => c2.lit && !c2.shattered)) {
             const next = g.cores.find(c2 => !c2.shattered);
             g.cores.forEach(c2 => { c2.lit = c2 === next; c2.el.classList.toggle('eg-shp-core-lit', c2 === next); });
-            if (next) _egNkToast('eg_mech_shp_core_lit', '💎 A core lights up - stand on it to crack it!', '#7dd3fc');
+            if (next) _nkToast('eg_mech_shp_core_lit', '💎 A core lights up - stand on it to crack it!', '#7dd3fc');
         }
         g.beatTimer = setTimeout(lightNext, beatMs);
     };
@@ -724,9 +724,9 @@ export function _egShpFinalStart(monster) {
 
 // THE MONOLITH BREAK: the sculpture detonates - a full-screen ice
 // shockwave with a safe eye at the centre.
-export function _egShpBreak(g, level) {
+export function _shpBreak(g, level) {
     if (!g || g.finished) return;
-    _egNkToast('eg_mech_shp_break', '⛄💀 THE MONOLITH BREAK - get into the ring at the centre!', '#7dd3fc');
+    _nkToast('eg_mech_shp_break', '⛄💀 THE MONOLITH BREAK - get into the ring at the centre!', '#7dd3fc');
     // Ring telegraph with a 3-2-1, then detonate. Safe: within 130px of the
     // centre - 3.2s covers a walk from any corner (320 px/s + reaction).
     g.breaking = true;
@@ -740,7 +740,7 @@ export function _egShpBreak(g, level) {
     const hint = g.overlay && g.overlay.querySelector('.eg-shp-cd-hint');
     if (hint) hint.textContent = 'MONOLITH BREAK - get into the ring at the centre!';
     const SAFE_R = 130;
-    const warnMs = 3200 * (_EG_SHP_DEBUG_SLOW ? 8 : 1);
+    const warnMs = 3200 * (_SHP_DEBUG_SLOW ? 8 : 1);
     const t0 = performance.now();
     const countEl = ring.querySelector('.eg-shp-break-count');
     const cd = setInterval(() => {
@@ -752,19 +752,19 @@ export function _egShpBreak(g, level) {
     setTimeout(() => {
         if (!g || g.finished) return;
         try { ring.remove(); } catch (e) {}
-        _egShpShards(g.px, g.py, true);
+        _shpShards(g.px, g.py, true);
         document.body.classList.add('eg-shp-flash');
         const fid = setTimeout(() => document.body.classList.remove('eg-shp-flash'), 700);
         if (g.fxRun) g.fxRun.timers.push(fid);
-        const c = _egNkPlayerCenter();
+        const c = _nkPlayerCenter();
         if (c && Math.hypot(c.x - g.px, c.y - g.py) > SAFE_R) {
-            _egShpTouch(EG_SHP_BREAK_DMG, level, 'MONOLITH BREAK');
+            _shpTouch(SHP_BREAK_DMG, level, 'MONOLITH BREAK');
         }
-        setTimeout(() => _egShpFinalEnd(g, false), _EG_SHP_DEBUG_SLOW ? 5000 : 1100);
+        setTimeout(() => _shpFinalEnd(g, false), _SHP_DEBUG_SLOW ? 5000 : 1100);
     }, warnMs);
 }
 
-export function _egShpFinalEnd(g, success) {
+export function _shpFinalEnd(g, success) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.beatTimer) { clearTimeout(g.beatTimer); g.beatTimer = null; }
@@ -774,7 +774,7 @@ export function _egShpFinalEnd(g, success) {
     g.arms = [];
     g.cores.forEach(c2 => { try { c2.el.remove(); } catch (e) {} });
     g.cores = [];
-    if (g.fxRun) { try { _egNkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
+    if (g.fxRun) { try { _nkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
     ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.remove('eg-charge-paused');
@@ -782,27 +782,27 @@ export function _egShpFinalEnd(g, success) {
     document.body.classList.remove('eg-shp-flash');
     document.querySelectorAll('.eg-shp-channelling').forEach(el => el.classList.remove('eg-shp-channelling'));
 
-    const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
+    const m = (g.monsterId && typeof _monsters !== 'undefined')
+        ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
-        if (typeof _egBossScheduleMechanics === 'function') {
-            try { _egBossScheduleMechanics(m, 3); } catch (e) {}
+        if (typeof _bossScheduleMechanics === 'function') {
+            try { _bossScheduleMechanics(m, 3); } catch (e) {}
         }
-        if (typeof _egRenderPanel === 'function') { try { _egRenderPanel(); } catch (e2) {} }
+        if (typeof _renderPanel === 'function') { try { _renderPanel(); } catch (e2) {} }
     }
-    if (_egShpFinal === g) _egShpFinal = null;
+    if (_shpFinal === g) _shpFinal = null;
 }
 
 
 //------------------------------------------------------------------------
 //-------------------TEARDOWN-----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop -
+// Called from _bossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-export function _egShpTeardown() {
-    if (_egShpFinal) { try { _egShpFinalEnd(_egShpFinal, false); } catch (e) {} _egShpFinal = null; }
-    _egShpPools = [];
+export function _shpTeardown() {
+    if (_shpFinal) { try { _shpFinalEnd(_shpFinal, false); } catch (e) {} _shpFinal = null; }
+    _shpPools = [];
     document.querySelectorAll('.eg-shp-riftwarn, .eg-shp-fissure, .eg-shp-front, .eg-shp-pool, ' +
         '.eg-shp-mono, .eg-shp-wall, .eg-shp-walker, .eg-shp-shardlet, ' +
         '.eg-shp-gmonolith, .eg-shp-arm, .eg-shp-core, .eg-shp-cd, ' +
@@ -822,27 +822,27 @@ export function _egShpTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_SHP_DEBUG.fire('rift'|'monos'|'walker', phase) - runs one now
-//   _EG_SHP_DEBUG.final()                              - SHAPED WINTER now
+//   _SHP_DEBUG.fire('rift'|'monos'|'walker', phase) - runs one now
+//   _SHP_DEBUG.final()                              - SHAPED WINTER now
 if (typeof window !== 'undefined') {
-    window._EG_SHP_DEBUG = {
+    window._SHP_DEBUG = {
         fire: (name, phase) => {
-            const monster = (typeof _egMonsters !== 'undefined')
-                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_shaper') : null;
+            const monster = (typeof _monsters !== 'undefined')
+                ? globalThis._monsters.find(m => m && m.baseId === 'boss_shaper') : null;
             if (!monster) return 'no shaper alive';
-            const fn = name === 'rift' ? _egMechShpRift
-                : name === 'monos' ? _egMechShpMonoliths
-                : name === 'walker' ? _egMechShpWalker : null;
+            const fn = name === 'rift' ? _mechShpRift
+                : name === 'monos' ? _mechShpMonoliths
+                : name === 'walker' ? _mechShpWalker : null;
             if (!fn) return 'unknown: ' + name;
-            if (name !== 'rift' && _egNkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for the field to clear)';
+            if (name !== 'rift' && _nkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for the field to clear)';
             fn(monster, phase || monster.bossPhase || 1);
             return 'fired ' + name;
         },
         final: () => {
-            const monster = (typeof _egMonsters !== 'undefined')
-                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_shaper') : null;
+            const monster = (typeof _monsters !== 'undefined')
+                ? globalThis._monsters.find(m => m && m.baseId === 'boss_shaper') : null;
             if (!monster) return 'no shaper alive';
-            _egShpFinalStart(monster);
+            _shpFinalStart(monster);
             return 'THE SHAPED WINTER started';
         },
     };

@@ -111,8 +111,8 @@ export function getSkillCastTimeSeconds(skillId) {
     if (!(base > 0)) return 0;
     let speedPct = 0;
     try {
-        if (typeof globalThis._egComputePlayerStats === 'function') {
-            const stats = globalThis._egComputePlayerStats();
+        if (typeof globalThis._computePlayerStats === 'function') {
+            const stats = globalThis._computePlayerStats();
             speedPct = Number(stats.castSpeedPct) || 0;
             // Fire/cold/lightning-only cast speed (passive tree) stacks on top, but
             // ONLY for spells of that element - every other element keeps the
@@ -223,7 +223,7 @@ function _holdCastCanBegin(skillId) {
         const isUniversal = !!def && def.slotKind === 'universal';
         if (isUniversal) {
             let encounterOn = false;
-            try { encounterOn = (typeof globalThis._egIsActive === 'function') && globalThis._egIsActive(); } catch (e) {}
+            try { encounterOn = (typeof globalThis._isActive === 'function') && globalThis._isActive(); } catch (e) {}
             if (!encounterOn) return false;
             // Support / movement self-casts only need the live encounter;
             // everything offensive needs a target too.
@@ -236,7 +236,7 @@ function _holdCastCanBegin(skillId) {
             } catch (e) {}
             if (!selfCast) {
                 let target = null;
-                try { target = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null; } catch (e) {}
+                try { target = (typeof globalThis._getTarget === 'function') ? globalThis._getTarget() : null; } catch (e) {}
                 if (!target) return false;
             }
         }
@@ -546,12 +546,12 @@ function _holdCastRemoveShell() {
 // Avatar centre in viewport coordinates (same anchors the projectiles use).
 function _holdCastAvatarCentre() {
     try {
-        if (typeof globalThis._egGetElementCentre !== 'function') return null;
+        if (typeof globalThis._getElementCentre !== 'function') return null;
         const avatar = document.getElementById('player-avatar-wrapper')
             || document.getElementById('player-avatar-simple')
             || document.getElementById('class-hud-drag-handle');
         if (!avatar) return null;
-        return globalThis._egGetElementCentre(avatar);
+        return globalThis._getElementCentre(avatar);
     } catch (e) { return null; }
 }
 
@@ -860,7 +860,7 @@ export function getAvatarCentre() {
             || document.getElementById('player-avatar-simple')
             || document.getElementById('class-hud-drag-handle');
         if (!el) return null;
-        if (typeof globalThis._egGetElementCentre === 'function') return globalThis._egGetElementCentre(el);
+        if (typeof globalThis._getElementCentre === 'function') return globalThis._getElementCentre(el);
         const r = el.getBoundingClientRect();
         return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     } catch (e) { return null; }

@@ -6,7 +6,7 @@
 // because dispatch is deferred through inline onclick strings). Screens
 // store a backFn NAME; the resolver validates that the name really is a
 // global function so a typo can never silently produce a dead back button.
-export const EG_SCREEN_NAV = {
+export const SCREEN_NAV = {
     hub: 'showEndgameHub',
     gate: 'showEndgameGate',
     atlas: 'showEndgameAtlas',
@@ -17,10 +17,10 @@ export const EG_SCREEN_NAV = {
 
 // Returns `name` if it names a callable global (function declaration),
 // otherwise warns and returns the fallback.
-export function _egResolveBackFn(name, fallback) {
+export function _resolveBackFn(name, fallback) {
     if (typeof name === 'string' && typeof window[name] === 'function') return name;
     if (name && name !== fallback) {
         console.warn('[load-order] unknown endgame back-nav function:', name, '- falling back to', fallback);
     }
-    return fallback || EG_SCREEN_NAV.nexus;
+    return fallback || SCREEN_NAV.nexus;
 }

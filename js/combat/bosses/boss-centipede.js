@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egFlingBurst, _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _flingBurst, _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkDotHit, _nkDotTick, _nkEl, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE CENTIPEDE (boss_centipede)------------------
@@ -13,7 +13,7 @@ import { _egFlingBurst, _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _e
 // are referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_centipede: {
         id: 'boss_centipede', name: 'The Centipede', emoji: '🐛',
         baseHP: 960, baseDamage: 20, chargeMax: 12,
@@ -21,7 +21,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_centipede: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -30,90 +30,90 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2200,
         mechanics: [
-            { name: 'clue_scramble', intervalBase: 26000, intervalVariance: 6000, handler: '_egMechClueScramble' },
+            { name: 'clue_scramble', intervalBase: 26000, intervalVariance: 6000, handler: '_mechClueScramble' },
         ],
-        onInit: _egCentipedeArenaInit,
+        onInit: _centipedeArenaInit,
     },
 });
 
 
 // ── Colony tuning ───────────────────────────────────────────────────────
 // The winding colony
-export const EG_CENT_SEGS = [0, 5, 7, 9];        // segments per boss phase
-export const EG_CENT_SEG_GAP = 36;               // px between segments
-export const EG_CENT_SPEED = [0, 95, 120, 150];  // px/s winding speed
-export const EG_CENT_MOLT_SPEED = 1.35;          // main body speed × after molt
-export const EG_CENT_SEG_DMG = [0, 0.05, 0.06, 0.07]; // %maxHP per segment touch
-export const EG_CENT_SEG_CD_MS = 700;            // global segment-touch cooldown
+export const CENT_SEGS = [0, 5, 7, 9];        // segments per boss phase
+export const CENT_SEG_GAP = 36;               // px between segments
+export const CENT_SPEED = [0, 95, 120, 150];  // px/s winding speed
+export const CENT_MOLT_SPEED = 1.35;          // main body speed × after molt
+export const CENT_SEG_DMG = [0, 0.05, 0.06, 0.07]; // %maxHP per segment touch
+export const CENT_SEG_CD_MS = 700;            // global segment-touch cooldown
 // Burrow holes (post-molt): safe holes that bait the molt mini-centipede
 // into burying itself. Standing on one is harmless - but the hole collapses
 // when the mini buries (or expires) and reopens after a while.
-export const EG_CENT_MOUND_INTERVAL_MS = [0, 8000, 6200, 4600]; // per boss phase
-export const EG_CENT_MOUND_R = 58;               // hole radius (visual + bait check)
-export const EG_CENT_MOUND_LIFE_MS = 9000;       // how long a hole stays open
-export const EG_CENT_MOUND_CLOSED_MS = 6000;     // collapsed hole reopens after this
-export const EG_CENT_MOLT_BURY_MS = 15000;       // the mini-centipede is buried for 15s
-export const EG_CENT_RESURFACE_WARN_MS = 1000;   // dirt-mound telegraph before it pops out
-export const EG_CENT_RESURFACE_DMG = 0.07;       // %maxHP burst if you stand on the pop-out
-export const EG_CENT_RESURF_BAIT_R = 280;        // stand within this of the mound to bait the pop-out
-export const EG_CENT_RESURF_BAIT_LOCK_MS = 600;  // committed straight-line charge at the baiter
+export const CENT_MOUND_INTERVAL_MS = [0, 8000, 6200, 4600]; // per boss phase
+export const CENT_MOUND_R = 58;               // hole radius (visual + bait check)
+export const CENT_MOUND_LIFE_MS = 9000;       // how long a hole stays open
+export const CENT_MOUND_CLOSED_MS = 6000;     // collapsed hole reopens after this
+export const CENT_MOLT_BURY_MS = 15000;       // the mini-centipede is buried for 15s
+export const CENT_RESURFACE_WARN_MS = 1000;   // dirt-mound telegraph before it pops out
+export const CENT_RESURFACE_DMG = 0.07;       // %maxHP burst if you stand on the pop-out
+export const CENT_RESURF_BAIT_R = 280;        // stand within this of the mound to bait the pop-out
+export const CENT_RESURF_BAIT_LOCK_MS = 600;  // committed straight-line charge at the baiter
 // Exoskeleton (60% gate)
-export const EG_CENT_SHELL_MS = 8000;            // whole shell set-piece duration
-export const EG_CENT_SHELL_WAVES = 2;            // rotating spiral waves
-export const EG_CENT_SHELL_N = 8;                // plates per wave
-export const EG_CENT_SHELL_DMG = 0.11;           // %maxHP per plate hit (physical)
-export const EG_CENT_SHELL_CD_MS = 500;          // global plate-hit cooldown
+export const CENT_SHELL_MS = 8000;            // whole shell set-piece duration
+export const CENT_SHELL_WAVES = 2;            // rotating spiral waves
+export const CENT_SHELL_N = 8;                // plates per wave
+export const CENT_SHELL_DMG = 0.11;           // %maxHP per plate hit (physical)
+export const CENT_SHELL_CD_MS = 500;          // global plate-hit cooldown
 // Molt (30% gate)
-export const EG_CENT_MOLT_SWELL_MS = 2200;       // visible swell telegraph
-export const EG_CENT_MOLT_MINI_SEGS = 4;         // the detached back half
-export const EG_CENT_MOLT_MINI_SPEED = 175;      // px/s - faster than base phase 1
+export const CENT_MOLT_SWELL_MS = 2200;       // visible swell telegraph
+export const CENT_MOLT_MINI_SEGS = 4;         // the detached back half
+export const CENT_MOLT_MINI_SPEED = 175;      // px/s - faster than base phase 1
 // Venom
-export const EG_CENT_VENOM_INTERVAL_MS = [0, 11000, 8500, 6000]; // per boss phase
-export const EG_CENT_VENOM_WARN_MS = 1050;       // target ring telegraph
-export const EG_CENT_VENOM_R = 110;              // splash radius
-export const EG_CENT_VENOM_BLOBS = 5;            // blobs per burst
-export const EG_CENT_VENOM_DMG = 0.08;           // %maxHP per blob hit (physical)
-export const EG_CENT_POOL_DPS = 6;               // %maxHP/s standing in a pool
-export const EG_CENT_POOL_MS = 4200;             // pool lifetime
+export const CENT_VENOM_INTERVAL_MS = [0, 11000, 8500, 6000]; // per boss phase
+export const CENT_VENOM_WARN_MS = 1050;       // target ring telegraph
+export const CENT_VENOM_R = 110;              // splash radius
+export const CENT_VENOM_BLOBS = 5;            // blobs per burst
+export const CENT_VENOM_DMG = 0.08;           // %maxHP per blob hit (physical)
+export const CENT_POOL_DPS = 6;               // %maxHP/s standing in a pool
+export const CENT_POOL_MS = 4200;             // pool lifetime
 // Stampede (charge attack)
-export const EG_CENT_STAMPEDE_WARN_MS = 1050;    // band telegraph
-export const EG_CENT_STAMPEDE_STRIKE_MS = 400;   // the dash is live
-export const EG_CENT_STAMPEDE_H = 72;            // band height
-export const EG_CENT_STAMPEDE_DMG = [0, 0.12, 0.15, 0.18]; // %maxHP by phase
+export const CENT_STAMPEDE_WARN_MS = 1050;    // band telegraph
+export const CENT_STAMPEDE_STRIKE_MS = 400;   // the dash is live
+export const CENT_STAMPEDE_H = 72;            // band height
+export const CENT_STAMPEDE_DMG = [0, 0.12, 0.15, 0.18]; // %maxHP by phase
 
 
-export let _egCentWatcher = null; // per-fight colony state
-export let _egCentStampedeActive = false; // a stampede set-piece is running
+export let _centWatcher = null; // per-fight colony state
+export let _centStampedeActive = false; // a stampede set-piece is running
 
 
 // Sweep every colony overlay off the screen. Safe to call twice.
-export function _egCentipedeSweep() {
-    _egCentStampedeActive = false;
+export function _centipedeSweep() {
+    _centStampedeActive = false;
     try {
         document.querySelectorAll('.eg-cent-seg, .eg-cent-mini, .eg-cent-mound, .eg-cent-resurf, .eg-cent-ring, .eg-cent-blob, .eg-cent-pool, .eg-cent-stampede, .eg-cent-shell').forEach(el => el.remove());
     } catch (e) {}
 }
 
 
-// Called from _egBossCleanup (boss-framework.js) on boss death / stop.
-export function _egCentipedeTeardown() {
-    const st = _egCentWatcher;
-    _egCentWatcher = null;
-    if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
+// Called from _bossCleanup (boss-framework.js) on boss death / stop.
+export function _centipedeTeardown() {
+    const st = _centWatcher;
+    _centWatcher = null;
+    if (st && st.run) { try { _nkKillRun(st.run); } catch (e) {} }
     // Always sweep: on boss death the run's onKill may have nulled the
     // watcher BEFORE this runs - the overlays must go either way.
-    _egCentipedeSweep();
+    _centipedeSweep();
 }
 
 
 // Spawns one centipede body (main or molt mini). Returns its part objects.
-export function _egCentSpawnBody(st, cls, n, label, anchor) {
+export function _centSpawnBody(st, cls, n, label, anchor) {
     const parts = [];
     const ax = (anchor && anchor.x != null) ? anchor.x : window.innerWidth * (0.25 + Math.random() * 0.5);
     const ay = (anchor && anchor.y != null) ? anchor.y : window.innerHeight * (0.2 + Math.random() * 0.5);
     for (let i = 0; i < n; i++) {
-        const el = _egNkEl(st.run, 'div', cls, i === 0 ? '🐛' : '🟤');
-        parts.push({ x: ax - i * EG_CENT_SEG_GAP, y: ay, cdUntil: 0, el });
+        const el = _nkEl(st.run, 'div', cls, i === 0 ? '🐛' : '🟤');
+        parts.push({ x: ax - i * CENT_SEG_GAP, y: ay, cdUntil: 0, el });
     }
     return { parts, label };
 }
@@ -124,10 +124,10 @@ export function _egCentSpawnBody(st, cls, n, label, anchor) {
 // body.lock (set on a baited resurface) makes the head charge STRAIGHT at
 // the locked point at full speed - no wobble, no turn delay - so a player
 // who baited the pop-out gets a crisp, funnelable charge out of it.
-export function _egCentAdvance(st, body, dtS, now, pr, speed, hitPct) {
+export function _centAdvance(st, body, dtS, now, pr, speed, hitPct) {
     const W = window.innerWidth, H = window.innerHeight;
     const head = body.parts[0];
-    const c = _egNkPlayerCenter();
+    const c = _nkPlayerCenter();
     let ang;
     if (body.lock && now < body.lock.until) {
         // Committed bait charge: straight at the spot the player stood when
@@ -163,23 +163,23 @@ export function _egCentAdvance(st, body, dtS, now, pr, speed, hitPct) {
             const prev = body.parts[i - 1];
             const dx = prev.x - sg.x, dy = prev.y - sg.y;
             const d = Math.hypot(dx, dy) || 1;
-            if (d > EG_CENT_SEG_GAP) {
-                sg.x += (dx / d) * (d - EG_CENT_SEG_GAP);
-                sg.y += (dy / d) * (d - EG_CENT_SEG_GAP);
+            if (d > CENT_SEG_GAP) {
+                sg.x += (dx / d) * (d - CENT_SEG_GAP);
+                sg.y += (dy / d) * (d - CENT_SEG_GAP);
             }
         }
         sg.el.style.transform = 'translate(' + Math.round(sg.x - 14) + 'px,' + Math.round(sg.y - 14) + 'px)';
-        if (hitPct != null && pr && now >= st.segCd && _egNkDotHit(sg.el, pr, 0)) {
-            st.segCd = now + EG_CENT_SEG_CD_MS;
-            const dealt = _egNkHit(hitPct, null, st.level);
-            _egNkAbilityHitToast(dealt, 'The Centipede', body.label);
+        if (hitPct != null && pr && now >= st.segCd && _nkDotHit(sg.el, pr, 0)) {
+            st.segCd = now + CENT_SEG_CD_MS;
+            const dealt = _nkHit(hitPct, null, st.level);
+            _nkAbilityHitToast(dealt, 'The Centipede', body.label);
         }
     });
 }
 
 
-export function _egCentipedeArenaInit(monster) {
-    if (_egCentWatcher) return;
+export function _centipedeArenaInit(monster) {
+    if (_centWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
         monsterId, level: monster ? monster.level : 1,
@@ -192,21 +192,21 @@ export function _egCentipedeArenaInit(monster) {
         gate60Done: false, gate30Done: false, molted: false,
         everLive: false, bornAt: performance.now(),
     };
-    _egCentWatcher = st;        _egNkToast('eg_cent_intro', '🐛 The Centipede: The colony infests the arena - cut it down!');
+    _centWatcher = st;        _nkToast('eg_cent_intro', '🐛 The Centipede: The colony infests the arena - cut it down!');
     // Tier-scaled clock: mound/venom/shell telegraphs breathe with tier.
-    // Passive run: lives the whole fight without hogging _egNkDodgeBusy().
-    const run = _egNkNewRun(monsterId, true);
+    // Passive run: lives the whole fight without hogging _nkDodgeBusy().
+    const run = _nkNewRun(monsterId, true);
     run.passive = true;
     st.run = run;
     run.onKill = () => {
-        if (_egCentWatcher && _egCentWatcher.run === run) _egCentWatcher = null;
-        _egCentipedeSweep();
+        if (_centWatcher && _centWatcher.run === run) _centWatcher = null;
+        _centipedeSweep();
     };
-    st.body = _egCentSpawnBody(st, 'eg-cent-seg', EG_CENT_SEGS[1], 'Colony');
+    st.body = _centSpawnBody(st, 'eg-cent-seg', CENT_SEGS[1], 'Colony');
 
-    _egNkLoop(run, (dtS, now) => {
-        const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
-            ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+    _nkLoop(run, (dtS, now) => {
+        const live = (typeof _monsters !== 'undefined' && globalThis._monsters)
+            ? (globalThis._monsters.find(m => m && m.id === st.monsterId) || null) : null;
         // Boss not registered yet → wait for it (spawn races the arena init);
         // boss vanished AFTER being live → the fight is over, tear down.
         if (!live) {
@@ -216,36 +216,36 @@ export function _egCentipedeArenaInit(monster) {
         st.everLive = true;
 
         const W = window.innerWidth, H = window.innerHeight;
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         const p = Math.max(1, Math.min(3, Number(live.bossPhase) || 1));
 
         // ── HP gates ──
         const hpPct = live.maxHP > 0 ? live.currentHP / live.maxHP : 1;
-        if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _egCentShell(st, now); }
-        if (!st.gate30Done && hpPct <= 0.30) { st.gate30Done = true; _egCentMolt(st, now); }
+        if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _centShell(st, now); }
+        if (!st.gate30Done && hpPct <= 0.30) { st.gate30Done = true; _centMolt(st, now); }
 
         // ── The winding colony ──
-        const wantN = st.molted ? EG_CENT_SEGS[p] + 2 : EG_CENT_SEGS[p];
+        const wantN = st.molted ? CENT_SEGS[p] + 2 : CENT_SEGS[p];
         while (st.body.parts.length < wantN) {
             const tail = st.body.parts[st.body.parts.length - 1];
-            const el = _egNkEl(st.run, 'div', 'eg-cent-seg', '🟤');
+            const el = _nkEl(st.run, 'div', 'eg-cent-seg', '🟤');
             st.body.parts.push({ x: tail.x, y: tail.y, cdUntil: 0, el });
         }
-        const spd = EG_CENT_SPEED[p] * (st.molted ? EG_CENT_MOLT_SPEED : 1);
-        _egCentAdvance(st, st.body, dtS, now, pr, spd, EG_CENT_SEG_DMG[p]);
-        if (st.mini) _egCentAdvance(st, st.mini, dtS, now, pr, EG_CENT_MOLT_MINI_SPEED, EG_CENT_SEG_DMG[p] * 0.8);
+        const spd = CENT_SPEED[p] * (st.molted ? CENT_MOLT_SPEED : 1);
+        _centAdvance(st, st.body, dtS, now, pr, spd, CENT_SEG_DMG[p]);
+        if (st.mini) _centAdvance(st, st.mini, dtS, now, pr, CENT_MOLT_MINI_SPEED, CENT_SEG_DMG[p] * 0.8);
         // The mini-centipede crawling over an OPEN hole buries itself for
-        // EG_CENT_MOLT_BURY_MS - the rewarded relief from the chase. It
+        // CENT_MOLT_BURY_MS - the rewarded relief from the chase. It
         // homes onto the player, so guide it by standing in a hole.
         if (st.mini && now >= (st.miniBuryGraceUntil || 0)) {
-            const hole = _egCentMoundHit(st, st.mini);
+            const hole = _centMoundHit(st, st.mini);
             if (hole) {
-                _egCentCloseMound(hole);
+                _centCloseMound(hole);
                 st.mini.parts.forEach(sg => { try { sg.el.remove(); } catch (e) {} });
                 st.mini = null;
-                st.miniBuriedUntil = now + EG_CENT_MOLT_BURY_MS;
+                st.miniBuriedUntil = now + CENT_MOLT_BURY_MS;
                 st.resurfWarned = false; // re-arm the resurface telegraph
-                _egNkToast('eg_cent_buried', '🕳️ BURIED! The mini centipede is gone for 15s!');
+                _nkToast('eg_cent_buried', '🕳️ BURIED! The mini centipede is gone for 15s!');
                 try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
             }
         }
@@ -254,14 +254,14 @@ export function _egCentipedeArenaInit(monster) {
         // out. Steer clear (the pop-out bursts for damage if you stand on
         // it) or use the warning to pre-position your next bait.
         if (st.miniBuriedUntil && !st.resurfWarned
-            && now >= st.miniBuriedUntil - EG_CENT_RESURFACE_WARN_MS) {
+            && now >= st.miniBuriedUntil - CENT_RESURFACE_WARN_MS) {
             st.resurfWarned = true;
             const side = Math.floor(Math.random() * 4);
             st.resurfAnchor = side === 0 ? { x: 70, y: 90 + Math.random() * Math.max(120, H - 200) }
                 : side === 1 ? { x: W - 70, y: 90 + Math.random() * Math.max(120, H - 200) }
                 : side === 2 ? { x: 90 + Math.random() * Math.max(120, W - 200), y: 70 }
                 : { x: 90 + Math.random() * Math.max(120, W - 200), y: H - 70 };
-            st.resurfEl = _egNkEl(st.run, 'div', 'eg-cent-resurf', '🕳️');
+            st.resurfEl = _nkEl(st.run, 'div', 'eg-cent-resurf', '🕳️');
             st.resurfEl.style.left = Math.round(st.resurfAnchor.x) + 'px';
             st.resurfEl.style.top = Math.round(st.resurfAnchor.y) + 'px';
             st.resurfBaitWarned = false; // re-arm the bait hint for this mound
@@ -272,14 +272,14 @@ export function _egCentipedeArenaInit(monster) {
         // at you, so you can funnel it over a nearby open hole. (Standing ON
         // the mound still eats the pop-out burst - bait from just outside.)
         if (st.resurfEl && st.miniBuriedUntil && now < st.miniBuriedUntil) {
-            const c = _egNkPlayerCenter();
-            const bait = c && Math.hypot(c.x - st.resurfAnchor.x, c.y - st.resurfAnchor.y) <= EG_CENT_RESURF_BAIT_R;
+            const c = _nkPlayerCenter();
+            const bait = c && Math.hypot(c.x - st.resurfAnchor.x, c.y - st.resurfAnchor.y) <= CENT_RESURF_BAIT_R;
             st.resurfEl.classList.toggle('bait', !!bait);
             if (bait) {
                 st.resurfBait = { x: c.x, y: c.y };
                 if (!st.resurfBaitWarned) {
                     st.resurfBaitWarned = true;
-                    _egNkToast('eg_cent_resurf_bait', '🧲 Bait ready! The mini will pop out straight at you - lure it into a hole!');
+                    _nkToast('eg_cent_resurf_bait', '🧲 Bait ready! The mini will pop out straight at you - lure it into a hole!');
                 }
             } else {
                 st.resurfBait = null;
@@ -297,28 +297,28 @@ export function _egCentipedeArenaInit(monster) {
             // Pop-out burst: standing on the telegraphed spot when it
             // erupts hurts - the old geyser language (dodge the rumble or
             // eat the hit), now punishing camping the resurface point.
-            if (pr && _egNkCircleHit(anchor.x, anchor.y, EG_CENT_MOUND_R, pr, 0)) {
-                const dealt = _egNkHit(EG_CENT_RESURFACE_DMG, null, st.level);
-                _egNkAbilityHitToast(dealt, 'The Centipede', 'Resurface');
+            if (pr && _nkCircleHit(anchor.x, anchor.y, CENT_MOUND_R, pr, 0)) {
+                const dealt = _nkHit(CENT_RESURFACE_DMG, null, st.level);
+                _nkAbilityHitToast(dealt, 'The Centipede', 'Resurface');
             }
-            try { _egFlingBurst(anchor.x, anchor.y, -Math.PI / 2); } catch (e) {}
-            st.mini = _egCentSpawnBody(st, 'eg-cent-mini', EG_CENT_MOLT_MINI_SEGS, 'Molt', anchor);
+            try { _flingBurst(anchor.x, anchor.y, -Math.PI / 2); } catch (e) {}
+            st.mini = _centSpawnBody(st, 'eg-cent-mini', CENT_MOLT_MINI_SEGS, 'Molt', anchor);
             if (baitLock) {
                 // Baited: committed straight charge at the player's spot.
-                st.mini.lock = { x: baitLock.x, y: baitLock.y, until: now + EG_CENT_RESURF_BAIT_LOCK_MS };
+                st.mini.lock = { x: baitLock.x, y: baitLock.y, until: now + CENT_RESURF_BAIT_LOCK_MS };
             }
             st.miniBuryGraceUntil = now + 2500; // can't instantly re-bury on the spot
-            _egNkToast('eg_cent_resurfaced', '🐛 The mini centipede breaks back out of the ground!');
+            _nkToast('eg_cent_resurfaced', '🐛 The mini centipede breaks back out of the ground!');
             try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
         }
 
         // ── Burrow holes (post-molt): bait the mini into burying itself ──
         st.moundAcc += dtS * 1000;
         if (st.molted) {
-            const mInt = EG_CENT_MOUND_INTERVAL_MS[p] || EG_CENT_MOUND_INTERVAL_MS[1];
+            const mInt = CENT_MOUND_INTERVAL_MS[p] || CENT_MOUND_INTERVAL_MS[1];
             if (st.moundAcc >= mInt) {
                 st.moundAcc = 0;
-                _egCentMound(st, now);
+                _centMound(st, now);
             }
         }
         for (let i = st.mounds.length - 1; i >= 0; i--) {
@@ -327,23 +327,23 @@ export function _egCentipedeArenaInit(monster) {
             if (m.closed) {
                 // Collapsed: the visual shrinks shut, then the spot reopens
                 // as a fresh hole after the closed window.
-                if (m.t >= EG_CENT_MOUND_CLOSED_MS) {
+                if (m.t >= CENT_MOUND_CLOSED_MS) {
                     m.closed = false;
                     m.t = 0;
                     m.el.classList.remove('closed');
                     m.el.classList.add('fresh');
                 }
-            } else if (m.t >= EG_CENT_MOUND_LIFE_MS) {
-                _egCentCloseMound(m);
+            } else if (m.t >= CENT_MOUND_LIFE_MS) {
+                _centCloseMound(m);
             }
         }
 
         // ── Venom burst (phase cadence) ──
         st.venomAcc += dtS * 1000;
-        const vInt = EG_CENT_VENOM_INTERVAL_MS[p] || EG_CENT_VENOM_INTERVAL_MS[1];
+        const vInt = CENT_VENOM_INTERVAL_MS[p] || CENT_VENOM_INTERVAL_MS[1];
         if (st.venomAcc >= vInt) {
             st.venomAcc = 0;
-            _egCentVenomBurst(st, now);
+            _centVenomBurst(st, now);
         }
         // Venom blobs fly out then become pools.
         for (let i = st.blobs.length - 1; i >= 0; i--) {
@@ -353,17 +353,17 @@ export function _egCentipedeArenaInit(monster) {
             b.y += b.vy * dtS;
             b.vy += 260 * dtS; // gravity
             b.el.style.transform = 'translate(' + Math.round(b.x) + 'px,' + Math.round(b.y) + 'px)';
-            if (pr && !b.hit && b.t > 120 && _egNkCircleHit(b.x, b.y, 14, pr, 0)) {
+            if (pr && !b.hit && b.t > 120 && _nkCircleHit(b.x, b.y, 14, pr, 0)) {
                 b.hit = true;
-                const dealt = _egNkHit(EG_CENT_VENOM_DMG, null, st.level);
-                _egNkAbilityHitToast(dealt, 'The Centipede', 'Venom');
+                const dealt = _nkHit(CENT_VENOM_DMG, null, st.level);
+                _nkAbilityHitToast(dealt, 'The Centipede', 'Venom');
             }
-            const landed = b.t >= EG_CENT_VENOM_WARN_MS + 500 || b.y > H - 30;
+            const landed = b.t >= CENT_VENOM_WARN_MS + 500 || b.y > H - 30;
             if (landed) {
                 try { b.el.remove(); } catch (e) {}
                 st.blobs.splice(i, 1);
                 // Leave a toxic pool where it lands.
-                const pool = _egNkEl(st.run, 'div', 'eg-cent-pool');
+                const pool = _nkEl(st.run, 'div', 'eg-cent-pool');
                 pool.style.left = Math.round(b.x) + 'px';
                 pool.style.top = Math.round(Math.min(b.y, H - 40)) + 'px';
                 st.pools.push({ x: b.x, y: Math.min(b.y, H - 40), t: 0, el: pool });
@@ -373,10 +373,10 @@ export function _egCentipedeArenaInit(monster) {
         for (let i = st.pools.length - 1; i >= 0; i--) {
             const pl = st.pools[i];
             pl.t += dtS * 1000;
-            if (pr && _egNkCircleHit(pl.x, pl.y, 46, pr, 0)) {
-                _egNkDotTick(st.run, EG_CENT_POOL_DPS, dtS, st.level, null);
+            if (pr && _nkCircleHit(pl.x, pl.y, 46, pr, 0)) {
+                _nkDotTick(st.run, CENT_POOL_DPS, dtS, st.level, null);
             }
-            if (pl.t >= EG_CENT_POOL_MS) {
+            if (pl.t >= CENT_POOL_MS) {
                 try { pl.el.remove(); } catch (e) {}
                 st.pools.splice(i, 1);
             }
@@ -394,13 +394,13 @@ export function _egCentipedeArenaInit(monster) {
                 pl.x = sh.cx + Math.cos(pl.a) * pl.r;
                 pl.y = sh.cy + Math.sin(pl.a) * pl.r;
                 pl.el.style.transform = 'translate(' + Math.round(pl.x - 16) + 'px,' + Math.round(pl.y - 16) + 'px) rotate(' + Math.round(pl.a * 57.3) + 'deg)';
-                if (pr && now >= st.shellCd && _egNkCircleHit(pl.x, pl.y, 20, pr, 0)) {
-                    st.shellCd = now + EG_CENT_SHELL_CD_MS;
-                    const dealt = _egNkHit(EG_CENT_SHELL_DMG, null, st.level);
-                    _egNkAbilityHitToast(dealt, 'The Centipede', 'Chitin');
+                if (pr && now >= st.shellCd && _nkCircleHit(pl.x, pl.y, 20, pr, 0)) {
+                    st.shellCd = now + CENT_SHELL_CD_MS;
+                    const dealt = _nkHit(CENT_SHELL_DMG, null, st.level);
+                    _nkAbilityHitToast(dealt, 'The Centipede', 'Chitin');
                 }
             });
-            if (sh.t >= EG_CENT_SHELL_MS) {
+            if (sh.t >= CENT_SHELL_MS) {
                 sh.plates.forEach(pl => { if (!pl.done) { try { pl.el.remove(); } catch (e) {} } });
                 st.shell = null;
             }
@@ -412,17 +412,17 @@ export function _egCentipedeArenaInit(monster) {
 
 
 // ── Burrow holes ────────────────────────────────────────────────────────
-export function _egCentMound(st, now) {
+export function _centMound(st, now) {
     const W = window.innerWidth, H = window.innerHeight;
     const x = 90 + Math.random() * Math.max(120, W - 180);
     const y = 90 + Math.random() * Math.max(120, H - 180);
-    const el = _egNkEl(st.run, 'div', 'eg-cent-mound fresh', '🕳️');
+    const el = _nkEl(st.run, 'div', 'eg-cent-mound fresh', '🕳️');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
     // First hole ever → teach the mechanic once, right where it becomes
     // relevant (holes only exist after the Molt).
     if (!st.mounds.length) {
-        _egNkToast('eg_cent_holes_hint', '🕳️ Burrow holes open - lure the mini centipede into one!');
+        _nkToast('eg_cent_holes_hint', '🕳️ Burrow holes open - lure the mini centipede into one!');
     }
     st.mounds.push({ x, y, t: 0, closed: false, el });
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
@@ -430,8 +430,8 @@ export function _egCentMound(st, now) {
 
 
 // A hole collapses shut (mini buried in it, or it expired empty). It
-// reopens as a fresh hole after EG_CENT_MOUND_CLOSED_MS.
-export function _egCentCloseMound(m) {
+// reopens as a fresh hole after CENT_MOUND_CLOSED_MS.
+export function _centCloseMound(m) {
     if (m.closed) return;
     m.closed = true;
     m.t = 0;
@@ -441,13 +441,13 @@ export function _egCentCloseMound(m) {
 
 
 // Does any part of the body sit inside an open burrow hole? Returns it or null.
-export function _egCentMoundHit(st, body) {
+export function _centMoundHit(st, body) {
     for (let i = 0; i < st.mounds.length; i++) {
         const m = st.mounds[i];
         if (m.closed) continue;
         for (let j = 0; j < body.parts.length; j++) {
             const sg = body.parts[j];
-            if (Math.hypot(sg.x - m.x, sg.y - m.y) <= EG_CENT_MOUND_R) return m;
+            if (Math.hypot(sg.x - m.x, sg.y - m.y) <= CENT_MOUND_R) return m;
         }
     }
     return null;
@@ -456,16 +456,16 @@ export function _egCentMoundHit(st, body) {
 
 // ── 60% gate: Exoskeleton ───────────────────────────────────────────────
 // Chitin plates orbit the boss, then spiral outward - weave the gaps.
-export function _egCentShell(st, now) {
+export function _centShell(st, now) {
     if (st.shell) return;
-    const c = _egNkPlayerCenter();
+    const c = _nkPlayerCenter();
     const cx = c ? c.x : window.innerWidth / 2;
     const cy = c ? c.y : window.innerHeight / 2;
     const plates = [];
-    for (let w = 0; w < EG_CENT_SHELL_WAVES; w++) {
-        for (let i = 0; i < EG_CENT_SHELL_N; i++) {
-            const el = _egNkEl(st.run, 'div', 'eg-cent-shell', '🛡️');
-            const a0 = (i / EG_CENT_SHELL_N) * Math.PI * 2 + w * 0.4;
+    for (let w = 0; w < CENT_SHELL_WAVES; w++) {
+        for (let i = 0; i < CENT_SHELL_N; i++) {
+            const el = _nkEl(st.run, 'div', 'eg-cent-shell', '🛡️');
+            const a0 = (i / CENT_SHELL_N) * Math.PI * 2 + w * 0.4;
             plates.push({
                 a: a0, r: 40 + w * 70, spin: 1.6 * (w % 2 ? -1 : 1),
                 vr: 120 + w * 60, delay: w * 1600, t0: now, done: false, el,
@@ -477,7 +477,7 @@ export function _egCentShell(st, now) {
     st.shellCd = 0;
     // Delay: plates start expanding after a short beat.
     st.shell.plates.forEach(pl => { pl.vrStart = performance.now() + pl.delay; });
-    _egNkToast('eg_cent_shell', '🛡️ EXOSKELETON! Chitin plates spiral out - weave the gaps!');
+    _nkToast('eg_cent_shell', '🛡️ EXOSKELETON! Chitin plates spiral out - weave the gaps!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
 }
 
@@ -485,47 +485,47 @@ export function _egCentShell(st, now) {
 // ── 30% gate: Molt ──────────────────────────────────────────────────────
 // The body stops and swells, then the back half detaches into a faster
 // mini-centipede while the main body enrages.
-export function _egCentMolt(st, now) {
+export function _centMolt(st, now) {
     if (st.molted) return;
     st.molted = true;
     // Visible swell: pulse every living segment.
     st.body.parts.forEach(sg => sg.el.classList.add('swell'));
     setTimeout(() => {
-        const s = _egCentWatcher;
+        const s = _centWatcher;
         if (!s) return;
         s.body.parts.forEach(sg => { try { sg.el.classList.remove('swell'); } catch (e) {} });
         // Detach the back half into the mini.
-        const cut = Math.min(EG_CENT_MOLT_MINI_SEGS, Math.max(1, s.body.parts.length - 3));
+        const cut = Math.min(CENT_MOLT_MINI_SEGS, Math.max(1, s.body.parts.length - 3));
         const detached = s.body.parts.splice(s.body.parts.length - cut, cut);
         detached.forEach(sg => sg.el.className = 'eg-cent-mini');
         s.mini = { parts: detached, label: 'Molt' };
         // Short grace so a hole that happens to open right on the fresh
         // mini can't bury it before the player ever baited it.
         s.miniBuryGraceUntil = performance.now() + 2500;
-        _egNkToast('eg_cent_molt', '🦋 MOLT! The colony splits - lure the mini into a burrow hole!');
+        _nkToast('eg_cent_molt', '🦋 MOLT! The colony splits - lure the mini into a burrow hole!');
         try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
-    }, EG_CENT_MOLT_SWELL_MS);
-    _egNkToast('eg_cent_molt_swell', '🐛 The Centipede swells - its shell is cracking!');
+    }, CENT_MOLT_SWELL_MS);
+    _nkToast('eg_cent_molt_swell', '🐛 The Centipede swells - its shell is cracking!');
 }
 
 
 // ── Venom burst ─────────────────────────────────────────────────────────
-export function _egCentVenomBurst(st, now) {
-    const c = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    _egNkToast('eg_cent_venom', '🟢 VENOM BURST! Clear the ring - the splash leaves pools!');
+export function _centVenomBurst(st, now) {
+    const c = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    _nkToast('eg_cent_venom', '🟢 VENOM BURST! Clear the ring - the splash leaves pools!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_venom'); } catch (e) {}
-    const ring = _egNkEl(st.run, 'div', 'eg-cent-ring');
+    const ring = _nkEl(st.run, 'div', 'eg-cent-ring');
     ring.style.left = c.x + 'px';
     ring.style.top = c.y + 'px';
-    ring.style.width = ring.style.height = (EG_CENT_VENOM_R * 2) + 'px';
-    setTimeout(() => { try { ring.remove(); } catch (e) {} }, EG_CENT_VENOM_WARN_MS);
+    ring.style.width = ring.style.height = (CENT_VENOM_R * 2) + 'px';
+    setTimeout(() => { try { ring.remove(); } catch (e) {} }, CENT_VENOM_WARN_MS);
     // Blobs spray out after the telegraph.
     setTimeout(() => {
-        const s = _egCentWatcher;
+        const s = _centWatcher;
         if (!s) return;
-        for (let i = 0; i < EG_CENT_VENOM_BLOBS; i++) {
-            const a = (i / EG_CENT_VENOM_BLOBS) * Math.PI * 2 + Math.random() * 0.6;
-            const el = _egNkEl(s.run, 'div', 'eg-cent-blob', '🟢');
+        for (let i = 0; i < CENT_VENOM_BLOBS; i++) {
+            const a = (i / CENT_VENOM_BLOBS) * Math.PI * 2 + Math.random() * 0.6;
+            const el = _nkEl(s.run, 'div', 'eg-cent-blob', '🟢');
             el.style.left = '0'; el.style.top = '0';
             s.blobs.push({
                 x: c.x, y: c.y,
@@ -534,7 +534,7 @@ export function _egCentVenomBurst(st, now) {
                 t: 0, hit: false, el,
             });
         }
-    }, EG_CENT_VENOM_WARN_MS);
+    }, CENT_VENOM_WARN_MS);
 }
 
 
@@ -543,39 +543,39 @@ export function _egCentVenomBurst(st, now) {
 //------------------------------------------------------------------------
 // The boss's charged attack IS the set-piece: a full-screen horizontal dash
 // band telegraphs at the player's row, then the colony stampedes across.
-// Wired from _egFireMonsterAttack (endgame-encounter.js).
+// Wired from _fireMonsterAttack (endgame-encounter.js).
 
-export function _egCentStampede(monster) {
-    if (_egCentStampedeActive || _egNkDodgeBusy() || _egNkFrozen()) return;
+export function _centStampede(monster) {
+    if (_centStampedeActive || _nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(monster ? monster.id : null, true);
-    _egCentStampedeActive = true;
-    run.onKill = () => { _egCentStampedeActive = false; };
-    const c = _egNkPlayerCenter();
+    const run = _nkNewRun(monster ? monster.id : null, true);
+    _centStampedeActive = true;
+    run.onKill = () => { _centStampedeActive = false; };
+    const c = _nkPlayerCenter();
     const cy = c ? c.y : window.innerHeight / 2;
     const fromLeft = Math.random() < 0.5;
-    const band = _egNkEl(run, 'div', 'eg-cent-stampede' + (fromLeft ? '' : ' flip'));
-    band.style.top = Math.round(cy - EG_CENT_STAMPEDE_H / 2) + 'px';
-    band.style.height = EG_CENT_STAMPEDE_H + 'px';
-    _egNkToast('eg_cent_stampede', '🐛 STAMPEDE! Get out of its lane!');
+    const band = _nkEl(run, 'div', 'eg-cent-stampede' + (fromLeft ? '' : ' flip'));
+    band.style.top = Math.round(cy - CENT_STAMPEDE_H / 2) + 'px';
+    band.style.height = CENT_STAMPEDE_H + 'px';
+    _nkToast('eg_cent_stampede', '🐛 STAMPEDE! Get out of its lane!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
     let t = 0, hit = false;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         t += dtS * 1000;
-        if (t >= EG_CENT_STAMPEDE_WARN_MS && !hit) {
+        if (t >= CENT_STAMPEDE_WARN_MS && !hit) {
             band.classList.add('hot');
-            const pr = _egNkPlayerRect();
+            const pr = _nkPlayerRect();
             if (pr) {
-                const top = cy - EG_CENT_STAMPEDE_H / 2, bottom = cy + EG_CENT_STAMPEDE_H / 2;
+                const top = cy - CENT_STAMPEDE_H / 2, bottom = cy + CENT_STAMPEDE_H / 2;
                 if (pr.bottom > top && pr.top < bottom) {
                     hit = true;
-                    const dealt = _egNkHit(EG_CENT_STAMPEDE_DMG[p], null, level);
-                    _egNkAbilityHitToast(dealt, 'The Centipede', 'Stampede');
+                    const dealt = _nkHit(CENT_STAMPEDE_DMG[p], null, level);
+                    _nkAbilityHitToast(dealt, 'The Centipede', 'Stampede');
                 }
             }
         }
-        if (t >= EG_CENT_STAMPEDE_WARN_MS + EG_CENT_STAMPEDE_STRIKE_MS) return false;
+        if (t >= CENT_STAMPEDE_WARN_MS + CENT_STAMPEDE_STRIKE_MS) return false;
         return true;
     });
 }
@@ -586,4 +586,4 @@ export function _egCentStampede(monster) {
 //------------------------------------------------------------------------
 // The old scheduled crossing is now the persistent arena - keep the handler
 // name alive so any stale schedule entry no-ops instead of erroring.
-export function _egMechCentipedeCross() { void 0; }
+export function _mechCentipedeCross() { void 0; }

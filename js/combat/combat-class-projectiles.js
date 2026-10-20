@@ -9,7 +9,7 @@ import { STATE } from '../state.js';
 // css/endgame/projectiles.css). No emojis: every shape is built pointing
 // RIGHT (+x) inside a 44x28 px box so it can always be rotated exactly along
 // the flight vector toward the targeted creature.
-export const EG_CLASS_PROJECTILES = {
+export const CLASS_PROJECTILES = {
     probabilist: {
         cssClass: 'eg-proj-arrow', duration: 900, easing: 'linear', rotOffset: 0,
         build(root) {
@@ -75,14 +75,14 @@ export const EG_CLASS_PROJECTILES = {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-export function _egGetProjectileDef() {
+export function _getProjectileDef() {
     const cls = (typeof STATE !== 'undefined' && STATE.playerClass)
         ? STATE.playerClass.toLowerCase()
         : '_default';
-    return EG_CLASS_PROJECTILES[cls] || EG_CLASS_PROJECTILES._default;
+    return CLASS_PROJECTILES[cls] || CLASS_PROJECTILES._default;
 }
 
-export function _egGetElementCentre(el) {
+export function _getElementCentre(el) {
     const rect = el.getBoundingClientRect();
     return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
@@ -90,8 +90,8 @@ export function _egGetElementCentre(el) {
 // Centre of a monster card ignoring an in-progress melee lunge. The lunge is
 // quicker than a projectile's flight, so aiming at the mid-dash position makes
 // shots land in empty space between the monster and the player.
-export function _egGetElementRestCentre(el) {
-    const c = _egGetElementCentre(el);
+export function _getElementRestCentre(el) {
+    const c = _getElementCentre(el);
     if (el.dataset && el.dataset.egLunging) {
         const m = new DOMMatrix(getComputedStyle(el).transform);
         c.x -= m.m41;
@@ -100,7 +100,7 @@ export function _egGetElementRestCentre(el) {
     return c;
 }
 
-export function _egFireProjectile(visual, cssClass, start, end, duration, easing, onArrive, orient, startScale) {
+export function _fireProjectile(visual, cssClass, start, end, duration, easing, onArrive, orient, startScale) {
     const proj = document.createElement('div');
     proj.className = `eg-projectile ${cssClass}`;
     proj.style.left = '0px';

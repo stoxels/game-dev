@@ -4,34 +4,34 @@
 
 // Compatibility facade for the equipment requirements module surface.
 export {
-    EG_PLAYER_BASE_ATTRIBUTES,
-    _egSumAttributeBonuses,
-    _egComputeLoadoutAttributes,
-    _egFindUnmetRequirements,
-    _egSimulateAndCheck,
-    _egCheckMoveAllowed,
-    _egCanEquipInSlot,
-    _egCheckUnequipSlot,
-    _egFormatRequirementPart,
-    _egGetUnmetRequirementsText,
+    PLAYER_BASE_ATTRIBUTES,
+    _sumAttributeBonuses,
+    _computeLoadoutAttributes,
+    _findUnmetRequirements,
+    _simulateAndCheck,
+    _checkMoveAllowed,
+    _canEquipInSlot,
+    _checkUnequipSlot,
+    _formatRequirementPart,
+    _getUnmetRequirementsText,
 } from './loot-requirements-core.js';
 
 export {
-    _egGetWeaponHands,
-    _egIsTwoHandedWeapon,
-    _egIsOneHandedWeapon,
-    _egIsDualWielding,
-    _egHasShieldEquipped,
-    _egCheckHandCompatibilityInSlot,
-    _egHandErrorMessage,
-    _egHealWeaponHands,
+    _getWeaponHands,
+    _isTwoHandedWeapon,
+    _isOneHandedWeapon,
+    _isDualWielding,
+    _hasShieldEquipped,
+    _checkHandCompatibilityInSlot,
+    _handErrorMessage,
+    _healWeaponHands,
 } from './loot-requirements-weapons.js';
 
 export {
-    _egShowRequirementsToast,
-    _egPreviewEquipAttributes,
-    _egGetSwapChainBreak,
-    _egIsItemBlocked,
-    _egTryAutoUnequipOffhandForTwoHander,
-    _egMigrateIllegalHandsToStash,
+    _showRequirementsToast,
+    _previewEquipAttributes,
+    _getSwapChainBreak,
+    _isItemBlocked,
+    _tryAutoUnequipOffhandForTwoHander,
+    _migrateIllegalHandsToStash,
 } from './loot-requirements-actions.js';

@@ -1,16 +1,16 @@
-import { EG_CURRENCY_DEFS } from './loot-currency.js';
-import { EG_SHARD_DEFS } from './loot-shards.js';
+import { CURRENCY_DEFS } from './loot-currency.js';
+import { SHARD_DEFS } from './loot-shards.js';
 
 //------------------------------------------------------------------------
 //-------------------CURRENCY TAB LAYOUT-----------------------------------
 //------------------------------------------------------------------------
 
 // Fixed dimensions of the Orbs & Shards tab.
-export const EG_CURRENCY_COLS = 5;
-export const EG_CURRENCY_ROWS = 7;
+export const CURRENCY_COLS = 5;
+export const CURRENCY_ROWS = 7;
 
 // Fixed currency and shard positions in the tab.
-export const EG_CURRENCY_SLOT_MAP = {
+export const CURRENCY_SLOT_MAP = {
     'orb_transmutation': { r: 0, c: 0 },
     'orb_augmentation': { r: 0, c: 1 },
     'orb_alteration': { r: 0, c: 2 },
@@ -42,25 +42,25 @@ export const EG_CURRENCY_SLOT_MAP = {
 };
 
 // Reverse lookup from a grid coordinate to its currency id.
-export const EG_CURRENCY_SLOT_REVERSE = (() => {
+export const CURRENCY_SLOT_REVERSE = (() => {
     const reverse = {};
-    for (const [id, pos] of Object.entries(EG_CURRENCY_SLOT_MAP)) reverse[`${pos.r}-${pos.c}`] = id;
+    for (const [id, pos] of Object.entries(CURRENCY_SLOT_MAP)) reverse[`${pos.r}-${pos.c}`] = id;
     return reverse;
 })();
 
 // Returns the fixed position for a currency id.
-export function _egCurrencySlotForId(id) {
-    return EG_CURRENCY_SLOT_MAP[id] || null;
+export function _currencySlotForId(id) {
+    return CURRENCY_SLOT_MAP[id] || null;
 }
 
 // Returns the currency id assigned to a grid coordinate.
-export function _egCurrencyIdForSlot(r, c) {
-    return EG_CURRENCY_SLOT_REVERSE[`${r}-${c}`] || null;
+export function _currencyIdForSlot(r, c) {
+    return CURRENCY_SLOT_REVERSE[`${r}-${c}`] || null;
 }
 
 // Returns the definition for an orb or shard id.
-export function _egCurrencyDefForId(id) {
-    if (typeof EG_CURRENCY_DEFS !== 'undefined' && EG_CURRENCY_DEFS[id]) return EG_CURRENCY_DEFS[id];
-    if (typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS[id]) return EG_SHARD_DEFS[id];
+export function _currencyDefForId(id) {
+    if (typeof CURRENCY_DEFS !== 'undefined' && CURRENCY_DEFS[id]) return CURRENCY_DEFS[id];
+    if (typeof SHARD_DEFS !== 'undefined' && SHARD_DEFS[id]) return SHARD_DEFS[id];
     return null;
 }

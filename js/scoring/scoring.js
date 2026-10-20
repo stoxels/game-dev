@@ -12,16 +12,16 @@ import { WORLD_START_GI } from '../levels/levels.js';
 import { checkWorldCompletion } from '../classes/class-ui.js';
 import { isConvergenceLevel as _questIsConvergenceLevel } from './scoring-core.js';
 import { Audio_Manager } from '../audio/audio.js';
-import { _egIsActive } from '../combat/combat-state.js';
-import { _egOnPuzzleComplete } from '../combat/encounter-chain.js';
-import { _egGauntletPlayable, startGauntlet } from '../combat/gauntlet.js';
+import { _isActive } from '../combat/combat-state.js';
+import { _onPuzzleComplete } from '../combat/encounter-chain.js';
+import { _gauntletPlayable, startGauntlet } from '../combat/gauntlet.js';
 import { resetRecursionistState } from '../classes/class-recursionist.js';
 import { _arcaneFreeze_clearAllFrostAndStalagmites } from '../classes/class-mathmagician-absolute-zero.js';
 import { _endBlackSwan } from '../classes/class-outlier-black-swan.js';
 import { triggerBanter } from '../sprite/character-banter.js';
 import { checkWorldCodes, checkWorldCodesSync } from '../codes.js';
 import { showQuiz } from '../quiz-exercise/quiz.js';
-import { _egGrantCampaignLevelXP } from '../endgame/endgame-leveling.js';
+import { _grantCampaignLevelXP } from '../endgame/endgame-leveling.js';
 
 //------------------------------------------------------------------------
 //-------------------SCORING ORCHESTRATOR (scoring.js)---------------------
@@ -80,11 +80,11 @@ function checkWin() {
     // Monster levels hand off to the encounter chain instead of the normal
     // win flow. Campaign levels also run monsters (cur.campaignMonsters) but
     // must still complete as normal puzzle levels, so they are excluded.
-    if (_egIsActive()
+    if (_isActive()
         && !(cur && cur.campaignMonsters)) {
         globalThis.dead = true;
         stopTimer();
-        _egOnPuzzleComplete();
+        _onPuzzleComplete();
         return;           // skip all normal scoring / overlay logic
     }
 
@@ -92,9 +92,9 @@ function checkWin() {
     // encounter flag has flipped (initial puzzle only). The normal
     // win/scoring path must NOT run - the puzzle belongs to the encounter
     // chain (question modal → countdown → next puzzle). Suppress the normal
-    // overlay here; _doStartLevel() will hand off to _egOnPuzzleComplete
+    // overlay here; _doStartLevel() will hand off to _onPuzzleComplete
     // immediately after it starts the encounter.
-    if (window._egIsMapDeviceRun && cur && cur.isMonsterLevel && !_egIsActive()) {
+    if (window._egIsMapDeviceRun && cur && cur.isMonsterLevel && !_isActive()) {
         return;
     }
 
@@ -121,9 +121,9 @@ function checkWin() {
     if (isFirstClear) STATE.done.push(gi);
 
     // Campaign XP: a first clear grants the full amount, a replay a fraction
-    // of it (see _egGrantCampaignLevelXP / EG_LEVELING_CONFIG). Endgame map
-    // runs return above via _egOnPuzzleComplete and never reach this path.
-    try { _egGrantCampaignLevelXP(gi, isFirstClear); } catch (e) {}
+    // of it (see _grantCampaignLevelXP / LEVELING_CONFIG). Endgame map
+    // runs return above via _onPuzzleComplete and never reach this path.
+    try { _grantCampaignLevelXP(gi, isFirstClear); } catch (e) {}
 
     _wdSyncSpriteToLevel(gi);    // move sprite to the just completed level
 
@@ -208,7 +208,7 @@ function checkWin() {
 
     Audio_Manager.playSFX('win');
 
-    if (cur.bonusType === 'gauntlet' && _egGauntletPlayable()) {
+    if (cur.bonusType === 'gauntlet' && _gauntletPlayable()) {
         // Gauntlet bonus: the arena opens over the solved grid; the win
         // overlay (and its rewards) follow once the arena reports back.
         const levelAtWin = cur;

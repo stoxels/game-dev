@@ -562,7 +562,7 @@ export function isSkillUsableNow(skillId) {
 //--------------------------DAMAGE ESTIMATE-------------------------------
 //------------------------------------------------------------------------
 // Puzzle abilities deal damage through the reveal projectiles they fire
-// (see _egOnProgrammaticReveal in endgame-class-projectiles.js). The tooltip
+// (see _onProgrammaticReveal in endgame-class-projectiles.js). The tooltip
 // shows: per-projectile range × number of projectiles.
 //
 // Inside an endgame encounter the per-projectile hit is derived from the
@@ -572,12 +572,12 @@ export function isSkillUsableNow(skillId) {
 
 // Returns the live per-projectile reveal damage, or null when unavailable.
 function _skillLiveRevealDamage() {
-    if (typeof globalThis._egGetRevealProjectileDamagePct !== 'function') return null;
-    if (typeof globalThis._egIsActive !== 'function' || !globalThis._egIsActive()) return null;
-    if (typeof globalThis._egCalcPlayerDamage !== 'function') return null;
+    if (typeof globalThis._getRevealProjectileDamagePct !== 'function') return null;
+    if (typeof globalThis._isActive !== 'function' || !globalThis._isActive()) return null;
+    if (typeof globalThis._calcPlayerDamage !== 'function') return null;
     try {
-        const pct = globalThis._egGetRevealProjectileDamagePct() / 100;
-        const rolled = globalThis._egCalcPlayerDamage();
+        const pct = globalThis._getRevealProjectileDamagePct() / 100;
+        const rolled = globalThis._calcPlayerDamage();
         const hit = Math.max(1, Math.round(rolled * pct));
         return { min: hit, max: hit };
     } catch (e) {
@@ -877,7 +877,7 @@ export function activateSkill(skillId, opts) {
         return false;
     }
     // Stunned heroes cannot cast (the stun interrupts and locks actions briefly).
-    if (Date.now() < (Number(globalThis._egPlayerStunnedUntil) || 0)) {
+    if (Date.now() < (Number(globalThis._playerStunnedUntil) || 0)) {
         if (typeof globalThis.showToast === 'function') globalThis.showToast(t('eg_stunned'), '#ff6b9d');
         return false;
     }

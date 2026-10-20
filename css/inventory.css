@@ -386,7 +386,7 @@
     user-select: none;
 }
 
-/* 5f2 - Puzzle-item art (images/items manifest via EG_ART): scale exactly
+/* 5f2 - Puzzle-item art (images/items manifest via GAME_ART): scale exactly
    like the emoji fallback it replaces, so slots never change size. */
 .inv-slot-icon img.eg-art-img {
     width: 1.5em;

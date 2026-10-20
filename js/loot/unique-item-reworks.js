@@ -24,7 +24,7 @@
 // uniques stack with the tree and tooltips are generated from the registry.
 // Label placeholders: '#' = signed value, '{a}' = absolute value.
 
-import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';
+import { ALL_BASE_TYPES } from './equipment-base-items.js';
 
 // key -> [EN, DE] default line templates (positive form; negative values
 // render with a minus sign through the '+#' placeholder).
@@ -146,7 +146,7 @@ const down = (key, value, en, de) => ({
 });
 
 // uniqueId -> replacement stat block. `v2: true` is added on merge.
-export const EG_UNIQUE_REWORKS = {
+export const UNIQUE_REWORKS = {
 
     // ── BIS: best stat stick for the slot, tiny or no downside ───────────
 
@@ -705,7 +705,7 @@ const COMPACT_REWORKS = {
     vampiric_fang: ['S', 'life_leech inc_physical_damage accuracy', 'life_leech_effect_inc:35 leech_effect_recent_crit:30 life_leech_instant', 'life_regen -.25'],
     worldsplitter: ['W', 'inc_physical_damage stagger crit_chance', 'melee_aoe_pct:30 stun_chance:15 melee_double_damage_chance:12 area_damage_inc:20', ''],
 };
-Object.assign(EG_UNIQUE_REWORKS, COMPACT_REWORKS);
+Object.assign(UNIQUE_REWORKS, COMPACT_REWORKS);
 
 // ── Generated reworks ────────────────────────────────────────────────────
 // Compact form: id: [role, keepKeys, effects, downside]
@@ -834,7 +834,7 @@ function levelOfBase(b) { return (b.requirements && b.requirements.level) || b.m
 
 function upgradeBase(def) {
     const level = (def.minLevel || 1) + 2;
-    const bases = EG_ALL_BASE_TYPES.filter(b => b.slotType === def.slotType && levelOfBase(b) <= level);
+    const bases = ALL_BASE_TYPES.filter(b => b.slotType === def.slotType && levelOfBase(b) <= level);
     if (!bases.length) return;
     if (def.defenses) {
         const kinds = ['armour', 'evasion', 'absorption'].filter(k => def.defenses[k] > 0);
@@ -910,16 +910,16 @@ function normalizeTimers(def) {
 
 // Applies the rework table onto the base definition array (mutates entries in
 // place so importers see the reworked stats). Returns the number applied;
-// unknown keep keys are collected in EG_UNIQUE_REWORK_PROBLEMS (tested).
-export const EG_UNIQUE_REWORK_PROBLEMS = [];
+// unknown keep keys are collected in UNIQUE_REWORK_PROBLEMS (tested).
+export const UNIQUE_REWORK_PROBLEMS = [];
 export function applyUniqueReworks(items) {
     let applied = 0;
-    EG_UNIQUE_REWORK_PROBLEMS.length = 0;
+    UNIQUE_REWORK_PROBLEMS.length = 0;
     for (const def of items) {
-        const rework = EG_UNIQUE_REWORKS[def.uniqueId];
+        const rework = UNIQUE_REWORKS[def.uniqueId];
         if (!rework) continue;
         if (Array.isArray(rework)) {
-            generateStats(def, rework, EG_UNIQUE_REWORK_PROBLEMS);
+            generateStats(def, rework, UNIQUE_REWORK_PROBLEMS);
         } else {
             delete def.downsides;
             delete def.effects;

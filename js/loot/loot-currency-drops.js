@@ -5,12 +5,12 @@
 // Drop weights, the normal/boss drop chances, and the weighted roll
 // that turns a monster death into one orb on the grid.
 
-import { _egSpawnCurrencyDrop } from '../combat/combat-grid-pickups-currency.js';
+import { _spawnCurrencyDrop } from '../combat/combat-grid-pickups-currency.js';
 import { _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
-import { EG_CURRENCY_DEFS } from './loot-currency.js';
+import { CURRENCY_DEFS } from './loot-currency.js';
 
 
-export const EG_CURRENCY_DROP_TABLE = [
+export const CURRENCY_DROP_TABLE = [
     { id: 'orb_transmutation', weight: 180 },
     { id: 'orb_augmentation', weight: 300 },
     { id: 'orb_alteration', weight: 380 },
@@ -36,34 +36,34 @@ export const EG_CURRENCY_DROP_TABLE = [
     { id: 'orb_ancient', weight: 4 },
 ];
 
-export const EG_CURRENCY_DROP_CHANCE_NORMAL = 0.25; // 25% per normal kill
-export const EG_CURRENCY_DROP_CHANCE_BOSS = 0.90;   // bosses almost always drop one
+export const CURRENCY_DROP_CHANCE_NORMAL = 0.25; // 25% per normal kill
+export const CURRENCY_DROP_CHANCE_BOSS = 0.90;   // bosses almost always drop one
 
-export function _egRollCurrencyDef() {
-    const total = EG_CURRENCY_DROP_TABLE.reduce((s, e) => s + e.weight, 0);
+export function _rollCurrencyDef() {
+    const total = CURRENCY_DROP_TABLE.reduce((s, e) => s + e.weight, 0);
     let roll = Math.random() * total;
-    for (const entry of EG_CURRENCY_DROP_TABLE) {
+    for (const entry of CURRENCY_DROP_TABLE) {
         roll -= entry.weight;
-        if (roll <= 0) return EG_CURRENCY_DEFS[entry.id];
+        if (roll <= 0) return CURRENCY_DEFS[entry.id];
     }
-    return EG_CURRENCY_DEFS.orb_transmutation;
+    return CURRENCY_DEFS.orb_transmutation;
 }
 
 
 // Called on monster death (see endgame-encounter.js edit below).
 // Orbs now land on the grid and must be picked up, just like equipment loot.
 // force - skip the chance roll (the kill handler already picked this bucket).
-export function _egTryDropCurrency(isBoss, force = false) {
-    const baseChance = isBoss ? EG_CURRENCY_DROP_CHANCE_BOSS : EG_CURRENCY_DROP_CHANCE_NORMAL;
+export function _tryDropCurrency(isBoss, force = false) {
+    const baseChance = isBoss ? CURRENCY_DROP_CHANCE_BOSS : CURRENCY_DROP_CHANCE_NORMAL;
     // Active map's loot quantity bonus scales the drop chance up.
     const qtyMult = (typeof _egMapLootQuantityMult === 'function') ? _egMapLootQuantityMult() : 1;
     const chance = Math.min(1, baseChance * qtyMult);
     if (!force && Math.random() > chance) return;
 
-    const def = _egRollCurrencyDef();
+    const def = _rollCurrencyDef();
     if (!def) return;
 
-    if (typeof _egSpawnCurrencyDrop === 'function') {
-        _egSpawnCurrencyDrop(def);
+    if (typeof _spawnCurrencyDrop === 'function') {
+        _spawnCurrencyDrop(def);
     }
 }

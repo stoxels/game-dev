@@ -4,45 +4,45 @@
 
 // Compatibility facade for the crafting bench's historical module surface.
 export {
-    EG_CRAFTED_MOD_CAPS,
-    _egCraftingBenchScroll,
-    _egCraftingBenchSelection,
+    CRAFTED_MOD_CAPS,
+    _craftingBenchScroll,
+    _craftingBenchSelection,
 } from './loot-crafting-bench-state.js';
 
 export {
-    _egCountCraftedMods,
-    _egCountRegularMods,
-    _egCraftCurrencyCount,
-    _egCraftingBenchCanAfford,
-    _egCraftingBenchCanUseItem,
-    _egCraftingBenchCostLabel,
-    _egCraftingBenchCostTooltip,
-    _egCraftingBenchEffectiveCosts,
-    _egCraftingBenchFamilies,
-    _egCraftingBenchTypeState,
+    _countCraftedMods,
+    _countRegularMods,
+    _craftCurrencyCount,
+    _craftingBenchCanAfford,
+    _craftingBenchCanUseItem,
+    _craftingBenchCostLabel,
+    _craftingBenchCostTooltip,
+    _craftingBenchEffectiveCosts,
+    _craftingBenchFamilies,
+    _craftingBenchTypeState,
 } from './loot-crafting-bench-rules.js';
 
 export {
-    _egCraftingBenchBindTooltips,
-    _egCraftingBenchBuildHTML,
-    _egCraftingBenchCapacityHTML,
-    _egCraftingBenchCostHTML,
-    _egCraftingBenchTierLabel,
-    _egCraftingBenchTooltipHTML,
+    _craftingBenchBindTooltips,
+    _craftingBenchBuildHTML,
+    _craftingBenchCapacityHTML,
+    _craftingBenchCostHTML,
+    _craftingBenchTierLabel,
+    _craftingBenchTooltipHTML,
 } from './loot-crafting-bench-render.js';
 
 export {
-    _egCloseCraftingBench,
-    _egCraftingBenchBindDrop,
-    _egCraftingBenchRestoreScroll,
-    _egCraftingBenchSyncScrollStore,
-    _egEnsureCraftingBenchOverlay,
-    _egOpenCraftingBench,
-    _egRefreshCraftingBench,
+    _closeCraftingBench,
+    _craftingBenchBindDrop,
+    _craftingBenchRestoreScroll,
+    _craftingBenchSyncScrollStore,
+    _ensureCraftingBenchOverlay,
+    _openCraftingBench,
+    _refreshCraftingBench,
 } from './loot-crafting-bench-overlay.js';
 
 export {
-    _egCraftingBenchApply,
-    _egCraftingBenchSelect,
-    _egSetCraftingBenchItem,
+    _craftingBenchApply,
+    _craftingBenchSelect,
+    _setCraftingBenchItem,
 } from './loot-crafting-bench-apply.js';

@@ -243,7 +243,7 @@ function _getAscendencyTreeCooldownReduction(slot) {
 }
 
 // Maps every class/ascendency active slot to its arcane cooldown family.
-// One family per skill - mods roll on the arcane slot (EG_MOD_TABLE_ARCANE).
+// One family per skill - mods roll on the arcane slot (MOD_TABLE_ARCANE).
 const BASE_SKILL_COOLDOWN_FAMILY = {
     mathmagician: { active1: 'cooldown_arcane_reveal', active2: 'cooldown_absolute_zero' },
     statistician: { active1: 'cooldown_data_strike', active2: 'cooldown_diagonal_strike' },
@@ -265,7 +265,7 @@ const ASCENDENCY_SKILL_COOLDOWN_FAMILY = {
 // carry the mod (future-proof - loop all equipped items).
 function _getEquipmentCooldownReduction(slot) {
     if (slot === 'active5') return 0;
-    if (typeof globalThis._egEquipped === 'undefined' || !globalThis._egEquipped) return 0;
+    if (typeof globalThis._equipped === 'undefined' || !globalThis._equipped) return 0;
 
     let familyId = null;
     if (slot === 'active1' || slot === 'active2') {
@@ -280,7 +280,7 @@ function _getEquipmentCooldownReduction(slot) {
     if (!familyId) return 0;
 
     let total = 0;
-    for (const item of Object.values(globalThis._egEquipped)) {
+    for (const item of Object.values(globalThis._equipped)) {
         if (!item || !Array.isArray(item.mods)) continue;
         for (const mod of item.mods) {
             if (mod.familyId !== familyId) continue;

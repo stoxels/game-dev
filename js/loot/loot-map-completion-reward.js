@@ -1,15 +1,15 @@
 import { EG_ATLAS_MAX_TIER } from '../endgame/endgame-atlas.js';
-import { egAddCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
-import { egSaveHubState } from '../endgame/endgame-hub.js';
-import { _egAddItemToStash } from '../endgame/hub-stash.js';
-import { _egGetPlayerLevel } from '../endgame/endgame-leveling.js';
-import { _egGenerateEquipmentDrop } from './loot-equipment-generator.js';
+import { addCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
+import { saveHubState } from '../endgame/endgame-hub.js';
+import { _addItemToStash } from '../endgame/hub-stash.js';
+import { _getPlayerLevel } from '../endgame/endgame-leveling.js';
+import { _generateEquipmentDrop } from './loot-equipment-generator.js';
 import { _egAddMapToMapStash } from './loot-map-drops.js';
 import { _egGenerateMapDrop } from './loot-maps.js';
-import { egAddEssence } from './loot-essences-stash.js';
-import { EG_CURRENCY_DEFS } from './loot-currency.js';
-import { _EG_ESSENCE_FAMILIES } from './loot-essences.js';
-import { EG_ESSENCE_DEFS } from './loot-essences-defs.js';
+import { addEssence } from './loot-essences-stash.js';
+import { CURRENCY_DEFS } from './loot-currency.js';
+import { _ESSENCE_FAMILIES } from './loot-essences.js';
+import { ESSENCE_DEFS } from './loot-essences-defs.js';
 
 //----------------------------------------------------------------------
 //------------------------MAP COMPLETION REWARD-------------------------
@@ -56,7 +56,7 @@ export const EG_MAP_COMPLETION_REWARD_POOL = [
 export const EG_MAP_COMPLETION_ESSENCE_POOL = [];
 export function _egHydrateMapCompletionEssencePool() {
     if (EG_MAP_COMPLETION_ESSENCE_POOL.length) return EG_MAP_COMPLETION_ESSENCE_POOL;
-    for (const fid of _EG_ESSENCE_FAMILIES) {
+    for (const fid of _ESSENCE_FAMILIES) {
         EG_MAP_COMPLETION_ESSENCE_POOL.push({ id: 'essence_' + fid, weight: 5 });
     }
     return EG_MAP_COMPLETION_ESSENCE_POOL;
@@ -79,7 +79,7 @@ export function _egGetMapCompletionRewardPool() {
 
 // Resolves a completion-reward def from either currency table.
 export function _egGetCompletionRewardDef(id) {
-    return EG_CURRENCY_DEFS[id] || EG_ESSENCE_DEFS[id] || null;
+    return CURRENCY_DEFS[id] || ESSENCE_DEFS[id] || null;
 }
 
 // Rolls the completion reward for a map → { id, count }. The count scales
@@ -150,7 +150,7 @@ function _egScriptedPick(list, weightOf) {
 
 // The level guaranteed rewards are rolled at: the player's own level.
 export function _egScriptedLootLevel() {
-    return Math.max(1, Math.round(Number(_egGetPlayerLevel()) || 1));
+    return Math.max(1, Math.round(Number(_getPlayerLevel()) || 1));
 }
 
 // Grants one guaranteed loot reward straight into the hub stashes and
@@ -158,29 +158,29 @@ export function _egScriptedLootLevel() {
 // usable for the hover tooltip) for the caller to display
 // (null when nothing could be granted). kind: equipment | core | essence |
 // map. `level` is the power level to roll at; `tier` only matters for maps.
-export function egGrantScriptedLoot(kind, level, tier) {
+export function grantScriptedLoot(kind, level, tier) {
     level = Math.max(1, Math.round(Number(level) || 1));
-    if (typeof globalThis._egLoadHubState === 'function') globalThis._egLoadHubState();
+    if (typeof globalThis._loadHubState === 'function') globalThis._loadHubState();
     let result = null;
     if (kind === 'equipment') {
-        const item = _egGenerateEquipmentDrop(level, Math.random() < 0.6 ? 'uncommon' : 'rare');
+        const item = _generateEquipmentDrop(level, Math.random() < 0.6 ? 'uncommon' : 'rare');
         if (item) {
-            _egAddItemToStash(item);
+            _addItemToStash(item);
             result = { kind, icon: item.icon, name: item.name, rarity: item.rarity, count: 1, item };
         }
     } else if (kind === 'core') {
-        const pool = EG_SCRIPTED_CORE_POOL.filter(e => level >= e[2] && EG_CURRENCY_DEFS[e[0]]);
+        const pool = EG_SCRIPTED_CORE_POOL.filter(e => level >= e[2] && CURRENCY_DEFS[e[0]]);
         const [id, , , lo, hi] = _egScriptedPick(pool, e => e[1]);
-        const def = EG_CURRENCY_DEFS[id];
+        const def = CURRENCY_DEFS[id];
         const count = lo + Math.floor(Math.random() * (hi - lo + 1));
-        if (egAddCurrency(id, count, { name: def.name, icon: def.icon, rarity: 'currency', category: 'currency', description: def.description })) {
+        if (addCurrency(id, count, { name: def.name, icon: def.icon, rarity: 'currency', category: 'currency', description: def.description })) {
             result = { kind, icon: def.icon, name: def.name, rarity: 'currency', count, item: { ...def, id, category: 'currency', count } };
         }
     } else if (kind === 'essence') {
         _egHydrateMapCompletionEssencePool();
         const entry = _egScriptedPick(EG_MAP_COMPLETION_ESSENCE_POOL, e => e.weight);
-        const def = EG_ESSENCE_DEFS[entry.id];
-        if (def && egAddEssence(entry.id, 1, def)) {
+        const def = ESSENCE_DEFS[entry.id];
+        if (def && addEssence(entry.id, 1, def)) {
             result = { kind, icon: def.icon, name: def.name, rarity: 'essence', count: 1, item: { ...def, id: entry.id, category: 'essence', count: 1 } };
         }
     } else if (kind === 'map') {
@@ -189,7 +189,7 @@ export function egGrantScriptedLoot(kind, level, tier) {
             result = { kind, icon: map.icon || '🗺️', name: map.name, rarity: map.rarity || 'common', count: 1, item: map };
         }
     }
-    if (result) egSaveHubState();
+    if (result) saveHubState();
     return result;
 }
 

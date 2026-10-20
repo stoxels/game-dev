@@ -23,7 +23,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { cur } from '../state.js';
 
-try { Object.defineProperty(globalThis, '_egTooltipItem', { get() { return _egTooltipItem; }, set(v) { _egTooltipItem = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_tooltipItem', { get() { return _tooltipItem; }, set(v) { _tooltipItem = v; }, configurable: true }); } catch (e) {}
 
 import { buildClassHUD } from '../classes/class-hud.js';
 import { _getPlayerMaxMana, updateClassHUDManaBar } from '../classes/class-mana.js';
@@ -31,28 +31,28 @@ import { switchScreen } from '../screens/screens.js';
 import { renderSkillHotbar } from '../skills/skill-hotbar.js';
 import { pauseTimer, resumeTimer } from '../timer/timer.js';
 import { LANG, t } from '../translation/translations.js';
-import { EG_ART } from './endgame-art.js';
-import { _egShowTooltip } from '../loot/loot-currency-tooltip.js';
-import { _egOnPause, _egOnResume } from '../combat/encounter-tick-support.js';
-import { _egGetEncounterBaseLevel, _egGetTarget, _egRenderPanel } from '../combat/encounter.js';
-import { _egBuildEssenceTabHTML, _egRenderEssenceStash } from '../loot/loot-essences-render.js';
+import { GAME_ART } from './endgame-art.js';
+import { _showHubTooltip } from '../loot/loot-currency-tooltip.js';
+import { _onPause, _onResume } from '../combat/encounter-tick-support.js';
+import { _getEncounterBaseLevel, _getTarget, _renderPanel } from '../combat/encounter.js';
+import { _buildEssenceTabHTML, _renderEssenceStash } from '../loot/loot-essences-render.js';
 import { _egRenderMapSlot, _egRenderMapStash } from './endgame-gate.js';
-import { _egFlushRunLootToStash } from '../combat/combat-grid-pickups-loot.js';
-import { _egBindDragEvents, _egRenderCurrencyCell } from './endgame-hub-drag-and-drop.js';
-import { _egBuildTooltipBodyHTML, _egClearTooltip } from './endgame-hub-tooltips.js';
-import { _egEnsureUniqueStash, _egGetUniqueCount, _egIsUniqueCollected, _egMoveUniqueToInventory, _egUpdateUniqueTabBadge } from './endgame-hub-uniques.js';
-import { EG_LEVELING_CONFIG, _egGetPlayerLevel, _egRenderLevelHUD } from './endgame-leveling.js';
+import { _flushRunLootToStash } from '../combat/combat-grid-pickups-loot.js';
+import { _bindDragEvents, _renderCurrencyCell } from './endgame-hub-drag-and-drop.js';
+import { _buildTooltipBodyHTML, _clearTooltip } from './endgame-hub-tooltips.js';
+import { _ensureUniqueStash, _getUniqueCount, _isUniqueCollected, _moveUniqueToInventory, _updateUniqueTabBadge } from './endgame-hub-uniques.js';
+import { LEVELING_CONFIG, _getPlayerLevel, _renderLevelHUD } from './endgame-leveling.js';
 import { _egMapPlayerLifeMult } from './endgame-map-launch.js';
 import { showEndgameNexus } from './endgame-nexus.js';
-import { EG_PLAYER_STATS, _egBuildGroupedStats, _egCalcAccuracyMissChance, _egCalcArmourReductionPct, _egCalcEvasionDodgeChance, _egComputePlayerStats } from './endgame-player-stats.js';
-import { _egIsItemBlocked } from '../loot/loot-requirements.js';
-import { EG_CURRENCY_COLS, EG_CURRENCY_ROWS, _egBuildCraftingBenchSlotHTML, _egCurrencyDefForId, _egCurrencyIdForSlot, _egCurrencyStash } from '../loot/hub-currency.js';
-import { _egPendingHandMigrationToast, _egShowHandMigrationToast } from './hub-save.js';
-import { _egCancelMassSellConfirm, _egCloseMassSellModal, _egInjectMassSellStyles } from './hub-mass-sell-modal.js';
-import { _egBuildItemChipHTML, _egShowItemLevel } from './hub-mass-sell.js';
-import { EG_INV_COLS, _egEnsureInvRows, _egEquipped, _egGetInvCapacity, _egGetInvRows, _egInventory, _egStashTab } from './hub-stash.js';
-import { _egBuildTopbarHTML, _egUpdateItemLevelToggleButton, _egUpdatePassiveTreeButton } from './hub-topbar.js';
-import { EG_UNIQUE_ITEMS } from '../loot/unique-item-data.js';
+import { PLAYER_STATS, _buildGroupedStats, _calcAccuracyMissChance, _calcArmourReductionPct, _calcEvasionDodgeChance, _computePlayerStats } from './endgame-player-stats.js';
+import { _isItemBlocked } from '../loot/loot-requirements.js';
+import { CURRENCY_COLS, CURRENCY_ROWS, _buildCraftingBenchSlotHTML, _currencyDefForId, _currencyIdForSlot, _currencyStash } from '../loot/hub-currency.js';
+import { _pendingHandMigrationToast, _showHandMigrationToast } from './hub-save.js';
+import { _cancelMassSellConfirm, _closeMassSellModal, _injectMassSellStyles } from './hub-mass-sell-modal.js';
+import { _buildItemChipHTML, _showItemLevel } from './hub-mass-sell.js';
+import { INV_COLS, _ensureInvRows, _equipped, _getInvCapacity, _getInvRows, _inventory, _stashTab } from './hub-stash.js';
+import { _buildTopbarHTML, _updateItemLevelToggleButton, _updatePassiveTreeButton } from './hub-topbar.js';
+import { UNIQUE_ITEMS } from '../loot/unique-item-data.js';
 
 
 //------------------------------------------------------------------------
@@ -76,7 +76,7 @@ import { EG_UNIQUE_ITEMS } from '../loot/unique-item-data.js';
 
 // Equipment slot definitions - each entry maps a slot id to its icon and
 // which column of the paperdoll it belongs to (left / right / bottom).
-export const EG_EQUIP_SLOTS = [
+export const EQUIP_SLOTS = [
     // Left column (top → bottom)
     { id: 'head', icon: '👑', col: 'left' },
     { id: 'earring1', icon: '💎', col: 'left' },
@@ -105,7 +105,7 @@ export const EG_EQUIP_SLOTS = [
 
 
 // Tooltip state: tracks which item is currently being previewed in the tooltip panel
-let _egTooltipItem = null;
+let _tooltipItem = null;
 
 
 
@@ -116,7 +116,7 @@ let _egTooltipItem = null;
 //------------------------------------------------------------------------
 
 // Builds a single equipment slot div (the outer drop-target container).
-export function _egBuildEquipSlotHTML(slot) {
+export function _buildEquipSlotHTML(slot) {
     return `
 <div class="eg-equip-slot"
      id="eg-equip-slot-${slot.id}"
@@ -132,16 +132,16 @@ export function _egBuildEquipSlotHTML(slot) {
 }
 
 // Builds all equipment slot divs for a given paperdoll column.
-export function _egBuildEquipColHTML(col) {
-    return EG_EQUIP_SLOTS
+export function _buildEquipColHTML(col) {
+    return EQUIP_SLOTS
         .filter(s => s.col === col)
-        .map(s => _egBuildEquipSlotHTML(s))
+        .map(s => _buildEquipSlotHTML(s))
         .join('');
 }
 
 // Assembles the full character panel: offense stats (upper left), left slots,
 // center puzzle stats, right slots, defense stats (upper right), weapon row.
-export function _egBuildCharPanelHTML() {
+export function _buildCharPanelHTML() {
     return `
 <div class="eg-panel eg-panel-char">
     <div class="eg-panel-label eg-char-label-row"><span>${t('eg_char_label')}</span><span id="eg-char-level-inline"></span></div>
@@ -151,14 +151,14 @@ export function _egBuildCharPanelHTML() {
             <div class="eg-stats-list" id="eg-offense-stats-list"></div>
         </div>
         <div class="eg-equip-col eg-equip-left" id="eg-equip-left">
-            ${_egBuildEquipColHTML('left')}
+            ${_buildEquipColHTML('left')}
         </div>
         <div class="eg-char-stats-panel" id="eg-char-stats-panel">
             <div class="eg-stats-header">${t('eg_stats_label')}</div>
             <div class="eg-stats-list" id="eg-stats-list"></div>
         </div>
         <div class="eg-equip-col eg-equip-right" id="eg-equip-right">
-            ${_egBuildEquipColHTML('right')}
+            ${_buildEquipColHTML('right')}
         </div>
         <div class="eg-stat-block" id="eg-stats-defense">
             <div class="eg-stats-header">${t('eg_stats_defense_label')}</div>
@@ -166,7 +166,7 @@ export function _egBuildCharPanelHTML() {
         </div>
     </div>
     <div class="eg-equip-bottom-row" id="eg-equip-bottom">
-        ${_egBuildEquipColHTML('bottom')}
+        ${_buildEquipColHTML('bottom')}
     </div>
 </div>`;
 }
@@ -178,16 +178,16 @@ export function _egBuildCharPanelHTML() {
 
 // Builds a single currency stash cell div (drop target).
 // Empty assigned slots get a faint icon + hover tooltip stating the assigned orb/shard name.
-export function _egBuildCurrencyCellHTML(row, col) {
+export function _buildCurrencyCellHTML(row, col) {
     // Placeholder tooltip handled via JS hover helpers; cell carries data for empty display.
     return `
 <div class="eg-inv-cell eg-currency-cell"
      id="eg-currency-cell-${row}-${col}"
      data-row="${row}" data-col="${col}"
      data-eg-dropzone="currency"
-     onmouseenter="_egOnCurrencyCellEnter(${row}, ${col}, event)"
-     onmousemove="_egOnCurrencyCellMove(event)"
-     onmouseleave="_egOnCurrencyCellLeave()"
+     onmouseenter="_onCurrencyCellEnter(${row}, ${col}, event)"
+     onmousemove="_onCurrencyCellMove(event)"
+     onmouseleave="_onCurrencyCellLeave()"
      ondragover="egDragOver(event)"
      ondrop="egDropOnCurrency(event, ${row}, ${col})"
      ondragleave="egDragLeave(event)">
@@ -195,49 +195,49 @@ export function _egBuildCurrencyCellHTML(row, col) {
 }
 
 // Builds the full currency grid by iterating over all rows and columns.
-export function _egBuildCurrencyGridHTML() {
+export function _buildCurrencyGridHTML() {
     let html = '';
-    for (let r = 0; r < EG_CURRENCY_ROWS; r++) {
-        for (let c = 0; c < EG_CURRENCY_COLS; c++) {
-            html += _egBuildCurrencyCellHTML(r, c);
+    for (let r = 0; r < CURRENCY_ROWS; r++) {
+        for (let c = 0; c < CURRENCY_COLS; c++) {
+            html += _buildCurrencyCellHTML(r, c);
         }
     }
     return html;
 }
 
 // Hub: left-side Orbs & Shards panel (currency tab style)
-export function _egBuildCurrencyPanelHTML() {
+export function _buildCurrencyPanelHTML() {
     return `
 <div class="eg-currency-col">
     <div class="eg-panel-label">${t('eg_runes_orbs')}</div>
     <div class="eg-currency-grid" id="eg-currency-grid"
-         style="grid-template-columns: repeat(${EG_CURRENCY_COLS}, 1fr);">
-        ${_egBuildCurrencyGridHTML()}
+         style="grid-template-columns: repeat(${CURRENCY_COLS}, 1fr);">
+        ${_buildCurrencyGridHTML()}
     </div>
-    ${_egBuildCraftingBenchSlotHTML()}
+    ${_buildCraftingBenchSlotHTML()}
 </div>`;
 }
 
 // Gate: horizontal Orbs & Shards strip (same fixed slots, shared data)
-export function _egBuildCurrencyStripHTML() {
+export function _buildCurrencyStripHTML() {
     return `
 <div class="eg-currency-strip">
     <div class="eg-panel-label">${t('eg_runes_orbs')}</div>
     <div class="eg-currency-row" id="eg-currency-grid"
-         style="grid-template-columns: repeat(${EG_CURRENCY_COLS}, 1fr);">
-        ${_egBuildCurrencyGridHTML()}
+         style="grid-template-columns: repeat(${CURRENCY_COLS}, 1fr);">
+        ${_buildCurrencyGridHTML()}
     </div>
 </div>`;
 }
 
 // Hover helpers for empty assigned slots - show placeholder name without needing an item.
-export function _egOnCurrencyCellEnter(row, col, e) {
+export function _onCurrencyCellEnter(row, col, e) {
     document.getElementById(`eg-currency-cell-${row}-${col}`);
-    const item = _egCurrencyStash[row] && _egCurrencyStash[row][col];
+    const item = _currencyStash[row] && _currencyStash[row][col];
     if (item) return; // occupied → chip's own onmouseenter handles tooltip
-    const assignedId = _egCurrencyIdForSlot(row, col);
+    const assignedId = _currencyIdForSlot(row, col);
     if (!assignedId) return;
-    const def = _egCurrencyDefForId(assignedId);
+    const def = _currencyDefForId(assignedId);
     if (!def) return;
     // Build a minimal currency-like tooltip for the empty slot
     const ttName = def.name || assignedId;
@@ -247,7 +247,7 @@ export function _egOnCurrencyCellEnter(row, col, e) {
     const html = `
 <div class="eg-tt-frame" style="--tt-border:#b59248;">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon" style="opacity:0.55;">${EG_ART.html('item', assignedId, ttIcon)}</div>
+        <div class="eg-tt-icon" style="opacity:0.55;">${GAME_ART.html('item', assignedId, ttIcon)}</div>
         <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${ttName}</div>
         <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
     </div>
@@ -255,16 +255,16 @@ export function _egOnCurrencyCellEnter(row, col, e) {
 </div>`;
     if (typeof showGameTooltip === 'function') globalThis.showGameTooltip(html, e);
 }
-export function _egOnCurrencyCellMove(e) {
+export function _onCurrencyCellMove(e) {
     // Only move tooltip when hovering an empty assigned slot (occupied chips manage themselves)
     const cell = e.currentTarget || e.target.closest && e.target.closest('.eg-currency-cell');
     if (!cell) return;
     const r = +cell.dataset.row, c = +cell.dataset.col;
-    const item = _egCurrencyStash[r] && _egCurrencyStash[r][c];
+    const item = _currencyStash[r] && _currencyStash[r][c];
     if (item) return;
-    if (_egCurrencyIdForSlot(r,c) && typeof moveGameTooltip === 'function') globalThis.moveGameTooltip(e);
+    if (_currencyIdForSlot(r,c) && typeof moveGameTooltip === 'function') globalThis.moveGameTooltip(e);
 }
-export function _egOnCurrencyCellLeave() {
+export function _onCurrencyCellLeave() {
     // Only clear if we were showing an empty-slot tooltip (occupied chip leave already handled)
     if (typeof hideGameTooltip === 'function') globalThis.hideGameTooltip();
 }
@@ -275,7 +275,7 @@ export function _egOnCurrencyCellLeave() {
 //------------------------------------------------------------------------
 
 // Builds a single equipment stash cell div (drop target).
-export function _egBuildInventoryCellHTML(row, col) {
+export function _buildInventoryCellHTML(row, col) {
     return `
 <div class="eg-inv-cell"
      id="eg-inv-cell-${row}-${col}"
@@ -288,12 +288,12 @@ export function _egBuildInventoryCellHTML(row, col) {
 }
 
 // Builds the full equipment stash grid by iterating over all rows and columns.
-export function _egBuildInventoryGridHTML() {
+export function _buildInventoryGridHTML() {
     let html = '';
-    const rows = _egGetInvRows();
+    const rows = _getInvRows();
     for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < EG_INV_COLS; c++) {
-            html += _egBuildInventoryCellHTML(r, c);
+        for (let c = 0; c < INV_COLS; c++) {
+            html += _buildInventoryCellHTML(r, c);
         }
     }
     return html;
@@ -301,11 +301,11 @@ export function _egBuildInventoryGridHTML() {
 
 // Assembles the full-width stash panel at the bottom of the screen.
 // Now with two tabs: INVENTORY (regular stash) and UNIQUES (stash collection).
-export function _egBuildStashPanelHTML() {
-    const invActive = _egStashTab !== 'uniques';
-    const uniqActive = _egStashTab === 'uniques';
-    const totalUniques = (typeof EG_UNIQUE_ITEMS !== 'undefined' ? EG_UNIQUE_ITEMS.length : 0);
-    const foundUniques = (globalThis._egUniqueCollected ? globalThis._egUniqueCollected.size : 0);
+export function _buildStashPanelHTML() {
+    const invActive = _stashTab !== 'uniques';
+    const uniqActive = _stashTab === 'uniques';
+    const totalUniques = (typeof UNIQUE_ITEMS !== 'undefined' ? UNIQUE_ITEMS.length : 0);
+    const foundUniques = (globalThis._uniqueCollected ? globalThis._uniqueCollected.size : 0);
     return `
 <div class="eg-panel eg-panel-inv">
     <div class="eg-panel-label eg-stash-header">
@@ -313,66 +313,66 @@ export function _egBuildStashPanelHTML() {
         <div id="eg-stash-info" class="eg-stash-info" aria-live="polite"></div>
         <div class="eg-stash-actions">
             <button class="eg-stash-btn eg-stash-btn-config" id="eg-toggle-ilvl-btn"
-                     onclick="_egToggleItemLevelDisplay()"
-                     onmouseenter="_egShowItemLevelToggleTooltip(event)"
+                     onclick="_toggleItemLevelDisplay()"
+                     onmouseenter="_showItemLevelToggleTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
-                     onmouseleave="hideGameTooltip()">${_egShowItemLevel ? '🔢' : '👤'} ${t(_egShowItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</button>
+                     onmouseleave="hideGameTooltip()">${_showItemLevel ? '🔢' : '👤'} ${t(_showItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</button>
             <button class="eg-stash-btn eg-stash-btn-config" id="eg-loot-filter-btn"
-                     onclick="_egOpenLootFilterModal()"
-                     onmouseenter="_egShowLootFilterTooltip(event)"
+                     onclick="_openLootFilterModal()"
+                     onmouseenter="_showLootFilterTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
                      onmouseleave="hideGameTooltip()">⚗ ${t('eg_loot_filter_btn')}</button>
-            <button class="eg-stash-btn eg-stash-btn-config" onclick="_egOpenMassSellModal()"
-                     onmouseenter="_egShowMassSellConfigTooltip(event)"
+            <button class="eg-stash-btn eg-stash-btn-config" onclick="_openMassSellModal()"
+                     onmouseenter="_showMassSellConfigTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
                      onmouseleave="hideGameTooltip()">⚙ ${t('eg_mass_sell_config')}</button>
-            <button class="eg-stash-btn eg-stash-btn-sell" onclick="_egRequestMassSell()"
-                     onmouseenter="_egShowMassSellTooltip(event)"
+            <button class="eg-stash-btn eg-stash-btn-sell" onclick="_requestMassSell()"
+                     onmouseenter="_showMassSellTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
                      onmouseleave="hideGameTooltip()">⚒ ${t('eg_mass_sell_btn')}</button>
         </div>
     </div>
     <div class="eg-stash-tabs" id="eg-stash-tabs">
-        <button class="eg-stash-tab ${invActive ? 'active' : ''}" id="eg-tab-inventory" data-tab="inventory" onclick="_egSwitchStashTab('inventory')">${t('eg_tab_inventory') || 'INVENTORY'}</button>
-        <button class="eg-stash-tab ${uniqActive ? 'active' : ''}" id="eg-tab-uniques" data-tab="uniques" onclick="_egSwitchStashTab('uniques')">${t('eg_tab_uniques') || 'UNIQUES'} <span class="eg-tab-count">${foundUniques}/${totalUniques}</span></button>
+        <button class="eg-stash-tab ${invActive ? 'active' : ''}" id="eg-tab-inventory" data-tab="inventory" onclick="_switchStashTab('inventory')">${t('eg_tab_inventory') || 'INVENTORY'}</button>
+        <button class="eg-stash-tab ${uniqActive ? 'active' : ''}" id="eg-tab-uniques" data-tab="uniques" onclick="_switchStashTab('uniques')">${t('eg_tab_uniques') || 'UNIQUES'} <span class="eg-tab-count">${foundUniques}/${totalUniques}</span></button>
     </div>
     <div class="eg-stash-tab-body ${invActive ? 'active' : ''}" id="eg-stash-tab-inventory">
-        <div class="eg-inv-grid" id="eg-inv-grid" style="grid-template-columns: repeat(${EG_INV_COLS}, 1fr);">
-            ${_egBuildInventoryGridHTML()}
+        <div class="eg-inv-grid" id="eg-inv-grid" style="grid-template-columns: repeat(${INV_COLS}, 1fr);">
+            ${_buildInventoryGridHTML()}
         </div>
     </div>
     <div class="eg-stash-tab-body ${uniqActive ? 'active' : ''}" id="eg-stash-tab-uniques">
         <div class="eg-unique-hint">${t('eg_unique_stash_hint')}</div>
         <div class="eg-unique-count" id="eg-unique-count">${t('eg_uniques_collected').replace('{found}', foundUniques).replace('{total}', totalUniques)}</div>
         <div class="eg-unique-grid" id="eg-unique-grid" data-eg-dropzone="uniques" ondragover="egDragOver(event)" ondragleave="egDragLeave(event)">
-            ${_egBuildUniqueGridHTML()}
+            ${_buildUniqueGridHTML()}
         </div>
     </div>
 </div>`;
 }
-export function _egSwitchStashTab(tab) {
+export function _switchStashTab(tab) {
     Audio_Manager.playSFX('ui_tab_switch');
-    globalThis._egStashTab = (tab === 'uniques' ? 'uniques' : 'inventory');
+    globalThis._stashTab = (tab === 'uniques' ? 'uniques' : 'inventory');
     const invBody = document.getElementById('eg-stash-tab-inventory');
     const uniqBody = document.getElementById('eg-stash-tab-uniques');
     const invTab = document.getElementById('eg-tab-inventory');
     const uniqTab = document.getElementById('eg-tab-uniques');
-    if (invBody) invBody.classList.toggle('active', _egStashTab === 'inventory');
-    if (uniqBody) uniqBody.classList.toggle('active', _egStashTab === 'uniques');
-    if (invTab) invTab.classList.toggle('active', _egStashTab === 'inventory');
-    if (uniqTab) uniqTab.classList.toggle('active', _egStashTab === 'uniques');
-    if (_egStashTab === 'uniques') _egRenderUniqueStash();
-    else _egRenderInventory();
+    if (invBody) invBody.classList.toggle('active', _stashTab === 'inventory');
+    if (uniqBody) uniqBody.classList.toggle('active', _stashTab === 'uniques');
+    if (invTab) invTab.classList.toggle('active', _stashTab === 'inventory');
+    if (uniqTab) uniqTab.classList.toggle('active', _stashTab === 'uniques');
+    if (_stashTab === 'uniques') _renderUniqueStash();
+    else _renderInventory();
 }
-export function _egBuildUniqueGridHTML() {
-    if (typeof EG_UNIQUE_ITEMS === 'undefined' || !Array.isArray(EG_UNIQUE_ITEMS)) return '<div class="eg-unique-empty">No uniques defined</div>';
+export function _buildUniqueGridHTML() {
+    if (typeof UNIQUE_ITEMS === 'undefined' || !Array.isArray(UNIQUE_ITEMS)) return '<div class="eg-unique-empty">No uniques defined</div>';
     let html = '';
-    for (let i = 0; i < EG_UNIQUE_ITEMS.length; i++) {
-        const def = EG_UNIQUE_ITEMS[i];
+    for (let i = 0; i < UNIQUE_ITEMS.length; i++) {
+        const def = UNIQUE_ITEMS[i];
         const uid = def.uniqueId;
-        const collected = _egIsUniqueCollected(uid);
-        const count = _egGetUniqueCount(uid);
-        const items = collected ? (globalThis._egUniqueStash[uid] || []) : [];
+        const collected = _isUniqueCollected(uid);
+        const count = _getUniqueCount(uid);
+        const items = collected ? (globalThis._uniqueStash[uid] || []) : [];
         const displayName = (LANG === 'de' ? (def.nameDe || def.nameEn) : def.nameEn) || uid;
         let cellCls;
         if (!collected) cellCls = 'locked';
@@ -383,47 +383,47 @@ export function _egBuildUniqueGridHTML() {
         const lockedOverlay = !collected ? '<span class="eg-unique-lock">?</span>' : '';
         html += `<div class="eg-unique-cell ${cellCls}" data-unique-id="${uid}" data-uid="${uid}" data-eg-dropzone="uniques"
             ondragover="egDragOver(event)" ondragleave="egDragLeave(event)"
-            onmouseenter="_egOnUniqueCellEnter('${uid}', event)"
-            onmousemove="_egOnUniqueCellMove('${uid}', event)"
-            onmouseleave="_egOnUniqueCellLeave('${uid}', event)"
-            oncontextmenu="_egOnUniqueCellRightClick(event, '${uid}')"
-            onclick="_egOnUniqueCellClick(event, '${uid}')">
+            onmouseenter="_onUniqueCellEnter('${uid}', event)"
+            onmousemove="_onUniqueCellMove('${uid}', event)"
+            onmouseleave="_onUniqueCellLeave('${uid}', event)"
+            oncontextmenu="_onUniqueCellRightClick(event, '${uid}')"
+            onclick="_onUniqueCellClick(event, '${uid}')">
             <div class="eg-unique-cell-name">${displayName}</div>
-            <div class="eg-unique-cell-icon">${EG_ART ? EG_ART.html('item', uid, icon) : icon}${countBadge}${lockedOverlay}</div>
+            <div class="eg-unique-cell-icon">${GAME_ART ? GAME_ART.html('item', uid, icon) : icon}${countBadge}${lockedOverlay}</div>
         </div>`;
     }
     return html;
 }
-export function _egRenderUniqueStash() {
+export function _renderUniqueStash() {
     const grid = document.getElementById('eg-unique-grid');
     if (!grid) return;
-    grid.innerHTML = _egBuildUniqueGridHTML();
-    const total = (typeof EG_UNIQUE_ITEMS !== 'undefined' ? EG_UNIQUE_ITEMS.length : 0);
-    const found = (globalThis._egUniqueCollected ? globalThis._egUniqueCollected.size : 0);
+    grid.innerHTML = _buildUniqueGridHTML();
+    const total = (typeof UNIQUE_ITEMS !== 'undefined' ? UNIQUE_ITEMS.length : 0);
+    const found = (globalThis._uniqueCollected ? globalThis._uniqueCollected.size : 0);
     const cntEl = document.getElementById('eg-unique-count');
     if (cntEl) cntEl.textContent = t('eg_uniques_collected').replace('{found}', found).replace('{total}', total);
-    _egUpdateUniqueTabBadge();
+    _updateUniqueTabBadge();
 }
-export function _egOnUniqueCellClick(e, uid) {
+export function _onUniqueCellClick(e, uid) {
     // left click does nothing except ensure tooltip stays; right-click handles transfer via contextmenu
     if (e.button === 0) e.preventDefault();
 }
-export function _egOnUniqueCellRightClick(e, uid) {
+export function _onUniqueCellRightClick(e, uid) {
     e.preventDefault();
-    _egEnsureUniqueStash();
-    const arr = globalThis._egUniqueStash[uid];
+    _ensureUniqueStash();
+    const arr = globalThis._uniqueStash[uid];
     if (!arr || arr.length === 0) {
-        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(t('eg_unique_not_collected'), {type:'info'});
+        if (typeof _showStashInfo === 'function') _showStashInfo(t('eg_unique_not_collected'), {type:'info'});
         return;
     }
-    _egClearTooltip();
+    _clearTooltip();
     globalThis.hideGameTooltip();
-    const ok = _egMoveUniqueToInventory(uid);
-    if (ok) _egRenderInventory();
+    const ok = _moveUniqueToInventory(uid);
+    if (ok) _renderInventory();
 }
-export function _egOnUniqueCellEnter(uid, e) {
-    _egEnsureUniqueStash();
-    const arr = globalThis._egUniqueStash[uid];
+export function _onUniqueCellEnter(uid, e) {
+    _ensureUniqueStash();
+    const arr = globalThis._uniqueStash[uid];
     // Ensure previous multi-tip inline overrides don't leak into next tooltip
     const prevTip = document.getElementById('ghud-floating-tip');
     if (prevTip && prevTip.classList.contains('eg-unique-multi')) {
@@ -438,12 +438,12 @@ export function _egOnUniqueCellEnter(uid, e) {
         prevTip.onmouseleave = null;
     }
     if (!arr || arr.length === 0) {
-        const isCollected = _egIsUniqueCollected(uid);
-        const def = (typeof EG_UNIQUE_ITEMS !== 'undefined') ? EG_UNIQUE_ITEMS.find(u=>u.uniqueId===uid) : null;
+        const isCollected = _isUniqueCollected(uid);
+        const def = (typeof UNIQUE_ITEMS !== 'undefined') ? UNIQUE_ITEMS.find(u=>u.uniqueId===uid) : null;
         const name = def ? ((LANG==='de'?def.nameDe:def.nameEn)||def.nameEn) : uid;
         const icon = def ? (def.icon || '?') : '?';
         if (isCollected) {
-            const html = `<div class="eg-tt-frame" style="--tt-border:#c8a84b;"><div class="eg-tt-header"><div class="eg-tt-icon" style="opacity:0.6;">${EG_ART ? EG_ART.html('item', uid, icon) : icon}</div><div class="eg-tt-name" style="color:#c8a84b;">${name}</div><div class="eg-tt-rarity-line" style="color:#f5d98a;">${t('eg_unique_in_inventory') || 'Collected - in Inventory (0 remaining)'}</div></div><div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:.8;">${t('eg_unique_empty_hint') || 'All copies moved to Inventory. Drag one back or loot another.'}</div></div></div>`;
+            const html = `<div class="eg-tt-frame" style="--tt-border:#c8a84b;"><div class="eg-tt-header"><div class="eg-tt-icon" style="opacity:0.6;">${GAME_ART ? GAME_ART.html('item', uid, icon) : icon}</div><div class="eg-tt-name" style="color:#c8a84b;">${name}</div><div class="eg-tt-rarity-line" style="color:#f5d98a;">${t('eg_unique_in_inventory') || 'Collected - in Inventory (0 remaining)'}</div></div><div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:.8;">${t('eg_unique_empty_hint') || 'All copies moved to Inventory. Drag one back or loot another.'}</div></div></div>`;
             globalThis.showGameTooltip(html, e);
         } else {
             const html = `<div class="eg-tt-frame" style="--tt-border:#555;"><div class="eg-tt-header"><div class="eg-tt-icon">?</div><div class="eg-tt-name" style="color:#888;">${name}</div><div class="eg-tt-rarity-line" style="color:#888;">${t('eg_unique_not_collected')}</div></div><div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:.6;">${t('eg_unique_stash_hint')}</div></div></div>`;
@@ -453,7 +453,7 @@ export function _egOnUniqueCellEnter(uid, e) {
     }
     // Build multi-tooltip: container with flex row of each variant's full tooltip body
     if (arr.length === 1) {
-        _egShowTooltip(arr[0], e);
+        _showHubTooltip(arr[0], e);
         // append right-click hint
         // we could inject after, but just let normal tooltip; right-click hint via extra line handled in custom?
         // add hint via stash info? Instead append to tooltip DOM after show
@@ -470,7 +470,7 @@ export function _egOnUniqueCellEnter(uid, e) {
         return;
     }
     // Multiple copies: build side-by-side frames – scrollable, stays open while hovering tip
-    const frames = arr.map(it=>_egBuildTooltipBodyHTML(it)).join('');
+    const frames = arr.map(it=>_buildTooltipBodyHTML(it)).join('');
     const header = `<div style="text-align:center;font-family:var(--PX);font-size:9px;color:#f5d98a;margin-bottom:6px;letter-spacing:1px;">${t('eg_unique_tooltip_count').replace('{n}', arr.length)} - ${t('eg_unique_right_click_hint')}</div>`;
     const html = `<div class="eg-unique-multi-tip">${header}<div class="eg-unique-multi-row">${frames}</div></div>`;
     globalThis.showGameTooltip(html, e);
@@ -507,14 +507,14 @@ export function _egOnUniqueCellEnter(uid, e) {
         }
     }
 }
-export function _egOnUniqueCellMove(uid, e){
+export function _onUniqueCellMove(uid, e){
     // support both signatures: (uid, e) and (e)
     if (e === undefined) { e = uid; uid = null; }
     const tip=document.getElementById('ghud-floating-tip');
     if (tip && tip.classList.contains('eg-unique-multi')) return; // multi tip is pinned, don't follow mouse
     if(typeof moveGameTooltip==='function') globalThis.moveGameTooltip(e);
 }
-export function _egOnUniqueCellLeave(uid, e){
+export function _onUniqueCellLeave(uid, e){
     if (e === undefined && typeof uid === 'object' && uid && uid.type) { e = uid; uid = null; }
     const tip=document.getElementById('ghud-floating-tip');
     if(tip && tip.classList.contains('eg-unique-multi')) {
@@ -551,9 +551,9 @@ export function _egOnUniqueCellLeave(uid, e){
     }
 }
 
-export let _egStashInfoTimer = null;
+export let _stashInfoTimer = null;
 
-export function _egEnsureStashInfoEl() {
+export function _ensureStashInfoEl() {
     let el = document.getElementById('eg-stash-info');
     if (el) return el;
     const header = document.querySelector('.eg-stash-header');
@@ -569,8 +569,8 @@ export function _egEnsureStashInfoEl() {
     return el;
 }
 
-export function _egShowStashInfo(message, opts = {}) {
-    const el = _egEnsureStashInfoEl();
+export function _showStashInfo(message, opts = {}) {
+    const el = _ensureStashInfoEl();
     if (!el || !message) return;
     const type = opts.type || 'error';
     const duration = opts.duration != null ? opts.duration : 4500;
@@ -585,37 +585,37 @@ export function _egShowStashInfo(message, opts = {}) {
     } catch (e) {}
     el.textContent = message;
     el.className = 'eg-stash-info show eg-stash-info--' + type;
-    if (_egStashInfoTimer) clearTimeout(_egStashInfoTimer);
-    _egStashInfoTimer = setTimeout(() => {
+    if (_stashInfoTimer) clearTimeout(_stashInfoTimer);
+    _stashInfoTimer = setTimeout(() => {
         el.classList.remove('show');
     }, effectiveDuration);
 }
 
-export function _egClearStashInfo() {
+export function _clearStashInfo() {
     const el = document.getElementById('eg-stash-info');
     if (el) el.classList.remove('show');
-    if (_egStashInfoTimer) { clearTimeout(_egStashInfoTimer); _egStashInfoTimer = null; }
+    if (_stashInfoTimer) { clearTimeout(_stashInfoTimer); _stashInfoTimer = null; }
 }
 
 
 // Assembles the complete hub screen layout:
 // topbar → [ Orbs & Shards (left) | character panel (center) | Essence (right) ] → stash.
 // The Orbs & Shards tab uses fixed slots; the item tooltip is a floating mouseover.
-export function _egBuildFullScreenHTML() {
+export function _buildFullScreenHTML() {
     return `
 <div class="eg-hub-layout">
-    ${_egBuildTopbarHTML()}
+    ${_buildTopbarHTML()}
     <div class="eg-body">
         <div class="eg-upper-row">
-            ${_egBuildCurrencyPanelHTML()}
+            ${_buildCurrencyPanelHTML()}
             <div class="eg-char-wrap">
-                ${_egBuildCharPanelHTML()}
+                ${_buildCharPanelHTML()}
             </div>
             <div class="eg-essence-col">
-                ${typeof _egBuildEssenceTabHTML === 'function' ? _egBuildEssenceTabHTML() : ''}
+                ${typeof _buildEssenceTabHTML === 'function' ? _buildEssenceTabHTML() : ''}
             </div>
         </div>
-        ${_egBuildStashPanelHTML()}
+        ${_buildStashPanelHTML()}
     </div>
 </div>`;
 }
@@ -629,29 +629,29 @@ export function _egBuildFullScreenHTML() {
 // Shows the equipped item chip, or the slot's placeholder icon if empty.
 // The whole slot cell is tinted with the item's rarity color (same scheme
 // as the main stash cells).
-export function _egRenderEquipSlot(slotId) {
+export function _renderEquipSlot(slotId) {
     const slotEl = document.getElementById(`eg-equip-slot-${slotId}`);
     const el = document.getElementById(`eg-equip-item-${slotId}`);
     if (!el) return;
-    const slot = EG_EQUIP_SLOTS.find(s => s.id === slotId);
-    const item = _egEquipped[slotId] || null;
+    const slot = EQUIP_SLOTS.find(s => s.id === slotId);
+    const item = _equipped[slotId] || null;
 
     // Empty slots show their slot art (slot_<type> from images/items/) once
     // loaded, else the classic emoji placeholder. weapon2 is the offhand.
     let placeholderIcon = slot ? slot.icon : '◻';
     if (slot) {
         const artKey = slot.id === 'weapon2' ? 'slot_shield' : 'slot_' + String(slot.id).replace(/[0-9]+$/, '');
-        const artHtml = EG_ART.html('item', artKey, '');
+        const artHtml = GAME_ART.html('item', artKey, '');
         if (artHtml) placeholderIcon = artHtml;
     }
 
     el.innerHTML = item
-        ? _egBuildItemChipHTML(item)
+        ? _buildItemChipHTML(item)
         : `<span class="eg-equip-slot-placeholder">${placeholderIcon}</span>`;
 
     if (slotEl) {
         if (item) {
-            const fill = _egGetCellFill(item);
+            const fill = _getCellFill(item);
             slotEl.style.background = fill;
             slotEl.style.borderColor = fill.replace(/[\d.]+\)$/, '0.9)');
         } else {
@@ -662,8 +662,8 @@ export function _egRenderEquipSlot(slotId) {
 }
 
 // Re-renders all paperdoll equipment slots.
-export function _egRenderEquipSlots() {
-    EG_EQUIP_SLOTS.forEach(slot => _egRenderEquipSlot(slot.id));
+export function _renderEquipSlots() {
+    EQUIP_SLOTS.forEach(slot => _renderEquipSlot(slot.id));
 }
 
 
@@ -674,7 +674,7 @@ export function _egRenderEquipSlots() {
 // Full-cell rarity tint used by the main stash - each occupied cell is
 // filled with its item's rarity color (instead of only a chip glow).
 // Items with unmet stat requirements override the rarity tint with red.
-export const EG_RARITY_CELL_FILL = {
+export const RARITY_CELL_FILL = {
     common: 'rgba(122, 122, 122, 0.40)',
     uncommon: 'rgba(46, 204, 113, 0.35)',
     rare: 'rgba(52, 152, 219, 0.40)',
@@ -684,28 +684,28 @@ export const EG_RARITY_CELL_FILL = {
     artifact: 'rgba(241, 196, 15, 0.40)',
     currency: 'rgba(181, 146, 72, 0.35)',
 };
-export const EG_REQ_BLOCKED_FILL = 'rgba(231, 76, 60, 0.45)';
+export const REQ_BLOCKED_FILL = 'rgba(231, 76, 60, 0.45)';
 
 // Cell fill color for an item: red when its requirements cannot currently
 // be met, otherwise its rarity color.
-export function _egGetCellFill(item) {
-    if (item && _egIsItemBlocked(item)) return EG_REQ_BLOCKED_FILL;
-    return EG_RARITY_CELL_FILL[item && item.rarity] || EG_RARITY_CELL_FILL.common;
+export function _getCellFill(item) {
+    if (item && _isItemBlocked(item)) return REQ_BLOCKED_FILL;
+    return RARITY_CELL_FILL[item && item.rarity] || RARITY_CELL_FILL.common;
 }
 
 // Re-renders a single cell in the main stash grid.
-export function _egRenderInventoryCell(row, col) {
+export function _renderInventoryCell(row, col) {
     const cell = document.getElementById(`eg-inv-cell-${row}-${col}`);
     if (!cell) return;
-    const item = _egInventory[row][col];
+    const item = _inventory[row][col];
     cell.innerHTML = item
-        ? _egBuildItemChipHTML(item)
+        ? _buildItemChipHTML(item)
         : '';
 
     // Fill the whole cell with the item's rarity color (red when its stat
     // requirements cannot currently be met); reset when empty.
     if (item) {
-        const fill = _egGetCellFill(item);
+        const fill = _getCellFill(item);
         cell.style.background = fill;
         cell.style.borderColor = fill.replace(/[\d.]+\)$/, '0.9)');
     } else {
@@ -715,22 +715,22 @@ export function _egRenderInventoryCell(row, col) {
 }
 
 // Re-renders the entire main stash grid.
-export function _egRenderInventory() {
-    for (let r = 0; r < _egGetInvRows(); r++) {
-        for (let c = 0; c < EG_INV_COLS; c++) {
-            _egRenderInventoryCell(r, c);
+export function _renderInventory() {
+    for (let r = 0; r < _getInvRows(); r++) {
+        for (let c = 0; c < INV_COLS; c++) {
+            _renderInventoryCell(r, c);
         }
     }
 }
 
 // Updates the stash item-count label (if present in the DOM).
-export function _egUpdateInvCount() {
+export function _updateInvCount() {
     const el = document.getElementById('eg-inv-count');
     if (!el) return;
     let used = 0;
-    _egInventory.forEach(row => row.forEach(cell => { if (cell) used++; }));
+    _inventory.forEach(row => row.forEach(cell => { if (cell) used++; }));
     // Unlimited stash: show used / capacity (capacity grows with rows) - keeps the familiar counter
-    el.textContent = `${used} / ${_egGetInvCapacity()}`;
+    el.textContent = `${used} / ${_getInvCapacity()}`;
 }
 
 
@@ -740,7 +740,7 @@ export function _egUpdateInvCount() {
 
 // Re-renders a single cell in the currency stash grid.
 // Empty assigned slots show a faint placeholder icon and dashed border.
-// _egRenderCurrencyCell is defined ONCE, in
+// _renderCurrencyCell is defined ONCE, in
 // endgame-hub-drag-and-drop.js: it renders a currency-stash cell into BOTH
 // the hub grid (eg-currency-cell-*) and the gate grid
 // (eg-gate-currency-cell-*) using drag-and-drop chips. The earlier copy
@@ -748,10 +748,10 @@ export function _egUpdateInvCount() {
 // drag-and-drop version already won via load order, so behaviour is
 // unchanged; hub's stash render loop below calls the shared global.
 // Re-renders the entire currency stash grid.
-export function _egRenderCurrencyStash() {
-    for (let r = 0; r < EG_CURRENCY_ROWS; r++) {
-        for (let c = 0; c < EG_CURRENCY_COLS; c++) {
-            _egRenderCurrencyCell(r, c);
+export function _renderCurrencyStash() {
+    for (let r = 0; r < CURRENCY_ROWS; r++) {
+        for (let c = 0; c < CURRENCY_COLS; c++) {
+            _renderCurrencyCell(r, c);
         }
     }
 }
@@ -763,7 +763,7 @@ if (typeof document !== 'undefined' && document.addEventListener) {
     document.addEventListener('eg-art-loaded', function () {
         try {
             if (document.getElementById('eg-currency-cell-0-0') || document.getElementById('eg-gate-currency-cell-0-0')) {
-                _egRenderCurrencyStash();
+                _renderCurrencyStash();
             }
         } catch (e) { /* hub not open - safe to ignore */ }
     });
@@ -774,7 +774,7 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 //-------------------RENDER: MAP STASH / MAP DEVICE-----------------------
 //------------------------------------------------------------------------
 // Moved to endgame-gate.js - the map stash and map device live on the
-// separate Probability Gate screen. _egRenderAll() still calls
+// separate Probability Gate screen. _renderAll() still calls
 // _egRenderMapSlot() / _egRenderMapStash(); they no-op while the gate
 // screen is not in the DOM.
 
@@ -787,11 +787,11 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 // Re-renders the three aggregated stat regions of the character panel:
 //   offense - upper left corner block, defense - upper right corner block,
 //   puzzle  - center column between the paperdoll slots.
-// Reads live gear via _egComputePlayerStats() / _egBuildGroupedStats()
+// Reads live gear via _computePlayerStats() / _buildGroupedStats()
 // (endgame-player-stats.js) so it always reflects whatever is equipped.
-export function _egRenderStatsList() {
-    const stats = _egComputePlayerStats();
-    const groups = _egBuildGroupedStats(stats);
+export function _renderStatsList() {
+    const stats = _computePlayerStats();
+    const groups = _buildGroupedStats(stats);
 
     const emptyHTML = `
 <div class="eg-stat-row eg-stat-placeholder">
@@ -819,7 +819,7 @@ export function _egRenderStatsList() {
     renderSide('eg-offense-stats-list', groups.offense);
     renderSide('eg-defense-stats-list', groups.defense);
     renderSide('eg-stats-list', groups.puzzle);
-    _egBindStatTooltips();
+    _bindStatTooltips();
 }
 
 
@@ -829,7 +829,7 @@ export function _egRenderStatsList() {
 // exact formulas from endgame-player-stats.js. For resistance rows the
 // uncapped gear total and the effective cap are revealed (the row itself
 // shows the capped value).
-export function _egBuildStatDescTooltipHTML(descKey, label, row) {
+export function _buildStatDescTooltipHTML(descKey, label, row) {
     let html = `<strong style="color:var(--accent,#66fcf1)">${label}</strong>`;
     if (descKey) {
         const desc = t(descKey);
@@ -852,20 +852,20 @@ export function _egBuildStatDescTooltipHTML(descKey, label, row) {
                 html += `<br><span style="color:#ff8a6a">${t('eg_statdesc_res_penalty').replace('{p}', penalty.toFixed(0))}</span>`;
             }
         }
-        const stats = _egComputePlayerStats();
+        const stats = _computePlayerStats();
         // Armour/evasion live values are measured against a representative
         // monster: the current target's level, else the encounter's base
         // level - same convention as the accuracy tooltip below.
-        const hasLevelCtx = typeof _egGetTarget === 'function' && typeof _egGetEncounterBaseLevel === 'function';
+        const hasLevelCtx = typeof _getTarget === 'function' && typeof _getEncounterBaseLevel === 'function';
         const refMonsterLevel = hasLevelCtx
-            ? ((_egGetTarget() && _egGetTarget().level) || _egGetEncounterBaseLevel() || 1)
+            ? ((_getTarget() && _getTarget().level) || _getEncounterBaseLevel() || 1)
             : 1;
         // Character level for multi-level display (falls back to ref level if unavailable)
-        const playerLevel = (typeof _egGetPlayerLevel === 'function')
-            ? Math.max(1, Number(_egGetPlayerLevel()) || 1)
+        const playerLevel = (typeof _getPlayerLevel === 'function')
+            ? Math.max(1, Number(_getPlayerLevel()) || 1)
             : refMonsterLevel;
-        const maxLvl = (typeof EG_LEVELING_CONFIG !== 'undefined' && EG_LEVELING_CONFIG.maxLevel)
-            ? EG_LEVELING_CONFIG.maxLevel : 100;
+        const maxLvl = (typeof LEVELING_CONFIG !== 'undefined' && LEVELING_CONFIG.maxLevel)
+            ? LEVELING_CONFIG.maxLevel : 100;
 
         if (descKey === 'eg_statdesc_armour') {
             // Show damage reduction vs monster levels: playerLevel-1 .. playerLevel+3
@@ -880,7 +880,7 @@ export function _egBuildStatDescTooltipHTML(descKey, label, row) {
             const lines = levels.map(lvl => {
                 // Representative raw hit size at this monster level
                 const refDamage = Math.round(12 * (1 + 0.12 * (lvl - 1)));
-                const reductionPct = _egCalcArmourReductionPct(stats.armour, refDamage) * 100;
+                const reductionPct = _calcArmourReductionPct(stats.armour, refDamage) * 100;
                 const labelPart = t('eg_statdesc_armour_value').replace('{p}', reductionPct.toFixed(1));
                 return `${labelPart} (L${lvl})`;
             });
@@ -896,7 +896,7 @@ export function _egBuildStatDescTooltipHTML(descKey, label, row) {
             }
             if (!levels.length) levels.push(refMonsterLevel);
             const lines = levels.map(lvl => {
-                const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion, lvl));
+                const dodgeChance = Math.min(75, stats.dodgeChance + _calcEvasionDodgeChance(stats.evasion, lvl));
                 const labelPart = t('eg_statdesc_evasion_value').replace('{p}', dodgeChance.toFixed(1));
                 return `${labelPart} (L${lvl})`;
             });
@@ -913,8 +913,8 @@ export function _egBuildStatDescTooltipHTML(descKey, label, row) {
             }
             if (!levels.length) levels.push(playerLevel);
             const lines = levels.map(lvl => {
-                const missPct = (typeof _egCalcAccuracyMissChance === 'function')
-                    ? _egCalcAccuracyMissChance(stats.accuracy, lvl) : 0;
+                const missPct = (typeof _calcAccuracyMissChance === 'function')
+                    ? _calcAccuracyMissChance(stats.accuracy, lvl) : 0;
                 return t('eg_statdesc_accuracy_value')
                     .replace('{p}', missPct.toFixed(1))
                     .replace('{n}', lvl);
@@ -927,8 +927,8 @@ export function _egBuildStatDescTooltipHTML(descKey, label, row) {
 
 // Wires delegated mouseover tooltips onto the three stat list containers
 // (delegation survives frequent innerHTML re-renders; the dataset guard
-// makes repeated calls after each _egRenderStatsList() a no-op).
-export function _egBindStatTooltips() {
+// makes repeated calls after each _renderStatsList() a no-op).
+export function _bindStatTooltips() {
     ['eg-offense-stats-list', 'eg-stats-list', 'eg-defense-stats-list'].forEach(id => {
         const el = document.getElementById(id);
         if (!el || el.dataset.statTipBound) return;
@@ -937,7 +937,7 @@ export function _egBindStatTooltips() {
         el.addEventListener('mouseover', e => {
             const row = e.target.closest ? e.target.closest('.eg-stat-row') : null;
             if (row && !row.classList.contains('eg-stat-placeholder')) {
-                globalThis.showGameTooltip(_egBuildStatDescTooltipHTML(row.dataset.descKey, row.dataset.descLabel, row), e);
+                globalThis.showGameTooltip(_buildStatDescTooltipHTML(row.dataset.descKey, row.dataset.descLabel, row), e);
             }
         });
         el.addEventListener('mousemove', e => {
@@ -952,42 +952,42 @@ export function _egBindStatTooltips() {
 
 
 // Re-renders the launcher slot for the crafting bench (in the currency panel).
-export function _egUpdateCraftingBenchLauncherSlot() {
+export function _updateCraftingBenchLauncherSlot() {
     const craftingSlot = document.getElementById('eg-crafting-bench-launch-slot');
     if (craftingSlot) {
-        const item = typeof _egCraftingBenchItem !== 'undefined' ? globalThis._egCraftingBenchItem : null;
-        craftingSlot.innerHTML = item ? _egBuildItemChipHTML(item) : 'Drop equipment here';
+        const item = typeof _craftingBenchItem !== 'undefined' ? globalThis._craftingBenchItem : null;
+        craftingSlot.innerHTML = item ? _buildItemChipHTML(item) : 'Drop equipment here';
     }
 }
 
 // Triggers a full re-render of every zone in the hub.
 // Call this after any state-changing operation.
-export function _egRenderAll() {
-    _egRenderEquipSlots();
-    _egRenderInventory();
-    _egRenderUniqueStash();
-    _egUpdateUniqueTabBadge();
+export function _renderAll() {
+    _renderEquipSlots();
+    _renderInventory();
+    _renderUniqueStash();
+    _updateUniqueTabBadge();
     // keep tab visibility in sync
     const invBody = document.getElementById('eg-stash-tab-inventory');
     const uniqBody = document.getElementById('eg-stash-tab-uniques');
     const invTab = document.getElementById('eg-tab-inventory');
     const uniqTab = document.getElementById('eg-tab-uniques');
-    if (invBody) invBody.classList.toggle('active', _egStashTab !== 'uniques');
-    if (uniqBody) uniqBody.classList.toggle('active', _egStashTab === 'uniques');
-    if (invTab) invTab.classList.toggle('active', _egStashTab !== 'uniques');
-    if (uniqTab) uniqTab.classList.toggle('active', _egStashTab === 'uniques');
+    if (invBody) invBody.classList.toggle('active', _stashTab !== 'uniques');
+    if (uniqBody) uniqBody.classList.toggle('active', _stashTab === 'uniques');
+    if (invTab) invTab.classList.toggle('active', _stashTab !== 'uniques');
+    if (uniqTab) uniqTab.classList.toggle('active', _stashTab === 'uniques');
     _egRenderMapSlot();
-    _egRenderCurrencyStash();
-    _egRenderEssenceStash();
+    _renderCurrencyStash();
+    _renderEssenceStash();
     _egRenderMapStash();
-    _egUpdateInvCount();
-    _egRenderStatsList();
-    if (typeof _egRenderLevelHUD === 'function') _egRenderLevelHUD();
-    _egUpdatePassiveTreeButton();
+    _updateInvCount();
+    _renderStatsList();
+    if (typeof _renderLevelHUD === 'function') _renderLevelHUD();
+    _updatePassiveTreeButton();
     const craftingSlot = document.getElementById('eg-crafting-bench-launch-slot');
     if (craftingSlot) {
-        const item = typeof _egCraftingBenchItem !== 'undefined' ? globalThis._egCraftingBenchItem : null;
-        craftingSlot.innerHTML = item ? _egBuildItemChipHTML(item) : 'Drop equipment here';
+        const item = typeof _craftingBenchItem !== 'undefined' ? globalThis._craftingBenchItem : null;
+        craftingSlot.innerHTML = item ? _buildItemChipHTML(item) : 'Drop equipment here';
     }
 }
 
@@ -999,20 +999,20 @@ export function _egRenderAll() {
 
 // Creates and injects the hub screen DOM element on first call.
 // Also binds the delegated drag-start event listener (defined in endgame-hub-drag-and-drop.js).
-export function _egCreateScreen() {
+export function _createScreen() {
     const screen = document.createElement('div');
     screen.id = 'screen-endgame-hub';
     screen.className = 'screen';
-    screen.innerHTML = _egBuildFullScreenHTML();
+    screen.innerHTML = _buildFullScreenHTML();
     document.body.appendChild(screen);
-    _egBindDragEvents();  // defined in endgame-hub-drag-and-drop.js
-    _egInjectMassSellStyles();
+    _bindDragEvents();  // defined in endgame-hub-drag-and-drop.js
+    _injectMassSellStyles();
 }
 
 // Ensures the hub screen element exists in the DOM; creates it on first call.
 export function ensureEndgameHubScreen() {
     if (!document.getElementById('screen-endgame-hub')) {
-        _egCreateScreen();
+        _createScreen();
     }
 }
 
@@ -1029,19 +1029,19 @@ export function showEndgameHub() {
         document.getElementById('screen-endgame-hub').style.display = 'block';
     }
 
-    globalThis._egLoadHubState();
-    _egUpdateItemLevelToggleButton();
-    _egRenderAll();
-    _egApplyOverlayChrome();
+    globalThis._loadHubState();
+    _updateItemLevelToggleButton();
+    _renderAll();
+    _applyOverlayChrome();
     // Flush any deferred legacy-hand-migration notice on the visible sheet.
     try {
-        if (_egPendingHandMigrationToast && _egPendingHandMigrationToast.length
-            && typeof _egShowHandMigrationToast === 'function') {
-            _egShowHandMigrationToast(_egPendingHandMigrationToast);
+        if (_pendingHandMigrationToast && _pendingHandMigrationToast.length
+            && typeof _showHandMigrationToast === 'function') {
+            _showHandMigrationToast(_pendingHandMigrationToast);
         }
     } catch (e) {}
-    globalThis._egPendingHandMigrationToast = null;
-    _egClearTooltip();
+    globalThis._pendingHandMigrationToast = null;
+    _clearTooltip();
 }
 
 // Navigates back from the character sheet & inventory screen.
@@ -1050,21 +1050,21 @@ export function showEndgameHub() {
 // keybind mid-puzzle), where it returns to the running puzzle instead:
 // the Nexus path would strand the paused run with no way back.
 export function safeGoBackFromHub() {
-    if (_egHubGameOverlay) { closeHubToGame(); return; }
+    if (_hubGameOverlay) { closeHubToGame(); return; }
     showEndgameNexus();
 }
 
-export let _egHubGameOverlay = false;
+export let _hubGameOverlay = false;
 // Screen the overlay returns to on close: the running puzzle ('screen-game')
 // or, when B was pressed on the world map / level selection, that screen.
-let _egHubReturnScreen = 'screen-game';
+let _hubReturnScreen = 'screen-game';
 // True only if THIS overlay open paused the game (a pause menu may already
 // have been up when B was pressed - then pause state is left untouched).
-export let _egHubOverlayPaused = false;
+export let _hubOverlayPaused = false;
 
 // True while the hub is open as an overlay over a running puzzle.
 export function isHubGameOverlay() {
-    return _egHubGameOverlay === true;
+    return _hubGameOverlay === true;
 }
 
 // Hides the exits to other progression screens (probability tree, atlas of
@@ -1072,8 +1072,8 @@ export function isHubGameOverlay() {
 // leaving them would strand that run with no way back. Restores them on
 // every normal open (the hub DOM persists across opens, so this must run
 // both ways on every showEndgameHub).
-export function _egApplyOverlayChrome() {
-    const hide = _egHubGameOverlay === true;
+export function _applyOverlayChrome() {
+    const hide = _hubGameOverlay === true;
     ['eg-btn-passive-tree', 'eg-btn-atlas', 'eg-btn-gate'].forEach((id) => {
         const btn = document.getElementById(id);
         if (btn) btn.style.display = hide ? 'none' : '';
@@ -1082,77 +1082,77 @@ export function _egApplyOverlayChrome() {
 
 // Silently pauses the run WITHOUT the pause overlay (same recipe the
 // tutorial's _tqSetPaused uses). No-op unless a level is actually running.
-export function _egHubOverlayPause() {
-    _egHubOverlayPaused = false;
+export function _hubOverlayPause() {
+    _hubOverlayPaused = false;
     try {
         if (typeof dead !== 'undefined' && globalThis.dead) return;
         if (typeof cur === 'undefined' || !cur) return;
         if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;  // pause menu already up
         if (typeof pauseTimer === 'function') pauseTimer();
         globalThis._gamePaused = true;
-        if (typeof _egOnPause === 'function') { try { _egOnPause(); } catch (e) {} }
-        _egHubOverlayPaused = true;
+        if (typeof _onPause === 'function') { try { _onPause(); } catch (e) {} }
+        _hubOverlayPaused = true;
     } catch (e) {}
 }
 
-// Resumes a run paused by _egHubOverlayPause. Never touches pause state
+// Resumes a run paused by _hubOverlayPause. Never touches pause state
 // owned by someone else (pause menu, tutorial lessons).
-export function _egHubOverlayResume() {
-    if (!_egHubOverlayPaused) return;
-    _egHubOverlayPaused = false;
+export function _hubOverlayResume() {
+    if (!_hubOverlayPaused) return;
+    _hubOverlayPaused = false;
     try {
         globalThis._gamePaused = false;
-        if (typeof _egOnResume === 'function') { try { _egOnResume(); } catch (e) {} }
+        if (typeof _onResume === 'function') { try { _onResume(); } catch (e) {} }
         if (typeof resumeTimer === 'function') resumeTimer();
     } catch (e) {}
 }
 
-export function _egHubHideAvatars() {
+export function _hubHideAvatars() {
     try { if (typeof _hidePlayerAvatarSimple === 'function') globalThis._hidePlayerAvatarSimple(); } catch (e) {}
     try { if (typeof _hidePlayerAvatar === 'function') globalThis._hidePlayerAvatar(); } catch (e) {}
 }
 
-export function _egHubShowAvatars() {
+export function _hubShowAvatars() {
     try { if (typeof _showPlayerAvatarSimple === 'function') globalThis._showPlayerAvatarSimple(); } catch (e) {}
     try { if (typeof _showPlayerAvatar === 'function') globalThis._showPlayerAvatar(); } catch (e) {}
 }
 
 // Opens the sheet over a running puzzle (B keybind path).
 export function openHubFromGame(returnScreen = 'screen-game') {
-    _egHubGameOverlay = true;
-    _egHubReturnScreen = returnScreen;
+    _hubGameOverlay = true;
+    _hubReturnScreen = returnScreen;
     // Only a running puzzle has anything to pause or hide; on the world map
     // / level selection the sheet simply floats over the screen it came from.
     const overGame = returnScreen === 'screen-game';
     if (overGame) {
-        _egHubOverlayPause();
-        _egHubHideAvatars();
+        _hubOverlayPause();
+        _hubHideAvatars();
     } else {
-        _egHubOverlayPaused = false;
+        _hubOverlayPaused = false;
     }
     // Safety net: loot claimed this run must already be visible. Claims now
-    // stash instantly (see _egCheckLootClaim), but a pending item from an
+    // stash instantly (see _checkLootClaim), but a pending item from an
     // older save or a pre-flush code path would otherwise stay hidden in
-    // _egRunLoot until map clear. The flush is idempotent (_egStashed skip).
-    try { if (typeof _egFlushRunLootToStash === 'function') _egFlushRunLootToStash(); } catch (e) {}
+    // _runLoot until map clear. The flush is idempotent (_stashed skip).
+    try { if (typeof _flushRunLootToStash === 'function') _flushRunLootToStash(); } catch (e) {}
     showEndgameHub();
 }
 
 // Reconciles the live combat pools with the loadout edited in the overlay.
-// Damage done/received already read _egComputePlayerStats() live, but the
+// Damage done/received already read _computePlayerStats() live, but the
 // snapshotted pools (max HP / max mana / absorption) are only set at level
 // start - equipping +health/+mana/+absorption mid-puzzle would otherwise do
 // nothing until the next level. Grants max-increases to the current pool
 // and clamps decreases, then refreshes every combat HUD element
 // so the new values are visible the instant B closes the sheet.
-export function _egSyncOverlayGearPools() {
+export function _syncOverlayGearPools() {
     try {
-        if (typeof _egComputePlayerStats !== 'function') return;
+        if (typeof _computePlayerStats !== 'function') return;
         if (typeof cur === 'undefined' || !cur) return;
-        const stats = _egComputePlayerStats() || {};
+        const stats = _computePlayerStats() || {};
         // ── HP ──
         if (typeof playerMaxHP !== 'undefined' && typeof playerCurrentHP !== 'undefined') {
-            const baseHP = (typeof EG_PLAYER_STATS !== 'undefined') ? EG_PLAYER_STATS.baseHP : 100;
+            const baseHP = (typeof PLAYER_STATS !== 'undefined') ? PLAYER_STATS.baseHP : 100;
             let newMax = baseHP + (Number(stats.health) || 0);
             if (Number(stats.healthMorePct) > 0) newMax = Math.round(newMax * (1 + stats.healthMorePct / 100));
             if (typeof _egMapPlayerLifeMult === 'function') {
@@ -1179,10 +1179,10 @@ export function _egSyncOverlayGearPools() {
         // ── Absorption shield ──
         // Regen caps at the live stats max, so clamping is enough: a raised
         // cap refills via regen, a lowered cap trims the current shield now.
-        if (typeof _egPlayerAbsorptionCurrent !== 'undefined') {
+        if (typeof _playerAbsorptionCurrent !== 'undefined') {
             try {
                 const newAbs = Math.max(0, Number(stats.absorption) || 0);
-                globalThis._egPlayerAbsorptionCurrent = Math.max(0, Math.min(newAbs, globalThis._egPlayerAbsorptionCurrent));
+                globalThis._playerAbsorptionCurrent = Math.max(0, Math.min(newAbs, globalThis._playerAbsorptionCurrent));
             } catch (e) {}
         }
     } catch (e) {}
@@ -1190,21 +1190,21 @@ export function _egSyncOverlayGearPools() {
 
 // Closes the overlay and returns to the running puzzle exactly where it was.
 export function closeHubToGame() {
-    _egHubGameOverlay = false;
-    const returnScreen = _egHubReturnScreen;
-    _egHubReturnScreen = 'screen-game';
+    _hubGameOverlay = false;
+    const returnScreen = _hubReturnScreen;
+    _hubReturnScreen = 'screen-game';
     if (typeof switchScreen === 'function') switchScreen(returnScreen);
     if (returnScreen !== 'screen-game') return;   // map / level select: nothing to resync
-    _egHubShowAvatars();
+    _hubShowAvatars();
     // Gear edited mid-puzzle must apply instantly: sync pools first, then
     // repaint every HUD surface that displays damage done/received or pools.
-    try { _egSyncOverlayGearPools(); } catch (e) {}
+    try { _syncOverlayGearPools(); } catch (e) {}
     try { if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth(); } catch (e) {}
     try { if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar(); } catch (e) {}
-    try { if (typeof _egRenderPanel === 'function') _egRenderPanel(); } catch (e) {}
+    try { if (typeof _renderPanel === 'function') _renderPanel(); } catch (e) {}
     try { if (typeof buildClassHUD === 'function') buildClassHUD(); } catch (e) {}
     try { if (typeof renderSkillHotbar === 'function') renderSkillHotbar(); } catch (e) {}
-    _egHubOverlayResume();
+    _hubOverlayResume();
 }
 
 
@@ -1214,7 +1214,7 @@ export function closeHubToGame() {
 
 // Populates the main stash with a set of mock items for visual debugging.
 // Should NOT be called in the production flow.
-export function egAddTestItems() {
+export function addTestItems() {
     const testItems = [
         { id: 'map_tier1', name: 'Forge Vault (T1 Map)', icon: '🗺', rarity: 'common', type: 'map' },
         { id: 'map_tier5', name: 'Core Nexus (T5 Map)', icon: '🗺', rarity: 'uncommon', type: 'map' },
@@ -1227,13 +1227,13 @@ export function egAddTestItems() {
     ];
 
     testItems.forEach((item, i) => {
-        const r = Math.floor(i / EG_INV_COLS);
-        const c = i % EG_INV_COLS;
-        _egEnsureInvRows(r + 1);
-        _egInventory[r][c] = item;
+        const r = Math.floor(i / INV_COLS);
+        const c = i % INV_COLS;
+        _ensureInvRows(r + 1);
+        _inventory[r][c] = item;
     });
 
-    _egRenderAll();
+    _renderAll();
 }
 
 
@@ -1246,9 +1246,9 @@ window.addEventListener('keydown', (e) => {
             // If confirm sub-panel is visible, first step back to the filter view.
             const confirm = document.getElementById('eg-mass-sell-confirm');
             if (confirm && confirm.style.display !== 'none') {
-                _egCancelMassSellConfirm();
+                _cancelMassSellConfirm();
             } else {
-                _egCloseMassSellModal();
+                _closeMassSellModal();
             }
             e.preventDefault();
             e.stopPropagation();
@@ -1259,31 +1259,31 @@ window.addEventListener('keydown', (e) => {
 // ---- re-exports from the focused split modules (public surface preserved) ----
 
 export {
-    EG_INV_COLS,
-    EG_INV_INITIAL_ROWS,
-    EG_INV_ROWS,
-    _egAddItemToStash,
-    _egEnsureInvRows,
-    _egEquipped,
-    _egExpandStashByOneRow,
-    _egFindFreeInvCell,
-    _egGetInvCapacity,
-    _egGetInvRows,
-    _egInventory,
-    _egRebuildInventoryGrid,
-    _egStashTab,
+    INV_COLS,
+    INV_INITIAL_ROWS,
+    INV_ROWS,
+    _addItemToStash,
+    _ensureInvRows,
+    _equipped,
+    _expandStashByOneRow,
+    _findFreeInvCell,
+    _getInvCapacity,
+    _getInvRows,
+    _inventory,
+    _rebuildInventoryGrid,
+    _stashTab,
 } from './hub-stash.js';
 
 export {
-    EG_CURRENCY_COLS,
-    EG_CURRENCY_ROWS,
-    EG_CURRENCY_SLOT_MAP,
-    EG_CURRENCY_SLOT_REVERSE,
-    _egBuildCraftingBenchSlotHTML,
-    _egCurrencyDefForId,
-    _egCurrencyIdForSlot,
-    _egCurrencySlotForId,
-    _egCurrencyStash,
+    CURRENCY_COLS,
+    CURRENCY_ROWS,
+    CURRENCY_SLOT_MAP,
+    CURRENCY_SLOT_REVERSE,
+    _buildCraftingBenchSlotHTML,
+    _currencyDefForId,
+    _currencyIdForSlot,
+    _currencySlotForId,
+    _currencyStash,
 } from '../loot/hub-currency.js';
 
 export {
@@ -1306,60 +1306,60 @@ export {
 } from './hub-map-stash.js';
 
 export {
-    EG_MASS_SELL_RARITIES,
-    _egBuildItemChipHTML,
-    _egChipCounter,
-    _egChipRegistry,
-    _egDefaultMassSellKeep,
-    _egHandleChipMouseDown,
-    _egIsProtectedFromMassSell,
-    _egLoadMassSellSettings,
-    _egMassSellCounts,
-    _egMassSellKeep,
-    _egMassSellKeepUnique,
-    _egMassSellMinItemLevel,
-    _egMassSellMinReqLevel,
-    _egNormaliseMassSellKeep,
-    _egSaveMassSellSettings,
-    _egShowItemLevel,
-    _egShowTooltipFromChip,
+    MASS_SELL_RARITIES,
+    _buildItemChipHTML,
+    _chipCounter,
+    _chipRegistry,
+    _defaultMassSellKeep,
+    _handleChipMouseDown,
+    _isProtectedFromMassSell,
+    _loadMassSellSettings,
+    _massSellCounts,
+    _massSellKeep,
+    _massSellKeepUnique,
+    _massSellMinItemLevel,
+    _massSellMinReqLevel,
+    _normaliseMassSellKeep,
+    _saveMassSellSettings,
+    _showItemLevel,
+    _showTooltipFromChip,
 } from './hub-mass-sell.js';
 
 export {
-    _egBuildHubInfoTooltipHTML,
-    _egBuildTopbarHTML,
-    _egExportBuildSnapshot,
-    _egHideHubInfoTooltip,
-    _egShowHubInfoTooltip,
-    _egShowItemLevelToggleTooltip,
-    _egShowMassSellConfigTooltip,
-    _egShowMassSellTooltip,
-    _egToggleItemLevelDisplay,
-    _egUpdateItemLevelToggleButton,
-    _egUpdatePassiveTreeButton,
+    _buildHubInfoTooltipHTML,
+    _buildTopbarHTML,
+    _exportBuildSnapshot,
+    _hideHubInfoTooltip,
+    _showHubInfoTooltip,
+    _showItemLevelToggleTooltip,
+    _showMassSellConfigTooltip,
+    _showMassSellTooltip,
+    _toggleItemLevelDisplay,
+    _updateItemLevelToggleButton,
+    _updatePassiveTreeButton,
 } from './hub-topbar.js';
 
 export {
-    _egHealCurrencyItem,
-    _egHealEssenceItem,
-    _egPendingHandMigrationToast,
-    _egShowHandMigrationToast,
-    egSaveHubState,
+    _healCurrencyItem,
+    _healEssenceItem,
+    _pendingHandMigrationToast,
+    _showHandMigrationToast,
+    saveHubState,
 } from './hub-save.js';
 
 export {
-    _egCancelMassSellConfirm,
-    _egCloseMassSellModal,
-    _egConfirmMassSell,
-    _egEnsureMassSellModal,
-    _egExecuteMassSell,
-    _egInjectMassSellStyles,
-    _egMassSellRenderStaticText,
-    _egOpenMassSellModal,
-    _egRarityColor,
-    _egRarityLabel,
-    _egRenderMassSellModalContent,
-    _egRequestMassSell,
-    _egSaveMassSellModal,
-    _egUpdateMassSellPreview,
+    _cancelMassSellConfirm,
+    _closeMassSellModal,
+    _confirmMassSell,
+    _ensureMassSellModal,
+    _executeMassSell,
+    _injectMassSellStyles,
+    _massSellRenderStaticText,
+    _openMassSellModal,
+    _rarityColor,
+    _itemRarityLabel,
+    _renderMassSellModalContent,
+    _requestMassSell,
+    _saveMassSellModal,
+    _updateMassSellPreview,
 } from './hub-mass-sell-modal.js';

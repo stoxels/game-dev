@@ -287,7 +287,7 @@ export function _ptOverlayPause() {
         if (typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused) return;  // pause menu already up
         if (typeof pauseTimer === 'function') pauseTimer();
         globalThis._gamePaused = true;
-        if (typeof globalThis._egOnPause === 'function') { try { globalThis._egOnPause(); } catch (e) {} }
+        if (typeof globalThis._onPause === 'function') { try { globalThis._onPause(); } catch (e) {} }
         _ptOverlayPaused = true;
     } catch (e) {}
 }
@@ -299,7 +299,7 @@ export function _ptOverlayResume() {
     _ptOverlayPaused = false;
     try {
         globalThis._gamePaused = false;
-        if (typeof globalThis._egOnResume === 'function') { try { globalThis._egOnResume(); } catch (e) {} }
+        if (typeof globalThis._onResume === 'function') { try { globalThis._onResume(); } catch (e) {} }
         if (typeof resumeTimer === 'function') resumeTimer();
     } catch (e) {}
 }
@@ -344,7 +344,7 @@ export function closeTreeToGame() {
     _ptGameOverlay = false;
     if (typeof switchScreen === 'function') switchScreen('screen-game');
     _ptShowAvatars();
-    try { if (typeof globalThis._egSyncOverlayGearPools === 'function') globalThis._egSyncOverlayGearPools(); } catch (e) {}
+    try { if (typeof globalThis._syncOverlayGearPools === 'function') globalThis._syncOverlayGearPools(); } catch (e) {}
     try { if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth(); } catch (e) {}
     try { if (typeof globalThis.updateClassHUDManaBar === 'function') globalThis.updateClassHUDManaBar(); } catch (e) {}
     // Newly allocated nodes: refresh the in-puzzle tracker so it picks up

@@ -7,7 +7,7 @@
 // Unique item definitions (data). The golden tier: fixed-modifier named
 // items with a built-in downside. Uniques are NOT rolled - every copy has
 // the exact same stats. The requirements-rebalance IIFE at the end mutates
-// EG_UNIQUE_ITEMS entries at module-eval time, so importers deterministically
+// UNIQUE_ITEMS entries at module-eval time, so importers deterministically
 // see the rebalanced curves.
 
 import '../grid.js';
@@ -17,7 +17,7 @@ import '../translation/translations.js';
 import './equipment-base-items.js';
 import '../endgame/endgame-hub.js';
 import './loot-implicits.js';
-import { egRequirementStatTarget, egScaleRequirements } from './equipment-base-types.js';
+import { requirementStatTarget, scaleRequirements } from './equipment-base-types.js';
 import '../endgame/endgame-map-launch.js';
 import { applyUniqueReworks } from './unique-item-reworks.js';
 
@@ -30,8 +30,8 @@ import { applyUniqueReworks } from './unique-item-reworks.js';
 // the right setup and a trap in the wrong one.
 //
 // Load AFTER endgame-equipment-generator.js (uses _egMapLootRarityWeightMult,
-// EG_SLOT_ICONS) - the drop hook is applied inside _egSpawnLootDrop
-// (endgame-grid-pickups.js), which tries _egTryGenerateUniqueDrop() first.
+// SLOT_ICONS) - the drop hook is applied inside _spawnLootDrop
+// (endgame-grid-pickups.js), which tries _tryGenerateUniqueDrop() first.
 //
 // Rarity string is 'legendary' (the game's golden tier) plus `isUnique:true`
 // so all existing rendering (glow, toasts, chips, vendor) works out of the
@@ -45,18 +45,18 @@ import { applyUniqueReworks } from './unique-item-reworks.js';
 
 // Chance that an equipment drop is replaced by a random unique
 // (~2% of equipment drops → roughly 1 in 150 normal monster kills).
-export const EG_UNIQUE_DROP_CHANCE = 0.02;
+export const UNIQUE_DROP_CHANCE = 0.02;
 
 // The active map's loot-rarity bonus also makes uniques more likely
 // (applied as a square-root so rarity farming helps, but softly).
 
 // Unique-only QoL perk text for the zero-line auto-mark modifier.
 // Rendered as a special (blue) tooltip line, NOT a stat mod - it never
-// touches EG_STAT_KEY_MAP / _egComputePlayerStats.
-export const EG_UNIQUE_ZERO_AUTOMARK_EN = 'Rows and Columns with zero filled cells are automatically marked incorrect on level start';
-export const EG_UNIQUE_ZERO_AUTOMARK_DE = 'Reihen und Spalten ohne gefüllte Zellen werden bei Levelstart automatisch als falsch markiert';
+// touches STAT_KEY_MAP / _computePlayerStats.
+export const UNIQUE_ZERO_AUTOMARK_EN = 'Rows and Columns with zero filled cells are automatically marked incorrect on level start';
+export const UNIQUE_ZERO_AUTOMARK_DE = 'Reihen und Spalten ohne gefüllte Zellen werden bei Levelstart automatisch als falsch markiert';
 
-export const EG_UNIQUE_ITEMS = [
+export const UNIQUE_ITEMS = [
 
     // ── Head ──────────────────────────────────────────────────────────
     {
@@ -6170,7 +6170,7 @@ export const EG_UNIQUE_ITEMS = [
     // ══════════════════════════════════════════════════════════════════
     // ── ZERO-AUTOMARK UNIQUES (QoL-for-power tradeoff) ─────────────────
     // Each carries autoMarkZeroLines:true - empty rows/columns are marked
-    // incorrect on level start (see _egApplyUniqueZeroLineAutomark). To pay
+    // incorrect on level start (see _applyUniqueZeroLineAutomark). To pay
     // for that QoL their raw stats run slightly below curve for the level
     // plus a real downside.
     // ══════════════════════════════════════════════════════════════════
@@ -6242,7 +6242,7 @@ export const EG_UNIQUE_ITEMS = [
 
 // v2 stat rework (see unique-item-reworks.js): replaces stat blocks of the
 // reworked uniques before the requirement curve is applied.
-applyUniqueReworks(EG_UNIQUE_ITEMS);
+applyUniqueReworks(UNIQUE_ITEMS);
 
 //========================================================================
 //-------------------UNIQUE STAT REQUIREMENT REBALANCE (2026)-------------
@@ -6255,16 +6255,16 @@ applyUniqueReworks(EG_UNIQUE_ITEMS);
 // (pure) / 80% (hybrid), as before. Keeps starter uniques (minLevel <=10)
 // from being bumped.
 (() => {
-    const pureForArmor = (lvl) => Math.round(egRequirementStatTarget(lvl, 1));
-    const pureForJewelry = (lvl) => Math.round(16 + (egRequirementStatTarget(lvl, 1) - 20) * 0.82);
-    const hybridForArmor = (lvl) => { if(lvl<40) return null; return Math.round(egRequirementStatTarget(lvl, 2)); };
-    const hybridForJewelry = (lvl) => { if(lvl<40) return null; return Math.round(16 + (egRequirementStatTarget(lvl, 2) - 20) * 0.80); };
+    const pureForArmor = (lvl) => Math.round(requirementStatTarget(lvl, 1));
+    const pureForJewelry = (lvl) => Math.round(16 + (requirementStatTarget(lvl, 1) - 20) * 0.82);
+    const hybridForArmor = (lvl) => { if(lvl<40) return null; return Math.round(requirementStatTarget(lvl, 2)); };
+    const hybridForJewelry = (lvl) => { if(lvl<40) return null; return Math.round(16 + (requirementStatTarget(lvl, 2) - 20) * 0.80); };
     const JEWELRY = new Set(['ring','earring','amulet','talisman']);
     new Set(['head','chest','pants','shoulders','cloak','bracers','gloves','boots','belt','weapon','shield','ranged','arcane']);
-    for (const u of EG_UNIQUE_ITEMS) {
+    for (const u of UNIQUE_ITEMS) {
         const lvl = u.minLevel || 1;
         // Authored literals were written for the old economy: scale them first.
-        if (u.requirements) egScaleRequirements(u.requirements);
+        if (u.requirements) scaleRequirements(u.requirements);
         if (lvl <= 10) continue;
         const cur = u.requirements || { level: lvl, str:0, agi:0, int:0 };
         const hasStat = (cur.str||0)+(cur.agi||0)+(cur.int||0) > 0;

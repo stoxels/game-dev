@@ -1,8 +1,8 @@
 import { t } from '../translation/translations.js';
-import { EG_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from '../endgame/endgame-art.js';
 import { _egAtlasResolveNodeForMap, egAtlasIsCompleted, egAtlasNodeById, egAtlasNodeName, egAtlasTierDifficulty } from '../endgame/endgame-atlas.js';
 import { EG_MAP_BASE_BOSS_CHANCE } from '../endgame/endgame-map-launch.js';
-import { _egBuildMergedModLines } from '../endgame/endgame-player-stats.js';
+import { _buildMergedModLines } from '../endgame/endgame-player-stats.js';
 import { _egMapModAffects } from './loot-map-mod-tables.js';
 import { _egGetMapGoldRewardRange, _egGetMapRewardBonuses } from './loot-map-mod-rewards.js';
 import { _egGetCompletionRewardDef } from './loot-map-completion-reward.js';
@@ -42,7 +42,7 @@ export function _egBuildMapTooltipBodyHTML(item) {
     });
     Object.keys(groupMods).forEach(affects => {
         // Mods sharing the same stat are merged into one combined line.
-        groups[affects] = _egBuildMergedModLines(groupMods[affects]);
+        groups[affects] = _buildMergedModLines(groupMods[affects]);
     });
 
     const hideTier = !!item.isUnique;
@@ -90,7 +90,7 @@ export function _egBuildMapTooltipBodyHTML(item) {
         // Multi-boss maps have no single identity, so they keep the count.
         const boss = bossCount > 1 ? null : _egResolveMapBoss(item);
         const bossIcon = boss
-            ? ((typeof EG_ART !== 'undefined' && EG_ART.html) ? EG_ART.html('monster', boss.id, boss.emoji) : boss.emoji)
+            ? ((typeof GAME_ART !== 'undefined' && GAME_ART.html) ? GAME_ART.html('monster', boss.id, boss.emoji) : boss.emoji)
             : null;
         const bossLabel = boss
             ? `${bossIcon} ${boss.name}`
@@ -191,7 +191,7 @@ export function _egBuildMapTooltipBodyHTML(item) {
     return `
 <div class="eg-tt-frame eg-map-frame" style="--tt-border:${rc.border};">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon">${EG_ART.html('item', EG_ART.artIdForItem(item), item.icon || '🗺️')}</div>
+        <div class="eg-tt-icon">${GAME_ART.html('item', GAME_ART.artIdForItem(item), item.icon || '🗺️')}</div>
         <div class="eg-tt-name" style="color:${rc.color};">${item.name || '???'}</div>
         ${(item.baseName && item.baseName !== item.name)
             ? `<div class="eg-tt-basename" style="opacity:.7;">${item.baseName}</div>` : ''}
@@ -215,7 +215,7 @@ export function _egBuildMapTooltipBodyHTML(item) {
 //-------------------CSS INJECTION-----------------------------------------
 //------------------------------------------------------------------------
 
-(function _egInjectMapStyles() {
+(function _injectMapStyles() {
     if (document.getElementById('eg-map-item-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-map-item-styles';

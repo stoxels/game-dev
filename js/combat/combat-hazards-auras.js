@@ -1,20 +1,20 @@
 import { Audio_Manager } from '../audio/audio.js';
-import { EG_AIL_IGNITE_DMG_SHARE, EG_AIL_MIN_DOT_DAMAGE, _egApplyPlayerAilment } from './combat-ailments-core.js';
+import { AIL_IGNITE_DMG_SHARE, AIL_MIN_DOT_DAMAGE, _applyPlayerAilment } from './combat-ailments-core.js';
 import {
-    EG_HZ_FIREWALL_BASE_DMG_PCT, EG_HZ_FIREWALL_BOTTOM_SAFE_MAX, EG_HZ_FIREWALL_BOTTOM_SAFE_MIN,
-    EG_HZ_FIREWALL_GAP_MARGIN, EG_HZ_FIREWALL_GAP_MAX_W, EG_HZ_FIREWALL_GAP_MIN_W,
-    EG_HZ_FIREWALL_HEIGHT, EG_HZ_FIREWALL_IGNITE_CHANCE_PCT, EG_HZ_FIREWALL_INTERVAL_MAX_MS,
-    EG_HZ_FIREWALL_INTERVAL_MIN_MS, EG_HZ_FIREWALL_SWEEP_MS, EG_HZ_FIREWALL_TOP_SAFE_MAX,
-    EG_HZ_FIREWALL_TOP_SAFE_MIN, EG_HZ_FIREWALL_WARNING_MS, EG_HZ_FROSTNOVA_BAND,
-    EG_HZ_FROSTNOVA_BASE_DMG_PCT, EG_HZ_FROSTNOVA_EXPAND_MS, EG_HZ_FROSTNOVA_FREEZE_CHANCE_PCT,
-    EG_HZ_FROSTNOVA_INTERVAL_MAX_MS, EG_HZ_FROSTNOVA_INTERVAL_MIN_MS, EG_HZ_FROSTNOVA_MAX_R,
-    EG_HZ_VOLATILE_BASE_DMG_PCT, EG_HZ_VOLATILE_BLAST_R, EG_HZ_VOLATILE_FUSE_MS,
-    EG_HZ_VOLATILE_LIFETIME_MS, EG_HZ_VOLATILE_RESPAWN_MAX_MS, EG_HZ_VOLATILE_RESPAWN_MIN_MS,
-    EG_HZ_VOLATILE_SHADOWBURN_CHANCE_PCT, EG_HZ_VOLATILE_SPEED_MAX, EG_HZ_VOLATILE_SPEED_MIN,
-    EG_HZ_VOLATILE_TRIGGER_R, _egHzApplyCircleHit, _egHzCircleRectOverlap, _egHzDamage,
-    _egHzLayer, _egHzMult, _egHzPlayerHitbox, _egHzPointOutsideGrid, _egHzRand, _egHzRingRectOverlap,
+    HZ_FIREWALL_BASE_DMG_PCT, HZ_FIREWALL_BOTTOM_SAFE_MAX, HZ_FIREWALL_BOTTOM_SAFE_MIN,
+    HZ_FIREWALL_GAP_MARGIN, HZ_FIREWALL_GAP_MAX_W, HZ_FIREWALL_GAP_MIN_W,
+    HZ_FIREWALL_HEIGHT, HZ_FIREWALL_IGNITE_CHANCE_PCT, HZ_FIREWALL_INTERVAL_MAX_MS,
+    HZ_FIREWALL_INTERVAL_MIN_MS, HZ_FIREWALL_SWEEP_MS, HZ_FIREWALL_TOP_SAFE_MAX,
+    HZ_FIREWALL_TOP_SAFE_MIN, HZ_FIREWALL_WARNING_MS, HZ_FROSTNOVA_BAND,
+    HZ_FROSTNOVA_BASE_DMG_PCT, HZ_FROSTNOVA_EXPAND_MS, HZ_FROSTNOVA_FREEZE_CHANCE_PCT,
+    HZ_FROSTNOVA_INTERVAL_MAX_MS, HZ_FROSTNOVA_INTERVAL_MIN_MS, HZ_FROSTNOVA_MAX_R,
+    HZ_VOLATILE_BASE_DMG_PCT, HZ_VOLATILE_BLAST_R, HZ_VOLATILE_FUSE_MS,
+    HZ_VOLATILE_LIFETIME_MS, HZ_VOLATILE_RESPAWN_MAX_MS, HZ_VOLATILE_RESPAWN_MIN_MS,
+    HZ_VOLATILE_SHADOWBURN_CHANCE_PCT, HZ_VOLATILE_SPEED_MAX, HZ_VOLATILE_SPEED_MIN,
+    HZ_VOLATILE_TRIGGER_R, _hzApplyCircleHit, _hzCircleRectOverlap, _hzDamage,
+    _hzLayer, _hzMult, _hzPlayerHitbox, _hzPointOutsideGrid, _hzRand, _hzRingRectOverlap,
 } from './combat-hazards.js';
-import { _egHzFirewall, _egHzFrostNova, _egHzVolatile, _egSetHzFirewall, _egSetHzFrostNova, _egSetHzVolatile } from './combat-hazards.js';
+import { _hzFirewall, _hzFrostNova, _hzVolatile, _setHzFirewall, _setHzFrostNova, _setHzVolatile } from './combat-hazards.js';
 
 //------------------------------------------------------------------------
 //-------------------VOLATILE WISPS---------------------------------------
@@ -23,44 +23,44 @@ import { _egHzFirewall, _egHzFrostNova, _egHzVolatile, _egSetHzFirewall, _egSetH
 // in on the player. When close (or after a lifetime) they flash briefly,
 // then detonate - shadow damage in a blast radius, may inflict Shadow Burn.
 
-export function _egHzInitVolatile(intensity) {
+export function _hzInitVolatile(intensity) {
     const maxWisps = Math.min(6, 1 + Math.round(intensity / 22));
-    _egSetHzVolatile({
+    _setHzVolatile({
         wisps: [],
         respawnIn: 0,
         maxWisps,
         speedScale: Math.max(0.65, 1 - intensity / 300),
-        dmgMult: _egHzMult(intensity),
+        dmgMult: _hzMult(intensity),
     });
     // Stagger the initial wave so wisps don't all arrive simultaneously.
     for (let i = 0; i < maxWisps; i++) {
         const wisp = {
             x: -200, y: -200,
-            speed: _egHzRand(EG_HZ_VOLATILE_SPEED_MIN, EG_HZ_VOLATILE_SPEED_MAX),
+            speed: _hzRand(HZ_VOLATILE_SPEED_MIN, HZ_VOLATILE_SPEED_MAX),
             state: 'delay',
-            t: 800 + i * _egHzRand(1500, 3500),
-            life: EG_HZ_VOLATILE_LIFETIME_MS,
+            t: 800 + i * _hzRand(1500, 3500),
+            life: HZ_VOLATILE_LIFETIME_MS,
             el: null,
         };
-        wisp.speed /= _egHzVolatile.speedScale;
-        _egHzVolatile.wisps.push(wisp);
+        wisp.speed /= _hzVolatile.speedScale;
+        _hzVolatile.wisps.push(wisp);
     }
 }
 
-export function _egHzActivateVolatileWisp(wisp) {
-    const pos = _egHzPointOutsideGrid(40);
+export function _hzActivateVolatileWisp(wisp) {
+    const pos = _hzPointOutsideGrid(40);
     wisp.x = pos.x;
     wisp.y = pos.y;
-    wisp.life = EG_HZ_VOLATILE_LIFETIME_MS;
+    wisp.life = HZ_VOLATILE_LIFETIME_MS;
     wisp.state = 'hunt';
     const el = document.createElement('div');
     el.className = 'eg-hz-volatile';
-    _egHzLayer.appendChild(el);
+    _hzLayer.appendChild(el);
     wisp.el = el;
 }
 
-export function _egHzDetonateVolatile(wisp) {
-    const st = _egHzVolatile;
+export function _hzDetonateVolatile(wisp) {
+    const st = _hzVolatile;
     wisp.state = 'dead';
     Audio_Manager.playSFX('hz_volatile_detonate');
     if (wisp.el) {
@@ -70,22 +70,22 @@ export function _egHzDetonateVolatile(wisp) {
         wisp.el = null;
     }
 
-    const pr = _egHzPlayerHitbox();
-    _egHzApplyCircleHit(wisp.x, wisp.y, EG_HZ_VOLATILE_BLAST_R, pr,
-        EG_HZ_VOLATILE_BASE_DMG_PCT * st.dmgMult, 'shadow', '#b39ddb',
-        Math.random() * 100 < EG_HZ_VOLATILE_SHADOWBURN_CHANCE_PCT ? 'shadowburn' : null);
+    const pr = _hzPlayerHitbox();
+    _hzApplyCircleHit(wisp.x, wisp.y, HZ_VOLATILE_BLAST_R, pr,
+        HZ_VOLATILE_BASE_DMG_PCT * st.dmgMult, 'shadow', '#b39ddb',
+        Math.random() * 100 < HZ_VOLATILE_SHADOWBURN_CHANCE_PCT ? 'shadowburn' : null);
 
     // Queue a replacement so the pressure never runs dry.
     if (!(st.respawnIn > 0)) {
-        st.respawnIn = _egHzRand(
-            EG_HZ_VOLATILE_RESPAWN_MIN_MS, EG_HZ_VOLATILE_RESPAWN_MAX_MS);
+        st.respawnIn = _hzRand(
+            HZ_VOLATILE_RESPAWN_MIN_MS, HZ_VOLATILE_RESPAWN_MAX_MS);
     }
 }
 
-export function _egHzTickVolatile(dtMs) {
-    const st = _egHzVolatile;
+export function _hzTickVolatile(dtMs) {
+    const st = _hzVolatile;
     const dtS = dtMs / 1000;
-    const pr = _egHzPlayerHitbox();
+    const pr = _hzPlayerHitbox();
 
     // Respawn timer for detonated wisps.
     if (st.respawnIn > 0) {
@@ -93,8 +93,8 @@ export function _egHzTickVolatile(dtMs) {
         if (st.respawnIn <= 0) {
             st.respawnIn = 0;
             const idle = st.wisps.find(w => w.state === 'dead');
-            if (idle) _egHzActivateVolatileWisp(idle);
-            else st.respawnIn = _egHzRand(1000, 2500);
+            if (idle) _hzActivateVolatileWisp(idle);
+            else st.respawnIn = _hzRand(1000, 2500);
         }
     }
 
@@ -103,7 +103,7 @@ export function _egHzTickVolatile(dtMs) {
 
         if (w.state === 'delay') {
             w.t -= dtMs;
-            if (w.t <= 0) _egHzActivateVolatileWisp(w);
+            if (w.t <= 0) _hzActivateVolatileWisp(w);
             return;
         }
 
@@ -117,10 +117,10 @@ export function _egHzTickVolatile(dtMs) {
                 const cy = pr.top + pr.height / 2;
                 const dx = cx - w.x, dy = cy - w.y;
                 const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-                if (_egHzCircleRectOverlap(w.x, w.y, EG_HZ_VOLATILE_TRIGGER_R, pr) || w.life <= 0) {
+                if (_hzCircleRectOverlap(w.x, w.y, HZ_VOLATILE_TRIGGER_R, pr) || w.life <= 0) {
                     w.state = 'fuse';
                     Audio_Manager.playSFX('hz_volatile_arm');
-                    w.t = EG_HZ_VOLATILE_FUSE_MS;
+                    w.t = HZ_VOLATILE_FUSE_MS;
                     w.el.classList.add('eg-hz-volatile-fuse');
                     return;
                 }
@@ -134,7 +134,7 @@ export function _egHzTickVolatile(dtMs) {
                 `translate(${Math.round(w.x)}px, ${Math.round(w.y)}px)`;
         } else if (w.state === 'fuse') {
             w.t -= dtMs;
-            if (w.t <= 0) _egHzDetonateVolatile(w);
+            if (w.t <= 0) _hzDetonateVolatile(w);
         }
     });
 }
@@ -147,23 +147,23 @@ export function _egHzTickVolatile(dtMs) {
 // expanding ring damages anything it passes through once (chill + freeze
 // chance). Cold Resistance mitigates; dodging out of the ring radius works.
 
-export function _egHzInitFrostNova(intensity) {
-    _egSetHzFrostNova({
+export function _hzInitFrostNova(intensity) {
+    _setHzFrostNova({
         novas: [],
-        nextIn: _egHzRand(2500, 5000),
+        nextIn: _hzRand(2500, 5000),
         intervalScale: 1 - Math.min(0.45, intensity / 220),
-        dmgMult: _egHzMult(intensity),
+        dmgMult: _hzMult(intensity),
     });
 }
 
-export function _egHzSpawnFrostNova() {
+export function _hzSpawnFrostNova() {
     // Erupt close to the player so the expanding ring must be reacted to.
     let x = window.innerWidth * 0.5;
     let y = window.innerHeight * 0.5;
-    const pr = _egHzPlayerHitbox();
+    const pr = _hzPlayerHitbox();
     if (pr) {
-        x = pr.left + pr.width / 2 + _egHzRand(-240, 240);
-        y = pr.top + pr.height / 2 + _egHzRand(-240, 240);
+        x = pr.left + pr.width / 2 + _hzRand(-240, 240);
+        y = pr.top + pr.height / 2 + _hzRand(-240, 240);
     }
     x = Math.max(20, Math.min(window.innerWidth - 20, x));
     y = Math.max(20, Math.min(window.innerHeight - 20, y));
@@ -172,25 +172,25 @@ export function _egHzSpawnFrostNova() {
     el.className = 'eg-hz-frostnova';
     el.style.left = x + 'px';
     el.style.top = y + 'px';
-    _egHzLayer.appendChild(el);
+    _hzLayer.appendChild(el);
 
     Audio_Manager.playSFX('hz_frostnova_burst');
-    _egHzFrostNova.novas.push({ x, y, t: EG_HZ_FROSTNOVA_EXPAND_MS, r: 0, el, hitDone: false });
+    _hzFrostNova.novas.push({ x, y, t: HZ_FROSTNOVA_EXPAND_MS, r: 0, el, hitDone: false });
 }
 
-export function _egHzTickFrostNova(dtMs) {
-    const st = _egHzFrostNova;
+export function _hzTickFrostNova(dtMs) {
+    const st = _hzFrostNova;
 
     st.nextIn -= dtMs;
     if (st.nextIn <= 0) {
-        st.nextIn = _egHzRand(
-            EG_HZ_FROSTNOVA_INTERVAL_MIN_MS,
-            EG_HZ_FROSTNOVA_INTERVAL_MAX_MS
+        st.nextIn = _hzRand(
+            HZ_FROSTNOVA_INTERVAL_MIN_MS,
+            HZ_FROSTNOVA_INTERVAL_MAX_MS
         ) * st.intervalScale;
-        _egHzSpawnFrostNova();
+        _hzSpawnFrostNova();
     }
 
-    const pr = _egHzPlayerHitbox();
+    const pr = _hzPlayerHitbox();
 
     for (let i = st.novas.length - 1; i >= 0; i--) {
         const nova = st.novas[i];
@@ -198,8 +198,8 @@ export function _egHzTickFrostNova(dtMs) {
 
         nova.prevR = nova.r;
         nova.t -= dtMs;
-        nova.r = EG_HZ_FROSTNOVA_MAX_R *
-            Math.min(1, 1 - nova.t / EG_HZ_FROSTNOVA_EXPAND_MS);
+        nova.r = HZ_FROSTNOVA_MAX_R *
+            Math.min(1, 1 - nova.t / HZ_FROSTNOVA_EXPAND_MS);
 
         const size = nova.r * 2;
         nova.el.style.width = size + 'px';
@@ -211,17 +211,17 @@ export function _egHzTickFrostNova(dtMs) {
         // Swept so 10px/tick + 26px band can't be missed; tight hitbox vs ring.
         if (pr && !nova.hitDone) {
             const prevR = (typeof nova.prevR === 'number') ? nova.prevR : nova.r;
-            const hitNow = _egHzRingRectOverlap(nova.x, nova.y, nova.r, EG_HZ_FROSTNOVA_BAND, pr);
-            const hitPrev = _egHzRingRectOverlap(nova.x, nova.y, prevR, EG_HZ_FROSTNOVA_BAND, pr);
+            const hitNow = _hzRingRectOverlap(nova.x, nova.y, nova.r, HZ_FROSTNOVA_BAND, pr);
+            const hitPrev = _hzRingRectOverlap(nova.x, nova.y, prevR, HZ_FROSTNOVA_BAND, pr);
             if (hitNow || hitPrev) {
                 nova.hitDone = true;
-                const dealt = _egHzDamage(
-                    EG_HZ_FROSTNOVA_BASE_DMG_PCT * st.dmgMult, 'cold', '#a8e6ff'
+                const dealt = _hzDamage(
+                    HZ_FROSTNOVA_BASE_DMG_PCT * st.dmgMult, 'cold', '#a8e6ff'
                 );
-                if (dealt > 0 && typeof _egApplyPlayerAilment === 'function') {
-                    _egApplyPlayerAilment('chill');
-                    if (Math.random() * 100 < EG_HZ_FROSTNOVA_FREEZE_CHANCE_PCT) {
-                        _egApplyPlayerAilment('frozen');
+                if (dealt > 0 && typeof _applyPlayerAilment === 'function') {
+                    _applyPlayerAilment('chill');
+                    if (Math.random() * 100 < HZ_FROSTNOVA_FREEZE_CHANCE_PCT) {
+                        _applyPlayerAilment('frozen');
                     }
                 }
             }
@@ -260,17 +260,17 @@ export function _egHzTickFrostNova(dtMs) {
 // the player's tight sprite hitbox; for gap variants the hit is
 // suppressed when the hitbox is fully inside the gap.
 
-export function _egHzInitFirewall(intensity) {
-    _egSetHzFirewall({
+export function _hzInitFirewall(intensity) {
+    _setHzFirewall({
         pending: [],
-        nextIn: _egHzRand(3500, 6500),
+        nextIn: _hzRand(3500, 6500),
         intervalScale: 1 - Math.min(0.45, intensity / 220),
-        dmgMult: _egHzMult(intensity),
+        dmgMult: _hzMult(intensity),
     });
 }
 
-export function _egHzCreateFirewallWallEls(variant, gapX, gapW, startY) {
-    const h = EG_HZ_FIREWALL_HEIGHT;
+export function _hzCreateFirewallWallEls(variant, gapX, gapW, startY) {
+    const h = HZ_FIREWALL_HEIGHT;
     const hasGap = variant === 'gapDown' || variant === 'gapUp';
     const els = [];
     if (!hasGap) {
@@ -279,13 +279,13 @@ export function _egHzCreateFirewallWallEls(variant, gapX, gapW, startY) {
         el.style.height = h + 'px';
         el.style.transform = `translateY(${Math.round(startY)}px)`;
         el.style.display = 'none';
-        if (_egHzLayer) _egHzLayer.appendChild(el);
+        if (_hzLayer) _hzLayer.appendChild(el);
         els.push(el);
     } else {
         const vw = window.innerWidth;
         // Clamp gap to viewport
-        const gx = Math.max(EG_HZ_FIREWALL_GAP_MARGIN,
-            Math.min(gapX, vw - gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+        const gx = Math.max(HZ_FIREWALL_GAP_MARGIN,
+            Math.min(gapX, vw - gapW - HZ_FIREWALL_GAP_MARGIN));
         const leftW = gx;
         const rightX = gx + gapW;
         const rightW = Math.max(0, vw - rightX);
@@ -298,7 +298,7 @@ export function _egHzCreateFirewallWallEls(variant, gapX, gapW, startY) {
             seg.style.width = width + 'px';
             seg.style.transform = `translateY(${Math.round(startY)}px)`;
             seg.style.display = 'none';
-            if (_egHzLayer) _egHzLayer.appendChild(seg);
+            if (_hzLayer) _hzLayer.appendChild(seg);
             return seg;
         };
         if (leftW > 2) els.push(mkSeg(0, leftW));
@@ -311,15 +311,15 @@ export function _egHzCreateFirewallWallEls(variant, gapX, gapW, startY) {
             el.style.height = h + 'px';
             el.style.transform = `translateY(${Math.round(startY)}px)`;
             el.style.display = 'none';
-            if (_egHzLayer) _egHzLayer.appendChild(el);
+            if (_hzLayer) _hzLayer.appendChild(el);
             els.push(el);
         }
     }
     return els;
 }
 
-export function _egHzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
-    const h = EG_HZ_FIREWALL_HEIGHT;
+export function _hzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
+    const h = HZ_FIREWALL_HEIGHT;
     const hasGap = variant === 'gapDown' || variant === 'gapUp';
     const els = [];
     if (!hasGap) {
@@ -328,12 +328,12 @@ export function _egHzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
         // Position at the wall's start location so the safe strip is visible.
         warn.style.top = Math.round(startY) + 'px';
         warn.style.height = h + 'px';
-        if (_egHzLayer) _egHzLayer.appendChild(warn);
+        if (_hzLayer) _hzLayer.appendChild(warn);
         els.push(warn);
     } else {
         const vw = window.innerWidth;
-        const gx = Math.max(EG_HZ_FIREWALL_GAP_MARGIN,
-            Math.min(gapX, vw - gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+        const gx = Math.max(HZ_FIREWALL_GAP_MARGIN,
+            Math.min(gapX, vw - gapW - HZ_FIREWALL_GAP_MARGIN));
         const leftW = gx;
         const rightX = gx + gapW;
         const rightW = Math.max(0, vw - rightX);
@@ -345,7 +345,7 @@ export function _egHzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
             seg.style.left = left + 'px';
             seg.style.right = 'auto';
             seg.style.width = width + 'px';
-            if (_egHzLayer) _egHzLayer.appendChild(seg);
+            if (_hzLayer) _hzLayer.appendChild(seg);
             return seg;
         };
         if (leftW > 2) els.push(mkWarnSeg(0, leftW));
@@ -355,15 +355,15 @@ export function _egHzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
             warn.className = 'eg-hz-firewall-warning';
             warn.style.top = Math.round(startY) + 'px';
             warn.style.height = h + 'px';
-            if (_egHzLayer) _egHzLayer.appendChild(warn);
+            if (_hzLayer) _hzLayer.appendChild(warn);
             els.push(warn);
         }
     }
     return els;
 }
 
-export function _egHzTickFirewall(dtMs) {
-    const st = _egHzFirewall;
+export function _hzTickFirewall(dtMs) {
+    const st = _hzFirewall;
     const dtS = dtMs / 1000;
 
     st.nextIn -= dtMs;
@@ -374,9 +374,9 @@ export function _egHzTickFirewall(dtMs) {
         if (st.pending.length > 0) {
             st.nextIn = 250;
         } else {
-            st.nextIn = _egHzRand(
-                EG_HZ_FIREWALL_INTERVAL_MIN_MS,
-                EG_HZ_FIREWALL_INTERVAL_MAX_MS
+            st.nextIn = _hzRand(
+                HZ_FIREWALL_INTERVAL_MIN_MS,
+                HZ_FIREWALL_INTERVAL_MAX_MS
             ) * st.intervalScale;
 
             // ── Pick a random outplay variation ───────────────────────────
@@ -384,45 +384,45 @@ export function _egHzTickFirewall(dtMs) {
             const variant = variants[Math.floor(Math.random() * variants.length)];
             const vh = window.innerHeight;
             const vw = window.innerWidth;
-            const h = EG_HZ_FIREWALL_HEIGHT;
+            const h = HZ_FIREWALL_HEIGHT;
             let startY, endY, dir, gapX = 0, gapW = 0;
 
             if (variant === 'offsetTop') {
-                const safeTop = _egHzRand(EG_HZ_FIREWALL_TOP_SAFE_MIN, EG_HZ_FIREWALL_TOP_SAFE_MAX);
+                const safeTop = _hzRand(HZ_FIREWALL_TOP_SAFE_MIN, HZ_FIREWALL_TOP_SAFE_MAX);
                 startY = safeTop;
                 endY = vh;
                 dir = 1;
             } else if (variant === 'offsetBottom') {
-                const safeBottom = _egHzRand(EG_HZ_FIREWALL_BOTTOM_SAFE_MIN, EG_HZ_FIREWALL_BOTTOM_SAFE_MAX);
+                const safeBottom = _hzRand(HZ_FIREWALL_BOTTOM_SAFE_MIN, HZ_FIREWALL_BOTTOM_SAFE_MAX);
                 startY = vh - h - safeBottom;
                 endY = -h;
                 dir = -1;
             } else if (variant === 'gapDown') {
-                gapW = _egHzRand(EG_HZ_FIREWALL_GAP_MIN_W, EG_HZ_FIREWALL_GAP_MAX_W);
-                gapX = _egHzRand(EG_HZ_FIREWALL_GAP_MARGIN, Math.max(EG_HZ_FIREWALL_GAP_MARGIN, vw - gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+                gapW = _hzRand(HZ_FIREWALL_GAP_MIN_W, HZ_FIREWALL_GAP_MAX_W);
+                gapX = _hzRand(HZ_FIREWALL_GAP_MARGIN, Math.max(HZ_FIREWALL_GAP_MARGIN, vw - gapW - HZ_FIREWALL_GAP_MARGIN));
                 startY = -h;
                 endY = vh;
                 dir = 1;
             } else { // gapUp
-                gapW = _egHzRand(EG_HZ_FIREWALL_GAP_MIN_W, EG_HZ_FIREWALL_GAP_MAX_W);
-                gapX = _egHzRand(EG_HZ_FIREWALL_GAP_MARGIN, Math.max(EG_HZ_FIREWALL_GAP_MARGIN, vw - gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+                gapW = _hzRand(HZ_FIREWALL_GAP_MIN_W, HZ_FIREWALL_GAP_MAX_W);
+                gapX = _hzRand(HZ_FIREWALL_GAP_MARGIN, Math.max(HZ_FIREWALL_GAP_MARGIN, vw - gapW - HZ_FIREWALL_GAP_MARGIN));
                 startY = vh;
                 endY = -h;
                 dir = -1;
             }
 
             const totalDist = Math.abs(endY - startY);
-            const wallEls = _egHzCreateFirewallWallEls(variant, gapX, gapW, startY);
-            const warningEls = _egHzCreateFirewallWarningEls(variant, gapX, gapW, startY);
+            const wallEls = _hzCreateFirewallWallEls(variant, gapX, gapW, startY);
+            const warningEls = _hzCreateFirewallWarningEls(variant, gapX, gapW, startY);
             Audio_Manager.playSFX('hz_firewall_warn');
             // Remove telegraph after wind-up; wall becomes visible then.
             const warnElsSnapshot = warningEls.slice();
-            setTimeout(() => warnElsSnapshot.forEach(el => { try { el.remove(); } catch(e){} }), EG_HZ_FIREWALL_WARNING_MS);
+            setTimeout(() => warnElsSnapshot.forEach(el => { try { el.remove(); } catch(e){} }), HZ_FIREWALL_WARNING_MS);
 
             const isGapVariant = variant === 'gapDown' || variant === 'gapUp';
             st.pending.push({
-                t: EG_HZ_FIREWALL_WARNING_MS,
-                lingerT: isGapVariant ? EG_HZ_FIREWALL_WARNING_MS : 0,
+                t: HZ_FIREWALL_WARNING_MS,
+                lingerT: isGapVariant ? HZ_FIREWALL_WARNING_MS : 0,
                 y: startY,
                 dir: dir,
                 totalDist: totalDist,
@@ -437,7 +437,7 @@ export function _egHzTickFirewall(dtMs) {
         }
     }
 
-    const pr = _egHzPlayerHitbox();
+    const pr = _hzPlayerHitbox();
 
     for (let i = st.pending.length - 1; i >= 0; i--) {
         const w = st.pending[i];
@@ -466,14 +466,14 @@ export function _egHzTickFirewall(dtMs) {
 
             // Hit detection during linger - wall is stationary at startY.
             const wallTop = w.y;
-            const wallBottom = w.y + EG_HZ_FIREWALL_HEIGHT;
+            const wallBottom = w.y + HZ_FIREWALL_HEIGHT;
             const verticalOverlap = pr && pr.bottom > wallTop && pr.top < wallBottom;
             if (!w.hitDone && verticalOverlap) {
                 let shouldHit = true;
                 if (w.variant === 'gapDown' || w.variant === 'gapUp') {
                     const vw = window.innerWidth;
-                    const gx = Math.max(EG_HZ_FIREWALL_GAP_MARGIN,
-                        Math.min(w.gapX, vw - w.gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+                    const gx = Math.max(HZ_FIREWALL_GAP_MARGIN,
+                        Math.min(w.gapX, vw - w.gapW - HZ_FIREWALL_GAP_MARGIN));
                     const gapLeft = gx;
                     const gapRight = gx + w.gapW;
                     const inset = 6;
@@ -487,12 +487,12 @@ export function _egHzTickFirewall(dtMs) {
                 }
                 if (shouldHit) {
                     w.hitDone = true;
-                    const dealt = _egHzDamage(
-                        EG_HZ_FIREWALL_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
+                    const dealt = _hzDamage(
+                        HZ_FIREWALL_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
                     );
-                    if (dealt > 0 && typeof _egApplyPlayerAilment === 'function') {
-                        _egApplyPlayerAilment('ignite',
-                            Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
+                    if (dealt > 0 && typeof _applyPlayerAilment === 'function') {
+                        _applyPlayerAilment('ignite',
+                            Math.max(AIL_MIN_DOT_DAMAGE, dealt * AIL_IGNITE_DMG_SHARE));
                     }
                 }
             }
@@ -501,13 +501,13 @@ export function _egHzTickFirewall(dtMs) {
 
         // Sweeping phase - the wave moves in its variant direction.
         const prevY = w.y;
-        const speed = w.totalDist / (EG_HZ_FIREWALL_SWEEP_MS / 1000);
+        const speed = w.totalDist / (HZ_FIREWALL_SWEEP_MS / 1000);
         w.y += w.dir * speed * dtS;
         w.wallEls.forEach(el => { el.style.transform = `translateY(${Math.round(w.y)}px)`; });
 
         // Swept vertical interval so high speed cannot skip hitbox.
         const wallTop = Math.min(prevY, w.y);
-        const wallBottom = Math.max(prevY + EG_HZ_FIREWALL_HEIGHT, w.y + EG_HZ_FIREWALL_HEIGHT);
+        const wallBottom = Math.max(prevY + HZ_FIREWALL_HEIGHT, w.y + HZ_FIREWALL_HEIGHT);
         const verticalOverlap = pr && pr.bottom > wallTop && pr.top < wallBottom;
 
         if (!w.hitDone && verticalOverlap) {
@@ -515,8 +515,8 @@ export function _egHzTickFirewall(dtMs) {
             // Gap variants: player fully inside the gap is safe.
             if (w.variant === 'gapDown' || w.variant === 'gapUp') {
                 const vw = window.innerWidth;
-                const gx = Math.max(EG_HZ_FIREWALL_GAP_MARGIN,
-                    Math.min(w.gapX, vw - w.gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+                const gx = Math.max(HZ_FIREWALL_GAP_MARGIN,
+                    Math.min(w.gapX, vw - w.gapW - HZ_FIREWALL_GAP_MARGIN));
                 const gapLeft = gx;
                 const gapRight = gx + w.gapW;
                 // Small forgiveness inset so touching the flame edge still burns.
@@ -537,20 +537,20 @@ export function _egHzTickFirewall(dtMs) {
 
             if (shouldHit) {
                 w.hitDone = true;
-                const dealt = _egHzDamage(
-                    EG_HZ_FIREWALL_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
+                const dealt = _hzDamage(
+                    HZ_FIREWALL_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
                 );
-                if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
-                    && Math.random() * 100 < EG_HZ_FIREWALL_IGNITE_CHANCE_PCT) {
-                    _egApplyPlayerAilment('ignite',
-                        Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
+                if (dealt > 0 && typeof _applyPlayerAilment === 'function'
+                    && Math.random() * 100 < HZ_FIREWALL_IGNITE_CHANCE_PCT) {
+                    _applyPlayerAilment('ignite',
+                        Math.max(AIL_MIN_DOT_DAMAGE, dealt * AIL_IGNITE_DMG_SHARE));
                 }
             }
         }
 
         // Remove when the wall has fully exited the screen in its direction.
         const exited = (w.dir === 1 && w.y >= window.innerHeight) ||
-                       (w.dir === -1 && w.y <= -EG_HZ_FIREWALL_HEIGHT);
+                       (w.dir === -1 && w.y <= -HZ_FIREWALL_HEIGHT);
         if (exited) {
             w.wallEls.forEach(el => { try { el.remove(); } catch(e){} });
             // Warning already removed via timeout, but ensure cleanup.

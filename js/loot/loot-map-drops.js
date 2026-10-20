@@ -1,13 +1,13 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { EG_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from '../endgame/endgame-art.js';
 import { egAtlasAdjacentBonusChance, egAtlasAdjacentBonusPercent, egAtlasPickAdjacentBonusNodeId } from '../endgame/endgame-atlas.js';
-import { _egGetElementCentre } from '../combat/combat-class-projectiles.js';
+import { _getElementCentre } from '../combat/combat-class-projectiles.js';
 import { _egRenderMapStashCell, _egUpdateMapStashTabCounts } from '../endgame/endgame-gate.js';
-import { EG_LOOT_DROP_LIFETIME_MS, _egAnimatePickupDiscard, _egBuildPickupEligiblePool, _egCancelTrackedExpiry, _egCellHasAnyDrop, _egRarityToastColor, _egScheduleTrackedExpiry, _egStartDropExpireCountdown } from '../combat/combat-grid-pickups.js';
-import { EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_TIER_COUNT, _egFindFreeMapCellForTier, _egGetMapTierGrid, _egMapStash, _egRebuildMapStashGrid, egSaveHubState } from '../endgame/endgame-hub.js';
+import { LOOT_DROP_LIFETIME_MS, _animatePickupDiscard, _buildPickupEligiblePool, _cancelTrackedExpiry, _cellHasAnyDrop, _rarityToastColor, _scheduleTrackedExpiry, _startDropExpireCountdown } from '../combat/combat-grid-pickups.js';
+import { EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_TIER_COUNT, _egFindFreeMapCellForTier, _egGetMapTierGrid, _egMapStash, _egRebuildMapStashGrid, saveHubState } from '../endgame/endgame-hub.js';
 import { _egActiveMapItem, _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
-import { _egIsActive } from '../combat/combat-state.js';
+import { _isActive } from '../combat/combat-state.js';
 import { _egGetMapRewardBonuses } from './loot-map-mod-rewards.js';
 import { _egGenerateMapDrop, _egResolveAtlasDropTarget } from './loot-maps.js';
 import { EG_MAP_DROP_CHANCE_NORMAL } from './loot-map-config.js';
@@ -143,8 +143,8 @@ export function _egTryDropMap(isBoss, monsterLevel, force = false, opts = null) 
 // The bonus map comes from a region linked to the just-finished run's
 // region - preferring an uncompleted +1-tier link so the bonus can climb
 // to higher tiers (see egAtlasPickAdjacentBonusNodeId) - and is banked
-// straight into the map stash (+ _egRunMaps so it shows in the leave-map
-// summary). Must be called from _egEndMap() AFTER _egAtlasOnMapCompleted()
+// straight into the map stash (+ _runMaps so it shows in the leave-map
+// summary). Must be called from _endMap() AFTER _egAtlasOnMapCompleted()
 // so a fresh first clear already counts.
 // Returns the bonus map item when the roll succeeded, else null.
 export function _egRollAtlasAdjacentBonusDrop(activeMapItem) {
@@ -166,7 +166,7 @@ export function _egRollAtlasAdjacentBonusDrop(activeMapItem) {
     if (!bonusMap) return null;
 
     _egAddMapToMapStash(bonusMap);
-    if (typeof _egRunMaps !== 'undefined' && Array.isArray(globalThis._egRunMaps)) globalThis._egRunMaps.push(bonusMap);
+    if (typeof _runMaps !== 'undefined' && Array.isArray(globalThis._runMaps)) globalThis._runMaps.push(bonusMap);
 
     let pct = 0;
     try { pct = egAtlasAdjacentBonusPercent(); } catch (e) { pct = Math.round(chance * 100); }
@@ -180,16 +180,16 @@ export function _egRollAtlasAdjacentBonusDrop(activeMapItem) {
     return bonusMap;
 }
 
-// Places a map drop on an eligible grid cell (mirrors _egSpawnLootDrop).
+// Places a map drop on an eligible grid cell (mirrors _spawnLootDrop).
 export function _egSpawnMapDrop(map) {
-    if (!_egIsActive() || !map) return;
+    if (!_isActive() || !map) return;
     if (_egMapDrops.size >= 1) return; // one map drop on the board at a time
 
-    const pool = typeof _egBuildPickupEligiblePool === 'function'
-        ? _egBuildPickupEligiblePool()
+    const pool = typeof _buildPickupEligiblePool === 'function'
+        ? _buildPickupEligiblePool()
         : [];
-    const filtered = typeof _egCellHasAnyDrop === 'function'
-        ? pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c))
+    const filtered = typeof _cellHasAnyDrop === 'function'
+        ? pool.filter(([r, c]) => !_cellHasAnyDrop(r, c))
         : pool;
     if (filtered.length === 0) return;
 
@@ -200,20 +200,20 @@ export function _egSpawnMapDrop(map) {
 
     // Overlay visual - reuses the loot overlay styling with a map tint class.
     // Glow class follows the map's own rarity color. Shows the tier-specific
-    // map art (map_tNN via EG_ART.artIdForItem) when available, else emoji.
+    // map art (map_tNN via GAME_ART.artIdForItem) when available, else emoji.
     const el = document.getElementById(`g-${r}-${c}`);
     if (el) {
         const span = document.createElement('span');
         span.className = `eg-pickup-overlay eg-pickup-rarity-${map.rarity || 'common'} eg-loot-overlay eg-mapdrop-overlay`;
         span.id = `eg-mapdrop-${r}-${c}`;
-        EG_ART.fillElement(span, 'item', EG_ART.artIdForItem(map), map.icon || '🗺️');
+        GAME_ART.fillElement(span, 'item', GAME_ART.artIdForItem(map), map.icon || '🗺️');
         el.appendChild(span);
     }
 
     // Auto-expire after the shared loot lifetime (pause-aware).
-    const lifetime = EG_LOOT_DROP_LIFETIME_MS;
-    if (typeof _egScheduleTrackedExpiry === 'function') {
-        _egScheduleTrackedExpiry(_egMapDrops, key, map, lifetime, `eg-mapdrop-${r}-${c}`, _egRemoveMapDropOverlay);
+    const lifetime = LOOT_DROP_LIFETIME_MS;
+    if (typeof _scheduleTrackedExpiry === 'function') {
+        _scheduleTrackedExpiry(_egMapDrops, key, map, lifetime, `eg-mapdrop-${r}-${c}`, _egRemoveMapDropOverlay);
     } else {
         const timer = setTimeout(() => {
             if (_egMapDrops.get(key) === map) {
@@ -221,9 +221,9 @@ export function _egSpawnMapDrop(map) {
                 _egRemoveMapDropOverlay(key);
             }
         }, lifetime);
-        if (typeof _egPickupTimers !== 'undefined') globalThis._egPickupTimers.push(timer);
-        if (typeof _egStartDropExpireCountdown === 'function') {
-            _egStartDropExpireCountdown(`eg-mapdrop-${r}-${c}`, lifetime);
+        if (typeof _pickupTimers !== 'undefined') globalThis._pickupTimers.push(timer);
+        if (typeof _startDropExpireCountdown === 'function') {
+            _startDropExpireCountdown(`eg-mapdrop-${r}-${c}`, lifetime);
         }
     }
 }
@@ -237,57 +237,57 @@ export function _egRemoveMapDropOverlay(key) {
 export function _egAnimateMapDropClaim(row, col, item) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
-    const centre = typeof _egGetElementCentre === 'function' ? _egGetElementCentre(el) : { x: 0, y: 0 };
+    const centre = typeof _getElementCentre === 'function' ? _getElementCentre(el) : { x: 0, y: 0 };
     const floater = document.createElement('div');
     floater.className = 'eg-pickup-floater';
-    EG_ART.fillElement(floater, 'item', EG_ART.artIdForItem(item), item.icon || '🗺️');
+    GAME_ART.fillElement(floater, 'item', GAME_ART.artIdForItem(item), item.icon || '🗺️');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
     document.body.appendChild(floater);
     setTimeout(() => floater.remove(), 800);
 }
 
-// Called from _egCheckAllClaims (mouse-button-handlers.js) and
-// _egAutoClaimDropsOnReveal (endgame-grid-pickups.js). Banks the claimed map
+// Called from _checkAllClaims (mouse-button-handlers.js) and
+// _autoClaimDropsOnReveal (endgame-grid-pickups.js). Banks the claimed map
 // straight into the Probability Gate map stash.
 export function _egCheckMapDropClaim(row, col) {
-    if (!_egIsActive()) return false;
+    if (!_isActive()) return false;
     const key = `${row}-${col}`;
     const map = _egMapDrops.get(key);
     if (!map) return false;
 
     // Tiered stashes are infinite - no capacity check needed.
 
-    if (typeof _egCancelTrackedExpiry === 'function') _egCancelTrackedExpiry(_egMapDrops, key, map);
+    if (typeof _cancelTrackedExpiry === 'function') _cancelTrackedExpiry(_egMapDrops, key, map);
     _egMapDrops.delete(key);
     _egRemoveMapDropOverlay(key);
     _egAnimateMapDropClaim(row, col, map);
 
     _egAddMapToMapStash(map);
 
-    // Track for the leave-map summary screen (mirrors _egTrackRunCurrency)
-    if (typeof _egRunMaps !== 'undefined') globalThis._egRunMaps.push(map);
+    // Track for the leave-map summary screen (mirrors _trackRunCurrency)
+    if (typeof _runMaps !== 'undefined') globalThis._runMaps.push(map);
 
     globalThis.showToast(t('eg_map_claimed')
         .replace('{icon}', map.icon || '')
         .replace('{name}', map.name)
-        .replace('{tier}', map.mapTier != null ? map.mapTier : '?'), _egRarityToastColor(map.rarity));
+        .replace('{tier}', map.mapTier != null ? map.mapTier : '?'), _rarityToastColor(map.rarity));
     Audio_Manager.playSFX('pickup_map', 'player_equip_pickup');
-    egSaveHubState();
+    saveHubState();
     return true;
 }
 
-// Called from _egDiscardAllDrops (mouse-button-handlers.js).
+// Called from _discardAllDrops (mouse-button-handlers.js).
 export function _egDiscardMapDrop(row, col) {
-    if (!_egIsActive()) return;
+    if (!_isActive()) return;
     const key = `${row}-${col}`;
     if (!_egMapDrops.has(key)) return;
     const map = _egMapDrops.get(key);
-    if (typeof _egCancelTrackedExpiry === 'function') _egCancelTrackedExpiry(_egMapDrops, key, map);
+    if (typeof _cancelTrackedExpiry === 'function') _cancelTrackedExpiry(_egMapDrops, key, map);
     _egMapDrops.delete(key);
     _egRemoveMapDropOverlay(key);
-    if (typeof _egAnimatePickupDiscard === 'function') {
-        _egAnimatePickupDiscard(row, col, { emoji: map.icon || '🗺️', artId: EG_ART.artIdForItem(map) });
+    if (typeof _animatePickupDiscard === 'function') {
+        _animatePickupDiscard(row, col, { emoji: map.icon || '🗺️', artId: GAME_ART.artIdForItem(map) });
     }
     Audio_Manager.playSFX('player_equip_not_pickup');
 }
@@ -302,31 +302,31 @@ export function _egBankUnclaimedMapDrops() {
     }
     _egMapDrops.clear();
     document.querySelectorAll('[id^="eg-mapdrop-"]').forEach(el => el.remove());
-    if (banked > 0) egSaveHubState();
+    if (banked > 0) saveHubState();
 }
 
-// Clears all active map drops from the board (called by _egStopPickupSpawner).
+// Clears all active map drops from the board (called by _stopPickupSpawner).
 export function _egStopMapDrops() {
-    if (typeof _egCancelTrackedExpiry === 'function') {
-        Array.from(_egMapDrops.entries()).forEach(([key, map]) => _egCancelTrackedExpiry(_egMapDrops, key, map));
+    if (typeof _cancelTrackedExpiry === 'function') {
+        Array.from(_egMapDrops.entries()).forEach(([key, map]) => _cancelTrackedExpiry(_egMapDrops, key, map));
     }
     _egMapDrops.forEach((map, key) => _egRemoveMapDropOverlay(key));
     _egMapDrops.clear();
 }
 
 // Carries unclaimed map drops into the next chained puzzle
-// (mirrors _egReplaceCarriedLootDrops / _egReplaceCarriedCurrencyDrops).
+// (mirrors _replaceCarriedLootDrops / _replaceCarriedCurrencyDrops).
 export function _egReplaceCarriedMapDrops(maps) {
     if (!maps || maps.length === 0) return;
 
     maps.forEach(map => {
         if (_egMapDrops.size >= 1) return;
 
-        const pool = typeof _egBuildPickupEligiblePool === 'function'
-            ? _egBuildPickupEligiblePool()
+        const pool = typeof _buildPickupEligiblePool === 'function'
+            ? _buildPickupEligiblePool()
             : [];
-        const filtered = typeof _egCellHasAnyDrop === 'function'
-            ? pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c))
+        const filtered = typeof _cellHasAnyDrop === 'function'
+            ? pool.filter(([r, c]) => !_cellHasAnyDrop(r, c))
             : pool;
         if (filtered.length === 0) return;
 
@@ -340,13 +340,13 @@ export function _egReplaceCarriedMapDrops(maps) {
             const span = document.createElement('span');
             span.className = `eg-pickup-overlay eg-pickup-rarity-${map.rarity || 'common'} eg-loot-overlay eg-mapdrop-overlay`;
             span.id = `eg-mapdrop-${r}-${c}`;
-            EG_ART.fillElement(span, 'item', EG_ART.artIdForItem(map), map.icon || '🗺️');
+            GAME_ART.fillElement(span, 'item', GAME_ART.artIdForItem(map), map.icon || '🗺️');
             el.appendChild(span);
         }
 
-        const lifetime = typeof EG_LOOT_DROP_LIFETIME_MS !== 'undefined' ? EG_LOOT_DROP_LIFETIME_MS : 60000;
-        if (typeof _egScheduleTrackedExpiry === 'function') {
-            _egScheduleTrackedExpiry(_egMapDrops, key, map, lifetime, `eg-mapdrop-${r}-${c}`, _egRemoveMapDropOverlay);
+        const lifetime = typeof LOOT_DROP_LIFETIME_MS !== 'undefined' ? LOOT_DROP_LIFETIME_MS : 60000;
+        if (typeof _scheduleTrackedExpiry === 'function') {
+            _scheduleTrackedExpiry(_egMapDrops, key, map, lifetime, `eg-mapdrop-${r}-${c}`, _egRemoveMapDropOverlay);
         } else {
             const timer = setTimeout(() => {
                 if (_egMapDrops.get(key) === map) {
@@ -354,9 +354,9 @@ export function _egReplaceCarriedMapDrops(maps) {
                     _egRemoveMapDropOverlay(key);
                 }
             }, lifetime);
-            if (typeof _egPickupTimers !== 'undefined') globalThis._egPickupTimers.push(timer);
-            if (typeof _egStartDropExpireCountdown === 'function') {
-                _egStartDropExpireCountdown(`eg-mapdrop-${r}-${c}`, lifetime);
+            if (typeof _pickupTimers !== 'undefined') globalThis._pickupTimers.push(timer);
+            if (typeof _startDropExpireCountdown === 'function') {
+                _startDropExpireCountdown(`eg-mapdrop-${r}-${c}`, lifetime);
             }
         }
     });

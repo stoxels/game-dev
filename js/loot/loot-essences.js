@@ -6,8 +6,8 @@
 // file reads: which modifier families exist, which fixed cell each one
 // owns, and whether a family can be applied to a given item.
 
-import {EG_LOCAL_DEFENSE_FAMILY_STATS, _egEligibleTiers} from './loot-mod-application.js';
-import { EG_SLOT_MOD_TABLE_MAP, _egGetModTable } from './loot-equipment-mod-tables.js';
+import {LOCAL_DEFENSE_FAMILY_STATS, _eligibleTiers} from './loot-mod-application.js';
+import { SLOT_MOD_TABLE_MAP, _getModTable } from './loot-equipment-mod-tables.js';
 
 
 //----------------------------------------------------------------------
@@ -18,16 +18,16 @@ import { EG_SLOT_MOD_TABLE_MAP, _egGetModTable } from './loot-equipment-mod-tabl
 // (mirrors the Orbs & Shards currency tab). Every essence id has a
 // dedicated cell; hovering an empty cell still shows its essence tooltip.
 // 12 rows × 8 cols = 96 cells → 95 modifier essences + 1 decorative empty.
-export const EG_ESSENCE_ROWS = 12;
-export const EG_ESSENCE_COLS = 8;
+export const ESSENCE_ROWS = 12;
+export const ESSENCE_COLS = 8;
 
 // Essence stash: 2D grid of stacked essence items (null = empty cell)
-export let _egEssenceStash = Array.from({ length: EG_ESSENCE_ROWS }, () => Array(EG_ESSENCE_COLS).fill(null));
+export let _essenceStash = Array.from({ length: ESSENCE_ROWS }, () => Array(ESSENCE_COLS).fill(null));
 
 // The grid is also written from outside this file (drag-and-drop moves
 // cells, hub-save.js swaps the whole grid on load), so it is re-exposed
 // as a live globalThis property whose writes go straight back.
-try { Object.defineProperty(globalThis, '_egEssenceStash', { get() { return _egEssenceStash; }, set(v) { _egEssenceStash = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_essenceStash', { get() { return _essenceStash; }, set(v) { _essenceStash = v; }, configurable: true }); } catch (e) {}
 
 
 //----------------------------------------------------------------------
@@ -36,7 +36,7 @@ try { Object.defineProperty(globalThis, '_egEssenceStash', { get() { return _egE
 
 
 // Complete list of individual modifier families - one essence per family.
-export const _EG_ESSENCE_FAMILIES = [
+export const _ESSENCE_FAMILIES = [
     'absorption_on_kill', 'absorption_regen_rate', 'accuracy', 'agility', 'arcane_surge',
     'attack_speed', 'block_chance', 'block_recovery', 'chain', 'chance_for_new_question', 'chance_to_blind',
     'chance_to_convert', 'chance_to_freeze', 'chance_to_ignite', 'chance_to_shock', 'channel', 'cleave',
@@ -56,7 +56,7 @@ export const _EG_ESSENCE_FAMILIES = [
 
 // Visual variety - cycle through a set of emojis so the essences don't all look identical.
 // Kept intentionally diverse (hearts, elements, combat, jewelry) but deterministic.
-export const _EG_ESSENCE_ICON_CYCLE = [
+export const _ESSENCE_ICON_CYCLE = [
     '💚', '💙', '❤️', '🧡', '💛', '💜', '🤍', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚪', '⚫', '🟤',
     '🔥', '❄️', '⚡', '🌑', '✨', '⭐', '💫', '🌟', '💠', '🔷', '🔶', '🌀', '🧩', '⚔️', '🛡️', '🏹',
     '🎯', '🔮', '🧪', '💎', '👑', '💍', '🧥', '🥋', '🦾', '🧤', '🔗', '👖', '👢', '📿', '🪬', '🧬',
@@ -66,29 +66,29 @@ export const _EG_ESSENCE_ICON_CYCLE = [
 ];
 
 // Fixed assignment: essence id → {r,c}. Mirrors the Orbs & Shards tab.
-export const EG_ESSENCE_SLOT_MAP = {};
-(function _egBuildEssenceSlotMap() {
+export const ESSENCE_SLOT_MAP = {};
+(function _buildEssenceSlotMap() {
     let idx = 0;
-    for (const fam of _EG_ESSENCE_FAMILIES) {
+    for (const fam of _ESSENCE_FAMILIES) {
         const id = 'essence_' + fam;
-        const r = Math.floor(idx / EG_ESSENCE_COLS);
-        const c = idx % EG_ESSENCE_COLS;
-        EG_ESSENCE_SLOT_MAP[id] = { r, c };
+        const r = Math.floor(idx / ESSENCE_COLS);
+        const c = idx % ESSENCE_COLS;
+        ESSENCE_SLOT_MAP[id] = { r, c };
         idx++;
     }
 })();
-export const EG_ESSENCE_SLOT_REVERSE = (() => {
+export const ESSENCE_SLOT_REVERSE = (() => {
     const m = {};
-    for (const [id, pos] of Object.entries(EG_ESSENCE_SLOT_MAP)) m[`${pos.r}-${pos.c}`] = id;
+    for (const [id, pos] of Object.entries(ESSENCE_SLOT_MAP)) m[`${pos.r}-${pos.c}`] = id;
     return m;
 })();
-export function _egEssenceSlotForId(id) { return EG_ESSENCE_SLOT_MAP[id] || null; }
-export function _egEssenceIdForSlot(r, c) { return EG_ESSENCE_SLOT_REVERSE[`${r}-${c}`] || null; }
+export function _essenceSlotForId(id) { return ESSENCE_SLOT_MAP[id] || null; }
+export function _essenceIdForSlot(r, c) { return ESSENCE_SLOT_REVERSE[`${r}-${c}`] || null; }
 
-export function _egEssenceCompatibleSlotTypes(familyId) {
-    if (typeof EG_SLOT_MOD_TABLE_MAP === 'undefined') return [];
+export function _essenceCompatibleSlotTypes(familyId) {
+    if (typeof SLOT_MOD_TABLE_MAP === 'undefined') return [];
     const slots = [];
-    for (const [slotType, getter] of Object.entries(EG_SLOT_MOD_TABLE_MAP)) {
+    for (const [slotType, getter] of Object.entries(SLOT_MOD_TABLE_MAP)) {
         let tbl = null;
         try { tbl = getter(); } catch (e) { continue; }
         if (!tbl) continue;
@@ -101,12 +101,12 @@ export function _egEssenceCompatibleSlotTypes(familyId) {
 // Lowest item level at which the essence can roll its guaranteed modifier
 // (the family's weakest tier), per compatible slot type. Returns
 // { min, max } across slot types, or null when no slot can roll it.
-export function _egEssenceItemLevelRange(familyId) {
+export function _essenceItemLevelRange(familyId) {
     let min = Infinity;
     let max = 0;
-    for (const slotType of _egEssenceCompatibleSlotTypes(familyId)) {
+    for (const slotType of _essenceCompatibleSlotTypes(familyId)) {
         let tbl = null;
-        try { tbl = EG_SLOT_MOD_TABLE_MAP[slotType](); } catch (e) { continue; }
+        try { tbl = SLOT_MOD_TABLE_MAP[slotType](); } catch (e) { continue; }
         if (!tbl) continue;
         const fam = (tbl.prefixes && tbl.prefixes[familyId]) || (tbl.suffixes && tbl.suffixes[familyId]);
         if (!fam || !fam.tiers || !fam.tiers.length) continue;
@@ -116,8 +116,8 @@ export function _egEssenceItemLevelRange(familyId) {
     }
     return Number.isFinite(min) ? { min, max } : null;
 }
-export function _egEssenceCanApplyToItem(familyId, item) {
-    return _egEssenceIncompatibilityReason(familyId, item) === null;
+export function _essenceCanApplyToItem(familyId, item) {
+    return _essenceIncompatibilityReason(familyId, item) === null;
 }
 
 // Classifies WHY an essence's guaranteed family cannot be applied to an item.
@@ -132,22 +132,22 @@ export function _egEssenceCanApplyToItem(familyId, item) {
 //   'needs_evasion_absorption' - hybrid defence mods, base lacks one/both stats
 //   'no_eligible_tier'  - family exists on this slot, but every tier needs a
 //                         higher item level than the item has
-export function _egEssenceIncompatibilityReason(familyId, item) {
-    if (typeof EG_SLOT_MOD_TABLE_MAP === 'undefined') return 'no_mod_table';
-    const modTable = _egGetModTable(item);
+export function _essenceIncompatibilityReason(familyId, item) {
+    if (typeof SLOT_MOD_TABLE_MAP === 'undefined') return 'no_mod_table';
+    const modTable = _getModTable(item);
     if (!modTable) return 'no_mod_table';
     const sections = [modTable.prefixes || {}, modTable.suffixes || {}];
     const hasFamily = sections.some(sec => !!sec[familyId]);
     if (!hasFamily) return 'family_missing';
     // Local-defence gate first: a wrong base stat is more informative to the
     // player than tier availability (armour bases are the common failure).
-    const neededStats = (typeof EG_LOCAL_DEFENSE_FAMILY_STATS !== 'undefined')
-        ? EG_LOCAL_DEFENSE_FAMILY_STATS[familyId] : null;
+    const neededStats = (typeof LOCAL_DEFENSE_FAMILY_STATS !== 'undefined')
+        ? LOCAL_DEFENSE_FAMILY_STATS[familyId] : null;
     if (neededStats) {
         const defenses = item.defenses || {};
         const missing = neededStats.filter(stat => !(defenses[stat] > 0));
         if (missing.length > 0) {
-            // EG_LOCAL_DEFENSE_FAMILY_STATS lists stats in canonical order, so
+            // LOCAL_DEFENSE_FAMILY_STATS lists stats in canonical order, so
             // the joined key matches one of the dedicated translation keys.
             return 'needs_' + missing.join('_');
         }
@@ -156,14 +156,14 @@ export function _egEssenceIncompatibilityReason(familyId, item) {
     for (const sec of sections) {
         const fam = sec[familyId];
         if (!fam) continue;
-        const tiers = _egEligibleTiers(fam, item.itemLevel || 1);
+        const tiers = _eligibleTiers(fam, item.itemLevel || 1);
         if (tiers && tiers.length > 0) return null;
     }
     return 'no_eligible_tier';
 }
 
 // Maps classifier reasons to translation keys for the reject messages.
-export const EG_ESSENCE_REASON_KEYS = {
+export const ESSENCE_REASON_KEYS = {
     no_mod_table: 'eg_essence_no_mod_table',
     family_missing: 'eg_essence_family_missing',
     needs_armour: 'eg_essence_needs_armour',

@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE ZENITH (boss_zenith)-----------------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_zenith: {
         id: 'boss_zenith', name: 'The Zenith', emoji: '👑',
         baseHP: 1250, baseDamage: 28, chargeMax: 10,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_zenith: {
         phases: [
             { threshold: 1.00, chargeMax: 10, damageMultiplier: 1.00 },
@@ -29,22 +29,22 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 3000,
         mechanics: [
-            { name: 'royal_decree', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechRoyalDecree' },
-            { name: 'crown_rings', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechCrownRings' },
-            { name: 'soul_tithe', intervalBase: 23000, intervalVariance: 5000, handler: '_egMechSoulTithe' },
+            { name: 'royal_decree', intervalBase: 18000, intervalVariance: 4000, handler: '_mechRoyalDecree' },
+            { name: 'crown_rings', intervalBase: 19000, intervalVariance: 4000, handler: '_mechCrownRings' },
+            { name: 'soul_tithe', intervalBase: 23000, intervalVariance: 5000, handler: '_mechSoulTithe' },
         ],
     },
 });
 
 
-export function _egMechRoyalDecree(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechRoyalDecree(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const waves = [0, 3, 3, 4][p];
     const warnMs = 900, activeMs = 2200, gapMs = 500;
     const moveTol = 22, stillTol = 40;
     const dmgPct = [0, 0.17, 0.20, 0.25][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     let left = waves, stage = 'idle', t = 0, blue = true;
     let tint = null, label = null, judged = false, ax = 0, ay = 0, waveNo = 0;
@@ -52,8 +52,8 @@ export function _egMechRoyalDecree(monster, phase) {
         if (tint) { tint.remove(); tint = null; }
         if (label) { label.remove(); label = null; }
     };
-    _egNkToast('eg_mech_zenith', '👑 The Zenith: Royal Decree! Obey - instantly!');
-    _egNkLoop(run, (dtS) => {
+    _nkToast('eg_mech_zenith', '👑 The Zenith: Royal Decree! Obey - instantly!');
+    _nkLoop(run, (dtS) => {
         if (stage === 'idle') {
             if (left <= 0) { clearEls(); return false; }
             left--;
@@ -62,29 +62,29 @@ export function _egMechRoyalDecree(monster, phase) {
             stage = 'warn';
             t = 0;
             judged = false;
-            tint = _egNkEl(run, 'div', blue ? 'eg-nk-trial-blue' : 'eg-nk-trial-orange');
-            label = _egNkEl(run, 'div', 'eg-nk-trial-label', blue ? '💙 FREEZE!' : '🧡 MOVE!');
+            tint = _nkEl(run, 'div', blue ? 'eg-nk-trial-blue' : 'eg-nk-trial-orange');
+            label = _nkEl(run, 'div', 'eg-nk-trial-label', blue ? '💙 FREEZE!' : '🧡 MOVE!');
             return true;
         }
         t += dtS * 1000;
         if (stage === 'warn' && t >= warnMs) {
             stage = 'active';
             t = 0;
-            const c = _egNkPlayerCenter();
+            const c = _nkPlayerCenter();
             ax = c ? c.x : 0;
             ay = c ? c.y : 0;
         } else if (stage === 'active') {
-            const c = _egNkPlayerCenter();
+            const c = _nkPlayerCenter();
             if (c && !judged) {
                 const moved = Math.hypot(c.x - ax, c.y - ay);
                 if (blue && moved > moveTol) {
                     judged = true;
-                    const dealt = _egNkHit(dmgPct, null, level);
-                    _egNkAbilityHitToast(dealt, 'The Zenith', 'Royal Decree');
+                    const dealt = _nkHit(dmgPct, null, level);
+                    _nkAbilityHitToast(dealt, 'The Zenith', 'Royal Decree');
                 } else if (!blue && t >= activeMs && moved < stillTol) {
                     judged = true;
-                    const dealt = _egNkHit(dmgPct, null, level);
-                    _egNkAbilityHitToast(dealt, 'The Zenith', 'Royal Decree');
+                    const dealt = _nkHit(dmgPct, null, level);
+                    _nkAbilityHitToast(dealt, 'The Zenith', 'Royal Decree');
                 }
             }
             if (t >= activeMs + gapMs) {
@@ -97,29 +97,29 @@ export function _egMechRoyalDecree(monster, phase) {
     });
 }
 
-export function _egMechCrownRings(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechCrownRings(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const expandMs = [0, 1700, 1500, 1300][p];
     const bandHalf = 24;
     const dmgPct = [0, 0.22, 0.26, 0.32][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const cx = window.innerWidth * 0.5;
     const cy = window.innerHeight * 0.42;
     const rMax = Math.max(window.innerWidth, window.innerHeight) * 0.7;
-    const crown = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '👑');
+    const crown = _nkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '👑');
     crown.style.transform = 'translate(' + Math.round(cx - 26) + 'px,' + Math.round(cy - 26) + 'px)';
     const rings = [0, 1, 2].map(i => {
-        const el = _egNkEl(run, 'div', 'eg-nk-ring eg-nk-ring-crown');
+        const el = _nkEl(run, 'div', 'eg-nk-ring eg-nk-ring-crown');
         el.style.display = 'none';
         return { delay: i * 450, r: 40, el };
     });
-    _egNkToast('eg_mech_crown', '👑 The Zenith: Crown Rings! Three heartbeats!');
+    _nkToast('eg_mech_crown', '👑 The Zenith: Crown Rings! Three heartbeats!');
     let e = 0, cdUntil = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         e += dtS * 1000;
-        const c = _egNkPlayerCenter();
+        const c = _nkPlayerCenter();
         const dist = c ? Math.hypot(c.x - cx, c.y - cy) : 9999;
         let pending = false;
         rings.forEach(rg => {
@@ -139,8 +139,8 @@ export function _egMechCrownRings(monster, phase) {
             rg.el.style.height = r * 2 + 'px';
             if (c && now >= cdUntil && Math.abs(dist - rg.r) < bandHalf) {
                 cdUntil = now + 900;
-                const dealt = _egNkHit(dmgPct, null, level);
-                _egNkAbilityHitToast(dealt, 'The Zenith', 'Crown Rings');
+                const dealt = _nkHit(dmgPct, null, level);
+                _nkAbilityHitToast(dealt, 'The Zenith', 'Crown Rings');
             }
         });
         return pending;

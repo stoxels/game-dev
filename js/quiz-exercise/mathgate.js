@@ -1,9 +1,9 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { curMods } from '../difficulty-modifiers.js';
-import { _egOnQuestionAnswered } from '../combat/encounter-chain.js';
-import { _egApplyQuizRewardBuff } from '../endgame/endgame-quiz-buffs.js';
-import { _egIsActive } from '../combat/combat-state.js';
+import { _onQuestionAnswered } from '../combat/encounter-chain.js';
+import { _applyQuizRewardBuff } from '../endgame/endgame-quiz-buffs.js';
+import { _isActive } from '../combat/combat-state.js';
 import { WORLDS } from '../levels/level-world-data.js';
 import { WORLD_START_GI } from '../levels/levels.js';
 import { PT } from '../probability-tree/probability-tree.js';
@@ -636,18 +636,18 @@ function mgHandleCorrectAnswer() {
     // quiz_time (gear / tree): a correct answer adds seconds to the Timer.
     // The gate opens before the level timer exists, so bank the seconds; the
     // level's _initTimer() adds them (see start-level.js).
-    if (typeof globalThis._egComputePlayerStats === 'function') {
-        const secs = Number(globalThis._egComputePlayerStats().quizTimeSecs) || 0;
+    if (typeof globalThis._computePlayerStats === 'function') {
+        const secs = Number(globalThis._computePlayerStats().quizTimeSecs) || 0;
         if (secs > 0) globalThis._mgGateTimeBonusSecs = (Number(globalThis._mgGateTimeBonusSecs) || 0) + secs;
     }
 
     Audio_Manager.playSFX('quizCorrect');
 
-    if (typeof _egOnQuestionAnswered === 'function') _egOnQuestionAnswered();
+    if (typeof _onQuestionAnswered === 'function') _onQuestionAnswered();
 
     // Endgame reward: roll a temporary damage buff / life heal / mana restore
-    if (typeof _egIsActive === 'function' && _egIsActive()
-        && typeof _egApplyQuizRewardBuff === 'function') _egApplyQuizRewardBuff();
+    if (typeof _isActive === 'function' && _isActive()
+        && typeof _applyQuizRewardBuff === 'function') _applyQuizRewardBuff();
 
     _mgRefreshWhyButton();
     const contBtn = document.getElementById('mg-continue-btn');

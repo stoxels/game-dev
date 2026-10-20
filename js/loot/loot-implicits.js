@@ -1,7 +1,7 @@
-import { _egBuildMergedModLines } from '../endgame/endgame-player-stats.js';
-import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';
-import { EG_IMPLICIT_FAMILIES } from './loot-implicit-families.js';
-import { _egBuildImplicitRolledStats, _egGetImplicitRange, _egImplicitAllowedOnBase } from './loot-implicit-scaling.js';
+import { _buildMergedModLines } from '../endgame/endgame-player-stats.js';
+import { ALL_BASE_TYPES } from './equipment-base-items.js';
+import { IMPLICIT_FAMILIES } from './loot-implicit-families.js';
+import { _buildImplicitRolledStats, _getImplicitRange, _implicitAllowedOnBase } from './loot-implicit-scaling.js';
 
 //----------------------------------------------------------------------
 //---------------------------IMPLICIT ROLLING---------------------------
@@ -14,7 +14,7 @@ import { _egBuildImplicitRolledStats, _egGetImplicitRange, _egImplicitAllowedOnB
 // Each slot lists candidate familyIds. The generator samples uniformly from
 // the subset that is actually allowed on the base (local-defense implicits
 // need the base to have the stat). Jewelry never carries local implicits.
-export const EG_IMPLICIT_POOL_BY_SLOT = {
+export const IMPLICIT_POOL_BY_SLOT = {
     head:      ['flat_health','flat_mana','fire_resist','cold_resist','lightning_resist','shadow_resist','strength','agility','intelligence','inc_armour','inc_evasion','inc_absorption','life_regen'],
     chest:     ['flat_health','flat_mana','fire_resist','cold_resist','lightning_resist','shadow_resist','strength','agility','intelligence','inc_armour','inc_evasion','inc_absorption','life_regen','mana_regen'],
     gloves:    ['flat_health','accuracy','crit_chance','strength','agility','intelligence','inc_armour','inc_evasion','inc_absorption','attack_speed','spell_damage'],
@@ -37,15 +37,15 @@ export const EG_IMPLICIT_POOL_BY_SLOT = {
 
 // Picks 1 implicit for the given base, scaled by base.requirements.level.
 // Returns array of implicit objects: [{ familyId, tier:'implicit', isImplicit:true, rolledStats }]
-export function _egRollImplicitsForBase(base) {
+export function _rollImplicitsForBase(base) {
     if (!base || !base.slotType) return [];
     const reqLevel = (base.requirements && base.requirements.level) || base.minLevel || 1;
-    const pool = EG_IMPLICIT_POOL_BY_SLOT[base.slotType] || EG_IMPLICIT_POOL_BY_SLOT.head;
+    const pool = IMPLICIT_POOL_BY_SLOT[base.slotType] || IMPLICIT_POOL_BY_SLOT.head;
     // Filter pool to only families allowed on this base (local defense check)
     const eligible = pool.filter(fid => {
-        const fam = EG_IMPLICIT_FAMILIES[fid];
+        const fam = IMPLICIT_FAMILIES[fid];
         if (!fam) return false;
-        return _egImplicitAllowedOnBase(fid, base.defenses);
+        return _implicitAllowedOnBase(fid, base.defenses);
     });
     if (eligible.length === 0) return [];
     // Most items get 1 implicit; high-tier bases (req >= 60) get a small chance for a second distinct implicit
@@ -57,11 +57,11 @@ export function _egRollImplicitsForBase(base) {
         if (candidates.length === 0) break;
         const fid = candidates[Math.floor(Math.random() * candidates.length)];
         used.add(fid);
-        const fam = EG_IMPLICIT_FAMILIES[fid];
-        const range = _egGetImplicitRange(fam, reqLevel);
+        const fam = IMPLICIT_FAMILIES[fid];
+        const range = _getImplicitRange(fam, reqLevel);
         // Safety: range sanity
         if (range.min == null && range.min1 == null) continue;
-        const rolledStats = _egBuildImplicitRolledStats(fam, reqLevel);
+        const rolledStats = _buildImplicitRolledStats(fam, reqLevel);
         chosen.push({
             familyId: fid,
             tier: 'implicit',
@@ -76,24 +76,24 @@ export function _egRollImplicitsForBase(base) {
 // Rerolls numeric values of existing implicits, keeping the same families.
 // Used by the Blessing Orb. Values are freshly sampled from the SAME
 // reqLevel-scaled range (so the orb can high-roll or low-roll within tier).
-export function _egRerollImplicits(item) {
+export function _rerollImplicits(item) {
     if (!item || !Array.isArray(item.implicits) || item.implicits.length === 0) return item;
     const reqLevel = (item.requirements && item.requirements.level) || item.itemLevel || 1;
     const newImplicits = item.implicits.map(imp => {
-        const fam = EG_IMPLICIT_FAMILIES[imp.familyId];
+        const fam = IMPLICIT_FAMILIES[imp.familyId];
         if (!fam) return imp;
-        const rolledStats = _egBuildImplicitRolledStats(fam, reqLevel);
+        const rolledStats = _buildImplicitRolledStats(fam, reqLevel);
         return { ...imp, rolledStats, reqLevel };
     });
     return { ...item, implicits: newImplicits };
 }
 
-// Helper for tooltip merging - returns merged implicit lines (like _egBuildMergedModLines but for implicits)
-export function _egBuildMergedImplicitLines(implicits) {
+// Helper for tooltip merging - returns merged implicit lines (like _buildMergedModLines but for implicits)
+export function _buildMergedImplicitLines(implicits) {
     // Reuse the same merging logic as explicit mods when available
-    if (typeof _egBuildMergedModLines === 'function' && Array.isArray(implicits) && implicits.length) {
+    if (typeof _buildMergedModLines === 'function' && Array.isArray(implicits) && implicits.length) {
         // Map implicits to pseudo-mods so the merger can handle them; tag them as implicit for styling
-        return _egBuildMergedModLines(implicits.map(i => ({ ...i, isImplicit: true })));
+        return _buildMergedModLines(implicits.map(i => ({ ...i, isImplicit: true })));
     }
     // Fallback simple
     const out = [];
@@ -107,20 +107,20 @@ export function _egBuildMergedImplicitLines(implicits) {
 
 // Heals a legacy item that was saved before implicits existed: generates implicits
 // from its baseId/requirements when none are present. Returns the healed item.
-export function _egHealItemImplicits(item) {
+export function _healItemImplicits(item) {
     if (!item || item.category !== 'equip' || item.isUnique) return item;
     if (Array.isArray(item.implicits) && item.implicits.length > 0) return item;
     try {
-        if (typeof _egRollImplicitsForBase !== 'function') return item;
+        if (typeof _rollImplicitsForBase !== 'function') return item;
         let base = null;
-        if (typeof EG_ALL_BASE_TYPES !== 'undefined' && Array.isArray(EG_ALL_BASE_TYPES) && item.baseId) {
-            base = EG_ALL_BASE_TYPES.find(b => b.id === item.baseId) || null;
+        if (typeof ALL_BASE_TYPES !== 'undefined' && Array.isArray(ALL_BASE_TYPES) && item.baseId) {
+            base = ALL_BASE_TYPES.find(b => b.id === item.baseId) || null;
         }
         if (!base) {
             // synthesize a minimal base from item itself
             base = { slotType: item.slotType || 'head', requirements: item.requirements || { level: item.itemLevel || 1 }, defenses: item.defenses || {}, minLevel: (item.requirements && item.requirements.level) || 1 };
         }
-        const implicits = _egRollImplicitsForBase(base);
+        const implicits = _rollImplicitsForBase(base);
         if (implicits && implicits.length) item.implicits = implicits;
         else if (!Array.isArray(item.implicits)) item.implicits = [];
     } catch (e) { if (!Array.isArray(item.implicits)) item.implicits = []; }

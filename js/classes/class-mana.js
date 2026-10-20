@@ -14,7 +14,7 @@ import { STATE } from '../state.js';
 
 const MANA_REGEN_INTERVAL_MS = 5000;
 
-// The base regen (EG_PLAYER_STATS.baseManaRegen) is part of the computed
+// The base regen (PLAYER_STATS.baseManaRegen) is part of the computed
 // manaRegen stat, so the character sheet shows exactly what the tick applies.
 
 // Global balance multiplier applied inside _scaleAbilityManaCost so every
@@ -69,8 +69,8 @@ function _manaEnabled() {
 
 // One summed passive-tree channel (0 before the leveling module is live).
 function _treeChannel(channel) {
-    return (typeof globalThis._egGetTreeChannel === 'function')
-        ? globalThis._egGetTreeChannel(channel) : 0;
+    return (typeof globalThis._getTreeChannel === 'function')
+        ? globalThis._getTreeChannel(channel) : 0;
 }
 
 
@@ -83,9 +83,9 @@ function _manaRemovedByTree() {
 // Returns the current maximum mana from the base pool and live gear stats.
 export function _getPlayerMaxMana() {
     if (!_manaEnabled() || _manaRemovedByTree()) return 0;
-    const base = (typeof globalThis.EG_PLAYER_STATS !== 'undefined') ? globalThis.EG_PLAYER_STATS.baseMana : 0;
-    const gearBonus = (typeof globalThis._egComputePlayerStats === 'function')
-        ? globalThis._egComputePlayerStats().mana : 0;
+    const base = (typeof globalThis.PLAYER_STATS !== 'undefined') ? globalThis.PLAYER_STATS.baseMana : 0;
+    const gearBonus = (typeof globalThis._computePlayerStats === 'function')
+        ? globalThis._computePlayerStats().mana : 0;
     // "Less" maximum Mana (Butterfly Effect keystone downside) multiplies the
     // whole pool, base included, after every increased source.
     const lessPct = Math.min(100, Math.max(0, _treeChannel('manaLessPct')));
@@ -144,7 +144,7 @@ function _getAbilityScaledBaseCost(hudSlot) {
 // Returns how much of `cost` the current Absorption can cover (0 when off).
 function _absorptionCostShare(cost) {
     if (!(cost > 0) || _treeChannel('spellCostFromAbsorption') <= 0) return 0;
-    return Math.min(cost, Math.max(0, Math.floor(Number(globalThis._egPlayerAbsorptionCurrent) || 0)));
+    return Math.min(cost, Math.max(0, Math.floor(Number(globalThis._playerAbsorptionCurrent) || 0)));
 }
 
 // Returns true when the current mana pool covers a cost.
@@ -231,7 +231,7 @@ export function payAbilityCost(cost) {
     const fromAbsorption = _absorptionCostShare(cost);
     if (fromAbsorption > 0) {
         if (!canAffordMana(cost - fromAbsorption)) return false;
-        globalThis._egPlayerAbsorptionCurrent = Math.max(0, globalThis._egPlayerAbsorptionCurrent - fromAbsorption);
+        globalThis._playerAbsorptionCurrent = Math.max(0, globalThis._playerAbsorptionCurrent - fromAbsorption);
         return spendMana(cost - fromAbsorption);
     }
     return spendMana(cost);
@@ -292,8 +292,8 @@ function _ensureManaRegenLoop() {
     if (_manaRegenInterval) return;
     _manaRegenInterval = setInterval(() => {
         if (globalThis.dead) return;
-        const stats = (typeof globalThis._egComputePlayerStats === 'function')
-            ? globalThis._egComputePlayerStats() : null;
+        const stats = (typeof globalThis._computePlayerStats === 'function')
+            ? globalThis._computePlayerStats() : null;
         const regenIncPct = stats ? (stats.manaRegenIncPct || 0) : 0;
         const regen = (stats ? (stats.manaRegen || 0) : 0) * (1 + regenIncPct / 100);
         if (regen > 0 && globalThis.playerMaxMana > 0 && globalThis.playerCurrentMana < globalThis.playerMaxMana) {

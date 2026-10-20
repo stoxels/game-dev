@@ -1,27 +1,27 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { t } from '../../translation/translations.js';
-import { _egRenderPanel } from '../encounter.js';
+import { _renderPanel } from '../encounter.js';
 import { _egApplyMapModsToMonster, _egGetActiveMapModValue } from '../../endgame/endgame-map-launch.js';
-import { _egBossTimers, _egIsActive } from '../combat-state.js';
-import { _egDropHeartPickup } from '../combat-grid-pickups-spawner.js';
+import { _bossTimers, _isActive } from '../combat-state.js';
+import { _dropHeartPickup } from '../combat-grid-pickups-spawner.js';
 // NOTE: no imports from per-boss boss files here on purpose (the data
 // table ./boss-teardown-hooks.js is exempt - it imports nothing, so it
 // cannot cycle). The per-boss teardown fns resolve lazily via globalThis
 // (same dynamic dispatch
 // as window[mech.handler]): a static import would cycle framework ->
-// boss -> framework, running the boss's top-level Object.assign(EG_BOSS_*)
+// boss -> framework, running the boss's top-level Object.assign(BOSS_*)
 // while these consts are still in their temporal dead zone and aborting
 // the whole entry (the step-5 SKILL_REGISTRY lesson).
-import { _egBlastTeardownAll, _egClearAllCorruptedCells, _egClearAllFrozenCells, _egClearPriorBombFuses, _egClearShiftGlows, _egNkTeardownBoss, _egRemoveClueSwap, _egRemoveGridInvert } from './shared-boss-abilities.js';
-import { _egClearFateMarks, _egRemoveClueScramble, _egRemoveFogBank, _egRemoveVeil, _egTitheTeardown } from './shared-puzzle-mechanics.js';
-import { EG_BOSS_TEARDOWN_HOOKS } from './boss-teardown-hooks.js';
+import { _blastTeardownAll, _clearAllCorruptedCells, _clearAllFrozenCells, _clearPriorBombFuses, _clearShiftGlows, _nkTeardownBoss, _removeClueSwap, _removeGridInvert } from './shared-boss-abilities.js';
+import { _clearFateMarks, _removeClueScramble, _removeFogBank, _removeVeil, _titheTeardown } from './shared-puzzle-mechanics.js';
+import { BOSS_TEARDOWN_HOOKS } from './boss-teardown-hooks.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME BOSS FRAMEWORK-------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 // Registries, scaling, lifecycle, phases and scheduling for all bosses.
-// Per-boss files register via Object.assign(EG_BOSS_DEFS/MECHANICS); the
+// Per-boss files register via Object.assign(BOSS_DEFS/MECHANICS); the
 // teardown table lives in ./boss-teardown-hooks.js. To add a boss, copy
 // boss-template.js, list exports + handler bridges in module-manifest.json,
 // then run the full gate (lint + tests + phase2:verify + build).
@@ -31,15 +31,15 @@ import { EG_BOSS_TEARDOWN_HOOKS } from './boss-teardown-hooks.js';
 // ── Boss registries ──────────────────────────────────────────────────────────
 // Populated by the per-boss files via Object.assign. Kept empty here so file
 // load order is simply framework → shared → bosses (any boss order works).
-export const EG_BOSS_DEFS = {};
-export const EG_BOSS_MECHANICS = {};
+export const BOSS_DEFS = {};
+export const BOSS_MECHANICS = {};
 
 // Boss level scaling 
 // Applied per level above 1. 
-export const EG_BOSS_LEVEL_HP_SCALE = 0.28; // +28% HP per level above 1
+export const BOSS_LEVEL_HP_SCALE = 0.28; // +28% HP per level above 1
 
 
-export const EG_BOSS_LEVEL_DAMAGE_SCALE = 0.12; // +12% damage per level above 1
+export const BOSS_LEVEL_DAMAGE_SCALE = 0.12; // +12% damage per level above 1
 
 
 // ── Late-endgame HP explosion ────────────────────────────────────────────
@@ -52,12 +52,12 @@ export const EG_BOSS_LEVEL_DAMAGE_SCALE = 0.12; // +12% damage per level above 1
 // curve is unchanged (boss ~50k), then it climbs geometrically (x1.135 per
 // level) so an unmodified T16 boss (L90, ~1k base HP) has about 1M HP.
 // Anchors: 1→1.0, 50→1.15, 60→1.7, 68→2.4, 75→5.8, 80→11.2, 85→21.6, 90→38.6, 95→70
-export const EG_BOSS_LATE_HP_ANCHORS = [[1,1.0],[50,1.15],[60,1.7],[68,2.4],[75,5.8],[80,11.2],[85,21.6],[90,38.6],[95,70]];
+export const BOSS_LATE_HP_ANCHORS = [[1,1.0],[50,1.15],[60,1.7],[68,2.4],[75,5.8],[80,11.2],[85,21.6],[90,38.6],[95,70]];
 
 
-export function _egGetBossLateHpMult(lvl) {
+export function _getBossLateHpMult(lvl) {
     const l = Math.max(1, Number(lvl) || 1);
-    const a = EG_BOSS_LATE_HP_ANCHORS;
+    const a = BOSS_LATE_HP_ANCHORS;
     if (l <= a[0][0]) return a[0][1];
     if (l >= a[a.length-1][0]) return a[a.length-1][1];
     for (let i = 0; i < a.length - 1; i++) {
@@ -74,36 +74,36 @@ export function _egGetBossLateHpMult(lvl) {
 // ── Soft enrage ──────────────────────────────────────────────────────────────
 // If a boss fight drags on too long, the boss starts stacking damage buffs.
 // Prevents bosses from being trivialised by pure attrition/turtling.
-export const EG_BOSS_SOFT_ENRAGE_DELAY_MS = 150000;   // grace period before stacks begin (2.5 min)
+export const BOSS_SOFT_ENRAGE_DELAY_MS = 150000;   // grace period before stacks begin (2.5 min)
 
 
-export const EG_BOSS_SOFT_ENRAGE_INTERVAL_MS = 30000; // a new stack every 30s after the delay
+export const BOSS_SOFT_ENRAGE_INTERVAL_MS = 30000; // a new stack every 30s after the delay
 
 
-export const EG_BOSS_SOFT_ENRAGE_DMG_STEP = 0.08;     // +8% damage per stack
+export const BOSS_SOFT_ENRAGE_DMG_STEP = 0.08;     // +8% damage per stack
 
 
-export const EG_BOSS_SOFT_ENRAGE_MAX_STACKS = 10;     // hard cap: +80% damage
+export const BOSS_SOFT_ENRAGE_MAX_STACKS = 10;     // hard cap: +80% damage
 
 
 // ── Phase display names (translation keys, indexed by phase number) ──────────
 // Index 0 is unused. Add entries here as you add more phases to any boss.
-export const EG_BOSS_PHASE_NAMES = ['', 'eg_phase_1', 'eg_phase_2_enrage', 'eg_phase_3_fury', 'eg_phase_4_finale'];
+export const BOSS_PHASE_NAMES = ['', 'eg_phase_1', 'eg_phase_2_enrage', 'eg_phase_3_fury', 'eg_phase_4_finale'];
 
 
 // ── Recent fill tracker capacity ─────────────────────────────────────────────
 // Used by the Prior Bomb mechanic. Increase if you want it to reach further back.
-export const EG_RECENT_FILLS_CAPACITY = 20;
+export const RECENT_FILLS_CAPACITY = 20;
 
 
 // Global boss attack-speed tuning - all bosses charge their attack bar this
 // much faster than the chargeMax values in their defs (0.8 = 25% faster).
-export const EG_BOSS_CHARGE_SPEED_MULT = 0.8;
+export const BOSS_CHARGE_SPEED_MULT = 0.8;
 
 // Scales a raw boss chargeMax by the global attack-speed tuning, keeping a
 // sane minimum so the fastest bosses never attack faster than 3 ticks.
-export function _egScaleBossChargeMax(raw) {
-    return Math.max(3, Math.round(raw * EG_BOSS_CHARGE_SPEED_MULT));
+export function _scaleBossChargeMax(raw) {
+    return Math.max(3, Math.round(raw * BOSS_CHARGE_SPEED_MULT));
 }
 
 // Early bosses used to die in seconds to geared characters: their HP only
@@ -111,17 +111,17 @@ export function _egScaleBossChargeMax(raw) {
 // This multiplier compares what the current character hits for (best of
 // grid projectile and spell) with a bare character, and fades out by L50
 // where the late-HP curve takes over. Capped so it can never become a wall.
-const EG_BOSS_GEAR_HP_CAP = 2.5;
-const EG_BOSS_GEAR_HP_EXP = 0.5;
-const EG_BOSS_GEAR_HP_FADE_FROM = 20;
-const EG_BOSS_GEAR_HP_FADE_TO = 50;
-function _egBossGearHpMult(lvl) {
-    if (lvl >= EG_BOSS_GEAR_HP_FADE_TO) return 1;
+const BOSS_GEAR_HP_CAP = 2.5;
+const BOSS_GEAR_HP_EXP = 0.5;
+const BOSS_GEAR_HP_FADE_FROM = 20;
+const BOSS_GEAR_HP_FADE_TO = 50;
+function _bossGearHpMult(lvl) {
+    if (lvl >= BOSS_GEAR_HP_FADE_TO) return 1;
     try {
         const g = globalThis;
-        if (typeof g._egComputePlayerStats !== 'function') return 1;
-        const st = g._egComputePlayerStats() || {};
-        const base = (g.EG_PLAYER_STATS && g.EG_PLAYER_STATS.baseDamage) || 10;
+        if (typeof g._computePlayerStats !== 'function') return 1;
+        const st = g._computePlayerStats() || {};
+        const base = (g.PLAYER_STATS && g.PLAYER_STATS.baseDamage) || 10;
         const mid = (a, b) => ((Number(a) || 0) + (Number(b) || 0)) / 2;
         const phys = (base + mid(st.physFlatMin, st.physFlatMax)) * (1 + (Number(st.physIncPct) || 0) / 100);
         const elem = (mid(st.fireDmgMin, st.fireDmgMax) + mid(st.coldDmgMin, st.coldDmgMax)
@@ -130,9 +130,9 @@ function _egBossGearHpMult(lvl) {
         const proj = (phys + elem) * (1 + (Number(st.damageIncPct) || 0) / 100) * (1 + (Number(st.projectileDamageIncPct) || 0) / 100);
         const spell = (base + (Number(st.spellDamageFlat) || 0)) * (1 + (Number(st.spellDamageIncPct) || 0) / 100) * 0.5;
         const ratio = Math.max(1, Math.max(proj, spell) / base);
-        let m = Math.min(EG_BOSS_GEAR_HP_CAP, Math.pow(ratio, EG_BOSS_GEAR_HP_EXP));
-        if (lvl > EG_BOSS_GEAR_HP_FADE_FROM) {
-            const f = (lvl - EG_BOSS_GEAR_HP_FADE_FROM) / (EG_BOSS_GEAR_HP_FADE_TO - EG_BOSS_GEAR_HP_FADE_FROM);
+        let m = Math.min(BOSS_GEAR_HP_CAP, Math.pow(ratio, BOSS_GEAR_HP_EXP));
+        if (lvl > BOSS_GEAR_HP_FADE_FROM) {
+            const f = (lvl - BOSS_GEAR_HP_FADE_FROM) / (BOSS_GEAR_HP_FADE_TO - BOSS_GEAR_HP_FADE_FROM);
             m = 1 + (m - 1) * (1 - Math.min(1, f));
         }
         return Math.max(1, m);
@@ -140,21 +140,21 @@ function _egBossGearHpMult(lvl) {
 }
 
 // Returns the scaled stats for a boss at the given level.
-// Accepts either a string id (looks up EG_BOSS_DEFS) or a def object directly.
+// Accepts either a string id (looks up BOSS_DEFS) or a def object directly.
 // hpMult: optional multiplier for boss max HP only (e.g., 500k HP test
 // mode). Damage is intentionally left at its normal scaled value so the
 // test boost never inflates the boss's attacks.
-export function _egBuildBoss(defOrId, level = 1, hpMult = 1) {
-    const def = (typeof defOrId === 'string') ? EG_BOSS_DEFS[defOrId] : defOrId;
+export function _buildBoss(defOrId, level = 1, hpMult = 1) {
+    const def = (typeof defOrId === 'string') ? BOSS_DEFS[defOrId] : defOrId;
     if (!def) { console.warn('Unknown Boss id:', defOrId); return null; }
 
     const lvl = Math.max(1, level);
-    const baseHpScale = 1 + EG_BOSS_LEVEL_HP_SCALE * (lvl - 1);
-    const lateMult = (typeof _egGetBossLateHpMult === 'function') ? _egGetBossLateHpMult(lvl) : 1;
+    const baseHpScale = 1 + BOSS_LEVEL_HP_SCALE * (lvl - 1);
+    const lateMult = (typeof _getBossLateHpMult === 'function') ? _getBossLateHpMult(lvl) : 1;
     const hpScale = baseHpScale * lateMult;
-    const dmgScale = 1 + EG_BOSS_LEVEL_DAMAGE_SCALE * (lvl - 1);
+    const dmgScale = 1 + BOSS_LEVEL_DAMAGE_SCALE * (lvl - 1);
 
-    const maxHP = Math.round(def.baseHP * hpScale * hpMult * _egBossGearHpMult(lvl));
+    const maxHP = Math.round(def.baseHP * hpScale * hpMult * _bossGearHpMult(lvl));
     // Early bosses must always be able to hurt: their level-curve damage can
     // be a rounding error next to a geared character's life pool. Floor the
     // basic attack at a share of the player's max life (fades out by L50,
@@ -162,15 +162,15 @@ export function _egBuildBoss(defOrId, level = 1, hpMult = 1) {
     let damage = Math.round(def.baseDamage * dmgScale);
     try {
         const pMax = Number(globalThis.playerMaxHP) || 0;
-        if (pMax > 0 && lvl < EG_BOSS_GEAR_HP_FADE_TO) {
-            const fade = lvl <= EG_BOSS_GEAR_HP_FADE_FROM ? 1
-                : 1 - (lvl - EG_BOSS_GEAR_HP_FADE_FROM) / (EG_BOSS_GEAR_HP_FADE_TO - EG_BOSS_GEAR_HP_FADE_FROM);
+        if (pMax > 0 && lvl < BOSS_GEAR_HP_FADE_TO) {
+            const fade = lvl <= BOSS_GEAR_HP_FADE_FROM ? 1
+                : 1 - (lvl - BOSS_GEAR_HP_FADE_FROM) / (BOSS_GEAR_HP_FADE_TO - BOSS_GEAR_HP_FADE_FROM);
             damage = Math.max(damage, Math.round(pMax * 0.13 * fade));
         }
     } catch (e) { /* floor is best-effort */ }
 
     const monster = {
-        id: `${def.id}_${++globalThis._egMonsterSpawnCounter}`,
+        id: `${def.id}_${++globalThis._monsterSpawnCounter}`,
         baseId: def.id,
         artId: def.id, // bosses have no variants - always the base id
         artScale: 1, // bosses keep their fixed (large) frame size
@@ -179,7 +179,7 @@ export function _egBuildBoss(defOrId, level = 1, hpMult = 1) {
         level: lvl,
         maxHP,
         currentHP: maxHP,
-        chargeMax: _egScaleBossChargeMax(def.chargeMax),
+        chargeMax: _scaleBossChargeMax(def.chargeMax),
         currentCharge: 0,
         damageValue: damage,
         element: def.element || null,
@@ -194,42 +194,42 @@ export function _egBuildBoss(defOrId, level = 1, hpMult = 1) {
 
 
 // Returns the current soft-enrage damage multiplier for a boss (1.0 if none).
-export function _egBossEnrageMultiplier(monster) {
-    return 1 + EG_BOSS_SOFT_ENRAGE_DMG_STEP * (monster.enrageStacks || 0);
+export function _bossEnrageMultiplier(monster) {
+    return 1 + BOSS_SOFT_ENRAGE_DMG_STEP * (monster.enrageStacks || 0);
 }
 
 
 // Recomputes a boss's damageValue from its base damage, phase multiplier and
 // soft-enrage stacks. Called on phase transitions and enrage stack ticks.
-export function _egBossRecalcDamage(monster) {
+export function _bossRecalcDamage(monster) {
     const phaseData = monster.bossDef.phases[monster.bossPhase - 1];
     monster.damageValue = Math.round(
-        monster.bossBaseDamage * phaseData.damageMultiplier * _egBossEnrageMultiplier(monster)
+        monster.bossBaseDamage * phaseData.damageMultiplier * _bossEnrageMultiplier(monster)
     );
 }
 
 
-// Per-tick boss logic, called from _egTickLoop every 100ms.
+// Per-tick boss logic, called from _tickLoop every 100ms.
 // Handles the soft-enrage damage stacking for all live bosses.
-export function _egBossTick() {
-    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+export function _bossTick() {
+    if (typeof _isActive === 'function' && !_isActive()) return;
 
     const now = Date.now();
     let anyNewlyEnraged = false;
-    globalThis._egMonsters.forEach(m => {
+    globalThis._monsters.forEach(m => {
         if (!m.isBoss || !m.bossDef) return;
 
         if (!m.bossSpawnTime) m.bossSpawnTime = now;
-        const elapsed = now - m.bossSpawnTime - EG_BOSS_SOFT_ENRAGE_DELAY_MS;
+        const elapsed = now - m.bossSpawnTime - BOSS_SOFT_ENRAGE_DELAY_MS;
         if (elapsed < 0) return;
 
         const targetStacks = Math.min(
-            EG_BOSS_SOFT_ENRAGE_MAX_STACKS,
-            1 + Math.floor(elapsed / EG_BOSS_SOFT_ENRAGE_INTERVAL_MS)
+            BOSS_SOFT_ENRAGE_MAX_STACKS,
+            1 + Math.floor(elapsed / BOSS_SOFT_ENRAGE_INTERVAL_MS)
         );
         if (targetStacks > (m.enrageStacks || 0)) {
             m.enrageStacks = targetStacks;
-            _egBossRecalcDamage(m);
+            _bossRecalcDamage(m);
             anyNewlyEnraged = true;
 
             const card = document.getElementById(`eg-card-${m.id}`);
@@ -254,10 +254,10 @@ export function _egBossTick() {
 
 // Attaches boss runtime state to a newly spawned boss monster object
 // and kicks off its phase 1 mechanics.
-export function _egBossInit(monster) {
+export function _bossInit(monster) {
     // Runtime monster ids are suffixed (e.g. "boss_null_7") - look the
     // mechanics entry up via the unsuffixed base id.
-    const def = EG_BOSS_MECHANICS[monster.baseId || monster.id];
+    const def = BOSS_MECHANICS[monster.baseId || monster.id];
     if (!def) return; // not all bosses need special mechanics
 
     monster.bossPhase = 1;
@@ -267,59 +267,59 @@ export function _egBossInit(monster) {
     monster.bossSpawnTime = Date.now();
     monster.enrageStacks = 0;
 
-    _egBossTimers[monster.id] = [];
+    _bossTimers[monster.id] = [];
     // Persistent arena systems (such as The Firefly's lights) start before
     // scheduled mechanics, so they are present from the opening second.
     if (typeof def.onInit === 'function') {
         try { def.onInit(monster); } catch (e) { console.warn('Boss init hook failed:', monster.baseId, e); }
     }
-    _egBossScheduleMechanics(monster, 1);
+    _bossScheduleMechanics(monster, 1);
 }
 
 
 // Teardown registry lives in ./boss-teardown-hooks.js (imported above).
-// _egBossCleanup + _egValidateAllBossHandlers read it from there.
+// _bossCleanup + _validateAllBossHandlers read it from there.
 
 
 // Cancels all mechanic timers for a specific boss and cleans up any
 // active field effects it created (corrupted cells, veil, blackout).
-export function _egBossCleanup(monsterId) {
-    const timers = _egBossTimers[monsterId];
+export function _bossCleanup(monsterId) {
+    const timers = _bossTimers[monsterId];
     if (timers) {
         timers.forEach(t => { clearTimeout(t); clearInterval(t); });
-        delete _egBossTimers[monsterId];
+        delete _bossTimers[monsterId];
     }
-    if (typeof _egClearAllCorruptedCells === 'function') _egClearAllCorruptedCells();
-    if (typeof _egClearPriorBombFuses === 'function') _egClearPriorBombFuses();
-    if (typeof _egClearShiftGlows === 'function') _egClearShiftGlows();
-    if (typeof _egClearAllFrozenCells === 'function') _egClearAllFrozenCells();
-    if (typeof _egRemoveVeil === 'function') _egRemoveVeil();
-    if (typeof globalThis._egRemoveBlackout === 'function') globalThis._egRemoveBlackout();
+    if (typeof _clearAllCorruptedCells === 'function') _clearAllCorruptedCells();
+    if (typeof _clearPriorBombFuses === 'function') _clearPriorBombFuses();
+    if (typeof _clearShiftGlows === 'function') _clearShiftGlows();
+    if (typeof _clearAllFrozenCells === 'function') _clearAllFrozenCells();
+    if (typeof _removeVeil === 'function') _removeVeil();
+    if (typeof globalThis._removeBlackout === 'function') globalThis._removeBlackout();
     // Shadow-veiled row/column clues ('?') are timed puzzle effects with their
     // own expiry; if the boss dies first they would stay hidden into the loot
     // phase. Boss death ends them.
-    if (typeof globalThis._egClearAllPuzzleEffects === 'function') globalThis._egClearAllPuzzleEffects();
-    if (typeof _egRemoveClueSwap === 'function') _egRemoveClueSwap();
-    if (typeof _egRemoveGridInvert === 'function') _egRemoveGridInvert();
-    if (typeof globalThis._egVoidSurgeTeardown === 'function') globalThis._egVoidSurgeTeardown();
-    if (typeof _egBlastTeardownAll === 'function') _egBlastTeardownAll();
-    if (typeof window._egCrushTeardown === 'function') window._egCrushTeardown();
-    if (typeof _egClearFateMarks === 'function') _egClearFateMarks();
-    if (typeof _egRemoveFogBank === 'function') _egRemoveFogBank();
-    if (typeof _egRemoveClueScramble === 'function') _egRemoveClueScramble();
-    if (typeof _egTitheTeardown === 'function') _egTitheTeardown(monsterId);
-    if (typeof _egNkTeardownBoss === 'function') _egNkTeardownBoss(monsterId);
-    if (typeof globalThis._egFireflyTeardown === 'function') globalThis._egFireflyTeardown(monsterId);
+    if (typeof globalThis._clearAllPuzzleEffects === 'function') globalThis._clearAllPuzzleEffects();
+    if (typeof _removeClueSwap === 'function') _removeClueSwap();
+    if (typeof _removeGridInvert === 'function') _removeGridInvert();
+    if (typeof globalThis._voidSurgeTeardown === 'function') globalThis._voidSurgeTeardown();
+    if (typeof _blastTeardownAll === 'function') _blastTeardownAll();
+    if (typeof window._crushTeardown === 'function') window._crushTeardown();
+    if (typeof _clearFateMarks === 'function') _clearFateMarks();
+    if (typeof _removeFogBank === 'function') _removeFogBank();
+    if (typeof _removeClueScramble === 'function') _removeClueScramble();
+    if (typeof _titheTeardown === 'function') _titheTeardown(monsterId);
+    if (typeof _nkTeardownBoss === 'function') _nkTeardownBoss(monsterId);
+    if (typeof globalThis._fireflyTeardown === 'function') globalThis._fireflyTeardown(monsterId);
     // The Snail: slimes + broom live outside nk runs - tear them down too.
-    if (typeof globalThis._egSnailTeardown === 'function') globalThis._egSnailTeardown();
+    if (typeof globalThis._snailTeardown === 'function') globalThis._snailTeardown();
     // The Demolitionist: the Bomb Maze owns body-level state (countdown
     // overlay, banner, charge-bar freeze) while it runs - drop it with the
-    // boss. Runs on boss death and on encounter stop via _egBossCleanupAll.
-    if (typeof globalThis._egCrashTeardown === 'function') globalThis._egCrashTeardown();
+    // boss. Runs on boss death and on encounter stop via _bossCleanupAll.
+    if (typeof globalThis._crashTeardown === 'function') globalThis._crashTeardown();
     // Per-boss field-effect teardowns - registry-driven (table in
     // ./boss-teardown-hooks.js; entries keep their own typeof guard).
-    for (let i = 0; i < EG_BOSS_TEARDOWN_HOOKS.length; i++) {
-        const hook = EG_BOSS_TEARDOWN_HOOKS[i];
+    for (let i = 0; i < BOSS_TEARDOWN_HOOKS.length; i++) {
+        const hook = BOSS_TEARDOWN_HOOKS[i];
         const matches = hook[2] ? monsterId === hook[0] : monsterId.startsWith(hook[0]);
         if (matches && typeof window[hook[1]] === 'function') window[hook[1]]();
     }
@@ -327,14 +327,14 @@ export function _egBossCleanup(monsterId) {
 
 
 // Cleans up all tracked bosses at once. Called on encounter stop.
-export function _egBossCleanupAll() {
-    Object.keys(_egBossTimers).forEach(id => _egBossCleanup(id));
+export function _bossCleanupAll() {
+    Object.keys(_bossTimers).forEach(id => _bossCleanup(id));
 }
 
 
 // Determines which phase the boss should be in based on current HP%.
 // Returns the target phase number (1-indexed).
-export function _egBossCalcTargetPhase(monster) {
+export function _bossCalcTargetPhase(monster) {
     const hpPct = monster.currentHP / monster.maxHP;
     const phases = monster.bossDef.phases;
     let targetPhase = 1;
@@ -350,11 +350,11 @@ export function _egBossCalcTargetPhase(monster) {
 
 // Applies the stat changes for a new boss phase to the monster object.
 // (chargeMax, damageValue). Does not touch timers or UI.
-export function _egBossApplyPhaseStats(monster, newPhase) {
+export function _bossApplyPhaseStats(monster, newPhase) {
     const phaseData = monster.bossDef.phases[newPhase - 1];
     monster.bossPhase = newPhase;
     monster.bossImmune = true;
-    monster.chargeMax = _egScaleBossChargeMax(phaseData.chargeMax);
+    monster.chargeMax = _scaleBossChargeMax(phaseData.chargeMax);
 
     // Active map run: re-apply the attack-speed mod, the raw phase value
     // just overwrote it.
@@ -364,22 +364,22 @@ export function _egBossApplyPhaseStats(monster, newPhase) {
         monster.chargeMax = Math.max(3, Math.ceil(monster.chargeMax / (1 + spdPct / 100)));
     }
 
-    _egBossRecalcDamage(monster);
+    _bossRecalcDamage(monster);
 }
 
 
 // Cancels existing mechanic timers for a boss so they can be rescheduled
 // at the new phase's speed when the immunity window expires.
-export function _egBossClearMechanicTimers(monster) {
-    const timers = _egBossTimers[monster.id] || [];
+export function _bossClearMechanicTimers(monster) {
+    const timers = _bossTimers[monster.id] || [];
     timers.forEach(t => { clearTimeout(t); clearInterval(t); });
-    _egBossTimers[monster.id] = [];
+    _bossTimers[monster.id] = [];
 }
 
 
 // Shows the phase transition toast and triggers the transition CSS animation on the card.
-export function _egBossPlayTransitionFeedback(monster, newPhase) {
-    const label = EG_BOSS_PHASE_NAMES[newPhase] ? t(EG_BOSS_PHASE_NAMES[newPhase]) : t('eg_phase_badge').replace('{n}', newPhase);
+export function _bossPlayTransitionFeedback(monster, newPhase) {
+    const label = BOSS_PHASE_NAMES[newPhase] ? t(BOSS_PHASE_NAMES[newPhase]) : t('eg_phase_badge').replace('{n}', newPhase);
     globalThis.showCombatToast(`⚡ ${monster.name}: ${label}!`);
 
     const card = document.getElementById(`eg-card-${monster.id}`);
@@ -395,15 +395,15 @@ export function _egBossPlayTransitionFeedback(monster, newPhase) {
 //   2. Cancels old mechanic timers
 //   3. Plays feedback (toast + card flash)
 //   4. Waits for the immunity window, then re-schedules mechanics at new phase speed
-export function _egBossTransition(monster, newPhase) {
-    _egBossApplyPhaseStats(monster, newPhase);
-    _egBossClearMechanicTimers(monster);
-    _egBossPlayTransitionFeedback(monster, newPhase);
+export function _bossTransition(monster, newPhase) {
+    _bossApplyPhaseStats(monster, newPhase);
+    _bossClearMechanicTimers(monster);
+    _bossPlayTransitionFeedback(monster, newPhase);
     Audio_Manager.playSFX('boss_phase_change');
-    _egRenderPanel();
+    _renderPanel();
 
     // Optional per-boss phase-enter hook. A boss can define
-    // `onPhaseEnter(monster, newPhase)` in its EG_BOSS_MECHANICS entry to run
+    // `onPhaseEnter(monster, newPhase)` in its BOSS_MECHANICS entry to run
     // phase-specific logic (gate events, special spawns) right at the moment
     // the phase begins - before the generic immunity window. Returning true
     // takes over the phase entirely: the boss owns its immunity release and
@@ -419,10 +419,10 @@ export function _egBossTransition(monster, newPhase) {
     }
 
     setTimeout(() => {
-        if (!globalThis._egMonsters.find(m => m.id === monster.id)) return; // boss died mid-window
+        if (!globalThis._monsters.find(m => m.id === monster.id)) return; // boss died mid-window
         monster.bossImmune = false;
-        _egBossScheduleMechanics(monster, newPhase);
-        _egRenderPanel();
+        _bossScheduleMechanics(monster, newPhase);
+        _renderPanel();
     }, monster.bossDef.immunityDuration);
 }
 
@@ -431,37 +431,37 @@ export function _egBossTransition(monster, newPhase) {
 // Called after every hit on a boss. No-op during existing immunity windows.
 // Hearts dropped onto the grid as a boss falls through these health shares
 // (one burst per threshold, per boss) - a breather in the long fights.
-const EG_BOSS_HEART_THRESHOLDS = [0.75, 0.5, 0.25];
-const EG_BOSS_HEARTS_PER_BURST = 2;
-function _egBossHeartBursts(monster) {
+const BOSS_HEART_THRESHOLDS = [0.75, 0.5, 0.25];
+const BOSS_HEARTS_PER_BURST = 2;
+function _bossHeartBursts(monster) {
     if (!monster || !(monster.maxHP > 0) || !(monster.currentHP > 0)) return;
     const ratio = monster.currentHP / monster.maxHP;
     const given = monster._heartBursts || 0;
     let due = 0;
-    while (given + due < EG_BOSS_HEART_THRESHOLDS.length && ratio <= EG_BOSS_HEART_THRESHOLDS[given + due]) due++;
+    while (given + due < BOSS_HEART_THRESHOLDS.length && ratio <= BOSS_HEART_THRESHOLDS[given + due]) due++;
     if (!due) return;
     monster._heartBursts = given + due;
     let placed = 0;
-    for (let i = 0; i < due * EG_BOSS_HEARTS_PER_BURST; i++) {
-        if (_egDropHeartPickup({ ignoreCap: true })) placed++;
+    for (let i = 0; i < due * BOSS_HEARTS_PER_BURST; i++) {
+        if (_dropHeartPickup({ ignoreCap: true })) placed++;
     }
     if (placed > 0) globalThis.showCombatToast(t('eg_boss_hearts_spawned'), '#f9a8d4');
 }
 
-export function _egBossCheckPhase(monster) {
-    _egBossHeartBursts(monster);
+export function _bossCheckPhase(monster) {
+    _bossHeartBursts(monster);
     if (!monster.bossDef || monster.bossImmune) return;
 
-    const targetPhase = _egBossCalcTargetPhase(monster);
+    const targetPhase = _bossCalcTargetPhase(monster);
     if (targetPhase > monster.bossPhase) {
-        _egBossTransition(monster, targetPhase);
+        _bossTransition(monster, targetPhase);
     }
 }
 
 
 // Returns the delay (ms) for the next trigger of a mechanic at the given phase.
 // Higher phases reduce the interval by 20% per phase above 1, capped at 5s minimum.
-export function _egCalcMechanicInterval(mech, phase) {
+export function _calcMechanicInterval(mech, phase) {
     const speedFactor = 1 - (phase - 1) * 0.20;
     const rawInterval = mech.intervalBase
         + (Math.random() * mech.intervalVariance - mech.intervalVariance / 2);
@@ -470,12 +470,12 @@ export function _egCalcMechanicInterval(mech, phase) {
 
 
 // Bosses whose mechanics already play bespoke sounds (see their boss-*.js).
-const EG_BOSSES_WITH_OWN_SFX = /^boss_(bumper|centipede|clock|coil|dancer|gale|gambler|gourmet|lodestone|puddle|sprout|stack|striker|tactician|thwomp|gust|marksman)/;
+const BOSSES_WITH_OWN_SFX = /^boss_(bumper|centipede|clock|coil|dancer|gale|gambler|gourmet|lodestone|puddle|sprout|stack|striker|tactician|thwomp|gust|marksman)/;
 
 // Mechanic → activation-sting category. Shared mechanics (used by 2+ bosses)
 // are mapped explicitly; boss-unique names fall back to a keyword heuristic
 // (most one-off moves are hazard-style attacks).
-export const _EG_MECH_CATEGORY = {
+export const _MECH_CATEGORY = {
     corrupt_cells: 'grid', prior_bomb: 'grid', probability_shift: 'grid',
     fated_cell: 'grid', frozen_cells: 'grid', clue_scramble: 'grid',
     clue_swap: 'grid', grid_invert: 'grid',
@@ -486,8 +486,8 @@ export const _EG_MECH_CATEGORY = {
 // Resolves any mechanic name to a category so the activation sting's pitch
 // identifies the mechanic TYPE by ear: grid-affecting (mid) vs hazard (low)
 // vs summon (high). Uncategorized names return undefined → generic sting.
-export function _egBossMechCategory(name) {
-    if (_EG_MECH_CATEGORY[name]) return _EG_MECH_CATEGORY[name];
+export function _bossMechCategory(name) {
+    if (_MECH_CATEGORY[name]) return _MECH_CATEGORY[name];
     if (/clue|grid|cell|invert|pattern|thread/.test(name)) return 'grid';
     if (/summon|sprout|wisp|seek|ghost|guard|dive/.test(name)) return 'summon';
     return 'hazard';
@@ -496,7 +496,7 @@ export function _egBossMechCategory(name) {
 
 // Schedules a single mechanic for the given boss at the given phase.
 // Self-reschedules after each trigger so the mechanic keeps firing until the boss dies.
-export function _egBossScheduleSingleMechanic(monster, mech, phase) {
+export function _bossScheduleSingleMechanic(monster, mech, phase) {
     // phase2Only mechanics are skipped unless we're already in phase 2 or later
     if (mech.phase2Only && phase < 2) return;
 
@@ -512,14 +512,14 @@ export function _egBossScheduleSingleMechanic(monster, mech, phase) {
             }, 200);
             return;
         }
-        const stillAlive = _egIsActive() && globalThis._egMonsters.find(m => m.id === monster.id);
+        const stillAlive = _isActive() && globalThis._monsters.find(m => m.id === monster.id);
         if (stillAlive && !monster.bossImmune) {
             const fn = window[mech.handler];
             if (typeof fn === 'function') {
                 // Generic activation cue for bosses that have no sounds of
                 // their own yet; bosses with bespoke sounds play those in-handler.
-                if (!EG_BOSSES_WITH_OWN_SFX.test(String(monster.id || ''))) {
-                    const cat = _egBossMechCategory(String(mech.name || ''));
+                if (!BOSSES_WITH_OWN_SFX.test(String(monster.id || ''))) {
+                    const cat = _bossMechCategory(String(mech.name || ''));
                     Audio_Manager.playSFX(cat === 'summon' ? 'boss_summon_adds'
                         : cat === 'grid' ? 'grid_scramble' : 'boss_telegraph_warn');
                 }
@@ -538,11 +538,11 @@ export function _egBossScheduleSingleMechanic(monster, mech, phase) {
 
     const scheduleNext = () => {
         // Bail out if the encounter ended or this boss is already dead
-        if (!_egIsActive() || !globalThis._egMonsters.find(m => m.id === monster.id)) return;
+        if (!_isActive() || !globalThis._monsters.find(m => m.id === monster.id)) return;
 
-        const interval = _egCalcMechanicInterval(mech, phase);
+        const interval = _calcMechanicInterval(mech, phase);
         const t = setTimeout(fireTrigger, interval);
-        if (_egBossTimers[monster.id]) _egBossTimers[monster.id].push(t);
+        if (_bossTimers[monster.id]) _bossTimers[monster.id].push(t);
     };
 
     // The FIRST trigger fires after a short opening delay instead of waiting out
@@ -552,16 +552,16 @@ export function _egBossScheduleSingleMechanic(monster, mech, phase) {
     // every later trigger keeps the full per-mechanic interval above.
     const initialDelay = 3000 + Math.random() * 5000;
     const t0 = setTimeout(fireTrigger, initialDelay);
-    if (_egBossTimers[monster.id]) _egBossTimers[monster.id].push(t0);
+    if (_bossTimers[monster.id]) _bossTimers[monster.id].push(t0);
 }
 
 
 // Schedules all mechanics defined for a boss at the given phase.
 // Called on boss spawn (phase 1) and again after each phase transition.
-export function _egBossScheduleMechanics(monster, phase) {
+export function _bossScheduleMechanics(monster, phase) {
     const def = monster.bossDef;
     if (!def) return;
-    def.mechanics.forEach(mech => _egBossScheduleSingleMechanic(monster, mech, phase));
+    def.mechanics.forEach(mech => _bossScheduleSingleMechanic(monster, mech, phase));
 }
 
 
@@ -569,20 +569,20 @@ export function _egBossScheduleMechanics(monster, phase) {
 // do not resolve to a global function. Called once after all boss files
 // have loaded (end of boss-rosters.js) so a typo'd handler string can
 // never silently disable a mechanic. Dispatch happens via
-// window[mech.handler] in _egBossScheduleSingleMechanic, so every handler
+// window[mech.handler] in _bossScheduleSingleMechanic, so every handler
 // must be a top-level function declaration.
-export function _egValidateAllBossHandlers() {
+export function _validateAllBossHandlers() {
     const missing = [];
-    Object.keys(EG_BOSS_MECHANICS).forEach(bossId => {
-        const def = EG_BOSS_MECHANICS[bossId];
+    Object.keys(BOSS_MECHANICS).forEach(bossId => {
+        const def = BOSS_MECHANICS[bossId];
         (def.mechanics || []).forEach(mech => {
             if (mech.handler && typeof window[mech.handler] !== 'function') {
                 missing.push(`${bossId}: ${mech.handler} (${mech.name || 'unnamed mechanic'})`);
             }
         });
     });
-    // Teardown hooks are dispatched via window[name] in _egBossCleanup.
-    EG_BOSS_TEARDOWN_HOOKS.forEach(hook => {
+    // Teardown hooks are dispatched via window[name] in _bossCleanup.
+    BOSS_TEARDOWN_HOOKS.forEach(hook => {
         if (typeof window[hook[1]] !== 'function') {
             missing.push(`${hook[0]}: teardown ${hook[1]}`);
         }

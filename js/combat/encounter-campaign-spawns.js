@@ -4,11 +4,11 @@
 //------------------------------------------------------------------------
 
 import { cur } from '../state.js';
-import { _egCampaignMonsterLevel } from '../endgame/endgame-leveling.js';
-import { EG_MONSTER_DEFS } from './combat-monsters-data.js';
+import { _campaignMonsterLevel } from '../endgame/endgame-leveling.js';
+import { MONSTER_DEFS } from './combat-monsters-data.js';
 
-try { Object.defineProperty(globalThis, '_egClearCampaignLevelFields', { get() { return _egClearCampaignLevelFields; }, set(v) { _egClearCampaignLevelFields = v; }, configurable: true }); } catch (e) {}
-try { Object.defineProperty(globalThis, '_egShouldPrepareCampaignEncounter', { get() { return _egShouldPrepareCampaignEncounter; }, set(v) { _egShouldPrepareCampaignEncounter = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_clearCampaignLevelFields', { get() { return _clearCampaignLevelFields; }, set(v) { _clearCampaignLevelFields = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_shouldPrepareCampaignEncounter', { get() { return _shouldPrepareCampaignEncounter; }, set(v) { _shouldPrepareCampaignEncounter = v; }, configurable: true }); } catch (e) {}
 
 //------------------------------------------------------------------------
 //-------------------CAMPAIGN MONSTER PACK--------------------------------
@@ -23,7 +23,7 @@ try { Object.defineProperty(globalThis, '_egShouldPrepareCampaignEncounter', { g
 // spell builds delete every pack).
 //
 // Campaign packs never respawn and never include bosses.
-export const EG_CAMPAIGN_MONSTER_CONFIG = {
+export const CAMPAIGN_MONSTER_CONFIG = {
     // Per-monster HP = refHit(level) * hitsToKill * early ramp * spread.
     // refHit anchors [level, best single-action damage] were measured from
     // real character exports (L7 geared 138, L10 spell build 176, L42 melee
@@ -72,15 +72,15 @@ export const EG_CAMPAIGN_MONSTER_CONFIG = {
 
 // Multiplier (0..1 blend) for the early-game ease: 1 at monster level 1,
 // falling to 0 at earlyEaseLevels. Exported for the charge path and tests.
-export function _egEarlyEaseBlend(level) {
-    const n = Math.max(2, EG_CAMPAIGN_MONSTER_CONFIG.earlyEaseLevels);
+export function _earlyEaseBlend(level) {
+    const n = Math.max(2, CAMPAIGN_MONSTER_CONFIG.earlyEaseLevels);
     return Math.max(0, Math.min(1, 1 - (Math.max(1, Number(level) || 1) - 1) / (n - 1)));
 }
 
 // Best single-action damage of a level-appropriate character (see
 // refHitAnchors). Gear-independent by design.
-function _egCampaignRefHit(level) {
-    const cfg = EG_CAMPAIGN_MONSTER_CONFIG;
+function _campaignRefHit(level) {
+    const cfg = CAMPAIGN_MONSTER_CONFIG;
     const pts = cfg.refHitAnchors;
     const l = Math.max(1, Number(level) || 1);
     if (l <= pts[0][0]) return pts[0][1];
@@ -94,8 +94,8 @@ function _egCampaignRefHit(level) {
 
 // Raw per-hit damage of a campaign monster at `level` (see refDamageAnchors).
 // Shared with the gauntlet arena, which scales it by its own share.
-export function _egCampaignRefDamage(level) {
-    const cfg = EG_CAMPAIGN_MONSTER_CONFIG;
+export function _campaignRefDamage(level) {
+    const cfg = CAMPAIGN_MONSTER_CONFIG;
     const pts = cfg.refDamageAnchors;
     const l = Math.max(1, Number(level) || 1);
     if (l <= pts[0][0]) return pts[0][1];
@@ -107,17 +107,17 @@ export function _egCampaignRefDamage(level) {
     return yn + cfg.refDamageSlopeBeyond * (l - xn);
 }
 
-// Fields _egPrepareCampaignEncounter stamps onto the level object. Listed so
-// _egClearCampaignLevelFields can restore the story level to its pristine
+// Fields _prepareCampaignEncounter stamps onto the level object. Listed so
+// _clearCampaignLevelFields can restore the story level to its pristine
 // state once the encounter ends (the same level objects are reused as
 // endgame map seeds, so nothing may leak).
-export const EG_CAMPAIGN_STAMPED_FIELDS = [
+export const CAMPAIGN_STAMPED_FIELDS = [
     'campaignMonsters', 'campaignMonsterCount', 'campaignMonsterHp',
     'campaignMonsterDamage', 'monsters', 'monsterLevel', 'maxMonsters',
 ];
 
 // Counts the solution cells (value 1) of the current puzzle.
-export function _egCountSolutionCells() {
+export function _countSolutionCells() {
     if (!cur || !cur.grid) return 0;
     let n = 0;
     for (const row of cur.grid) for (const v of row) if (v === 1) n++;
@@ -128,8 +128,8 @@ export function _egCountSolutionCells() {
 // monster level so early worlds stay to fragile creatures while late worlds
 // can roll tankier ones (their HP is overridden by the campaign budget
 // anyway, but baseId drives the sprite and resistances).
-export function _egBuildCampaignMonsterList(count, level) {
-    const defs = (typeof EG_MONSTER_DEFS !== 'undefined') ? Object.values(EG_MONSTER_DEFS) : [];
+export function _buildCampaignMonsterList(count, level) {
+    const defs = (typeof MONSTER_DEFS !== 'undefined') ? Object.values(MONSTER_DEFS) : [];
     if (!defs.length) return [];
     const maxBaseHp = level <= 12 ? 40 : level <= 30 ? 80 : level <= 50 ? 130 : 200;
     let pool = defs.filter(d => (d.baseHP || 0) <= maxBaseHp);
@@ -145,7 +145,7 @@ export function _egBuildCampaignMonsterList(count, level) {
 // Returns true when the current level should run a campaign monster pack.
 // Excludes endgame sandbox levels and levels already stamped as map seeds.
 // MONSTERLESS runs never prepare an encounter - pure puzzles, no Beasts.
-function _egShouldPrepareCampaignEncounter() {
+function _shouldPrepareCampaignEncounter() {
     if (!cur) return false;
     if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return false;
     if (cur.isEndgameSandbox) return false;
@@ -159,16 +159,16 @@ function _egShouldPrepareCampaignEncounter() {
 
 // Stamps the current campaign level with everything the shared encounter loop
 // needs (monster list, level, HP/damage budget) and returns true on success.
-// Called from start-level.js right before _egStartEncounter().
-export function _egPrepareCampaignEncounter() {
-    if (!_egShouldPrepareCampaignEncounter()) return false;
+// Called from start-level.js right before _startEncounter().
+export function _prepareCampaignEncounter() {
+    if (!_shouldPrepareCampaignEncounter()) return false;
     if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return false;
     if (cur.campaignMonsters) return true;   // already prepared (retry / chain)
 
-    const cfg = EG_CAMPAIGN_MONSTER_CONFIG;
-    const cells = _egCountSolutionCells();
-    const level = (typeof _egCampaignMonsterLevel === 'function')
-        ? _egCampaignMonsterLevel(cur.gIdx) : 1;
+    const cfg = CAMPAIGN_MONSTER_CONFIG;
+    const cells = _countSolutionCells();
+    const level = (typeof _campaignMonsterLevel === 'function')
+        ? _campaignMonsterLevel(cur.gIdx) : 1;
     const world = cur.world || 1;
     let count = cfg.countBase + Math.floor((world - 1) / cfg.countPerWorlds);
     count = Math.max(1, Math.min(cfg.countMax, count));
@@ -178,9 +178,9 @@ export function _egPrepareCampaignEncounter() {
 
     const ramp = Math.max(0, Math.min(1, (level - 1) / Math.max(1, cfg.earlyHpRampLevels)));
     const hits = cfg.hitsToKill * (cfg.earlyHitsFraction + (1 - cfg.earlyHitsFraction) * ramp);
-    const perHp = Math.max(cfg.minHp, Math.round(_egCampaignRefHit(level) * hits));
-    const easeDamage = 1 - (1 - cfg.earlyDamageMult) * _egEarlyEaseBlend(level);
-    const damage = Math.max(1, Math.round(_egCampaignRefDamage(level) * easeDamage));
+    const perHp = Math.max(cfg.minHp, Math.round(_campaignRefHit(level) * hits));
+    const easeDamage = 1 - (1 - cfg.earlyDamageMult) * _earlyEaseBlend(level);
+    const damage = Math.max(1, Math.round(_campaignRefDamage(level) * easeDamage));
 
     cur.campaignMonsters = true;
     cur.isMonsterLevel = true;
@@ -189,14 +189,14 @@ export function _egPrepareCampaignEncounter() {
     cur.campaignMonsterCount = count;
     cur.campaignMonsterHp = perHp;
     cur.campaignMonsterDamage = damage;
-    cur.monsters = _egBuildCampaignMonsterList(count, level);
+    cur.monsters = _buildCampaignMonsterList(count, level);
     return true;
 }
 
 // Restores a campaign level object to its pristine story-level state after
 // its encounter ends. Safe to call with a non-campaign level (no-op).
-export function _egClearCampaignLevelFields(level) {
+export function _clearCampaignLevelFields(level) {
     if (!level || !level.campaignMonsters) return;
-    EG_CAMPAIGN_STAMPED_FIELDS.forEach(k => { delete level[k]; });
+    CAMPAIGN_STAMPED_FIELDS.forEach(k => { delete level[k]; });
     delete level.isMonsterLevel;
 }

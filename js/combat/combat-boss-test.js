@@ -6,48 +6,48 @@
 
 import { switchScreen } from '../screens/screens.js';
 import { t } from '../translation/translations.js';
-import { _egbtBuildFullScreenHTML, _egbtEnsureStyles, _egbtRenderGrid } from './combat-boss-test-ui.js';
+import { _bossTestBuildFullScreenHTML, _bossTestEnsureStyles, _bossTestRenderGrid } from './combat-boss-test-ui.js';
 
 //------------------------------------------------------------------------
 //-------------------GODMODE DEBUG TOGGLE----------------------------------
 //------------------------------------------------------------------------
-// Proper UI switch for the damage-immune debug flag window._egGodMode
-// (honoured at the top of _egPlayerTakeDamage). Lives in the boss-test
+// Proper UI switch for the damage-immune debug flag window._godMode
+// (honoured at the top of _playerTakeDamage). Lives in the boss-test
 // settings bar, persists per browser so the state survives screen changes,
 // and a fixed HUD chip shows "GODMODE ON" wherever you are - no console
 // access needed. The chip also guards against accidentally leaving it on
 // during a real map run.
-let _egbtGodModeOn = false;
+let _bossTestGodModeOn = false;
 
 
 // Applies the flag, persists it, and re-syncs every godmode UI element.
-export function _egbtApplyGodMode(on) {
-    _egbtGodModeOn = !!on;
-    window._egGodMode = _egbtGodModeOn;
-    try { localStorage.setItem('_egbtGodMode', _egbtGodModeOn ? '1' : '0'); } catch (e) {}
-    _egbtSyncGodModeUI();
+export function _bossTestApplyGodMode(on) {
+    _bossTestGodModeOn = !!on;
+    window._godMode = _bossTestGodModeOn;
+    try { localStorage.setItem('_egbtGodMode', _bossTestGodModeOn ? '1' : '0'); } catch (e) {}
+    _bossTestSyncGodModeUI();
 }
 
 
 // Restores the persisted state (called when the boss-test screen opens and
 // once at script load, so the chip is correct even outside the screen).
-export function _egbtInitGodMode() {
+export function _bossTestInitGodMode() {
     let on = false;
     try { on = localStorage.getItem('_egbtGodMode') === '1'; } catch (e) {}
-    _egbtApplyGodMode(on);
+    _bossTestApplyGodMode(on);
 }
 
 
 // Checkbox handler (inline onchange).
-export function _egbtToggleGodMode(checkbox) {
-    _egbtApplyGodMode(checkbox && checkbox.checked);
+export function _bossTestToggleGodMode(checkbox) {
+    _bossTestApplyGodMode(checkbox && checkbox.checked);
 }
 
 
 // Keeps every godmode UI element in sync: the settings checkbox + state
 // badge on the boss-test screen, and the always-visible in-game chip.
-export function _egbtSyncGodModeUI() {
-    const on = _egbtGodModeOn;
+export function _bossTestSyncGodModeUI() {
+    const on = _bossTestGodModeOn;
     document.querySelectorAll('.egbt-godmode-checkbox').forEach(cb => { cb.checked = on; });
     const badge = document.getElementById('egbt-godmode-badge');
     if (badge) {
@@ -71,17 +71,17 @@ export function _egbtSyncGodModeUI() {
 //-------------------SCREEN BOOTSTRAP----------------------------------------
 //------------------------------------------------------------------------
 
-export function _egbtCreateScreen() {
-    _egbtEnsureStyles();
+export function _bossTestCreateScreen() {
+    _bossTestEnsureStyles();
     const screen = document.createElement('div');
     screen.id = 'screen-endgame-boss-test';
     screen.className = 'screen';
-    screen.innerHTML = _egbtBuildFullScreenHTML();
+    screen.innerHTML = _bossTestBuildFullScreenHTML();
     document.body.appendChild(screen);
 }
 
 export function ensureEndgameBossTestScreen() {
-    if (!document.getElementById('screen-endgame-boss-test')) _egbtCreateScreen();
+    if (!document.getElementById('screen-endgame-boss-test')) _bossTestCreateScreen();
 }
 
 // Entry point - call this to show the boss selection screen.
@@ -91,23 +91,23 @@ export function showEndgameBossTest() {
     // search box for a fresh pick.
     const screen = document.getElementById('screen-endgame-boss-test');
     if (screen) {
-        const keepSearch = window._egBossTestSearch || '';
-        screen.innerHTML = _egbtBuildFullScreenHTML();
+        const keepSearch = window._bossTestSearch || '';
+        screen.innerHTML = _bossTestBuildFullScreenHTML();
         const searchEl = document.getElementById('egbt-search');
         if (searchEl && keepSearch) {
             searchEl.value = keepSearch;
-            window._egBossTestSearch = keepSearch;
+            window._bossTestSearch = keepSearch;
         } else {
-            window._egBossTestSearch = '';
+            window._bossTestSearch = '';
         }
     }
     switchScreen('screen-endgame-boss-test');
-    _egbtRenderGrid();
+    _bossTestRenderGrid();
     // Restore + re-apply the persisted godmode toggle (checkbox, badge, chip).
-    _egbtInitGodMode();
+    _bossTestInitGodMode();
 }
 
 
 // Apply the persisted godmode flag at script load so the HUD chip is correct
 // even before the boss-test screen is ever opened.
-_egbtInitGodMode();
+_bossTestInitGodMode();

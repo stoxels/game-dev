@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkDotHit, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE CYCLOPS (boss_cyclops)---------------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_cyclops: {
         id: 'boss_cyclops', name: 'The Cyclops', emoji: '👹',
         baseHP: 1080, baseDamage: 24, chargeMax: 12,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_cyclops: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -29,8 +29,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'eye_bursts', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechEyeBursts' },
-            { name: 'prior_bomb', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechPriorBomb' },
+            { name: 'eye_bursts', intervalBase: 20000, intervalVariance: 5000, handler: '_mechEyeBursts' },
+            { name: 'prior_bomb', intervalBase: 19000, intervalVariance: 4000, handler: '_mechPriorBomb' },
         ],
     },
 });
@@ -38,8 +38,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // Rotating radial orb volleys from a fixed eye. Each volley turns the gaps,
 // so park where the last gap was, not where the next one will be.
-export function _egMechEyeBursts(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechEyeBursts(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const volleys = [0, 4, 4, 5][p];
     const ways = 8;
@@ -47,15 +47,15 @@ export function _egMechEyeBursts(monster, phase) {
     const speed = [0, 120, 140, 165][p];
     const lifeMs = 8000;
     const dmgPct = [0, 0.055, 0.065, 0.08][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const ex = window.innerWidth * 0.5, ey = window.innerHeight * 0.35;
-    const eye = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '👹');
+    const eye = _nkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '👹');
     eye.style.transform = 'translate(' + Math.round(ex - 26) + 'px,' + Math.round(ey - 26) + 'px)';
     const orbs = [];
     let fired = 0, acc = 0, orbCdUntil = 0, spin = Math.random() * 6.28;
-    _egNkToast('eg_mech_cyclops', '👹 The Cyclops: Eye Bursts! Mind the gaps!');
-    _egNkLoop(run, (dtS, now) => {
+    _nkToast('eg_mech_cyclops', '👹 The Cyclops: Eye Bursts! Mind the gaps!');
+    _nkLoop(run, (dtS, now) => {
         if (fired < volleys) {
             acc += dtS * 1000;
             if (acc >= (fired === 0 ? 500 : volleyGapMs)) {
@@ -64,12 +64,12 @@ export function _egMechEyeBursts(monster, phase) {
                 spin += 0.39; // rotate the pattern so gaps move each volley
                 for (let i = 0; i < ways; i++) {
                     const a = spin + i * Math.PI * 2 / ways;
-                    const el = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-orb');
+                    const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-orb');
                     orbs.push({ x: ex, y: ey, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, t: 0, hitDone: false, el });
                 }
             }
         }
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         for (let i = orbs.length - 1; i >= 0; i--) {
             const o = orbs[i];
             o.t += dtS * 1000;
@@ -81,11 +81,11 @@ export function _egMechEyeBursts(monster, phase) {
                 continue;
             }
             o.el.style.transform = 'translate(' + Math.round(o.x - 9) + 'px,' + Math.round(o.y - 9) + 'px)';
-            if (!o.hitDone && pr && now >= orbCdUntil && _egNkDotHit(o.el, pr, 2)) {
+            if (!o.hitDone && pr && now >= orbCdUntil && _nkDotHit(o.el, pr, 2)) {
                 o.hitDone = true;
                 orbCdUntil = now + 500;
-                const dealt = _egNkHit(dmgPct, 'fire', level);
-                _egNkAbilityHitToast(dealt, 'The Cyclops', 'Eye Bursts');
+                const dealt = _nkHit(dmgPct, 'fire', level);
+                _nkAbilityHitToast(dealt, 'The Cyclops', 'Eye Bursts');
             }
         }
         return fired < volleys || orbs.length > 0;

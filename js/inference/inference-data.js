@@ -2649,7 +2649,7 @@ function _lootHash(str) {
 }
 
 // Resolves a milestone's reward into { ptPoints, items, loot } where loot is
-// a list of { kind, tier? } granted through egGrantScriptedLoot.
+// a list of { kind, tier? } granted through grantScriptedLoot.
 // Balance: no milestone pays more than two puzzle items - the third/fourth
 // item is trimmed from the richest milestones (one- and two-item
 // milestones are untouched). Applied after the loot swap so swapped

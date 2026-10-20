@@ -2,12 +2,12 @@ import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { save, STATE } from '../state.js';
 import { t } from '../translation/translations.js';
-import { EG_CURRENCY_DEFS } from './loot-currency.js';
-import { EG_ESSENCE_DEFS } from './loot-essences-defs.js';
-import { egAddEssence } from './loot-essences-stash.js';
-import { egAddCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
-import { egGetGold, egSpendGold } from './loot-gold.js';
-import { _egvBuildCardHTML, _egvBuildCharmFilterBarHTML, _egvFilterCharmIds, _egvIconHTML, _egvPurchase, _egvRefreshTabContent } from './loot-vendor-shared.js';
+import { CURRENCY_DEFS } from './loot-currency.js';
+import { ESSENCE_DEFS } from './loot-essences-defs.js';
+import { addEssence } from './loot-essences-stash.js';
+import { addCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
+import { getGold, spendGold } from './loot-gold.js';
+import { _vendorBuildCardHTML, _vendorBuildCharmFilterBarHTML, _vendorFilterCharmIds, _vendorIconHTML, _vendorPurchase, _vendorRefreshTabContent } from './loot-vendor-shared.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE--------------------------------------
@@ -17,7 +17,7 @@ import { _egvBuildCardHTML, _egvBuildCharmFilterBarHTML, _egvFilterCharmIds, _eg
 // Prices per currency orb id (gold). Missing ids fall back to the default.
 // Rebalanced: common crafting orbs are affordable, rare/epic orbs are
 // deliberately expensive so they remain chase items and cannot be spammed.
-const EG_VENDOR_CURRENCY_PRICES = {
+const VENDOR_CURRENCY_PRICES = {
     orb_transmutation: 45,
     orb_augmentation: 55,
     orb_alteration: 65,
@@ -38,11 +38,11 @@ const EG_VENDOR_CURRENCY_PRICES = {
     orb_horizons: 500,
     mirror_of_kalandra: 8500,
 };
-const EG_VENDOR_CURRENCY_DEFAULT_PRICE = 320;
+const VENDOR_CURRENCY_DEFAULT_PRICE = 320;
 
 // Prices per essence id (gold). Every per-modifier essence has a distinct
 // price: baseline 320, powerful families cost significantly more.
-const EG_VENDOR_ESSENCE_PRICES = {
+const VENDOR_ESSENCE_PRICES = {
     // Recovery / absorption - 400-440
     essence_absorption_on_kill: 440,
     essence_absorption_regen_rate: 440,
@@ -153,11 +153,11 @@ const EG_VENDOR_ESSENCE_PRICES = {
     // Movement / utility
     essence_movement_speed: 540,
 };
-const EG_VENDOR_ESSENCE_DEFAULT_PRICE = 350;
+const VENDOR_ESSENCE_DEFAULT_PRICE = 350;
 
 // Puzzle item prices by rarity (gold) - rebalanced to be more expensive
 // across the board so puzzle items remain meaningful purchases.
-const EG_VENDOR_ITEM_RARITY_PRICES = {
+const VENDOR_ITEM_RARITY_PRICES = {
     common: 55,
     uncommon: 130,
     rare: 280,
@@ -173,29 +173,29 @@ const EG_VENDOR_ITEM_RARITY_PRICES = {
 //------------------------------------------------------------------------//------------------------------------------------------------------------
 
 // Returns the gold price for a currency orb id.
-function _egvCurrencyPrice(id) {
-    return EG_VENDOR_CURRENCY_PRICES[id] != null ? EG_VENDOR_CURRENCY_PRICES[id] : EG_VENDOR_CURRENCY_DEFAULT_PRICE;
+function _vendorCurrencyPrice(id) {
+    return VENDOR_CURRENCY_PRICES[id] != null ? VENDOR_CURRENCY_PRICES[id] : VENDOR_CURRENCY_DEFAULT_PRICE;
 }
 
 // Builds purchase cards for every known currency orb.
-export function _egvBuildCurrencyTabHTML() {
-    const defs = Object.values(EG_CURRENCY_DEFS);
-    const cards = defs.map(def => _egvBuildCardHTML({
-        icon: _egvIconHTML(def.id, def.icon),
+export function _vendorBuildCurrencyTabHTML() {
+    const defs = Object.values(CURRENCY_DEFS);
+    const cards = defs.map(def => _vendorBuildCardHTML({
+        icon: _vendorIconHTML(def.id, def.icon),
         title: def.name,
         desc: def.description,
-        price: _egvCurrencyPrice(def.id),
-        buyCall: `_egvBuyCurrency('${def.id}')`,
+        price: _vendorCurrencyPrice(def.id),
+        buyCall: `_vendorBuyCurrency('${def.id}')`,
     })).join('');
     return `<div class="egv-cards">${cards}</div>`;
 }
 
 // Buys one currency orb and adds it to the hub stash.
-export function _egvBuyCurrency(id) {
-    const def = EG_CURRENCY_DEFS[id];
+export function _vendorBuyCurrency(id) {
+    const def = CURRENCY_DEFS[id];
     if (!def) return;
-    const price = _egvCurrencyPrice(id);
-    if (!_egvPurchase(price, () => egAddCurrency(id, 1, {
+    const price = _vendorCurrencyPrice(id);
+    if (!_vendorPurchase(price, () => addCurrency(id, 1, {
         name: def.name,
         icon: def.icon,
         rarity: 'currency',
@@ -206,7 +206,7 @@ export function _egvBuyCurrency(id) {
     globalThis.showToast(t('eg_vendor_bought_generic')
         .replace('{icon}', def.icon)
         .replace('{name}', def.name));
-    _egvRefreshTabContent();
+    _vendorRefreshTabContent();
 }
 
 //------------------------------------------------------------------------
@@ -215,30 +215,30 @@ export function _egvBuyCurrency(id) {
 //------------------------------------------------------------------------//------------------------------------------------------------------------
 
 // Returns the gold price for an essence id.
-function _egvEssencePrice(id) {
-    return EG_VENDOR_ESSENCE_PRICES[id] != null ? EG_VENDOR_ESSENCE_PRICES[id] : EG_VENDOR_ESSENCE_DEFAULT_PRICE;
+function _vendorEssencePrice(id) {
+    return VENDOR_ESSENCE_PRICES[id] != null ? VENDOR_ESSENCE_PRICES[id] : VENDOR_ESSENCE_DEFAULT_PRICE;
 }
 
 // Builds purchase cards for every known essence.
-export function _egvBuildEssencesTabHTML() {
-    const defs = Object.values(EG_ESSENCE_DEFS);
-    const cards = defs.map(def => _egvBuildCardHTML({
-        icon: _egvIconHTML(def.id, def.icon),
+export function _vendorBuildEssencesTabHTML() {
+    const defs = Object.values(ESSENCE_DEFS);
+    const cards = defs.map(def => _vendorBuildCardHTML({
+        icon: _vendorIconHTML(def.id, def.icon),
         title: def.name,
         desc: def.description,
-        price: _egvEssencePrice(def.id),
-        buyCall: `_egvBuyEssence('${def.id}')`,
+        price: _vendorEssencePrice(def.id),
+        buyCall: `_vendorBuyEssence('${def.id}')`,
         extraClass: 'egv-essence-card',
     })).join('');
     return `<div class="egv-cards">${cards}</div>`;
 }
 
 // Buys one essence and adds it to the hub stash.
-export function _egvBuyEssence(id) {
-    const def = EG_ESSENCE_DEFS[id];
+export function _vendorBuyEssence(id) {
+    const def = ESSENCE_DEFS[id];
     if (!def) return;
-    const price = _egvEssencePrice(id);
-    if (!_egvPurchase(price, () => egAddEssence(id, 1, {
+    const price = _vendorEssencePrice(id);
+    if (!_vendorPurchase(price, () => addEssence(id, 1, {
         name: def.name,
         icon: def.icon,
         rarity: 'essence',
@@ -249,7 +249,7 @@ export function _egvBuyEssence(id) {
     globalThis.showToast(t('eg_vendor_bought_generic')
         .replace('{icon}', def.icon)
         .replace('{name}', def.name));
-    _egvRefreshTabContent();
+    _vendorRefreshTabContent();
 }
 
 //------------------------------------------------------------------------
@@ -260,31 +260,31 @@ export function _egvBuyEssence(id) {
 //------------------------------------------------------------------------
 
 // Returns the gold price for a puzzle-item rarity.
-function _egvPuzzleItemPrice(rarity) {
-    return EG_VENDOR_ITEM_RARITY_PRICES[rarity] != null ? EG_VENDOR_ITEM_RARITY_PRICES[rarity] : 100;
+function _vendorPuzzleItemPrice(rarity) {
+    return VENDOR_ITEM_RARITY_PRICES[rarity] != null ? VENDOR_ITEM_RARITY_PRICES[rarity] : 100;
 }
 
 // Builds purchase cards for every regular puzzle item.
-export function _egvBuildItemsTabHTML() {
-    const cards = Object.values(globalThis.ITEM_DEFS).map(def => _egvBuildCardHTML({
-        icon: _egvIconHTML(def.id, def.icon),
+export function _vendorBuildItemsTabHTML() {
+    const cards = Object.values(globalThis.ITEM_DEFS).map(def => _vendorBuildCardHTML({
+        icon: _vendorIconHTML(def.id, def.icon),
         title: globalThis.itemName(def),
         subtitle: def.rarity,
         desc: globalThis.itemDesc(def),
-        price: _egvPuzzleItemPrice(def.rarity),
-        buyCall: `_egvBuyPuzzleItem('${def.id}')`,
+        price: _vendorPuzzleItemPrice(def.rarity),
+        buyCall: `_vendorBuyPuzzleItem('${def.id}')`,
     })).join('');
     return `<div class="egv-cards">${cards}</div>`;
 }
 
 // Buys a regular puzzle item straight into the persistent main inventory.
-export function _egvBuyPuzzleItem(defId) {
+export function _vendorBuyPuzzleItem(defId) {
     const def = globalThis.ITEM_DEFS[defId];
     if (!def) return;
-    const price = _egvPuzzleItemPrice(def.rarity);
+    const price = _vendorPuzzleItemPrice(def.rarity);
 
-    if (!egSpendGold(price)) {
-        globalThis.showToast(t('eg_vendor_no_gold').replace('{n}', price - egGetGold()));
+    if (!spendGold(price)) {
+        globalThis.showToast(t('eg_vendor_no_gold').replace('{n}', price - getGold()));
         Audio_Manager.playSFX('player_equip_not_pickup');
         return;
     }
@@ -301,7 +301,7 @@ export function _egvBuyPuzzleItem(defId) {
         .replace('{icon}', def.icon)
         .replace('{name}', globalThis.itemName(def)));
     try { trackAchStat('egVendorPurchases', 1); } catch (e) { /* never block a purchase */ }
-    _egvRefreshTabContent();
+    _vendorRefreshTabContent();
 }
 
 //------------------------------------------------------------------------
@@ -313,52 +313,52 @@ export function _egvBuyPuzzleItem(defId) {
 // level that can slot it (mirrors CHARM_RANK_MIN_PLAYER_LEVEL in
 // skill-charms.js for ranks 6+), so the shop never runs ahead of the road.
 // Ranks 6-10 are the atlas ranks and carry atlas-sized prices (gold).
-const EG_VENDOR_CHARM_RANK_PRICES = [60, 250, 700, 1800, 4200, 9000, 20000, 44000, 95000, 200000];
+const VENDOR_CHARM_RANK_PRICES = [60, 250, 700, 1800, 4200, 9000, 20000, 44000, 95000, 200000];
 // Minimum player level per rank (index = rank - 1).
-const EG_VENDOR_CHARM_RANK_MIN_LEVEL = [1, 10, 22, 35, 50, 68, 74, 79, 84, 89];
+const VENDOR_CHARM_RANK_MIN_LEVEL = [1, 10, 22, 35, 50, 68, 74, 79, 84, 89];
 
 // Live player level for the rank gates (saved level when the HUD hook is absent).
-function _egvPlayerLevel() {
+function _vendorPlayerLevel() {
     try {
-        const lv = Math.round(Number(globalThis._egGetPlayerLevel && globalThis._egGetPlayerLevel()) || 0);
+        const lv = Math.round(Number(globalThis._getPlayerLevel && globalThis._getPlayerLevel()) || 0);
         if (lv >= 1) return lv;
     } catch (e) { /* fall back to the saved level */ }
     return Math.max(1, Math.round(Number(STATE && STATE.playerLevel) || 1));
 }
 
 // One row per universal spell (the arsenal charms drop for), in registry order.
-function _egvCharmSkillIds() {
+function _vendorCharmSkillIds() {
     const defs = Array.isArray(globalThis.UNIVERSAL_SPELL_DEFS) ? globalThis.UNIVERSAL_SPELL_DEFS : [];
     return defs.map(d => d && d.id).filter(id => id && globalThis.getSkillDef(id));
 }
 
 // True when the charm for this skill + rank is already in the inventory.
-function _egvCharmOwned(skillId, rank) {
+function _vendorCharmOwned(skillId, rank) {
     return !!globalThis.getCharmByKey(globalThis.charmKeyFor(skillId, rank));
 }
 
 // Builds one card per spell with a buy button for every sold rank. The
 // all-tabs search passes ignoreFilter so a query still covers every spell.
-export function _egvBuildCharmsTabHTML(ignoreFilter) {
-    const lv = _egvPlayerLevel();
-    const gold = egGetGold();
-    const ids = ignoreFilter ? _egvCharmSkillIds() : _egvFilterCharmIds(_egvCharmSkillIds());
+export function _vendorBuildCharmsTabHTML(ignoreFilter) {
+    const lv = _vendorPlayerLevel();
+    const gold = getGold();
+    const ids = ignoreFilter ? _vendorCharmSkillIds() : _vendorFilterCharmIds(_vendorCharmSkillIds());
     const cards = ids.map(id => {
         const def = globalThis.getSkillDef(id);
         const art = globalThis.getCharmArtForSkill(id, 1);
         const icon = art ? `<img class="eg-art-img" src="${art}" alt="" draggable="false">` : (def.icon || '💫');
-        const ranks = EG_VENDOR_CHARM_RANK_PRICES.map((price, i) => {
+        const ranks = VENDOR_CHARM_RANK_PRICES.map((price, i) => {
             const rank = i + 1;
             const tip = ` onmouseenter="handleSkillTipRank(event, '${id}', ${rank})" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()"`;
-            if (_egvCharmOwned(id, rank)) {
+            if (_vendorCharmOwned(id, rank)) {
                 return `<span class="egv-charm-rank egv-charm-owned"${tip}>R${rank}<small>${t('eg_vendor_charm_owned')}</small></span>`;
             }
-            const need = EG_VENDOR_CHARM_RANK_MIN_LEVEL[i];
+            const need = VENDOR_CHARM_RANK_MIN_LEVEL[i];
             if (lv < need) {
                 return `<span class="egv-charm-rank egv-charm-locked"${tip}>R${rank}<small>${t('eg_vendor_charm_locked').replace('{n}', need)}</small></span>`;
             }
             const cls = gold < price ? ' egv-charm-short' : '';
-            return `<button class="egv-charm-rank egv-charm-buy${cls}"${tip} onclick="_egvBuyCharm('${id}', ${rank})">R${rank}<small>🪙 ${price.toLocaleString()}</small></button>`;
+            return `<button class="egv-charm-rank egv-charm-buy${cls}"${tip} onclick="_vendorBuyCharm('${id}', ${rank})">R${rank}<small>🪙 ${price.toLocaleString()}</small></button>`;
         }).join('');
         return `
 <div class="egv-card egv-charm-card">
@@ -369,20 +369,20 @@ export function _egvBuildCharmsTabHTML(ignoreFilter) {
     <div class="egv-charm-ranks">${ranks}</div>
 </div>`;
     }).join('');
-    const bar = ignoreFilter ? '' : _egvBuildCharmFilterBarHTML();
+    const bar = ignoreFilter ? '' : _vendorBuildCharmFilterBarHTML();
     return `${bar}<div class="egv-cards">${cards}</div>`;
 }
 
 // Buys one rank's charm; it goes straight into the spell book.
-export function _egvBuyCharm(skillId, rank) {
+export function _vendorBuyCharm(skillId, rank) {
     rank = Math.round(Number(rank));
     const i = rank - 1;
-    const price = EG_VENDOR_CHARM_RANK_PRICES[i];
+    const price = VENDOR_CHARM_RANK_PRICES[i];
     if (!(price > 0) || !globalThis.getSkillDef(skillId)) return;
-    if (_egvCharmOwned(skillId, rank) || _egvPlayerLevel() < EG_VENDOR_CHARM_RANK_MIN_LEVEL[i]) return;
+    if (_vendorCharmOwned(skillId, rank) || _vendorPlayerLevel() < VENDOR_CHARM_RANK_MIN_LEVEL[i]) return;
 
-    if (!egSpendGold(price)) {
-        globalThis.showToast(t('eg_vendor_no_gold').replace('{n}', price - egGetGold()));
+    if (!spendGold(price)) {
+        globalThis.showToast(t('eg_vendor_no_gold').replace('{n}', price - getGold()));
         Audio_Manager.playSFX('ui_error', 'player_equip_not_pickup');
         return;
     }
@@ -391,5 +391,5 @@ export function _egvBuyCharm(skillId, rank) {
     globalThis.showToast(t('eg_vendor_bought_charm')
         .replace('{name}', `${globalThis.getSkillName(skillId)} · ${t('skill_tip_rank')} ${rank}`));
     try { trackAchStat('egVendorPurchases', 1); } catch (e) { /* never block a purchase */ }
-    _egvRefreshTabContent();
+    _vendorRefreshTabContent();
 }

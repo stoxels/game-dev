@@ -177,8 +177,8 @@ function _precisionMarkCommitMark(id) {
     }
     // Credible Interval (combat): each marked cell fires a half-strength
     // reveal projectile at the target.
-    if (ptHasSkill('credible_interval') && typeof globalThis._egOnProgrammaticReveal === 'function') {
-        globalThis._egOnProgrammaticReveal([id], 'ability', { strengthMult: 0.5 });
+    if (ptHasSkill('credible_interval') && typeof globalThis._onProgrammaticReveal === 'function') {
+        globalThis._onProgrammaticReveal([id], 'ability', { strengthMult: 0.5 });
     }
 }
 
@@ -644,10 +644,10 @@ function _fieldScanHotZone(prevStates, sol) {
     if (!prevStates.length) return;
     const correct = prevStates.filter(({ r, c }) => sol[r][c] === 1);
     if (correct.length * 2 >= prevStates.length) reduceSlotCooldown('active2', 20);
-    if (!correct.length || typeof globalThis._egOnProgrammaticReveal !== 'function') return;
+    if (!correct.length || typeof globalThis._onProgrammaticReveal !== 'function') return;
     _shuffleArray(correct);
     const ids = correct.slice(0, 8).map(({ r, c }) => `g-${r}-${c}`);
-    globalThis._egOnProgrammaticReveal(ids, 'ability', { strengthMult: 0.5 });
+    globalThis._onProgrammaticReveal(ids, 'ability', { strengthMult: 0.5 });
 }
 
 // _fieldScanKeepOneCorrectCell - Lasting Impression: permanently reveals one

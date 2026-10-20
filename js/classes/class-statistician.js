@@ -690,7 +690,7 @@ export function _executeDataStrike(count, revealCap) {
 //   type : 'rows' | 'cols'
 export function _dataStrikeResolve(type) {
     _dataStrikeRemoveOverlay();
-    window._egLastBaseCast = { id: 'statistician_active1', at: Date.now() };
+    window._lastBaseCast = { id: 'statistician_active1', at: Date.now() };
 
     const count = _dataStrikeCalculateFinalCount();
     const cap = _dataStrikeCalculateRevealCap();
@@ -1344,9 +1344,9 @@ export function _statisticianTriggerMomentum(bonusSeconds) {
         _centralLimitReveal();
     }
     // Central Limit (combat): a trigger shocks the targeted monster.
-    if (ptHasSkill('central_limit') && typeof globalThis._egApplyMonsterAilment === 'function') {
-        const targetMon = (globalThis._egMonsters || []).find(m => m.id === globalThis._egTargetId);
-        if (targetMon && targetMon.currentHP > 0) globalThis._egApplyMonsterAilment(targetMon, 'shocked');
+    if (ptHasSkill('central_limit') && typeof globalThis._applyMonsterAilment === 'function') {
+        const targetMon = (globalThis._monsters || []).find(m => m.id === globalThis._targetId);
+        if (targetMon && targetMon.currentHP > 0) globalThis._applyMonsterAilment(targetMon, 'shocked');
     }
 
     Audio_Manager.playSFX('momentum');

@@ -1,4 +1,4 @@
-import { _egLoadLevelingState } from './endgame/endgame-leveling.js';
+import { _loadLevelingState } from './endgame/endgame-leveling.js';
 import { showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { renderSaveSlotScreen } from './screens/screens-save-slots.js';
 import { hideModal, showTitle } from './screens/screens.js';
@@ -43,7 +43,7 @@ function confirmFullReset() {
     wipeSaveData();
     resetAllBeats();
     globalThis.STATE = buildFreshState();
-    if (typeof _egLoadLevelingState === 'function') _egLoadLevelingState(); // re-sync endgame leveling
+    if (typeof _loadLevelingState === 'function') _loadLevelingState(); // re-sync endgame leveling
     save(); // writes the blank state back into the active slot
     showTitle();
     showToast(t('toast_reset'));

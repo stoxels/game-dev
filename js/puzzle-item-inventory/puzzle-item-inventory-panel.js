@@ -1,5 +1,5 @@
 import { trackAchStat } from '../achievements/achievements.js';
-import { EG_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from '../endgame/endgame-art.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';
 import { RESHUFFLE_GOAL, reshuffleCount, reshuffleRightClickItem, updateReshuffleCounter } from './puzzle-item-reshuffle.js';
@@ -104,10 +104,10 @@ function _positionTooltip(tip, anchor) {
 }
 
 // Puzzle-item art: real image from images/items/manifest.json when present,
-// otherwise the emoji fallback from the def (EG_ART.html handles both).
+// otherwise the emoji fallback from the def (GAME_ART.html handles both).
 function _puzArtHtml(def) {
-    if (typeof EG_ART !== 'undefined' && EG_ART && typeof EG_ART.html === 'function') {
-        return EG_ART.html('item', def.id, def.icon);
+    if (typeof GAME_ART !== 'undefined' && GAME_ART && typeof GAME_ART.html === 'function') {
+        return GAME_ART.html('item', def.id, def.icon);
     }
     return def.icon;
 }

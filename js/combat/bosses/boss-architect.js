@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkLoop, _egNkNewRun, _egNkPlayerRect, _egNkRectsOverlap, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkDodgeBusy, _nkDotTick, _nkEl, _nkFrozen, _nkLoop, _nkNewRun, _nkPlayerRect, _nkRectsOverlap, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE ARCHITECT (boss_architect)-----------------------
@@ -12,7 +12,7 @@ import { _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkLoop, _egNkNew
 // and are referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_architect: {
         id: 'boss_architect', name: 'The Architect', emoji: '🏛️',
         baseHP: 1100, baseDamage: 22, chargeMax: 12,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_architect: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -29,8 +29,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'sinking_platforms', intervalBase: 22000, intervalVariance: 5000, handler: '_egMechRisingPlats' },
-            { name: 'probability_shift', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechProbabilityShift' },
+            { name: 'sinking_platforms', intervalBase: 22000, intervalVariance: 5000, handler: '_mechRisingPlats' },
+            { name: 'probability_shift', intervalBase: 18000, intervalVariance: 4000, handler: '_mechProbabilityShift' },
         ],
     },
 });
@@ -38,18 +38,18 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // True when a new platform rectangle would crowd an existing one.
 // Keeps platforms spread out so there is always room to stand.
-export function _egArchitectSpotTaken(spots, x, y, w, h) {
+export function _architectSpotTaken(spots, x, y, w, h) {
     return spots.some(s =>
         x < s.x + s.w + 60 && x + w + 60 > s.x && y < s.y + s.h + 60 && y + h + 60 > s.y);
 }
 
 // Picks a clear spot for a fresh platform, retrying crowded picks.
 // Falls back to any random spot if the arena is too full.
-export function _egArchitectNewSpot(spots, w, h) {
+export function _architectNewSpot(spots, w, h) {
     for (let tries = 0; tries < 40; tries++) {
         const x = 40 + Math.random() * Math.max(40, window.innerWidth - w - 80);
         const y = 80 + Math.random() * Math.max(40, window.innerHeight - h - 160);
-        if (!_egArchitectSpotTaken(spots, x, y, w, h)) return { x, y };
+        if (!_architectSpotTaken(spots, x, y, w, h)) return { x, y };
     }
     return {
         x: 40 + Math.random() * Math.max(40, window.innerWidth - w - 80),
@@ -59,20 +59,20 @@ export function _egArchitectNewSpot(spots, w, h) {
 
 // Four safe platforms sink one at a time and respawn elsewhere.
 // Standing off every platform burns; move before your ground sinks.
-export function _egMechRisingPlats(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechRisingPlats(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const dotPct = [0, 9, 11, 13][p];
     const swapMs = [0, 3000, 2600, 2200][p];
     const sinkWarnMs = 800;
     const durMs = 11000;
     const PW = 190, PH = 130;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const plats = [];
     const spawnPlat = () => {
-        const spot = _egArchitectNewSpot(plats.filter(q => q.state === 'safe'), PW, PH);
-        const el = _egNkEl(run, 'div', 'eg-nk-plat');
+        const spot = _architectNewSpot(plats.filter(q => q.state === 'safe'), PW, PH);
+        const el = _nkEl(run, 'div', 'eg-nk-plat');
         el.style.left = Math.round(spot.x) + 'px';
         el.style.top = Math.round(spot.y) + 'px';
         el.style.width = PW + 'px';
@@ -82,9 +82,9 @@ export function _egMechRisingPlats(monster, phase) {
         return q;
     };
     for (let i = 0; i < 4; i++) spawnPlat();
-    _egNkToast('eg_mech_platforms', '🏛️ The Architect: Sinking Platforms! Stay on solid ground!');
+    _nkToast('eg_mech_platforms', '🏛️ The Architect: Sinking Platforms! Stay on solid ground!');
     let e = 0, swapAcc = 0, dotWarnAt = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         e += dtS * 1000;
         swapAcc += dtS * 1000;
         if (swapAcc >= swapMs) {
@@ -109,15 +109,15 @@ export function _egMechRisingPlats(monster, phase) {
                 }
             }
         }
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         if (pr) {
-            const onPlat = plats.some(q => q.state === 'safe' && _egNkRectsOverlap(
+            const onPlat = plats.some(q => q.state === 'safe' && _nkRectsOverlap(
                 { left: q.x, right: q.x + q.w, top: q.y, bottom: q.y + q.h }, pr));
             if (!onPlat) {
-                _egNkDotTick(run, dotPct, dtS, level, 'fire');
+                _nkDotTick(run, dotPct, dtS, level, 'fire');
                 if (now - dotWarnAt > 2500) {
                     dotWarnAt = now;
-                    _egNkToast('eg_nk_move', '⚠️ Get on a platform!', '#fb923c');
+                    _nkToast('eg_nk_move', '⚠️ Get on a platform!', '#fb923c');
                 }
             } else {
                 run.dotAcc = 0;

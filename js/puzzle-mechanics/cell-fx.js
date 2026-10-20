@@ -1,4 +1,4 @@
-import { _egOnProgrammaticReveal } from '../combat/combat-class-projectiles-reveal.js';
+import { _onProgrammaticReveal } from '../combat/combat-class-projectiles-reveal.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE------------------------------------
@@ -127,8 +127,8 @@ export function _applyCellEffect(cellIds, type, source) {
 
     // Programmatic reveals (items, passives, class abilities) feed the
     // endgame projectile system - guarded, so it is a no-op outside endgame.
-    if (type === 'reveal' && typeof _egOnProgrammaticReveal === 'function') {
-        _egOnProgrammaticReveal(cellIds, source);
+    if (type === 'reveal' && typeof _onProgrammaticReveal === 'function') {
+        _onProgrammaticReveal(cellIds, source);
     }
 
     const cls = `cell-fx-${type}`;

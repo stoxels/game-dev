@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkDotHit, _nkDotTick, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE DREADNOUGHT (boss_dreadnought)------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkE
 // are referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_dreadnought: {
         id: 'boss_dreadnought', name: 'The Dreadnought', emoji: '🛳️',
         baseHP: 1220, baseDamage: 27, chargeMax: 12,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_dreadnought: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -29,9 +29,9 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 3000,
         mechanics: [
-            { name: 'broadsides', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechBroadsides' },
-            { name: 'searchlight', intervalBase: 20000, intervalVariance: 4000, handler: '_egMechSearchlight' },
-            { name: 'corrupt_cells', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechCorruptCells' },
+            { name: 'broadsides', intervalBase: 19000, intervalVariance: 4000, handler: '_mechBroadsides' },
+            { name: 'searchlight', intervalBase: 20000, intervalVariance: 4000, handler: '_mechSearchlight' },
+            { name: 'corrupt_cells', intervalBase: 19000, intervalVariance: 4000, handler: '_mechCorruptCells' },
         ],
     },
 });
@@ -39,8 +39,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // Broadside volleys from alternating flanks, aimed where the player stands.
 // Shells fly straight for a few seconds; each shell can hit once.
-export function _egMechBroadsides(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechBroadsides(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const volleys = [0, 4, 4, 5][p];
     const fanN = 4;
@@ -48,13 +48,13 @@ export function _egMechBroadsides(monster, phase) {
     const speed = [0, 200, 225, 255][p];
     const lifeMs = 6000;
     const dmgPct = [0, 0.06, 0.07, 0.09][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const orbs = [];
     let fired = 0, acc = 0, orbCdUntil = 0, side = 1;
-    _egNkToast('eg_mech_dreadnought', '🛳️ The Dreadnought: Broadsides! Watch the muzzle side!');
-    _egNkLoop(run, (dtS, now) => {
+    _nkToast('eg_mech_dreadnought', '🛳️ The Dreadnought: Broadsides! Watch the muzzle side!');
+    _nkLoop(run, (dtS, now) => {
         if (fired < volleys) {
             acc += dtS * 1000;
             if (acc >= (fired === 0 ? 500 : volleyGapMs)) {
@@ -63,16 +63,16 @@ export function _egMechBroadsides(monster, phase) {
                 side *= -1; // alternate flanks
                 const ox = side > 0 ? W - 60 : 60;
                 const oy = 100 + Math.random() * Math.max(60, H - 200);
-                const c = _egNkPlayerCenter();
+                const c = _nkPlayerCenter();
                 const base = Math.atan2((c ? c.y : H / 2) - oy, (c ? c.x : W / 2) - ox);
                 for (let i = 0; i < fanN; i++) {
                     const a = base + (i - (fanN - 1) / 2) * 0.22;
-                    const el = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-shell', '💣');
+                    const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-shell', '💣');
                     orbs.push({ x: ox, y: oy, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, t: 0, hitDone: false, el });
                 }
             }
         }
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         for (let i = orbs.length - 1; i >= 0; i--) {
             const o = orbs[i];
             o.t += dtS * 1000;
@@ -84,11 +84,11 @@ export function _egMechBroadsides(monster, phase) {
                 continue;
             }
             o.el.style.transform = 'translate(' + Math.round(o.x - 14) + 'px,' + Math.round(o.y - 14) + 'px)';
-            if (!o.hitDone && pr && now >= orbCdUntil && _egNkDotHit(o.el, pr, 2)) {
+            if (!o.hitDone && pr && now >= orbCdUntil && _nkDotHit(o.el, pr, 2)) {
                 o.hitDone = true;
                 orbCdUntil = now + 500;
-                const dealt = _egNkHit(dmgPct, 'fire', level);
-                _egNkAbilityHitToast(dealt, 'The Dreadnought', 'Broadsides');
+                const dealt = _nkHit(dmgPct, 'fire', level);
+                _nkAbilityHitToast(dealt, 'The Dreadnought', 'Broadsides');
             }
         }
         return fired < volleys || orbs.length > 0;
@@ -97,22 +97,22 @@ export function _egMechBroadsides(monster, phase) {
 
 // A slow lamp chases the player and burns anyone caught inside its light.
 // Keep moving so the lamp never settles on you.
-export function _egMechSearchlight(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechSearchlight(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const radius = [0, 110, 100, 90][p];
     const dotPct = [0, 13, 15, 18][p];
     const durMs = 8000;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     // The lamp lags a half-second behind you - juke it, don't outrun it.
     const lamp = { x: window.innerWidth / 2, y: 100 };
-    const beam = _egNkEl(run, 'div', 'eg-nk-searchlight');
-    _egNkToast('eg_mech_searchlight', '🛳️ The Dreadnought: Searchlight! Kill it by leaving it!');
+    const beam = _nkEl(run, 'div', 'eg-nk-searchlight');
+    _nkToast('eg_mech_searchlight', '🛳️ The Dreadnought: Searchlight! Kill it by leaving it!');
     let e = 0, dotWarnAt = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         e += dtS * 1000;
-        const c = _egNkPlayerCenter();
+        const c = _nkPlayerCenter();
         if (c) {
             const dx = c.x - lamp.x, dy = c.y - lamp.y;
             const d = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -125,10 +125,10 @@ export function _egMechSearchlight(monster, phase) {
         beam.style.width = radius * 2 + 'px';
         beam.style.height = radius * 2 + 'px';
         if (c && Math.hypot(c.x - lamp.x, c.y - lamp.y) <= radius) {
-            _egNkDotTick(run, dotPct, dtS, level, 'fire');
+            _nkDotTick(run, dotPct, dtS, level, 'fire');
             if (now - dotWarnAt > 2500) {
                 dotWarnAt = now;
-                _egNkToast('eg_nk_move', '⚠️ Out of the light!', '#f87171');
+                _nkToast('eg_nk_move', '⚠️ Out of the light!', '#f87171');
             }
         } else {
             run.dotAcc = 0;

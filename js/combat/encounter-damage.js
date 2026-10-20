@@ -13,61 +13,61 @@
 // attack key is HELD to charge an overcharge art, the hero stands rooted
 // (see _avatarMoveUiBlocked) AND takes amplified damage from every hit
 // that lands. Pure - safe to unit-test.
-export const EG_MELEE_HOLD_VULNERABILITY_MULT = 1.5;
+export const MELEE_HOLD_VULNERABILITY_MULT = 1.5;
 
 import { Audio_Manager } from '../audio/audio.js';
 import { _uspApplySupportMitigation, _uspGetSupportMitigation, _uspReflectThorns, _uspTryWardNegate } from '../skills/universal-spells.js';
 import { t } from '../translation/translations.js';
-import { _egAimChargingProjectile, _egGetTarget } from './encounter-charged-shot.js';
-import { EG_BLOCK_LOCKOUT_BASE_MS } from './encounter-constants.js';
-import { _egGameOver } from './encounter-kills.js';
-import { _egApplyPlayerBlockFeedback, _egApplyPlayerMissFeedback, _egShowBlockLockoutOverlay } from './encounter-monster-attack-feedback.js';
-import { _egDamageTargetById } from './encounter-monster-damage.js';
-import { EG_FORTIFY_DR_PER_STACK, _egConsumeGhostShroud, _egArmRiposte, _egGainEnduranceCharge, _egGainFrenzyCharge, _egGainPowerCharge, _egGetFortifyStacks, _egRageOnPlayerHit } from './combat-ailments-state.js';
-import { _egApplyPlayerParryFeedback, _egGetDualWieldParryChancePct, _egGetParryChancePct, _egIsDualWieldParryActive, _egRollFateNegation, _egTryDeflectProjectile } from './encounter-player-mitigation.js';
-import { _egGetEncounterBaseLevel } from './encounter-spawn-rules.js';
-import { _egApplyPlayerShockAmp, _egPlayerHasAilment, _egRollMonsterHitAilment, _egRollPlayerStunFromHit, _egStunPlayer } from './combat-ailments-core.js';
+import { _aimChargingProjectile, _getTarget } from './encounter-charged-shot.js';
+import { BLOCK_LOCKOUT_BASE_MS } from './encounter-constants.js';
+import { _gameOver } from './encounter-kills.js';
+import { _applyPlayerBlockFeedback, _applyPlayerMissFeedback, _showBlockLockoutOverlay } from './encounter-monster-attack-feedback.js';
+import { _damageTargetById } from './encounter-monster-damage.js';
+import { FORTIFY_DR_PER_STACK, _consumeGhostShroud, _armRiposte, _gainEnduranceCharge, _gainFrenzyCharge, _gainPowerCharge, _getFortifyStacks, _rageOnPlayerHit } from './combat-ailments-state.js';
+import { _applyPlayerParryFeedback, _getDualWieldParryChancePct, _getParryChancePct, _isDualWieldParryActive, _rollFateNegation, _tryDeflectProjectile } from './encounter-player-mitigation.js';
+import { _getEncounterBaseLevel } from './encounter-spawn-rules.js';
+import { _applyPlayerShockAmp, _playerHasAilment, _rollMonsterHitAilment, _rollPlayerStunFromHit, _stunPlayer } from './combat-ailments-core.js';
 import { isHoldCasting } from '../skills/spell-casttime.js';
-import { _egCalcPlayerResistanceReduction } from './combat-calculations-resistances.js';
-import { _egMaybeShowAbsorptionBroken } from './encounter-overlays.js';
-import { _egRenderPanel } from './encounter.js';
-import { _egGetPlayerLevel } from '../endgame/endgame-leveling.js';
-import { _egIsDualWielding } from '../loot/loot-requirements.js';
+import { _calcPlayerResistanceReduction } from './combat-calculations-resistances.js';
+import { _maybeShowAbsorptionBroken } from './encounter-overlays.js';
+import { _renderPanel } from './encounter.js';
+import { _getPlayerLevel } from '../endgame/endgame-leveling.js';
+import { _isDualWielding } from '../loot/loot-requirements.js';
 import { _egGetActiveMapModValue, _egMapDamageTakenAmpMult } from '../endgame/endgame-map-launch.js';
-import { _egCalcArmourMitigation, _egCalcEvasionDodgeChance, _egComputePlayerStats, _egGetAllEquippedItems, _egScheduleAbsorptionRegen } from '../endgame/endgame-player-stats.js';
-import { _egIsActive } from './combat-state.js';
+import { _calcArmourMitigation, _calcEvasionDodgeChance, _computePlayerStats, _getAllEquippedItems, _scheduleAbsorptionRegen } from '../endgame/endgame-player-stats.js';
+import { _isActive } from './combat-state.js';
 import { STATE } from '../state.js';
 
 
 // Sets the player's target to the given monster and refreshes the panel.
 // Called by the onclick handler on monster cards in the rendered panel HTML.
-export function _egSelectTarget(monsterId) {
-    if (!_egIsActive()) return;
-    if (globalThis._egTargetId !== monsterId) Audio_Manager.playSFX('target_select');
-    globalThis._egTargetId = monsterId;
-    _egRenderPanel();
+export function _selectTarget(monsterId) {
+    if (!_isActive()) return;
+    if (globalThis._targetId !== monsterId) Audio_Manager.playSFX('target_select');
+    globalThis._targetId = monsterId;
+    _renderPanel();
 
     // Keep the charging projectile aimed at the new target mid-stroke
-    if (globalThis._egDragChargeStacks > 0) {
-        const anchor = ((globalThis._egDragChargeRow >= 0 && globalThis._egDragChargeCol >= 0)
-            && document.getElementById(`g-${globalThis._egDragChargeRow}-${globalThis._egDragChargeCol}`))
+    if (globalThis._dragChargeStacks > 0) {
+        const anchor = ((globalThis._dragChargeRow >= 0 && globalThis._dragChargeCol >= 0)
+            && document.getElementById(`g-${globalThis._dragChargeRow}-${globalThis._dragChargeCol}`))
             || document.getElementById('class-hud-drag-handle');
-        _egAimChargingProjectile(anchor);
+        _aimChargingProjectile(anchor);
     }
 }
 
 // Cycles the target through the live monster list (Shift = reverse).
 // Wraps around at both ends; no-op when no monsters are on the field.
-export function _egCycleTarget(reverse) {
-    if (!_egIsActive() || globalThis._egMonsters.length === 0) return;
+export function _cycleTarget(reverse) {
+    if (!_isActive() || globalThis._monsters.length === 0) return;
 
-    const idx = globalThis._egMonsters.findIndex(m => m.id === globalThis._egTargetId);
+    const idx = globalThis._monsters.findIndex(m => m.id === globalThis._targetId);
     const step = reverse ? -1 : 1;
     const nextIdx = idx === -1
         ? 0
-        : (idx + step + globalThis._egMonsters.length) % globalThis._egMonsters.length;
+        : (idx + step + globalThis._monsters.length) % globalThis._monsters.length;
 
-    _egSelectTarget(globalThis._egMonsters[nextIdx].id);
+    _selectTarget(globalThis._monsters[nextIdx].id);
 }
 
 // Tab targeting: registered via keybind system. Only active during an encounter.
@@ -76,9 +76,9 @@ export function _egCycleTarget(reverse) {
 export function _initEgTargetHotkeys() {
     if (typeof onKeybindAction === 'function') {
         globalThis.onKeybindAction('cycle-target', (e) => {
-            const encounterActive = (typeof _egIsActive === 'function') && _egIsActive();
+            const encounterActive = (typeof _isActive === 'function') && _isActive();
             if ((!STATE.playerClass || (typeof isClassless === 'function' && globalThis.isClassless())) && !encounterActive) return false;
-            _egCycleTarget(e.shiftKey);
+            _cycleTarget(e.shiftKey);
             return false;
         });
     }
@@ -114,34 +114,34 @@ function _rsAvoid(kind) {
 // `opts.isBossAbility` marks damage dealt by boss special abilities - those
 // hits can never be parried, dodged, blocked or fate-negated; they always
 // land unless the telegraphed mechanic itself was avoided by movement.
-export function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLevel = null, opts = null) {
-    if (!_egIsActive()) return 0;
+export function _playerTakeDamage(amount, isSpell = false, element = null, attackerLevel = null, opts = null) {
+    if (!_isActive()) return 0;
 
     // GODMODE - developer/test-only: blocks ALL incoming damage before any
     // mitigation runs, so mechanic testing can ignore the player's health.
-    // Toggle with window._egGodMode = true/false from the console.
-    if (window._egGodMode) return 0;
+    // Toggle with window._godMode = true/false from the console.
+    if (window._godMode) return 0;
 
-    const stats = _egComputePlayerStats();
+    const stats = _computePlayerStats();
 
     // Shadow Inoculation: immune to Shadow damage.
     if (element === 'shadow' && (Number(stats.shadowImmune) || 0) > 0) return 0;
     // Wind Dancer: whether an Attack hit you recently (read before this hit stamps it).
-    const attackHitRecently = Date.now() - (Number(globalThis._egLastAttackHitAt) || 0) < 4000;
+    const attackHitRecently = Date.now() - (Number(globalThis._lastAttackHitAt) || 0) < 4000;
 
     // Rage: being hit restarts the grace timer before it starts fading.
-    _egRageOnPlayerHit(Number(stats.rageWhenHitAmount) || 0, Number(stats.rageMax) || 0);
+    _rageOnPlayerHit(Number(stats.rageWhenHitAmount) || 0, Number(stats.rageMax) || 0);
 
     // Charging a melee hold roots the hero: no evasion, no shield block,
     // and every landed hit is amplified (see
-    // EG_MELEE_HOLD_VULNERABILITY_MULT) - the price of the overcharge
+    // MELEE_HOLD_VULNERABILITY_MULT) - the price of the overcharge
     // arts. Read straight off globalThis like the parry-hold flag below
     // (no import cycle back into the weapon-swing module).
-    const chargingMelee = (typeof _egMeleeHoldActive !== 'undefined' && !!globalThis._egMeleeHoldActive);
+    const chargingMelee = (typeof _meleeHoldActive !== 'undefined' && !!globalThis._meleeHoldActive);
 
     // A stunned hero is helpless: no parry, deflect, evasion or block (fate and
     // the Aegis Ward still work - they are luck / a stored charge, not actions).
-    const stunned = _egPlayerHasAilment('stunned');
+    const stunned = _playerHasAilment('stunned');
 
     // Boss special abilities are never negatable - their damage always lands
     // unless the player avoided the ability by movement/position (the
@@ -152,7 +152,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
 
     // Gear: fate - pure-luck chance to negate ANY incoming hit entirely
     // (attacks, spells and charge hits alike), before all other mitigation.
-    if (!isBossAbility && _egRollFateNegation(stats)) { _rsAvoid('other'); return 0; }
+    if (!isBossAbility && _rollFateNegation(stats)) { _rsAvoid('other'); return 0; }
 
     // Support spells (js/skills/universal-spells.js): the mitigation profile
     // is read once here so the rest of this function never re-derives it.
@@ -169,7 +169,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // is too small to be worth a charge.
     if (typeof _uspTryWardNegate === 'function' && _uspTryWardNegate(amount)) {
         _rsAvoid('other');
-        _egApplyPlayerMissFeedback();
+        _applyPlayerMissFeedback();
         return 0;
     }
 
@@ -179,25 +179,25 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // On a successful projectile parry there is a 5% + gear deflect chance to
     // hit another monster for 30% + gear damage. Dual-wielding two 1H weapons
     // grants the same roll at a 15% + gear base WITHOUT holding the key.
-    const holdingE = !stunned && (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive);
+    const holdingE = !stunned && (typeof _holdEPauseActive !== 'undefined' && globalThis._holdEPauseActive);
     const dualWieldParry = !holdingE && !stunned
-        && (typeof _egIsDualWieldParryActive === 'function' && _egIsDualWieldParryActive());
+        && (typeof _isDualWieldParryActive === 'function' && _isDualWieldParryActive());
     if (!isSpell && !isBossAbility && (holdingE || dualWieldParry)) {
-        if (typeof _egIsActive === 'function' && _egIsActive()) {
+        if (typeof _isActive === 'function' && _isActive()) {
             const parryChance = holdingE
-                ? _egGetParryChancePct()
-                : (typeof _egGetDualWieldParryChancePct === 'function' ? _egGetDualWieldParryChancePct() : 15);
+                ? _getParryChancePct()
+                : (typeof _getDualWieldParryChancePct === 'function' ? _getDualWieldParryChancePct() : 15);
             if (parryChance > 0 && Math.random() * 100 < parryChance) {
                 const isProjectile = !!(opts && opts.isProjectile);
                 const attacker = opts && opts.attacker ? opts.attacker : null;
                 const parryToast = (typeof t === 'function' ? t('eg_parried') : '');
                 globalThis.showCombatToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
                 _rsAvoid('parry');
-                _egApplyPlayerParryFeedback();
-                _egScheduleAbsorptionRegen();
+                _applyPlayerParryFeedback();
+                _scheduleAbsorptionRegen();
                 // Sword identity: a successful Parry readies a riposte strike.
-                if (stats.isSwordEquipped) _egArmRiposte(stats.riposteDurationPct);
-                if (isProjectile && attacker) _egTryDeflectProjectile(attacker, true);
+                if (stats.isSwordEquipped) _armRiposte(stats.riposteDurationPct);
+                if (isProjectile && attacker) _tryDeflectProjectile(attacker, true);
                 return 0;
             }
         }
@@ -206,14 +206,14 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // Spell parry (passive tree): while the parry key is held, spell damage
     // (not boss abilities / hazards) can also be parried at the tree's chance.
     if (isSpell && !isBossAbility && holdingE
-        && typeof _egIsActive === 'function' && _egIsActive()) {
+        && typeof _isActive === 'function' && _isActive()) {
         const spellParryChance = Number(stats.parrySpellChancePct) || 0;
         if (spellParryChance > 0 && Math.random() * 100 < spellParryChance) {
             const parryToast = (typeof t === 'function' ? t('eg_parried') : '');
             globalThis.showCombatToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
             _rsAvoid('parry');
-            _egApplyPlayerParryFeedback();
-            _egScheduleAbsorptionRegen();
+            _applyPlayerParryFeedback();
+            _scheduleAbsorptionRegen();
             return 0;
         }
     }
@@ -221,15 +221,15 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // Blind (player hits): a blinded attacker misses 50% of the time (scaled by
     // the Blind Effect line). Spells, hazards and boss abilities are unaffected.
     if (!isSpell && !isBossAbility && !chargingMelee && opts && opts.attacker && opts.attacker.id != null) {
-        const blindAttacker = (globalThis._egMonsters || []).find(m => m.id === opts.attacker.id);
+        const blindAttacker = (globalThis._monsters || []).find(m => m.id === opts.attacker.id);
         const blindSt = blindAttacker && blindAttacker.statuses && blindAttacker.statuses.blind;
         if (blindSt && blindSt.until > Date.now()) {
             const missPct = Math.min(90, 50 * (1 + (Number(blindSt.effectPct) || 0) / 100));
             if (Math.random() * 100 < missPct) {
                 _rsAvoid('other');
                 globalThis.showCombatToast(t('eg_blind_miss'));
-                _egApplyPlayerMissFeedback();
-                _egScheduleAbsorptionRegen();
+                _applyPlayerMissFeedback();
+                _scheduleAbsorptionRegen();
                 return 0;
             }
         }
@@ -240,10 +240,10 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // cannot be dodged. Neither can a hero rooted mid overcharge-charge.
     if (!isSpell && !isBossAbility && !chargingMelee && !stunned && !((Number(stats.cannotEvade) || 0) > 0)) {
         const attackerLvl = Number(attackerLevel)
-            || (_egGetTarget() && _egGetTarget().level)
-            || _egGetEncounterBaseLevel()
-            || _egGetPlayerLevel();
-        let dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion, attackerLvl)
+            || (_getTarget() && _getTarget().level)
+            || _getEncounterBaseLevel()
+            || _getPlayerLevel();
+        let dodgeChance = Math.min(75, stats.dodgeChance + _calcEvasionDodgeChance(stats.evasion, attackerLvl)
             + ((support && support.dodgePct) || 0));
         // Wind Dancer: more chance to Evade after an Attack hit you recently.
         if (attackHitRecently && (Number(stats.windDancerEvadePct) || 0) > 0) {
@@ -253,8 +253,8 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
             _rsAvoid('dodge');
             try { if (typeof globalThis.noteUniversalReaction === 'function') globalThis.noteUniversalReaction('dodge'); } catch (e) { /* optional */ }
             globalThis.showCombatToast(t('eg_dodged'));
-            _egApplyPlayerMissFeedback();
-            _egScheduleAbsorptionRegen();
+            _applyPlayerMissFeedback();
+            _scheduleAbsorptionRegen();
             return 0;
         }
     }
@@ -266,7 +266,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         try { if (typeof globalThis.noteUniversalReaction === 'function') globalThis.noteUniversalReaction('dodge'); } catch (e) { /* optional */ }
         globalThis.showCombatToast(t('eg_dodged'));
         Audio_Manager.playSFX('player_dodge');
-        _egScheduleAbsorptionRegen();
+        _scheduleAbsorptionRegen();
         return 0;
     }
 
@@ -278,14 +278,14 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // from mods/passives on other slots does nothing without one. Boss
     // special abilities are never blockable - nor is anything, while the
     // hero is rooted charging a melee hold.
-    const isBlockLockedOut = Date.now() < globalThis._egPlayerBlockLockoutUntil;
-    const hasShieldEquipped = _egGetAllEquippedItems()
+    const isBlockLockedOut = Date.now() < globalThis._playerBlockLockoutUntil;
+    const hasShieldEquipped = _getAllEquippedItems()
         .some(item => item.slotType === 'shield');
     // Passive tree: conditional block chance (effects pipeline, e.g.
     // reworked node 30255). Fires without a shield while dual-wielding or
     // holding one, attacks only - spells still use spell block alone. The
     // boss / lockout / charging gates below apply to both sides equally.
-    const dualWielding = (typeof _egIsDualWielding === 'function' && _egIsDualWielding());
+    const dualWielding = (typeof _isDualWielding === 'function' && _isDualWielding());
     // Shield batch (e.g. reworked nodes 30374/285): extra attack block
     // chance that needs a shield specifically (dual-wielding alone is not
     // enough), stacked on the shared tree bucket.
@@ -321,22 +321,22 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     let blockedHitMult = 1;
     if (blockChance > 0 && Math.random() * 100 < blockChance) {
         // Timestamp for the tree's timed armour pulse (reworked node 337):
-        // _egComputePlayerStats grants the bonus while this is under 10s old.
-        globalThis._egLastBlockAt = Date.now();
+        // _computePlayerStats grants the bonus while this is under 10s old.
+        globalThis._lastBlockAt = Date.now();
         // Phase B: charges gained on a successful block.
         if ((stats.powerOnBlockPct || 0) > 0 && Math.random() * 100 < Math.min(100, stats.powerOnBlockPct)) {
-            _egGainPowerCharge(stats.powerChargesMax, stats.powerDurationPct);
+            _gainPowerCharge(stats.powerChargesMax, stats.powerDurationPct);
         }
         if ((stats.frenzyOnBlockPct || 0) > 0 && Math.random() * 100 < Math.min(100, stats.frenzyOnBlockPct)) {
-            _egGainFrenzyCharge(stats.frenzyChargesMax, stats.frenzyDurationPct);
+            _gainFrenzyCharge(stats.frenzyChargesMax, stats.frenzyDurationPct);
         }
         if ((stats.enduranceOnBlockPct || 0) > 0 && Math.random() * 100 < Math.min(100, stats.enduranceOnBlockPct)) {
-            _egGainEnduranceCharge(stats.enduranceChargesMax, stats.enduranceDurationPct);
+            _gainEnduranceCharge(stats.enduranceChargesMax, stats.enduranceDurationPct);
         }
         _rsAvoid('block');
         globalThis.showCombatToast(t('eg_blocked'));
-        _egApplyPlayerBlockFeedback();
-        _egScheduleAbsorptionRegen();
+        _applyPlayerBlockFeedback();
+        _scheduleAbsorptionRegen();
 
         // Shield bash retaliation: chance to slam the current target for
         // flat physical damage when blocking an attack.
@@ -344,19 +344,19 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
             && stats.shieldBashChancePct > 0
             && stats.shieldBashDamageFlat > 0
             && Math.random() * 100 < stats.shieldBashChancePct) {
-            const target = _egGetTarget();
-            if (target) _egDamageTargetById(target.id, Math.round(stats.shieldBashDamageFlat), null, { isPlayerFlat: true });
+            const target = _getTarget();
+            if (target) _damageTargetById(target.id, Math.round(stats.shieldBashDamageFlat), null, { isPlayerFlat: true });
         }
 
         const recoveryFactor = Math.max(0, 1 - Math.min(100, stats.blockRecoveryPct) / 100);
-        let lockoutDuration = EG_BLOCK_LOCKOUT_BASE_MS * recoveryFactor;
+        let lockoutDuration = BLOCK_LOCKOUT_BASE_MS * recoveryFactor;
         // Active map run: block lockouts last #% longer.
         if (typeof _egGetActiveMapModValue === 'function') {
             const lockoutPct = _egGetActiveMapModValue('map_longer_lockout');
             if (lockoutPct > 0) lockoutDuration *= (1 + lockoutPct / 100);
         }
-        globalThis._egPlayerBlockLockoutUntil = Date.now() + lockoutDuration;
-        _egShowBlockLockoutOverlay(lockoutDuration);
+        globalThis._playerBlockLockoutUntil = Date.now() + lockoutDuration;
+        _showBlockLockoutOverlay(lockoutDuration);
         // Glancing Blows: a blocked hit still deals a share of its damage.
         if ((Number(stats.blockedHitTakenPct) || 0) > 0) blockedHitMult = stats.blockedHitTakenPct / 100;
         else return 0;
@@ -364,12 +364,12 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     if (blockedHitMult !== 1) amount *= blockedHitMult;
 
     // The hit has landed (past parry, evasion and block).
-    if (!isSpell) globalThis._egLastAttackHitAt = Date.now();
+    if (!isSpell) globalThis._lastAttackHitAt = Date.now();
     // Ghost Dance: a Ghost Shroud breaks and restores Absorption from your Evasion.
-    if ((Number(stats.ghostShroudRecoverPct) || 0) > 0 && _egConsumeGhostShroud(stats.ghostShroudMax)) {
+    if ((Number(stats.ghostShroudRecoverPct) || 0) > 0 && _consumeGhostShroud(stats.ghostShroudMax)) {
         const ghostMax = Number(stats.absorption) || 0;
         const ghostGain = Math.round((Number(stats.evasion) || 0) * stats.ghostShroudRecoverPct / 100);
-        globalThis._egPlayerAbsorptionCurrent = Math.min(ghostMax, (Number(globalThis._egPlayerAbsorptionCurrent) || 0) + ghostGain);
+        globalThis._playerAbsorptionCurrent = Math.min(ghostMax, (Number(globalThis._playerAbsorptionCurrent) || 0) + ghostGain);
     }
 
     // Retribution - the hit has been confirmed to land (it got past parry,
@@ -391,7 +391,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     if (!isSpell && !isBossAbility && !(opts && opts.isProjectile)
         && opts && opts.attacker && opts.attacker.id != null && amount > 0
         && stats.reflectPhysFlat > 0) {
-        _egDamageTargetById(opts.attacker.id, Math.round(stats.reflectPhysFlat), null, { isPlayerFlat: true });
+        _damageTargetById(opts.attacker.id, Math.round(stats.reflectPhysFlat), null, { isPlayerFlat: true });
     }
 
     // Elemental resistances (fire/cold/lightning/shadow %) mitigate
@@ -400,17 +400,17 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     const drCap = Number(stats.maxDamageReductionCap) || 0;
     if (element) {
         const preResist = amount;
-        amount = _egCalcPlayerResistanceReduction(amount, stats, element);
+        amount = _calcPlayerResistanceReduction(amount, stats, element);
         if (drCap > 0) amount = Math.max(amount, preResist * (1 - drCap / 100));
     }
 
     // Ailments: a shocked player takes amplified damage from all hits.
-    if (typeof _egApplyPlayerShockAmp === 'function') amount = _egApplyPlayerShockAmp(amount);
+    if (typeof _applyPlayerShockAmp === 'function') amount = _applyPlayerShockAmp(amount);
 
     // Melee-hold vulnerability: charging an overcharge art hurts - every
     // landed hit is amplified while the attack key is held (applied here,
     // pre-armour, like the shock amp above).
-    if (chargingMelee) amount *= EG_MELEE_HOLD_VULNERABILITY_MULT;
+    if (chargingMelee) amount *= MELEE_HOLD_VULNERABILITY_MULT;
 
     // Wind Dancer: less Attack damage when no Attack hit you recently, more when one did.
     if (!isSpell) {
@@ -441,7 +441,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     }
     // Imbalanced Guard: defend with 200% of Armour.
     if ((Number(stats.armourDefendDouble) || 0) > 0) effectiveArmour *= 2;
-    let mitigated = _egCalcArmourMitigation(amount, effectiveArmour);
+    let mitigated = _calcArmourMitigation(amount, effectiveArmour);
     if (drCap > 0) mitigated = Math.max(mitigated, amount * (1 - drCap / 100));
 
     // Bulwark - flat percentage damage reduction, applied AFTER armour and
@@ -449,9 +449,9 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     if (support) mitigated = _uspApplySupportMitigation(mitigated);
 
     // Fortification: each live stack takes a share of the damage away.
-    const fortifyStacks = _egGetFortifyStacks();
+    const fortifyStacks = _getFortifyStacks();
     if (fortifyStacks > 0) {
-        const drPct = Math.min(40, fortifyStacks * EG_FORTIFY_DR_PER_STACK * (1 + (Number(stats.fortifyEffectIncPct) || 0) / 100));
+        const drPct = Math.min(40, fortifyStacks * FORTIFY_DR_PER_STACK * (1 + (Number(stats.fortifyEffectIncPct) || 0) / 100));
         mitigated *= 1 - drPct / 100;
     }
 
@@ -464,47 +464,47 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         if (typeof globalThis.updateClassHUDManaBar === 'function') globalThis.updateClassHUDManaBar();
     }
 
-    if (globalThis._egPlayerAbsorptionCurrent > 0) {
-        const prevAbs = globalThis._egPlayerAbsorptionCurrent;
-        const absorbed = Math.min(globalThis._egPlayerAbsorptionCurrent, mitigated);
-        globalThis._egPlayerAbsorptionCurrent -= absorbed;
+    if (globalThis._playerAbsorptionCurrent > 0) {
+        const prevAbs = globalThis._playerAbsorptionCurrent;
+        const absorbed = Math.min(globalThis._playerAbsorptionCurrent, mitigated);
+        globalThis._playerAbsorptionCurrent -= absorbed;
         mitigated -= absorbed;
         Audio_Manager.playSFX('player_shield_damage_taken');
-        if (typeof _egMaybeShowAbsorptionBroken === 'function') _egMaybeShowAbsorptionBroken(prevAbs, globalThis._egPlayerAbsorptionCurrent);
+        if (typeof _maybeShowAbsorptionBroken === 'function') _maybeShowAbsorptionBroken(prevAbs, globalThis._playerAbsorptionCurrent);
     }
 
-    _egScheduleAbsorptionRegen();
+    _scheduleAbsorptionRegen();
 
     mitigated = Math.max(0, Math.round(mitigated));
     if (mitigated <= 0) { _rsAvoid('other'); return 0; }
 
     globalThis.playerCurrentHP =Math.max(0, globalThis.playerCurrentHP - mitigated);
-    globalThis._egLastHitTakenAt = Date.now();
+    globalThis._lastHitTakenAt = Date.now();
     // Stun: forced by the source (opts.stun) or rolled from how much Life the hit took.
     if (globalThis.playerCurrentHP > 0) {
-        if (opts && opts.stun) _egStunPlayer();
-        else _egRollPlayerStunFromHit(mitigated);
+        if (opts && opts.stun) _stunPlayer();
+        else _rollPlayerStunFromHit(mitigated);
     }
     if ((Number(stats.enduranceWhenHitPct) || 0) > 0 && Math.random() * 100 < Math.min(100, stats.enduranceWhenHitPct)) {
-        _egGainEnduranceCharge(stats.enduranceChargesMax, stats.enduranceDurationPct);
+        _gainEnduranceCharge(stats.enduranceChargesMax, stats.enduranceDurationPct);
     }
 
     // Life Recoup (passive tree): a share of the Life damage taken is paid
-    // back over ~4s by _egTickLifeRegen. The pool belongs to one encounter.
+    // back over ~4s by _tickLifeRegen. The pool belongs to one encounter.
     if ((Number(stats.lifeRecoupPct) || 0) > 0 && globalThis.playerCurrentHP > 0) {
-        if (globalThis._egRecoupStamp !== globalThis._egEncounterStartAt) {
-            globalThis._egRecoupStamp = globalThis._egEncounterStartAt;
-            globalThis._egRecoupPool = 0;
+        if (globalThis._recoupStamp !== globalThis._encounterStartAt) {
+            globalThis._recoupStamp = globalThis._encounterStartAt;
+            globalThis._recoupPool = 0;
         }
-        globalThis._egRecoupPool = (Number(globalThis._egRecoupPool) || 0) + mitigated * stats.lifeRecoupPct / 100;
+        globalThis._recoupPool = (Number(globalThis._recoupPool) || 0) + mitigated * stats.lifeRecoupPct / 100;
     }
 
     // Gear: warding - once per map, a killing blow instead leaves the player
     // at wardingHP health and the ward shatters.
-    if (globalThis.playerCurrentHP <= 0 && !globalThis._egWardingUsedThisMap) {
+    if (globalThis.playerCurrentHP <= 0 && !globalThis._wardingUsedThisMap) {
         const wardHP = Math.round(stats.wardingHP || 0);
         if (wardHP > 0) {
-            globalThis._egWardingUsedThisMap = true;
+            globalThis._wardingUsedThisMap = true;
             globalThis.playerCurrentHP = wardHP;
             globalThis.showCombatToast(t('eg_warding'));
             Audio_Manager.playSFX('player_shield_damage_taken');
@@ -518,14 +518,14 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     }
 
     globalThis._renderPlayerHealth();
-    if (globalThis.playerCurrentHP <= 0) _egGameOver();
+    if (globalThis.playerCurrentHP <= 0) _gameOver();
 
     // Ailments: elemental hits can ignite / chill / shock / shadow-burn the
     // player (rolled from the monster's attack element).
     // The attacker rides along so physical hits can bleed (which needs a
     // real attacker, never self-damage) and the retaliation ward (node
     // 20036) can read its live statuses.
-    if (typeof _egRollMonsterHitAilment === 'function') _egRollMonsterHitAilment(element, mitigated, opts && opts.attacker ? opts.attacker : null);
+    if (typeof _rollMonsterHitAilment === 'function') _rollMonsterHitAilment(element, mitigated, opts && opts.attacker ? opts.attacker : null);
 
     // Dev fight log (js/dev/dev-testing.js): attributes the HP actually lost.
     // Read-only observer - absent unless the dev harness registered it.

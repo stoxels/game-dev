@@ -13,7 +13,7 @@
 // Between those, min and max are linearly interpolated by t.
 // Values are intentionally strong - roughly 60-80% of a top-tier explicit
 // affix at endgame, and ~30% at level 1 so early implicits feel real.
-export const EG_IMPLICIT_FAMILIES = {
+export const IMPLICIT_FAMILIES = {
     flat_health: {
         id: 'flat_health',
         label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
@@ -140,7 +140,7 @@ export const EG_IMPLICIT_FAMILIES = {
 (() => {
     const fams = ['strength','agility','intelligence'];
     for (const k of fams) {
-        const fam = EG_IMPLICIT_FAMILIES[k];
+        const fam = IMPLICIT_FAMILIES[k];
         if (!fam || !fam.hi) continue;
         fam.hi.min = Math.round(fam.hi.min * 0.73);
         fam.hi.max = Math.round(fam.hi.max * 0.73);

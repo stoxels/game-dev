@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkDotHit, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE ECLIPSE (boss_eclipse)---------------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_eclipse: {
         id: 'boss_eclipse', name: 'The Eclipse', emoji: '🌒',
         baseHP: 1100, baseDamage: 25, chargeMax: 11,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_eclipse: {
         phases: [
             { threshold: 1.00, chargeMax: 11, damageMultiplier: 1.00 },
@@ -29,8 +29,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'umbral_dashes', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechUmbralDashes' },
-            { name: 'fated_cell', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechFatedCell' },
+            { name: 'umbral_dashes', intervalBase: 20000, intervalVariance: 5000, handler: '_mechUmbralDashes' },
+            { name: 'fated_cell', intervalBase: 20000, intervalVariance: 5000, handler: '_mechFatedCell' },
         ],
     },
 });
@@ -38,19 +38,19 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // A shade telegraphs from a random screen edge, then dashes at the player.
 // Each dash locks its line at fire time, so keep moving after the tell.
-export function _egMechUmbralDashes(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechUmbralDashes(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const dashes = [0, 3, 4, 4][p];
     const warnMs = 900, dashSpeed = 950;
     const dmgPct = [0, 0.22, 0.26, 0.32][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
-    _egNkToast('eg_mech_eclipse', '🌒 The Eclipse: Umbral Dashes! Only the tell, and moving!');
+    _nkToast('eg_mech_eclipse', '🌒 The Eclipse: Umbral Dashes! Only the tell, and moving!');
     let idx = 0, stage = 'idle', t = 0, dashHit = false;
     let sx = 0, sy = 0, tx = 0, ty = 0, dx = 0, dy = 0, dist = 1;
     let shade = null, lineEl = null;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         if (idx >= dashes) {
             if (shade) { shade.remove(); shade = null; }
             if (lineEl) { lineEl.remove(); lineEl = null; }
@@ -60,7 +60,7 @@ export function _egMechUmbralDashes(monster, phase) {
         if (stage === 'idle') {
             // Spawn at a random screen edge, aimed at the player's live position.
             dashHit = false;
-            const c = _egNkPlayerCenter();
+            const c = _nkPlayerCenter();
             tx = c ? c.x : window.innerWidth / 2;
             ty = c ? c.y : window.innerHeight / 2;
             const edge = Math.floor(Math.random() * 4);
@@ -72,10 +72,10 @@ export function _egMechUmbralDashes(monster, phase) {
             dx = tx - sx;
             dy = ty - sy;
             dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            shade = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-shade', '🌒');
+            shade = _nkEl(run, 'div', 'eg-nk-dot eg-nk-shade', '🌒');
             shade.style.transform = 'translate(' + Math.round(sx - 26) + 'px,' + Math.round(sy - 26) + 'px)';
             // Thin warning line from spawn toward the target.
-            lineEl = _egNkEl(run, 'div', 'eg-nk-dashline');
+            lineEl = _nkEl(run, 'div', 'eg-nk-dashline');
             const ang = Math.atan2(dy, dx);
             lineEl.style.width = Math.round(dist) + 'px';
             lineEl.style.left = Math.round(sx) + 'px';
@@ -97,11 +97,11 @@ export function _egMechUmbralDashes(monster, phase) {
             sy += uy * step;
             dist -= step;
             if (shade) shade.style.transform = 'translate(' + Math.round(sx - 26) + 'px,' + Math.round(sy - 26) + 'px)';
-            const pr = _egNkPlayerRect();
-            if (pr && !dashHit && _egNkDotHit(shade, pr, 0)) {
+            const pr = _nkPlayerRect();
+            if (pr && !dashHit && _nkDotHit(shade, pr, 0)) {
                 dashHit = true;
-                const dealt = _egNkHit(dmgPct, 'shadow', level);
-                _egNkAbilityHitToast(dealt, 'The Eclipse', 'Umbral Dashes');
+                const dealt = _nkHit(dmgPct, 'shadow', level);
+                _nkAbilityHitToast(dealt, 'The Eclipse', 'Umbral Dashes');
             }
             if (dist <= 1) {
                 if (shade) { shade.remove(); shade = null; }

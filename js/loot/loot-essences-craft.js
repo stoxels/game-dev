@@ -6,10 +6,10 @@
 // it as an epic with the essence's family guaranteed plus 3-5 random
 // ones. Returns null when the base cannot carry the family at all.
 
-import { EG_MOD_CAPS } from './loot-equipment-generator.js';
-import { _egGetModTable } from './loot-equipment-mod-tables.js';
-import {_egBuildItemName} from './loot-mod-naming.js';
-import {_egBuildModPool, _egBuildRolledStats, _egEligibleTiers, _egFamilyAllowedOnBase, _egPickModFromPool, _egPickTier} from './loot-mod-application.js';
+import { ITEM_MOD_CAPS } from './loot-equipment-generator.js';
+import { _getModTable } from './loot-equipment-mod-tables.js';
+import {_buildItemName} from './loot-mod-naming.js';
+import {_buildModPool, _buildRolledStats, _eligibleTiers, _familyAllowedOnBase, _pickModFromPool, _pickTier} from './loot-mod-application.js';
 
 
 //----------------------------------------------------------------------
@@ -19,7 +19,7 @@ import {_egBuildModPool, _egBuildRolledStats, _egEligibleTiers, _egFamilyAllowed
 // Rolls the GUARANTEED modifier for an essence application.
 // Now single-family: looks for the family in either prefix or suffix section,
 // checks defense gating and ilvl eligibility, and rolls a random eligible tier.
-export function _egRollGuaranteedMod(modTable, preferredFamilies, itemLevel, defenses) {
+export function _rollGuaranteedMod(modTable, preferredFamilies, itemLevel, defenses) {
     const families = Array.isArray(preferredFamilies) ? preferredFamilies : [preferredFamilies];
     const sections = [
         { type: 'prefix', pool: modTable.prefixes || {} },
@@ -29,16 +29,16 @@ export function _egRollGuaranteedMod(modTable, preferredFamilies, itemLevel, def
         for (const sec of sections) {
             const family = sec.pool[familyId];
             if (!family) continue;
-            if (!_egFamilyAllowedOnBase(familyId, defenses)) continue;
-            const tiers = _egEligibleTiers(family, itemLevel);
+            if (!_familyAllowedOnBase(familyId, defenses)) continue;
+            const tiers = _eligibleTiers(family, itemLevel);
             if (!tiers || tiers.length === 0) continue;
-            const tier = _egPickTier(tiers);
+            const tier = _pickTier(tiers);
             if (!tier) continue;
             return {
                 familyId,
                 type: sec.type,
                 tier: tier.tier,
-                rolledStats: _egBuildRolledStats(family, tier),
+                rolledStats: _buildRolledStats(family, tier),
             };
         }
     }
@@ -52,11 +52,11 @@ export function _egRollGuaranteedMod(modTable, preferredFamilies, itemLevel, def
 
 // Core essence re-forge. Returns the new EPIC item, or null when the item
 // has no usable mod table or the guaranteed family cannot roll on this base.
-export function _egApplyEssenceCraft(item, def) {
-    const modTable = _egGetModTable(item);
+export function _applyEssenceCraft(item, def) {
+    const modTable = _getModTable(item);
     if (!modTable) return null;
     // Epic caps per spec
-    const cap = EG_MOD_CAPS.epic;
+    const cap = ITEM_MOD_CAPS.epic;
     const itemLevel = item.itemLevel || 1;
     const mods = [];
     const chosenFamilyIds = new Set();
@@ -64,7 +64,7 @@ export function _egApplyEssenceCraft(item, def) {
     // 1 guaranteed modifier - must succeed or the craft is incompatible
     let preCount = 0;
     let sufCount = 0;
-    const guaranteed = _egRollGuaranteedMod(modTable, families, itemLevel, item.defenses);
+    const guaranteed = _rollGuaranteedMod(modTable, families, itemLevel, item.defenses);
     if (!guaranteed) return null;
     mods.push(guaranteed);
     chosenFamilyIds.add(guaranteed.familyId);
@@ -82,18 +82,18 @@ export function _egApplyEssenceCraft(item, def) {
     for (let i = 0; i < extra; i++) {
         const options = [];
         if (preCount < cap.maxPre) {
-            const pool = _egBuildModPool(modTable.prefixes || {}, itemLevel, chosenFamilyIds, item.defenses);
+            const pool = _buildModPool(modTable.prefixes || {}, itemLevel, chosenFamilyIds, item.defenses);
             if (pool.length > 0) options.push({ type: 'prefix', pool });
         }
         if (sufCount < cap.maxSuf) {
-            const pool = _egBuildModPool(modTable.suffixes || {}, itemLevel, chosenFamilyIds, item.defenses);
+            const pool = _buildModPool(modTable.suffixes || {}, itemLevel, chosenFamilyIds, item.defenses);
             if (pool.length > 0) options.push({ type: 'suffix', pool });
         }
         if (options.length === 0) break;
         const sec = options[Math.floor(Math.random() * options.length)];
-        const entry = _egPickModFromPool(sec.pool);
+        const entry = _pickModFromPool(sec.pool);
         if (!entry) break;
-        const tier = _egPickTier(entry.tiers);
+        const tier = _pickTier(entry.tiers);
         if (!tier) break;
         chosenFamilyIds.add(entry.familyId);
         if (sec.type === 'prefix') preCount++; else sufCount++;
@@ -101,13 +101,13 @@ export function _egApplyEssenceCraft(item, def) {
             familyId: entry.familyId,
             type: sec.type,
             tier: tier.tier,
-            rolledStats: _egBuildRolledStats(entry.family, tier),
+            rolledStats: _buildRolledStats(entry.family, tier),
         });
     }
 
     // Ensure at least 4 mods for epic feel when pool allowed - if we ended <4 try to fill
     // (spec: 4-6) - already 1+3 =4 minimum, so okay.
 
-    const name = _egBuildItemName(item.baseName || item.name, 'epic', mods);
+    const name = _buildItemName(item.baseName || item.name, 'epic', mods);
     return { ...item, rarity: 'epic', mods, name };
 }

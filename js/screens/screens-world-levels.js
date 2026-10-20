@@ -272,7 +272,7 @@ function _wdBuildRoads(cfg, wi) {
     // flow), but the endpoint key feeds _wdIsNodeReached so the spur can
     // render as 'travelled' once the trial is cleared.
     if (cfg.trialNode && _wdTrialNodeForWorld(wi)) {
-        const triggers = (typeof globalThis._egTrialTriggerLevels === 'function') ? globalThis._egTrialTriggerLevels(wi) : null;
+        const triggers = (typeof globalThis._trialTriggerLevels === 'function') ? globalThis._trialTriggerLevels(wi) : null;
         const fromLi = (triggers && triggers[1] != null && cfg.nodes[triggers[1]]) ? triggers[1] : (cfg.nodes.length - 1);
         const fromPos = cfg.nodes[fromLi] || cfg.entrancePos;
         roads.push({
@@ -459,8 +459,8 @@ function _wdIsNodeReached(n, wi) {
     if (n === 'trial') {
         // Lit once the trial is unlocked (not only when cleared), so the spur
         // reads as a real, open road to the trial node.
-        return ((typeof globalThis._egIsTrialDone === 'function') && globalThis._egIsTrialDone(wi))
-            || ((typeof globalThis._egIsTrialUnlocked === 'function') && globalThis._egIsTrialUnlocked(wi));
+        return ((typeof globalThis._isTrialDone === 'function') && globalThis._isTrialDone(wi))
+            || ((typeof globalThis._isTrialUnlocked === 'function') && globalThis._isTrialUnlocked(wi));
     }
     const gi = globalThis.WORLD_START_GI[wi] + n;
     if (STATE && STATE.done && STATE.done.includes(gi)) return true;
@@ -1441,7 +1441,7 @@ function _wdAppendLevelNodes(canvas, wi, cfg, levelCount) {
 function _wdTrialNodeForWorld(wi) {
     const cfg = (typeof WD_WORLD_CONFIGS !== 'undefined') ? WD_WORLD_CONFIGS[wi] : null;
     if (!cfg || !cfg.trialNode) return null;
-    if (typeof globalThis._egTrialWorlds === 'function' && globalThis._egTrialWorlds().indexOf(wi) === -1) return null;
+    if (typeof globalThis._trialWorlds === 'function' && globalThis._trialWorlds().indexOf(wi) === -1) return null;
     return cfg.trialNode;
 }
 
@@ -1456,8 +1456,8 @@ function _wdBuildTrialNode(wi, pos) {
     node.dataset.trial = wi;
     _wdPositionNodeOnCanvas(node, wi, pos);
 
-    const isDone = (typeof globalThis._egIsTrialDone === 'function') && globalThis._egIsTrialDone(wi);
-    const isLocked = (typeof globalThis._egIsTrialUnlocked === 'function') ? !globalThis._egIsTrialUnlocked(wi) : false;
+    const isDone = (typeof globalThis._isTrialDone === 'function') && globalThis._isTrialDone(wi);
+    const isLocked = (typeof globalThis._isTrialUnlocked === 'function') ? !globalThis._isTrialUnlocked(wi) : false;
     if (isDone) node.classList.add('done');
     else if (isLocked) node.classList.add('locked');
     node.classList.add('convergence');
@@ -1502,7 +1502,7 @@ function _wdShowTrialEnterButton(wi) {
     const pos = cfg && cfg.trialNode;
     if (!pos) return;
 
-    const name = (typeof globalThis._egTrialName === 'function') ? globalThis._egTrialName(wi) : ('Convergence Trial ' + (wi + 1));
+    const name = (typeof globalThis._trialName === 'function') ? globalThis._trialName(wi) : ('Convergence Trial ' + (wi + 1));
     const rawEnter = (typeof t === 'function') ? t('scr_enter_trial') : null;
     const btnText = (rawEnter && rawEnter !== 'scr_enter_trial')
         ? rawEnter.replace('{n}', name) : ('Enter ' + name);
@@ -1532,7 +1532,7 @@ function _wdShowTrialEnterButton(wi) {
     `;
     btn.addEventListener('click', () => {
         btn.remove();
-        if (typeof globalThis._egLaunchCampaignTrial === 'function') globalThis._egLaunchCampaignTrial(wi);
+        if (typeof globalThis._launchCampaignTrial === 'function') globalThis._launchCampaignTrial(wi);
     });
     _wdWireEnterButtonDismiss(btn);
     if (canvas) canvas.appendChild(btn);
@@ -1544,7 +1544,7 @@ function _wdShowTrialEnterButton(wi) {
  */
 function _wdShowTrialTooltip(e, wi, isDone, isLocked) {
     const tip = _wdEnsureTooltip();
-    const name = (typeof globalThis._egTrialName === 'function') ? globalThis._egTrialName(wi) : ('Convergence Trial ' + (wi + 1));
+    const name = (typeof globalThis._trialName === 'function') ? globalThis._trialName(wi) : ('Convergence Trial ' + (wi + 1));
     let status = '';
     if (isLocked) status = t('scr_locked');
     else if (isDone) status = t('scr_trial_done');
@@ -1553,12 +1553,12 @@ function _wdShowTrialTooltip(e, wi, isDone, isLocked) {
         status = isLocked ? 'Locked' : (isDone ? 'Completed' : 'Not completed');
     }
     let detail = '';
-    if (!isLocked && typeof globalThis._egTrialMonsterLevel === 'function') {
-        const ml = globalThis._egTrialMonsterLevel(wi, false);
+    if (!isLocked && typeof globalThis._trialMonsterLevel === 'function') {
+        const ml = globalThis._trialMonsterLevel(wi, false);
         let bossName = '';
         try {
-            if (typeof globalThis._egTrialBossId === 'function' && typeof globalThis.EG_BOSS_DEFS !== 'undefined' && globalThis.EG_BOSS_DEFS) {
-                const def = globalThis.EG_BOSS_DEFS[globalThis._egTrialBossId(wi, 0)];
+            if (typeof globalThis._trialBossId === 'function' && typeof globalThis.BOSS_DEFS !== 'undefined' && globalThis.BOSS_DEFS) {
+                const def = globalThis.BOSS_DEFS[globalThis._trialBossId(wi, 0)];
                 if (def) bossName = ' · ' + (def.emoji ? def.emoji + ' ' : '') + (def.name || '');
             }
         } catch (err) {}

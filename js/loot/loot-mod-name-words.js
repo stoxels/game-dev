@@ -7,7 +7,7 @@
 // loot-mod-naming.js when it builds an item's display name; a family with
 // no row here falls back to a title-cased family id.
 
-export const EG_MOD_NAME_WORDS = {
+export const MOD_NAME_WORDS = {
     // --- LIFE & MANA ---
     flat_health: ['Healthy', 'of Vitality', 'des Lebens'],
     inc_health: ['Vital', 'of Vitality', 'des Lebens'],

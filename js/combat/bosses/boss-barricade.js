@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BARRICADE (boss_barricade)-----------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_barricade: {
         id: 'boss_barricade', name: 'The Barricade', emoji: '🚧',
         baseHP: 1060, baseDamage: 24, chargeMax: 12,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_barricade: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -29,8 +29,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'bullet_walls', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechBulletWalls' },
-            { name: 'soul_tithe', intervalBase: 23000, intervalVariance: 5000, handler: '_egMechSoulTithe' },
+            { name: 'bullet_walls', intervalBase: 21000, intervalVariance: 5000, handler: '_mechBulletWalls' },
+            { name: 'soul_tithe', intervalBase: 23000, intervalVariance: 5000, handler: '_mechSoulTithe' },
         ],
     },
 });
@@ -38,8 +38,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // Falling shot walls with one drifting gap each; anything outside the gap
 // burns. Read the gap early since it slides sideways while falling.
-export function _egMechBulletWalls(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechBulletWalls(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const walls = [0, 2, 3, 3][p];
     const fallSpeed = [0, 150, 180, 215][p];
@@ -47,7 +47,7 @@ export function _egMechBulletWalls(monster, phase) {
     const cell = 40, gapW = 170;
     const dmgPct = [0, 0.15, 0.18, 0.22][p];
     const staggerMs = 2200;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const queue = [];
@@ -60,18 +60,18 @@ export function _egMechBulletWalls(monster, phase) {
         q.y = -cell - 10;
         for (let x = 0; x < W; x += cell) {
             if (x + cell > q.gapX && x < q.gapX + gapW) continue;
-            const el = _egNkEl(run, 'div', 'eg-nk-tetblock eg-nk-wallshot');
+            const el = _nkEl(run, 'div', 'eg-nk-tetblock eg-nk-wallshot');
             el.style.width = (cell - 3) + 'px';
             el.style.height = (cell - 3) + 'px';
             q.blocks.push({ x, el });
         }
         q.fired = true;
     };
-    _egNkToast('eg_mech_barricade', '🚧 The Barricade: Bullet Walls! Track the gap!');
+    _nkToast('eg_mech_barricade', '🚧 The Barricade: Bullet Walls! Track the gap!');
     let cdUntil = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         let pending = false;
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         queue.forEach(q => {
             if (!q.fired) {
                 pending = true;
@@ -98,8 +98,8 @@ export function _egMechBulletWalls(monster, phase) {
                 const inBand = pr.bottom > q.y && pr.top < q.y + cell;
                 if (inBand && !inGap) {
                     cdUntil = now + 800;
-                    const dealt = _egNkHit(dmgPct, null, level);
-                    _egNkAbilityHitToast(dealt, 'The Barricade', 'Bullet Walls');
+                    const dealt = _nkHit(dmgPct, null, level);
+                    _nkAbilityHitToast(dealt, 'The Barricade', 'Bullet Walls');
                 }
             }
         });

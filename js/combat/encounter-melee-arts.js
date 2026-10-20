@@ -5,34 +5,34 @@
 
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { _egGetElementCentre } from './combat-class-projectiles.js';
-import { _egMeleeLeapTo } from './encounter-melee-delivery.js';
-import { _egDamageTargetById, _egShowStatusLabel } from './encounter-monster-damage.js';
-import { _egRestartFlashClass } from './encounter.js';
-import { _egFacingFromVector, _egGetEquippedWeaponInfo } from './combat-weapon-swing-config.js';
-import { _egMeleeImpactThump, _egShowWeaponSwing, _egWeaponSwingSound } from './combat-weapon-swing.js';
+import { _getElementCentre } from './combat-class-projectiles.js';
+import { _meleeLeapTo } from './encounter-melee-delivery.js';
+import { _damageTargetById, _showStatusLabel } from './encounter-monster-damage.js';
+import { _restartFlashClass } from './encounter.js';
+import { _facingFromVector, _getEquippedWeaponInfo } from './combat-weapon-swing-config.js';
+import { _meleeImpactThump, _showWeaponSwing, _weaponSwingSound } from './combat-weapon-swing.js';
 
 // Overcharge tuning (Secret-of-Mana-style weapon arts): the charge bar
-// auto-fills to 100% on its own (see _egTickPlayer in
+// auto-fills to 100% on its own (see _tickPlayer in
 // encounter-tick.js) and, while the attack key is HELD past full, keeps
 // filling through the overcharge tiers up to this multiplier (5 = up to
 // 500% / 5x damage for a patient player). Releasing E inside a tier band
-// unleashes that tier's weapon art (see _egMeleeTierForCharge /
-// _egMeleeTierArt): 200% dash-through, 300% + sky leap onto a second
+// unleashes that tier's weapon art (see _meleeTierForCharge /
+// _meleeTierArt): 200% dash-through, 300% + sky leap onto a second
 // monster, 400% + weapon nova around the target, 500% grand nova that
 // strikes every monster on screen.
-export const EG_MELEE_OVERCHARGE_MULT = 5;
-export const EG_MELEE_OVERCHARGE_RATIO = 5;
+export const MELEE_OVERCHARGE_MULT = 5;
+export const MELEE_OVERCHARGE_RATIO = 5;
 
 // Overcharge climb rates per milestone band (Secret-of-Mana-style: each
 // weapon level takes longer than the last). Index = the tier of the
-// CURRENT charge (see _egMeleeTierForCharge): band 0 fills 100→200% at
+// CURRENT charge (see _meleeTierForCharge): band 0 fills 100→200% at
 // full speed, band 1 fills 200→300% at 80%, band 2 at 62%, band 3
 // (400→500%) at 48% - reaching the 500% grand nova is a real commitment.
 // Pure data + pure helper - safe to unit-test.
-export const EG_MELEE_OVERCHARGE_RATE_PER_TIER = [1, 0.8, 0.62, 0.48];
-export function _egOverchargeRateForTier(tier) {
-    const bands = EG_MELEE_OVERCHARGE_RATE_PER_TIER;
+export const MELEE_OVERCHARGE_RATE_PER_TIER = [1, 0.8, 0.62, 0.48];
+export function _overchargeRateForTier(tier) {
+    const bands = MELEE_OVERCHARGE_RATE_PER_TIER;
     let t = Math.floor(Number(tier) || 0);
     if (t < 0) t = 0;
     if (t >= bands.length) t = bands.length - 1;
@@ -42,9 +42,9 @@ export function _egOverchargeRateForTier(tier) {
 // Weapon-art tier for a spent charge share (0..5): 0 = plain hit (below
 // 200%), 1 = released at 200-299%, 2 = 300-399%, 3 = 400-499%,
 // 4 = 500% (fully overcharged). Pure - safe to unit-test.
-export function _egMeleeTierForCharge(chargePct) {
+export function _meleeTierForCharge(chargePct) {
     const c = Math.max(0, Number(chargePct) || 0);
-    if (c >= EG_MELEE_OVERCHARGE_RATIO - 0.001) return 4;
+    if (c >= MELEE_OVERCHARGE_RATIO - 0.001) return 4;
     if (c >= 4) return 3;
     if (c >= 3) return 2;
     if (c >= 2) return 1;
@@ -53,7 +53,7 @@ export function _egMeleeTierForCharge(chargePct) {
 
 // Tier display name: translated when the key exists, English fallback
 // otherwise (same guard shape as the parry feedback labels).
-export function _egMeleeTierLabel(key, fallback) {
+export function _meleeTierLabel(key, fallback) {
     try {
         if (typeof t === 'function') {
             const txt = t(key);
@@ -86,31 +86,31 @@ export function _egMeleeTierLabel(key, fallback) {
 // resolves when the follow-through lands (the caller glides the avatar
 // home afterwards); sync mode returns undefined. Never throws; damage
 // always applies even without DOM.
-export function _egMeleeTierArt(targetId, tier, rawHit, elements, wasCrit, opts) {
+export function _meleeTierArt(targetId, tier, rawHit, elements, wasCrit, opts) {
     if (!tier || tier < 1) return undefined;
-    if (opts && opts.sequenced) return _egMeleeTierArtSequenced(targetId, tier, rawHit, elements, wasCrit);
+    if (opts && opts.sequenced) return _meleeTierArtSequenced(targetId, tier, rawHit, elements, wasCrit);
     const hitOpts = { isCrit: !!wasCrit, isMelee: true };
     const othersAlive = () => {
         try {
-            return globalThis._egMonsters.filter(m => m && m.id !== targetId && m.currentHP > 0);
+            return globalThis._monsters.filter(m => m && m.id !== targetId && m.currentHP > 0);
         } catch (e) { return []; }
     };
 
     // Tier 1+ reads on the primary target: the dash visual always plays,
     // but the label names the HIGHEST art unlocked (tiers 3/4 rename it).
-    _egMeleeDashVisual(targetId);
-    if (tier <= 2) _egShowStatusLabel(targetId, _egMeleeTierLabel('eg_melee_tier1', 'Dash Strike!'));
+    _meleeDashVisual(targetId);
+    if (tier <= 2) _showStatusLabel(targetId, _meleeTierLabel('eg_melee_tier1', 'Dash Strike!'));
 
     // Tier 2+: leap onto one random other living monster for the same hit.
     if (tier >= 2) {
         const others = othersAlive();
         if (others.length) {
             const victim = others[Math.floor(Math.random() * others.length)];
-            _egMeleeLeapVisual(victim.id);
-            _egShowStatusLabel(victim.id, _egMeleeTierLabel('eg_melee_tier2', 'Sky Leap!'));
-            _egDamageTargetById(victim.id, rawHit, elements, hitOpts);
-            if (typeof _egMeleeImpactThump === 'function') {
-                try { _egMeleeImpactThump(victim.id); } catch (e) {}
+            _meleeLeapVisual(victim.id);
+            _showStatusLabel(victim.id, _meleeTierLabel('eg_melee_tier2', 'Sky Leap!'));
+            _damageTargetById(victim.id, rawHit, elements, hitOpts);
+            if (typeof _meleeImpactThump === 'function') {
+                try { _meleeImpactThump(victim.id); } catch (e) {}
             }
         }
     }
@@ -122,13 +122,13 @@ export function _egMeleeTierArt(targetId, tier, rawHit, elements, wasCrit, opts)
         const grand = tier >= 4;
         let zoneId = null;
         try {
-            const primary = globalThis._egMonsters.find(m => m && m.id === targetId);
+            const primary = globalThis._monsters.find(m => m && m.id === targetId);
             zoneId = primary ? primary.zoneId : null;
         } catch (e) {}
-        _egMeleeNovaVisual(targetId, grand);
-        _egShowStatusLabel(targetId, grand
-            ? _egMeleeTierLabel('eg_melee_tier4', 'MANA STRIKE!')
-            : _egMeleeTierLabel('eg_melee_tier3', 'Weapon Nova!'));
+        _meleeNovaVisual(targetId, grand);
+        _showStatusLabel(targetId, grand
+            ? _meleeTierLabel('eg_melee_tier4', 'MANA STRIKE!')
+            : _meleeTierLabel('eg_melee_tier3', 'Weapon Nova!'));
         const victims = grand
             ? othersAlive()
             : othersAlive().filter(m => zoneId == null || m.zoneId === zoneId);
@@ -136,38 +136,38 @@ export function _egMeleeTierArt(targetId, tier, rawHit, elements, wasCrit, opts)
             try {
                 const card = (typeof document !== 'undefined')
                     ? document.getElementById(`eg-card-${m.id}`) : null;
-                if (card) _egRestartFlashClass(card, 'eg-flash-cleave');
+                if (card) _restartFlashClass(card, 'eg-flash-cleave');
             } catch (e) {}
-            _egDamageTargetById(m.id, rawHit, elements, hitOpts);
-            if (typeof _egMeleeImpactThump === 'function') {
-                try { _egMeleeImpactThump(m.id); } catch (e) {}
+            _damageTargetById(m.id, rawHit, elements, hitOpts);
+            if (typeof _meleeImpactThump === 'function') {
+                try { _meleeImpactThump(m.id); } catch (e) {}
             }
         });
-        if (grand) _egMeleeGrandFlash();
+        if (grand) _meleeGrandFlash();
     }
 }
 
 // Waits for a frozen presentation beat inside the sequenced follow-through.
 // This private timing helper is separate from the avatar movement owner.
-function _egMeleeWaitMs(ms) {
+function _meleeWaitMs(ms) {
     return new Promise((resolve) => {
         try { setTimeout(resolve, Math.max(0, ms || 0)); }
         catch (e) { resolve(); }
     });
 }
 
-// Sequenced follow-through for a delivered art (see _egMeleeTierArt): the
+// Sequenced follow-through for a delivered art (see _meleeTierArt): the
 // avatar is already parked on the primary target and the telegraph labels
 // were shown at launch. Tier 2+ travels a visible sky-leap arc onto the
 // second victim with the swing + damage ON ARRIVAL there; tier 3+ bursts
 // the nova around the primary target. Resolves when the follow-through
 // lands (damage applied even without DOM); never rejects, never throws.
-function _egMeleeTierArtSequenced(targetId, tier, rawHit, elements, wasCrit) {
+function _meleeTierArtSequenced(targetId, tier, rawHit, elements, wasCrit) {
     const run = async () => {
         const hitOpts = { isCrit: !!wasCrit, isMelee: true };
         const othersAlive = () => {
             try {
-                return globalThis._egMonsters.filter(m => m && m.id !== targetId && m.currentHP > 0);
+                return globalThis._monsters.filter(m => m && m.id !== targetId && m.currentHP > 0);
             } catch (e) { return []; }
         };
         // Tier 2+: leap onto one random other living monster - picked NOW
@@ -177,15 +177,15 @@ function _egMeleeTierArtSequenced(targetId, tier, rawHit, elements, wasCrit) {
             const others = othersAlive();
             if (others.length) {
                 const victim = others[Math.floor(Math.random() * others.length)];
-                _egShowStatusLabel(victim.id, _egMeleeTierLabel('eg_melee_tier2', 'Sky Leap!'));
-                await _egMeleeLeapTo(victim.id);
+                _showStatusLabel(victim.id, _meleeTierLabel('eg_melee_tier2', 'Sky Leap!'));
+                await _meleeLeapTo(victim.id);
                 Audio_Manager.playSFX('art_land_thud');
-                _egMeleeLeapVisual(victim.id, { swingOnly: true });
-                _egDamageTargetById(victim.id, rawHit, elements, hitOpts);
-                if (typeof _egMeleeImpactThump === 'function') {
-                    try { _egMeleeImpactThump(victim.id); } catch (e) {}
+                _meleeLeapVisual(victim.id, { swingOnly: true });
+                _damageTargetById(victim.id, rawHit, elements, hitOpts);
+                if (typeof _meleeImpactThump === 'function') {
+                    try { _meleeImpactThump(victim.id); } catch (e) {}
                 }
-                await _egMeleeWaitMs(120);
+                await _meleeWaitMs(120);
             }
         }
 
@@ -195,10 +195,10 @@ function _egMeleeTierArtSequenced(targetId, tier, rawHit, elements, wasCrit) {
             const grand = tier >= 4;
             let zoneId = null;
             try {
-                const primary = globalThis._egMonsters.find(m => m && m.id === targetId);
+                const primary = globalThis._monsters.find(m => m && m.id === targetId);
                 zoneId = primary ? primary.zoneId : null;
             } catch (e) {}
-            _egMeleeNovaVisual(targetId, grand);
+            _meleeNovaVisual(targetId, grand);
             const victims = grand
                 ? othersAlive()
                 : othersAlive().filter(m => zoneId == null || m.zoneId === zoneId);
@@ -206,16 +206,16 @@ function _egMeleeTierArtSequenced(targetId, tier, rawHit, elements, wasCrit) {
                 try {
                     const card = (typeof document !== 'undefined')
                         ? document.getElementById(`eg-card-${m.id}`) : null;
-                    if (card) _egRestartFlashClass(card, 'eg-flash-cleave');
+                    if (card) _restartFlashClass(card, 'eg-flash-cleave');
                 } catch (e) {}
-                _egDamageTargetById(m.id, rawHit, elements, hitOpts);
-                if (typeof _egMeleeImpactThump === 'function') {
-                    try { _egMeleeImpactThump(m.id); } catch (e) {}
+                _damageTargetById(m.id, rawHit, elements, hitOpts);
+                if (typeof _meleeImpactThump === 'function') {
+                    try { _meleeImpactThump(m.id); } catch (e) {}
                 }
             });
-            if (grand) _egMeleeGrandFlash();
+            if (grand) _meleeGrandFlash();
             // Let the burst read before the hero glides home.
-            await _egMeleeWaitMs(320);
+            await _meleeWaitMs(320);
         }
     };
     try {
@@ -226,11 +226,11 @@ function _egMeleeTierArtSequenced(targetId, tier, rawHit, elements, wasCrit) {
 }
 
 // Dash-through visual (synchronous playout only - sequenced deliveries fly
-// via _egMeleeDashOut instead): lunges the avatar toward the target card
+// via _meleeDashOut instead): lunges the avatar toward the target card
 // and snaps back (the hit already landed - this is pure theatre). The
 // clamped so the sprite never leaves the screen on far-away cards.
 // No-op without DOM; skipped under prefers-reduced-motion. Never throws.
-export function _egMeleeDashVisual(targetId) {
+export function _meleeDashVisual(targetId) {
     try {
         if (typeof document === 'undefined') return;
         const avatar = document.getElementById('player-avatar-wrapper');
@@ -239,8 +239,8 @@ export function _egMeleeDashVisual(targetId) {
         if (!avatar || !card || typeof avatar.animate !== 'function') return;
         if (typeof window !== 'undefined' && window.matchMedia
             && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        const a = _egGetElementCentre(avatar);
-        const b = _egGetElementCentre(card);
+        const a = _getElementCentre(avatar);
+        const b = _getElementCentre(card);
         let dx = b.x - a.x, dy = b.y - a.y;
         const dist = Math.hypot(dx, dy) || 1;
         // Dash-through: the sprite charges the target across the screen and
@@ -264,9 +264,9 @@ export function _egMeleeDashVisual(targetId) {
 // equipped weapon swings at it. Damage is applied by the caller - this is
 // pure theatre. No-op without DOM; never throws.
 // opts.swingOnly (sequenced deliveries): skip the in-place hop - the avatar
-// was FLOWN here by _egMeleeLeapTo and a fresh from-origin bounce would
+// was FLOWN here by _meleeLeapTo and a fresh from-origin bounce would
 // snap it back to its laid-out spot; only the weapon swing + sound play.
-export function _egMeleeLeapVisual(victimId, opts) {
+export function _meleeLeapVisual(victimId, opts) {
     try {
         if (typeof document === 'undefined') return;
         const avatar = document.getElementById('player-avatar-wrapper');
@@ -288,16 +288,16 @@ export function _egMeleeLeapVisual(victimId, opts) {
         }
         if (!card) return;
         try {
-            const fam = (typeof _egGetEquippedWeaponInfo === 'function')
-                ? _egGetEquippedWeaponInfo().family : 'sword';
+            const fam = (typeof _getEquippedWeaponInfo === 'function')
+                ? _getEquippedWeaponInfo().family : 'sword';
             let face = 'down';
-            if (avatar && typeof _egFacingFromVector === 'function') {
-                const a = _egGetElementCentre(avatar);
-                const b = _egGetElementCentre(card);
-                face = _egFacingFromVector(b.x - a.x, b.y - a.y);
+            if (avatar && typeof _facingFromVector === 'function') {
+                const a = _getElementCentre(avatar);
+                const b = _getElementCentre(card);
+                face = _facingFromVector(b.x - a.x, b.y - a.y);
             }
-            if (typeof _egShowWeaponSwing === 'function') _egShowWeaponSwing(fam, face);
-            if (typeof _egWeaponSwingSound === 'function') _egWeaponSwingSound(fam);
+            if (typeof _showWeaponSwing === 'function') _showWeaponSwing(fam, face);
+            if (typeof _weaponSwingSound === 'function') _weaponSwingSound(fam);
         } catch (e) {}
     } catch (e) {}
 }
@@ -305,7 +305,7 @@ export function _egMeleeLeapVisual(victimId, opts) {
 // Weapon-nova visual: a ring of the EQUIPPED weapon's icon bursts outward
 // around the target card (styles in css/endgame/weapon-swing.css). Falls
 // back to ⚔️ without a weapon. Never throws.
-export function _egMeleeNovaVisual(targetId, grand) {
+export function _meleeNovaVisual(targetId, grand) {
     try {
         if (typeof document === 'undefined') return;
         const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
@@ -313,11 +313,11 @@ export function _egMeleeNovaVisual(targetId, grand) {
         Audio_Manager.playSFX(grand ? 'art_grand_nova' : 'art_nova');
         let icon = '⚔️';
         try {
-            const info = (typeof _egGetEquippedWeaponInfo === 'function')
-                ? _egGetEquippedWeaponInfo() : null;
+            const info = (typeof _getEquippedWeaponInfo === 'function')
+                ? _getEquippedWeaponInfo() : null;
             if (info && info.item && info.item.icon) icon = String(info.item.icon);
         } catch (e) {}
-        const c = _egGetElementCentre(card);
+        const c = _getElementCentre(card);
         const el = document.createElement('div');
         el.className = 'eg-melee-nova' + (grand ? ' eg-melee-nova-grand' : '');
         const bits = grand ? 12 : 8;
@@ -339,7 +339,7 @@ export function _egMeleeNovaVisual(targetId, grand) {
 
 // Fullscreen gold flash for the 500% grand nova (styles in
 // css/endgame/weapon-swing.css). Skipped under prefers-reduced-motion.
-export function _egMeleeGrandFlash() {
+export function _meleeGrandFlash() {
     try {
         if (typeof document === 'undefined') return;
         if (typeof window !== 'undefined' && window.matchMedia

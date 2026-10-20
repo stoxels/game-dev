@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkDotHit, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SERAPH (boss_seraph)-----------------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_seraph: {
         id: 'boss_seraph', name: 'The Seraph', emoji: '😇',
         baseHP: 1180, baseDamage: 26, chargeMax: 10,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_seraph: {
         phases: [
             { threshold: 1.00, chargeMax: 10, damageMultiplier: 1.00 },
@@ -29,37 +29,37 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 3000,
         mechanics: [
-            { name: 'judgment_pillars', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechJudgmentPillars' },
-            { name: 'radiant_fans', intervalBase: 20000, intervalVariance: 4000, handler: '_egMechRadiantFans' },
-            { name: 'fated_cell', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechFatedCell' },
+            { name: 'judgment_pillars', intervalBase: 18000, intervalVariance: 4000, handler: '_mechJudgmentPillars' },
+            { name: 'radiant_fans', intervalBase: 20000, intervalVariance: 4000, handler: '_mechRadiantFans' },
+            { name: 'fated_cell', intervalBase: 21000, intervalVariance: 5000, handler: '_mechFatedCell' },
         ],
     },
 });
 
 
-export function _egMechJudgmentPillars(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechJudgmentPillars(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const strikes = [0, 7, 9, 11][p];
     const width = 46;
     const warnMs = 800, activeMs = 500, staggerMs = 260;
     const dmgPct = [0, 0.12, 0.14, 0.17][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const W = window.innerWidth;
     const pillars = [];
     for (let i = 0; i < strikes; i++) {
         const x = 50 + Math.random() * Math.max(50, W - 100);
-        const warnEl = _egNkEl(run, 'div', 'eg-nk-pillar-warn eg-nk-pillar-holy');
+        const warnEl = _nkEl(run, 'div', 'eg-nk-pillar-warn eg-nk-pillar-holy');
         warnEl.style.display = 'none';
-        const pilEl = _egNkEl(run, 'div', 'eg-nk-pillar eg-nk-pillar-holy');
+        const pilEl = _nkEl(run, 'div', 'eg-nk-pillar eg-nk-pillar-holy');
         pilEl.style.display = 'none';
         pillars.push({ x, t: -i * staggerMs, stage: 'warn', hitDone: false, warnEl, pilEl });
     }
-    _egNkToast('eg_mech_seraph', '😇 The Seraph: Judgment Pillars! No pattern - only the flicker!');
-    _egNkLoop(run, (dtS) => {
+    _nkToast('eg_mech_seraph', '😇 The Seraph: Judgment Pillars! No pattern - only the flicker!');
+    _nkLoop(run, (dtS) => {
         let allDone = true;
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         pillars.forEach(pl => {
             if (pl.stage === 'done') return;
             allDone = false;
@@ -80,8 +80,8 @@ export function _egMechJudgmentPillars(monster, phase) {
                 if (!pl.hitDone && pr
                     && pr.right > pl.x - width / 2 && pr.left < pl.x + width / 2) {
                     pl.hitDone = true;
-                    const dealt = _egNkHit(dmgPct, 'lightning', level);
-                    _egNkAbilityHitToast(dealt, 'The Seraph', 'Judgment Pillars');
+                    const dealt = _nkHit(dmgPct, 'lightning', level);
+                    _nkAbilityHitToast(dealt, 'The Seraph', 'Judgment Pillars');
                 }
                 if (pl.t >= warnMs + activeMs) {
                     pl.stage = 'done';
@@ -93,8 +93,8 @@ export function _egMechJudgmentPillars(monster, phase) {
     });
 }
 
-export function _egMechRadiantFans(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechRadiantFans(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const volleys = [0, 3, 4, 5][p];
     const fanN = 7, fanSpread = 0.5;
@@ -102,28 +102,28 @@ export function _egMechRadiantFans(monster, phase) {
     const speed = [0, 150, 170, 195][p];
     const lifeMs = 7000;
     const dmgPct = [0, 0.05, 0.06, 0.075][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const ex = window.innerWidth * 0.5, ey = 80;
     const orbs = [];
     let fired = 0, acc = 0, orbCdUntil = 0;
-    _egNkToast('eg_mech_radiant', '😇 The Seraph: Radiant Fans! Seven petals, no gaps kept!');
-    _egNkLoop(run, (dtS, now) => {
+    _nkToast('eg_mech_radiant', '😇 The Seraph: Radiant Fans! Seven petals, no gaps kept!');
+    _nkLoop(run, (dtS, now) => {
         if (fired < volleys) {
             acc += dtS * 1000;
             if (acc >= (fired === 0 ? 400 : volleyGapMs)) {
                 acc = 0;
                 fired++;
-                const c = _egNkPlayerCenter();
+                const c = _nkPlayerCenter();
                 const base = Math.atan2((c ? c.y : 300) - ey, (c ? c.x : ex) - ex);
                 for (let i = 0; i < fanN; i++) {
                     const a = base + (i - (fanN - 1) / 2) * (fanSpread * 2 / (fanN - 1));
-                    const el = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-orb-spirit');
+                    const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-orb-spirit');
                     orbs.push({ x: ex, y: ey, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, t: 0, hitDone: false, el });
                 }
             }
         }
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         for (let i = orbs.length - 1; i >= 0; i--) {
             const o = orbs[i];
             o.t += dtS * 1000;
@@ -135,11 +135,11 @@ export function _egMechRadiantFans(monster, phase) {
                 continue;
             }
             o.el.style.transform = 'translate(' + Math.round(o.x - 9) + 'px,' + Math.round(o.y - 9) + 'px)';
-            if (!o.hitDone && pr && now >= orbCdUntil && _egNkDotHit(o.el, pr, 2)) {
+            if (!o.hitDone && pr && now >= orbCdUntil && _nkDotHit(o.el, pr, 2)) {
                 o.hitDone = true;
                 orbCdUntil = now + 450;
-                const dealt = _egNkHit(dmgPct, 'lightning', level);
-                _egNkAbilityHitToast(dealt, 'The Seraph', 'Radiant Fans');
+                const dealt = _nkHit(dmgPct, 'lightning', level);
+                _nkAbilityHitToast(dealt, 'The Seraph', 'Radiant Fans');
             }
         }
         return fired < volleys || orbs.length > 0;

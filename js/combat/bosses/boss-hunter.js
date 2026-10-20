@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkDotHit, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE HUNTER (boss_hunter)-----------------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_hunter: {
         id: 'boss_hunter', name: 'The Hunter', emoji: '🏹',
         baseHP: 1060, baseDamage: 24, chargeMax: 12,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_hunter: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -29,8 +29,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'dormant_seekers', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechDormantSeekers' },
-            { name: 'fog_bank', intervalBase: 22000, intervalVariance: 5000, handler: '_egMechFogBank' },
+            { name: 'dormant_seekers', intervalBase: 21000, intervalVariance: 5000, handler: '_mechDormantSeekers' },
+            { name: 'fog_bank', intervalBase: 22000, intervalVariance: 5000, handler: '_mechFogBank' },
         ],
     },
 });
@@ -38,18 +38,18 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // Sleeping seekers wake when approached, chase briefly, then burn out.
 // Keep your distance and each one spends itself on empty ground.
-export function _egMechDormantSeekers(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechDormantSeekers(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const wakeRange = 260;
     const igniteMs = 500, chaseMs = [0, 2800, 3200, 3600][p];
     const chaseSpeed = [0, 190, 220, 255][p];
     const dmgPct = [0, 0.15, 0.18, 0.22][p];
     const durMs = 12000;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const seekers = [0.25, 0.5, 0.75].map(fx => {
-        const el = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-seeker', '🏹');
+        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-seeker', '🏹');
         const s = {
             x: window.innerWidth * fx,
             y: window.innerHeight * (0.3 + Math.random() * 0.4),
@@ -58,12 +58,12 @@ export function _egMechDormantSeekers(monster, phase) {
         el.style.transform = 'translate(' + Math.round(s.x - 22) + 'px,' + Math.round(s.y - 22) + 'px)';
         return s;
     });
-    _egNkToast('eg_mech_hunter', '🏹 The Hunter: Dormant Seekers! Feed them distance!');
+    _nkToast('eg_mech_hunter', '🏹 The Hunter: Dormant Seekers! Feed them distance!');
     let e = 0, cdUntil = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         e += dtS * 1000;
-        const c = _egNkPlayerCenter();
-        const pr = _egNkPlayerRect();
+        const c = _nkPlayerCenter();
+        const pr = _nkPlayerRect();
         seekers.forEach(s => {
             const d = c ? Math.hypot(c.x - s.x, c.y - s.y) : 9999;
             if (s.stage === 'sleep') {
@@ -90,10 +90,10 @@ export function _egMechDormantSeekers(monster, phase) {
                     s.y += (dy / dd) * chaseSpeed * dtS;
                 }
                 s.el.style.transform = 'translate(' + Math.round(s.x - 22) + 'px,' + Math.round(s.y - 22) + 'px)';
-                if (pr && now >= cdUntil && _egNkDotHit(s.el, pr, 0)) {
+                if (pr && now >= cdUntil && _nkDotHit(s.el, pr, 0)) {
                     cdUntil = now + 800;
-                    const dealt = _egNkHit(dmgPct, 'shadow', level);
-                    _egNkAbilityHitToast(dealt, 'The Hunter', 'Dormant Seekers');
+                    const dealt = _nkHit(dmgPct, 'shadow', level);
+                    _nkAbilityHitToast(dealt, 'The Hunter', 'Dormant Seekers');
                 }
                 if (s.t >= chaseMs) {
                     s.stage = 'spent';

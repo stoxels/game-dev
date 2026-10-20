@@ -1,15 +1,15 @@
-import { EG_BOSS_DEFS } from './boss-framework.js';
+import { BOSS_DEFS } from './boss-framework.js';
 import { Audio_Manager } from '../../audio/audio.js';
 import { renderCell, updClues } from '../../grid.js';
 import { t } from '../../translation/translations.js';
-import { _egUpdateObjectivesHUD } from '../encounter-chain.js';
-import { _egPlayerTakeDamage, _egSpawnMonster } from '../encounter.js';
-import { _egApplyPlayerHitFeedback } from '../encounter-monster-attack-feedback.js';
-import { _egAnimateMonsterProjectile } from '../encounter-monster-attacks.js';
-import { _egHzPlayerHitbox, _egHzPlayerRect, _egHzPlayerSpriteRect } from '../combat-hazards.js';
+import { _updateObjectivesHUD } from '../encounter-chain.js';
+import { _playerTakeDamage, _spawnMonster } from '../encounter.js';
+import { _applyPlayerHitFeedback } from '../encounter-monster-attack-feedback.js';
+import { _animateMonsterProjectile } from '../encounter-monster-attacks.js';
+import { _hzPlayerHitbox, _hzPlayerRect, _hzPlayerSpriteRect } from '../combat-hazards.js';
 import { EG_MAP_TIER_MONSTER_LEVELS, EG_MAX_MAP_TIER, _egRollMapTier } from '../../loot/loot-map-config.js';
-import { EG_MAX_CONCURRENT_MONSTERS } from '../combat-monsters.js';
-import { _egActiveBlasts, _egBossCorrupted, _egBossFrozen, _egCellInBounds, _egIsActive, _egRecentFills } from '../combat-state.js';
+import { MAX_CONCURRENT_MONSTERS } from '../combat-monsters.js';
+import { _activeBlasts, _bossCorrupted, _bossFrozen, _cellInBounds, _isActive, _recentFills } from '../combat-state.js';
 import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
@@ -18,10 +18,10 @@ import { cur } from '../../state.js';
 // Mechanics used by TWO OR MORE bosses live here so they are defined once;
 // per-boss-only abilities live in the boss's own file. Boss files reference
 // these by handler-name string, e.g. { name: 'corrupt_cells',
-// handler: '_egMechCorruptCells', ... }. Family layout:
+// handler: '_mechCorruptCells', ... }. Family layout:
 //   shared (here) - corrupt_cells, probability_shift, prior_bomb (+ summon
 //     helpers), clue_swap, frozen_cells, grid_invert + the shared engines
-//     (screen-blast, _egNk dodge kit).
+//     (screen-blast, _nk dodge kit).
 //   shared-puzzle-mechanics.js - fated_cell, fog_bank, clue_scramble, soul_tithe.
 //
 // PHASE VARIANTS - every shared ability evolves per boss phase (P1/P2/P3)
@@ -51,33 +51,33 @@ import { cur } from '../../state.js';
 //------------------------------------------------------------------------
 
 // ── Corrupt cell expiry time ───────────────────────────────────────────────
-export const EG_CORRUPT_CELL_LIFETIME_MS = 15000; // ms before corruption auto-expires (P1/P2 only)
+export const CORRUPT_CELL_LIFETIME_MS = 15000; // ms before corruption auto-expires (P1/P2 only)
 // Brutus's arena keeps corruption on the grid LONGER (30s) so his corrupted
 // cells linger as an ongoing hazard - they also chain his ground slams, so a
 // fuller field means more slams in a row. P3 (never expires) is unchanged.
-export const EG_BRUTUS_CORRUPT_LIFETIME_MS = 30000;
+export const BRUTUS_CORRUPT_LIFETIME_MS = 30000;
 // The Snail keeps corruption on the grid for a full minute: banishing the
 // doom snail requires crashing it into a corrupted cell, and a 15 s cell
 // evaporates long before the slow snail can ever reach it.
-export const EG_SNAIL_CORRUPT_LIFETIME_MS = 60000;
+export const SNAIL_CORRUPT_LIFETIME_MS = 60000;
 
-export const EG_CORRUPT_SPREAD_INTERVAL_P2 = [6500, 3500]; // ms between spread attempts
-export const EG_CORRUPT_SPREAD_INTERVAL_P3 = [5500, 2800];
-export const EG_CORRUPT_SPREAD_CAP_P2 = [4, 8];           // max simultaneous corruptions
-export const EG_CORRUPT_SPREAD_CAP_P3 = [5, 11];
+export const CORRUPT_SPREAD_INTERVAL_P2 = [6500, 3500]; // ms between spread attempts
+export const CORRUPT_SPREAD_INTERVAL_P3 = [5500, 2800];
+export const CORRUPT_SPREAD_CAP_P2 = [4, 8];           // max simultaneous corruptions
+export const CORRUPT_SPREAD_CAP_P3 = [5, 11];
 
 // Warning time between the ghost telegraph appearing on a target cell and the
 // corruption actually landing there - spreads are always telegraphed so the
 // relentless phase stays readable.
-export const EG_CORRUPT_TELEGRAPH_MS = 1000;
+export const CORRUPT_TELEGRAPH_MS = 1000;
 
 // Initial cast count per phase - also TIER-SCALED. Each pair is the endpoint
 // at tier 1 (gentle) vs tier 16 (brutal); the old flat behaviour sat around
 // tier ~8 (P1 2 · P2 3 · P3 4). Casts are clamped to the phase's spread cap
 // so a high-tier opener can never exceed the simultaneous ceiling.
-export const EG_CORRUPT_CAST_P1 = [1, 3]; // P1 - static, no spread
-export const EG_CORRUPT_CAST_P2 = [2, 4]; // P2 - spreading
-export const EG_CORRUPT_CAST_P3 = [3, 5]; // P3 - relentless
+export const CORRUPT_CAST_P1 = [1, 3]; // P1 - static, no spread
+export const CORRUPT_CAST_P2 = [2, 4]; // P2 - spreading
+export const CORRUPT_CAST_P3 = [3, 5]; // P3 - relentless
 
 
 // ── Tier-scaling endpoint pairs ───────────────────────────────────────────────
@@ -88,31 +88,31 @@ export const EG_CORRUPT_CAST_P3 = [3, 5]; // P3 - relentless
 // Prior Bomb - target counts per phase:
 //   P1–P3 all arm visible bombs; P3 adds a delayed cascade bomb after the
 //   first wave.
-export const EG_PRIOR_BOMB_COUNT_P1 = [1, 2];
-export const EG_PRIOR_BOMB_COUNT_P2 = [1, 3];
-export const EG_PRIOR_BOMB_COUNT_P3 = [2, 4];
+export const PRIOR_BOMB_COUNT_P1 = [1, 2];
+export const PRIOR_BOMB_COUNT_P2 = [1, 3];
+export const PRIOR_BOMB_COUNT_P3 = [2, 4];
 // Countdown between the 💣 arming and its detonation - this whole window is
 // the counterplay: run your sprite onto a bomb to pause its fuse and start
-// defusing (stand still for EG_PRIOR_BOMB_DEFUSE_MS to disarm it). Gentle
+// defusing (stand still for PRIOR_BOMB_DEFUSE_MS to disarm it). Gentle
 // 15s → brutal 10s (was ~1.2s with no counterplay).
-export const EG_PRIOR_BOMB_FUSE_RANGE = [15000, 10000]; // ms, [tier1, tier16]
-export const EG_PRIOR_BOMB_DEFUSE_MS = 3000;       // standing time on a bomb to defuse it
-export const EG_PRIOR_BOMB_STAND_PAD_PX = 10;      // overlap forgiveness around the bomb cell
-export const EG_PRIOR_BOMB_TICK_MS = 100;          // fuse + defuse driver resolution
-export const EG_PRIOR_BOMB_CASCADE_DELAY_MS = 3500; // P3: second-wave bomb arms this long after the first
+export const PRIOR_BOMB_FUSE_RANGE = [15000, 10000]; // ms, [tier1, tier16]
+export const PRIOR_BOMB_DEFUSE_MS = 3000;       // standing time on a bomb to defuse it
+export const PRIOR_BOMB_STAND_PAD_PX = 10;      // overlap forgiveness around the bomb cell
+export const PRIOR_BOMB_TICK_MS = 100;          // fuse + defuse driver resolution
+export const PRIOR_BOMB_CASCADE_DELAY_MS = 3500; // P3: second-wave bomb arms this long after the first
 
 // Probability Shift - mark target counts per phase:
 //   P1 erased · P2 relocated · P3 relocated + erased
-export const EG_SHIFT_ERASE_P1 = [1, 3];
-export const EG_SHIFT_RELOCATE_P2 = [2, 4];
-export const EG_SHIFT_RELOCATE_P3 = [3, 5];
-export const EG_SHIFT_ERASE_P3 = [1, 2];
+export const SHIFT_ERASE_P1 = [1, 3];
+export const SHIFT_RELOCATE_P2 = [2, 4];
+export const SHIFT_RELOCATE_P3 = [3, 5];
+export const SHIFT_ERASE_P3 = [1, 2];
 
 
 // Linear interpolation helper for the [tier1, tier16] endpoint ranges above.
 // Shared by every tier-scaled mechanic (Corrupt Cells, Prior Bomb,
 // Probability Shift).
-export function _egBossTierLerp(range, norm) {
+export function _bossTierLerp(range, norm) {
     return range[0] + (range[1] - range[0]) * Math.max(0, Math.min(1, norm));
 }
 
@@ -120,7 +120,7 @@ export function _egBossTierLerp(range, norm) {
 // Duration multiplier for tier-scaled TIMING, anchored at tier 8 (factor 1.0,
 // pre-scaling duration unchanged there). range = [tier1, tier16 factor];
 // callers pick the direction so tier 1 is easy and tier 16 is brutal.
-export function _egBossTierFactor(norm, range) {
+export function _bossTierFactor(norm, range) {
     if (norm == null || !isFinite(norm)) return 1;
     const anchor = 7 / 15; // tier 8 - where the pre-scaling timing was tuned
     norm = Math.max(0, Math.min(1, Number(norm) || 0));
@@ -133,7 +133,7 @@ export function _egBossTierFactor(norm, range) {
 // Reuses _egRollMapTier (endgame-maps.js) when available; falls back to the
 // shared tier-level ladder otherwise. Unknown levels default to mid-tier so
 // the mechanic never swings to an extreme by accident.
-export function _egBossTierNorm(monster) {
+export function _bossTierNorm(monster) {
     const lvl = (monster && monster.level) ? Math.max(1, Math.round(monster.level)) : 0;
     let tier = 0;
     if (lvl > 0 && typeof _egRollMapTier === 'function') {
@@ -153,16 +153,16 @@ export function _egBossTierNorm(monster) {
 
 
 // Spread interval (ms) for one corruption's next attempt, given its cfg.
-export function _egCorruptSpreadIntervalMs(cfg) {
-    const range = cfg.p >= 3 ? EG_CORRUPT_SPREAD_INTERVAL_P3 : EG_CORRUPT_SPREAD_INTERVAL_P2;
-    return Math.max(1500, Math.round(_egBossTierLerp(range, cfg.norm)));
+export function _corruptSpreadIntervalMs(cfg) {
+    const range = cfg.p >= 3 ? CORRUPT_SPREAD_INTERVAL_P3 : CORRUPT_SPREAD_INTERVAL_P2;
+    return Math.max(1500, Math.round(_bossTierLerp(range, cfg.norm)));
 }
 
 
 // Spread cap for a corruption field, given its cfg.
-export function _egCorruptSpreadCap(cfg) {
-    const range = cfg.p >= 3 ? EG_CORRUPT_SPREAD_CAP_P3 : EG_CORRUPT_SPREAD_CAP_P2;
-    return Math.max(1, Math.round(_egBossTierLerp(range, cfg.norm)));
+export function _corruptSpreadCap(cfg) {
+    const range = cfg.p >= 3 ? CORRUPT_SPREAD_CAP_P3 : CORRUPT_SPREAD_CAP_P2;
+    return Math.max(1, Math.round(_bossTierLerp(range, cfg.norm)));
 }
 
 
@@ -170,15 +170,15 @@ export function _egCorruptSpreadCap(cfg) {
 //   p    - boss phase (1-3): drives expiry + base behaviour
 //   norm - tier difficulty weight (0 tier 1 ... 1 tier 16): caps + rates
 // Newly spread cells inherit the same cfg, so one field follows one rule set.
-export function _egCorruptConfig(monster, phase) {
+export function _corruptConfig(monster, phase) {
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const isBrutus = !!(monster && (monster.id === 'boss_brutus' || monster.baseId === 'boss_brutus'));
     const isSnail = !!(monster && (monster.id === 'boss_snail' || monster.baseId === 'boss_snail'));
     return {
         p,
-        norm: _egBossTierNorm(monster),
-        lifetimeMs: isBrutus ? EG_BRUTUS_CORRUPT_LIFETIME_MS
-            : (isSnail ? EG_SNAIL_CORRUPT_LIFETIME_MS : EG_CORRUPT_CELL_LIFETIME_MS),
+        norm: _bossTierNorm(monster),
+        lifetimeMs: isBrutus ? BRUTUS_CORRUPT_LIFETIME_MS
+            : (isSnail ? SNAIL_CORRUPT_LIFETIME_MS : CORRUPT_CELL_LIFETIME_MS),
     };
 }
 
@@ -186,7 +186,7 @@ export function _egCorruptConfig(monster, phase) {
 // Returns all grid cells that are valid targets for the Corrupt Cells mechanic.
 // Targets BOTH correct cells (sol=1, blockable until filled) and incorrect
 // cells (sol=0, blockable until ✕-marked) that the player hasn't finished yet.
-export function _egBuildCorruptibleCellPool() {
+export function _buildCorruptibleCellPool() {
     if (!cur || !cur.grid) return [];
     const sol = cur.grid;
     const rows = sol.length;
@@ -195,7 +195,7 @@ export function _egBuildCorruptibleCellPool() {
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            if (_egBossCorrupted.has(`${r}-${c}`)) continue; // already corrupted
+            if (_bossCorrupted.has(`${r}-${c}`)) continue; // already corrupted
             if (sol[r][c] === 1) {
                 // correct cell - blockable while still unfilled/unrevealed
                 if (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c]) continue; // already filled
@@ -216,7 +216,7 @@ export function _egBuildCorruptibleCellPool() {
 // corrupted (correct or incorrect, unsolved, not already corrupted, and not
 // already marked as a pending spread target). Returns null when no neighbour
 // qualifies.
-export function _egCorruptPickNeighbor(r, c) {
+export function _corruptPickNeighbor(r, c) {
     if (!cur || !cur.grid) return null;
     const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
@@ -232,7 +232,7 @@ export function _egCorruptPickNeighbor(r, c) {
         } else {
             continue; // grid only holds 0/1
         }
-        if (_egBossCorrupted.has(`${nr}-${nc}`)) continue;
+        if (_bossCorrupted.has(`${nr}-${nc}`)) continue;
         if (document.getElementById(`eg-corrupt-tel-${nr}-${nc}`)) continue; // already telegraphed
         cands.push([nr, nc]);
     }
@@ -244,7 +244,7 @@ export function _egCorruptPickNeighbor(r, c) {
 // Shows the ghosted ☣️ on the chosen target and schedules the corruption to
 // land there after the telegraph window. Stored on the source cell's entry so
 // dispelling or expiring the source cancels the pending spread with it.
-export function _egCorruptTelegraphSpread(key, data, tr, tc) {
+export function _corruptTelegraphSpread(key, data, tr, tc) {
     const el = document.getElementById(`g-${tr}-${tc}`);
     if (!el) return;
 
@@ -256,7 +256,7 @@ export function _egCorruptTelegraphSpread(key, data, tr, tc) {
 
     data.pending = {
         tr, tc,
-        landTimer: setTimeout(() => _egCorruptSpreadLand(key), EG_CORRUPT_TELEGRAPH_MS),
+        landTimer: setTimeout(() => _corruptSpreadLand(key), CORRUPT_TELEGRAPH_MS),
     };
 }
 
@@ -265,15 +265,15 @@ export function _egCorruptTelegraphSpread(key, data, tr, tc) {
 // mid-telegraph refill, arena transition or cap change can never corrupt the
 // wrong cell. If the spread fizzles, the source's next attempt picks a fresh
 // target.
-export function _egCorruptSpreadLand(key) {
-    const data = _egBossCorrupted.get(key);
+export function _corruptSpreadLand(key) {
+    const data = _bossCorrupted.get(key);
     if (!data || !data.pending) return;
     const { tr, tc } = data.pending;
     data.pending = null;
     const tel = document.getElementById(`eg-corrupt-tel-${tr}-${tc}`);
     if (tel) tel.remove();
 
-    if (!_egBossCorrupted.has(key)) return;          // source dispelled mid-telegraph
+    if (!_bossCorrupted.has(key)) return;          // source dispelled mid-telegraph
     if (!cur || !cur.grid) return;
     if (tr >= cur.grid.length || tc >= cur.grid[0].length) return; // grid swapped
     const sol = cur.grid;
@@ -284,39 +284,39 @@ export function _egCorruptSpreadLand(key) {
     } else {
         return;                                                        // grid swapped to a new shape
     }
-    if (_egBossCorrupted.size >= _egCorruptSpreadCap(data.cfg)) return; // cap during window
+    if (_bossCorrupted.size >= _corruptSpreadCap(data.cfg)) return; // cap during window
 
-    _egApplyCellCorruption(tr, tc, data.cfg);
+    _applyCellCorruption(tr, tc, data.cfg);
 }
 
 
 // Spread tick for one corrupted cell: tries to infect a neighbour and
 // reschedules itself while the cell stays corrupted. When the global cap is
 // reached it just waits - dispelling cells re-opens the floodgates.
-export function _egCorruptSpreadTick(key) {
-    const data = _egBossCorrupted.get(key);
+export function _corruptSpreadTick(key) {
+    const data = _bossCorrupted.get(key);
     if (!data) return;
 
-    if (_egBossCorrupted.size < _egCorruptSpreadCap(data.cfg)) {
+    if (_bossCorrupted.size < _corruptSpreadCap(data.cfg)) {
         const [r, c] = key.split('-').map(Number);
-        const neighbor = _egCorruptPickNeighbor(r, c);
-        if (neighbor) _egCorruptTelegraphSpread(key, data, neighbor[0], neighbor[1]);
+        const neighbor = _corruptPickNeighbor(r, c);
+        if (neighbor) _corruptTelegraphSpread(key, data, neighbor[0], neighbor[1]);
     }
 
-    if (_egBossCorrupted.has(key)) {
-        data.spreadTimer = setTimeout(() => _egCorruptSpreadTick(key), _egCorruptSpreadIntervalMs(data.cfg));
+    if (_bossCorrupted.has(key)) {
+        data.spreadTimer = setTimeout(() => _corruptSpreadTick(key), _corruptSpreadIntervalMs(data.cfg));
     }
 }
 
 
 // Places the ☣️ corruption overlay on a cell and registers its expiry timer.
-// cfg drives the variants (see _egCorruptConfig): p = phase (P1 static+expire,
+// cfg drives the variants (see _corruptConfig): p = phase (P1 static+expire,
 // P2 expire+spread, P3 never expires), norm = tier weight. Spread children
 // inherit the cfg, so a whole field follows one rule set.
-export function _egApplyCellCorruption(r, c, cfg) {
+export function _applyCellCorruption(r, c, cfg) {
     const key = `${r}-${c}`;
     const el = document.getElementById(`g-${r}-${c}`);
-    if (!el || _egBossCorrupted.has(key)) return;
+    if (!el || _bossCorrupted.has(key)) return;
 
     const p = cfg.p;
     const overlay = document.createElement('span');
@@ -328,22 +328,22 @@ export function _egApplyCellCorruption(r, c, cfg) {
     const data = { timer: null, spreadTimer: null, pending: null, cfg };
     // P3 corruption is permanent until dispelled - "relentless"
     if (p < 3) {
-        data.timer = setTimeout(() => _egRemoveCellCorruption(key),
-            cfg.lifetimeMs || EG_CORRUPT_CELL_LIFETIME_MS);
+        data.timer = setTimeout(() => _removeCellCorruption(key),
+            cfg.lifetimeMs || CORRUPT_CELL_LIFETIME_MS);
     }
     // P2+ corruptions spread to neighbours on a tier-scaled timer
     if (p >= 2) {
-        data.spreadTimer = setTimeout(() => _egCorruptSpreadTick(key), _egCorruptSpreadIntervalMs(cfg));
+        data.spreadTimer = setTimeout(() => _corruptSpreadTick(key), _corruptSpreadIntervalMs(cfg));
     }
-    _egBossCorrupted.set(key, data);
+    _bossCorrupted.set(key, data);
 }
 
 
 // Removes the corruption overlay from the DOM and clears its state entry -
 // including any pending telegraphed spread (its ghost overlay is removed so
 // no orphan telegraph can outlive its source).
-export function _egRemoveCellCorruption(key) {
-    const data = _egBossCorrupted.get(key);
+export function _removeCellCorruption(key) {
+    const data = _bossCorrupted.get(key);
     if (data) {
         clearTimeout(data.timer);
         clearTimeout(data.spreadTimer);
@@ -357,33 +357,33 @@ export function _egRemoveCellCorruption(key) {
     const [r, c] = key.split('-').map(Number);
     const span = document.getElementById(`eg-corrupt-${r}-${c}`);
     if (span) span.remove();
-    _egBossCorrupted.delete(key);
+    _bossCorrupted.delete(key);
 }
 
 
 // Removes all currently active corrupted cells.
 // Called on boss death or encounter stop to avoid leaving orphaned overlays.
-export function _egClearAllCorruptedCells() {
-    Array.from(_egBossCorrupted.keys()).forEach(key => _egRemoveCellCorruption(key));
+export function _clearAllCorruptedCells() {
+    Array.from(_bossCorrupted.keys()).forEach(key => _removeCellCorruption(key));
 }
 
 
 // Returns true if the cell at (row, col) currently has an active corruption overlay.
 // Called from mouse-button-handlers.js before allowing a cell fill.
-export function _egIsCellCorrupted(row, col) {
-    return _egBossCorrupted.has(`${row}-${col}`);
+export function _isCellCorrupted(row, col) {
+    return _bossCorrupted.has(`${row}-${col}`);
 }
 
 
 // Dispels the corruption on a cell when the player clicks it.
 // Returns true if the cell was corrupted (caller should block the normal fill action
 // and require a second click to actually fill).
-export function _egDispelCorruption(row, col) {
+export function _dispelCorruption(row, col) {
     const key = `${row}-${col}`;
-    if (!_egBossCorrupted.has(key)) return false;
+    if (!_bossCorrupted.has(key)) return false;
 
-    clearTimeout(_egBossCorrupted.get(key).timer);
-    _egRemoveCellCorruption(key);
+    clearTimeout(_bossCorrupted.get(key).timer);
+    _removeCellCorruption(key);
     globalThis.showCombatToast(t('eg_corruption_dispelled'));
     return true;
 }
@@ -393,27 +393,27 @@ export function _egDispelCorruption(row, col) {
 // counts, caps + spread rates; P1 static cells (auto-expire, dispel to fill,
 // 1-3 by tier), P2 cells that SPREAD to neighbours, P3 cells that never expire
 // and spread faster (tier 1 manageable, tier 16 drowns the grid).
-export function _egMechCorruptCells(monster, phase) {
-    const pool = _egBuildCorruptibleCellPool();
+export function _mechCorruptCells(monster, phase) {
+    const pool = _buildCorruptibleCellPool();
     if (pool.length === 0) return;
 
-    const cfg = _egCorruptConfig(monster, phase);
-    const castRange = cfg.p >= 3 ? EG_CORRUPT_CAST_P3
-        : (cfg.p >= 2 ? EG_CORRUPT_CAST_P2 : EG_CORRUPT_CAST_P1);
-    let count = Math.max(1, Math.round(_egBossTierLerp(castRange, cfg.norm)));
+    const cfg = _corruptConfig(monster, phase);
+    const castRange = cfg.p >= 3 ? CORRUPT_CAST_P3
+        : (cfg.p >= 2 ? CORRUPT_CAST_P2 : CORRUPT_CAST_P1);
+    let count = Math.max(1, Math.round(_bossTierLerp(castRange, cfg.norm)));
     // Never open above the phase's simultaneous corruption ceiling.
-    if (cfg.p >= 2) count = Math.min(count, _egCorruptSpreadCap(cfg));
+    if (cfg.p >= 2) count = Math.min(count, _corruptSpreadCap(cfg));
     const targets = pool.sort(() => Math.random() - 0.5).slice(0, Math.min(count, pool.length));
 
     const toastKey = cfg.p >= 3 ? 'eg_mech_corrupt_rage'
         : (cfg.p >= 2 ? 'eg_mech_corrupt_spread' : 'eg_mech_corrupt_cells');
     globalThis.showCombatToast(t(toastKey).replace('{n}', targets.length));
-    targets.forEach(([r, c]) => _egApplyCellCorruption(r, c, cfg));
+    targets.forEach(([r, c]) => _applyCellCorruption(r, c, cfg));
 }
 
 
 // Returns all cells the player has correctly marked as ✕ (userGrid=2, sol=0).
-export function _egBuildProbabilityShiftPool() {
+export function _buildProbabilityShiftPool() {
     if (!cur || !cur.grid) return [];
     const sol = cur.grid;
     const rows = sol.length;
@@ -429,7 +429,7 @@ export function _egBuildProbabilityShiftPool() {
 
 // Returns empty (sol=0) cells that a shifted mark can land on: unmarked,
 // not already wrong-marked, and never the source cells being relocated.
-export function _egBuildMarkDestinations(excludeKeys) {
+export function _buildMarkDestinations(excludeKeys) {
     if (!cur || !cur.grid) return [];
     const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
@@ -448,25 +448,25 @@ export function _egBuildMarkDestinations(excludeKeys) {
 
 
 // Flight time for the relocated ✕ to travel from its old cell to the new one.
-export const EG_SHIFT_FLY_MS = 1500;
+export const SHIFT_FLY_MS = 1500;
 
 // Active shift flyers (fixed-position ✕ nodes) so boss death / encounter
-// stop can remove mid-flight orphans. See _egClearShiftGlows.
-export let _egShiftFlyNodes = [];
+// stop can remove mid-flight orphans. See _clearShiftGlows.
+export let _shiftFlyNodes = [];
 
 
 // Ease in-out cubic for the shift flight - slow lift-off, fast cruise,
 // soft landing so the eye can track the ✕ across the grid.
-export function _egShiftFlyEase(t) {
+export function _shiftFlyEase(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
 
-// Spawns one flying ✕ from cell (sr,sc) to (dr,dc) over EG_SHIFT_FLY_MS; the
+// Spawns one flying ✕ from cell (sr,sc) to (dr,dc) over SHIFT_FLY_MS; the
 // destination rect is re-read per frame so scroll/zoom mid-flight still lands
 // right. onLanded fires exactly once (also when a cell is missing - state
 // commits without the visual).
-export function _egShiftSpawnFlyer(sr, sc, dr, dc, onLanded) {
+export function _shiftSpawnFlyer(sr, sc, dr, dc, onLanded) {
     let done = false;
     const finish = () => {
         if (done) return;
@@ -501,20 +501,20 @@ export function _egShiftSpawnFlyer(sr, sc, dr, dc, onLanded) {
     node.style.left = `${startX - size / 2}px`;
     node.style.top = `${startY - size / 2}px`;
     document.body.appendChild(node);
-    _egShiftFlyNodes.push(node);
+    _shiftFlyNodes.push(node);
 
     const t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     const step = (now) => {
         // Cancelled mid-flight (cleanup removed the node) - still commit
         // the destination state so no mark stays visually missing.
         if (!node.isConnected) {
-            const idx = _egShiftFlyNodes.indexOf(node);
-            if (idx !== -1) _egShiftFlyNodes.splice(idx, 1);
+            const idx = _shiftFlyNodes.indexOf(node);
+            if (idx !== -1) _shiftFlyNodes.splice(idx, 1);
             finish();
             return;
         }
-        const tRaw = Math.max(0, Math.min(1, ((now || t0) - t0) / EG_SHIFT_FLY_MS));
-        const t = _egShiftFlyEase(tRaw);
+        const tRaw = Math.max(0, Math.min(1, ((now || t0) - t0) / SHIFT_FLY_MS));
+        const t = _shiftFlyEase(tRaw);
 
         // Live destination so scrolling / rescaling mid-flight still lands.
         const dstEl = document.getElementById(`g-${dr}-${dc}`);
@@ -541,8 +541,8 @@ export function _egShiftSpawnFlyer(sr, sc, dr, dc, onLanded) {
 
         if (tRaw >= 1) {
             node.remove();
-            const idx = _egShiftFlyNodes.indexOf(node);
-            if (idx !== -1) _egShiftFlyNodes.splice(idx, 1);
+            const idx = _shiftFlyNodes.indexOf(node);
+            if (idx !== -1) _shiftFlyNodes.splice(idx, 1);
             finish();
             return;
         }
@@ -554,12 +554,12 @@ export function _egShiftSpawnFlyer(sr, sc, dr, dc, onLanded) {
 
 // Moves each target mark to a different empty cell. The ✕ stays on the board
 // (the emptiness just "shifts" elsewhere) so no information is destroyed.
-// Visual: old ✕ vanishes, a floating ✕ flies over EG_SHIFT_FLY_MS, the new
+// Visual: old ✕ vanishes, a floating ✕ flies over SHIFT_FLY_MS, the new
 // mark lands with a golden glow. userGrid commits instantly (a mid-flight
 // click can never double-mark the destination) - only the reveal waits.
-export function _egRelocateMarks(targets) {
+export function _relocateMarks(targets) {
     const excludeKeys = new Set(targets.map(([r, c]) => `${r}-${c}`));
-    const dests = _egBuildMarkDestinations(excludeKeys).sort(() => Math.random() - 0.5);
+    const dests = _buildMarkDestinations(excludeKeys).sort(() => Math.random() - 0.5);
 
     targets.forEach(([r, c], i) => {
         const d = dests[i];
@@ -571,7 +571,7 @@ export function _egRelocateMarks(targets) {
         renderCell(r, c);
         globalThis.userGrid[dr][dc] = 2;
 
-        _egShiftSpawnFlyer(r, c, dr, dc, () => {
+        _shiftSpawnFlyer(r, c, dr, dc, () => {
             // The player may have clicked the destination mid-flight -
             // never stomp their newer input, just make the DOM match it.
             renderCell(dr, dc);
@@ -590,16 +590,16 @@ export function _egRelocateMarks(targets) {
 //   P1 - Probability Shift: erases marks (2 at tier 8, 1–3 across tiers).
 //   P2 - Relocation: moves marks to other empty cells (info preserved).
 //   P3 - Quantum Shift: relocates marks AND erases 1–2 outright.
-export function _egMechProbabilityShift(monster, phase) {
-    const pool = _egBuildProbabilityShiftPool();
+export function _mechProbabilityShift(monster, phase) {
+    const pool = _buildProbabilityShiftPool();
     if (pool.length === 0) return;
 
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
-    const norm = _egBossTierNorm(monster);
+    const norm = _bossTierNorm(monster);
     const shuffled = pool.sort(() => Math.random() - 0.5);
 
     if (p === 1) {
-        const n = Math.max(1, Math.round(_egBossTierLerp(EG_SHIFT_ERASE_P1, norm)));
+        const n = Math.max(1, Math.round(_bossTierLerp(SHIFT_ERASE_P1, norm)));
         const targets = shuffled.slice(0, Math.min(n, shuffled.length));
         globalThis.showCombatToast(t('eg_mech_probability_shift').replace('{n}', targets.length));
         targets.forEach(([r, c]) => {
@@ -610,16 +610,16 @@ export function _egMechProbabilityShift(monster, phase) {
     }
 
     if (p === 2) {
-        const n = Math.max(1, Math.round(_egBossTierLerp(EG_SHIFT_RELOCATE_P2, norm)));
+        const n = Math.max(1, Math.round(_bossTierLerp(SHIFT_RELOCATE_P2, norm)));
         const targets = shuffled.slice(0, Math.min(n, shuffled.length));
         globalThis.showCombatToast(t('eg_mech_shift_relocate').replace('{n}', targets.length));
-        _egRelocateMarks(targets);
+        _relocateMarks(targets);
         return;
     }
 
     // P3: erase N, relocate M after them
-    const eraseN = Math.max(1, Math.round(_egBossTierLerp(EG_SHIFT_ERASE_P3, norm)));
-    const relocateN = Math.max(1, Math.round(_egBossTierLerp(EG_SHIFT_RELOCATE_P3, norm)));
+    const eraseN = Math.max(1, Math.round(_bossTierLerp(SHIFT_ERASE_P3, norm)));
+    const relocateN = Math.max(1, Math.round(_bossTierLerp(SHIFT_RELOCATE_P3, norm)));
     const erase = shuffled.slice(0, Math.min(eraseN, shuffled.length));
     const relocate = shuffled.slice(erase.length, erase.length + relocateN);
     globalThis.showCombatToast(t('eg_mech_shift_quantum').replace('{n}', relocate.length));
@@ -627,7 +627,7 @@ export function _egMechProbabilityShift(monster, phase) {
         globalThis.userGrid[r][c] = 0;
         renderCell(r, c);
     });
-    _egRelocateMarks(relocate);
+    _relocateMarks(relocate);
 }
 
 
@@ -635,25 +635,25 @@ export function _egMechProbabilityShift(monster, phase) {
 // rebuilt mid-animation). Also removes in-flight ✕ flyers so no orphan can
 // outlive its grid - their onLanded callbacks still commit state safely via
 // renderCell, but the node check in the flight loop stops the animation.
-export function _egClearShiftGlows() {
+export function _clearShiftGlows() {
     document.querySelectorAll('.eg-shift-moved').forEach(el => el.classList.remove('eg-shift-moved'));
-    if (Array.isArray(_egShiftFlyNodes)) {
-        _egShiftFlyNodes.forEach(n => { try { n.remove(); } catch (e) { /* ignore */ } });
-        _egShiftFlyNodes = [];
+    if (Array.isArray(_shiftFlyNodes)) {
+        _shiftFlyNodes.forEach(n => { try { n.remove(); } catch (e) { /* ignore */ } });
+        _shiftFlyNodes = [];
     }
     document.querySelectorAll('.eg-shift-fly').forEach(el => el.remove());
 }
 
 
 // Removes a specific [row, col] entry from the recent-fills tracker.
-export function _egRemoveFromRecentFills(row, col) {
-    const idx = _egRecentFills.findIndex(([fr, fc]) => fr === row && fc === col);
-    if (idx !== -1) _egRecentFills.splice(idx, 1);
+export function _removeFromRecentFills(row, col) {
+    const idx = _recentFills.findIndex(([fr, fc]) => fr === row && fc === col);
+    if (idx !== -1) _recentFills.splice(idx, 1);
 }
 
 
 // Plays the burst visual on a cell unfilled by Prior Bomb.
-export function _egFlashPriorBombCell(row, col) {
+export function _flashPriorBombCell(row, col) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     el.classList.add('eg-prior-bomb-flash');
@@ -664,8 +664,8 @@ export function _egFlashPriorBombCell(row, col) {
 // One Prior Bomb detonation at the bomb's cell centre: Demolitionist boom +
 // purple tint + whole-screen shake so the payoff is FELT. Purely visual (the
 // unfill stays in the caller); runs on an orphan layer that outlives the nk
-// run and self-removes (same pattern as _egCrashBoom's orphan branch).
-export function _egPriorBombBoom(x, y, radius) {
+// run and self-removes (same pattern as _crashBoom's orphan branch).
+export function _priorBombBoom(x, y, radius) {
     const R = Math.max(12, radius);
 
     let layer = document.createElement('div');
@@ -709,9 +709,9 @@ export function _egPriorBombBoom(x, y, radius) {
 
 
 // Detonation FX + purple tint on the cell itself. Fired from
-// _egPriorBombExplode BEFORE the cell is unfilled so the tint sits on the
+// _priorBombExplode BEFORE the cell is unfilled so the tint sits on the
 // still-filled cell and visibly pops as it is cleared.
-export function _egPriorBombDetonationFX(b) {
+export function _priorBombDetonationFX(b) {
     const cellEl = b.cellEl && b.cellEl.isConnected ? b.cellEl
         : document.getElementById(`g-${b.r}-${b.c}`);
     if (cellEl) {
@@ -719,59 +719,59 @@ export function _egPriorBombDetonationFX(b) {
         setTimeout(() => cellEl.classList.remove('eg-pb-detonated'), 900);
         const r = cellEl.getBoundingClientRect();
         if (r.width && r.height) {
-            _egPriorBombBoom(r.left + r.width / 2, r.top + r.height / 2, Math.max(34, r.width * 1.15));
+            _priorBombBoom(r.left + r.width / 2, r.top + r.height / 2, Math.max(34, r.width * 1.15));
             return;
         }
     }
     // Cell not measurable (mid-rebuild) - still detonate audibly/shakily.
-    _egPriorBombBoom(window.innerWidth / 2, window.innerHeight / 2, 40);
+    _priorBombBoom(window.innerWidth / 2, window.innerHeight / 2, 40);
 }
 
 
 // Unfills a single cell and removes it from the recent-fills tracker.
-export function _egUnfillCell(row, col) {
+export function _unfillCell(row, col) {
     globalThis.userGrid[row][col] = 0;
-    _egRemoveFromRecentFills(row, col);
+    _removeFromRecentFills(row, col);
     renderCell(row, col);
     updClues(row, col);
-    _egFlashPriorBombCell(row, col);
+    _flashPriorBombCell(row, col);
 }
 
 
 // Boss mechanic handler - deliberately SUMMONS reinforcements: the one spawn
 // path left open inside the boss arena (natural respawns are suppressed - see
-// _egShouldSuppressRespawn). 2 minions in P3 (else 1) at the boss's level,
+// _shouldSuppressRespawn). 2 minions in P3 (else 1) at the boss's level,
 // capped by the global monster cap; slain minions pay normal XP/loot.
-export const EG_SUMMON_POOL = ['slime', 'ghost', 'rat', 'bat', 'bee'];
+export const SUMMON_POOL = ['slime', 'ghost', 'rat', 'bat', 'bee'];
 
 
-export function _egMechSummonAdds(monster, phase) {
-    if (typeof _egSpawnMonster !== 'function') return;
+export function _mechSummonAdds(monster, phase) {
+    if (typeof _spawnMonster !== 'function') return;
     const count = phase >= 3 ? 2 : 1;
     const level = Math.max(1, Math.round(monster.level || 1));
     const name = monster.name || monster.baseId || '?';
 
     let summoned = 0;
     for (let i = 0; i < count; i++) {
-        if (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length >= EG_MAX_CONCURRENT_MONSTERS) break;
-        const defId = EG_SUMMON_POOL[Math.floor(Math.random() * EG_SUMMON_POOL.length)];
-        _egSpawnMonster(defId, level);
+        if (typeof _monsters !== 'undefined' && globalThis._monsters.length >= MAX_CONCURRENT_MONSTERS) break;
+        const defId = SUMMON_POOL[Math.floor(Math.random() * SUMMON_POOL.length)];
+        _spawnMonster(defId, level);
         summoned++;
     }
     if (summoned > 0) {
         Audio_Manager.playSFX('boss_summon');
         globalThis.showCombatToast(t('eg_boss_summon').replace('{name}', name).replace('{n}', summoned), '#f87171');
-        if (typeof _egUpdateObjectivesHUD === 'function') _egUpdateObjectivesHUD();
+        if (typeof _updateObjectivesHUD === 'function') _updateObjectivesHUD();
     }
 }
 
 
 // Returns the most-recently-filled correct cells eligible for Prior Bomb.
-export function _egPriorBombPool() {
+export function _priorBombPool() {
     if (!cur || !cur.grid) return [];
     const sol = cur.grid;
-    return [..._egRecentFills].reverse().filter(([r, c]) =>
-        _egCellInBounds(r, c)
+    return [..._recentFills].reverse().filter(([r, c]) =>
+        _cellInBounds(r, c)
         && globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1
     );
 }
@@ -779,32 +779,32 @@ export function _egPriorBombPool() {
 
 // ── Prior Bomb: countdown bombs with a defuse counterplay ────────────────────
 // A LIVE countdown above the 💣; standing on the bomb pauses the fuse - hold
-// for EG_PRIOR_BOMB_DEFUSE_MS to disarm it with no grid effect. State in
-// _egPriorBombs, driven by one shared 100 ms pause-aware interval.
+// for PRIOR_BOMB_DEFUSE_MS to disarm it with no grid effect. State in
+// _priorBombs, driven by one shared 100 ms pause-aware interval.
 
-export let _egPriorBombs = [];           // { r, c, cellEl, fuseEl, remainMs, defuseAcc, monsterId, resolved }
-export let _egPriorBombTimer = null;
-export let _egPriorBombDefusingActive = false;   // player standing on an armed bomb right now
-export let _egPriorBombChargePauseShown = false; // dedupes the charge-bar pause style toggles
+export let _priorBombs = [];           // { r, c, cellEl, fuseEl, remainMs, defuseAcc, monsterId, resolved }
+export let _priorBombTimer = null;
+export let _priorBombDefusingActive = false;   // player standing on an armed bomb right now
+export let _priorBombChargePauseShown = false; // dedupes the charge-bar pause style toggles
 
 
 // True while the player is actively defusing a Prior Bomb (standing on it,
 // fuse paused). Defusing still costs time the player could spend positioning
 // for a charged strike.
-export function _egPriorBombDefusing() {
-    return _egPriorBombDefusingActive;
+export function _priorBombDefusing() {
+    return _priorBombDefusingActive;
 }
 
 
 // Keeps the DEFUSING label in sync with defusing. NOTE: unlike the old
 // auto-attack era, defusing no longer pauses the melee charge bar, so this
 // intentionally touches only the label - the bar's paused styling is owned
-// centrally by _egUpdatePlayerChargeBar.
-export function _egSyncDefuseChargePause(active) {
-    _egPriorBombDefusingActive = !!active;
-    if (!!active === _egPriorBombChargePauseShown) return;
-    _egPriorBombChargePauseShown = !!active;
-    _egSyncDefuseLabel(!!active);
+// centrally by _updatePlayerChargeBar.
+export function _syncDefuseChargePause(active) {
+    _priorBombDefusingActive = !!active;
+    if (!!active === _priorBombChargePauseShown) return;
+    _priorBombChargePauseShown = !!active;
+    _syncDefuseLabel(!!active);
 }
 
 
@@ -812,7 +812,7 @@ export function _egSyncDefuseChargePause(active) {
 // same visual language as the hold-parry PARRYING label (#eg-hold-pause-label),
 // but in defuse green and driven by the bomb tick instead of the parry key.
 // Touches the DOM only on real state changes (caller dedupes transitions).
-export function _egSyncDefuseLabel(show) {
+export function _syncDefuseLabel(show) {
     const hud = document.getElementById('player-avatar-wrapper');
     if (hud) {
         let lbl = document.getElementById('eg-defuse-label');
@@ -837,12 +837,12 @@ export function _egSyncDefuseLabel(show) {
 
 
 // True while the player sprite overlaps the bomb's cell (with forgiveness).
-export function _egPriorBombStanding(b, pr) {
+export function _priorBombStanding(b, pr) {
     if (!pr || !b.cellEl || !b.cellEl.isConnected) return false;
     const r = b.cellEl.getBoundingClientRect();
     if (!r.width || !r.height) return false;
-    const p = EG_PRIOR_BOMB_STAND_PAD_PX;
-    return _egNkRectsOverlap(
+    const p = PRIOR_BOMB_STAND_PAD_PX;
+    return _nkRectsOverlap(
         { left: r.left - p, right: r.right + p, top: r.top - p, bottom: r.bottom + p },
         pr
     );
@@ -850,8 +850,8 @@ export function _egPriorBombStanding(b, pr) {
 
 
 // Arms a single bomb on a cell: countdown label above the 💣 icon, then a
-// shared driver (see _egPriorBombTick) counts it down / defuses it.
-export function _egPriorBombArmCell(r, c, monsterId, fuseMs) {
+// shared driver (see _priorBombTick) counts it down / defuses it.
+export function _priorBombArmCell(r, c, monsterId, fuseMs) {
     const cellEl = document.getElementById(`g-${r}-${c}`);
     if (!cellEl || !cellEl.isConnected) return;
     if (cellEl.querySelector('.eg-prior-bomb-fuse')) return; // never double-arm
@@ -865,7 +865,7 @@ export function _egPriorBombArmCell(r, c, monsterId, fuseMs) {
         '<span class="eg-pb-defuse"><i></i></span>';
     cellEl.appendChild(fuseEl);
 
-    _egPriorBombs.push({
+    _priorBombs.push({
         r, c, cellEl, fuseEl,
         monsterId: monsterId || null,
         remainMs: Math.max(1, fuseMs),
@@ -873,8 +873,8 @@ export function _egPriorBombArmCell(r, c, monsterId, fuseMs) {
         resolved: false,
     });
 
-    if (!_egPriorBombTimer) {
-        _egPriorBombTimer = setInterval(_egPriorBombTick, EG_PRIOR_BOMB_TICK_MS);
+    if (!_priorBombTimer) {
+        _priorBombTimer = setInterval(_priorBombTick, PRIOR_BOMB_TICK_MS);
     }
 }
 
@@ -882,14 +882,14 @@ export function _egPriorBombArmCell(r, c, monsterId, fuseMs) {
 // World 1 convergence trial: The Null has no regular projectiles, instead an
 // undefused bomb makes him shoot the player once, hard. Other bosses and the
 // endgame are untouched.
-const EG_NULL_BOMB_STRIKE_MULT = 3;
-function _egNullBombStrike(b) {
+const NULL_BOMB_STRIKE_MULT = 3;
+function _nullBombStrike(b) {
     if (!b || !b.monsterId) return;
-    const boss = (globalThis._egMonsters || []).find(m => m.id === b.monsterId);
+    const boss = (globalThis._monsters || []).find(m => m.id === b.monsterId);
     if (!boss || !boss.isBoss || typeof boss.id !== 'string' || !boss.id.startsWith('boss_null')) return;
-    const tr = typeof globalThis._egIsConvergenceTrialRun === 'function' ? globalThis._egIsConvergenceTrialRun() : null;
+    const tr = typeof globalThis._isConvergenceTrialRun === 'function' ? globalThis._isConvergenceTrialRun() : null;
     if (!tr || tr.wi !== 0) return;
-    _egAnimateMonsterProjectile(boss, EG_NULL_BOMB_STRIKE_MULT);
+    _animateMonsterProjectile(boss, NULL_BOMB_STRIKE_MULT);
 }
 
 
@@ -897,19 +897,19 @@ function _egNullBombStrike(b) {
 // Re-validated so an arena transition or mid-fuse refill can never corrupt
 // the new grid; a ghosted cell (grid rebuilt, cell still present) still pops
 // visually - the FX read from the DOM cell when possible.
-export function _egPriorBombExplode(b) {
-    _egPriorBombDetonationFX(b);
+export function _priorBombExplode(b) {
+    _priorBombDetonationFX(b);
     if (b.fuseEl) b.fuseEl.remove();
-    _egNullBombStrike(b);
+    _nullBombStrike(b);
     if (!cur || !cur.grid) return;
     if (b.r >= cur.grid.length || b.c >= cur.grid[0].length) return;
     if (globalThis.userGrid[b.r][b.c] !== 1 || globalThis.revealedGrid[b.r][b.c] || cur.grid[b.r][b.c] !== 1) return;
-    _egUnfillCell(b.r, b.c);
+    _unfillCell(b.r, b.c);
 }
 
 
 // Disarmed: green flash on the cell - the fill survives untouched.
-export function _egPriorBombDefuse(b) {
+export function _priorBombDefuse(b) {
     if (b.fuseEl) b.fuseEl.remove();
     const cellEl = document.getElementById(`g-${b.r}-${b.c}`);
     if (cellEl) {
@@ -923,30 +923,30 @@ export function _egPriorBombDefuse(b) {
 //   • player standing on the bomb → fuse paused, defuse accumulates;
 //   • otherwise → fuse ticks down to detonation.
 // Freezes under pause/death; vanishes silently on boss death / teardown.
-export function _egPriorBombTick() {
+export function _priorBombTick() {
     if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;
     if (typeof dead !== 'undefined' && globalThis.dead) return;
-    if (typeof _egIsActive === 'function' && !_egIsActive()) {
-        _egClearPriorBombFuses();
+    if (typeof _isActive === 'function' && !_isActive()) {
+        _clearPriorBombFuses();
         return;
     }
 
-    const pr = typeof _egNkPlayerRect === 'function' ? _egNkPlayerRect() : null;
-    const dt = EG_PRIOR_BOMB_TICK_MS;
+    const pr = typeof _nkPlayerRect === 'function' ? _nkPlayerRect() : null;
+    const dt = PRIOR_BOMB_TICK_MS;
 
-    for (const b of _egPriorBombs) {
+    for (const b of _priorBombs) {
         if (b.resolved) continue;
 
         // Boss died or the grid moved on → the bomb just vanishes (old behaviour).
-        if ((b.monsterId && typeof _egMonsters !== 'undefined'
-                && !globalThis._egMonsters.some(m => m.id === b.monsterId))
+        if ((b.monsterId && typeof _monsters !== 'undefined'
+                && !globalThis._monsters.some(m => m.id === b.monsterId))
             || !b.cellEl || !b.cellEl.isConnected) {
             if (b.fuseEl) b.fuseEl.remove();
             b.resolved = true;
             continue;
         }
 
-        const standing = _egPriorBombStanding(b, pr);
+        const standing = _priorBombStanding(b, pr);
 
         if (standing) {
             // Defusing: the explosion timer is PAUSED - accumulate stand time.
@@ -956,10 +956,10 @@ export function _egPriorBombTick() {
             if (bar) bar.style.display = 'block';
             const fill = bar ? bar.querySelector('i') : null;
             if (fill) {
-                fill.style.width = Math.min(100, (b.defuseAcc / EG_PRIOR_BOMB_DEFUSE_MS) * 100) + '%';
+                fill.style.width = Math.min(100, (b.defuseAcc / PRIOR_BOMB_DEFUSE_MS) * 100) + '%';
             }
-            if (b.defuseAcc >= EG_PRIOR_BOMB_DEFUSE_MS) {
-                _egPriorBombDefuse(b);
+            if (b.defuseAcc >= PRIOR_BOMB_DEFUSE_MS) {
+                _priorBombDefuse(b);
                 b.resolved = true;
                 continue;
             }
@@ -967,7 +967,7 @@ export function _egPriorBombTick() {
             b.fuseEl.classList.remove('eg-pb-defusing');
             b.remainMs -= dt;
             if (b.remainMs <= 0) {
-                _egPriorBombExplode(b);
+                _priorBombExplode(b);
                 b.resolved = true;
                 continue;
             }
@@ -981,35 +981,35 @@ export function _egPriorBombTick() {
         }
     }
 
-    _egPriorBombs = _egPriorBombs.filter(b => !b.resolved);
+    _priorBombs = _priorBombs.filter(b => !b.resolved);
 
     // Defusing = the player is still standing on a bomb that survived this
     // tick. Re-checking AFTER the filter releases the charge pause cleanly
     // when the very last bomb is defused mid-stand (otherwise the interval
     // below would stop with the pause latch stuck on forever).
     let stillDefusing = false;
-    for (const b of _egPriorBombs) {
-        if (_egPriorBombStanding(b, pr)) { stillDefusing = true; break; }
+    for (const b of _priorBombs) {
+        if (_priorBombStanding(b, pr)) { stillDefusing = true; break; }
     }
-    _egSyncDefuseChargePause(stillDefusing);
+    _syncDefuseChargePause(stillDefusing);
 
-    if (_egPriorBombs.length === 0 && _egPriorBombTimer) {
-        clearInterval(_egPriorBombTimer);
-        _egPriorBombTimer = null;
+    if (_priorBombs.length === 0 && _priorBombTimer) {
+        clearInterval(_priorBombTimer);
+        _priorBombTimer = null;
     }
 }
 
 
 // Removes any armed-but-undetonated bomb fuses (encounter stop / cleanup).
-export function _egClearPriorBombFuses() {
-    if (_egPriorBombTimer) {
-        clearInterval(_egPriorBombTimer);
-        _egPriorBombTimer = null;
+export function _clearPriorBombFuses() {
+    if (_priorBombTimer) {
+        clearInterval(_priorBombTimer);
+        _priorBombTimer = null;
     }
-    _egPriorBombs.forEach(b => { if (b.fuseEl) b.fuseEl.remove(); });
-    _egPriorBombs = [];
+    _priorBombs.forEach(b => { if (b.fuseEl) b.fuseEl.remove(); });
+    _priorBombs = [];
     document.querySelectorAll('.eg-prior-bomb-fuse').forEach(el => el.remove());
-    _egSyncDefuseChargePause(false);
+    _syncDefuseChargePause(false);
 }
 
 
@@ -1018,42 +1018,42 @@ export function _egClearPriorBombFuses() {
 //   P1 - Prior Bomb: {n} bombs on the most recent correct fills.
 //   P2 - Fused Bomb: {n} bombs (snappier window at high tier).
 //   P3 - Cascade Bomb: {n} bombs, then a delayed second bomb arms on the
-//        freshest fill ~EG_PRIOR_BOMB_CASCADE_DELAY_MS later.
+//        freshest fill ~PRIOR_BOMB_CASCADE_DELAY_MS later.
 //
-// Standing on any bomb for EG_PRIOR_BOMB_DEFUSE_MS defuses it.
-export function _egMechPriorBomb(monster, phase) {
-    const pool = _egPriorBombPool();
+// Standing on any bomb for PRIOR_BOMB_DEFUSE_MS defuses it.
+export function _mechPriorBomb(monster, phase) {
+    const pool = _priorBombPool();
     if (pool.length === 0) return;
 
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
-    const norm = _egBossTierNorm(monster);
-    const countRange = p >= 3 ? EG_PRIOR_BOMB_COUNT_P3
-        : (p >= 2 ? EG_PRIOR_BOMB_COUNT_P2 : EG_PRIOR_BOMB_COUNT_P1);
-    const count = Math.max(1, Math.round(_egBossTierLerp(countRange, norm)));
-    const fuseMs = Math.max(5000, Math.round(_egBossTierLerp(EG_PRIOR_BOMB_FUSE_RANGE, norm)));
+    const norm = _bossTierNorm(monster);
+    const countRange = p >= 3 ? PRIOR_BOMB_COUNT_P3
+        : (p >= 2 ? PRIOR_BOMB_COUNT_P2 : PRIOR_BOMB_COUNT_P1);
+    const count = Math.max(1, Math.round(_bossTierLerp(countRange, norm)));
+    const fuseMs = Math.max(5000, Math.round(_bossTierLerp(PRIOR_BOMB_FUSE_RANGE, norm)));
     const targets = pool.slice(0, Math.min(count, pool.length));
     const mid = monster ? monster.id : null;
 
     globalThis.showCombatToast(t(p >= 3 ? 'eg_mech_prior_bomb_cascade'
         : (p >= 2 ? 'eg_mech_prior_bomb_fuse' : 'eg_mech_prior_bomb')).replace('{n}', targets.length));
-    targets.forEach(([r, c]) => _egPriorBombArmCell(r, c, mid, fuseMs));
+    targets.forEach(([r, c]) => _priorBombArmCell(r, c, mid, fuseMs));
 
     // P3 keeps the pressure on: a delayed second bomb on the freshest fill.
     if (p >= 3) {
         setTimeout(() => {
-            if (mid && typeof _egMonsters !== 'undefined'
-                && !globalThis._egMonsters.some(m => m.id === mid)) return; // boss dead
-            const pool2 = _egPriorBombPool();
+            if (mid && typeof _monsters !== 'undefined'
+                && !globalThis._monsters.some(m => m.id === mid)) return; // boss dead
+            const pool2 = _priorBombPool();
             if (pool2.length === 0) return;
-            _egPriorBombArmCell(pool2[0][0], pool2[0][1], mid, fuseMs);
-        }, EG_PRIOR_BOMB_CASCADE_DELAY_MS);
+            _priorBombArmCell(pool2[0][0], pool2[0][1], mid, fuseMs);
+        }, PRIOR_BOMB_CASCADE_DELAY_MS);
     }
 }
 
 
 // Collects the per-number clue spans of one line ('r', idx) or ('c', idx).
 // Filters by exact id pattern so row 1 never catches row 11's spans.
-export function _egCollectClueSpans(kind, idx) {
+export function _collectClueSpans(kind, idx) {
     const prefix = kind === 'r' ? `rn-${idx}-` : `cn-${idx}-`;
     const re = kind === 'r'
         ? new RegExp(`^rn-${idx}-\\d+$`)
@@ -1072,10 +1072,10 @@ export function _egCollectClueSpans(kind, idx) {
 // Picks `n` distinct rows with clue spans, preferring rows of equal clue
 // length so positional exchanges read as clean full swaps. Returns null when
 // the puzzle cannot supply enough rows.
-export function _egSwapPickRows(rowCount, n) {
+export function _swapPickRows(rowCount, n) {
     const buckets = {};
     for (let r = 0; r < rowCount; r++) {
-        const s = _egCollectClueSpans('r', r).filter(el => el.isConnected);
+        const s = _collectClueSpans('r', r).filter(el => el.isConnected);
         if (!s.length) continue;
         (buckets[s.length] = buckets[s.length] || []).push(r);
     }
@@ -1090,10 +1090,10 @@ export function _egSwapPickRows(rowCount, n) {
 
 
 // Snapshots the per-number clue spans of one row in visual order.
-export function _egSwapRowGroup(rows) {
+export function _swapRowGroup(rows) {
     const spans = [], orig = [];
     rows.forEach(r => {
-        const s = _egCollectClueSpans('r', r).filter(el => el.isConnected);
+        const s = _collectClueSpans('r', r).filter(el => el.isConnected);
         spans.push(s);
         orig.push(s.map(el => el.textContent));
     });
@@ -1105,7 +1105,7 @@ export function _egSwapRowGroup(rows) {
 // receives number i of the row one step ahead in the cycle; when the supplier
 // is shorter, the remainder keeps its own value (unequal clue lengths always
 // restore exactly because every original text is snapshotted).
-export function _egSwapApplyGroup(group) {
+export function _swapApplyGroup(group) {
     const n = group.rows.length;
     group.spans.forEach((spans, k) => {
         const src = group.orig[(k + 1) % n];
@@ -1123,21 +1123,21 @@ export function _egSwapApplyGroup(group) {
 // Restores every active swap group to its original clue order. Defers while a
 // Clue Blackout is active so the blackout's own text snapshot/restore isn't
 // fought over.
-export function _egRestoreClueSwap() {
-    if (globalThis._egBlackoutActive) {
+export function _restoreClueSwap() {
+    if (globalThis._blackoutActive) {
         // Blackout in progress - retry shortly until it clears.
-        globalThis._egClueSwapRestoreTimer = setTimeout(_egRestoreClueSwap, 2000);
+        globalThis._clueSwapRestoreTimer = setTimeout(_restoreClueSwap, 2000);
         return;
     }
-    if (!globalThis._egActiveClueSwap) return;
-    globalThis._egActiveClueSwap.groups.forEach(g => {
+    if (!globalThis._activeClueSwap) return;
+    globalThis._activeClueSwap.groups.forEach(g => {
         g.spans.forEach((spans, k) => {
             spans.forEach((el, i) => {
                 if (el.isConnected && g.orig[k][i] !== undefined) el.textContent = g.orig[k][i];
             });
         });
     });
-    globalThis._egActiveClueSwap = null;
+    globalThis._activeClueSwap = null;
     document.querySelectorAll('.eg-swap-clue').forEach(el => el.classList.remove('eg-swap-clue'));
 }
 
@@ -1145,7 +1145,7 @@ export function _egRestoreClueSwap() {
 // TIER-SCALED Clue Swap timing - a duration factor anchored exactly at tier 8
 // (8s / 10s / 12s unchanged there). Swapped clues read wrong, so a LONGER
 // effect is harsher: low tiers restore fast, high tiers hold longer.
-export const EG_SWAP_DURATION_F = [0.85, 1.15]; // [tier1, tier16]
+export const SWAP_DURATION_F = [0.85, 1.15]; // [tier1, tier16]
 
 
 // Boss mechanic handler - phase variants over ROW clues:
@@ -1153,93 +1153,93 @@ export const EG_SWAP_DURATION_F = [0.85, 1.15]; // [tier1, tier16]
 //        now actually swaps, operating on the real per-number spans).
 //   P2 - Triple Shift: three rows' clues rotate one step.
 //   P3 - Double Cross: two independent row pairs swap at once.
-export function _egMechClueSwap(monster, phase) {
-    if (globalThis._egBlackoutActive || globalThis._egActiveClueScramble) return; // don't fight over clue text
+export function _mechClueSwap(monster, phase) {
+    if (globalThis._blackoutActive || globalThis._activeClueScramble) return; // don't fight over clue text
     const rows = (cur && cur.grid) ? cur.grid.length : 0;
     if (rows < 2) return;
 
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
-    const swapNorm = _egBossTierNorm(monster);
+    const swapNorm = _bossTierNorm(monster);
     let groups = [];
     if (p === 1) {
-        const pick = _egSwapPickRows(rows, 2);
-        if (pick) groups.push(_egSwapRowGroup(pick));
+        const pick = _swapPickRows(rows, 2);
+        if (pick) groups.push(_swapRowGroup(pick));
     } else if (p === 2) {
-        const pick = _egSwapPickRows(rows, 3);
-        if (pick) groups.push(_egSwapRowGroup(pick));
+        const pick = _swapPickRows(rows, 3);
+        if (pick) groups.push(_swapRowGroup(pick));
     } else {
-        const pick = _egSwapPickRows(rows, 4);
+        const pick = _swapPickRows(rows, 4);
         if (pick) {
-            groups.push(_egSwapRowGroup([pick[0], pick[1]]));
-            groups.push(_egSwapRowGroup([pick[2], pick[3]]));
+            groups.push(_swapRowGroup([pick[0], pick[1]]));
+            groups.push(_swapRowGroup([pick[2], pick[3]]));
         }
     }
     if (!groups.length) return;
 
-    groups.forEach(g => _egSwapApplyGroup(g));
+    groups.forEach(g => _swapApplyGroup(g));
 
     const duration = Math.round((p === 1 ? 8000 : (p === 2 ? 10000 : 12000))
-        * _egBossTierFactor(swapNorm, EG_SWAP_DURATION_F));
+        * _bossTierFactor(swapNorm, SWAP_DURATION_F));
     const toastKey = p === 1 ? 'eg_mech_clue_swap'
         : (p === 2 ? 'eg_mech_clue_swap_triple' : 'eg_mech_clue_swap_double');
     globalThis.showCombatToast(t(toastKey).replace('{n}', duration / 1000));
 
-    clearTimeout(globalThis._egClueSwapRestoreTimer);
-    globalThis._egActiveClueSwap = { groups };
-    globalThis._egClueSwapRestoreTimer = setTimeout(_egRestoreClueSwap, duration);
+    clearTimeout(globalThis._clueSwapRestoreTimer);
+    globalThis._activeClueSwap = { groups };
+    globalThis._clueSwapRestoreTimer = setTimeout(_restoreClueSwap, duration);
 }
 
 
 // Full cleanup - undoes any active swap immediately if one is pending.
-// Called from _egBossCleanup on boss death / encounter stop.
-export function _egRemoveClueSwap() {
-    clearTimeout(globalThis._egClueSwapRestoreTimer);
-    globalThis._egClueSwapRestoreTimer = null;
-    if (globalThis._egActiveClueSwap) _egRestoreClueSwap();
+// Called from _bossCleanup on boss death / encounter stop.
+export function _removeClueSwap() {
+    clearTimeout(globalThis._clueSwapRestoreTimer);
+    globalThis._clueSwapRestoreTimer = null;
+    if (globalThis._activeClueSwap) _restoreClueSwap();
 }
 
 
 // ── Frozen cell thaw time ────────────────────────────────────────────────────
-export const EG_FROZEN_CELL_LIFETIME_MS = 9000;    // P1/P2 thaw time (tier-8 base)
-export const EG_FROZEN_CELL_LIFETIME_P3_MS = 12000; // P3 - the deep freeze lasts longer
-export const EG_FROZEN_CREEP_DELAY_MS = 4500;     // P2 - when each initial freeze spawns its creeping child
-export const EG_FROZEN_CREEP_DELAY_P3_MS = 4000;  // P3 - the ice creeps faster
-export const EG_FROZEN_TELEGRAPH_MS = 1000;       // warning between the ghost ❄️ and the creep landing
+export const FROZEN_CELL_LIFETIME_MS = 9000;    // P1/P2 thaw time (tier-8 base)
+export const FROZEN_CELL_LIFETIME_P3_MS = 12000; // P3 - the deep freeze lasts longer
+export const FROZEN_CREEP_DELAY_MS = 4500;     // P2 - when each initial freeze spawns its creeping child
+export const FROZEN_CREEP_DELAY_P3_MS = 4000;  // P3 - the ice creeps faster
+export const FROZEN_TELEGRAPH_MS = 1000;       // warning between the ghost ❄️ and the creep landing
 
 // TIER-SCALED knobs - [tier1, tier16] endpoint pairs like Corrupt Cells
 // (tier 8 lands on the pre-scaling values: 2/3/4 casts, 6/8 caps). Thaw time
 // and creep delay are duration factors anchored at tier 8: low tiers thaw
 // faster and creep slower; high tiers hold the freeze longer and creep sooner.
-export const EG_FROZEN_CAST_P1 = [1, 3]; // P1 static locks
-export const EG_FROZEN_CAST_P2 = [2, 4]; // P2 initial locks
-export const EG_FROZEN_CAST_P3 = [3, 5]; // P3 initial locks
+export const FROZEN_CAST_P1 = [1, 3]; // P1 static locks
+export const FROZEN_CAST_P2 = [2, 4]; // P2 initial locks
+export const FROZEN_CAST_P3 = [3, 5]; // P3 initial locks
 // Max simultaneous frozen cells. Creep is single-generation (children never
 // re-creep) so caps stay at initial count + children, and the field always
 // thaws out completely afterwards.
-export const EG_FROZEN_CAP_P2 = [5, 7]; // 3 initial + up to 3 children at tier 8
-export const EG_FROZEN_CAP_P3 = [7, 9]; // 4 initial + up to 4 children at tier 8
-export const EG_FROZEN_LIFE_F = [0.85, 1.15];  // thaw-time factor [tier1, tier16]
-export const EG_FROZEN_CREEP_F = [1.2, 0.8];   // creep-delay factor [tier1, tier16]
+export const FROZEN_CAP_P2 = [5, 7]; // 3 initial + up to 3 children at tier 8
+export const FROZEN_CAP_P3 = [7, 9]; // 4 initial + up to 4 children at tier 8
+export const FROZEN_LIFE_F = [0.85, 1.15];  // thaw-time factor [tier1, tier16]
+export const FROZEN_CREEP_F = [1.2, 0.8];   // creep-delay factor [tier1, tier16]
 
 
 // Resolved cast count for one phase at a given tier weight.
-export function _egFrozenCastCount(p, norm) {
-    const range = p >= 3 ? EG_FROZEN_CAST_P3 : (p >= 2 ? EG_FROZEN_CAST_P2 : EG_FROZEN_CAST_P1);
-    return Math.max(1, Math.round(_egBossTierLerp(range, norm)));
+export function _frozenCastCount(p, norm) {
+    const range = p >= 3 ? FROZEN_CAST_P3 : (p >= 2 ? FROZEN_CAST_P2 : FROZEN_CAST_P1);
+    return Math.max(1, Math.round(_bossTierLerp(range, norm)));
 }
 
 
 // Resolved thaw time (ms) for one phase at a given tier weight.
-export function _egFrozenLifeMs(p, norm) {
-    const base = p >= 3 ? EG_FROZEN_CELL_LIFETIME_P3_MS : EG_FROZEN_CELL_LIFETIME_MS;
-    return Math.max(2000, Math.round(base * _egBossTierFactor(norm, EG_FROZEN_LIFE_F)));
+export function _frozenLifeMs(p, norm) {
+    const base = p >= 3 ? FROZEN_CELL_LIFETIME_P3_MS : FROZEN_CELL_LIFETIME_MS;
+    return Math.max(2000, Math.round(base * _bossTierFactor(norm, FROZEN_LIFE_F)));
 }
 
 
 // Resolved creep delay (ms) - when an initial freeze spawns its child.
-export function _egFrozenCreepDelayMs(p, norm) {
-    const base = p >= 3 ? EG_FROZEN_CREEP_DELAY_P3_MS : EG_FROZEN_CREEP_DELAY_MS;
-    return Math.max(800, Math.round(base * _egBossTierFactor(norm, EG_FROZEN_CREEP_F)));
+export function _frozenCreepDelayMs(p, norm) {
+    const base = p >= 3 ? FROZEN_CREEP_DELAY_P3_MS : FROZEN_CREEP_DELAY_MS;
+    return Math.max(800, Math.round(base * _bossTierFactor(norm, FROZEN_CREEP_F)));
 }
 
 
@@ -1247,7 +1247,7 @@ export function _egFrozenCreepDelayMs(p, norm) {
 // (sol=1, lockable until filled) and incorrect cells (sol=0, lockable until
 // ✕-marked) that the player hasn't finished yet. Cells already frozen or
 // corrupted are skipped.
-export function _egBuildFreezableCellPool() {
+export function _buildFreezableCellPool() {
     if (!cur || !cur.grid) return [];
     const sol = cur.grid;
     const rows = sol.length;
@@ -1256,8 +1256,8 @@ export function _egBuildFreezableCellPool() {
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            if (_egBossFrozen.has(`${r}-${c}`)) continue; // already frozen
-            if (_egBossCorrupted.has(`${r}-${c}`)) continue; // already corrupted
+            if (_bossFrozen.has(`${r}-${c}`)) continue; // already frozen
+            if (_bossCorrupted.has(`${r}-${c}`)) continue; // already corrupted
             if (sol[r][c] === 1) {
                 // correct cell - lockable while still unfilled/unrevealed
                 if (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c]) continue; // already filled
@@ -1279,12 +1279,12 @@ export function _egBuildFreezableCellPool() {
 // re-creeps), norm: tier weight 0..1 } - children inherit the source's cfg.
 //
 // P1 - plain static freeze. P2+ - initial freezes each spawn one telegraphed
-// "creeping frost" child mid-life (see _egFrozenCreepTick): the lock count can
+// "creeping frost" child mid-life (see _frozenCreepTick): the lock count can
 // double while it lasts, but always fully thaws afterwards.
-export function _egApplyCellFreeze(r, c, cfg) {
+export function _applyCellFreeze(r, c, cfg) {
     const key = `${r}-${c}`;
     const el = document.getElementById(`g-${r}-${c}`);
-    if (!el || _egBossFrozen.has(key)) return;
+    if (!el || _bossFrozen.has(key)) return;
 
     const p = (cfg && cfg.p) ? Math.max(1, Math.min(3, cfg.p)) : 1;
     const isChild = !!(cfg && cfg.child);
@@ -1299,11 +1299,11 @@ export function _egApplyCellFreeze(r, c, cfg) {
         thawTimer: null, creepTimer: null, pending: null,
         cfg: { p, child: isChild, norm },
     };
-    data.thawTimer = setTimeout(() => _egRemoveCellFreeze(key), _egFrozenLifeMs(p, norm));
+    data.thawTimer = setTimeout(() => _removeCellFreeze(key), _frozenLifeMs(p, norm));
     if (p >= 2 && !isChild) {
-        data.creepTimer = setTimeout(() => _egFrozenCreepTick(key), _egFrozenCreepDelayMs(p, norm));
+        data.creepTimer = setTimeout(() => _frozenCreepTick(key), _frozenCreepDelayMs(p, norm));
     }
-    _egBossFrozen.set(key, data);
+    _bossFrozen.set(key, data);
 }
 
 
@@ -1311,7 +1311,7 @@ export function _egApplyCellFreeze(r, c, cfg) {
 // (correct or incorrect, unsolved, not already frozen, and not already
 // marked as a pending creep target). Returns null when no neighbour
 // qualifies.
-export function _egFrozenPickNeighbor(r, c) {
+export function _frozenPickNeighbor(r, c) {
     if (!cur || !cur.grid) return null;
     const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
@@ -1327,7 +1327,7 @@ export function _egFrozenPickNeighbor(r, c) {
         } else {
             continue; // grid only holds 0/1
         }
-        if (_egBossFrozen.has(`${nr}-${nc}`)) continue;
+        if (_bossFrozen.has(`${nr}-${nc}`)) continue;
         if (document.getElementById(`eg-freeze-tel-${nr}-${nc}`)) continue; // already telegraphed
         cands.push([nr, nc]);
     }
@@ -1337,16 +1337,16 @@ export function _egFrozenPickNeighbor(r, c) {
 
 
 // Cap of concurrent frozen cells for one phase at the field's tier weight.
-export function _egFrozenCap(data) {
-    const range = (data && data.cfg && data.cfg.p >= 3) ? EG_FROZEN_CAP_P3 : EG_FROZEN_CAP_P2;
+export function _frozenCap(data) {
+    const range = (data && data.cfg && data.cfg.p >= 3) ? FROZEN_CAP_P3 : FROZEN_CAP_P2;
     const norm = (data && data.cfg) ? data.cfg.norm : 0.5;
-    return Math.max(1, Math.round(_egBossTierLerp(range, norm)));
+    return Math.max(1, Math.round(_bossTierLerp(range, norm)));
 }
 
 
 // Shows the ghosted ❄ on the target and lands the creep after the warning.
 // Stored on the source entry so thawing the source cancels the pending creep.
-export function _egFrozenTelegraphCreep(key, data, tr, tc) {
+export function _frozenTelegraphCreep(key, data, tr, tc) {
     const el = document.getElementById(`g-${tr}-${tc}`);
     if (!el) return;
 
@@ -1358,7 +1358,7 @@ export function _egFrozenTelegraphCreep(key, data, tr, tc) {
 
     data.pending = {
         tr, tc,
-        landTimer: setTimeout(() => _egFrozenCreepLand(key), EG_FROZEN_TELEGRAPH_MS),
+        landTimer: setTimeout(() => _frozenCreepLand(key), FROZEN_TELEGRAPH_MS),
     };
 }
 
@@ -1366,18 +1366,18 @@ export function _egFrozenTelegraphCreep(key, data, tr, tc) {
 // Lands a telegraphed creep. Re-validates everything (source still frozen,
 // cap not exceeded, target still legal) so a mid-telegraph thaw, refill or
 // grid swap can never freeze the wrong cell.
-export function _egFrozenCreepLand(key) {
-    const data = _egBossFrozen.get(key);
+export function _frozenCreepLand(key) {
+    const data = _bossFrozen.get(key);
     if (!data || !data.pending) return;
     const { tr, tc } = data.pending;
     data.pending = null;
     const tel = document.getElementById(`eg-freeze-tel-${tr}-${tc}`);
     if (tel) tel.remove();
 
-    if (!_egBossFrozen.has(key)) return;          // source thawed mid-telegraph
+    if (!_bossFrozen.has(key)) return;          // source thawed mid-telegraph
     if (!cur || !cur.grid) return;
     if (tr >= cur.grid.length || tc >= cur.grid[0].length) return; // grid swapped
-    if (_egBossFrozen.size >= _egFrozenCap(data)) return;          // cap reached meanwhile
+    if (_bossFrozen.size >= _frozenCap(data)) return;          // cap reached meanwhile
     const sol = cur.grid;
     if (sol[tr][tc] === 1) {
         if (globalThis.userGrid[tr][tc] === 1 || globalThis.revealedGrid[tr][tc]) return;    // correct target filled meanwhile
@@ -1386,9 +1386,9 @@ export function _egFrozenCreepLand(key) {
     } else {
         return;                                                        // grid swapped to a new shape
     }
-    if (_egBossFrozen.has(`${tr}-${tc}`)) return;
+    if (_bossFrozen.has(`${tr}-${tc}`)) return;
 
-    _egApplyCellFreeze(tr, tc, { p: data.cfg.p, child: true, norm: data.cfg.norm });
+    _applyCellFreeze(tr, tc, { p: data.cfg.p, child: true, norm: data.cfg.norm });
     if (typeof showCombatToast === 'function') globalThis.showCombatToast(t('eg_frozen_spread'));
 }
 
@@ -1396,13 +1396,13 @@ export function _egFrozenCreepLand(key) {
 // One creep attempt from a frozen source: telegraphs a child when under the
 // cap. Single-generation - the child never creeps again, so the field always
 // thaws out completely.
-export function _egFrozenCreepTick(key) {
-    const data = _egBossFrozen.get(key);
+export function _frozenCreepTick(key) {
+    const data = _bossFrozen.get(key);
     if (!data) return;
-    if (_egBossFrozen.size < _egFrozenCap(data)) {
+    if (_bossFrozen.size < _frozenCap(data)) {
         const [r, c] = key.split('-').map(Number);
-        const neighbor = _egFrozenPickNeighbor(r, c);
-        if (neighbor) _egFrozenTelegraphCreep(key, data, neighbor[0], neighbor[1]);
+        const neighbor = _frozenPickNeighbor(r, c);
+        if (neighbor) _frozenTelegraphCreep(key, data, neighbor[0], neighbor[1]);
     }
 }
 
@@ -1410,8 +1410,8 @@ export function _egFrozenCreepTick(key) {
 // Removes the freeze overlay from the DOM and clears its state entry -
 // including any pending telegraphed creep (its ghost is removed too, so no
 // orphan telegraph can outlive its source).
-export function _egRemoveCellFreeze(key) {
-    const data = _egBossFrozen.get(key);
+export function _removeCellFreeze(key) {
+    const data = _bossFrozen.get(key);
     if (data) {
         clearTimeout(data.thawTimer);
         clearTimeout(data.creepTimer);
@@ -1424,20 +1424,20 @@ export function _egRemoveCellFreeze(key) {
     }
     const span = document.getElementById(`eg-freeze-${key}`);
     if (span) span.remove();
-    _egBossFrozen.delete(key);
+    _bossFrozen.delete(key);
 }
 
 
 // Removes all currently frozen cells. Called on boss death / encounter stop.
-export function _egClearAllFrozenCells() {
-    Array.from(_egBossFrozen.keys()).forEach(key => _egRemoveCellFreeze(key));
+export function _clearAllFrozenCells() {
+    Array.from(_bossFrozen.keys()).forEach(key => _removeCellFreeze(key));
 }
 
 
 // Returns true if the cell at (row, col) is currently frozen.
 // Called from mouse-button-handlers.js before allowing a cell fill.
-export function _egIsCellFrozen(row, col) {
-    return _egBossFrozen.has(`${row}-${col}`);
+export function _isCellFrozen(row, col) {
+    return _bossFrozen.has(`${row}-${col}`);
 }
 
 
@@ -1447,34 +1447,34 @@ export function _egIsCellFrozen(row, col) {
 //   P2 - Creeping Frost: each initial freeze spawns ONE telegraphed child on
 //        a neighbour mid-life (field caps out, all auto-thaw).
 //   P3 - Glacial Drift: locks last longer and creep faster.
-export function _egMechFrozenCells(monster, phase) {
-    const pool = _egBuildFreezableCellPool();
+export function _mechFrozenCells(monster, phase) {
+    const pool = _buildFreezableCellPool();
     if (pool.length === 0) return;
 
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
-    const norm = _egBossTierNorm(monster);
-    const count = _egFrozenCastCount(p, norm);
+    const norm = _bossTierNorm(monster);
+    const count = _frozenCastCount(p, norm);
     const targets = pool.sort(() => Math.random() - 0.5).slice(0, Math.min(count, pool.length));
 
     const toastKey = p >= 3 ? 'eg_mech_frozen_drift'
         : (p >= 2 ? 'eg_mech_frozen_creep' : 'eg_mech_frozen_cells');
     globalThis.showCombatToast(t(toastKey).replace('{n}', targets.length));
-    targets.forEach(([r, c]) => _egApplyCellFreeze(r, c, { p, child: false, norm }));
+    targets.forEach(([r, c]) => _applyCellFreeze(r, c, { p, child: false, norm }));
 }
 
 
 // Removes the invert filter from the puzzle table and clears its timer.
-export function _egRemoveGridInvert() {
-    clearTimeout(globalThis._egGridInvertTimer);
-    globalThis._egGridInvertTimer = null;
+export function _removeGridInvert() {
+    clearTimeout(globalThis._gridInvertTimer);
+    globalThis._gridInvertTimer = null;
     const tbl = document.getElementById('ptable');
     if (tbl) tbl.classList.remove('eg-grid-invert');
 }
 
 
 // Boss mechanic handler - applies the Inversion Field for a phase-scaled duration.
-export function _egMechGridInvert(monster, phase) {
-    if (globalThis._egGridInvertTimer) return; // already active
+export function _mechGridInvert(monster, phase) {
+    if (globalThis._gridInvertTimer) return; // already active
     const tbl = document.getElementById('ptable');
     if (!tbl) return;
 
@@ -1483,63 +1483,63 @@ export function _egMechGridInvert(monster, phase) {
     const duration = phase >= 3 ? 9000 : 6000;
     Audio_Manager.playSFX('grid_invert');
     globalThis.showCombatToast(t('eg_mech_grid_invert').replace('{n}', duration / 1000));
-    globalThis._egGridInvertTimer = setTimeout(_egRemoveGridInvert, duration);
+    globalThis._gridInvertTimer = setTimeout(_removeGridInvert, duration);
 }
 
 
-export const EG_BLAST_WARN_MS = 1500;
+export const BLAST_WARN_MS = 1500;
 
 
-export const EG_BLAST_ACTIVE_MS = 5000;
+export const BLAST_ACTIVE_MS = 5000;
 
 
-export const EG_BLAST_DAMAGE_PCT = 0.30;
+export const BLAST_DAMAGE_PCT = 0.30;
 
 
 // Readability/fairness knobs for the shared screen-blast engine. Every boss
-// that drives it through _egRunScreenBlast gets the same timeline language:
+// that drives it through _runScreenBlast gets the same timeline language:
 //   1. the countdown ticks through the WARNING phase (seconds until the blast
 //      goes live) and resets at the impact flash to count the hold window;
-//   2. the last EG_BLAST_LASTCALL_MS of the hold window turn the countdown
+//   2. the last BLAST_LASTCALL_MS of the hold window turn the countdown
 //      red and set the zone border flashing - the resolve is imminent;
 //      the WARNING, HOLD and LAST-CALL windows are TIER-SCALED
-//      (EG_BLAST_TIER_*_F): low-tier bosses give more time to react,
+//      (BLAST_TIER_*_F): low-tier bosses give more time to react,
 //      high-tier ones stay brutal - tier 8 is the anchor (factor 1.0);
 //   3. shrinking zones (Heat Death / Overfit Bloom) reach their final radius
-//      at EG_BLAST_SHRINK_SETTLE of the window and HOLD it, so what the player
+//      at BLAST_SHRINK_SETTLE of the window and HOLD it, so what the player
 //      sees for the final seconds is exactly what the resolve check uses;
 //   4. a bottom status line mirrors the crush-walls label idiom: GET INSIDE /
 //      IN THE ZONE / LAST-CHECK, plus ✓/✗ resolve flashes.
-export const EG_BLAST_LASTCALL_MS = 1500; // anchor last-call window (tier 8)
-export const EG_BLAST_SHRINK_SETTLE = 0.85;
-export const EG_BLAST_TRANSITION_FLASH_MS = 160;
-export const EG_BLAST_CHARGE_MS = 550; // ghost destination charges up right before the jump
+export const BLAST_LASTCALL_MS = 1500; // anchor last-call window (tier 8)
+export const BLAST_SHRINK_SETTLE = 0.85;
+export const BLAST_TRANSITION_FLASH_MS = 160;
+export const BLAST_CHARGE_MS = 550; // ghost destination charges up right before the jump
 
 // Screen-blast timeline scaling - same [tier1, tier16] endpoint pattern as the
 // corruption caps. Each pair is the DURATION MULTIPLIER at tier 1 (gentle:
 // more warning / longer hold / longer last call) vs tier 16 (brutal: all of
 // them shorter). Tier 8 (norm = 7/15) is the anchor where the factor is
 // exactly 1.0, so the pre-scaling timing is unchanged for mid-tier bosses.
-export const EG_BLAST_TIER_WARN_F = [1.22, 0.75];     // warning window
-export const EG_BLAST_TIER_HOLD_F = [1.21, 0.76];     // hold (active) window
-export const EG_BLAST_TIER_LASTCALL_F = [1.26, 0.70]; // last-call urgency window
+export const BLAST_TIER_WARN_F = [1.22, 0.75];     // warning window
+export const BLAST_TIER_HOLD_F = [1.21, 0.76];     // hold (active) window
+export const BLAST_TIER_LASTCALL_F = [1.26, 0.70]; // last-call urgency window
 
 // Tier factor for one blast knob: exactly 1 at the tier-8 anchor, >1 on
 // gentle tiers, <1 on brutal tiers. Callers without a boss (no opts.tierNorm)
 // get factor 1 - the engine keeps its exact current timing outside boss
 // fights.
-export function _egBlastTierFactor(norm, range) {
-    return _egBossTierFactor(norm, range);
+export function _blastTierFactor(norm, range) {
+    return _bossTierFactor(norm, range);
 }
 
 
 // The older per-boss nk dodge engines (band slams, storms, shrapnel, chase
-// orbs, etc.) share ONE difficulty curve through _egNkNewRun: their internal
-// clock runs on _egBossTierFactor(norm, EG_NK_TIER_FACTOR) - the same
+// orbs, etc.) share ONE difficulty curve through _nkNewRun: their internal
+// clock runs on _bossTierFactor(norm, NK_TIER_FACTOR) - the same
 // [tier1, tier16] timing-multiplier family as the blast warning window.
 // Tier 8 is the anchor (factor 1.0, pre-scaling timing untouched). DoT
-// damage is counter-scaled in _egNkDotTick so only TIMING moves, never DPS.
-export const EG_NK_TIER_FACTOR = [1.22, 0.75];
+// damage is counter-scaled in _nkDotTick so only TIMING moves, never DPS.
+export const NK_TIER_FACTOR = [1.22, 0.75];
 
 
 // Failed-dodge DAMAGE companion to the timing curve above: the %maxHP hit
@@ -1547,32 +1547,32 @@ export const EG_NK_TIER_FACTOR = [1.22, 0.75];
 // high tier, keeping the timing curve company. Tier 8 is the anchor (×1.0)
 // - pre-scaling damage unchanged for mid-tier bosses. Endpoints: tier 1
 // deals 85% of the tuned percent, tier 16 deals 120%.
-export const EG_NK_DAMAGE_TIER = [0.85, 1.20];
+export const NK_DAMAGE_TIER = [0.85, 1.20];
 
 
 // Tier damage multiplier for a failed-dodge hit/DoT, resolved from the boss
-// level the callers already pass in (the same source _egNkNewRun uses for
+// level the callers already pass in (the same source _nkNewRun uses for
 // the timing factor). Unknown/zero levels → factor 1 (unchanged).
 // Failing a telegraphed, avoidable mechanic must hurt: every boss-ability hit
 // (point hits, DoT ticks and blast circles) is multiplied by this, but one
-// hit is never boosted past EG_NK_FAIL_HIT_CAP of max life (a boss that
+// hit is never boosted past NK_FAIL_HIT_CAP of max life (a boss that
 // already hits that hard keeps its own value).
-export const EG_NK_FAIL_MULT = 2.0;
-export const EG_NK_FAIL_HIT_CAP = 0.65;
-export function _egNkBoostFailedDodge(raw, maxHp) {
-    const boosted = raw * EG_NK_FAIL_MULT;
-    return Math.min(boosted, Math.max(raw, (Number(maxHp) || 0) * EG_NK_FAIL_HIT_CAP));
+export const NK_FAIL_MULT = 2.0;
+export const NK_FAIL_HIT_CAP = 0.65;
+export function _nkBoostFailedDodge(raw, maxHp) {
+    const boosted = raw * NK_FAIL_MULT;
+    return Math.min(boosted, Math.max(raw, (Number(maxHp) || 0) * NK_FAIL_HIT_CAP));
 }
 
-export function _egNkTierDamageFactor(level) {
+export function _nkTierDamageFactor(level) {
     if (!level || !(level > 0)) return 1;
-    return _egBossTierFactor(_egBossTierNorm({ level }), EG_NK_DAMAGE_TIER);
+    return _bossTierFactor(_bossTierNorm({ level }), NK_DAMAGE_TIER);
 }
 
 
 // Picks a screen position for a zone, biased away from edges so the circle
 // is always fully visible and reachable.
-export function _egBlastPickPos(radius) {
+export function _blastPickPos(radius) {
     const margin = radius + 40;
     const x = margin + Math.random() * Math.max(1, window.innerWidth - margin * 2);
     const y = margin + Math.random() * Math.max(1, window.innerHeight - margin * 2);
@@ -1584,8 +1584,8 @@ export function _egBlastPickPos(radius) {
 // Entropy's Heat Bloom (and all generic blasts) are dodge mechanics where the
 // player must move their draggable avatar sprite - not the class HUD - into
 // the circle. Uses the tight sprite image rect (hazard-style) with tolerance.
-export function _egBlastHudInZone(zone) {
-    const rect = _egBlastGetPlayerRect();
+export function _blastHudInZone(zone) {
+    const rect = _blastGetPlayerRect();
     if (!rect || (rect.width === 0 && rect.height === 0)) return false;
     const closestX = Math.max(rect.left, Math.min(zone.x, rect.right));
     const closestY = Math.max(rect.top, Math.min(zone.y, rect.bottom));
@@ -1597,17 +1597,17 @@ export function _egBlastHudInZone(zone) {
 
 
 // Tight hitbox derived from the visible avatar sprite image, not the wrapper.
-// Mirrors the hazard system's _egHzPlayerRect logic: the wrapper is taller than
+// Mirrors the hazard system's _hzPlayerRect logic: the wrapper is taller than
 // the artwork (HP/charge bars), so using its bounds misaligns collision.
 // Falls back to HUD only if no avatar is present (non-endgame screen).
-export function _egBlastGetPlayerRect() {
+export function _blastGetPlayerRect() {
     // Reuse the hazard helper if it is already loaded for exact parity
-    if (typeof _egHzPlayerRect === 'function') {
-        const hr = _egHzPlayerRect();
+    if (typeof _hzPlayerRect === 'function') {
+        const hr = _hzPlayerRect();
         if (hr && hr.width && hr.height) return hr;
     }
-    if (typeof _egHzPlayerSpriteRect === 'function') {
-        const sr = _egHzPlayerSpriteRect();
+    if (typeof _hzPlayerSpriteRect === 'function') {
+        const sr = _hzPlayerSpriteRect();
         if (sr && sr.width && sr.height) return sr;
     }
     let img = document.getElementById('avatar-sprite-img');
@@ -1647,7 +1647,7 @@ export function _egBlastGetPlayerRect() {
 
 
 // DOM helpers - each blast gets uniquely suffixed elements.
-export function _egBlastGetOverlay(id) {
+export function _blastGetOverlay(id) {
     let el = document.getElementById(`eg-blast-overlay-${id}`);
     if (!el) {
         el = document.createElement('div');
@@ -1658,7 +1658,7 @@ export function _egBlastGetOverlay(id) {
 }
 
 
-export function _egBlastPositionCircle(el, zone) {
+export function _blastPositionCircle(el, zone) {
     el.style.left = zone.x + 'px';
     el.style.top = zone.y + 'px';
     el.style.width = (zone.radius * 2) + 'px';
@@ -1668,19 +1668,19 @@ export function _egBlastPositionCircle(el, zone) {
 }
 
 
-export function _egBlastGetCircle(id, idx, zone) {
+export function _blastGetCircle(id, idx, zone) {
     let el = document.getElementById(`eg-blast-circle-${id}-${idx}`);
     if (!el) {
         el = document.createElement('div');
         el.id = `eg-blast-circle-${id}-${idx}`;
         document.body.appendChild(el);
     }
-    _egBlastPositionCircle(el, zone);
+    _blastPositionCircle(el, zone);
     return el;
 }
 
 
-export function _egBlastGetCountdownLabel(id, zone) {
+export function _blastGetCountdownLabel(id, zone) {
     let el = document.getElementById(`eg-blast-countdown-${id}`);
     if (!el) {
         el = document.createElement('div');
@@ -1694,21 +1694,21 @@ export function _egBlastGetCountdownLabel(id, zone) {
 }
 
 
-export function _egBlastGetGhost(id, pos, radius) {
+export function _blastGetGhost(id, pos, radius) {
     let el = document.getElementById(`eg-blast-ghost-${id}`);
     if (!el) {
         el = document.createElement('div');
         el.id = `eg-blast-ghost-${id}`;
         document.body.appendChild(el);
     }
-    _egBlastPositionCircle(el, { x: pos.x, y: pos.y, radius });
+    _blastPositionCircle(el, { x: pos.x, y: pos.y, radius });
     return el;
 }
 
 
 // Bottom-centre status line for one blast (mirrors the crush-walls label).
 // Lives for the blast's duration; hidden unless the engine paints it.
-export function _egBlastGetStatus(id) {
+export function _blastGetStatus(id) {
     let el = document.getElementById(`eg-blast-status-${id}`);
     if (!el) {
         el = document.createElement('div');
@@ -1722,12 +1722,12 @@ export function _egBlastGetStatus(id) {
 
 
 // Removes every element and timer belonging to one blast.
-export function _egBlastTeardown(id) {
-    const state = _egActiveBlasts.get(id);
+export function _blastTeardown(id) {
+    const state = _activeBlasts.get(id);
     if (state) {
         state.timers.forEach(t => { clearTimeout(t); clearInterval(t); });
         if (state.poll) clearInterval(state.poll);
-        _egActiveBlasts.delete(id);
+        _activeBlasts.delete(id);
     }
     [
         `eg-blast-overlay-${id}`, `eg-blast-countdown-${id}`, `eg-blast-ghost-${id}`,
@@ -1737,10 +1737,10 @@ export function _egBlastTeardown(id) {
 }
 
 
-// Tears down ALL active blasts. Called from _egBossCleanup on boss death /
+// Tears down ALL active blasts. Called from _bossCleanup on boss death /
 // encounter stop so no overlay can outlive its boss.
-export function _egBlastTeardownAll() {
-    Array.from(_egActiveBlasts.keys()).forEach(id => _egBlastTeardown(id));
+export function _blastTeardownAll() {
+    Array.from(_activeBlasts.keys()).forEach(id => _blastTeardown(id));
 }
 
 
@@ -1755,34 +1755,34 @@ export function _egBlastTeardownAll() {
 //              zone/countdown red (LAST CALL), and a bottom status line says
 //              whether you are inside or must move.
 //   RESOLVE  - ✓/✗ flash on the zone + status line, brief pause, teardown.
-export function _egRunScreenBlast(opts) {
+export function _runScreenBlast(opts) {
     // Never stack two blasts - the last thing the player needs is two
     // overlapping blackout screens fighting over the same dodge.
-    if (_egActiveBlasts.size > 0) return;
+    if (_activeBlasts.size > 0) return;
 
-    // Module era: _egBlastSeq is owned by endgame-state.js (live globalThis
+    // Module era: _blastSeq is owned by endgame-state.js (live globalThis
     // accessor); a bare ++ would illegally reassign the entry's import
     // binding and fail the build. globalThis routes through the accessor.
-    const id = ++globalThis._egBlastSeq;
+    const id = ++globalThis._blastSeq;
     const state = { timers: [], poll: null, t0: Date.now(), live: false, activeAt: null };
-    _egActiveBlasts.set(id, state);
+    _activeBlasts.set(id, state);
 
     // Tier-scaled timeline: the boss's atlas tier (opts.tierNorm, 0–1)
     // multiplies the warning, hold and last-call windows. No tierNorm
     // (non-boss callers) → factor 1 → exact current timing.
     const tierF = {
-        warn: _egBlastTierFactor(opts.tierNorm, EG_BLAST_TIER_WARN_F),
-        hold: _egBlastTierFactor(opts.tierNorm, EG_BLAST_TIER_HOLD_F),
-        last: _egBlastTierFactor(opts.tierNorm, EG_BLAST_TIER_LASTCALL_F),
+        warn: _blastTierFactor(opts.tierNorm, BLAST_TIER_WARN_F),
+        hold: _blastTierFactor(opts.tierNorm, BLAST_TIER_HOLD_F),
+        last: _blastTierFactor(opts.tierNorm, BLAST_TIER_LASTCALL_F),
     };
-    const warnMs = Math.max(600, Math.round((opts.warnMs != null ? opts.warnMs : EG_BLAST_WARN_MS) * tierF.warn));
-    const activeMs = Math.max(1200, Math.round((opts.activeMs != null ? opts.activeMs : EG_BLAST_ACTIVE_MS) * tierF.hold));
-    const lastcallMs = Math.max(700, Math.round(EG_BLAST_LASTCALL_MS * tierF.last));
+    const warnMs = Math.max(600, Math.round((opts.warnMs != null ? opts.warnMs : BLAST_WARN_MS) * tierF.warn));
+    const activeMs = Math.max(1200, Math.round((opts.activeMs != null ? opts.activeMs : BLAST_ACTIVE_MS) * tierF.hold));
+    const lastcallMs = Math.max(700, Math.round(BLAST_LASTCALL_MS * tierF.last));
     // Rewrite Fate's mid-window jump keeps its proportional spot inside the
     // (possibly scaled) hold window - relocate at 55% stays 55%.
     const relocateAtMs = opts.relocateAtMs != null
         ? Math.max(0, Math.round(opts.relocateAtMs * tierF.hold)) : null;
-    const damagePct = opts.damagePct != null ? opts.damagePct : EG_BLAST_DAMAGE_PCT;
+    const damagePct = opts.damagePct != null ? opts.damagePct : BLAST_DAMAGE_PCT;
     const realIndex = opts.realIndex != null ? opts.realIndex : 0;
     const accent = opts.accent || '#ffd93c';
 
@@ -1797,7 +1797,7 @@ export function _egRunScreenBlast(opts) {
     };
 
     // Bottom status line - painted by the poll/resolve; hidden until then.
-    const statusEl = _egBlastGetStatus(id);
+    const statusEl = _blastGetStatus(id);
     const statusCache = { mode: 'idle', arg: null };
     const paintStatus = (mode, arg) => {
         if (statusCache.mode === mode && statusCache.arg === arg) return;
@@ -1815,12 +1815,12 @@ export function _egRunScreenBlast(opts) {
     };
 
     // ── Warning phase: red tint fades in, all candidate zones appear ────────
-    const overlay = _egBlastGetOverlay(id);
+    const overlay = _blastGetOverlay(id);
     overlay.className = 'eg-blast-overlay eg-blast-warning';
     if (opts.accent) overlay.style.setProperty('--blast-accent', accent);
 
     zones.forEach((z, i) => {
-        const circle = _egBlastGetCircle(id, i, z);
+        const circle = _blastGetCircle(id, i, z);
         circle.className = 'eg-blast-circle' + (i === realIndex ? '' : ' eg-blast-fake');
         // Prior Collapse tell: the REAL zone sparkles throughout the warning
         // so the choice is always readable - never a coin flip.
@@ -1830,12 +1830,12 @@ export function _egRunScreenBlast(opts) {
 
     let ghostEl = null;
     if (opts.ghost) {
-        ghostEl = _egBlastGetGhost(id, opts.ghost, startRadius);
+        ghostEl = _blastGetGhost(id, opts.ghost, startRadius);
         ghostEl.className = 'eg-blast-ghost';
         ghostEl.style.setProperty('--blast-accent', accent);
     }
 
-    const label = _egBlastGetCountdownLabel(id, real);
+    const label = _blastGetCountdownLabel(id, real);
     label.className = 'eg-blast-countdown';
     label.style.setProperty('--blast-accent', accent);
     label.textContent = Math.max(1, Math.ceil(warnMs / 1000)); // counts down to impact
@@ -1856,12 +1856,12 @@ export function _egRunScreenBlast(opts) {
         const progress = Math.min(1, elActive / activeMs);
 
         // Shrinking blooms (Heat Death / Overfit Bloom): reach the final radius
-        // at EG_BLAST_SHRINK_SETTLE of the window and HOLD it - the resolve
+        // at BLAST_SHRINK_SETTLE of the window and HOLD it - the resolve
         // check then matches exactly what the player sees for the last seconds.
         if (shrinkTo != null) {
-            const settle = Math.min(1, progress / EG_BLAST_SHRINK_SETTLE);
+            const settle = Math.min(1, progress / BLAST_SHRINK_SETTLE);
             real.radius = Math.round(startRadius + (shrinkTo - startRadius) * settle);
-            _egBlastPositionCircle(_egBlastGetCircle(id, realIndex, real), real);
+            _blastPositionCircle(_blastGetCircle(id, realIndex, real), real);
         }
 
         const remainingMs = Math.max(0, activeMs - elActive);
@@ -1871,7 +1871,7 @@ export function _egRunScreenBlast(opts) {
             lbl.classList.toggle('eg-blast-urgent', remainingMs <= lastcallMs);
         }
 
-        const inZone = _egBlastHudInZone(real);
+        const inZone = _blastHudInZone(real);
         const circle = document.getElementById(`eg-blast-circle-${id}-${realIndex}`);
         if (circle && !circle.classList.contains('eg-blast-collapsed')) {
             circle.classList.toggle('eg-blast-safe', inZone);
@@ -1883,7 +1883,7 @@ export function _egRunScreenBlast(opts) {
         if (relocateAtMs != null && ghostEl) {
             const untilJump = relocateAtMs - elActive;
             ghostEl.classList.toggle('eg-blast-ghost-charge',
-                untilJump > 0 && untilJump <= EG_BLAST_CHARGE_MS);
+                untilJump > 0 && untilJump <= BLAST_CHARGE_MS);
         }
 
         if (remainingMs <= lastcallMs) paintStatus(inZone ? 'in' : 'final');
@@ -1910,7 +1910,7 @@ export function _egRunScreenBlast(opts) {
         schedule(() => {
             overlay.classList.remove('eg-blast-impact');
             overlay.classList.add('eg-blast-active');
-        }, EG_BLAST_TRANSITION_FLASH_MS);
+        }, BLAST_TRANSITION_FLASH_MS);
 
         // Prior Collapse: the fake zones visibly collapse the instant the
         // blast hits - by then the player has had the whole warning to note
@@ -1934,7 +1934,7 @@ export function _egRunScreenBlast(opts) {
         if (relocateAtMs != null && ghostEl) {
             schedule(() => {
                 real = { x: opts.ghost.x, y: opts.ghost.y, radius: real.radius };
-                const circle = _egBlastGetCircle(id, realIndex, real);
+                const circle = _blastGetCircle(id, realIndex, real);
                 circle.classList.add('eg-blast-jump');
                 schedule(() => circle.classList.remove('eg-blast-jump'), 400);
                 const l2 = document.getElementById(`eg-blast-countdown-${id}`);
@@ -1948,30 +1948,30 @@ export function _egRunScreenBlast(opts) {
             if (state.poll) { clearInterval(state.poll); state.poll = null; }
             if (shrinkTo != null) {
                 real.radius = shrinkTo;
-                _egBlastPositionCircle(_egBlastGetCircle(id, realIndex, real), real);
+                _blastPositionCircle(_blastGetCircle(id, realIndex, real), real);
             }
 
-            const survived = _egBlastHudInZone(real);
+            const survived = _blastHudInZone(real);
             const circle = document.getElementById(`eg-blast-circle-${id}-${realIndex}`);
             if (circle) circle.classList.add(survived ? 'eg-blast-survived' : 'eg-blast-hit');
 
             if (!survived) {
                 // Percentage of max HP - survivable even at full health, but it
                 // stings enough that ignoring the mechanic loses fights.
-                const damage = Math.round(_egNkBoostFailedDodge(globalThis.playerMaxHP * damagePct, globalThis.playerMaxHP));
-                const shielded = _egNkShieldUp();
-                const dealt = typeof _egPlayerTakeDamage === 'function'
-                    ? _egPlayerTakeDamage(damage, true, null, null, { isBossAbility: true }) : 0;
-                _egNkLastHitAbsorbed = shielded && dealt <= 0;
-                if (dealt > 0 && typeof _egApplyPlayerHitFeedback === 'function') {
-                    _egApplyPlayerHitFeedback(dealt);
+                const damage = Math.round(_nkBoostFailedDodge(globalThis.playerMaxHP * damagePct, globalThis.playerMaxHP));
+                const shielded = _nkShieldUp();
+                const dealt = typeof _playerTakeDamage === 'function'
+                    ? _playerTakeDamage(damage, true, null, null, { isBossAbility: true }) : 0;
+                _nkLastHitAbsorbed = shielded && dealt <= 0;
+                if (dealt > 0 && typeof _applyPlayerHitFeedback === 'function') {
+                    _applyPlayerHitFeedback(dealt);
                 }
                 // Named, localized feedback toast: damage when the hit landed,
                 // a shield-absorbed toast when the absorption shield ate it
                 // whole - never a misleading "hit for 0". Callers pass their
                 // boss/ability names.
-                if (dealt > 0 || _egNkLastHitAbsorbed) {
-                    _egNkAbilityHitToast(dealt, opts.bossName || null, opts.abilityName || null);
+                if (dealt > 0 || _nkLastHitAbsorbed) {
+                    _nkAbilityHitToast(dealt, opts.bossName || null, opts.abilityName || null);
                     if (dealt > 0) paintStatus('hit', dealt);
                 }
             } else {
@@ -1980,54 +1980,54 @@ export function _egRunScreenBlast(opts) {
             }
 
             // Brief resolve pause so the outcome flash is readable
-            schedule(() => _egBlastTeardown(id), 500);
+            schedule(() => _blastTeardown(id), 500);
         }, activeMs);
     }, warnMs);
 }
 
 
-export const _egNkRuns = new Map(); // runId → { bossId, dodge, raf, timers, els, dotAcc }
+export const _nkRuns = new Map(); // runId → { bossId, dodge, raf, timers, els, dotAcc }
 
 
-export let _egNkSeq = 0;
+export let _nkSeq = 0;
 
 
 // True while any dodge run, crush corridor or screen blast is active.
-export function _egNkDodgeBusy() {
-    if (typeof window._egCrushState !== 'undefined' && window._egCrushState) return true;
-    if (typeof _egActiveBlasts !== 'undefined' && _egActiveBlasts.size > 0) return true;
-    for (const r of _egNkRuns.values()) if (r.dodge && !r.passive) return true;
+export function _nkDodgeBusy() {
+    if (typeof window._crushState !== 'undefined' && window._crushState) return true;
+    if (typeof _activeBlasts !== 'undefined' && _activeBlasts.size > 0) return true;
+    for (const r of _nkRuns.values()) if (r.dodge && !r.passive) return true;
     return false;
 }
 
 
-export function _egNkNewRun(bossId, isDodge) {
-    const id = ++_egNkSeq;
+export function _nkNewRun(bossId, isDodge) {
+    const id = ++_nkSeq;
     const run = { id, bossId: bossId || null, dodge: !!isDodge, raf: 0, timers: [], els: [], dotAcc: 0 };
     // Tier scaling for DODGE runs: the run's internal clock advances on a
-    // scaled dtS (see _egNkLoop), so every per-boss nk hazard - slam bands,
+    // scaled dtS (see _nkLoop), so every per-boss nk hazard - slam bands,
     // storms, shrapnel, chase orbs, weather watchers (Puddle), garden
     // watchers (Sprout) - shares the screen-blast difficulty curve.
     // Non-dodge runs (shields, summons, buff enrage) keep real-time timing.
     // PERSISTENT WATCHERS (Puddle/Sprout/Bumper/Marksman gauntlet-watcher):
     // they want the tier clock but must NOT count as an active set-piece -
-    // a forever-alive dodge run would trip _egNkDodgeBusy() and permanently
+    // a forever-alive dodge run would trip _nkDodgeBusy() and permanently
     // block scheduled mechanics (sproutlings, fog bank) and other bosses'
     // set-pieces. They set run.passive = true right after creation; the
     // tierFactor lookup below runs on the same tick either way.
     run.tierFactor = 1;
-    if (run.dodge && bossId && typeof _egMonsters !== 'undefined') {
+    if (run.dodge && bossId && typeof _monsters !== 'undefined') {
         try {
-            const m = globalThis._egMonsters.find(x => x && x.id === bossId);
-            if (m) run.tierFactor = _egBossTierFactor(_egBossTierNorm(m), EG_NK_TIER_FACTOR);
+            const m = globalThis._monsters.find(x => x && x.id === bossId);
+            if (m) run.tierFactor = _bossTierFactor(_bossTierNorm(m), NK_TIER_FACTOR);
         } catch (e) {}
     }
-    _egNkRuns.set(id, run);
+    _nkRuns.set(id, run);
     return run;
 }
 
 
-export function _egNkEl(run, tag, cls, text) {
+export function _nkEl(run, tag, cls, text) {
     const el = document.createElement(tag || 'div');
     if (cls) el.className = cls;
     if (text != null) el.textContent = text;
@@ -2037,7 +2037,7 @@ export function _egNkEl(run, tag, cls, text) {
 }
 
 
-export function _egNkKillRun(run) {
+export function _nkKillRun(run) {
     if (!run) return;
     if (run.raf) cancelAnimationFrame(run.raf);
     run.timers.forEach(t => { clearTimeout(t); clearInterval(t); });
@@ -2048,49 +2048,49 @@ export function _egNkKillRun(run) {
     if (typeof run.onKill === 'function') {
         try { run.onKill(); } catch (e) {}
     }
-    _egNkRuns.delete(run.id);
+    _nkRuns.delete(run.id);
 }
 
 
 // Cancels only runs owned by one boss - add deaths must never nuke the
-// boss's own active mechanic. Called from _egBossCleanup.
-export function _egNkTeardownBoss(bossId) {
-    Array.from(_egNkRuns.values()).forEach(r => {
-        if (r.bossId === bossId) _egNkKillRun(r);
+// boss's own active mechanic. Called from _bossCleanup.
+export function _nkTeardownBoss(bossId) {
+    Array.from(_nkRuns.values()).forEach(r => {
+        if (r.bossId === bossId) _nkKillRun(r);
     });
     document.querySelectorAll('.eg-nk-shielded').forEach(el => el.classList.remove('eg-nk-shielded'));
 }
 
 
-export function _egNkTeardownAll() {
-    Array.from(_egNkRuns.values()).forEach(_egNkKillRun);
+export function _nkTeardownAll() {
+    Array.from(_nkRuns.values()).forEach(_nkKillRun);
     document.querySelectorAll('.eg-nk-shielded').forEach(el => el.classList.remove('eg-nk-shielded'));
 }
 
 
 // Pause / encounter / death guard - loops freeze instead of advancing.
-export function _egNkFrozen() {
+export function _nkFrozen() {
     if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return true;
-    if (typeof _egIsActive === 'function' && !_egIsActive()) return true;
+    if (typeof _isActive === 'function' && !_isActive()) return true;
     if (typeof dead !== 'undefined' && globalThis.dead) return true;
     return false;
 }
 
 
-export function _egNkBossAlive(bossId) {
-    if (!bossId || typeof _egMonsters === 'undefined') return true;
-    return !!globalThis._egMonsters.find(m => m.id === bossId);
+export function _nkBossAlive(bossId) {
+    if (!bossId || typeof _monsters === 'undefined') return true;
+    return !!globalThis._monsters.find(m => m.id === bossId);
 }
 
 
 // Pause-safe rAF driver. tick(dtS, now) returns true to continue.
 // Boss death ends the run silently (visuals vanish with their owner).
-export function _egNkLoop(run, tick) {
+export function _nkLoop(run, tick) {
     let last = performance.now();
     const step = (now) => {
-        if (!_egNkRuns.has(run.id)) return;
-        if (!_egNkBossAlive(run.bossId)) { _egNkKillRun(run); return; }
-        if (_egNkFrozen()) {
+        if (!_nkRuns.has(run.id)) return;
+        if (!_nkBossAlive(run.bossId)) { _nkKillRun(run); return; }
+        if (_nkFrozen()) {
             last = now;
             run.raf = requestAnimationFrame(step);
             return;
@@ -2106,39 +2106,39 @@ export function _egNkLoop(run, tick) {
             ? rawDt / run.tierFactor : rawDt;
         let cont = true;
         try { cont = tick(dtS, now); } catch (e) { console.warn('nk loop tick error:', e); cont = false; }
-        if (cont && _egNkRuns.has(run.id)) run.raf = requestAnimationFrame(step);
-        else _egNkKillRun(run);
+        if (cont && _nkRuns.has(run.id)) run.raf = requestAnimationFrame(step);
+        else _nkKillRun(run);
     };
     run.raf = requestAnimationFrame(step);
 }
 
 
-export function _egNkPlayerRect() {
-    if (typeof _egBlastGetPlayerRect === 'function') {
-        const r = _egBlastGetPlayerRect();
+export function _nkPlayerRect() {
+    if (typeof _blastGetPlayerRect === 'function') {
+        const r = _blastGetPlayerRect();
         if (r && (r.width || r.height)) return r;
     }
-    if (typeof _egHzPlayerHitbox === 'function') {
-        const r = _egHzPlayerHitbox();
+    if (typeof _hzPlayerHitbox === 'function') {
+        const r = _hzPlayerHitbox();
         if (r) return r;
     }
     return null;
 }
 
 
-export function _egNkPlayerCenter() {
-    const r = _egNkPlayerRect();
+export function _nkPlayerCenter() {
+    const r = _nkPlayerRect();
     if (!r) return null;
     return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 }
 
 
-export function _egNkMaxHP() {
+export function _nkMaxHP() {
     return (typeof playerMaxHP !== 'undefined' && globalThis.playerMaxHP > 0) ? globalThis.playerMaxHP : 100;
 }
 
 
-export function _egNkCircleHit(x, y, r, pr, pad) {
+export function _nkCircleHit(x, y, r, pr, pad) {
     if (!pr) return false;
     const p = pad || 0;
     const cx = Math.max(pr.left, Math.min(x, pr.right));
@@ -2148,7 +2148,7 @@ export function _egNkCircleHit(x, y, r, pr, pad) {
 }
 
 
-export function _egNkRectsOverlap(a, b) {
+export function _nkRectsOverlap(a, b) {
     return !!a && !!b && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 }
 
@@ -2157,12 +2157,12 @@ export function _egNkRectsOverlap(a, b) {
 // saws, wisps, ...): collision uses the dot's ACTUAL painted box (+2px
 // forgiveness) rather than an idealized circle, so visible contact always
 // registers and CSS motion can't skew the hitbox.
-export function _egNkDotHit(el, pr, pad) {
+export function _nkDotHit(el, pr, pad) {
     if (!el || !pr) return false;
     const r = el.getBoundingClientRect();
     if (!r.width || !r.height) return false;
     const p = (pad == null) ? 2 : pad;
-    return _egNkRectsOverlap(
+    return _nkRectsOverlap(
         { left: r.left - p, right: r.right + p, top: r.top - p, bottom: r.bottom + p },
         pr
     );
@@ -2173,40 +2173,40 @@ export function _egNkDotHit(el, pr, pad) {
 // ability hit is applied so a fully-absorbed hit (dealt 0 because the shield
 // ate everything) can be told apart from other zero-damage cases (godmode,
 // inactive encounter) after the fact.
-export function _egNkShieldUp() {
-    return typeof _egPlayerAbsorptionCurrent !== 'undefined' && globalThis._egPlayerAbsorptionCurrent > 0;
+export function _nkShieldUp() {
+    return typeof _playerAbsorptionCurrent !== 'undefined' && globalThis._playerAbsorptionCurrent > 0;
 }
 
 
-// Set by _egNkHit and the screen-blast engine right after applying damage:
+// Set by _nkHit and the screen-blast engine right after applying damage:
 // true when that hit was fully eaten by the absorption shield. Consumed by
-// _egNkAbilityHitToast in the same synchronous frame, so it can never leak
+// _nkAbilityHitToast in the same synchronous frame, so it can never leak
 // into a later toast.
-export let _egNkLastHitAbsorbed = false;
+export let _nkLastHitAbsorbed = false;
 
 
 // Direct %maxHP hit through the normal intake (resists apply). The percent
-// itself is tier-scaled (_egNkTierDamageFactor) so failed dodges sting less
+// itself is tier-scaled (_nkTierDamageFactor) so failed dodges sting less
 // on gentle bosses and harder on brutal ones - the damage companion to the
-// EG_NK_TIER_FACTOR timing curve.
-export function _egNkHit(pct, element, level) {
-    const shielded = _egNkShieldUp();
-    const dmg = Math.max(1, Math.round(_egNkBoostFailedDodge(_egNkMaxHP() * pct * _egNkTierDamageFactor(level), _egNkMaxHP())));
-    const dealt = (typeof _egPlayerTakeDamage === 'function')
-        ? _egPlayerTakeDamage(dmg, true, element || null, level || 1, { isBossAbility: true }) : 0;
-    _egNkLastHitAbsorbed = shielded && dealt <= 0;
-    if (dealt > 0 && typeof _egApplyPlayerHitFeedback === 'function') {
-        try { _egApplyPlayerHitFeedback(dealt); } catch (e) {}
+// NK_TIER_FACTOR timing curve.
+export function _nkHit(pct, element, level) {
+    const shielded = _nkShieldUp();
+    const dmg = Math.max(1, Math.round(_nkBoostFailedDodge(_nkMaxHP() * pct * _nkTierDamageFactor(level), _nkMaxHP())));
+    const dealt = (typeof _playerTakeDamage === 'function')
+        ? _playerTakeDamage(dmg, true, element || null, level || 1, { isBossAbility: true }) : 0;
+    _nkLastHitAbsorbed = shielded && dealt <= 0;
+    if (dealt > 0 && typeof _applyPlayerHitFeedback === 'function') {
+        try { _applyPlayerHitFeedback(dealt); } catch (e) {}
     }
     return dealt;
 }
 
 
 // Distance from point (px,py) to segment (ax,ay)-(bx,by).
-// Shared since the Tier 7 Colossus rework (was _egInfernoPtSegDist in
+// Shared since the Tier 7 Colossus rework (was _infernoPtSegDist in
 // boss-inferno.js; also used by Clock, Guardian, Kraken, Oblivion and the
 // Colossus rework's rock chutes).
-export function _egPtSegDist(px, py, ax, ay, bx, by) {
+export function _ptSegDist(px, py, ax, ay, bx, by) {
     const dx = bx - ax, dy = by - ay;
     const len2 = dx * dx + dy * dy || 1;
     const f = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2));
@@ -2215,21 +2215,21 @@ export function _egPtSegDist(px, py, ax, ay, bx, by) {
 
 
 // DoT chunking: accumulates fractional damage, applies whole-HP ticks.
-export function _egNkDotTick(run, pctPerSec, dtS, level, element) {
-    // dtS arrives already clock-scaled from _egNkLoop (real / tierFactor);
+export function _nkDotTick(run, pctPerSec, dtS, level, element) {
+    // dtS arrives already clock-scaled from _nkLoop (real / tierFactor);
     // multiply it back out so the DoT's DPS is independent of the TIMING
     // curve. The percent-per-second itself is tier-scaled (same damage
-    // companion as _egNkHit) - so only the damage knob moves here, never
+    // companion as _nkHit) - so only the damage knob moves here, never
     // the clock.
     const realDt = dtS * ((run && run.tierFactor) || 1);
-    const dmgF = _egNkTierDamageFactor(level);
-    run.dotAcc = (run.dotAcc || 0) + (_egNkMaxHP() * pctPerSec * dmgF * EG_NK_FAIL_MULT / 100) * realDt;
-    const unit = Math.max(1, _egNkMaxHP() * 0.01);
+    const dmgF = _nkTierDamageFactor(level);
+    run.dotAcc = (run.dotAcc || 0) + (_nkMaxHP() * pctPerSec * dmgF * NK_FAIL_MULT / 100) * realDt;
+    const unit = Math.max(1, _nkMaxHP() * 0.01);
     if (run.dotAcc >= unit) {
         const tick = Math.floor(run.dotAcc);
         run.dotAcc -= tick;
-        if (typeof _egPlayerTakeDamage === 'function') {
-            _egPlayerTakeDamage(tick, true, element || null, level || 1, { isBossAbility: true });
+        if (typeof _playerTakeDamage === 'function') {
+            _playerTakeDamage(tick, true, element || null, level || 1, { isBossAbility: true });
         }
     }
 }
@@ -2237,16 +2237,16 @@ export function _egNkDotTick(run, pctPerSec, dtS, level, element) {
 
 // Failed-dodge feedback toast for a NAMED boss ability, decided by damage:
 //   dealt > 0 → silent (damage taken is never shown in the combat toast)
-//   dealt == 0 + absorption flag (from _egNkHit / the blast engine) →
+//   dealt == 0 + absorption flag (from _nkHit / the blast engine) →
 //     "🛡️ absorbed by your shield!" - never a misleading "hit for 0".
 //   dealt == 0 without absorption (godmode, inactive encounter) → silent.
 // bossName may be null; abilityName reads after it. Element bosses use the
 // canonical damage-number palette; elementless ones (Brutus, The Minotaur, ...)
-// get a fixed signature color from EG_NK_BOSS_SIGNATURE_COLORS.
-export const EG_NK_ELEMENT_TOAST_COLORS = {
+// get a fixed signature color from NK_BOSS_SIGNATURE_COLORS.
+export const NK_ELEMENT_TOAST_COLORS = {
     fire: '#ff3b1f', cold: '#6ecbff', lightning: '#ffe536', shadow: '#c084ff',
 };
-export const EG_NK_BOSS_SIGNATURE_COLORS = {
+export const NK_BOSS_SIGNATURE_COLORS = {
     // Elementless bosses get distinct signature colors (themed where obvious).
     Brutus: '#f87171',
     'The Architect': '#e5e7eb',
@@ -2275,16 +2275,16 @@ export const EG_NK_BOSS_SIGNATURE_COLORS = {
 
 // Resolves a boss display name to its toast color: signature color for
 // elementless bosses, else the def's element color, else classic damage red.
-export function _egNkBossToastColor(bossName) {
-    if (bossName && EG_NK_BOSS_SIGNATURE_COLORS[bossName]) {
-        return EG_NK_BOSS_SIGNATURE_COLORS[bossName];
+export function _nkBossToastColor(bossName) {
+    if (bossName && NK_BOSS_SIGNATURE_COLORS[bossName]) {
+        return NK_BOSS_SIGNATURE_COLORS[bossName];
     }
-    if (bossName && typeof EG_BOSS_DEFS !== 'undefined') {
-        for (const key in EG_BOSS_DEFS) {
-            const d = EG_BOSS_DEFS[key];
+    if (bossName && typeof BOSS_DEFS !== 'undefined') {
+        for (const key in BOSS_DEFS) {
+            const d = BOSS_DEFS[key];
             if (d && d.name === bossName && d.element
-                && EG_NK_ELEMENT_TOAST_COLORS[d.element]) {
-                return EG_NK_ELEMENT_TOAST_COLORS[d.element];
+                && NK_ELEMENT_TOAST_COLORS[d.element]) {
+                return NK_ELEMENT_TOAST_COLORS[d.element];
             }
         }
     }
@@ -2296,12 +2296,12 @@ export function _egNkBossToastColor(bossName) {
 // consumed here so it can never leak into a later toast.
 // quiet = skip the on-screen toast (for repeating contact hits that would
 // spam it); the dev fight log and the absorbed-flag reset still happen.
-export function _egNkAbilityHitToast(dealt, bossName, abilityName, quiet) {
-    // Dev fight log: names the hit that _egPlayerTakeDamage just recorded.
+export function _nkAbilityHitToast(dealt, bossName, abilityName, quiet) {
+    // Dev fight log: names the hit that _playerTakeDamage just recorded.
     if (typeof globalThis.__fightLogAbility === 'function') globalThis.__fightLogAbility(dealt, bossName, abilityName);
     const ability = (bossName ? bossName + '’s ' : '') + abilityName;
-    const absorbed = _egNkLastHitAbsorbed;
-    _egNkLastHitAbsorbed = false;
+    const absorbed = _nkLastHitAbsorbed;
+    _nkLastHitAbsorbed = false;
     if (quiet) return;
     // Damage taken is never shown in the combat toast (the floating hit number on
     // the avatar already covers it); only the shield-absorbed outcome is toasted.
@@ -2321,7 +2321,7 @@ export function _egNkAbilityHitToast(dealt, bossName, abilityName, quiet) {
 }
 
 
-export function _egNkToast(key, fallback, color) {
+export function _nkToast(key, fallback, color) {
     let msg = fallback;
     try {
         const raw = t(key);
@@ -2354,7 +2354,7 @@ export function _egNkToast(key, fallback, color) {
 // Random-walk fissures across the band: 2–3 main cracks running left → right
 // plus short branch cracks hanging off their interior vertices. Returns SVG
 // path strings with a `core` flag (main cracks draw brighter/thicker).
-export function _egNkSlamPaths(w, h) {
+export function _nkSlamPaths(w, h) {
     const paths = [];
     const fissures = 2 + Math.floor(Math.random() * 2);
     for (let i = 0; i < fissures; i++) {
@@ -2393,7 +2393,7 @@ export function _egNkSlamPaths(w, h) {
 
 
 // Builds and launches one impact burst across the band's struck area.
-export function _egNkSlamShatter(band, run) {
+export function _nkSlamShatter(band, run) {
     const rect = band.getBoundingClientRect();
     if (!rect || rect.width <= 0 || rect.height <= 0) return;
     const w = rect.width, h = rect.height;
@@ -2414,7 +2414,7 @@ export function _egNkSlamShatter(band, run) {
     svg.setAttribute('viewBox', '0 0 ' + Math.max(10, Math.round(w)) + ' ' + Math.max(10, Math.round(h)));
     burst.appendChild(svg);
     let delay = 0;
-    _egNkSlamPaths(w, h).forEach(c => {
+    _nkSlamPaths(w, h).forEach(c => {
         const path = document.createElementNS(NS, 'path');
         path.setAttribute('d', c.d);
         path.setAttribute('pathLength', '1');
@@ -2480,7 +2480,7 @@ export function _egNkSlamShatter(band, run) {
 
 // Gently displaces the avatar (polarity field). Composes with WASD
 // movement, which reads the same style offsets every frame.
-export function _egNkNudgeAvatar(dx, dy) {
+export function _nkNudgeAvatar(dx, dy) {
     const el = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     if (!el) return;
@@ -2507,13 +2507,13 @@ export function _egNkNudgeAvatar(dx, dy) {
 }
 
 
-// Animated knockback: like _egNkNudgeAvatar but the avatar's PIXELS glide
+// Animated knockback: like _nkNudgeAvatar but the avatar's PIXELS glide
 // (compositor-driven CSS ease-out slide on left/top + tumble wobble) instead
 // of teleporting, with an impact burst at the contact point.
 //   dx, dy     - fling impulse in px (same as the nudge)
 //   srcX, srcY - optional contact point for the burst
-export let _egFlingSeq = 0;
-export function _egNkFlingAvatar(dx, dy, srcX, srcY) {
+export let _flingSeq = 0;
+export function _nkFlingAvatar(dx, dy, srcX, srcY) {
     const el = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     if (!el) return;
@@ -2566,9 +2566,9 @@ export function _egNkFlingAvatar(dx, dy, srcX, srcY) {
     const dist = Math.hypot(x1 - x0, y1 - y0);
     const bx = (srcX != null) ? srcX : x0 + w / 2 - dx * 0.4;
     const by = (srcY != null) ? srcY : y0 + h / 2 - dy * 0.4;
-    _egFlingBurst(bx, by, Math.atan2(dy, dx));
+    _flingBurst(bx, by, Math.atan2(dy, dx));
     if (dist < 6) return; // nothing worth tweening
-    const seq = ++_egFlingSeq;
+    const seq = ++_flingSeq;
     const dur = Math.max(300, Math.min(430, 260 + dist * 0.5));
     // Tumble wobble on the wrapper (its transform is otherwise unused) -
     // direction-signed via a CSS var so left/right flings tilt oppositely.
@@ -2588,7 +2588,7 @@ export function _egNkFlingAvatar(dx, dy, srcX, srcY) {
     // (divergence check), so control resumes seamlessly wherever the fling
     // ended up - no snap-back if the player fought the knockback.
     setTimeout(() => {
-        if (seq !== _egFlingSeq) return; // superseded by a newer fling
+        if (seq !== _flingSeq) return; // superseded by a newer fling
         try {
             el.style.transition = '';
             el.classList.remove('eg-flinging');
@@ -2604,7 +2604,7 @@ export function _egNkFlingAvatar(dx, dy, srcX, srcY) {
 
 // Small impact punctuation for a fling: sparks + an expanding ring at (x, y).
 // Self-removing after ~0.5s; no run tracking needed.
-export function _egFlingBurst(x, y, angle) {
+export function _flingBurst(x, y, angle) {
     try {
         const ring = document.createElement('div');
         ring.className = 'eg-fling-ring';
@@ -2638,24 +2638,24 @@ export function _egFlingBurst(x, y, angle) {
 //   'shelter' - ONE green circle opens within walking reach (never on you):
 //               everything outside it is hit.
 //   'avoid'   - red circles land on your spot (+ extra ones): be outside.
-// Damage goes through _egNkHit (flash + number). Waves always leave at
+// Damage goes through _nkHit (flash + number). Waves always leave at
 // least the countdown minus ~0.7s reaction to walk (320 px/s avatar).
 // Per-boss look: cfg.cls is added to the banner and zones (CSS colour
 // variable --nk-fin), and the finale fires at most once per boss.
-const EG_NK_FIN_SAFE_R = 115;    // px green shelter radius
-const EG_NK_FIN_DANGER_R = 135;  // px red strike radius
-const EG_NK_FIN_GAP_MS = 900;    // pause between waves
+const NK_FIN_SAFE_R = 115;    // px green shelter radius
+const NK_FIN_DANGER_R = 135;  // px red strike radius
+const NK_FIN_GAP_MS = 900;    // pause between waves
 
 // Starts a passive HP watcher: at ≤10% the finale (cfg) begins once.
-export function _egNkWatchFinale(monster, cfg) {
+export function _nkWatchFinale(monster, cfg) {
     if (!monster || monster._nkFinaleWatch) return;
     monster._nkFinaleWatch = true;
-    const run = _egNkNewRun(monster.id, true);
+    const run = _nkNewRun(monster.id, true);
     run.passive = true;
-    _egNkLoop(run, () => {
+    _nkLoop(run, () => {
         if (monster._nkFinaleDone) return false;
         if (monster.currentHP > 0 && monster.currentHP <= monster.maxHP * 0.10 && !monster.bossImmune) {
-            _egNkFinaleWaves(monster, cfg);
+            _nkFinaleWaves(monster, cfg);
             return false;
         }
         return true;
@@ -2664,15 +2664,15 @@ export function _egNkWatchFinale(monster, cfg) {
 
 // Runs the finale. cfg: { name (boss display name), title, hint, cls,
 // element, waves: [{ kind: 'shelter'|'avoid', ms, dmg, extra, label }] }
-export function _egNkFinaleWaves(monster, cfg) {
+export function _nkFinaleWaves(monster, cfg) {
     if (!monster || monster._nkFinaleDone) return;
     monster._nkFinaleDone = true;
     // The finale owns the arena: stop this boss's other active mechanics.
-    Array.from(_egNkRuns.values()).forEach(r => {
-        if (r.bossId === monster.id && !r.passive) { try { _egNkKillRun(r); } catch (e) {} }
+    Array.from(_nkRuns.values()).forEach(r => {
+        if (r.bossId === monster.id && !r.passive) { try { _nkKillRun(r); } catch (e) {} }
     });
     const level = monster.level || 1;
-    const run = _egNkNewRun(monster.id, false);
+    const run = _nkNewRun(monster.id, false);
     run.passive = true;
     monster.bossImmune = true;
     const card = document.getElementById('eg-card-' + monster.id);
@@ -2682,12 +2682,12 @@ export function _egNkFinaleWaves(monster, cfg) {
         try { monster.bossImmune = false; } catch (e) {}
         if (wrap) wrap.classList.remove('eg-nk-shielded');
     };
-    const banner = _egNkEl(run, 'div', 'eg-nk-fin-banner ' + (cfg.cls || ''));
+    const banner = _nkEl(run, 'div', 'eg-nk-fin-banner ' + (cfg.cls || ''));
     banner.innerHTML = '<div class="eg-nk-fin-title"></div><div class="eg-nk-fin-hint"></div>';
     banner.querySelector('.eg-nk-fin-title').textContent = cfg.title;
     const hintEl = banner.querySelector('.eg-nk-fin-hint');
     hintEl.textContent = cfg.hint;
-    _egNkToast(cfg.toastKey || 'eg_nk_finale', cfg.title + ' - ' + cfg.hint, cfg.color);
+    _nkToast(cfg.toastKey || 'eg_nk_finale', cfg.title + ' - ' + cfg.hint, cfg.color);
 
     const W = () => window.innerWidth, H = () => window.innerHeight;
     const clamp = (x, y, r) => ({
@@ -2695,15 +2695,15 @@ export function _egNkFinaleWaves(monster, cfg) {
         // keep clear of the inventory bar along the bottom edge
         y: Math.max(r + 20, Math.min(H() - r - 70, y)),
     });
-    const pcNow = () => _egNkPlayerCenter() || { x: W() / 2, y: H() / 2 };
+    const pcNow = () => _nkPlayerCenter() || { x: W() / 2, y: H() / 2 };
     const waves = cfg.waves || [];
     let wi = 0, stage = 'gap', t = 0, zones = [], countEls = [], wave = null;
 
-    _egNkLoop(run, (dtS) => {
-        if (!_egNkBossAlive(monster.id)) return false;
+    _nkLoop(run, (dtS) => {
+        if (!_nkBossAlive(monster.id)) return false;
         t += dtS * 1000;
         if (stage === 'gap') {
-            if (t < EG_NK_FIN_GAP_MS) return true;
+            if (t < NK_FIN_GAP_MS) return true;
             if (wi >= waves.length) return false;      // done → onKill releases immunity
             wave = waves[wi++];
             t = 0; stage = 'count';
@@ -2712,17 +2712,17 @@ export function _egNkFinaleWaves(monster, cfg) {
             if (wave.kind === 'shelter') {
                 // 170-360 px away: a short walk, never where you already stand.
                 const a = Math.random() * Math.PI * 2, d = 170 + Math.random() * 190;
-                const c = clamp(pc.x + Math.cos(a) * d, pc.y + Math.sin(a) * d, EG_NK_FIN_SAFE_R);
-                zones.push({ ...c, r: EG_NK_FIN_SAFE_R, safe: true });
+                const c = clamp(pc.x + Math.cos(a) * d, pc.y + Math.sin(a) * d, NK_FIN_SAFE_R);
+                zones.push({ ...c, r: NK_FIN_SAFE_R, safe: true });
             } else {
-                const c = clamp(pc.x, pc.y, EG_NK_FIN_DANGER_R);
-                zones.push({ ...c, r: EG_NK_FIN_DANGER_R, safe: false });
+                const c = clamp(pc.x, pc.y, NK_FIN_DANGER_R);
+                zones.push({ ...c, r: NK_FIN_DANGER_R, safe: false });
                 for (let i = 0; i < (wave.extra || 0); i++) {
-                    zones.push({ ...clamp(Math.random() * W(), Math.random() * H(), EG_NK_FIN_DANGER_R), r: EG_NK_FIN_DANGER_R, safe: false });
+                    zones.push({ ...clamp(Math.random() * W(), Math.random() * H(), NK_FIN_DANGER_R), r: NK_FIN_DANGER_R, safe: false });
                 }
             }
             countEls = zones.map(z => {
-                const el = _egNkEl(run, 'div', 'eg-nk-fin-zone ' + (z.safe ? 'eg-nk-fin-safe ' : 'eg-nk-fin-danger ') + (cfg.cls || ''));
+                const el = _nkEl(run, 'div', 'eg-nk-fin-zone ' + (z.safe ? 'eg-nk-fin-safe ' : 'eg-nk-fin-danger ') + (cfg.cls || ''));
                 el.style.left = Math.round(z.x - z.r) + 'px';
                 el.style.top = Math.round(z.y - z.r) + 'px';
                 el.style.width = el.style.height = (z.r * 2) + 'px';
@@ -2744,8 +2744,8 @@ export function _egNkFinaleWaves(monster, cfg) {
                 : zones.some(z => Math.hypot(pc.x - z.x, pc.y - z.y) < z.r);
             zones.forEach(z => z.el.classList.add('eg-nk-fin-strike'));
             if (hit) {
-                const dealt = _egNkHit(wave.dmg, cfg.element || null, level);
-                _egNkAbilityHitToast(dealt, cfg.name, wave.label || cfg.title);
+                const dealt = _nkHit(wave.dmg, cfg.element || null, level);
+                _nkAbilityHitToast(dealt, cfg.name, wave.label || cfg.title);
             }
             const old = zones.map(z => z.el);
             setTimeout(() => old.forEach(el => { try { el.remove(); } catch (e) {} }), 600);

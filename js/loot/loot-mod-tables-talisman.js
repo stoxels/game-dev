@@ -2,7 +2,7 @@
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
+//  which evals every MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------TALISMAN MODIFIER TABLE------------------------------
@@ -29,7 +29,7 @@
 // added, no spell damage, no quiz exclusives, no precision, no echo,
 // no arcane_surge, no mana_to_damage.
 
-export const EG_MOD_TABLE_TALISMAN = {
+export const MOD_TABLE_TALISMAN = {
     prefixes: {
 
         // --- LIFE (primary for a protective charm) ---

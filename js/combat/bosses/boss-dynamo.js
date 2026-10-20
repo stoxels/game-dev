@@ -1,10 +1,10 @@
 import { t } from '../../translation/translations.js';
-import { EG_ART } from '../../endgame/endgame-art.js';
-import { _egHpBarClass } from '../encounter.js';
-import { EG_MONSTER_DEFS } from '../combat-monsters-data.js';
-import { _egIsActive } from '../combat-state.js';
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
+import { GAME_ART } from '../../endgame/endgame-art.js';
+import { _hpBarClass } from '../encounter.js';
+import { MONSTER_DEFS } from '../combat-monsters-data.js';
+import { _isActive } from '../combat-state.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast, _ptSegDist } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE DYNAMO (boss_dynamo)---------------------------
@@ -15,7 +15,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 // burn the boss down inside the field.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_dynamo: {
         id: 'boss_dynamo', name: 'The Dynamo', emoji: '⚡',
         baseHP: 1200, baseDamage: 26, chargeMax: 11,
@@ -23,7 +23,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_dynamo: {
         phases: [
             { threshold: 1.00, chargeMax: 11, damageMultiplier: 1.00 },
@@ -33,9 +33,9 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'spark_pillars', intervalBase: 18000, intervalVariance: 5000, handler: '_egMechSparkPillars' },
-            { name: 'lightning_conductors', intervalBase: 22000, intervalVariance: 6000, handler: '_egMechLightningConductors' },
-            { name: 'prior_bomb', intervalBase: 17000, intervalVariance: 4000, handler: '_egMechPriorBomb' },
+            { name: 'spark_pillars', intervalBase: 18000, intervalVariance: 5000, handler: '_mechSparkPillars' },
+            { name: 'lightning_conductors', intervalBase: 22000, intervalVariance: 6000, handler: '_mechLightningConductors' },
+            { name: 'prior_bomb', intervalBase: 17000, intervalVariance: 4000, handler: '_mechPriorBomb' },
         ],
         // Phase-sting extras: announce the new pillar orientations the moment
         // they come online. Returning false keeps the standard immunity
@@ -56,7 +56,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 // Lightning Conductor base def - real conductors are built per-spawn below
 // (HP scales off the live boss's max HP). This entry keeps any def lookup
 // (art, tooltips) working for the baseId.
-Object.assign(EG_MONSTER_DEFS, {
+Object.assign(MONSTER_DEFS, {
     dynamo_conductor: {
         id: 'dynamo_conductor', name: 'Lightning Conductor', emoji: '🔌',
         baseHP: 350, baseDamage: 0, chargeMax: 9999,
@@ -81,18 +81,18 @@ Object.assign(EG_MONSTER_DEFS, {
 // pillar also gets its own random start offset, so bolts never all fire at
 // the same instant.
 
-export const EG_PILLAR_WIDTH = 46;          // hitbox + bolt width (px)
-export const EG_PILLAR_WARN_MS = 1000;      // crackling telegraph before the strike
-export const EG_PILLAR_ACTIVE_MS = 620;     // how long the live bolt deals damage
-export const EG_PILLAR_STAGGER_SPREAD = 900; // max per-pillar start offset (ms)
+export const PILLAR_WIDTH = 46;          // hitbox + bolt width (px)
+export const PILLAR_WARN_MS = 1000;      // crackling telegraph before the strike
+export const PILLAR_ACTIVE_MS = 620;     // how long the live bolt deals damage
+export const PILLAR_STAGGER_SPREAD = 900; // max per-pillar start offset (ms)
 // Shape re-jitter cadence per stage. Warn arcs re-crackle slower (still
 // lively); live bolts crackle faster. Cheaper than the old ~12x/second for
 // EVERY bolt - with 18 pillars up that was 200+ path rebuilds per second.
-export const EG_BOLT_CRACKLE_WARN_MS = [180, 360];
-export const EG_BOLT_CRACKLE_ACTIVE_MS = [90, 180];
+export const BOLT_CRACKLE_WARN_MS = [180, 360];
+export const BOLT_CRACKLE_ACTIVE_MS = [90, 180];
 
-export function _egMechSparkPillars(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechSparkPillars(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(4, Number(phase) || 1));
     const W = window.innerWidth;
     const H = window.innerHeight;
@@ -104,16 +104,16 @@ export function _egMechSparkPillars(monster, phase) {
 
     const dmgPct = [0, 0.12, 0.14, 0.16, 0.18][p];
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
 
     // Stratified lane positions with minimum-gap padding.
-    const vPos = _egDynamoStratifiedPositions(nV, 70, W - 140);
-    const hPos = _egDynamoStratifiedPositions(nH, 95, H - 190);
+    const vPos = _dynamoStratifiedPositions(nV, 70, W - 140);
+    const hPos = _dynamoStratifiedPositions(nH, 95, H - 190);
     // Diagonals run at ±45° through offset anchors; offsets are stratified
     // across ±maxOff. maxOff is the largest perpendicular distance at which
     // a 45° line still visibly crosses the viewport.
     const diagMaxOff = (W + H) * 0.32;
-    const dPosRaw = _egDynamoStratifiedPositions(nD, 0, diagMaxOff * 2);
+    const dPosRaw = _dynamoStratifiedPositions(nD, 0, diagMaxOff * 2);
 
     // Build the shuffled orientation list, then hand out the lane positions.
     const types = [];
@@ -154,9 +154,9 @@ export function _egMechSparkPillars(monster, phase) {
             len = diagLen;
         }
 
-        const el = _egDynamoBoltEl(run, len);
+        const el = _dynamoBoltEl(run, len);
         el.classList.add('eg-bolt-warn');
-        el.style.left = Math.round(ax - EG_PILLAR_WIDTH / 2) + 'px';
+        el.style.left = Math.round(ax - PILLAR_WIDTH / 2) + 'px';
         el.style.top = Math.round(ay - len / 2) + 'px';
         el.style.transform = `rotate(${rot}rad)`;
 
@@ -164,7 +164,7 @@ export function _egMechSparkPillars(monster, phase) {
         const glow = el.querySelector('.bolt-glow');
         const halo = el.querySelector('.bolt-halo');
         const paintBolt = () => {
-            const d = _egDynamoBoltPath(len);
+            const d = _dynamoBoltPath(len);
             halo.setAttribute('d', d);
             core.setAttribute('d', d);
             glow.setAttribute('d', d);
@@ -173,7 +173,7 @@ export function _egMechSparkPillars(monster, phase) {
 
         pillars.push({
             type, pos, angle, nx, ny, len,
-            t: -(Math.random() * EG_PILLAR_STAGGER_SPREAD), // per-bolt offset
+            t: -(Math.random() * PILLAR_STAGGER_SPREAD), // per-bolt offset
             stage: 'warn', hitDone: false,
             crackleIn: 60 + Math.random() * 120,
             paintBolt, el, core, glow,
@@ -184,12 +184,12 @@ export function _egMechSparkPillars(monster, phase) {
     if (nV) modeNames.push('vertical');
     if (nH) modeNames.push('horizontal');
     if (nD) modeNames.push('diagonal');
-    _egNkToast('eg_mech_pillars',
+    _nkToast('eg_mech_pillars',
         `⚡ The Dynamo: Spark Pillars (${modeNames.join(' · ')})! Watch the warnings!`);
 
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         let allDone = true;
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         const dtMs = dtS * 1000;
 
         pillars.forEach((pl) => {
@@ -202,12 +202,12 @@ export function _egMechSparkPillars(monster, phase) {
             pl.crackleIn -= dtMs;
             if (pl.crackleIn <= 0) {
                 pl.paintBolt();
-                const [lo, hi] = pl.stage === 'active' ? EG_BOLT_CRACKLE_ACTIVE_MS : EG_BOLT_CRACKLE_WARN_MS;
+                const [lo, hi] = pl.stage === 'active' ? BOLT_CRACKLE_ACTIVE_MS : BOLT_CRACKLE_WARN_MS;
                 pl.crackleIn = lo + Math.random() * (hi - lo);
             }
 
             if (pl.stage === 'warn') {
-                if (pl.t >= EG_PILLAR_WARN_MS) {
+                if (pl.t >= PILLAR_WARN_MS) {
                     pl.stage = 'active';
                     pl.el.classList.remove('eg-bolt-warn');
                     pl.el.classList.add('eg-bolt-active');
@@ -216,12 +216,12 @@ export function _egMechSparkPillars(monster, phase) {
             }
 
             // Active bolt - damage window.
-            if (!pl.hitDone && pr && _egDynamoPillarHits(pl, pr)) {
+            if (!pl.hitDone && pr && _dynamoPillarHits(pl, pr)) {
                 pl.hitDone = true;
-                const dealt = _egNkHit(dmgPct, 'lightning', level);
-                _egNkAbilityHitToast(dealt, 'The Dynamo', 'Spark Pillars');
+                const dealt = _nkHit(dmgPct, 'lightning', level);
+                _nkAbilityHitToast(dealt, 'The Dynamo', 'Spark Pillars');
             }
-            if (pl.t >= EG_PILLAR_WARN_MS + EG_PILLAR_ACTIVE_MS) {
+            if (pl.t >= PILLAR_WARN_MS + PILLAR_ACTIVE_MS) {
                 pl.stage = 'done';
                 pl.el.style.display = 'none';
             }
@@ -233,7 +233,7 @@ export function _egMechSparkPillars(monster, phase) {
 // Splits [inset, inset+span] into `count` equal bands and picks one random
 // position per band, padded inward so adjacent pillars keep a minimum gap.
 // Bands are shuffled so the draw order carries no positional bias.
-export function _egDynamoStratifiedPositions(count, inset, span) {
+export function _dynamoStratifiedPositions(count, inset, span) {
     const out = [];
     if (count <= 0) return out;
     const usable = Math.max(40, span - inset * 2);
@@ -253,13 +253,13 @@ export function _egDynamoStratifiedPositions(count, inset, span) {
 
 // Builds the bolt container: a fixed div holding an SVG with a glow path and
 // a bright core path (both re-jittered while the pillar lives).
-export function _egDynamoBoltEl(run, len) {
-    const el = _egNkEl(run, 'div', 'eg-nk-bolt');
+export function _dynamoBoltEl(run, len) {
+    const el = _nkEl(run, 'div', 'eg-nk-bolt');
     const L = Math.round(len);
-    el.style.width = EG_PILLAR_WIDTH + 'px';
+    el.style.width = PILLAR_WIDTH + 'px';
     el.style.height = L + 'px';
     el.innerHTML =
-        `<svg width="${EG_PILLAR_WIDTH}" height="${L}" viewBox="0 0 ${EG_PILLAR_WIDTH} ${L}" overflow="visible">` +
+        `<svg width="${PILLAR_WIDTH}" height="${L}" viewBox="0 0 ${PILLAR_WIDTH} ${L}" overflow="visible">` +
         '<path class="bolt-halo"></path>' +
         '<path class="bolt-glow"></path>' +
         '<path class="bolt-core"></path>' +
@@ -269,10 +269,10 @@ export function _egDynamoBoltEl(run, len) {
 
 // Zigzag path for one bolt: midpoint jitter around the container's central
 // axis, calming down at the endpoints so the arc meets its anchor cleanly.
-export function _egDynamoBoltPath(len) {
-    const cx = EG_PILLAR_WIDTH / 2;
+export function _dynamoBoltPath(len) {
+    const cx = PILLAR_WIDTH / 2;
     const steps = Math.max(8, Math.round(len / 90));
-    const amp = EG_PILLAR_WIDTH * 0.36;
+    const amp = PILLAR_WIDTH * 0.36;
     let d = `M ${cx.toFixed(1)} 0`;
     for (let i = 1; i <= steps; i++) {
         const y = (len * i) / steps;
@@ -284,8 +284,8 @@ export function _egDynamoBoltPath(len) {
 }
 
 // Rendered-box hit test for one pillar against the player rect.
-export function _egDynamoPillarHits(pl, pr) {
-    const half = EG_PILLAR_WIDTH / 2;
+export function _dynamoPillarHits(pl, pr) {
+    const half = PILLAR_WIDTH / 2;
     if (pl.type === 'vertical') {
         return pr.right > pl.pos - half && pr.left < pl.pos + half;
     }
@@ -317,52 +317,52 @@ export function _egDynamoPillarHits(pl, pr) {
 // conductor) plus the filled convex hull of the network; the hull interior
 // and the beam lines themselves shock the player while the boss lives.
 
-export const EG_CONDUCTOR_MAX = 4;            // hard cap on fielded conductors
-export const EG_CONDUCTOR_HP_FRACTION = 0.18; // of the boss's live max HP each
-export const EG_CONDUCTOR_HP_MIN = 200;       // floor at low levels
-export const EG_BEAM_HIT_PAD = 9;             // px forgiveness around a beam line
-export const EG_BEAM_DPS = 0.06;              // % maxHP per second ON a beam line
-export const EG_BEAM_HULL_DPS = 0.10;         // % maxHP per second INSIDE the field
-export const EG_DYNAMO_TICK_MS = 250;         // damage + card-sync cadence
-export const EG_DYNAMO_CRACKLE_MS = 240;      // beam re-jitter cadence (was 130ms + full innerHTML churn)
-export const EG_DYNAMO_JITTER_BUDGET = 2;     // conductor↔conductor arcs re-struck per crackle tick
+export const CONDUCTOR_MAX = 4;            // hard cap on fielded conductors
+export const CONDUCTOR_HP_FRACTION = 0.18; // of the boss's live max HP each
+export const CONDUCTOR_HP_MIN = 200;       // floor at low levels
+export const BEAM_HIT_PAD = 9;             // px forgiveness around a beam line
+export const BEAM_DPS = 0.06;              // % maxHP per second ON a beam line
+export const BEAM_HULL_DPS = 0.10;         // % maxHP per second INSIDE the field
+export const DYNAMO_TICK_MS = 250;         // damage + card-sync cadence
+export const DYNAMO_CRACKLE_MS = 240;      // beam re-jitter cadence (was 130ms + full innerHTML churn)
+export const DYNAMO_JITTER_BUDGET = 2;     // conductor↔conductor arcs re-struck per crackle tick
 
-export const EG_DYNAMO_LAYER_ID = 'eg-dynamo-layer';
-export const EG_DYNAMO_SVG_ID = 'eg-dynamo-net';
+export const DYNAMO_LAYER_ID = 'eg-dynamo-layer';
+export const DYNAMO_SVG_ID = 'eg-dynamo-net';
 
-export let _egDynamoConductors = new Map(); // monsterId → { monsterId, x, y, card }
-export let _egDynamoSeq = 0;
-export let _egDynamoDamageTimer = null;
-export let _egDynamoCrackleTimer = null;
-export let _egDynamoLastBeamToast = 0;
-export let _egDynamoLastHullToast = 0;
+export let _dynamoConductors = new Map(); // monsterId → { monsterId, x, y, card }
+export let _dynamoSeq = 0;
+export let _dynamoDamageTimer = null;
+export let _dynamoCrackleTimer = null;
+export let _dynamoLastBeamToast = 0;
+export let _dynamoLastHullToast = 0;
 
 // Mechanic trigger: spawn one conductor if the phase cap allows it.
-export function _egMechLightningConductors(monster, phase) {
-    if (_egNkFrozen()) return;
-    const boss = monster || _egDynamoFindBoss();
+export function _mechLightningConductors(monster, phase) {
+    if (_nkFrozen()) return;
+    const boss = monster || _dynamoFindBoss();
     if (!boss) return;
     const p = Math.max(1, Math.min(4, Number(phase) || 1));
-    const cap = Math.min(EG_CONDUCTOR_MAX, 1 + p); // P1:2 P2:3 P3:4 P4:4
-    if (_egDynamoConductors.size >= cap) return;
+    const cap = Math.min(CONDUCTOR_MAX, 1 + p); // P1:2 P2:3 P3:4 P4:4
+    if (_dynamoConductors.size >= cap) return;
 
-    const m = _egDynamoSpawnConductor(boss);
+    const m = _dynamoSpawnConductor(boss);
     if (!m) return;
-    _egNkToast('eg_mech_conductor_spawn',
+    _nkToast('eg_mech_conductor_spawn',
         '⚡ The Dynamo summons a Lightning Conductor! Destroy it to break the network!');
 }
 
 // Builds the conductor monster + card. HP scales off the LIVE boss max HP so
 // conductors stay a real time investment at every level and with the 500k
 // test boost.
-export function _egDynamoSpawnConductor(boss) {
-    const spot = _egDynamoPickSpot(boss);
+export function _dynamoSpawnConductor(boss) {
+    const spot = _dynamoPickSpot(boss);
     if (!spot) return null;
 
-    const maxHP = Math.max(EG_CONDUCTOR_HP_MIN, Math.round(boss.maxHP * EG_CONDUCTOR_HP_FRACTION));
+    const maxHP = Math.max(CONDUCTOR_HP_MIN, Math.round(boss.maxHP * CONDUCTOR_HP_FRACTION));
     const nameRes = (typeof t === 'function') ? t('eg_mon_dynamo_conductor') : null;
     const m = {
-        id: `dynamo_conductor_${++_egDynamoSeq}`,
+        id: `dynamo_conductor_${++_dynamoSeq}`,
         baseId: 'dynamo_conductor',
         name: (nameRes && nameRes !== 'eg_mon_dynamo_conductor') ? nameRes : 'Lightning Conductor',
         emoji: '🔌',
@@ -380,26 +380,26 @@ export function _egDynamoSpawnConductor(boss) {
         zoneId: 'eg-monster-panel', // present but never rendered there
     };
 
-    globalThis._egMonsters.push(m);
-    if (!globalThis._egTargetId) globalThis._egTargetId = m.id;
+    globalThis._monsters.push(m);
+    if (!globalThis._targetId) globalThis._targetId = m.id;
 
     const rec = { monsterId: m.id, x: spot.x, y: spot.y, card: null };
-    _egDynamoConductors.set(m.id, rec);
-    rec.card = _egDynamoRenderConductorCard(m, rec);
+    _dynamoConductors.set(m.id, rec);
+    rec.card = _dynamoRenderConductorCard(m, rec);
 
-    _egDynamoDeathBurst(spot.x, spot.y, true); // charged arrival pop
-    _egDynamoRebuildNet();
-    _egDynamoStartTicks();
+    _dynamoDeathBurst(spot.x, spot.y, true); // charged arrival pop
+    _dynamoRebuildNet();
+    _dynamoStartTicks();
     return m;
 }
 
 // Random spawn spot with soft exclusion zones (boss, other conductors,
 // player), relaxing when cramped screens force it.
-export function _egDynamoPickSpot(boss) {
+export function _dynamoPickSpot(boss) {
     const W = window.innerWidth, H = window.innerHeight;
-    const bc = _egDynamoCardCenter(boss.id) || { x: W / 2, y: H * 0.35 };
-    const others = Array.from(_egDynamoConductors.values());
-    const player = (typeof _egNkPlayerCenter === 'function') ? _egNkPlayerCenter() : null;
+    const bc = _dynamoCardCenter(boss.id) || { x: W / 2, y: H * 0.35 };
+    const others = Array.from(_dynamoConductors.values());
+    const player = (typeof _nkPlayerCenter === 'function') ? _nkPlayerCenter() : null;
 
     for (let i = 0; i < 30; i++) {
         const x = 90 + Math.random() * Math.max(60, W - 180);
@@ -416,28 +416,28 @@ export function _egDynamoPickSpot(boss) {
 
 // Builds the roaming conductor card (same ids as panel cards so the engine's
 // 10Hz bar updater, damage numbers and kill flash all work untouched).
-export function _egDynamoRenderConductorCard(m, rec) {
-    let layer = document.getElementById(EG_DYNAMO_LAYER_ID);
+export function _dynamoRenderConductorCard(m, rec) {
+    let layer = document.getElementById(DYNAMO_LAYER_ID);
     if (!layer) {
         layer = document.createElement('div');
-        layer.id = EG_DYNAMO_LAYER_ID;
+        layer.id = DYNAMO_LAYER_ID;
         document.body.appendChild(layer);
     }
 
     const hpPct = Math.max(0, Math.round((m.currentHP / m.maxHP) * 100));
-    const art = (typeof EG_ART !== 'undefined' && EG_ART.html)
-        ? EG_ART.html('monster', m.artId || m.baseId, m.emoji) : m.emoji;
+    const art = (typeof GAME_ART !== 'undefined' && GAME_ART.html)
+        ? GAME_ART.html('monster', m.artId || m.baseId, m.emoji) : m.emoji;
 
     const card = document.createElement('div');
     card.className = 'eg-monster-card-compact eg-dynamo-conductor-card';
     card.id = 'eg-card-' + m.id;
     card.style.left = Math.round(rec.x) + 'px';
     card.style.top = Math.round(rec.y) + 'px';
-    card.setAttribute('onclick', `_egSelectTarget('${m.id}')`);
+    card.setAttribute('onclick', `_selectTarget('${m.id}')`);
     card.innerHTML =
         '<div class="eg-compact-bars">' +
             '<div class="eg-charge-track-compact"><div class="eg-charge-bar" id="eg-charge-bar-' + m.id + '" style="width:0%"></div></div>' +
-            '<div class="eg-hp-track-compact"><div class="eg-hp-bar-compact ' + _egHpBarClass(hpPct) + '" id="eg-hp-bar-' + m.id + '" style="width:' + hpPct + '%"></div></div>' +
+            '<div class="eg-hp-track-compact"><div class="eg-hp-bar-compact ' + _hpBarClass(hpPct) + '" id="eg-hp-bar-' + m.id + '" style="width:' + hpPct + '%"></div></div>' +
         '</div>' +
         '<div class="eg-status-strip" id="eg-status-' + m.id + '"></div>' +
         '<div class="eg-emoji-wrapper">' +
@@ -454,12 +454,12 @@ export function _egDynamoRenderConductorCard(m, rec) {
 
 // Keeps target feedback on roaming cards current (the panel rebuild never
 // touches this layer). Runs on the damage tick - cheap class toggles.
-export function _egDynamoSyncCards() {
-    if (typeof _egTargetId === 'undefined') return;
-    _egDynamoConductors.forEach((rec) => {
+export function _dynamoSyncCards() {
+    if (typeof _targetId === 'undefined') return;
+    _dynamoConductors.forEach((rec) => {
         const card = rec.card || document.getElementById('eg-card-' + rec.monsterId);
         if (!card) return;
-        const targeted = globalThis._egTargetId === rec.monsterId;
+        const targeted = globalThis._targetId === rec.monsterId;
         const pill = card.querySelector('.eg-dynamo-target-pill, .eg-target-arrow');
         if (pill) pill.remove();
         const wrap = card.querySelector('.eg-emoji-wrapper');
@@ -469,13 +469,13 @@ export function _egDynamoSyncCards() {
 
 // ── Network geometry + rendering ──────────────────────────────────────────
 
-export function _egDynamoFindBoss() {
-    if (typeof _egMonsters === 'undefined') return null;
-    return globalThis._egMonsters.find(m => m && m.isBoss && m.baseId === 'boss_dynamo') || null;
+export function _dynamoFindBoss() {
+    if (typeof _monsters === 'undefined') return null;
+    return globalThis._monsters.find(m => m && m.isBoss && m.baseId === 'boss_dynamo') || null;
 }
 
 // Centre of any monster's card, or null when it has no rendered card.
-export function _egDynamoCardCenter(monsterId) {
+export function _dynamoCardCenter(monsterId) {
     const el = document.getElementById('eg-card-' + monsterId);
     if (!el) return null;
     const r = el.getBoundingClientRect();
@@ -484,18 +484,18 @@ export function _egDynamoCardCenter(monsterId) {
 }
 
 // Network nodes: the boss card centre + every conductor anchor.
-export function _egDynamoNodes() {
-    const boss = _egDynamoFindBoss();
+export function _dynamoNodes() {
+    const boss = _dynamoFindBoss();
     if (!boss) return null;
-    const b = _egDynamoCardCenter(boss.id);
+    const b = _dynamoCardCenter(boss.id);
     if (!b) return null;
     const nodes = [b];
-    _egDynamoConductors.forEach((rec) => nodes.push({ x: rec.x, y: rec.y }));
+    _dynamoConductors.forEach((rec) => nodes.push({ x: rec.x, y: rec.y }));
     return nodes;
 }
 
 // Beam pairs: boss→every conductor, plus every conductor↔conductor pair.
-export function _egDynamoBeamSegs(nodes) {
+export function _dynamoBeamSegs(nodes) {
     const segs = [];
     for (let i = 1; i < nodes.length; i++) segs.push([nodes[0], nodes[i]]);
     for (let i = 1; i < nodes.length; i++) {
@@ -508,15 +508,15 @@ export function _egDynamoBeamSegs(nodes) {
 // rebuilt from a stored per-segment offset array, so a crackle tick only
 // rewrites the `d` attribute of existing <path> nodes - the SVG structure is
 // NEVER torn down per tick (innerHTML churn at 130ms was the old FPS sink).
-export const EG_DYNAMO_JAG_STEP_PX = 45;   // zigzag resolution per beam length
+export const DYNAMO_JAG_STEP_PX = 45;   // zigzag resolution per beam length
 
-export function _egDynamoSegSteps(len) {
-    return Math.max(5, Math.min(16, Math.round(len / EG_DYNAMO_JAG_STEP_PX)));
+export function _dynamoSegSteps(len) {
+    return Math.max(5, Math.min(16, Math.round(len / DYNAMO_JAG_STEP_PX)));
 }
 
 // Random perpendicular offsets for a segment's interior zigzag points.
-export function _egDynamoNewOffsets(len) {
-    const steps = _egDynamoSegSteps(len);
+export function _dynamoNewOffsets(len) {
+    const steps = _dynamoSegSteps(len);
     const offs = [];
     for (let i = 1; i < steps; i++) {
         const t = i / steps;
@@ -528,7 +528,7 @@ export function _egDynamoNewOffsets(len) {
 
 // Builds a jagged path `d` from endpoints + stored offsets (no randomness -
 // so position updates can reuse the exact same lightning shape).
-export function _egDynamoBuildSegD(a, b, offs) {
+export function _dynamoBuildSegD(a, b, offs) {
     const dx = b.x - a.x, dy = b.y - a.y;
     const len = Math.hypot(dx, dy) || 1;
     const nx = -dy / len, ny = dx / len;
@@ -542,23 +542,23 @@ export function _egDynamoBuildSegD(a, b, offs) {
     return d;
 }
 
-export function _egDynamoEnsureSvg() {
-    let svg = document.getElementById(EG_DYNAMO_SVG_ID);
+export function _dynamoEnsureSvg() {
+    let svg = document.getElementById(DYNAMO_SVG_ID);
     if (!svg) {
         svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.id = EG_DYNAMO_SVG_ID;
+        svg.id = DYNAMO_SVG_ID;
         document.body.appendChild(svg);
     }
     return svg;
 }
 
-export function _egDynamoRemoveNet() {
-    _egDynamoNet = null;
-    const svg = document.getElementById(EG_DYNAMO_SVG_ID);
+export function _dynamoRemoveNet() {
+    _dynamoNet = null;
+    const svg = document.getElementById(DYNAMO_SVG_ID);
     if (svg) svg.remove();
 }
 
-export function _egDynamoEmptySvg(svg) {
+export function _dynamoEmptySvg(svg) {
     if (!svg) return;
     while (svg.firstChild) svg.removeChild(svg.firstChild);
 }
@@ -570,46 +570,46 @@ export function _egDynamoEmptySvg(svg) {
 //   segs                - [{a, b, key, isBossArc, offs}]
 //   p2pIdx/jitterCursor - round-robin budget so conductor↔conductor arcs
 //                         re-strike a few per tick instead of all at once
-export let _egDynamoNet = null;
+export let _dynamoNet = null;
 
-export function _egDynamoSvgEl(tag, cls) {
+export function _dynamoSvgEl(tag, cls) {
     const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
     if (cls) el.setAttribute('class', cls);
     return el;
 }
 
-export function _egDynamoTopoKey() {
+export function _dynamoTopoKey() {
     const ids = [];
-    _egDynamoConductors.forEach((r, id) => ids.push(id));
+    _dynamoConductors.forEach((r, id) => ids.push(id));
     return ids.join('|');
 }
 
 // (Re)creates the SVG structure for the current conductor topology.
-export function _egDynamoBuildNetStructure(svg, topoKey, nodes) {
-    _egDynamoEmptySvg(svg);
+export function _dynamoBuildNetStructure(svg, topoKey, nodes) {
+    _dynamoEmptySvg(svg);
     const st = { svg, topoKey, fieldPoly: null, fieldEdge: null, beams: new Map(), segs: [], p2pIdx: [], jitterCursor: 0 };
 
     if (nodes.length >= 3) {
-        const hull = _egConvexHull(nodes);
+        const hull = _convexHull(nodes);
         if (hull && hull.length >= 3) {
-            st.fieldPoly = _egDynamoSvgEl('polygon', 'eg-dynamo-field');
-            st.fieldEdge = _egDynamoSvgEl('polygon', 'eg-dynamo-field-edge');
+            st.fieldPoly = _dynamoSvgEl('polygon', 'eg-dynamo-field');
+            st.fieldEdge = _dynamoSvgEl('polygon', 'eg-dynamo-field-edge');
             svg.appendChild(st.fieldPoly);
             svg.appendChild(st.fieldEdge);
         }
     }
 
-    _egDynamoBeamSegs(nodes).forEach(([a, b], i) => {
+    _dynamoBeamSegs(nodes).forEach(([a, b], i) => {
         const key = 's' + i;
-        const halo = _egDynamoSvgEl('path', 'eg-dynamo-beam-halo');
-        const mid = _egDynamoSvgEl('path', 'eg-dynamo-beam-mid');
-        const core = _egDynamoSvgEl('path', 'eg-dynamo-beam-core');
+        const halo = _dynamoSvgEl('path', 'eg-dynamo-beam-halo');
+        const mid = _dynamoSvgEl('path', 'eg-dynamo-beam-mid');
+        const core = _dynamoSvgEl('path', 'eg-dynamo-beam-core');
         svg.appendChild(halo); svg.appendChild(mid); svg.appendChild(core);
         st.beams.set(key, { halo, mid, core });
         st.segs.push({
             a, b, key, ia: i === 0 ? -1 : Math.ceil(i / 1), ib: -1,
             isBossArc: a === nodes[0] || b === nodes[0],
-            offs: _egDynamoNewOffsets(Math.hypot(b.x - a.x, b.y - a.y)),
+            offs: _dynamoNewOffsets(Math.hypot(b.x - a.x, b.y - a.y)),
         });
         if (!(a === nodes[0] || b === nodes[0])) st.p2pIdx.push(st.segs.length - 1);
     });
@@ -621,28 +621,28 @@ export function _egDynamoBuildNetStructure(svg, topoKey, nodes) {
     for (let i = 1; i < n; i++) {
         for (let j = i + 1; j < n; j++, si++) { st.segs[si].ia = i; st.segs[si].ib = j; }
     }
-    _egDynamoNet = st;
+    _dynamoNet = st;
 }
 
 // Updates the network in place. Called on the crackle timer and on any
 // roster change. Per tick: 1 getBoundingClientRect (boss anchor), hull math
 // on ≤5 points, and `d` rewrites for the boss arcs + a small round-robin
 // budget of conductor↔conductor arcs. No element creation, no innerHTML.
-export function _egDynamoRebuildNet() {
-    if (!_egDynamoConductors.size) { _egDynamoRemoveNet(); return; }
-    const nodes = _egDynamoNodes();
-    const svg = _egDynamoEnsureSvg();
-    if (!nodes || nodes.length < 2) { _egDynamoEmptySvg(svg); _egDynamoNet = null; return; }
+export function _dynamoRebuildNet() {
+    if (!_dynamoConductors.size) { _dynamoRemoveNet(); return; }
+    const nodes = _dynamoNodes();
+    const svg = _dynamoEnsureSvg();
+    if (!nodes || nodes.length < 2) { _dynamoEmptySvg(svg); _dynamoNet = null; return; }
 
-    const topoKey = _egDynamoTopoKey();
-    if (!_egDynamoNet || _egDynamoNet.svg !== svg || _egDynamoNet.topoKey !== topoKey) {
-        _egDynamoBuildNetStructure(svg, topoKey, nodes);
+    const topoKey = _dynamoTopoKey();
+    if (!_dynamoNet || _dynamoNet.svg !== svg || _dynamoNet.topoKey !== topoKey) {
+        _dynamoBuildNetStructure(svg, topoKey, nodes);
     }
-    const st = _egDynamoNet;
+    const st = _dynamoNet;
 
     // Hull polygons follow the anchors (positions can shift with the boss card).
     if (st.fieldPoly && nodes.length >= 3) {
-        const hull = _egConvexHull(nodes);
+        const hull = _convexHull(nodes);
         if (hull && hull.length >= 3) {
             const pts = hull.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
             st.fieldPoly.setAttribute('points', pts);
@@ -654,16 +654,16 @@ export function _egDynamoRebuildNet() {
     // round-robin budget so each still re-strikes every ~1–1.5s while the
     // per-tick DOM writes stay flat no matter how many arcs exist.
     const segs = st.segs;
-    for (let k = 0; k < EG_DYNAMO_JITTER_BUDGET && st.p2pIdx.length; k++) {
+    for (let k = 0; k < DYNAMO_JITTER_BUDGET && st.p2pIdx.length; k++) {
         const s = segs[st.p2pIdx[st.jitterCursor % st.p2pIdx.length]];
-        s.offs = _egDynamoNewOffsets(Math.hypot(s.b.x - s.a.x, s.b.y - s.a.y));
+        s.offs = _dynamoNewOffsets(Math.hypot(s.b.x - s.a.x, s.b.y - s.a.y));
         st.jitterCursor++;
     }
     for (const s of segs) {
         s.a = nodes[s.ia]; s.b = nodes[s.ib]; // fresh anchor positions
-        if (s.isBossArc) s.offs = _egDynamoNewOffsets(Math.hypot(s.b.x - s.a.x, s.b.y - s.a.y));
+        if (s.isBossArc) s.offs = _dynamoNewOffsets(Math.hypot(s.b.x - s.a.x, s.b.y - s.a.y));
         const entry = st.beams.get(s.key);
-        const d = _egDynamoBuildSegD(s.a, s.b, s.offs);
+        const d = _dynamoBuildSegD(s.a, s.b, s.offs);
         entry.halo.setAttribute('d', d);
         entry.mid.setAttribute('d', d);
         entry.core.setAttribute('d', d);
@@ -672,43 +672,43 @@ export function _egDynamoRebuildNet() {
 
 // ── Damage ticks ──────────────────────────────────────────────────────────
 
-export function _egDynamoStartTicks() {
-    if (!_egDynamoDamageTimer) _egDynamoDamageTimer = setInterval(_egDynamoDamageTick, EG_DYNAMO_TICK_MS);
-    if (!_egDynamoCrackleTimer) _egDynamoCrackleTimer = setInterval(_egDynamoRebuildNet, EG_DYNAMO_CRACKLE_MS);
+export function _dynamoStartTicks() {
+    if (!_dynamoDamageTimer) _dynamoDamageTimer = setInterval(_dynamoDamageTick, DYNAMO_TICK_MS);
+    if (!_dynamoCrackleTimer) _dynamoCrackleTimer = setInterval(_dynamoRebuildNet, DYNAMO_CRACKLE_MS);
 }
 
-export function _egDynamoStopTicks() {
-    if (_egDynamoDamageTimer) { clearInterval(_egDynamoDamageTimer); _egDynamoDamageTimer = null; }
-    if (_egDynamoCrackleTimer) { clearInterval(_egDynamoCrackleTimer); _egDynamoCrackleTimer = null; }
+export function _dynamoStopTicks() {
+    if (_dynamoDamageTimer) { clearInterval(_dynamoDamageTimer); _dynamoDamageTimer = null; }
+    if (_dynamoCrackleTimer) { clearInterval(_dynamoCrackleTimer); _dynamoCrackleTimer = null; }
 }
 
-export function _egDynamoDamageTick() {
-    if (typeof _egIsActive === 'function' && !_egIsActive()) { _egClearDynamoConductors(); return; }
-    if (typeof dead !== 'undefined' && globalThis.dead) { _egClearDynamoConductors(); return; }
-    if (_egNkFrozen()) return; // paused - hold damage, keep visuals
-    if (!_egDynamoConductors.size) { _egDynamoStopTicks(); _egDynamoRemoveNet(); return; }
+export function _dynamoDamageTick() {
+    if (typeof _isActive === 'function' && !_isActive()) { _clearDynamoConductors(); return; }
+    if (typeof dead !== 'undefined' && globalThis.dead) { _clearDynamoConductors(); return; }
+    if (_nkFrozen()) return; // paused - hold damage, keep visuals
+    if (!_dynamoConductors.size) { _dynamoStopTicks(); _dynamoRemoveNet(); return; }
 
-    _egDynamoSyncCards();
+    _dynamoSyncCards();
 
-    const nodes = _egDynamoNodes();
+    const nodes = _dynamoNodes();
     if (!nodes || nodes.length < 2) return;
-    const boss = _egDynamoFindBoss();
+    const boss = _dynamoFindBoss();
     const level = boss ? boss.level : 1;
-    const pr = _egNkPlayerRect();
+    const pr = _nkPlayerRect();
     if (!pr) return;
-    const dt = EG_DYNAMO_TICK_MS / 1000;
+    const dt = DYNAMO_TICK_MS / 1000;
     const now = Date.now();
 
     // Inner field (convex hull of boss + conductors) - the heavy zone.
     if (nodes.length >= 3) {
-        const hull = _egConvexHull(nodes);
+        const hull = _convexHull(nodes);
         if (hull && hull.length >= 3) {
             const c = { x: pr.left + pr.width / 2, y: pr.top + pr.height / 2 };
-            if (_egPointInPolygon(c, hull)) {
-                const dealt = _egNkHit(EG_BEAM_HULL_DPS * dt, 'lightning', level);
-                if (dealt > 0 && now - _egDynamoLastHullToast > 1000) {
-                    _egDynamoLastHullToast = now;
-                    _egNkAbilityHitToast(dealt, 'The Dynamo', 'Conduit Field');
+            if (_pointInPolygon(c, hull)) {
+                const dealt = _nkHit(BEAM_HULL_DPS * dt, 'lightning', level);
+                if (dealt > 0 && now - _dynamoLastHullToast > 1000) {
+                    _dynamoLastHullToast = now;
+                    _nkAbilityHitToast(dealt, 'The Dynamo', 'Conduit Field');
                 }
             }
         }
@@ -716,9 +716,9 @@ export function _egDynamoDamageTick() {
 
     // Beam lines themselves. Reuses the persistent net segments when the
     // renderer has them (same anchors the visuals draw - no duplicate work).
-    const segs = (_egDynamoNet && _egDynamoNet.segs.length)
-        ? _egDynamoNet.segs.map(s => [s.a, s.b])
-        : _egDynamoBeamSegs(nodes);
+    const segs = (_dynamoNet && _dynamoNet.segs.length)
+        ? _dynamoNet.segs.map(s => [s.a, s.b])
+        : _dynamoBeamSegs(nodes);
     const pts = [
         [pr.left + pr.width / 2, pr.top + pr.height / 2],
         [pr.left, pr.top], [pr.right, pr.top],
@@ -727,22 +727,22 @@ export function _egDynamoDamageTick() {
     let onBeam = false;
     for (const [a, b] of segs) {
         for (const [px, py] of pts) {
-            if (_egPtSegDist(px, py, a.x, a.y, b.x, b.y) < EG_BEAM_HIT_PAD) { onBeam = true; break; }
+            if (_ptSegDist(px, py, a.x, a.y, b.x, b.y) < BEAM_HIT_PAD) { onBeam = true; break; }
         }
         if (onBeam) break;
     }
     if (onBeam) {
-        const dealt = _egNkHit(EG_BEAM_DPS * dt, 'lightning', level);
-        if (dealt > 0 && now - _egDynamoLastBeamToast > 1000) {
-            _egDynamoLastBeamToast = now;
-            _egNkAbilityHitToast(dealt, 'The Dynamo', 'Lightning Network');
+        const dealt = _nkHit(BEAM_DPS * dt, 'lightning', level);
+        if (dealt > 0 && now - _dynamoLastBeamToast > 1000) {
+            _dynamoLastBeamToast = now;
+            _nkAbilityHitToast(dealt, 'The Dynamo', 'Lightning Network');
         }
     }
 }
 
 // ── Death / teardown ──────────────────────────────────────────────────────
 
-export function _egDynamoDeathBurst(x, y, small) {
+export function _dynamoDeathBurst(x, y, small) {
     const el = document.createElement('div');
     el.className = 'eg-dynamo-burst' + (small ? ' eg-dynamo-burst-small' : '');
     el.textContent = small ? '✦' : '⚡';
@@ -754,12 +754,12 @@ export function _egDynamoDeathBurst(x, y, small) {
 
 // One conductor died (player kill). Tears down its record + beams; the card
 // lingers briefly so the engine's kill-flash animation can play.
-export function _egRemoveConductor(monsterId) {
-    const rec = _egDynamoConductors.get(monsterId);
+export function _removeConductor(monsterId) {
+    const rec = _dynamoConductors.get(monsterId);
     if (!rec) return;
-    _egDynamoConductors.delete(monsterId);
+    _dynamoConductors.delete(monsterId);
 
-    _egDynamoDeathBurst(rec.x, rec.y, false);
+    _dynamoDeathBurst(rec.x, rec.y, false);
 
     const card = rec.card || document.getElementById('eg-card-' + monsterId);
     if (card) {
@@ -767,10 +767,10 @@ export function _egRemoveConductor(monsterId) {
         setTimeout(() => { if (card && card.parentNode) card.parentNode.removeChild(card); }, 850);
     }
 
-    _egDynamoRebuildNet();
-    if (!_egDynamoConductors.size) {
-        _egDynamoStopTicks();
-        _egDynamoRemoveNet();
+    _dynamoRebuildNet();
+    if (!_dynamoConductors.size) {
+        _dynamoStopTicks();
+        _dynamoRemoveNet();
     }
 
     try {
@@ -783,34 +783,34 @@ export function _egRemoveConductor(monsterId) {
 // Full teardown: boss death, encounter stop, or the damage-tick guard.
 // Pops every conductor and drops them from the encounter (their charge
 // source is gone - no loot, no kill credit).
-export function _egClearDynamoConductors() {
-    _egDynamoStopTicks();
+export function _clearDynamoConductors() {
+    _dynamoStopTicks();
 
     const cards = [];
-    _egDynamoConductors.forEach((rec) => {
-        _egDynamoDeathBurst(rec.x, rec.y, false);
+    _dynamoConductors.forEach((rec) => {
+        _dynamoDeathBurst(rec.x, rec.y, false);
         const card = rec.card || document.getElementById('eg-card-' + rec.monsterId);
         if (card) cards.push(card);
     });
     cards.forEach(c => c.remove());
 
-    if (typeof _egMonsters !== 'undefined') {
-        globalThis._egMonsters = globalThis._egMonsters.filter(m => !m || !m.isDynamoConductor);
+    if (typeof _monsters !== 'undefined') {
+        globalThis._monsters = globalThis._monsters.filter(m => !m || !m.isDynamoConductor);
     }
-    _egDynamoConductors.clear();
+    _dynamoConductors.clear();
 
-    const layer = document.getElementById(EG_DYNAMO_LAYER_ID);
+    const layer = document.getElementById(DYNAMO_LAYER_ID);
     if (layer) layer.remove();
-    _egDynamoRemoveNet();
+    _dynamoRemoveNet();
 }
 
-// Expose for boss cleanup (boss-framework.js _egBossCleanup).
-window._egDynamoTeardown = _egClearDynamoConductors;
+// Expose for boss cleanup (boss-framework.js _bossCleanup).
+window._dynamoTeardown = _clearDynamoConductors;
 
 
 // ── Shared geometry helpers (Dynamo-local) ────────────────────────────────
 
-export function _egConvexHull(points) {
+export function _convexHull(points) {
     if (points.length < 3) return points;
     const sorted = [...points].sort((a, b) => a.x - b.x || a.y - b.y);
     const cross = (o, a, b) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
@@ -834,7 +834,7 @@ export function _egConvexHull(points) {
     return [...lower, ...upper];
 }
 
-export function _egPointInPolygon(point, polygon) {
+export function _pointInPolygon(point, polygon) {
     let inside = false;
     for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
         const xi = polygon[i].x, yi = polygon[i].y;

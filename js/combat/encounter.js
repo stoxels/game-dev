@@ -9,12 +9,12 @@
 // modules, re-exported below so existing import sites keep working.
 
 import { t } from '../translation/translations.js';
-import { EG_DAMAGE_NUMBER_DURATION_MS, EG_IMMUNE_FLASH_DURATION_MS, EG_IMMUNE_LABEL_DURATION_MS, EG_MONSTER_ZONES } from './encounter-constants.js';
-import { _egGetDominantElement } from './encounter-monster-damage.js';
-import { _egRenderMonsterStatusStrip } from './combat-ailments-core.js';
-import { EG_ART } from '../endgame/endgame-art.js';
-import { _egRoamShouldRoam, _egRoamSync, _egRoamTeardown } from './combat-monster-roam.js';
-import { _egIsActive } from './combat-state.js';
+import { DAMAGE_NUMBER_DURATION_MS, IMMUNE_FLASH_DURATION_MS, IMMUNE_LABEL_DURATION_MS, MONSTER_ZONES } from './encounter-constants.js';
+import { _getDominantElement } from './encounter-monster-damage.js';
+import { _renderMonsterStatusStrip } from './combat-ailments-core.js';
+import { GAME_ART } from '../endgame/endgame-art.js';
+import { _roamShouldRoam, _roamSync, _roamTeardown } from './combat-monster-roam.js';
+import { _isActive } from './combat-state.js';
 
 
 
@@ -26,12 +26,12 @@ import { _egIsActive } from './combat-state.js';
 // Appends a floating "-N" damage number to the monster's card that fades out.
 // `isCrit` and `elements` drive the RPG pop: crits are bigger/gold, elemental
 // dominance tints the number and its glow (shadow/fire/cold/lightning).
-export function _egShowDamageNumber(monsterId, amount, isCrit, elements) {
+export function _showDamageNumber(monsterId, amount, isCrit, elements) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
 
     const dmgText = document.createElement('div');
-    const domEl = _egGetDominantElement(elements);
+    const domEl = _getDominantElement(elements);
     let cls = 'eg-damage-number';
     if (domEl && domEl !== 'physical') cls += ' eg-dmg-' + domEl;
     else cls += ' eg-dmg-physical';
@@ -44,47 +44,47 @@ export function _egShowDamageNumber(monsterId, amount, isCrit, elements) {
     dmgText.style.marginTop = `${(Math.random() * 6 - 3).toFixed(1)}px`;
     card.appendChild(dmgText);
     // crit numbers linger longer (matches damage-float-crit, 1.5s)
-    setTimeout(() => dmgText.remove(), isCrit ? EG_DAMAGE_NUMBER_DURATION_MS + 480 : EG_DAMAGE_NUMBER_DURATION_MS);
+    setTimeout(() => dmgText.remove(), isCrit ? DAMAGE_NUMBER_DURATION_MS + 480 : DAMAGE_NUMBER_DURATION_MS);
 }
 
 // Removes and re-adds a CSS flash class to force the animation to restart.
 // Works for any flash class on any card element.
-export function _egRestartFlashClass(card, cssClass) {
+export function _restartFlashClass(card, cssClass) {
     card.classList.remove(cssClass);
     void card.offsetWidth; // force reflow so the CSS animation restarts
     card.classList.add(cssClass);
 }
 
 // Triggers the damage flash CSS animation on the monster's card.
-export function _egFlashDamageCard(monsterId) {
+export function _flashDamageCard(monsterId) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
-    _egRestartFlashClass(card, 'eg-flash-damage');
+    _restartFlashClass(card, 'eg-flash-damage');
 }
 
 // Adds the kill flash class to the monster's card (plays the death animation).
-export function _egFlashKillCard(monsterId) {
+export function _flashKillCard(monsterId) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (card) card.classList.add('eg-flash-kill');
 }
 
 // Shows the IMMUNE label and flashes the immunity animation on the monster's card.
-export function _egFlashImmune(monsterId) {
+export function _flashImmune(monsterId) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
 
-    _egRestartFlashClass(card, 'eg-flash-immune');
-    setTimeout(() => card.classList.remove('eg-flash-immune'), EG_IMMUNE_FLASH_DURATION_MS);
+    _restartFlashClass(card, 'eg-flash-immune');
+    setTimeout(() => card.classList.remove('eg-flash-immune'), IMMUNE_FLASH_DURATION_MS);
 
     const label = document.createElement('div');
     label.className = 'eg-damage-number eg-immune-label';
     label.textContent = t('eg_immune');
     card.appendChild(label);
-    setTimeout(() => label.remove(), EG_IMMUNE_LABEL_DURATION_MS);
+    setTimeout(() => label.remove(), IMMUNE_LABEL_DURATION_MS);
 }
 
 // Particle colour per damage element (falls back to white for physical).
-export const EG_HIT_ELEMENT_COLORS = {
+export const HIT_ELEMENT_COLORS = {
     physical: '#ffffff',
     fire: '#ff6b35',
     cold: '#4fc3f7',
@@ -92,24 +92,24 @@ export const EG_HIT_ELEMENT_COLORS = {
     shadow: '#b06bff'
 };
 
-export const EG_HIT_BURST_SPARK_COUNT = 14;
-export const EG_HIT_BURST_DURATION_MS = 750;
+export const HIT_BURST_SPARK_COUNT = 14;
+export const HIT_BURST_DURATION_MS = 750;
 
 // Spawns a short spark burst + expanding shockwave ring at the monster's
 // card centre when damage lands. `elements` optionally maps each element to
 // its share of the hit; the dominant element picks the burst colour.
 // `isCrit` enlarges the burst.
-export function _egSpawnHitBurst(monsterId, elements, isCrit) {
+export function _spawnHitBurst(monsterId, elements, isCrit) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
 
-    let color = EG_HIT_ELEMENT_COLORS.physical;
+    let color = HIT_ELEMENT_COLORS.physical;
     if (elements) {
         let best = null;
         Object.keys(elements).forEach(el => {
-            if (EG_HIT_ELEMENT_COLORS[el] && (!best || elements[el] > elements[best])) best = el;
+            if (HIT_ELEMENT_COLORS[el] && (!best || elements[el] > elements[best])) best = el;
         });
-        if (best) color = EG_HIT_ELEMENT_COLORS[best];
+        if (best) color = HIT_ELEMENT_COLORS[best];
     }
 
     const rect = card.getBoundingClientRect();
@@ -132,7 +132,7 @@ export function _egSpawnHitBurst(monsterId, elements, isCrit) {
     }
 
     // Outward-flying sparks in a ring with slight random jitter
-    const sparkCount = isCrit ? EG_HIT_BURST_SPARK_COUNT + 8 : EG_HIT_BURST_SPARK_COUNT;
+    const sparkCount = isCrit ? HIT_BURST_SPARK_COUNT + 8 : HIT_BURST_SPARK_COUNT;
     for (let i = 0; i < sparkCount; i++) {
         const spark = document.createElement('div');
         spark.className = 'eg-hit-spark';
@@ -149,7 +149,7 @@ export function _egSpawnHitBurst(monsterId, elements, isCrit) {
     }
 
     document.body.appendChild(burst);
-    setTimeout(() => burst.remove(), isCrit ? EG_HIT_BURST_DURATION_MS + 150 : EG_HIT_BURST_DURATION_MS);
+    setTimeout(() => burst.remove(), isCrit ? HIT_BURST_DURATION_MS + 150 : HIT_BURST_DURATION_MS);
 }
 
 
@@ -159,15 +159,15 @@ export function _egSpawnHitBurst(monsterId, elements, isCrit) {
 //------------------------------------------------------------------------
 
 // Returns the CSS class for an HP bar based on the percentage remaining.
-export function _egHpBarClass(hpPct) {
+export function _hpBarClass(hpPct) {
     if (hpPct > 60) return 'eg-hp-high';
     if (hpPct > 30) return 'eg-hp-mid';
     return 'eg-hp-low';
 }
 
 // Builds the badge HTML for a monster's name row (level, boss phase, immune, target).
-// NOTE: _egBuildMonsterBadgesHTML is kept for any external callers.
-export function _egBuildMonsterBadgesHTML(m, isTarget) {
+// NOTE: _buildMonsterBadgesHTML is kept for any external callers.
+export function _buildMonsterBadgesHTML(m, isTarget) {
     let html = `<span class="eg-level-badge">${t('eg_lv_badge').replace('{n}', m.level)}</span>`;
     if (m.isBoss && m.bossPhase)
         html += `<span class="eg-boss-phase-badge eg-boss-phase-${m.bossPhase}">${t('eg_phase_badge').replace('{n}', m.bossPhase)}</span>`;
@@ -179,7 +179,7 @@ export function _egBuildMonsterBadgesHTML(m, isTarget) {
 }
 
 // Calculates HP and charge percentages clamped to [0, 100] for a given monster.
-export function _egCalcBarPercentages(m) {
+export function _calcBarPercentages(m) {
     return {
         hpPct: Math.max(0, Math.round((m.currentHP / m.maxHP) * 100)),
         chargePct: Math.min(100, Math.max(0, (m.currentCharge / m.chargeMax) * 100)),
@@ -187,22 +187,22 @@ export function _egCalcBarPercentages(m) {
 }
 
 // Builds the compact emoji card HTML for a single monster.
-export function _egBuildMonsterCardHTML(m) {
-    const { hpPct, chargePct } = _egCalcBarPercentages(m);
-    const isTarget = (m.id === globalThis._egTargetId);
+export function _buildMonsterCardHTML(m) {
+    const { hpPct, chargePct } = _calcBarPercentages(m);
+    const isTarget = (m.id === globalThis._targetId);
     const bossCls = m.isBoss ? ' eg-boss-card' : '';
     const targetedCls = isTarget ? ' eg-card-targeted' : '';
     const traitCls = m.gauntletTrait ? ` ga-trait-${m.gauntletTrait}` : '';
 
     return `
-    <div class="eg-monster-card-compact${bossCls}${targetedCls}${traitCls}" id="eg-card-${m.id}" onclick="_egSelectTarget('${m.id}')" style="--eg-art:${m.artScale || 1}">
+    <div class="eg-monster-card-compact${bossCls}${targetedCls}${traitCls}" id="eg-card-${m.id}" onclick="_selectTarget('${m.id}')" style="--eg-art:${m.artScale || 1}">
         <!-- Bars stacked top-to-bottom: Charge bar then HP bar above the icon -->
         <div class="eg-compact-bars">
             <div class="eg-charge-track-compact">
                 <div class="eg-charge-bar" id="eg-charge-bar-${m.id}" style="width:${chargePct}%"></div>
             </div>
             <div class="eg-hp-track-compact">
-                <div class="eg-hp-bar-compact ${_egHpBarClass(hpPct)}" id="eg-hp-bar-${m.id}" style="width:${hpPct}%"></div>
+                <div class="eg-hp-bar-compact ${_hpBarClass(hpPct)}" id="eg-hp-bar-${m.id}" style="width:${hpPct}%"></div>
             </div>
         </div>
 
@@ -212,7 +212,7 @@ export function _egBuildMonsterCardHTML(m) {
         <!-- Emoji icon with level badge and hover tooltip -->
         <div class="eg-emoji-wrapper${m.isBoss ? ' eg-boss-emoji-wrapper' : ''}${((m.enrageStacks || 0) > 0 || m.enraged) ? ' eg-boss-enraged' : ''} ${isTarget ? 'eg-compact-targeted' : ''}">
             ${m.isBoss ? '<span class="eg-boss-crown">👑</span><span class="eg-boss-rage-fire"></span><span class="eg-boss-rage-badge">😡</span>' : ''}
-            <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${EG_ART.html('monster', m.artId || m.baseId, m.emoji)}</span>
+            <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${GAME_ART.html('monster', m.artId || m.baseId, m.emoji)}</span>
             <span class="eg-level-bottom-left">${m.level}</span>
             <span class="eg-grace-badge" id="eg-grace-${m.id}" style="display:none"></span>
             ${m.gauntletTrait ? `<span class="ga-trait-badge" title="${m.gauntletTrait === 'warded' ? 'Spell Ward: takes 65% less damage from spells - melee works best' : (m.gauntletTrait === 'champion' ? 'Champion: tougher and hits harder' : 'Phased: takes 65% less damage from melee - spells work best')}">${m.gauntletTrait === 'warded' ? '🛡' : (m.gauntletTrait === 'champion' ? '👑' : '👻')}</span>` : ''}
@@ -231,13 +231,13 @@ export function _egBuildMonsterCardHTML(m) {
 
 
 // Mirrors a monster's art so it looks toward the player's avatar. Art is
-// drawn facing right; ids in EG_ART_FACES_LEFT are drawn facing left and
+// drawn facing right; ids in ART_FACES_LEFT are drawn facing left and
 // get the opposite flip. A small dead-zone stops flicker when the player
 // is roughly above/below the monster.
-const EG_ART_FACES_LEFT = new Set([]);
-const EG_FACE_DEADZONE_PX = 14;
+const ART_FACES_LEFT = new Set([]);
+const FACE_DEADZONE_PX = 14;
 
-function _egFaceMonsterTowardPlayer(m) {
+function _faceMonsterTowardPlayer(m) {
     const card = document.getElementById(`eg-card-${m.id}`);
     const art = card && card.querySelector('.eg-monster-emoji-compact');
     const player = document.getElementById('player-avatar-wrapper');
@@ -246,17 +246,17 @@ function _egFaceMonsterTowardPlayer(m) {
     const p = player.getBoundingClientRect();
     if (!c.width || !p.width) return;
     const dx = (p.left + p.width / 2) - (c.left + c.width / 2);
-    if (Math.abs(dx) < EG_FACE_DEADZONE_PX) return;
+    if (Math.abs(dx) < FACE_DEADZONE_PX) return;
     const playerIsLeft = dx < 0;
-    const nativeLeft = EG_ART_FACES_LEFT.has(m.artId || m.baseId);
+    const nativeLeft = ART_FACES_LEFT.has(m.artId || m.baseId);
     const flip = (playerIsLeft !== nativeLeft) ? -1 : 1;
-    if (art._egFlip === flip) return;
-    art._egFlip = flip;
+    if (art._flip === flip) return;
+    art._flip = flip;
     art.style.transform = flip === -1 ? 'scaleX(-1)' : '';
 }
 
 // Grace period (firstStepUntil): 👣 countdown on the card + teal charge bar.
-function _egUpdateGraceBadge(m) {
+function _updateGraceBadge(m) {
     const badge = document.getElementById(`eg-grace-${m.id}`);
     if (!badge) return;
     const left = m.firstStepUntil ? m.firstStepUntil - Date.now() : 0;
@@ -266,8 +266,8 @@ function _egUpdateGraceBadge(m) {
 
 // Updates the HP bar, charge bar, and HP label for a single monster.
 // Cheap DOM update used by the 10Hz tick loop - no full rebuild.
-export function _egUpdateMonsterBars(m) {
-    const { hpPct, chargePct } = _egCalcBarPercentages(m);
+export function _updateMonsterBars(m) {
+    const { hpPct, chargePct } = _calcBarPercentages(m);
 
     const hpBar = document.getElementById(`eg-hp-bar-${m.id}`);
     const chargeBar = document.getElementById(`eg-charge-bar-${m.id}`);
@@ -275,7 +275,7 @@ export function _egUpdateMonsterBars(m) {
 
     if (hpBar) {
         hpBar.style.width = hpPct + '%';
-        hpBar.className = `eg-hp-bar-compact ${_egHpBarClass(hpPct)}`;
+        hpBar.className = `eg-hp-bar-compact ${_hpBarClass(hpPct)}`;
     }
     if (chargeBar) {
         chargeBar.style.width = chargePct + '%';
@@ -285,35 +285,35 @@ export function _egUpdateMonsterBars(m) {
     }
     if (hpLabel) hpLabel.textContent = `${m.currentHP} / ${m.maxHP} HP`;
 
-    _egFaceMonsterTowardPlayer(m);
-    _egUpdateGraceBadge(m);
+    _faceMonsterTowardPlayer(m);
+    _updateGraceBadge(m);
 
     // Elemental ailment icon strip (only rebuilds when statuses change)
-    _egRenderMonsterStatusStrip(m);
+    _renderMonsterStatusStrip(m);
 }
 
 // High-frequency bar update (10Hz). Only touches bar widths and HP text -
 // no DOM rebuilds. Keeps the tick loop cheap.
-export function _egUpdateBars() {
-    if (!_egIsActive()) return;
-    globalThis._egMonsters.forEach(_egUpdateMonsterBars);
+export function _updateBars() {
+    if (!_isActive()) return;
+    globalThis._monsters.forEach(_updateMonsterBars);
 }
 
 // Clears all monster zone elements and hides the wrapper.
-export function _egHideMonsterPanel() {
-    EG_MONSTER_ZONES.forEach(zone => {
+export function _hideMonsterPanel() {
+    MONSTER_ZONES.forEach(zone => {
         const el = document.getElementById(zone);
         if (el) el.innerHTML = '';
     });
     // Legacy roam layer cleanup (encounter over).
-    try { _egRoamTeardown(); } catch (e) {}
+    try { _roamTeardown(); } catch (e) {}
     const wrapper = document.getElementById('eg-monster-wrapper');
     if (wrapper) wrapper.classList.add('eg-hidden');
 }
 
 // Clears the HTML content of every monster zone panel.
-export function _egClearAllZones() {
-    EG_MONSTER_ZONES.forEach(zone => {
+export function _clearAllZones() {
+    MONSTER_ZONES.forEach(zone => {
         const el = document.getElementById(zone);
         if (el) el.innerHTML = '';
     });
@@ -323,8 +323,8 @@ export function _egClearAllZones() {
 // Uses += so multiple monsters assigned to the same zone stack correctly.
 // Only Brutus zombies / Dynamo conductors (own layers) and the legacy
 // roam hook skip panels; every other monster renders in its static panel.
-export function _egRenderMonstersIntoZones() {
-    globalThis._egMonsters.forEach(m => {
+export function _renderMonstersIntoZones() {
+    globalThis._monsters.forEach(m => {
         // Brutus's sacrificial zombies render as roaming cards in the fixed
         // #eg-zombie-layer, not in the static monster panel.
         if (m.isSacrificialZombie) return;
@@ -335,37 +335,37 @@ export function _egRenderMonstersIntoZones() {
         // Legacy patrol hook (always false now): normal monsters stay put.
         // Occasional melee sidesteps (endgame-monster-roam.js) just change
         // zoneId and re-render here - no separate layer.
-        if (_egRoamShouldRoam(m)) return;
+        if (_roamShouldRoam(m)) return;
         const zoneEl = document.getElementById(m.zoneId || 'eg-monster-panel');
-        if (zoneEl) zoneEl.innerHTML += _egBuildMonsterCardHTML(m);
+        if (zoneEl) zoneEl.innerHTML += _buildMonsterCardHTML(m);
     });
 }
 
 // Full panel rebuild. Only called on spawn, death, or target change -
 // never from the tick loop.
-export function _egRenderPanel() {
+export function _renderPanel() {
     const wrapper = document.getElementById('eg-monster-wrapper');
 
-    if (!_egIsActive()) {
-        _egClearAllZones();
+    if (!_isActive()) {
+        _clearAllZones();
         if (wrapper) wrapper.classList.add('eg-hidden');
         return;
     }
 
     if (wrapper) wrapper.classList.remove('eg-hidden');
 
-    _egClearAllZones();
-    _egRenderMonstersIntoZones();
+    _clearAllZones();
+    _renderMonstersIntoZones();
     // Legacy patrol cleanup (clears the old #eg-roam-layer if present).
-    try { _egRoamSync(); } catch (e) {}
-    _egStartGridOverlapSync();
+    try { _roamSync(); } catch (e) {}
+    _startGridOverlapSync();
 }
 
 // Cards overlapping the grid get `eg-over-grid` (CSS: click-through and
 // see-through art) so monsters can draw above the grid without blocking
 // cells. One light interval per encounter; it stops itself afterwards.
-let _egGridOverlapTimer = null;
-function _egSyncGridOverlap() {
+let _gridOverlapTimer = null;
+function _syncGridOverlap() {
     const grid = document.getElementById('ptable');
     const gr = grid ? grid.getBoundingClientRect() : null;
     const cards = document.querySelectorAll('#eg-monster-wrapper .eg-monster-card-compact, .eg-floating-panel .eg-monster-card-compact');
@@ -379,220 +379,220 @@ function _egSyncGridOverlap() {
     });
 }
 
-function _egStartGridOverlapSync() {
-    _egSyncGridOverlap();
-    if (_egGridOverlapTimer) return;
-    _egGridOverlapTimer = setInterval(() => {
-        if (!_egIsActive()) {
-            clearInterval(_egGridOverlapTimer);
-            _egGridOverlapTimer = null;
+function _startGridOverlapSync() {
+    _syncGridOverlap();
+    if (_gridOverlapTimer) return;
+    _gridOverlapTimer = setInterval(() => {
+        if (!_isActive()) {
+            clearInterval(_gridOverlapTimer);
+            _gridOverlapTimer = null;
             return;
         }
-        _egSyncGridOverlap();
+        _syncGridOverlap();
     }, 200);
 }
 
 // ---- re-exports from the focused split modules (public surface preserved) ----
 
 export {
-    EG_BLOCK_LOCKOUT_BASE_MS,
-    EG_BOSS_SPAWN_DELAY_MS,
-    EG_DAMAGE_NUMBER_DURATION_MS,
-    EG_DEFAULT_MONSTER_CAP,
-    EG_DEFLECT_BASE_DMG_PCT,
-    EG_DEFLECT_BASE_PCT,
-    EG_IMMUNE_FLASH_DURATION_MS,
-    EG_IMMUNE_LABEL_DURATION_MS,
-    EG_INITIAL_SPAWN_STAGGER_BASE_MS,
-    EG_MELEE_ANIM_DURATION_MS,
-    EG_MONSTER_PROJ_DURATION_MS,
-    EG_MONSTER_ZONES,
-    EG_PANEL_RERENDER_DELAY_MS,
-    EG_PARRY_BASE_PCT,
-    EG_PLAYER_DAMAGE_NUMBER_DURATION_MS,
-    EG_PLAYER_HIT_FLASH_MS,
-    EG_RESPAWN_DELAY_MIN_MS,
-    EG_RESPAWN_DELAY_RANGE_MS,
-    _egGetDefaultMonsterCap,
-    _egGetRespawnDelayMs,
+    BLOCK_LOCKOUT_BASE_MS,
+    BOSS_SPAWN_DELAY_MS,
+    DAMAGE_NUMBER_DURATION_MS,
+    DEFAULT_MONSTER_CAP,
+    DEFLECT_BASE_DMG_PCT,
+    DEFLECT_BASE_PCT,
+    IMMUNE_FLASH_DURATION_MS,
+    IMMUNE_LABEL_DURATION_MS,
+    INITIAL_SPAWN_STAGGER_BASE_MS,
+    MELEE_ANIM_DURATION_MS,
+    MONSTER_PROJ_DURATION_MS,
+    MONSTER_ZONES,
+    PANEL_RERENDER_DELAY_MS,
+    PARRY_BASE_PCT,
+    PLAYER_DAMAGE_NUMBER_DURATION_MS,
+    PLAYER_HIT_FLASH_MS,
+    RESPAWN_DELAY_MIN_MS,
+    RESPAWN_DELAY_RANGE_MS,
+    _getDefaultMonsterCap,
+    _getRespawnDelayMs,
 } from './encounter-constants.js';
 
 export {
-    EG_EARLY_VARIANCE_FREE_LEVEL,
-    EG_MONSTER_VARIANCE_DOWN,
-    EG_MONSTER_VARIANCE_UP_MAX,
-    EG_MONSTER_VARIANCE_UP_MIN,
-    _egBuildBossSpawnList,
-    _egBuildBossSpawnListFromDef,
-    _egBuildFixedBossList,
-    _egBuildFixedNormalList,
-    _egBuildNormalSpawnList,
-    _egBuildRandomBossList,
-    _egBuildRandomNormalList,
-    _egBuildSpawnList,
-    _egCategorizeMonsterTier,
-    _egGetEncounterBaseLevel,
-    _egIsPuzzleSolved,
-    _egPickWeightedMonster,
-    _egRollMonsterLevel,
+    EARLY_VARIANCE_FREE_LEVEL,
+    MONSTER_VARIANCE_DOWN,
+    MONSTER_VARIANCE_UP_MAX,
+    MONSTER_VARIANCE_UP_MIN,
+    _buildBossSpawnList,
+    _buildBossSpawnListFromDef,
+    _buildFixedBossList,
+    _buildFixedNormalList,
+    _buildNormalSpawnList,
+    _buildRandomBossList,
+    _buildRandomNormalList,
+    _buildSpawnList,
+    _categorizeMonsterTier,
+    _getEncounterBaseLevel,
+    _isPuzzleSolved,
+    _pickWeightedMonster,
+    _rollMonsterLevel,
 } from './encounter-spawn-rules.js';
 
 export {
-    EG_CAMPAIGN_MONSTER_CONFIG,
-    EG_CAMPAIGN_STAMPED_FIELDS,
-    _egBuildCampaignMonsterList,
-    _egCampaignRefDamage,
-    _egClearCampaignLevelFields,
-    _egCountSolutionCells,
-    _egEarlyEaseBlend,
-    _egPrepareCampaignEncounter,
+    CAMPAIGN_MONSTER_CONFIG,
+    CAMPAIGN_STAMPED_FIELDS,
+    _buildCampaignMonsterList,
+    _campaignRefDamage,
+    _clearCampaignLevelFields,
+    _countSolutionCells,
+    _earlyEaseBlend,
+    _prepareCampaignEncounter,
 } from './encounter-campaign-spawns.js';
 
 export {
-    EG_INITIAL_SPAWN_STAGGER_STEP_MS,
-    _egCalcSpawnDelay,
-    _egRespawnRandomMonster,
-    _egScheduleMonsterSpawns,
-    _egScheduleRespawn,
-    _egShouldSuppressRespawn,
+    INITIAL_SPAWN_STAGGER_STEP_MS,
+    _calcSpawnDelay,
+    _respawnRandomMonster,
+    _scheduleMonsterSpawns,
+    _scheduleRespawn,
+    _shouldSuppressRespawn,
 } from './encounter-spawn-scheduler.js';
 
 export {
-    EG_LIFE_REGEN_INTERVAL_MS,
-    EG_STAGGER_DURATION_MS,
-    _egAttachBossStylesheet,
-    _egCancelSpawnTimers,
-    _egResetEncounterState,
-    _egStartEncounter,
-    _egStartTickLoop,
-    _egStopEncounter,
-    _egStopTickLoop,
+    LIFE_REGEN_INTERVAL_MS,
+    STAGGER_DURATION_MS,
+    _attachBossStylesheet,
+    _cancelSpawnTimers,
+    _resetEncounterState,
+    _startEncounter,
+    _startTickLoop,
+    _stopEncounter,
+    _stopTickLoop,
 } from './encounter-lifecycle.js';
 
 export {
-    _egAnimateMonsterMelee,
-    _egAnimateMonsterProjectile,
-    _egApplyMeleeImpact,
-    _egFireMonsterAttack,
-    _egFlashMonsterAttackCard,
-    _egResolveAttackType,
-    _egRollPreemptiveDodge,
+    _animateMonsterMelee,
+    _animateMonsterProjectile,
+    _applyMeleeImpact,
+    _fireMonsterAttack,
+    _flashMonsterAttackCard,
+    _resolveAttackType,
+    _rollPreemptiveDodge,
 } from './encounter-monster-attacks.js';
 
 export {
-    _egApplyPlayerBlockFeedback,
-    _egApplyPlayerBlockLockoutFeedback,
-    _egApplyPlayerHitFeedback,
-    _egApplyPlayerMissFeedback,
-    _egBlockLockoutOverlayTimer,
-    _egHideBlockLockoutOverlay,
-    _egShowBlockLockoutOverlay,
+    _applyPlayerBlockFeedback,
+    _applyPlayerBlockLockoutFeedback,
+    _applyPlayerHitFeedback,
+    _applyPlayerMissFeedback,
+    _blockLockoutOverlayTimer,
+    _hideBlockLockoutOverlay,
+    _showBlockLockoutOverlay,
 } from './encounter-monster-attack-feedback.js';
 
 export {
-    _egAnimatePlayerProjectile,
-    _egConsumeOnHitGearBonus,
-    _egOnMistake,
-    _egReleaseChannelAtMax,
-    _egResolveProjectileImpact,
-    _egTickCorrectCellGearProcs,
-    _egTrackRecentFill,
+    _animatePlayerProjectile,
+    _consumeOnHitGearBonus,
+    _onMistake,
+    _releaseChannelAtMax,
+    _resolveProjectileImpact,
+    _tickCorrectCellGearProcs,
+    _trackRecentFill,
 } from './encounter-player-attacks.js';
 
 export {
-    _egApplyGroundedReduction,
-    _egApplyPlayerDeflectFeedback,
-    _egApplyPlayerParryFeedback,
-    _egGetDeflectChancePct,
-    _egGetDeflectDamagePct,
-    _egGetDualWieldParryChancePct,
-    _egGetParryChancePct,
-    _egIsDualWieldParryActive,
-    _egRollFateNegation,
-    _egRollParry,
-    _egTryDeflectProjectile,
+    _applyGroundedReduction,
+    _applyPlayerDeflectFeedback,
+    _applyPlayerParryFeedback,
+    _getDeflectChancePct,
+    _getDeflectDamagePct,
+    _getDualWieldParryChancePct,
+    _getParryChancePct,
+    _isDualWieldParryActive,
+    _rollFateNegation,
+    _rollParry,
+    _tryDeflectProjectile,
 } from './encounter-player-mitigation.js';
 
 export {
-    EG_DRAG_CHARGE_BASE_SIZE_PX,
-    EG_DRAG_CHARGE_MAX_VISUAL_STACKS,
-    EG_DRAG_CHARGE_SCALE_PER_STACK,
-    EG_DRAG_CHARGE_SIZE_PER_STACK_PX,
-    _egAimChargingProjectile,
-    _egClearChargedProjectileVisual,
-    _egClearDragBonusLabel,
-    _egGetTarget,
-    _egReleaseChargedShot,
-    _egRollPlayerMiss,
-    _egTryMultishot,
-    _egUpdateChargedProjectileVisual,
-    _egUpdateDragBonusLabel,
+    DRAG_CHARGE_BASE_SIZE_PX,
+    DRAG_CHARGE_MAX_VISUAL_STACKS,
+    DRAG_CHARGE_SCALE_PER_STACK,
+    DRAG_CHARGE_SIZE_PER_STACK_PX,
+    _aimChargingProjectile,
+    _clearChargedProjectileVisual,
+    _clearDragBonusLabel,
+    _getTarget,
+    _releaseChargedShot,
+    _rollPlayerMiss,
+    _tryMultishot,
+    _updateChargedProjectileVisual,
+    _updateDragBonusLabel,
 } from './encounter-charged-shot.js';
 
 export {
-    EG_MELEE_OVERCHARGE_MULT,
-    EG_MELEE_OVERCHARGE_RATIO,
-    EG_MELEE_OVERCHARGE_RATE_PER_TIER,
-    _egMeleeDashVisual,
-    _egMeleeGrandFlash,
-    _egMeleeLeapVisual,
-    _egMeleeNovaVisual,
-    _egMeleeTierArt,
-    _egMeleeTierForCharge,
-    _egMeleeTierLabel,
-    _egOverchargeRateForTier,
+    MELEE_OVERCHARGE_MULT,
+    MELEE_OVERCHARGE_RATIO,
+    MELEE_OVERCHARGE_RATE_PER_TIER,
+    _meleeDashVisual,
+    _meleeGrandFlash,
+    _meleeLeapVisual,
+    _meleeNovaVisual,
+    _meleeTierArt,
+    _meleeTierForCharge,
+    _meleeTierLabel,
+    _overchargeRateForTier,
 } from './encounter-melee-arts.js';
 
 export {
-    EG_MELEE_DELIVERY_ARRIVAL_BEAT_MS,
-    EG_MELEE_DELIVERY_LEAP_MS,
-    EG_MELEE_DELIVERY_OUT_MAX_MS,
-    EG_MELEE_DELIVERY_OUT_MIN_MS,
-    EG_MELEE_DELIVERY_RETURN_MS,
-    _egMeleeDashOut,
-    _egMeleeDeliveryAvailable,
-    _egMeleeGlideHome,
-    _egMeleeLeapTo,
-    _egMeleeRaiseAvatar,
+    MELEE_DELIVERY_ARRIVAL_BEAT_MS,
+    MELEE_DELIVERY_LEAP_MS,
+    MELEE_DELIVERY_OUT_MAX_MS,
+    MELEE_DELIVERY_OUT_MIN_MS,
+    MELEE_DELIVERY_RETURN_MS,
+    _meleeDashOut,
+    _meleeDeliveryAvailable,
+    _meleeGlideHome,
+    _meleeLeapTo,
+    _meleeRaiseAvatar,
 } from './encounter-melee-delivery.js';
 
 export {
-    EG_MELEE_HOLD_VULNERABILITY_MULT,
-    _egCycleTarget,
-    _egPlayerTakeDamage,
-    _egSelectTarget,
+    MELEE_HOLD_VULNERABILITY_MULT,
+    _cycleTarget,
+    _playerTakeDamage,
+    _selectTarget,
     _initEgTargetHotkeys,
 } from './encounter-damage.js';
 
 export {
-    EG_CHARGED_RICOCHET_DURATION_MS,
-    EG_CHARGED_RICOCHET_SCALE,
-    EG_ECHO_DELAY_MS,
-    _egApplyHitToMonster,
-    _egDamageTarget,
-    _egDamageTargetById,
-    _egGetDominantElement,
-    _egShowStatusLabel,
-    _egTryChargedOverkillRicochet,
-    _egTryEchoHit,
-    _egTryOverkillSpread,
+    CHARGED_RICOCHET_DURATION_MS,
+    CHARGED_RICOCHET_SCALE,
+    ECHO_DELAY_MS,
+    _applyHitToMonster,
+    _damageTarget,
+    _damageTargetById,
+    _getDominantElement,
+    _showStatusLabel,
+    _tryChargedOverkillRicochet,
+    _tryEchoHit,
+    _tryOverkillSpread,
 } from './encounter-monster-damage.js';
 
 export {
-    _egGameOver,
-    _egKillMonster,
-    _egOnAllMonstersDead,
-    _egUpdateTargetAfterKill,
+    _gameOver,
+    _killMonster,
+    _onAllMonstersDead,
+    _updateTargetAfterKill,
 } from './encounter-kills.js';
 
 export {
-    _egHandleBossKill,
-    _egHandleNormalMonsterKill,
+    _handleBossKill,
+    _handleNormalMonsterKill,
 } from './encounter-kill-rewards.js';
 
 export {
-    _egAssignRandomSpawnZone,
-    _egBuildMonsterOrBoss,
-    _egNotifyMonsterArrival,
-    _egSpawnMonster,
+    _assignRandomSpawnZone,
+    _buildMonsterOrBoss,
+    _notifyMonsterArrival,
+    _spawnMonster,
 } from './encounter-monster-spawning.js';

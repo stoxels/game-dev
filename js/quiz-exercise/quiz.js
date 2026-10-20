@@ -3,9 +3,9 @@ import { Audio_Manager } from '../audio/audio.js';
 import { checkWorldCompletion } from '../classes/class-ui.js';
 import { checkWorldCodes, checkWorldCodesSync } from '../codes.js';
 import { curMods } from '../difficulty-modifiers.js';
-import { _egOnQuestionAnswered } from '../combat/encounter-chain.js';
+import { _onQuestionAnswered } from '../combat/encounter-chain.js';
 import { _egOnQuizWrongAnswer } from '../endgame/endgame-map-launch.js';
-import { _egApplyQuizRewardBuff } from '../endgame/endgame-quiz-buffs.js';
+import { _applyQuizRewardBuff } from '../endgame/endgame-quiz-buffs.js';
 import { buildReveal } from '../grid.js';
 import { addTimeSecs } from '../timer/timer-adjust.js';
 import { PT } from '../probability-tree/probability-tree.js';
@@ -284,8 +284,8 @@ function _quizTryEliminateWrongAnswer() {
 
 // Passive-tree stat lookup for the quiz lines (hint / retry / time).
 function _quizTreeStat(key) {
-    if (typeof globalThis._egComputePlayerStats !== 'function') return 0;
-    return Number(globalThis._egComputePlayerStats()[key]) || 0;
+    if (typeof globalThis._computePlayerStats !== 'function') return 0;
+    return Number(globalThis._computePlayerStats()[key]) || 0;
 }
 
 // quiz_hint (tree): a chance that the question opens with a hint. Numeric
@@ -405,7 +405,7 @@ function _resolveQuizAnswer(correct) {
     globalThis.quizAnsweredCorrectly = correct;
     document.getElementById('quiz-tutor-btn').style.display = 'none';
     const resEl = document.getElementById('quiz-result');
-    const isInterstitial = typeof window._egInterstitialDone === 'function';
+    const isInterstitial = typeof window._interstitialDone === 'function';
     const quizAlreadyClaimed = STATE.bonusDone.includes(cur.gIdx);
     if (correct) {
         Audio_Manager.playSFX('quizCorrect');
@@ -413,9 +413,9 @@ function _resolveQuizAnswer(correct) {
         updateQuestStats('questionCorrect', { source: 'quiz' });
         // Count toward map objectives
         if (isInterstitial) {
-            if (typeof _egOnQuestionAnswered === 'function') _egOnQuestionAnswered();
+            if (typeof _onQuestionAnswered === 'function') _onQuestionAnswered();
             // Endgame reward: roll a temporary damage buff / life heal / mana restore
-            if (typeof _egApplyQuizRewardBuff === 'function') _egApplyQuizRewardBuff();
+            if (typeof _applyQuizRewardBuff === 'function') _applyQuizRewardBuff();
             _quizAddTreeTime();
             resEl.className = 'quiz-result ok';
             resEl.textContent = t('qz_correct_short');
@@ -784,8 +784,8 @@ function _quizShowWinOverlay() {
 // back to the interstitial chain instead of showing the win overlay.
 // Returns true if the interstitial path was taken (caller should stop).
 function _quizHandleInterstitialExit() {
-    if (typeof window._egInterstitialDone !== 'function') return false;
-    const cb = window._egInterstitialDone;
+    if (typeof window._interstitialDone !== 'function') return false;
+    const cb = window._interstitialDone;
     closeQuiz();
     cb();
     return true;

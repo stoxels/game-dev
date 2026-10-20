@@ -18,7 +18,7 @@ import { playFreezeCountdownOverlay } from '../puzzle-mechanics/fx-helpers.js';
 // primitive but releases them itself via endTimerFreeze() when its own
 // pause-aware boss-loop countdown expires - a real-time setTimeout here
 // would wrongly keep ticking through Escape-pause and mid-freeze arena
-// transitions. It drops its _egClockTimeFreezeActive guard flag BEFORE
+// transitions. It drops its _clockTimeFreezeActive guard flag BEFORE
 // calling endTimerFreeze, which is what lets the guard below release.
 // Reads updTimer via the globalThis bridge: timer.js calls into this
 // module for Timed Stasis, so a static import back would create a cycle.
@@ -98,7 +98,7 @@ export function endTimerFreeze() {
         clearTimeout(_freezeReleaseTimer);
         _freezeReleaseTimer = null;
     }
-    if (typeof window === 'undefined' || !window._egClockTimeFreezeActive) {
+    if (typeof window === 'undefined' || !window._clockTimeFreezeActive) {
         globalThis.timerFrozen = false;
     }
     if (_ownsFreezeActive) {

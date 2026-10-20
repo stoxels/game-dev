@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkDotHit, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE VOIDBORN (boss_voidborn)-------------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_voidborn: {
         id: 'boss_voidborn', name: 'The Voidborn', emoji: '🌚',
         baseHP: 1200, baseDamage: 27, chargeMax: 10,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_voidborn: {
         phases: [
             { threshold: 1.00, chargeMax: 10, damageMultiplier: 1.00 },
@@ -29,22 +29,22 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 3000,
         mechanics: [
-            { name: 'void_choice', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechVoidChoice' },
-            { name: 'void_tendrils', intervalBase: 20000, intervalVariance: 4000, handler: '_egMechVoidTendrils' },
-            { name: 'prior_bomb', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechPriorBomb' },
+            { name: 'void_choice', intervalBase: 19000, intervalVariance: 4000, handler: '_mechVoidChoice' },
+            { name: 'void_tendrils', intervalBase: 20000, intervalVariance: 4000, handler: '_mechVoidTendrils' },
+            { name: 'prior_bomb', intervalBase: 19000, intervalVariance: 4000, handler: '_mechPriorBomb' },
         ],
     },
 });
 
 
-export function _egMechVoidChoice(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechVoidChoice(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const radius = 95;
     const warnMs = [0, 2200, 1900, 1600][p];
     const activeMs = 3500;
     const dmgPct = [0, 0.26, 0.30, 0.36][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const a = {
         x: 120 + Math.random() * Math.max(60, window.innerWidth - 240),
@@ -63,7 +63,7 @@ export function _egMechVoidChoice(monster, phase) {
     }
     const realFirst = Math.random() < 0.5;
     const mkZone = (z, real) => {
-        const el = _egNkEl(run, 'div', 'eg-nk-mem' + (real ? ' eg-nk-mem-on' : ''));
+        const el = _nkEl(run, 'div', 'eg-nk-mem' + (real ? ' eg-nk-mem-on' : ''));
         el.textContent = real ? '✨' : '';
         el.style.left = Math.round(z.x - radius) + 'px';
         el.style.top = Math.round(z.y - radius) + 'px';
@@ -73,9 +73,9 @@ export function _egMechVoidChoice(monster, phase) {
     };
     const elA = mkZone(a, realFirst);
     const elB = mkZone(b, !realFirst);
-    _egNkToast('eg_mech_voidborn', '🌚 The Voidborn: Void Choice! Only the ✨ zone is real - hurry!');
+    _nkToast('eg_mech_voidborn', '🌚 The Voidborn: Void Choice! Only the ✨ zone is real - hurry!');
     let e = 0, resolved = false;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         e += dtS * 1000;
         if (!resolved && e >= warnMs) {
             // The false zone collapses; judgment begins.
@@ -84,12 +84,12 @@ export function _egMechVoidChoice(monster, phase) {
         }
         if (e >= warnMs + activeMs) {
             const real = realFirst ? a : b;
-            const c = _egNkPlayerCenter();
+            const c = _nkPlayerCenter();
             if (!c || Math.hypot(c.x - real.x, c.y - real.y) > radius) {
-                const dealt = _egNkHit(dmgPct, 'shadow', level);
-                _egNkAbilityHitToast(dealt, 'The Voidborn', 'Void Choice');
+                const dealt = _nkHit(dmgPct, 'shadow', level);
+                _nkAbilityHitToast(dealt, 'The Voidborn', 'Void Choice');
             } else {
-                _egNkToast('eg_blast_dodged', '✅ You chose... wisely.', '#4ade80');
+                _nkToast('eg_blast_dodged', '✅ You chose... wisely.', '#4ade80');
             }
             return false;
         }
@@ -97,14 +97,14 @@ export function _egMechVoidChoice(monster, phase) {
     });
 }
 
-export function _egMechVoidTendrils(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechVoidTendrils(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const count = [0, 3, 4, 4][p];
     const speed = [0, 68, 80, 95][p];
     const dmgPct = [0, 0.10, 0.12, 0.15][p];
     const durMs = 11000;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const corners = [
         [50, 80], [window.innerWidth - 50, 80],
@@ -112,16 +112,16 @@ export function _egMechVoidTendrils(monster, phase) {
     ];
     const tendrils = [];
     for (let i = 0; i < count; i++) {
-        const el = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-tendril', '🐙');
+        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-tendril', '🐙');
         const cn = corners[i % corners.length];
         tendrils.push({ x: cn[0], y: cn[1], wob: Math.random() * 6.28, cdUntil: 0, el });
     }
-    _egNkToast('eg_mech_tendrils', '🌚 The Voidborn: Void Tendrils! They crawl from the corners!');
+    _nkToast('eg_mech_tendrils', '🌚 The Voidborn: Void Tendrils! They crawl from the corners!');
     let e = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         e += dtS * 1000;
-        const c = _egNkPlayerCenter();
-        const pr = _egNkPlayerRect();
+        const c = _nkPlayerCenter();
+        const pr = _nkPlayerRect();
         tendrils.forEach(td => {
             if (c) {
                 const dx = c.x - td.x, dy = c.y - td.y;
@@ -130,9 +130,9 @@ export function _egMechVoidTendrils(monster, phase) {
                 td.y += (dy / d) * speed * dtS + Math.sin(e / 1000 * 2.9 + td.wob) * 20 * dtS;
             }
             td.el.style.transform = 'translate(' + Math.round(td.x - 22) + 'px,' + Math.round(td.y - 22) + 'px)';
-            if (pr && now >= td.cdUntil && _egNkDotHit(td.el, pr, 0)) {
+            if (pr && now >= td.cdUntil && _nkDotHit(td.el, pr, 0)) {
                 td.cdUntil = now + 800;
-                _egNkHit(dmgPct, 'shadow', level);
+                _nkHit(dmgPct, 'shadow', level);
             }
         });
         return e < durMs;

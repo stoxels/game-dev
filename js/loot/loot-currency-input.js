@@ -10,10 +10,10 @@
 import { t } from '../translation/translations.js';
 import { _egRenderMapSlot, _egRenderMapStashCell, _egSwitchMapStashTier, _egUpdateMapStashTabCounts } from '../endgame/endgame-gate.js';
 import { _dndChipScreenEl } from '../endgame/endgame-hub-drag-and-drop.js';
-import { EG_MAP_STASH_COLS, _egCurrencyStash, _egEquipped, _egFindFreeMapCellForTier, _egGetMapTierGrid, _egHealCurrencyItem, _egInventory, _egMapStash, _egRebuildMapStashGrid, _egRenderEquipSlot, _egRenderEquipSlots, _egRenderInventory, _egRenderInventoryCell, _egShowStashInfo } from '../endgame/endgame-hub.js';
-import { EG_CURRENCY_DEFS } from './loot-currency.js';
-import { _egApplyCurrencyToItem, _egCancelCurrencyUse, _egPendingCurrencyUse, _egStartCurrencyUse } from './loot-currency-use.js';
-import { EG_SHARD_DEFS } from './loot-shards.js';
+import { EG_MAP_STASH_COLS, _currencyStash, _equipped, _egFindFreeMapCellForTier, _egGetMapTierGrid, _healCurrencyItem, _inventory, _egMapStash, _egRebuildMapStashGrid, _renderEquipSlot, _renderEquipSlots, _renderInventory, _renderInventoryCell, _showStashInfo } from '../endgame/endgame-hub.js';
+import { CURRENCY_DEFS } from './loot-currency.js';
+import { _applyCurrencyToItem, _cancelCurrencyUse, _pendingCurrencyUse, _startCurrencyUse } from './loot-currency-use.js';
+import { SHARD_DEFS } from './loot-shards.js';
 
 
 // Right-click on a currency chip: start or cancel "use mode".
@@ -32,14 +32,14 @@ document.addEventListener('contextmenu', function (e) {
     e.stopImmediatePropagation();
 
     const r = +currencyCell.dataset.row, c = +currencyCell.dataset.col;
-    const item = _egCurrencyStash[r][c];
+    const item = _currencyStash[r][c];
     if (!item) return;
 
     // Heal legacy items saved without category/description so right-click
     // still enters use-mode (previous saves stored only {id,count}).
-    if (item && typeof _egHealCurrencyItem === 'function') _egHealCurrencyItem(item);
-    else if (item && !item.category && EG_CURRENCY_DEFS[item.id]) {
-        const _def = EG_CURRENCY_DEFS[item.id];
+    if (item && typeof _healCurrencyItem === 'function') _healCurrencyItem(item);
+    else if (item && !item.category && CURRENCY_DEFS[item.id]) {
+        const _def = CURRENCY_DEFS[item.id];
         if (!item.description) item.description = _def.description;
         if (!item.category) item.category = 'currency';
         if (!item.rarity) item.rarity = 'currency';
@@ -47,24 +47,24 @@ document.addEventListener('contextmenu', function (e) {
         if (!item.icon) item.icon = _def.icon;
     }
     // Also try shard heal (shards also live in the currency strip)
-    if (item && typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS[item.id] && !item.category) {
-        const _sdef = EG_SHARD_DEFS[item.id];
+    if (item && typeof SHARD_DEFS !== 'undefined' && SHARD_DEFS[item.id] && !item.category) {
+        const _sdef = SHARD_DEFS[item.id];
         if (!item.description) item.description = _sdef.description;
         if (!item.category) item.category = 'currency';
     }
 
     if (!item.category) return; // empty cell / unknown type
 
-    const def = EG_CURRENCY_DEFS[item.id] || (typeof EG_SHARD_DEFS !== 'undefined' ? EG_SHARD_DEFS[item.id] : null);
+    const def = CURRENCY_DEFS[item.id] || (typeof SHARD_DEFS !== 'undefined' ? SHARD_DEFS[item.id] : null);
     if (!def || (typeof def.apply !== 'function' && !def.isMirror)) {
         globalThis.showToast(t('eg_no_usable_effect'));
         return;
     }
 
-    if (_egPendingCurrencyUse && _egPendingCurrencyUse.sourceRow === r && _egPendingCurrencyUse.sourceCol === c) {
-        _egCancelCurrencyUse();
+    if (_pendingCurrencyUse && _pendingCurrencyUse.sourceRow === r && _pendingCurrencyUse.sourceCol === c) {
+        _cancelCurrencyUse();
     } else {
-        _egStartCurrencyUse(def, r, c, chip);
+        _startCurrencyUse(def, r, c, chip);
     }
 }, true);
 
@@ -72,7 +72,7 @@ document.addEventListener('contextmenu', function (e) {
 // or cancel if the click isn't a valid target. Registered early so it
 // pre-empts the DnD file's drag-pickup mousedown listener.
 document.addEventListener('mousedown', function (e) {
-    if (!_egPendingCurrencyUse) return;
+    if (!_pendingCurrencyUse) return;
     if (e.button !== 0) return;
 
     const chip = e.target.closest('.eg-item-chip');
@@ -81,12 +81,12 @@ document.addEventListener('mousedown', function (e) {
         ? !!_dndChipScreenEl(chip)
         : !!chip.closest('#screen-endgame-hub'));
     if (!onManagedScreen) {
-        _egCancelCurrencyUse();
+        _cancelCurrencyUse();
         return;
     }
 
     if (chip.closest('.eg-currency-cell')) {
-        _egCancelCurrencyUse(); // clicking any orb cancels use-mode
+        _cancelCurrencyUse(); // clicking any orb cancels use-mode
         return;
     }
 
@@ -141,37 +141,37 @@ document.addEventListener('mousedown', function (e) {
         applyFn = (newItem) => { globalThis._egMapSlotItem = newItem; _egRenderMapSlot(); };
     } else if (invCell) {
         const r = +invCell.dataset.row, c = +invCell.dataset.col;
-        targetItem = _egInventory[r][c];
-        applyFn = (newItem) => { _egInventory[r][c] = newItem; _egRenderInventoryCell(r, c); };
+        targetItem = _inventory[r][c];
+        applyFn = (newItem) => { _inventory[r][c] = newItem; _renderInventoryCell(r, c); };
     } else if (equipSlot) {
         const slotId = equipSlot.dataset.slotId;
-        targetItem = _egEquipped[slotId] || null;
+        targetItem = _equipped[slotId] || null;
         applyFn = (newItem) => {
-            _egEquipped[slotId] = newItem;
-            _egRenderEquipSlot(slotId);
+            _equipped[slotId] = newItem;
+            _renderEquipSlot(slotId);
             // Rerolled mods change the attribute totals, which can flip the
             // requirement-blocked (red) state of other items - refresh both
             // the stash and all paperdoll slots.
-            _egRenderInventory();
-            _egRenderEquipSlots();
+            _renderInventory();
+            _renderEquipSlots();
         };
     } else {
-        _egCancelCurrencyUse();
+        _cancelCurrencyUse();
         return;
     }
 
     if (!targetItem) {
         const msg = t('eg_no_item_target');
         globalThis.showToast(msg);
-        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
-        _egCancelCurrencyUse(true);
+        if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
+        _cancelCurrencyUse(true);
         return;
     }
 
-    _egApplyCurrencyToItem(targetItem, applyFn, chip, e.shiftKey);
+    _applyCurrencyToItem(targetItem, applyFn, chip, e.shiftKey);
 }, true);
 
 // Escape cancels a pending currency use too.
 document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && _egPendingCurrencyUse) _egCancelCurrencyUse();
+    if (e.key === 'Escape' && _pendingCurrencyUse) _cancelCurrencyUse();
 });

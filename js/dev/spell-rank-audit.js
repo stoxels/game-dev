@@ -763,8 +763,8 @@ export function _sraFxNote(spellId) {
 //------------------------------------------------------------------------
 // Replays the spell's REAL visual, built from the same art the game uses:
 //   • universal offensive spells → USP_THEME_PROJ[theme]  (spell-rank-audit
-//     fires it through _egFireProjectile, the shared flight code)
-//   • class / ascendency / Heartbloom spells → EG_CLASS_PROJECTILES[owner]
+//     fires it through _fireProjectile, the shared flight code)
+//   • class / ascendency / Heartbloom spells → CLASS_PROJECTILES[owner]
 //   • universal support → the .usp-support-ring + floating value label
 //   • universal movement → the .usp-move-streak trail
 // Impact / nova / DoT overlays are the spell's own classes from
@@ -814,25 +814,25 @@ export function _sraStageOverlay(className, ms) {
 }
 
 export function _sraHitBurst(x, y, color, isCrit) {
-    if (typeof globalThis.EG_HIT_ELEMENT_COLORS === 'undefined') return;
+    if (typeof globalThis.HIT_ELEMENT_COLORS === 'undefined') return;
     const burst = document.createElement('div');
     burst.className = 'eg-hit-burst sra-fx';
     burst.style.left = `${x}px`;
     burst.style.top = `${y}px`;
     const ring = document.createElement('div');
     ring.className = 'eg-hit-ring';
-    ring.style.setProperty('--eg-hit-color', color || globalThis.EG_HIT_ELEMENT_COLORS.physical);
+    ring.style.setProperty('--eg-hit-color', color || globalThis.HIT_ELEMENT_COLORS.physical);
     if (isCrit) {
         ring.style.transform = 'scale(1.35)';
         ring.style.borderWidth = '4px';
         ring.style.filter = 'brightness(1.5)';
     }
     burst.appendChild(ring);
-    const sparkCount = (typeof globalThis.EG_HIT_BURST_SPARK_COUNT === 'number') ? globalThis.EG_HIT_BURST_SPARK_COUNT : 8;
+    const sparkCount = (typeof globalThis.HIT_BURST_SPARK_COUNT === 'number') ? globalThis.HIT_BURST_SPARK_COUNT : 8;
     for (let i = 0; i < sparkCount; i++) {
         const spark = document.createElement('div');
         spark.className = 'eg-hit-spark';
-        spark.style.setProperty('--eg-hit-color', color || globalThis.EG_HIT_ELEMENT_COLORS.physical);
+        spark.style.setProperty('--eg-hit-color', color || globalThis.HIT_ELEMENT_COLORS.physical);
         const angle = (Math.PI * 2 * i) / sparkCount;
         spark.style.setProperty('--eg-hit-dx', `${Math.cos(angle) * 22}px`);
         spark.style.setProperty('--eg-hit-dy', `${Math.sin(angle) * 22}px`);
@@ -844,15 +844,15 @@ export function _sraHitBurst(x, y, color, isCrit) {
 
 // Class / ascendency projectile art, keyed by owner id.
 export function _sraClassProjDef(spellId) {
-    if (typeof globalThis.EG_CLASS_PROJECTILES === 'undefined') return null;
+    if (typeof globalThis.CLASS_PROJECTILES === 'undefined') return null;
     const def = _sraDef(spellId);
     const owner = (def && def.source && def.source.ownerId) || null;
-    return globalThis.EG_CLASS_PROJECTILES[owner] || globalThis.EG_CLASS_PROJECTILES._default || null;
+    return globalThis.CLASS_PROJECTILES[owner] || globalThis.CLASS_PROJECTILES._default || null;
 }
 
 // Fires ONE real projectile and OWNS its lifetime.
 //
-// _egFireProjectile removes its own element from `anim.onfinish` (see
+// _fireProjectile removes its own element from `anim.onfinish` (see
 // js/combat/combat-class-projectiles.js). That is reliable in-game, but this
 // screen is not the game: a 5-projectile volley (Rain of Fire) came back with
 // the projectiles parked at the origin - animations gone, arrival never fired
@@ -863,7 +863,7 @@ export function _sraClassProjDef(spellId) {
 export function _sraFireFlight(projDef, start, end, dur, easing, scale, onArrive) {
     const before = new Set(document.querySelectorAll('.eg-projectile'));
     try {
-        globalThis._egFireProjectile(projDef, projDef.cssClass, start, end, dur, easing, () => {}, null, scale);
+        globalThis._fireProjectile(projDef, projDef.cssClass, start, end, dur, easing, () => {}, null, scale);
     } catch (e) {
         return null; // flight is cosmetic - never let the sandbox throw
     }
@@ -884,13 +884,13 @@ export function _sraPlayVisual() {
     const hits = row ? Math.max(1, Math.min(row.count, 6)) : 1;
 
     // ── universal offensive: themed projectile + its own impact overlays ──
-    if (usp && usp.dmg && typeof globalThis._egFireProjectile === 'function') {
+    if (usp && usp.dmg && typeof globalThis._fireProjectile === 'function') {
         const projDef = (typeof _uspProjDefFor === 'function') ? _uspProjDefFor(usp) : null;
         if (projDef) {
             const big = usp.behavior === 'single' && (usp.dmg[0] >= 40);
             const fromSky = !!usp.fromSky || usp.behavior === 'delayed' || usp.behavior === 'starfall';
             for (let i = 0; i < hits; i++) {
-                _sraAfter(i * (typeof globalThis.EG_REVEAL_PROJECTILE_STAGGER_MS === 'number' ? globalThis.EG_REVEAL_PROJECTILE_STAGGER_MS : 60), () => {
+                _sraAfter(i * (typeof globalThis.REVEAL_PROJECTILE_STAGGER_MS === 'number' ? globalThis.REVEAL_PROJECTILE_STAGGER_MS : 60), () => {
                     const p = _sraStagePoints();
                     if (!p) return;
                     const start = fromSky ? { x: p.end.x, y: p.end.y - 300 } : p.start;
@@ -918,8 +918,8 @@ export function _sraPlayVisual() {
     // ── class / ascendency / Heartbloom: the class's own projectile art ───
     if (!usp) {
         const projDef = _sraClassProjDef(spellId);
-        if (projDef && typeof globalThis._egFireProjectile === 'function') {
-            const color = (typeof globalThis.EG_HIT_ELEMENT_COLORS !== 'undefined') ? globalThis.EG_HIT_ELEMENT_COLORS.physical : '#ffffff';
+        if (projDef && typeof globalThis._fireProjectile === 'function') {
+            const color = (typeof globalThis.HIT_ELEMENT_COLORS !== 'undefined') ? globalThis.HIT_ELEMENT_COLORS.physical : '#ffffff';
             for (let i = 0; i < hits; i++) {
                 _sraAfter(i * 90, () => {
                     const p = _sraStagePoints();

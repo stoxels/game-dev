@@ -86,8 +86,8 @@ function _tryProcStochasticResonance(row, col) {
 // True when this mistake is not counted towards the allowed mistakes.
 // Chance = tree (mistake_not_count_pct) + gear (mistake_not_count), capped at 100.
 function _rollUncountedMistake() {
-    if (typeof globalThis._egComputePlayerStats !== 'function') return false;
-    const pct = Number(globalThis._egComputePlayerStats().mistakeNotCountPct) || 0;
+    if (typeof globalThis._computePlayerStats !== 'function') return false;
+    const pct = Number(globalThis._computePlayerStats().mistakeNotCountPct) || 0;
     return pct > 0 && Math.random() * 100 < Math.min(100, pct);
 }
 
@@ -264,9 +264,9 @@ export function _updateMistakeCounterHUD() {
         if (mc) mc.textContent = `${t('cg_mistakes_lbl')}: ${globalThis.mistakeCount}`;
     }
 
-    if (typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) {
-        if (typeof globalThis._egUpdateObjectivesHUD === 'function') globalThis._egUpdateObjectivesHUD();
-        if (typeof globalThis._egCheckMistakeLimit === 'function') globalThis._egCheckMistakeLimit();
+    if (typeof globalThis._isActive === 'function' && globalThis._isActive()) {
+        if (typeof globalThis._updateObjectivesHUD === 'function') globalThis._updateObjectivesHUD();
+        if (typeof globalThis._checkMistakeLimit === 'function') globalThis._checkMistakeLimit();
     }
 }
 
@@ -289,8 +289,8 @@ function _triggerPenaltyFlash() {
 export function applyPenalty(row, col) {
     // The Clock's Time Freeze: the mistake counter is frozen - wrong fills
     // still flash red and ring, but cost no mistake and no timer time until
-    // the 30s window ends (or the boss is slain). See _egClockStartTimeFreeze.
-    if (window._egClockTimeFreezeActive) return;
+    // the 30s window ends (or the boss is slain). See _clockStartTimeFreeze.
+    if (window._clockTimeFreezeActive) return;
 
     const penMult = globalThis.getClassPenaltyMultiplier(); // 5.0 during Black Swan, 0 = shield absorbed
 
@@ -315,9 +315,9 @@ export function applyPenalty(row, col) {
 
     // Mana on mistake (gear stat)
     if (typeof globalThis.gainMana === 'function'
-        && typeof globalThis._egComputePlayerStats === 'function'
+        && typeof globalThis._computePlayerStats === 'function'
         && globalThis.playerMaxMana > 0) {
-        globalThis.gainMana(globalThis._egComputePlayerStats().manaOnMistake || 0);
+        globalThis.gainMana(globalThis._computePlayerStats().manaOnMistake || 0);
     }
 
     // --- Character banter: react to this mistake (and to mistake streaks) ---
@@ -337,7 +337,7 @@ export function applyPenalty(row, col) {
 
     // Endgame ailment: wrong clicks on LAVA cells burn twice as hard -
     // count as a second mistake AND double the time loss.
-    if (typeof globalThis._egIsLavaCell === 'function' && globalThis._egIsLavaCell(row, col)) {
+    if (typeof globalThis._isLavaCell === 'function' && globalThis._isLavaCell(row, col)) {
         globalThis.mistakeCount++;
         effectivePen *= 2;
         globalThis.showToast('🌋 Lava! The mistake counts twice!');

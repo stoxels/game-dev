@@ -1,14 +1,14 @@
 import { Audio_Manager } from '../audio/audio.js';
-import { _egApplyPlayerAilment } from './combat-ailments-core.js';
+import { _applyPlayerAilment } from './combat-ailments-core.js';
 import {
-    EG_HZ_CYCLONE_BASE_DMG_PCT, EG_HZ_CYCLONE_R_MAX, EG_HZ_CYCLONE_R_MIN, EG_HZ_CYCLONE_SPEED_MAX,
-    EG_HZ_CYCLONE_SPEED_MIN, EG_HZ_CYCLONE_TICK_MS, EG_HZ_DELIRIUM_FADE_IN_MS,
-    EG_HZ_DELIRIUM_FADE_OUT_MS, EG_HZ_DELIRIUM_HOLD_MS, EG_HZ_DELIRIUM_INTERVAL_MAX_MS,
-    EG_HZ_DELIRIUM_INTERVAL_MIN_MS, EG_HZ_DELIRIUM_POLYMORPH_CHANCE_PCT,
-    _egHzApplyCircleHit, _egHzLayer, _egHzMult, _egHzPlayerHitbox, _egHzRand,
-    _egHzSweptCircleRectOverlap,
+    HZ_CYCLONE_BASE_DMG_PCT, HZ_CYCLONE_R_MAX, HZ_CYCLONE_R_MIN, HZ_CYCLONE_SPEED_MAX,
+    HZ_CYCLONE_SPEED_MIN, HZ_CYCLONE_TICK_MS, HZ_DELIRIUM_FADE_IN_MS,
+    HZ_DELIRIUM_FADE_OUT_MS, HZ_DELIRIUM_HOLD_MS, HZ_DELIRIUM_INTERVAL_MAX_MS,
+    HZ_DELIRIUM_INTERVAL_MIN_MS, HZ_DELIRIUM_POLYMORPH_CHANCE_PCT,
+    _hzApplyCircleHit, _hzLayer, _hzMult, _hzPlayerHitbox, _hzRand,
+    _hzSweptCircleRectOverlap,
 } from './combat-hazards.js';
-import { _egHzCyclone, _egHzDelirium, _egSetHzCyclone, _egSetHzDelirium } from './combat-hazards.js';
+import { _hzCyclone, _hzDelirium, _setHzCyclone, _setHzDelirium } from './combat-hazards.js';
 
 //------------------------------------------------------------------------
 //-------------------CYCLONES---------------------------------------------
@@ -16,12 +16,12 @@ import { _egHzCyclone, _egHzDelirium, _egSetHzCyclone, _egSetHzDelirium } from '
 // Fast wind vortices that race across the whole screen (grid included),
 // damaging the player continuously while they stand inside one.
 
-export function _egHzInitCyclone(intensity) {
+export function _hzInitCyclone(intensity) {
     const count = Math.min(5, 2 + Math.round(intensity / 33));
     const vortices = [];
     for (let i = 0; i < count; i++) {
-        const r = _egHzRand(EG_HZ_CYCLONE_R_MIN, EG_HZ_CYCLONE_R_MAX);
-        const speed = _egHzRand(EG_HZ_CYCLONE_SPEED_MIN, EG_HZ_CYCLONE_SPEED_MAX)
+        const r = _hzRand(HZ_CYCLONE_R_MIN, HZ_CYCLONE_R_MAX);
+        const speed = _hzRand(HZ_CYCLONE_SPEED_MIN, HZ_CYCLONE_SPEED_MAX)
             * (1 + intensity / 200);
         const angle = Math.random() * Math.PI * 2;
 
@@ -30,11 +30,11 @@ export function _egHzInitCyclone(intensity) {
         const size = r * 2;
         el.style.width = size + 'px';
         el.style.height = size * 1.6 + 'px';
-        _egHzLayer.appendChild(el);
+        _hzLayer.appendChild(el);
 
         vortices.push({
-            x: _egHzRand(r, window.innerWidth - r),
-            y: _egHzRand(r, window.innerHeight - r),
+            x: _hzRand(r, window.innerWidth - r),
+            y: _hzRand(r, window.innerHeight - r),
             r,
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
@@ -42,13 +42,13 @@ export function _egHzInitCyclone(intensity) {
         });
     }
     Audio_Manager.playSFX('hz_cyclone_loop');
-    _egSetHzCyclone({ vortices, dmgMult: _egHzMult(intensity) });
+    _setHzCyclone({ vortices, dmgMult: _hzMult(intensity) });
 }
 
-export function _egHzTickCyclone(dtMs) {
-    const st = _egHzCyclone;
+export function _hzTickCyclone(dtMs) {
+    const st = _hzCyclone;
     const dtS = dtMs / 1000;
-    const pr = _egHzPlayerHitbox();
+    const pr = _hzPlayerHitbox();
 
     st.vortices.forEach(v => {
         if (!v.el.isConnected) return;
@@ -64,11 +64,11 @@ export function _egHzTickCyclone(dtMs) {
 
         // Continuous cold damage while the player stands in the funnel.
         v.dmgAcc += dtMs;
-        if (v.dmgAcc >= EG_HZ_CYCLONE_TICK_MS) {
+        if (v.dmgAcc >= HZ_CYCLONE_TICK_MS) {
             v.dmgAcc = 0;
-            if (pr && _egHzSweptCircleRectOverlap(prevX, prevY, v.x, v.y, v.r * 0.9, pr)) {
-                _egHzApplyCircleHit(v.x, v.y, v.r * 0.9, pr,
-                    EG_HZ_CYCLONE_BASE_DMG_PCT * st.dmgMult, 'cold', '#a8e6ff');
+            if (pr && _hzSweptCircleRectOverlap(prevX, prevY, v.x, v.y, v.r * 0.9, pr)) {
+                _hzApplyCircleHit(v.x, v.y, v.r * 0.9, pr,
+                    HZ_CYCLONE_BASE_DMG_PCT * st.dmgMult, 'cold', '#a8e6ff');
             }
         }
     });
@@ -81,19 +81,19 @@ export function _egHzTickCyclone(dtMs) {
 // Delirium: a purple mist periodically floods the screen. While it holds,
 // there is one chance roll to polymorph the player into chaos.
 
-export function _egHzInitDelirium(intensity) {
-    _egSetHzDelirium({
+export function _hzInitDelirium(intensity) {
+    _setHzDelirium({
         phase: 'idle',
-        nextIn: _egHzRand(8000, 14000),
+        nextIn: _hzRand(8000, 14000),
         t: 0,
         el: null,
         rolled: false,
-        polyChance: Math.min(80, EG_HZ_DELIRIUM_POLYMORPH_CHANCE_PCT * _egHzMult(intensity)),
+        polyChance: Math.min(80, HZ_DELIRIUM_POLYMORPH_CHANCE_PCT * _hzMult(intensity)),
     });
 }
 
-export function _egHzTickDelirium(dtMs) {
-    const st = _egHzDelirium;
+export function _hzTickDelirium(dtMs) {
+    const st = _hzDelirium;
 
     if (st.phase === 'idle') {
         st.nextIn -= dtMs;
@@ -101,13 +101,13 @@ export function _egHzTickDelirium(dtMs) {
             const mist = document.createElement('div');
             mist.className = 'eg-hz-delirium';
             mist.style.animationDuration =
-                `${EG_HZ_DELIRIUM_FADE_IN_MS}ms, ${EG_HZ_DELIRIUM_FADE_OUT_MS}ms`;
-            mist.style.animationDelay = `0ms, ${EG_HZ_DELIRIUM_FADE_IN_MS + EG_HZ_DELIRIUM_HOLD_MS}ms`;
+                `${HZ_DELIRIUM_FADE_IN_MS}ms, ${HZ_DELIRIUM_FADE_OUT_MS}ms`;
+            mist.style.animationDelay = `0ms, ${HZ_DELIRIUM_FADE_IN_MS + HZ_DELIRIUM_HOLD_MS}ms`;
             document.body.appendChild(mist);
             Audio_Manager.playSFX('hz_delirium_pulse');
             st.el = mist;
             st.phase = 'mist';
-            st.t = EG_HZ_DELIRIUM_FADE_IN_MS + EG_HZ_DELIRIUM_HOLD_MS;
+            st.t = HZ_DELIRIUM_FADE_IN_MS + HZ_DELIRIUM_HOLD_MS;
             st.rolled = false;
         }
         return;
@@ -115,19 +115,19 @@ export function _egHzTickDelirium(dtMs) {
 
     // Mist phase
     st.t -= dtMs;
-    if (!st.rolled && st.t <= EG_HZ_DELIRIUM_HOLD_MS) {
+    if (!st.rolled && st.t <= HZ_DELIRIUM_HOLD_MS) {
         st.rolled = true;
-        if (typeof _egApplyPlayerAilment === 'function'
+        if (typeof _applyPlayerAilment === 'function'
             && Math.random() * 100 < st.polyChance) {
-            _egApplyPlayerAilment('polymorph');
+            _applyPlayerAilment('polymorph');
         }
     }
     if (st.t <= 0) {
         if (st.el) { st.el.remove(); st.el = null; }
         st.phase = 'idle';
-        st.nextIn = _egHzRand(
-            EG_HZ_DELIRIUM_INTERVAL_MIN_MS,
-            EG_HZ_DELIRIUM_INTERVAL_MAX_MS
+        st.nextIn = _hzRand(
+            HZ_DELIRIUM_INTERVAL_MIN_MS,
+            HZ_DELIRIUM_INTERVAL_MAX_MS
         );
     }
 }

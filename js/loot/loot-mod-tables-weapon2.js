@@ -2,14 +2,14 @@
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
+//  which evals every MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------WEAPON 2 (OFF-HAND / SHIELD) MODIFIER TABLE----------
 //------------------------------------------------------------------------
 // The off-hand slot accepts either a shield or an offhand item (focus,
 // orb, tome, dagger-grip, etc). Players who dual-wield use two copies
-// of EG_MOD_TABLE_WEAPON1 instead - this table is specifically for
+// of MOD_TABLE_WEAPON1 instead - this table is specifically for
 // the protective/utility off-hand archetype.
 //
 // SHIELD identity:
@@ -20,7 +20,7 @@
 //   offence: when the player blocks, there is a % chance the shield
 //   slams back for damage. Absorption regen mods are strong here -
 //   the shield is the front line of that layer.
-//   Shields use EG_MOD_TABLE_SHIELD below - a defensive-only copy of
+//   Shields use MOD_TABLE_SHIELD below - a defensive-only copy of
 //   this table. The offhand-identity offensive mods (spell_damage,
 //   inc_spell_damage, channel) are stripped from it since shields are
 //   purely protective pieces; those mods remain reserved for actual
@@ -40,7 +40,7 @@
 // No chain/splash/multishot (cloak/gloves), no pushback/overkill
 // (shoulders), no stagger/grounded/first_step (pants/boots).
 
-export const EG_MOD_TABLE_WEAPON2 = {
+export const MOD_TABLE_WEAPON2 = {
     prefixes: {
 
         // --- LIFE & MANA ---
@@ -279,7 +279,7 @@ export const EG_MOD_TABLE_WEAPON2 = {
         // the same reason: the offhand is where a caster's ROLE is declared, so
         // it carries both halves of the support stat. Shields inherit these
         // two automatically (they strip only the offensive families, see
-        // _egBuildPerModEssences / EG_MOD_TABLE_SHIELD) - a shield that heals
+        // _buildPerModEssences / MOD_TABLE_SHIELD) - a shield that heals
         // is exactly the support fantasy the slot should allow.
         healing_power: {
             id: 'healing_power',

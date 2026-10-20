@@ -3,7 +3,7 @@ import { setAchStat, trackAchStat } from '../achievements/achievements.js';
 import { updateQuestStats } from '../inference/inference-stats.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
-import { egSaveHubState } from './endgame-hub.js';
+import { saveHubState } from './endgame-hub.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -24,7 +24,7 @@ import { STATE } from '../state.js';
 // Every generated map item is stamped with an `atlasNodeId` so running it
 // can be attributed to an atlas region. Completion state persists in
 // STATE.egAtlasCompleted ({ nodeId: true }) and is saved together with the
-// rest of the hub state via egSaveHubState().
+// rest of the hub state via saveHubState().
 //
 // Legacy save compatibility: node ids are `atlas_t<tier>_<slot>` where
 // slot is the index within the tier. The original region names keep their
@@ -39,7 +39,7 @@ import { STATE } from '../state.js';
 //   egAtlasDropNodeIds(id, isBoss) - ARPG-style drop pool for kills in that node's map
 //   egAtlasPickDropNodeId(id, isBoss) - pool pick; bosses favour the +1 climb
 //   egAtlasProgress()              - { completed, total, highestTier }
-//   _egAtlasOnMapCompleted(map)    - completion hook (called from _egEndMap)
+//   _egAtlasOnMapCompleted(map)    - completion hook (called from _endMap)
 //
 // Load order: this file runs BEFORE endgame-maps.js / endgame-hub.js, so no
 // top-level code may touch their symbols - everything below only uses LANG,
@@ -622,7 +622,7 @@ export function egAtlasChainBlueprint(node) {
     // after the chain (like per-map bosses). The roster in
     // js/combat/bosses/boss-rosters.js assigns each region its specific
     // boss (easy fights low, brutal fights at the pinnacle).
-    const bossIds = (typeof EG_BOSS_DEFS !== 'undefined') ? Object.keys(globalThis.EG_BOSS_DEFS) : [];
+    const bossIds = (typeof BOSS_DEFS !== 'undefined') ? Object.keys(globalThis.BOSS_DEFS) : [];
     // Always consume the roll so the PRNG stream - and therefore every
     // region's chain flavour and step sources - stays exactly as before,
     // whether or not the roster overrides the result.
@@ -664,7 +664,7 @@ export function egAtlasChainBlueprintForMap(mapItem) {
 
 // Persists the atlas completion state through the shared save pipeline.
 export function _egAtlasPersist() {
-    if (typeof egSaveHubState === 'function') egSaveHubState();
+    if (typeof saveHubState === 'function') saveHubState();
     else if (typeof save === 'function') save();
 }
 
@@ -697,7 +697,7 @@ export function _egAtlasResolveNodeForMap(mapItem) {
 }
 
 // Marks the atlas node belonging to a successfully completed map run as
-// cleared and unlocks its connected regions. Called from _egEndMap()
+// cleared and unlocks its connected regions. Called from _endMap()
 // (endgame-encounter-chain.js) while _egActiveMapItem is still set.
 //
 // Completion gate: the region only counts as cleared when the run was

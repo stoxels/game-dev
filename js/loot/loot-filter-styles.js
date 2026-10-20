@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------
 
 // Injects the loot-filter editor styles once.
-export function _egInjectLootFilterStyles() {
+export function _injectLootFilterStyles() {
     if (document.getElementById('eg-loot-filter-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-loot-filter-styles';

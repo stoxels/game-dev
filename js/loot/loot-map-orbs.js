@@ -1,7 +1,7 @@
 import { egAtlasNodeById, egAtlasNodeName, egAtlasPickNodeIdForTier } from '../endgame/endgame-atlas.js';
-import { _egRerollItemModValues } from './loot-currency-item-edits.js';
-import { EG_MOD_CAPS, _egRollModCounts } from './loot-equipment-generator.js';
-import {_egBuildItemName} from './loot-mod-naming.js';
+import { _rerollItemModValues } from './loot-currency-item-edits.js';
+import { ITEM_MOD_CAPS, _rollModCounts } from './loot-equipment-generator.js';
+import {_buildItemName} from './loot-mod-naming.js';
 import { _egAddOneModToMap, _egRemoveOneModFromMap, _egRerollMapMods } from './loot-maps.js';
 import { _egWithImplicits } from './loot-map-implicits.js';
 import { EG_MAP_MOD_TABLES } from './loot-map-mod-tables.js';
@@ -24,14 +24,14 @@ export const EG_MAP_CURRENCY_RULES = {
     orb_transmutation: {
         canApply(map) { return map.rarity === 'common'; },
         apply(map) {
-            const { prefixCount, suffixCount } = _egRollModCounts('uncommon');
+            const { prefixCount, suffixCount } = _rollModCounts('uncommon');
             return _egRerollMapMods(map, 'uncommon', prefixCount, suffixCount);
         },
     },
     orb_alteration: {
         canApply(map) { return map.rarity === 'uncommon'; },
         apply(map) {
-            const { prefixCount, suffixCount } = _egRollModCounts('uncommon');
+            const { prefixCount, suffixCount } = _rollModCounts('uncommon');
             return _egRerollMapMods(map, 'uncommon', prefixCount, suffixCount);
         },
     },
@@ -39,7 +39,7 @@ export const EG_MAP_CURRENCY_RULES = {
         canApply(map) { return map.rarity === 'uncommon' && (map.mods || []).length === 1; },
         apply(map) {
             const updated = _egAddOneModToMap(map, 'uncommon');
-            const name = _egBuildItemName(updated.baseName || updated.name, updated.rarity, updated.mods);
+            const name = _buildItemName(updated.baseName || updated.name, updated.rarity, updated.mods);
             return { ...updated, name };
         },
     },
@@ -47,21 +47,21 @@ export const EG_MAP_CURRENCY_RULES = {
         canApply(map) { return map.rarity === 'uncommon'; },
         apply(map) {
             const updated = _egAddOneModToMap({ ...map, rarity: 'rare' }, 'rare');
-            const name = _egBuildItemName(updated.baseName || updated.name, 'rare', updated.mods);
+            const name = _buildItemName(updated.baseName || updated.name, 'rare', updated.mods);
             return { ...updated, rarity: 'rare', name };
         },
     },
     orb_alchemy: {
         canApply(map) { return map.rarity === 'common'; },
         apply(map) {
-            const { prefixCount, suffixCount } = _egRollModCounts('rare');
+            const { prefixCount, suffixCount } = _rollModCounts('rare');
             return _egRerollMapMods(map, 'rare', prefixCount, suffixCount);
         },
     },
     orb_chaos: {
         canApply(map) { return map.rarity === 'rare'; },
         apply(map) {
-            const { prefixCount, suffixCount } = _egRollModCounts('rare');
+            const { prefixCount, suffixCount } = _rollModCounts('rare');
             return _egRerollMapMods(map, 'rare', prefixCount, suffixCount);
         },
     },
@@ -74,36 +74,36 @@ export const EG_MAP_CURRENCY_RULES = {
     orb_exalted: {
         canApply(map) {
             if (map.rarity !== 'rare' && map.rarity !== 'epic') return false;
-            return (map.mods || []).length < EG_MOD_CAPS.epic.maxTotal;
+            return (map.mods || []).length < ITEM_MOD_CAPS.epic.maxTotal;
         },
         apply(map) {
             const updated = _egAddOneModToMap({ ...map, rarity: 'epic' }, 'epic');
-            const name = _egBuildItemName(updated.baseName || updated.name, 'epic', updated.mods);
+            const name = _buildItemName(updated.baseName || updated.name, 'epic', updated.mods);
             return { ...updated, rarity: 'epic', name };
         },
     },
     orb_ascension: {
         canApply(map) { return map.rarity === 'common'; },
         apply(map) {
-            const { prefixCount, suffixCount } = _egRollModCounts('epic');
+            const { prefixCount, suffixCount } = _rollModCounts('epic');
             return _egRerollMapMods(map, 'epic', prefixCount, suffixCount);
         },
     },
     orb_elevation: {
         canApply(map) {
             if (map.rarity !== 'rare') return false;
-            return (map.mods || []).length < EG_MOD_CAPS.epic.maxTotal;
+            return (map.mods || []).length < ITEM_MOD_CAPS.epic.maxTotal;
         },
         apply(map) {
             const updated = _egAddOneModToMap({ ...map, rarity: 'epic' }, 'epic');
-            const name = _egBuildItemName(updated.baseName || updated.name, 'epic', updated.mods);
+            const name = _buildItemName(updated.baseName || updated.name, 'epic', updated.mods);
             return { ...updated, rarity: 'epic', name };
         },
     },
     orb_cataclysm: {
         canApply(map) { return map.rarity === 'epic'; },
         apply(map) {
-            const { prefixCount, suffixCount } = _egRollModCounts('epic');
+            const { prefixCount, suffixCount } = _rollModCounts('epic');
             return _egRerollMapMods(map, 'epic', prefixCount, suffixCount);
         },
     },
@@ -112,7 +112,7 @@ export const EG_MAP_CURRENCY_RULES = {
         apply(map) {
             const roll = Math.random();
             const rarity = roll < 0.60 ? 'uncommon' : (roll < 0.90 ? 'rare' : 'epic');
-            const { prefixCount, suffixCount } = _egRollModCounts(rarity);
+            const { prefixCount, suffixCount } = _rollModCounts(rarity);
             return _egRerollMapMods(map, rarity, prefixCount, suffixCount);
         },
     },
@@ -126,7 +126,7 @@ export const EG_MAP_CURRENCY_RULES = {
     orb_divine: {
         canApply(map) { return (map.mods || []).length > 0; },
         apply(map) {
-            const updated = _egRerollItemModValues(map, EG_MAP_MOD_TABLES);
+            const updated = _rerollItemModValues(map, EG_MAP_MOD_TABLES);
             return _egWithImplicits(updated);
         },
     },
@@ -144,7 +144,7 @@ export const EG_MAP_CURRENCY_RULES = {
                 if (node) baseName = egAtlasNodeName(node);
             }
             if (!baseName) baseName = _egPickMapBaseName(newTier);
-            const name = _egBuildItemName(baseName, map.rarity, map.mods || []);
+            const name = _buildItemName(baseName, map.rarity, map.mods || []);
             // Re-derive item/monster level so drops and mod rolls inside the
             // upgraded map match the new tier's curve value.
             const newLevel = _egMapTierMonsterLevel(newTier);

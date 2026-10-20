@@ -48,8 +48,8 @@ export function campaignGridSizeClass(cells, shift = 0) {
 // Marathon keystone: the time budget counts the grid one size larger, the
 // mistake cap one size smaller (flag read lazily: this file has no stats import).
 function _marathonShift() {
-    if (typeof globalThis._egComputePlayerStats !== 'function') return 0;
-    const s = globalThis._egComputePlayerStats();
+    if (typeof globalThis._computePlayerStats !== 'function') return 0;
+    const s = globalThis._computePlayerStats();
     return s && Number(s.marathon) > 0 ? 1 : 0;
 }
 

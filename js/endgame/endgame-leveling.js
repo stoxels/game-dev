@@ -5,16 +5,16 @@ import { _incDirect } from '../inference/inference-stats.js';
 import { ptEffectChannels, ptNodeHasEffects } from '../probability-tree/pt-effects.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';
-import { _egGetRevealProjectileDamagePct } from '../combat/combat-class-projectiles-reveal.js';
-import { _egCalcPlayerDamage, _egLastHitElements } from '../combat/combat-calculations.js';
-import { _egScaleElements } from '../combat/combat-calculations-resistances.js';
-import { _egAnimatePlayerProjectile } from '../combat/encounter.js';
+import { _getRevealProjectileDamagePct } from '../combat/combat-class-projectiles-reveal.js';
+import { _calcPlayerDamage, _lastHitElements } from '../combat/combat-calculations.js';
+import { _scaleElements } from '../combat/combat-calculations-resistances.js';
+import { _animatePlayerProjectile } from '../combat/encounter.js';
 import { _egRenderGateLevelChip } from './endgame-gate.js';
-import { _egRenderEquipSlots, _egRenderInventory, _egRenderStatsList } from './endgame-hub.js';
+import { _renderEquipSlots, _renderInventory, _renderStatsList } from './endgame-hub.js';
 import { _egMapPlayerLifeMult, _egMapXpMult } from './endgame-map-launch.js';
-import { _egCancelAbsorptionRegen, _egComputePlayerStats, _egGetAllEquippedItems } from './endgame-player-stats.js';
-import { EG_PLAYER_BASE_ATTRIBUTES, _egFindUnmetRequirements, _egGetUnmetRequirementsText } from '../loot/loot-requirements.js';
-import { _egIsActive } from '../combat/combat-state.js';
+import { _cancelAbsorptionRegen, _computePlayerStats, _getAllEquippedItems } from './endgame-player-stats.js';
+import { PLAYER_BASE_ATTRIBUTES, _findUnmetRequirements, _getUnmetRequirementsText } from '../loot/loot-requirements.js';
+import { _isActive } from '../combat/combat-state.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
 import { TALENT_TREE_DATA } from '../probability-tree/probability-tree-data.js';
@@ -32,7 +32,7 @@ import { TALENT_TREE_DATA } from '../probability-tree/probability-tree-data.js';
 //     falls off exponentially - so re-farming old content gives little.
 //   - The campaign carries the character from level 1 to ~level 68 (the
 //     atlas entry level); a one-time sweep of the atlas then reaches ~94
-//     and 94→100 is the dedicated late grind - see EG_LEVELING_CONFIG and
+//     and 94→100 is the dedicated late grind - see LEVELING_CONFIG and
 //     tools/xp-curve-tune.py.
 //   - Each level grants passivePointsPerLevel (1) passive tree point. Raw
 //     attribute points are no longer granted per level; the character's
@@ -42,31 +42,31 @@ import { TALENT_TREE_DATA } from '../probability-tree/probability-tree-data.js';
 //     the hub.
 //
 // Wiring notes:
-//   - _egSyncBaseAttributes() keeps EG_PLAYER_BASE_ATTRIBUTES
+//   - _syncBaseAttributes() keeps PLAYER_BASE_ATTRIBUTES
 //     (endgame-requirements.js) in sync with STATE.playerLevel, legacy
 //     attribute points, and allocated travel nodes. That single sync
 //     automatically enables item LEVEL requirements everywhere (equip gate,
-//     tooltips) and feeds attributes into _egComputePlayerStats() side-effects
+//     tooltips) and feeds attributes into _computePlayerStats() side-effects
 //     (Str -> life/armour, Agi -> accuracy/evasion, Int -> mana/spell dmg).
-//   - Kill integration lives in _egKillMonster() (endgame-encounter.js),
-//     which calls _egGrantMonsterXP(monsterLevel, isBoss).
+//   - Kill integration lives in _killMonster() (endgame-encounter.js),
+//     which calls _grantMonsterXP(monsterLevel, isBoss).
 //
 // Dependencies (must be loaded before this file):
 //   js/state.js             - STATE, save()
-//   endgame-player-stats.js  - _egGetAllEquippedItems()
-//   endgame-requirements.js - EG_PLAYER_BASE_ATTRIBUTES,
-//                             _egFindUnmetRequirements(),
-//                             _egGetUnmetRequirementsText()
+//   endgame-player-stats.js  - _getAllEquippedItems()
+//   endgame-requirements.js - PLAYER_BASE_ATTRIBUTES,
+//                             _findUnmetRequirements(),
+//                             _getUnmetRequirementsText()
 //
 // Entry points:
-//   _egGrantMonsterXP(mLevel, isBoss)      → called on every monster kill
-//   _egGetPlayerLevel() / _egGetPlayerXP() → current progression
-//   _egGetXpForNextLevel(level)            → XP needed to leave `level`
-//   _egCalcXpMultiplier(playerLvl, mLvl)   → ARPG-style range multiplier
-//   _egAllocateAttribute('str'|'agi'|'int')→ spend one point
-//   _egRefundAttribute('str'|'agi'|'int')  → verify & refund one point
-//   _egCanRefundAttribute(attr)            → refund legality check
-//   _egRenderLevelHUD()                    → refresh the inline level chip
+//   _grantMonsterXP(mLevel, isBoss)      → called on every monster kill
+//   _getPlayerLevel() / _getPlayerXP() → current progression
+//   _getXpForNextLevel(level)            → XP needed to leave `level`
+//   _calcXpMultiplier(playerLvl, mLvl)   → ARPG-style range multiplier
+//   _allocateAttribute('str'|'agi'|'int')→ spend one point
+//   _refundAttribute('str'|'agi'|'int')  → verify & refund one point
+//   _canRefundAttribute(attr)            → refund legality check
+//   _renderLevelHUD()                    → refresh the inline level chip
 //------------------------------------------------------------------------
 
 
@@ -74,7 +74,7 @@ import { TALENT_TREE_DATA } from '../probability-tree/probability-tree-data.js';
 //-------------------CONSTANTS--------------------------------------------
 //------------------------------------------------------------------------
 
-export const EG_LEVELING_CONFIG = {
+export const LEVELING_CONFIG = {
     startLevel: 1,
     maxLevel: 100,
 
@@ -87,7 +87,7 @@ export const EG_LEVELING_CONFIG = {
     // the atlas is a genuine next step, ARPG-style (T1 = 68 → T16 = 90).
     // Campaign pacing does not depend on the curve's shape: level-completion
     // XP is a FRACTION of xpToNextLevel(expectedLevel) - see
-    // EG_LEVELING_CONFIG.campaignFirstClearFraction.
+    // LEVELING_CONFIG.campaignFirstClearFraction.
     xpBase: 158,
     xpExp: 1.72,
     xpLinear: 197,
@@ -165,7 +165,7 @@ export const EG_LEVELING_CONFIG = {
     // EXPECTED character level, and a replay grants campaignReplayFraction
     // of that. Both are additionally scaled by the ARPG-style range
     // multiplier against the expected level, so farming old content gives
-    // almost nothing. Monster kills (see _egGrantMonsterXP) make up the
+    // almost nothing. Monster kills (see _grantMonsterXP) make up the
     // rest of the budget.
     campaignFirstClearFraction: 0.22,
     campaignReplayFraction: 0.35,
@@ -173,13 +173,13 @@ export const EG_LEVELING_CONFIG = {
 
 // Pristine copy of the base attribute pool from endgame-requirements.js,
 // captured before this file mutates the object with allocated points.
-export const _EG_ATTR_ORIGINAL_BASE = {
-    str: EG_PLAYER_BASE_ATTRIBUTES.str,
-    agi: EG_PLAYER_BASE_ATTRIBUTES.agi,
-    int: EG_PLAYER_BASE_ATTRIBUTES.int,
+export const _ATTR_ORIGINAL_BASE = {
+    str: PLAYER_BASE_ATTRIBUTES.str,
+    agi: PLAYER_BASE_ATTRIBUTES.agi,
+    int: PLAYER_BASE_ATTRIBUTES.int,
 };
 
-const _EG_PASSIVE_TREE_TRAVEL_BONUSES = {
+const _PASSIVE_TREE_TRAVEL_BONUSES = {
     small_strength: { str: 5 },
     small_agility: { agi: 5 },
     small_intellect: { int: 5 },
@@ -199,27 +199,27 @@ const _EG_PASSIVE_TREE_TRAVEL_BONUSES = {
 
 // Notable nodes now ride the effects pipeline (pt-effects.js); the table is
 // kept (empty) because the scanner still consults it for unconverted notables.
-const _EG_PASSIVE_TREE_NOTABLE_BONUSES = {};
+const _PASSIVE_TREE_NOTABLE_BONUSES = {};
 
 // Small pathing nodes previously had no stat channel at all - only travel
 // and notable tiers were read. Deliberately narrow: a small node contributes
 // only when its (unique) stat key is listed here, so untouched pathing nodes
 // keep granting nothing.
-const _EG_PASSIVE_TREE_SMALL_BONUSES = {};
+const _PASSIVE_TREE_SMALL_BONUSES = {};
 
-const _EG_PASSIVE_TREE_NODES_BY_ID = new Map(
+const _PASSIVE_TREE_NODES_BY_ID = new Map(
     Array.isArray(TALENT_TREE_DATA?.nodes)
         ? TALENT_TREE_DATA.nodes.map(node => [node.id, node])
         : []
 );
 
-function _egGetPassiveTreeTravelBonuses() {
+function _getPassiveTreeTravelBonuses() {
     const totals = { glassClockTimerLessPct: 0, glassClockGain: 0, noFillTimeGain: 0, mistakeTimeCostMorePct: 0, marathon: 0, str: 0, agi: 0, int: 0, mana: 0, armourFlat: 0, armourIncPct: 0, lifeRegenPct: 0, lifeRegenFlat: 0, accuracy: 0, accuracyIncPct: 0, movementSpeedPct: 0, absorptionFlat: 0, absorptionIncPct: 0, absorptionRegenRatePct: 0, spellDamageIncPct: 0, meleePhysIncPct: 0, meleePhys1HIncPct: 0, meleePhysHeavyIncPct: 0, meleeChargeSpeedPct: 0, attackSpeedPct: 0, physDamageIncPct: 0, elementalDamageIncPct: 0, fireDamageIncPct: 0, coldDamageIncPct: 0, lightningDamageIncPct: 0, castSpeedPct: 0, fireCastSpeedPct: 0, coldCastSpeedPct: 0, lightningCastSpeedPct: 0, fireResistFlat: 0, coldResistFlat: 0, lightningResistFlat: 0, fireResistMax: 0, healthFlat: 0, healthIncPct: 0, manaIncPct: 0, manaLessPct: 0, allElementalResist: 0, castingAilmentAvoidPct: 0, reflectPhysFlat: 0, blockChanceTree: 0, blockRecoveryPct: 0, blockArmorPulse: 0, igniteDurationPct: 0, bleedDurationPct: 0, meleeRangeM: 0, meleeSplashBaseM: 0, lifeLeechMeleePct: 0, timerStartSecs: 0, mistakeCountTree: 0, mistakeNotCountTreePct: 0, lifeOnLine: 0, absorptionOnLine: 0, manaOnLine: 0, chargeOnLinePct: 0, enduranceOnLinePct: 0, frenzyOnLinePct: 0, powerOnLinePct: 0, armourPerStreak: 0, blockFlawlessPct: 0, mistakeHeal: 0, damagePerStreakPct: 0, damageFlawlessPct: 0, damageLowTimePct: 0, damageAfterLinePct: 0, revealProjectileDamagePct: 0, damageOnMistakePct: 0, timeOnKill: 0, timeOnElite: 0, timerFreezeOnStun: 0, cellOnKillPct: 0, markOnKillPct: 0, quickFillStreakPct: 0, firstStepTreeSecs: 0, pickupLifetimeSecs: 0, luckyTileRewardAmount: 0, regenLowTimePct: 0, quizHintPct: 0, quizRetryPct: 0, quizTimeSecs: 0, itemDropPct: 0, itemEffectPct: 0, retaliationWardBleed: 0, retaliationWardIgnite: 0, meleeAoEPct: 0, lifeLeechPct: 0, impaleChanceHeavyPct: 0, impaleEffectHeavyPct: 0, impaleEffectFreshPct: 0, impaleDurationPct: 0, blockChanceShieldPct: 0, meleePhysShieldIncPct: 0, attackPhysShieldIncPct: 0, shieldDefencePct: 0, enduranceOnKillShieldPct: 0, enduranceChargesMax: 0, enduranceDurationPct: 0, lifeRegenPerEndurancePct: 0, meleePhysSwordIncPct: 0, meleePhysAxeIncPct: 0, swordChargeSpeedPct: 0, accuracySwordFlat: 0, ignorePhysReductionPct: 0, intimidateChanceMeleePct: 0, intimidateMeleeAmpPct: 0, bleedChanceMeleePct: 0, bleedChanceAttackPct: 0, bleedSpeedPct: 0, lifeRegenRatePct: 0, axeChargeSpeedPct: 0, rageOnHitAxe: 0, rageMeleeMorePct: 0, rageMax: 0, meleePhysMaceIncPct: 0, areaOfEffectPct: 0, stunChanceMaceChargedPct: 0, stunDurationPct: 0, coldResistMax: 0, lightningResistMax: 0, allElementalResistMax: 0, stunChanceHeavyPct: 0, stunDurationHeavyPct: 0, stunDoubleChancePct: 0, meleeDoubleDamageChancePct: 0, meleeSpellManaCostReducedPct: 0, meleeSpellLifeCostPct: 0, meleeKillExplodeChancePct: 0, healthMorePct: 0, manaRemoved: 0, spellsCostLife: 0, spellCostIncPct: 0, damageToFirePct: 0, onlyFireDamage: 0, critChanceMeleeMacePct: 0, critMultiplierMeleeMacePct: 0, igniteDamageMorePct: 0, physDotMorePct: 0, physAsExtraFirePct: 0, physAsExtraFireTimedPct: 0, crushPhysReductionPct: 0, lifeRegenLessPct: 0, lifeLeechLessPct: 0, absorptionRechargesLife: 0, projectileDamageIncPct: 0, projectileSpeedPct: 0, projectileCritChancePct: 0, bowSpellDamageIncPct: 0, bowSpellDotIncPct: 0, stunAvoidPct: 0, evasionFlat: 0, evasionIncPct: 0, manaHealIncPct: 0, manaOnMeleeHitChargedPct: 0, parrySpellChancePct: 0, critChanceMeleePct: 0, projectileElementalDamageIncPct: 0, projectileCritMultiplierPct: 0, heartHealFlat: 0, manaOnProjectileHitPct: 0, bowSpellManaCostReducedPct: 0, frenzyChargesMax: 0, frenzyDurationPct: 0, evasionPerFrenzyChargePct: 0, lifeOnProjectileHit: 0, lifeBurstOnProjectileHitChancePct: 0, heartSpawnIncPct: 0, manaSpawnIncPct: 0, poisonChanceAttackPct: 0, poisonDotMultiPct: 0, lifeOnMeleeHit: 0, lifeOnAttackHit: 0, dotIncPct: 0, skillEffectDurationPct: 0, lifeLeechEffectIncPct: 0, shadowResistFlat: 0, critChanceFlat: 0, dotIncDaggerPct: 0, critMultiplierDaggerPct: 0, poisonDurationPct: 0, critDotMultiPct: 0, shadowDamageIncPct: 0, manaOnKillFlat: 0, damageIncPct: 0, critChanceDaggerPct: 0, bleedAvoidPct: 0, poisonAvoidPct: 0, lifeOnKillFlat: 0, critMultiplierFlatPct: 0, manaRegenIncPct: 0, spellCritChancePct: 0, spellCritMultiplierPct: 0, chillEffectIncPct: 0, absorptionLeechSpellPct: 0, absorptionLeechEffectIncPct: 0, physAsExtraShadowPct: 0, lifeRecoupPct: 0, daggerDamageIncPct: 0, lifeLeechAsAbsorption: 0, absorptionNoRecharge: 0, daggerChargeSpeedPct: 0, absorptionOnKillFlat: 0, shockAvoidPct: 0, igniteAvoidPct: 0, chillAvoidPct: 0, elementalAilmentAvoidPct: 0, igniteChancePct: 0, attacksNeverMiss: 0, movementSpeedLessPct: 0, noRepeatTarget: 0, singleElementMorePct: 0, lastElementResistPct: 0, absorptionStopsWhileAttacking: 0, absorptionRegenDelaySecs: 0, evasionToArmour: 0, agilityNoEvasion: 0, lifeLeechInstant: 0, lifeOnlyFromLeech: 0, windDancerLessPct: 0, windDancerEvadePct: 0, windDancerMorePct: 0, lifeBecomesOne: 0, shadowImmune: 0, chilledColdTaken: 0, damageToColdPct: 0, onlyColdDamage: 0, bleedStackMax: 0, bleedLessPct: 0, absorptionRemoved: 0, manaToLifePct: 0, elementalOverloadPct: 0, critsNoExtraDamage: 0, dotMultiEqualsCrit: 0, nonCritNoAilments: 0, absorptionRegenUninterrupted: 0, absorptionRegenLessPct: 0, armourDefendDouble: 0, maxDamageReductionCap: 0, spellDmgLowLifeMorePct: 0, damageFromManaPct: 0, ghostDance: 0, ghostShroudMax: 0, ghostShroudRecoverPct: 0, blockDoubled: 0, blockedHitTakenPct: 0, damageToLightningPct: 0, onlyLightningDamage: 0, lightningMaxMorePct: 0, lightningMinLessPct: 0, cannotEvade: 0, cannotBeStunned: 0, pointBlankPct: 0, blockMaxAttackLess: 0, blockMaxSpellLess: 0, spellBlockPerOvercap: 0, dodgeChanceTreePct: 0, armourLessPct: 0, absorptionLessPct: 0, spellCostFromAbsorption: 0, strengthSpellDamage: 0, lifeRegenToAbsorption: 0, preciseTechniquePct: 0, neverCrit: 0, impaleSpread: 0, impaleExtra: 0, impaleLockout: 0, secondaryDamagePct: 0, pierceChanceTreePct: 0, pierceTargetsExtra: 0, chainChanceTreePct: 0, chainCountExtra: 0, forkChancePct: 0, forkExtraChancePct: 0, multishotChanceTreePct: 0, costEfficiencyPct: 0, onslaughtEffectPct: 0, onslaughtOnKillPct: 0, onslaughtDefencePct: 0, leechEffectRecentCritPct: 0, wandPhysAsLightningPct: 0, bowAoePct: 0, dmgFullAbsorptionPct: 0, critMultiHeavy: 0, dmgVsLowLifePct: 0, aoeRecentKillPct: 0, ailmentDurationTakenPct: 0, chillShockTakenPct: 0, spellDotMultiPct: 0, manaLeechAttackPct: 0, spellBlockFlat: 0, dmgRecentShockPct: 0, shockDurationPct: 0, shockEffectPct: 0, lifePulsePct: 0, dotFasterPct: 0, enduranceMin: 0, enduranceOnKillPct: 0, damagePerEndurancePct: 0, enduranceWhenHitPct: 0, lowLifeRegenPct: 0, physTakenFlat: 0, manaLeechEffectPct: 0, critVsBleedingPct: 0, critMultiVsBleedingPct: 0, avoidPhysHitPct: 0, armourIfHitPct: 0, evasionIfNotHitPct: 0, igniteFasterPct: 0, freezeDurationPct: 0, critVsShockedPct: 0, shadowResDouble: 0, armourPerEndurancePct: 0, moveSpeedPerFrenzyPct: 0, chargeSpeedPerFrenzyPct: 0, stunPerEndurancePct: 0, aoePerEndurancePct: 0, areaDamagePct: 0, shieldElementalRes: 0, ailmentEffectTreePct: 0, blindDurationPct: 0, chillDurationPct: 0, poisonChanceSpellPct: 0, igniteDurationTakenPct: 0, shockEffectTakenPct: 0, chillEffectTakenPct: 0, freezeDurationTakenPct: 0, spellDotIncPct: 0, critPerPowerCharge: 0, manaRegenPerPowerPct: 0, critMultiPerPowerCharge: 0, shieldCastSpeedPct: 0, shieldSpellDamagePct: 0, spellDamagePerPowerPct: 0, shieldAbsorptionPct: 0, rageDecaySlowerPct: 0, ragePerArmourPct: 0, rageWhenHitAmount: 0, powerChargesMax: 0, powerDurationPct: 0, powerOnCritPct: 0, powerOnKillPct: 0, powerOnBlockPct: 0, powerOnStunPct: 0, powerDamagePerChargePct: 0, frenzyOnKillPct: 0, frenzyOnBlockPct: 0, enduranceOnBlockPct: 0, enduranceOnMeleeCritPct: 0, blindChancePct: 0, blindEffectIncPct: 0, critChanceVsBlindedPct: 0, fortifyMax: 0, fortifyDurationPct: 0, fortifyOnStunPct: 0, fortifyEffectIncPct: 0, fortifiedDefencePct: 0, stunChancePct: 0, riposteDamagePct: 0, riposteDurationPct: 0, poisonChanceDaggerPct: 0, daggerCritPoisons: 0, staffBlockPct: 0, staffSpellBlockPct: 0, shieldSpellBlockPct: 0, critChanceSwordPct: 0, critMultiplierSwordPct: 0, critChanceAxePct: 0, critMultiplierAxePct: 0, staffDamageIncPct: 0, staffChargeSpeedPct: 0, critChanceStaffPct: 0, critMultiplierStaffPct: 0, wandDamageIncPct: 0, wandChargeSpeedPct: 0, critChanceWandPct: 0, critMultiplierWandPct: 0, dualDamageIncPct: 0, dualChargeSpeedPct: 0, dualAccuracyIncPct: 0, dualCritChancePct: 0, dualCritMultiPct: 0, dualCastSpeedPct: 0, dualSpellDamagePct: 0, dualMoveSpeedPct: 0, dualBlockPct: 0, physAsExtraColdPct: 0, physAsExtraLightningPct: 0, freezeChancePct: 0, shockChancePct: 0, penFirePct: 0, penColdPct: 0, penLightningPct: 0, penShadowPct: 0, penElementalPct: 0 };
     // Unique equipment carries passive-tree style effects (`effects` on the
     // unique def, copied to item.uniqueEffects). They ride the same channels
     // as tree nodes and apply even without a tree (treeless / no allocation).
     try {
-        for (const item of _egGetAllEquippedItems()) {
+        for (const item of _getAllEquippedItems()) {
             if (!item || !item.isUnique || !Array.isArray(item.uniqueEffects)) continue;
             const gearChannels = ptEffectChannels(item.uniqueEffects);
             for (const channel in gearChannels) totals[channel] = (totals[channel] || 0) + gearChannels[channel];
@@ -235,15 +235,15 @@ function _egGetPassiveTreeTravelBonuses() {
     if (typeof globalThis.isTreeless === 'function' && globalThis.isTreeless()) return totals;
 
     for (const nodeId of state.passiveTreeAllocated) {
-        const node = _EG_PASSIVE_TREE_NODES_BY_ID.get(Number(nodeId));
+        const node = _PASSIVE_TREE_NODES_BY_ID.get(Number(nodeId));
         if (!node) continue;
         let bonus = null;
         if (node.tier === 'travel') {
-            bonus = _EG_PASSIVE_TREE_TRAVEL_BONUSES[node.statKey];
+            bonus = _PASSIVE_TREE_TRAVEL_BONUSES[node.statKey];
         } else if (node.tier === 'notable') {
-            bonus = _EG_PASSIVE_TREE_NOTABLE_BONUSES[node.statKey];
+            bonus = _PASSIVE_TREE_NOTABLE_BONUSES[node.statKey];
         } else if (node.tier === 'small') {
-            bonus = _EG_PASSIVE_TREE_SMALL_BONUSES[node.statKey];
+            bonus = _PASSIVE_TREE_SMALL_BONUSES[node.statKey];
         }
         // Legacy path: statKey -> tier bonus table. Kept for the ~2100
         // nodes not yet converted to the effects pipeline below.
@@ -301,25 +301,25 @@ function _egGetPassiveTreeTravelBonuses() {
 // Seconds added to the level timer by passive nodes (timer_start_secs
 // effect, nodes 31211/31215/31216). Read by the _initTimer patch in
 // probability-tree-expansion.js.
-export function _egGetTreeTimerStartSecs() {
-    return _egGetTreeChannel('timerStartSecs');
+export function _getTreeTimerStartSecs() {
+    return _getTreeChannel('timerStartSecs');
 }
 
 // One summed passive-tree channel without the rest of the player stats.
 // Cheap enough for cost helpers that run on every HUD refresh (Blood Magic
 // keystone: manaRemoved / spellsCostLife / spellCostIncPct).
-export function _egGetTreeChannel(channel) {
-    return Number(_egGetPassiveTreeTravelBonuses()[channel]) || 0;
+export function _getTreeChannel(channel) {
+    return Number(_getPassiveTreeTravelBonuses()[channel]) || 0;
 }
 
 // Sanguine Pact keystone: Life can only be recovered from Leech. Every non-leech
 // Life gain (regeneration, Hearts, on-kill / on-hit gains, recoup, boss heals)
 // passes its amount through here; leech heals do not.
-export function _egLifeGain(amount) {
-    return _egGetTreeChannel('lifeOnlyFromLeech') > 0 ? 0 : amount;
+export function _lifeGain(amount) {
+    return _getTreeChannel('lifeOnlyFromLeech') > 0 ? 0 : amount;
 }
 
-export const EG_LEVELING_ATTRS = [
+export const LEVELING_ATTRS = [
     { key: 'str', icon: '💪', nameKey: 'eg_stat_strength' },
     { key: 'agi', icon: '🏃', nameKey: 'eg_stat_agility' },
     { key: 'int', icon: '🧠', nameKey: 'eg_stat_intelligence' },
@@ -330,19 +330,19 @@ export const EG_LEVELING_ATTRS = [
 //-------------------PROGRESSION STATE------------------------------------
 //------------------------------------------------------------------------
 
-export function _egGetPlayerLevel() {
-    return (typeof globalThis.STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.playerLevel) || EG_LEVELING_CONFIG.startLevel;
+export function _getPlayerLevel() {
+    return (typeof globalThis.STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.playerLevel) || LEVELING_CONFIG.startLevel;
 }
 
-export function _egGetPlayerXP() {
+export function _getPlayerXP() {
     return (typeof globalThis.STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.playerXP) || 0;
 }
 
-export function _egGetUnspentPoints() {
+export function _getUnspentPoints() {
     return (typeof STATE !== 'undefined' && STATE && STATE.egAttrPoints) || 0;
 }
 
-export function _egGetAllocatedAttributes() {
+export function _getAllocatedAttributes() {
     if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE || !globalThis.STATE.egAttrAllocated) {
         return { str: 0, agi: 0, int: 0 };
     }
@@ -350,8 +350,8 @@ export function _egGetAllocatedAttributes() {
 }
 
 // XP required to advance FROM `level` to `level + 1`.
-export function _egGetXpForNextLevel(level) {
-    const c = EG_LEVELING_CONFIG;
+export function _getXpForNextLevel(level) {
+    const c = LEVELING_CONFIG;
     let xp = c.xpBase * Math.pow(level, c.xpExp) + c.xpLinear * level;
     if (level <= c.earlyXpDiscountLevels) {
         // Discount fades linearly: full factor at level 1, none at
@@ -373,14 +373,14 @@ export function _egGetXpForNextLevel(level) {
 
 // Pushes the live player level, legacy attributes, and passive-tree travel
 // bonuses into shared character systems.
-export function _egSyncBaseAttributes() {
-    if (!EG_PLAYER_BASE_ATTRIBUTES) return null;
-    const alloc = _egGetAllocatedAttributes();
-    const tree = _egGetPassiveTreeTravelBonuses();
-    EG_PLAYER_BASE_ATTRIBUTES.level = _egGetPlayerLevel();
-    EG_PLAYER_BASE_ATTRIBUTES.str = _EG_ATTR_ORIGINAL_BASE.str + (alloc.str || 0) + tree.str;
-    EG_PLAYER_BASE_ATTRIBUTES.agi = _EG_ATTR_ORIGINAL_BASE.agi + (alloc.agi || 0) + tree.agi;
-    EG_PLAYER_BASE_ATTRIBUTES.int = _EG_ATTR_ORIGINAL_BASE.int + (alloc.int || 0) + tree.int;
+export function _syncBaseAttributes() {
+    if (!PLAYER_BASE_ATTRIBUTES) return null;
+    const alloc = _getAllocatedAttributes();
+    const tree = _getPassiveTreeTravelBonuses();
+    PLAYER_BASE_ATTRIBUTES.level = _getPlayerLevel();
+    PLAYER_BASE_ATTRIBUTES.str = _ATTR_ORIGINAL_BASE.str + (alloc.str || 0) + tree.str;
+    PLAYER_BASE_ATTRIBUTES.agi = _ATTR_ORIGINAL_BASE.agi + (alloc.agi || 0) + tree.agi;
+    PLAYER_BASE_ATTRIBUTES.int = _ATTR_ORIGINAL_BASE.int + (alloc.int || 0) + tree.int;
     return tree;
 }
 
@@ -395,8 +395,8 @@ export function _egSyncBaseAttributes() {
 //   - Monster too far BELOW → ((mLvl + 5) / (safeEdge + 5))^6 (genre formula).
 //   - Monster too far ABOVE → mirrored decay against its overhang edge.
 // Returns a value clamped to [minMultiplier, 1].
-export function _egCalcXpMultiplier(playerLevel, monsterLevel) {
-    const c = EG_LEVELING_CONFIG;
+export function _calcXpMultiplier(playerLevel, monsterLevel) {
+    const c = LEVELING_CONFIG;
     const lowSafe = c.safeRangeBelowBase + Math.floor(playerLevel / c.safeRangeBelowLevelsPer);
     const highSafe = c.safeRangeAbove;
 
@@ -418,8 +418,8 @@ export function _egCalcXpMultiplier(playerLevel, monsterLevel) {
 // Inverts the XP multiplier curve around hintPoorMultiplier to split monster
 // levels into "optimal" (100% band), "average" (>= hintPoorMultiplier) and
 // "poor" (below it) ranges for the attribute-window hint.
-export function _egGetXpTierRanges(playerLevel) {
-    const c = EG_LEVELING_CONFIG;
+export function _getXpTierRanges(playerLevel) {
+    const c = LEVELING_CONFIG;
     if (playerLevel >= c.maxLevel) return null;
 
     const lowSafe = c.safeRangeBelowBase + Math.floor(playerLevel / c.safeRangeBelowLevelsPer);
@@ -444,9 +444,9 @@ export function _egGetXpTierRanges(playerLevel) {
 
 // Builds the "which monster levels give which XP" rows for the window body.
 // Returns '' at max level (no more XP to earn).
-export function _egBuildXpTiersHTML() {
-    const c = EG_LEVELING_CONFIG;
-    const r = _egGetXpTierRanges(_egGetPlayerLevel());
+export function _buildXpTiersHTML() {
+    const c = LEVELING_CONFIG;
+    const r = _getXpTierRanges(_getPlayerLevel());
     if (!r) return '';
 
     const fmtRange = (a, b) => t('eg_lvl_range').replace('{a}', a).replace('{b}', b);
@@ -476,14 +476,14 @@ export function _egBuildXpTiersHTML() {
 // the classic full life/mana/shield refill and level-up effect. Returns the
 // number of levels gained. All XP sources (monster kills and campaign level
 // completions) funnel through here so progression stays consistent.
-export function _egAwardXP(xpGain) {
+export function _awardXP(xpGain) {
     if (typeof STATE === 'undefined' || !STATE) return 0;
     // Dev level lock (js/dev/dev-testing.js): freezes XP so balance tests
     // run at a constant character level. Never set outside the dev harness.
     if (globalThis.__devLevelLock) return 0;
-    const c = EG_LEVELING_CONFIG;
+    const c = LEVELING_CONFIG;
 
-    if (_egGetPlayerLevel() >= c.maxLevel) {
+    if (_getPlayerLevel() >= c.maxLevel) {
         // Level cap reached - no more XP accumulates.
         if (STATE.playerXP !== 0) { STATE.playerXP = 0; egSaveLevelingState(); }
         return 0;
@@ -492,13 +492,13 @@ export function _egAwardXP(xpGain) {
     const gain = Math.max(0, Math.round(Number(xpGain) || 0));
     if (gain <= 0) return 0;
     Audio_Manager.playSFX('xp_gain');
-    STATE.playerXP = _egGetPlayerXP() + gain;
+    STATE.playerXP = _getPlayerXP() + gain;
 
     let levelsGained = 0;
     let passiveGained = 0;
-    while (_egGetPlayerLevel() < c.maxLevel
-        && STATE.playerXP >= _egGetXpForNextLevel(_egGetPlayerLevel())) {
-        STATE.playerXP -= _egGetXpForNextLevel(_egGetPlayerLevel());
+    while (_getPlayerLevel() < c.maxLevel
+        && STATE.playerXP >= _getXpForNextLevel(_getPlayerLevel())) {
+        STATE.playerXP -= _getXpForNextLevel(_getPlayerLevel());
         STATE.playerLevel++;
         levelsGained++;
         // Legacy: attribute points per level are disabled (0) now, but the
@@ -506,7 +506,7 @@ export function _egAwardXP(xpGain) {
         if (c.attrPointsPerLevel) STATE.egAttrPoints = (STATE.egAttrPoints || 0) + c.attrPointsPerLevel;
         passiveGained += (c.passivePointsPerLevel || 0);
     }
-    if (_egGetPlayerLevel() >= c.maxLevel) STATE.playerXP = 0;
+    if (_getPlayerLevel() >= c.maxLevel) STATE.playerXP = 0;
 
     if (passiveGained > 0) {
         STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + passiveGained;
@@ -515,10 +515,10 @@ export function _egAwardXP(xpGain) {
         setTimeout(() => Audio_Manager.playSFX('passive_point_gain'), 700);
     }
 
-    _egSyncBaseAttributes();
+    _syncBaseAttributes();
     egSaveLevelingState();
-    _egRenderLevelHUD();
-    if (typeof setAchStat === 'function') try { setAchStat('egPlayerLevel', _egGetPlayerLevel()); } catch(e){}
+    _renderLevelHUD();
+    if (typeof setAchStat === 'function') try { setAchStat('egPlayerLevel', _getPlayerLevel()); } catch(e){}
 
     if (levelsGained > 0) {
         // Reset all active ability cooldowns on level up
@@ -531,8 +531,8 @@ export function _egAwardXP(xpGain) {
         if (typeof playerMaxHP !== 'undefined' && typeof playerCurrentHP !== 'undefined') {
             const lifeMult = (typeof _egMapPlayerLifeMult === 'function')
                 ? _egMapPlayerLifeMult() : 1;
-            const lifeGain = _egGetTreeChannel('lifeBecomesOne') > 0 ? 0
-                : Math.round(levelsGained * 5 * lifeMult * (1 + _egGetTreeChannel('healthMorePct') / 100));
+            const lifeGain = _getTreeChannel('lifeBecomesOne') > 0 ? 0
+                : Math.round(levelsGained * 5 * lifeMult * (1 + _getTreeChannel('healthMorePct') / 100));
             globalThis.playerMaxHP = Math.max(1, globalThis.playerMaxHP + lifeGain);
             globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + lifeGain);
         }
@@ -541,29 +541,29 @@ export function _egAwardXP(xpGain) {
             gainMana(levelsGained * 2);
         }
 
-        _egPlayLevelUpEffect(_egGetPlayerLevel());
-        _egPlayLevelUpReward();
+        _playLevelUpEffect(_getPlayerLevel());
+        _playLevelUpReward();
         // Absorption shield: fully replenish even when not in an active encounter
-        // (_egPlayLevelUpReward already handles the active case and early-returns otherwise).
-        if ((typeof _egIsActive !== 'function' || !_egIsActive())
-            && typeof _egComputePlayerStats === 'function'
-            && typeof _egPlayerAbsorptionCurrent !== 'undefined') {
-            globalThis._egPlayerAbsorptionCurrent = _egComputePlayerStats().absorption || 0;
-            if (typeof _egCancelAbsorptionRegen === 'function') _egCancelAbsorptionRegen();
+        // (_playLevelUpReward already handles the active case and early-returns otherwise).
+        if ((typeof _isActive !== 'function' || !_isActive())
+            && typeof _computePlayerStats === 'function'
+            && typeof _playerAbsorptionCurrent !== 'undefined') {
+            globalThis._playerAbsorptionCurrent = _computePlayerStats().absorption || 0;
+            if (typeof _cancelAbsorptionRegen === 'function') _cancelAbsorptionRegen();
         }
         if (typeof showToast === 'function') {
             // Key label follows the player's CURRENT binding (default K).
             const treeKey = (typeof keybindDisplayLabel === 'function' && typeof keybindKeyFor === 'function')
                 ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('passive-tree')) : 'K';
             const msg = t('eg_lvl_levelup_toast')
-                .replace('{n}', _egGetPlayerLevel())
+                .replace('{n}', _getPlayerLevel())
                 .replace('{pts}', passiveGained)
                 .replace('{key}', treeKey);
             globalThis.showToast(msg, '#f5b642');
         }
-        if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
-        if (typeof _egRenderInventory === 'function') try { _egRenderInventory(); } catch (e) {}
-        if (typeof _egRenderEquipSlots === 'function') try { _egRenderEquipSlots(); } catch (e) {}
+        if (typeof _renderStatsList === 'function') _renderStatsList();
+        if (typeof _renderInventory === 'function') try { _renderInventory(); } catch (e) {}
+        if (typeof _renderEquipSlots === 'function') try { _renderEquipSlots(); } catch (e) {}
     }
     return levelsGained;
 }
@@ -571,30 +571,30 @@ export function _egAwardXP(xpGain) {
 // Awards XP for killing one monster of `monsterLevel`: the kill value is
 // scaled by the ARPG-style range multiplier against the character level and
 // by the active map's "% more Experience" bonus (neutral outside runs),
-// then handed to _egAwardXP.
-export function _egGrantMonsterXP(monsterLevel, isBoss) {
+// then handed to _awardXP.
+export function _grantMonsterXP(monsterLevel, isBoss) {
     if (typeof STATE === 'undefined' || !STATE) return;
-    if (_egGetPlayerLevel() >= EG_LEVELING_CONFIG.maxLevel) {
+    if (_getPlayerLevel() >= LEVELING_CONFIG.maxLevel) {
         if (STATE.playerXP !== 0) { STATE.playerXP = 0; egSaveLevelingState(); }
         return;
     }
 
-    const playerLevel = _egGetPlayerLevel();
+    const playerLevel = _getPlayerLevel();
     const mLvl = Math.max(1, Number(monsterLevel) || 1);
-    const c = EG_LEVELING_CONFIG;
+    const c = LEVELING_CONFIG;
     let xp = c.xpPerKillBase + c.xpPerKillGrowth * Math.pow(mLvl, c.xpPerKillExp);
     if (isBoss) xp *= c.bossXpMultiplier;
     const mapXpMult = (typeof _egMapXpMult === 'function') ? _egMapXpMult() : 1;
-    xp = Math.max(1, Math.round(xp * _egCalcXpMultiplier(playerLevel, mLvl) * mapXpMult));
+    xp = Math.max(1, Math.round(xp * _calcXpMultiplier(playerLevel, mLvl) * mapXpMult));
 
-    _egAwardXP(xp);
+    _awardXP(xp);
     return globalThis.__devLevelLock ? 0 : xp;
 }
 
 // Floating "+N XP" text over a defeated monster's card (classic MMO style:
 // violet number drifting up and fading). Lives on <body> as a fixed element
 // so it outlives the card's kill animation. Cosmetic only.
-export function _egShowXpGainText(monsterId, xp) {
+export function _showXpGainText(monsterId, xp) {
     if (!(xp > 0)) return;
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
@@ -610,15 +610,15 @@ export function _egShowXpGainText(monsterId, xp) {
 }
 
 // Progress to the next level in percent (100 at max level).
-function _egXpBarPct() {
-    const lvl = _egGetPlayerLevel();
-    if (lvl >= EG_LEVELING_CONFIG.maxLevel) return 100;
-    return Math.min(100, (_egGetPlayerXP() / Math.max(1, _egGetXpForNextLevel(lvl))) * 100);
+function _xpBarPct() {
+    const lvl = _getPlayerLevel();
+    if (lvl >= LEVELING_CONFIG.maxLevel) return 100;
+    return Math.min(100, (_getPlayerXP() / Math.max(1, _getXpForNextLevel(lvl))) * 100);
 }
 
 // Highlights a just-earned XP gain on the bar: a bright band over the newly
 // filled stretch (from -> to, in percent) plus a "+N XP" label above it.
-export function _egShowXpBarGain(xp, from, to) {
+export function _showXpBarGain(xp, from, to) {
     const bar = document.getElementById('eg-xp-bar');
     const gain = document.getElementById('eg-xp-bar-gain');
     if (!bar || !gain || !(xp > 0) || bar.getBoundingClientRect().width === 0) return;
@@ -639,24 +639,24 @@ export function _egShowXpBarGain(xp, from, to) {
 // Experience bar along the very bottom edge of the game screen (#eg-xp-bar,
 // classic MMO style). Fill width = progress to the next level; hovering it
 // shows how much XP is still missing (generic data-tip tooltip).
-let _egXpBarLastKey = '';
-let _egXpBarLastPct = 0;
-export function _egRenderXpBar() {
+let _xpBarLastKey = '';
+let _xpBarLastPct = 0;
+export function _renderXpBar() {
     const bar = document.getElementById('eg-xp-bar');
     const fill = document.getElementById('eg-xp-bar-fill');
     if (!bar || !fill) return;
-    const lvl = _egGetPlayerLevel();
-    const xp = _egGetPlayerXP();
-    const maxed = lvl >= EG_LEVELING_CONFIG.maxLevel;
-    const need = maxed ? 0 : _egGetXpForNextLevel(lvl);
+    const lvl = _getPlayerLevel();
+    const xp = _getPlayerXP();
+    const maxed = lvl >= LEVELING_CONFIG.maxLevel;
+    const need = maxed ? 0 : _getXpForNextLevel(lvl);
     const key = `${lvl}|${xp}|${need}`;
-    if (key === _egXpBarLastKey) return;
-    _egXpBarLastKey = key;
+    if (key === _xpBarLastKey) return;
+    _xpBarLastKey = key;
     const pct = maxed ? 100 : Math.min(100, (xp / Math.max(1, need)) * 100);
     // After a level-up the bar wraps back to ~0: snap instead of sweeping backwards.
-    fill.style.transition = pct < _egXpBarLastPct ? 'none' : '';
+    fill.style.transition = pct < _xpBarLastPct ? 'none' : '';
     fill.style.width = `${pct}%`;
-    _egXpBarLastPct = pct;
+    _xpBarLastPct = pct;
     const tip = maxed
         ? t('eg_xp_bar_tip_max').replace('{lvl}', lvl)
         : t('eg_xp_bar_tip')
@@ -664,7 +664,7 @@ export function _egRenderXpBar() {
             .replace('{pct}', pct.toFixed(1)).replace('{rem}', Math.max(0, need - xp)).replace('{next}', lvl + 1);
     bar.setAttribute('data-tip', tip);
 }
-setInterval(() => { try { _egRenderXpBar(); } catch (e) { /* cosmetic */ } }, 700);
+setInterval(() => { try { _renderXpBar(); } catch (e) { /* cosmetic */ } }, 700);
 
 
 //------------------------------------------------------------------------
@@ -676,66 +676,66 @@ setInterval(() => { try { _egRenderXpBar(); } catch (e) { /* cosmetic */ } }, 70
 //     that level's expected character level - a first clear grants
 //     campaignFirstClearFraction, a replay campaignReplayFraction of that.
 //   • Monsters spawning in every campaign level grant kill XP through the
-//     normal _egGrantMonsterXP path; their level tracks the expected level
+//     normal _grantMonsterXP path; their level tracks the expected level
 //     so the ARPG range multiplier stays ~1 during normal play.
-// Both are scaled by _egCalcXpMultiplier(), so re-farming content far below
+// Both are scaled by _calcXpMultiplier(), so re-farming content far below
 // the character's level gives almost nothing (anti-farm, ARPG-style).
 
-export let _egCampaignLevelCountCache = null;
+export let _campaignLevelCountCache = null;
 
 // Number of story levels in the campaign (excludes monster/endgame levels).
-export function _egCampaignTotalLevels() {
-    if (_egCampaignLevelCountCache != null) return _egCampaignLevelCountCache;
+export function _campaignTotalLevels() {
+    if (_campaignLevelCountCache != null) return _campaignLevelCountCache;
     let n = 0;
     if (typeof ALL !== 'undefined' && globalThis.ALL) {
         for (const lvl of globalThis.ALL) {
             if (lvl && !lvl.isMonsterLevel && !lvl.isEndgameSandbox) n++;
         }
     }
-    _egCampaignLevelCountCache = n;
+    _campaignLevelCountCache = n;
     return n;
 }
 
 // Character level a player is expected to be at when completing story level
 // `gi`, spread linearly from 1 to campaignEndLevel across the campaign.
 // Drives both level-completion XP and campaign monster levels.
-export function _egCampaignExpectedLevel(gi) {
-    const n = _egCampaignTotalLevels();
+export function _campaignExpectedLevel(gi) {
+    const n = _campaignTotalLevels();
     if (n <= 1) return 1;
-    const end = EG_LEVELING_CONFIG.campaignEndLevel || 68;
+    const end = LEVELING_CONFIG.campaignEndLevel || 68;
     const idx = Math.max(0, Math.min(n - 1, Number(gi) || 0));
     return 1 + (end - 1) * idx / (n - 1);
 }
 
 // Monster level for campaign monsters on story level `gi`.
-export function _egCampaignMonsterLevel(gi) {
-    return Math.max(1, Math.round(_egCampaignExpectedLevel(gi)));
+export function _campaignMonsterLevel(gi) {
+    return Math.max(1, Math.round(_campaignExpectedLevel(gi)));
 }
 
 // Awards level-completion XP for story level `gi`. Called from checkWin()
 // on every campaign clear (first clear and replay alike). No-ops during
 // endgame map/chain runs.
-export function _egGrantCampaignLevelXP(gi, isFirstClear) {
+export function _grantCampaignLevelXP(gi, isFirstClear) {
     if (typeof STATE === 'undefined' || !STATE) return 0;
     if (typeof cur === 'undefined' || !cur) return 0;
     // Never award campaign XP during an endgame map/chain run.
     if (cur.isMonsterLevel && !cur.campaignMonsters) return 0;
-    if (_egGetPlayerLevel() >= EG_LEVELING_CONFIG.maxLevel) return 0;
+    if (_getPlayerLevel() >= LEVELING_CONFIG.maxLevel) return 0;
 
-    const c = EG_LEVELING_CONFIG;
-    const refLevel = Math.max(1, Math.round(_egCampaignExpectedLevel(gi)));
-    const base = _egGetXpForNextLevel(refLevel);
+    const c = LEVELING_CONFIG;
+    const refLevel = Math.max(1, Math.round(_campaignExpectedLevel(gi)));
+    const base = _getXpForNextLevel(refLevel);
     const fraction = c.campaignFirstClearFraction
         * (isFirstClear ? 1 : (c.campaignReplayFraction || 0));
-    const mult = _egCalcXpMultiplier(_egGetPlayerLevel(), refLevel);
+    const mult = _calcXpMultiplier(_getPlayerLevel(), refLevel);
     const xp = Math.max(1, Math.round(base * fraction * mult));
     // Show the gain on the XP bar once the win overlay is coming up.
-    const lvl0 = _egGetPlayerLevel();
-    const pct0 = _egXpBarPct();
-    const levels = _egAwardXP(xp);
-    const from = _egGetPlayerLevel() > lvl0 ? 0 : pct0;
-    const to = _egXpBarPct();
-    setTimeout(() => _egShowXpBarGain(xp, from, to), 900);
+    const lvl0 = _getPlayerLevel();
+    const pct0 = _xpBarPct();
+    const levels = _awardXP(xp);
+    const from = _getPlayerLevel() > lvl0 ? 0 : pct0;
+    const to = _xpBarPct();
+    setTimeout(() => _showXpBarGain(xp, from, to), 900);
     return levels;
 }
 
@@ -748,11 +748,11 @@ export function _egGrantCampaignLevelXP(gi, isFirstClear) {
 //   - Life, mana and the absorption shield are completely refilled.
 //   - 3 waves of projectiles (0.5 s apart) launch at EVERY monster on
 //     screen, each hitting with correct-reveal projectile damage.
-export const EG_LEVELUP_REWARD_WAVES = 3;
-export const EG_LEVELUP_REWARD_WAVE_DELAY_MS = 500;
+export const LEVELUP_REWARD_WAVES = 3;
+export const LEVELUP_REWARD_WAVE_DELAY_MS = 500;
 
-export function _egPlayLevelUpReward() {
-    if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
+export function _playLevelUpReward() {
+    if (typeof _isActive !== 'function' || !_isActive()) return;
 
     // Full life, mana & absorption shield restore (after the +max bonuses were applied).
     if (typeof playerMaxHP !== 'undefined' && typeof playerCurrentHP !== 'undefined') {
@@ -761,30 +761,30 @@ export function _egPlayLevelUpReward() {
     }
     if (typeof _resetPlayerMana === 'function') _resetPlayerMana();
     // Fully replenish the absorption shield
-    if (typeof _egComputePlayerStats === 'function' && typeof _egPlayerAbsorptionCurrent !== 'undefined') {
-        const maxAbs = _egComputePlayerStats().absorption || 0;
-        globalThis._egPlayerAbsorptionCurrent = maxAbs;
-        if (typeof _egCancelAbsorptionRegen === 'function') _egCancelAbsorptionRegen();
+    if (typeof _computePlayerStats === 'function' && typeof _playerAbsorptionCurrent !== 'undefined') {
+        const maxAbs = _computePlayerStats().absorption || 0;
+        globalThis._playerAbsorptionCurrent = maxAbs;
+        if (typeof _cancelAbsorptionRegen === 'function') _cancelAbsorptionRegen();
         if (typeof _renderPlayerAvatar === 'function') try { globalThis._renderPlayerAvatar(); } catch (e) {}
     }
 
     // Snapshot the monsters on screen now; each wave skips ones that died
     // in the meantime. Damage matches a correct-reveal projectile hit.
-    if (typeof _egMonsters === 'undefined' || !globalThis._egMonsters.length) return;
-    const targetIds = globalThis._egMonsters.map(m => m.id);
-    const revealPct = _egGetRevealProjectileDamagePct() / 100;
+    if (typeof _monsters === 'undefined' || !globalThis._monsters.length) return;
+    const targetIds = globalThis._monsters.map(m => m.id);
+    const revealPct = _getRevealProjectileDamagePct() / 100;
 
-    for (let wave = 0; wave < EG_LEVELUP_REWARD_WAVES; wave++) {
+    for (let wave = 0; wave < LEVELUP_REWARD_WAVES; wave++) {
         setTimeout(() => {
-            if (!_egIsActive()) return;
+            if (!_isActive()) return;
             targetIds.forEach(id => {
-                if (!globalThis._egMonsters.some(m => m.id === id)) return;
-                const rolled = _egCalcPlayerDamage();
+                if (!globalThis._monsters.some(m => m.id === id)) return;
+                const rolled = _calcPlayerDamage();
                 const damage = Math.max(1, Math.round(rolled * revealPct));
-                const elements = _egScaleElements(_egLastHitElements, revealPct);
-                _egAnimatePlayerProjectile(damage, id, undefined, undefined, undefined, undefined, elements);
+                const elements = _scaleElements(_lastHitElements, revealPct);
+                _animatePlayerProjectile(damage, id, undefined, undefined, undefined, undefined, elements);
             });
-        }, wave * EG_LEVELUP_REWARD_WAVE_DELAY_MS);
+        }, wave * LEVELUP_REWARD_WAVE_DELAY_MS);
     }
 }
 
@@ -796,7 +796,7 @@ export function _egPlayLevelUpReward() {
 // Full-screen gold flash + expanding "LEVEL UP!" banner. Pure CSS animation,
 // element removes itself after the effect finishes. Safe mid-combat (the
 // overlay ignores pointer events).
-export function _egPlayLevelUpEffect(newLevel) {
+export function _playLevelUpEffect(newLevel) {
     Audio_Manager.playSFX('level_up');
     const el = document.createElement('div');
     el.className = 'eg-levelup-fx';
@@ -815,43 +815,43 @@ export function _egPlayLevelUpEffect(newLevel) {
 //------------------------------------------------------------------------
 
 // Spends one unspent point on `attr` ('str' | 'agi' | 'int').
-export function _egAllocateAttribute(attr) {
-    if (!(attr in _EG_ATTR_ORIGINAL_BASE)) return false;
-    if (_egGetUnspentPoints() <= 0) {
+export function _allocateAttribute(attr) {
+    if (!(attr in _ATTR_ORIGINAL_BASE)) return false;
+    if (_getUnspentPoints() <= 0) {
         if (typeof showToast === 'function') globalThis.showToast(t('eg_lvl_no_points'), '#e74c3c');
         return false;
     }
 
     STATE.egAttrPoints--;
     STATE.egAttrAllocated[attr] = (STATE.egAttrAllocated[attr] || 0) + 1;
-    _egSyncBaseAttributes();
+    _syncBaseAttributes();
     egSaveLevelingState();
     Audio_Manager.playSFX('attribute_allocate');
 
     if (typeof showToast === 'function') {
-        const name = t(EG_LEVELING_ATTRS.find(a => a.key === attr).nameKey);
+        const name = t(LEVELING_ATTRS.find(a => a.key === attr).nameKey);
         globalThis.showToast(t('eg_lvl_alloc_done').replace('{attr}', name), '#2ecc71');
     }
 
-    _egRenderLevelHUD();
-    if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
+    _renderLevelHUD();
+    if (typeof _renderStatsList === 'function') _renderStatsList();
     return true;
 }
 
 // Evaluates the equipped loadout with `attr` temporarily reduced by one
 // point and returns the resulting unmet requirements. The real base value
 // is always restored, even when the check throws.
-export function _egSimulateRefundUnmet(attr) {
-    if (!(attr in _EG_ATTR_ORIGINAL_BASE)) return [];
-    if (typeof _egFindUnmetRequirements !== 'function'
-        || typeof _egGetAllEquippedItems !== 'function') return [];
+export function _simulateRefundUnmet(attr) {
+    if (!(attr in _ATTR_ORIGINAL_BASE)) return [];
+    if (typeof _findUnmetRequirements !== 'function'
+        || typeof _getAllEquippedItems !== 'function') return [];
 
-    const saved = EG_PLAYER_BASE_ATTRIBUTES[attr];
-    EG_PLAYER_BASE_ATTRIBUTES[attr] = saved - 1;
+    const saved = PLAYER_BASE_ATTRIBUTES[attr];
+    PLAYER_BASE_ATTRIBUTES[attr] = saved - 1;
     try {
-        return _egFindUnmetRequirements(_egGetAllEquippedItems());
+        return _findUnmetRequirements(_getAllEquippedItems());
     } finally {
-        EG_PLAYER_BASE_ATTRIBUTES[attr] = saved;
+        PLAYER_BASE_ATTRIBUTES[attr] = saved;
     }
 }
 
@@ -860,24 +860,24 @@ export function _egSimulateRefundUnmet(attr) {
 //   - the equipped gear stays fully valid afterwards (no NEW unmet
 //     requirements compared to the current state - same grandfather rule
 //     the equip gate uses).
-export function _egCanRefundAttribute(attr) {
-    if ((_egGetAllocatedAttributes()[attr] || 0) <= 0) return false;
-    if (typeof _egFindUnmetRequirements !== 'function') return true;
-    const before = _egFindUnmetRequirements(_egGetAllEquippedItems());
-    const after = _egSimulateRefundUnmet(attr);
+export function _canRefundAttribute(attr) {
+    if ((_getAllocatedAttributes()[attr] || 0) <= 0) return false;
+    if (typeof _findUnmetRequirements !== 'function') return true;
+    const before = _findUnmetRequirements(_getAllEquippedItems());
+    const after = _simulateRefundUnmet(attr);
     return after.length <= before.length;
 }
 
 // Verified refund: returns one spent point to the unspent pool unless the
 // equipped gear depends on the attribute (blocked with an explanatory toast).
-export function _egRefundAttribute(attr) {
-    if (!(attr in _EG_ATTR_ORIGINAL_BASE)) return false;
+export function _refundAttribute(attr) {
+    if (!(attr in _ATTR_ORIGINAL_BASE)) return false;
 
-    if (!_egCanRefundAttribute(attr)) {
+    if (!_canRefundAttribute(attr)) {
         if (typeof showToast === 'function') {
-            const missing = _egSimulateRefundUnmet(attr);
-            const list = typeof _egGetUnmetRequirementsText === 'function'
-                ? _egGetUnmetRequirementsText(missing)
+            const missing = _simulateRefundUnmet(attr);
+            const list = typeof _getUnmetRequirementsText === 'function'
+                ? _getUnmetRequirementsText(missing)
                 : '';
             globalThis.showToast(t('eg_lvl_refund_blocked').replace('{list}', list || '?'), '#e74c3c');
         }
@@ -886,17 +886,17 @@ export function _egRefundAttribute(attr) {
 
     STATE.egAttrAllocated[attr] = (STATE.egAttrAllocated[attr] || 0) - 1;
     STATE.egAttrPoints = (STATE.egAttrPoints || 0) + 1;
-    _egSyncBaseAttributes();
+    _syncBaseAttributes();
     egSaveLevelingState();
     Audio_Manager.playSFX('attribute_refund');
 
     if (typeof showToast === 'function') {
-        const name = t(EG_LEVELING_ATTRS.find(a => a.key === attr).nameKey);
+        const name = t(LEVELING_ATTRS.find(a => a.key === attr).nameKey);
         globalThis.showToast(t('eg_lvl_refund_done').replace('{attr}', name), '#2ecc71');
     }
 
-    _egRenderLevelHUD();
-    if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
+    _renderLevelHUD();
+    if (typeof _renderStatsList === 'function') _renderStatsList();
     return true;
 }
 
@@ -911,14 +911,14 @@ export function egSaveLevelingState() {
 
 // Reads leveling fields from STATE (with defaults for legacy saves) and
 // applies them to the shared base attributes object.
-export function _egLoadLevelingState() {
+export function _loadLevelingState() {
     if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return;
-    if (!globalThis.STATE.playerLevel) globalThis.STATE.playerLevel = EG_LEVELING_CONFIG.startLevel;
+    if (!globalThis.STATE.playerLevel) globalThis.STATE.playerLevel = LEVELING_CONFIG.startLevel;
     if (!globalThis.STATE.playerXP) globalThis.STATE.playerXP = 0;
     if (!globalThis.STATE.egAttrPoints) globalThis.STATE.egAttrPoints = 0;
     if (!globalThis.STATE.egAttrAllocated) globalThis.STATE.egAttrAllocated = { str: 0, agi: 0, int: 0 };
-    _egSyncBaseAttributes();
-    if (typeof setAchStat === 'function') try { setAchStat('egPlayerLevel', _egGetPlayerLevel()); } catch(e){}
+    _syncBaseAttributes();
+    if (typeof setAchStat === 'function') try { setAchStat('egPlayerLevel', _getPlayerLevel()); } catch(e){}
 }
 
 
@@ -928,13 +928,13 @@ export function _egLoadLevelingState() {
 
 // Refreshes the small level chip on the character panel label. It is optional
 // and this no-ops outside the hub.
-export function _egRenderLevelHUD() {
-    _egRenderXpBar();
-    const pts = _egGetUnspentPoints();
-    const lvl = _egGetPlayerLevel();
-    const xp = _egGetPlayerXP();
-    const need = _egGetXpForNextLevel(lvl);
-    const pct = lvl >= EG_LEVELING_CONFIG.maxLevel ? 100 : Math.min(100, (xp / need) * 100);
+export function _renderLevelHUD() {
+    _renderXpBar();
+    const pts = _getUnspentPoints();
+    const lvl = _getPlayerLevel();
+    const xp = _getPlayerXP();
+    const need = _getXpForNextLevel(lvl);
+    const pct = lvl >= LEVELING_CONFIG.maxLevel ? 100 : Math.min(100, (xp / need) * 100);
 
     const chip = document.getElementById('eg-char-level-inline');
     if (chip) {
@@ -943,7 +943,7 @@ export function _egRenderLevelHUD() {
             : '';
         chip.innerHTML = `
 <span class="eg-lvl-chip"
-      onmouseenter="_egShowLevelBtnTooltip(event)"
+      onmouseenter="_showLevelBtnTooltip(event)"
       onmousemove="moveGameTooltip(event)"
       onmouseleave="hideGameTooltip()">
     <span class="eg-lvl-chip-lvl">${t('eg_lvl_short').replace('{n}', lvl)}</span>
@@ -972,16 +972,16 @@ export function _egRenderLevelHUD() {
 
 // Hover tooltip for the level indicators, built on the shared game
 // tooltip engine (tooltips-hud.js) instead of the native browser title.
-export function _egBuildLevelBtnTooltipHTML() {
-    const lvl = _egGetPlayerLevel();
-    const xp = _egGetPlayerXP();
-    const atMax = lvl >= EG_LEVELING_CONFIG.maxLevel;
+export function _buildLevelBtnTooltipHTML() {
+    const lvl = _getPlayerLevel();
+    const xp = _getPlayerXP();
+    const atMax = lvl >= LEVELING_CONFIG.maxLevel;
     const xpLine = atMax
         ? t('eg_lvl_max_level')
         : t('eg_lvl_xp_progress')
             .replace('{cur}', xp.toLocaleString())
-            .replace('{need}', _egGetXpForNextLevel(lvl).toLocaleString());
-    const xpTiers = _egBuildXpTiersHTML();
+            .replace('{need}', _getXpForNextLevel(lvl).toLocaleString());
+    const xpTiers = _buildXpTiersHTML();
 
     return `
 <div class="eg-tt-frame" style="--tt-border:#c8a84b;">
@@ -997,8 +997,8 @@ export function _egBuildLevelBtnTooltipHTML() {
 </div>`;
 }
 
-export function _egShowLevelBtnTooltip(e) {
-    if (typeof showGameTooltip === 'function') globalThis.showGameTooltip(_egBuildLevelBtnTooltipHTML(), e);
+export function _showLevelBtnTooltip(e) {
+    if (typeof showGameTooltip === 'function') globalThis.showGameTooltip(_buildLevelBtnTooltipHTML(), e);
 }
 
 
@@ -1007,7 +1007,7 @@ export function _egShowLevelBtnTooltip(e) {
 //------------------------------------------------------------------------
 
 // Injects all leveling UI styles once (inline chip, XP tiers, effects).
-export function _egInjectLevelingStyles() {
+export function _injectLevelingStyles() {
     if (document.getElementById('eg-leveling-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-leveling-styles';
@@ -1116,7 +1116,7 @@ export function _egInjectLevelingStyles() {
 //-------------------BOOTSTRAP--------------------------------------------
 //------------------------------------------------------------------------
 
-// Loads saved progression immediately (same pattern as _egLoadHubState in
+// Loads saved progression immediately (same pattern as _loadHubState in
 // endgame-hub.js) so level requirements are enforced without visiting the hub.
-_egLoadLevelingState();
-_egInjectLevelingStyles();
+_loadLevelingState();
+_injectLevelingStyles();

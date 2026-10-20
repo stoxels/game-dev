@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast, _ptSegDist } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE GUARDIAN (boss_guardian)-------------------------
@@ -11,7 +11,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 // are referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_guardian: {
         id: 'boss_guardian', name: 'The Guardian', emoji: '🛰️',
         baseHP: 1080, baseDamage: 24, chargeMax: 12,
@@ -19,7 +19,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_guardian: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -28,8 +28,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'lock_on', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechLockOn' },
-            { name: 'clue_scramble', intervalBase: 22000, intervalVariance: 5000, handler: '_egMechClueScramble' },
+            { name: 'lock_on', intervalBase: 21000, intervalVariance: 5000, handler: '_mechLockOn' },
+            { name: 'clue_scramble', intervalBase: 22000, intervalVariance: 5000, handler: '_mechClueScramble' },
         ],
     },
 });
@@ -37,35 +37,35 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // A beam charges while tracking the player with a capped turn rate,
 // then fires one snapshot along its final angle. Out-turn it to dodge.
-export function _egMechLockOn(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechLockOn(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const locks = [0, 2, 2, 3][p];
     const chargeMs = [0, 2600, 2300, 2000][p];
     const trackRate = [0, 1.6, 2.0, 2.5][p]; // rad/s the lock can turn
     const halfW = 18;
     const dmgPct = [0, 0.22, 0.26, 0.32][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const ax = window.innerWidth * 0.85, ay = window.innerHeight * 0.25;
     const len = Math.hypot(window.innerWidth, window.innerHeight);
-    const eye = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '🛰️');
+    const eye = _nkEl(run, 'div', 'eg-nk-dot eg-nk-anchor', '🛰️');
     eye.style.transform = 'translate(' + Math.round(ax - 26) + 'px,' + Math.round(ay - 26) + 'px)';
-    _egNkToast('eg_mech_guardian', '🛰️ The Guardian: Lock-On! Out-turn the beam!');
+    _nkToast('eg_mech_guardian', '🛰️ The Guardian: Lock-On! Out-turn the beam!');
     let idx = 0, stage = 'idle', t = 0, ang = 0;
     let beam = null;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         if (idx >= locks) {
             if (beam) { beam.remove(); beam = null; }
             return false;
         }
         t += dtS * 1000;
-        const c = _egNkPlayerCenter();
+        const c = _nkPlayerCenter();
         if (stage === 'idle') {
             stage = 'charge';
             t = 0;
             ang = c ? Math.atan2(c.y - ay, c.x - ax) : Math.PI;
-            beam = _egNkEl(run, 'div', 'eg-nk-beam eg-nk-beam-warn eg-nk-lockline');
+            beam = _nkEl(run, 'div', 'eg-nk-beam eg-nk-beam-warn eg-nk-lockline');
             beam.style.width = Math.round(len) + 'px';
             beam.style.height = halfW * 2 + 'px';
             beam.style.left = Math.round(ax) + 'px';
@@ -88,7 +88,7 @@ export function _egMechLockOn(monster, phase) {
                     beam.classList.add('eg-nk-beam-fire');
                 }
                 // Snapshot judgment along the fired line.
-                const pr = _egNkPlayerRect();
+                const pr = _nkPlayerRect();
                 if (pr) {
                     const bx = ax + Math.cos(ang) * len, by = ay + Math.sin(ang) * len;
                     const pts = [
@@ -97,9 +97,9 @@ export function _egMechLockOn(monster, phase) {
                         [pr.left, pr.bottom], [pr.right, pr.bottom],
                     ];
                     for (const pt of pts) {
-                        if (_egPtSegDist(pt[0], pt[1], ax, ay, bx, by) < halfW + 6) {
-                            const dealt = _egNkHit(dmgPct, 'lightning', level);
-                            _egNkAbilityHitToast(dealt, 'The Guardian', 'Lock-On');
+                        if (_ptSegDist(pt[0], pt[1], ax, ay, bx, by) < halfW + 6) {
+                            const dealt = _nkHit(dmgPct, 'lightning', level);
+                            _nkAbilityHitToast(dealt, 'The Guardian', 'Lock-On');
                             break;
                         }
                     }

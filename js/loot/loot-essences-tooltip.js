@@ -6,19 +6,19 @@
 // modifier it promises and the bases that can actually roll it.
 
 import { LANG, t } from '../translation/translations.js';
-import { _egEssenceCompatibleSlotTypes, _egEssenceItemLevelRange } from './loot-essences.js';
-import { _egEssenceFamilyDisplayName } from './loot-essences-names.js';
+import { _essenceCompatibleSlotTypes, _essenceItemLevelRange } from './loot-essences.js';
+import { _essenceFamilyDisplayName } from './loot-essences-names.js';
 
 
 // Builds the inner HTML for the essence tooltip's "Guaranteed" section.
 // NEW per-modifier version: single mod name + list of compatible base types.
-export function _egBuildEssenceDetailHTML(def) {
+export function _buildEssenceDetailHTML(def) {
     if (!def) return '';
     const families = def.guaranteedFamilies || (def.guaranteedFamily ? [def.guaranteedFamily] : []);
     if (!families.length) return '';
     const familyId = families[0];
-    const modName = _egEssenceFamilyDisplayName(familyId);
-    const slotTypes = _egEssenceCompatibleSlotTypes(familyId);
+    const modName = _essenceFamilyDisplayName(familyId);
+    const slotTypes = _essenceCompatibleSlotTypes(familyId);
     const slotLabel = (slotType) => {
         const key = 'eg_slot_' + slotType;
         try { const tr = t(key); if (tr && tr !== key) return tr; } catch (e) { }
@@ -41,7 +41,7 @@ export function _egBuildEssenceDetailHTML(def) {
     }
 
     // Item level the target item must have for the modifier to be able to roll.
-    const range = _egEssenceItemLevelRange(familyId);
+    const range = _essenceItemLevelRange(familyId);
     if (range) {
         const lvl = range.min === range.max ? `${range.min}+` : `${range.min}+ (${range.min}–${range.max})`;
         const titleIlvl = isDe ? 'Benötigtes Itemlevel:' : 'Required item level:';

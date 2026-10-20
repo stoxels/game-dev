@@ -246,7 +246,7 @@ export function _hotbarClasslessHasSpells() {
 // Slots overlapping the puzzle grid get .over-grid (css/skills.css): the bar
 // paints above the grid so cooldowns stay visible, and those slots turn
 // see-through and click-through. Same idea as the monster cards
-// (_egSyncGridOverlap in combat/encounter.js); the timer stops itself when
+// (_syncGridOverlap in combat/encounter.js); the timer stops itself when
 // the bar is hidden. Bar geometry only changes on rebuild/resize, so 250 ms
 // polling is plenty.
 let _hotbarGridTimer = null;

@@ -423,7 +423,7 @@ export const BGM_TRACKS = {
 //------------------------------------------------------------------------
 //-------------------BOSS → TRACK KEYS-------------------------------------
 //------------------------------------------------------------------------
-// Groups the boss_* track keys above by endgame boss id (EG_BOSS_DEFS id).
+// Groups the boss_* track keys above by endgame boss id (BOSS_DEFS id).
 // playBossBGM(bossId) picks one at random. Bosses with a single theme just
 // list one key. NOTE: boss_brutus has no music files yet - it is
 // intentionally absent and falls back to a random boss theme at play time.

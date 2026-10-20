@@ -13,7 +13,7 @@ const ATTRIBUTE_AFFIX_SCALE = 0.70;
 const ATTRIBUTE_AFFIX_FAMILIES = new Set(['strength', 'agility', 'intelligence']);
 
 // Every equipment table to walk, named by the part of the table name that
-// follows the EG_MOD_TABLE_ prefix.
+// follows the MOD_TABLE_ prefix.
 const REBALANCED_TABLE_NAMES = [
     'HEAD', 'EARRING', 'AMULET', 'SHOULDERS', 'CLOAK', 'CHEST', 'BRACERS',
     'GLOVES', 'BELT', 'PANTS', 'BOOTS', 'RING', 'ARCANE', 'TALISMAN',
@@ -36,7 +36,7 @@ const REBALANCED_TABLE_NAMES = [
 (() => {
     const tables = [];
     for (const name of REBALANCED_TABLE_NAMES) {
-        const key = 'EG_MOD_TABLE_' + name;
+        const key = 'MOD_TABLE_' + name;
         try {
             const table = eval(key);
             if (table) tables.push(table);

@@ -4,16 +4,16 @@
 // Tooltip construction, card rendering, screen markup, and injected styles.
 
 import { t } from '../translation/translations.js';
-import { EG_ART } from '../endgame/endgame-art.js';
+import { GAME_ART } from '../endgame/endgame-art.js';
 import { _egRollMapTier } from '../loot/loot-map-config.js';
 import {
-    EG_BOSS_TEST_DEFAULT_LEVEL,
-    _egbtBossTier,
-    _egbtCalcTestHPMultiplier,
-    _egbtScaledPreview,
-    _egbtTierMonsterLevel,
+    BOSS_TEST_DEFAULT_LEVEL,
+    _bossTestBossTier,
+    _bossTestCalcTestHPMultiplier,
+    _bossTestScaledPreview,
+    _bossTestTierMonsterLevel,
 } from './combat-boss-test-core.js';
-import { _egbtGetSpecialPhaseInfo, _egbtTr } from './combat-boss-test-phases.js';
+import { _bossTestGetSpecialPhaseInfo, _bossTestTr } from './combat-boss-test-phases.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS TOOLTIP & TEST HP HELPERS-----------------------
@@ -21,13 +21,13 @@ import { _egbtGetSpecialPhaseInfo, _egbtTr } from './combat-boss-test-phases.js'
 
 // Builds a tooltip HTML string for a boss, listing its phases, mechanics,
 // and estimated damage at the given level. Uses showGameTooltip from tooltips-hud.js.
-export function _egbtBuildBossTooltipHTML(def, level) {
-    const preview = _egbtScaledPreview(def, level);
-    const mechDef = (typeof EG_BOSS_MECHANICS !== 'undefined') ? globalThis.EG_BOSS_MECHANICS[def.id] : null;
+export function _bossTestBuildBossTooltipHTML(def, level) {
+    const preview = _bossTestScaledPreview(def, level);
+    const mechDef = (typeof BOSS_MECHANICS !== 'undefined') ? globalThis.BOSS_MECHANICS[def.id] : null;
     if (!mechDef) return null;
 
-    const bossIcon = (typeof EG_ART !== 'undefined' && EG_ART.html)
-        ? EG_ART.html('monster', def.id, def.emoji || '💀')
+    const bossIcon = (typeof GAME_ART !== 'undefined' && GAME_ART.html)
+        ? GAME_ART.html('monster', def.id, def.emoji || '💀')
         : (def.emoji || '💀');
     let html = `<div style="min-width:280px;">
         <div style="font-size:13px;font-weight:700;color:var(--accent,#c8a84b);margin-bottom:6px;">
@@ -41,7 +41,7 @@ export function _egbtBuildBossTooltipHTML(def, level) {
     // (Corrupt Cells caps/rates, Prior Bomb counts/fuse, Probability Shift
     // target counts). Shown for every boss so playtesting numbers are
     // transparent. Unassigned bosses fall back to the tier of their level.
-    let tier = (typeof _egbtBossTier === 'function') ? _egbtBossTier(def.id) : 0;
+    let tier = (typeof _bossTestBossTier === 'function') ? _bossTestBossTier(def.id) : 0;
     if (tier <= 0 && typeof _egRollMapTier === 'function') {
         try { tier = _egRollMapTier(level); } catch (e) { tier = 0; }
     }
@@ -55,13 +55,13 @@ export function _egbtBuildBossTooltipHTML(def, level) {
     // Corruption caps at this tier (only for bosses using corrupt_cells).
     // Mirrors the live fight values: cap = P2 spread ceiling / P3 relentless ceiling.
     if (mechDef.mechanics && mechDef.mechanics.some(m => (m.handler || '').includes('CorruptCells'))) {
-        const norm = (typeof _egBossTierNorm === 'function')
-            ? (() => { try { return globalThis._egBossTierNorm({ level }); } catch (e) { return 0.5; } })()
+        const norm = (typeof _bossTierNorm === 'function')
+            ? (() => { try { return globalThis._bossTierNorm({ level }); } catch (e) { return 0.5; } })()
             : 0.5;
-        const cap2 = (typeof _egCorruptSpreadCap === 'function')
-            ? globalThis._egCorruptSpreadCap({ p: 2, norm }) : null;
-        const cap3 = (typeof _egCorruptSpreadCap === 'function')
-            ? globalThis._egCorruptSpreadCap({ p: 3, norm }) : null;
+        const cap2 = (typeof _corruptSpreadCap === 'function')
+            ? globalThis._corruptSpreadCap({ p: 2, norm }) : null;
+        const cap3 = (typeof _corruptSpreadCap === 'function')
+            ? globalThis._corruptSpreadCap({ p: 3, norm }) : null;
         if (cap2 != null && cap3 != null) {
             html += `<div style="font-size:11px;margin-bottom:8px;">
                 <span style="color:#7fb8ff;">🧫 Corruption cap:</span>
@@ -91,12 +91,12 @@ export function _egbtBuildBossTooltipHTML(def, level) {
     }
 
     // Special phase mechanics (from onPhaseEnter hooks, etc.)
-    const specialPhases = _egbtGetSpecialPhaseInfo(def.id);
+    const specialPhases = _bossTestGetSpecialPhaseInfo(def.id);
     if (specialPhases && specialPhases.length > 0) {
         html += `<div style="margin-bottom:8px;">`;
         specialPhases.forEach(sp => {
             html += `<div style="font-size:11px;margin:3px 0;">
-                <span style="color:var(--accent2,#ccc);">${_egbtTr('eg_boss_test_special_phase', 'Special')}:</span>
+                <span style="color:var(--accent2,#ccc);">${_bossTestTr('eg_boss_test_special_phase', 'Special')}:</span>
                 <span style="color:#f5d98a;"> ${sp.name}</span>
                 <span style="opacity:0.6;"> - ${sp.desc}</span>
             </div>`;
@@ -123,9 +123,9 @@ export function _egbtBuildBossTooltipHTML(def, level) {
     }
 
     // Soft enrage note
-    if (typeof EG_BOSS_SOFT_ENRAGE_DELAY_MS !== 'undefined') {
-        const delayMin = globalThis.EG_BOSS_SOFT_ENRAGE_DELAY_MS / 60000;
-        const stepPct = Math.round(globalThis.EG_BOSS_SOFT_ENRAGE_DMG_STEP * 100);
+    if (typeof BOSS_SOFT_ENRAGE_DELAY_MS !== 'undefined') {
+        const delayMin = globalThis.BOSS_SOFT_ENRAGE_DELAY_MS / 60000;
+        const stepPct = Math.round(globalThis.BOSS_SOFT_ENRAGE_DMG_STEP * 100);
         html += `<div style="margin-top:8px;font-size:10px;opacity:0.6;">
             ${t('eg_boss_test_soft_enrage').replace('{delay}', delayMin).replace('{step}', stepPct)}
         </div>`;
@@ -135,13 +135,13 @@ export function _egbtBuildBossTooltipHTML(def, level) {
     return html;
 }
 
-export function _egbtShowTooltip(cardEl, e) {
+export function _bossTestShowTooltip(cardEl, e) {
     const bossId = cardEl.dataset.bossId;
     const level = Number(cardEl.dataset.bossLevel);
     if (!bossId || !level) return;
-    const def = (typeof EG_BOSS_DEFS !== 'undefined') ? globalThis.EG_BOSS_DEFS[bossId] : null;
+    const def = (typeof BOSS_DEFS !== 'undefined') ? globalThis.BOSS_DEFS[bossId] : null;
     if (!def) return;
-    const html = _egbtBuildBossTooltipHTML(def, level);
+    const html = _bossTestBuildBossTooltipHTML(def, level);
     if (html) globalThis.showGameTooltip(html, e);
 }
 
@@ -149,26 +149,26 @@ export function _egbtShowTooltip(cardEl, e) {
 // button handlers so the launch carries the boost (or drops it again on
 // uncheck). Handlers are real functions, not string attributes, so the
 // rebind works identically in every environment.
-export function _egbtToggleTestHP(checkbox, bossId, level, hpMult) {
+export function _bossTestToggleTestHP(checkbox, bossId, level, hpMult) {
     const card = checkbox.closest('.egbt-boss-card');
     if (!card) return;
     const newHpMult = checkbox.checked ? hpMult : 1;
     card.onclick = (ev) => {
         if (ev.target.closest('button')) return;   // Fight button handles itself
-        globalThis._egLaunchBossTest(bossId, level, newHpMult);
+        globalThis._launchBossTest(bossId, level, newHpMult);
     };
     const btn = card.querySelector('.egbt-fight-btn');
     if (btn) {
         btn.onclick = (ev) => {
             ev.stopPropagation();
-            globalThis._egLaunchBossTest(bossId, level, newHpMult);
+            globalThis._launchBossTest(bossId, level, newHpMult);
         };
     }
     const statsEl = card.querySelector('.egbt-boss-stats');
     if (statsEl) {
-        const def = (typeof EG_BOSS_DEFS !== 'undefined') ? globalThis.EG_BOSS_DEFS[bossId] : null;
+        const def = (typeof BOSS_DEFS !== 'undefined') ? globalThis.BOSS_DEFS[bossId] : null;
         if (def) {
-            const p = _egbtScaledPreview(def, level);
+            const p = _bossTestScaledPreview(def, level);
             const hp = checkbox.checked ? Math.round(p.hp * hpMult) : p.hp;
             // Test boost only scales HP - damage stays at its normal value.
             statsEl.textContent = `Lv ${level} · ❤️ ${hp} · 🗡️ ${p.dmg}`;
@@ -180,23 +180,23 @@ export function _egbtToggleTestHP(checkbox, bossId, level, hpMult) {
 //-------------------HTML BUILDERS------------------------------------------
 //------------------------------------------------------------------------
 
-export function _egbtBossIconHTML(def) {
+export function _bossTestBossIconHTML(def) {
     // Real boss art when it exists (see images/endgame/monsters/boss_*.jpeg),
     // otherwise the emoji fallback - same helper the arena cards use.
-    if (typeof EG_ART !== 'undefined' && EG_ART.html) return EG_ART.html('monster', def.id, def.emoji || '💀');
+    if (typeof GAME_ART !== 'undefined' && GAME_ART.html) return GAME_ART.html('monster', def.id, def.emoji || '💀');
     return def.emoji || '💀';
 }
 
-export function _egbtBuildBossCardHTML(def, level) {
-    const preview = _egbtScaledPreview(def, level);
-    const hpMult = _egbtCalcTestHPMultiplier(def, level);
+export function _bossTestBuildBossCardHTML(def, level) {
+    const preview = _bossTestScaledPreview(def, level);
+    const hpMult = _bossTestCalcTestHPMultiplier(def, level);
     return `
 <div class="egbt-boss-card" data-boss-id="${def.id}" data-boss-level="${level}"
-     onmouseenter="_egbtShowTooltip(this, event)"
+     onmouseenter="_bossTestShowTooltip(this, event)"
      onmousemove="moveGameTooltip(event)"
      onmouseleave="hideGameTooltip()"
-     onclick="_egLaunchBossTest('${def.id}', ${level})">
-    <div class="egbt-boss-emoji">${_egbtBossIconHTML(def)}</div>
+     onclick="_launchBossTest('${def.id}', ${level})">
+    <div class="egbt-boss-emoji">${_bossTestBossIconHTML(def)}</div>
     <div class="egbt-boss-name">${def.name || def.id}</div>
     <div class="egbt-boss-stats">Lv ${level} · ❤️ ${preview.hp} · 🗡️ ${preview.dmg}</div>
     <div class="egbt-boss-id">${def.id}</div>
@@ -206,11 +206,11 @@ export function _egbtBuildBossCardHTML(def, level) {
         <input type="checkbox" class="egbt-test-hp-checkbox"
                onmousedown="event.stopPropagation()"
                onclick="event.stopPropagation();"
-               onchange="_egbtToggleTestHP(this, '${def.id}', ${level}, ${hpMult})">
+               onchange="_bossTestToggleTestHP(this, '${def.id}', ${level}, ${hpMult})">
         <span>${t('eg_boss_test_500k_hp')}</span>
     </label>
     <button class="title-btn egbt-fight-btn"
-            onclick="event.stopPropagation(); _egLaunchBossTest('${def.id}', ${level})">
+            onclick="event.stopPropagation(); _launchBossTest('${def.id}', ${level})">
         ${t('eg_boss_test_fight')}
     </button>
 </div>`;
@@ -218,9 +218,9 @@ export function _egbtBuildBossCardHTML(def, level) {
 
 // Groups boss defs into tier sections (1–16, then unassigned as tier 0),
 // honouring the search query. Empty tiers are omitted.
-export function _egbtBuildSections() {
-    const all = (typeof EG_BOSS_DEFS !== 'undefined') ? Object.values(globalThis.EG_BOSS_DEFS) : [];
-    const query = String(window._egBossTestSearch || '').trim().toLowerCase();
+export function _bossTestBuildSections() {
+    const all = (typeof BOSS_DEFS !== 'undefined') ? Object.values(globalThis.BOSS_DEFS) : [];
+    const query = String(window._bossTestSearch || '').trim().toLowerCase();
     const matches = def => !query
         || String(def.name || '').toLowerCase().includes(query)
         || String(def.id || '').toLowerCase().includes(query);
@@ -228,7 +228,7 @@ export function _egbtBuildSections() {
 
     // Resolve each boss's tier once - the roster scan is O(regions).
     const tierOf = {};
-    all.forEach(def => { tierOf[def.id] = _egbtBossTier(def.id); });
+    all.forEach(def => { tierOf[def.id] = _bossTestBossTier(def.id); });
 
     const sections = [];
     for (let tier = 1; tier <= 16; tier++) {
@@ -240,31 +240,31 @@ export function _egbtBuildSections() {
     return sections;
 }
 
-export function _egbtBuildSectionHTML(section) {
-    const level = section.tier > 0 ? _egbtTierMonsterLevel(section.tier) : EG_BOSS_TEST_DEFAULT_LEVEL;
+export function _bossTestBuildSectionHTML(section) {
+    const level = section.tier > 0 ? _bossTestTierMonsterLevel(section.tier) : BOSS_TEST_DEFAULT_LEVEL;
     const title = section.tier > 0
         ? `${t('eg_boss_test_tier').replace('{n}', section.tier)} · ${t('eg_boss_test_tier_level').replace('{lv}', level)}`
         : t('eg_boss_test_unassigned');
     return `
 <div class="egbt-tier-section">
     <div class="egbt-tier-header">${title}</div>
-    <div class="egbt-boss-grid">${section.defs.map(def => _egbtBuildBossCardHTML(def, level)).join('')}</div>
+    <div class="egbt-boss-grid">${section.defs.map(def => _bossTestBuildBossCardHTML(def, level)).join('')}</div>
 </div>`;
 }
 
-export function _egbtRenderGrid() {
+export function _bossTestRenderGrid() {
     const container = document.getElementById('egbt-boss-grid');
     if (!container) return;
-    const sections = _egbtBuildSections();
+    const sections = _bossTestBuildSections();
     const total = sections.reduce((sum, s) => sum + s.defs.length, 0);
     container.innerHTML = total > 0
-        ? sections.map(_egbtBuildSectionHTML).join('')
+        ? sections.map(_bossTestBuildSectionHTML).join('')
         : `<div class="egbt-empty">${t('eg_boss_test_no_bosses')}</div>`;
     const count = document.getElementById('egbt-count');
     if (count) count.textContent = t('eg_boss_test_count').replace('{n}', total);
 }
 
-export function _egbtBuildFullScreenHTML() {
+export function _bossTestBuildFullScreenHTML() {
     return `
 <div class="egbt-hub-layout">
     <div class="egbt-topbar">
@@ -275,10 +275,10 @@ export function _egbtBuildFullScreenHTML() {
     <div class="egbt-controls">
         <input class="egbt-search" id="egbt-search" type="text"
             placeholder="${t('eg_boss_test_search_placeholder')}"
-            oninput="window._egBossTestSearch=this.value;_egbtRenderGrid()">
+            oninput="window._bossTestSearch=this.value;_bossTestRenderGrid()">
         <label class="egbt-godmode-label" data-tip-t="eg_boss_test_godmode_hint">
             <input type="checkbox" class="egbt-godmode-checkbox"
-                onchange="_egbtToggleGodMode(this)">
+                onchange="_bossTestToggleGodMode(this)">
             <span>${t('eg_boss_test_godmode')}</span>
         </label>
         <span class="egbt-godmode-badge" id="egbt-godmode-badge"></span>
@@ -295,7 +295,7 @@ export function _egbtBuildFullScreenHTML() {
 // Injected via JS, same pattern as _egtEnsureStyles() in
 // endgame-testing-screen.js - avoids needing to touch the main CSS files.
 
-export function _egbtEnsureStyles() {
+export function _bossTestEnsureStyles() {
     if (document.getElementById('egbt-boss-test-style')) return;
 
     const style = document.createElement('style');

@@ -149,8 +149,8 @@ function showConvergenceModal() {
 let _convTotalCache = null;
 function _convergenceTotalMilestones() {
     if (_convTotalCache != null) return _convTotalCache;
-    if (typeof globalThis._egTrialCount === 'function') {
-        _convTotalCache = globalThis._egTrialCount();
+    if (typeof globalThis._trialCount === 'function') {
+        _convTotalCache = globalThis._trialCount();
         return _convTotalCache;
     }
     if (typeof globalThis.WORLDS === 'undefined' || typeof isLevelConvergence !== 'function') return 0;
@@ -413,8 +413,8 @@ export function goToLevelSelect() {
 
         // Route back to the boss testing screen if this run was a
         // single-boss test fight (forfeit via the pause menu).
-        if (window._egIsBossTestRun) {
-            window._egIsBossTestRun = false;
+        if (window._isBossTestRun) {
+            window._isBossTestRun = false;
             if (typeof globalThis.showEndgameBossTest === 'function') {
                 globalThis.showEndgameBossTest();
                 return;
@@ -422,8 +422,8 @@ export function goToLevelSelect() {
         }
 
         // Route back to the endgame test hub if this run was launched from there
-        if (window._egIsTestRun) {
-            window._egIsTestRun = false;
+        if (window._isTestRun) {
+            window._isTestRun = false;
             if (typeof globalThis.showEndgameTestHub === 'function') {
                 globalThis.showEndgameTestHub();
                 return;
@@ -509,27 +509,27 @@ export function goToPreviousScreen() {
 
 // Snapshots every unclaimed (still on the grid, i.e. unexpired) drop so the
 // NEXT-level path can carry it forward. Mirrors the endgame encounter chain
-// (_egTransitionToChainPuzzle): loot / currency (incl. essences) / regular
+// (_transitionToChainPuzzle): loot / currency (incl. essences) / regular
 // items / maps / charms ride along, instant-effect pickups (hearts, mana,
 // mistake erasers, cooldown surges) are intentionally left behind. Values are
 // captured by reference; the subsequent startLevel's encounter teardown
 // cancels their old expiry timers, and the restore step below re-places them
-// with fresh lifetimes via the shared _egReplaceCarried* helpers.
+// with fresh lifetimes via the shared _replaceCarried* helpers.
 function _campaignSnapshotCarriedDrops() {
     const carried = { loot: [], currency: [], items: [], maps: [], charms: [] };
     try {
-        if (typeof globalThis._egLootDrops !== 'undefined' && globalThis._egLootDrops instanceof Map) {
-            carried.loot = Array.from(globalThis._egLootDrops.values());
+        if (typeof globalThis._lootDrops !== 'undefined' && globalThis._lootDrops instanceof Map) {
+            carried.loot = Array.from(globalThis._lootDrops.values());
         }
     } catch (e) {}
     try {
-        if (typeof globalThis._egCurrencyDrops !== 'undefined' && globalThis._egCurrencyDrops instanceof Map) {
-            carried.currency = Array.from(globalThis._egCurrencyDrops.values());
+        if (typeof globalThis._currencyDrops !== 'undefined' && globalThis._currencyDrops instanceof Map) {
+            carried.currency = Array.from(globalThis._currencyDrops.values());
         }
     } catch (e) {}
     try {
-        if (typeof globalThis._egItemDrops !== 'undefined' && globalThis._egItemDrops instanceof Map) {
-            carried.items = Array.from(globalThis._egItemDrops.values());
+        if (typeof globalThis._itemDrops !== 'undefined' && globalThis._itemDrops instanceof Map) {
+            carried.items = Array.from(globalThis._itemDrops.values());
         }
     } catch (e) {}
     try {
@@ -538,8 +538,8 @@ function _campaignSnapshotCarriedDrops() {
         }
     } catch (e) {}
     try {
-        if (typeof globalThis._egCharmDrops !== 'undefined' && globalThis._egCharmDrops instanceof Map) {
-            carried.charms = Array.from(globalThis._egCharmDrops.values());
+        if (typeof globalThis._charmDrops !== 'undefined' && globalThis._charmDrops instanceof Map) {
+            carried.charms = Array.from(globalThis._charmDrops.values());
         }
     } catch (e) {}
     return carried;
@@ -558,14 +558,14 @@ function _campaignRestoreCarriedDrops(carried, nextIndex) {
 
     let attempts = 0;
     const doRestore = () => {
-        if (carried.loot.length > 0 && typeof globalThis._egReplaceCarriedLootDrops === 'function') {
-            try { globalThis._egReplaceCarriedLootDrops(carried.loot); } catch (e) {}
+        if (carried.loot.length > 0 && typeof globalThis._replaceCarriedLootDrops === 'function') {
+            try { globalThis._replaceCarriedLootDrops(carried.loot); } catch (e) {}
         }
-        if (carried.currency.length > 0 && typeof globalThis._egReplaceCarriedCurrencyDrops === 'function') {
-            try { globalThis._egReplaceCarriedCurrencyDrops(carried.currency); } catch (e) {}
+        if (carried.currency.length > 0 && typeof globalThis._replaceCarriedCurrencyDrops === 'function') {
+            try { globalThis._replaceCarriedCurrencyDrops(carried.currency); } catch (e) {}
         }
-        if (carried.items.length > 0 && typeof globalThis._egReplaceCarriedItemDrops === 'function') {
-            try { globalThis._egReplaceCarriedItemDrops(carried.items); } catch (e) {}
+        if (carried.items.length > 0 && typeof globalThis._replaceCarriedItemDrops === 'function') {
+            try { globalThis._replaceCarriedItemDrops(carried.items); } catch (e) {}
         }
         if (carried.maps.length > 0 && typeof globalThis._egReplaceCarriedMapDrops === 'function') {
             try { globalThis._egReplaceCarriedMapDrops(carried.maps); } catch (e) {}
@@ -612,8 +612,8 @@ export function goToNextLevel() {
         // convergence / class-event / math-gate modal sits open are NOT
         // carried - only what is still unclaimed on the grid counts.
         // Skipped for real endgame map runs: the encounter chain owns that
-        // transition (_egTransitionToChainPuzzle) and would double-place.
-        const isMapRun = (typeof globalThis._egIsMapRun === 'function') && globalThis._egIsMapRun();
+        // transition (_transitionToChainPuzzle) and would double-place.
+        const isMapRun = (typeof globalThis._isMapRun === 'function') && globalThis._isMapRun();
         const carried = isMapRun ? null : _campaignSnapshotCarriedDrops();
         globalThis.startLevel(nextIndex);
         if (carried) _campaignRestoreCarriedDrops(carried, nextIndex);
@@ -628,9 +628,9 @@ function replayLevel() {
     hideResultOverlays();
     // "Restarting the game" should clear any stacked quiz damage buff -
     // this covers the win/lose retry buttons. Chain transitions preserve
-    // the buff via _egSuppressEncounterStop, but a manual retry is a map
+    // the buff via _suppressEncounterStop, but a manual retry is a map
     // exit and must wipe it.
-    if (typeof globalThis._egResetQuizDamageBuff === 'function') globalThis._egResetQuizDamageBuff();
+    if (typeof globalThis._resetQuizDamageBuff === 'function') globalThis._resetQuizDamageBuff();
 
     const currentIndex = cur.gIdx;
     const proceed = () => globalThis.startLevel(currentIndex);

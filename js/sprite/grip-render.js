@@ -55,7 +55,7 @@ export const GRIP_DATA_VERSION = 2;
 export const ITEM_CATEGORIES = [
     // Visual categories only — two-handed-ness is per-TIER in the game
     // (early battle blades are 2H, later ones 1H), so it must come from the
-    // game's own tables (EG_BASE_TYPES_WEAPON.hands), never from a pattern.
+    // game's own tables (BASE_TYPES_WEAPON.hands), never from a pattern.
     { id: 'blade', re: /_battle_blade_/, role: 'weapon',
       handle: [0.5, 0.85], scale: 0.5, axis: [0.5, 0.12] },
     { id: '2h', re: /^(wpn_2h_|wpn_int_)/, role: 'weapon',

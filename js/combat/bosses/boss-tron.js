@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE TRON (boss_tron)---------------------------------
@@ -13,7 +13,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 // are referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_tron: {
         id: 'boss_tron', name: 'The Tron', emoji: '🏍️',
         baseHP: 1060, baseDamage: 24, chargeMax: 12,
@@ -21,7 +21,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_tron: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -30,8 +30,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'light_cycle', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechLightCycle' },
-            { name: 'corrupt_cells', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechCorruptCells' },
+            { name: 'light_cycle', intervalBase: 21000, intervalVariance: 5000, handler: '_mechLightCycle' },
+            { name: 'corrupt_cells', intervalBase: 19000, intervalVariance: 4000, handler: '_mechCorruptCells' },
         ],
     },
 });
@@ -39,8 +39,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // A rider steers around the arena laying a deadly trail behind it.
 // Touching the bike or any trail segment burns; give it looping room.
-export function _egMechLightCycle(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechLightCycle(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     Audio_Manager.playSFX('boss_tron_cycle');
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const speed = [0, 260, 300, 350][p];
@@ -48,17 +48,17 @@ export function _egMechLightCycle(monster, phase) {
     const hitW = 16;
     const dmgPct = [0, 0.18, 0.22, 0.27][p];
     const durMs = 12000;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]];
     const bike = {
         x: window.innerWidth * 0.2, y: window.innerHeight * 0.3,
         dir: 0, turnIn: 900,
-        el: _egNkEl(run, 'div', 'eg-nk-dot eg-nk-bike', '🏍️'),
+        el: _nkEl(run, 'div', 'eg-nk-dot eg-nk-bike', '🏍️'),
     };
     const trail = []; // { x, y, el }
     const laySegment = () => {
-        const el = _egNkEl(run, 'div', 'eg-nk-trail');
+        const el = _nkEl(run, 'div', 'eg-nk-trail');
         el.style.transform = 'translate(' + Math.round(bike.x - 8) + 'px,' + Math.round(bike.y - 8) + 'px)';
         trail.push({ x: bike.x, y: bike.y, el });
         if (trail.length > maxSegs) {
@@ -66,9 +66,9 @@ export function _egMechLightCycle(monster, phase) {
             old.el.remove();
         }
     };
-    _egNkToast('eg_mech_tron', '🏍️ The Tron: Light Cycle! The trail is death!');
+    _nkToast('eg_mech_tron', '🏍️ The Tron: Light Cycle! The trail is death!');
     let e = 0, cdUntil = 0, acc = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         e += dtS * 1000;
         // Steer toward open space: turn before walls, randomly otherwise.
         bike.turnIn -= dtS * 1000;
@@ -88,9 +88,9 @@ export function _egMechLightCycle(monster, phase) {
             acc = 0;
             laySegment();
         }
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         if (pr && now >= cdUntil) {
-            const c = _egNkPlayerCenter();
+            const c = _nkPlayerCenter();
             let hit = c && Math.hypot(c.x - bike.x, c.y - bike.y) < 30;
             if (!hit) {
                 for (const s of trail) {
@@ -103,8 +103,8 @@ export function _egMechLightCycle(monster, phase) {
             }
             if (hit) {
                 cdUntil = now + 1000;
-                const dealt = _egNkHit(dmgPct, 'lightning', level);
-                _egNkAbilityHitToast(dealt, 'The Tron', 'Light Cycle');
+                const dealt = _nkHit(dmgPct, 'lightning', level);
+                _nkAbilityHitToast(dealt, 'The Tron', 'Light Cycle');
             }
         }
         return e < durMs;

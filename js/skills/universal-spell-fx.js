@@ -5,7 +5,7 @@ import { Audio_Manager } from '../audio/audio.js';
 //------------------------------------------------------------------------
 // Code-drawn combat visuals for the universal spell arsenal (no emoji):
 // every projectile is built from nested divs pointing RIGHT (+x) inside a
-// 44x28 px box - the shared _egFireProjectile() flight code rotates the
+// 44x28 px box - the shared _fireProjectile() flight code rotates the
 // whole box onto the flight vector, exactly like the class projectiles
 // (see js/combat/combat-class-projectiles.js).
 //
@@ -144,7 +144,7 @@ export const USP_THEME_PROJ = {
 // Per-spell projectile overrides (visual overhaul, one spell at a time).
 // Checked BEFORE the theme table so a spell can own a unique silhouette +
 // flight scale while its schoolmates keep the shared theme look untouched.
-//   scale - launch startScale handed to _egFireProjectile (shared default is
+//   scale - launch startScale handed to _fireProjectile (shared default is
 //           1.4, 1.8 for big hits, 1.1 for volley followers; every flight
 //           shrinks to 0.5 on arrival, so scale reads as launch size).
 //   isBig - also plays the .is-big impact treatment on arrival.
@@ -990,7 +990,7 @@ export function _uspMeleeSwing(spell, origin, aim) {
 export function _uspArrowFan(spell, origin, point) {
     if (!origin || !point || typeof document === 'undefined') return;
     try {
-        const fire = globalThis._egFireProjectile;
+        const fire = globalThis._fireProjectile;
         if (typeof fire !== 'function') return;
         const def = USP_THEME_PROJ.arrow || USP_THEME_PROJ.arcane;
         const dx = point.x - origin.x, dy = point.y - origin.y;
@@ -1058,7 +1058,7 @@ export function _uspBladeBlastPlant(spell, origin, point, delayMs) {
                 setTimeout(() => { try { el.remove(); } catch (x) { /* already gone */ } }, Math.max(300, (delayMs || 800) + 150));
             } catch (e) { /* marker is cosmetic */ }
         };
-        const fire = globalThis._egFireProjectile;
+        const fire = globalThis._fireProjectile;
         if (origin && typeof fire === 'function') {
             try {
                 fire(USP_BLADEBLAST_THROW, USP_BLADEBLAST_THROW.cssClass, origin, point,
@@ -1096,7 +1096,7 @@ export function _uspTelegraph(spell, monsterId, delayMs) {
 // Source anchor: chain jumps fly card→card; sky strikes fall from above the
 // card; everything else launches from the player avatar (the caster).
 function _uspResolveStart(spell, targetCard, opts) {
-    const centre = (typeof globalThis._egGetElementCentre === 'function') ? globalThis._egGetElementCentre : null;
+    const centre = (typeof globalThis._getElementCentre === 'function') ? globalThis._getElementCentre : null;
     if (opts && opts.fromMonsterId && centre) {
         const from = document.getElementById(`eg-card-${opts.fromMonsterId}`);
         if (from) return centre(from);
@@ -1126,12 +1126,12 @@ function _uspResolveStart(spell, targetCard, opts) {
 // Resolves the avatar centre in viewport coordinates, or null when the avatar
 // is not on screen (then the callers just skip the cosmetic layer).
 function _uspSupportAnchor() {
-    if (typeof globalThis._egGetElementCentre !== 'function') return null;
+    if (typeof globalThis._getElementCentre !== 'function') return null;
     const avatar = document.getElementById('player-avatar-wrapper')
         || document.getElementById('class-hud-drag-handle')
         || document.getElementById('ptable');
     if (!avatar) return null;
-    try { return globalThis._egGetElementCentre(avatar); } catch (e) { return null; }
+    try { return globalThis._getElementCentre(avatar); } catch (e) { return null; }
 }
 
 // Ring pulse + floating label over the player. `flavor` is one of
@@ -1188,9 +1188,9 @@ let _uspBarrierRaised = false;
 function _uspBarrierFrame() {
     _uspBarrierRaf = null;
     try {
-        const cur = Number(globalThis._egPlayerAbsorptionCurrent) || 0;
-        const max = (typeof globalThis._egComputePlayerStats === 'function')
-            ? (globalThis._egComputePlayerStats().absorption || 0) : 0;
+        const cur = Number(globalThis._playerAbsorptionCurrent) || 0;
+        const max = (typeof globalThis._computePlayerStats === 'function')
+            ? (globalThis._computePlayerStats().absorption || 0) : 0;
         const avatar = document.getElementById('player-avatar-wrapper')
             || document.getElementById('player-avatar-simple');
         if (!(max > 0 && cur > 0)) _uspBarrierRaised = false;
@@ -1205,8 +1205,8 @@ function _uspBarrierFrame() {
                 document.body.appendChild(el);
                 _uspBarrierEl = el;
             }
-            const c = (typeof globalThis._egGetElementCentre === 'function')
-                ? globalThis._egGetElementCentre(avatar)
+            const c = (typeof globalThis._getElementCentre === 'function')
+                ? globalThis._getElementCentre(avatar)
                 : (() => { const r = avatar.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })();
             _uspBarrierEl.style.left = `${c.x}px`;
             _uspBarrierEl.style.top = `${c.y}px`;
@@ -1259,8 +1259,8 @@ function _uspBloomTrack() {
         let c = null;
         // Hidden hero (character sheet etc.) = 0x0 rect at (0,0): no centre.
         if (avatar && avatar.getBoundingClientRect().width > 0) {
-            c = (typeof globalThis._egGetElementCentre === 'function')
-                ? globalThis._egGetElementCentre(avatar)
+            c = (typeof globalThis._getElementCentre === 'function')
+                ? globalThis._getElementCentre(avatar)
                 : (() => { const r = avatar.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })();
         }
         for (const id of ids) {
@@ -1283,7 +1283,7 @@ export function _uspRenewalBloom(spell, ms) {
                 const avatar = document.getElementById('player-avatar-wrapper')
                     || document.getElementById('player-avatar-simple')
                     || document.getElementById('class-hud-drag-handle');
-                if (avatar && typeof globalThis._egGetElementCentre === 'function') return globalThis._egGetElementCentre(avatar);
+                if (avatar && typeof globalThis._getElementCentre === 'function') return globalThis._getElementCentre(avatar);
             } catch (e) { /* fall through */ }
             return null;
         })() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -1350,8 +1350,8 @@ function _uspBulwarkTrack() {
         let c = null;
         // Hidden hero (character sheet etc.) = 0x0 rect at (0,0): no centre.
         if (avatar && avatar.getBoundingClientRect().width > 0) {
-            c = (typeof globalThis._egGetElementCentre === 'function')
-                ? globalThis._egGetElementCentre(avatar)
+            c = (typeof globalThis._getElementCentre === 'function')
+                ? globalThis._getElementCentre(avatar)
                 : (() => { const r = avatar.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })();
         }
         for (const id of ids) {
@@ -1374,7 +1374,7 @@ export function _uspBulwarkWall(spell, ms) {
                 const avatar = document.getElementById('player-avatar-wrapper')
                     || document.getElementById('player-avatar-simple')
                     || document.getElementById('class-hud-drag-handle');
-                if (avatar && typeof globalThis._egGetElementCentre === 'function') return globalThis._egGetElementCentre(avatar);
+                if (avatar && typeof globalThis._getElementCentre === 'function') return globalThis._getElementCentre(avatar);
             } catch (e) { /* fall through */ }
             return null;
         })() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -1431,8 +1431,8 @@ function _uspWindwardTrack() {
         let c = null;
         // Hidden hero (character sheet etc.) = 0x0 rect at (0,0): no centre.
         if (avatar && avatar.getBoundingClientRect().width > 0) {
-            c = (typeof globalThis._egGetElementCentre === 'function')
-                ? globalThis._egGetElementCentre(avatar)
+            c = (typeof globalThis._getElementCentre === 'function')
+                ? globalThis._getElementCentre(avatar)
                 : (() => { const r = avatar.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })();
         }
         for (const id of ids) {
@@ -1455,7 +1455,7 @@ export function _uspWindwardGale(spell, ms) {
                 const avatar = document.getElementById('player-avatar-wrapper')
                     || document.getElementById('player-avatar-simple')
                     || document.getElementById('class-hud-drag-handle');
-                if (avatar && typeof globalThis._egGetElementCentre === 'function') return globalThis._egGetElementCentre(avatar);
+                if (avatar && typeof globalThis._getElementCentre === 'function') return globalThis._getElementCentre(avatar);
             } catch (e) { /* fall through */ }
             return null;
         })() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -1514,8 +1514,8 @@ function _uspAegisTrack() {
             || document.getElementById('class-hud-drag-handle');
         let c = null;
         if (avatar) {
-            c = (typeof globalThis._egGetElementCentre === 'function')
-                ? globalThis._egGetElementCentre(avatar)
+            c = (typeof globalThis._getElementCentre === 'function')
+                ? globalThis._getElementCentre(avatar)
                 : (() => { const r = avatar.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })();
         }
         if (c) {
@@ -1547,7 +1547,7 @@ export function _uspAegisWardShow(spell, ms, charges) {
                 const avatar = document.getElementById('player-avatar-wrapper')
                     || document.getElementById('player-avatar-simple')
                     || document.getElementById('class-hud-drag-handle');
-                if (avatar && typeof globalThis._egGetElementCentre === 'function') return globalThis._egGetElementCentre(avatar);
+                if (avatar && typeof globalThis._getElementCentre === 'function') return globalThis._getElementCentre(avatar);
             } catch (e) { /* fall through */ }
             return null;
         })() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -1626,8 +1626,8 @@ function _uspRetribTrack() {
             || document.getElementById('class-hud-drag-handle');
         let c = null;
         if (avatar) {
-            c = (typeof globalThis._egGetElementCentre === 'function')
-                ? globalThis._egGetElementCentre(avatar)
+            c = (typeof globalThis._getElementCentre === 'function')
+                ? globalThis._getElementCentre(avatar)
                 : (() => { const r = avatar.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })();
         }
         if (c) {
@@ -1650,7 +1650,7 @@ export function _uspRetributionShow(spell, ms) {
                 const avatar = document.getElementById('player-avatar-wrapper')
                     || document.getElementById('player-avatar-simple')
                     || document.getElementById('class-hud-drag-handle');
-                if (avatar && typeof globalThis._egGetElementCentre === 'function') return globalThis._egGetElementCentre(avatar);
+                if (avatar && typeof globalThis._getElementCentre === 'function') return globalThis._getElementCentre(avatar);
             } catch (e) { /* fall through */ }
             return null;
         })() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -1757,8 +1757,8 @@ function _uspWindstepTrack() {
             || document.getElementById('class-hud-drag-handle');
         let c = null;
         if (avatar) {
-            c = (typeof globalThis._egGetElementCentre === 'function')
-                ? globalThis._egGetElementCentre(avatar)
+            c = (typeof globalThis._getElementCentre === 'function')
+                ? globalThis._getElementCentre(avatar)
                 : (() => { const r = avatar.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })();
         }
         if (c) {
@@ -1796,7 +1796,7 @@ export function _uspWindstepTailwind(spell, ms) {
                 const avatar = document.getElementById('player-avatar-wrapper')
                     || document.getElementById('player-avatar-simple')
                     || document.getElementById('class-hud-drag-handle');
-                if (avatar && typeof globalThis._egGetElementCentre === 'function') return globalThis._egGetElementCentre(avatar);
+                if (avatar && typeof globalThis._getElementCentre === 'function') return globalThis._getElementCentre(avatar);
             } catch (e) { /* fall through */ }
             return null;
         })() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -1865,7 +1865,7 @@ function _uspAuraCentre() {
         // snapping to the screen corner.
         const r = avatar.getBoundingClientRect();
         if (!(r.width > 0) || !(r.height > 0)) return null;
-        if (typeof globalThis._egGetElementCentre === 'function') return globalThis._egGetElementCentre(avatar);
+        if (typeof globalThis._getElementCentre === 'function') return globalThis._getElementCentre(avatar);
         return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     } catch (e) { return null; }
 }
@@ -2209,8 +2209,8 @@ function _uspBeamFlash(spell, monsterId) {
         const card = document.getElementById(`eg-card-${monsterId}`);
         if (!hero || !card) return;
         const centre = (el) => {
-            if (typeof globalThis._egGetElementCentre === 'function') {
-                try { return globalThis._egGetElementCentre(el); } catch (e) { /* fall through */ }
+            if (typeof globalThis._getElementCentre === 'function') {
+                try { return globalThis._getElementCentre(el); } catch (e) { /* fall through */ }
             }
             const r = el.getBoundingClientRect();
             return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
@@ -2248,8 +2248,8 @@ function _uspFlameJet(spell, monsterId) {
         const card = document.getElementById(`eg-card-${monsterId}`);
         if (!hero || !card) return;
         const centre = (el) => {
-            if (typeof globalThis._egGetElementCentre === 'function') {
-                try { return globalThis._egGetElementCentre(el); } catch (e) { /* fall through */ }
+            if (typeof globalThis._getElementCentre === 'function') {
+                try { return globalThis._getElementCentre(el); } catch (e) { /* fall through */ }
             }
             const r = el.getBoundingClientRect();
             return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
@@ -2289,8 +2289,8 @@ function _uspSoulBeam(spell, monsterId) {
         const card = document.getElementById(`eg-card-${monsterId}`);
         if (!hero || !card) return;
         const centre = (el) => {
-            if (typeof globalThis._egGetElementCentre === 'function') {
-                try { return globalThis._egGetElementCentre(el); } catch (e) { /* fall through */ }
+            if (typeof globalThis._getElementCentre === 'function') {
+                try { return globalThis._getElementCentre(el); } catch (e) { /* fall through */ }
             }
             const r = el.getBoundingClientRect();
             return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
@@ -2318,7 +2318,7 @@ function _uspSoulBeam(spell, monsterId) {
     } catch (e) { /* beam is cosmetic */ }
 }
 
-// Fires one themed projectile; damage lands via _egDamageTargetById so
+// Fires one themed projectile; damage lands via _damageTargetById so
 // resistances, ailments, echo and kill detection all apply. DoT ticks skip
 // the flight and sizzle directly on the card.
 export function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
@@ -2327,7 +2327,7 @@ export function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
     // scale and impact weight; everyone else keeps the shared theme behavior.
     const projDef = _uspProjDefFor(spell);
     if (projDef.isBig) opts.isBig = true;
-    const damageFn = (typeof globalThis._egDamageTargetById === 'function') ? globalThis._egDamageTargetById : null;
+    const damageFn = (typeof globalThis._damageTargetById === 'function') ? globalThis._damageTargetById : null;
     if (!damageFn) return;
 
     // Melee strikes (spell pass 1): the swing already played beside the
@@ -2372,18 +2372,18 @@ export function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
 
     const impact = () => {
         // isPlayerSpell: Spellproof monsters resist magic sources (melee
-        // strikes are exempt - see _egApplyTargetResistances).
+        // strikes are exempt - see _applyTargetResistances).
         damageFn(monsterId, hit.amount, hit.elements, { isCrit: !!hit.isCrit, isPlayerSpell: true, spellId: spell && spell.id, uspSfx: !!USP_IMPACT_SFX[spell && spell.theme] });
         _uspImpact(spell, monsterId, opts);
     };
 
     // No visual path (card hidden / missing anchor) - apply instantly.
-    if (!start || !targetCard || typeof globalThis._egFireProjectile !== 'function') {
+    if (!start || !targetCard || typeof globalThis._fireProjectile !== 'function') {
         impact();
         return;
     }
 
-    let centre = globalThis._egGetElementCentre(targetCard);
+    let centre = globalThis._getElementCentre(targetCard);
     // Volley spread (Barrage): fan the shafts across the victim so rapid
     // followers don't land on the exact same pixel - cosmetic only, the
     // hit still lands on the same monster.
@@ -2397,12 +2397,12 @@ export function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
     let flightMs = opts.fromSky ? 550 : projDef.duration;
     if (projDef.speedScales && !opts.fromSky) {
         try {
-            const pct = Math.max(0, Number(globalThis._egComputePlayerStats().projectileSpeedPct) || 0);
+            const pct = Math.max(0, Number(globalThis._computePlayerStats().projectileSpeedPct) || 0);
             flightMs = Math.max(60, Math.round(flightMs / (1 + pct / 100)));
         } catch (e) { /* no stats - base speed */ }
     }
     try {
-        globalThis._egFireProjectile(
+        globalThis._fireProjectile(
             projDef, projDef.cssClass,
             start, centre,
             flightMs,

@@ -1,20 +1,20 @@
 import { ASCENDENCY_LIST } from '../classes/class-cooldown-state.js';
 import { CLASS_LIST } from '../classes/class-defs.js';
 import { ALL, WORLD_START_GI } from '../levels/levels.js';
-import { EG_CURRENCY_COLS, EG_CURRENCY_ROWS, EG_CURRENCY_SLOT_MAP, _egCurrencyDefForId } from '../loot/hub-currency-layout.js';
-import { EG_ESSENCE_COLS, EG_ESSENCE_ROWS, EG_ESSENCE_SLOT_MAP } from '../loot/loot-essences.js';
-import { _egEssenceDefForId } from '../loot/loot-essences-defs.js';
-import { _egIsActive } from '../combat/combat-state.js';
-import { EG_SLOT_ACCEPTS } from '../endgame/endgame-hub-drag-and-drop.js';
-import { EG_ALL_BASE_TYPES } from '../loot/equipment-base-items.js';
-import { EG_SLOT_ICONS } from '../loot/equipment-slot-icons.js';
-import { _egRollModCounts } from '../loot/loot-equipment-generator.js';
-import { _egGetModTable } from '../loot/loot-equipment-mod-tables.js';
-import { _egRollImplicitsForBase } from '../loot/loot-implicits.js';
-import { _egBuildItemName } from '../loot/loot-mod-naming.js';
-import { _egRollMods } from '../loot/loot-mod-application.js';
-import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
-import { _egQuizDamageBuffMult } from '../endgame/endgame-quiz-buffs.js';
+import { CURRENCY_COLS, CURRENCY_ROWS, CURRENCY_SLOT_MAP, _currencyDefForId } from '../loot/hub-currency-layout.js';
+import { ESSENCE_COLS, ESSENCE_ROWS, ESSENCE_SLOT_MAP } from '../loot/loot-essences.js';
+import { _essenceDefForId } from '../loot/loot-essences-defs.js';
+import { _isActive } from '../combat/combat-state.js';
+import { SLOT_ACCEPTS } from '../endgame/endgame-hub-drag-and-drop.js';
+import { ALL_BASE_TYPES } from '../loot/equipment-base-items.js';
+import { SLOT_ICONS } from '../loot/equipment-slot-icons.js';
+import { _rollModCounts } from '../loot/loot-equipment-generator.js';
+import { _getModTable } from '../loot/loot-equipment-mod-tables.js';
+import { _rollImplicitsForBase } from '../loot/loot-implicits.js';
+import { _buildItemName } from '../loot/loot-mod-naming.js';
+import { _rollMods } from '../loot/loot-mod-application.js';
+import { _computePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _quizDamageBuffMult } from '../endgame/endgame-quiz-buffs.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { showMapView } from '../screens/screens-map-view.js';
 import { onSaveSlotChosen, renderSaveSlotScreen, showSaveSlotSelect } from '../screens/screens-save-slots.js';
@@ -63,7 +63,7 @@ import { markSeen } from '../storyline/storyline-progress.js';
 window.DEV_EFFECT_TIME_SCALE = 1;
 
 // Duration wiring sites for the effect time scale (see header section 3):
-//   combat-ailments-core.js (_egApplyStatusToMap)   - ailment durations
+//   combat-ailments-core.js (_applyStatusToMap)   - ailment durations
 //   class-cooldown-state.js (startSlotCooldown)      - ability cooldowns
 //   endgame-quiz-buffs.js (expiry, FX, toast label)  - quiz buff stacks
 //   universal-spells.js                              - spell durations
@@ -313,19 +313,19 @@ function _devTestRarityForLevel(level) {
 }
 
 function _devTestMakeItem(base, level, rarity) {
-    const table = _egGetModTable(base);
-    const { prefixCount, suffixCount } = _egRollModCounts(rarity);
+    const table = _getModTable(base);
+    const { prefixCount, suffixCount } = _rollModCounts(rarity);
     const mods = (table && prefixCount + suffixCount > 0)
-        ? _egRollMods(prefixCount, suffixCount, table, level, base.defenses) : [];
+        ? _rollMods(prefixCount, suffixCount, table, level, base.defenses) : [];
     const baseName = base.name;
     let implicits = [];
-    try { implicits = _egRollImplicitsForBase(base) || []; } catch (e) { implicits = []; }
+    try { implicits = _rollImplicitsForBase(base) || []; } catch (e) { implicits = []; }
     return {
         id: `${base.id}_${Date.now()}_${Math.floor(Math.random() * 100000)}`,
         baseId: base.id,
-        name: _egBuildItemName(baseName, rarity, mods),
+        name: _buildItemName(baseName, rarity, mods),
         baseName,
-        icon: base.icon || EG_SLOT_ICONS[base.slotType] || '📦',
+        icon: base.icon || SLOT_ICONS[base.slotType] || '📦',
         category: 'equip',
         slotType: base.slotType,
         archetype: base.archetype,
@@ -359,7 +359,7 @@ function _devTestFilledSlotCount(level) {
 function _devTestGear(level, cls) {
     // Brand-new characters own only the tutorial's starter sword.
     if (level < 8) {
-        const sword = EG_ALL_BASE_TYPES.find(b => b.id === DEV_TEST_STARTER_SWORD_ID);
+        const sword = ALL_BASE_TYPES.find(b => b.id === DEV_TEST_STARTER_SWORD_ID);
         if (!sword) return {};
         const item = _devTestMakeItem(sword, sword.minLevel, 'common');
         item.noSellValue = true;
@@ -369,11 +369,11 @@ function _devTestGear(level, cls) {
     const rarity = _devTestRarityForLevel(level);
     const equipped = {};
     const slotsBySlotType = {};
-    for (const [slotId, slotType] of Object.entries(EG_SLOT_ACCEPTS)) {
+    for (const [slotId, slotType] of Object.entries(SLOT_ACCEPTS)) {
         (slotsBySlotType[slotType] = slotsBySlotType[slotType] || []).push(slotId);
     }
     for (const [slotType, slotIds] of Object.entries(slotsBySlotType)) {
-        let pool = EG_ALL_BASE_TYPES.filter(b => b.slotType === slotType && b.minLevel <= level);
+        let pool = ALL_BASE_TYPES.filter(b => b.slotType === slotType && b.minLevel <= level);
         if (slotType === 'weapon') pool = pool.filter(b => b.hands !== 2); // 1H main hand so the shield slot stays usable
         if (!pool.length) continue;
         const pref = pool.filter(b => b.archetype === want || b.archetype === 'any');
@@ -438,9 +438,9 @@ function devCheatFillTestSlots() {
         s.ascendencySkill2Level = asc ? rank : 1;
         s.egGold = DEV_TEST_GOLD;
         s.egHubVisited = true;
-        s.egCurrencyStash = _devTestStash(EG_CURRENCY_ROWS, EG_CURRENCY_COLS, EG_CURRENCY_SLOT_MAP, _egCurrencyDefForId, 'currency', 'currency');
+        s.egCurrencyStash = _devTestStash(CURRENCY_ROWS, CURRENCY_COLS, CURRENCY_SLOT_MAP, _currencyDefForId, 'currency', 'currency');
         s.egEquipped = _devTestGear(level, cls);
-        s.egEssenceStash = _devTestStash(EG_ESSENCE_ROWS, EG_ESSENCE_COLS, EG_ESSENCE_SLOT_MAP, _egEssenceDefForId, 'essence', 'essence');
+        s.egEssenceStash = _devTestStash(ESSENCE_ROWS, ESSENCE_COLS, ESSENCE_SLOT_MAP, _essenceDefForId, 'essence', 'essence');
 
         try {
             localStorage.setItem(_devTestSlotKey(slotNum), JSON.stringify(s));
@@ -467,7 +467,7 @@ DevTest.fillTestSlots = devCheatFillTestSlots;
 // real fights instead of guesses.
 //
 // Pure observer: a 250 ms poll of the live combat globals plus one guarded
-// call from _egPlayerTakeDamage (encounter-damage.js) for attribution.
+// call from _playerTakeDamage (encounter-damage.js) for attribution.
 // Nothing here changes how a fight plays. Stored in localStorage under
 // FIGHTLOG_KEY, capped at FIGHTLOG_MAX entries.
 
@@ -488,14 +488,14 @@ function _flWrite(list) {
 
 // Active quiz damage buff as a percentage (stacks x 10); 0 when none.
 function _flQuizBuffPct() {
-    try { return Math.round((_egQuizDamageBuffMult() - 1) * 1000) / 10; } catch (e) { return 0; }
+    try { return Math.round((_quizDamageBuffMult() - 1) * 1000) / 10; } catch (e) { return 0; }
 }
 
 function _flBuildSnapshot() {
     const S = STATE || {};
     const sheet = {};
     try {
-        const stats = _egComputePlayerStats() || {};
+        const stats = _computePlayerStats() || {};
         for (const [k, v] of Object.entries(stats)) {
             if (typeof v === 'number' && Number.isFinite(v) && v !== 0) sheet[k] = Math.round(v * 100) / 100;
         }
@@ -518,13 +518,13 @@ function _flBuildSnapshot() {
             asc1: S.ascendencySkill1Level, asc2: S.ascendencySkill2Level,
         },
         passivePointsAllocated: S.passiveTreeAllocated ? Array.from(S.passiveTreeAllocated).length : 0,
-        equippedCount: Object.keys(globalThis._egEquipped || S.egEquipped || {}).length,
+        equippedCount: Object.keys(globalThis._equipped || S.egEquipped || {}).length,
         sheet,
     };
 }
 
 function _flStart(boss) {
-    const trial = (typeof globalThis._egIsTrialRun === 'function') ? globalThis._egIsTrialRun() : null;
+    const trial = (typeof globalThis._isTrialRun === 'function') ? globalThis._isTrialRun() : null;
     const now = Date.now();
     _flCur = {
         v: 1,
@@ -540,7 +540,7 @@ function _flStart(boss) {
             element: boss.element || null,
         },
         trial: trial ? { kind: trial.kind || null, world: trial.wi != null ? trial.wi + 1 : (trial.world || null) } : null,
-        killsBefore: Number(globalThis._egBossKilledCount) || 0,
+        killsBefore: Number(globalThis._bossKilledCount) || 0,
         player: _flBuildSnapshot(),
         damageTaken: 0,
         hitCount: 0,
@@ -590,7 +590,7 @@ function _flFinish(result) {
     } catch (e) { /* toast optional */ }
 }
 
-// Attribution hook called from _egPlayerTakeDamage with the HP actually lost.
+// Attribution hook called from _playerTakeDamage with the HP actually lost.
 window.__fightLogHit = function (amount, isSpell, element, isBossAbility, attacker) {
     const f = _flCur;
     if (!f || !(amount > 0)) return;
@@ -608,7 +608,7 @@ window.__fightLogHit = function (amount, isSpell, element, isBossAbility, attack
     f.lastHit = { key, amount, top, at: Date.now(), element };
 };
 
-// Names the hit _egPlayerTakeDamage just recorded: boss abilities report
+// Names the hit _playerTakeDamage just recorded: boss abilities report
 // their mechanic ("Void Line", "Null Ray", ...) right after the damage lands,
 // so the generic "(boss ability) [spell]" bucket is split per mechanic.
 window.__fightLogAbility = function (dealt, bossName, abilityName) {
@@ -631,7 +631,7 @@ window.__fightLogAbility = function (dealt, bossName, abilityName) {
 };
 
 // HP lost to ailment damage over time (burn, shadow burn, bleed, poison...):
-// it never passes through _egPlayerTakeDamage, so it needs its own hook.
+// it never passes through _playerTakeDamage, so it needs its own hook.
 window.__fightLogDot = function (amount, keys) {
     const f = _flCur;
     if (!f || !(amount > 0)) return;
@@ -645,8 +645,8 @@ window.__fightLogDot = function (amount, keys) {
 
 function _flPoll() {
     let active = false;
-    try { active = !!_egIsActive(); } catch (e) { active = false; }
-    const monsters = Array.isArray(globalThis._egMonsters) ? globalThis._egMonsters : [];
+    try { active = !!_isActive(); } catch (e) { active = false; }
+    const monsters = Array.isArray(globalThis._monsters) ? globalThis._monsters : [];
 
     if (!_flCur) {
         if (!active) return;
@@ -664,7 +664,7 @@ function _flPoll() {
     if (hp <= 0) { _flFinish('loss'); return; }
 
     if (!boss || boss.currentHP <= 0) {
-        const killed = (Number(globalThis._egBossKilledCount) || 0) > f.killsBefore || (boss && boss.currentHP <= 0);
+        const killed = (Number(globalThis._bossKilledCount) || 0) > f.killsBefore || (boss && boss.currentHP <= 0);
         _flFinish(killed ? 'win' : 'left');
         return;
     }
@@ -684,7 +684,7 @@ function _flPoll() {
         f.timeline.push([
             Math.round((now - f.startedMs) / 100) / 10,
             Math.round(hp),
-            Math.round(Number(globalThis._egPlayerAbsorptionCurrent) || 0),
+            Math.round(Number(globalThis._playerAbsorptionCurrent) || 0),
             Math.round(bossPct * 10) / 10,
         ]);
     }
@@ -714,7 +714,7 @@ DevTest.clearFightLog = function () {
 //------------------------------------------------------------------------
 //-------------------LEVEL LOCK (constant-level balance tests)-------------
 //------------------------------------------------------------------------
-// While locked, _egAwardXP (endgame-leveling.js) awards nothing, so the
+// While locked, _awardXP (endgame-leveling.js) awards nothing, so the
 // character stays at exactly its level through monster kills, trial chains
 // and level clears - fights stay comparable. Persisted across reloads.
 // Button: "🔒 Level Lock" on the dev mode-select screen; console:

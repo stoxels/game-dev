@@ -3,7 +3,7 @@
 // encounter-melee-arts.js and is never gated by this presentation layer.
 
 import { Audio_Manager } from '../audio/audio.js';
-import { _egGetElementCentre } from './combat-class-projectiles.js';
+import { _getElementCentre } from './combat-class-projectiles.js';
 
 //------------------------------------------------------------------------
 //-------------------SEQUENCED DELIVERY (visible arts)--------------------
@@ -13,13 +13,13 @@ import { _egGetElementCentre } from './combat-class-projectiles.js';
 // Frozen timing bands for the outbound dash, arrival beat, sky leap, and
 // return glide. Every flight has a safety fallback and resolves rather than
 // rejecting, so presentation can never strand the gameplay follow-through.
-export const EG_MELEE_DELIVERY_OUT_MIN_MS = 550;
-export const EG_MELEE_DELIVERY_OUT_MAX_MS = 1150;
-export const EG_MELEE_DELIVERY_ARRIVAL_BEAT_MS = 170;
-export const EG_MELEE_DELIVERY_RETURN_MS = 550;
-export const EG_MELEE_DELIVERY_LEAP_MS = 700;
+export const MELEE_DELIVERY_OUT_MIN_MS = 550;
+export const MELEE_DELIVERY_OUT_MAX_MS = 1150;
+export const MELEE_DELIVERY_ARRIVAL_BEAT_MS = 170;
+export const MELEE_DELIVERY_RETURN_MS = 550;
+export const MELEE_DELIVERY_LEAP_MS = 700;
 
-function _egMeleeReducedMotion() {
+function _meleeReducedMotion() {
     try {
         return !!(typeof window !== 'undefined' && window.matchMedia
             && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -28,10 +28,10 @@ function _egMeleeReducedMotion() {
 
 // True when a sequenced delivery can be seen: the avatar and target card
 // exist, WAAPI is available, and reduced motion is not active.
-export function _egMeleeDeliveryAvailable(targetId) {
+export function _meleeDeliveryAvailable(targetId) {
     try {
         if (typeof document === 'undefined') return false;
-        if (_egMeleeReducedMotion()) return false;
+        if (_meleeReducedMotion()) return false;
         const avatar = document.getElementById('player-avatar-wrapper');
         const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
         if (!avatar || !card) return false;
@@ -40,7 +40,7 @@ export function _egMeleeDeliveryAvailable(targetId) {
     } catch (e) { return false; }
 }
 
-function _egMeleeWaitMs(ms) {
+function _meleeWaitMs(ms) {
     return new Promise((resolve) => {
         try { setTimeout(resolve, Math.max(0, ms || 0)); }
         catch (e) { resolve(); }
@@ -49,7 +49,7 @@ function _egMeleeWaitMs(ms) {
 
 // Cancels in-flight avatar motion so each awaited leg starts from the
 // laid-out position. Only already-active presentation is cut short.
-function _egMeleeSnapAvatar() {
+function _meleeSnapAvatar() {
     try {
         const avatar = document.getElementById('player-avatar-wrapper');
         if (avatar && typeof avatar.getAnimations === 'function') {
@@ -58,20 +58,20 @@ function _egMeleeSnapAvatar() {
     } catch (e) {}
 }
 
-// Last visual offset from _egMeleeFlyLeg. The return glide starts from this
+// Last visual offset from _meleeFlyLeg. The return glide starts from this
 // parked position; this state never gates damage.
-let _egMeleeParkedOffset = { x: 0, y: 0 };
+let _meleeParkedOffset = { x: 0, y: 0 };
 
 // Moves the avatar from its laid-out spot toward the target card. Arc lifts
 // the midpoint and scale grows the sprite; a safety timeout always resolves.
-function _egMeleeFlyLeg(targetId, durationMs, arc, scale) {
+function _meleeFlyLeg(targetId, durationMs, arc, scale) {
     try {
         const avatar = document.getElementById('player-avatar-wrapper');
         const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
         if (!avatar || !card || typeof avatar.animate !== 'function') return Promise.resolve();
-        _egMeleeSnapAvatar();
-        const a = _egGetElementCentre(avatar);
-        const b = _egGetElementCentre(card);
+        _meleeSnapAvatar();
+        const a = _getElementCentre(avatar);
+        const b = _getElementCentre(card);
         // Aim to land ON the card, slightly short so the sprite overlaps
         // its edge instead of hiding dead-centre behind it.
         const dx = (b.x - a.x) * 0.82, dy = (b.y - a.y) * 0.82;
@@ -91,7 +91,7 @@ function _egMeleeFlyLeg(targetId, durationMs, arc, scale) {
                 { transform: `translate(${x1}px, ${y1}px) scale(${s1})` },
             ];
         }
-        _egMeleeParkedOffset = { x: dx, y: dy };
+        _meleeParkedOffset = { x: dx, y: dy };
         let anim = null;
         try { anim = avatar.animate(frames, { duration: dur, easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)', fill: 'forwards' }); }
         catch (e) { return Promise.resolve(); }
@@ -110,7 +110,7 @@ function _egMeleeFlyLeg(targetId, durationMs, arc, scale) {
 
 // Raises the avatar above monster cards for a flight and returns a
 // re-entrant restore function. Failure leaves the current style untouched.
-export function _egMeleeRaiseAvatar() {
+export function _meleeRaiseAvatar() {
     try {
         const avatar = document.getElementById('player-avatar-wrapper');
         if (!avatar) return () => {};
@@ -132,54 +132,54 @@ export function _egMeleeRaiseAvatar() {
 
 // Moves the avatar to the primary target at a readable pace, then holds
 // the frozen arrival beat before the caller applies the impact.
-export function _egMeleeDashOut(targetId) {
+export function _meleeDashOut(targetId) {
     Audio_Manager.playSFX('art_dash_strike');
     try {
         const avatar = document.getElementById('player-avatar-wrapper');
         const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
         if (!avatar || !card) return Promise.resolve();
-        const a = _egGetElementCentre(avatar);
-        const b = _egGetElementCentre(card);
+        const a = _getElementCentre(avatar);
+        const b = _getElementCentre(card);
         const dist = Math.hypot(b.x - a.x, b.y - a.y) || 0;
-        const dur = Math.min(EG_MELEE_DELIVERY_OUT_MAX_MS,
-            Math.max(EG_MELEE_DELIVERY_OUT_MIN_MS, Math.round(420 + dist * 0.55)));
-        return _egMeleeFlyLeg(targetId, dur, 0, 1.08)
-            .then(() => _egMeleeWaitMs(EG_MELEE_DELIVERY_ARRIVAL_BEAT_MS));
+        const dur = Math.min(MELEE_DELIVERY_OUT_MAX_MS,
+            Math.max(MELEE_DELIVERY_OUT_MIN_MS, Math.round(420 + dist * 0.55)));
+        return _meleeFlyLeg(targetId, dur, 0, 1.08)
+            .then(() => _meleeWaitMs(MELEE_DELIVERY_ARRIVAL_BEAT_MS));
     } catch (e) { return Promise.resolve(); }
 }
 
 // Moves the avatar along the frozen high arc to the secondary victim.
-export function _egMeleeLeapTo(victimId) {
+export function _meleeLeapTo(victimId) {
     Audio_Manager.playSFX('art_sky_leap');
-    return _egMeleeFlyLeg(victimId, EG_MELEE_DELIVERY_LEAP_MS, 110, 1.18);
+    return _meleeFlyLeg(victimId, MELEE_DELIVERY_LEAP_MS, 110, 1.18);
 }
 
 // Returns the avatar from its parked offset to the laid-out position.
-export function _egMeleeGlideHome() {
+export function _meleeGlideHome() {
     try {
         const avatar = document.getElementById('player-avatar-wrapper');
         if (!avatar || typeof avatar.animate !== 'function') {
-            _egMeleeParkedOffset = { x: 0, y: 0 };
+            _meleeParkedOffset = { x: 0, y: 0 };
             return Promise.resolve();
         }
-        const ox = _egMeleeParkedOffset.x || 0, oy = _egMeleeParkedOffset.y || 0;
-        _egMeleeParkedOffset = { x: 0, y: 0 };
+        const ox = _meleeParkedOffset.x || 0, oy = _meleeParkedOffset.y || 0;
+        _meleeParkedOffset = { x: 0, y: 0 };
         if (Math.hypot(ox, oy) < 1) {
-            _egMeleeSnapAvatar();
+            _meleeSnapAvatar();
             return Promise.resolve();
         }
-        const dur = EG_MELEE_DELIVERY_RETURN_MS;
+        const dur = MELEE_DELIVERY_RETURN_MS;
         let anim = null;
         try {
             anim = avatar.animate([
                 { transform: `translate(${ox.toFixed(1)}px, ${oy.toFixed(1)}px)` },
                 { transform: 'translate(0px, 0px)' },
             ], { duration: dur, easing: 'cubic-bezier(0.3, 0.6, 0.4, 1)' });
-        } catch (e) { _egMeleeSnapAvatar(); return Promise.resolve(); }
+        } catch (e) { _meleeSnapAvatar(); return Promise.resolve(); }
         return new Promise((resolve) => {
             let done = false;
             const fin = () => {
-                if (!done) { done = true; _egMeleeSnapAvatar(); resolve(); }
+                if (!done) { done = true; _meleeSnapAvatar(); resolve(); }
             };
             try {
                 if (anim && 'onfinish' in Object(anim)) anim.onfinish = fin;

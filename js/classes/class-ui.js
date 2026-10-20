@@ -1009,7 +1009,7 @@ export function confirmAscendencySelection(aid) {
 
     STATE.playerAscendency = aid;
     // Safety net for the -30% resistance penalty (normally applied at trial clear).
-    if (typeof globalThis._egAdvanceResistPenaltyStage === 'function') globalThis._egAdvanceResistPenaltyStage(1);
+    if (typeof globalThis._advanceResistPenaltyStage === 'function') globalThis._advanceResistPenaltyStage(1);
     STATE.ascendencySkill1Level = 1;
     STATE.ascendencySkill2Level = 1;
 

@@ -7,7 +7,7 @@ import { pickRandomItem } from '../puzzle-items/item-pool.js';
 import { buildInventoryPanel } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { _escapeToastHtml, puzzleItemIconHtml, showHtmlToast, showItemGainPopup, showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { LEDGER_CATEGORIES, _MILESTONE_MAP, _milestoneEffectiveReward } from './inference-data.js';
-import { _egScriptedLootLevel, egGrantScriptedLoot } from '../loot/loot-map-completion-reward.js';
+import { _egScriptedLootLevel, grantScriptedLoot } from '../loot/loot-map-completion-reward.js';
 import { _incDirect } from './inference-stats.js';
 import { renderQuestLog } from './inference-ui.js';
 
@@ -151,7 +151,7 @@ function _reward_grantPassivePoints(amount) {
 // Grants all rewards defined on a milestone: passive-tree points, items and
 // loot. Also triggers the reward SFX. Returns { itemIds, loot }: the defIds
 // of every puzzle item actually granted (resolved, non-null) and the loot
-// pieces (see egGrantScriptedLoot) that landed in the stashes.
+// pieces (see grantScriptedLoot) that landed in the stashes.
 function _reward_grantAll(ms) {
     Audio_Manager.playSFX('questRewardClaimed');
     const reward = _milestoneEffectiveReward(ms);
@@ -168,7 +168,7 @@ function _reward_grantAll(ms) {
 
     const loot = [];
     reward.loot.forEach(spec => {
-        const got = egGrantScriptedLoot(spec.kind, _egScriptedLootLevel(), spec.tier);
+        const got = grantScriptedLoot(spec.kind, _egScriptedLootLevel(), spec.tier);
         if (got) loot.push(got);
     });
 

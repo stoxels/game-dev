@@ -1,18 +1,18 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
-import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';
-import { EG_SLOT_MOD_TABLE_MAP } from './loot-equipment-mod-tables.js';
-import { EG_SHARD_DEFS, _egRollShardForItem, egAddShard } from './loot-shards.js';
-import { _egIsActive } from '../combat/combat-state.js';
-import { _egLootFilter, _egLoadLootFilter } from './loot-filter-state.js';
+import { ALL_BASE_TYPES } from './equipment-base-items.js';
+import { SLOT_MOD_TABLE_MAP } from './loot-equipment-mod-tables.js';
+import { SHARD_DEFS, _rollShardForItem, addShard } from './loot-shards.js';
+import { _isActive } from '../combat/combat-state.js';
+import { _lootFilter, _loadLootFilter } from './loot-filter-state.js';
 
 //------------------------------------------------------------------------
 //-------------------LOOT FILTER MATCHER-----------------------------------
 //------------------------------------------------------------------------
 
 // Returns true when every enabled condition in one rule matches an item.
-export function _eglfRuleMatches(rule, item) {
+export function _lootFilterRuleMatches(rule, item) {
     if (rule.slot !== 'any' && item.slotType !== rule.slot) return false;
     if (rule.baseId !== 'any' && item.baseId !== rule.baseId) return false;
     if (rule.maxIlvl > 0 && !(item.itemLevel != null && item.itemLevel <= rule.maxIlvl)) return false;
@@ -32,19 +32,19 @@ export function _eglfRuleMatches(rule, item) {
 }
 
 // Returns true when an item is eligible for automatic vendoring.
-export function _egLootFilterShouldVendor(item, workingFilter = null) {
+export function _lootFilterShouldVendor(item, workingFilter = null) {
     if (!item || item.category !== 'equip') return false;
-    if (!_egLootFilter && !workingFilter) _egLoadLootFilter();
-    const filter = workingFilter || _egLootFilter;
+    if (!_lootFilter && !workingFilter) _loadLootFilter();
+    const filter = workingFilter || _lootFilter;
     if (!filter.enabled || item.noSellValue) return false;
     if (filter.keepUnique && item.isUnique) return false;
     const rules = filter.rules.filter(r => r.enabled);
-    return rules.length > 0 && rules.some(rule => _eglfRuleMatches(rule, item));
+    return rules.length > 0 && rules.some(rule => _lootFilterRuleMatches(rule, item));
 }
 
 // Returns true when automatic vendoring keeps an item in the stash.
-export function _egLootFilterKeeps(item) {
-    return !_egLootFilterShouldVendor(item);
+export function _lootFilterKeeps(item) {
+    return !_lootFilterShouldVendor(item);
 }
 
 //------------------------------------------------------------------------
@@ -52,16 +52,16 @@ export function _egLootFilterKeeps(item) {
 //------------------------------------------------------------------------
 
 // Converts a matching pickup into a shard and mirrors it in run currency.
-export function _egLootFilterAutoVendor(item) {
-    if (!_egLootFilterShouldVendor(item)) return false;
-    const shardDef = (item.isUnique && typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS.shard_ancient)
-        ? EG_SHARD_DEFS.shard_ancient
-        : (typeof _egRollShardForItem === 'function' ? _egRollShardForItem(item) : null);
+export function _lootFilterAutoVendor(item) {
+    if (!_lootFilterShouldVendor(item)) return false;
+    const shardDef = (item.isUnique && typeof SHARD_DEFS !== 'undefined' && SHARD_DEFS.shard_ancient)
+        ? SHARD_DEFS.shard_ancient
+        : (typeof _rollShardForItem === 'function' ? _rollShardForItem(item) : null);
     if (!shardDef) return false;
 
     let granted = false;
     try {
-        granted = (typeof egAddShard === 'function') ? egAddShard(shardDef.id, 1) : false;
+        granted = (typeof addShard === 'function') ? addShard(shardDef.id, 1) : false;
     } catch (e) { granted = false; }
     if (!granted) {
         if (typeof showToast === 'function') {
@@ -70,11 +70,11 @@ export function _egLootFilterAutoVendor(item) {
         return false;
     }
 
-    if (typeof _egRunCurrency !== 'undefined' && Array.isArray(globalThis._egRunCurrency)
-        && (typeof _egIsActive !== 'function' || _egIsActive())) {
-        const existing = globalThis._egRunCurrency.find(e => e.id === shardDef.id);
+    if (typeof _runCurrency !== 'undefined' && Array.isArray(globalThis._runCurrency)
+        && (typeof _isActive !== 'function' || _isActive())) {
+        const existing = globalThis._runCurrency.find(e => e.id === shardDef.id);
         if (existing) existing.count = (existing.count || 1) + 1;
-        else globalThis._egRunCurrency.push({
+        else globalThis._runCurrency.push({
             id: shardDef.id, name: shardDef.name, icon: shardDef.icon,
             description: shardDef.description, count: 1,
         });
@@ -97,10 +97,10 @@ export function _egLootFilterAutoVendor(item) {
 //------------------------------------------------------------------------
 
 // Returns distinct slot types in stable first-seen order.
-export function _eglfSlotTypes() {
+export function _lootFilterSlotTypes() {
     const out = [];
-    if (typeof EG_ALL_BASE_TYPES !== 'undefined') {
-        for (const b of EG_ALL_BASE_TYPES) {
+    if (typeof ALL_BASE_TYPES !== 'undefined') {
+        for (const b of ALL_BASE_TYPES) {
             if (b.slotType && !out.includes(b.slotType)) out.push(b.slotType);
         }
     }
@@ -108,16 +108,16 @@ export function _eglfSlotTypes() {
 }
 
 // Returns base types available for one slot.
-export function _eglfBasesForSlot(slot) {
-    if (typeof EG_ALL_BASE_TYPES === 'undefined') return [];
-    return EG_ALL_BASE_TYPES.filter(b => slot === 'any' || b.slotType === slot);
+export function _lootFilterBasesForSlot(slot) {
+    if (typeof ALL_BASE_TYPES === 'undefined') return [];
+    return ALL_BASE_TYPES.filter(b => slot === 'any' || b.slotType === slot);
 }
 
 // Returns localized modifier families available for one slot.
-export function _eglfModFamiliesForSlot(slot) {
+export function _lootFilterModFamiliesForSlot(slot) {
     const out = [];
-    if (typeof EG_SLOT_MOD_TABLE_MAP === 'undefined') return out;
-    const getter = EG_SLOT_MOD_TABLE_MAP[slot];
+    if (typeof SLOT_MOD_TABLE_MAP === 'undefined') return out;
+    const getter = SLOT_MOD_TABLE_MAP[slot];
     if (!getter) return out;
     let table = null;
     try { table = getter(); } catch (e) { table = null; }
@@ -138,11 +138,11 @@ export function _eglfModFamiliesForSlot(slot) {
 }
 
 // Returns every modifier family across all slots.
-export function _eglfAllModFamilies() {
+export function _lootFilterAllModFamilies() {
     const out = [];
     const seen = new Set();
-    for (const slot of _eglfSlotTypes()) {
-        for (const fam of _eglfModFamiliesForSlot(slot)) {
+    for (const slot of _lootFilterSlotTypes()) {
+        for (const fam of _lootFilterModFamiliesForSlot(slot)) {
             if (!seen.has(fam.id)) { seen.add(fam.id); out.push(fam); }
         }
     }

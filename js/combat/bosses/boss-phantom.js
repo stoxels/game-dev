@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE PHANTOM (boss_phantom)---------------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_phantom: {
         id: 'boss_phantom', name: 'The Phantom', emoji: '👻',
         baseHP: 1040, baseDamage: 24, chargeMax: 11,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_phantom: {
         phases: [
             { threshold: 1.00, chargeMax: 11, damageMultiplier: 1.00 },
@@ -29,8 +29,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'vent_ambush', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechVentAmbush' },
-            { name: 'fog_bank', intervalBase: 22000, intervalVariance: 5000, handler: '_egMechFogBank' },
+            { name: 'vent_ambush', intervalBase: 20000, intervalVariance: 5000, handler: '_mechVentAmbush' },
+            { name: 'fog_bank', intervalBase: 22000, intervalVariance: 5000, handler: '_mechFogBank' },
         ],
     },
 });
@@ -38,35 +38,35 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // Slash strikes from the vent nearest the player, telegraphed first.
 // Keep moving so no vent stays the nearest one for long.
-export function _egMechVentAmbush(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechVentAmbush(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const strikes = [0, 3, 4, 5][p];
     const warnMs = 800, slashR = 90;
     const dmgPct = [0, 0.18, 0.22, 0.27][p];
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const vents = [0.25, 0.5, 0.75].map(fx => {
-        const el = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-vent', '🕳️');
+        const el = _nkEl(run, 'div', 'eg-nk-dot eg-nk-vent', '🕳️');
         const v = { x: window.innerWidth * fx, y: window.innerHeight * 0.75, el };
         el.style.transform = 'translate(' + Math.round(v.x - 22) + 'px,' + Math.round(v.y - 22) + 'px)';
         return v;
     });
-    _egNkToast('eg_mech_phantom', '👻 The Phantom: Vent Ambush! Never linger by a vent!');
+    _nkToast('eg_mech_phantom', '👻 The Phantom: Vent Ambush! Never linger by a vent!');
     let idx = 0, stage = 'pick', t = 0, vent = null, mark = null;
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         if (idx >= strikes) return false;
         t += dtS * 1000;
         if (stage === 'pick') {
             // Strike from the vent nearest the player - always personal.
-            const c = _egNkPlayerCenter();
+            const c = _nkPlayerCenter();
             vent = vents[0];
             if (c) {
                 vent = vents.slice().sort((a, b) =>
                     Math.hypot(c.x - a.x, c.y - a.y) - Math.hypot(c.x - b.x, c.y - b.y))[0];
             }
             vent.el.classList.add('eg-nk-fuse');
-            mark = _egNkEl(run, 'div', 'eg-nk-mark');
+            mark = _nkEl(run, 'div', 'eg-nk-mark');
             mark.style.left = Math.round(vent.x - slashR) + 'px';
             mark.style.top = Math.round(vent.y - slashR) + 'px';
             mark.style.width = slashR * 2 + 'px';
@@ -78,16 +78,16 @@ export function _egMechVentAmbush(monster, phase) {
                 stage = 'slash';
                 t = 0;
                 vent.el.classList.remove('eg-nk-fuse');
-                const ghost = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-assassin', '👻');
+                const ghost = _nkEl(run, 'div', 'eg-nk-dot eg-nk-assassin', '👻');
                 ghost.style.transform = 'translate(' + Math.round(vent.x - 22) + 'px,' + Math.round(vent.y - 22) + 'px)';
                 setTimeout(() => ghost.remove(), 450);
                 if (mark) {
                     mark.classList.add('eg-nk-mark-hit');
                     setTimeout(() => { if (mark) { mark.remove(); mark = null; } }, 400);
                 }
-                if (_egNkCircleHit(vent.x, vent.y, slashR, _egNkPlayerRect(), 0)) {
-                    const dealt = _egNkHit(dmgPct, 'shadow', level);
-                    _egNkAbilityHitToast(dealt, 'The Phantom', 'Vent Ambush');
+                if (_nkCircleHit(vent.x, vent.y, slashR, _nkPlayerRect(), 0)) {
+                    const dealt = _nkHit(dmgPct, 'shadow', level);
+                    _nkAbilityHitToast(dealt, 'The Phantom', 'Vent Ambush');
                 }
             }
         } else if (stage === 'slash') {

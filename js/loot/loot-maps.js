@@ -1,8 +1,8 @@
 import { egAtlasDropNodeIds, egAtlasNodeById, egAtlasNodeName, egAtlasPickDropNodeId, egAtlasPickNodeIdForTier } from '../endgame/endgame-atlas.js';
-import { EG_MOD_CAPS, _egRollModCounts, _egRollRarity } from './loot-equipment-generator.js';
+import { ITEM_MOD_CAPS, _rollModCounts, _rollRarity } from './loot-equipment-generator.js';
 import { _egActiveMapItem } from '../endgame/endgame-map-launch.js';
-import {_egBuildItemName} from './loot-mod-naming.js';
-import {_egBuildModPool, _egBuildRolledStats, _egPickModFromPool, _egPickTier, _egRollMods} from './loot-mod-application.js';
+import {_buildItemName} from './loot-mod-naming.js';
+import {_buildModPool, _buildRolledStats, _pickModFromPool, _pickTier, _rollMods} from './loot-mod-application.js';
 import { _egWithImplicits } from './loot-map-implicits.js';
 import { EG_MAX_MAP_TIER, _egMapTierMonsterLevel, _egPickMapBaseName, _egRollMapTier } from './loot-map-config.js';
 import { EG_MAP_MOD_TABLES } from './loot-map-mod-tables.js';
@@ -58,7 +58,7 @@ export function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts =
             if (node) normalName = egAtlasNodeName(node);
         }
         if (!normalName) normalName = _egPickMapBaseName(mapTier);
-        const name = _egBuildItemName(normalName, 'common', []);
+        const name = _buildItemName(normalName, 'common', []);
         return _egWithImplicits({
             id: `map_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
             baseId: 'atlas_map',
@@ -78,10 +78,10 @@ export function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts =
         });
     }
 
-    const rarity = _egRollRarity();
-    const { prefixCount, suffixCount } = _egRollModCounts(rarity);
+    const rarity = _rollRarity();
+    const { prefixCount, suffixCount } = _rollModCounts(rarity);
     const mods = (prefixCount + suffixCount) > 0
-        ? _egRollMods(prefixCount, suffixCount, EG_MAP_MOD_TABLES, monsterLevel, null)
+        ? _rollMods(prefixCount, suffixCount, EG_MAP_MOD_TABLES, monsterLevel, null)
         : [];
 
     // Prefer a concrete atlas region for this tier; fall back to the
@@ -98,7 +98,7 @@ export function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts =
     }
     if (!baseName) baseName = _egPickMapBaseName(mapTier);
 
-    const name = _egBuildItemName(baseName, rarity, mods);
+    const name = _buildItemName(baseName, rarity, mods);
 
     return _egWithImplicits({
         id: `map_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
@@ -154,8 +154,8 @@ export function _egResolveAtlasDropTarget(isBoss) {
 
 // Rerolls ALL mods of a map at the given rarity/counts (orb support).
 export function _egRerollMapMods(map, rarity, prefixCount, suffixCount) {
-    const mods = _egRollMods(prefixCount, suffixCount, EG_MAP_MOD_TABLES, map.itemLevel || map.monsterLevel || 1, null);
-    const name = _egBuildItemName(map.baseName || map.name, rarity, mods);
+    const mods = _rollMods(prefixCount, suffixCount, EG_MAP_MOD_TABLES, map.itemLevel || map.monsterLevel || 1, null);
+    const name = _buildItemName(map.baseName || map.name, rarity, mods);
     return _egWithImplicits({ ...map, rarity, mods, name });
 }
 
@@ -165,7 +165,7 @@ export function _egAddOneModToMap(map, rarityForCaps) {
     const chosenFamilyIds = new Set(existing.map(m => m.familyId));
     const prefixCount = existing.filter(m => m.type === 'prefix').length;
     const suffixCount = existing.filter(m => m.type === 'suffix').length;
-    const cap = EG_MOD_CAPS[rarityForCaps];
+    const cap = ITEM_MOD_CAPS[rarityForCaps];
 
     const sections = [];
     if (prefixCount < cap.maxPre) sections.push({ type: 'prefix', pool: EG_MAP_MOD_TABLES.prefixes });
@@ -173,16 +173,16 @@ export function _egAddOneModToMap(map, rarityForCaps) {
     if (sections.length === 0) return map;
 
     const chosen = sections[Math.floor(Math.random() * sections.length)];
-    const pool = _egBuildModPool(chosen.pool, map.itemLevel || map.monsterLevel || 1, chosenFamilyIds, null);
-    const entry = _egPickModFromPool(pool);
+    const pool = _buildModPool(chosen.pool, map.itemLevel || map.monsterLevel || 1, chosenFamilyIds, null);
+    const entry = _pickModFromPool(pool);
     if (!entry) return map;
 
-    const tier = _egPickTier(entry.tiers);
+    const tier = _pickTier(entry.tiers);
     const newMod = {
         familyId: entry.familyId,
         type: chosen.type,
         tier: tier.tier,
-        rolledStats: _egBuildRolledStats(entry.family, tier),
+        rolledStats: _buildRolledStats(entry.family, tier),
     };
 
     return _egWithImplicits({ ...map, mods: [...existing, newMod] });
@@ -194,7 +194,7 @@ export function _egRemoveOneModFromMap(map) {
     if (existing.length === 0) return map;
     const index = Math.floor(Math.random() * existing.length);
     const mods = existing.filter((_, i) => i !== index);
-    const name = _egBuildItemName(map.baseName || map.name, map.rarity, mods);
+    const name = _buildItemName(map.baseName || map.name, map.rarity, mods);
     return _egWithImplicits({ ...map, mods, name });
 }
 

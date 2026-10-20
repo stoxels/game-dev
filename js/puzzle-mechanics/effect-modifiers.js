@@ -11,7 +11,7 @@ import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js
 // item_effect (passive tree): "Puzzle Items are #% more effective" as a
 // multiplier over the base effect. Read live so equips / respecs apply at once.
 function _treeItemEffectMult() {
-    const stats = typeof globalThis._egComputePlayerStats === 'function' ? globalThis._egComputePlayerStats() : null;
+    const stats = typeof globalThis._computePlayerStats === 'function' ? globalThis._computePlayerStats() : null;
     return 1 + (Math.max(0, Number(stats && stats.itemEffectPct) || 0) / 100);
 }
 

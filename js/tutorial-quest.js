@@ -1,25 +1,25 @@
 import { Audio_Manager } from './audio/audio.js';
 import { _getPlayerMaxMana, updateClassHUDManaBar } from './classes/class-mana.js';
-import { _egOnPause, _egOnResume } from './combat/encounter-tick-support.js';
-import { _egStopEncounter } from './combat/encounter-lifecycle.js';
-import { _egGetTarget } from './combat/encounter-charged-shot.js';
+import { _onPause, _onResume } from './combat/encounter-tick-support.js';
+import { _stopEncounter } from './combat/encounter-lifecycle.js';
+import { _getTarget } from './combat/encounter-charged-shot.js';
 import { startParryTutorial } from './combat/gauntlet.js';
-import { _egDamageTargetById } from './combat/encounter-monster-damage.js';
-import { _egSpawnMonster } from './combat/encounter-monster-spawning.js';
-import { EG_ALL_BASE_TYPES } from './loot/equipment-base-items.js';
-import { _egCellHasAnyDrop } from './combat/combat-grid-pickups.js';
-import { _egDropHeartPickup, _egStopPickupSpawner } from './combat/combat-grid-pickups-spawner.js';
-import { _egFlushRunLootToStash, _egRenderLootOverlay } from './combat/combat-grid-pickups-loot.js';
-import { _egRenderCurrencyDropOverlay } from './combat/combat-grid-pickups-currency.js';
-import { _egRenderItemDropOverlay } from './combat/combat-grid-pickups-items.js';
+import { _damageTargetById } from './combat/encounter-monster-damage.js';
+import { _spawnMonster } from './combat/encounter-monster-spawning.js';
+import { ALL_BASE_TYPES } from './loot/equipment-base-items.js';
+import { _cellHasAnyDrop } from './combat/combat-grid-pickups.js';
+import { _dropHeartPickup, _stopPickupSpawner } from './combat/combat-grid-pickups-spawner.js';
+import { _flushRunLootToStash, _renderLootOverlay } from './combat/combat-grid-pickups-loot.js';
+import { _renderCurrencyDropOverlay } from './combat/combat-grid-pickups-currency.js';
+import { _renderItemDropOverlay } from './combat/combat-grid-pickups-items.js';
 import { closeHubToGame, isHubGameOverlay, openHubFromGame, showEndgameHub } from './endgame/endgame-hub.js';
-import { _egAddItemToStash, _egInventory } from './endgame/hub-stash.js';
-import { egSaveHubState } from './endgame/hub-save.js';
-import { _egResetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
-import { _egGetAllEquippedItems } from './endgame/endgame-player-stats.js';
-import { _egCurrencyDrops, _egItemDrops, _egLootDrops, _egPickups } from './combat/combat-state.js';
-import { EG_CURRENCY_DEFS } from './loot/loot-currency.js';
-import { EG_VENDOR_FREE_BASE_IDS, _egvBuildBaseItemFromBase, _egvGetSlotOrder } from './loot/loot-vendor-equipment.js';
+import { _addItemToStash, _inventory } from './endgame/hub-stash.js';
+import { saveHubState } from './endgame/hub-save.js';
+import { _resetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
+import { _getAllEquippedItems } from './endgame/endgame-player-stats.js';
+import { _currencyDrops, _itemDrops, _lootDrops, _pickups } from './combat/combat-state.js';
+import { CURRENCY_DEFS } from './loot/loot-currency.js';
+import { VENDOR_FREE_BASE_IDS, _vendorBuildBaseItemFromBase, _vendorGetSlotOrder } from './loot/loot-vendor-equipment.js';
 import { renderCell, updClues } from './grid.js';
 import { keybindDisplayLabel, keybindKeyFor, onKeybindAction } from './keybinds.js';
 import { ALL } from './levels/levels.js';
@@ -34,7 +34,7 @@ import { _consumeItem } from './puzzle-items/use-item.js';
 import { questStat_revealItemUsed } from './inference/inference-stats.js';
 import { isPuzzleSolved } from './scoring/scoring-core.js';
 import { hideResultOverlays, showSetup } from './screens/screens.js';
-import { _charmMake, _charmRenderOverlay, _egCharmDrops, grantCharm, isSkillCharmUnlocked } from './skills/skill-charms.js';
+import { _charmMake, _charmRenderOverlay, _charmDrops, grantCharm, isSkillCharmUnlocked } from './skills/skill-charms.js';
 import { SKILL_REGISTRY, getSkillName } from './skills/skill-registry.js';
 import { closeSpellbook, isSpellbookOpen } from './skills/skill-spellbook.js';
 import { getUniversalSpellManaCost } from './skills/universal-spells.js';
@@ -99,7 +99,7 @@ const TQ_AMBIGUOUS_CELLS = [[0, 0], [1, 1]];
 const TQ_CORNER_CELLS = [[0, 0], [0, 1], [1, 0], [1, 1]];
 // Puzzle 2 is a FULL-PICTURE grid: every single cell belongs to the
 // solution (25 correct cells). A fresh, un-geared character deals exactly
-// EG_PLAYER_STATS.baseDamage (10) per correct fill, and the tutorial rat's
+// PLAYER_STATS.baseDamage (10) per correct fill, and the tutorial rat's
 // campaign HP budget (lvl.campaignMonsterHp = 55, ±15% spread → 47-63)
 // always dies a few fills in. The moment the rat dies the board locks and
 // the Professor's heart drops onto the grid (claimed with a left-click),
@@ -167,7 +167,7 @@ function _tqEnsureLevels() {
 }
 
 // Re-applies the tutorial monster stamp to puzzles 2 and 3. The encounter
-// teardown (_egStopEncounter → _egClearCampaignLevelFields(_egMapDef)) wipes
+// teardown (_stopEncounter → _clearCampaignLevelFields(_mapDef)) wipes
 // the stamped fields off the level object after EVERY p2/p3 run - defeat,
 // forfeit or completion alike. The level objects are reused for the whole
 // session, so the stamp must be refreshed before any restart. The
@@ -318,12 +318,12 @@ function _tqSetPaused(paused) {
         if (paused) {
             if (typeof pauseTimer === 'function') pauseTimer();
             globalThis._gamePaused = true;
-            if (typeof _egOnPause === 'function') { try { _egOnPause(); } catch (e) {} }
+            if (typeof _onPause === 'function') { try { _onPause(); } catch (e) {} }
         } else {
             if (typeof isHubGameOverlay === 'function' && isHubGameOverlay()) return;
             if (typeof isTreeGameOverlay === 'function' && isTreeGameOverlay()) return;
             globalThis._gamePaused = false;
-            if (typeof _egOnResume === 'function') { try { _egOnResume(); } catch (e) {} }
+            if (typeof _onResume === 'function') { try { _onResume(); } catch (e) {} }
             if (typeof resumeTimer === 'function') resumeTimer();
         }
     } catch (e) {}
@@ -1138,8 +1138,8 @@ const TQ_TASKS = {
     // (charged shot). The stack counter resets on release, so the best value
     // seen while polling is kept. Also done when the rat dies first.
     drag_shot: () => {
-        try { _tqP2MaxDragStack = Math.max(_tqP2MaxDragStack, globalThis._egDragChargeStacks || 0); } catch (e) {}
-        const dead = _tqSawMonster && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length === 0;
+        try { _tqP2MaxDragStack = Math.max(_tqP2MaxDragStack, globalThis._dragChargeStacks || 0); } catch (e) {}
+        const dead = _tqSawMonster && typeof _monsters !== 'undefined' && globalThis._monsters.length === 0;
         return _tqP2MaxDragStack >= TQ_P2_DRAG_CELLS || dead;
     },
     // Puzzle 2: the rat was defeated (fills only). Stamps the death so the
@@ -1147,7 +1147,7 @@ const TQ_TASKS = {
     // rolls are suppressed for the tutorial - the Professor drops his own
     // heart on the kill).
     kill_monster: () => {
-        const dead = _tqSawMonster && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length === 0;
+        const dead = _tqSawMonster && typeof _monsters !== 'undefined' && globalThis._monsters.length === 0;
         if (dead && !_tqP2RatDead) { _tqP2RatDead = true; _tqP2RatDeadAt = Date.now(); }
         return dead;
     },
@@ -1155,7 +1155,7 @@ const TQ_TASKS = {
     // here (not in the step flow) guarantees the gate resets even if the
     // heart expires on its own instead of being picked up.
     pick_heart: () => {
-        const done = typeof _egPickups !== 'undefined' && _egPickups.size === 0;
+        const done = typeof _pickups !== 'undefined' && _pickups.size === 0;
         if (done && _tqP2HeartOpen) {
             _tqP2HeartOpen = false;
             _tqP2HeartCell = null;
@@ -1170,15 +1170,15 @@ const TQ_TASKS = {
     pick_sword: () => {
         if (_tqP3SwordClaimed) return true;
         try {
-            if (typeof _egLootDrops !== 'undefined' && _tqP3SwordKey
-                && !_egLootDrops.has(_tqP3SwordKey)) {
+            if (typeof _lootDrops !== 'undefined' && _tqP3SwordKey
+                && !_lootDrops.has(_tqP3SwordKey)) {
                 _tqP3SwordClaimed = true;
                 _tqP3DropOpen = false;
                 _tqP3DropCell = null;
-                if (typeof _egFlushRunLootToStash === 'function') {
-                    try { _egFlushRunLootToStash(); } catch (e) {}
+                if (typeof _flushRunLootToStash === 'function') {
+                    try { _flushRunLootToStash(); } catch (e) {}
                 }
-                try { if (typeof egSaveHubState === 'function') egSaveHubState(); } catch (e) {}
+                try { if (typeof saveHubState === 'function') saveHubState(); } catch (e) {}
                 _tqRefreshGridLockBorder();
                 return true;
             }
@@ -1190,14 +1190,14 @@ const TQ_TASKS = {
     // Puzzle 3: the bat was defeated with melee strikes. Guarded by
     // _tqSawMonster so an empty field at boot can never complete it.
     melee_kill: () => _tqSawMonster
-        && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length === 0,
+        && typeof _monsters !== 'undefined' && globalThis._monsters.length === 0,
     // Puzzle 3: the dropped Fireball charm has been picked up (grantCharm
     // lands it straight in the charm inventory - no flush needed).
     pick_charm: () => {
         if (_tqP3CharmClaimed) return true;
         try {
-            if (typeof _egCharmDrops !== 'undefined' && _tqP3CharmKey
-                && !_egCharmDrops.has(_tqP3CharmKey)) {
+            if (typeof _charmDrops !== 'undefined' && _tqP3CharmKey
+                && !_charmDrops.has(_tqP3CharmKey)) {
                 _tqP3CharmClaimed = true;
                 _tqP3DropOpen = false;
                 _tqP3DropCell = null;
@@ -1209,15 +1209,15 @@ const TQ_TASKS = {
     },
     // Puzzle 3: the ghost was burned down with Fireball.
     fireball_kill: () => _tqSawMonster
-        && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length === 0,
+        && typeof _monsters !== 'undefined' && globalThis._monsters.length === 0,
     // Puzzle 3: the ghost's Candle drop has been picked up with the correct
     // click (the engine's item-drop pipeline grants it into the inventory).
     // The gate admits only the left-click, so disappearance means claimed.
     pick_candle: () => {
         if (_tqP3CandleClaimed) return true;
         try {
-            if (typeof _egItemDrops !== 'undefined' && _tqP3CandleKey
-                && !_egItemDrops.has(_tqP3CandleKey)) {
+            if (typeof _itemDrops !== 'undefined' && _tqP3CandleKey
+                && !_itemDrops.has(_tqP3CandleKey)) {
                 _tqP3CandleClaimed = true;
                 _tqP3DropOpen = false;
                 _tqP3DropCell = null;
@@ -1233,8 +1233,8 @@ const TQ_TASKS = {
     orb_destroyed: () => {
         if (_tqP3OrbDestroyed) return true;
         try {
-            if (typeof _egCurrencyDrops !== 'undefined' && _tqP3OrbKey
-                && !_egCurrencyDrops.has(_tqP3OrbKey)) {
+            if (typeof _currencyDrops !== 'undefined' && _tqP3OrbKey
+                && !_currencyDrops.has(_tqP3OrbKey)) {
                 _tqP3OrbDestroyed = true;
                 _tqP3DropOpen = false;
                 _tqP3DropCell = null;
@@ -1546,7 +1546,7 @@ function _tqPhaseFinished() {
     } else if (_tqPhase === 'p4') {
         STATE.tutorialDone = true;
         save();
-        try { if (typeof _egStopEncounter === 'function') _egStopEncounter(); } catch (e) {}
+        try { if (typeof _stopEncounter === 'function') _stopEncounter(); } catch (e) {}
         _tqHideProfessor();
         // Final farewell: as the Professor's graduation line closes, the
         // player's character signs off BY NAME (tutorial_farewell bank in
@@ -1623,7 +1623,7 @@ function _tqStartPuzzle(i) {
 // Stamps campaign-monster fields onto a tutorial level before startLevel
 // runs. Puzzle 2 gets one very weak level-1 rat; puzzle 3 starts with NO
 // monster at all (maxMonsters 0 → empty spawn list) and its lessons spawn a
-// bat, then a ghost, on demand via _egSpawnMonster.
+// bat, then a ghost, on demand via _spawnMonster.
 function _tqStampLevel(lvl) {
     if (!lvl || !lvl.isTutorialQuest) return;
     if (lvl.tqPuzzle === 0) {
@@ -1655,7 +1655,7 @@ function _tqStampLevel(lvl) {
     // The tutorial rat must be beatable by a fresh, un-geared character
     // using ONLY correct fills (reveal projectiles), and the fight must fit
     // inside the puzzle-2 half-fill lesson cap (TQ_P2_FILLS_LIMIT = 12 fills
-    // of EG_PLAYER_STATS.baseDamage = 10 → 120 damage ceiling, minus ~5%
+    // of PLAYER_STATS.baseDamage = 10 → 120 damage ceiling, minus ~5%
     // accuracy misses on a naked level-1 character). A budget of 55 (±15%
     // spread → 47-63) always dies at fill 5-7 - a real multi-stroke fight
     // that can never soft-lock the lesson: even 5 misses out of 12 fills
@@ -1691,7 +1691,7 @@ function _tqOnPuzzleSolved() {
     // after it: unlocking the board before a still-living ghost is told
     // about would strand the lesson.
     if (_tqPhase === 'p3'
-        && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) {
+        && typeof _monsters !== 'undefined' && globalThis._monsters.length > 0) {
         globalThis.dead = false;
         _tqStepIdx = _tqP3GhostSpawned ? TQ_P3_STEP_FIREBALL_GHOST : TQ_P3_STEP_MELEE_BAT;
         _tqRunCurrentPhase();
@@ -1701,7 +1701,7 @@ function _tqOnPuzzleSolved() {
     // back to the fight instead of finishing the lesson - the encounter
     // keeps running so nothing is lost.
     if (_tqPhase === 'p2' && !_tqP2RatDead
-        && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) {
+        && typeof _monsters !== 'undefined' && globalThis._monsters.length > 0) {
         globalThis.dead = false;
         _tqStepIdx = TQ_P2_STEP_KILL_RAT;   // re-run the defeat-the-rat task (s1b)
         _tqRunCurrentPhase();
@@ -1712,8 +1712,8 @@ function _tqOnPuzzleSolved() {
     globalThis.dead = true;
     if (typeof stopTimer === 'function') stopTimer();
     // Puzzle 3 keeps the encounter alive: the parry lesson (p4) reuses it.
-    if (_tqPhase !== 'p3' && typeof _egStopEncounter === 'function') _egStopEncounter();
-    if (_tqPhase === 'p3') { try { _egStopPickupSpawner(); } catch (e) {} }
+    if (_tqPhase !== 'p3' && typeof _stopEncounter === 'function') _stopEncounter();
+    if (_tqPhase === 'p3') { try { _stopPickupSpawner(); } catch (e) {} }
     // Congratulation reply - the character celebrates the solved puzzle
     // after a natural beat, while the Professor's payoff line is up.
     _tqPlayerReply(5000, 'tutorial_solve');
@@ -1813,8 +1813,8 @@ function _tqOnCandleUse(uid) {
 function _tqSpawnHeart() {
     if (_tqP2HeartOpen) return;
     try {
-        if (typeof _egPickups !== 'undefined' && _egPickups.size > 0) {
-            const keys = Array.from(_egPickups.keys());
+        if (typeof _pickups !== 'undefined' && _pickups.size > 0) {
+            const keys = Array.from(_pickups.keys());
             _tqP2HeartCell = keys[keys.length - 1];
             _tqP2HeartOpen = true;
             _tqRefreshGridLockBorder();
@@ -1824,11 +1824,11 @@ function _tqSpawnHeart() {
     _tqP2HeartOpen = false;
     _tqP2HeartCell = null;
     try {
-        if (typeof _egDropHeartPickup === 'function') _egDropHeartPickup();
+        if (typeof _dropHeartPickup === 'function') _dropHeartPickup();
     } catch (e) {}
     try {
-        if (typeof _egPickups !== 'undefined' && _egPickups.size > 0) {
-            const keys = Array.from(_egPickups.keys());
+        if (typeof _pickups !== 'undefined' && _pickups.size > 0) {
+            const keys = Array.from(_pickups.keys());
             _tqP2HeartCell = keys[keys.length - 1];
             _tqP2HeartOpen = true;
         }
@@ -1855,11 +1855,11 @@ function _tqHasTutorialSword() {
         if (typeof STATE !== 'undefined' && _tqHasTutorialSwordInGrid(STATE.egInventory)) return true;
     } catch (e) {}
     try {
-        if (_tqHasTutorialSwordInGrid(_egInventory)) return true;
+        if (_tqHasTutorialSwordInGrid(_inventory)) return true;
     } catch (e) {}
     try {
-        if (typeof _egGetAllEquippedItems === 'function'
-            && _egGetAllEquippedItems().some(_tqIsTutorialSword)) return true;
+        if (typeof _getAllEquippedItems === 'function'
+            && _getAllEquippedItems().some(_tqIsTutorialSword)) return true;
     } catch (e) {}
     return false;
 }
@@ -1890,24 +1890,24 @@ function _tqPlaceSwordDrop() {
         return;
     }
     try {
-        if (typeof EG_ALL_BASE_TYPES === 'undefined'
-            || typeof _egvBuildBaseItemFromBase !== 'function'
+        if (typeof ALL_BASE_TYPES === 'undefined'
+            || typeof _vendorBuildBaseItemFromBase !== 'function'
             || typeof cur === 'undefined' || !cur || !cur.grid
             || typeof userGrid === 'undefined' || !globalThis.userGrid) {
             _tqGrantSwordToStash();
             return;
         }
-        const base = EG_ALL_BASE_TYPES.find((b) => b && b.id === 'wpn_1h_1');
+        const base = ALL_BASE_TYPES.find((b) => b && b.id === 'wpn_1h_1');
         if (!base) { _tqGrantSwordToStash(); return; }
         const stamp = Date.now();
-        const item = _egvBuildBaseItemFromBase(base);
+        const item = _vendorBuildBaseItemFromBase(base);
         item.id = `wpn_1h_1_tutorial_${stamp}`;
         item.noSellValue = true;   // loot-filter proof, like the starter gear
         item.isTutorialSword = true;
         const key = '2-2';
         if (cur.grid[2][2] !== 1 || globalThis.userGrid[2][2] !== 0) { _tqGrantSwordToStash(); return; }
-        _egLootDrops.set(key, item);
-        if (typeof _egRenderLootOverlay === 'function') _egRenderLootOverlay(2, 2, item);
+        _lootDrops.set(key, item);
+        if (typeof _renderLootOverlay === 'function') _renderLootOverlay(2, 2, item);
         // No expiry: unlike normal loot, the lesson drop waits until claimed.
         _tqP3SwordKey = key;
         _tqP3DropCell = key;
@@ -1927,15 +1927,15 @@ function _tqGrantSwordToStash() {
         return;
     }
     try {
-        if (typeof EG_ALL_BASE_TYPES === 'undefined' || typeof _egvBuildBaseItemFromBase !== 'function') return;
-        const base = EG_ALL_BASE_TYPES.find((b) => b && b.id === 'wpn_1h_1');
+        if (typeof ALL_BASE_TYPES === 'undefined' || typeof _vendorBuildBaseItemFromBase !== 'function') return;
+        const base = ALL_BASE_TYPES.find((b) => b && b.id === 'wpn_1h_1');
         if (!base) return;
-        const item = _egvBuildBaseItemFromBase(base);
+        const item = _vendorBuildBaseItemFromBase(base);
         item.id = `wpn_1h_1_tutorial_${Date.now()}`;
         item.noSellValue = true;
         item.isTutorialSword = true;
-        if (typeof _egAddItemToStash === 'function') _egAddItemToStash(item);
-        if (typeof egSaveHubState === 'function') egSaveHubState();
+        if (typeof _addItemToStash === 'function') _addItemToStash(item);
+        if (typeof saveHubState === 'function') saveHubState();
     } catch (e) {}
     _tqP3SwordClaimed = true;
 }
@@ -1951,7 +1951,7 @@ function _tqPlaceCharmDrop() {
     _tqP3DropButton = 1;
     try {
         if (typeof _charmMake !== 'function'
-            || typeof _egCharmDrops === 'undefined'
+            || typeof _charmDrops === 'undefined'
             || typeof cur === 'undefined' || !cur || !cur.grid
             || typeof userGrid === 'undefined' || !globalThis.userGrid
             || cur.grid[2][0] !== 1 || globalThis.userGrid[2][0] !== 0) {
@@ -1961,7 +1961,7 @@ function _tqPlaceCharmDrop() {
         }
         const charm = _charmMake(TQ_FIREBALL_ID, 1);
         const key = '2-0';
-        _egCharmDrops.set(key, charm);
+        _charmDrops.set(key, charm);
         if (typeof _charmRenderOverlay === 'function') _charmRenderOverlay(2, 0, charm);
         // No expiry scheduled: the lesson drop waits until claimed, so the
         // claim task can never complete without the charm being granted.
@@ -1986,7 +1986,7 @@ function _tqGhostSpoilCell(prefR, prefC) {
             && globalThis.userGrid[r][c] === 0
             && !(typeof revealedGrid !== 'undefined' && globalThis.revealedGrid[r] && globalThis.revealedGrid[r][c])
             && !(typeof wrongGrid !== 'undefined' && globalThis.wrongGrid[r] && globalThis.wrongGrid[r][c])
-            && !(typeof _egCellHasAnyDrop === 'function' && _egCellHasAnyDrop(r, c));
+            && !(typeof _cellHasAnyDrop === 'function' && _cellHasAnyDrop(r, c));
         if (eligible(prefR, prefC)) return [prefR, prefC];
         for (let r = 0; r < cur.grid.length; r++) {
             for (let c = 0; c < cur.grid[r].length; c++) {
@@ -2009,8 +2009,8 @@ function _tqPlaceCandleDrop() {
     _tqP3CandleKey = null;
     _tqP3DropButton = 1;
     try {
-        if (typeof _egItemDrops === 'undefined'
-            || typeof _egRenderItemDropOverlay !== 'function') {
+        if (typeof _itemDrops === 'undefined'
+            || typeof _renderItemDropOverlay !== 'function') {
             // Engine pipeline unavailable - grant the candle straight into
             // the inventory so the lesson degrades to a gift, never a lock.
             _tqGrantPuzzleItem('reveal1');
@@ -2025,8 +2025,8 @@ function _tqPlaceCandleDrop() {
         }
         const [r, c] = cell;
         const key = `${r}-${c}`;
-        _egItemDrops.set(key, { defId: 'reveal1' });
-        _egRenderItemDropOverlay(r, c, { defId: 'reveal1' });
+        _itemDrops.set(key, { defId: 'reveal1' });
+        _renderItemDropOverlay(r, c, { defId: 'reveal1' });
         _tqP3CandleKey = key;
         _tqP3DropCell = key;
         _tqP3DropOpen = true;
@@ -2042,9 +2042,9 @@ function _tqPlaceCandleDrop() {
 function _tqPlaceOrbDrop() {
     _tqP3OrbKey = null;
     try {
-        if (typeof _egCurrencyDrops === 'undefined'
-            || typeof _egRenderCurrencyDropOverlay !== 'function'
-            || typeof EG_CURRENCY_DEFS === 'undefined' || !EG_CURRENCY_DEFS.orb_divine) {
+        if (typeof _currencyDrops === 'undefined'
+            || typeof _renderCurrencyDropOverlay !== 'function'
+            || typeof CURRENCY_DEFS === 'undefined' || !CURRENCY_DEFS.orb_divine) {
             // Engine pipeline unavailable - skip the destroy lesson rather
             // than gate the board on a drop that never lands.
             _tqP3OrbDestroyed = true;
@@ -2057,9 +2057,9 @@ function _tqPlaceOrbDrop() {
         }
         const [r, c] = cell;
         const key = `${r}-${c}`;
-        const def = EG_CURRENCY_DEFS.orb_divine;
-        _egCurrencyDrops.set(key, def);
-        _egRenderCurrencyDropOverlay(r, c, def);
+        const def = CURRENCY_DEFS.orb_divine;
+        _currencyDrops.set(key, def);
+        _renderCurrencyDropOverlay(r, c, def);
         _tqP3OrbKey = key;
     } catch (e) {}
     _tqRefreshGridLockBorder();
@@ -2068,9 +2068,9 @@ function _tqPlaceOrbDrop() {
 // over from the sword / charm pickup fills, so the lesson fights start
 // clean and pickups never leak free damage into them.
 function _tqClearStaleFillDamage() {
-    try { if (typeof _egDragChargeDamage !== 'undefined') globalThis._egDragChargeDamage = 0; } catch (e) {}
-    try { if (typeof _egDragChargeStacks !== 'undefined') globalThis._egDragChargeStacks = 0; } catch (e) {}
-    try { if (typeof _egPendingRevealQueue !== 'undefined') globalThis._egPendingRevealQueue = []; } catch (e) {}
+    try { if (typeof _dragChargeDamage !== 'undefined') globalThis._dragChargeDamage = 0; } catch (e) {}
+    try { if (typeof _dragChargeStacks !== 'undefined') globalThis._dragChargeStacks = 0; } catch (e) {}
+    try { if (typeof _pendingRevealQueue !== 'undefined') globalThis._pendingRevealQueue = []; } catch (e) {}
 }
 
 // Puzzle 3 melee lesson: a bat arrives once the sword is equipped. Its HP
@@ -2081,12 +2081,12 @@ function _tqClearStaleFillDamage() {
 function _tqSpawnP3Bat() {
     _tqClearStaleFillDamage();
     try {
-        if (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) { _tqSawMonster = true; return; }
+        if (typeof _monsters !== 'undefined' && globalThis._monsters.length > 0) { _tqSawMonster = true; return; }
         if (typeof cur !== 'undefined' && cur) {
             cur.campaignMonsterHp = 45;
             cur.campaignMonsterDamage = 3;
         }
-        if (typeof _egSpawnMonster === 'function') _egSpawnMonster('bat', 1);
+        if (typeof _spawnMonster === 'function') _spawnMonster('bat', 1);
         _tqSawMonster = true;
     } catch (e) {}
 }
@@ -2100,15 +2100,15 @@ function _tqSpawnP3Ghost() {
     _tqClearStaleFillDamage();
     _tqP3GhostSpawned = true;
     try {
-        if (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) { _tqSawMonster = true; return; }
+        if (typeof _monsters !== 'undefined' && globalThis._monsters.length > 0) { _tqSawMonster = true; return; }
         if (typeof cur !== 'undefined' && cur) {
             cur.campaignMonsterHp = 30;
             cur.campaignMonsterDamage = 3;
         }
-        if (typeof _egSpawnMonster === 'function') _egSpawnMonster('ghost', 1);
+        if (typeof _spawnMonster === 'function') _spawnMonster('ghost', 1);
         try {
-            const g = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length)
-                ? globalThis._egMonsters[globalThis._egMonsters.length - 1] : null;
+            const g = (typeof _monsters !== 'undefined' && globalThis._monsters.length)
+                ? globalThis._monsters[globalThis._monsters.length - 1] : null;
             if (g) g.meleeImmune = true;
         } catch (e) {}
         _tqSawMonster = true;
@@ -2225,9 +2225,9 @@ function _tqCheckGearFillsBackstop() {
 // the player is actively guided.)
 function _tqCountGearDrops() {
     try {
-        if (typeof _egLootDrops === 'undefined') return 0;
+        if (typeof _lootDrops === 'undefined') return 0;
         let n = 0;
-        _egLootDrops.forEach(item => { if (item && item.isTutorialStarterGear) n++; });
+        _lootDrops.forEach(item => { if (item && item.isTutorialStarterGear) n++; });
         return n;
     } catch (e) {
         return 0;
@@ -2252,22 +2252,22 @@ function _tqCountGearDrops() {
 function _tqGrantStarterGear() {
     if (_tqP2GearDropped) return;
     try {
-        if (typeof EG_VENDOR_FREE_BASE_IDS === 'undefined'
-            || typeof EG_ALL_BASE_TYPES === 'undefined'
-            || typeof _egvBuildBaseItemFromBase !== 'function') {
+        if (typeof VENDOR_FREE_BASE_IDS === 'undefined'
+            || typeof ALL_BASE_TYPES === 'undefined'
+            || typeof _vendorBuildBaseItemFromBase !== 'function') {
             // Engine helpers unavailable - stash-grant fallback so the set
             // is never lost (the lesson step then completes via backstop).
             _tqGrantStarterGearToStash();
             return;
         }
-        const slotOrder = (typeof _egvGetSlotOrder === 'function') ? _egvGetSlotOrder() : [];
-        const bases = EG_ALL_BASE_TYPES
-            .filter(b => EG_VENDOR_FREE_BASE_IDS.has(b.id) && TQ_STARTER_BASE_IDS.indexOf(b.id) !== -1)
+        const slotOrder = (typeof _vendorGetSlotOrder === 'function') ? _vendorGetSlotOrder() : [];
+        const bases = ALL_BASE_TYPES
+            .filter(b => VENDOR_FREE_BASE_IDS.has(b.id) && TQ_STARTER_BASE_IDS.indexOf(b.id) !== -1)
             .sort((a, b) => (slotOrder.indexOf(a.slotType) - slotOrder.indexOf(b.slotType)));
         if (!bases.length) { _tqGrantStarterGearToStash(); return; }
         const stamp = Date.now();
         const items = bases.map((base, i) => {
-            const item = _egvBuildBaseItemFromBase(base);
+            const item = _vendorBuildBaseItemFromBase(base);
             item.id = `${base.id}_${stamp}_${i}`;
             item.noSellValue = true;
             item.isTutorialStarterGear = true;   // safety-net marker
@@ -2283,14 +2283,14 @@ function _tqGrantStarterGear() {
         // land (no open solution cell left) falls back to the stash
         // immediately - that piece is never lost.
         items.forEach((item) => {
-            if (!_tqPlaceGearDrop(item) && typeof _egAddItemToStash === 'function') {
-                try { _egAddItemToStash(item); } catch (e) {}
+            if (!_tqPlaceGearDrop(item) && typeof _addItemToStash === 'function') {
+                try { _addItemToStash(item); } catch (e) {}
             }
         });
-        // _egAddItemToStash is mirror-only (no save) - persist so a
+        // _addItemToStash is mirror-only (no save) - persist so a
         // stash-fallback piece can never evaporate before the solve-time
         // flush. Refused safely while the hub load latch is unset.
-        try { if (typeof egSaveHubState === 'function') egSaveHubState(); } catch (e) {}
+        try { if (typeof saveHubState === 'function') saveHubState(); } catch (e) {}
     } catch (e) {
         try { _tqGrantStarterGearToStash(); } catch (e2) {}
     }
@@ -2311,15 +2311,15 @@ function _tqPlaceGearDrop(item) {
                 if (globalThis.userGrid[r][c] !== 0) continue;             // untouched only
                 if (typeof revealedGrid !== 'undefined' && globalThis.revealedGrid[r] && globalThis.revealedGrid[r][c]) continue;
                 if (typeof wrongGrid !== 'undefined' && globalThis.wrongGrid[r] && globalThis.wrongGrid[r][c]) continue;
-                if (typeof _egCellHasAnyDrop === 'function' && _egCellHasAnyDrop(r, c)) continue;
+                if (typeof _cellHasAnyDrop === 'function' && _cellHasAnyDrop(r, c)) continue;
                 open.push([r, c]);
             }
         }
         if (!open.length) return false;
         const [r, c] = open[Math.floor(Math.random() * open.length)];
         const key = `${r}-${c}`;
-        _egLootDrops.set(key, item);
-        if (typeof _egRenderLootOverlay === 'function') _egRenderLootOverlay(r, c, item);
+        _lootDrops.set(key, item);
+        if (typeof _renderLootOverlay === 'function') _renderLootOverlay(r, c, item);
         // No expiry scheduling: unlike normal loot, the lesson drops persist
         // until claimed (or until encounter teardown). A mid-lesson expiry
         // would zero the gear count and complete the claim task with the
@@ -2336,21 +2336,21 @@ function _tqPlaceGearDrop(item) {
 // the old grant. The lesson flow completes through the backstop gates.
 function _tqGrantStarterGearToStash() {
     try {
-        if (typeof EG_VENDOR_FREE_BASE_IDS === 'undefined'
-            || typeof EG_ALL_BASE_TYPES === 'undefined'
-            || typeof _egvBuildBaseItemFromBase !== 'function') return;
-        const slotOrder = (typeof _egvGetSlotOrder === 'function') ? _egvGetSlotOrder() : [];
-        const bases = EG_ALL_BASE_TYPES
-            .filter(b => EG_VENDOR_FREE_BASE_IDS.has(b.id) && TQ_STARTER_BASE_IDS.indexOf(b.id) !== -1)
+        if (typeof VENDOR_FREE_BASE_IDS === 'undefined'
+            || typeof ALL_BASE_TYPES === 'undefined'
+            || typeof _vendorBuildBaseItemFromBase !== 'function') return;
+        const slotOrder = (typeof _vendorGetSlotOrder === 'function') ? _vendorGetSlotOrder() : [];
+        const bases = ALL_BASE_TYPES
+            .filter(b => VENDOR_FREE_BASE_IDS.has(b.id) && TQ_STARTER_BASE_IDS.indexOf(b.id) !== -1)
             .sort((a, b) => (slotOrder.indexOf(a.slotType) - slotOrder.indexOf(b.slotType)));
         const stamp = Date.now();
         bases.forEach((base, i) => {
-            const item = _egvBuildBaseItemFromBase(base);
+            const item = _vendorBuildBaseItemFromBase(base);
             item.id = `${base.id}_${stamp}_${i}`;
             item.noSellValue = true;
-            if (typeof _egAddItemToStash === 'function') _egAddItemToStash(item);
+            if (typeof _addItemToStash === 'function') _addItemToStash(item);
         });
-        if (typeof egSaveHubState === 'function') egSaveHubState();
+        if (typeof saveHubState === 'function') saveHubState();
     } catch (e) {}
 }
 
@@ -2407,9 +2407,9 @@ function _tqChestEntryInfo(entry) {
         try { name = getSkillName(entry.skillId) || name; } catch (e) {}
         return { icon: entry.icon, name, sub: t('skill_tip_rank') + ' ' + entry.rank };
     }
-    const base = EG_ALL_BASE_TYPES.find((b) => b && b.id === entry.baseId);
+    const base = ALL_BASE_TYPES.find((b) => b && b.id === entry.baseId);
     if (!base) return { icon: '📦', name: entry.baseId, sub: '' };
-    const item = _egvBuildBaseItemFromBase(base);
+    const item = _vendorBuildBaseItemFromBase(base);
     return { icon: item.icon, name: _tqChestItemName(entry, item), sub: '' };
 }
 
@@ -2420,7 +2420,7 @@ function _tqEnterChestScene() {
     _tqChestAllClaimed = false;
     _tqChestClaimed.clear();
     _tqChestScene = true;
-    try { if (typeof _egStopEncounter === 'function') _egStopEncounter(); } catch (e) {}
+    try { if (typeof _stopEncounter === 'function') _stopEncounter(); } catch (e) {}
     globalThis.dead = false;   // the arena/solve left the run "finished"; the sprite is hidden while dead
     try { _renderPlayerAvatarSimple(); } catch (e) {}
     _tqRefreshGridLockBorder();
@@ -2484,9 +2484,9 @@ function _tqOpenChestModal() {
 
 // Equips (empty slot) or stashes one piece of starter gear.
 function _tqGrantChestGear(entry, idx) {
-    const base = EG_ALL_BASE_TYPES.find((b) => b && b.id === entry.baseId);
+    const base = ALL_BASE_TYPES.find((b) => b && b.id === entry.baseId);
     if (!base) return false;
-    const item = _egvBuildBaseItemFromBase(base);
+    const item = _vendorBuildBaseItemFromBase(base);
     item.id = `${base.id}_chest_${Date.now()}_${idx}`;
     item.name = _tqChestItemName(entry, item);   // story name (uniform)
     item.noSellValue = true;          // loot-filter proof, like the starter gear
@@ -2494,16 +2494,16 @@ function _tqGrantChestGear(entry, idx) {
     const slotId = item.slotType;     // chest / pants / ranged match the paperdoll slot ids
     let equipped = false;
     try {
-        const eq = (globalThis._egEquipped && typeof globalThis._egEquipped === 'object')
-            ? globalThis._egEquipped
+        const eq = (globalThis._equipped && typeof globalThis._equipped === 'object')
+            ? globalThis._equipped
             : (STATE.egEquipped || (STATE.egEquipped = {}));
         if (!eq[slotId]) { eq[slotId] = item; equipped = true; }
         STATE.egEquipped = eq;
     } catch (e) { equipped = false; }
-    if (!equipped && typeof _egAddItemToStash === 'function') {
-        try { _egAddItemToStash(item); } catch (e) {}
+    if (!equipped && typeof _addItemToStash === 'function') {
+        try { _addItemToStash(item); } catch (e) {}
     }
-    try { if (typeof egSaveHubState === 'function') egSaveHubState(); } catch (e) {}
+    try { if (typeof saveHubState === 'function') saveHubState(); } catch (e) {}
     try { save(); } catch (e) {}
     return true;
 }
@@ -2628,11 +2628,11 @@ function _tqEnsureIntermissionGear() {
             if (item && item.baseId && TQ_STARTER_BASE_IDS.indexOf(item.baseId) !== -1) have.add(item.baseId);
         };
         try {
-            if (typeof _egGetAllEquippedItems === 'function') _egGetAllEquippedItems().forEach(scan);
+            if (typeof _getAllEquippedItems === 'function') _getAllEquippedItems().forEach(scan);
         } catch (e) {}
         try {
-            if (typeof _egInventory !== 'undefined' && Array.isArray(_egInventory)) {
-                _egInventory.forEach((row) => {
+            if (typeof _inventory !== 'undefined' && Array.isArray(_inventory)) {
+                _inventory.forEach((row) => {
                     if (!Array.isArray(row)) return;
                     row.forEach((it) => { if (it && typeof it === 'object' && !Array.isArray(it)) scan(it); });
                 });
@@ -2640,17 +2640,17 @@ function _tqEnsureIntermissionGear() {
         } catch (e) {}
         const missing = TQ_STARTER_BASE_IDS.filter((id) => !have.has(id));
         if (!missing.length) return;
-        if (typeof EG_ALL_BASE_TYPES === 'undefined' || typeof _egvBuildBaseItemFromBase !== 'function') return;
+        if (typeof ALL_BASE_TYPES === 'undefined' || typeof _vendorBuildBaseItemFromBase !== 'function') return;
         const stamp = Date.now();
         missing.forEach((baseId, k) => {
-            const base = EG_ALL_BASE_TYPES.find((b) => b.id === baseId);
+            const base = ALL_BASE_TYPES.find((b) => b.id === baseId);
             if (!base) return;
-            const item = _egvBuildBaseItemFromBase(base);
+            const item = _vendorBuildBaseItemFromBase(base);
             item.id = `${base.id}_intermission_${stamp}_${k}`;
             item.noSellValue = true;
-            try { if (typeof _egAddItemToStash === 'function') _egAddItemToStash(item); } catch (e) {}
+            try { if (typeof _addItemToStash === 'function') _addItemToStash(item); } catch (e) {}
         });
-        try { if (typeof egSaveHubState === 'function') egSaveHubState(); } catch (e) {}
+        try { if (typeof saveHubState === 'function') saveHubState(); } catch (e) {}
         try { console.info('[tutorial] intermission restock', missing); } catch (e) {}
     } catch (e) {}
 }
@@ -2757,8 +2757,8 @@ const TQ_FIREBALL_ID = 'usp_fireball';
 
     // 3. Tutorial levels: stamp monster data and bypass the normal win flow.
     //    The startLevel wrap ALSO re-protects the monster stamp: the pipeline
-    //    calls _egStopEncounter() during boot, which clears the stamped
-    //    campaign fields (_egMapDef still points at this level object on a
+    //    calls _stopEncounter() during boot, which clears the stamped
+    //    campaign fields (_mapDef still points at this level object on a
     //    retry) - without this, a puzzle-2/3 restart loses the pre-stamped
     //    level-1 rat and falls into the generic campaign preparer, which
     //    derives the monster level from the level index. Tutorial levels sit
@@ -2782,21 +2782,21 @@ const TQ_FIREBALL_ID = 'usp_fireball';
                 _tqPhase = lvl.tqPuzzle === 0 ? 'p1' : lvl.tqPuzzle === 1 ? 'p2' : 'p3';
                 _tqSawMonster = false;
                 // While this tutorial level boots, its teardown
-                // (_egStopEncounter → _egClearCampaignLevelFields(_egMapDef))
+                // (_stopEncounter → _clearCampaignLevelFields(_mapDef))
                 // must not wipe the just-applied stamp - on a same-level
-                // re-entry _egMapDef STILL points at this level object. The
+                // re-entry _mapDef STILL points at this level object. The
                 // natural way back is the normal pipeline: an empty stamp
                 // would fall into the generic campaign preparer and roll a
                 // level-index-derived monster pack (see the level-68 bug).
-                const _origClear = globalThis._egClearCampaignLevelFields;
-                globalThis._egClearCampaignLevelFields = function (level) {
+                const _origClear = globalThis._clearCampaignLevelFields;
+                globalThis._clearCampaignLevelFields = function (level) {
                     if (level && level.isTutorialQuest) return;   // protect the fresh stamp
                     return _origClear(level);
                 };
                 try {
                     return _orig(gi);
                 } finally {
-                    globalThis._egClearCampaignLevelFields = _origClear;
+                    globalThis._clearCampaignLevelFields = _origClear;
                 }
             }
             return _orig(gi);
@@ -2816,10 +2816,10 @@ const TQ_FIREBALL_ID = 'usp_fireball';
     }
 
     // 4. Campaign-monster suppression for puzzle 1 (no monsters there).
-    if (typeof _egShouldPrepareCampaignEncounter === 'function' && !window._tqWrappedPrepEnc) {
+    if (typeof _shouldPrepareCampaignEncounter === 'function' && !window._tqWrappedPrepEnc) {
         window._tqWrappedPrepEnc = true;
-        const _orig = globalThis._egShouldPrepareCampaignEncounter;
-        globalThis._egShouldPrepareCampaignEncounter = function () {
+        const _orig = globalThis._shouldPrepareCampaignEncounter;
+        globalThis._shouldPrepareCampaignEncounter = function () {
             if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest && cur.tqPuzzle === 0) return false;
             return _orig();
         };
@@ -2879,8 +2879,8 @@ const TQ_FIREBALL_ID = 'usp_fireball';
                 // mark would be a wrong fill on a solution cell.
                 if (_tqP2GateOpen && typeof cur !== 'undefined' && cur) {
                     const key = `${row}-${col}`;
-                    const isDropCell = (typeof _egLootDrops !== 'undefined' && _egLootDrops.has(key))
-                        || (typeof _egPickups !== 'undefined' && _egPickups.has(key));
+                    const isDropCell = (typeof _lootDrops !== 'undefined' && _lootDrops.has(key))
+                        || (typeof _pickups !== 'undefined' && _pickups.has(key));
                     if (!isDropCell || pval !== 1) { _tqGridLockToast(); return true; }
                     return false;  // genuine handler performs the fill claim
                 }
@@ -2911,10 +2911,10 @@ const TQ_FIREBALL_ID = 'usp_fireball';
 
     // 4e. Correct-fill tracking for puzzle 2: the count drives the
     // first-fill task (damage lesson) and freezes once the rat is dead.
-    if (typeof _egOnCorrectCell === 'function' && !window._tqWrappedCorrectCell) {
+    if (typeof _onCorrectCell === 'function' && !window._tqWrappedCorrectCell) {
         window._tqWrappedCorrectCell = true;
-        const _orig = globalThis._egOnCorrectCell;
-        globalThis._egOnCorrectCell = function (row, col) {
+        const _orig = globalThis._onCorrectCell;
+        globalThis._onCorrectCell = function (row, col) {
             const r = _orig(row, col);
             if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest && cur.tqPuzzle === 1) {
                 _tqCountCorrectFill();
@@ -2926,7 +2926,7 @@ const TQ_FIREBALL_ID = 'usp_fireball';
     // 4f. Starter-gear claim detection (puzzle 2 loot lesson): after the
     // engine claims a gear drop, check whether the last piece of the set
     // has left the board - if so, mark the claim task complete.
-    if (typeof _egCheckLootClaim === 'function' && !window._tqWrappedGearClaim) {
+    if (typeof _checkLootClaim === 'function' && !window._tqWrappedGearClaim) {
         window._tqGearClaimCheck = () => {
             if (_tqPhase === 'p2' && _tqP2GearDropped && !_tqP2GearClaimed
                 && (!_tqP2GearSettleAt || Date.now() >= _tqP2GearSettleAt)
@@ -2934,8 +2934,8 @@ const TQ_FIREBALL_ID = 'usp_fireball';
                 _tqP2GearClaimed = true;
             }
         };
-        const _orig = globalThis._egCheckLootClaim;
-        globalThis._egCheckLootClaim = function (row, col) {
+        const _orig = globalThis._checkLootClaim;
+        globalThis._checkLootClaim = function (row, col) {
             const r = _orig(row, col);
             window._tqGearClaimCheck();
             return r;
@@ -2950,10 +2950,10 @@ const TQ_FIREBALL_ID = 'usp_fireball';
     // blocking the spawner never touches them.
     // (Item / currency / essence / charm kill drops are suppressed
     // separately for the whole tutorial in 4h below.)
-    if (typeof _egSpawnLootDrop === 'function' && !window._tqWrappedLootSpawn) {
+    if (typeof _spawnLootDrop === 'function' && !window._tqWrappedLootSpawn) {
         window._tqWrappedLootSpawn = true;
-        const _orig = globalThis._egSpawnLootDrop;
-        globalThis._egSpawnLootDrop = function (...args) {
+        const _orig = globalThis._spawnLootDrop;
+        globalThis._spawnLootDrop = function (...args) {
             if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest
                 && ((cur.tqPuzzle === 1 && _tqPhase === 'p2')
                     || (cur.tqPuzzle === 2 && _tqPhase === 'p3'))) return;
@@ -2968,21 +2968,21 @@ const TQ_FIREBALL_ID = 'usp_fireball';
     // own heart) - a stray random drop on a locked board would be
     // unclaimable (the claim gates only admit the lesson cell) and linger
     // until it expires. The dedicated _tqSpawnHeart calls
-    // _egDropHeartPickup directly and is never routed through these
+    // _dropHeartPickup directly and is never routed through these
     // spawners, so the healing lesson is unaffected.
-    if (typeof _egSpawnPickup === 'function' && !window._tqWrappedAmbientPickup) {
+    if (typeof _spawnPickup === 'function' && !window._tqWrappedAmbientPickup) {
         window._tqWrappedAmbientPickup = true;
-        const _orig = globalThis._egSpawnPickup;
-        globalThis._egSpawnPickup = function (...args) {
+        const _orig = globalThis._spawnPickup;
+        globalThis._spawnPickup = function (...args) {
             if (typeof _tqPhase !== 'undefined' && _tqPhase
                 && typeof cur !== 'undefined' && cur && cur.isTutorialQuest) return;
             return _orig(...args);
         };
     }
     [
-        ['_egSpawnItemDrop', '_tqWrappedTutItemDrop'],
-        ['_egTryDropCurrency', '_tqWrappedTutCurrencyDrop'],
-        ['_egTryDropEssence', '_tqWrappedTutEssenceDrop'],
+        ['_spawnItemDrop', '_tqWrappedTutItemDrop'],
+        ['_tryDropCurrency', '_tqWrappedTutCurrencyDrop'],
+        ['_tryDropEssence', '_tqWrappedTutEssenceDrop'],
         ['_charmTryMonsterDrop', '_tqWrappedTutCharmDrop'],
     ].forEach(([fnName, flag]) => {
         if (typeof window[fnName] === 'function' && !window[flag]) {
@@ -3044,7 +3044,7 @@ const TQ_FIREBALL_ID = 'usp_fireball';
     if (!window._tqMonsterWatch) {
         window._tqMonsterWatch = setInterval(() => {
             try {
-                if (_tqPhase && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) {
+                if (_tqPhase && typeof _monsters !== 'undefined' && globalThis._monsters.length > 0) {
                     _tqSawMonster = true;
                 }
             } catch (e) {}
@@ -3099,12 +3099,12 @@ export function startTutorialQuest() {
 function restartTutorialQuest() {
     // Tear down the failed level like any manual retry does.
     try { hideResultOverlays(); } catch (e) {}
-    try { if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff(); } catch (e) {}
+    try { if (typeof _resetQuizDamageBuff === 'function') _resetQuizDamageBuff(); } catch (e) {}
     try { if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple(); } catch (e) {}
     try { if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar(); } catch (e) {}
     // Gear claimed during a lost puzzle-2 lesson sits in the run loot bag
     // and would be wiped by the next level's encounter reset - bank it.
-    if (typeof _egFlushRunLootToStash === 'function') { try { _egFlushRunLootToStash(); } catch (e) {} }
+    if (typeof _flushRunLootToStash === 'function') { try { _flushRunLootToStash(); } catch (e) {} }
     startTutorialQuest();
 }
 
@@ -3124,7 +3124,7 @@ function restartTutorialQuest() {
 function _tqRegisterCharSheetKeybind() {
     // Bridge for the top-bar CHARACTER button on the world map / level
     // selection (those modules must not import the hub directly).
-    globalThis._egOpenCharSheetOverlay = (screenId) => { openHubFromGame(screenId); };
+    globalThis._openCharSheetOverlay = (screenId) => { openHubFromGame(screenId); };
     onKeybindAction('char-sheet', () => {
         // Overlay close: the sheet is open over a running puzzle - B closes
         // it and the puzzle continues exactly where it was.

@@ -15,7 +15,7 @@
 // tier 5 (cheapest) down to tier 1 (most expensive). Each tier holds a list
 // so the top end can mix orbs, e.g. 1x Exalted plus 2x Chaos.
 
-export const EG_CRAFT_TIER_LADDER = {
+export const CRAFT_TIER_LADDER = {
     orb_transmutation: {
         5: [{ id: 'orb_transmutation', count: 4 }],
         4: [{ id: 'orb_augmentation', count: 3 }],
@@ -111,7 +111,7 @@ export const EG_CRAFT_TIER_LADDER = {
 
 // Which crafting orb each mod family is made with. Families missing here
 // fall back to orb_alchemy.
-export const EG_CRAFT_FAMILY_CURRENCIES = {
+export const CRAFT_FAMILY_CURRENCIES = {
     // Life, mana and recovery
     flat_health: 'orb_alchemy', inc_health: 'orb_alchemy', heart_heal: 'orb_alchemy',
     inc_heart_heal: 'orb_alchemy', flat_mana: 'orb_alteration', mana_heal: 'orb_alteration',
@@ -173,9 +173,9 @@ export const EG_CRAFT_FAMILY_CURRENCIES = {
 
 // Returns the orbs needed to craft `familyId` at `tier` as a fresh list, so
 // callers can change it without touching the ladder table.
-export function _egCraftingBenchCostFor(familyId, tier) {
-    const baseId = EG_CRAFT_FAMILY_CURRENCIES[familyId] || 'orb_alchemy';
-    const ladder = EG_CRAFT_TIER_LADDER[baseId] || EG_CRAFT_TIER_LADDER['orb_alchemy'];
+export function _craftingBenchCostFor(familyId, tier) {
+    const baseId = CRAFT_FAMILY_CURRENCIES[familyId] || 'orb_alchemy';
+    const ladder = CRAFT_TIER_LADDER[baseId] || CRAFT_TIER_LADDER['orb_alchemy'];
     const entry = ladder[tier] || ladder[5] || [{ id: baseId, count: 2 }];
     // Return a shallow copy so callers can mutate without affecting the table.
     return entry.map(cost => ({ id: cost.id, count: cost.count }));
@@ -183,11 +183,11 @@ export function _egCraftingBenchCostFor(familyId, tier) {
 
 // Legacy flat view of the ladder: the largest per-tier orb total across all
 // families. Kept for older tooling; the bench itself uses the ladder above.
-export const EG_CRAFT_TIER_COSTS = (() => {
+export const CRAFT_TIER_COSTS = (() => {
     const out = {};
     for (let tier = 1; tier <= 5; tier++) {
         let max = 0;
-        for (const ladder of Object.values(EG_CRAFT_TIER_LADDER)) {
+        for (const ladder of Object.values(CRAFT_TIER_LADDER)) {
             const entry = ladder[tier];
             if (!entry) continue;
             const sum = entry.reduce((s, c) => s + c.count, 0);

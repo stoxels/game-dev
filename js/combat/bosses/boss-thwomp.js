@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkEl, _nkFlingAvatar, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE THWOMP (boss_thwomp)------------------------
@@ -13,7 +13,7 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFli
 // in shared-boss-abilities.js) are referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_thwomp: {
         id: 'boss_thwomp', name: 'The Thwomp', emoji: '🪨',
         baseHP: 1120, baseDamage: 25, chargeMax: 13,
@@ -21,7 +21,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_thwomp: {
         phases: [
             { threshold: 1.00, chargeMax: 13, damageMultiplier: 1.00 },
@@ -30,72 +30,72 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'soul_tithe', intervalBase: 23000, intervalVariance: 5000, handler: '_egMechSoulTithe' },
-            { name: 'corrupt_cells', intervalBase: 17000, intervalVariance: 4000, handler: '_egMechCorruptCells' },
+            { name: 'soul_tithe', intervalBase: 23000, intervalVariance: 5000, handler: '_mechSoulTithe' },
+            { name: 'corrupt_cells', intervalBase: 17000, intervalVariance: 4000, handler: '_mechCorruptCells' },
         ],
-        onInit: _egThwompArenaInit,
+        onInit: _thwompArenaInit,
     },
 });
 
 
 // ── Thwomp tuning ───────────────────────────────────────────────────────
 // The hovering block
-export const EG_THW_R = 62;                          // half-size of the block (visual + hit)
-export const EG_THW_HOVER_SPEED = [0, 26, 34, 44];   // px/s drift while hovering
-export const EG_THW_STOMP_INTERVAL_MS = [0, 8200, 6400, 4800]; // quake stomp cadence
-export const EG_THW_STOMP_WARN_MS = 1000;            // dust-ring telegraph
-export const EG_THW_STOMP_CRASH_MS = 320;            // the drop itself
-export const EG_THW_STOMP_R = 120;                   // impact circle radius
-export const EG_THW_STOMP_DMG = [0, 0.14, 0.16, 0.19]; // %maxHP per quake stomp
-export const EG_THW_STOMP_FLING = [0, 190, 220, 250];  // px outward fling
+export const THW_R = 62;                          // half-size of the block (visual + hit)
+export const THW_HOVER_SPEED = [0, 26, 34, 44];   // px/s drift while hovering
+export const THW_STOMP_INTERVAL_MS = [0, 8200, 6400, 4800]; // quake stomp cadence
+export const THW_STOMP_WARN_MS = 1000;            // dust-ring telegraph
+export const THW_STOMP_CRASH_MS = 320;            // the drop itself
+export const THW_STOMP_R = 120;                   // impact circle radius
+export const THW_STOMP_DMG = [0, 0.14, 0.16, 0.19]; // %maxHP per quake stomp
+export const THW_STOMP_FLING = [0, 190, 220, 250];  // px outward fling
 // Ceiling collapse (60% gate)
-export const EG_THW_COLLAPSE_MARKS = [0, 6, 8, 10];  // rubble marks per boss phase
-export const EG_THW_COLLAPSE_MARK_MS = 1150;         // per-mark telegraph
-export const EG_THW_COLLAPSE_STAGGER_MS = 380;       // between marks
-export const EG_THW_COLLAPSE_DMG = 0.11;             // %maxHP per falling stone
-export const EG_THW_AFTERSHOCK_MS = 2600;            // dust cloud lingers (visual)
+export const THW_COLLAPSE_MARKS = [0, 6, 8, 10];  // rubble marks per boss phase
+export const THW_COLLAPSE_MARK_MS = 1150;         // per-mark telegraph
+export const THW_COLLAPSE_STAGGER_MS = 380;       // between marks
+export const THW_COLLAPSE_DMG = 0.11;             // %maxHP per falling stone
+export const THW_AFTERSHOCK_MS = 2600;            // dust cloud lingers (visual)
 // Mini-thwomp siege (30% gate)
-export const EG_THW_MINI_N = [0, 3, 4, 5];           // minis per boss phase
-export const EG_THW_MINI_HOP_MS = 700;               // per hop
-export const EG_THW_MINI_SPEED = [0, 150, 165, 180]; // px/s hop-chase speed
-export const EG_THW_MINI_R = 34;                     // impact radius per mini slam
-export const EG_THW_MINI_DMG = 0.08;                 // %maxHP per mini slam
-export const EG_THW_MINI_SIEGE_MS = 12000;           // siege duration
+export const THW_MINI_N = [0, 3, 4, 5];           // minis per boss phase
+export const THW_MINI_HOP_MS = 700;               // per hop
+export const THW_MINI_SPEED = [0, 150, 165, 180]; // px/s hop-chase speed
+export const THW_MINI_R = 34;                     // impact radius per mini slam
+export const THW_MINI_DMG = 0.08;                 // %maxHP per mini slam
+export const THW_MINI_SIEGE_MS = 12000;           // siege duration
 // Grand Slam (charge attack)
-export const EG_THW_GS_FOLLOW_MS = 1000;             // shadow marker stalks you
-export const EG_THW_GS_LOCK_MS = 550;                // the lock tell
-export const EG_THW_GS_FALL_MS = 420;                // block drop time
-export const EG_THW_GS_DMG = [0, 0.24, 0.28, 0.34];  // %maxHP (the signature hit)
-export const EG_THW_GS_SHOCK_R = 200;                // shockwave ring radius
-export const EG_THW_GS_SHOCK_DMG = [0, 0.08, 0.09, 0.11]; // %maxHP shockwave edge
+export const THW_GS_FOLLOW_MS = 1000;             // shadow marker stalks you
+export const THW_GS_LOCK_MS = 550;                // the lock tell
+export const THW_GS_FALL_MS = 420;                // block drop time
+export const THW_GS_DMG = [0, 0.24, 0.28, 0.34];  // %maxHP (the signature hit)
+export const THW_GS_SHOCK_R = 200;                // shockwave ring radius
+export const THW_GS_SHOCK_DMG = [0, 0.08, 0.09, 0.11]; // %maxHP shockwave edge
 
 
-export let _egThwWatcher = null;      // per-fight guardian state
-export let _egThwGrandSlamActive = false;
+export let _thwWatcher = null;      // per-fight guardian state
+export let _thwGrandSlamActive = false;
 
 
 // Sweep every thwomp overlay off the screen. Safe to call twice.
-export function _egThwompSweep() {
-    _egThwGrandSlamActive = false;
+export function _thwompSweep() {
+    _thwGrandSlamActive = false;
     try {
         document.querySelectorAll('.eg-thw-block, .eg-thw-ring, .eg-thw-mark, .eg-thw-stone, .eg-thw-cloud, .eg-thw-mini, .eg-thw-gs-mark, .eg-thw-shock, .eg-thw-crash').forEach(el => el.remove());
     } catch (e) {}
 }
 
 
-// Called from _egBossCleanup (boss-framework.js) on boss death / stop.
-export function _egThwompTeardown() {
-    const st = _egThwWatcher;
-    _egThwWatcher = null;
-    if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
+// Called from _bossCleanup (boss-framework.js) on boss death / stop.
+export function _thwompTeardown() {
+    const st = _thwWatcher;
+    _thwWatcher = null;
+    if (st && st.run) { try { _nkKillRun(st.run); } catch (e) {} }
     // Always sweep: on boss death the run's onKill may have nulled the
     // watcher BEFORE this runs - the overlays must go either way.
-    _egThwompSweep();
+    _thwompSweep();
 }
 
 
-export function _egThwompArenaInit(monster) {
-    if (_egThwWatcher) return;
+export function _thwompArenaInit(monster) {
+    if (_thwWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
         monsterId, level: monster ? monster.level : 1,
@@ -104,21 +104,21 @@ export function _egThwompArenaInit(monster) {
         gate60Done: false, gate30Done: false,
         everLive: false, bornAt: performance.now(),
     };
-    _egThwWatcher = st;
-    _egNkToast('eg_thwomp_intro', '🪨 The Thwomp: The guardian wakes - respect the block!');
+    _thwWatcher = st;
+    _nkToast('eg_thwomp_intro', '🪨 The Thwomp: The guardian wakes - respect the block!');
     // Tier-scaled clock: every telegraph breathes with tier.
-    // Passive run: lives the whole fight without hogging _egNkDodgeBusy().
-    const run = _egNkNewRun(monsterId, true);
+    // Passive run: lives the whole fight without hogging _nkDodgeBusy().
+    const run = _nkNewRun(monsterId, true);
     run.passive = true;
     st.run = run;
     run.onKill = () => {
-        if (_egThwWatcher && _egThwWatcher.run === run) _egThwWatcher = null;
-        _egThwompSweep();
+        if (_thwWatcher && _thwWatcher.run === run) _thwWatcher = null;
+        _thwompSweep();
     };
 
     // The hovering block: big angry stone face, drifts to a new hover spot
     // after every stomp.
-    const blockEl = _egNkEl(run, 'div', 'eg-thw-block', '🪨');
+    const blockEl = _nkEl(run, 'div', 'eg-thw-block', '🪨');
     const W0 = window.innerWidth, H0 = window.innerHeight;
     const block = {
         x: W0 / 2, y: H0 * 0.28,
@@ -127,11 +127,11 @@ export function _egThwompArenaInit(monster) {
         el: blockEl,
     };
     st.block = block;
-    _egThwPickHoverSpot(block);
+    _thwPickHoverSpot(block);
 
-    _egNkLoop(run, (dtS, now) => {
-        const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
-            ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+    _nkLoop(run, (dtS, now) => {
+        const live = (typeof _monsters !== 'undefined' && globalThis._monsters)
+            ? (globalThis._monsters.find(m => m && m.id === st.monsterId) || null) : null;
         // Boss not registered yet → wait for it (spawn races the arena init);
         // boss vanished AFTER being live → the fight is over, tear down.
         if (!live) {
@@ -140,13 +140,13 @@ export function _egThwompArenaInit(monster) {
         }
         st.everLive = true;
 
-        const pr = _egNkPlayerRect();
+        const pr = _nkPlayerRect();
         const p = Math.max(1, Math.min(3, Number(live.bossPhase) || 1));
 
         // ── HP gates ──
         const hpPct = live.maxHP > 0 ? live.currentHP / live.maxHP : 1;
-        if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _egThwCollapse(st, p); }
-        if (!st.gate30Done && hpPct <= 0.30) { st.gate30Done = true; _egThwSiege(st, p); }
+        if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _thwCollapse(st, p); }
+        if (!st.gate30Done && hpPct <= 0.30) { st.gate30Done = true; _thwSiege(st, p); }
 
         // ── The hovering block + quake stomps ──
         const b = st.block;
@@ -155,72 +155,72 @@ export function _egThwompArenaInit(monster) {
             // Drift toward the hover spot; pick a new one on arrival.
             const dx = b.hx - b.x, dy = b.hy - b.y;
             const d = Math.hypot(dx, dy) || 1;
-            const step = EG_THW_HOVER_SPEED[p] * dtS;
+            const step = THW_HOVER_SPEED[p] * dtS;
             if (d <= step) {
                 b.x = b.hx; b.y = b.hy;
-                if (b.t >= 1200) _egThwPickHoverSpot(b);
+                if (b.t >= 1200) _thwPickHoverSpot(b);
             } else {
                 b.x += (dx / d) * step;
                 b.y += (dy / d) * step;
             }
             // Quake stomp cadence.
             st.quakeAcc += dtS * 1000;
-            const qInt = (st.siege ? EG_THW_STOMP_INTERVAL_MS[p] * 0.6 : EG_THW_STOMP_INTERVAL_MS[p]);
+            const qInt = (st.siege ? THW_STOMP_INTERVAL_MS[p] * 0.6 : THW_STOMP_INTERVAL_MS[p]);
             if (st.quakeAcc >= qInt) {
                 st.quakeAcc = 0;
                 b.phase = 'stomp-warn';
                 b.t = 0;
-                const ring = _egNkEl(st.run, 'div', 'eg-thw-ring');
+                const ring = _nkEl(st.run, 'div', 'eg-thw-ring');
                 ring.style.left = Math.round(b.x) + 'px';
                 ring.style.top = Math.round(b.y) + 'px';
-                ring.style.width = ring.style.height = (EG_THW_STOMP_R * 2) + 'px';
+                ring.style.width = ring.style.height = (THW_STOMP_R * 2) + 'px';
                 st.quakeRing = ring;
-                _egNkToast('eg_thwomp_quake', '🪨 QUAKE STOMP! Clear the dust ring!');
+                _nkToast('eg_thwomp_quake', '🪨 QUAKE STOMP! Clear the dust ring!');
                 try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'thwomp_slam'); } catch (e) {}
             }
         } else if (b.phase === 'stomp-warn') {
-            if (b.t >= EG_THW_STOMP_WARN_MS) {
+            if (b.t >= THW_STOMP_WARN_MS) {
                 b.phase = 'crash';
                 b.t = 0;
                 b.el.classList.add('crash');
                 try { if (st.quakeRing) st.quakeRing.classList.add('hot'); } catch (e) {}
             }
         } else if (b.phase === 'crash') {
-            if (b.t >= EG_THW_STOMP_CRASH_MS) {
+            if (b.t >= THW_STOMP_CRASH_MS) {
                 // Impact: damage circle + fling outward, then rise again.
                 b.el.classList.remove('crash');
                 try { if (st.quakeRing) { st.quakeRing.remove(); st.quakeRing = null; } } catch (e) {}
-                const c = _egNkPlayerCenter();
-                if (pr && _egNkCircleHit(b.x, b.y, EG_THW_STOMP_R, pr, 0)) {
-                    const dealt = _egNkHit(EG_THW_STOMP_DMG[p], null, st.level);
-                    _egNkAbilityHitToast(dealt, 'The Thwomp', 'Quake Stomp');
+                const c = _nkPlayerCenter();
+                if (pr && _nkCircleHit(b.x, b.y, THW_STOMP_R, pr, 0)) {
+                    const dealt = _nkHit(THW_STOMP_DMG[p], null, st.level);
+                    _nkAbilityHitToast(dealt, 'The Thwomp', 'Quake Stomp');
                     if (c) {
                         const dx = c.x - b.x, dy = c.y - b.y;
                         const d = Math.hypot(dx, dy) || 1;
                         // Animated fling (contact at the impact): glide +
                         // tumble + burst instead of a raw teleport.
-                        _egNkFlingAvatar((dx / d) * EG_THW_STOMP_FLING[p], (dy / d) * EG_THW_STOMP_FLING[p], b.x, b.y);
+                        _nkFlingAvatar((dx / d) * THW_STOMP_FLING[p], (dy / d) * THW_STOMP_FLING[p], b.x, b.y);
                     }
                 }
-                _egThwShockRing(st, b.x, b.y, EG_THW_STOMP_R, 0.5);
+                _thwShockRing(st, b.x, b.y, THW_STOMP_R, 0.5);
                 try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'thwomp_slam'); } catch (e) {}
                 b.phase = 'hover';
                 b.t = 0;
-                _egThwPickHoverSpot(b);
+                _thwPickHoverSpot(b);
             }
         }
-        b.el.style.transform = 'translate(' + Math.round(b.x - EG_THW_R) + 'px,' + Math.round(b.y - EG_THW_R) + 'px)' + (b.phase === 'crash' ? ' scale(1.12)' : '');
+        b.el.style.transform = 'translate(' + Math.round(b.x - THW_R) + 'px,' + Math.round(b.y - THW_R) + 'px)' + (b.phase === 'crash' ? ' scale(1.12)' : '');
 
         // ── Ceiling collapse (60% gate) ──
         if (st.collapse) {
             const cl = st.collapse;
             cl.t += dtS * 1000;
             // Spawn marks on the stagger schedule.
-            while (cl.next < cl.marks.length && cl.t >= cl.next * EG_THW_COLLAPSE_STAGGER_MS) {
+            while (cl.next < cl.marks.length && cl.t >= cl.next * THW_COLLAPSE_STAGGER_MS) {
                 const mk = cl.marks[cl.next];
                 mk.stage = 'warn';
                 mk.t = 0;
-                mk.el = _egNkEl(st.run, 'div', 'eg-thw-mark');
+                mk.el = _nkEl(st.run, 'div', 'eg-thw-mark');
                 mk.el.style.left = Math.round(mk.x - 44) + 'px';
                 mk.el.style.top = Math.round(mk.y - 44) + 'px';
                 cl.next++;
@@ -229,22 +229,22 @@ export function _egThwompArenaInit(monster) {
             cl.marks.forEach(mk => {
                 if (mk.stage === 'warn') {
                     mk.t += dtS * 1000;
-                    if (mk.t >= EG_THW_COLLAPSE_MARK_MS) {
+                    if (mk.t >= THW_COLLAPSE_MARK_MS) {
                         mk.stage = 'done';
                         try { mk.el.remove(); } catch (e) {}
-                        const stone = _egNkEl(st.run, 'div', 'eg-thw-stone', '🪨');
+                        const stone = _nkEl(st.run, 'div', 'eg-thw-stone', '🪨');
                         stone.style.left = Math.round(mk.x) + 'px';
                         stone.style.top = Math.round(mk.y) + 'px';
                         setTimeout(() => { try { stone.remove(); } catch (e) {} }, 320);
-                        if (pr && _egNkCircleHit(mk.x, mk.y, 46, pr, 0)) {
-                            const dealt = _egNkHit(EG_THW_COLLAPSE_DMG, null, st.level);
-                            _egNkAbilityHitToast(dealt, 'The Thwomp', 'Collapse');
+                        if (pr && _nkCircleHit(mk.x, mk.y, 46, pr, 0)) {
+                            const dealt = _nkHit(THW_COLLAPSE_DMG, null, st.level);
+                            _nkAbilityHitToast(dealt, 'The Thwomp', 'Collapse');
                         }
                         // Aftershock dust cloud.
-                        const cloud = _egNkEl(st.run, 'div', 'eg-thw-cloud');
+                        const cloud = _nkEl(st.run, 'div', 'eg-thw-cloud');
                         cloud.style.left = Math.round(mk.x) + 'px';
                         cloud.style.top = Math.round(mk.y) + 'px';
-                        setTimeout(() => { try { cloud.remove(); } catch (e) {} }, EG_THW_AFTERSHOCK_MS);
+                        setTimeout(() => { try { cloud.remove(); } catch (e) {} }, THW_AFTERSHOCK_MS);
                     }
                 }
             });
@@ -265,14 +265,14 @@ export function _egThwompArenaInit(monster) {
                 if (mn.phase === 'chase') {
                     // Hop-chase: move toward the player in hops.
                     mn.hopAcc += dtS * 1000;
-                    const c = _egNkPlayerCenter();
+                    const c = _nkPlayerCenter();
                     if (c) {
                         const dx = c.x - mn.x, dy = c.y - mn.y;
                         const d = Math.hypot(dx, dy) || 1;
-                        if (mn.hopAcc >= EG_THW_MINI_HOP_MS) {
+                        if (mn.hopAcc >= THW_MINI_HOP_MS) {
                             mn.hopAcc = 0;
-                            mn.hopVx = (dx / d) * EG_THW_MINI_SPEED[p];
-                            mn.hopVy = (dy / d) * EG_THW_MINI_SPEED[p];
+                            mn.hopVx = (dx / d) * THW_MINI_SPEED[p];
+                            mn.hopVy = (dy / d) * THW_MINI_SPEED[p];
                             mn.hopZ = 1; // hop arc trigger
                         }
                         if (mn.hopVx != null) {
@@ -280,33 +280,33 @@ export function _egThwompArenaInit(monster) {
                             mn.y += mn.hopVy * dtS;
                         }
                     }
-                    const hopScale = mn.hopZ > 0 ? 1 + Math.sin(Math.min(1, mn.hopAcc / EG_THW_MINI_HOP_MS) * Math.PI) * 0.22 : 1;
+                    const hopScale = mn.hopZ > 0 ? 1 + Math.sin(Math.min(1, mn.hopAcc / THW_MINI_HOP_MS) * Math.PI) * 0.22 : 1;
                     mn.el.style.transform = 'translate(' + Math.round(mn.x - 20) + 'px,' + Math.round(mn.y - 20 - hopScale * 10) + 'px) scale(' + hopScale.toFixed(2) + ')';
-                    if (mn.hopAcc >= EG_THW_MINI_HOP_MS * 0.9 && c && Math.hypot(c.x - mn.x, c.y - mn.y) < 130) {
+                    if (mn.hopAcc >= THW_MINI_HOP_MS * 0.9 && c && Math.hypot(c.x - mn.x, c.y - mn.y) < 130) {
                         mn.phase = 'slam-warn';
                         mn.t = 0;
-                        mn.ring = _egNkEl(st.run, 'div', 'eg-thw-ring mini');
+                        mn.ring = _nkEl(st.run, 'div', 'eg-thw-ring mini');
                         mn.ring.style.left = Math.round(mn.x) + 'px';
                         mn.ring.style.top = Math.round(mn.y) + 'px';
-                        mn.ring.style.width = mn.ring.style.height = (EG_THW_MINI_R * 2) + 'px';
+                        mn.ring.style.width = mn.ring.style.height = (THW_MINI_R * 2) + 'px';
                     }
                 } else if (mn.phase === 'slam-warn') {
                     mn.t += dtS * 1000;
-                    if (mn.t >= EG_THW_STOMP_WARN_MS) {
+                    if (mn.t >= THW_STOMP_WARN_MS) {
                         mn.phase = 'chase';
                         mn.t = 0;
                         try { if (mn.ring) { mn.ring.remove(); mn.ring = null; } } catch (e) {}
-                        const prNow = _egNkPlayerRect();
-                        if (prNow && _egNkCircleHit(mn.x, mn.y, EG_THW_MINI_R, prNow, 0)) {
-                            const dealt = _egNkHit(EG_THW_MINI_DMG, null, st.level);
-                            _egNkAbilityHitToast(dealt, 'The Thwomp', 'Mini Slam');
+                        const prNow = _nkPlayerRect();
+                        if (prNow && _nkCircleHit(mn.x, mn.y, THW_MINI_R, prNow, 0)) {
+                            const dealt = _nkHit(THW_MINI_DMG, null, st.level);
+                            _nkAbilityHitToast(dealt, 'The Thwomp', 'Mini Slam');
                         }
-                        _egThwShockRing(st, mn.x, mn.y, EG_THW_MINI_R, 0.3);
+                        _thwShockRing(st, mn.x, mn.y, THW_MINI_R, 0.3);
                         try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'thwomp_slam'); } catch (e) {}
                     }
                 }
             });
-            if (sg.t >= EG_THW_MINI_SIEGE_MS || !active) {
+            if (sg.t >= THW_MINI_SIEGE_MS || !active) {
                 sg.minis.forEach(mn => {
                     try { if (mn.ring) mn.ring.remove(); } catch (e) {}
                     try { mn.el.remove(); } catch (e) {}
@@ -321,7 +321,7 @@ export function _egThwompArenaInit(monster) {
 
 
 // Picks a fresh hover spot away from the current one, inside the arena.
-export function _egThwPickHoverSpot(b) {
+export function _thwPickHoverSpot(b) {
     const W = window.innerWidth, H = window.innerHeight;
     const pad = 130;
     let x = W / 2, y = H / 2;
@@ -335,8 +335,8 @@ export function _egThwPickHoverSpot(b) {
 
 
 // Expanding shockwave ring (visual punctuation for any slam).
-export function _egThwShockRing(st, x, y, r, power) {
-    const ring = _egNkEl(st.run, 'div', 'eg-thw-shock');
+export function _thwShockRing(st, x, y, r, power) {
+    const ring = _nkEl(st.run, 'div', 'eg-thw-shock');
     ring.style.left = Math.round(x) + 'px';
     ring.style.top = Math.round(y) + 'px';
     ring.style.setProperty('--eg-thw-r', (r * 2.4) + 'px');
@@ -346,9 +346,9 @@ export function _egThwShockRing(st, x, y, r, power) {
 
 
 // ── 60% gate: Ceiling Collapse ──────────────────────────────────────────
-export function _egThwCollapse(st, p) {
+export function _thwCollapse(st, p) {
     const W = window.innerWidth, H = window.innerHeight;
-    const n = EG_THW_COLLAPSE_MARKS[p];
+    const n = THW_COLLAPSE_MARKS[p];
     const marks = [];
     for (let i = 0; i < n; i++) {
         marks.push({
@@ -358,17 +358,17 @@ export function _egThwCollapse(st, p) {
         });
     }
     st.collapse = { t: 0, marks, next: 0 };
-    _egNkToast('eg_thwomp_collapse', '🪨 CEILING COLLAPSE! Watch the rubble marks!');
+    _nkToast('eg_thwomp_collapse', '🪨 CEILING COLLAPSE! Watch the rubble marks!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'thwomp_slam'); } catch (e) {}
 }
 
 
 // ── 30% gate: Mini-thwomp Siege ─────────────────────────────────────────
-export function _egThwSiege(st, p) {
-    const n = EG_THW_MINI_N[p];
+export function _thwSiege(st, p) {
+    const n = THW_MINI_N[p];
     const minis = [];
     for (let i = 0; i < n; i++) {
-        const el = _egNkEl(st.run, 'div', 'eg-thw-mini', '🪨');
+        const el = _nkEl(st.run, 'div', 'eg-thw-mini', '🪨');
         const mn = {
             x: window.innerWidth * (0.2 + Math.random() * 0.6),
             y: window.innerHeight * (0.2 + Math.random() * 0.6),
@@ -378,7 +378,7 @@ export function _egThwSiege(st, p) {
         minis.push(mn);
     }
     st.siege = { t: 0, minis };
-    _egNkToast('eg_thwomp_siege', '🪨 MINI-THWOMP SIEGE! The blocks multiply!');
+    _nkToast('eg_thwomp_siege', '🪨 MINI-THWOMP SIEGE! The blocks multiply!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'thwomp_slam'); } catch (e) {}
 }
 
@@ -388,33 +388,33 @@ export function _egThwSiege(st, p) {
 //------------------------------------------------------------------------
 // A shadow marker stalks your avatar and locks (the classic Thwomp tell),
 // then the whole block teleports overhead and crashes onto the mark with a
-// huge shockwave ring. Wired from _egFireMonsterAttack (endgame-encounter.js).
+// huge shockwave ring. Wired from _fireMonsterAttack (endgame-encounter.js).
 
-export function _egThwompGrandSlam(monster) {
-    if (_egThwGrandSlamActive || _egNkDodgeBusy() || _egNkFrozen()) return;
-    const st = _egThwWatcher;
+export function _thwompGrandSlam(monster) {
+    if (_thwGrandSlamActive || _nkDodgeBusy() || _nkFrozen()) return;
+    const st = _thwWatcher;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
     const level = monster ? monster.level : 1;
-    const run = _egNkNewRun(monster ? monster.id : null, true);
-    _egThwGrandSlamActive = true;
-    run.onKill = () => { _egThwGrandSlamActive = false; };
-    const mark = _egNkEl(run, 'div', 'eg-thw-gs-mark');
-    mark.style.width = mark.style.height = (EG_THW_STOMP_R * 1.9) + 'px';
-    _egNkToast('eg_thwomp_gs', '🪨 GRAND SLAM! Get out from under the block!');
+    const run = _nkNewRun(monster ? monster.id : null, true);
+    _thwGrandSlamActive = true;
+    run.onKill = () => { _thwGrandSlamActive = false; };
+    const mark = _nkEl(run, 'div', 'eg-thw-gs-mark');
+    mark.style.width = mark.style.height = (THW_STOMP_R * 1.9) + 'px';
+    _nkToast('eg_thwomp_gs', '🪨 GRAND SLAM! Get out from under the block!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'thwomp_slam'); } catch (e) {}
     let t = 0, stage = 'follow', x = 0, y = 0, hit = false, shocked = false;
-    const crashEl = _egNkEl(run, 'div', 'eg-thw-crash', '🪨');
+    const crashEl = _nkEl(run, 'div', 'eg-thw-crash', '🪨');
     crashEl.style.opacity = '0';
-    _egNkLoop(run, (dtS) => {
+    _nkLoop(run, (dtS) => {
         t += dtS * 1000;
         if (stage === 'follow') {
-            const c = _egNkPlayerCenter();
+            const c = _nkPlayerCenter();
             if (c) { x = c.x; y = c.y; }
-            mark.style.left = Math.round(x - EG_THW_STOMP_R * 0.95) + 'px';
-            mark.style.top = Math.round(y - EG_THW_STOMP_R * 0.95) + 'px';
-            if (t >= EG_THW_GS_FOLLOW_MS) { stage = 'lock'; t = 0; mark.classList.add('lock'); }
+            mark.style.left = Math.round(x - THW_STOMP_R * 0.95) + 'px';
+            mark.style.top = Math.round(y - THW_STOMP_R * 0.95) + 'px';
+            if (t >= THW_GS_FOLLOW_MS) { stage = 'lock'; t = 0; mark.classList.add('lock'); }
         } else if (stage === 'lock') {
-            if (t >= EG_THW_GS_LOCK_MS) {
+            if (t >= THW_GS_LOCK_MS) {
                 stage = 'fall';
                 t = 0;
                 mark.classList.add('hot');
@@ -422,37 +422,37 @@ export function _egThwompGrandSlam(monster) {
             }
         } else if (stage === 'fall') {
             // Drop: animate the crash block from above the mark.
-            const k = Math.min(1, t / EG_THW_GS_FALL_MS);
-            crashEl.style.left = Math.round(x - EG_THW_R) + 'px';
-            crashEl.style.top = Math.round(y - EG_THW_R - (1 - k) * 420) + 'px';
+            const k = Math.min(1, t / THW_GS_FALL_MS);
+            crashEl.style.left = Math.round(x - THW_R) + 'px';
+            crashEl.style.top = Math.round(y - THW_R - (1 - k) * 420) + 'px';
             if (k >= 1 && !shocked) {
                 shocked = true;
-                _egThwShockRing(st, x, y, EG_THW_GS_SHOCK_R * 0.55, 0.9);
+                _thwShockRing(st, x, y, THW_GS_SHOCK_R * 0.55, 0.9);
             }
-            if (t >= EG_THW_GS_FALL_MS + 120) {
-                const pr = _egNkPlayerRect();
-                if (!hit && _egNkCircleHit(x, y, EG_THW_STOMP_R, pr, 0)) {
+            if (t >= THW_GS_FALL_MS + 120) {
+                const pr = _nkPlayerRect();
+                if (!hit && _nkCircleHit(x, y, THW_STOMP_R, pr, 0)) {
                     hit = true;
-                    const dealt = _egNkHit(EG_THW_GS_DMG[p], null, level);
-                    _egNkAbilityHitToast(dealt, 'The Thwomp', 'Grand Slam');
+                    const dealt = _nkHit(THW_GS_DMG[p], null, level);
+                    _nkAbilityHitToast(dealt, 'The Thwomp', 'Grand Slam');
                 }
                 // Shockwave edge: anyone just outside the core still gets clipped.
-                const c = _egNkPlayerCenter();
+                const c = _nkPlayerCenter();
                 if (c && !hit) {
                     const d = Math.hypot(c.x - x, c.y - y);
-                    if (d <= EG_THW_GS_SHOCK_R && d > EG_THW_STOMP_R) {
-                        const dealt = _egNkHit(EG_THW_GS_SHOCK_DMG[p], null, level);
-                        _egNkAbilityHitToast(dealt, 'The Thwomp', 'Shockwave');
+                    if (d <= THW_GS_SHOCK_R && d > THW_STOMP_R) {
+                        const dealt = _nkHit(THW_GS_SHOCK_DMG[p], null, level);
+                        _nkAbilityHitToast(dealt, 'The Thwomp', 'Shockwave');
                     }
                 }
                 mark.remove();
                 crashEl.remove();
-                _egThwShockRing(st, x, y, EG_THW_GS_SHOCK_R * 0.55, 0.9);
+                _thwShockRing(st, x, y, THW_GS_SHOCK_R * 0.55, 0.9);
                 if (st && st.block) {
                     // The guardian reappears at its hover spot after the slam.
                     st.block.phase = 'hover';
                     st.block.t = 0;
-                    _egThwPickHoverSpot(st.block);
+                    _thwPickHoverSpot(st.block);
                 }
                 return false;
             }
@@ -467,4 +467,4 @@ export function _egThwompGrandSlam(monster) {
 //------------------------------------------------------------------------
 // The old scheduled Crushing Slam is now the persistent arena - keep the
 // handler name alive so any stale schedule entry no-ops instead of erroring.
-export function _egMechThwompSlam() { void 0; }
+export function _mechThwompSlam() { void 0; }

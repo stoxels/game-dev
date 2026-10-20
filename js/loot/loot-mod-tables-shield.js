@@ -1,28 +1,28 @@
-import { EG_MOD_TABLE_WEAPON2 } from './loot-mod-tables-weapon2.js';
+import { MOD_TABLE_WEAPON2 } from './loot-mod-tables-weapon2.js';
 
 //  endgame-mod-tables-shield.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
+//  which evals every MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------SHIELD MODIFIER TABLE--------------------------------
 //------------------------------------------------------------------------
-// Defensive-only derivative of EG_MOD_TABLE_WEAPON2. Shields must not
+// Defensive-only derivative of MOD_TABLE_WEAPON2. Shields must not
 // roll offensive stats (spell damage / channel are offhand-item identity,
 // attack mods live on WEAPON1), so those families are stripped here while
 // everything else - local defences, block & dodge suffixes, shield_bash,
 // attributes, regen and utility - carries over unchanged.
 
-export const EG_MOD_TABLE_SHIELD = (() => {
+export const MOD_TABLE_SHIELD = (() => {
     const offensivePrefixIds = ['spell_damage', 'inc_spell_damage', 'channel'];
     return {
         prefixes: Object.fromEntries(
-            Object.entries(EG_MOD_TABLE_WEAPON2.prefixes)
+            Object.entries(MOD_TABLE_WEAPON2.prefixes)
                 .filter(([id]) => !offensivePrefixIds.includes(id))
         ),
-        suffixes: { ...Object.fromEntries(Object.entries(EG_MOD_TABLE_WEAPON2.suffixes).filter(([id]) => !['spell_crit_chance', 'spell_crit_multiplier', 'cast_speed'].includes(id))),
+        suffixes: { ...Object.fromEntries(Object.entries(MOD_TABLE_WEAPON2.suffixes).filter(([id]) => !['spell_crit_chance', 'spell_crit_multiplier', 'cast_speed'].includes(id))),
         parry: {
             id: 'parry',
             label: '#% Chance to Parry Attacks while holding [R]', labelDe: '#% Chance, Angriffe beim Halten von [R] zu parieren',
@@ -56,9 +56,9 @@ export const EG_MOD_TABLE_SHIELD = (() => {
 })();
 
 // In: endgame-mod-tables.js
-// Replace the empty EG_MOD_TABLE_RANGED at the bottom of the file
+// Replace the empty MOD_TABLE_RANGED at the bottom of the file
 
-export const EG_MOD_TABLE_RANGED = {
+export const MOD_TABLE_RANGED = {
     prefixes: {
 
         // --- FLAT PHYSICAL DAMAGE ---

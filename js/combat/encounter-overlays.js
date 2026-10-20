@@ -1,15 +1,15 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { _egGetMistakesRemaining } from './encounter-tick-support.js';
-import { _egIsActive } from './combat-state.js';
-import { _egClearCenterGridBanners } from '../timer/timer.js';
+import { _getMistakesRemaining } from './encounter-tick-support.js';
+import { _isActive } from './combat-state.js';
+import { _clearCenterGridBanners } from '../timer/timer.js';
 // Encounter warning overlays: mistake, low-health, and absorption-broken
 // banners with their threshold tracking and reset paths.
 //
-export function _egShowMistakesWarningBanner(remaining) {
+export function _showMistakesWarningBanner(remaining) {
     Audio_Manager.playSFX('mistakes_warning');
     // Dismiss any other center-grid banner so concurrent events don't stack
-    _egClearCenterGridBanners('eg-mistakes-warning-banner');
+    _clearCenterGridBanners('eg-mistakes-warning-banner');
     // Remove any stale banner so a rapid 3→2→1 cascade always shows the newest count
     const old = document.getElementById('eg-mistakes-warning-banner');
     if (old) old.remove();
@@ -51,33 +51,33 @@ export function _egShowMistakesWarningBanner(remaining) {
     setTimeout(() => el.remove(), 2500);
 }
 
-export function _egMaybeShowMistakesWarning() {
-    if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
-    const remaining = _egGetMistakesRemaining();
+export function _maybeShowMistakesWarning() {
+    if (typeof _isActive !== 'function' || !_isActive()) return;
+    const remaining = _getMistakesRemaining();
     if (remaining == null || remaining < 0) {
         // No limit or already over - keep last remaining for next comparison
-        globalThis._egLastMistakesRemaining = remaining;
+        globalThis._lastMistakesRemaining = remaining;
         return;
     }
-    const prev = globalThis._egLastMistakesRemaining;
-    globalThis._egLastMistakesRemaining = remaining;
+    const prev = globalThis._lastMistakesRemaining;
+    globalThis._lastMistakesRemaining = remaining;
 
     if (remaining > 3) {
         // Out of the 3/2/1/0 window - clear the dedup so re-entering can fire again
-        globalThis._egLastMistakesWarningShown = null;
+        globalThis._lastMistakesWarningShown = null;
         return;
     }
     // Only warn when the count *decreased* into / within the window.
     // Increases (eraser) update the tracker but do not re-fire the overlay.
     if (prev != null && remaining >= prev) return;
-    if (remaining === globalThis._egLastMistakesWarningShown) return;
-    globalThis._egLastMistakesWarningShown = remaining;
-    _egShowMistakesWarningBanner(remaining);
+    if (remaining === globalThis._lastMistakesWarningShown) return;
+    globalThis._lastMistakesWarningShown = remaining;
+    _showMistakesWarningBanner(remaining);
 }
 
-export function _egResetMistakesWarningState() {
-    globalThis._egLastMistakesWarningShown = null;
-    globalThis._egLastMistakesRemaining = null;
+export function _resetMistakesWarningState() {
+    globalThis._lastMistakesWarningShown = null;
+    globalThis._lastMistakesRemaining = null;
     const banner = document.getElementById('eg-mistakes-warning-banner');
     if (banner) banner.remove();
 }
@@ -86,22 +86,22 @@ export function _egResetMistakesWarningState() {
 //-------------------LOW HEALTH WARNING-----------------------------------
 //------------------------------------------------------------------------
 
-export let _egLastHealthPct = null;
-export let _egLastLowHealthWarningShown = null;
+export let _lastHealthPct = null;
+export let _lastLowHealthWarningShown = null;
 
-export function _egGetHealthPct() {
+export function _getHealthPct() {
     if (typeof playerMaxHP === 'undefined' || globalThis.playerMaxHP <= 0) return 1;
     return globalThis.playerCurrentHP / globalThis.playerMaxHP;
 }
 
-export function _egGetLowHealthWarningTier(pct) {
+export function _getLowHealthWarningTier(pct) {
     if (pct <= 0.35) return 35;
     return null;
 }
 
-export function _egShowLowHealthWarningBanner() {
+export function _showLowHealthWarningBanner() {
     Audio_Manager.playSFX('low_health_warning');
-    _egClearCenterGridBanners('eg-low-health-warning-banner');
+    _clearCenterGridBanners('eg-low-health-warning-banner');
     const old = document.getElementById('eg-low-health-warning-banner');
     if (old) old.remove();
 
@@ -134,31 +134,31 @@ export function _egShowLowHealthWarningBanner() {
     setTimeout(() => el.remove(), 2500);
 }
 
-export function _egMaybeShowLowHealthWarning() {
-    if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
+export function _maybeShowLowHealthWarning() {
+    if (typeof _isActive !== 'function' || !_isActive()) return;
     if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
     if (globalThis.playerCurrentHP <= 0) return;
 
-    const pct = _egGetHealthPct();
-    const prev = _egLastHealthPct;
-    _egLastHealthPct = pct;
+    const pct = _getHealthPct();
+    const prev = _lastHealthPct;
+    _lastHealthPct = pct;
 
-    const tier = _egGetLowHealthWarningTier(pct);
+    const tier = _getLowHealthWarningTier(pct);
     if (!tier) {
-        _egLastLowHealthWarningShown = null;
+        _lastLowHealthWarningShown = null;
         return;
     }
     // Only warn when health *decreased* into / within a threshold.
     // Healing back up does not re-fire the overlay.
     if (prev != null && pct >= prev) return;
-    if (_egLastLowHealthWarningShown) return;
-    _egLastLowHealthWarningShown = true;
-    _egShowLowHealthWarningBanner();
+    if (_lastLowHealthWarningShown) return;
+    _lastLowHealthWarningShown = true;
+    _showLowHealthWarningBanner();
 }
 
-export function _egResetLowHealthWarningState() {
-    _egLastHealthPct = null;
-    _egLastLowHealthWarningShown = null;
+export function _resetLowHealthWarningState() {
+    _lastHealthPct = null;
+    _lastLowHealthWarningShown = null;
     const banner = document.getElementById('eg-low-health-warning-banner');
     if (banner) banner.remove();
 }
@@ -169,9 +169,9 @@ export function _egResetLowHealthWarningState() {
 // Only fires when the absorption shield transitions from >0 to 0 (broken),
 // not at percentage thresholds like the health warning.
 
-export function _egShowAbsorptionBrokenBanner() {
+export function _showAbsorptionBrokenBanner() {
     Audio_Manager.playSFX('absorption_broken');
-    _egClearCenterGridBanners('eg-absorption-broken-banner');
+    _clearCenterGridBanners('eg-absorption-broken-banner');
     const old = document.getElementById('eg-absorption-broken-banner');
     if (old) old.remove();
 
@@ -203,14 +203,14 @@ export function _egShowAbsorptionBrokenBanner() {
     setTimeout(() => el.remove(), 2500);
 }
 
-export function _egMaybeShowAbsorptionBroken(prevAbsorption, nextAbsorption) {
-    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+export function _maybeShowAbsorptionBroken(prevAbsorption, nextAbsorption) {
+    if (typeof _isActive === 'function' && !_isActive()) return;
     if (prevAbsorption > 0 && nextAbsorption <= 0) {
-        _egShowAbsorptionBrokenBanner();
+        _showAbsorptionBrokenBanner();
     }
 }
 
-export function _egResetAbsorptionBrokenState() {
+export function _resetAbsorptionBrokenState() {
     const banner = document.getElementById('eg-absorption-broken-banner');
     if (banner) banner.remove();
 }

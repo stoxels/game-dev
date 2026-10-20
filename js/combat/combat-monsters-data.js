@@ -14,7 +14,7 @@ import { t } from '../translation/translations.js';
 // resistances: % reduction of incoming player damage per element (capped at 75%).
 // Elemental monsters resist their own element.
 
-export const EG_MONSTER_DEFS = {
+export const MONSTER_DEFS = {
     // TIER 1 - Weak / fast
     slime: {
         id: 'slime', name: t('eg_mon_slime'), emoji: '🟢',

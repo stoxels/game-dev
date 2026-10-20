@@ -8,12 +8,12 @@
 
 import { LANG } from '../translation/translations.js';
 import { _egMapLootRarityWeightMult } from '../endgame/endgame-map-launch.js';
-import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';
-import { EG_SLOT_ICONS } from './equipment-slot-icons.js';
-import { _egGetModTable } from './loot-equipment-mod-tables.js';
-import { _egRollImplicitsForBase } from './loot-implicits.js';
-import {_egBuildItemName} from './loot-mod-naming.js';
-import {_egRollMods} from './loot-mod-application.js';
+import { ALL_BASE_TYPES } from './equipment-base-items.js';
+import { SLOT_ICONS } from './equipment-slot-icons.js';
+import { _getModTable } from './loot-equipment-mod-tables.js';
+import { _rollImplicitsForBase } from './loot-implicits.js';
+import {_buildItemName} from './loot-mod-naming.js';
+import {_rollMods} from './loot-mod-application.js';
 
 
 //----------------------------------------------------------------------
@@ -26,14 +26,14 @@ import {_egRollMods} from './loot-mod-application.js';
 //   uncommon (green)  - 1-2 mods  (max 1 prefix, max 1 suffix)
 //   rare     (blue)   - 3-4 mods  (max 3 prefix, max 3 suffix)
 //   epic     (purple) - 5-6 mods  (max 3 prefix, max 3 suffix)
-export const EG_ITEM_RARITY_TABLE = [
+export const ITEM_RARITY_TABLE = [
     { rarity: 'common', weight: 550 },
     { rarity: 'uncommon', weight: 290 },
     { rarity: 'rare', weight: 130 },
     { rarity: 'epic', weight: 60 },
 ];
 
-export const EG_MOD_CAPS = {
+export const ITEM_MOD_CAPS = {
     common: { maxPre: 0, maxSuf: 0, maxTotal: 0, minTotal: 0 },
     uncommon: { maxPre: 1, maxSuf: 1, maxTotal: 2, minTotal: 1 },
     rare: { maxPre: 3, maxSuf: 3, maxTotal: 4, minTotal: 3 },
@@ -45,11 +45,11 @@ export const EG_MOD_CAPS = {
 //----------------------------RARITY ROLLER-----------------------------
 //----------------------------------------------------------------------
 
-export function _egRollRarity() {
+export function _rollRarity() {
     // Active map's loot rarity bonus boosts non-common weights during runs.
     const rarMult = (typeof _egMapLootRarityWeightMult === 'function')
         ? _egMapLootRarityWeightMult() : 1;
-    const weighted = EG_ITEM_RARITY_TABLE.map(e => ({
+    const weighted = ITEM_RARITY_TABLE.map(e => ({
         rarity: e.rarity,
         weight: e.rarity === 'common' ? e.weight : e.weight * rarMult,
     }));
@@ -68,8 +68,8 @@ export function _egRollRarity() {
 //----------------------------------------------------------------------
 
 // Returns { prefixCount, suffixCount } for the given rarity.
-export function _egRollModCounts(rarity) {
-    const cap = EG_MOD_CAPS[rarity];
+export function _rollModCounts(rarity) {
+    const cap = ITEM_MOD_CAPS[rarity];
     if (!cap || cap.maxTotal === 0) return { prefixCount: 0, suffixCount: 0 };
 
     if (rarity === 'uncommon') {
@@ -110,14 +110,14 @@ export function _egRollModCounts(rarity) {
 // Below this monster level, bases that carry Armour are this much more
 // likely to drop. It is a weighting, not a freebie - the gear still has to
 // be found - and it fades out with the level so later drops are unbiased.
-export const EG_EARLY_ARMOUR_BIAS_MAX_LEVEL = 12;
-export const EG_EARLY_ARMOUR_BIAS_WEIGHT = 3;
+export const EARLY_ARMOUR_BIAS_MAX_LEVEL = 12;
+export const EARLY_ARMOUR_BIAS_WEIGHT = 3;
 
-export function _egPickBaseWithEarlyArmourBias(eligible, monsterLevel) {
-    if (!(monsterLevel <= EG_EARLY_ARMOUR_BIAS_MAX_LEVEL)) {
+export function _pickBaseWithEarlyArmourBias(eligible, monsterLevel) {
+    if (!(monsterLevel <= EARLY_ARMOUR_BIAS_MAX_LEVEL)) {
         return eligible[Math.floor(Math.random() * eligible.length)];
     }
-    const weights = eligible.map(b => ((b.defenses && b.defenses.armour > 0) ? EG_EARLY_ARMOUR_BIAS_WEIGHT : 1));
+    const weights = eligible.map(b => ((b.defenses && b.defenses.armour > 0) ? EARLY_ARMOUR_BIAS_WEIGHT : 1));
     const total = weights.reduce((s, w) => s + w, 0);
     let roll = Math.random() * total;
     for (let i = 0; i < eligible.length; i++) {
@@ -130,36 +130,36 @@ export function _egPickBaseWithEarlyArmourBias(eligible, monsterLevel) {
 // Picks a base type the monster is high enough for, rolls rarity, mods
 // and implicits off it, and assembles the finished item object.
 // forcedRarity (optional) skips the rarity roll - guaranteed rewards use it.
-export function _egGenerateEquipmentDrop(monsterLevel = 1, forcedRarity = null) {
+export function _generateEquipmentDrop(monsterLevel = 1, forcedRarity = null) {
 
     // ── 1. Pick base type ────────────────────────────────────────────
-    let eligible = EG_ALL_BASE_TYPES.filter(b => b.minLevel <= monsterLevel);
-    if (eligible.length === 0) eligible = EG_ALL_BASE_TYPES;
-    const base = _egPickBaseWithEarlyArmourBias(eligible, monsterLevel);
+    let eligible = ALL_BASE_TYPES.filter(b => b.minLevel <= monsterLevel);
+    if (eligible.length === 0) eligible = ALL_BASE_TYPES;
+    const base = _pickBaseWithEarlyArmourBias(eligible, monsterLevel);
 
     // ── 2. Roll rarity ───────────────────────────────────────────────
-    const rarity = forcedRarity || _egRollRarity();
+    const rarity = forcedRarity || _rollRarity();
 
     // ── 3. Get the mod table for this slot ───────────────────────────
-    const modTable = _egGetModTable(base);
+    const modTable = _getModTable(base);
 
     // ── 4. Roll mod counts ───────────────────────────────────────────
-    const { prefixCount, suffixCount } = _egRollModCounts(rarity);
+    const { prefixCount, suffixCount } = _rollModCounts(rarity);
 
     // ── 5. Roll mods (skip if no table or common) ────────────────────
     const mods = (modTable && (prefixCount + suffixCount) > 0)
-        ? _egRollMods(prefixCount, suffixCount, modTable, monsterLevel, base.defenses)
+        ? _rollMods(prefixCount, suffixCount, modTable, monsterLevel, base.defenses)
         : [];
 
     // ── 6. Build display name ────────────────────────────────────────
     const baseName = (LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
-    const name = _egBuildItemName(baseName, rarity, mods);
+    const name = _buildItemName(baseName, rarity, mods);
 
     // ── 6b. Roll implicit(s) - scaled by base required level (not item level) ──
     let implicits = [];
     try {
-        if (typeof _egRollImplicitsForBase === 'function') {
-            implicits = _egRollImplicitsForBase(base) || [];
+        if (typeof _rollImplicitsForBase === 'function') {
+            implicits = _rollImplicitsForBase(base) || [];
         }
     } catch (e) { implicits = []; }
 
@@ -169,7 +169,7 @@ export function _egGenerateEquipmentDrop(monsterLevel = 1, forcedRarity = null) 
         baseId: base.id,
         name,
         baseName,
-        icon: base.icon || EG_SLOT_ICONS[base.slotType] || '📦',
+        icon: base.icon || SLOT_ICONS[base.slotType] || '📦',
 
         category: 'equip',
         slotType: base.slotType,

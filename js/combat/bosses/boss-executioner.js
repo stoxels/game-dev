@@ -1,5 +1,5 @@
-import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkDotHit, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE EXECUTIONER (boss_executioner)-------------------
@@ -12,7 +12,7 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
-Object.assign(EG_BOSS_DEFS, {
+Object.assign(BOSS_DEFS, {
     boss_executioner: {
         id: 'boss_executioner', name: 'The Executioner', emoji: '🪓',
         baseHP: 1100, baseDamage: 25, chargeMax: 12,
@@ -20,7 +20,7 @@ Object.assign(EG_BOSS_DEFS, {
     },
 });
 
-Object.assign(EG_BOSS_MECHANICS, {
+Object.assign(BOSS_MECHANICS, {
     boss_executioner: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
@@ -29,8 +29,8 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'axe_pendulum', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechAxePendulum' },
-            { name: 'prior_bomb', intervalBase: 19000, intervalVariance: 4000, handler: '_egMechPriorBomb' },
+            { name: 'axe_pendulum', intervalBase: 21000, intervalVariance: 5000, handler: '_mechAxePendulum' },
+            { name: 'prior_bomb', intervalBase: 19000, intervalVariance: 4000, handler: '_mechPriorBomb' },
         ],
     },
 });
@@ -38,28 +38,28 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // A giant axe sweeps a fixed pendulum arc; the blade burns on contact.
 // Cross the lower arena only while the blade swings far away.
-export function _egMechAxePendulum(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+export function _mechAxePendulum(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const periodMs = [0, 2600, 2200, 1800][p];
     const swing = 1.1; // radians either side of straight down
     const dmgPct = [0, 0.24, 0.28, 0.34][p];
     const durMs = 10000;
-    const run = _egNkNewRun(monster && monster.id, true);
+    const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const px = window.innerWidth * 0.5, py = 40;
     const armLen = window.innerHeight * 0.62;
-    const pivot = _egNkEl(run, 'div', 'eg-nk-dot', '⛓️');
+    const pivot = _nkEl(run, 'div', 'eg-nk-dot', '⛓️');
     pivot.style.transform = 'translate(' + Math.round(px - 22) + 'px,' + Math.round(py - 22) + 'px)';
-    const arm = _egNkEl(run, 'div', 'eg-nk-pendulum-arm');
+    const arm = _nkEl(run, 'div', 'eg-nk-pendulum-arm');
     arm.style.width = '6px';
     arm.style.height = Math.round(armLen) + 'px';
     arm.style.left = Math.round(px - 3) + 'px';
     arm.style.top = Math.round(py) + 'px';
-    const blade = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-pendulum', '🪓');
-    _egNkToast('eg_mech_executioner', '🪓 The Executioner: Axe Pendulum! Time the swing!');
+    const blade = _nkEl(run, 'div', 'eg-nk-dot eg-nk-pendulum', '🪓');
+    _nkToast('eg_mech_executioner', '🪓 The Executioner: Axe Pendulum! Time the swing!');
     let e = 0, cdUntil = 0;
-    _egNkLoop(run, (dtS, now) => {
+    _nkLoop(run, (dtS, now) => {
         e += dtS * 1000;
         // Pendulum angle: sinusoidal sweep, fastest at the bottom.
         const a = Math.sin((e / periodMs) * Math.PI * 2) * swing;
@@ -68,10 +68,10 @@ export function _egMechAxePendulum(monster, phase) {
         const bx = px + Math.sin(a) * armLen;
         const by = py + Math.cos(a) * armLen;
         blade.style.transform = 'translate(' + Math.round(bx - 30) + 'px,' + Math.round(by - 30) + 'px) rotate(' + (a * 2) + 'rad)';
-        if (now >= cdUntil && _egNkDotHit(blade, _egNkPlayerRect(), 0)) {
+        if (now >= cdUntil && _nkDotHit(blade, _nkPlayerRect(), 0)) {
             cdUntil = now + 1000;
-            const dealt = _egNkHit(dmgPct, null, level);
-            _egNkAbilityHitToast(dealt, 'The Executioner', 'Axe Pendulum');
+            const dealt = _nkHit(dmgPct, null, level);
+            _nkAbilityHitToast(dealt, 'The Executioner', 'Axe Pendulum');
         }
         return e < durMs;
     });
