@@ -7,11 +7,11 @@
 // store a backFn NAME; the resolver validates that the name really is a
 // global function so a typo can never silently produce a dead back button.
 export const SCREEN_NAV = {
-    hub: 'showEndgameHub',
+    hub: 'showHub',
     gate: 'showEndgameGate',
     atlas: 'showEndgameAtlas',
     nexus: 'showEndgameNexus',
-    vendor: 'showEndgameVendor',
+    vendor: 'showVendor',
     bossTest: 'showEndgameBossTest',
 };
 

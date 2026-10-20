@@ -981,7 +981,7 @@ function _spawnNextWave() {
 function _syncArenaVisibility() {
     if (!_g.overlay) return;
     let blocked = false;
-    for (const id of ['screen-endgame-hub', 'screen-passive-tree', 'screen-endgame-atlas']) {
+    for (const id of ['screen-hub', 'screen-passive-tree', 'screen-endgame-atlas']) {
         const el = document.getElementById(id);
         if (el && el.style.display && el.style.display !== 'none') { blocked = true; break; }
         if (el && el.classList.contains('active')) { blocked = true; break; }

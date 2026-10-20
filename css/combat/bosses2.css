@@ -4358,7 +4358,7 @@ body.sx-gust-spike-hot-r .sx-nk-gust-spike-right {
 /* The Eye: the boss's vortex body, wandering the arena. */
 /* Gale storm layers are body-level fixed overlays: hide them while the
    character sheet floats over the paused run. */
-body:has(#screen-endgame-hub.active) [class*="sx-gal-"] { display: none !important; }
+body:has(#screen-hub.active) [class*="sx-gal-"] { display: none !important; }
 
 .sx-gal-eye {
     position: fixed; left: 0; top: 0; z-index: 9003; pointer-events: none;

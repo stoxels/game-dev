@@ -12,7 +12,7 @@ Layout Architecture:
 */
 
 /* ── SCREEN WRAPPER ── */
-#screen-endgame-hub {
+#screen-hub {
     background: var(--bg);
     overflow: hidden;
     position: absolute;
@@ -1217,15 +1217,15 @@ img.sx-art-img {
 }
 
 /* Hub uses the left-side currency COL instead of the horizontal strip - hide strip there */
-#screen-endgame-hub .sx-currency-strip {
+#screen-hub .sx-currency-strip {
     display: none !important;
 }
 
 /* ── HUB CURRENCY GRID specifics ── */
-#screen-endgame-hub .sx-currency-col .sx-panel-label {
+#screen-hub .sx-currency-col .sx-panel-label {
     border-bottom: 1px solid var(--border);
 }
-#screen-endgame-hub .sx-currency-col .sx-currency-grid {
+#screen-hub .sx-currency-col .sx-currency-grid {
     scrollbar-width: thin;
     scrollbar-color: var(--border2) transparent;
 }

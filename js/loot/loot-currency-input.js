@@ -23,7 +23,7 @@ import { SHARD_DEFS } from './loot-shards.js';
 document.addEventListener('contextmenu', function (e) {
     const chip = e.target.closest('.sx-item-chip');
     // Active on both the hub and the Probability Gate screens (shared state).
-    if (!chip || (typeof _dndChipScreenEl === 'function' ? !_dndChipScreenEl(chip) : !chip.closest('#screen-endgame-hub'))) return;
+    if (!chip || (typeof _dndChipScreenEl === 'function' ? !_dndChipScreenEl(chip) : !chip.closest('#screen-hub'))) return;
 
     const currencyCell = chip.closest('.sx-currency-cell');
     if (!currencyCell) return; // not currency - let the normal handler deal with it
@@ -79,7 +79,7 @@ document.addEventListener('mousedown', function (e) {
     // Active on both the hub and the Probability Gate screens (shared state).
     const onManagedScreen = !!chip && (typeof _dndChipScreenEl === 'function'
         ? !!_dndChipScreenEl(chip)
-        : !!chip.closest('#screen-endgame-hub'));
+        : !!chip.closest('#screen-hub'));
     if (!onManagedScreen) {
         _cancelCurrencyUse();
         return;

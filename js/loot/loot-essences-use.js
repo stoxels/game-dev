@@ -158,7 +158,7 @@ document.addEventListener('contextmenu', function (e) {
         return;
     }
 
-    if (!chip || (typeof _dndChipScreenEl === 'function' ? !_dndChipScreenEl(chip) : !chip.closest('#screen-endgame-hub'))) return;
+    if (!chip || (typeof _dndChipScreenEl === 'function' ? !_dndChipScreenEl(chip) : !chip.closest('#screen-hub'))) return;
     if (!essenceCell) return;
 
     e.preventDefault();
@@ -181,7 +181,7 @@ document.addEventListener('mousedown', function (e) {
     const chip = e.target.closest('.sx-item-chip');
     const onManagedScreen = !!chip && (typeof _dndChipScreenEl === 'function'
         ? !!_dndChipScreenEl(chip)
-        : !!chip.closest('#screen-endgame-hub'));
+        : !!chip.closest('#screen-hub'));
     if (!onManagedScreen) {
         _cancelEssenceUse();
         return;

@@ -4,7 +4,7 @@ import { t } from '../translation/translations.js';
 import { egAtlasChainBlueprintForMap, egAtlasMakeRng } from './endgame-atlas.js';
 import { _pickMapRunPuzzleGi } from '../combat/encounter-chain.js';
 import { _buildChainPool } from '../combat/encounter-chain-pool.js';
-import { _ensureLoseOverlayEndgameUI } from '../combat/encounter-defeat-overlay.js';
+import { _ensureLoseOverlayCombatUI } from '../combat/encounter-defeat-overlay.js';
 import { _playerTakeDamage } from '../combat/encounter.js';
 import { _egRenderMapSlot } from './endgame-gate.js';
 import { saveHubState } from '../hub/hub.js';
@@ -702,7 +702,7 @@ export function _egLaunchMapFromDevice(mapItem) {
 
     // Bind the endgame lose-overlay UI (no Retry - only "Return to the Nexus")
     // up front so every defeat path inside the map is covered.
-    if (typeof _ensureLoseOverlayEndgameUI === 'function') _ensureLoseOverlayEndgameUI();
+    if (typeof _ensureLoseOverlayCombatUI === 'function') _ensureLoseOverlayCombatUI();
 
     // Guard flag: startLevel() synchronously runs _cleanupPreviousLevel →
     // _stopEncounter → _chainCleanup, which must NOT clear the runtime

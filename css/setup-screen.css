@@ -366,7 +366,7 @@
 .mod-icon-treeless  { background-image: url('../images/Game_Setup/Icon-Treeless.webp'); }
 /* MONSTERLESS sits leftmost in the row and shows the fallen abyss boss */
 .mod-icon-monsterless {
-    background-image: url('../images/endgame/monsters/boss_abyss.webp');
+    background-image: url('../images/combat/monsters/boss_abyss.webp');
     border-radius: 50%;
 }
 .mod-monsterless-skull {

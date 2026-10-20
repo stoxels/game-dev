@@ -5,7 +5,7 @@
 
 import { _spawnNextArenaBoss, _updateObjectivesHUD } from './encounter-chain.js';
 import { _buildChainPool } from './encounter-chain-pool.js';
-import { _ensureLoseOverlayEndgameUI } from './encounter-defeat-overlay.js';
+import { _ensureLoseOverlayCombatUI } from './encounter-defeat-overlay.js';
 import { _createGeneratedLevel } from './combat-puzzle-generator.js';
 import { t } from '../translation/translations.js';
 import {
@@ -133,8 +133,8 @@ export function _launchBossTest(bossId, level, hpMult) {
 
     // Lose-overlay hardening so every defeat path inside the test is
     // covered (same call the map device makes on launch).
-    if (typeof _ensureLoseOverlayEndgameUI === 'function') {
-        try { _ensureLoseOverlayEndgameUI(); } catch (e) {}
+    if (typeof _ensureLoseOverlayCombatUI === 'function') {
+        try { _ensureLoseOverlayCombatUI(); } catch (e) {}
     }
 
     window._bossTestLaunching = true;

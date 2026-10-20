@@ -5,7 +5,7 @@ import { _egAtlasBuildTierProgressHTML, _egAtlasEnsureStyles, _egAtlasRoman, _eg
 import { _egAtlasResolveNodeForMap, egAtlasDropNodeIds, egAtlasIsCompleted, egAtlasNodeById, egAtlasNodeName } from './endgame-atlas.js';
 import { _chainTransitioning } from '../combat/encounter-chain.js';
 import { _clearTooltip } from '../hub/hub-tooltips.js';
-import { CURRENCY_COLS, CURRENCY_ROWS, EG_MAP_STASH_COLS, EG_MAP_STASH_INITIAL_ROWS, EG_MAP_TIER_COUNT, EG_MAP_TIER_ROMANS, _buildItemChipHTML, _currencyDefForId, _currencyIdForSlot, _currencyStash, _getCellFill, _egGetMapStashRowsForTier, _egGetMapTierGrid, _egMapStash, _renderCurrencyStash, saveHubState, ensureEndgameHubScreen } from '../hub/hub.js';
+import { CURRENCY_COLS, CURRENCY_ROWS, EG_MAP_STASH_COLS, EG_MAP_STASH_INITIAL_ROWS, EG_MAP_TIER_COUNT, EG_MAP_TIER_ROMANS, _buildItemChipHTML, _currencyDefForId, _currencyIdForSlot, _currencyStash, _getCellFill, _egGetMapStashRowsForTier, _egGetMapTierGrid, _egMapStash, _renderCurrencyStash, saveHubState, ensureHubScreen } from '../hub/hub.js';
 import { LEVELING_CONFIG, _getPlayerLevel, _getPlayerXP, _getUnspentPoints, _getXpForNextLevel } from '../hub/hub-leveling.js';
 import { _egLaunchMapFromDevice } from './endgame-map-launch.js';
 import { EG_MAP_MOD_TABLES, _egMapModAffects } from '../loot/loot-map-mod-tables.js';
@@ -1170,7 +1170,7 @@ export function _egInjectMapModsOverlayStyles() {
 // Also ensures the hub screen exists so its delegated DnD/currency
 // listeners (_bindDragEvents) are active for the gate as well.
 export function _egCreateGateScreen() {
-    if (typeof ensureEndgameHubScreen === 'function') ensureEndgameHubScreen();
+    if (typeof ensureHubScreen === 'function') ensureHubScreen();
     _egInjectAtlasHighlightStyles();
     _egInjectGateLevelChipStyles();
     const screen = document.createElement('div');
@@ -1196,7 +1196,7 @@ export let _egGateBackFn = SCREEN_NAV.nexus;
 // Transitions to the Probability Gate screen and refreshes all rendered zones.
 // This is the main entry point called from elsewhere in the codebase.
 // An optional backFn argument (name of a global function, e.g.
-// 'showEndgameHub') overrides where the BACK button returns to - used
+// 'showHub') overrides where the BACK button returns to - used
 // when the gate is opened from the endgame hub character sheet.
 export function showEndgameGate(backFn) {
     if (typeof backFn === 'string') _egGateBackFn = _resolveBackFn(backFn, SCREEN_NAV.nexus);

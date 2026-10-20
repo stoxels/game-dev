@@ -1001,7 +1001,7 @@ export function _renderAll() {
 // Also binds the delegated drag-start event listener (defined in hub-drag-and-drop.js).
 export function _createScreen() {
     const screen = document.createElement('div');
-    screen.id = 'screen-endgame-hub';
+    screen.id = 'screen-hub';
     screen.className = 'screen';
     screen.innerHTML = _buildFullScreenHTML();
     document.body.appendChild(screen);
@@ -1010,23 +1010,23 @@ export function _createScreen() {
 }
 
 // Ensures the hub screen element exists in the DOM; creates it on first call.
-export function ensureEndgameHubScreen() {
-    if (!document.getElementById('screen-endgame-hub')) {
+export function ensureHubScreen() {
+    if (!document.getElementById('screen-hub')) {
         _createScreen();
     }
 }
 
 // Transitions to the Endgame Hub screen and fully refreshes all rendered zones.
 // This is the main entry point called from elsewhere in the codebase.
-export function showEndgameHub() {
-    ensureEndgameHubScreen();
+export function showHub() {
+    ensureHubScreen();
 
     // Use the global screen-switcher if available, otherwise manually show/hide.
     if (typeof switchScreen === 'function') {
-        switchScreen('screen-endgame-hub');
+        switchScreen('screen-hub');
     } else {
         document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
-        document.getElementById('screen-endgame-hub').style.display = 'block';
+        document.getElementById('screen-hub').style.display = 'block';
     }
 
     globalThis._loadHubState();
@@ -1071,7 +1071,7 @@ export function isHubGameOverlay() {
 // statistica, probability gate) while the sheet floats over a paused run -
 // leaving them would strand that run with no way back. Restores them on
 // every normal open (the hub DOM persists across opens, so this must run
-// both ways on every showEndgameHub).
+// both ways on every showHub).
 export function _applyOverlayChrome() {
     const hide = _hubGameOverlay === true;
     ['sx-btn-passive-tree', 'sx-btn-atlas', 'sx-btn-gate'].forEach((id) => {
@@ -1135,7 +1135,7 @@ export function openHubFromGame(returnScreen = 'screen-game') {
     // older save or a pre-flush code path would otherwise stay hidden in
     // _runLoot until map clear. The flush is idempotent (_stashed skip).
     try { if (typeof _flushRunLootToStash === 'function') _flushRunLootToStash(); } catch (e) {}
-    showEndgameHub();
+    showHub();
 }
 
 // Reconciles the live combat pools with the loadout edited in the overlay.

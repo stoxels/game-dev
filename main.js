@@ -227,7 +227,7 @@ function _handleEscapeKey() {
     }
     // Shop opened from the pause menu: Escape returns to the menu.
     if (globalThis._pauseShopReturn && typeof globalThis._pauseCloseShopToGame === 'function'
-        && document.getElementById('screen-endgame-vendor')?.classList.contains('active')) {
+        && document.getElementById('screen-vendor')?.classList.contains('active')) {
         globalThis._pauseCloseShopToGame();
         return;
     }

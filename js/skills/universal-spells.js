@@ -4078,7 +4078,7 @@ export function _registerUniversalSpells() {
                 slotKind: 'universal',
                 isPassive: false,
                 movable: true,
-                endgameOnly: false,
+                combatOnly: false,
                 tags: spell.tags,
                 scaling: _uspScalingLine(spell),
                 damage: null,

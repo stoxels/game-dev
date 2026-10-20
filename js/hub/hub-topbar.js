@@ -36,11 +36,11 @@ export function _buildTopbarHTML() {
     <button class="sx-back-btn back-btn" onclick="safeGoBackFromHub()">${t('btn_back')}</button>
     <span class="sx-topbar-title">${t('eg_char_sheet_title')}</span>
     <button class="sx-level-btn" id="sx-btn-passive-tree"
-         onclick="showPassiveTree('screen-endgame-hub')">🌿 ${t('scr_probability_tree')}</button>
+         onclick="showPassiveTree('screen-hub')">🌿 ${t('scr_probability_tree')}</button>
     <button class="sx-level-btn" id="sx-btn-atlas"
-         onclick="showEndgameAtlas('showEndgameHub')">🗺 ${t('eg_atlas_title')}</button>
+         onclick="showEndgameAtlas('showHub')">🗺 ${t('eg_atlas_title')}</button>
     <button class="sx-level-btn" id="sx-btn-gate"
-         onclick="showEndgameGate('showEndgameHub')">🎲 ${t('mg_gate_badge')}</button>
+         onclick="showEndgameGate('showHub')">🎲 ${t('mg_gate_badge')}</button>
     <button class="sx-level-btn" id="sx-btn-export-build"
          title="Saves your gear, passive tree, spells and stats to a small file (for balance testing)"
          onclick="_exportBuildSnapshot()">📤 Export build</button>

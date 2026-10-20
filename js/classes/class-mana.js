@@ -1,5 +1,5 @@
 import { _getAscendencySlotData } from './class-abilities.js';
-import { CLASS_DEFS, ENDGAME_HEARTBLOOM_DEF } from './class-defs.js';
+import { CLASS_DEFS, COMBAT_HEARTBLOOM_DEF } from './class-defs.js';
 import { buildClassHUD } from './class-hud.js';
 import { getSkillManaCostOverrideForSlot, getSkillRankManaMultForSlot } from '../skills/skill-charms.js';
 import { _hotbarClasslessHasSpells } from '../skills/skill-hotbar.js';
@@ -108,7 +108,7 @@ export function _getAbilityManaCost(hudSlot) {
 function _getAbilityScaledBaseCost(hudSlot) {
     if (hudSlot === 'active5') {
         if (!STATE.playerClass || !_manaEnabled()) return 0;
-        const def = ENDGAME_HEARTBLOOM_DEF;
+        const def = COMBAT_HEARTBLOOM_DEF;
         return _scaleAbilityManaCost((def && def.manaCost) || 0);
     }
 

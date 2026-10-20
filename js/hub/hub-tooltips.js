@@ -377,7 +377,7 @@ document.addEventListener('mousemove', e => {
 // True while the endgame hub or gate screen is the active screen.
 // Used to scope the Alt-key browser-menu suppression to the item UIs.
 export function _isItemScreenActive() {
-    const hub = document.getElementById('screen-endgame-hub');
+    const hub = document.getElementById('screen-hub');
     const gate = document.getElementById('screen-endgame-gate');
     return (hub && hub.classList.contains('active'))
         || (gate && gate.classList.contains('active'));

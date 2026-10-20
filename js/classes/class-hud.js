@@ -1,8 +1,8 @@
-import { isEndgameLevel } from '../mouse-button-handlers.js';
+import { isCombatLevel } from '../mouse-button-handlers.js';
 import { LANG, t } from '../translation/translations.js';
 import { ASCENDENCY_DEFS } from './ascendency-defs.js';
 import { _formatCooldown, cooldownState, getEffectiveCooldown } from './class-cooldown-state.js';
-import { CLASS_DEFS, ENDGAME_HEARTBLOOM_DEF } from './class-defs.js';
+import { CLASS_DEFS, COMBAT_HEARTBLOOM_DEF } from './class-defs.js';
 import { _abilityCanAfford, _bloodMagicActive, _getAbilityManaCost, updateClassHUDManaBar } from './class-mana.js';
 import { _clsGetLocalizedName } from './class-ui.js';
 import { getSkillCastRankClampedForSlot } from '../skills/skill-charms.js';
@@ -318,7 +318,7 @@ function buildAscendencySkillTooltip(hudSlot) {
 
 // Builds the tooltip HTML for the Heartbloom ability (active5 HUD slot).
 function buildHeartbloomTooltip() {
-    const def = ENDGAME_HEARTBLOOM_DEF;
+    const def = COMBAT_HEARTBLOOM_DEF;
     if (!def) return '';
     const castRank = Math.max(1, getSkillCastRankClampedForSlot('active5') || 1);
     const data = def.levels[Math.min(castRank, def.levels.length) - 1] || def.levels[0];
@@ -352,9 +352,9 @@ function _getSkillBtnState(hudSlot, accentColor) {
     const noMana = !canAfford && !isOnCD;
 
     // Heartbloom (active5) is endgame-only - lock when not on an endgame map.
-    const isEndgameLocked = hudSlot === 'active5'
-        && !isEndgameLevel();
-    const isLocked = isEndgameLocked && !isOnCD;
+    const isCombatLocked = hudSlot === 'active5'
+        && !isCombatLevel();
+    const isLocked = isCombatLocked && !isOnCD;
 
     const btnColor = isArmed ? '#e74c3c' : (isOnCD || isLocked) ? '#555' : accentColor;
     const cursor = (isOnCD || noMana || isLocked) ? 'not-allowed' : 'pointer';

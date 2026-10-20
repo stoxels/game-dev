@@ -1,4 +1,4 @@
-import { isEndgameLevel } from '../mouse-button-handlers.js';
+import { isCombatLevel } from '../mouse-button-handlers.js';
 import { LANG, t } from '../translation/translations.js';
 import { _formatCooldown } from '../classes/class-cooldown-state.js';
 import { hideHUDTooltip, moveHUDTooltip, showHUDTooltip } from '../classes/class-hud.js';
@@ -289,8 +289,8 @@ function _skillTooltipCharmBonus(skillId) {
 
 // Endgame-only warning for Heartbloom.
 function _skillTooltipGating(def) {
-    if (!def.endgameOnly) return '';
-    const active = isEndgameLevel();
+    if (!def.combatOnly) return '';
+    const active = isCombatLevel();
     return active
         ? `<div class="skl-tip-note">${t('skill_tip_endgame_only')}</div>`
         : `<div class="skl-tip-warn">⚠ ${t('skill_tip_endgame_only')}</div>`;

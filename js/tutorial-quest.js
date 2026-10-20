@@ -12,7 +12,7 @@ import { _dropHeartPickup, _stopPickupSpawner } from './combat/combat-grid-picku
 import { _flushRunLootToStash, _renderLootOverlay } from './combat/combat-grid-pickups-loot.js';
 import { _renderCurrencyDropOverlay } from './combat/combat-grid-pickups-currency.js';
 import { _renderItemDropOverlay } from './combat/combat-grid-pickups-items.js';
-import { closeHubToGame, isHubGameOverlay, openHubFromGame, showEndgameHub } from './hub/hub.js';
+import { closeHubToGame, isHubGameOverlay, openHubFromGame, showHub } from './hub/hub.js';
 import { _addItemToStash, _inventory } from './hub/hub-stash.js';
 import { saveHubState } from './hub/hub-save.js';
 import { _resetQuizDamageBuff } from './combat/combat-quiz-buffs.js';
@@ -2579,7 +2579,7 @@ function _tqShowIntermission() {
     // no way back). Restored the moment the gear is equipped.
     try { document.body.classList.add('tq-intermission-active'); } catch (e) {}
     setTimeout(() => {
-        try { if (typeof showEndgameHub === 'function') showEndgameHub(); } catch (e) {}
+        try { if (typeof showHub === 'function') showHub(); } catch (e) {}
     }, 400);
     // Poll until the essentials are equipped. The checklist in the box ticks
     // along live so a stall is always actionable; a state change is logged
@@ -3129,7 +3129,7 @@ function _tqRegisterCharSheetKeybind() {
         // Overlay close: the sheet is open over a running puzzle - B closes
         // it and the puzzle continues exactly where it was.
         try {
-            if (document.getElementById('screen-endgame-hub')?.classList.contains('active')
+            if (document.getElementById('screen-hub')?.classList.contains('active')
                 && typeof isHubGameOverlay === 'function' && isHubGameOverlay()
                 && typeof closeHubToGame === 'function') {
                 closeHubToGame();

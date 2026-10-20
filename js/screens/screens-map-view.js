@@ -3,7 +3,7 @@ import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { MOD_CLASSES, MOD_LABELS, applyClassStatusActiveStyle, applyClassStatusEmptyStyle, buildNextTitleStr, isLevelConvergence, isMaxCleared, renderLevelSelect } from './screens-level-select.js';
 import { showWorldDetail, wdGoBackToMap } from './screens-world-levels.js';
-import { launchAtlasVendor, showModal, showSetup, switchScreen } from './screens.js';
+import { launchVendor, showModal, showSetup, switchScreen } from './screens.js';
 import { showQuestLog } from '../inference/inference-ui.js';
 import { showPassiveTree } from '../probability-tree/probability-tree.js';
 import { STATE } from '../state.js';
@@ -1595,7 +1595,7 @@ function _buildHomeMarker() {
     // Travelling to the outpost opens the Cartographer's shop on arrival (or
     // right away when the hero is already standing there).
     const openShop = () => {
-        launchAtlasVendor('screen-map-view');
+        launchVendor('screen-map-view');
     };
     marker.addEventListener('mouseenter', (e) => {
         const gold = (STATE && Math.round(Number(STATE.egGold) || 0)) || 0;
@@ -1895,7 +1895,7 @@ export function _wireTopBarButtons(p = 'mv') {
     // Character sheet floats over this screen (same overlay as the B key, so
     // Back / B return here); the shop's Back also returns to this screen.
     if (charBtn) charBtn.onclick = () => { if (typeof globalThis._openCharSheetOverlay === 'function') globalThis._openCharSheetOverlay(thisScreen); };
-    if (shopBtn) shopBtn.onclick = () => launchAtlasVendor(thisScreen);
+    if (shopBtn) shopBtn.onclick = () => launchVendor(thisScreen);
     if (settingsBtn) settingsBtn.onclick = () => { globalThis.loadSettingsUI(); showModal('settings-modal'); };
     if (changeBtn) changeBtn.onclick = () => { if (typeof globalThis.showClassChange === 'function') globalThis.showClassChange(); };
 }

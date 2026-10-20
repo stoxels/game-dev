@@ -8,13 +8,13 @@
 // original <img> back. Nothing here touches combat state, timing or damage,
 // and every failure path degrades to "no animation".
 //
-// Art: images/endgame/monsters/rigs/<boss>/<part>.webp, cut from the normal
+// Art: images/combat/monsters/rigs/<boss>/<part>.webp, cut from the normal
 // boss art by dev/scratch/rigger/cut_ingame.py (authoring demo: boss.html).
 // Pose numbers below are in the units of the large source art (px); each
 // rig's S converts them to the 512px in-game art.
 //------------------------------------------------------------------------
 
-const RIG_DIR = 'images/endgame/monsters/rigs/';
+const RIG_DIR = 'images/combat/monsters/rigs/';
 
 const RIGS = {
     boss_mech: {

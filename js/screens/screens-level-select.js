@@ -524,18 +524,18 @@ function buildEndgameHubCard(w, wi, tip) {
     if (isHubUnlocked) {
         hubCard.addEventListener('click', () => {
             tip.classList.remove('show');
-            if (typeof globalThis.showEndgameHub === 'function') {
-                globalThis.showEndgameHub();
-                if (typeof globalThis.initEndgameHubDnD === 'function') globalThis.initEndgameHubDnD({ seedTestItems: true });
+            if (typeof globalThis.showHub === 'function') {
+                globalThis.showHub();
+                if (typeof globalThis.initHubDnD === 'function') globalThis.initHubDnD({ seedTestItems: true });
             } else if (typeof globalThis.showEndgameNexus === 'function') {
                 globalThis.showEndgameNexus();
             }
             /*
             showBeat('nexus_opens', {
                 onComplete: () => {
-                    if (typeof showEndgameHub === 'function') {
-                        showEndgameHub();
-                        initEndgameHubDnD({ seedTestItems: true });
+                    if (typeof showHub === 'function') {
+                        showHub();
+                        initHubDnD({ seedTestItems: true });
                     }
                 }
             });

@@ -190,7 +190,7 @@ export const PICKUP_DEFS = {
             Audio_Manager.playSFX('heart_heals');
         },
     },
-    // Mana orbs - endgame only (mana system is gated to isEndgameLevel()).
+    // Mana orbs - endgame only (mana system is gated to isCombatLevel()).
     // gainMana() clamps to max mana, applies the map's "% reduced Mana
     // gained" mod and refreshes the HUD bar; it returns the amount actually
     // gained so the toast stays honest when the pool is nearly full.

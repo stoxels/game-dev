@@ -382,9 +382,9 @@ export function launchEndgameTestMode() {
 // Opens the Cartographer's shop (the old Atlas Vendor). The overworld calls
 // this on arrival at the Cartographer's Outpost; `fromScreen` is the screen
 // Back returns to (defaults to the map view).
-export function launchAtlasVendor(fromScreen) {
+export function launchVendor(fromScreen) {
     globalThis.screenHistory.push(typeof fromScreen === 'string' ? fromScreen : 'screen-map-view');
-    if (typeof globalThis.showEndgameVendor === 'function') globalThis.showEndgameVendor();
+    if (typeof globalThis.showVendor === 'function') globalThis.showVendor();
 }
 
 // Closes any overlays and active quiz, then navigates to the level select screen.

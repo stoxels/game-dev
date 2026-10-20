@@ -5,7 +5,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
 import { ASCENDENCY_DEFS } from './ascendency-defs.js';
 import { _setAbilityMode } from './class-abilities.js';
-import { CLASS_DEFS, ENDGAME_HEARTBLOOM_DEF } from './class-defs.js';
+import { CLASS_DEFS, COMBAT_HEARTBLOOM_DEF } from './class-defs.js';
 import { buildClassHUD } from './class-hud.js';
 import { ptHasAscendencySkill, ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { patchHotbarCooldownForLegacySlot } from '../skills/skill-hotbar.js';
@@ -172,7 +172,7 @@ function _getAscendencyAbilityData(slot) {
 // Returns the ability definition for any slot, routing to the correct source.
 export function _getAbilityData(slot) {
     if (slot === 'active5') {
-        return ENDGAME_HEARTBLOOM_DEF;
+        return COMBAT_HEARTBLOOM_DEF;
     }
     if (slot === 'active3' || slot === 'active4') {
         return _getAscendencyAbilityData(slot);

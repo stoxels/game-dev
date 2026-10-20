@@ -2,7 +2,7 @@ import { trackAchStat } from '../achievements/achievements.js';
 import { markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { renderCell, updClues } from '../grid.js';
-import { isEndgameLevel } from '../mouse-button-handlers.js';
+import { isCombatLevel } from '../mouse-button-handlers.js';
 import { _resetLevelFlags, save } from '../state.js';
 import { addTimeSecs, previewGainSecs } from '../timer/timer-adjust.js';
 import { bumpFreezeCorrFills } from '../timer/timer-freeze.js';
@@ -12,7 +12,7 @@ import { _executeRegressionToPrior, _executeSignificanceThreshold } from './clas
 import { _executeBayesTraps } from './class-bayesian.js';
 import { _executeTypeIShield } from './class-bayesian-type-i.js';
 import { _patchCooldownButton, cooldownState, getEffectiveCooldown, reduceSlotCooldown, startSlotCooldown } from './class-cooldown-state.js';
-import { CLASS_DEFS, ENDGAME_HEARTBLOOM_DEF } from './class-defs.js';
+import { CLASS_DEFS, COMBAT_HEARTBLOOM_DEF } from './class-defs.js';
 import { CLASS_HUD_HINT_MAX_USES, buildClassHUD, updateMomentumBar } from './class-hud.js';
 import { _abilityCanAfford, _bloodMagicActive, _getAbilityManaCost, payAbilityCost } from './class-mana.js';
 import { _executeStateRollback, resetMarkovianState } from './class-markovian.js';
@@ -497,7 +497,7 @@ function _isInstantAbility(slot) {
 // mistake log. Prevents wasting the cooldown on a no-op.
 function _canFireInstantAbility(slot) {
     if (slot === 'active5') {
-        if (!isEndgameLevel()) {
+        if (!isCombatLevel()) {
             globalThis.showToast('💚 Heartbloom cannot be used here!', '#ff6b9d');
             return false;
         }
@@ -694,7 +694,7 @@ function _spawnHeartbloomHearts(count) {
 
 // Fires the Heartbloom ability: pays cost, spawns 3 hearts, starts 5-min cooldown.
 function _fireInstantHeartbloomAbility() {
-    const def = ENDGAME_HEARTBLOOM_DEF;
+    const def = COMBAT_HEARTBLOOM_DEF;
     if (!def) return;
 
     // Pay the cost (life under Blood Magic) - abort without firing if it can't be covered.
@@ -775,7 +775,7 @@ function toggleActiveAbility(slot) {
     if (globalThis.dead || !cd || cd.remaining > 0) return;
 
     // Heartbloom is endgame-only - block entirely outside endgame (HUD also shows locked)
-    if (newSlot === 'active5' && !isEndgameLevel()) {
+    if (newSlot === 'active5' && !isCombatLevel()) {
         globalThis.showToast('💚 Heartbloom cannot be used here!', '#ff6b9d');
         return;
     }

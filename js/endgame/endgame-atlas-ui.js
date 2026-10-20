@@ -791,7 +791,7 @@ export function ensureEndgameAtlasScreen() {
 
 // Entry point - opens the Atlas of Statistica screen.
 // An optional backFn argument (name of a global function, e.g.
-// 'showEndgameHub') overrides where the BACK button returns to - used
+// 'showHub') overrides where the BACK button returns to - used
 // when the atlas is opened from the endgame hub character sheet.
 export function showEndgameAtlas(backFn) {
     if (typeof backFn === 'string') _egAtlasBackFn = _resolveBackFn(backFn, SCREEN_NAV.gate);

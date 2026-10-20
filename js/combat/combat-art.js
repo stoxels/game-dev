@@ -9,16 +9,16 @@ import { _isActive } from './combat-state.js';
 // Resolves real images for endgame monsters and equipment base items.
 //
 // Convention - drop images in these folders, named after the definition id:
-//   images/endgame/monsters/<id>.png   (regular monsters AND bosses)
-//       e.g. images/endgame/monsters/slime.png, boss_null.png
-//   images/endgame/items/<id>.png      (equipment base items)
-//       e.g. images/endgame/items/wpn_1h_1.png
+//   images/combat/monsters/<id>.png   (regular monsters AND bosses)
+//       e.g. images/combat/monsters/slime.png, boss_null.png
+//   images/combat/items/<id>.png      (equipment base items)
+//       e.g. images/combat/items/wpn_1h_1.png
 //
 // IMPORTANT - no extension probing!
 // The old approach fired one request per id x extension (5x) on every page
 // load, which got this GitHub Pages site rate-limited. Instead we fetch a
 // single manifest file listing what actually exists:
-//   images/endgame/manifest.json     { "monster": { "<id>": "png", ... },
+//   images/combat/manifest.json     { "monster": { "<id>": "png", ... },
 //                                     "item":    { "<id>": "png", ... } }
 // Regenerate it after adding/removing art with:
 //   powershell -File tools/build-art-manifest.ps1
@@ -44,11 +44,11 @@ import { _isActive } from './combat-state.js';
 export const GAME_ART = (function () {
 
     const ART_PATHS = {
-        monster: 'images/endgame/monsters/',
-        item: 'images/endgame/items/'
+        monster: 'images/combat/monsters/',
+        item: 'images/combat/items/'
     };
 
-    const MANIFEST_URL = 'images/endgame/manifest.json';
+    const MANIFEST_URL = 'images/combat/manifest.json';
     const EXTENSIONS = ['png', 'webp', 'jpg', 'jpeg', 'gif'];
 
     // Item-icon manifest (images/items/): id -> art path relative to images/.

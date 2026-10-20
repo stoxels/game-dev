@@ -1231,7 +1231,7 @@ export function renderCell(row, col) {
         // sitting there. Covers ability / item / passive / proc marks so the
         // player no longer has to erase and re-mark the same cell to pick up.
         if (cur && cur.grid && cur.grid[row][col] === 0) {
-            if (typeof globalThis.isEndgameLevel === 'function' && globalThis.isEndgameLevel() && typeof globalThis._checkAllClaims === 'function') {
+            if (typeof globalThis.isCombatLevel === 'function' && globalThis.isCombatLevel() && typeof globalThis._checkAllClaims === 'function') {
                 globalThis._checkAllClaims(row, col);
             }
         }

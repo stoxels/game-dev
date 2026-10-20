@@ -5,7 +5,7 @@ import { curMods } from './difficulty-modifiers.js';
 import { BOSS_DEFS } from './combat/bosses/boss-framework.js';
 import { _canLeaveMap, _cancelChainCountdown, _rollBonusMapLoot, _showLeaveMapTransition } from './combat/encounter-chain.js';
 import { _buildChainPool } from './combat/encounter-chain-pool.js';
-import { _ensureLoseOverlayEndgameUI } from './combat/encounter-defeat-overlay.js';
+import { _ensureLoseOverlayCombatUI } from './combat/encounter-defeat-overlay.js';
 import { _stopEncounter } from './combat/encounter.js';
 import { _flushRunLootToStash } from './combat/combat-grid-pickups-loot.js';
 import { saveHubState } from './hub/hub.js';
@@ -443,7 +443,7 @@ export function _launchTrialRun(wi, kind, opts) {
     level.chainMaxMistakes = baseline.chainMaxMistakes;
     level.campaignTrial = stamp;
 
-    if (typeof _ensureLoseOverlayEndgameUI === 'function') _ensureLoseOverlayEndgameUI();
+    if (typeof _ensureLoseOverlayCombatUI === 'function') _ensureLoseOverlayCombatUI();
 
     window._egMapDeviceLaunching = true;
     try {

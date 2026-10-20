@@ -1,4 +1,4 @@
-import { isEndgameLevel } from '../mouse-button-handlers.js';
+import { isCombatLevel } from '../mouse-button-handlers.js';
 import { t } from '../translation/translations.js';
 import { _getBayesianBonus, _overfittingGetPhase } from './probability-tree-special-nodes-logic.js';
 import { ptHasSkill } from './probability-tree-state-points.js';
@@ -437,7 +437,7 @@ export const PassiveTracker = (() => {
         try {
             if (typeof globalThis.SETTINGS === 'undefined' || !globalThis.SETTINGS.hidePassiveTrackerInEndgame) return false;
             if (typeof globalThis._isActive === 'function' && globalThis._isActive()) return true;
-            if (typeof isEndgameLevel === 'function' && isEndgameLevel()) return true;
+            if (typeof isCombatLevel === 'function' && isCombatLevel()) return true;
             if (typeof cur !== 'undefined' && cur && cur.isMonsterLevel) return true;
             return false;
         } catch (_) { return false; }

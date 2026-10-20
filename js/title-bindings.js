@@ -7,7 +7,7 @@ import { toggleTouchpadMarkMode } from './mouse-button-handlers.js';
 import { clearHover } from './mouse-over.js';
 import { showHS } from './screens/screens-highscore.js';
 import { cancelSlotName, confirmSlotName, showSaveSlotSelect } from './screens/screens-save-slots.js';
-import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goToPreviousScreen, hideModal, launchAtlasVendor, launchEndgameTestMode, launchExistingGame, showModal, showSetup, showTitle } from './screens/screens.js';
+import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goToPreviousScreen, hideModal, launchVendor, launchEndgameTestMode, launchExistingGame, showModal, showSetup, showTitle } from './screens/screens.js';
 import { switchScreen } from './screens/screens.js';
 import { openTreeFromGame, ptGoBack, showPassiveTree, showPassiveTreeAsCharacter } from './probability-tree/probability-tree.js';
 import { openHubFromGame } from './hub/hub.js';
@@ -299,10 +299,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     globalThis._pauseCloseShopToGame = closeShopToGame;
     onClick('btn-pause-shop', () => openFromPauseMenu(() => {
-        launchAtlasVendor('screen-game');
-        globalThis.screenHistory.pop();       // undo launchAtlasVendor's history push
+        launchVendor('screen-game');
+        globalThis.screenHistory.pop();       // undo launchVendor's history push
         globalThis._pauseShopReturn = true;
-        const back = document.querySelector('#screen-endgame-vendor .back-btn');
+        const back = document.querySelector('#screen-vendor .back-btn');
         if (back) back.onclick = closeShopToGame;
     }, true));
     onClick('btn-pause-inference', () => showQuestLog());
@@ -421,7 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
     onClick('btn-mode-existing', () => launchExistingGame());
     onClick('btn-mode-endgame-test', () => launchEndgameTestMode());
     // Classic list view has no outpost to walk to: the Cartographer's shop opens from the top bar.
-    onClick('btn-levels-cartographer', () => launchAtlasVendor('screen-levels'));
+    onClick('btn-levels-cartographer', () => launchVendor('screen-levels'));
     // TEMPORARY TEST BUTTON (see index.html #btn-dev-codex): +999 Codex of
     // Completion for the selected character. Remove together with the button.
     onClick('btn-dev-codex', () => {

@@ -32,8 +32,8 @@ import { _canEquipInSlot, _checkMoveAllowed, _checkUnequipSlot, _getWeaponHands,
 //   hub.js - exposes all _eg* state variables and render helpers
 //
 // Entry point:
-//   Call initEndgameHubDnD() once after the hub screen has been created.
-//   (showEndgameHub() calls this via _bindDragEvents())
+//   Call initHubDnD() once after the hub screen has been created.
+//   (showHub() calls this via _bindDragEvents())
 //------------------------------------------------------------------------
 
 
@@ -1278,7 +1278,7 @@ export function _dndInjectStyles() {
 //-------------------EVENT BINDING----------------------------------------
 //------------------------------------------------------------------------
 
-// Returns the managed screen element (#screen-endgame-hub or
+// Returns the managed screen element (#screen-hub or
 // #screen-endgame-gate) that contains the given chip, or null. The DnD and
 // currency systems operate on both screens - they share the same state.
 export function _dndChipScreenEl(chip) {
@@ -1287,7 +1287,7 @@ export function _dndChipScreenEl(chip) {
     // _ensureCraftingBenchOverlay), so it sits outside both screen roots.
     // Treat it as a valid drag-origin container too, or items placed in the
     // bench slot could never be picked back up.
-    return chip.closest('#screen-endgame-hub') || chip.closest('#screen-endgame-gate') || chip.closest('#sx-crafting-bench-overlay');
+    return chip.closest('#screen-hub') || chip.closest('#screen-endgame-gate') || chip.closest('#sx-crafting-bench-overlay');
 }
 
 // Binds the four global listeners that power the custom DnD system.
@@ -1389,7 +1389,7 @@ export function egDragOver(event) {
 //------------------------------------------------------------------------
 
 // Entry point - called once after the hub screen DOM has been created.
-export function initEndgameHubDnD() {
+export function initHubDnD() {
     _dndInjectStyles();
     _dndBindListeners();
 }
@@ -1397,5 +1397,5 @@ export function initEndgameHubDnD() {
 // Called from hub.js _createScreen() - alias so the hub bootstrap
 // doesn't need to know whether it's calling the init function or the bind function.
 export function _bindDragEvents() {
-    initEndgameHubDnD();
+    initHubDnD();
 }

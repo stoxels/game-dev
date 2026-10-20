@@ -195,7 +195,7 @@ export function _vendorSwitchTab(tabId) {
 function _vendorCreateScreen() {
     _vendorEnsureStyles();
     const screen = document.createElement('div');
-    screen.id = 'screen-endgame-vendor';
+    screen.id = 'screen-vendor';
     screen.className = 'screen';
     screen.innerHTML = _vendorBuildFullScreenHTML();
     document.body.appendChild(screen);
@@ -222,15 +222,15 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 }
 
 // Opens the Vendor screen on the last active tab.
-export function showEndgameVendor() {
-    if (!document.getElementById('screen-endgame-vendor')) _vendorCreateScreen();
+export function showVendor() {
+    if (!document.getElementById('screen-vendor')) _vendorCreateScreen();
 
-    // The vendor is opened from the overworld (launchAtlasVendor), which
+    // The vendor is opened from the overworld (launchVendor), which
     // pushes the screen it came from onto the history: back pops to it.
-    const backBtn = document.querySelector('#screen-endgame-vendor .back-btn');
+    const backBtn = document.querySelector('#screen-vendor .back-btn');
     if (backBtn) backBtn.setAttribute('onclick', 'goToPreviousScreen()');
 
-    switchScreen('screen-endgame-vendor');
+    switchScreen('screen-vendor');
 
     // Keep the active tab highlighted across visits.
     document.querySelectorAll('.sx-vendor-tab-btn').forEach(btn => btn.classList.remove('sx-vendor-tab-active'));

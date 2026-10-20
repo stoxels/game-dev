@@ -6,7 +6,7 @@ import { _isActive } from './combat-state.js';
 //------------------------------------------------------------------------
 
 // Redirects generic lose overlays to the map-defeat screen during active maps.
-export function _ensureLoseOverlayEndgameUI() {
+export function _ensureLoseOverlayCombatUI() {
     const ov = document.getElementById('ov-lose');
     if (!ov || ov.dataset.egFailUiBound) return;
     ov.dataset.egFailUiBound = '1';

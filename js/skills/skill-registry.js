@@ -1,10 +1,10 @@
 import { Audio_Manager } from '../audio/audio.js';
-import { isEndgameLevel } from '../mouse-button-handlers.js';
+import { isCombatLevel } from '../mouse-button-handlers.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { ASCENDENCY_DEFS } from '../classes/ascendency-defs.js';
 import { cooldownState, getEffectiveCooldown } from '../classes/class-cooldown-state.js';
-import { CLASS_DEFS, CLASS_SPELL_ICONS, ENDGAME_HEARTBLOOM_DEF } from '../classes/class-defs.js';
+import { CLASS_DEFS, CLASS_SPELL_ICONS, COMBAT_HEARTBLOOM_DEF } from '../classes/class-defs.js';
 import { _abilityCanAfford, _getAbilityManaCost } from '../classes/class-mana.js';
 import { getCharmArtForSkill, getSkillCastRankClamped, getSkillCastRankFull, getSpellRankDamageMult, isSkillCharmUnlocked, noteCharmCast } from './skill-charms.js';
 import { UNIVERSAL_SPELL_DEFS, _registerUniversalSpells, _uspGroupTitle, _uspMovementGroupTitle, _uspSupportGroupTitle, canAffordUniversalSpell, castUniversalSpell, getUniversalSpellCooldownRemaining, getUniversalSpellDamageEstimate, getUniversalSpellEffectiveCooldown, getUniversalSpellManaCost, isUniversalMovementSpell, isUniversalSpellUnlocked, isUniversalSupportSpell } from './universal-spells.js';
@@ -29,7 +29,7 @@ try { Object.defineProperty(globalThis, 'setHotbarSlot', { get() { return setHot
 // execution wiring) rather than touching UI code.
 //
 // Existing class abilities are NOT re-declared: the registry is built at
-// load time from CLASS_DEFS / ASCENDENCY_DEFS / ENDGAME_HEARTBLOOM_DEF so
+// load time from CLASS_DEFS / ASCENDENCY_DEFS / COMBAT_HEARTBLOOM_DEF so
 // their names, descriptions, mana costs, cooldowns and effects keep living
 // in exactly one place. This file only adds the extra metadata those defs
 // do not carry (tags, scaling, reveal-projectile damage, passive flags).
@@ -191,7 +191,7 @@ const SKILL_META = {
         scaling: ['Cooldown Recovery'],
         damage: null,
         castTime: 'instant',
-        endgameOnly: false,
+        combatOnly: false,
     },
 };
 
@@ -237,7 +237,7 @@ function _registerSkill(id, source, def, slotKind) {
         slotKind,
         isPassive: false,
         movable: true,
-        endgameOnly: meta.endgameOnly === true,
+        combatOnly: meta.combatOnly === true,
         tags: meta.tags || [],
         scaling: meta.scaling || [],
         damage: meta.damage || null,
@@ -343,8 +343,8 @@ function buildSkillRegistry() {
         if (asc.active2) _registerSkill(`${ascId}_active2`, { kind: 'ascendency', ownerId: ascId, slot: 'active2' }, asc.active2, 'asc2');
     }
 
-    if (ENDGAME_HEARTBLOOM_DEF) {
-        _registerSkill(HEARTBLOOM_SKILL_ID, { kind: 'heartbloom', ownerId: null, slot: 'active1' }, ENDGAME_HEARTBLOOM_DEF, 'heartbloom');
+    if (COMBAT_HEARTBLOOM_DEF) {
+        _registerSkill(HEARTBLOOM_SKILL_ID, { kind: 'heartbloom', ownerId: null, slot: 'active1' }, COMBAT_HEARTBLOOM_DEF, 'heartbloom');
     }
 }
 
@@ -548,8 +548,8 @@ export function isSkillUsableNow(skillId) {
     if (def.slotKind === 'universal') {
         try { if (!isUniversalSpellUnlocked(skillId)) return false; } catch (e) { /* treat as unlocked */ }
     }
-    if (def.endgameOnly) {
-        if (!isEndgameLevel()) return false;
+    if (def.combatOnly) {
+        if (!isCombatLevel()) return false;
     }
     // Charm gate: only spells whose charm is currently placed in one of the
     // spell slots may be cast (js/skills/skill-charms.js).
@@ -746,7 +746,7 @@ export function _defaultSkillHotbar(state) {
     if (s.playerAscendency && ASCENDENCY_DEFS[s.playerAscendency]) {
         ids.push(`${s.playerAscendency}_active1`, `${s.playerAscendency}_active2`);
     }
-    if (ENDGAME_HEARTBLOOM_DEF) ids.push(HEARTBLOOM_SKILL_ID);
+    if (COMBAT_HEARTBLOOM_DEF) ids.push(HEARTBLOOM_SKILL_ID);
 
     ids.slice(0, SKILL_HOTBAR_SIZE).forEach((id, i) => { slots[i] = id; });
     return slots;

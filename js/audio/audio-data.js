@@ -785,13 +785,13 @@ export const SFX = {
 
     // --- Endgame ---
     // ── Endgame: base combat feedback ──────────────
-    player_damage_taken: 'audio/sfx/endgame/sfx_player_damage_taken.ogg',
-    player_shield_damage_taken: 'audio/sfx/endgame/sfx_player_shield_damage_taken.ogg',
-    heart_heals: 'audio/sfx/endgame/sfx_heart_heals.ogg',
-    heart_destroyed: 'audio/sfx/endgame/sfx_heart_destroyed.ogg',
+    player_damage_taken: 'audio/sfx/combat/sfx_player_damage_taken.ogg',
+    player_shield_damage_taken: 'audio/sfx/combat/sfx_player_shield_damage_taken.ogg',
+    heart_heals: 'audio/sfx/combat/sfx_heart_heals.ogg',
+    heart_destroyed: 'audio/sfx/combat/sfx_heart_destroyed.ogg',
     // Placeholder: reuses the heart heal sound until a dedicated mana
     // pickup sound is added to audio/
-    mana_pickup: 'audio/sfx/endgame/sfx_heart_heals.ogg',
+    mana_pickup: 'audio/sfx/combat/sfx_heart_heals.ogg',
     // Placeholder: reuses the shield-break crack until a dedicated thunder
     // crack is added to audio/ (plays for The Gust's lightning pre-warning)
     gust_thunder: 'audio/sfx/items/sfx_shield_break.ogg',
@@ -814,9 +814,9 @@ export const SFX = {
     striker_kick: 'audio/sfx/classes/sfx_diagonal_strike.ogg',
     cent_venom: 'audio/sfx/items/sfx_tidal_wave.ogg',
     pud_wave: 'audio/sfx/items/sfx_tidal_wave.ogg',
-    player_equip_pickup: 'audio/sfx/endgame/sfx_player_equip_pickup.ogg',
-    player_equip_not_pickup: 'audio/sfx/endgame/sfx_player_equip_not_pickup.ogg',
-    player_defeated: 'audio/sfx/endgame/sfx_player_defeated.ogg',
+    player_equip_pickup: 'audio/sfx/combat/sfx_player_equip_pickup.ogg',
+    player_equip_not_pickup: 'audio/sfx/combat/sfx_player_equip_not_pickup.ogg',
+    player_defeated: 'audio/sfx/combat/sfx_player_defeated.ogg',
     // Placeholder: reuses the diagonal strike sound until a dedicated
     // cleave sweep sound is added to audio/
     cleave: 'audio/sfx/classes/sfx_diagonal_strike.ogg',

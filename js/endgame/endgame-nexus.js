@@ -11,12 +11,12 @@ import { t } from '../translation/translations.js';
 //=  select screen ("Endgame Test") and from all "Return to Nexus"       =
 //=  flows. Contains the following doors:                                =
 //=                                                                      =
-//=    1. Character Sheet & Inventory -> showEndgameHub()                =
+//=    1. Character Sheet & Inventory -> showHub()                =
 //=       (hub.js)                                               =
 //=    2. Probability Gate         -> showEndgameGate()                  =
 //=       (endgame-gate.js)                                              =
 //=    3. Atlas of Statistica      -> showEndgameAtlas()                 =
-//=    (Atlas Vendor moved to the mode select screen - launchAtlasVendor) =
+//=    (Atlas Vendor moved to the mode select screen - launchVendor) =
 //=    5. Boss Testing            -> showEndgameBossTest()                 =
 //=       (endgame-boss-test.js)                                       =
 //=                                                                      =
@@ -57,7 +57,7 @@ export function _egnBuildFullScreenHTML() {
 <div class="egn-hub-layout">
     ${_egnBuildTopbarHTML()}
     <div class="egn-doors">
-        ${_egnBuildDoorHTML('🧙', 'eg_char_sheet_title', 'showEndgameHub()')}
+        ${_egnBuildDoorHTML('🧙', 'eg_char_sheet_title', 'showHub()')}
         ${_egnBuildDoorHTML('🎲', 'mg_gate_badge', 'showEndgameGate()')}
         ${_egnBuildDoorHTML('🗺️', 'eg_atlas_title', 'showEndgameAtlas()')}
         ${_egnBuildDoorHTML('💀', 'eg_boss_test_title', 'showEndgameBossTest()')}

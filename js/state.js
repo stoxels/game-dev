@@ -1057,7 +1057,7 @@ export function loadStateFromSlot(slotNum) {
     window._hubLoadFailed = false;
     // Slot switch resync: the live hub mirrors (_equipped, _inventory,
     // currency/essence/map stashes, ...) still hold the PREVIOUS slot's data
-    // until something re-runs the load. showEndgameHub does - but the
+    // until something re-runs the load. showHub does - but the
     // tutorial never opens the hub before it needs combat stats, so a fresh
     // character would fight with the old slot's gear (inflated HP / mana /
     // absorption / damage on the avatar bars, and stash grants landing in

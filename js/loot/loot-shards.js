@@ -389,7 +389,7 @@ document.addEventListener('mousedown', function (e) {
     const chip = e.target.closest('.sx-item-chip');
     const onManagedScreen = !!chip && (typeof _dndChipScreenEl === 'function'
         ? !!_dndChipScreenEl(chip)
-        : !!chip.closest('#screen-endgame-hub'));
+        : !!chip.closest('#screen-hub'));
     if (!onManagedScreen) return;
 
     // Don't sell while an orb "use mode" selection is active - the click

@@ -126,7 +126,7 @@ export function _healEssenceItem(item) {
 
 // Deferred notice for the legacy hand migration below: _loadHubState also
 // runs at script parse time (no visible screen yet), so the message waits
-// here until showEndgameHub renders the sheet.
+// here until showHub renders the sheet.
 export let _pendingHandMigrationToast = null;
 
 // Reads hub state from the global STATE object into local variables.
@@ -561,7 +561,7 @@ function _loadHubState() {
     // A 2H weapon + shield equipped before the patch is illegal now. Free the
     // off-hand into the stash so the very next sheet visit shows a legal,
     // working loadout (offense without block, as designed). Nothing is lost
-    // (stash is unlimited); the notice toast is deferred to showEndgameHub so
+    // (stash is unlimited); the notice toast is deferred to showHub so
     // it fires on the visible sheet.
     try {
         if (typeof _migrateIllegalHandsToStash === 'function') {

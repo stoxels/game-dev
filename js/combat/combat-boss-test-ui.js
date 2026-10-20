@@ -181,7 +181,7 @@ export function _bossTestToggleTestHP(checkbox, bossId, level, hpMult) {
 //------------------------------------------------------------------------
 
 export function _bossTestBossIconHTML(def) {
-    // Real boss art when it exists (see images/endgame/monsters/boss_*.jpeg),
+    // Real boss art when it exists (see images/combat/monsters/boss_*.jpeg),
     // otherwise the emoji fallback - same helper the arena cards use.
     if (typeof GAME_ART !== 'undefined' && GAME_ART.html) return GAME_ART.html('monster', def.id, def.emoji || '💀');
     return def.emoji || '💀';

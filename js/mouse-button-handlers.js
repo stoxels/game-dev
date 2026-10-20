@@ -87,7 +87,7 @@ let touchpadMarkModeActive = false;
 
 // Returns true if the current level is an endgame sandbox or monster level.
 // Used to guard all _eg* hook calls throughout this file.
-export function isEndgameLevel() {
+export function isCombatLevel() {
     if (!cur) return false;
     return cur.isEndgameSandbox || cur.isMonsterLevel;
 }
@@ -96,7 +96,7 @@ export function isEndgameLevel() {
 // cell. Shared by the real-mistake path and the wrong-fill path in
 // applyCell(), both of which need to invalidate a cell's drop the same way.
 function _discardAllDrops(row, col) {
-    if (!isEndgameLevel()) return;
+    if (!isCombatLevel()) return;
     if (typeof globalThis._discardPickup === 'function') globalThis._discardPickup(row, col);
     if (typeof globalThis._discardLootDrop === 'function') globalThis._discardLootDrop(row, col);
     if (typeof globalThis._discardCurrencyDrop === 'function') globalThis._discardCurrencyDrop(row, col);
@@ -110,7 +110,7 @@ function _discardAllDrops(row, col) {
 // cell. Shared by the correct-fill path and the right-click-mark path in
 // applyCell(), both of which claim drops on an empty-solution cell.
 export function _checkAllClaims(row, col) {
-    if (!isEndgameLevel()) return;
+    if (!isCombatLevel()) return;
     if (typeof globalThis._checkPickupClaim === 'function') globalThis._checkPickupClaim(row, col);
     if (typeof globalThis._checkLootClaim === 'function') globalThis._checkLootClaim(row, col);
     if (typeof globalThis._checkCurrencyDropClaim === 'function') globalThis._checkCurrencyDropClaim(row, col);
@@ -785,7 +785,7 @@ function handleCorrectFill(row, col) {
     }
 
     // Endgame hooks
-    if (isEndgameLevel()) {
+    if (isCombatLevel()) {
         _checkAllClaims(row, col);
         if (typeof globalThis._onCorrectCell === 'function') globalThis._onCorrectCell(row, col);
         // Shocked-cursor ailment: reveals may strip ✕ marks from neighbours
@@ -860,7 +860,7 @@ export function applyCell(row, col) {
     Audio_Manager.playSFX('cellMark');
 
     // Endgame: right-click mark on a correct cell discards any drop sitting there
-    if (isEndgameLevel() && pval === 2 && cur.grid[row][col] === 1) {
+    if (isCombatLevel() && pval === 2 && cur.grid[row][col] === 1) {
         _discardAllDrops(row, col);
     }
 
@@ -990,7 +990,7 @@ export function stopPainting() {
     dragCounterClear();
 
     // Endgame: release the charged projectile accumulated while drag-painting
-    if (isEndgameLevel() && typeof globalThis._releaseChargedShot === 'function') {
+    if (isCombatLevel() && typeof globalThis._releaseChargedShot === 'function') {
         globalThis._releaseChargedShot();
     }
 }
