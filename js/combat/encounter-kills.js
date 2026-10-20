@@ -112,6 +112,9 @@ export function _killMonster(monsterId) {
 
     _updateTargetAfterKill();
 
+    // Character banter: kill / kill-streak / boss-down quips.
+    if (dying && typeof globalThis.triggerKillBanter === 'function') globalThis.triggerKillBanter(!!dying.isBoss);
+
     // Endgame achievements - combat
     if (typeof trackAchStat === 'function') try {
         if (dying && !dying.isBoss) trackAchStat('egMonstersSlain', 1);
@@ -208,6 +211,7 @@ export function _onAllMonstersDead() { }
 export function _gameOver() {
     // Gauntlet arena: dying only forfeits the bonus (the level is already won).
     if (_gauntletOnDefeat()) return;
+    if (typeof globalThis.triggerBanter === 'function') globalThis.triggerBanter('player_defeat');
     // Campaign defeat: fall back to the normal lose overlay (retry/levels)
     // instead of the endgame map-failed screen, which routes to the Nexus.
     if (typeof _isCampaignRun === 'function' && _isCampaignRun()) {

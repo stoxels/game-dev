@@ -60,7 +60,13 @@ export const CAMPAIGN_MONSTER_CONFIG = {
     // past the last. Retune the anchors, not the formula.
     refDamageAnchors: [[1, 17], [6, 27], [12, 38], [30, 63], [50, 91], [90, 147]],
     refDamageSlopeBeyond: 2.5,
-    chargeMult: 0.65,         // campaign monsters wind up as fast as atlas ones (pass 2: was 1.15; player hits already push the bar back)
+    // Over-levelled monsters hit harder: every monster level above the player's
+    // level (past a small grace gap) adds this share of the base hit, capped.
+    // A level-34 monster vs a level-15 character: 1 + 0.15 * 17 = 3.55x.
+    overLevelGrace: 2,
+    overLevelDamagePerLevel: 0.15,
+    overLevelDamageMax: 6,
+    chargeMult: 0.65,        // campaign monsters wind up as fast as atlas ones (pass 2: was 1.15; player hits already push the bar back)
     // Early-game ease (playtest feedback: the first worlds felt rough for
     // newcomers, yet fixed starter gear overshot for experienced players).
     // The first monster levels hit softer and wind up slower; both ease

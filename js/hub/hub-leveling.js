@@ -492,6 +492,7 @@ export function _awardXP(xpGain) {
     const gain = Math.max(0, Math.round(Number(xpGain) || 0));
     if (gain <= 0) return 0;
     Audio_Manager.playSFX('xp_gain');
+    if (window.LEVEL_FLAGS) window.LEVEL_FLAGS.xpGained = (window.LEVEL_FLAGS.xpGained || 0) + gain;
     STATE.playerXP = _getPlayerXP() + gain;
 
     let levelsGained = 0;
@@ -798,6 +799,8 @@ export function _playLevelUpReward() {
 // overlay ignores pointer events).
 export function _playLevelUpEffect(newLevel) {
     Audio_Manager.playSFX('level_up');
+    // Character banter: lands just after the kill / quest line that caused it.
+    if (typeof globalThis.triggerBanter === 'function') setTimeout(() => globalThis.triggerBanter('level_up'), 700);
     const el = document.createElement('div');
     el.className = 'sx-levelup-fx';
     el.innerHTML = `

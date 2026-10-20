@@ -272,3 +272,97 @@
 #sx-forfeit-modal.show {
     z-index: 10000;
 }
+
+
+/* ── Art skin (rune-stone frame, plaque and stone buttons) ──────────────────
+   Reuses the Settings / Game Reset assets. Appended after the base rules so
+   it only overrides looks - ids, layout hooks and game code are untouched. */
+#pause-overlay {
+    background:
+        radial-gradient(ellipse at center, rgba(8, 10, 22, 0.72) 0%, rgba(0, 0, 0, 0.93) 100%),
+        url('../images/Game_Setup/Game_Setup_New_Background.webp') center bottom / cover no-repeat;
+}
+
+#pause-overlay .pause-menu {
+    width: min(520px, 94vw);
+    box-sizing: border-box;
+    gap: 12px;
+    padding: 30px 12px 24px;
+    background: transparent;
+    border: 46px solid transparent;
+    border-image: url('../images/Settings/settings_background.webp') 46 fill / 46px stretch;
+    border-radius: 0;
+    box-shadow: none;
+    filter: drop-shadow(0 12px 34px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 22px rgba(140, 90, 220, 0.35));
+}
+
+/* Title: stone plaque hanging over the frame's top edge */
+#pause-overlay .pm-title {
+    position: relative;
+    z-index: 2;
+    align-self: center;
+    box-sizing: border-box;
+    width: min(360px, 92%);
+    height: 62px;
+    margin: -78px 0 6px;
+    padding: 0 12%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: url('../images/Settings/settings_title_plague.webp') center / 100% 100% no-repeat;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+#pause-overlay #pause-label { font-size: 14px; color: var(--yellow, #f3dc9a); }
+
+/* Run-info plate: dark rune slab */
+#pause-overlay .pm-info {
+    box-sizing: border-box;
+    padding: 18px 28px 30px;
+    background: url('../images/Game-Reset/Note-Banner.webp') center / 100% 100% no-repeat;
+    border: none;
+    border-radius: 0;
+}
+
+#pause-overlay .pm-section-label { color: #e0cfa2; text-shadow: 0 1px 2px #000; }
+#pause-overlay .pm-section-label::before,
+#pause-overlay .pm-section-label::after {
+    background: linear-gradient(90deg, transparent, rgba(240, 225, 180, 0.6), transparent);
+}
+
+/* Stone buttons (same art as the reset / achievements-reset dialogs) */
+#pause-overlay .pm-btn {
+    min-height: 50px;
+    padding: 10px 14px;
+    color: #eadfc0;
+    background: url('../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
+}
+#pause-overlay .pm-btn:hover {
+    color: #fff3c4;
+    border: none;
+    filter: brightness(1.28);
+    transform: translateY(-1px);
+}
+#pause-overlay .pm-btn:active { transform: translateY(1px); }
+
+#pause-overlay .pm-leave {
+    color: #f1b3a8;
+    background: url('../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat;
+}
+#pause-overlay .pm-leave:hover { color: #ffd6cc; border: none; }
+
+#pause-overlay .pm-resume {
+    min-height: 58px;
+    color: #ffe9a8;
+    background: url('../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat;
+    border: none;
+    filter: drop-shadow(0 0 10px rgba(255, 190, 70, 0.55));
+}
+#pause-overlay .pm-resume:hover { border: none; filter: brightness(1.2) drop-shadow(0 0 14px rgba(255, 190, 70, 0.8)); }
+
+#pause-overlay #pause-hint { color: rgba(240, 225, 190, 0.6); text-shadow: 0 1px 2px #000; }

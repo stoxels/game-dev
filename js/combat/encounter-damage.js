@@ -34,7 +34,7 @@ import { _renderPanel } from './encounter.js';
 import { _getPlayerLevel } from '../hub/hub-leveling.js';
 import { _isDualWielding } from '../loot/loot-requirements.js';
 import { _egGetActiveMapModValue, _egMapDamageTakenAmpMult } from '../endgame/endgame-map-launch.js';
-import { _calcArmourMitigation, _calcEvasionDodgeChance, _computePlayerStats, _getAllEquippedItems, _scheduleAbsorptionRegen } from './combat-player-stats.js';
+import { _calcArmourMitigation, _calcEvasionDodgeChance, _computePlayerStats, _getAllEquippedItems, _overLevelAvoidMult, _scheduleAbsorptionRegen } from './combat-player-stats.js';
 import { _isActive } from './combat-state.js';
 import { STATE } from '../state.js';
 
@@ -99,6 +99,8 @@ if (typeof document !== 'undefined' && document.readyState !== 'complete') {
 function _rsAvoid(kind) {
     const rs = globalThis.RunStats;
     if (rs) rs.avoided(kind);
+    // Character banter: a dodged / parried / blocked hit earns a quip.
+    if (typeof globalThis.triggerAvoidBanter === 'function') globalThis.triggerAvoidBanter(kind);
 }
 
 // Applies incoming monster damage to the player, after dodge/block/resist/
@@ -179,14 +181,20 @@ export function _playerTakeDamage(amount, isSpell = false, element = null, attac
     // On a successful projectile parry there is a 5% + gear deflect chance to
     // hit another monster for 30% + gear damage. Dual-wielding two 1H weapons
     // grants the same roll at a 15% + gear base WITHOUT holding the key.
+    // Over-level attackers are harder to avoid: scales every dodge/block/parry roll below.
+    const attackerLvl = Number(attackerLevel)
+        || (_getTarget() && _getTarget().level)
+        || _getEncounterBaseLevel()
+        || _getPlayerLevel();
+    const avoidMult = _overLevelAvoidMult(attackerLvl, _getPlayerLevel());
     const holdingE = !stunned && (typeof _holdEPauseActive !== 'undefined' && globalThis._holdEPauseActive);
     const dualWieldParry = !holdingE && !stunned
         && (typeof _isDualWieldParryActive === 'function' && _isDualWieldParryActive());
     if (!isSpell && !isBossAbility && (holdingE || dualWieldParry)) {
         if (typeof _isActive === 'function' && _isActive()) {
-            const parryChance = holdingE
+            const parryChance = avoidMult * (holdingE
                 ? _getParryChancePct()
-                : (typeof _getDualWieldParryChancePct === 'function' ? _getDualWieldParryChancePct() : 15);
+                : (typeof _getDualWieldParryChancePct === 'function' ? _getDualWieldParryChancePct() : 15));
             if (parryChance > 0 && Math.random() * 100 < parryChance) {
                 const isProjectile = !!(opts && opts.isProjectile);
                 const attacker = opts && opts.attacker ? opts.attacker : null;
@@ -207,7 +215,7 @@ export function _playerTakeDamage(amount, isSpell = false, element = null, attac
     // (not boss abilities / hazards) can also be parried at the tree's chance.
     if (isSpell && !isBossAbility && holdingE
         && typeof _isActive === 'function' && _isActive()) {
-        const spellParryChance = Number(stats.parrySpellChancePct) || 0;
+        const spellParryChance = (Number(stats.parrySpellChancePct) || 0) * avoidMult;
         if (spellParryChance > 0 && Math.random() * 100 < spellParryChance) {
             const parryToast = (typeof t === 'function' ? t('eg_parried') : '');
             globalThis.showCombatToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
@@ -239,12 +247,8 @@ export function _playerTakeDamage(amount, isSpell = false, element = null, attac
     // projectiles) - spells, environmental hazards and boss special abilities
     // cannot be dodged. Neither can a hero rooted mid overcharge-charge.
     if (!isSpell && !isBossAbility && !chargingMelee && !stunned && !((Number(stats.cannotEvade) || 0) > 0)) {
-        const attackerLvl = Number(attackerLevel)
-            || (_getTarget() && _getTarget().level)
-            || _getEncounterBaseLevel()
-            || _getPlayerLevel();
         let dodgeChance = Math.min(75, stats.dodgeChance + _calcEvasionDodgeChance(stats.evasion, attackerLvl)
-            + ((support && support.dodgePct) || 0));
+            + ((support && support.dodgePct) || 0)) * avoidMult;
         // Wind Dancer: more chance to Evade after an Attack hit you recently.
         if (attackHitRecently && (Number(stats.windDancerEvadePct) || 0) > 0) {
             dodgeChance = Math.min(75, dodgeChance * (1 + stats.windDancerEvadePct / 100));
@@ -261,7 +265,7 @@ export function _playerTakeDamage(amount, isSpell = false, element = null, attac
 
     // Aspect of Stone (tree): chance to avoid physical damage from hits.
     if (!isSpell && !isBossAbility && !chargingMelee && !stunned && (Number(stats.avoidPhysHitPct) || 0) > 0
-        && (!element || element === 'physical') && Math.random() * 100 < Math.min(75, stats.avoidPhysHitPct)) {
+        && (!element || element === 'physical') && Math.random() * 100 < Math.min(75, stats.avoidPhysHitPct) * avoidMult) {
         _rsAvoid('dodge');
         try { if (typeof globalThis.noteUniversalReaction === 'function') globalThis.noteUniversalReaction('dodge'); } catch (e) { /* optional */ }
         globalThis.showCombatToast(t('eg_dodged'));
@@ -319,7 +323,7 @@ export function _playerTakeDamage(amount, isSpell = false, element = null, attac
             ((isSpell ? stats.spellBlockChance : stats.blockChance) + treeBlock) * blockMult + overcapSpellBonus)
         : 0;
     let blockedHitMult = 1;
-    if (blockChance > 0 && Math.random() * 100 < blockChance) {
+    if (blockChance > 0 && Math.random() * 100 < blockChance * avoidMult) {
         // Timestamp for the tree's timed armour pulse (reworked node 337):
         // _computePlayerStats grants the bonus while this is under 10s old.
         globalThis._lastBlockAt = Date.now();
@@ -518,6 +522,10 @@ export function _playerTakeDamage(amount, isSpell = false, element = null, attac
     }
 
     globalThis._renderPlayerHealth();
+    // Character banter: react to how much life is left after this hit.
+    if (typeof globalThis.triggerHitTakenBanter === 'function') {
+        globalThis.triggerHitTakenBanter(mitigated, globalThis.playerCurrentHP, globalThis.playerMaxHP);
+    }
     if (globalThis.playerCurrentHP <= 0) _gameOver();
 
     // Ailments: elemental hits can ignite / chill / shock / shadow-burn the

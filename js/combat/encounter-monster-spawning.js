@@ -148,4 +148,8 @@ export function _spawnMonster(defId, level, hpMult = 1) {
 
     _renderPanel();
     _notifyMonsterArrival(monster);
+    // Character banter: a boss stepping onto the field deserves a remark.
+    if (monster.isBoss && typeof globalThis.triggerBanter === 'function') {
+        setTimeout(() => globalThis.triggerBanter('boss_appear'), 900);
+    }
 }

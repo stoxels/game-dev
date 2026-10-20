@@ -5,7 +5,7 @@
 #
 # The game online needs exactly:
 #   index.html, main.js, animations/, audio/, css/, images/, js/ and
-#   generated/phase2/entry.mjs (index.html loads exactly this ONE file;
+#   generated/bundle/entry.mjs (index.html loads exactly this ONE file;
 #   it contains the whole game). .nojekyll (stops GitHub's
 #   site builder from skipping underscore files like animations/Stox/abilities/_shared)
 #
@@ -34,9 +34,9 @@
 # --- in the game fetches order.json / manifest-imports.json - those are
 # --- build-tool bookkeeping and stay local-only) ---
 /generated/*
-!/generated/phase2/
-/generated/phase2/*
-!/generated/phase2/entry.mjs
+!/generated/bundle/
+/generated/bundle/*
+!/generated/bundle/entry.mjs
 
 # --- junk that must never be pushed even from allowed folders ---
 node_modules/

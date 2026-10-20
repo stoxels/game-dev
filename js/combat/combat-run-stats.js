@@ -26,7 +26,6 @@ import { trackAchStat, setAchStat } from '../achievements/achievements.js';
     const HIST_BINS = 8;
     const LOG_KEEP = 8;
     const REWARD_GOLD = 25;
-    const STYLE_ID = 'rs-panel-styles';
 
     const tr = (key, vars) => {
         let s = t(key);
@@ -274,62 +273,8 @@ import { trackAchStat, setAchStat } from '../achievements/achievements.js';
     }
 
     // ── Rendering ─────────────────────────────────────────────────────
-    function injectStyles() {
-        if (typeof document === 'undefined' || document.getElementById(STYLE_ID)) return;
-        const st = document.createElement('style');
-        st.id = STYLE_ID;
-        st.textContent = `
-        .rs-panel { margin: 10px auto; max-width: 560px; padding: 10px 14px; text-align: left;
-            background: rgba(20,20,40,0.78); border: 1px solid #5555aa; border-radius: 8px;
-            color: #dde; font-size: 13px; line-height: 1.45; }
-        .rs-panel.rs-lose { border-color: #aa5566; }
-        .rs-panel.rs-side { flex: 0 1 400px; margin: 0 0 0 16px; max-height: 80vh; overflow-y: auto;
-            box-sizing: border-box; align-self: center; }
-        @media (max-width: 1150px) {
-            .sx-leave-map-transition.sx-has-side { flex-direction: column; overflow-y: auto; justify-content: flex-start; gap: 12px; padding: 12px 0; }
-            .rs-panel.rs-side { margin: 0; flex: none; width: 90%; max-width: 640px; max-height: none; }
-        }
-        .rs-title { font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px; }
-        .rs-row { margin: 2px 0; }
-        .rs-hist { display: flex; align-items: flex-end; gap: 3px; height: 54px; margin: 6px 0 2px; }
-        .rs-bar { flex: 1; background: #6a7bd8; border-radius: 2px 2px 0 0; min-height: 2px; }
-        .rs-hist-axis { display: flex; justify-content: space-between; font-size: 11px; opacity: 0.7; }
-        .rs-hist-cap { font-size: 11px; opacity: 0.7; margin-top: 2px; }
-        .rs-src { display: flex; align-items: center; gap: 8px; margin: 2px 0; }
-        .rs-src-name { flex: 0 0 38%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .rs-kind { margin: 3px 0; text-align: left; }
-        .rs-kind-top { display: flex; justify-content: space-between; gap: 6px; }
-        .rs-kind-bar { height: 6px; background: #6a7bd8; border-radius: 2px; margin-top: 1px; }
-        .rs-src-bar { height: 8px; background: #d86a7b; border-radius: 2px; }
-        .rs-src-val { font-size: 12px; opacity: 0.8; }
-        .rs-ca-title { font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; color: var(--accent2, #9fd); }
-        .rs-col-head { font-weight: 700; opacity: 0.9; }
-        .rs-col { font-size: clamp(10px, 1.3vw, 13px); line-height: 1.4; color: #dde; }
-        .rs-col .rs-hist, .rs-col .rs-hist-axis, .rs-col .rs-hist-cap { display: none; }
-        .rs-col .rs-src-name { flex-basis: 34%; }
-        .rs-log-row { display: flex; gap: 8px; align-items: baseline; padding: 1px 0; font-size: 12px; }
-        .rs-log-t { flex: 0 0 44px; opacity: 0.65; }
-        .rs-log-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .rs-log-dmg { flex: 0 0 52px; text-align: right; color: #f0a0b0; font-weight: 700; }
-        .rs-log-hp { flex: 0 0 76px; text-align: right; opacity: 0.7; }
-        .rs-log-last { color: #ff8da0; font-weight: 700; }
-        .rs-q { margin-top: 10px; padding-top: 8px; border-top: 1px dashed #5555aa; }
-        .rs-q-title { font-weight: 700; margin-bottom: 4px; }
-        .rs-q-hint { margin-bottom: 4px; color: #ffd76a; font-weight: 700; }
-        .rs-choices { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
-        .rs-choice { min-width: 56px; padding: 5px 12px; cursor: pointer; border-radius: 6px;
-            border: 1px solid #7777cc; background: #23233a; color: #fff; font: inherit; }
-        .rs-choice:hover:not(:disabled) { background: #33335a; }
-        .rs-choice:disabled { cursor: default; opacity: 0.85; }
-        .rs-choice.rs-right { background: #1f6b3a; border-color: #4fd17f; }
-        .rs-choice.rs-miss { background: #6b1f2c; border-color: #d14f66; }
-        .rs-result { margin-top: 6px; }
-        .rs-result.ok { color: #7fe0a0; }
-        .rs-result.no { color: #f0a0b0; }
-        .rs-why { margin-top: 4px; opacity: 0.9; }
-        `;
-        document.head.appendChild(st);
-    }
+    // Styles live in css/combat/run-summary.css (this stays a no-op hook).
+    function injectStyles() {}
 
     function histogramHTML(d) {
         const vals = d.dealt;
@@ -354,37 +299,49 @@ import { trackAchStat, setAchStat } from '../achievements/achievements.js';
         const top = entries[0][1];
         const rows = entries.map(([name, dmg]) => `
             <div class="rs-src"><span class="rs-src-name">${esc(name)}</span>
-                <div style="flex:1"><div class="rs-src-bar" style="width:${Math.max(4, Math.round(dmg / top * 100))}%"></div></div>
+                <div class="rs-track"><div class="rs-fill rs-fill-bad" style="width:${Math.max(4, Math.round(dmg / top * 100))}%"></div></div>
                 <span class="rs-src-val">${dmg} (${Math.round(dmg / d.dmgTaken * 100)}%)</span></div>`).join('');
-        return `<div class="rs-row" style="margin-top:6px"><b>${esc(tr('rs_sources'))}</b></div>${rows}`;
+        return `<div class="rs-sources" title="${esc(tr('rs_sources'))}">${rows}</div>`;
+    }
+
+    function statTile(label, value, sub, bad) {
+        return `<div class="rs-stat${bad ? ' rs-bad' : ''}"><div class="rs-stat-val">${esc(String(value))}</div>
+            <div class="rs-stat-label">${esc(label)}</div>${sub ? `<div class="rs-stat-sub">${esc(sub)}</div>` : ''}</div>`;
     }
 
     const KIND_ORDER = ['melee', 'spell', 'projectile', 'other'];
+    const KIND_ICON = { melee: '⚔️', spell: '✨', projectile: '🏹', other: '💥' };
     function kindsHTML(d) {
         const rows = KIND_ORDER.filter(k => d.byKind[k] && d.byKind[k].n > 0);
         if (!rows.length || d.dealtSum <= 0) return '';
-        const top = Math.max(...rows.map(k => d.byKind[k].sum));
-        return rows.map(k => {
+        const html = rows.map(k => {
             const e = d.byKind[k];
             const share = Math.round(e.sum / d.dealtSum * 100);
-            return `<div class="rs-kind"><div class="rs-kind-top"><b>${esc(tr('rs_kind_' + k))}</b>
-                <span class="rs-src-val">${esc(tr('rs_kind_val', { n: e.n, avg: fmt(e.sum / e.n), c: e.crits, pct: share }))}</span></div>
-                <div class="rs-kind-bar" style="width:${Math.max(4, Math.round(e.sum / top * 100))}%"></div></div>`;
+            return `<div class="rs-kind"><span class="rs-kind-name">${KIND_ICON[k]} ${esc(tr('rs_kind_' + k))}</span>
+                <div class="rs-track"><div class="rs-fill" style="width:${Math.max(3, share)}%"></div></div>
+                <span class="rs-kind-pct">${share}%</span>
+                <span class="rs-kind-sub">${esc(tr('rs_kind_sub', { n: e.n, avg: fmt(e.sum / e.n), c: e.crits }))}</span></div>`;
         }).join('');
+        return `<div class="rs-kinds">${html}</div>`;
     }
 
     function offenseHTML(d) {
         const { mean, sd } = meanSd(d);
         const parts = [];
+        const tiles = [];
         if (d.dealtCount > 0) {
-            parts.push(`<div class="rs-row">${esc(tr('rs_dealt', { n: d.dealtCount }))} &middot; ${esc(tr('rs_avg', { mean: fmt(mean), sd: fmt(sd) }))}</div>`);
-            parts.push(kindsHTML(d));
-            parts.push(histogramHTML(d));
+            tiles.push(statTile(tr('rs_stat_hits'), d.dealtCount));
+            tiles.push(statTile(tr('rs_stat_avg'), fmt(mean), tr('rs_stat_avg_sub', { sd: fmt(sd) })));
         }
         if (d.critTrials > 0) {
             const pct = Math.round(d.crits / d.critTrials * 100);
             const exp = Math.round(d.critExp / d.critTrials * 100);
-            parts.push(`<div class="rs-row">${esc(tr('rs_crit', { k: d.crits, n: d.critTrials, pct, exp }))}</div>`);
+            tiles.push(statTile(tr('rs_stat_crit'), pct + '%', tr('rs_stat_crit_sub', { k: d.crits, n: d.critTrials, exp })));
+        }
+        if (tiles.length) parts.push(`<div class="rs-tiles">${tiles.join('')}</div>`);
+        if (d.dealtCount > 0) {
+            parts.push(kindsHTML(d));
+            parts.push(histogramHTML(d));
         }
         return parts.join('');
     }
@@ -392,18 +349,25 @@ import { trackAchStat, setAchStat } from '../achievements/achievements.js';
     function defenseHTML(d, always) {
         const parts = [];
         if (d.hitsTaken > 0 || always) {
-            parts.push(`<div class="rs-row" style="margin-top:6px">${esc(tr('rs_taken', { n: d.hitsTaken, dmg: d.dmgTaken }))}</div>`);
             const a = d.avoided;
             const total = a.dodge + a.block + a.parry + a.other;
-            if (total > 0) parts.push(`<div class="rs-row">${esc(tr('rs_avoided', { n: total, d: a.dodge, b: a.block, p: a.parry, o: a.other }))}</div>`);
+            parts.push(`<div class="rs-tiles">${statTile(tr('rs_stat_taken'), d.hitsTaken)}${statTile(tr('rs_stat_dmg'), d.dmgTaken, '', true)}${statTile(tr('rs_stat_avoided'), total)}</div>`);
+            if (total > 0) {
+                const pills = ['dodge', 'block', 'parry', 'other'].filter(k => a[k] > 0)
+                    .map(k => `<span class="rs-pill">${esc(tr('rs_av_' + k))} ${a[k]}</span>`).join('');
+                parts.push(`<div class="rs-pills">${pills}</div>`);
+            }
             parts.push(sourcesHTML(d));
         }
         return parts.join('');
     }
 
     function panelHTML(d, lose) {
+        const off = offenseHTML(d);
+        const def = defenseHTML(d, lose);
         return `<div class="rs-title">${esc(tr('rs_title_win'))}</div>`
-            + offenseHTML(d) + defenseHTML(d, lose);
+            + (off ? `<div class="rs-section-head">${esc(tr('rs_offense'))}</div>${off}` : '')
+            + (def ? `<div class="rs-section-head">${esc(tr('rs_defense'))}</div>${def}` : '');
     }
 
     // Campaign win overlay: two extra columns (offense | defense) in the

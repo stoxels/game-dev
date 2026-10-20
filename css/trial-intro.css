@@ -1,0 +1,229 @@
+/*
+    ------------------------------------------------------------------------
+    trial-intro.css
+    Briefing shown before a Convergence / Ascension Trial (#trial-intro-modal,
+    built in js/campaign-trials.js _showTrialIntro).
+
+    Same shell as the save-slot / reset dialogs: stone frame, title plaque,
+    close X, cream text plates, stone buttons. Shared classes come from
+    modals.css (.modal-bg), reset-game.css (.reset-header, .reset-title,
+    .reset-close-btn, .reset-btn, .reset-portal-deco, .reset-note-banner)
+    and save-slots.css (.dialog-plate). Only trial-specific bits live here.
+    ------------------------------------------------------------------------
+*/
+
+#trial-intro-modal {
+    z-index: 10100;
+}
+
+.ti-box {
+    position: relative;
+    width: min(880px, 94vw);
+    padding: clamp(54px, min(8vw, 11vh), 92px) clamp(30px, 7vw, 84px) clamp(30px, min(5vw, 8vh), 62px);
+    box-sizing: border-box;
+    background-image: url('../images/Settings/settings_background.webp');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: clamp(8px, 1.4vw, 14px);
+    z-index: 1;
+    overflow: visible;
+}
+
+#trial-intro-modal .reset-header {
+    width: max(min(84%, 640px), 300px);
+    height: clamp(46px, 6vw, 64px);
+}
+
+/* Ascension names are long ("Ascension Trial - World 12"): shrink a step and
+   wrap rather than ellipsize. */
+#trial-intro-modal .reset-title {
+    font-size: min(clamp(10px, 1.35vw, 17px), 3vh);
+    letter-spacing: 1px;
+    white-space: normal;
+    line-height: 1.15;
+    text-overflow: clip;
+}
+
+/* Small caps line above the lead text: "CONVERGENCE TRIAL" */
+.ti-kind {
+    font-family: var(--C);
+    font-weight: 700;
+    font-size: clamp(11px, 1.5vw, 13px);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #8a2c1e;
+}
+
+.ti-lead {
+    margin: 0;
+    text-align: center;
+    font-family: var(--B);
+    font-weight: 600;
+    font-size: clamp(14px, 2vw, 17px);
+    line-height: 1.45;
+    color: #2c1a0c;
+}
+
+/* ---- steps ------------------------------------------------------------ */
+.ti-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(5px, 0.9vw, 8px);
+}
+
+/* The monster line is the long one: it takes the full row */
+.ti-step-wide {
+    grid-column: 1 / -1;
+}
+
+.ti-step {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: clamp(10px, 1.6vw, 16px);
+    padding: clamp(6px, 1vw, 9px) clamp(10px, 1.6vw, 16px) clamp(6px, 1vw, 9px) clamp(8px, 1.2vw, 12px);
+    background: linear-gradient(180deg, rgba(255, 249, 230, 0.96), rgba(243, 226, 190, 0.96));
+    border: 2px solid rgba(74, 44, 18, 0.55);
+    border-left: 6px solid #a8741a;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgba(255, 252, 235, 0.7), 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.ti-step-boss {
+    border-left-color: #b03a2e;
+}
+
+.ti-step-icon {
+    position: relative;
+    flex-shrink: 0;
+    width: clamp(34px, 4.6vw, 48px);
+    height: clamp(34px, 4.6vw, 48px);
+}
+
+    /* Art overflows its slot so the rows keep a tight height */
+    .ti-step-icon::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 140%;
+        height: 140%;
+        transform: translate(-50%, -50%);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
+    }
+
+.ti-icon-puzzle::before { background-image: url('../images/Game-Reset/Icon-Codes.webp'); }
+.ti-icon-quiz::before { background-image: url('../images/Game-Reset/Icon-Class.webp'); }
+.ti-icon-monsters::before { background-image: url('../images/Game-Reset/Icon-Shield-Star.webp'); }
+.ti-icon-boss::before { background-image: url('../images/Game-Reset/Icon-Trophy.webp'); }
+.ti-icon-peace::before { background-image: url('../images/Game-Reset/Icon-Inference.webp'); }
+.ti-icon-finish::before { background-image: url('../images/Game-Reset/Icon-Bonus.webp'); }
+
+.ti-step-text {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--B);
+    font-weight: 700;
+    font-size: clamp(13px, 1.8vw, 16px);
+    line-height: 1.35;
+    color: #2c1a0c;
+    text-shadow: 0 1px 0 rgba(255, 240, 200, 0.55);
+}
+
+/* ---- rules (dark stone strip, like the reset-modal note banner) -------- */
+#trial-intro-modal .reset-note-banner {
+    margin: 0;
+    justify-content: center;
+}
+
+.ti-rules {
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    font-family: var(--B);
+    font-weight: 600;
+    font-size: clamp(12.5px, 1.7vw, 15px);
+    line-height: 1.4;
+    color: #fff3d6;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.6);
+}
+
+/* ---- reward ------------------------------------------------------------ */
+.ti-reward {
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 1.4vw, 14px);
+    padding: clamp(8px, 1.2vw, 12px) clamp(12px, 2vw, 18px);
+    background: linear-gradient(180deg, rgba(255, 244, 200, 0.98), rgba(238, 205, 120, 0.98));
+    border: 2px solid #8a5a00;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgba(255, 252, 235, 0.7), 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+
+    .ti-reward::before {
+        content: '';
+        flex-shrink: 0;
+        width: clamp(30px, 4vw, 42px);
+        height: clamp(30px, 4vw, 42px);
+        background: url('../images/Game-Reset/Icon-Highscores.webp') center / contain no-repeat;
+        filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
+    }
+
+.ti-reward-text {
+    font-family: var(--B);
+    font-weight: 700;
+    font-size: clamp(13px, 1.8vw, 16px);
+    line-height: 1.35;
+    color: #4a2c00;
+}
+
+#trial-intro-modal .reset-footer {
+    padding-top: clamp(2px, 0.6vw, 8px);
+}
+
+#trial-intro-modal .reset-btn {
+    min-width: clamp(130px, 22vw, 210px);
+    padding: clamp(10px, 1.6vw, 16px) clamp(14px, 2.4vw, 24px);
+    font-size: clamp(10px, 1.4vw, 14px);
+}
+
+#trial-intro-modal .reset-portal-deco {
+    width: clamp(50px, 7vw, 84px);
+    height: clamp(50px, 7vw, 84px);
+    margin: 0 clamp(-18px, -1.6vw, -8px);
+}
+
+@media (max-width: 700px) {
+    .ti-box {
+        gap: 8px;
+    }
+
+    .ti-steps {
+        grid-template-columns: 1fr;
+    }
+
+    #trial-intro-modal .reset-btn {
+        min-width: 110px;
+        padding: 9px 12px;
+        font-size: 10px;
+    }
+
+    #trial-intro-modal .reset-portal-deco {
+        display: none;
+    }
+
+    #trial-intro-modal .reset-footer {
+        gap: 10px;
+    }
+}

@@ -6,14 +6,14 @@
 // and panned. On a phone that happens all the time (large puzzles are only
 // playable zoomed in), and a puzzle without its clues cannot be solved.
 //
-// While the touch controls are showing, this module pins a copy of the
+// On every device (PC included), this module pins a copy of the
 // clues for the rows and columns currently on screen to the left and top
 // edge of the play area, only for the side that has actually scrolled away.
 // The copies are read-only and let touches pass through to the cells below.
 // Clue numbers are read from the live table (rn-<row>-<k> / cn-<col>-<k>),
 // so solved-line dimming and clue-side toggles keep working.
 //
-// Does nothing unless touch controls are showing: PC play is untouched.
+// Does nothing while the whole puzzle is in view (no clue has scrolled away).
 //
 // Side-effect module (no exports).
 
@@ -41,13 +41,14 @@ function hideAll() {
 }
 
 function numbersOf(prefix, index) {
+    // Shorter lines are bottom/right-aligned, so their ids do not start at 0:
+    // collect by prefix (document order = reading order), never by counting.
+    // Each entry carries its struck-out state (clue-done) from the live table.
     const out = [];
-    for (let k = 0; ; k++) {
-        const el = document.getElementById(`${prefix}-${index}-${k}`);
-        if (!el) break;
+    document.querySelectorAll(`[id^="${prefix}-${index}-"]`).forEach(el => {
         const text = el.textContent.trim();
-        if (text) out.push(text);
-    }
+        if (text) out.push({ text, done: el.classList.contains('clue-done') });
+    });
     return out;
 }
 
@@ -57,13 +58,14 @@ function solvedOf(cellClass, index) {
 }
 
 function fill(el, numbers, solved) {
-    const text = numbers.join(' ');
+    const text = numbers.map(n => n.text + (n.done ? '!' : '')).join(' ');
     if (el.dataset.t !== text) {
         el.dataset.t = text;
         el.textContent = '';
         for (const n of numbers) {
             const s = document.createElement('span');
-            s.textContent = n;
+            s.textContent = n.text;
+            if (n.done) s.className = 'clue-done';
             el.appendChild(s);
         }
     }
@@ -80,10 +82,10 @@ function prune(pool, keep) {
 }
 
 function update() {
-    const on = document.documentElement.classList.contains('touch-controls-on');
-    const first = on ? document.getElementById('g-0-0') : null;
+    const first = document.getElementById('g-0-0');
     const scroller = first ? document.querySelector('#screen-game .game-main') : null;
-    if (!first || !scroller || !first.offsetParent) {
+    // The win/lose screens sit over the puzzle; the pinned copies must not float on top of them.
+    if (!first || !scroller || !first.offsetParent || document.querySelector('#ov-win.show, #ov-lose.show')) {
         hideAll();
         return;
     }

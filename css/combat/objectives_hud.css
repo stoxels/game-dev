@@ -1,7 +1,11 @@
-﻿/* ── Endgame Objectives - Top-Center Single Line ─────────────── */
+/* ── Objectives HUD - top-center stone chips ─────────────────────
+   Each open objective is a rune-edged slate plaque (same art as the reset
+   dialog's note banner) with the objective's icon overlapping the left edge.
+   Icons match the trial briefing (css/trial-intro.css). Action buttons use
+   the stone button art with a coloured glow. */
 #sx-objectives-strip {
     position: fixed;
-    top: 10px;
+    top: 8px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 250;
@@ -10,52 +14,75 @@
     align-items: center;
     gap: 6px;
     pointer-events: auto;
-    max-width: 92vw;
+    max-width: 96vw;
 }
 
     #sx-objectives-strip.sx-hidden {
         display: none !important;
     }
 
-/* The single-line pill containing the objectives */
 .sx-obj-line {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 14px 18px;
-    background: linear-gradient(160deg, rgba(18, 22, 34, 0.96), rgba(12, 15, 26, 0.96));
-    border: 1px solid rgba(122, 138, 168, 0.38);
-    border-radius: 999px;
-    padding: 7px 18px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(6px);
-    font-size: 0.88em;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    color: #e2e8f0;
-    white-space: nowrap;
+    gap: 6px clamp(8px, 1.4vw, 16px);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.55));
 }
 
 .sx-obj-seg {
+    position: relative;
     display: inline-flex;
-    align-items: center;
-    gap: 4px;
+    align-items: baseline;
+    gap: 7px;
     white-space: nowrap;
+    min-width: clamp(118px, 12vw, 168px);
+    padding: 7px 16px 7px 50px;
+    box-sizing: border-box;
+    background: url('../../images/Game-Reset/Note-Banner.webp') center / 100% 100% no-repeat;
 }
 
+/* Icon overflows the chip's left edge */
+.sx-obj-seg-icon {
+    position: absolute;
+    left: -2px;
+    top: 50%;
+    width: 46px;
+    height: 46px;
+    transform: translateY(-50%);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.7));
+}
+
+.sx-obj-monsters .sx-obj-seg-icon { background-image: url('../../images/Game-Reset/Icon-Shield-Star.webp'); }
+.sx-obj-puzzle .sx-obj-seg-icon { background-image: url('../../images/Game-Reset/Icon-Codes.webp'); }
+.sx-obj-quiz .sx-obj-seg-icon { background-image: url('../../images/Game-Reset/Icon-Class.webp'); }
+.sx-obj-boss .sx-obj-seg-icon { background-image: url('../../images/Game-Reset/Icon-Trophy.webp'); }
+
 .sx-obj-seg-val {
-    color: #f1f5f9;
+    font-family: var(--C);
+    font-size: clamp(15px, 1.5vw, 19px);
     font-weight: 800;
+    letter-spacing: 0.04em;
+    color: #ffd76e;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 8px rgba(255, 190, 70, 0.35);
 }
 
 .sx-obj-seg-label {
-    color: #94a3b8;
-    font-weight: 600;
-    font-size: 0.9em;
+    font-family: var(--C);
+    font-size: clamp(10px, 1vw, 12px);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #cfd6e6;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
-/* Action buttons that appear underneath / beside the line */
+.sx-obj-boss .sx-obj-seg-val { color: #ff9a8a; }
+
+/* Action buttons that appear underneath the chips */
 .sx-obj-actions {
     display: flex;
     align-items: center;
@@ -64,106 +91,81 @@
 }
 
 .sx-obj-action-btn {
-    font-size: 0.82em;
-    font-weight: 800;
-    padding: 7px 16px;
-    border-radius: 999px;
-    border: 1px solid #4a5568;
+    font-family: var(--PX);
+    font-size: clamp(9px, 1vw, 12px);
+    letter-spacing: 1.2px;
+    padding: 13px 30px;
+    border: none;
+    background: url('../../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat;
+    color: #fff1cf;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.85), 0 0 8px rgba(0, 0, 0, 0.7);
     cursor: pointer;
-    transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.1s, box-shadow 0.18s;
     white-space: nowrap;
-    letter-spacing: 0.04em;
     pointer-events: auto;
+    transition: transform 0.1s, filter 0.18s;
 }
 
-.sx-obj-action-btn:active {
-    transform: scale(0.97);
-}
+    .sx-obj-action-btn:hover {
+        filter: brightness(1.2);
+        animation-play-state: paused;
+    }
+
+    .sx-obj-action-btn:active {
+        transform: scale(0.97);
+    }
 
 /* Enter Boss Arena - red danger pulse */
 .sx-obj-action-boss {
-    background: linear-gradient(180deg, #3d1212, #2b0d0d);
-    color: #f87171;
-    border-color: #7a2d2d;
-    box-shadow: 0 0 0 rgba(248, 113, 113, 0);
+    color: #ffb3a6;
     animation: sx-boss-btn-pulse 1.6s ease-in-out infinite;
 }
 
-    .sx-obj-action-boss:hover {
-        background: #7a2d2d;
-        color: #fff;
-        border-color: #f87171;
-        animation-play-state: paused;
-    }
-
 @keyframes sx-boss-btn-pulse {
-    0%, 100% { box-shadow: 0 0 0 rgba(248, 113, 113, 0.0); }
-    50%      { box-shadow: 0 0 14px rgba(248, 113, 113, 0.55); }
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(248, 113, 113, 0)); }
+    50%      { filter: drop-shadow(0 0 12px rgba(248, 113, 113, 0.85)); }
 }
 
-/* Complete Map - green highlighted, strong pulse when ready */
+/* Complete Map / Finish Trial - green pulse when ready */
 .sx-obj-action-complete {
-    background: linear-gradient(180deg, #143522, #0d2b1a);
-    color: #4ade80;
-    border-color: #2d7a4f;
-    box-shadow: 0 0 10px rgba(74, 222, 128, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    color: #b8f5c8;
     animation: sx-complete-pulse 1.4s ease-in-out infinite;
 }
 
-    .sx-obj-action-complete:hover {
-        background: #1e6a3a;
-        color: #fff;
-        border-color: #4ade80;
-        box-shadow: 0 0 18px rgba(74, 222, 128, 0.6);
-        animation-play-state: paused;
-    }
-
 @keyframes sx-complete-pulse {
-    0%, 100% { box-shadow: 0 0 10px rgba(74, 222, 128, 0.35), inset 0 1px 0 rgba(255,255,255,0.06); transform: scale(1); }
-    50%      { box-shadow: 0 0 22px rgba(74, 222, 128, 0.7), inset 0 1px 0 rgba(255,255,255,0.1); transform: scale(1.03); }
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(74, 222, 128, 0.45)); transform: scale(1); }
+    50%      { filter: drop-shadow(0 0 14px rgba(74, 222, 128, 0.9)); transform: scale(1.03); }
 }
 
-/* Trigger Question - blue accent pulse */
+/* Trigger Question - blue pulse */
 .sx-obj-action-question {
-    background: linear-gradient(180deg, #11264a, #0a1a36);
-    color: #7fb8ff;
-    border-color: #2d5aa0;
-    box-shadow: 0 0 10px rgba(127, 184, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    color: #b9d9ff;
     animation: sx-question-pulse 1.5s ease-in-out infinite;
 }
 
-    .sx-obj-action-question:hover {
-        background: #1e4a8a;
-        color: #fff;
-        border-color: #7fb8ff;
-        box-shadow: 0 0 18px rgba(127, 184, 255, 0.6);
-        animation-play-state: paused;
-    }
-
 @keyframes sx-question-pulse {
-    0%, 100% { box-shadow: 0 0 10px rgba(127, 184, 255, 0.35), inset 0 1px 0 rgba(255,255,255,0.06); transform: scale(1); }
-    50%      { box-shadow: 0 0 22px rgba(127, 184, 255, 0.7), inset 0 1px 0 rgba(255,255,255,0.1); transform: scale(1.03); }
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(127, 184, 255, 0.45)); transform: scale(1); }
+    50%      { filter: drop-shadow(0 0 14px rgba(127, 184, 255, 0.9)); transform: scale(1.03); }
 }
 
 /* Locked Complete Map - dim, no pulse */
 .sx-obj-action-locked {
-    background: #1e293b;
-    color: #64748b;
-    border-color: #334155;
+    color: #8a8f9c;
     cursor: not-allowed;
-    opacity: 0.9;
+    opacity: 0.75;
+    animation: none;
 }
 
-/* Responsive: on very narrow screens reduce gap/padding */
 @media (max-width: 560px) {
-    .sx-obj-line {
-        gap: 10px 12px;
-        padding: 6px 12px;
-        font-size: 0.8em;
+    .sx-obj-seg {
+        min-width: 100px;
+        padding: 5px 12px 5px 40px;
+    }
+    .sx-obj-seg-icon {
+        width: 36px;
+        height: 36px;
     }
     .sx-obj-action-btn {
-        font-size: 0.76em;
-        padding: 6px 12px;
+        padding: 10px 20px;
     }
 }
 

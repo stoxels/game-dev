@@ -3802,6 +3802,7 @@ export function castUniversalSpell(spellId, opts) {
     try {
         if (typeof globalThis.updateQuestStats === 'function') updateQuestStats('classAbilityUsed', {});
         if (typeof globalThis.triggerSkillBanter === 'function') globalThis.triggerSkillBanter(spellId);
+        if (typeof globalThis.triggerSpellBanter === 'function') globalThis.triggerSpellBanter(spell);
     } catch (e) { /* non-combat progress is best-effort */ }
 
     // Support family: the effect lands on the player, not on a monster, so it

@@ -205,57 +205,49 @@ export function formatTime(totalSeconds) {
     return `${mins}:${String(secs).padStart(2, '0')}`;
 }
 
-// Builds the gain-note string shown next to the score.
-// If a new record was set, shows the net-new points and the previous best.
-// Otherwise shows just the total points awarded.
+// Builds the plain-language note under the score: what was added to the
+// player's total, and (when this run did not beat it) the level's best.
 function buildGainNote(pts, ptsAwarded, prevBest) {
-    if (ptsAwarded < pts) {
-        return ` (+${ptsAwarded} ${t('ov_win_new')} - ${t('ov_win_best_was')} ${prevBest})`;
+    if (ptsAwarded >= pts) {
+        return `+${ptsAwarded} ${t('ov_win_added')}`;
     }
-    return ` (+${ptsAwarded})`;
+    if (ptsAwarded > 0) {
+        return `🏆 ${t('ov_win_new_best')} +${ptsAwarded} ${t('ov_win_added')}`;
+    }
+    return `${t('ov_win_best_here')} ${prevBest} - ${t('ov_win_nothing_added')}`;
 }
 
-// Returns the appropriate HTML line for the mistake count.
-// Handles the three distinct display states: no mistakes, all absorbed, partial absorbed.
+// Returns the appropriate HTML for the mistake count.
+// Handles the distinct display states: flawless, all absorbed, some made.
 function buildMistakeLine() {
-    const totalWrongClicks = _liveMistakes() + _liveAbsorbed();
+    const mistakes = _liveMistakes();
+    const absorbed = _liveAbsorbed();
+    const absorbedLine = absorbed > 0
+        ? `<div class="ov-sub-line ov-score-detail ov-note">🛡 ${absorbed} ${t('ov_win_absorbed')}</div>` : '';
 
-    if (totalWrongClicks === 0) {
-        return `<div class="ov-sub-line ov-sub-miss-ok">✗ 0 ${t('ov_win_mistakes')}</div>`;
+    if (mistakes === 0) {
+        return `<div class="ov-sub-line ov-sub-miss-ok">✔ ${t('ov_win_flawless')}</div>${absorbedLine}`;
     }
-
-    const absorbedNote = `<span style="opacity:0.55;font-size:0.85em">(${_liveAbsorbed()} ${t('ov_win_absorbed')})</span>`;
-
-    if (_liveAbsorbed() > 0 && _liveMistakes() === 0) {
-        // All wrong clicks were absorbed - still shows as a clean run
-        return `<div class="ov-sub-line ov-sub-miss-ok">✗ 0 ${t('ov_win_mistakes')} ${absorbedNote}</div>`;
-    }
-
-    const mistakeWord = _liveMistakes() !== 1 ? t('ov_win_mistakes') : t('ov_win_mistake');
-    const cssClass = _liveMistakes() === 0 ? 'ov-sub-miss-ok' : 'ov-sub-miss';
-
-    if (_liveAbsorbed() > 0) {
-        return `<div class="ov-sub-line ${cssClass}">✗ ${_liveMistakes()} ${mistakeWord} ${absorbedNote}</div>`;
-    }
-
-    return `<div class="ov-sub-line ${cssClass}">✗ ${_liveMistakes()} ${mistakeWord}</div>`;
+    const mistakeWord = mistakes !== 1 ? t('ov_win_mistakes') : t('ov_win_mistake');
+    return `<div class="ov-sub-line ov-sub-miss">✗ ${mistakes} ${mistakeWord}</div>${absorbedLine}`;
 }
 
 function buildScoreColumn(pts, ptsAwarded, prevBest, mult, monsterPts = 0, monsterAwarded = 0) {
     const safeMult = Number.isFinite(Number(mult)) ? Number(mult) : 1;
     const gainNote = buildGainNote(pts, ptsAwarded, prevBest);
+    const xpGained = Math.round(Number(window.LEVEL_FLAGS && window.LEVEL_FLAGS.xpGained) || 0);
     document.getElementById('ov-col-score').innerHTML = `
-        <div class="ov-sub-line ov-sub-pts">${pts} ${t('ov_win_pts')}</div>
-        <div class="ov-sub-line ov-sub-pts">${t('ov_win_multiplier')} ×${safeMult.toFixed(2)}</div>
-        <div class="ov-sub-line ov-sub-pts">${gainNote}</div>
-        ${monsterPts > 0 ? `<div class="ov-sub-line ov-sub-pts">⚔ ${t('ov_win_combat')} ${monsterPts} (+${monsterAwarded})</div>` : ''}`;
+        <div class="ov-sub-line ov-sub-pts ov-score-main">${pts} ${t('ov_win_pts')}</div>
+        <div class="ov-sub-line ov-score-detail">${t('ov_win_multiplier')} ×${safeMult.toFixed(2)}</div>
+        <div class="ov-sub-line ov-score-detail ov-score-gain">${gainNote}</div>
+        ${monsterPts > 0 ? `<div class="ov-sub-line ov-score-detail">⚔ ${t('ov_win_combat')} ${monsterPts} · +${monsterAwarded} ${t('ov_win_added')}</div>` : ''}
+        ${xpGained > 0 ? `<div class="ov-sub-line ov-score-detail ov-score-xp">✨ +${xpGained} XP</div>` : ''}`;
 }
 
 function buildTimeColumn(elapsed) {
     document.getElementById('ov-col-time').innerHTML = `
-        <div class="ov-sub-line ov-sub-time">
-            ⏱ ${formatTime(_liveTimerSecs())} ${t('ov_win_left')} · ${t('ov_win_solved_in')} ${formatTime(elapsed)}
-        </div>
+        <div class="ov-sub-line ov-sub-time">⏱ ${t('ov_win_solved_time')} ${formatTime(elapsed)}</div>
+        <div class="ov-sub-line ov-score-detail">⏳ ${t('ov_win_time_left')} ${formatTime(_liveTimerSecs())}</div>
         ${buildMistakeLine()}`;
 }
 

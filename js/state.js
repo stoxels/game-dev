@@ -71,6 +71,7 @@ window.LEVEL_FLAGS = {
     stunFreezeUntil: 0,       // freeze_timer_on_stun: cooldown stamp
     damageAfterLineUntil: 0,  // damage_after_line (tree): timestamp until which the bonus lasts
     damageOnMistakePending: false, // damage_on_mistake (tree): next Attack deals more damage
+    xpGained: 0,              // character XP awarded this level (kills + completion), shown on the win overlay
     lastFailedGi: null,       // gIdx of the level the player last failed (bounceback achievement)
 };
 
@@ -98,6 +99,7 @@ export function _resetLevelFlags() {
     window.LEVEL_FLAGS.stunFreezeUntil = 0;
     window.LEVEL_FLAGS.damageAfterLineUntil = 0;
     window.LEVEL_FLAGS.damageOnMistakePending = false;
+    window.LEVEL_FLAGS.xpGained = 0;
     // devTestActive survives: it describes the session, not the level.
     // oracleActive survives this reset: _doStartLevel sets it (step 4) before
     // _initClassSystems fires this reset (step 6), so zeroing it here would

@@ -26,7 +26,7 @@ import { STATE } from '../state.js';
 // Progression loop:
 //   • every skill + rank pair has its own charm - key "<skillId>#<rank>"
 //   • picking up a charm you already own yields a Lemma instead
-//   • 10 Lemmas automatically prove 1 Theorem
+//   • 5 Lemmas automatically prove 1 Theorem
 //   • right-click the Theorems pill, then left-click a charm: spends 1 Theorem → +1% damage for its spell
 //   • placing a charm into one of the 10 SPELL SLOTS unlocks that spell
 //     directly on the matching hotbar slot (spell slot N = hotbar key N -
@@ -56,8 +56,8 @@ export const CHARM_SLOT_COUNT = 10;
 // eslint-disable-next-line no-unused-vars -- flagged dead, kept deliberately
 const CHARM_SLOT_COLS = 5;
 
-// Ten duplicate Lemmas prove one Theorem.
-const CHARM_SHARDS_PER_ORB = 10;
+// Five duplicate Lemmas prove one Theorem.
+const CHARM_SHARDS_PER_ORB = 5;
 
 // Every applied Theorem adds this much damage to the charm's spell.
 export const CHARM_ORB_DAMAGE_PCT = 1;
@@ -1067,7 +1067,7 @@ function _charmSlotsCountLabel() {
 }
 
 // Currency strip: Lemmas (towards the next Theorem) + spendable Theorems.
-// The Lemma meter always reads plural (it is a count of ten); the Theorem
+// The Lemma meter always reads plural (it is a count of five); the Theorem
 // count flips to its singular form at exactly one. Both widgets use the
 // custom spell-book hover tooltip instead of a native `title` popup.
 function _charmBuildCurrencyHTML() {

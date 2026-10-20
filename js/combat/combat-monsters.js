@@ -163,6 +163,15 @@ export function _buildMonster(defOrId, level = 1, hpMult = 1) {
         // ±15% spread so a pack doesn't feel flat; never below a few hits.
         maxHP = Math.max(10, Math.round(hpTarget * (0.85 + Math.random() * 0.30) * hpMult));
         damage = Math.max(1, Math.round(dmgTarget * (0.85 + Math.random() * 0.30)));
+        // A monster far above the player's level hits much harder.
+        try {
+            const cc = CAMPAIGN_MONSTER_CONFIG;
+            const pl = Number(typeof globalThis._getPlayerLevel === 'function' ? globalThis._getPlayerLevel() : 0) || 0;
+            const over = pl > 0 ? lvl - pl - (cc.overLevelGrace || 0) : 0;
+            if (over > 0) {
+                damage = Math.round(damage * Math.min(cc.overLevelDamageMax || 1, 1 + (cc.overLevelDamagePerLevel || 0) * over));
+            }
+        } catch (e) { /* config optional */ }
         const chargeMult = (typeof CAMPAIGN_MONSTER_CONFIG !== 'undefined' && CAMPAIGN_MONSTER_CONFIG.chargeMult)
             ? CAMPAIGN_MONSTER_CONFIG.chargeMult : 1.15;
         // Early-game ease: the first monster levels wind up a little slower.

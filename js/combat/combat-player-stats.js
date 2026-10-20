@@ -1716,6 +1716,23 @@ export function _calcEvasionDodgeChance(evasion, monsterLevel) {
     return Math.min(EVASION_DODGE_CAP_PCT, (evasion / (evasion + k)) * 100);
 }
 
+// Over-level penalty for every avoidance roll (dodge, block, parry, deflect):
+// each attacker level above the player's (past a small grace gap) cuts the
+// chance by OVER_LEVEL_AVOID_PER_LEVEL, never below OVER_LEVEL_AVOID_MIN of it.
+// Returns a multiplier in [OVER_LEVEL_AVOID_MIN, 1]; 1 for equal/lower levels.
+export const OVER_LEVEL_AVOID_GRACE = 2;
+export const OVER_LEVEL_AVOID_PER_LEVEL = 0.03;
+export const OVER_LEVEL_AVOID_MIN = 0.25;
+
+export function _overLevelAvoidMult(attackerLevel, playerLevel) {
+    const a = Number(attackerLevel) || 0;
+    const p = Number(playerLevel) || 0;
+    if (a <= 0 || p <= 0) return 1;
+    const over = a - p - OVER_LEVEL_AVOID_GRACE;
+    if (over <= 0) return 1;
+    return Math.max(OVER_LEVEL_AVOID_MIN, 1 - OVER_LEVEL_AVOID_PER_LEVEL * over);
+}
+
 // Accuracy vs monster level → % chance for the player's attacks to miss.
 // Miss chance scales linearly with the target's level and inversely with
 // accuracy, clamped to a floor (never perfectly accurate) and a ceiling

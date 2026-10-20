@@ -153,7 +153,7 @@ export const ITEM_DEFS = {
     },
     tutor4: {
         id: 'tutor4', icon: '📚',
-        nameEn: 'Professor', nameDE: 'Professor',
+        nameEn: 'Bookworm', nameDE: 'Bücherwurm',
         descEn: 'Reduces your mistake count by 4', descDE: 'Reduziert deine Fehleranzahl um 4',
         rarity: 'epic', weight: 3
     },

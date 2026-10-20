@@ -767,7 +767,10 @@ A thin meta-bar sits at the very top of the game content (inside the scroll area
 .puzzle-scaler {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    /* `safe`: a zoomed grid wider than the window overflows to the right only,
+       so it can be scrolled; plain `center` pushed half of it off the left
+       edge where no scrollbar can reach. */
+    align-items: safe center;
     gap: 8px;
     transform-origin: top center;
     /* scale is set inline via JS */

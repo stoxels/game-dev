@@ -624,3 +624,187 @@ body.question-modal-open #player-avatar-wrapper,
 body.question-modal-open #player-avatar-simple {
     display: none !important;
 }
+
+
+/*
+    ------------------------------------------------------------------------
+    ART SKIN - win / lose screens (rune-stone frame, plaque, stone buttons)
+    Appended last so it only overrides looks; layout hooks are unchanged.
+    ------------------------------------------------------------------------
+*/
+.overlay {
+    background:
+        linear-gradient(rgba(8, 6, 16, 0.9), rgba(4, 3, 9, 0.96)),
+        url('../images/Game_Setup/Game_Setup_New_Background.webp') center bottom / cover no-repeat;
+}
+
+/* Title on the stone plaque */
+.ov-title {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(520px, 94vw);
+    height: clamp(64px, 9vw, 92px);
+    padding: 0 11%;
+    white-space: nowrap;
+    background: url('../images/Settings/settings_title_plague.webp') center / 100% 100% no-repeat;
+    flex-shrink: 0;
+}
+.ov-title.win { color: var(--yellow, #ffd98a); text-shadow: 0 0 18px rgba(255, 190, 70, 0.85), 0 2px 3px #000; }
+.ov-title.lose { color: #ff9c8c; text-shadow: 0 0 18px rgba(255, 70, 50, 0.85), 0 2px 3px #000; }
+
+/* Win results sit inside one framed panel under the plaque */
+#ov-win .ov-bottom-half {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    width: min(980px, 96vw);
+    margin: 0 auto clamp(12px, 3vw, 24px);
+    padding: clamp(14px, 2.4vw, 22px) clamp(10px, 2vw, 22px) clamp(14px, 2.4vw, 22px);
+    border: 44px solid transparent;
+    border-image: url('../images/Settings/settings_background.webp') 44 fill / 44px stretch;
+    filter: drop-shadow(0 0 22px rgba(140, 90, 220, 0.35));
+}
+/* the plaque overlaps the frame's top border */
+#ov-win .ov-title { margin-top: calc(-44px - clamp(30px, 4vw, 42px)); position: relative; z-index: 2; }
+#ov-win .ov-reveal-quote { color: #f3e6c8; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85); }
+#ov-win .ov-col, #ov-win .ov-sub-line { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85); }
+#ov-win .ov-top-half { padding-bottom: clamp(30px, 4vw, 46px); }
+
+/* Lose screen: plaque title (big) + framed last-hits panel */
+#ov-lose #lose-title {
+    width: min(900px, 96vw);
+    height: clamp(90px, 15vw, 150px);
+}
+#ov-lose .rs-panel {
+    border: 40px solid transparent;
+    border-image: url('../images/Settings/settings_background.webp') 44 fill / 40px stretch;
+    background: transparent;
+    padding: 4px 8px;
+    filter: drop-shadow(0 0 20px rgba(120, 40, 40, 0.45));
+}
+#ov-lose .ov-sub { color: #f3e6c8; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85); }
+
+/* Stone buttons */
+.ob {
+    border: none;
+    background: url('../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat;
+    padding: clamp(12px, 2vw, 16px) clamp(18px, 3vw, 28px);
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
+}
+.ob:hover { filter: brightness(1.28); transform: translateY(-1px); }
+.ob.p, .ob.y, .ob.s { border: none; background-color: transparent; }
+.ob.p { color: #ffe9a8; filter: drop-shadow(0 0 8px rgba(255, 190, 70, 0.5)); }
+.ob.y { color: #f0d98a; }
+.ob.s { color: #cfc6ad; }
+.ob.p:hover, .ob.y:hover { background-color: transparent; color: #fff3c4; border: none; filter: brightness(1.25) drop-shadow(0 0 10px rgba(255, 190, 70, 0.7)); }
+.ob.s:hover { border: none; color: #fff3c4; }
+#ov-lose #lose-title {
+    font-size: clamp(22px, 5vw, 54px);
+    letter-spacing: clamp(2px, 0.5vw, 6px);
+    padding: 0 16%;
+}
+
+/* ── Win screen: fit one screen, wider panel, readable text ────────────────── */
+#ov-win { overflow-x: hidden; }
+#ov-win .ov-top-half { flex: 0 1 24%; padding-bottom: 58px; }
+#ov-win .ov-bottom-half {
+    flex: 1 1 auto;
+    width: min(1640px, 98vw);
+    margin: 0 auto 8px;
+    gap: clamp(4px, 0.8vh, 8px);
+    padding: 4px clamp(8px, 1.6vw, 20px) 0;
+    border-width: 34px;
+    border-image: url('../images/Settings/settings_background.webp') 46 fill / 34px stretch;
+}
+#ov-win .ov-title { margin-top: calc(-34px - 40px); height: clamp(58px, 7vh, 78px); width: min(480px, 90vw); }
+#ov-win .ov-reveal-quote { font-size: clamp(14px, 2.2vh, 20px); line-height: 1.25; }
+/* dark inset plate: every stat stays readable on the parchment */
+#ov-win .ov-stats-columns {
+    max-width: none;
+    padding: clamp(8px, 1.4vh, 14px) clamp(10px, 1.6vw, 22px);
+    background: rgba(10, 8, 18, 0.72);
+    border: 1px solid rgba(240, 225, 180, 0.25);
+    border-radius: 6px;
+    box-sizing: border-box;
+    align-items: start;
+}
+#ov-win .ov-sub-line, #ov-win .ov-sub-pts, #ov-win .ov-sub-time, #ov-win .ov-sub-miss, #ov-win .ov-sub-miss-ok {
+    font-size: clamp(13px, 2.1vh, 19px);
+    line-height: 1.35;
+}
+#ov-win .bonus-list { margin: 0; }
+#ov-win .ov-btns-win-grid .ob { min-width: clamp(130px, 14vw, 200px); }
+/* roomy screens: scale the combat analytics tiles up for legibility */
+@media (min-height: 800px) and (min-width: 1200px) {
+    #ov-win .ov-ca { zoom: 1.3; }
+}
+
+/* Score column: one big headline, plain detail lines underneath */
+#ov-win .ov-score-main { font-size: clamp(20px, 3.4vh, 30px); line-height: 1.2; }
+#ov-win .ov-score-detail { font-family: var(--C, inherit); font-size: clamp(13px, 2.1vh, 18px); line-height: 1.35; color: #e6dcc0; }
+#ov-win .ov-score-gain { color: #9fe6a8; }
+#ov-win .ov-score-xp { color: #d9b8ff; font-weight: 700; }
+#ov-win .ov-note { font-size: 0.85em; opacity: 0.8; }
+
+/* ── Win screen: four-corner layout ─────────────────────────────────────────
+   score (top-left) | time & mistakes (top-right)
+                 buttons + bonus badge (centre)
+   offense (bottom-left) | defense (bottom-right)
+   The stats wrappers dissolve (display: contents) so the four blocks become
+   direct cells of the panel's grid; ids and JS hooks are unchanged. */
+#ov-win .ov-bottom-half {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+        "title title"
+        "quote quote"
+        "score time"
+        "btns  btns"
+        "off   def"
+        "item  item";
+    align-content: start;
+    column-gap: clamp(10px, 1.6vw, 24px);
+    row-gap: clamp(6px, 1.2vh, 12px);
+    align-items: stretch;
+}
+#ov-win .ov-title { grid-area: title; justify-self: center; }
+#ov-win .ov-reveal-quote { grid-area: quote; justify-self: center; }
+#ov-win .ov-stats-columns,
+#ov-win .ov-ca,
+#ov-win .ov-ca-cols { display: contents; }
+#ov-win .rs-ca-title { display: none; }
+#ov-win #ov-col-score { grid-area: score; }
+#ov-win #ov-col-time { grid-area: time; }
+#ov-win .ov-ca-cols > .ov-col:first-child { grid-area: off; }
+#ov-win .ov-ca-cols > .ov-col:last-child { grid-area: def; }
+#ov-win .ov-btns { grid-area: btns; justify-self: center; }
+#ov-win #item-reward-zone { grid-area: item; justify-self: center; }
+
+/* each corner is its own dark plate */
+#ov-win #ov-col-score,
+#ov-win #ov-col-time,
+#ov-win .ov-ca-cols > .ov-col {
+    box-sizing: border-box;
+    padding: clamp(8px, 1.4vh, 14px) clamp(12px, 1.6vw, 22px);
+    background: rgba(10, 8, 18, 0.74);
+    border: 1px solid rgba(240, 225, 180, 0.28);
+    border-radius: 6px;
+    justify-content: center;
+}
+/* the bonus badge sits between REPLAY and REPLAY (NEW SETUP) */
+#ov-win .ov-btns-col .bonus-list { margin: 2px 0; }
+#ov-win .ov-btns-col .bonus-list:empty { display: none; }
+#ov-win .ov-btns-col .bonus-badge { background: rgba(10, 8, 18, 0.7); text-align: center; }
+
+/* compact combat plates: three stat tiles per row, heads aligned at the top */
+#ov-win .rs-col .rs-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+#ov-win .rs-col { font-size: clamp(12px, 1.5vh, 14px); }
+#ov-win .rs-col .rs-stat { padding: 5px 4px; }
+#ov-win .rs-col .rs-stat-val { font-size: clamp(16px, 2.4vh, 22px); }
+#ov-win .rs-col .rs-kinds { margin-top: 6px; gap: 4px; }
+#ov-win .ov-ca-cols > .ov-col { justify-content: flex-start; }
+#ov-win #ov-col-score, #ov-win #ov-col-time { justify-content: center; }
+@media (min-height: 800px) and (min-width: 1200px) {
+    #ov-win .ov-ca { zoom: 1; }
+}

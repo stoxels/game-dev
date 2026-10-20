@@ -501,15 +501,68 @@ export function _ptxRunExpansion() {
         }
     });
 
-    ON_FILL.push((r, c) => {   // Butterfly Effect keystone (336)
+    // Butterfly Effect FX: a ripple on the filled tile and a butterfly that
+    // flutters out to each tile it reveals, which flashes on arrival.
+    function playButterflyFx(r, c, targets) {
+        const wrap = document.getElementById('puzzle-scaler');
+        const src = document.getElementById(`g-${r}-${c}`);
+        if (!wrap || !src || typeof wrap.animate !== 'function') return;
+        const zoom = globalThis.currentZoom || 1;
+        const wRect = wrap.getBoundingClientRect();
+        const center = (el) => {
+            const b = el.getBoundingClientRect();
+            return [(b.left - wRect.left + b.width / 2) / zoom, (b.top - wRect.top + b.height / 2) / zoom, b.width / zoom];
+        };
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:absolute; inset:0; pointer-events:none; z-index:326; overflow:hidden;';
+        wrap.appendChild(overlay);
+        const [sx, sy, size] = center(src);
+
+        const ring = document.createElement('div');
+        ring.style.cssText = `position:absolute; left:${sx}px; top:${sy}px; width:${size}px; height:${size}px;`
+            + 'border:2px solid #7fd8ff; border-radius:50%; box-shadow:0 0 12px #7fd8ff, inset 0 0 8px #7fd8ff;';
+        ring.animate([
+            { transform: 'translate(-50%,-50%) scale(0.3)', opacity: 1 },
+            { transform: 'translate(-50%,-50%) scale(2.6)', opacity: 0 }
+        ], { duration: 700, easing: 'ease-out', fill: 'forwards' });
+        overlay.appendChild(ring);
+
+        targets.forEach(([tr, tc], i) => {
+            const el = document.getElementById(`g-${tr}-${tc}`);
+            if (!el) return;
+            const [tx, ty] = center(el);
+            const dx = tx - sx, dy = ty - sy;
+            const fly = document.createElement('div');
+            fly.textContent = '🦋';
+            fly.style.cssText = `position:absolute; left:${sx}px; top:${sy}px; font-size:${Math.round(size * 0.9)}px;`
+                + 'line-height:1; filter:drop-shadow(0 0 6px #7fd8ff);';
+            fly.animate([
+                { transform: 'translate(-50%,-50%) scale(0.4) rotate(0deg)', opacity: 0 },
+                { transform: `translate(calc(-50% + ${dx * 0.4}px), calc(-50% + ${dy * 0.4 - size * 0.8}px)) scale(1.3) rotate(-18deg)`, opacity: 1, offset: 0.45 },
+                { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.7) rotate(14deg)`, opacity: 1, offset: 0.85 },
+                { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.2)`, opacity: 0 }
+            ], { duration: 700, delay: i * 120, easing: 'ease-in-out', fill: 'both' });
+            overlay.appendChild(fly);
+            el.animate([
+                { filter: 'brightness(2.2) saturate(1.6)', boxShadow: '0 0 18px #7fd8ff' },
+                { filter: 'brightness(1)', boxShadow: '0 0 0 transparent' }
+            ], { duration: 600, delay: 450 + i * 120, easing: 'ease-out' });
+        });
+        setTimeout(() => overlay.remove(), 1200 + targets.length * 120);
+    }
+
+    ON_FILL.push((r, c) => {   // Butterfly Effect keystone (336): 3% per correct fill
         if (!has('keystone_butterfly_effect') || Math.random() >= 0.03) return;
-        let n = 0;
+        const hit = [];
         for (const [dr, dc] of ORTHO) {
-            if (n >= 2) break;
+            if (hit.length >= 2) break;
             const nr = r + dr, nc = c + dc;
-            if (inGrid(nr, nc) && revealAt(nr, nc)) n++;
+            if (inGrid(nr, nc) && revealAt(nr, nc)) hit.push([nr, nc]);
         }
-        if (n > 0) toast('🦋 Butterfly Effect');
+        if (hit.length > 0) {
+            playButterflyFx(r, c, hit);
+            toast('🦋 Butterfly Effect');
+        }
     });
 
     //--------------------------------------------------------------------------

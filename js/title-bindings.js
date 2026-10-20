@@ -424,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
     onClick('btn-levels-cartographer', () => launchVendor('screen-levels'));
     // TEMPORARY TEST BUTTON (see index.html #btn-dev-codex): +999 Codex of
     // Completion for the selected character. Remove together with the button.
-    onClick('btn-dev-codex', () => {
+    document.getElementById('btn-dev-codex')?.addEventListener('click', () => {
         if (!STATE || !Array.isArray(STATE.inventory)) return;
         const stamp = Date.now();
         for (let i = 0; i < 999; i++) {

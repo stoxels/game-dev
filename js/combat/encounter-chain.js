@@ -1284,19 +1284,19 @@ export function _updateObjectivesHUD() {
     if (req.totalMonsters > 0) {
         const count = Math.min(_chainKillCount, req.totalMonsters);
         if (count < req.totalMonsters) {
-            segs.push(`<span class="sx-obj-seg"><span class="sx-obj-seg-val">${count} / ${req.totalMonsters}</span> <span class="sx-obj-seg-label">Monsters</span></span>`);
+            segs.push(`<span class="sx-obj-seg sx-obj-monsters"><span class="sx-obj-seg-icon"></span><span class="sx-obj-seg-val">${count} / ${req.totalMonsters}</span><span class="sx-obj-seg-label">Monsters</span></span>`);
         }
     }
     if (req.requiredPuzzles > 0) {
         const count = Math.min(_chainPuzzleSolvedCount, req.requiredPuzzles);
         if (count < req.requiredPuzzles) {
-            segs.push(`<span class="sx-obj-seg"><span class="sx-obj-seg-val">${count} / ${req.requiredPuzzles}</span> <span class="sx-obj-seg-label">Puzzles</span></span>`);
+            segs.push(`<span class="sx-obj-seg sx-obj-puzzle"><span class="sx-obj-seg-icon"></span><span class="sx-obj-seg-val">${count} / ${req.requiredPuzzles}</span><span class="sx-obj-seg-label">Puzzles</span></span>`);
         }
     }
     if (req.requiredQuestions > 0) {
         const count = Math.min(_questionsAnswered, req.requiredQuestions);
         if (count < req.requiredQuestions) {
-            segs.push(`<span class="sx-obj-seg"><span class="sx-obj-seg-val">${count} / ${req.requiredQuestions}</span> <span class="sx-obj-seg-label">Questions</span></span>`);
+            segs.push(`<span class="sx-obj-seg sx-obj-quiz"><span class="sx-obj-seg-icon"></span><span class="sx-obj-seg-val">${count} / ${req.requiredQuestions}</span><span class="sx-obj-seg-label">Questions</span></span>`);
         }
     }
     if (req.hasBoss && !_bossDefeated()) {
@@ -1304,7 +1304,7 @@ export function _updateObjectivesHUD() {
         const bossCount = Math.min(_bossKilledCount, bossTotal || 1);
         // Show boss progress even before arena entry; hide only when all bosses slain.
         if (bossTotal > 0) {
-            segs.push(`<span class="sx-obj-seg"><span class="sx-obj-seg-val">${bossCount} / ${bossTotal}</span> <span class="sx-obj-seg-label">Bosses</span></span>`);
+            segs.push(`<span class="sx-obj-seg sx-obj-boss"><span class="sx-obj-seg-icon"></span><span class="sx-obj-seg-val">${bossCount} / ${bossTotal}</span><span class="sx-obj-seg-label">Bosses</span></span>`);
         }
     }
 
@@ -1860,12 +1860,16 @@ export function _showLeaveMapTransition(atlasResult, opts) {
 
     el.innerHTML = `
         <div class="sx-leave-map-panel ${failed ? 'sx-leave-map-failed' : ''}">
-            <div class="sx-leave-map-title ${failed ? 'sx-title-failed' : ''}">${titleText}</div>
-            ${subLineHTML}
-            ${keepHintHTML}
-            ${firstClearHTML}
-            <div id="sx-leave-summary-container"></div>
-            <button class="sx-leave-map-return-btn" id="btn-eg-leave-map-return">${t(isTrial ? 'eg_return_to_world' : 'eg_return_to_nexus')}</button>
+            <div class="reset-header"><div class="sx-leave-map-title ${failed ? 'sx-title-failed' : ''}">${titleText}</div></div>
+            <div class="sx-leave-body">
+                ${subLineHTML}
+                ${keepHintHTML}
+                ${firstClearHTML}
+                <div id="sx-leave-summary-container"></div>
+            </div>
+            <div class="reset-footer">
+                <button class="reset-btn sx-leave-map-return-btn" id="btn-eg-leave-map-return">${t(isTrial ? 'eg_return_to_world' : 'eg_return_to_nexus')}</button>
+            </div>
         </div>`;
     el.classList.add('show');
 
@@ -2008,151 +2012,6 @@ export function _endMapDefeated(titleText, subText) {
     return true;
 }
 
-// Injects the overlay's CSS once - same pattern as _injectCurrencyStyles
-// / _dndInjectStyles, so nothing needs to be added to your .css files.
-export function _injectLeaveMapTransitionStyles() {
-    if (document.getElementById('sx-leave-map-transition-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'sx-leave-map-transition-styles';
-    style.textContent = `
-        .sx-leave-map-transition {
-            display: none;
-            position: fixed; inset: 0;
-            z-index: 10000;
-            background: rgba(5,5,15,0.92);
-            align-items: center; justify-content: center;
-        }
-        .sx-leave-map-transition.show { display: flex; }
-        .sx-leave-map-panel {
-            background: #14141f;
-            border: 2px solid #5555aa;
-            border-radius: 10px;
-            padding: 24px 32px;
-            max-width: 640px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            text-align: center;
-        }
-        .sx-leave-map-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 16px;
-            letter-spacing: .05em;
-        }
-        .sx-leave-map-panel.sx-leave-map-failed { border-color: #aa4455; }
-        .sx-leave-map-title.sx-title-failed { color: #ff8080; }
-        .sx-leave-map-subline {
-            font-size: 0.85rem;
-            color: #bbb;
-            margin: -8px auto 10px auto;
-        }
-        .sx-leave-map-keep-hint {
-            margin: -4px auto 16px auto;
-            padding: 6px 14px;
-            display: inline-block;
-            font-size: 0.8rem;
-            color: #9fe0a0;
-            background: rgba(80, 200, 120, 0.08);
-            border: 1px solid rgba(80, 200, 120, 0.45);
-            border-radius: 999px;
-        }
-        .sx-leave-map-first-clear {
-            margin: -8px auto 16px auto;
-            padding: 6px 14px;
-            display: inline-block;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #f5d98a;
-            background: rgba(245, 217, 138, 0.08);
-            border: 1px solid rgba(245, 217, 138, 0.55);
-            border-radius: 999px;
-            text-shadow: 0 0 6px rgba(245, 217, 138, 0.4);
-        }
-        .sx-leave-summary-section { margin-bottom: 18px; }
-        .sx-leave-summary-title {
-            font-size: 0.85rem;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            margin-bottom: 8px;
-            text-align: left;
-        }
-        .sx-leave-summary-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            min-height: 40px;
-        }
-        .sx-leave-summary-empty { color: #666; font-size: 0.85rem; font-style: italic; }
-        .sx-leave-summary-hint {
-            font-size: 0.72rem;
-            color: #777;
-            text-align: left;
-            margin-top: 6px;
-        }
-        .sx-loot-chip { cursor: pointer; }
-        .sx-loot-chip:hover { filter: brightness(1.4); }
-        .sx-leave-summary-chip {
-            position: relative;
-            width: 42px; height: 42px;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 6px;
-            font-size: 1.3rem;
-        }
-        .sx-leave-summary-chip img.sx-art-img { width: 86%; height: 86%; object-fit: contain; }
-        .sx-leave-summary-chip.sx-rarity-uncommon { border-color: #2ecc71; }
-        .sx-leave-summary-chip.sx-rarity-rare { border-color: #3498db; }
-        .sx-leave-summary-chip.sx-rarity-epic { border-color: #9b59b6; }
-        .sx-leave-summary-chip.sx-rarity-legendary { border-color: #f39c12; }
-        .sx-leave-summary-chip.sx-rarity-cursed { border-color: #e74c3c; }
-        .sx-leave-summary-chip.sx-rarity-artifact { border-color: #f1c40f; }
-        .sx-leave-summary-chip.sx-rarity-currency { border-color: #b59248; }
-        .sx-leave-summary-chip.sx-rarity-essence { border-color: #b59248; }
-        .sx-leave-summary-chip.sx-rarity-gold { border-color: #f5d98a; background: rgba(245, 217, 138, 0.15); }
-        .sx-leave-summary-count {
-            position: absolute; bottom: 1px; right: 2px;
-            font-size: 0.6rem; font-weight: 700; color: #f0e6c0;
-            text-shadow: 0 0 3px #000, 0 0 6px #000;
-            pointer-events: none;
-        }
-        .sx-leave-summary-bonus {
-            position: absolute; top: -7px; right: -7px;
-            width: 18px; height: 18px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.65rem; line-height: 1;
-            background: #2a2413;
-            border: 1px solid #f5d98a;
-            border-radius: 50%;
-            box-shadow: 0 0 6px rgba(245, 217, 138, 0.55);
-            pointer-events: none;
-        }
-        .sx-leave-summary-tooltip {
-            display: none;
-            position: absolute;
-            bottom: 100%; left: 50%;
-            transform: translateX(-50%);
-            margin-bottom: 6px;
-            z-index: 10001;
-            white-space: normal;
-        }
-        .sx-leave-summary-chip:hover .sx-leave-summary-tooltip { display: block; }
-        .sx-leave-map-return-btn {
-            margin-top: 8px;
-            padding: 10px 24px;
-            font-weight: 700;
-            letter-spacing: .05em;
-            background: #5555aa;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.95rem;
-        }
-        .sx-leave-map-return-btn:hover { background: #6c6cc9; }
-    `;
-    document.head.appendChild(style);
-}
+// The overlay's styles live in css/combat/run-summary.css; kept as a no-op so
+// existing callers keep working.
+export function _injectLeaveMapTransitionStyles() {}

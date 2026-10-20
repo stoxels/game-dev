@@ -15,7 +15,7 @@
     <link rel="icon" type="image/png" href="images/favicon.png">
     <title>STOXELS - v0.32 BETA</title>
     <link rel="stylesheet" href="css/base.css?v=4">
-    <link rel="stylesheet" href="css/pause.css?v=5">
+    <link rel="stylesheet" href="css/pause.css?v=6">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/touch-controls.css">
     <link rel="stylesheet" href="css/title-screen.css?v=4">
@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="css/game.css?v=5">
     <link rel="stylesheet" href="css/setup-screen.css?v=11">
     <link rel="stylesheet" href="css/inventory.css">
-    <link rel="stylesheet" href="css/overlays.css?v=3">
+    <link rel="stylesheet" href="css/overlays.css?v=12">
     <link rel="stylesheet" href="css/modals.css?v=3">
     <link rel="stylesheet" href="css/class.css?v=5">
     <link rel="stylesheet" href="css/skills.css?v=22">
@@ -49,7 +49,7 @@
     <link rel="stylesheet" href="css/classes/targeting-reticle.css">
     <link rel="stylesheet" href="css/combat/monsters.css?v=17">
     <link rel="stylesheet" href="css/combat/monster-spells.css?v=2">
-    <link rel="stylesheet" href="css/combat/gauntlet.css?v=6">
+    <link rel="stylesheet" href="css/combat/gauntlet.css?v=8">
     <!-- bosses2.css (442 KB / 11,290 lines, boss-FX only - verified no
          non-boss code uses its classes; base monster-card styles live in
          monsters.css) is NOT render-blocking: it is warmed up once at idle
@@ -63,6 +63,7 @@
     <link rel="stylesheet" href="css/hub/crafting-bench.css">
     <link rel="stylesheet" href="css/hub/tooltip-styles.css">
     <link rel="stylesheet" href="css/combat/objectives_hud.css">
+    <link rel="stylesheet" href="css/combat/run-summary.css">
     <link rel="stylesheet" href="css/character-select.css?v=8">
     <link rel="stylesheet" href="css/map-view.css?v=4">
     <link rel="stylesheet" href="css/map-view-topbar.css?v=26">
@@ -76,6 +77,7 @@
     <link rel="stylesheet" href="css/class_spell_upgrade.css">
     <link rel="stylesheet" href="css/class_ascendency_selection.css">
     <link rel="stylesheet" href="css/reset-game.css?v=3">
+    <link rel="stylesheet" href="css/trial-intro.css?v=2">
     <link rel="stylesheet" href="css/replay.css">
     <link rel="stylesheet" href="css/dev-mode-select.css">
     <!-- Boot: discover title art as early as possible -->
@@ -225,7 +227,7 @@
                     </div>
                     <div class="modal-section tut-section tut-section-basics">
                         <h3 data-t="tut_s2h">CONTROLS</h3>
-                        <p data-t="tut_s2p"><strong>Left click</strong> - fill a cell<br><strong>Right click</strong> - mark a cell as empty<br><strong>Hold Left Click and Drag</strong> - fill multiple cells<br><strong>CTRL + MouseWheel</strong> - Zoom in &amp; out<br><strong>Left &amp; Right Arrow Keys</strong> - Move the row clue headers<br><strong>{k6} {k7} {k8} {k9}</strong> - walk your character<br><strong>{k10}</strong> (hold, then release) - charged melee strike<br><strong>{k11}</strong> (hold) - parry<br><strong>{k12}</strong> - cycle target<br><strong>{k1} - {k4} ...</strong> - cast the spells on your hotbar<br><strong>{k14}</strong> - character sheet &amp; inventory<br><strong>{k13}</strong> - spell book<br><strong>{k15}</strong> - Probability Tree<br><strong>{k5}</strong> - pause the game<br>Every key can be changed under Keybinds.</p>
+                        <p data-t="tut_s2p"><strong>Left click</strong> - fill a cell<br><strong>Right click</strong> - mark a cell as empty<br><strong>Hold Left Click and Drag</strong> - fill multiple cells<br><strong>CTRL + MouseWheel</strong> - Zoom in &amp; out<br><strong>MouseWheel</strong> - Scroll up &amp; down<br><strong>SHIFT + MouseWheel</strong> or <strong>Left &amp; Right Arrow Keys</strong> - Scroll left &amp; right (zoomed-in puzzles)<br>The clues stay pinned to the edge while you scroll.<br><strong>{k6} {k7} {k8} {k9}</strong> - walk your character<br><strong>{k10}</strong> (hold, then release) - charged melee strike<br><strong>{k11}</strong> (hold) - parry<br><strong>{k12}</strong> - cycle target<br><strong>{k1} - {k4} ...</strong> - cast the spells on your hotbar<br><strong>{k14}</strong> - character sheet &amp; inventory<br><strong>{k13}</strong> - spell book<br><strong>{k15}</strong> - Probability Tree<br><strong>{k5}</strong> - pause the game<br>Every key can be changed under Keybinds.</p>
                     </div>
                     <div class="modal-section tut-section tut-section-diff">
                         <h3 data-t="tut_s3h">DIFFICULTY</h3>
@@ -273,7 +275,7 @@
                     </div>
                     <div class="modal-section tut-section tut-section-progression">
                         <h3 data-t="tut_s9h">CHARMS &amp; SPELL SLOTS</h3>
-                        <p data-t="tut_s9p"><strong>Charms</strong> drop from defeated monsters onto the grid - bosses always drop one. Every skill has one charm for each rank (1–10). Unlocking a class grants its rank-1 charms, and upgrading an ability grants the next rank.<br><strong>Spell Slots</strong> - 10 slots (2 rows of 5) in the spell book. Slotting a charm unlocks that spell directly on the matching hotbar key (slot 1 = key 1, slot 2 = key 2, ...). A higher rank hits far harder but costs far more mana.<br><strong>Duplicates</strong> become a <strong>Lemma</strong> - 10 Lemmas automatically prove one <strong>Theorem</strong>.<br><strong>Shift-left-click</strong> a charm to spend a Theorem: +1% permanent damage for that spell.</p>
+                        <p data-t="tut_s9p"><strong>Charms</strong> drop from defeated monsters onto the grid - bosses always drop one. Every skill has one charm for each rank (1–10). Unlocking a class grants its rank-1 charms, and upgrading an ability grants the next rank.<br><strong>Spell Slots</strong> - 10 slots (2 rows of 5) in the spell book. Slotting a charm unlocks that spell directly on the matching hotbar key (slot 1 = key 1, slot 2 = key 2, ...). A higher rank hits far harder but costs far more mana.<br><strong>Duplicates</strong> become a <strong>Lemma</strong> - 5 Lemmas automatically prove one <strong>Theorem</strong>.<br><strong>Shift-left-click</strong> a charm to spend a Theorem: +1% permanent damage for that spell.</p>
                     </div>
                     <div class="modal-section tut-section tut-section-progression">
                         <h3 data-t="tut_s10h">CONVERGENCE, INFERENCE &amp; PROBABILITY TREE</h3>
@@ -405,7 +407,7 @@
                 <button class="setup-fig setup-fig-super-tutor" id="btn-super-tutor" data-mod="superTutor" aria-pressed="false" data-tip-t="mod_desc_super_tutor"
                         style="position:absolute; right:-10%; top:16%; width:145px; height:224px; z-index:6; background:transparent; border:none; padding:0; cursor:pointer; line-height:0; transition:transform .12s, filter .12s;">
                     <span class="mod-title mod-title-gold setup-fig-title" data-t="mod_super_tutor"
-                          style="position:absolute; top:-46px; left:50%; transform:translateX(-50%);">SUPER TUTOR</span>
+                          style="position:absolute; top:-46px; left:50%; transform:translateX(-50%);">PROFESSOR</span>
                     <img class="setup-fig-img" src="images/Tutorial/Professor.webp" alt="" width="132" height="212"
                          style="display:block; width:132px; height:212px; object-fit:contain; pointer-events:none; border-radius:12px; outline:4px solid transparent; outline-offset:2px;">
                 </button>
@@ -1317,7 +1319,6 @@
                 <div class="ov-col" id="ov-col-time"></div>
             </div>
 
-            <div class="bonus-list" id="bonus-list"></div>
             <div id="item-reward-zone"></div>
 
             <div class="ov-btns ov-btns-win-grid">
@@ -1326,6 +1327,7 @@
                 </div>
                 <div class="ov-btns-col">
                     <button class="ob s" id="btn-win-retry" data-tip-t="tip_ov_retry" data-t="btn_retry">REPLAY</button>
+                    <div class="bonus-list" id="bonus-list"></div>
                     <button class="ob y" id="btn-win-retry-setup" data-tip-t="tip_ov_retry_setup" data-t="btn_retry_setup">⟳ REPLAY (NEW SETUP)</button>
                 </div>
                 <div class="ov-btns-col">
@@ -1669,7 +1671,7 @@
     <!-- SCRIPTS
     ============================================================
     SCRIPT LOAD ORDER - READ BEFORE MOVING ANYTHING.
-     The game is assembled by generated/phase2/entry.mjs from the
+     The game is assembled by generated/bundle/entry.mjs from the
      module manifest and canonical order.json. The order still matters
      for the shared runtime graph, so do not sort paths blindly.
 
@@ -1723,7 +1725,7 @@
     CACHE-BUSTING: the ?v= param is per-file; bump it whenever that
     file's content changes so players don't run stale scripts.
     ============================================================ -->
-    <script type="module" src="./generated/phase2/entry.mjs"></script>
+    <script type="module" src="./generated/bundle/entry.mjs"></script>
 
     
     

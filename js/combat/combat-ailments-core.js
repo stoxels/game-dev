@@ -310,6 +310,7 @@ function _stunPlayer(durationS = AIL_STUN_DURATION_S) {
     globalThis._playerStunnedUntil = now + d * 1000;
     try { if (typeof isHoldCasting === 'function' && isHoldCasting()) cancelHoldCast(); } catch (e) { /* best-effort */ }
     Audio_Manager.playSFX('ail_stun');
+    if (typeof globalThis.triggerBanter === 'function') globalThis.triggerBanter('stunned');
     return true;
 }
 
@@ -392,6 +393,7 @@ function _applyPlayerAilment(key, dps) {
         frozen: 'ail_freeze', shocked: 'ail_shock', shadowburn: 'ail_shadowburn', shadow: 'ail_shadow',
         polymorph: 'ail_polymorph', confused: 'ail_confuse' })[key];
     if (ailSfx) Audio_Manager.playSFX(ailSfx);
+    if (typeof globalThis.triggerAilmentBanter === 'function') globalThis.triggerAilmentBanter(key);
     _startPlayerStatusBarTicker();
     if (key === 'ignite') _startPlayerFireDrops();
     if (key === 'shadow') _startPlayerShadowClouds();

@@ -1,5 +1,8 @@
 import { LANG } from '../translation/translations.js';
 import { STATE } from '../state.js';
+import { STOX_COMBAT_LINES } from './character-banter-combat-stox.js';
+import { TRIX_COMBAT_LINES } from './character-banter-combat-trix.js';
+import { SYLA_COMBAT_LINES } from './character-banter-combat-syla.js';
 
 //------------------------------------------------------------------------
 //-------------------CHARACTER BANTER (SPEECH BUBBLE)----------------------
@@ -13,10 +16,14 @@ import { STATE } from '../state.js';
 //   - Syla  : down-to-earth, childish/naive, sees the good in everything
 //
 // This file owns:
-//   - the line banks (_BANTER_LINES, _BANTER_ITEM_LINES, _BANTER_SKILL_LINES)
+//   - the line banks (_BANTER_LINES, _BANTER_ITEM_LINES, _BANTER_SKILL_LINES);
+//     the combat-side lines (spells, damage, kills, gauntlet...) live in
+//     character-banter-combat-<character>.js and are merged into _BANTER_LINES
 //   - the bubble DOM element (create / position / show / hide)
 //   - the trigger entry points (triggerBanter / triggerItemBanter /
-//     triggerSkillBanter / triggerLowTimeBanterIfNeeded / resetBanterState)
+//     triggerSkillBanter / triggerSpellBanter / triggerHitTakenBanter /
+//     triggerAvoidBanter / triggerKillBanter / triggerAilmentBanter /
+//     triggerLowTimeBanterIfNeeded / resetBanterState)
 //   - cooldown + chance gating so lines don't spam every tick
 //
 // Other files just call triggerBanter('some_event') at the moment that
@@ -1240,6 +1247,12 @@ const _BANTER_SKILL_LINES = {
     },
 };
 
+// Combat-side banks (spells, damage taken, kills, bosses, gauntlet, ...).
+// Kept in their own files so this one stays readable; same shape as above.
+Object.assign(_BANTER_LINES.stox, STOX_COMBAT_LINES);
+Object.assign(_BANTER_LINES.trix, TRIX_COMBAT_LINES);
+Object.assign(_BANTER_LINES.syla, SYLA_COMBAT_LINES);
+
 //------------------------------------------------------------------------
 //-------------------TRIGGER CONFIG-----------------------------------------
 //------------------------------------------------------------------------
@@ -1286,7 +1299,67 @@ const _BANTER_EVENT_CFG = {
     // Fired once when the tutorial finishes: the character's final farewell,
     // signing off BY NAME. chance 1.0 + no cooldown - this moment must land.
     tutorial_farewell: { chance: 1.0, cooldownMs: 0 },
+
+    // ---- Combat reactions (fired from the combat code, never in the tutorial) ----
+    // Spells: one event per school, so a fire mage is not greeted with the
+    // same line for every cast. Chance + per-school cooldown keep it rare.
+    spell_fire: { chance: 0.3, cooldownMs: 20000 },
+    spell_cold: { chance: 0.3, cooldownMs: 20000 },
+    spell_lightning: { chance: 0.3, cooldownMs: 20000 },
+    spell_shadow: { chance: 0.3, cooldownMs: 20000 },
+    spell_holy: { chance: 0.3, cooldownMs: 20000 },
+    spell_physical: { chance: 0.25, cooldownMs: 20000 },
+    spell_heal: { chance: 0.45, cooldownMs: 20000 },
+    spell_ward: { chance: 0.4, cooldownMs: 20000 },
+    spell_move: { chance: 0.25, cooldownMs: 20000 },
+    // Damage taken. low_hp / near_death are once per level (huge cooldown,
+    // wiped by resetBanterState) and bypass the global gap: the warning
+    // matters more than not overlapping with another line.
+    hit_taken: { chance: 0.12, cooldownMs: 20000 },
+    hit_heavy: { chance: 0.55, cooldownMs: 20000 },
+    low_hp: { chance: 1.0, cooldownMs: 9999999 },
+    near_death: { chance: 1.0, cooldownMs: 9999999 },
+    // Active defence.
+    combat_dodge: { chance: 0.15, cooldownMs: 18000 },
+    combat_parry: { chance: 0.3, cooldownMs: 18000 },
+    combat_block: { chance: 0.2, cooldownMs: 18000 },
+    // Kills and bosses.
+    monster_kill: { chance: 0.12, cooldownMs: 20000 },
+    kill_streak: { chance: 0.8, cooldownMs: 30000 },
+    boss_appear: { chance: 0.9, cooldownMs: 0 },
+    boss_kill: { chance: 1.0, cooldownMs: 0 },
+    // Gauntlet bonus arena.
+    gauntlet_start: { chance: 0.9, cooldownMs: 0 },
+    gauntlet_wave: { chance: 0.5, cooldownMs: 0 },
+    gauntlet_final_wave: { chance: 0.8, cooldownMs: 0 },
+    gauntlet_win: { chance: 1.0, cooldownMs: 0 },
+    gauntlet_flawless: { chance: 1.0, cooldownMs: 0 },
+    gauntlet_fail: { chance: 1.0, cooldownMs: 0 },
+    // Run end, pickups, progression.
+    player_defeat: { chance: 0.9, cooldownMs: 0 },
+    heart_pickup: { chance: 0.25, cooldownMs: 30000 },
+    level_up: { chance: 0.9, cooldownMs: 0 },
+    // Ailments on the hero.
+    stunned: { chance: 0.4, cooldownMs: 25000 },
+    ailment_fire: { chance: 0.3, cooldownMs: 25000 },
+    ailment_cold: { chance: 0.3, cooldownMs: 25000 },
+    ailment_shock: { chance: 0.3, cooldownMs: 25000 },
+    ailment_dot: { chance: 0.3, cooldownMs: 25000 },
 };
+
+// Combat events that must not be swallowed by the global minimum gap:
+// danger warnings, boss moments and the end-of-fight results.
+const _BANTER_FORCED_EVENTS = {
+    low_hp: true, near_death: true, boss_appear: true, boss_kill: true,
+    gauntlet_start: true, gauntlet_final_wave: true, gauntlet_win: true,
+    gauntlet_flawless: true, gauntlet_fail: true, player_defeat: true,
+    level_up: true,
+};
+
+// Kill-streak tracking: timestamps of recent normal kills.
+const _BANTER_KILL_STREAK_COUNT = 3;
+const _BANTER_KILL_STREAK_WINDOW_MS = 9000;
+let _banterKillTimes = [];
 
 // Global gate: minimum gap between ANY two banter lines, regardless of
 // event key, so the bubble never feels spammy even if several different
@@ -1432,6 +1505,12 @@ function _banterPickLine(charId, eventKey, bank) {
 // apply) - used by the tutorial replies, which must answer the Professor
 // even when level_start banter fired seconds earlier.
 export function triggerBanter(eventKey, force) {
+    // Combat events: silent during the tutorial, and the urgent ones skip the
+    // global gap (see _BANTER_FORCED_EVENTS).
+    if (eventKey in STOX_COMBAT_LINES) {
+        if (_banterCombatMuted()) return;
+        if (_BANTER_FORCED_EVENTS[eventKey]) force = true;
+    }
     const charId = STATE?.playerCharacter;
     if (!charId || !_BANTER_LINES[charId]) return; // no character chosen yet
 
@@ -1510,6 +1589,108 @@ export function triggerSkillBanter(skillKey) {
 // Special-cased entry point for the "low time" warning so it only ever
 // fires once per level (separate from the normal per-event cooldown,
 // since levels can run long and we don't want repeats every cooldown window).
+// ---- Combat entry points ------------------------------------------------
+
+// Tutorial lessons (and the parry training) are the Professor's moment: the
+// tutorial has its own replies, so none of the combat reactions fire there.
+function _banterCombatMuted() {
+    const lvl = globalThis.cur;
+    if (lvl && lvl.isTutorialQuest) return true;
+    if (globalThis._parryTutorialForce) return true;
+    return false;
+}
+
+function _banterCombat(eventKey) {
+    triggerBanter(eventKey);
+}
+
+// Decides which school bank fits a universal spell. Support spells split
+// into healing and protection; movement spells have their own bank.
+function _banterSpellEvent(spell) {
+    if (!spell) return null;
+    const isSupport = typeof globalThis.isUniversalSupportSpell === 'function'
+        && globalThis.isUniversalSupportSpell(spell);
+    if (isSupport) {
+        const heals = (spell.healFlat || 0) + (spell.healPct || 0)
+            + (spell.healTickFlat || 0) + (spell.healTickPct || 0) > 0;
+        return heals ? 'spell_heal' : 'spell_ward';
+    }
+    if (typeof globalThis.isUniversalMovementSpell === 'function'
+        && globalThis.isUniversalMovementSpell(spell)) return 'spell_move';
+    switch (spell.damageKind) {
+        case 'fire': return 'spell_fire';
+        case 'cold': return 'spell_cold';
+        case 'lightning': return 'spell_lightning';
+        case 'shadow': return 'spell_shadow';
+        case 'holy': return 'spell_holy';
+        case 'physical': return 'spell_physical';
+        default: return null;
+    }
+}
+
+// Call when a universal spell is cast (js/skills/universal-spells.js).
+export function triggerSpellBanter(spell) {
+    const eventKey = _banterSpellEvent(spell);
+    if (eventKey) _banterCombat(eventKey);
+}
+
+// Call after the hero actually lost life to a hit. Reads the health that is
+// left: a very low bar beats a heavy hit, which beats an ordinary one.
+export function triggerHitTakenBanter(amount, hp, maxHp) {
+    if (!(maxHp > 0) || !(amount > 0) || !(hp > 0)) return;   // dead heroes have the defeat line
+    const frac = hp / maxHp;
+    if (frac <= 0.12) { _banterCombat('near_death'); return; }
+    if (frac <= 0.3) { _banterCombat('low_hp'); return; }
+    if (amount / maxHp >= 0.25) { _banterCombat('hit_heavy'); return; }
+    _banterCombat('hit_taken');
+}
+
+// Call when an incoming hit was avoided. kind: 'dodge' | 'parry' | 'block'
+// (anything else - fate, ward - has no reaction).
+export function triggerAvoidBanter(kind) {
+    if (kind === 'dodge') _banterCombat('combat_dodge');
+    else if (kind === 'parry') _banterCombat('combat_parry');
+    else if (kind === 'block') _banterCombat('combat_block');
+}
+
+// Call when a monster dies. Bosses always get their line; three quick
+// ordinary kills in a row count as a streak.
+export function triggerKillBanter(isBoss) {
+    if (isBoss) {
+        _banterKillTimes = [];
+        _banterCombat('boss_kill');
+        return;
+    }
+    const now = Date.now();
+    _banterKillTimes = _banterKillTimes.filter(ts => now - ts < _BANTER_KILL_STREAK_WINDOW_MS);
+    _banterKillTimes.push(now);
+    if (_banterKillTimes.length >= _BANTER_KILL_STREAK_COUNT) {
+        _banterKillTimes = [];
+        _banterCombat('kill_streak');
+        return;
+    }
+    _banterCombat('monster_kill');
+}
+
+// Call when the hero gains an ailment. key is the ailment id used by
+// combat-ailments-core.js ('ignite', 'chill', 'frozen', 'shocked', ...).
+export function triggerAilmentBanter(key) {
+    switch (key) {
+        case 'ignite':
+        case 'shadowburn':
+            _banterCombat('ailment_fire'); break;
+        case 'chill':
+        case 'frozen':
+            _banterCombat('ailment_cold'); break;
+        case 'shocked':
+            _banterCombat('ailment_shock'); break;
+        case 'bleed':
+        case 'poison':
+            _banterCombat('ailment_dot'); break;
+        default: break;
+    }
+}
+
 export function triggerLowTimeBanterIfNeeded() {
     if (_banterLowTimeFired) return;
     if (typeof timerSecs === 'undefined' || globalThis.timerSecs > 60 || globalThis.timerSecs <= 0) return;
@@ -1524,6 +1705,7 @@ export function resetBanterState() {
     _banterLastShownByEvent = {};
     _banterLastShownAt = 0;
     _banterLowTimeFired = false;
+    _banterKillTimes = [];
     hideCharacterBanter();
 }
 
@@ -1541,6 +1723,28 @@ export function resetBanterState() {
 // lucky_tile           - fired when a lucky tile reward is claimed
 // low_time              - fired once when the timer drops under 60s
 // win                       - fired when the puzzle is solved
+//
+// Combat events (lines in character-banter-combat-<character>.js):
+//   spell_fire / spell_cold / spell_lightning / spell_shadow / spell_holy /
+//   spell_physical / spell_heal / spell_ward / spell_move
+//                         - triggerSpellBanter(spell), from castUniversalSpell
+//   hit_taken / hit_heavy / low_hp / near_death
+//                         - triggerHitTakenBanter, from _playerTakeDamage
+//   combat_dodge / combat_parry / combat_block
+//                         - triggerAvoidBanter, from the avoid hook in
+//                           encounter-damage.js
+//   monster_kill / kill_streak / boss_kill
+//                         - triggerKillBanter, from _killMonster
+//   boss_appear           - a boss enters the field (_spawnMonster)
+//   gauntlet_start / gauntlet_wave / gauntlet_final_wave /
+//   gauntlet_win / gauntlet_flawless / gauntlet_fail
+//                         - the gauntlet bonus arena (combat/gauntlet.js)
+//   player_defeat         - the hero's life hits zero (_gameOver)
+//   heart_pickup          - a healing heart is claimed from the grid
+//   level_up              - the hero gains a character level
+//   stunned / ailment_fire / ailment_cold / ailment_shock / ailment_dot
+//                         - the hero gains an ailment (combat-ailments-core.js)
+// None of these fire during the tutorial quest or the parry training.
 //
 // Item-specific banter (triggerItemBanter):
 //   item_<ITEM_DEFS id>     - e.g. item_reveal1, item_cursedRowSolve

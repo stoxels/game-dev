@@ -892,8 +892,8 @@ function _ptBuildReworkBriefing() {
         '  - set icon to "" and skip art entirely (art is deferred to the separate passive tree art pass; never add an emoji)',
         '  - audit every consumer before renaming a shared statKey',
         '  - run the repo gate before considering the rework done (fresh clone: npm ci, then all four must pass):',
-        '      npm run lint && npm test && npm run phase2:verify && npm run build',
-        '    (npm run verify = lint + tests + phase2:verify; .github/workflows/ci.yml',
+        '      npm run lint && npm test && npm run bundle:verify && npm run build',
+        '    (npm run verify = lint + tests + bundle:verify; .github/workflows/ci.yml',
         '    runs this same gate on every push/PR - see README.md, Passive tree reworks)',
     ].join('\n');
 }

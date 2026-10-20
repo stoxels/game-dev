@@ -168,6 +168,7 @@ export const PICKUP_DEFS = {
             globalThis._renderPlayerHealth();
             globalThis.showToast(t('eg_pickup_heal_small').replace('{n}', heal), _rarityToastColor(this.rarity));
             Audio_Manager.playSFX('heart_heals');
+            if (typeof globalThis.triggerBanter === 'function') globalThis.triggerBanter('heart_pickup');
         },
     },
     heart_medium: {
@@ -178,6 +179,7 @@ export const PICKUP_DEFS = {
             globalThis._renderPlayerHealth();
             globalThis.showToast(t('eg_pickup_heal_medium').replace('{n}', heal), _rarityToastColor(this.rarity));
             Audio_Manager.playSFX('heart_heals');
+            if (typeof globalThis.triggerBanter === 'function') globalThis.triggerBanter('heart_pickup');
         },
     },
     heart_large: {
@@ -188,6 +190,7 @@ export const PICKUP_DEFS = {
             globalThis._renderPlayerHealth();
             globalThis.showToast(t('eg_pickup_heal_large').replace('{n}', heal), _rarityToastColor(this.rarity));
             Audio_Manager.playSFX('heart_heals');
+            if (typeof globalThis.triggerBanter === 'function') globalThis.triggerBanter('heart_pickup');
         },
     },
     // Mana orbs - endgame only (mana system is gated to isCombatLevel()).

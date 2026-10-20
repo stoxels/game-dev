@@ -405,7 +405,9 @@ function _onArrowKeyScroll(e) {
 
     if (mouseZone === 'puzzle' && puzzleWrap) {
         e.preventDefault();
-        puzzleWrap.scrollLeft += dir * ARROW_SCROLL_STEP;
+        // The wrap itself does not scroll (overflow: visible); the game area does.
+        const scroller = puzzleWrap.closest('.game-main') || puzzleWrap;
+        scroller.scrollLeft += dir * ARROW_SCROLL_STEP;
     } else if (mouseZone === 'inventory' && invList) {
         e.preventDefault();
         invList.scrollLeft += dir * ARROW_SCROLL_STEP;

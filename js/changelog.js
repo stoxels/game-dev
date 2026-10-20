@@ -19,6 +19,7 @@ export const CHANGELOG_DATA = [
             {
                 category: ["New Features", "Neue Funktionen"],
                 items: [
+                    ["Big puzzles are easier to read when zoomed in: the row and column clues now stay pinned to the edge of the screen while you scroll, so you never lose the numbers. Scroll sideways with Shift + mouse wheel or the left and right arrow keys; the How to Play screen lists the controls.", "Große Rätsel sind beim Hineinzoomen leichter lesbar: Zeilen- und Spaltenhinweise bleiben beim Scrollen am Bildschirmrand fixiert, sodass du die Zahlen nie verlierst. Seitwärts scrollst du mit Umschalt + Mausrad oder den Pfeiltasten Links und Rechts; die Steuerung steht im Bildschirm So spielt man."],
                     ["Touch controls for phones and tablets: an on-screen joystick, action buttons, finger painting on the grid, pinch zoom and a layout editor to move the buttons where you like them.", "Touch-Steuerung für Handys und Tablets: ein Bildschirm-Joystick, Aktionstasten, Malen mit dem Finger auf dem Raster, Pinch-Zoom und ein Layout-Editor, um die Tasten nach Wunsch zu verschieben."],
                     ["Guaranteed rewards are more varied. Completing a level's bonus objective now gives a puzzle item about half the time, otherwise an equipment piece, a core or an essence. Hover the reward on the win screen to see its tooltip.", "Garantierte Belohnungen sind abwechslungsreicher. Das Bonusziel eines Levels gibt jetzt etwa zur Hälfte ein Rätsel-Item, sonst ein Ausrüstungsteil, einen Kern oder eine Essenz. Fahre auf dem Siegbildschirm über die Belohnung, um ihren Tooltip zu sehen."],
                     ["Inference quests can now reward equipment, cores and essences too, and the quest log shows which kind before you claim it. The 16 Atlas tier quests also give a map of their tier. All of it is rolled at your level, so rewards are helpful but never a jackpot: equipment is uncommon or rare, and the strongest cores stay out of reach.", "Inferenz-Quests können jetzt auch Ausrüstung, Kerne und Essenzen belohnen, und das Questlog zeigt vor dem Einlösen, welche Art es ist. Die 16 Atlas-Stufen-Quests geben zusätzlich eine Karte ihrer Stufe. Alles wird auf deiner Stufe gewürfelt, Belohnungen sind also hilfreich, aber nie ein Jackpot: Ausrüstung ist ungewöhnlich oder selten, und die stärksten Kerne bleiben außer Reichweite."],
@@ -30,6 +31,7 @@ export const CHANGELOG_DATA = [
             {
                 category: ["Combat & Gameplay", "Kampf & Gameplay"],
                 items: [
+                    ["Proving a Theorem now takes 5 Lemmas instead of 10, so charm upgrades come twice as fast.", "Für ein Theorem werden jetzt 5 statt 10 Lemmata benötigt, Anhänger-Verbesserungen gehen also doppelt so schnell."],
                     ["Combat and other toasts now use the right singular or plural, for example 1 mark erased and 3 marks erased, in English and German.", "Kampf- und andere Hinweise verwenden jetzt die richtige Einzahl oder Mehrzahl, zum Beispiel 1 Markierung gelöscht und 3 Markierungen gelöscht, in Deutsch und Englisch."],
                     ["The boss The Shaper was renamed The Frostwright so it no longer copies another game.", "Der Boss Der Former heißt jetzt Der Frostwerker, damit er kein anderes Spiel mehr kopiert."],
                 ],
@@ -37,6 +39,8 @@ export const CHANGELOG_DATA = [
             {
                 category: ["Bug Fixes & Technical", "Fehlerbehebungen & Technik"],
                 items: [
+                    ["Fixed the left and right arrow keys not scrolling a zoomed-in puzzle, and the left part of a zoomed puzzle being unreachable.", "Behoben: Die Pfeiltasten Links und Rechts scrollten ein hineingezoomtes Rätsel nicht, und der linke Teil eines gezoomten Rätsels war nicht erreichbar."],
+                    ["On the game setup screen the Game Modifiers heading no longer overlaps your character.", "Im Spiel-Setup überlappt die Überschrift Spielmodifikatoren nicht mehr deine Figur."],
                     ["Fixed the Moodle codes screen not showing a code you had already earned, and the real codes are no longer stored as readable text in the game files.", "Behoben: Der Moodle-Codes-Bildschirm zeigte einen bereits verdienten Code nicht an, und die echten Codes stehen nicht mehr als lesbarer Text in den Spieldateien."],
                     ["Fixed reward tooltips in the Inference screen being drawn behind the window, and added tooltips for the new loot rewards there.", "Behoben: Belohnungs-Tooltips im Inferenz-Bildschirm wurden hinter dem Fenster gezeichnet; für die neuen Beute-Belohnungen gibt es dort jetzt ebenfalls Tooltips."],
                     ["Fixed the shop's Back button doing nothing after finishing the tutorial until you started another level.", "Behoben: Die Zurück-Schaltfläche im Shop tat nach dem Tutorial nichts, bis ein weiteres Level gestartet wurde."],

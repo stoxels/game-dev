@@ -290,6 +290,15 @@ export function _gauntletPlayable() {
 //-------------------HELPERS----------------------------------------------
 //------------------------------------------------------------------------
 
+// Character banter for the arena (skipped in the parry training, which is a
+// Professor lesson).
+function _gauntletBanter(eventKey) {
+    if (_g.parryMode) return;
+    if (typeof globalThis.triggerBanter === 'function') {
+        globalThis.triggerBanter(eventKey);
+    }
+}
+
 function _tr(en, de) {
     return LANG === 'de' ? de : en;
 }
@@ -905,6 +914,7 @@ function _begin() {
     _spawnNextWave();
     _g.poll = setInterval(_tick, 300);
     _g.modPoll = setInterval(_modifierTick, 200);
+    _gauntletBanter('gauntlet_start');
 }
 
 // Wave 2+ monsters may roll a counter-trait. At most one warded and one
@@ -946,6 +956,8 @@ function _spawnNextWave() {
     const count = _g.waves[_g.wave];
     if (!count) return;
     _g.wave++;
+    // Wave 1 is covered by the start line; later waves get their own remark.
+    if (_g.wave >= 2) _gauntletBanter(_g.wave >= _g.waves.length ? 'gauntlet_final_wave' : 'gauntlet_wave');
     _g.traitsThisWave = {};
     if (_g.wave === 1) _g.championMade = false;
     const lvl = Math.max(1, Number(cur.monsterLevel) || 1);
@@ -1078,6 +1090,13 @@ function _finish(success, reason) {
     if (!success && wasFighting && _g.pre) {
         globalThis.playerCurrentHP = Math.max(1, Number(_g.pre.hp) || 1);
         if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+    }
+
+    // Character banter: the result line must go out BEFORE the sprite is
+    // hidden below (the bubble needs the avatar to anchor to).
+    if (!_g.parryMode && reason !== 'aborted' && reason !== 'skipped') {
+        if (success) _gauntletBanter(_g.damaged ? 'gauntlet_win' : 'gauntlet_flawless');
+        else if (wasFighting) _gauntletBanter('gauntlet_fail');
     }
 
     // The win flow hides the sprite once the puzzle is over; do the same here.

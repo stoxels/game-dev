@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 // GENERATED FILE - DO NOT EDIT BY HAND
-// Produced by: node tools/prepare-phase2.mjs
+// Produced by: node tools/prepare-bundle.mjs
 // Source of truth: index.html script order (LOAD-ORDER SENSITIVE!)
 // Regenerate after ANY change to js/ or index.html.
 //
@@ -335,7 +335,10 @@ import { CHANGELOG_DATA, _buildCategoryGroupHtml, _buildVersionBlockHtml, _chang
 import { ANIM_DIRECTIONS, _animHasDirectionalWalkSync, _animRefreshCacheFor, _animSetDefaultDownImage, _animShouldMirrorFor, _animWalkIsDirectionalFor, _animWarmCacheFor, _getPlayerPuzzleDefaultImage, _lastFacingDir, _playAvatarSkillAnimationForSlot, _playAvatarWalkAnimation, _scheduleAvatarWalkIdle, _startAvatarIdleAnimation, _startAvatarWalkAnimation, _stopAvatarWalkAnimation, _walkState } from '../../js/sprite/sprite_animations.js';
 import { AVATAR_MOVE_SPEED_PX_PER_SEC, _avatarBarsHTML, _avatarGetMoveSpeed, _avatarMoveState, _avatarMoveTick, _charIs, _chargeCompanionToCell, _getAvatarCharacterName, _getPlayerCharacterImage, _hidePlayerAvatar, _hidePlayerAvatarSimple, _renderPlayerAvatar, _renderPlayerAvatarSimple, _renderPlayerHealth, _setAvatarPos, _showPlayerAvatar, _showPlayerAvatarSimple, _updateLSAvatarImage, _updateSetupScreenCharacter, getAvatarLastMoveDir } from '../../js/sprite/player_sprite.js';
 import { _CHAR_LAB_CHARS, _CHAR_LAB_ICONS, _CHAR_LAB_LABELS, _CHAR_LAB_VARIANTS, _charLabApply, _charLabArtState, _charLabArtTip, _charLabParentOf, _charLabPortraitSrc, _charLabPreview, _charLabRefreshBadges, _charLabRenderGrid, _charLabRenderPreview, _charLabSaveCurrent, _charLabStartWalk, _charLabStopPreview, _charLabWalkDir, closeCharLab, showCharLab } from '../../js/dev/cheat-combo-picker.js';
-import { _banterRepositionBubbleIfVisible, hideCharacterBanter, resetBanterState, triggerBanter, triggerItemBanter, triggerLowTimeBanterIfNeeded, triggerSkillBanter } from '../../js/sprite/character-banter.js';
+import { _banterRepositionBubbleIfVisible, hideCharacterBanter, resetBanterState, triggerAilmentBanter, triggerAvoidBanter, triggerBanter, triggerHitTakenBanter, triggerItemBanter, triggerKillBanter, triggerLowTimeBanterIfNeeded, triggerSkillBanter, triggerSpellBanter } from '../../js/sprite/character-banter.js';
+import { STOX_COMBAT_LINES } from '../../js/sprite/character-banter-combat-stox.js';
+import { TRIX_COMBAT_LINES } from '../../js/sprite/character-banter-combat-trix.js';
+import { SYLA_COMBAT_LINES } from '../../js/sprite/character-banter-combat-syla.js';
 import { GRIP_DATA_VERSION, ITEM_CATEGORIES, categoryForId, looksTwoHanded, resolveItemMeta, defaultLayers, defaultHands, defaultRot, setDir, setState, mirrorPoint, mirrorSlotCfg, mirrorFrame, wrapDeg, spriteChain, resolveFrames, frameAt, resolvePlacement, placeItem, solveTwoHandRot } from '../../js/sprite/grip-render.js';
 import { GEAR_GRIP_DATA } from '../../js/sprite/gear-overlays-data.js';
 import { _SPRITE_IMG_IDS, _framesFor, _isMirrored, _parseAnimSrc, _readLoadout, stopGearOverlays } from '../../js/sprite/gear_overlays.js';
@@ -885,6 +888,8 @@ try { Object.defineProperty(globalThis, "isNexusWorld", { get() { return isNexus
 try { Object.defineProperty(globalThis, "isNexusWorldUnlocked", { get() { return isNexusWorldUnlocked; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "isReplayEntryUnlocked", { get() { return isReplayEntryUnlocked; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "isTreeless", { get() { return isTreeless; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "isUniversalMovementSpell", { get() { return isUniversalMovementSpell; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "isUniversalSupportSpell", { get() { return isUniversalSupportSpell; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "itemDesc", { get() { return itemDesc; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "itemName", { get() { return itemName; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "keybindDisplayLabel", { get() { return keybindDisplayLabel; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -980,11 +985,16 @@ try { Object.defineProperty(globalThis, "t", { get() { return t; }, configurable
 try { Object.defineProperty(globalThis, "titleProgressText", { get() { return titleProgressText; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "titlesCollectedText", { get() { return titlesCollectedText; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "togMod", { get() { return togMod; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "triggerAilmentBanter", { get() { return triggerAilmentBanter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "triggerAvoidBanter", { get() { return triggerAvoidBanter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "triggerBanter", { get() { return triggerBanter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "triggerClassEventIfPending", { get() { return triggerClassEventIfPending; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "triggerHitTakenBanter", { get() { return triggerHitTakenBanter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "triggerItemBanter", { get() { return triggerItemBanter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "triggerKillBanter", { get() { return triggerKillBanter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "triggerLowTimeBanterIfNeeded", { get() { return triggerLowTimeBanterIfNeeded; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "triggerSkillBanter", { get() { return triggerSkillBanter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "triggerSpellBanter", { get() { return triggerSpellBanter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "tutUpdateKeybinds", { get() { return tutUpdateKeybinds; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "unpauseGame", { get() { return unpauseGame; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "updDiffDesc", { get() { return updDiffDesc; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

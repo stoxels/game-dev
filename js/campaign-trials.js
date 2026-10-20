@@ -280,55 +280,47 @@ function _showTrialIntro(wi, kind, info, onBegin) {
     if (old) old.remove();
     const tx = _trialIntroText();
     const name = kind === 'convergence' ? _trialName(wi) : _ascensionTrialName(wi);
-    const steps = [];
-    steps.push(`🧩 ${tx.puzzles(info.requiredPuzzles)}`);
-    if (info.requiredQuestions > 0) steps.push(`❓ ${tx.questions(info.requiredQuestions)}`);
+    const steps = [{ icon: 'puzzle', text: tx.puzzles(info.requiredPuzzles) }];
+    if (info.requiredQuestions > 0) steps.push({ icon: 'quiz', text: tx.questions(info.requiredQuestions) });
     if (info.monsterless) {
-        steps.push(`🕊 ${tx.monsterless}`);
+        steps.push({ icon: 'peace', text: tx.monsterless });
     } else {
-        steps.push(`👹 ${tx.monsters(info.maxMonsters, info.totalMonsters, info.monsterLevel)}`);
-        steps.push(`👑 ${tx.boss(info.bossName)}`);
+        steps.push({ icon: 'monsters', text: tx.monsters(info.maxMonsters, info.totalMonsters, info.monsterLevel), wide: true });
+        steps.push({ icon: 'boss', text: tx.boss(info.bossName), boss: true });
     }
-    steps.push(`🏁 ${tx.finish}`);
+    steps.push({ icon: 'finish', text: tx.finish });
     const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    // Shell classes (.reset-*, .dialog-plate, .modal-bg) are shared with the
+    // reset / save-slot dialogs; trial-specific ones live in css/trial-intro.css.
     const el = document.createElement('div');
     el.id = 'trial-intro-modal';
+    el.className = 'modal-bg safe-center show';
     el.innerHTML = `
-<style>
-#trial-intro-modal{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(4,2,10,.78);font-family:system-ui,sans-serif}
-#trial-intro-modal .ti-card{max-width:560px;width:calc(100vw - 32px);box-sizing:border-box;padding:22px 26px;border-radius:14px;border:2px solid #b8862b;background:linear-gradient(180deg,#1b1030,#0d0818);color:#efe6ff;box-shadow:0 0 40px rgba(255,170,40,.35)}
-#trial-intro-modal .ti-kind{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#b9a8d6;text-align:center}
-#trial-intro-modal h2{margin:4px 0 12px;font-size:24px;letter-spacing:.06em;text-align:center;color:#ffd98a;text-shadow:0 0 12px rgba(255,160,30,.6)}
-#trial-intro-modal p{margin:0 0 12px;font-size:14px;line-height:1.5;color:#e4d8ff}
-#trial-intro-modal ol{margin:0 0 12px;padding:0;list-style:none;counter-reset:s}
-#trial-intro-modal li{position:relative;margin:0 0 8px;padding:8px 10px 8px 38px;border-radius:8px;background:rgba(255,255,255,.05);font-size:14px;line-height:1.4}
-#trial-intro-modal li::before{counter-increment:s;content:counter(s);position:absolute;left:10px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;background:#8a4d0a;color:#fff;font-size:12px;font-weight:800;text-align:center;line-height:20px}
-#trial-intro-modal .ti-rules{font-size:13px;color:#cbb8f0}
-#trial-intro-modal .ti-reward{font-size:13px;color:#ffe9a8}
-#trial-intro-modal .ti-actions{display:flex;gap:10px;justify-content:center;margin-top:14px}
-#trial-intro-modal button{font:800 13px/1 system-ui,sans-serif;letter-spacing:.1em;padding:11px 20px;border-radius:8px;cursor:pointer;border:1px solid #b8862b;color:#ffe9b8;background:#3a2410}
-#trial-intro-modal button.ti-go{background:linear-gradient(180deg,#d98a1f,#8a4d0a);color:#fff}
-#trial-intro-modal button:hover{filter:brightness(1.2)}
-</style>
-<div class="ti-card" role="dialog" aria-modal="true">
-    <div class="ti-kind">${esc(kind === 'convergence' ? tx.convergence : tx.ascension)}</div>
-    <h2>⚔ ${esc(name)}</h2>
-    <p>${esc(tx.lead)}</p>
-    <ol>${steps.map((st) => `<li>${esc(st)}</li>`).join('')}</ol>
-    <p class="ti-rules">${esc(tx.rules(Math.round(info.timeLimitSecs / 60), info.maxMistakes))}</p>
-    <p class="ti-reward">${esc(kind === 'convergence' ? tx.rewardConv : tx.rewardAsc)}</p>
-    <div class="ti-actions">
-        <button class="ti-back" id="ti-back">${esc(tx.back)}</button>
-        <button class="ti-go" id="ti-go">${esc(tx.begin)}</button>
+<div class="ti-box" role="dialog" aria-modal="true">
+    <button class="reset-close-btn" id="ti-close" aria-label="${esc(tx.back)}">✕</button>
+    <div class="reset-header"><div class="reset-title">${esc(name)}</div></div>
+    <div class="dialog-plate">
+        <div class="ti-kind">${esc(kind === 'convergence' ? tx.convergence : tx.ascension)}</div>
+        <p class="ti-lead">${esc(tx.lead)}</p>
+    </div>
+    <ol class="ti-steps">${steps.map((st) => `<li class="ti-step${st.boss ? ' ti-step-boss' : ''}${st.wide ? ' ti-step-wide' : ''}"><div class="ti-step-icon ti-icon-${st.icon}"></div><span class="ti-step-text">${esc(st.text)}</span></li>`).join('')}</ol>
+    <div class="reset-note-banner"><p class="ti-rules">${esc(tx.rules(Math.round(info.timeLimitSecs / 60), info.maxMistakes))}</p></div>
+    <div class="ti-reward"><span class="ti-reward-text">${esc(kind === 'convergence' ? tx.rewardConv : tx.rewardAsc)}</span></div>
+    <div class="reset-footer">
+        <button class="reset-btn" id="ti-back">${esc(tx.back)}</button>
+        <div class="reset-portal-deco"></div>
+        <button class="reset-btn reset-btn-confirm" id="ti-go">${esc(tx.begin)}</button>
     </div>
 </div>`;
     document.body.appendChild(el);
     const close = () => { const m = document.getElementById('trial-intro-modal'); if (m) m.remove(); };
     document.getElementById('ti-go').addEventListener('click', () => { close(); onBegin(); });
-    document.getElementById('ti-back').addEventListener('click', () => {
+    const back = () => {
         close();
         try { goToLevelSelect(); } catch (e) { /* level select optional */ }
-    });
+    };
+    document.getElementById('ti-back').addEventListener('click', back);
+    document.getElementById('ti-close').addEventListener('click', back);
 }
 
 // Largest puzzle (in cells) a trial may hand out. Trials used to draw from
@@ -676,7 +668,15 @@ export function _retitleLeaveMapTransition(tr) {
             const key = tr.kind === 'convergence' ? 'eg_trial_complete_title' : 'eg_ascension_trial_complete_title';
             let label = (typeof t === 'function') ? t(key) : null;
             if (!label || label === key) label = tr.kind === 'convergence' ? 'TRIAL COMPLETE' : 'ASCENSION COMPLETE';
-            titleEl.textContent = label + ' - ' + tr.name;
+            titleEl.textContent = label;
+            // The trial's own name goes on a line under the plaque.
+            const body = document.querySelector('#sx-leave-map-transition .sx-leave-body');
+            if (body && !body.querySelector('.sx-leave-map-name')) {
+                const nameEl = document.createElement('div');
+                nameEl.className = 'sx-leave-map-name';
+                nameEl.textContent = tr.name;
+                body.insertBefore(nameEl, body.firstChild);
+            }
         }
         const btn = document.getElementById('btn-eg-leave-map-return');
         if (btn) {
