@@ -454,7 +454,7 @@ export function _dndFinalizeDrop() {
 
 // Resolves the drop target from the mouse position and routes to the correct
 // zone handler. If no valid target is found, the item is returned to its source.
-export function egDropOnCraftingBench(event) {
+export function hubDropOnCraftingBench(event) {
     // The global mouseup router handles custom dragging; this prevents the
     // browser's native drop behavior from navigating the page.
     event.preventDefault();
@@ -1380,7 +1380,7 @@ export function _dndBindListeners() {
 // Native drag events (from draggable="true" on chips) are allowed to fire
 // but are neutralised here to avoid conflicts with the custom system.
 
-export function egDragOver(event) {
+export function hubDragOver(event) {
     event.preventDefault();
 }
 

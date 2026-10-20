@@ -122,9 +122,9 @@ export function _buildEquipSlotHTML(slot) {
      id="sx-equip-slot-${slot.id}"
      data-slot-id="${slot.id}"
      data-eg-dropzone="equip"
-     ondragover="egDragOver(event)"
-     ondrop="egDropOnEquip(event, '${slot.id}')"
-     ondragleave="egDragLeave(event)">
+     ondragover="hubDragOver(event)"
+     ondrop="hubDropOnEquip(event, '${slot.id}')"
+     ondragleave="hubDragLeave(event)">
     <div class="sx-equip-slot-item" id="sx-equip-item-${slot.id}">
         <span class="sx-equip-slot-placeholder">${slot.icon || '◻'}</span>
     </div>
@@ -188,9 +188,9 @@ export function _buildCurrencyCellHTML(row, col) {
      onmouseenter="_onCurrencyCellEnter(${row}, ${col}, event)"
      onmousemove="_onCurrencyCellMove(event)"
      onmouseleave="_onCurrencyCellLeave()"
-     ondragover="egDragOver(event)"
-     ondrop="egDropOnCurrency(event, ${row}, ${col})"
-     ondragleave="egDragLeave(event)">
+     ondragover="hubDragOver(event)"
+     ondrop="hubDropOnCurrency(event, ${row}, ${col})"
+     ondragleave="hubDragLeave(event)">
 </div>`;
 }
 
@@ -281,9 +281,9 @@ export function _buildInventoryCellHTML(row, col) {
      id="sx-inv-cell-${row}-${col}"
      data-row="${row}" data-col="${col}"
      data-eg-dropzone="inv"
-     ondragover="egDragOver(event)"
-     ondrop="egDropOnInv(event, ${row}, ${col})"
-     ondragleave="egDragLeave(event)">
+     ondragover="hubDragOver(event)"
+     ondrop="hubDropOnInv(event, ${row}, ${col})"
+     ondragleave="hubDragLeave(event)">
 </div>`;
 }
 
@@ -344,7 +344,7 @@ export function _buildStashPanelHTML() {
     <div class="sx-stash-tab-body ${uniqActive ? 'active' : ''}" id="sx-stash-tab-uniques">
         <div class="sx-unique-hint">${t('eg_unique_stash_hint')}</div>
         <div class="sx-unique-count" id="sx-unique-count">${t('eg_uniques_collected').replace('{found}', foundUniques).replace('{total}', totalUniques)}</div>
-        <div class="sx-unique-grid" id="sx-unique-grid" data-eg-dropzone="uniques" ondragover="egDragOver(event)" ondragleave="egDragLeave(event)">
+        <div class="sx-unique-grid" id="sx-unique-grid" data-eg-dropzone="uniques" ondragover="hubDragOver(event)" ondragleave="hubDragLeave(event)">
             ${_buildUniqueGridHTML()}
         </div>
     </div>
@@ -382,7 +382,7 @@ export function _buildUniqueGridHTML() {
         const countBadge = count > 1 ? `<span class="sx-unique-count-badge">${t('eg_unique_count').replace('{n}', count)}</span>` : (count === 0 && collected ? `<span class="sx-unique-count-badge" style="background:#888;">0</span>` : '');
         const lockedOverlay = !collected ? '<span class="sx-unique-lock">?</span>' : '';
         html += `<div class="sx-unique-cell ${cellCls}" data-unique-id="${uid}" data-uid="${uid}" data-eg-dropzone="uniques"
-            ondragover="egDragOver(event)" ondragleave="egDragLeave(event)"
+            ondragover="hubDragOver(event)" ondragleave="hubDragLeave(event)"
             onmouseenter="_onUniqueCellEnter('${uid}', event)"
             onmousemove="_onUniqueCellMove('${uid}', event)"
             onmouseleave="_onUniqueCellLeave('${uid}', event)"

@@ -119,9 +119,9 @@ export function _buildEssenceCellHTML(row, col) {
      onmouseenter="_onEssenceCellEnter(${row}, ${col}, event)"
      onmousemove="_onEssenceCellMove(event)"
      onmouseleave="_onEssenceCellLeave()"
-     ondragover="egDragOver(event)"
-     ondrop="egDropOnEssence(event, ${row}, ${col})"
-     ondragleave="egDragLeave(event)">
+     ondragover="hubDragOver(event)"
+     ondrop="hubDropOnEssence(event, ${row}, ${col})"
+     ondragleave="hubDragLeave(event)">
 </div>`;
 }
 

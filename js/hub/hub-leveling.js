@@ -485,7 +485,7 @@ export function _awardXP(xpGain) {
 
     if (_getPlayerLevel() >= c.maxLevel) {
         // Level cap reached - no more XP accumulates.
-        if (STATE.playerXP !== 0) { STATE.playerXP = 0; egSaveLevelingState(); }
+        if (STATE.playerXP !== 0) { STATE.playerXP = 0; saveLevelingState(); }
         return 0;
     }
 
@@ -516,7 +516,7 @@ export function _awardXP(xpGain) {
     }
 
     _syncBaseAttributes();
-    egSaveLevelingState();
+    saveLevelingState();
     _renderLevelHUD();
     if (typeof setAchStat === 'function') try { setAchStat('egPlayerLevel', _getPlayerLevel()); } catch(e){}
 
@@ -575,7 +575,7 @@ export function _awardXP(xpGain) {
 export function _grantMonsterXP(monsterLevel, isBoss) {
     if (typeof STATE === 'undefined' || !STATE) return;
     if (_getPlayerLevel() >= LEVELING_CONFIG.maxLevel) {
-        if (STATE.playerXP !== 0) { STATE.playerXP = 0; egSaveLevelingState(); }
+        if (STATE.playerXP !== 0) { STATE.playerXP = 0; saveLevelingState(); }
         return;
     }
 
@@ -825,7 +825,7 @@ export function _allocateAttribute(attr) {
     STATE.egAttrPoints--;
     STATE.egAttrAllocated[attr] = (STATE.egAttrAllocated[attr] || 0) + 1;
     _syncBaseAttributes();
-    egSaveLevelingState();
+    saveLevelingState();
     Audio_Manager.playSFX('attribute_allocate');
 
     if (typeof showToast === 'function') {
@@ -887,7 +887,7 @@ export function _refundAttribute(attr) {
     STATE.egAttrAllocated[attr] = (STATE.egAttrAllocated[attr] || 0) - 1;
     STATE.egAttrPoints = (STATE.egAttrPoints || 0) + 1;
     _syncBaseAttributes();
-    egSaveLevelingState();
+    saveLevelingState();
     Audio_Manager.playSFX('attribute_refund');
 
     if (typeof showToast === 'function') {
@@ -905,7 +905,7 @@ export function _refundAttribute(attr) {
 //-------------------PERSISTENCE------------------------------------------
 //------------------------------------------------------------------------
 
-export function egSaveLevelingState() {
+export function saveLevelingState() {
     if (typeof save === 'function') save();
 }
 

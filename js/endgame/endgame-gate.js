@@ -66,9 +66,9 @@ export function _egBuildMapOrbSlotHTML() {
 <div class="eg-map-slot"
      id="eg-map-slot"
      data-eg-dropzone="map"
-     ondragover="egDragOver(event)"
+     ondragover="hubDragOver(event)"
      ondrop="egDropOnMap(event)"
-     ondragleave="egDragLeave(event)">
+     ondragleave="hubDragLeave(event)">
     <div class="eg-map-slot-inner" id="eg-map-slot-inner">
         <span class="eg-map-slot-empty-text">${t('eg_insert_map')}</span>
     </div>
@@ -292,9 +292,9 @@ export function _egBuildMapStashCellHTML(row, col) {
      id="eg-map-stash-cell-${row}-${col}"
      data-row="${row}" data-col="${col}"
      data-eg-dropzone="mapstash"
-     ondragover="egDragOver(event)"
+     ondragover="hubDragOver(event)"
      ondrop="egDropOnMapStash(event, ${row}, ${col})"
-     ondragleave="egDragLeave(event)">
+     ondragleave="hubDragLeave(event)">
 </div>`;
 }
 
@@ -429,9 +429,9 @@ export function _egBuildGateCurrencyCellHTML(row, col) {
      onmouseenter="_egOnGateCurrencyCellEnter(${row}, ${col}, event)"
      onmousemove="_egOnGateCurrencyCellMove(event)"
      onmouseleave="_egOnGateCurrencyCellLeave()"
-     ondragover="egDragOver(event)"
-     ondrop="egDropOnCurrency(event, ${row}, ${col})"
-     ondragleave="egDragLeave(event)">
+     ondragover="hubDragOver(event)"
+     ondrop="hubDropOnCurrency(event, ${row}, ${col})"
+     ondragleave="hubDragLeave(event)">
 </div>`;
 }
 
