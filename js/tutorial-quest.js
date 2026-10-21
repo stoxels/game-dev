@@ -506,7 +506,12 @@ function _tqSay(textKey, wait, choice) {
     const cont = document.getElementById('tq-bubble-continue');
     if (!wrap || !bubble) return;
     wrap.style.display = '';
-    text.textContent = _tqFormatLine(_tqLineKey(textKey));
+    // Lines may carry <strong> emphasis (e.g. tq_p2_s1c). Everything is escaped
+    // first - the line contains the player's character name - and only the
+    // <strong> pair is let back through, so no other markup can ever render.
+    text.innerHTML = _tqFormatLine(_tqLineKey(textKey))
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/&lt;strong&gt;/g, '<strong>').replace(/&lt;\/strong&gt;/g, '</strong>');
     // Pop the bubble in with the banter-bubble transition (toggled class -
     // identical behaviour to the player's banter bubble).
     requestAnimationFrame(() => bubble.classList.add('show'));
@@ -2505,7 +2510,34 @@ function _tqOpenChestModal() {
     _tqChestModalEl = modal;
     modal.querySelectorAll('.tq-chest-item').forEach((btn) => {
         btn.addEventListener('click', () => _tqClaimChestItem(Number(btn.dataset.i), btn));
+        // Hover tooltips: the equipment stat block for gear, the spell tooltip
+        // (at the granted rank) for the charm.
+        const entry = TQ_CHEST_LOOT[Number(btn.dataset.i)];
+        btn.addEventListener('mouseenter', (e) => _tqChestShowTip(entry, e));
+        btn.addEventListener('mousemove', (e) => {
+            if (entry.kind === 'charm') globalThis.handleSkillTipMove(e); else globalThis.moveGameTooltip(e);
+        });
+        btn.addEventListener('mouseleave', _tqChestHideTips);
     });
+}
+
+function _tqChestShowTip(entry, e) {
+    try {
+        if (entry.kind === 'charm') {
+            globalThis.handleSkillTipRank(e, entry.skillId, entry.rank);
+            return;
+        }
+        const base = ALL_BASE_TYPES.find((b) => b && b.id === entry.baseId);
+        if (!base) return;
+        const item = _vendorBuildBaseItemFromBase(base);
+        item.name = _tqChestItemName(entry, item);   // the uniform name the player will receive
+        globalThis._showHubTooltip(item, e);
+    } catch (err) { /* tooltips are cosmetic */ }
+}
+
+function _tqChestHideTips() {
+    try { globalThis.handleSkillTipLeave(); } catch (e) {}
+    try { globalThis.hideGameTooltip(); } catch (e) {}
 }
 
 // Equips (empty slot) or stashes one piece of starter gear.
@@ -2575,6 +2607,7 @@ function _tqRemoveChestElOnly() {
 // and keeps the scene flag (inert board) until the tutorial is torn down:
 // pass endScene = true to release the board as well.
 function _tqRemoveChestScene(endScene) {
+    _tqChestHideTips();   // the hovered card is about to vanish without a mouseleave
     if (_tqChestProxTimer) { clearInterval(_tqChestProxTimer); _tqChestProxTimer = null; }
     _tqRemoveChestElOnly();
     if (_tqChestModalEl) { try { _tqChestModalEl.remove(); } catch (e) {} _tqChestModalEl = null; }

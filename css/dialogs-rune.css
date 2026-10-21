@@ -337,3 +337,137 @@
 }
 #tq-professor-wrap .tq-bubble-choices { gap: 6px; }
 #tq-professor-wrap .tq-bubble-choices .tq-bubble-choice { min-width: 0; padding: 12px 16px; }
+
+/* ── Tutorial chest ("Cartographer's Supplies") ─────────────────────── */
+#tq-chest-modal {
+    background:
+        linear-gradient(rgba(8, 6, 16, 0.80), rgba(4, 3, 9, 0.90)),
+        url('../images/Game_Setup/Game_Setup_New_Background.webp') center bottom / cover no-repeat;
+    backdrop-filter: none;
+}
+#tq-chest-modal .tq-chest-box {
+    position: relative;
+    box-sizing: border-box;
+    width: min(780px, 94vw);
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 40px solid transparent;
+    border-image: url('../images/Settings/settings_background.webp') 46 / 40px stretch;
+    border-radius: 0;
+    background:
+        radial-gradient(ellipse 50% 40% at 50% 14%, rgba(150, 100, 230, 0.22), transparent 70%),
+        rgba(14, 12, 24, 0.96);
+    background-clip: padding-box;
+    box-shadow: none;
+    padding: 0 clamp(8px, 2vw, 22px) clamp(10px, 2vh, 20px);
+    filter: drop-shadow(0 0 24px rgba(140, 90, 220, 0.4)) drop-shadow(0 16px 26px rgba(0, 0, 0, 0.7));
+}
+/* Plaque title overlapping the frame's top edge */
+#tq-chest-modal .tq-chest-box-title {
+    order: -1;
+    width: min(420px, 92%);
+    height: 62px;
+    margin: -26px 0 0;
+    padding: 0 44px;
+    box-sizing: border-box;
+    background: url('../images/Settings/settings_title_plague.webp') center / 100% 100% no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--C);
+    font-size: clamp(13px, 1.4vw, 17px);
+    letter-spacing: 3px;
+    color: #f3dc9a;
+    text-shadow: 0 2px 3px #000;
+}
+#tq-chest-modal .tq-chest-box-img {
+    width: clamp(120px, 16vw, 170px);
+    margin: 6px auto 0;
+    filter: drop-shadow(0 0 16px rgba(190, 130, 255, 0.75)) drop-shadow(0 6px 6px rgba(0, 0, 0, 0.6));
+}
+#tq-chest-modal .tq-chest-box-hint {
+    margin: 4px 0 14px;
+    padding: 6px 16px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #cdbf95;
+    text-shadow: 0 2px 2px #000;
+    border-top: 1px solid rgba(200, 168, 75, 0.3);
+    border-bottom: 1px solid rgba(200, 168, 75, 0.3);
+}
+#tq-chest-modal .tq-chest-items {
+    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+}
+/* Item slots: dark stone with a gold edge, icon in a glowing socket */
+#tq-chest-modal .tq-chest-item {
+    gap: 8px;
+    padding: 16px 10px 12px;
+    background: linear-gradient(180deg, rgba(34, 28, 56, 0.96), rgba(14, 12, 26, 0.97));
+    border: 1px solid rgba(200, 168, 75, 0.5);
+    border-top: 3px solid #c8a84b;
+    border-radius: 3px;
+    box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.55);
+    color: #f3e6c8;
+}
+#tq-chest-modal .tq-chest-item:hover:not(:disabled) {
+    transform: translateY(-4px);
+    border-color: #f3dc9a;
+    box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.55), 0 0 18px rgba(255, 200, 90, 0.55);
+}
+#tq-chest-modal .tq-chest-item-icon {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200, 168, 75, 0.28), rgba(8, 6, 16, 0.85) 70%);
+    border: 1px solid rgba(200, 168, 75, 0.55);
+    box-shadow: 0 0 14px rgba(200, 168, 75, 0.3), inset 0 0 12px rgba(0, 0, 0, 0.7);
+}
+#tq-chest-modal .tq-chest-item-name {
+    font-family: var(--C);
+    font-size: 14px;
+    line-height: 1.25;
+    color: #ffe9a8;
+    text-shadow: 0 2px 2px #000;
+}
+#tq-chest-modal .tq-chest-item-sub {
+    opacity: 1;
+    min-height: 0;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #cdbf95;
+}
+#tq-chest-modal .tq-chest-item-sub:empty { display: none; }
+/* "Take" as a small stone button */
+#tq-chest-modal .tq-chest-item-state {
+    margin-top: auto;
+    min-width: 96px;
+    padding: 9px 14px;
+    font-family: var(--PX);
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #f0d98a;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
+    background: url('../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+    transition: filter .12s;
+}
+#tq-chest-modal .tq-chest-item:hover:not(:disabled) .tq-chest-item-state { filter: brightness(1.3); color: #fff3c4; }
+/* Taken: calm green, no button */
+#tq-chest-modal .tq-chest-item-claimed {
+    opacity: 1;
+    border-color: rgba(95, 191, 127, 0.55);
+    border-top-color: #5fbf7f;
+    background: linear-gradient(180deg, rgba(18, 34, 28, 0.96), rgba(10, 18, 16, 0.97));
+}
+#tq-chest-modal .tq-chest-item-claimed .tq-chest-item-icon { filter: saturate(.6) brightness(.8); border-color: rgba(95, 191, 127, 0.6); }
+#tq-chest-modal .tq-chest-item-claimed .tq-chest-item-state {
+    background: none;
+    color: #8fd9a0;
+    filter: none;
+}
