@@ -322,7 +322,7 @@ import { _quizCalcEliminationChance, answerQuizInput, closeQuiz, finishQuiz, qui
 import { _getWrap, currentZoom, resetZoom, scalePuzzle, setPuzzleMonsterRoom, setPuzzleZoom, zoomInBtn, zoomOutBtn } from '../../js/grid-scaling.js';
 import { WORLD_CODES, checkWorldCodes, checkWorldCodesSync, showCodes } from '../../js/codes.js';
 import { TITLE_DEFS, checkTitleUnlocks, getActiveTitle, getActiveTitleName, getEarnedTitleTotalLines, getEarnedTitleTotals, getEarnedTitlesForScore, getNextTitle, getTitleEffectSpecs, getTitleForScore, getTitleName, getTitleStatLines, showTitlesModal, titleProgressText, titlesCollectedText, withTitle } from '../../js/titles.js';
-import { _applyCentralTendency, _applyCompletionGlimpse, _applyDeadReckoningStart, _applyDensityMapping, _applyInterquartileVision, _applyMarginalDistribution, _applyNullHypothesis, _applyProbabilisticStartRolls, _applySparseRegion, _applySylaForestAffinity, _deadReckoningApplyClues, _getGridSizeTier, _hideCompletionGlimpseBar, _initLuckyTiles, _revealCellsAndFinalize, triggerSylaFlowerEffect } from '../../js/start-level-passives.js';
+import { _getGridSizeTier, _initLuckyTiles, _applySylaForestAffinity, _hideCompletionGlimpseBar, _applyCompletionGlimpse } from '../../js/start-level-passives.js';
 import { _doStartLevel, _setMistakeCounterText } from '../../js/start-level.js';
 import { confirmReset } from '../../js/save-reset.js';
 import { advanceTutStep, finishTutorial, prevTutStep, replayTutorialFromTitle, showTutorial } from '../../js/tutorial.js';

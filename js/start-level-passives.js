@@ -12,11 +12,8 @@ import { _charIs } from './sprite/player_sprite.js';
 import { t } from './translation/translations.js';
 import { cur } from './state.js';
 
-//------------------------------------------------------------------------
-// Phase 3 step 10: live globalThis accessors for externally-patched names.
-// passive-tree-expansion.js's patch() reads window[name] and reassigns it;
-// the write-through accessor keeps the wrapper visible to every importer.
-//------------------------------------------------------------------------
+// Accessors: probability-tree-expansion.js patches these four by name through
+// globalThis; the write-through keeps the wrapper visible to every importer.
 try { Object.defineProperty(globalThis, '_applyPassiveStartEffects', { get() { return _applyPassiveStartEffects; }, set(v) { _applyPassiveStartEffects = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_calcLuckyTileCount', { get() { return _calcLuckyTileCount; }, set(v) { _calcLuckyTileCount = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_applyOutlierDetectionHighlights', { get() { return _applyOutlierDetectionHighlights; }, set(v) { _applyOutlierDetectionHighlights = v; }, configurable: true }); } catch (e) {}
@@ -24,7 +21,6 @@ try { Object.defineProperty(globalThis, '_deadReckoningCheckUnlock', { get() { r
 
 //------------------------------------------------------------------------
 //-------------------LUCKY TILES----------------------------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Determines how many lucky tiles to place based on grid size and passive nodes.
@@ -149,12 +145,11 @@ export function _initLuckyTiles() {
 //------------------------------------------------------------------------
 //-------------------DEAD RECKONING KEYSTONE-----------------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // Replaces each row/col clue span with the total filled count for that line.
 // Individual run-length numbers are hidden (only the first span is used).
 // Called with a short delay so the grid DOM exists before we modify spans.
-export function _deadReckoningApplyClues() {
+function _deadReckoningApplyClues() {
     if (!cur || !window._deadReckoningActive || window._deadReckoningUnlocked) return;
 
     const sol = cur.grid;
@@ -219,7 +214,7 @@ export function _deadReckoningCheckUnlock() {
 
 // keystone_dead_reckoning (264): initialises the dead reckoning mode at level start.
 // Activates the flag and replaces clue numbers with row/col totals after the grid builds.
-export function _applyDeadReckoningStart() {
+function _applyDeadReckoningStart() {
     window._deadReckoningActive = false;
     window._deadReckoningUnlocked = false;
 
@@ -235,12 +230,11 @@ export function _applyDeadReckoningStart() {
 //------------------------------------------------------------------------
 //-------------------PASSIVE START-OF-LEVEL EFFECTS----------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // Rolls probabilistic_start (reveal correct cells) and error_elimination
 // (mark wrong cells) at level start. Each node is an independent roll.
 // Skipped entirely when keystone_ergodic_field is active.
-export function _applyProbabilisticStartRolls() {
+function _applyProbabilisticStartRolls() {
     if (ptHasSkill('keystone_ergodic_field')) return;
 
     let reveals = 0;
@@ -259,7 +253,7 @@ export function _applyProbabilisticStartRolls() {
 // keystone_null_hypothesis (220): finds the sparsest row and sparsest column,
 // then marks all their wrong empty cells at level start.
 // Skipped if the oracle is active or keystone_ergodic_field is allocated.
-export function _applyNullHypothesis() {
+function _applyNullHypothesis() {
     if (!ptHasSkill('keystone_null_hypothesis')) return;
     if (window.LEVEL_FLAGS.oracleActive) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
@@ -301,7 +295,7 @@ export function _applyNullHypothesis() {
     }
 
     // Orange mark pulse so the auto-marks are visible at level start
-    if (typeof _applyCellEffect === 'function' && markedIds.length > 0) {
+    if (markedIds.length > 0) {
         _applyCellEffect(markedIds, 'mark');
     }
 }
@@ -309,12 +303,10 @@ export function _applyNullHypothesis() {
 // Reveals the supplied cells, fires the cell effect animation, refreshes adjacency
 // overlays if the node is active, and then checks for an immediate win.
 // Used as a shared helper by reveal-based passive effects.
-export function _revealCellsAndFinalize(affected) {
+function _revealCellsAndFinalize(affected) {
     if (affected.length === 0) return;
-    if (typeof _applyCellEffect === 'function') {
-        _applyCellEffect(affected, 'reveal');
-        if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
-    }
+    _applyCellEffect(affected, 'reveal');
+    if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
     globalThis.checkWin();
 }
 
@@ -322,7 +314,7 @@ export function _revealCellsAndFinalize(affected) {
 // Cells are sorted by normalised Euclidean distance from the centre point;
 // each node reveals the next closest unrevealed filled cell.
 // Skipped if the oracle is active or keystone_ergodic_field is allocated.
-export function _applyCentralTendency() {
+function _applyCentralTendency() {
     const nodes = (ptHasSkill('central_tendency_1') ? 1 : 0)
         + (ptHasSkill('central_tendency_2') ? 1 : 0)
         + (ptHasSkill('central_tendency_3') ? 1 : 0);
@@ -367,7 +359,7 @@ export function _applyCentralTendency() {
 // density_mapping (237-239): marks 1 wrong empty cell in the densest row
 // and 1 in the densest column. Node 3 extends this to the top-2 rows AND top-2 cols.
 // Skipped if the oracle is active or keystone_ergodic_field is allocated.
-export function _applyDensityMapping() {
+function _applyDensityMapping() {
     const nodes = (ptHasSkill('density_mapping_1') ? 1 : 0)
         + (ptHasSkill('density_mapping_2') ? 1 : 0)
         + (ptHasSkill('density_mapping_3') ? 1 : 0);
@@ -451,7 +443,7 @@ export function _applyDensityMapping() {
     }
 
     // Orange mark pulse so the auto-marks are visible at level start
-    if (typeof _applyCellEffect === 'function' && markedIds.length > 0) {
+    if (markedIds.length > 0) {
         _applyCellEffect(markedIds, 'mark');
     }
 }
@@ -460,7 +452,7 @@ export function _applyDensityMapping() {
 // row or column (whichever has fewer filled cells; randomly broken on a tie).
 // Each of the 3 nodes is evaluated independently.
 // Skipped if the oracle is active or keystone_ergodic_field is allocated.
-export function _applySparseRegion() {
+function _applySparseRegion() {
     const nodes = (ptHasSkill('sparse_region_1') ? 1 : 0)
         + (ptHasSkill('sparse_region_2') ? 1 : 0)
         + (ptHasSkill('sparse_region_3') ? 1 : 0);
@@ -518,7 +510,7 @@ export function _applySparseRegion() {
     }
 
     // Orange mark pulse so the auto-marks are visible at level start
-    if (typeof _applyCellEffect === 'function' && markedIds.length > 0) {
+    if (markedIds.length > 0) {
         _applyCellEffect(markedIds, 'mark');
     }
 }
@@ -528,7 +520,7 @@ export function _applySparseRegion() {
 // Filled edge cells are revealed; empty edge cells are marked as incorrect,
 // matching the description ("revealed as either filled or empty").
 // Skipped if the oracle is active or keystone_ergodic_field is allocated.
-export function _applyMarginalDistribution() {
+function _applyMarginalDistribution() {
     const nodes = (ptHasSkill('marginal_distribution_1') ? 1 : 0)
         + (ptHasSkill('marginal_distribution_2') ? 1 : 0)
         + (ptHasSkill('marginal_distribution_3') ? 1 : 0);
@@ -579,7 +571,7 @@ export function _applyMarginalDistribution() {
     }
 
     _revealCellsAndFinalize(affected);
-    if (typeof _applyCellEffect === 'function' && markedAffected.length > 0) {
+    if (markedAffected.length > 0) {
         _applyCellEffect(markedAffected, 'mark');
     }
 }
@@ -587,7 +579,7 @@ export function _applyMarginalDistribution() {
 // interquartile_vision (258-259): fires a centred field scan on large grids (≥200 cells).
 // Duration is 2s for node 1, +1s for node 2 (resolved by _interquartileVisionDuration).
 // Delayed to ensure the grid DOM is fully rendered before the scan runs.
-export function _applyInterquartileVision() {
+function _applyInterquartileVision() {
     if (!ptHasSkill('interquartile_vision_1')) return;
     if (window.LEVEL_FLAGS.oracleActive) return;
     if (!cur) return;
@@ -599,12 +591,12 @@ export function _applyInterquartileVision() {
     const scanDur = _interquartileVisionDuration();
 
     setTimeout(() => {
-        if (typeof _executeFieldScanLegacy === 'function') _executeFieldScanLegacy(Math.floor(rows / 2), Math.floor(cols / 2), scanSize, scanDur);
+        _executeFieldScanLegacy(Math.floor(rows / 2), Math.floor(cols / 2), scanSize, scanDur);
     }, 300);
 }
 
 // Spawns the 5-flower bloom animation around a revealed cell for Syla's forest affinity.
-export function triggerSylaFlowerEffect(coords) {
+function triggerSylaFlowerEffect(coords) {
     if (!coords || coords.length === 0) return;
 
     coords.forEach(({ row, col }) => {
@@ -697,7 +689,6 @@ export function _applyPassiveStartEffects() {
 
 //------------------------------------------------------------------------
 //-------------------COMPLETION GLIMPSE-----------------------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Hides the completion-glimpse bar and clears any pending auto-hide timer.
