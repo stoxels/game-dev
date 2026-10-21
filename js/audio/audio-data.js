@@ -837,7 +837,6 @@ export const SFX = {
     pickup_mana: 'audio/sfx/loot/sfx_pickup_mana.mp3',
     pickup_map: 'audio/sfx/loot/sfx_pickup_map.mp3',
     save_slot_delete: 'audio/sfx/ui/sfx_save_slot_delete.mp3',
-    save_slot_select: 'audio/sfx/ui/sfx_save_slot_select.mp3',
     spellbook_open: 'audio/sfx/ui/sfx_spellbook_open.mp3',
     target_select: 'audio/sfx/combat/sfx_target_select.mp3',
     toast_warning: 'audio/sfx/ui/sfx_toast_warning.mp3',

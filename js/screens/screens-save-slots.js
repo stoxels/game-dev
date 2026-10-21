@@ -144,7 +144,6 @@ function _attachSlotCardListeners(card, slotNum) {
 // Loads the chosen slot's save data and resumes whatever flow was waiting
 // on a slot pick (set up by showSaveSlotSelect).
 export function onSaveSlotChosen(slotNum) {
-    Audio_Manager.playSFX('save_slot_select');
     loadStateFromSlot(slotNum);
     const cb = window._pendingSaveSlotCallback;
     window._pendingSaveSlotCallback = null;
