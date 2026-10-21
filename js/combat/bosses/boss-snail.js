@@ -598,7 +598,7 @@ export function _snailCleanCell(entry) {
 
 
 // A chained/arena puzzle transition just rebuilt the grid (see
-// _transitionToChainPuzzle in endgame-encounter-chain.js): every slimed
+// _transitionToChainPuzzle in encounter-chain.js): every slimed
 // cell's overlay died with the old table, so drop the stale map entries -
 // otherwise they would block the NEW puzzle's cells sight-unseen. The
 // roaming snail gets a fresh slate too (slime budget + cell memory reset)
@@ -786,7 +786,7 @@ export let _snailgeddon = null;
 
 
 // True from the moment the countdown starts until the Snailgeddon is
-// over. Read by _tickPlayer (endgame-encounter.js) to freeze the auto-
+// over. Read by _tickPlayer (encounter.js) to freeze the auto-
 // attack charge bar for the whole set-piece.
 export function _snailgeddonActive() {
     return !!_snailgeddon && !_snailgeddon.finished;

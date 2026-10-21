@@ -76,7 +76,7 @@ export function _showHubTooltip(item, e) {
 </div>`;
     } else if (item.category === 'map' && typeof _egBuildMapTooltipBodyHTML === 'function') {
         // Maps get their own tooltip with mods grouped by
-        // monster / player / puzzle categories (endgame-maps.js).
+        // monster / player / puzzle categories (loot-maps.js).
         html = _egBuildMapTooltipBodyHTML(item);
     } else {
         html = _buildTooltipBodyHTML(item);

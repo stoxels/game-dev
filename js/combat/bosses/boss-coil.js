@@ -416,7 +416,7 @@ export function _coilTide(st, p) {
 //------------------------------------------------------------------------
 // A wide hood-shadow telegraphs a lane through your position, then the
 // maw rears up and strikes across it in one lightning lash.
-// Wired from _fireMonsterAttack (endgame-encounter.js).
+// Wired from _fireMonsterAttack (encounter.js).
 
 export function _coilCobraStrike(monster) {
     if (_coilCobraActive || _nkDodgeBusy() || _nkFrozen()) return;

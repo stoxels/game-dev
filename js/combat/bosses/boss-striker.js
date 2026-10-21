@@ -652,7 +652,7 @@ export function _strkScoringEnd(st, sc, success) {
 }
 
 
-// Charge-bar freeze gate for _tickPlayer (endgame-encounter.js): true
+// Charge-bar freeze gate for _tickPlayer (encounter.js): true
 // while a scoring set-piece (Kick-Off Challenge / Hat-Trick) is running -
 // chasing, charging and shooting the ball IS the attack, so the auto-attack
 // bar stays frozen (mirrors _bomberFinalActive). Pending queued gates only
@@ -681,7 +681,7 @@ export function _strkGoalPop(x, y, label) {
 //------------------------------------------------------------------------
 // A cone wall materializes between ball and player, a dotted arc telegraphs
 // the bend, then the ball curves around the wall onto the marked spot.
-// Wired from _fireMonsterAttack (endgame-encounter.js).
+// Wired from _fireMonsterAttack (encounter.js).
 
 export function _strkFreeKick(monster) {
     if (_strkFkActive || _nkDodgeBusy() || _nkFrozen()) return;

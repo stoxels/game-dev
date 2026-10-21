@@ -608,7 +608,7 @@ function _dndDrop(e) {
             // target cell is occupied, the displaced stash item will be
             // swapped INTO the vacated paperdoll slot - so the simulated final
             // loadout must include it. Checks both stat requirements
-            // (endgame-requirements.js) and the slot type of the swapped-in item.
+            // (loot-requirements.js) and the slot type of the swapped-in item.
             const displaced = _inventory[r][c];
             if (displaced && SLOT_ACCEPTS[_dnd.sourceSlot] !== displaced.slotType) {
                 const msg = `⚠️ Cannot unequip ${_dnd.item.name || '?'} - ${displaced.name || '?'} does not fit there`;
@@ -712,7 +712,7 @@ function _dndDropOnEssenceCell(essenceCell) {
 // Handles dropping onto a paperdoll char equip slot.
 // Validates the item's slotType against what the target slot accepts, then
 // checks stat requirements against the simulated final loadout (see
-// endgame-requirements.js). Shows a reject flash and returns to source when
+// loot-requirements.js). Shows a reject flash and returns to source when
 // either check fails.
 // Returns true when the drop was accepted.
 function _dndDropOnEquipSlot(equipSlotEl) {
@@ -819,7 +819,7 @@ function _dndFirstFreeInvCell() {
 
 // Right-click on a stash item → instantly equip it to the best matching slot.
 // Stat requirements are checked against the simulated final loadout first
-// (see endgame-requirements.js). The displaced item (if any) is placed back
+// (see loot-requirements.js). The displaced item (if any) is placed back
 // into the source stash cell.
 function _dndQuickEquipFromStash(invCell) {
     const r = +invCell.dataset.row, c = +invCell.dataset.col;
@@ -1093,7 +1093,7 @@ export function _renderCurrencyCell(row, col) {
 
 
 //------------------------------------------------------------------------
-// _showHubTooltip now lives ONLY in endgame-currency.js (single source of
+// _showHubTooltip now lives ONLY in loot-currency.js (single source of
 // truth). The legacy override copies that used to race via load order in
 // this file and hub.js were removed 2026-09; the commented-out
 // panel-based implementation below was already dead code. Currency chips

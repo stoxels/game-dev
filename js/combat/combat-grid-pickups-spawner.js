@@ -25,11 +25,17 @@ import { _stopLootDrops } from './combat-grid-pickups-loot.js';
 import { _stopCurrencyDrops } from './combat-grid-pickups-currency.js';
 import { _stopItemDrops } from './combat-grid-pickups-items.js';
 
+//------------------------------------------------------------------------
+//-------------------GRID PICKUP SPAWNER----------------------------------
+//------------------------------------------------------------------------
+// Spawns pickups on the grid on a timer, with pause and resume support.
+//------------------------------------------------------------------------
+
 try { Object.defineProperty(globalThis, '_checkPickupClaim', { get() { return _checkPickupClaim; }, set(v) { _checkPickupClaim = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_spawnPickup', { get() { return _spawnPickup; }, set(v) { _spawnPickup = v; }, configurable: true }); } catch (e) {}
 
 // Pause / resume for all grid drops (pickups, loot, currency, items, gold, maps).
-// Called from _onPause / _onResume in endgame-encounter.js.
+// Called from _onPause / _onResume in encounter.js.
 export function _pauseGridDrops() {
     const now = Date.now();
     // Pause pickup spawner

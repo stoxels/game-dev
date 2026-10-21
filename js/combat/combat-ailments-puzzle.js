@@ -9,6 +9,13 @@ import { cur } from '../state.js';
 import { _iceRedirectDepth, _puzzleEffects, _replacePuzzleEffects, _setIceRedirectDepth, _setSparkFollowerEl, _setSparkLastPosition, _setSparkMoveHandler, _setSparkSpawnTimer, _sparkFollowerEl, _sparkLastX, _sparkLastY, _sparkMoveHandler, _sparkSpawnTimer, SPARK_GLYPHS } from './combat-ailments-state.js';
 import { PUZZLE_ATTACK_CHANCE_PCT, PUZZLE_EFFECT_DURATION_MS, PUZZLE_HAZARD_CELLS, ICE_SLIP_CHANCE, SHOCK_MARK_STRIP_CHANCE } from './combat-ailments-core.js';
 
+//------------------------------------------------------------------------
+//-------------------PUZZLE HAZARDS FROM MONSTERS-------------------------
+//------------------------------------------------------------------------
+// Effects that monster attacks put on the puzzle itself: lava and ice cells,
+// the shocked cursor, arcane bombs and shadow blackouts of a line.
+//------------------------------------------------------------------------
+
 // Lets a monster strike the puzzle instead of the player (base chance plus
 // the map-mod bonus). Returns true when it did.
 function _maybePuzzleAttack(monster) {

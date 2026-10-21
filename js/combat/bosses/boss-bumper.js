@@ -464,7 +464,7 @@ export function _bumperMultiball(st, now) {
 //------------------------------------------------------------------------
 // The boss's charged attack IS the set-piece: a giant bumper slams onto a
 // telegraphed target ring at the player's position, flinging and hitting
-// everything inside. Wired from _fireMonsterAttack (endgame-encounter.js).
+// everything inside. Wired from _fireMonsterAttack (encounter.js).
 
 export function _bumperSlam(monster) {
     if (_bumpSlamActive || _nkDodgeBusy() || _nkFrozen()) return;

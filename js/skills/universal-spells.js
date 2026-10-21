@@ -1690,7 +1690,7 @@ export function _uspClearSupportBuffs() {
 }
 
 // ---------------------------------------------------------------------
-// Combat hooks - all typeof-guarded from endgame-encounter.js so the
+// Combat hooks - all typeof-guarded from encounter.js so the
 // combat path pays nothing when no support buff is active.
 // ---------------------------------------------------------------------
 

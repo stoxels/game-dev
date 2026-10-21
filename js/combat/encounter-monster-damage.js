@@ -12,6 +12,13 @@ import { _isActive } from './combat-state.js';
 import { startTimerFreeze } from '../timer/timer-freeze.js';
 import { _gainFortify, _gainPowerCharge, _gainRage } from './combat-ailments-state.js';
 
+//------------------------------------------------------------------------
+//-------------------MONSTER DAMAGE---------------------------------------
+//------------------------------------------------------------------------
+// Applies damage to monsters: hits, knockback on the charge bar, stun effects
+// and overkill spreading.
+//------------------------------------------------------------------------
+
 // Player-to-monster damage: target HP/charge/stagger application, elemental
 // resistance and ailment hooks, hit visuals, echo/overkill/ricochet procs,
 // and the shared floating status-label helper.

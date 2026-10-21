@@ -224,7 +224,7 @@ export const CURRENCY_DEFS = {
 
     // MAP ONLY - raises a map's tier by one. Equipment can never be a
     // target (canApply rejects non-maps); maps route through the dedicated
-    // EG_MAP_CURRENCY_RULES entry in endgame-maps.js.
+    // EG_MAP_CURRENCY_RULES entry in loot-maps.js.
     orb_horizons: {
         id: 'orb_horizons', name: t('eg_orb_horizons'), icon: '🌌',
         description: t('eg_orb_horizons_desc'),

@@ -18,8 +18,8 @@ import { _egMapHasBloodMagic } from '../endgame/endgame-map-launch.js';
 // Consumed by:
 //   • quiz.js (_resolveQuizAnswer → _applyQuizRewardBuff)
 //   • mathgate.js (mgHandleCorrectAnswer → _applyQuizRewardBuff)
-//   • endgame-combat-calculations.js (_quizDamageBuffMult)
-//   • endgame-encounter-chain.js (_chainCleanup → _resetQuizDamageBuff,
+//   • combat-calculations.js (_quizDamageBuffMult)
+//   • encounter-chain.js (_chainCleanup → _resetQuizDamageBuff,
 //     _buildChainBonusGainHTML → _consumePendingQuizRewardHTML)
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------

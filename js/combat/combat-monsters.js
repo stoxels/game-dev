@@ -65,7 +65,7 @@ function _getTierBalance(lvl) {
 
 // SUSPECTED DEAD: retained legacy roam-speed data; no current caller.
 // Lore-accurate roam speeds (px/s) for the perimeter patrol in
-// endgame-monster-roam.js. Small vermin scurry, medium beasts lope, heavy
+// combat-monster-roam.js. Small vermin scurry, medium beasts lope, heavy
 // brutes lumber. Bosses never roam (they hold their ground as set-pieces).
 const MONSTER_ROAM_SPEEDS = {
     // Scurrers - tiny, fast vermin

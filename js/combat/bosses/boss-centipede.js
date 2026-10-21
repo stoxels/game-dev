@@ -543,7 +543,7 @@ export function _centVenomBurst(st, now) {
 //------------------------------------------------------------------------
 // The boss's charged attack IS the set-piece: a full-screen horizontal dash
 // band telegraphs at the player's row, then the colony stampedes across.
-// Wired from _fireMonsterAttack (endgame-encounter.js).
+// Wired from _fireMonsterAttack (encounter.js).
 
 export function _centStampede(monster) {
     if (_centStampedeActive || _nkDodgeBusy() || _nkFrozen()) return;

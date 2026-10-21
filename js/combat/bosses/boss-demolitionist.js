@@ -443,7 +443,7 @@ export let _crashMaze = null;
 //   path, goal, P, hitCdUntil, ... }
 
 // True from countdown start until the maze resolves. Read by _tickPlayer
-// (endgame-encounter.js) to freeze the auto-attack charge bar.
+// (encounter.js) to freeze the auto-attack charge bar.
 export function _crashMazeActive() {
     return !!_crashMaze && !_crashMaze.finished;
 }

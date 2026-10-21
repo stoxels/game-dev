@@ -11,6 +11,12 @@ import { gainMana } from '../classes/class-mana.js';
 import { _renderPlayerHealth } from '../sprite/player_sprite.js';
 import { _gainEnduranceCharge, _gainFrenzyCharge, _gainPowerCharge, _getEnduranceCharges, _getFrenzyCharges, _getPowerCharges } from './combat-ailments-state.js';
 
+//------------------------------------------------------------------------
+//-------------------GRID PICKUP CLAIMS-----------------------------------
+//------------------------------------------------------------------------
+// Claim handling for pickups lying on grid cells.
+//------------------------------------------------------------------------
+
 // Called from renderCell whenever a cell becomes visually revealed
 // (via an ability, passive ability, or item reveal effect).
 // Revealed cells can no longer be filled by the player, so any drop

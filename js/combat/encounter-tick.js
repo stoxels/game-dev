@@ -12,10 +12,10 @@ import { _updateMeleeMarker } from './combat-weapon-swing-config.js';
 import { _checkMistakeLimit, _tickLifeRegen } from './encounter-tick-support.js';
 
 //  endgame-encounter-tick.js
-//  COMBAT TICK LOOP - extracted 2026-09-10 from endgame-encounter.js
+//  COMBAT TICK LOOP - extracted 2026-09-10 from encounter.js
 //  (tick loop, player/monster charge ticking, charge-pause gates,
 //  hold-parry pause, mistakes-limit logic, life regen, pause/resume).
-//  Loads AFTER endgame-encounter.js (its load-time code only touches
+//  Loads AFTER encounter.js (its load-time code only touches
 //  window and its own definitions; runtime calls cross freely).
 //
 // Encounter tick-loop owner: monster and player charge, melee feedback,

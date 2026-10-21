@@ -17,6 +17,13 @@ import { MELEE_OVERCHARGE_MULT, _meleeTierArt, _meleeTierForCharge } from './enc
 import { _rollPlayerMiss } from './encounter-charged-shot.js';
 import { resolveGroundShape } from '../skills/spell-casttime.js';
 
+//------------------------------------------------------------------------
+//-------------------MELEE IMPACT-----------------------------------------
+//------------------------------------------------------------------------
+// Applies a player melee strike to its target and any splash or cleave
+// victims.
+//------------------------------------------------------------------------
+
 // Current melee damage: rolls the dedicated melee channel (weapon base
 // range + melee-scoped mods - see _calcPlayerMeleeDamage). `chargePct`
 // (0..1, default 1) is the spent manual charge share - linear scaling, so
@@ -202,7 +209,7 @@ export function _applyPlayerMeleeImpact(targetId, opts) {
     // Melee sidestep: the struck monster sometimes darts to a different
     // zone panel, forcing the player to walk back into range instead of
     // standing still and spamming E. Chance + cooldown live in
-    // endgame-monster-roam.js; dead targets never move. Runs AFTER cleave
+    // combat-monster-roam.js; dead targets never move. Runs AFTER cleave
     // so the current swing still splashes the old neighbours.
     if (typeof _tryMonsterMeleeSidestep === 'function') {
         try { _tryMonsterMeleeSidestep(targetId); } catch (e) {}

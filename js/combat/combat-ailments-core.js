@@ -420,7 +420,7 @@ function _applyPlayerAilment(key, dps) {
 //------------------------------------------------------------------------
 // Shared bar above the inventory strip. Shows a chip per active player
 // ailment (icon + live countdown); the block-recovery chip is appended by
-// endgame-encounter.js into the same bar.
+// encounter.js into the same bar.
 //------------------------------------------------------------------------
 
 // 100 ms ticker that refreshes ailment chip countdowns.

@@ -17,7 +17,7 @@ import { _isActive } from './combat-state.js';
 
 //  endgame-weapon-swing.js
 //  MANUAL WEAPON ATTACK (E) + shared CSS swing visuals.
-//  Loads AFTER endgame-encounter.js, endgame-encounter-tick.js,
+//  Loads AFTER encounter.js, endgame-encounter-tick.js,
 //  combat-player-stats.js and sprite_animations.js (all globals are
 //  typeof-guarded so load order is forgiving; behaviour only runs live).
 //

@@ -69,7 +69,7 @@ export function _applyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     }
 
     // Maps use the dedicated map rules (EG_MAP_CURRENCY_RULES in
-    // endgame-maps.js) so orbs roll from the MAP modifier tables.
+    // loot-maps.js) so orbs roll from the MAP modifier tables.
     const isMap = item.category === 'map';
     const mapRule = isMap && typeof EG_MAP_CURRENCY_RULES !== 'undefined'
         ? EG_MAP_CURRENCY_RULES[defId]

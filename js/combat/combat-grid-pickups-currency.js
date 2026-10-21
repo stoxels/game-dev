@@ -16,6 +16,13 @@ import {
 } from './combat-grid-pickups.js';
 import { _currencyDrops, _isActive } from './combat-state.js';
 
+//------------------------------------------------------------------------
+//-------------------GRID CURRENCY DROPS----------------------------------
+//------------------------------------------------------------------------
+// Currency drops on grid cells: the overlay, its removal and the claim
+// animation.
+//------------------------------------------------------------------------
+
 // Same idea as loot drops (above), but for currency orbs. Orbs land on
 // the grid and must be claimed by filling the correct cell - they no
 // longer go straight into the currency strip on kill.
@@ -54,7 +61,7 @@ export function _animateCurrencyDropClaim(row, col, def) {
     setTimeout(() => floater.remove(), 800);
 }
 
-// Called by _tryDropCurrency() in endgame-currency.js instead of
+// Called by _tryDropCurrency() in loot-currency.js instead of
 // adding the orb straight to the stash.
 export function _spawnCurrencyDrop(def) {
     if (!_isActive() || !def) return;

@@ -74,10 +74,10 @@ export let _bmbMineKeeper = null;
 export let _bmbKeeperRun = null;
 
 // Set while the TOTAL CARPET set-piece runs (read by _tickPlayer's
-// charge-freeze gate, endgame-encounter.js).
+// charge-freeze gate, encounter.js).
 export let _bomberFinal = null;
 
-// Charge-bar freeze gate for _tickPlayer (endgame-encounter.js): true
+// Charge-bar freeze gate for _tickPlayer (encounter.js): true
 // from TOTAL CARPET start until it resolves. Mirrors _crashMazeActive.
 export function _bomberFinalActive() {
     return !!_bomberFinal && !_bomberFinal.finished;
@@ -569,7 +569,7 @@ export function _mechClusterShells(monster, phase) {
 // front goes off. OUTSIDE the dome = hit by the main wave, then by the
 // afterglow sweep 1.1s later (if you still linger outside). The boss is
 // immune + shielded until the set-piece resolves, and the auto-attack
-// charge bar freezes (gate in _tickPlayer, endgame-encounter.js).
+// charge bar freezes (gate in _tickPlayer, encounter.js).
 export const BMB_FINAL_CD_TICK_MS = 800;
 export const BMB_FINAL_CD_TICKS = 3;
 export const BMB_FINAL_WAVE_MS = 1500;                 // after countdown: bang wind-up

@@ -130,7 +130,7 @@ export function _bossTierFactor(norm, range) {
 
 
 // Resolves a boss's atlas tier (1–16) into a 0…1 difficulty weight.
-// Reuses _egRollMapTier (endgame-maps.js) when available; falls back to the
+// Reuses _egRollMapTier (loot-maps.js) when available; falls back to the
 // shared tier-level ladder otherwise. Unknown levels default to mid-tier so
 // the mechanic never swings to an extreme by accident.
 export function _bossTierNorm(monster) {

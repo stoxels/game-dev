@@ -129,7 +129,7 @@ export const LEVELING_CONFIG = {
     campaignReplayFraction: 0.35,
 };
 
-// Pristine copy of the base attribute pool from endgame-requirements.js,
+// Pristine copy of the base attribute pool from loot-requirements.js,
 // captured before this file mutates the object with allocated points.
 const _ATTR_ORIGINAL_BASE = {
     str: PLAYER_BASE_ATTRIBUTES.str,

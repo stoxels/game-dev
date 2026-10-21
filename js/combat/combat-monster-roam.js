@@ -4,7 +4,7 @@ import { _showStatusLabel } from './encounter-monster-damage.js';
 import { _isActive } from './combat-state.js';
 import { setPuzzleMonsterRoom } from '../grid-scaling.js';
 
-// endgame-monster-roam.js
+// combat-monster-roam.js
 // MONSTER POSITIONING - normal monsters now HOLD GROUND in static side
 // panels instead of pacing permanently around the puzzle grid.
 //
@@ -23,7 +23,7 @@ import { setPuzzleMonsterRoom } from '../grid-scaling.js';
 //     and spamming E sometimes forces the player to walk back into range.
 //     Chance is lore-weighted (vermin dart, brutes plod) with a per-monster
 //     cooldown so it feels alive but never jittery.
-// Loads AFTER endgame-encounter.js (calls its render helpers; encounter.js
+// Loads AFTER encounter.js (calls its render helpers; encounter.js
 // calls back into _roamShouldRoam/_roamSync/_roamTeardown guarded).
 
 const ROAM_LAYER_ID = 'sx-roam-layer';

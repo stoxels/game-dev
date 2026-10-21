@@ -17,6 +17,12 @@ import { _egTryDropMap } from '../loot/loot-map-drops.js';
 import { _tryGenerateUniqueDrop } from '../loot/unique-items.js';
 import { _isActive, _lootDrops } from './combat-state.js';
 import {
+
+//------------------------------------------------------------------------
+//-------------------GRID LOOT DROPS--------------------------------------
+//------------------------------------------------------------------------
+// Equipment and loot drops on grid cells.
+//------------------------------------------------------------------------
     LOOT_DROP_CHANCE_BOSS,
     LOOT_DROP_CHANCE_NORMAL,
     LOOT_DROP_LIFETIME_MS,

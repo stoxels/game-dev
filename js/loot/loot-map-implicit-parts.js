@@ -64,7 +64,7 @@ export function _egRollMapSizeMix(tier, largerPct) {
 
 // Every device map ends in a boss fight: the boss arena opens once all
 // other objectives (kills / puzzles / questions) are done (see
-// _canLeaveMap in endgame-encounter-chain.js). The status is baked as an
+// _canLeaveMap in encounter-chain.js). The status is baked as an
 // immutable implicit so tooltips can state it definitively - orbs/mods
 // MUST NOT be able to remove it.
 export function _egRollMapBossStatus(map) {

@@ -234,7 +234,7 @@ export function _buildBossSpawnListFromDef(mapDef, baseLevel) {
 // Returns the full ordered spawn list for this encounter: normal monsters only.
 // NOTE: Bosses never spawn inside regular puzzles. On boss maps they are
 //       fought in dedicated boss-arena puzzles at the end of the run
-//       (see _enterBossArena in endgame-encounter-chain.js).
+//       (see _enterBossArena in encounter-chain.js).
 export function _buildSpawnList() {
     const baseLevel = _getEncounterBaseLevel();
     return _buildNormalSpawnList(baseLevel);

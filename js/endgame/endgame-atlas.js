@@ -41,7 +41,7 @@ import { STATE } from '../state.js';
 //   egAtlasProgress()              - { completed, total, highestTier }
 //   _egAtlasOnMapCompleted(map)    - completion hook (called from _endMap)
 //
-// Load order: this file runs BEFORE endgame-maps.js / hub.js, so no
+// Load order: this file runs BEFORE loot-maps.js / hub.js, so no
 // top-level code may touch their symbols - everything below only uses LANG,
 // STATE and its own data at load time.
 //------------------------------------------------------------------------
@@ -698,7 +698,7 @@ export function _egAtlasResolveNodeForMap(mapItem) {
 
 // Marks the atlas node belonging to a successfully completed map run as
 // cleared and unlocks its connected regions. Called from _endMap()
-// (endgame-encounter-chain.js) while _egActiveMapItem is still set.
+// (encounter-chain.js) while _egActiveMapItem is still set.
 //
 // Completion gate: the region only counts as cleared when the run was
 // finished on the region's own difficulty (its tier band: I–V Easy,

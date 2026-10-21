@@ -84,7 +84,7 @@ export const CLOCK_FREEZE_RING_RADIUS = 92;     // countdown ring radius (px) ar
 //   start-level.js      keeps timerFrozen alive across arena transitions
 //   penalty.js          mistake counter frozen
 //   player_sprite.js    avatar can't move
-//   endgame-encounter.js auto-attack charge bar frozen
+//   encounter.js auto-attack charge bar frozen
 // Cleared by _clockClearFreezeWarn / _clockTimeFreezeEnd, which every
 // freeze-run kill path runs.
 window._clockTimeFreezeWarn = false;
@@ -367,7 +367,7 @@ export function _mechClockHands(monster, phase) {
 //   • then the 30s freeze: hands stay stopped, the map timer (timerFrozen)
 //     and the mistake counter freeze, the avatar cannot move (player_sprite /
 //     penalty read the flag) and its auto-attack charge bar stops charging
-//     (endgame-encounter.js)
+//     (encounter.js)
 //   • a ring of 12 frozen beams rushes in from all sides of the screen and
 //     hovers just short of the player, aimed straight at them
 // The player must slay the boss inside the window - and the freeze fires

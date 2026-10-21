@@ -50,7 +50,7 @@ export const PLAYER_STATS = {
     chargePushback: 1.5, // Seconds removed from a monster's charge bar on hit
 };
 
-// ARPG-style weapon setups (see _isDualWielding in endgame-requirements.js):
+// ARPG-style weapon setups (see _isDualWielding in loot-requirements.js):
 // dual-wielding two 1H weapons sums both weapons' melee damage then scales by
 // DUAL_WIELD_DAMAGE_MULT (~1.4x a single 1H, below a 2H's ~1.6-1.7x), and
 // grants DUAL_WIELD_PARRY_PCT base parry chance WITHOUT holding the parry key
@@ -65,7 +65,7 @@ export const DUAL_WIELD_PARRY_PCT = 15;
 //-------------------STAT AGGREGATION-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-// Maps every mod "key" produced by _buildRolledStats() (endgame-equipment-generator.js)
+// Maps every mod "key" produced by _buildRolledStats() (loot-equipment-generator.js)
 // to the stat bucket it feeds. Hybrid mods produce keys `${familyId}_1` / `${familyId}_2`;
 // single-stat mods just use `familyId` directly.
 export const STAT_KEY_MAP = {
@@ -736,7 +736,7 @@ export function _computePlayerStats() {
         evasionFlat: passiveTreeBonuses.evasionFlat || 0, evasionIncPct: passiveTreeBonuses.evasionIncPct || 0,
         absorptionFlat: passiveTreeBonuses.absorptionFlat || 0,
         absorptionIncPct: passiveTreeBonuses.absorptionIncPct || 0,
-        // Attributes start from the character's base pool (endgame-requirements.js)
+        // Attributes start from the character's base pool (loot-requirements.js)
         // so the stats panel, derived side-effects and requirement checks all
         // agree on the same totals.
         strength: (typeof PLAYER_BASE_ATTRIBUTES !== 'undefined') ? PLAYER_BASE_ATTRIBUTES.str : 0,
@@ -1798,7 +1798,7 @@ export function _overLevelAvoidMult(attackerLevel, playerLevel) {
 // Miss chance scales linearly with the target's level and inversely with
 // accuracy, clamped to a floor (never perfectly accurate) and a ceiling
 // (attacks always have a chance to land). Applied identically to melee
-// strikes and projectiles - see _rollPlayerMiss in endgame-encounter.js.
+// strikes and projectiles - see _rollPlayerMiss in encounter.js.
 //
 // Every character additionally gains INNATE accuracy with their own level
 // (ARPG-style level scaling), so a fresh, under-geared character is not
@@ -1923,7 +1923,7 @@ export function _fireSurgeActive(now = Date.now()) {
 }
 
 // _getElementalDamageBonus (rolls the total flat elemental damage bonus
-// for one hit) is defined ONCE, in endgame-combat-calculations.js (it sums
+// for one hit) is defined ONCE, in combat-calculations.js (it sums
 // _rollElementalBreakdown - identical math). The copy that used to live
 // here was removed 2026-09; it was silently shadowed by the later file via
 // load order, so behaviour is unchanged.

@@ -41,7 +41,7 @@ import { t } from '../translation/translations.js';
 // Five test maps, roughly increasing in difficulty/juice (ARPG-map style).
 // puzzlePool criteria are the same shape _buildChainPool() already
 // understands (minCells/maxCells/minRows/maxRows/minCols/maxCols/worlds/
-// excludeWorlds) - see endgame-encounter-chain.js.
+// excludeWorlds) - see encounter-chain.js.
 // DISABLED: Old test maps up to level 160 - might revisit in future, but for now we
 // test the actual map device / map system instead (see endgame-gate.js +
 // endgame-map-launch.js). The legacy map definitions are kept below inside a
@@ -676,7 +676,7 @@ export const EG_TEST_MAPS = [
 //------------------------------------------------------------------------
 
 // Picks a random eligible puzzle (gi) to seed a test map run.
-// Reuses _buildChainPool() from endgame-encounter-chain.js so the same
+// Reuses _buildChainPool() from encounter-chain.js so the same
 // exclusion rules apply (no sandbox levels, no already-map-flagged levels).
 // Additionally excludes math-gated levels, since test runs bypass the
 // normal gate-check flow entirely.

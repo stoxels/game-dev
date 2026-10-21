@@ -17,7 +17,7 @@ import { EG_MAX_MAP_TIER, _egMapTierMonsterLevel, _egPickMapBaseName } from './l
 
 //-------------------ORBS APPLIED TO MAPS---------------------------------
 //------------------------------------------------------------------------
-// Mirrors the orb semantics from endgame-currency.js, but rolls from the
+// Mirrors the orb semantics from loot-currency.js, but rolls from the
 // MAP modifier tables. Looked up by orb id when an orb is used on a map.
 
 export const EG_MAP_CURRENCY_RULES = {

@@ -35,7 +35,7 @@ import { _isActive } from './combat-state.js';
 //
 // Dependencies (loaded before this file):
 //   endgame-map-launch.js - _egGetActiveMapModValue
-//   endgame-encounter.js  - _playerTakeDamage, _isActive
+//   encounter.js  - _playerTakeDamage, _isActive
 //   endgame-ailments.js   - _applyPlayerAilment
 //------------------------------------------------------------------------
 

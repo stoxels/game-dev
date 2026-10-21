@@ -30,9 +30,9 @@ import { cur } from '../state.js';
 // below. The state is cleared by _chainCleanup() when the run ends.
 //
 // Dependencies (must be loaded before this file):
-//   endgame-maps.js            - EG_MAP_MOD_TABLES / mod shape
+//   loot-maps.js            - EG_MAP_MOD_TABLES / mod shape
 //   hub.js             - _egMapSlotItem, saveHubState()
-//   endgame-encounter-chain.js - _buildChainPool, _chainCleanup hook
+//   encounter-chain.js - _buildChainPool, _chainCleanup hook
 //
 // Entry point:
 //   egActivateMap() in endgame-gate.js → _egLaunchMapFromDevice(mapItem)
@@ -375,7 +375,7 @@ export function _egMapQuestionsPerInterstitial() {
 //-------------------RUN REWARD BONUSES------------------------------------
 //------------------------------------------------------------------------
 // The active map's mods grant run-wide reward bonuses (see
-// EG_MAP_MOD_REWARDS in endgame-maps.js). Helpers return neutral values
+// EG_MAP_MOD_REWARDS in loot-maps.js). Helpers return neutral values
 // when no device run is active.
 
 // { xp, quantity, rarity } percent bonuses of the active map (zeros outside runs).
@@ -457,7 +457,7 @@ export function _egRollMapRunBaseline(map) {
         maxBosses: 1,
         // T16 is the ceiling: at most 6 puzzles + 4 questions; lower tiers
         // ramp down smoothly (puzzles 2→6, questions 1→4 - see
-        // egMapBasePuzzlesForTier / egMapBaseQuestionsForTier in endgame-maps.js).
+        // egMapBasePuzzlesForTier / egMapBaseQuestionsForTier in loot-maps.js).
         requiredPuzzles: (typeof egMapBasePuzzlesForTier === 'function')
             ? egMapBasePuzzlesForTier(tier)
             : Math.max(1, Math.min(6, 2 + Math.floor((tier - 1) * 4 / 15))),

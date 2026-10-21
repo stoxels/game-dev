@@ -62,12 +62,12 @@ import { cur } from './state.js';
 //                      ascension levels into _launchAscensionTrial(wi)
 //   _tryLeaveMap() → branches to _endCampaignTrial() for trial runs
 //   _pickInterstitialWorldNum() → trial world override (patched in
-//                      endgame-encounter-chain.js, reads window._campaignTrial)
+//                      encounter-chain.js, reads window._campaignTrial)
 //   _chainCleanup()→ _cleanupCampaignTrialSeed() (patched call site)
 //   leave-map return → window._trialReturnWi branch (patched call site)
 //
 // Dependencies (all optional at load time, required at run time):
-//   js/levels/levels.js, js/state.js, endgame-encounter-chain.js,
+//   js/levels/levels.js, js/state.js, encounter-chain.js,
 //   endgame-map-launch.js (_egPickMapRunSeedGi), hub-leveling.js,
 //   js/scoring.js (applyConvergenceReward path), js/classes/class-ui.js
 //------------------------------------------------------------------------

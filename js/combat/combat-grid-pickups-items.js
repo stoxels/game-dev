@@ -15,6 +15,13 @@ import {
 import { _isActive, _itemDrops } from './combat-state.js';
 import { STATE, save } from '../state.js';
 
+//------------------------------------------------------------------------
+//-------------------GRID ITEM DROPS--------------------------------------
+//------------------------------------------------------------------------
+// Puzzle-item drops on grid cells: the overlay, its removal and the claim
+// animation.
+//------------------------------------------------------------------------
+
 // Same idea as loot/currency drops (above), but for the regular puzzle
 // items from ITEM_DEFS. A defeated monster has a small chance to drop a
 // random weighted item onto the grid. Claiming it adds it directly to

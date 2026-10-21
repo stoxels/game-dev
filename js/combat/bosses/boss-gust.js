@@ -106,7 +106,7 @@ export let _gustArena = null; // persistent non-dodge run state
 export let _gustWindPause = false; // true while a storm front shoves the player
 
 
-// Read by _tickPlayer (endgame-encounter.js): freeze the auto-attack bar
+// Read by _tickPlayer (encounter.js): freeze the auto-attack bar
 // while a storm front is blowing.
 export function _gustChargePaused() {
     return !!_gustWindPause;

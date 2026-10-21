@@ -50,7 +50,7 @@ export function _rollCurrencyDef() {
 }
 
 
-// Called on monster death (see endgame-encounter.js edit below).
+// Called on monster death (see encounter.js edit below).
 // Orbs now land on the grid and must be picked up, just like equipment loot.
 // force - skip the chance roll (the kill handler already picked this bucket).
 export function _tryDropCurrency(isBoss, force = false) {

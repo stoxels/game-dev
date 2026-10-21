@@ -427,7 +427,7 @@ export function _mechTntChain(monster, phase) {
 // while a huge red blast ring grows around it. At zero: MEGA detonation
 // (huge radius + screen flash + a long-lasting crater) and the immunity
 // releases. The auto-attack charge bar freezes for the whole set-piece
-// (gate in _tickPlayer, endgame-encounter.js - _crpFinalActive).
+// (gate in _tickPlayer, encounter.js - _crpFinalActive).
 export const CRP_FINAL_CD_TICK_MS = 1000;
 export const CRP_FINAL_CD_TICKS = 3;
 export const CRP_FINAL_BLAST_R_PCT = 0.42;              // of min(vw, vh)

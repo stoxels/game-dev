@@ -14,7 +14,7 @@ import { _egMapTierMonsterLevel } from '../loot/loot-map-config.js';
 export const BOSS_TEST_TIME_LIMIT = 3600;
 
 // Fallback monster level per map tier (T1–T16), used when
-// _egMapTierMonsterLevel() (endgame-maps.js) is unavailable. Mirrors
+// _egMapTierMonsterLevel() (loot-maps.js) is unavailable. Mirrors
 // EG_MAP_TIER_MONSTER_LEVELS.
 const BOSS_TEST_TIER_LEVELS = [3, 6, 10, 14, 19, 24, 30, 36, 43, 50, 57, 64, 71, 78, 84, 90];
 
@@ -22,7 +22,7 @@ const BOSS_TEST_TIER_LEVELS = [3, 6, 10, 14, 19, 24, 30, 36, 43, 50, 57, 64, 71,
 export const BOSS_TEST_DEFAULT_LEVEL = 50;
 
 // Arena board caps - mirrors BOSS_ARENA_MAX_ROWS/COLS in
-// endgame-encounter-chain.js so fights feel like real boss arenas.
+// encounter-chain.js so fights feel like real boss arenas.
 export const BOSS_TEST_ARENA_MAX_ROWS = 15;
 export const BOSS_TEST_ARENA_MAX_COLS = 25;
 export const BOSS_TEST_ARENA_MIN_CELLS = 36;

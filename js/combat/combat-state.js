@@ -236,7 +236,7 @@ export function _isActive() {
 }
 
 // True while the current level is a CAMPAIGN level running its light monster
-// encounter (stamped by _prepareCampaignEncounter in endgame-encounter.js).
+// encounter (stamped by _prepareCampaignEncounter in encounter.js).
 // Such levels set isMonsterLevel so the shared combat loop runs, but they
 // must NOT be treated as endgame map runs: no encounter chain, no map
 // objectives, no map-failed flow, no atlas completion.

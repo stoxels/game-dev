@@ -15,6 +15,12 @@ import {
     _hzPointOutsideGrid, _hzRand, _hzRectsOverlap,
 } from './combat-hazards.js';
 import {
+
+//------------------------------------------------------------------------
+//-------------------HAZARDS: LIGHTNING, BLIZZARD, DARKNESS, ARCANE, METEOR---
+//------------------------------------------------------------------------
+// Weather-style screen hazards. Each has an init and a per-frame tick.
+//------------------------------------------------------------------------
     _hzArcane, _hzBlizzard, _hzDarkness, _hzLightning, _hzMeteor,
     _setHzArcane, _setHzBlizzard, _setHzDarkness, _setHzLightning, _setHzMeteor,
 } from './combat-hazards.js';

@@ -62,7 +62,7 @@ export let _marksWatcher = null;  // per-fight HP-gate watcher state
 export let _marksGauntlet = null; // non-null while a gauntlet (countdown + waves) runs
 
 
-// Read by endgame-encounter.js: the whole gauntlet - countdown AND waves -
+// Read by encounter.js: the whole gauntlet - countdown AND waves -
 // is a dodge set-piece, so the auto-attack charge bar stays paused.
 export function _marksGauntletChargePaused() {
     return !!_marksGauntlet;

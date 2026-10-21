@@ -333,7 +333,7 @@ export function _renderMonstersIntoZones() {
         // spawn spots) - never in the static monster panel.
         if (m.isDynamoConductor) return;
         // Legacy patrol hook (always false now): normal monsters stay put.
-        // Occasional melee sidesteps (endgame-monster-roam.js) just change
+        // Occasional melee sidesteps (combat-monster-roam.js) just change
         // zoneId and re-render here - no separate layer.
         if (_roamShouldRoam(m)) return;
         const zoneEl = document.getElementById(m.zoneId || 'sx-monster-panel');

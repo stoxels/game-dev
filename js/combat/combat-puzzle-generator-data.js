@@ -603,7 +603,7 @@ export const GEN_SIZES = [
 ];
 
 // Grid-size buckets (same thresholds as EG_GRID_SIZE_BUCKETS in
-// endgame-maps.js). A requested bucket constrains which sizes are drawn.
+// loot-maps.js). A requested bucket constrains which sizes are drawn.
 export const GEN_BUCKETS = {
     small:   [1, 99],
     medium:  [100, 199],

@@ -370,7 +370,7 @@ export function timesUp() {
     // Retry button - the player keeps loot and returns via the map-failed
     // screen (_endMapDefeated). Intercept timer defeats directly here
     // instead of relying on the async MutationObserver fallback in
-    // endgame-encounter.js, which would otherwise flash the overlay first.
+    // encounter.js, which would otherwise flash the overlay first.
     // Campaign / story mode is unaffected (guard checks _isMapRun, which
     // excludes the campaign's own monster levels).
     if (typeof globalThis._isMapRun === 'function' && globalThis._isMapRun()) {

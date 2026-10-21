@@ -388,7 +388,7 @@ export function _thwSiege(st, p) {
 //------------------------------------------------------------------------
 // A shadow marker stalks your avatar and locks (the classic Thwomp tell),
 // then the whole block teleports overhead and crashes onto the mark with a
-// huge shockwave ring. Wired from _fireMonsterAttack (endgame-encounter.js).
+// huge shockwave ring. Wired from _fireMonsterAttack (encounter.js).
 
 export function _thwompGrandSlam(monster) {
     if (_thwGrandSlamActive || _nkDodgeBusy() || _nkFrozen()) return;

@@ -84,7 +84,7 @@ export function _egAddMapToMapStash(item, tierOverride) {
     return false;
 }
 
-// Called by the kill handlers in endgame-encounter.js.
+// Called by the kill handlers in encounter.js.
 // ARPG-style sustain: while running a map the drop chance is multiplied by the
 // active map's Quantity bonus (EG_MAP_MOD_REWARDS.quantity). Harder maps
 // (more / higher-tier mods) therefore sustain maps much better.
