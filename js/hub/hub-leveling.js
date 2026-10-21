@@ -3,7 +3,7 @@ import { setAchStat } from '../achievements/achievements.js';
 import { _resetPlayerMana, gainMana } from '../classes/class-mana.js';
 import { _incDirect } from '../inference/inference-stats.js';
 import { ptEffectChannels, ptNodeHasEffects } from '../probability-tree/pt-effects.js';
-import { save } from '../state.js';
+import { STATE, cur, save } from '../state.js';
 import { t } from '../translation/translations.js';
 import { _getRevealProjectileDamagePct } from '../combat/combat-class-projectiles-reveal.js';
 import { _calcPlayerDamage, _lastHitElements } from '../combat/combat-calculations.js';
@@ -15,58 +15,16 @@ import { _egMapPlayerLifeMult, _egMapXpMult } from '../endgame/endgame-map-launc
 import { _cancelAbsorptionRegen, _computePlayerStats, _getAllEquippedItems } from '../combat/combat-player-stats.js';
 import { PLAYER_BASE_ATTRIBUTES, _findUnmetRequirements, _getUnmetRequirementsText } from '../loot/loot-requirements.js';
 import { _isActive } from '../combat/combat-state.js';
-import { STATE } from '../state.js';
-import { cur } from '../state.js';
 import { TALENT_TREE_DATA } from '../probability-tree/probability-tree-data.js';
 
 //------------------------------------------------------------------------
-//-------------------ENDGAME CHARACTER LEVELING---------------------------
+//-------------------CHARACTER LEVELING-----------------------------------
 //------------------------------------------------------------------------
-// Experience & progression system shared by the CAMPAIGN and the endgame:
-//   - XP is earned from the very first story level: completing a level
-//     grants a one-time XP bonus (replays grant a reduced amount) and every
-//     monster killed grants kill XP.
-//   - Monster XP is scaled by the monster's level and by an ARPG-style
-//     multiplier: full XP only while the monster is within a safe level
-//     range of the character; beyond that range (too high OR too low) XP
-//     falls off exponentially - so re-farming old content gives little.
-//   - The campaign carries the character from level 1 to ~level 68 (the
-//     atlas entry level); a one-time sweep of the atlas then reaches ~94
-//     and 94→100 is the dedicated late grind - see LEVELING_CONFIG and
-//     tools/xp-curve-tune.py.
-//   - Each level grants passivePointsPerLevel (1) passive tree point. Raw
-//     attribute points are no longer granted per level; the character's
-//     +stats come from the travel nodes allocated in the passive tree.
-//   - Legacy attribute allocation helpers remain for backwards-compatible
-//     saves and refunds; the character-level modal is no longer exposed in
-//     the hub.
-//
-// Wiring notes:
-//   - _syncBaseAttributes() keeps PLAYER_BASE_ATTRIBUTES
-//     (endgame-requirements.js) in sync with STATE.playerLevel, legacy
-//     attribute points, and allocated travel nodes. That single sync
-//     automatically enables item LEVEL requirements everywhere (equip gate,
-//     tooltips) and feeds attributes into _computePlayerStats() side-effects
-//     (Str -> life/armour, Agi -> accuracy/evasion, Int -> mana/spell dmg).
-//   - Kill integration lives in _killMonster() (endgame-encounter.js),
-//     which calls _grantMonsterXP(monsterLevel, isBoss).
-//
-// Dependencies (must be loaded before this file):
-//   js/state.js             - STATE, save()
-//   combat-player-stats.js  - _getAllEquippedItems()
-//   endgame-requirements.js - PLAYER_BASE_ATTRIBUTES,
-//                             _findUnmetRequirements(),
-//                             _getUnmetRequirementsText()
-//
-// Entry points:
-//   _grantMonsterXP(mLevel, isBoss)      → called on every monster kill
-//   _getPlayerLevel() / _getPlayerXP() → current progression
-//   _getXpForNextLevel(level)            → XP needed to leave `level`
-//   _calcXpMultiplier(playerLvl, mLvl)   → ARPG-style range multiplier
-//   _allocateAttribute('str'|'agi'|'int')→ spend one point
-//   _refundAttribute('str'|'agi'|'int')  → verify & refund one point
-//   _canRefundAttribute(attr)            → refund legality check
-//   _renderLevelHUD()                    → refresh the inline level chip
+// XP and levels for the campaign and endgame: level-clear and kill XP (kills
+// scaled by how close the monster is to the player's level), the level-up
+// reward, the passive-point grant per level, and the level HUD chip.
+// _syncBaseAttributes keeps PLAYER_BASE_ATTRIBUTES in step with level and
+// travel nodes. Kills call _grantMonsterXP; tuning lives in LEVELING_CONFIG.
 //------------------------------------------------------------------------
 
 
@@ -173,7 +131,7 @@ export const LEVELING_CONFIG = {
 
 // Pristine copy of the base attribute pool from endgame-requirements.js,
 // captured before this file mutates the object with allocated points.
-export const _ATTR_ORIGINAL_BASE = {
+const _ATTR_ORIGINAL_BASE = {
     str: PLAYER_BASE_ATTRIBUTES.str,
     agi: PLAYER_BASE_ATTRIBUTES.agi,
     int: PLAYER_BASE_ATTRIBUTES.int,
@@ -319,7 +277,7 @@ export function _lifeGain(amount) {
     return _getTreeChannel('lifeOnlyFromLeech') > 0 ? 0 : amount;
 }
 
-export const LEVELING_ATTRS = [
+const LEVELING_ATTRS = [
     { key: 'str', icon: '💪', nameKey: 'eg_stat_strength' },
     { key: 'agi', icon: '🏃', nameKey: 'eg_stat_agility' },
     { key: 'int', icon: '🧠', nameKey: 'eg_stat_intelligence' },
@@ -342,7 +300,7 @@ export function _getUnspentPoints() {
     return (typeof STATE !== 'undefined' && STATE && STATE.egAttrPoints) || 0;
 }
 
-export function _getAllocatedAttributes() {
+function _getAllocatedAttributes() {
     if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE || !globalThis.STATE.egAttrAllocated) {
         return { str: 0, agi: 0, int: 0 };
     }
@@ -418,7 +376,7 @@ export function _calcXpMultiplier(playerLevel, monsterLevel) {
 // Inverts the XP multiplier curve around hintPoorMultiplier to split monster
 // levels into "optimal" (100% band), "average" (>= hintPoorMultiplier) and
 // "poor" (below it) ranges for the attribute-window hint.
-export function _getXpTierRanges(playerLevel) {
+function _getXpTierRanges(playerLevel) {
     const c = LEVELING_CONFIG;
     if (playerLevel >= c.maxLevel) return null;
 
@@ -444,7 +402,7 @@ export function _getXpTierRanges(playerLevel) {
 
 // Builds the "which monster levels give which XP" rows for the window body.
 // Returns '' at max level (no more XP to earn).
-export function _buildXpTiersHTML() {
+function _buildXpTiersHTML() {
     const c = LEVELING_CONFIG;
     const r = _getXpTierRanges(_getPlayerLevel());
     if (!r) return '';
@@ -619,7 +577,7 @@ function _xpBarPct() {
 
 // Highlights a just-earned XP gain on the bar: a bright band over the newly
 // filled stretch (from -> to, in percent) plus a "+N XP" label above it.
-export function _showXpBarGain(xp, from, to) {
+function _showXpBarGain(xp, from, to) {
     const bar = document.getElementById('sx-xp-bar');
     const gain = document.getElementById('sx-xp-bar-gain');
     if (!bar || !gain || !(xp > 0) || bar.getBoundingClientRect().width === 0) return;
@@ -642,7 +600,7 @@ export function _showXpBarGain(xp, from, to) {
 // shows how much XP is still missing (generic data-tip tooltip).
 let _xpBarLastKey = '';
 let _xpBarLastPct = 0;
-export function _renderXpBar() {
+function _renderXpBar() {
     const bar = document.getElementById('sx-xp-bar');
     const fill = document.getElementById('sx-xp-bar-fill');
     if (!bar || !fill) return;
@@ -682,10 +640,10 @@ setInterval(() => { try { _renderXpBar(); } catch (e) { /* cosmetic */ } }, 700)
 // Both are scaled by _calcXpMultiplier(), so re-farming content far below
 // the character's level gives almost nothing (anti-farm, ARPG-style).
 
-export let _campaignLevelCountCache = null;
+let _campaignLevelCountCache = null;
 
 // Number of story levels in the campaign (excludes monster/endgame levels).
-export function _campaignTotalLevels() {
+function _campaignTotalLevels() {
     if (_campaignLevelCountCache != null) return _campaignLevelCountCache;
     let n = 0;
     if (typeof ALL !== 'undefined' && globalThis.ALL) {
@@ -749,10 +707,10 @@ export function _grantCampaignLevelXP(gi, isFirstClear) {
 //   - Life, mana and the absorption shield are completely refilled.
 //   - 3 waves of projectiles (0.5 s apart) launch at EVERY monster on
 //     screen, each hitting with correct-reveal projectile damage.
-export const LEVELUP_REWARD_WAVES = 3;
-export const LEVELUP_REWARD_WAVE_DELAY_MS = 500;
+const LEVELUP_REWARD_WAVES = 3;
+const LEVELUP_REWARD_WAVE_DELAY_MS = 500;
 
-export function _playLevelUpReward() {
+function _playLevelUpReward() {
     if (typeof _isActive !== 'function' || !_isActive()) return;
 
     // Full life, mana & absorption shield restore (after the +max bonuses were applied).
@@ -797,7 +755,7 @@ export function _playLevelUpReward() {
 // Full-screen gold flash + expanding "LEVEL UP!" banner. Pure CSS animation,
 // element removes itself after the effect finishes. Safe mid-combat (the
 // overlay ignores pointer events).
-export function _playLevelUpEffect(newLevel) {
+function _playLevelUpEffect(newLevel) {
     Audio_Manager.playSFX('level_up');
     // Character banter: lands just after the kill / quest line that caused it.
     if (typeof globalThis.triggerBanter === 'function') setTimeout(() => globalThis.triggerBanter('level_up'), 700);
@@ -844,7 +802,7 @@ export function _allocateAttribute(attr) {
 // Evaluates the equipped loadout with `attr` temporarily reduced by one
 // point and returns the resulting unmet requirements. The real base value
 // is always restored, even when the check throws.
-export function _simulateRefundUnmet(attr) {
+function _simulateRefundUnmet(attr) {
     if (!(attr in _ATTR_ORIGINAL_BASE)) return [];
     if (typeof _findUnmetRequirements !== 'function'
         || typeof _getAllEquippedItems !== 'function') return [];
@@ -863,7 +821,7 @@ export function _simulateRefundUnmet(attr) {
 //   - the equipped gear stays fully valid afterwards (no NEW unmet
 //     requirements compared to the current state - same grandfather rule
 //     the equip gate uses).
-export function _canRefundAttribute(attr) {
+function _canRefundAttribute(attr) {
     if ((_getAllocatedAttributes()[attr] || 0) <= 0) return false;
     if (typeof _findUnmetRequirements !== 'function') return true;
     const before = _findUnmetRequirements(_getAllEquippedItems());
@@ -908,7 +866,7 @@ export function _refundAttribute(attr) {
 //-------------------PERSISTENCE------------------------------------------
 //------------------------------------------------------------------------
 
-export function saveLevelingState() {
+function saveLevelingState() {
     if (typeof save === 'function') save();
 }
 
@@ -975,7 +933,7 @@ export function _renderLevelHUD() {
 
 // Hover tooltip for the level indicators, built on the shared game
 // tooltip engine (tooltips-hud.js) instead of the native browser title.
-export function _buildLevelBtnTooltipHTML() {
+function _buildLevelBtnTooltipHTML() {
     const lvl = _getPlayerLevel();
     const xp = _getPlayerXP();
     const atMax = lvl >= LEVELING_CONFIG.maxLevel;
@@ -1010,7 +968,7 @@ export function _showLevelBtnTooltip(e) {
 //------------------------------------------------------------------------
 
 // Injects all leveling UI styles once (inline chip, XP tiers, effects).
-export function _injectLevelingStyles() {
+function _injectLevelingStyles() {
     if (document.getElementById('sx-leveling-styles')) return;
     const style = document.createElement('style');
     style.id = 'sx-leveling-styles';
