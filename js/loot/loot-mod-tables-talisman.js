@@ -1,33 +1,9 @@
-//  endgame-mod-tables-talisman.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------TALISMAN MODIFIER TABLE------------------------------
 //------------------------------------------------------------------------
-// The Talisman is a carried ward - a protective charm that bends
-// survival rules rather than amplifying offense. It is the defensive
-// magical utility slot: fate manipulation, elemental warding, and
-// death prevention are its identity. No local defences. Values sit
-// at amulet/ring scale, leaning slightly more defensive.
-//
-// Talisman-exclusive mods:
-//   warding - once per map, the talisman absorbs a killing blow and
-//             leaves you at # health instead of dying. Resets each map.
-//             The rarest and most powerful survival mod in the game.
-//             Only one talisman slot exists so it cannot be doubled up.
-//   fate - % chance to completely negate any incoming hit. More random
-//          than block (deterministic with downtime) and dodge (evasion-
-//          based) - fate is pure luck, but it applies to everything
-//          including charge hits, spells, and attacks with no downside
-//          on proc. Low chances kept intentionally to prevent it
-//          trivialising combat.
-//
-// No local defences, no offense mods, no crit, no elemental damage
-// added, no spell damage, no quiz exclusives, no precision, no echo,
-// no arcane_surge, no mana_to_damage.
+// The talisman is the defensive utility slot (no local defences, amulet/ring scale, slightly more defensive).
+// Exclusive mods: warding (once per map, survive a killing blow at # health) and fate (chance to negate any hit).
+// Only one talisman slot exists, so warding cannot be doubled. No offense mods, crit, echo or arcane mods.
 
 export const MOD_TABLE_TALISMAN = {
     prefixes: {

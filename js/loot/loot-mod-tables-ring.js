@@ -1,39 +1,9 @@
-//  endgame-mod-tables-ring.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------RING MODIFIER TABLE----------------------------------
 //------------------------------------------------------------------------
-// Shared between ring1 and ring2
-
-// Rings are magical conduits in permanent skin contact - always active,
-// always channelling. They are pure stat jewelry with no local defences
-// (no armour/evasion/absorption). Values sit between earring and amulet
-// scale - rings are significant but the amulet remains the prestige slot.
-// Both ring slots (ring1, ring2) share this table, making it possible
-// to double up on any mod at the cost of two ring slots.
-//
-// Ring-exclusive mods:
-//   mana_on_mistake - the ring pulses with energy when you err,
-//                     converting the mistake into a mana surge. A
-//                     risk/reward mod that softens mistake punishment
-//                     and rewards builds that can afford to make them.
-//                     Pairs naturally with mistake_count and focus.
-//   echo - a % chance that damage dealt resonates through the ring,
-//          firing a delayed second hit for a fraction of the original
-//          damage. Stacking two rings with echo lets both proc
-//          independently - a genuine build-enabling double-ring path.
-//
-// No local defences, no block/dodge, no spell damage multiplier,
-// no precision, no quiz exclusives, no heart_heal multiplier,
-// no pushback/overkill/stagger/grounded/first_step, no chain/splash,
-// no multishot. Elemental damage, crit, and status effects are absent
-// here - those are amulet and bracer/weapon territory. Rings focus on
-// resource sustain, attributes, resistances, and their two unique
-// passive-trigger exclusives.
+// Both ring slots share this table. Rings are pure stat jewelry with no local defences, valued between earring and amulet scale.
+// Exclusive mods: mana_on_mistake (mana surge when you err) and echo (chance for a delayed second hit); two rings can both proc.
+// No block/dodge, spell damage, precision, quiz mods, chain/splash/multishot, elemental damage, crit or status effects.
 
 export const MOD_TABLE_RING = {
     prefixes: {

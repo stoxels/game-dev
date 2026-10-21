@@ -1,17 +1,8 @@
-//  endgame-mod-tables-earring.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------EARRING MODIFIER TABLE-------------------------------
 //------------------------------------------------------------------------
-// Earrings are small jewelry - no local armour/evasion/absorption.
-// They focus on: life/mana pools, regen, leech, attributes,
-// resistances, and puzzle utility. Values are smaller than helmet
-// equivalents to reflect the slot's secondary status.
-// Both earring slots (earring1, earring2) share this same table.
+// Small jewelry with no local defences: life/mana pools, regen, leech, attributes, resistances and puzzle
+// utility, at values below the helmet equivalents. Both earring slots share this table.
 
 export const MOD_TABLE_EARRING = {
     prefixes: {

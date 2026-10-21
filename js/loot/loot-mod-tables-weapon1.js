@@ -1,39 +1,9 @@
-//  endgame-mod-tables-weapon1.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------WEAPON 1 (MAIN HAND / MELEE) MODIFIER TABLE----------
 //------------------------------------------------------------------------
-// The melee weapon is the primary offensive slot for the manual
-// Secret-of-Mana-style charge system. The bar charges over time and the
-// player spends it with a manual strike (E) - the weapon defines how fast
-// it recharges (attack_speed) and how hard a fully-charged strike hits
-// (physical damage, elemental damage, crit). Projectiles from cell reveals
-// fire independently.
-//
-// Attack speed is expressed as seconds reduced from the base time to full
-// charge - higher values mean faster recharges.
-//
-// Physical and elemental damage values are the highest of any equipment
-// slot since this is the dedicated melee damage piece. Bracers add flat
-// physical/elemental to ALL hits (including projectiles); the weapon's
-// damage only applies to melee strikes, so the ceiling is set higher
-// to compensate for the narrower trigger condition.
-//
-// Status effect chances are higher than bracers for the same reason:
-// bracers proc on every cell reveal, the weapon only procs on manual
-// melee strikes. Higher per-hit chance, lower total frequency.
-//
-// Cleave is weapon-exclusive: a sweeping strike that hits all monsters
-// sharing the same spawn location as the target.
-//
-// No local armour/evasion/absorption (weapon slot never grants those).
-// No block/dodge, no puzzle utility beyond the standard set, no spell
-// damage, no precision, no quiz exclusives, no absorption regen.
-// Accuracy applies here - melee strikes can miss.
+// The melee weapon is the primary offensive slot: it sets how fast the manual strike (E) recharges and how hard it hits.
+// Damage and status chances are the highest of any slot because they only apply to manual melee strikes; cleave is exclusive here.
+// No local defences, block/dodge, spell damage, precision, quiz mods or absorption regen. 1H alias and parry follow the table.
 
 export const MOD_TABLE_WEAPON1 = {
     prefixes: {

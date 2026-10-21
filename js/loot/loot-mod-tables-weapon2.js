@@ -1,44 +1,9 @@
-//  endgame-mod-tables-weapon2.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------WEAPON 2 (OFF-HAND / SHIELD) MODIFIER TABLE----------
 //------------------------------------------------------------------------
-// The off-hand slot accepts either a shield or an offhand item (focus,
-// orb, tome, dagger-grip, etc). Players who dual-wield use two copies
-// of MOD_TABLE_WEAPON1 instead - this table is specifically for
-// the protective/utility off-hand archetype.
-//
-// SHIELD identity:
-//   The shield is the premier block slot - it has the highest block and
-//   spell block values in the game, beating chest and shoulders. Its
-//   local defences (flat armour, evasion, absorption) rival shoulders
-//   scale. The shield-exclusive mod shield_bash lets it contribute to
-//   offence: when the player blocks, there is a % chance the shield
-//   slams back for damage. Absorption regen mods are strong here -
-//   the shield is the front line of that layer.
-//   Shields use MOD_TABLE_SHIELD below - a defensive-only copy of
-//   this table. The offhand-identity offensive mods (spell_damage,
-//   inc_spell_damage, channel) are stripped from it since shields are
-//   purely protective pieces; those mods remain reserved for actual
-//   offhand items (focus, orb, tome) once those exist.
-//
-// OFFHAND identity:
-//   An offhand item (focus, orb, tome, etc.) leans into spell damage,
-//   mana sustain, and the exclusive channel mod - filling correct cells
-//   consecutively charges a damage multiplier that fires on the next
-//   melee strike or projectile. Rewards streak play the same way
-//   precision (chest) does, but as burst output rather than regen.
-//
-// No attack speed (that's the main weapon), no cleave (main weapon),
-// no accuracy (off-hand doesn't swing), no crit (kept to main weapon,
-// amulet, bracers, arcane), no on-hit status effects (those come from
-// the striking weapon and bracers). No puzzle quiz exclusives (gloves).
-// No chain/splash/multishot (cloak/gloves), no pushback/overkill
-// (shoulders), no stagger/grounded/first_step (pants/boots).
+// The off-hand slot takes a shield (highest block and spell block in the game, plus shield_bash and absorption regen)
+// or an offhand item (spell damage, mana sustain, and the exclusive channel streak multiplier). MOD_TABLE_SHIELD below
+// is the defensive-only copy. No attack speed, cleave, accuracy, crit, on-hit status, quiz, chain/splash/multishot or pushback.
 
 export const MOD_TABLE_WEAPON2 = {
     prefixes: {

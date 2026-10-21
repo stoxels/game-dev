@@ -1,19 +1,10 @@
-import { MOD_TABLE_WEAPON2 } from './loot-mod-tables-weapon2.js';
-
-//  endgame-mod-tables-shield.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------SHIELD MODIFIER TABLE--------------------------------
 //------------------------------------------------------------------------
-// Defensive-only derivative of MOD_TABLE_WEAPON2. Shields must not
-// roll offensive stats (spell damage / channel are offhand-item identity,
-// attack mods live on WEAPON1), so those families are stripped here while
-// everything else - local defences, block & dodge suffixes, shield_bash,
-// attributes, regen and utility - carries over unchanged.
+// Defensive-only copy of MOD_TABLE_WEAPON2: the offensive off-hand families (spell damage, channel) are
+// stripped; local defences, block and dodge suffixes, shield_bash, attributes, regen and utility carry over.
+
+import { MOD_TABLE_WEAPON2 } from './loot-mod-tables-weapon2.js';
 
 export const MOD_TABLE_SHIELD = (() => {
     const offensivePrefixIds = ['spell_damage', 'inc_spell_damage', 'channel'];
@@ -55,8 +46,7 @@ export const MOD_TABLE_SHIELD = (() => {
     };
 })();
 
-// In: endgame-mod-tables.js
-// Replace the empty MOD_TABLE_RANGED at the bottom of the file
+// Ranged weapon modifier table (lives in this file next to the shield table).
 
 export const MOD_TABLE_RANGED = {
     prefixes: {
