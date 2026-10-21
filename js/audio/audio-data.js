@@ -906,5 +906,8 @@ export const SFX = {
     puzzle_col_complete: 'audio/sfx/puzzle/sfx_puzzle_col_complete.mp3',
     puzzle_row_complete: 'audio/sfx/puzzle/sfx_puzzle_row_complete.mp3',
     puzzle_streak_up: 'audio/sfx/puzzle/sfx_puzzle_streak_up.mp3',
+    spell_fireball: 'audio/sfx/spells/sfx_spell_fireball.mp3',
+    spell_magma_shot: 'audio/sfx/spells/sfx_spell_magma_shot.mp3',
+    wand_attack: 'audio/sfx/combat/sfx_wand_attack.mp3',
     // <<SFX-ACTIVE-END>>
 };

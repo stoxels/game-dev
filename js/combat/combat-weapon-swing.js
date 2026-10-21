@@ -150,7 +150,7 @@ export function _weaponSwingSound(family) {
         if (typeof Audio_Manager === 'undefined' || !Audio_Manager.playSFX) return;
         // [new per-family sound, placeholder that plays until it is recorded]
         const map = {
-            wand: ['melee_swing_staff', 'arcaneReveal'],
+            wand: ['wand_attack', 'melee_swing_staff'],
             staff: ['melee_swing_staff', 'arcaneReveal'],
             mace: ['melee_swing_mace', 'bump_thwack'],
             bow: ['bow_shot', 'precisionMark'],

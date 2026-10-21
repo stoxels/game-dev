@@ -3090,6 +3090,8 @@ function _uspCastSfxKey(spell) {
     switch (spell.id) {
         case 'usp_whirlwind': case 'usp_blade_vortex': return 'spell_whirlwind';
         case 'usp_execute': return 'spell_execute';
+        case 'usp_fireball': return 'spell_fireball';
+        case 'usp_pyroblast': return 'spell_magma_shot';
         case 'usp_explosive_shot': return 'spell_explosive_arrow';
         case 'usp_arrow_volley': case 'usp_barrage': return 'spell_arrow_volley';
         default: break;
