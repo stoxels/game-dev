@@ -6,20 +6,21 @@ import { TALENT_TREE_DATA } from './probability-tree-data.js';
 import { _ptRefreshAllStyles } from './probability-tree-ui.js';
 import { getPassiveTreeRootId, isPassiveTreeStartNode, _ptInitTreeData } from './probability-tree.js';
 import { STATE } from '../state.js';
-//--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
+// Accessors: other files reassign these through globalThis.
 try { Object.defineProperty(globalThis, '_pt_skills', { get() { return _pt_skills; }, set(v) { _pt_skills = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_pt_conns', { get() { return _pt_conns; }, set(v) { _pt_conns = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_pt_skillMap', { get() { return _pt_skillMap; }, set(v) { _pt_skillMap = v; }, configurable: true }); } catch (e) {}
-//  probability-tree-state-points.js
-//  Handles all allocation / deallocation logic, point accounting, and the
-//  adjacency graph that the connectivity checks rely on.
 
 
-
+//------------------------------------------------------------------------
+//-------------------TREE ALLOCATION & POINTS-----------------------------
+//------------------------------------------------------------------------
+// Allocation and refund of tree nodes, point accounting, and the neighbour
+// graph that the connectivity checks use.
+//------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
 //---------------------------CONSTANTS & STATE----------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Internal shared references - populated by _ptInitTreeData() (deferred to
@@ -64,6 +65,7 @@ const PT_TRAVEL_STAT_KEY_ALIASES = new Map([
     ['travel_regression_reward_1', 'regression_reward_1'],
 ]);
 
+// Maps alias stat keys of travel nodes to their canonical key.
 function _ptCanonicalStatKey(statKey) {
     if (typeof statKey !== 'string') return '';
     return PT_TRAVEL_STAT_KEY_ALIASES.get(statKey) || statKey;
@@ -183,11 +185,8 @@ export const PT_CLUSTER_CHECKS = [
 ];
 
 
-
-
 //------------------------------------------------------------------------
 //-------------------------LANGUAGE HELPER---------------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Returns the active UI language: 'de' or 'en'
@@ -196,11 +195,8 @@ export function _ptLang() {
 }
 
 
-
-
 //------------------------------------------------------------------------
 //---------------------------STATE ACCESSORS------------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Returns the live Set of allocated node IDs from STATE.
@@ -214,6 +210,8 @@ export function _ptAllocated() {
     return STATE.passiveTreeAllocated;
 }
 
+// Makes sure the character's start node is allocated; returns true when it
+// had to add it.
 export function ensurePassiveTreeRoot() {
     const root = getPassiveTreeRootId();
     if (!root) return false;
@@ -229,6 +227,8 @@ export function _ptPoints() {
     return (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;
 }
 
+// Asks the leveling code to recompute base attributes after the allocation
+// changed.
 function _ptSyncBaseAttributes() {
     if (typeof globalThis._syncBaseAttributes === 'function') {
         globalThis._syncBaseAttributes();
@@ -260,11 +260,8 @@ export function _ptRefreshPointsDisplay() {
 }
 
 
-
-
 //------------------------------------------------------------------------
 //---------------------------ADJACENCY GRAPH------------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Rebuilds _pt_adjacency as a bidirectional map from _pt_conns.
@@ -279,10 +276,13 @@ export function _ptBuildAdjacency() {
     });
 }
 
+// The neighbour lists used for connectivity checks.
 function _ptConnectivityAdjacency() {
     return _pt_adjacency;
 }
 
+// Nodes reachable from the given roots by walking only through the available
+// set.
 function _ptReachableFromRoots(roots, availableSet, adjacency) {
     const visited = new Set();
     const queue = roots.filter(id => availableSet.has(id));
@@ -299,11 +299,8 @@ function _ptReachableFromRoots(roots, availableSet, adjacency) {
 }
 
 
-
-
 //------------------------------------------------------------------------
 //---------------------GRAPH TRAVERSAL HELPERS---------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Traverses from `startId` through nodes present in `availableSet`, visiting
@@ -347,13 +344,12 @@ function _ptGetAllAllocatedStatKeys() {
 }
 
 
-
-
 //------------------------------------------------------------------------
 //------------------UNLOCK / DE-ALLOCATE RULES----------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
+// Allocated nodes still connected to the start node (cached until the
+// allocation changes).
 function _ptReachableAllocated() {
     if (_pt_reachableCache) return _pt_reachableCache;
     const alloc = _ptAllocated();
@@ -364,6 +360,8 @@ function _ptReachableAllocated() {
     return _pt_reachableCache;
 }
 
+// The given node ids plus their direct neighbours (the nodes whose look may
+// change).
 function _ptAffectedNodeIds(ids) {
     const affected = new Set();
     ids.forEach(id => {
@@ -424,11 +422,8 @@ export function _ptIsDeallocatable(id) {
 }
 
 
-
-
 //------------------------------------------------------------------------
 //------------------ACHIEVEMENT TRACKING HELPERS--------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Tracks the basic per-allocation counters that fire on every node allocation
@@ -526,6 +521,7 @@ const PT_ASCENDENCY_WHEELS = 6;
 const PT_ASCENDENCY_WHEEL_SIZE = 8;
 
 let _ptNodeIndex = null;
+// Looks a node up by id in the tree data (lazy index).
 function _ptNodeById(id) {
     if (!_ptNodeIndex) {
         _ptNodeIndex = new Map();
@@ -534,6 +530,7 @@ function _ptNodeById(id) {
     return _ptNodeIndex.get(Number(id));
 }
 
+// True for keystones that are not one of the god nodes.
 function _ptIsRegularKeystone(node) {
     return !!node && node.tier === 'keystone' && !PT_GOD_NODE_IDS.has(Number(node.id));
 }
@@ -587,11 +584,8 @@ export function _ptTrackAllocationAchievements(nodeId, alloc) {
 }
 
 
-
-
 //------------------------------------------------------------------------
 //----------CLICK HANDLER - ALLOCATION AND DEALLOCATION------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Handles the deallocation path when the player clicks an already-allocated node.
@@ -672,11 +666,8 @@ export function _ptOnNodeClick(id) {
 }
 
 
-
-
 //------------------------------------------------------------------------
 //---------------------VISUAL STATE QUERY--------------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Used by probability-tree-ui.js to determine which colour set to apply to a node.
@@ -688,11 +679,8 @@ export function _ptGetNodeVisualState(id) {
 }
 
 
-
-
 //------------------------------------------------------------------------
 //-------------------PUBLIC SKILL QUERY----------------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Returns true if the player has allocated the node AND plays the given

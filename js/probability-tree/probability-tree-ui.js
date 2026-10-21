@@ -8,8 +8,15 @@ import { ptBuildStatSummary, ptDerivedNodeEmoji, ptIsReservedNode, ptResolveNode
 import { _ptBindEvents, _ptFitToView } from './probability-tree-viewport.js';
 import { PT_COL_ALLOCATED_BG, PT_COL_ALLOCATED_BORDER, PT_COL_ALLOCATED_DOT, PT_COL_LOCKED_BG, PT_COL_LOCKED_BORDER, PT_COL_LOCKED_DOT, PT_COL_START, PT_COL_UNLOCKED_BG, PT_COL_UNLOCKED_BORDER, PT_COL_UNLOCKED_DOT, PT_CONN_ALLOCATED, PT_CONN_UNLOCKED, PT_CONN_WIDTH, PT_NODE_RADIUS, PT_PADDING } from './probability-tree.js';
 //------------------------------------------------------------------------
-//----------------------------CONSTANTS & STATE----------------------------
+//-------------------TREE RENDERER----------------------------------------
 //------------------------------------------------------------------------
+// Draws the Probability Tree: node and connection DOM (pooled, and mounted only
+// while inside the visible area), tooltips, node styles, the search bar and the
+// stat summary. Pan and zoom live in probability-tree-viewport.js.
+//------------------------------------------------------------------------
+
+//------------------------------------------------------------------------
+//----------------------------CONSTANTS & STATE----------------------------
 //------------------------------------------------------------------------
 
 // These are set during _ptRender() and shared across all UI/renderer functions.
@@ -70,7 +77,6 @@ let _ptReworkBriefingCopied = false;
 //------------------------------------------------------------------------
 //-------------------------LOCALIZATION HELPER-----------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // Picks between an English and German string based on the current language
 // code. Centralises the `lang === 'de' ? de : en` pattern used all over
@@ -84,7 +90,6 @@ function _ptPickLang(lang, en, de) {
 
 //------------------------------------------------------------------------
 //----------------------KEYSTONE DETECTION HELPER------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Returns true when a skill definition qualifies as a keystone node.
@@ -105,7 +110,6 @@ function _ptIsKeystoneNode(def) {
 //------------------------------------------------------------------------
 //----------------------NODE TIER CLASSIFICATION-------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // The visual/importance tiers used by the development layout.
 const PT_TIER_START = 'start';
@@ -114,6 +118,7 @@ const PT_TIER_NOTABLE = 'notable';
 const PT_TIER_KEYSTONE = 'keystone';
 const PT_TIER_SMALL = 'small';
 
+// Tier of a node: its own tier, else keystone / travel / notable by its data.
 function _ptGetNodeTier(def) {
     if (def && def.tier) return def.tier;
     if (_ptIsKeystoneNode(def)) return PT_TIER_KEYSTONE;
@@ -126,7 +131,6 @@ function _ptGetNodeTier(def) {
 
 //------------------------------------------------------------------------
 //---------------------NODE STYLE HELPERS---------------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Each helper below returns a plain style object for one specific node
@@ -294,7 +298,6 @@ function _ptApplyNodeStyle(id) {
 //------------------------------------------------------------------------
 //---------------------CONNECTION STYLE HELPERS---------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // Resolves the stroke colour for a single connection line.
 // Both-allocated connections get the bright allocated colour;
@@ -338,7 +341,6 @@ export function _ptRefreshAllStyles(affectedIds) {
 
 //------------------------------------------------------------------------
 //------------------------NODE TOOLTIP HELPERS----------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Builds the localised display name for a node.
@@ -450,7 +452,6 @@ function _ptTooltipBuildHtml(id) {
 //------------------------------------------------------------------------
 //----------------------------NODE TOOLTIP--------------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // Creates the singleton tooltip element and appends it to document.body.
 // The tooltip starts invisible (opacity:0) and is shown by _ptShowTooltip().
@@ -529,7 +530,6 @@ export function _ptHideTooltip() {
 //------------------------------------------------------------------------
 //-------------------BOUNDING BOX & LAYOUT HELPERS-------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // Returns the axis-aligned bounding box of all skill node positions.
 // Used to size the world <div> and to compute the initial fit-to-view transform.
@@ -569,7 +569,6 @@ function _ptComputeOffsets(bounds) {
 //------------------------------------------------------------------------
 //------------------------DRAW CONNECTIONS--------------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // Creates one SVG <line> element for a single connection and registers it
 // in _pt_connEls so style helpers can update it later.
@@ -599,6 +598,7 @@ export function _ptDrawConnections(bounds) {
     globalThis._pt_conns.forEach(conn => _ptDrawConnection(conn, offsetX, offsetY));
 }
 
+// Takes a pooled SVG line (or creates one) and clears its old attributes.
 function _ptAcquireConnectionElement() {
     const line = _pt_connPool.pop() || document.createElementNS('http://www.w3.org/2000/svg', 'line');
     line.removeAttribute('x1');
@@ -613,6 +613,7 @@ function _ptAcquireConnectionElement() {
     return line;
 }
 
+// Draws a connection line into the layer unless it is already mounted.
 function _ptMountConnection(meta, target) {
     if (_pt_connEls[meta.connection.id]) return;
     const line = _ptAcquireConnectionElement();
@@ -629,6 +630,7 @@ function _ptMountConnection(meta, target) {
     _ptApplyConnStyle(meta.connection.id, meta.connection.from, meta.connection.to);
 }
 
+// Removes a connection line and returns it to the pool.
 function _ptUnmountConnection(id) {
     const line = _pt_connEls[id];
     if (!line) return;
@@ -642,7 +644,6 @@ function _ptUnmountConnection(id) {
 
 //------------------------------------------------------------------------
 //------------------DRAW NODES - SHAPE HELPERS----------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Applies the base CSS layout for a regular (circular) node.
@@ -691,7 +692,6 @@ function _ptApplyDiamondShape(node, cx, cy, r) {
 
 //------------------------------------------------------------------------
 //------------------DRAW NODES - ICON HELPERS-----------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Counter-rotates the first child element of a keystone diamond node so that
@@ -802,6 +802,7 @@ export function _ptAppendNodeIcon(node, skill, def, isKeystone, scale) {
     }
 }
 
+// Adds the class sprite image on a start node.
 function _ptAppendStartSprite(skill, def, cx, cy, r, target = _pt_nodesLayer) {
     const src = (def && def.sprite) || skill.sprite;
     if (!src) return;
@@ -927,6 +928,8 @@ function _ptBuildReworkNodeCard(id) {
 }
 
 
+// Clipboard copy through a hidden textarea, for pages where the clipboard API
+// is unavailable (file://).
 function _ptCopyReworkTextFallback(text) {
     if (typeof document.execCommand !== 'function') return false;
     const previousFocus = document.activeElement;
@@ -950,6 +953,7 @@ function _ptCopyReworkTextFallback(text) {
     }
 }
 
+// Copies rework text to the clipboard; resolves to true on success.
 function _ptCopyReworkText(text) {
     const protocol = typeof location !== 'undefined' ? location.protocol : '';
     const clipboard = typeof navigator !== 'undefined' ? navigator.clipboard : null;
@@ -967,7 +971,6 @@ function _ptCopyReworkText(text) {
 
 //------------------------------------------------------------------------
 //------------------DRAW NODES - EVENT HELPERS----------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Attaches all mouse interaction handlers to a node element.
@@ -1058,7 +1061,6 @@ export function _ptBindNodeEvents() {
 //------------------------------------------------------------------------
 //----------------------------DRAW NODES----------------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // Builds and appends a single node <div> for the given skill.
 // Shape, icon, and events are handled by the helpers above.
@@ -1078,6 +1080,7 @@ function _ptGetNodeRadius(skill) {
     return PT_NODE_RADIUS * 1.12;
 }
 
+// Strips a pooled node element back to a blank div.
 function _ptResetNodeElement(node) {
     while (node.firstChild) node.removeChild(node.firstChild);
     node.className = '';
@@ -1087,12 +1090,15 @@ function _ptResetNodeElement(node) {
     delete node.dataset.ptArtPending;
 }
 
+// Takes a pooled node element (or creates one), reset and ready.
 function _ptAcquireNodeElement() {
     const node = _pt_nodePool.pop() || document.createElement('div');
     _ptResetNodeElement(node);
     return node;
 }
 
+// Creates the DOM for one tree node (shape, icon, rework marker) and
+// registers it; returns the existing one if already mounted.
 function _ptMountNode(skill, target) {
     if (_pt_nodeEls[skill.id]) return _pt_nodeEls[skill.id];
     const cx = skill._worldX;
@@ -1129,6 +1135,8 @@ function _ptMountNode(skill, target) {
     return node;
 }
 
+// Removes a node's DOM (and its sprite), hides its tooltip if hovered, and
+// pools the element.
 function _ptUnmountNode(id) {
     const node = _pt_nodeEls[id];
     if (!node) return;
@@ -1144,6 +1152,7 @@ function _ptUnmountNode(id) {
     if (_pt_nodePool.length < PT_NODE_POOL_LIMIT) _pt_nodePool.push(node);
 }
 
+// Computes a node's world position and radius, then mounts it.
 function _ptDrawNode(skill, offsetX, offsetY) {
     skill._worldX = skill.x + offsetX;
     skill._worldY = skill.y + offsetY;
@@ -1151,6 +1160,7 @@ function _ptDrawNode(skill, offsetX, offsetY) {
     _ptMountNode(skill, _pt_nodesLayer);
 }
 
+// Draws every node of the tree.
 export function _ptDrawNodes(bounds) {
     const { offsetX, offsetY } = _ptComputeOffsets(bounds);
     globalThis._pt_skills.forEach(skill => _ptDrawNode(skill, offsetX, offsetY));
@@ -1161,7 +1171,6 @@ export function _ptDrawNodes(bounds) {
 
 //------------------------------------------------------------------------
 //---------------------SEARCH - NODE HELPERS------------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Builds the search haystack string for a single skill definition.
@@ -1205,7 +1214,6 @@ function _ptClearSearchNodeStyle(el) {
 //------------------------------------------------------------------------
 //----------------------------SEARCH--------------------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // Applies or clears a search query across all node and connection elements.
 // Matching nodes glow; non-matching nodes are dimmed; connections are faded.
@@ -1234,6 +1242,8 @@ export function _ptApplySearch(query) {
     });
 }
 
+// Debounces search: remembers the latest query and applies it on the next
+// frame.
 function _ptScheduleSearch(query) {
     _pt_pendingSearchQuery = query.trim().toLowerCase();
     if (_pt_searchFrame) return;
@@ -1245,6 +1255,7 @@ function _ptScheduleSearch(query) {
     else _pt_searchFrame = setTimeout(run, 0);
 }
 
+// Cancels a pending search frame.
 function _ptCancelScheduledSearch() {
     if (!_pt_searchFrame) return;
     if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(_pt_searchFrame);
@@ -1339,8 +1350,9 @@ function _ptCreateSearchBar() {
 //------------------------------------------------------------------------
 //-----------------------------RENDERER-----------------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
+// Prepares the #pt-canvas container and clears all render state before a
+// redraw. Returns null if the container is missing.
 function _ptResetRenderState() {
     const container = document.getElementById('pt-canvas');
     if (!container) { console.error('[PassiveTree] #pt-canvas not found'); return null; }
@@ -1441,6 +1453,8 @@ function _ptCreateNodesLayer(worldW, worldH) {
     return layer;
 }
 
+// Works out world size and per-node/connection geometry for the virtualized
+// renderer.
 function _ptPrepareRenderLayout(bounds) {
     const { offsetX, offsetY } = _ptComputeOffsets(bounds);
     const worldW = bounds.maxX - bounds.minX + (PT_PADDING + PT_NODE_RADIUS) * 2;
@@ -1478,6 +1492,9 @@ function _ptPrepareRenderLayout(bounds) {
     return _pt_renderLayout;
 }
 
+// Mounts only the nodes and connections inside the visible area for the
+// current pan/zoom and unmounts the rest. Returns how many of each are
+// mounted.
 export function _ptUpdateVirtualViewport(scale, tx, ty) {
     if (!_pt_renderLayout || !_pt_container) return { nodes: 0, connections: 0 };
     const width = _pt_container.clientWidth;
@@ -1593,6 +1610,9 @@ function _ptInjectSearchBar() {
     existingWrap.style.cssText = searchBar.style.cssText;
 }
 
+// Renders the tree screen: builds the world, SVG and node layers (nodes and
+// connections are mounted lazily by the virtual viewport), binds events, the
+// search bar and the stat summary, then fits the view.
 export function _ptRender() {
     if (!_ptResetRenderState()) return;
 

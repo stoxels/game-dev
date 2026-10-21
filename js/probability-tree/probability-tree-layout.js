@@ -1,3 +1,11 @@
+//------------------------------------------------------------------------
+//-------------------TREE LAYOUT------------------------------------------
+//------------------------------------------------------------------------
+// Spreads the tree nodes so they do not overlap (relaxation passes), and keeps a
+// fingerprinted precomputed layout so the work is only redone when the tree
+// geometry changes.
+//------------------------------------------------------------------------
+
 const PASSIVE_TREE_LAYOUT_VERSION = 2;
 
 const LAYOUT_START_ID = 1;
@@ -34,10 +42,13 @@ const LAYOUT_RADII = Object.freeze({
 });
 const CLASS_START_IDS = new Set([1001, 1002, 1003]);
 
+// Collision radius for a node, by its tier.
 function layoutRadius(node) {
     return LAYOUT_RADII[node && node.tier] || LAYOUT_RADII.notable;
 }
 
+// Scale factor that stretches positions near the inner-circle hubs; the start
+// node and class starts get fixed factors.
 function innerCircleLayoutScale(node, nodesById) {
     if (node.id === LAYOUT_START_ID) return 1;
     if (CLASS_START_IDS.has(node.id)) return LAYOUT_SCALE;
@@ -63,6 +74,8 @@ function innerCircleLayoutScale(node, nodesById) {
     return INNER_CIRCLE_SCALE + (LAYOUT_SCALE - INNER_CIRCLE_SCALE) * smoothT;
 }
 
+// Cleanup passes after relaxing: pushes overlapping nodes apart (grid lookup)
+// and keeps edges at least a minimum length. Pinned nodes never move.
 function enforceLayoutConstraints(xs, ys, radii, fixed, edgePairs) {
     const count = xs.length;
     const minimumGap = LAYOUT_NODE_GAP + LAYOUT_ROUND_SAFETY;
@@ -150,6 +163,8 @@ function enforceLayoutConstraints(xs, ys, radii, fixed, edgePairs) {
     }
 }
 
+// Spreads the tree nodes so they do not overlap, with a force-style
+// relaxation over the node and edge lists. Returns the nodes with new x/y.
 export function relaxPassiveTreeLayout(nodes, connections) {
     if (!Array.isArray(nodes) || nodes.length < 2) return nodes;
 
@@ -287,6 +302,7 @@ export function relaxPassiveTreeLayout(nodes, connections) {
     }));
 }
 
+// Small 32-bit text hash (FNV style) used for the layout fingerprint.
 function hashLayoutText(text, seed) {
     let hash = seed >>> 0;
     for (let i = 0; i < text.length; i += 1) {
@@ -296,6 +312,8 @@ function hashLayoutText(text, seed) {
     return hash >>> 0;
 }
 
+// A text fingerprint of the tree geometry (ids, positions, tiers, pins,
+// edges), used to tell whether a stored layout is still valid.
 export function passiveTreeLayoutFingerprint(nodes, connections) {
     const geometry = JSON.stringify({
         nodes: (Array.isArray(nodes) ? nodes : []).map(node => [node.id, node.x, node.y, node.tier || '', node.layoutPinned === true ? 1 : 0]),
@@ -306,6 +324,8 @@ export function passiveTreeLayoutFingerprint(nodes, connections) {
     return first + second;
 }
 
+// True when the stored precomputed layout matches the current version, node
+// list and fingerprint.
 export function isPassiveTreeLayoutCacheValid(data) {
     const cache = data && data.precomputedLayout;
     if (!cache || cache.version !== PASSIVE_TREE_LAYOUT_VERSION || !Array.isArray(cache.positions)) return false;
@@ -322,6 +342,8 @@ export function isPassiveTreeLayoutCacheValid(data) {
     return data.nodes.every(node => ids.has(node.id));
 }
 
+// Returns the tree data with a precomputed layout attached (reuses the stored
+// one when it is still valid).
 export function precomputePassiveTreeLayoutData(data) {
     if (isPassiveTreeLayoutCacheValid(data)) {
         return { ...data, precomputedLayout: data.precomputedLayout };
@@ -337,6 +359,8 @@ export function precomputePassiveTreeLayoutData(data) {
     };
 }
 
+// The node list with final positions: from the stored layout when valid,
+// otherwise freshly relaxed.
 export function resolvePassiveTreeLayout(data) {
     if (!isPassiveTreeLayoutCacheValid(data)) {
         return relaxPassiveTreeLayout(data.nodes, data.connections);

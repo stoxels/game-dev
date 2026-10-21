@@ -16,6 +16,8 @@ export const PT_REWORKED_NODE_IDS = Object.freeze([1002, 1001, 1003, 31193, 3119
 // tracks. Building the set lazily keeps module init order irrelevant and
 // costs one pass over the node array on first use.
 let _effectsReworkedIds = null;
+// Ids of nodes that carry data-driven effects, built once from the tree data.
+// These count as reworked too.
 function _effectReworkedIdSet() {
     if (!_effectsReworkedIds) {
         _effectsReworkedIds = new Set(
@@ -27,6 +29,8 @@ function _effectReworkedIdSet() {
     return _effectsReworkedIds;
 }
 
+// True when the node was reworked (listed by hand or driven by the effect
+// registry).
 export function isPassiveTreeNodeReworked(id) {
     return PT_REWORKED_NODE_IDS.includes(id) || _effectReworkedIdSet().has(Number(id));
 }
@@ -45,6 +49,7 @@ export function isPassiveTreeNodeReworked(id) {
 // mechanic the game does not have yet - reserved for future puzzle work).
 export const PT_REWORK_PROPOSALS = Object.freeze({});
 
+// The written rework proposal for a node, or null when there is none.
 export function getPassiveTreeNodeProposal(id) {
     return PT_REWORK_PROPOSALS[Number(id)] || null;
 }

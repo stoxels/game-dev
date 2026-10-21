@@ -1,11 +1,17 @@
 import { _pt_container, _ptUpdateVirtualViewport, _pt_world } from './probability-tree-ui.js';
 import { getPassiveTreeRootId, PT_FOCUS_SCALE, PT_NODE_RADIUS, PT_PADDING, PT_START_ID, PT_ZOOM_MAX, PT_ZOOM_MIN, PT_ZOOM_STEP } from './probability-tree.js';
 import { STATE } from '../state.js';
-//--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
+// Accessors: other files reassign these through globalThis.
 try { Object.defineProperty(globalThis, '_pt_mouseDownTime', { get() { return _pt_mouseDownTime; }, set(v) { _pt_mouseDownTime = v; }, configurable: true }); } catch (e) {}
 //------------------------------------------------------------------------
-//-------------------CONSTANTS & STATE-------------------------------------
+//-------------------TREE VIEWPORT----------------------------------------
 //------------------------------------------------------------------------
+// Pan, zoom and touch handling for the Probability Tree canvas, plus fitting
+// and centering the view on nodes.
+//------------------------------------------------------------------------
+
+//------------------------------------------------------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 
 // Viewport transform state – applied to _pt_world every frame
@@ -50,7 +56,6 @@ const PT_LAST_NODE_OFFSET_X = 0;
 //------------------------------------------------------------------------
 //-------------------TRANSFORM HELPERS--------------------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // Clamps a raw scale value to [PT_ZOOM_MIN, PT_ZOOM_MAX].
 function _ptClampScale(rawScale) {
@@ -91,6 +96,8 @@ function _ptApplyTransform() {
     _ptUpdateVirtualViewport(_pt_scale, _pt_tx, _pt_ty);
 }
 
+// Applies the pan/zoom transform on the next animation frame (several changes
+// in one frame are merged); optionally syncs the zoom bar.
 function _ptScheduleTransform(syncZoom) {
     _pt_pendingZoomSync = _pt_pendingZoomSync || syncZoom;
     if (_pt_transformFrame) return;
@@ -107,6 +114,7 @@ function _ptScheduleTransform(syncZoom) {
     else flush();
 }
 
+// Cancels pending frames and any drag, e.g. when the tree screen closes.
 export function _ptSuspendViewport() {
     if (_pt_transformFrame && typeof cancelAnimationFrame === 'function') {
         cancelAnimationFrame(_pt_transformFrame);
@@ -122,7 +130,6 @@ export function _ptSuspendViewport() {
 
 //------------------------------------------------------------------------
 //-------------------CAMERA & NODE POSITIONING------------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Computes the pixel position of a node inside the world div,
@@ -147,6 +154,8 @@ function _ptCenterOnNode(skill, bounds) {
     _ptApplyTransform();
 }
 
+// Zooms to the focus scale and centers the view on a node. Returns false if
+// there is nothing to focus.
 export function _ptFocusNode(skill, bounds) {
     if (!skill || !_pt_container) return false;
     _pt_scale = _ptClampScale(PT_FOCUS_SCALE);
@@ -311,7 +320,6 @@ function _ptOnZoomBarInput(zoomBar) {
 
 //------------------------------------------------------------------------
 //-------------------EVENT BINDING-------------------------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Registers all viewport input listeners on the container (and on window

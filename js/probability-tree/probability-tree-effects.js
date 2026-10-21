@@ -1,8 +1,13 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { cur } from '../state.js';
-// Residual Analysis
 
-
+//------------------------------------------------------------------------
+//-------------------TREE SKILL EFFECTS (VISUAL)--------------------------
+//------------------------------------------------------------------------
+// Visual effects played when passive tree nodes trigger: Residual Analysis,
+// Sample Efficiency, Stochastic Resonance, time gain, shield / stasis overlays
+// and the Confidence Interval.
+//------------------------------------------------------------------------
 
 // ⚡🔬 Residual Analysis: High-Voltage Lightning Strike Effect
 export function playResidualAnalysisEffect(row, col) {
@@ -457,7 +462,6 @@ export function playStochasticResonanceEffect(mistakeRow, mistakeCol, targetRow,
 
 //------------------------------------------------------------------------
 //-------------------REUSABLE PASSIVE PROC EFFECTS-----------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 // Small shared visual feedback effects for passive-tree procs that only
 // showed a toast before. All of them are purely cosmetic and fail soft

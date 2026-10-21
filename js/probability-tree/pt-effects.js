@@ -1,27 +1,12 @@
-// pt-effects.js - passive-tree EFFECT REGISTRY (bulk-node pipeline, phase 1).
-//
-// Why this exists: reworking nodes one by one touched five places per node
-// (data.js statKey + hand-written EN/DE desc, a bonus-table entry in
-// hub-leveling.js, seeding/labels in combat-player-stats.js and
-// translation strings). With 1000+ stat-stick nodes to author that is not
-// feasible. This registry makes a plain stat node a SINGLE data.js line:
-//
-//     "effects": ["str_flat:5"]
-//
-// One effect = ONE stat channel + ONE localised template line. Composite
-// nodes simply list several effects (one per advertised line, matching the
-// rework rule "one stat per line"). The stat channels accumulate through
-// the generic scan in hub-leveling.js (_getPassiveTreeTravelBonuses)
-// and the tooltip text is generated in both languages by
-// ptResolveNodeDesc(), so no hand-written descEn/descDe and no per-node
-// bonus-table entry are needed.
-//
-// Spec syntax in data.js: "<key>:<value>" (e.g. "melee_phys_inc:12").
-// A bare key ("str_flat") is shorthand for value 1.
-//
-// Bespoke keystones with unique mechanics keep the legacy path:
-// hand-written descEn/descDe win over generation, and a statKey plus a
-// bonus-table entry still work exactly as before. Both pipelines coexist.
+//------------------------------------------------------------------------
+//-------------------TREE EFFECT REGISTRY---------------------------------
+//------------------------------------------------------------------------
+// A plain stat node is one data line: "effects": ["str_flat:5"] ("<key>:<value>",
+// a bare key means 1). Each effect is one stat channel plus one EN/DE template;
+// composite nodes list several. Channels accumulate in hub-leveling.js and the
+// tooltip text is built by ptResolveNodeDesc(). Bespoke keystones keep the
+// legacy path (hand-written descEn/descDe, statKey + bonus table); both coexist.
+//------------------------------------------------------------------------
 
 export const PT_EFFECT_DEFS = Object.freeze({
     // --- attributes -------------------------------------------------------
@@ -936,6 +921,8 @@ export function ptIsReservedNode(node) {
     return /^Reserved/.test(node.nameEn || '') || /^reserved_/.test(node.statKey || '');
 }
 
+// Icon for a node: a hand-picked one if listed, otherwise derived from its
+// first non-trivial effect key (none for start nodes).
 export function ptDerivedNodeEmoji(node) {
     if (!node || node.tier === 'start') return '';
     if (PT_DESC_ICON_BY_ID[node.id]) return PT_DESC_ICON_BY_ID[node.id];

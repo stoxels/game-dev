@@ -11,14 +11,21 @@ import { resolvePassiveTreeLayout } from './probability-tree-layout.js';
 import { ptHasSkill } from './probability-tree-state-points.js';
 import { _ptRender } from './probability-tree-ui.js';
 import { _ptSuspendViewport } from './probability-tree-viewport.js';
-import { STATE } from '../state.js';
-import { cur } from '../state.js';
-//--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
+import { STATE, cur } from '../state.js';
+// Accessors: other files reassign these through globalThis.
 try { Object.defineProperty(globalThis, '_ptReturnScreen', { get() { return _ptReturnScreen; }, set(v) { _ptReturnScreen = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_ptReturnWorldIndex', { get() { return _ptReturnWorldIndex; }, set(v) { _ptReturnWorldIndex = v; }, configurable: true }); } catch (e) {}
 //------------------------------------------------------------------------
-//-------------------CONSTANTS & STATE-------------------------------------
+//-------------------PASSIVE TREE SCREEN----------------------------------
 //------------------------------------------------------------------------
+// Opens, closes and routes the Probability Tree screen: class start nodes,
+// the K keybind, overlay mode over a running puzzle, point rewards and the
+// return-screen bookkeeping. Allocation lives in probability-tree-state-points.js,
+// drawing in probability-tree-ui.js, pan/zoom in probability-tree-viewport.js.
+//------------------------------------------------------------------------
+
+//------------------------------------------------------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 
 // The legacy ID 1 is the Ascendancy Gate in the development layout. The
@@ -30,11 +37,13 @@ const PT_CLASS_START_IDS = Object.freeze({
     probabilist: 1003,
 });
 
+// Id of the current character's start node (null when there is no state yet).
 export function getPassiveTreeRootId() {
     if (typeof STATE === 'undefined' || !STATE) return null;
     return getPassiveTreeCharacterRootId(STATE) || PT_CLASS_START_IDS[STATE.playerClass] || null;
 }
 
+// True for the three class start nodes.
 export function isPassiveTreeStartNode(id) {
     return id === PT_CLASS_START_IDS.statistician
         || id === PT_CLASS_START_IDS.mathmagician
@@ -78,7 +87,6 @@ let _ptReturnWorldIndex = null;
 
 //------------------------------------------------------------------------
 //-------------------TREE DATA INITIALISATION-----------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // These functions populate the shared _pt_skills, _pt_conns, and
@@ -142,7 +150,6 @@ if (typeof document !== 'undefined' && document.readyState !== 'complete') {
 //------------------------------------------------------------------------
 //-------------------PT MODULE--------------------------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // PT is a lightweight module that exposes the public API used by the UI.
 // Tree data is loaded once at startup above - PT itself has no data
@@ -161,7 +168,6 @@ export const PT = (() => {
 
 //------------------------------------------------------------------------
 //-------------------SCREEN BUILD & NAVIGATION----------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Renders a loading placeholder into the canvas element.
@@ -304,11 +310,13 @@ function _ptOverlayResume() {
     } catch (e) {}
 }
 
+// Hides the player avatars while the tree overlay is open over a puzzle.
 function _ptHideAvatars() {
     try { if (typeof globalThis._hidePlayerAvatarSimple === 'function') globalThis._hidePlayerAvatarSimple(); } catch (e) {}
     try { if (typeof globalThis._hidePlayerAvatar === 'function') globalThis._hidePlayerAvatar(); } catch (e) {}
 }
 
+// Shows the player avatars again when the overlay closes.
 function _ptShowAvatars() {
     try { if (typeof globalThis._showPlayerAvatarSimple === 'function') globalThis._showPlayerAvatarSimple(); } catch (e) {}
     try { if (typeof globalThis._showPlayerAvatar === 'function') globalThis._showPlayerAvatar(); } catch (e) {}
@@ -359,76 +367,69 @@ export function closeTreeToGame() {
 }
 
 // K keybind: toggles the tree over a running puzzle, or opens it from menu
-// screens (existing return-screen behaviour untouched there).
-// NOTE: unlike ability hotkeys this deliberately does NOT use
-// _abilityHotkeysBlocked() - that gate blocks classless characters, but the
-// tree needs no class (same reason B opens the sheet classless). Only real
-// blockers are checked: modals, question overlays, text input (already
-// filtered by the dispatcher) and death.
-// Phase 3 step 5: this file now evaluates as a module BEFORE keybinds.js
-    // (classic load order had it after), so the guard below was always true at
-    // eval time and would now silently be false. Defer to DOMContentLoaded -
-    // by then the full global surface exists and gameplay has not started
-    // (same pattern as tutorial-quest.js's _tqIntegrate). NOTE: deferred
-    // module scripts execute at readyState 'interactive', so 'loading' alone
-    // is not enough - both pre-complete states must wait (the skill-hotbar P
-    // bug was this exact miss).
-    if (typeof document !== 'undefined' && document.readyState !== 'complete') {
-        document.addEventListener('DOMContentLoaded', _ptWireKeybinds);
-    } else {
-        _ptWireKeybinds();
-    }
-    export function _ptWireKeybinds() {
+// screens (existing return-screen behaviour untouched there). Unlike ability
+// hotkeys it does NOT use _abilityHotkeysBlocked(), which blocks classless
+// characters; the tree needs no class. Only real blockers are checked: modals,
+// question overlays and death (text input is already filtered by the dispatcher).
+export function _ptWireKeybinds() {
     if (typeof globalThis.onKeybindAction === 'function') {
-    globalThis.onKeybindAction('passive-tree', () => {
-        // Toggle-close: the tree screen is not a .modal-bg, so the shared
-        // hotkey gate would not know about it - check first, like P does.
-        try {
-            if (document.getElementById('screen-passive-tree')?.classList.contains('active')) {
-                ptGoBack();
+        globalThis.onKeybindAction('passive-tree', () => {
+            // Toggle-close: the tree screen is not a .modal-bg, so the shared
+            // hotkey gate would not know about it - check first, like P does.
+            try {
+                if (document.getElementById('screen-passive-tree')?.classList.contains('active')) {
+                    ptGoBack();
+                    return false;
+                }
+            } catch (e) {}
+            // The character-sheet overlay owns its own stack (its tree button is
+            // hidden by design) - B closes it first, K stays out of the way.
+            try {
+                if (typeof globalThis.isHubGameOverlay === 'function' && globalThis.isHubGameOverlay()) return false;
+            } catch (e) {}
+            // A question modal (quiz / math gate / scouts primer) is a fixed
+            // overlay that would float above the tree screen - answer it first.
+            try {
+                if (document.getElementById('quiz-overlay')?.classList.contains('show')) return false;
+                if (document.getElementById('mg-modal')?.classList.contains('show')) return false;
+                if (document.getElementById('primer-overlay')) return false;
+            } catch (e) {}
+            // Any modal backdrop (spell book, pause dialogs, ...) owns the keys.
+            try {
+                if (document.querySelector('.modal-bg.show, .cs-overlay.show, #class-selection-overlay.show')) return false;
+            } catch (e) {}
+            try { if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return false; } catch (e) {}
+            // Overlay open: only from a live game screen. Any other screen
+            // (mode-select, Nexus, level select, hub, ...) keeps the menu path -
+            // with the CURRENT screen as the return target, so a stale
+            // _ptReturnScreen (e.g. 'screen-game' left over from an earlier
+            // overlay open) can never strand the BACK button.
+            const gameActive = document.getElementById('screen-game')?.classList.contains('active');
+            if (gameActive && typeof cur !== 'undefined' && cur) {
+                try { openTreeFromGame(); } catch (e) {}
                 return false;
             }
-        } catch (e) {}
-        // The character-sheet overlay owns its own stack (its tree button is
-        // hidden by design) - B closes it first, K stays out of the way.
-        try {
-            if (typeof globalThis.isHubGameOverlay === 'function' && globalThis.isHubGameOverlay()) return false;
-        } catch (e) {}
-        // A question modal (quiz / math gate / scouts primer) is a fixed
-        // overlay that would float above the tree screen - answer it first.
-        try {
-            if (document.getElementById('quiz-overlay')?.classList.contains('show')) return false;
-            if (document.getElementById('mg-modal')?.classList.contains('show')) return false;
-            if (document.getElementById('primer-overlay')) return false;
-        } catch (e) {}
-        // Any modal backdrop (spell book, pause dialogs, ...) owns the keys.
-        try {
-            if (document.querySelector('.modal-bg.show, .cs-overlay.show, #class-selection-overlay.show')) return false;
-        } catch (e) {}
-        try { if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return false; } catch (e) {}
-        // Overlay open: only from a live game screen. Any other screen
-        // (mode-select, Nexus, level select, hub, ...) keeps the menu path -
-        // with the CURRENT screen as the return target, so a stale
-        // _ptReturnScreen (e.g. 'screen-game' left over from an earlier
-        // overlay open) can never strand the BACK button.
-        const gameActive = document.getElementById('screen-game')?.classList.contains('active');
-        if (gameActive && typeof cur !== 'undefined' && cur) {
-            try { openTreeFromGame(); } catch (e) {}
+            try {
+                const activeId = document.querySelector('.screen.active')?.id;
+                showPassiveTree(activeId || undefined);
+            } catch (e) { try { showPassiveTree(); } catch (e2) {} }
             return false;
-        }
-        try {
-            const activeId = document.querySelector('.screen.active')?.id;
-            showPassiveTree(activeId || undefined);
-        } catch (e) { try { showPassiveTree(); } catch (e2) {} }
-        return false;
-    });
+        });
     }
+}
+
+// Register on page load: this module evaluates before keybinds.js. Deferred
+// module scripts run at readyState 'interactive', so both pre-complete states
+// must wait for DOMContentLoaded.
+if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', _ptWireKeybinds);
+} else {
+    _ptWireKeybinds();
 }
 
 
 //------------------------------------------------------------------------
 //-------------------ITEM GRANT HELPER------------------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Creates one item instance from a definition ID and adds it to the
@@ -450,7 +451,6 @@ function _ptGrantItem(defId) {
 
 //------------------------------------------------------------------------
 //-------------------LEVEL COMPLETE REWARD HELPERS------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Shared roll for a single gear-node bonus drop: if the player has the
@@ -497,7 +497,6 @@ function _ptApplyProbabilistRewards() {
 
 //------------------------------------------------------------------------
 //-------------------LEVEL COMPLETE REWARDS (MAIN)------------------------
-//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Called when the player completes a level.
