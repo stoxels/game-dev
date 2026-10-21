@@ -5,39 +5,25 @@ import { _pendingCurrencyUse } from './loot-currency-use.js';
 import { _egRenderMapSlot, _egRenderMapStashCell } from '../endgame/endgame-gate.js';
 import { _dndChipScreenEl, _renderCurrencyCell, addCurrency } from '../hub/hub-drag-and-drop.js';
 import { _clearTooltip } from '../hub/hub-tooltips.js';
-import { CURRENCY_COLS, _currencySlotForId, _currencyStash, _egGetMapTierGrid, _inventory, _egMapStash, _renderInventoryCell, _updateInvCount, saveHubState } from '../hub/hub.js';
+import { CURRENCY_COLS, _currencySlotForId, _currencyStash, _egGetMapTierGrid, _inventory, _renderInventoryCell, _updateInvCount, saveHubState } from '../hub/hub.js';
 
 //------------------------------------------------------------------------
-//-------------------ENDGAME ORB SHARDS (SELL SYSTEM)---------------------
+//-------------------ORB SHARDS (SELL SYSTEM)-----------------------------
 //------------------------------------------------------------------------
-// Orb shards are fragments of currency orbs obtained by "selling" an item
-// from the main stash via Ctrl + left-click. The sold item is destroyed
-// without any confirmation popup and grants exactly one shard.
-//
-// Shard quality scales with the number of stats on the sold item - the
-// more stats, the higher the chance for a better shard ("better" = a shard
-// that transmutes into an orb affecting epic-grade gear).
-//
-// Shards live in the runes & orbs strip like normal currency. They stack
-// up to 10 (3 for Horizon Fragments); reaching the cap automatically
-// converts the stack into the matching orb (or just bumps the existing orb
-// counter).
-//
-// Load AFTER hub.js and hub-drag-and-drop.js (needs
-// _inventory, _renderInventoryCell, addCurrency, saveHubState,
-// showToast) and AFTER endgame-currency.js (needs _pendingCurrencyUse).
+// Ctrl + left-click destroys a stash item and grants one orb shard (maps
+// grant a Horizon Fragment). Shard quality scales with the item's stat count.
+// A full stack (10, or 3 for Horizon) converts into the matching orb.
 //------------------------------------------------------------------------
-
 
 //------------------------------------------------------------------------
 //-------------------SHARD DEFINITIONS------------------------------------
 //------------------------------------------------------------------------
 
-// Each shard maps 1:1 to its parent orb. name/description are resolved
-// through t() so translations stay in translations-strings.js.
+// Each shard maps 1:1 to its parent orb. Names and descriptions are looked up
+// through t() on every read (see the getters below the table).
 
-export const SHARD_STACK_MAX = 10;
-export const SHARD_HORIZON_STACK_MAX = 3;
+const SHARD_STACK_MAX = 10;
+const SHARD_HORIZON_STACK_MAX = 3;
 
 export const SHARD_DEFS = {
     shard_transmutation: {
@@ -99,6 +85,7 @@ export const SHARD_DEFS = {
     },
 };
 
+// Replace the fixed name/description with live lookups so a language switch applies.
 for (const [id, def] of Object.entries(SHARD_DEFS)) {
     const nameKey = `eg_${id}`;
     Object.defineProperties(def, {
@@ -117,7 +104,7 @@ for (const [id, def] of Object.entries(SHARD_DEFS)) {
 // effectiveWeight = weight * (1 + statCount * statScale).
 // The epic-affecting shards (ascension / elevation / cataclysm) have the
 // highest scaling so stat-rich items yield better shards more often.
-export const SHARD_ROLL_TABLE = [
+const SHARD_ROLL_TABLE = [
     { id: 'shard_transmutation', weight: 220, statScale: 0.00 },
     { id: 'shard_alchemy',       weight: 200, statScale: 0.06 },
     { id: 'shard_chaos',         weight: 90,  statScale: 0.14 },
@@ -129,7 +116,7 @@ export const SHARD_ROLL_TABLE = [
 
 // Counts the total number of rolled stats on an item (each mod carries one
 // or more rolledStats entries; hybrid mods roll two stats at once).
-export function _countItemStats(item) {
+function _countItemStats(item) {
     if (!item || !Array.isArray(item.mods)) return 0;
     let count = 0;
     for (const mod of item.mods) {
@@ -162,15 +149,14 @@ export function _rollShardForItem(item) {
 //-------------------ADD SHARD TO RUNES & ORBS STRIP----------------------
 //------------------------------------------------------------------------
 
-// Adds `amount` of a shard type to its FIXED currency slot with a stack cap of
-// SHARD_STACK_MAX (3 for Horizon Fragments). Every full stack
-// automatically converts into the shard's parent orb via addCurrency()
-// (which merges into its own fixed orb slot). Returns true when granted.
+// Adds `amount` of a shard type to its fixed currency slot. Every full stack
+// (10, or 3 for Horizon Fragments) converts into the parent orb via
+// addCurrency(). Returns true when granted.
 export function addShard(id, amount = 1, def = null) {
     const shardDef = def || SHARD_DEFS[id];
     if (!shardDef) return false;
     const stackMax = shardDef.stackSize || SHARD_STACK_MAX;
-    const pos = (typeof _currencySlotForId === 'function') ? _currencySlotForId(id) : null;
+    const pos = _currencySlotForId(id);
     if (!pos) {
         console.warn(`[Shards] No fixed slot for "${id}".`);
         return false;
@@ -217,8 +203,8 @@ export function addShard(id, amount = 1, def = null) {
     return true;
 }
 
-// Resolves the translation key of a shard's parent orb name.
-export function _shardOrbNameKey(orbId) {
+// Returns the translation key of a parent orb's name (null for unknown ids).
+function _shardOrbNameKey(orbId) {
     switch (orbId) {
         case 'orb_transmutation': return 'eg_orb_transmutation';
         case 'orb_alchemy':       return 'eg_orb_alchemy';
@@ -233,9 +219,9 @@ export function _shardOrbNameKey(orbId) {
     }
 }
 
-// Consumes one full shard stack and grants the parent orb. The orb is
-// added through addCurrency so an existing orb stack just increments.
-export function _convertShardsToOrb(shardDef) {
+// Consumes one full shard stack and grants the parent orb (an existing orb
+// stack just goes up by one).
+function _convertShardsToOrb(shardDef) {
     const nameKey = _shardOrbNameKey(shardDef.orbId);
     addCurrency(shardDef.orbId, 1, {
         id: shardDef.orbId,
@@ -252,7 +238,7 @@ export function _convertShardsToOrb(shardDef) {
         .replace('{shard}', shardDef.name)
         .replace('{icon}', shardDef.orbIcon)
         .replace('{orb}', nameKey ? t(nameKey) : shardDef.orbId));
-    if (typeof trackAchStat === 'function') try { trackAchStat('egShardsConverted', 1); } catch(e){}
+    try { trackAchStat('egShardsConverted', 1); } catch(e){}
 }
 
 
@@ -263,7 +249,7 @@ export function _convertShardsToOrb(shardDef) {
 // Destroys the stash item in the given cell and grants one rolled shard.
 // Selling a UNIQUE item always grants an Ancient Shard (10 → Ancient Orb).
 // No confirmation popup - the sale is instant. Returns true on success.
-export function _sellStashItem(row, col) {
+function _sellStashItem(row, col) {
     const item = _inventory[row][col];
     if (!item) return false;
 
@@ -276,9 +262,7 @@ export function _sellStashItem(row, col) {
         _clearTooltip();
         saveHubState();
 
-        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-            Audio_Manager.playSFX('player_equip_pickup');
-        }
+        Audio_Manager.playSFX('player_equip_pickup');
         globalThis.showToast(t('eg_sell_item_no_value').replace('{name}', item.name || '???'));
         return true;
     }
@@ -309,14 +293,14 @@ export function _sellStashItem(row, col) {
         .replace('{name}', item.name || '???')
         .replace('{icon}', shardDef.icon)
         .replace('{shard}', shardDef.name));
-    if (typeof trackAchStat === 'function') try { trackAchStat('egItemsSold', 1); } catch(e){}
+    try { trackAchStat('egItemsSold', 1); } catch(e){}
     return true;
 }
 
 // Destroys a map item and grants exactly one Horizon Fragment (the
 // map-only sell currency). Shared by map-stash and map-device sells.
 // Returns true on success.
-export function _sellMapItem(map, sourceEl) {
+function _sellMapItem(map, sourceEl) {
     if (!map) return false;
 
     const shardDef = SHARD_DEFS.shard_horizon;
@@ -339,23 +323,17 @@ export function _sellMapItem(map, sourceEl) {
 }
 
 // Sells the map in the given map stash cell for one Horizon Fragment.
-export function _egSellMapStashItem(row, col) {
+function _egSellMapStashItem(row, col) {
     const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? globalThis._egMapStashActiveTier : 1);
     let map = null;
-    try {
-        if (typeof _egGetMapTierGrid === 'function') map = _egGetMapTierGrid(activeTier)[row][col];
-        else map = _egMapStash[row][col];
-    } catch(e) { map = null; }
+    try { map = _egGetMapTierGrid(activeTier)[row][col]; } catch(e) { map = null; }
     if (!map) return false;
 
     const cellEl = document.querySelector(
         `.eg-map-stash-cell[data-row="${row}"][data-col="${col}"]`);
     if (!_sellMapItem(map, cellEl)) return false;
 
-    try {
-        if (typeof _egGetMapTierGrid === 'function') _egGetMapTierGrid(activeTier)[row][col] = null;
-        else _egMapStash[row][col] = null;
-    } catch(e) {}
+    try { _egGetMapTierGrid(activeTier)[row][col] = null; } catch(e) {}
     _egRenderMapStashCell(row, col);
     saveHubState();
     return true;
@@ -363,7 +341,7 @@ export function _egSellMapStashItem(row, col) {
 
 // Sells the map currently loaded into the Probability Gate device slot
 // for one Horizon Fragment.
-export function _sellDeviceMap() {
+function _sellDeviceMap() {
     const map = globalThis._egMapSlotItem;
     if (!map) return false;
 
@@ -376,25 +354,20 @@ export function _sellDeviceMap() {
     return true;
 }
 
-// Capture-phase mousedown handler - intercepts Ctrl + left-click on items
-// in the MAIN stash, on MAPS in the map stash / map device slot (gate or
-// hub screen). Equipment sells into a random orb shard; maps always sell
-// into a Horizon Fragment. Registered at script load time so it fires
-// before the DnD pick-up listener (bound later at hub-open time);
-// stopImmediatePropagation keeps the drag system from also picking the
-// item up.
+// Capture-phase Ctrl + left-click handler for the main stash, the map stash
+// and the map device slot. Equipment sells into a random shard, maps into a
+// Horizon Fragment. Registered at load so it runs before the drag-and-drop
+// pick-up listener, and stops that listener from also grabbing the item.
 document.addEventListener('mousedown', function (e) {
     if (!e.ctrlKey || e.button !== 0) return;
 
     const chip = e.target.closest('.sx-item-chip');
-    const onManagedScreen = !!chip && (typeof _dndChipScreenEl === 'function'
-        ? !!_dndChipScreenEl(chip)
-        : !!chip.closest('#screen-hub'));
+    const onManagedScreen = !!chip && !!_dndChipScreenEl(chip);
     if (!onManagedScreen) return;
 
     // Don't sell while an orb "use mode" selection is active - the click
     // belongs to applying the orb.
-    if (typeof _pendingCurrencyUse !== 'undefined' && _pendingCurrencyUse) return;
+    if (_pendingCurrencyUse) return;
 
     const invCell = chip.closest('.sx-inv-cell:not(.sx-currency-cell):not(.eg-map-stash-cell)');
     const mapStashCell = chip.closest('.eg-map-stash-cell');

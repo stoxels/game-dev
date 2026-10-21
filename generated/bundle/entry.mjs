@@ -208,7 +208,7 @@ import '../../js/loot/loot-requirements-core.js';
 import '../../js/loot/loot-requirements-weapons.js';
 import '../../js/loot/loot-requirements-actions.js';
 import { PLAYER_BASE_ATTRIBUTES, _sumAttributeBonuses, _computeLoadoutAttributes, _findUnmetRequirements, _simulateAndCheck, _checkMoveAllowed, _canEquipInSlot, _checkUnequipSlot, _formatRequirementPart, _getUnmetRequirementsText, _showRequirementsToast, _previewEquipAttributes, _getSwapChainBreak, _isItemBlocked, _getWeaponHands, _isTwoHandedWeapon, _isOneHandedWeapon, _isDualWielding, _hasShieldEquipped, _checkHandCompatibilityInSlot, _handErrorMessage, _healWeaponHands, _tryAutoUnequipOffhandForTwoHander, _migrateIllegalHandsToStash } from '../../js/loot/loot-requirements.js';
-import { SHARD_STACK_MAX, SHARD_HORIZON_STACK_MAX, SHARD_DEFS, SHARD_ROLL_TABLE, _countItemStats, _rollShardForItem, addShard, _shardOrbNameKey, _convertShardsToOrb, _sellStashItem, _sellMapItem, _egSellMapStashItem, _sellDeviceMap } from '../../js/loot/loot-shards.js';
+import { SHARD_DEFS, _rollShardForItem, addShard } from '../../js/loot/loot-shards.js';
 import { SCREEN_NAV, _resolveBackFn } from '../../js/combat/combat-state-navigation.js';
 import { MELEE_DAMAGE_MULT, PLAYER_CHARGE_TIME_MULT, PLAYER_DEFAULT_ATTACK_INTERVAL, PLAYER_MELEE_ANIM_DURATION_MS, PLAYER_MELEE_DAMAGE, PLAYER_MIN_ATTACK_INTERVAL, _activeBlasts, _bossCorrupted, _bossFrozen, _bossTimers, _cellInBounds, _currencyDrops, _dragChargeElements, _isActive, _isCampaignRun, _isMapRun, _itemDrops, _lootDrops, _pickupSpawnerInfo, _pickups, _recentFills } from '../../js/combat/combat-state.js';
 import '../../js/loot/unique-items.js';
