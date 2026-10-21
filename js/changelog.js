@@ -13,6 +13,45 @@ export const CHANGELOG_DATA = [
 
 
     {
+        version: "v0.33 BETA",
+        date: "21.10.2026",
+        changes: [
+            {
+                category: ["New Features", "Neue Funktionen"],
+                items: [
+                    ["Titles: 50 score titles that stack their stat bonuses, with an unlock ceremony, a titles list, your title shown before your character name and a banner showing the score to the next title. Score now also counts campaign monster kills and Atlas clears.", "Titel: 50 Score-Titel, deren Statistik-Boni sich addieren, mit Freischalt-Zeremonie, Titelliste, deinem Titel vor dem Charakternamen und einem Banner mit dem Score bis zum nächsten Titel. Der Score zählt jetzt auch Monster-Kills der Kampagne und Atlas-Abschlüsse."],
+                    ["24 new achievements in two new categories, Probability Tree and Combat, and a redesigned achievements screen.", "24 neue Erfolge in zwei neuen Kategorien, Wahrscheinlichkeitsbaum und Kampf, sowie ein überarbeiteter Erfolge-Bildschirm."],
+                    ["Wands now fire a bolt of one spell school (fire, frost, lightning or shadow) at any distance and deal no physical damage. Staves add a weaker school bolt to a smaller physical hit. Dual wielding a wand and a melee weapon lets each hand deal its own damage. Old wands and staves convert automatically.", "Zauberstäbe feuern jetzt einen Blitz einer Zauberschule (Feuer, Frost, Blitz oder Schatten) aus jeder Entfernung und verursachen keinen physischen Schaden. Stäbe fügen einem kleineren physischen Treffer einen schwächeren Schulenblitz hinzu. Mit Zauberstab und Nahkampfwaffe in beiden Händen verursacht jede Hand ihren eigenen Schaden. Alte Zauberstäbe und Stäbe werden automatisch umgewandelt."],
+                    ["Tutorial: choose the Rusted Sword or the Carved Wand before the weapon drops. The Professor's lines are shorter, and the chest with your uniform has a new look and shows tooltips for each piece.", "Tutorial: Wähle das Rostige Schwert oder den Geschnitzten Zauberstab, bevor die Waffe fällt. Die Texte des Professors sind kürzer, und die Truhe mit deiner Uniform sieht neu aus und zeigt Tooltips für jedes Teil."],
+                    ["The save slot screen has a new look: 20 slots in 4 columns, each with your character portrait, title, score, stoxels done and level.", "Der Spielstand-Bildschirm sieht neu aus: 20 Plätze in 4 Spalten, jeweils mit Charakterporträt, Titel, Score, gelösten Stoxeln und Level."],
+                    ["Many screens got the new rune-stone look: character sheet & inventory, shop, crafting bench, loot filter, mass sell, gauntlet intro, pause menu, win and lose screens, the code window and the retry dialogs. How to Play was rewritten and now covers combat, bosses, titles, Moodle codes and maps.", "Viele Bildschirme haben den neuen Runenstein-Look: Charakterblatt & Inventar, Shop, Handwerksbank, Beutefilter, Massenverkauf, Arena-Intro, Pausenmenü, Sieg- und Niederlage-Bildschirme, das Code-Fenster und die Wiederholen-Dialoge. Wie man spielt wurde neu geschrieben und behandelt jetzt Kampf, Bosse, Titel, Moodle-Codes und Karten."],
+                ],
+            },
+            {
+                category: ["Combat & Gameplay", "Kampf & Gameplay"],
+                items: [
+                    ["Campaign monsters above your level now hit up to 6x harder, and your dodge, block and parry chances shrink against them.", "Kampagnen-Monster über deinem Level treffen jetzt bis zu 6x härter, und deine Chancen auf Ausweichen, Blocken und Parieren sinken gegen sie."],
+                    ["Fireball now casts in 0.5 seconds with a 2 second cooldown and has a new look: a burning ball trailing flames. Magma Shot's cooldown dropped from 22 to 10 seconds, and it ignites with a 35% chance, plus 5% for every spell rank.", "Feuerball wirkt jetzt in 0,5 Sekunden mit 2 Sekunden Abklingzeit und sieht neu aus: ein brennender Ball mit Flammenschweif. Die Abklingzeit des Magmageschosses sank von 22 auf 10 Sekunden, und es entzündet mit 35 % Chance, plus 5 % pro Zauberrang."],
+                    ["Spell tooltips now show the damage you will really deal, including flat and increased damage, element bonuses, passive tree, charm orbs and map or quiz bonuses.", "Zauber-Tooltips zeigen jetzt den Schaden, den du wirklich verursachst, inklusive fester und erhöhter Schadens-Boni, Element-Boni, Passivbaum, Anhänger-Orbs sowie Karten- und Quiz-Boni."],
+                    ["Attack speed is now called melee charge-up speed, and bow nodes say projectile speed.", "Angriffsgeschwindigkeit heißt jetzt Aufladegeschwindigkeit im Nahkampf, und Bogen-Knoten nennen Projektilgeschwindigkeit."],
+                    ["The win screen has a four-corner layout with simpler score text, XP gained and clearer time and mistakes. No milestone reward gives more than two puzzle items.", "Der Siegbildschirm hat ein Vier-Ecken-Layout mit einfacherem Score-Text, erhaltenen EP und klarerer Zeit- und Fehleranzeige. Keine Meilenstein-Belohnung gibt mehr als zwei Puzzle-Gegenstände."],
+                    ["A new character no longer re-collects account-wide Inference rewards, and the New Title Earned window has a Continue button. The mode select screen is skipped for now: confirming the setup takes you straight to the campaign.", "Ein neuer Charakter sammelt keine kontoweiten Inferenz-Belohnungen mehr erneut, und das Fenster Neuer Titel erhalten hat einen Weiter-Button. Der Moduswahl-Bildschirm wird vorerst übersprungen: Nach dem Setup geht es direkt in die Kampagne."],
+                ],
+            },
+            {
+                category: ["Bug Fixes & Technical", "Fehlerbehebungen & Technik"],
+                items: [
+                    ["Fixed spell tooltips in the spell book disappearing every few seconds while the mouse stood still.", "Behoben: Zauber-Tooltips im Zauberbuch verschwanden alle paar Sekunden, obwohl die Maus still stand."],
+                    ["Fixed long spell names being cut off on the cast bar.", "Behoben: Lange Zaubernamen wurden auf der Zauberleiste abgeschnitten."],
+                    ["Fixed the world map showing an internal name instead of PROFESSOR for levels finished with the old Super Tutor.", "Behoben: Die Weltkarte zeigte bei Leveln mit dem alten Super-Tutor einen internen Namen statt PROFESSOR."],
+                    ["Fixed bold text in the Professor's lessons showing as a literal tag, the arena lingering over the pause menu shop, the reset achievements window opening behind the achievements screen, and Cancel in the mass sell confirmation opening the filter.", "Behoben: Fetter Text in den Lektionen des Professors erschien als Tag, die Arena blieb über dem Shop im Pausenmenü sichtbar, das Fenster zum Zurücksetzen der Erfolge öffnete sich hinter dem Erfolge-Bildschirm, und Abbrechen beim Massenverkauf öffnete den Filter."],
+                    ["Behind the scenes, combat, loot and hub code was renamed and reorganised away from the old endgame names. Saved games load unchanged.", "Im Hintergrund wurde der Kampf-, Beute- und Hub-Code von den alten Endgame-Namen weg umbenannt und neu geordnet. Spielstände laden unverändert."],
+                ],
+            },
+        ],
+    },
+
+    {
         version: "v0.32 BETA",
         date: "19.10.2026",
         changes: [
