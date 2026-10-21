@@ -7,95 +7,88 @@ import { _buildMergedModLines, _getAllEquippedItems, _getItemEffectiveAttackInte
 import { PLAYER_BASE_ATTRIBUTES, _checkHandCompatibilityInSlot, _getSwapChainBreak, _getUnmetRequirementsText, _getWeaponHands, _handErrorMessage, _previewEquipAttributes } from '../loot/loot-requirements.js';
 import { _getUniqueSpecialLines, _inferWeaponHands } from '../loot/unique-items.js';
 
-//  hub-tooltips.js
-//  HUB TOOLTIPS - extracted 2026-09-10 from hub.js
-//  (stat-block tooltip builder, mouse tracking, Alt-compare tooltip
-//  and their event listeners). Loads AFTER hub.js; the single
-//  _showHubTooltip implementation in endgame-currency.js dispatches to
-//  _buildTooltipBodyHTML / _updateCompareTooltip at runtime.
-//
 //------------------------------------------------------------------------
-//-------------------TOOLTIP----------------------------------------------
+//-------------------HUB TOOLTIPS-----------------------------------------
+//------------------------------------------------------------------------
+// The item stat-block tooltip body, cursor tracking, and the compare
+// tooltip (shown while Alt is held or Auto-compare is on). The floating
+// tooltip itself is _showHubTooltip in loot-currency-tooltip.js, which calls
+// back into _buildTooltipBodyHTML and _updateCompareTooltip here.
 //------------------------------------------------------------------------
 
-// Builds the HTML for the tooltip panel body from an item object.
+
+//------------------------------------------------------------------------
+//-------------------CONSTANTS & STATE------------------------------------
+//------------------------------------------------------------------------
+
+const RARITY_COLOR_MAP = {
+    common: { border: '#7a7a7a', color: '#b0b0b0' },
+    uncommon: { border: '#2ecc71', color: '#2ecc71' },
+    rare: { border: '#3498db', color: '#3498db' },
+    epic: { border: '#9b59b6', color: '#c39bd3' },
+    legendary: { border: '#f39c12', color: '#f5b642' },
+    cursed: { border: '#e74c3c', color: '#e74c3c' },
+    artifact: { border: '#f1c40f', color: '#f1c40f' },
+};
+
+const TT_RARITY_KEYS = {
+    common: 'rar_common', uncommon: 'rar_uncommon', rare: 'rar_rare',
+    epic: 'eg_rar_epic', legendary: 'rar_legendary', cursed: 'rar_cursed',
+    artifact: 'eg_rar_artifact',
+};
+
+const TT_SLOT_KEYS = {
+    head: 'eg_slot_head', shoulders: 'eg_slot_shoulders', cloak: 'eg_slot_cloak',
+    chest: 'eg_slot_chest', bracers: 'eg_slot_bracers', gloves: 'eg_slot_gloves',
+    belt: 'eg_slot_belt', pants: 'eg_slot_pants', boots: 'eg_slot_boots',
+    amulet: 'eg_slot_amulet', earring: 'eg_slot_earring', ring: 'eg_slot_ring',
+    arcane: 'eg_slot_arcane', talisman: 'eg_slot_talisman', weapon: 'eg_slot_weapon',
+    shield: 'eg_slot_shield',
+    ranged: 'eg_slot_ranged',
+};
+
+// True while the Alt key is held down.
+let _altDown = false;
+
+// Last known cursor position - fallback anchor when no event is available.
+export let _lastMouse = { x: 0, y: 0 };
 
 
-export function _buildTooltipBodyHTML(item) {
-    const RARITY_COLOR_MAP = {
-        common: { border: '#7a7a7a', color: '#b0b0b0' },
-        uncommon: { border: '#2ecc71', color: '#2ecc71' },
-        rare: { border: '#3498db', color: '#3498db' },
-        epic: { border: '#9b59b6', color: '#c39bd3' },
-        legendary: { border: '#f39c12', color: '#f5b642' },
-        cursed: { border: '#e74c3c', color: '#e74c3c' },
-        artifact: { border: '#f1c40f', color: '#f1c40f' },
-    };
+//------------------------------------------------------------------------
+//-------------------TOOLTIP BODY: SECTION BUILDERS-----------------------
+//------------------------------------------------------------------------
 
-    const rarity = item.rarity || 'common';
-    const rc = RARITY_COLOR_MAP[rarity] || RARITY_COLOR_MAP.common;
-
-    const TT_RARITY_KEYS = {
-        common: 'rar_common', uncommon: 'rar_uncommon', rare: 'rar_rare',
-        epic: 'eg_rar_epic', legendary: 'rar_legendary', cursed: 'rar_cursed',
-        artifact: 'eg_rar_artifact',
-    };
-    const TT_SLOT_KEYS = {
-        head: 'eg_slot_head', shoulders: 'eg_slot_shoulders', cloak: 'eg_slot_cloak',
-        chest: 'eg_slot_chest', bracers: 'eg_slot_bracers', gloves: 'eg_slot_gloves',
-        belt: 'eg_slot_belt', pants: 'eg_slot_pants', boots: 'eg_slot_boots',
-        amulet: 'eg_slot_amulet', earring: 'eg_slot_earring', ring: 'eg_slot_ring',
-        arcane: 'eg_slot_arcane', talisman: 'eg_slot_talisman', weapon: 'eg_slot_weapon',
-        shield: 'eg_slot_shield',
-        ranged: 'eg_slot_ranged',
-    };
-
-    const rarityLabel = item.isUnique
-        ? t('rar_unique')
-        : TT_RARITY_KEYS[rarity]
-            ? t(TT_RARITY_KEYS[rarity])
-            : rarity.charAt(0).toUpperCase() + rarity.slice(1);
-    const slotLabel = item.slotType
-        ? (TT_SLOT_KEYS[item.slotType]
-            ? t(TT_SLOT_KEYS[item.slotType])
-            : item.slotType.charAt(0).toUpperCase() + item.slotType.slice(1))
-        : '';
-
-    // ── Weapon hand line: One-Handed / Heavy ────────────────
-    // Shown directly under the rarity line so the 1H/heavy choice - and with
-    // it the shield / dual-wield decision - is visible before equipping.
-    let handHTML = '';
-    if (item.slotType === 'weapon') {
-        let hands = (item.hands === 1 || item.hands === 2) ? item.hands : null;
-        if (hands == null && typeof _getWeaponHands === 'function') {
-            try { hands = _getWeaponHands(item); } catch (e) { hands = null; }
-        }
-        if (hands == null && typeof _inferWeaponHands === 'function') {
-            try { hands = _inferWeaponHands(item); } catch (e) { hands = null; }
-        }
-        if (hands === 1 || hands === 2) {
-            let handLabel = null;
-            try {
-                const key = hands === 2 ? 'eg_hands_two' : 'eg_hands_one';
-                const s = t(key);
-                if (s && s !== key) handLabel = s;
-            } catch (e) {}
-            if (!handLabel) {
-                const de = (typeof LANG !== 'undefined' && LANG === 'de');
-                handLabel = hands === 2
-                    ? (de ? 'Schwerwaffe' : 'Heavy Weapon')
-                    : (de ? 'Einhandwaffe' : 'One-Handed Weapon');
-            }
-            handHTML = `<div class="sx-tt-hands">${handLabel}</div>`;
-        }
+// "One-Handed" / "Heavy" line under the rarity line, so the 1H/2H choice
+// (and with it the shield / dual-wield decision) is visible before equipping.
+function _tooltipHandLineHTML(item) {
+    if (item.slotType !== 'weapon') return '';
+    let hands = (item.hands === 1 || item.hands === 2) ? item.hands : null;
+    if (hands == null) {
+        try { hands = _getWeaponHands(item); } catch (e) { hands = null; }
     }
+    if (hands == null) {
+        try { hands = _inferWeaponHands(item); } catch (e) { hands = null; }
+    }
+    if (hands !== 1 && hands !== 2) return '';
+    let handLabel = null;
+    try {
+        const key = hands === 2 ? 'eg_hands_two' : 'eg_hands_one';
+        const s = t(key);
+        if (s && s !== key) handLabel = s;
+    } catch (e) {}
+    if (!handLabel) {
+        const de = LANG === 'de';
+        handLabel = hands === 2
+            ? (de ? 'Schwerwaffe' : 'Heavy Weapon')
+            : (de ? 'Einhandwaffe' : 'One-Handed Weapon');
+    }
+    return `<div class="sx-tt-hands">${handLabel}</div>`;
+}
 
-    // ── Implicit defenses & damage ───────────────────────────────────
-    // Defense and damage values shown are the LOCAL-modified totals (base +    // local flat, scaled by the item's own "% increased" mods). Values
-    // altered by local mods get the
-
-    // .sx-tt-val-modified highlight so the player can tell them apart from
-    // the untouched base value.
+// Base defence / damage / attack interval / block lines. Values are the
+// local-modified totals (base + local flat, scaled by the item's own
+// "% increased" mods); modified values get the .sx-tt-val-modified highlight.
+function _tooltipBaseStatsHTML(item) {
     const implicitLines = [];
     const def = item.defenses || {};
     let eff = null;
@@ -134,8 +127,7 @@ export function _buildTooltipBodyHTML(item) {
             implicitLines.push(`<div class="sx-tt-implicit">${t(item.casterKind === 'staff' ? 'eg_tt_shot_staff' : 'eg_tt_shot_wand').replace('{school}', t('eg_school_' + item.school))}</div>`);
         }
         // Only the melee weapon slot has a charge interval (time to 100% for
-        // manual E strikes) - ranged weapons scale the input-driven
-        // projectile channel instead.
+        // manual E strikes); ranged weapons scale the projectile channel instead.
         if (item.slotType === 'weapon') {
             let atkEff = null;
             try { atkEff = _getItemEffectiveAttackInterval(item); } catch (e) { atkEff = null; }
@@ -143,11 +135,10 @@ export function _buildTooltipBodyHTML(item) {
             const valCls = (atkEff && atkEff.modded) ? 'sx-tt-val sx-tt-val-modified' : 'sx-tt-val';
             implicitLines.push(`<div class="sx-tt-implicit">${t('eg_tt_attack_interval')}: <span class="${valCls}">${interval}s</span></div>`);
         }
-        // Innate bleed: every physical hit has a built-in chance to bleed
-        // (PHYS_INNATE_BLEED_CHANCE_PCT in combat-ailments-core.js - keep
-        // the number in the translation in sync). Only shown for MELEE
-        // weapons that actually deal physical damage: bows (slot 'ranged')
-        // are not a bleed weapon and must not advertise it.
+        // Innate bleed: melee weapons that deal physical damage always carry a
+        // built-in bleed chance (PHYS_INNATE_BLEED_CHANCE_PCT in
+        // combat-ailments-core.js - keep the translated number in sync).
+        // Bows (slot 'ranged') are not a bleed weapon and must not advertise it.
         const physMax = dmgEff ? (dmgEff.physMax || 0) : (item.damage.max || 0);
         if (physMax > 0 && item.slotType === 'weapon') {
             implicitLines.push(`<div class="sx-tt-implicit">${t('eg_tt_innate_bleed')}</div>`);
@@ -155,7 +146,7 @@ export function _buildTooltipBodyHTML(item) {
     }
     if (item.blockChance) {
         let blockEff = null;
-        try { blockEff = typeof _getItemEffectiveBlockChance === 'function' ? _getItemEffectiveBlockChance(item) : null; } catch (e) { blockEff = null; }
+        try { blockEff = _getItemEffectiveBlockChance(item); } catch (e) { blockEff = null; }
         const bcVal = blockEff ? blockEff.value : item.blockChance;
         const bcModded = blockEff ? blockEff.modded : false;
         const valCls = bcModded ? 'sx-tt-val sx-tt-val-modified' : 'sx-tt-val';
@@ -165,35 +156,30 @@ export function _buildTooltipBodyHTML(item) {
     if (item.slotType === 'ranged') {
         implicitLines.push(`<div class="sx-tt-implicit" style="font-style:italic;opacity:0.85;">${t('eg_tt_bow_hint')}</div>`);
     }
-    const implicitHTML = implicitLines.length
+    return implicitLines.length
         ? `<div class="sx-tt-section">${implicitLines.join('')}</div>`
         : '';
+}
 
-    // ── Implicit modifiers (base implicits) ────────────────
-    // Each equipment base has 1 (sometimes 2) beneficial implicits scaled
-    // by required level. Rendered in its own blue section with an "Implicit"
-    // tag and a separator line above explicit mods, matching the usual layout.
-    let implicitsHTML = '';
+// The base implicit modifiers (1-2 beneficial lines scaled by required
+// level), in their own blue section above the explicit mods.
+function _tooltipImplicitModsHTML(item) {
     const implicits = Array.isArray(item.implicits) ? item.implicits : [];
-    if (implicits.length > 0) {
-        const merged = (typeof _buildMergedModLines === 'function')
-            ? _buildMergedModLines(implicits)
-            : implicits.flatMap(imp => (imp.rolledStats||[]).map(s => ({ label: s.label, downside:false, tierLabel:'Implicit' })));
-        const lines = merged.map(entry => {
-            // Implicits are always beneficial - render in implicit blue (no text tag needed, color is the indicator)
-            return `<div class="sx-tt-mod sx-tt-mod-implicit"><span class="sx-tt-mod-label">${entry.label}</span></div>`;
-        });
-        if (lines.length) {
-            implicitsHTML = `<div class="sx-tt-section sx-tt-implicits-section">${lines.join('')}</div>`;
-        }
-    }
+    if (implicits.length === 0) return '';
+    const merged = _buildMergedModLines(implicits);
+    // Implicits are always beneficial: the blue color is the indicator, no tag.
+    const lines = merged.map(entry =>
+        `<div class="sx-tt-mod sx-tt-mod-implicit"><span class="sx-tt-mod-label">${entry.label}</span></div>`);
+    return lines.length
+        ? `<div class="sx-tt-section sx-tt-implicits-section">${lines.join('')}</div>`
+        : '';
+}
 
-
-    // ── Requirements ─────────────────────────────────────────────────
-    // Each requirement part is compared against the attribute totals as the
-    // equip gate will see them after the swap (displaced occupant removed,
-    // item's own bonuses included - self-carrying). This keeps the tooltip
-    // consistent with what _canEquipInSlot will actually accept.
+// "Requires level / attributes" line. Each part is checked against the
+// attribute totals as the equip gate will see them after the swap (displaced
+// item removed, the item's own bonuses included), so the tooltip agrees with
+// what _canEquipInSlot will accept. Unmet parts are red and listed as missing.
+function _tooltipRequirementsHTML(item) {
     const req = item.requirements || {};
     const curAttrs = _previewEquipAttributes(item);
     const reqParts = [];
@@ -218,89 +204,114 @@ export function _buildTooltipBodyHTML(item) {
     const missingHTML = missingParts.length
         ? `<div class="sx-tt-req-missing">${t('eg_req_missing')} ${missingParts.join(', ')}</div>`
         : '';
-    const reqHTML = reqParts.length
+    return reqParts.length
         ? `<div class="sx-tt-section"><div class="sx-tt-req">${t('eg_requires')} ${reqParts.join(', ')}${missingHTML}</div></div>`
         : '';
+}
 
-    // ── Chain-break warning ──────────────────────────────────────────
-    // Shown when the item's own requirements are all met but equipping it
-    // would displace an item whose attribute bonuses other equipped items
-    // rely on (e.g. a +13 Int ring keeping a 45 Int chest satisfied).
+// Warning shown when the item's own requirements are met but equipping it
+// would displace an item whose attribute bonuses other equipped gear relies
+// on (e.g. a +13 Int ring keeping a 45 Int chest satisfied).
+function _tooltipChainBreakHTML(item) {
     const chain = _getSwapChainBreak(item);
-    const chainHTML = chain
+    return chain
         ? `<div class="sx-tt-section"><div class="sx-tt-swap-warning">${t('eg_swap_breaks_warning')
             .replace('{equipped}', chain.occupant.name || '?')
             .replace('{list}', _getUnmetRequirementsText(chain.broken))}</div></div>`
         : '';
+}
 
-    // ── Hand-conflict warning ────────────────────────────
-    // Shown when the item fits its own slot but the hand setup forbids it
-    // (2H needs a free off-hand, off-hand takes 1H/shield only).
-    let handHTML2 = '';
+// Warning shown when the item fits its slot but the hand setup forbids it
+// (a two-hander needs a free off-hand; the off-hand takes 1H or shield only).
+function _tooltipHandConflictHTML(item) {
     try {
         if (item && item.category === 'equip'
-            && (item.slotType === 'weapon' || item.slotType === 'shield')
-            && typeof _checkHandCompatibilityInSlot === 'function'
-            && typeof _dndFindTargetSlot === 'function') {
-            const equippedList = (typeof _getAllEquippedItems === 'function')
-                ? _getAllEquippedItems() : [];
-            if (!equippedList.includes(item)) {
+            && (item.slotType === 'weapon' || item.slotType === 'shield')) {
+            if (!_getAllEquippedItems().includes(item)) {
                 const target = _dndFindTargetSlot(item);
                 if (target) {
                     const hg = _checkHandCompatibilityInSlot(item, target);
-                    if (!hg.ok && hg.handError && typeof _handErrorMessage === 'function') {
-                        handHTML2 = `<div class="sx-tt-section"><div class="sx-tt-swap-warning">${_handErrorMessage(hg.handError, item)}</div></div>`;
+                    if (!hg.ok && hg.handError) {
+                        return `<div class="sx-tt-section"><div class="sx-tt-swap-warning">${_handErrorMessage(hg.handError, item)}</div></div>`;
                     }
                 }
             }
         }
-    } catch (e) { handHTML2 = ''; }
+    } catch (e) { return ''; }
+    return '';
+}
 
-    // ── Explicit mods ─────────────────────────────────────────────────
+// The rolled explicit mods. Mods sharing one stat (flat Health plus the
+// Health half of a hybrid roll) are merged into a single line.
+function _tooltipExplicitModsHTML(item) {
     const mods = Array.isArray(item.mods) ? item.mods : [];
-    let modsHTML = '';
-    if (mods.length > 0) {
-        // Mods sharing the same stat (e.g. flat Health + the Health half of
-        // a hybrid roll) are merged into one combined line per stat.
-        const mergedLines = _buildMergedModLines(mods);
-        // Unique items use bespoke mods without tiers - hide tier badges.
-        const hideTier = !!item.isUnique;
-        const lines = mergedLines.map(entry => {
-            // Unique downsides render in warning red instead of mod blue.
-            const cls = entry.downside ? 'sx-tt-mod sx-tt-mod-downside' : 'sx-tt-mod';
-            const tierSpan = (!hideTier && entry.tierLabel) ? `<span class="sx-tt-mod-tier">${entry.tierLabel}</span>` : '';
-            const craftedSpan = entry.crafted ? `<span class="sx-tt-mod-crafted">${t('eg_tt_crafted')}</span>` : '';
-            return `<div class="${cls}"><span class="sx-tt-mod-label">${entry.label}</span>${tierSpan}${craftedSpan}</div>`;
-        });
-        if (lines.length) {
-            modsHTML = `<div class="sx-tt-section sx-tt-mods-section">${lines.join('')}</div>`;
-        }
-    }
+    if (mods.length === 0) return '';
+    const mergedLines = _buildMergedModLines(mods);
+    // Unique items use bespoke mods without tiers - hide the tier badges.
+    const hideTier = !!item.isUnique;
+    const lines = mergedLines.map(entry => {
+        // Unique downsides render in warning red instead of mod blue.
+        const cls = entry.downside ? 'sx-tt-mod sx-tt-mod-downside' : 'sx-tt-mod';
+        const tierSpan = (!hideTier && entry.tierLabel) ? `<span class="sx-tt-mod-tier">${entry.tierLabel}</span>` : '';
+        const craftedSpan = entry.crafted ? `<span class="sx-tt-mod-crafted">${t('eg_tt_crafted')}</span>` : '';
+        return `<div class="${cls}"><span class="sx-tt-mod-label">${entry.label}</span>${tierSpan}${craftedSpan}</div>`;
+    });
+    return lines.length
+        ? `<div class="sx-tt-section sx-tt-mods-section">${lines.join('')}</div>`
+        : '';
+}
 
-    // ── Unique special modifiers (non-stat QoL perks) ─────────────────
-    // Rendered in implicit-blue between stat mods and flavor text so the
-    // zero-line auto-mark tradeoff is visible before equipping.
-    let specialHTML = '';
+// Unique non-stat perks (e.g. the zero-line auto-mark), in implicit blue
+// between the stat mods and the flavor text so the tradeoff is visible
+// before equipping.
+function _tooltipUniquePerksHTML(item) {
     try {
-        const specials = (typeof _getUniqueSpecialLines === 'function')
-            ? _getUniqueSpecialLines(item) : [];
-        if (specials.length) {
-            const lines = specials.map(s => {
-                const label = (typeof LANG !== 'undefined' && LANG === 'de') ? (s.de || s.en) : (s.en || s.de);
-                return `<div class="sx-tt-mod sx-tt-mod-implicit"><span class="sx-tt-mod-label">✨ ${label}</span></div>`;
-            });
-            specialHTML = `<div class="sx-tt-section sx-tt-mods-section">${lines.join('')}</div>`;
-        }
-    } catch (e) { specialHTML = ''; }
+        const specials = _getUniqueSpecialLines(item);
+        if (!specials.length) return '';
+        const lines = specials.map(s => {
+            const label = LANG === 'de' ? (s.de || s.en) : (s.en || s.de);
+            return `<div class="sx-tt-mod sx-tt-mod-implicit"><span class="sx-tt-mod-label">✨ ${label}</span></div>`;
+        });
+        return `<div class="sx-tt-section sx-tt-mods-section">${lines.join('')}</div>`;
+    } catch (e) { return ''; }
+}
 
-    // ── Unique flavor text ────────────────────────────────────────────
+
+//------------------------------------------------------------------------
+//-------------------TOOLTIP BODY-----------------------------------------
+//------------------------------------------------------------------------
+
+// Builds the HTML for the tooltip panel body from an item object.
+export function _buildTooltipBodyHTML(item) {
+    const rarity = item.rarity || 'common';
+    const rc = RARITY_COLOR_MAP[rarity] || RARITY_COLOR_MAP.common;
+
+    const rarityLabel = item.isUnique
+        ? t('rar_unique')
+        : TT_RARITY_KEYS[rarity]
+            ? t(TT_RARITY_KEYS[rarity])
+            : rarity.charAt(0).toUpperCase() + rarity.slice(1);
+    const slotLabel = item.slotType
+        ? (TT_SLOT_KEYS[item.slotType]
+            ? t(TT_SLOT_KEYS[item.slotType])
+            : item.slotType.charAt(0).toUpperCase() + item.slotType.slice(1))
+        : '';
+
+    const handHTML = _tooltipHandLineHTML(item);
+    const implicitHTML = _tooltipBaseStatsHTML(item);
+    const implicitsHTML = _tooltipImplicitModsHTML(item);
+    const reqHTML = _tooltipRequirementsHTML(item);
+    const chainHTML = _tooltipChainBreakHTML(item);
+    const handHTML2 = _tooltipHandConflictHTML(item);
+    const modsHTML = _tooltipExplicitModsHTML(item);
+    const specialHTML = _tooltipUniquePerksHTML(item);
+
     const flavorHTML = item.isUnique
         ? `<div class="sx-tt-section"><div class="sx-tt-flavor">${LANG === 'de'
             ? (item.flavorDe || item.flavorEn || '')
             : (item.flavorEn || item.flavorDe || '')}</div></div>`
         : '';
 
-    // ── Item level ────────────────────────────────────────────────────
     const ilvlHTML = item.itemLevel != null
         ? `<div class="sx-tt-ilvl">${t('eg_item_level').replace('{n}', item.itemLevel)}</div>`
         : '';
@@ -338,23 +349,14 @@ export function _buildTooltipBodyHTML(item) {
 }
 
 
+//------------------------------------------------------------------------
+//-------------------MAIN TOOLTIP: CLEAR & MOVE--------------------------
+//------------------------------------------------------------------------
 
-// _showHubTooltip is defined ONCE, in endgame-currency.js: it renders the
-// floating mouseover tooltip (equipment stat blocks, currency/essence/shard
-// cards, map tooltips) via the shared tooltip engine from tooltips-hud.js,
-// and drives the Alt-compare tooltip (_updateCompareTooltip /
-// _hideCompareTooltip). Historically this file and
-// hub-drag-and-drop.js each shipped their own copy and the
-// LAST-DECLARED-WINS load-order rule picked currency's version silently -
-// the duplicates were removed (2026-09) and this is the single source.
-
-
-
-
+// Hides the hover tooltip.
 export function _clearTooltip() {
     _showHubTooltip(null);
 }
-
 
 // Moves the main tooltip (and the compare tooltip with it) while the
 // cursor glides over the hovered item chip.
@@ -364,84 +366,31 @@ export function _moveTooltip(e) {
 }
 
 
-// ── Alt-hold compare tooltip ────────────────────────────────────────────
+//------------------------------------------------------------------------
+//-------------------COMPARE TOOLTIP: LOOKUP------------------------------
+//------------------------------------------------------------------------
 
-// True while the Alt key is held down.
-export let _altDown = false;
-
-// Last known cursor position - fallback anchor when no event is available.
-export let _lastMouse = { x: 0, y: 0 };
-
-document.addEventListener('mousemove', e => {
-    _lastMouse.x = e.clientX;
-    _lastMouse.y = e.clientY;
-});
-
-// True while the endgame hub or gate screen is the active screen.
-// Used to scope the Alt-key browser-menu suppression to the item UIs.
-export function _isItemScreenActive() {
+// True while the hub or gate screen is the active screen. Scopes the
+// Alt-key browser-menu suppression to the item screens.
+function _isItemScreenActive() {
     const hub = document.getElementById('screen-hub');
     const gate = document.getElementById('screen-endgame-gate');
     return (hub && hub.classList.contains('active'))
         || (gate && gate.classList.contains('active'));
 }
 
-window.addEventListener('keydown', e => {
-    if (e.key === 'Alt') {
-        // Suppress the browser's default Alt behaviour (Firefox/Chrome
-        // focus the menu bar, which shifts the layout mid-comparison).
-        if (_isItemScreenActive()) e.preventDefault();
-        if (!_altDown) {
-            _altDown = true;
-            _updateCompareTooltip();
-        }
-    }
-});
-
-window.addEventListener('keyup', e => {
-    if (e.key === 'Alt') {
-        // Firefox triggers the menu bar on Alt *release* - block that too.
-        if (_isItemScreenActive()) e.preventDefault();
-        _altDown = false;
-        _updateCompareTooltip();
-    }
-});
-
-// Alt state is unreliable after alt-tabbing away - reset on blur.
-window.addEventListener('blur', () => {
-    _altDown = false;
-    _updateCompareTooltip();
-});
-
-
-// Resolves the equipped item to compare against the hovered item.
-// Only equipment items have a matching paperdoll slot; for multi-slot
-// types (rings, earrings, weapons) the first occupied slot wins.
-// Returns null when there is nothing meaningful to compare.
-export function _getCompareItem(item) {
-    if (!item || item.category !== 'equip' || !item.slotType) return null;
-    if (typeof SLOT_ACCEPTS === 'undefined') return null;
-    const ids = Object.keys(SLOT_ACCEPTS)
-        .filter(id => SLOT_ACCEPTS[id] === item.slotType);
-    for (const id of ids) {
-        if (_equipped[id]) return _equipped[id];
-    }
-    return null;
-}
-
 // "Auto-compare" checkbox in the character sheet's top bar (persisted).
 // When on, hovering gear compares it without holding Alt.
-export function _autoCompareOn() {
+function _autoCompareOn() {
     if (typeof globalThis._autoCompare === 'boolean') return globalThis._autoCompare;
     try { return localStorage.getItem('stoxels_auto_compare') === '1'; } catch (e) { return false; }
 }
 
 // Every equipped item the hovered piece could replace: both rings, both
 // earrings, and for weapons / shields / two-handers the main hand AND the
-// off-hand. Falls back to the single-slot lookup for everything else.
-export function _getCompareItems(item) {
+// off-hand. Everything else maps to its single slot.
+function _getCompareItems(item) {
     if (!item || item.category !== 'equip' || !item.slotType) return [];
-    if (typeof SLOT_ACCEPTS === 'undefined') return [];
     const hands = (item.slotType === 'weapon' || item.slotType === 'shield');
     const ids = Object.keys(SLOT_ACCEPTS).filter(id =>
         SLOT_ACCEPTS[id] === item.slotType
@@ -455,9 +404,13 @@ export function _getCompareItems(item) {
 }
 
 
+//------------------------------------------------------------------------
+//-------------------COMPARE TOOLTIP: SHOW / HIDE / POSITION--------------
+//------------------------------------------------------------------------
+
 // Shows or hides the compare tooltip based on the current hover target.
-// Shown while Alt is held or the sheet's Auto-compare box is checked -
-// unless the hovered item IS an equipped one.
+// Shown while Alt is held or Auto-compare is checked, unless the hovered
+// item is itself equipped.
 export function _updateCompareTooltip() {
     const hovered = globalThis._tooltipItem;
     // Shop previews (id ends in _preview) compare only while Alt is held: the
@@ -477,10 +430,9 @@ export function _updateCompareTooltip() {
     else _hideCompareTooltip();
 }
 
-
 // Lazily creates the compare tooltip element (visual twin of the main
-// game tooltip, but with a yellow accent edge to tell them apart).
-export function _getCompareTip() {
+// game tooltip, with a yellow accent edge to tell them apart).
+function _getCompareTip() {
     let tip = document.getElementById('sx-compare-tip');
     if (!tip) {
         tip = document.createElement('div');
@@ -507,8 +459,8 @@ export function _getCompareTip() {
     return tip;
 }
 
-
-export function _showCompareTooltip(itemOrItems) {
+// Fills the compare tooltip with one column per equipped item and shows it.
+function _showCompareTooltip(itemOrItems) {
     const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
     const tip = _getCompareTip();
     // Columns start as wide as the regular tooltip (same 560px cap the shared
@@ -530,19 +482,18 @@ ${_buildTooltipBodyHTML(it)}</div>`).join('');
     _positionCompareTooltip();
 }
 
-
+// Fades the compare tooltip out.
 export function _hideCompareTooltip() {
     const tip = document.getElementById('sx-compare-tip');
     if (tip) tip.style.opacity = '0';
 }
-
 
 // Places the compare tooltip beside the main tooltip, on whichever side has
 // more room, and sizes its columns to fit that room: side by side when each
 // column can stay readable (>= 250px), otherwise stacked. Several equipped
 // items (main hand + off hand / shield, both rings) therefore never run under
 // the main tooltip or off the screen.
-export function _positionCompareTooltip() {
+function _positionCompareTooltip() {
     const main = document.getElementById('ghud-floating-tip');
     const cmp = document.getElementById('sx-compare-tip');
     if (!main || !cmp || cmp.style.opacity !== '1') return;
@@ -577,3 +528,40 @@ export function _positionCompareTooltip() {
     ));
     cmp.style.top = clampedTop + 'px';
 }
+
+
+//------------------------------------------------------------------------
+//-------------------EVENT LISTENERS (REGISTERED AT LOAD)-----------------
+//------------------------------------------------------------------------
+
+document.addEventListener('mousemove', e => {
+    _lastMouse.x = e.clientX;
+    _lastMouse.y = e.clientY;
+});
+
+window.addEventListener('keydown', e => {
+    if (e.key === 'Alt') {
+        // Suppress the browser's default Alt behaviour (Firefox/Chrome
+        // focus the menu bar, which shifts the layout mid-comparison).
+        if (_isItemScreenActive()) e.preventDefault();
+        if (!_altDown) {
+            _altDown = true;
+            _updateCompareTooltip();
+        }
+    }
+});
+
+window.addEventListener('keyup', e => {
+    if (e.key === 'Alt') {
+        // Firefox triggers the menu bar on Alt *release* - block that too.
+        if (_isItemScreenActive()) e.preventDefault();
+        _altDown = false;
+        _updateCompareTooltip();
+    }
+});
+
+// Alt state is unreliable after alt-tabbing away - reset on blur.
+window.addEventListener('blur', () => {
+    _altDown = false;
+    _updateCompareTooltip();
+});
