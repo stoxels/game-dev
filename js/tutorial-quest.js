@@ -2431,6 +2431,31 @@ function _tqChestItemName(entry, item) {
     return (label && label !== entry.nameKey) ? label : item.name;
 }
 
+// The item's real art (equipment art by base id, charm art by spell + rank),
+// falling back to the emoji while / if no art exists. Returns ready HTML.
+function _tqChestIconFor(entry, fallbackEmoji) {
+    try {
+        if (entry.kind === 'charm') {
+            const art = globalThis.getCharmArtForSkill(entry.skillId, entry.rank);
+            if (art) return `<img src="${art}" alt="" draggable="false">`;
+        } else {
+            const h = globalThis.GAME_ART.html('item', entry.baseId, '');
+            if (h) return h;
+        }
+    } catch (e) { /* art is cosmetic - emoji below */ }
+    return _tqChestIconHTML(fallbackEmoji);
+}
+
+// Item art loads lazily (manifest fetch): swap emoji for art once it arrives.
+document.addEventListener('sx-art-loaded', () => {
+    if (!_tqChestModalEl || !_tqChestModalEl.isConnected) return;
+    _tqChestModalEl.querySelectorAll('.tq-chest-item').forEach((btn) => {
+        const entry = TQ_CHEST_LOOT[Number(btn.dataset.i)];
+        const holder = btn.querySelector('.tq-chest-item-icon');
+        if (entry && holder) holder.innerHTML = _tqChestIconFor(entry, _tqChestEntryInfo(entry).icon);
+    });
+});
+
 // Display data for one loot entry: { icon, name, sub }.
 function _tqChestEntryInfo(entry) {
     if (entry.kind === 'charm') {
@@ -2494,7 +2519,7 @@ function _tqOpenChestModal() {
     const cards = TQ_CHEST_LOOT.map((entry, i) => {
         const info = _tqChestEntryInfo(entry);
         return `<button class="tq-chest-item" data-i="${i}">
-                <span class="tq-chest-item-icon">${_tqChestIconHTML(info.icon)}</span>
+                <span class="tq-chest-item-icon">${_tqChestIconFor(entry, info.icon)}</span>
                 <span class="tq-chest-item-name">${info.name}</span>
                 <span class="tq-chest-item-sub">${info.sub}</span>
                 <span class="tq-chest-item-state">${t('tq_chest_claim')}</span>
