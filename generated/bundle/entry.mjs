@@ -851,6 +851,7 @@ try { Object.defineProperty(globalThis, "getCharmArtForSkill", { get() { return 
 try { Object.defineProperty(globalThis, "getCharmByKey", { get() { return getCharmByKey; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getClassPenaltyMultiplier", { get() { return getClassPenaltyMultiplier; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getGameTooltip", { get() { return getGameTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "getSkillCastRankFull", { get() { return getSkillCastRankFull; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getSkillDef", { get() { return getSkillDef; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getSkillName", { get() { return getSkillName; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getTitleEffectSpecs", { get() { return getTitleEffectSpecs; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

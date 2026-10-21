@@ -1436,9 +1436,13 @@
     font-family: var(--PX, monospace);
     font-size:12px; font-weight:bold; letter-spacing:.04em; line-height:1.2;
     color:#fff; text-shadow:1px 1px 2px black;
+    position:relative; left:50%; transform:translateX(-50%);
+    width:max-content; min-width:100%; max-width:280px; text-align:center; flex-wrap:wrap;
 }
 .spell-castbar-icon{ font-size:12px; line-height:1; }
-.spell-castbar-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+/* The name may be wider than the 128px bar: the head grows around the bar's
+   centre (up to 280px, then wraps) instead of clipping with an ellipsis. */
+.spell-castbar-name{ white-space:nowrap }
 .spell-castbar-track{
     position:relative; height:8px;
     background:#111; border:1px solid #000; border-radius:4px; overflow:hidden;
@@ -1583,6 +1587,50 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
 }
 @media (prefers-reduced-motion: reduce) {
     .skill-hotbar-slot.is-toggled { animation: none; }
+}
+
+/* ━━━ FIREBALL (usp_fireball) — burning sphere trailing flame tongues ━ */
+/* Own silhouette, deliberately unlike the shared fire bolt (Fire Wand): a
+   deep orange-red sphere with a dark crimson rim and a small yellow heart,
+   dragging three ragged flame tongues of different lengths. Aims +X in the
+   44x28 box; the engine scales it (1.7x). */
+.usp-proj-fireball{ filter: drop-shadow(0 0 5px rgba(255,90,10,.85)) drop-shadow(0 0 12px rgba(200,30,0,.45)); }
+.usp-p-fb-tongue{
+    position:absolute; top:50%; height:12px; margin-top:-6px;
+    transform-origin:100% 50%;
+    background: linear-gradient(to right, transparent 0%, rgba(160,25,0,.55) 25%, #ff4a00 62%, #ffb020 100%);
+    clip-path: polygon(100% 50%, 78% 0, 52% 22%, 28% 8%, 0 50%, 28% 92%, 52% 78%, 78% 100%);
+    filter: blur(.5px);
+    animation: usp-fb-lick 150ms ease-in-out infinite alternate;
+}
+.usp-p-fb-tongue-1{ left:-22px; width:44px; }
+.usp-p-fb-tongue-2{ left:-8px; width:30px; margin-top:-15px; animation-delay:-60ms; opacity:.85; rotate:-12deg; }
+.usp-p-fb-tongue-3{ left:-12px; width:34px; margin-top:3px; animation-delay:-110ms; opacity:.85; rotate:12deg; }
+@keyframes usp-fb-lick{ from{ scale:.85 1 } to{ scale:1.15 1.12 } }
+.usp-p-fb-ember{
+    position:absolute; width:3px; height:3px; border-radius:50%;
+    background:radial-gradient(circle, #ffe08a 0%, #ff7a1a 60%, #d62800 100%);
+    animation: usp-ember 460ms ease-in infinite;
+}
+.usp-p-fb-ember-1{ left:6px; top:1px }
+.usp-p-fb-ember-2{ left:2px; top:24px; animation-delay:160ms }
+.usp-p-fb-ember-3{ left:-6px; top:12px; animation-delay:300ms }
+.usp-p-fb-ball{
+    position:absolute; left:22px; top:2px; width:24px; height:24px; border-radius:50%;
+    background: radial-gradient(circle at 40% 40%, #ffd23f 0%, #ff8a00 34%, #e8420a 62%, #8c1000 88%, #4a0800 100%);
+    box-shadow: inset 0 0 6px rgba(255,150,40,.6), inset -3px -3px 7px rgba(60,5,0,.8);
+    overflow:hidden;
+}
+.usp-p-fb-swirl{
+    position:absolute; inset:-4px; border-radius:50%;
+    background: conic-gradient(from 0deg, rgba(255,210,90,0) 0deg, rgba(255,210,90,.55) 60deg, rgba(255,210,90,0) 120deg, rgba(90,8,0,.6) 210deg, rgba(90,8,0,0) 270deg, rgba(255,150,30,.5) 320deg, rgba(255,210,90,0) 360deg);
+    animation: usp-fb-spin 480ms linear infinite;
+}
+@keyframes usp-fb-spin{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.usp-p-fb-core{
+    position:absolute; left:8px; top:8px; width:8px; height:8px; border-radius:50%;
+    background:radial-gradient(circle, #fff3b0 0%, #ffd23f 55%, rgba(255,160,0,0) 100%);
+    animation: usp-pyro-core 300ms ease-in-out infinite alternate;
 }
 
 /* ━━━ PYROBLAST (usp_pyroblast) — classic "immense fiery boulder" ━━ */
@@ -2739,26 +2787,49 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
 @keyframes usp-barrier-flicker{ 0%{ opacity:1; } 50%{ opacity:.55; } 100%{ opacity:.9; } }
 
 /* ━━━ RENEWAL (usp_renewal) — living bloom ━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-/* A blossom pinned on the hero for the whole heal-over-time: six petals
-   breathing around a golden core, flaring on every HoT tick (.is-tick).
-   Purely additive. */
+/* A blossom pinned on the hero for the whole heal-over-time: it unfurls on
+   cast, then two counter-turning rings of petals breathe around a golden
+   core while spores drift upward. Every HoT tick (.is-tick) flares the
+   petals, pops the core and sends a ring of life outward. Purely additive. */
 .usp-renew-bloom{
-    position:fixed; width:76px; height:76px; margin:0;
+    position:fixed; width:118px; height:118px; margin:0;
     pointer-events:none; z-index:990;
     transform:translate(-50%,-50%);
+    animation: usp-renew-unfurl .7s cubic-bezier(.2,.9,.3,1.2);
 }
+@keyframes usp-renew-unfurl{ 0%{ opacity:0; scale:.15; rotate:-70deg; } 60%{ opacity:1; } 100%{ opacity:1; scale:1; rotate:0deg; } }
 .usp-renew-glow{
-    position:absolute; inset:0; border-radius:50%;
-    background: radial-gradient(circle, rgba(220,237,200,.4) 0%, rgba(165,214,167,.22) 45%, transparent 70%);
+    position:absolute; inset:-6px; border-radius:50%;
+    background: radial-gradient(circle, rgba(236,248,200,.5) 0%, rgba(165,214,167,.28) 42%, transparent 70%);
     animation: usp-renew-breathe 3s ease-in-out infinite;
 }
+.usp-renew-ring{
+    position:absolute; inset:14px; border-radius:50%;
+    border:2px solid rgba(197,225,165,.0);
+    opacity:0;
+}
+.usp-renew-layer{ position:absolute; inset:0; }
+.usp-renew-layer-back{ animation: usp-renew-spin-rev 22s linear infinite; }
+.usp-renew-layer-front{ animation: usp-renew-spin 16s linear infinite; }
+@keyframes usp-renew-spin{ 0%{ rotate:0deg; } 100%{ rotate:360deg; } }
+@keyframes usp-renew-spin-rev{ 0%{ rotate:360deg; } 100%{ rotate:0deg; } }
 .usp-renew-petal{
-    position:absolute; left:50%; top:50%; width:16px; height:30px; margin:-30px 0 0 -8px;
-    transform-origin:8px 30px;
-    border-radius:50% 50% 46% 46% / 62% 62% 38% 38%;
-    background: linear-gradient(to top, #2e7d32 0%, #66bb6a 55%, #c5e1a5 100%);
-    filter: drop-shadow(0 0 4px rgba(165,214,167,.8));
+    position:absolute; left:50%; top:50%; width:20px; height:40px; margin:-40px 0 0 -10px;
+    transform-origin:10px 40px;
+    border-radius:50% 50% 46% 46% / 66% 66% 34% 34%;
+    background:
+        linear-gradient(to right, transparent 46%, rgba(255,255,255,.28) 50%, transparent 54%),
+        linear-gradient(to top, #1b5e20 0%, #43a047 35%, #81c784 70%, #dcedc8 100%);
+    box-shadow: inset 0 -6px 8px rgba(27,94,32,.45);
+    filter: drop-shadow(0 0 5px rgba(165,214,167,.75));
     animation: usp-renew-breathe 3s ease-in-out infinite;
+}
+.usp-renew-petal-back{
+    width:24px; height:46px; margin:-46px 0 0 -12px; transform-origin:12px 46px;
+    background:
+        linear-gradient(to top, #2e7d32 0%, #7cb342 45%, #dce775 85%, #f9fbe7 100%);
+    opacity:.72;
+    animation-delay:-1.4s;
 }
 .usp-renew-petal-1{ transform:rotate(0deg); }
 .usp-renew-petal-2{ transform:rotate(60deg); }
@@ -2766,22 +2837,53 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
 .usp-renew-petal-4{ transform:rotate(180deg); }
 .usp-renew-petal-5{ transform:rotate(240deg); }
 .usp-renew-petal-6{ transform:rotate(300deg); }
+.usp-renew-petal-back.usp-renew-petal-1{ transform:rotate(30deg); }
+.usp-renew-petal-back.usp-renew-petal-2{ transform:rotate(90deg); }
+.usp-renew-petal-back.usp-renew-petal-3{ transform:rotate(150deg); }
+.usp-renew-petal-back.usp-renew-petal-4{ transform:rotate(210deg); }
+.usp-renew-petal-back.usp-renew-petal-5{ transform:rotate(270deg); }
+.usp-renew-petal-back.usp-renew-petal-6{ transform:rotate(330deg); }
 .usp-renew-core{
-    position:absolute; left:50%; top:50%; width:16px; height:16px; margin:-8px 0 0 -8px;
+    position:absolute; left:50%; top:50%; width:20px; height:20px; margin:-10px 0 0 -10px;
     border-radius:50%;
-    background: radial-gradient(circle at 40% 35%, #fffde7 0%, #ffd54f 55%, #ff8f00 100%);
-    box-shadow: 0 0 10px #ffd54f, 0 0 20px rgba(255,213,79,.6);
+    background: radial-gradient(circle at 40% 35%, #fffde7 0%, #ffd54f 50%, #ff8f00 100%);
+    box-shadow: 0 0 12px #ffd54f, 0 0 26px rgba(255,213,79,.65);
     animation: usp-renew-breathe 3s ease-in-out infinite;
 }
-@keyframes usp-renew-breathe{ 0%,100%{ filter:brightness(.94); } 50%{ filter:brightness(1.1); } }
-.usp-renew-bloom.is-tick .usp-renew-petal{
-    animation: usp-renew-flare .55s ease-out;
+@keyframes usp-renew-breathe{ 0%,100%{ filter:brightness(.94); } 50%{ filter:brightness(1.12); } }
+/* Spores: little life-motes rising out of the blossom, staggered. */
+.usp-renew-mote{
+    position:absolute; left:50%; top:50%; width:5px; height:5px; margin:-2px 0 0 -2px;
+    border-radius:50%;
+    background:radial-gradient(circle, #f9fbe7 0%, #c5e1a5 60%, transparent 100%);
+    box-shadow:0 0 6px rgba(197,225,165,.95);
+    opacity:0;
+    animation: usp-renew-rise 2.8s ease-out infinite;
 }
-.usp-renew-bloom.is-tick .usp-renew-core{
-    animation: usp-renew-coreflash .55s ease-out;
+.usp-renew-mote-1{ --mx:-30px; animation-delay:0s; }
+.usp-renew-mote-2{ --mx:22px;  animation-delay:-.4s; }
+.usp-renew-mote-3{ --mx:-12px; animation-delay:-.8s; }
+.usp-renew-mote-4{ --mx:34px;  animation-delay:-1.2s; }
+.usp-renew-mote-5{ --mx:-24px; animation-delay:-1.6s; }
+.usp-renew-mote-6{ --mx:8px;   animation-delay:-2s; }
+.usp-renew-mote-7{ --mx:-38px; animation-delay:-2.4s; }
+@keyframes usp-renew-rise{
+    0%{ opacity:0; translate:0 10px; scale:.6; }
+    20%{ opacity:1; }
+    100%{ opacity:0; translate:var(--mx,0px) -66px; scale:1.1; }
 }
-@keyframes usp-renew-flare{ 0%{ filter:brightness(1); } 30%{ filter:brightness(1.7); } 100%{ filter:brightness(1); } }
-@keyframes usp-renew-coreflash{ 0%{ transform:scale(1); } 30%{ transform:scale(1.5); } 100%{ transform:scale(1); } }
+/* HoT tick: petals flare, core pops, a ring of life ripples outward. */
+.usp-renew-bloom.is-tick .usp-renew-petal{ animation: usp-renew-flare .6s ease-out; }
+.usp-renew-bloom.is-tick .usp-renew-core{ animation: usp-renew-coreflash .6s ease-out; }
+.usp-renew-bloom.is-tick .usp-renew-glow{ animation: usp-renew-glowflash .6s ease-out; }
+.usp-renew-bloom.is-tick .usp-renew-ring{ animation: usp-renew-ripple .8s ease-out; }
+@keyframes usp-renew-flare{ 0%{ filter:brightness(1) drop-shadow(0 0 5px rgba(165,214,167,.75)); } 30%{ filter:brightness(1.6) drop-shadow(0 0 12px rgba(220,237,200,1)); } 100%{ filter:brightness(1) drop-shadow(0 0 5px rgba(165,214,167,.75)); } }
+@keyframes usp-renew-coreflash{ 0%{ scale:1; } 30%{ scale:1.6; } 100%{ scale:1; } }
+@keyframes usp-renew-glowflash{ 0%{ scale:1; opacity:1; } 30%{ scale:1.25; opacity:1; } 100%{ scale:1; opacity:1; } }
+@keyframes usp-renew-ripple{
+    0%{ opacity:.9; scale:.5; border-color:rgba(220,237,200,.95); }
+    100%{ opacity:0; scale:1.45; border-color:rgba(165,214,167,0); }
+}
 
 /* ━━━ BULWARK (usp_bulwark) — circling ring of consecrated stone ━━━━━ */
 /* Lives on the hero for the whole guard buff: six rock plates orbiting a

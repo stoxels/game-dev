@@ -631,7 +631,11 @@ export function buildClassHUD() {
     const panel = document.getElementById('class-hud-panel');
     if (!panel) return;
 
-    hideHUDTooltip();
+    // Only drop the tooltip when the cursor is on the panel being rebuilt (its
+    // hovered button is about to be replaced). Rebuilds are also triggered by
+    // the mana regen tick, which used to hide an unrelated tooltip - e.g. a
+    // spell charm tooltip in the spell book - every few seconds.
+    if (panel.matches(':hover')) hideHUDTooltip();
 
     // Retired panel: keep the element around (boss effects use it as a
     // last-resort anchor) but never render anything into it. The skill hotbar

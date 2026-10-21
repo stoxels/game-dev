@@ -18,6 +18,7 @@ export const MOD_LABELS = {
     classless: 'CL',
     treeless: 'TR',
     monsterless: 'ML',
+    superTutor: 'PROFESSOR',
 };
 
 // Maps internal modifier keys to their CSS class names (used for tag coloring)

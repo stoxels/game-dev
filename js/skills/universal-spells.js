@@ -85,10 +85,10 @@ export const UNIVERSAL_SPELL_DEFS = [
     // ── FIRE ────────────────────────────────────────────────────────────
     {
         // The starter spell: the tutorial hands out its rank-1 charm. A
-        // 1.0s cast bar and ~18 damage (the numbers the old tutorial-only
+        // 0.5s cast bar and ~18 damage (the numbers the old tutorial-only
         // Fireball had), cheap enough to be the first spell you learn.
         id: 'usp_fireball', icon: '🔥', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'single', dmg: [16, 20], manaCost: 16, cooldownSeconds: 4, castTimeSeconds: 1.0,
+        behavior: 'single', dmg: [16, 20], manaCost: 16, cooldownSeconds: 2, castTimeSeconds: 0.5,
         tags: ['Spell', 'Fire', 'Projectile'], scalingTags: ['spell', 'fire', 'projectile'],
         nameEn: 'Fireball', nameDE: 'Feuerball',
         descEn: 'A fireball at the target. 25% chance to Ignite.',
@@ -97,11 +97,11 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_pyroblast', icon: '☄️', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'single', dmg: [19, 24], manaCost: 51, cooldownSeconds: 22, castTimeSeconds: 2.0,
+        behavior: 'single', dmg: [19, 24], manaCost: 51, cooldownSeconds: 10, castTimeSeconds: 2.0,
         tags: ['Spell', 'Fire', 'Projectile'], scalingTags: ['spell', 'fire', 'projectile'],
         nameEn: 'Magma Shot', nameDE: 'Magmageschoss',
-        descEn: 'A slow, heavy molten blast. Big single-target fire damage.',
-        descDE: 'Ein schwerer Magmabrocken. Hoher Feuerschaden auf ein Ziel.',
+        descEn: 'A slow, heavy molten blast. Big single-target fire damage. 35% chance to Ignite, +5% for every spell rank.',
+        descDE: 'Ein schwerer Magmabrocken. Hoher Feuerschaden auf ein Ziel. 35% Chance zu entzünden, +5% pro Zauberrang.',
         sfx: 'dofBurn',
     },
     {
@@ -2896,14 +2896,13 @@ function _uspPhysicalWeaponPart(spell, stats, tree) {
     };
 }
 
-function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
-    const stats = (typeof globalThis._computePlayerStats === 'function')
-        ? globalThis._computePlayerStats() : {};
-    const tree = getUniversalSpellDamageBonus(spell);
+// Everything about a hit that is not random: one base value scaled by level
+// ramp, flat + increased damage, tags and DoT multipliers. Shared by the hit
+// roll below and the tooltip estimate so the two cannot drift apart. Returns
+// { dmg, swing }: swing is the melee weapon share, added after rank.
+function _uspScaleBase(spell, base, flatShare, hitOpts, stats, tree) {
     const isPhys = spell.damageKind === 'physical';
-    const flatShare = Math.max(USP_FLAT_MIN_SHARE, Math.min(1, ((dmgMin + dmgMax) / 2) / USP_FLAT_FULL_HIT));
-
-    let dmg = dmgMin + Math.random() * (dmgMax - dmgMin);
+    let dmg = base;
     // Melee strikes: a full weapon swing (100% of the melee weapon's damage) plus
     // the spell's own roll on top. Multi-hit strikes split the swing across their
     // hits so the whole cast stays one swing; DoT ticks carry no swing. The swing
@@ -2947,18 +2946,36 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
     if (hitOpts && hitOpts.isTick) {
         dmg *= (1 + Math.max(0, stats.spellDotIncPct || 0) / 100) * (1 + Math.max(0, stats.spellDotMultiPct || 0) / 100);
     }
+    return { dmg, swing };
+}
+
+// Map / quiz-buff / charm-orb multiplier applied to every hit after crit.
+function _uspCommonMult(spell) {
+    let common = 1;
+    if (typeof globalThis._egMapPlayerDamageMult === 'function') common *= globalThis._egMapPlayerDamageMult();
+    if (typeof globalThis._quizDamageBuffMult === 'function') common *= globalThis._quizDamageBuffMult();
+    // Charm orbs applied to this spell's charm: +1% damage each
+    // (js/skills/skill-charms.js).
+    common *= getCharmSkillDamageMult(spell.id);
+    return common;
+}
+
+function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
+    const stats = (typeof globalThis._computePlayerStats === 'function')
+        ? globalThis._computePlayerStats() : {};
+    const tree = getUniversalSpellDamageBonus(spell);
+    const flatShare = Math.max(USP_FLAT_MIN_SHARE, Math.min(1, ((dmgMin + dmgMax) / 2) / USP_FLAT_FULL_HIT));
+
+    const scaled = _uspScaleBase(spell, dmgMin + Math.random() * (dmgMax - dmgMin), flatShare, hitOpts, stats, tree);
+    let dmg = scaled.dmg;
+    let swing = scaled.swing;
     const critMult = _uspRollCritMult();
     const isCrit = critMult > 1;
     dmg *= critMult;
     swing *= critMult;
 
     try {
-        let common = 1;
-        if (typeof globalThis._egMapPlayerDamageMult === 'function') common *= globalThis._egMapPlayerDamageMult();
-        if (typeof globalThis._quizDamageBuffMult === 'function') common *= globalThis._quizDamageBuffMult();
-        // Charm orbs applied to this spell's charm: +1% damage each
-        // (js/skills/skill-charms.js).
-        common *= getCharmSkillDamageMult(spell.id);
+        const common = _uspCommonMult(spell);
         dmg *= common;
         swing *= common;
         // Spell rank: rank 10 hits ~6× a rank-1 cast (SPELL_RANK_DAMAGE_MULT).
@@ -3001,7 +3018,10 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
     return { amount, elements, isCrit };
 }
 
-// Tooltip estimate (outside encounters gear still applies via stats).
+// Tooltip estimate: the same scaling a real cast applies (level ramp, rank,
+// flat + increased spell / elemental / element damage, tree and charm bonuses,
+// map and quiz multipliers, melee weapon swing) via _uspScaleBase, before the
+// random roll and crit. Outside encounters gear still applies via stats.
 export function getUniversalSpellDamageEstimate(spellId) {
     const spell = getUniversalSpellDef(spellId);
     if (!spell) return null;
@@ -3009,11 +3029,13 @@ export function getUniversalSpellDamageEstimate(spellId) {
     // getUniversalSpellSupportEstimate(). Returning null here (instead of
     // letting spell.dmg[0] throw) keeps every damage consumer honest.
     if (!spell.dmg) return null;
-    // Reference values are rank-1; the cast rank scales them
-    // (SPELL_RANK_DAMAGE_MULT in skill-charms.js).
-    const rankMult = getSpellRankDamageMultForSkill(spellId) * (spell.damageKind === 'physical' ? 1 : _uspSpellLevelRamp());
-    const perHitMin = Math.max(1, Math.round(spell.dmg[0] * rankMult));
-    const perHitMax = Math.max(1, Math.round(spell.dmg[1] * rankMult));
+    let stats = {};
+    try { stats = globalThis._computePlayerStats() || {}; } catch (e) { stats = {}; }
+    const tree = getUniversalSpellDamageBonus(spell);
+    const flatShare = Math.max(USP_FLAT_MIN_SHARE, Math.min(1, ((spell.dmg[0] + spell.dmg[1]) / 2) / USP_FLAT_FULL_HIT));
+    let common = 1;
+    try { common = _uspCommonMult(spell); } catch (e) { common = 1; }
+    const rank = getSpellRankDamageMultForSkill(spellId);
     let count = 1;
     if (spell.behavior === 'volley' || spell.behavior === 'starfall' || spell.behavior === 'wild') count = spell.count || 1;
     else if (spell.behavior === 'ticks') count = 1 + (spell.ticks || 0);
@@ -3021,23 +3043,26 @@ export function getUniversalSpellDamageEstimate(spellId) {
     // Melee strikes also deal a full swing of the equipped melee weapon (see
     // calcUniversalSpellHit): shown as part of the per-hit range, split across
     // multi-hit strikes. Rend's swing rides its opening strike only.
-    let swing = 0;
+    const isTickSpell = spell.behavior === 'ticks';
     const swingHits = (spell.castKind === 'melee' && spell.melee) ? Math.max(1, Math.round(spell.melee.hits || 1)) : 0;
-    if (swingHits && spell.damageKind === 'physical' && !spell.melee.noWeapon && spell.behavior !== 'aura') {
-        try {
-            const stats = globalThis._computePlayerStats();
-            const part = _uspPhysicalWeaponPart(spell, stats, getUniversalSpellDamageBonus(spell));
-            swing = (part.flat / swingHits) * (1 + part.incPct / 100);
-        } catch (e) { swing = 0; }
-    }
+    const useSwing = swingHits > 0 && spell.damageKind === 'physical' && !spell.melee.noWeapon && spell.behavior !== 'aura';
+    const hitOpts = useSwing ? { isMelee: true, meleeHits: swingHits } : {};
+    const scale = (base, o) => {
+        const r = _uspScaleBase(spell, base, flatShare, o, stats, tree);
+        return { dmg: r.dmg * common * rank, swing: r.swing * common };
+    };
+    const tickOpts = isTickSpell ? Object.assign({}, hitOpts, { isTick: true }) : hitOpts;
+    const lo = scale(spell.dmg[0], tickOpts);
+    const hi = scale(spell.dmg[1], tickOpts);
+    const swing = useSwing ? scale(spell.dmg[0], hitOpts).swing : 0;
     if (swingHits > 1) count = swingHits;
-    const swingOnce = spell.behavior === 'ticks' ? Math.round(swing) : 0;
-    const perHitSwing = spell.behavior === 'ticks' ? 0 : Math.round(swing);
-    const hitMin = perHitMin + perHitSwing;
-    const hitMax = perHitMax + perHitSwing;
+    const swingOnce = isTickSpell ? Math.round(swing) : 0;
+    const perHitSwing = isTickSpell ? 0 : Math.round(swing);
+    const hitMin = Math.max(1, Math.round(lo.dmg)) + perHitSwing;
+    const hitMax = Math.max(1, Math.round(hi.dmg)) + perHitSwing;
     return {
-        perHitMin: spell.behavior === 'ticks' ? perHitMin + Math.round(swing) : hitMin,
-        perHitMax: spell.behavior === 'ticks' ? perHitMax + Math.round(swing) : hitMax,
+        perHitMin: isTickSpell ? hitMin + Math.round(swing) : hitMin,
+        perHitMax: isTickSpell ? hitMax + Math.round(swing) : hitMax,
         count,
         totalMin: hitMin * count + swingOnce,
         totalMax: hitMax * count + swingOnce,

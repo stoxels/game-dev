@@ -346,20 +346,23 @@ export function showSetup() {
     }
 }
 
-// Confirms setup and navigates to the temporary dev mode-select screen.
-// TEMP: once Adventure Mode replaces the world map, this should go straight
-// back to calling launchExistingGame()'s body, and screen-mode-select /
-// this function's redirect can be deleted.
+// Confirms setup and goes straight into the campaign world map. The dev
+// mode-select screen (screen-mode-select, campaign vs. endgame test) is
+// switched off while only the campaign is being reworked; flip
+// MODE_SELECT_ENABLED to bring it back.
+const MODE_SELECT_ENABLED = false;
+
 export function confirmSetup() {
     globalThis.screenHistory.push('screen-setup');
-    switchScreen('screen-mode-select');
+    if (MODE_SELECT_ENABLED) {
+        switchScreen('screen-mode-select');
+        return;
+    }
+    _enterCampaign();
 }
 
-// Launches the existing world-map implementation.
-// This is the exact logic that used to run at the end of confirmSetup() -
-// unchanged, just moved behind the dev mode-select screen.
-export function launchExistingGame() {
-    globalThis.screenHistory.push('screen-mode-select');
+// Opens the world-map implementation (the campaign).
+function _enterCampaign() {
     STATE.mapViewEnabled = true;
     if (typeof save === 'function') save();
 
@@ -371,6 +374,12 @@ export function launchExistingGame() {
         renderLevelSelect();
         switchScreen('screen-levels');
     }
+}
+
+// Launches the world map from the dev mode-select screen's button.
+export function launchExistingGame() {
+    globalThis.screenHistory.push('screen-mode-select');
+    _enterCampaign();
 }
 
 // Launches the endgame Nexus of Worlds screen (see endgame-nexus.js).

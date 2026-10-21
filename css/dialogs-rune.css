@@ -1,0 +1,339 @@
+/* ════════════════════════════════════════════════════════════════════════
+   RUNE DIALOGS - hub-style skin for the Code modal (#pw-modal), the Retry
+   setup dialog (#retry-setup-modal), the Keep-or-revert prompt
+   (#retry-keep-modal) and the tutorial Professor's speech bubble.
+   Same family as css/hub/hub-dialogs.css: dimmed art backdrop, dark rune
+   frame (Settings frame as border-image), plaque title, stone buttons,
+   gold accents. Looks only - markup, ids and game code are untouched.
+   Loaded after modals.css / tutorial.css so these id-scoped rules win.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* Dimmed art backdrop */
+#pw-modal,
+#retry-setup-modal,
+#retry-keep-modal {
+    background:
+        linear-gradient(rgba(8, 6, 16, 0.86), rgba(4, 3, 9, 0.94)),
+        url('../images/Game_Setup/Game_Setup_New_Background.webp') center bottom / cover no-repeat;
+    backdrop-filter: none;
+}
+
+/* Rune frame, dark inside so text stays readable */
+#pw-modal .pw-box,
+#retry-setup-modal .retry-setup-box,
+#retry-keep-modal .modal-box-danger {
+    position: relative;
+    box-sizing: border-box;
+    width: min(var(--rd-w, 620px), 94vw);
+    max-width: none;
+    aspect-ratio: auto;
+    max-height: min(780px, 94vh);
+    border: 40px solid transparent;
+    border-image: url('../images/Settings/settings_background.webp') 46 / 40px stretch;
+    border-radius: 0;
+    background: rgba(14, 12, 24, 0.95);
+    background-clip: padding-box;
+    box-shadow: none;
+    padding: 0 clamp(10px, 2vw, 22px) clamp(10px, 2vh, 18px);
+    overflow: visible;
+    color: #f3e6c8;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 10px;
+    container-type: inline-size;
+    filter: drop-shadow(0 0 24px rgba(140, 90, 220, 0.35)) drop-shadow(0 16px 26px rgba(0, 0, 0, 0.7));
+}
+#pw-modal .pw-box { --rd-w: 600px; }
+#retry-setup-modal .retry-setup-box { --rd-w: 900px; }
+#retry-keep-modal .modal-box-danger { --rd-w: 800px; }
+
+/* Plaque title in flow, overlapping the frame's top edge */
+#pw-modal .pw-box .modal-title,
+#retry-setup-modal .retry-setup-box .modal-title,
+#retry-keep-modal .modal-box-danger .modal-title {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    flex: 0 0 auto;
+    align-self: center;
+    width: min(440px, 92%);
+    height: 62px;
+    margin: -26px 0 4px;
+    padding: 0 44px;
+    box-sizing: border-box;
+    background: url('../images/Settings/settings_title_plague.webp') center / 100% 100% no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--C);
+    font-size: clamp(12px, 1.3vw, 16px);
+    letter-spacing: 3px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
+    color: #f3dc9a;
+    text-shadow: 0 2px 3px #000;
+    z-index: 3;
+}
+
+/* Stone close button, hanging off the frame corner */
+#pw-modal .pw-box .modal-close,
+#retry-setup-modal .retry-setup-box .modal-close {
+    position: absolute;
+    top: -26px;
+    right: -26px;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    font-size: 0;
+    border: none;
+    border-radius: 0;
+    background: url('../images/Settings/settings_close_button.webp') center / 100% 100% no-repeat transparent;
+    z-index: 5;
+    transition: filter .12s, transform .12s;
+}
+#pw-modal .pw-box .modal-close:hover,
+#retry-setup-modal .retry-setup-box .modal-close:hover {
+    filter: brightness(1.35) drop-shadow(0 0 6px rgba(255, 120, 90, 0.7));
+    transform: scale(1.06);
+}
+
+/* ── Code modal ─────────────────────────────────────────────────────── */
+#pw-modal .pw-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 4px 6px;
+    scrollbar-color: #8a7a4a transparent;
+}
+#pw-modal .pw-scroll::-webkit-scrollbar-track { background: transparent; }
+#pw-modal .pw-scroll::-webkit-scrollbar-thumb { background: #8a7a4a; }
+#pw-modal .pw-intro {
+    font-size: clamp(14px, 2.4cqw, 17px);
+    color: #f3e6c8;
+    text-shadow: 0 1px 3px #000;
+}
+#pw-modal .pw-card {
+    background: rgba(8, 6, 16, 0.55);
+    border: 1px solid rgba(240, 225, 180, 0.22);
+    border-left: 3px solid #c8a84b;
+    border-radius: 3px;
+    box-shadow: none;
+}
+#pw-modal .pw-card-title {
+    font-size: clamp(10px, 1.8cqw, 13px);
+    color: #f3dc9a;
+    text-shadow: 0 2px 2px #000;
+}
+#pw-modal .pw-unlock-anim {
+    color: #ffe9a8;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid #8a7a4a;
+    border-radius: 2px;
+    text-shadow: 0 0 10px rgba(255, 200, 80, 0.6);
+}
+#pw-modal .pw-hint,
+#pw-modal .pw-card-status-score,
+#pw-modal .pw-card-status-ach { color: #cdbf95; }
+#pw-modal .pw-card-status-score { color: #8fd9a0; }
+#pw-modal .pw-card-status-ach { color: #f0b86a; }
+
+/* ── Retry setup ────────────────────────────────────────────────────── */
+#retry-setup-modal .retry-setup-box {
+    text-align: left;
+    overflow: visible;
+}
+#retry-setup-modal .retry-setup-hint {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 10px 14px;
+    text-align: center;
+    font-size: clamp(14px, 2.2cqw, 17px);
+    font-weight: 400;
+    color: #f3e6c8;
+    text-shadow: 0 1px 3px #000;
+    background: rgba(8, 6, 16, 0.55);
+    border: 1px solid rgba(240, 225, 180, 0.22);
+    border-left: 3px solid #c8a84b;
+    border-radius: 3px;
+}
+#retry-setup-modal .retry-setup-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 2px 6px 6px;
+    scrollbar-color: #8a7a4a transparent;
+}
+#retry-setup-modal .retry-setup-body::-webkit-scrollbar-thumb { background: #8a7a4a; }
+#retry-setup-modal .retry-setup-section-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 12px 0 10px;
+    font-size: 12px;
+    color: #f3dc9a;
+    text-shadow: 0 2px 2px #000;
+}
+#retry-setup-modal .retry-setup-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(240, 225, 180, 0.3);
+}
+/* All six modifiers on one row when the dialog is wide enough */
+#retry-setup-modal .retry-setup-mods-row { flex-wrap: nowrap; gap: 8px; }
+#retry-setup-modal .retry-setup-mods-row .mod-wrapper { flex: 1 1 0; width: auto; min-width: 0; }
+#retry-setup-modal .retry-setup-mods-row .mod-title { font-size: clamp(9px, 1.5cqw, 13px); padding: 0 2px; }
+@media (max-width: 760px) {
+    #retry-setup-modal .retry-setup-mods-row { flex-wrap: wrap; }
+    #retry-setup-modal .retry-setup-mods-row .mod-wrapper { flex: 0 0 30%; }
+}
+#retry-setup-modal .retry-setup-mods-row .mod-score-tag {
+    color: #cdbf95;
+    text-shadow: 0 1px 2px #000;
+}
+#retry-setup-modal .retry-setup-mods-row .mod-per-desc {
+    color: #f3e6c8;
+    text-shadow: 0 1px 2px #000;
+}
+#retry-setup-modal .retry-setup-actions {
+    flex: 0 0 auto;
+    margin: 0;
+    padding-top: 8px;
+    border-top: 1px solid rgba(240, 225, 180, 0.2);
+}
+
+/* ── Keep or revert ─────────────────────────────────────────────────── */
+#retry-keep-modal .reset-body-text {
+    margin: 0;
+    padding: 10px 14px;
+    text-align: center;
+    font-size: clamp(14px, 2.4cqw, 17px);
+    line-height: 1.6;
+    color: #f3e6c8;
+    text-shadow: 0 1px 3px #000;
+}
+#retry-keep-modal .retry-keep-compare {
+    margin: 0;
+    gap: 8px;
+    font-family: var(--C);
+    font-size: clamp(13px, 2.3cqw, 16px);
+    color: #f3e6c8;
+}
+#retry-keep-modal .retry-keep-row {
+    padding: 8px 12px;
+    background: rgba(8, 6, 16, 0.55);
+    border: 1px solid rgba(240, 225, 180, 0.22);
+    border-left-width: 3px;
+    border-radius: 3px;
+    opacity: 1;
+}
+#retry-keep-modal .retry-keep-row-new { border-left-color: #5fbf7f; }
+#retry-keep-modal .retry-keep-row-prev { border-left-color: #8a7a4a; }
+#retry-keep-modal .retry-keep-label {
+    margin-right: 6px;
+    font-size: 0.8em;
+    letter-spacing: 2px;
+    color: #cdbf95;
+    opacity: 1;
+}
+#retry-keep-modal .retry-keep-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* ── Stone action buttons (start / keep / replay again / revert) ───── */
+#retry-setup-modal .retry-start-btn,
+#retry-keep-modal .retry-keep-btn,
+#retry-keep-modal .retry-again-btn,
+#retry-keep-modal .retry-revert-btn {
+    min-width: 150px;
+    padding: 16px 26px;
+    font-family: var(--PX);
+    font-size: clamp(10px, 1.6cqw, 12px);
+    letter-spacing: 2px;
+    color: #f0d98a;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
+    border: none;
+    border-radius: 0;
+    background: url('../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+    box-shadow: none;
+    cursor: pointer;
+    transition: filter .15s, transform .12s;
+}
+#retry-setup-modal .retry-start-btn,
+#retry-keep-modal .retry-keep-btn {
+    color: #ffe9a8;
+    filter: drop-shadow(0 0 8px rgba(255, 190, 70, 0.5));
+}
+#retry-keep-modal .retry-keep-btn { filter: drop-shadow(0 0 8px rgba(110, 220, 140, 0.5)); }
+#retry-keep-modal .retry-revert-btn { color: #cdbf95; }
+#retry-setup-modal .retry-start-btn:hover,
+#retry-keep-modal .retry-keep-btn:hover,
+#retry-keep-modal .retry-again-btn:hover,
+#retry-keep-modal .retry-revert-btn:hover {
+    color: #fff3c4;
+    filter: brightness(1.28);
+    transform: translateY(-1px);
+    box-shadow: none;
+}
+#retry-setup-modal .retry-start-btn:active,
+#retry-keep-modal .retry-keep-btn:active,
+#retry-keep-modal .retry-again-btn:active,
+#retry-keep-modal .retry-revert-btn:active { transform: translateY(1px); }
+
+/* ── Professor speech bubble ────────────────────────────────────────── */
+/* Dark rune card with a gold edge and a gold tail, instead of the white
+   comic bubble the player's banter uses. */
+#tq-professor-wrap .tq-bubble {
+    padding: 12px 16px 14px;
+    background: linear-gradient(180deg, rgba(30, 24, 46, 0.97), rgba(14, 12, 24, 0.97));
+    color: #f3e6c8;
+    border: 2px solid #c8a84b;
+    border-radius: 6px;
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 233, 168, 0.18),
+        inset 0 0 18px rgba(140, 90, 220, 0.15),
+        0 6px 16px rgba(0, 0, 0, 0.6),
+        0 0 18px rgba(200, 168, 75, 0.25);
+    font-family: var(--C);
+    font-size: clamp(13px, 1.5vw, 16px);
+    line-height: 1.5;
+}
+#tq-professor-wrap .tq-bubble::after { border-left-color: #c8a84b; }
+#tq-professor-wrap .tq-bubble::before { border-left-color: #14101e; }
+#tq-professor-wrap .tq-bubble-name {
+    display: inline-block;
+    margin-bottom: 6px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid rgba(200, 168, 75, 0.45);
+    font-size: 0.78em;
+    letter-spacing: 3px;
+    color: #f3dc9a;
+    text-shadow: 0 2px 2px #000;
+}
+#tq-professor-wrap .tq-bubble-text strong,
+#tq-professor-wrap .tq-bubble-text b { color: #ffe9a8; }
+#tq-professor-wrap .tq-bubble-continue {
+    min-width: 130px;
+    padding: 12px 22px;
+    font-family: var(--PX);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #ffe9a8;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
+    background: url('../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    filter: drop-shadow(0 0 8px rgba(255, 190, 70, 0.5));
+    animation: none;
+}
+#tq-professor-wrap .tq-bubble-continue:hover {
+    color: #fff3c4;
+    filter: brightness(1.28) drop-shadow(0 0 10px rgba(255, 190, 70, 0.7));
+    box-shadow: none;
+}
+#tq-professor-wrap .tq-bubble-choices { gap: 6px; }
+#tq-professor-wrap .tq-bubble-choices .tq-bubble-choice { min-width: 0; padding: 12px 16px; }

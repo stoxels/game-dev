@@ -78,12 +78,17 @@ function _buildSlotCardHtml(slotNum, summary) {
         ? `<div class="ssc-player-level">${t('eg_lvl_short').replace('{n}', summary.playerLevel)}</div>`
         : '';
 
-    return `${headingHtml}
-              ${portraitHtml}
-              ${_buildSlotTitleHtml(summary)}
-              <div class="ssc-score">${t('score_lbl')}: ${summary.totalScore}</div>
-              <div class="ssc-levels">${t('scr_stoxels_done').replace('{n}', summary.levelsDone)}</div>
-              ${levelHtml}
+    // Portrait on the left, text stack on the right (css/save-slots.css rune skin).
+    return `<div class="ssc-body">
+                ${portraitHtml}
+                <div class="ssc-info">
+                  ${headingHtml}
+                  ${_buildSlotTitleHtml(summary)}
+                  <div class="ssc-score">${t('score_lbl')}: ${summary.totalScore}</div>
+                  <div class="ssc-levels">${t('scr_stoxels_done').replace('{n}', summary.levelsDone)}</div>
+                  ${levelHtml}
+                </div>
+              </div>
               <button class="ssc-name-btn" data-slot="${slotNum}" data-tip-t="scr_slot_name_edit" aria-label="${t('scr_slot_name_edit')}">✏️</button>
               <button class="ssc-delete-btn" data-slot="${slotNum}" data-tip-t="scr_delete_save" aria-label="${t('scr_delete_save')}">❌</button>`;
 }

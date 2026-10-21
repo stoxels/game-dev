@@ -59,7 +59,7 @@ const WD_WALK_SPEED_PX_PER_SEC = 96;
 const WD_WALK_REF_WIDTH = 1000;
 
 // Maps modifier keys → short display labels / CSS classes for the tooltip (mirrors screens-level-select.js)
-const WD_MOD_LABELS = { timetrial: 'TT', hardcore: 'HC', ironman: 'IM', classless: 'CL', treeless: 'TR' };
+const WD_MOD_LABELS = { timetrial: 'TT', hardcore: 'HC', ironman: 'IM', classless: 'CL', treeless: 'TR', superTutor: 'PROFESSOR' };
 const WD_MOD_CLASSES = { timetrial: 'tt', hardcore: 'hc', ironman: 'im', classless: 'cl', treeless: 'tl' };
 const WD_BONUS_ICONS = {
     nomiss: '✨', fast: '⚡', noitem: '🎒', quiz: '🧠', gauntlet: '⚔️', combo: '🔥', lowmiss: '🎯',

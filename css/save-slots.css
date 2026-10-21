@@ -506,3 +506,228 @@
         font-size: 10px;
     }
 }
+
+
+/* ============================================================
+   RUNE SKIN - hub-style redesign of the save slot select screen.
+   Dimmed art backdrop, title plaque, rune-stone slot cards with a
+   gold hover glow, ribbon slot numbers, stone icon buttons. Looks
+   only: markup, classes and behaviour are untouched. Placed last so
+   these id-scoped rules win over the base card rules above.
+   ============================================================ */
+#screen-save-slots.active {
+    background:
+        linear-gradient(rgba(8, 6, 16, 0.80), rgba(4, 3, 9, 0.92)),
+        url('../images/Game_Setup/Game_Setup_New_Background.webp') center bottom / cover no-repeat;
+}
+
+#screen-save-slots .ss-topbar { padding: 12px 20px 6px; }
+#screen-save-slots .ss-title {
+    min-width: min(420px, 60%);
+    box-sizing: border-box;
+    padding: 18px 54px;
+    text-align: center;
+    font-family: var(--C);
+    font-size: clamp(13px, 1.4vw, 18px);
+    letter-spacing: 4px;
+    color: #f3dc9a;
+    text-shadow: 0 2px 3px #000;
+    background: url('../images/Settings/settings_title_plague.webp') center / 100% 100% no-repeat;
+}
+
+#screen-save-slots .ss-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 columns x 5 rows */
+    grid-template-rows: repeat(5, minmax(150px, 1fr));
+    gap: 16px 22px;
+    padding: 14px 28px 28px;
+    scrollbar-color: #8a7a4a transparent;
+}
+#screen-save-slots .ss-grid::-webkit-scrollbar-thumb { background: #8a7a4a; }
+#screen-save-slots .ss-grid::-webkit-scrollbar-track { background: transparent; }
+
+/* Rune-stone card: the Settings frame as a slim border, dark inside */
+#screen-save-slots .save-slot-card {
+    box-sizing: border-box;
+    border: 16px solid transparent;
+    border-image: url('../images/Settings/settings_background.webp') 46 / 16px stretch;
+    border-radius: 0;
+    background: linear-gradient(180deg, rgba(26, 22, 42, 0.96), rgba(12, 10, 22, 0.97));
+    background-clip: padding-box;
+    color: #f3e6c8;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
+    transition: transform .14s, filter .14s;
+}
+#screen-save-slots .save-slot-card:hover {
+    border-color: transparent;
+    transform: translateY(-4px);
+    filter: drop-shadow(0 0 14px rgba(255, 200, 90, 0.55)) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.6));
+}
+
+/* Empty slot: calm, with a gold dashed "place to begin" inside */
+#screen-save-slots .save-slot-card.empty {
+    opacity: 1;
+    border-style: solid;
+    background:
+        radial-gradient(circle at 50% 62%, rgba(200, 168, 75, 0.10), transparent 62%),
+        linear-gradient(180deg, rgba(20, 17, 33, 0.94), rgba(10, 8, 18, 0.96));
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5)) saturate(.8);
+    justify-content: flex-start;
+}
+#screen-save-slots .save-slot-card.empty:hover { filter: drop-shadow(0 0 14px rgba(255, 200, 90, 0.5)) saturate(1); }
+#screen-save-slots .save-slot-card.empty .ssc-empty {
+    margin-top: auto;
+    margin-bottom: auto;
+    padding: 18px 12px;
+    width: 86%;
+    box-sizing: border-box;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #cdbf95;
+    border: 1px dashed rgba(200, 168, 75, 0.45);
+    border-radius: 3px;
+    text-shadow: 0 2px 2px #000;
+}
+#screen-save-slots .save-slot-card.empty:hover .ssc-empty { color: #f3dc9a; border-color: rgba(243, 220, 154, 0.8); }
+
+/* Slot number as a small gold ribbon */
+#screen-save-slots .ssc-num {
+    display: inline-block;
+    margin: -4px 0 8px;
+    padding: 4px 14px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    white-space: nowrap;
+    color: #f3dc9a;
+    text-shadow: 0 2px 2px #000;
+    background: rgba(200, 168, 75, 0.14);
+    border: 1px solid rgba(200, 168, 75, 0.45);
+    border-radius: 2px;
+}
+#screen-save-slots .ssc-num-named { opacity: .85; color: #cdbf95; }
+#screen-save-slots .ssc-name {
+    max-width: 100%;
+    box-sizing: border-box;
+    color: #ffe9a8;
+    text-shadow: 0 2px 3px #000;
+}
+
+/* Portrait on a soft glow, so the character reads against the dark stone */
+#screen-save-slots .ssc-portrait {
+    filter: drop-shadow(0 0 12px rgba(200, 168, 75, 0.35)) drop-shadow(0 4px 4px rgba(0, 0, 0, 0.6));
+}
+#screen-save-slots .ssc-title { font-size: 14px; color: #f3dc9a; text-shadow: 0 2px 2px #000; }
+#screen-save-slots .ssc-score,
+#screen-save-slots .ssc-levels { color: #f3e6c8; text-shadow: 0 2px 2px #000; }
+#screen-save-slots .ssc-score { font-size: 17px; }
+#screen-save-slots .ssc-levels { font-size: 15px; color: #cdbf95; }
+#screen-save-slots .ssc-player-level {
+    color: #ffe9a8;
+    background: rgba(200, 168, 75, 0.14);
+    border-color: rgba(200, 168, 75, 0.5);
+    border-radius: 2px;
+}
+
+/* Edit / delete: small stone round buttons tucked into the frame corners */
+#screen-save-slots .ssc-name-btn,
+#screen-save-slots .ssc-delete-btn {
+    top: -2px;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    line-height: 1;
+    opacity: .85;
+    background: rgba(8, 6, 16, 0.85);
+    border: 1px solid rgba(200, 168, 75, 0.55);
+    border-radius: 50%;
+    transition: background .12s, border-color .12s, transform .12s, opacity .12s;
+}
+#screen-save-slots .ssc-name-btn { left: -2px; }
+#screen-save-slots .ssc-delete-btn { right: -2px; }
+#screen-save-slots .ssc-name-btn:hover { background: rgba(200, 168, 75, 0.3); border-color: #f3dc9a; opacity: 1; transform: scale(1.1); }
+#screen-save-slots .ssc-delete-btn:hover { background: rgba(176, 58, 46, 0.5); border-color: #ff8a70; opacity: 1; transform: scale(1.1); }
+
+@media (max-width: 900px) {
+    #screen-save-slots .ss-grid { gap: 10px; padding: 10px 14px 18px; }
+    #screen-save-slots .save-slot-card {
+        border-width: 10px;
+        border-image-width: 10px;
+        min-height: 120px;
+    }
+    #screen-save-slots .ssc-num { font-size: 8px; padding: 3px 8px; letter-spacing: 2px; }
+    #screen-save-slots .ssc-score { font-size: 13px; }
+    #screen-save-slots .ssc-levels { font-size: 12px; }
+    #screen-save-slots .ssc-title { font-size: 11px; }
+    #screen-save-slots .ss-title { padding: 12px 36px; }
+}
+@media (max-width: 700px) {
+    #screen-save-slots .ss-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); grid-template-rows: none; grid-auto-rows: minmax(140px, auto); }
+    #screen-save-slots .ss-title { min-width: 0; padding: 10px 22px; font-size: 10px; letter-spacing: 2px; }
+}
+
+
+/* ------------------------------------------------------------
+   HORIZONTAL SLOT CARDS (4 columns x 5 rows)
+   Portrait on the left inside the frame, text stack on the right, so the
+   sprite never overflows and score / stoxels done / level stay visible.
+   ------------------------------------------------------------ */
+#screen-save-slots .save-slot-card { min-height: 0; justify-content: center; }
+#screen-save-slots .ssc-body {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 0 6px;
+    box-sizing: border-box;
+}
+#screen-save-slots .ssc-body .ssc-portrait {
+    flex: 0 0 auto;
+    width: auto;
+    height: 100%;
+    max-height: 120px;
+    aspect-ratio: 1 / 1;
+    margin: 0;
+    object-fit: contain;
+}
+#screen-save-slots .ssc-info {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 3px;
+    text-align: left;
+}
+#screen-save-slots .ssc-info .ssc-num { margin: 0 0 4px; }
+#screen-save-slots .ssc-info .ssc-name { padding: 0; margin: 0 0 2px; width: 100%; font-size: 13px; }
+#screen-save-slots .ssc-info .ssc-title { margin: 0; font-size: 13px; }
+#screen-save-slots .ssc-info .ssc-score { margin: 2px 0 0; font-size: 16px; }
+#screen-save-slots .ssc-info .ssc-levels { margin: 0; font-size: 14px; }
+#screen-save-slots .ssc-info .ssc-player-level { margin: 4px 0 0; }
+
+@media (max-width: 900px) {
+    #screen-save-slots .ssc-body { gap: 8px; padding: 0 2px; }
+    #screen-save-slots .ssc-body .ssc-portrait { max-height: 84px; }
+    #screen-save-slots .ssc-info .ssc-score { font-size: 13px; }
+    #screen-save-slots .ssc-info .ssc-levels { font-size: 12px; }
+}
+
+/* Tighter text stack so the fullest card (custom name + title + level badge)
+   stays inside the frame at the smallest row height. */
+#screen-save-slots .ssc-info { gap: 1px; }
+#screen-save-slots .ssc-info .ssc-num { margin: 0 0 2px; padding: 2px 10px; font-size: 9px; }
+#screen-save-slots .ssc-info .ssc-name { font-size: 12px; margin: 0; }
+#screen-save-slots .ssc-info .ssc-title { font-size: 12px; }
+#screen-save-slots .ssc-info .ssc-score { font-size: 15px; margin: 1px 0 0; }
+#screen-save-slots .ssc-info .ssc-levels { font-size: 13px; }
+#screen-save-slots .ssc-info .ssc-player-level { margin: 2px 0 0; padding: 1px 8px; font-size: 10px; }

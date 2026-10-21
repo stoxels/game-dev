@@ -555,6 +555,27 @@ const USP_SPELL_PROJ = {
                 '</div>';
         },
     },
+    // Fireball - a true round fireball, not the shared fire bolt: a swirling
+    // molten sphere dragging a long comet tail of flame, shedding embers.
+    usp_fireball: {
+        cssClass: 'usp-proj-fireball', duration: 750, easing: 'ease-in', rotOffset: 0,
+        scale: 1.7,
+        build(root) {
+            root.innerHTML =
+                '<div class="egp usp-p-fb">' +
+                    '<div class="usp-p-fb-tongue usp-p-fb-tongue-1"></div>' +
+                    '<div class="usp-p-fb-tongue usp-p-fb-tongue-2"></div>' +
+                    '<div class="usp-p-fb-tongue usp-p-fb-tongue-3"></div>' +
+                    '<div class="usp-p-fb-ember usp-p-fb-ember-1"></div>' +
+                    '<div class="usp-p-fb-ember usp-p-fb-ember-2"></div>' +
+                    '<div class="usp-p-fb-ember usp-p-fb-ember-3"></div>' +
+                    '<div class="usp-p-fb-ball">' +
+                        '<div class="usp-p-fb-swirl"></div>' +
+                        '<div class="usp-p-fb-core"></div>' +
+                    '</div>' +
+                '</div>';
+        },
+    },
     usp_pyroblast: {
         cssClass: 'usp-proj-pyroblast', duration: 850, easing: 'ease-in', rotOffset: 0,
         scale: 2.4, isBig: true,
@@ -1291,11 +1312,17 @@ export function _uspRenewalBloom(spell, ms) {
         el.className = 'usp-renew-bloom';
         el.style.left = `${c.x}px`;
         el.style.top = `${c.y}px`;
-        let petals = '';
-        for (let p = 1; p <= 6; p++) petals += `<div class="usp-renew-petal usp-renew-petal-${p}"></div>`;
+        let back = '', front = '', motes = '';
+        for (let p = 1; p <= 6; p++) back += `<div class="usp-renew-petal usp-renew-petal-back usp-renew-petal-${p}"></div>`;
+        for (let p = 1; p <= 6; p++) front += `<div class="usp-renew-petal usp-renew-petal-${p}"></div>`;
+        for (let m = 1; m <= 7; m++) motes += `<div class="usp-renew-mote usp-renew-mote-${m}"></div>`;
         el.innerHTML =
-            '<div class="usp-renew-glow"></div>' + petals +
-            '<div class="usp-renew-core"></div>';
+            '<div class="usp-renew-ring"></div>' +
+            '<div class="usp-renew-glow"></div>' +
+            `<div class="usp-renew-layer usp-renew-layer-back">${back}</div>` +
+            `<div class="usp-renew-layer usp-renew-layer-front">${front}</div>` +
+            '<div class="usp-renew-core"></div>' +
+            motes;
         document.body.appendChild(el);
         _uspBloomEls[spell.id] = el;
         if (!_uspBloomRaf) _uspBloomRaf = requestAnimationFrame(_uspBloomTrack);

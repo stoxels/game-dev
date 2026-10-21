@@ -44,6 +44,8 @@ const AIL_IGNITE_DMG_SHARE = 0.15;   // dps = share of the triggering hit
 // Innate on-hit ailment of signature spells (spell id -> ailment + chance %).
 const SPELL_INNATE_AILMENT = {
     usp_fireball: { key: 'ignite', pct: 25 },
+    // Magma Shot: the chance grows with spell rank (35% at rank 1, +5% per rank).
+    usp_pyroblast: { key: 'ignite', pct: 35, pctPerRank: 5 },
     usp_ball_lightning: { key: 'shocked', pct: 25 },
 };
 // Bleed mirrors ignite one-to-one: a physical damage-over-time status with
@@ -772,7 +774,11 @@ function _rollPlayerHitAilments(target, amount, elements, opts) {
     // Signature spells carry an innate ailment chance of their own (stacks
     // with gear/tree chances; each roll is independent).
     const spellInnate = (opts && opts.spellId) ? SPELL_INNATE_AILMENT[opts.spellId] : null;
-    if (spellInnate && Math.random() * 100 < spellInnate.pct) {
+    let spellInnatePct = spellInnate ? spellInnate.pct : 0;
+    if (spellInnate && spellInnate.pctPerRank && typeof globalThis.getSkillCastRankFull === 'function') {
+        try { spellInnatePct += spellInnate.pctPerRank * (Math.max(1, Number(globalThis.getSkillCastRankFull(opts.spellId)) || 1) - 1); } catch (e) { /* base chance only */ }
+    }
+    if (spellInnate && Math.random() * 100 < spellInnatePct) {
         if (spellInnate.key === 'ignite') {
             _applyMonsterAilment(target, 'ignite', Math.max(AIL_MIN_DOT_DAMAGE, amount * AIL_IGNITE_DMG_SHARE) * critDotMult);
         } else {

@@ -301,6 +301,11 @@ export function renderSkillHotbar() {
     if (typeof globalThis.ensureSkillHotbar === 'function') globalThis.ensureSkillHotbar();
     bar.style.display = '';
 
+    // The rebuild below replaces the hovered slot without a mouseleave, so only
+    // then must its tooltip go (an unrelated tooltip, e.g. a spell book charm,
+    // stays up through the regen-tick re-renders).
+    if (bar.matches(':hover')) hideHUDTooltip();
+
     // Column count drives the CSS grid; kept configurable for future bars.
     bar.style.setProperty('--skill-hotbar-cols', String(SKILL_HOTBAR_COLS));
 
