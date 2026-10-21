@@ -64,7 +64,7 @@ const PT_TRAVEL_STAT_KEY_ALIASES = new Map([
     ['travel_regression_reward_1', 'regression_reward_1'],
 ]);
 
-export function _ptCanonicalStatKey(statKey) {
+function _ptCanonicalStatKey(statKey) {
     if (typeof statKey !== 'string') return '';
     return PT_TRAVEL_STAT_KEY_ALIASES.get(statKey) || statKey;
 }
@@ -82,7 +82,7 @@ export const PT_BRANCH_STATISTICIAN = new Set([
     'god_of_statistics',
 ]);
 
-export const PT_BRANCH_MATHMAGICIAN = new Set([
+const PT_BRANCH_MATHMAGICIAN = new Set([
     'gear_of_the_mathmagician', 'improved_gear_of_the_mathmagician',
     'arcane_echo', 'resonant_reveal', 'arcane_exposure',
     'rapid_revelation', 'accelerated_revelation',
@@ -93,7 +93,7 @@ export const PT_BRANCH_MATHMAGICIAN = new Set([
     'god_of_math',
 ]);
 
-export const PT_BRANCH_PROBABILIST = new Set([
+const PT_BRANCH_PROBABILIST = new Set([
     'gear_of_the_probabilist', 'improved_gear_of_the_probabilist',
     'probabilistic_sweep', 'expanded_inference', 'momentum_of_certainty',
     'swift_marking', 'accelerated_marking',
@@ -236,7 +236,7 @@ function _ptSyncBaseAttributes() {
 }
 
 // Decrements the point counter by 1 (floor 0) and refreshes the UI label
-export function _ptSpendPoint() {
+function _ptSpendPoint() {
     if (typeof STATE !== 'undefined') {
         STATE.passiveTreePoints = Math.max(0, _ptPoints() - 1);
     }
@@ -244,7 +244,7 @@ export function _ptSpendPoint() {
 }
 
 // Increments the point counter by 1 and refreshes the UI label
-export function _ptRefundPoint() {
+function _ptRefundPoint() {
     if (typeof STATE !== 'undefined') {
         STATE.passiveTreePoints = _ptPoints() + 1;
     }
@@ -328,7 +328,7 @@ export function _ptBfsReachable(startId, availableSet, adjacency = _pt_adjacency
 
 // Returns the statKey string for the skill at the given node ID,
 // or an empty string if the node has no definition.
-export function _ptGetSkillStatKey(nodeId) {
+function _ptGetSkillStatKey(nodeId) {
     const skill = _pt_skillMap[nodeId];
     const def = skill ? skill._def : null;
     return def ? _ptCanonicalStatKey(def.statKey) : '';
@@ -336,7 +336,7 @@ export function _ptGetSkillStatKey(nodeId) {
 
 // Builds and returns a Set of all statKeys that are currently allocated.
 // Filters out any nodes that have no associated definition.
-export function _ptGetAllAllocatedStatKeys() {
+function _ptGetAllAllocatedStatKeys() {
     const alloc = _ptAllocated();
     const keys = new Set();
     for (const nodeId of alloc) {
@@ -394,7 +394,7 @@ export function _ptIsUnlockable(id) {
 }
 
 // Returns true if the given node exists in the allocated set
-export function _ptIsAllocated(id) {
+function _ptIsAllocated(id) {
     return _ptAllocated().has(id);
 }
 
@@ -596,7 +596,7 @@ export function _ptTrackAllocationAchievements(nodeId, alloc) {
 
 // Handles the deallocation path when the player clicks an already-allocated node.
 // Returns true if deallocation succeeded so the caller can exit early.
-export function _ptHandleDeallocation(id, alloc) {
+function _ptHandleDeallocation(id, alloc) {
     if (!_ptIsDeallocatable(id)) return false;
 
     alloc.delete(id);

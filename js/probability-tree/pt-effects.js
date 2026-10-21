@@ -969,7 +969,7 @@ export function ptDerivedNodeEmoji(node) {
 // Display order of the summary sections. `rule` is matched against the
 // effect key; the FIRST category whose rule matches wins, so specific
 // families (puzzle, life, mana, defence) come before broad ones.
-export const PT_STAT_CATEGORIES = Object.freeze([
+const PT_STAT_CATEGORIES = Object.freeze([
     { id: 'puzzle', en: 'Puzzle', de: 'Rätsel',
         rule: /^(timer_start|time_added|mistake_|quiz_|item_(drop|effect)|pickup_lifetime|lucky_tile|first_step|cell_on_kill|mark_on_kill|quick_fill|time_on_|freeze_timer|regen_low_time|glass_clock|long_game|perfectionist|marathon|reveal_projectile|damage_(per_streak|flawless|low_time|after_line|on_mistake)|armour_per_streak|block_flawless|.*_on_line)/ },
     { id: 'attr', en: 'Attributes', de: 'Attribute', rule: /^(str|agi|int)_flat$/ },

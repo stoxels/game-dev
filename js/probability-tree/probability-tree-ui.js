@@ -17,14 +17,14 @@ import { PT_COL_ALLOCATED_BG, PT_COL_ALLOCATED_BORDER, PT_COL_ALLOCATED_DOT, PT_
 
 export let _pt_container = null;  // #pt-canvas element - the outermost scrollable frame
 export let _pt_world = null;  // the zoomable/pannable world <div> inside the container
-export let _pt_svg = null;  // SVG overlay that holds all connection <line> elements
-export let _pt_nodesLayer = null;  // <div> layer that holds all node <div> elements
-export let _pt_tooltip = null;  // floating tooltip <div> that lives in document.body
+let _pt_svg = null;  // SVG overlay that holds all connection <line> elements
+let _pt_nodesLayer = null;  // <div> layer that holds all node <div> elements
+let _pt_tooltip = null;  // floating tooltip <div> that lives in document.body
 
 // Element caches: populated by _ptDrawConnections / _ptDrawNodes,
 // used by style helpers and search to avoid repeated DOM queries.
-export let _pt_nodeEls = {};   // skill id  →  node <div>
-export let _pt_connEls = {};   // conn id   →  SVG <line>
+let _pt_nodeEls = {};   // skill id  →  node <div>
+let _pt_connEls = {};   // conn id   →  SVG <line>
 
 const PT_NODE_POOL_LIMIT = 256;
 const PT_CONN_POOL_LIMIT = 512;
@@ -75,7 +75,7 @@ let _ptReworkBriefingCopied = false;
 // Picks between an English and German string based on the current language
 // code. Centralises the `lang === 'de' ? de : en` pattern used all over
 // the tooltip, search bar, and empty-state copy.
-export function _ptPickLang(lang, en, de) {
+function _ptPickLang(lang, en, de) {
     return lang === 'de' ? de : en;
 }
 
@@ -91,7 +91,7 @@ export function _ptPickLang(lang, en, de) {
 // Keystones use a diamond shape and a different colour palette.
 // A node is a keystone when its statKey starts with 'keystone_', or when
 // either localised name starts with the expected prefix string.
-export function _ptIsKeystoneNode(def) {
+function _ptIsKeystoneNode(def) {
     if (!def) return false;
     return (
         (def.statKey && def.statKey.startsWith('keystone_')) ||
@@ -108,13 +108,13 @@ export function _ptIsKeystoneNode(def) {
 //------------------------------------------------------------------------
 
 // The visual/importance tiers used by the development layout.
-export const PT_TIER_START = 'start';
-export const PT_TIER_TRAVEL = 'travel';
-export const PT_TIER_NOTABLE = 'notable';
-export const PT_TIER_KEYSTONE = 'keystone';
-export const PT_TIER_SMALL = 'small';
+const PT_TIER_START = 'start';
+const PT_TIER_TRAVEL = 'travel';
+const PT_TIER_NOTABLE = 'notable';
+const PT_TIER_KEYSTONE = 'keystone';
+const PT_TIER_SMALL = 'small';
 
-export function _ptGetNodeTier(def) {
+function _ptGetNodeTier(def) {
     if (def && def.tier) return def.tier;
     if (_ptIsKeystoneNode(def)) return PT_TIER_KEYSTONE;
     if (def && def.statKey && def.statKey.startsWith('travel_')) return PT_TIER_TRAVEL;
@@ -135,7 +135,7 @@ export function _ptGetNodeTier(def) {
 // _ptApplyNodeStyle() is the only function that actually touches the DOM.
 
 // --- allocated ---
-export function _ptStylePropsAllocated(tier) {
+function _ptStylePropsAllocated(tier) {
     if (tier === PT_TIER_START) {
         return {
             bg: 'radial-gradient(circle at 50% 35%, #2d2306 0%, #171004 60%, #0d0900 100%)',
@@ -193,7 +193,7 @@ export function _ptStylePropsAllocated(tier) {
 }
 
 // --- unlockable (reachable but not yet taken) ---
-export function _ptStylePropsUnlockable(isStart, tier) {
+function _ptStylePropsUnlockable(isStart, tier) {
     // The start node gets a special golden border even in unlockable state
     if (isStart) {
         return {
@@ -235,14 +235,14 @@ export function _ptStylePropsUnlockable(isStart, tier) {
 }
 
 // --- locked (not reachable) ---
-export function _ptStylePropsLocked() {
+function _ptStylePropsLocked() {
     return PT_STYLE_PROPS_LOCKED;
 }
 
 // Picks the correct style props for the given node id based on its current
 // visual state (allocated / unlockable / locked) and its tier
 // (travel / notable / keystone).
-export function _ptResolveNodeStyleProps(id, state = _ptGetNodeVisualState(id)) {
+function _ptResolveNodeStyleProps(id, state = _ptGetNodeVisualState(id)) {
     const isStart = isPassiveTreeStartNode(id);
     const isSelectedStart = id === getPassiveTreeRootId();
     const skill = globalThis._pt_skillMap[id];
@@ -260,7 +260,7 @@ export function _ptResolveNodeStyleProps(id, state = _ptGetNodeVisualState(id)) 
 
 // Applies pre-resolved style props to the node's DOM element.
 // Also sets opacity: locked nodes are dimmed to 0.45.
-export function _ptApplyNodeStyle(id) {
+function _ptApplyNodeStyle(id) {
     const el = _pt_nodeEls[id];
     if (!el) return;
 
@@ -299,14 +299,14 @@ export function _ptApplyNodeStyle(id) {
 // Resolves the stroke colour for a single connection line.
 // Both-allocated connections get the bright allocated colour;
 // everything else (one side active, neither active) uses the dimmer unlocked colour.
-export function _ptResolveConnColor(fromId, toId) {
+function _ptResolveConnColor(fromId, toId) {
     const alloc = _ptAllocated();
     if (alloc.has(fromId) && alloc.has(toId)) return PT_CONN_ALLOCATED;
     return PT_CONN_UNLOCKED;
 }
 
 // Writes the resolved stroke colour onto the SVG <line> element.
-export function _ptApplyConnStyle(connId, fromId, toId) {
+function _ptApplyConnStyle(connId, fromId, toId) {
     const line = _pt_connEls[connId];
     if (!line) return;
     line.setAttribute('stroke', _ptResolveConnColor(fromId, toId));
@@ -342,7 +342,7 @@ export function _ptRefreshAllStyles(affectedIds) {
 //------------------------------------------------------------------------
 
 // Builds the localised display name for a node.
-export function _ptTooltipResolveName(skill, def, lang) {
+function _ptTooltipResolveName(skill, def, lang) {
     if (def) return _ptPickLang(lang, def.nameEn, def.nameDe || def.nameEn);
     return skill ? skill.name : t('pt_skill_fallback').replace('{n}', skill?.id);
 }
@@ -350,7 +350,7 @@ export function _ptTooltipResolveName(skill, def, lang) {
 // Builds the localised description HTML. Every newline-separated effect
 // becomes its own block with a gap above it, so a long effect that wraps
 // onto a second row is still clearly distinct from the next effect.
-export function _ptTooltipResolveDesc(def, lang) {
+function _ptTooltipResolveDesc(def, lang) {
     if (!def) return '';
     // Hand-written descEn/descDe win; effects nodes without authored text
     // get their lines generated from the registry (pt-effects.js).
@@ -363,7 +363,7 @@ export function _ptTooltipResolveDesc(def, lang) {
 
 // Builds the small status line shown at the bottom of the tooltip.
 // Colour and wording vary by state and whether the node can still be removed.
-export function _ptTooltipBuildStatusHtml(id, state, lang) {
+function _ptTooltipBuildStatusHtml(id, state, lang) {
     if (state === 'allocated') {
         const canRemove = _ptIsDeallocatable(id);
         const color = canRemove ? '#6dbf40' : '#888';
@@ -407,7 +407,7 @@ function _ptTooltipBuildProposalHtml(proposal) {
 }
 
 // Assembles the full tooltip inner HTML from name, description, and status.
-export function _ptTooltipBuildHtml(id) {
+function _ptTooltipBuildHtml(id) {
     const skill = globalThis._pt_skillMap[id];
     const def = skill ? skill._def : null;
     const lang = _ptLang();
@@ -454,7 +454,7 @@ export function _ptTooltipBuildHtml(id) {
 
 // Creates the singleton tooltip element and appends it to document.body.
 // The tooltip starts invisible (opacity:0) and is shown by _ptShowTooltip().
-export function _ptCreateTooltip() {
+function _ptCreateTooltip() {
     const tt = document.createElement('div');
     tt.id = 'pt-tooltip';
     tt.style.cssText = `
@@ -479,7 +479,7 @@ export function _ptCreateTooltip() {
 }
 
 // Clamps the tooltip position so it never overflows the viewport edges.
-export function _ptPositionTooltip(mx, my) {
+function _ptPositionTooltip(mx, my) {
     if (!_pt_tooltip) return;
 
     const W = window.innerWidth;
@@ -502,7 +502,7 @@ export function _ptPositionTooltip(mx, my) {
 }
 
 // Populates the tooltip with content for the given node and makes it visible.
-export function _ptShowTooltip(id, mouseX, mouseY) {
+function _ptShowTooltip(id, mouseX, mouseY) {
     if (!_pt_tooltip) _pt_tooltip = _ptCreateTooltip();
 
     const html = _ptTooltipBuildHtml(id);
@@ -534,7 +534,7 @@ export function _ptHideTooltip() {
 // Returns the axis-aligned bounding box of all skill node positions.
 // Used to size the world <div> and to compute the initial fit-to-view transform.
 // Falls back to a sensible default when the tree has no nodes.
-export function _ptGetBounds() {
+function _ptGetBounds() {
     if (!globalThis._pt_skills.length) return { minX: 0, minY: 0, maxX: 800, maxY: 600 };
     if (_pt_boundsSkills === globalThis._pt_skills && _pt_boundsCache) return _pt_boundsCache;
 
@@ -556,7 +556,7 @@ export function _ptGetBounds() {
 // Converts skill-space bounds into the pixel offset needed to translate
 // node/connection coordinates into the padded world <div>. Shared by
 // _ptDrawConnections and _ptDrawNodes so both always agree on placement.
-export function _ptComputeOffsets(bounds) {
+function _ptComputeOffsets(bounds) {
     return {
         offsetX: PT_PADDING + PT_NODE_RADIUS - bounds.minX,
         offsetY: PT_PADDING + PT_NODE_RADIUS - bounds.minY,
@@ -573,7 +573,7 @@ export function _ptComputeOffsets(bounds) {
 
 // Creates one SVG <line> element for a single connection and registers it
 // in _pt_connEls so style helpers can update it later.
-export function _ptDrawConnection(conn, offsetX, offsetY) {
+function _ptDrawConnection(conn, offsetX, offsetY) {
     const from = globalThis._pt_skillMap[conn.from];
     const to = globalThis._pt_skillMap[conn.to];
     if (!from || !to) return;
@@ -646,7 +646,7 @@ function _ptUnmountConnection(id) {
 //------------------------------------------------------------------------
 
 // Applies the base CSS layout for a regular (circular) node.
-export function _ptApplyCircleShape(node, cx, cy, r) {
+function _ptApplyCircleShape(node, cx, cy, r) {
     node.style.cssText = `
         position: absolute;
         left: ${cx - r}px;
@@ -667,7 +667,7 @@ export function _ptApplyCircleShape(node, cx, cy, r) {
 // The diamond is achieved by rotating a square 45 degrees.
 // A slightly smaller side length keeps the diamond inside the same footprint
 // as a regular node at the same radius.
-export function _ptApplyDiamondShape(node, cx, cy, r) {
+function _ptApplyDiamondShape(node, cx, cy, r) {
     const side = r * 2 * 0.92;
     node.style.cssText = `
         position: absolute;
@@ -696,7 +696,7 @@ export function _ptApplyDiamondShape(node, cx, cy, r) {
 
 // Counter-rotates the first child element of a keystone diamond node so that
 // the icon or emoji appears upright despite the 45-degree parent rotation.
-export function _ptCounterRotateKeystoneChild(node) {
+function _ptCounterRotateKeystoneChild(node) {
     const inner = node.firstChild;
     if (inner) inner.style.transform = 'rotate(-45deg)';
 }
@@ -704,7 +704,7 @@ export function _ptCounterRotateKeystoneChild(node) {
 // Creates and appends an <img> icon element inside the node.
 // `smooth` disables the pixelated upscaling used for pixel-art portraits -
 // detailed item art (images/passives/, images/keystones/) renders smooth.
-export function _ptAppendImageIcon(node, iconSrc, isKeystone, smooth) {
+function _ptAppendImageIcon(node, iconSrc, isKeystone, smooth) {
     const img = document.createElement('img');
     img.src = iconSrc;
     img.alt = '';
@@ -724,7 +724,7 @@ export function _ptAppendImageIcon(node, iconSrc, isKeystone, smooth) {
 
 // Creates and appends an emoji <span> icon inside the node.
 // `scale` scales the emoji with the node's tier size (1 = regular node).
-export function _ptAppendEmojiIcon(node, emoji, isKeystone, scale) {
+function _ptAppendEmojiIcon(node, emoji, isKeystone, scale) {
     const span = document.createElement('span');
     span.textContent = emoji;
     span.style.cssText = `
@@ -739,7 +739,7 @@ export function _ptAppendEmojiIcon(node, emoji, isKeystone, scale) {
 
 // Creates and appends the small coloured dot used as a fallback when a node
 // has no icon and no emoji assigned.
-export function _ptAppendDotFallback(node, isKeystone) {
+function _ptAppendDotFallback(node, isKeystone) {
     const dot = document.createElement('div');
     dot.className = 'pt-dot';
     dot.style.cssText = `
@@ -802,7 +802,7 @@ export function _ptAppendNodeIcon(node, skill, def, isKeystone, scale) {
     }
 }
 
-export function _ptAppendStartSprite(skill, def, cx, cy, r, target = _pt_nodesLayer) {
+function _ptAppendStartSprite(skill, def, cx, cy, r, target = _pt_nodesLayer) {
     const src = (def && def.sprite) || skill.sprite;
     if (!src) return;
     const img = document.createElement('img');
@@ -837,7 +837,7 @@ export function _ptAppendStartSprite(skill, def, cx, cy, r, target = _pt_nodesLa
 // (images/items/manifest.json is fetched lazily on first use). Node elements
 // contain exactly one child (the icon), so replacing it is safe - shape,
 // styles and events live on the node element itself.
-export function _ptRefreshPendingArt() {
+function _ptRefreshPendingArt() {
     if (typeof document === 'undefined' || !_pt_nodesLayer || !_pt_nodesLayer.isConnected) return;
     const pending = _pt_nodesLayer.querySelectorAll('[data-pt-art-pending]');
     pending.forEach(function (el) {
@@ -1144,7 +1144,7 @@ function _ptUnmountNode(id) {
     if (_pt_nodePool.length < PT_NODE_POOL_LIMIT) _pt_nodePool.push(node);
 }
 
-export function _ptDrawNode(skill, offsetX, offsetY) {
+function _ptDrawNode(skill, offsetX, offsetY) {
     skill._worldX = skill.x + offsetX;
     skill._worldY = skill.y + offsetY;
     skill._renderRadius = _ptGetNodeRadius(skill);
@@ -1167,7 +1167,7 @@ export function _ptDrawNodes(bounds) {
 // Builds the search haystack string for a single skill definition.
 // All localised name, description, and statKey fields are concatenated so
 // that the user can search in either language.
-export function _ptBuildSearchHaystack(def) {
+function _ptBuildSearchHaystack(def) {
     return [
         def.nameEn || '',
         def.nameDe || '',
@@ -1178,14 +1178,14 @@ export function _ptBuildSearchHaystack(def) {
 }
 
 // Applies a golden highlight to a node element that matched the search query.
-export function _ptApplySearchMatchStyle(el) {
+function _ptApplySearchMatchStyle(el) {
     el.style.filter = 'drop-shadow(0 0 8px rgba(255,215,0,0.95)) drop-shadow(0 0 16px rgba(255,165,0,0.6))';
     el.style.opacity = '1';
     el.style.zIndex = '20';
 }
 
 // Dims a node element that did not match the search query.
-export function _ptApplySearchNoMatchStyle(el) {
+function _ptApplySearchNoMatchStyle(el) {
     el.style.filter = 'brightness(0.3) saturate(0.3)';
     el.style.opacity = '0.35';
     el.style.zIndex = '1';
@@ -1193,7 +1193,7 @@ export function _ptApplySearchNoMatchStyle(el) {
 
 // Clears any search-related style overrides from a node element,
 // restoring it to whatever the regular style helpers last set.
-export function _ptClearSearchNodeStyle(el) {
+function _ptClearSearchNodeStyle(el) {
     el.style.filter = '';
     el.style.opacity = '';
     el.style.zIndex = '2';
@@ -1260,7 +1260,7 @@ export function _ptClearSearch() {
 // Creates the search bar widget (wrapper + icon + input + clear button).
 // The element is NOT appended to the DOM here; _ptInjectSearchBar() handles
 // placement so the search bar always lands in the correct topbar slot.
-export function _ptCreateSearchBar() {
+function _ptCreateSearchBar() {
     const wrap = document.createElement('div');
     wrap.id = 'pt-search-wrap';
     wrap.style.cssText = `
@@ -1341,7 +1341,7 @@ export function _ptCreateSearchBar() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-export function _ptResetRenderState() {
+function _ptResetRenderState() {
     const container = document.getElementById('pt-canvas');
     if (!container) { console.error('[PassiveTree] #pt-canvas not found'); return null; }
     if (_pt_container && _pt_container !== container) _pt_nodeEventsBound = false;
@@ -1385,7 +1385,7 @@ export function _ptResetRenderState() {
 }
 
 // Renders an error / empty state when the skill list failed to load.
-export function _ptRenderEmptyState() {
+function _ptRenderEmptyState() {
     const msg = t('pt_tree_load_failed');
 
     _pt_container.innerHTML = `
@@ -1399,7 +1399,7 @@ export function _ptRenderEmptyState() {
 }
 
 // Creates the world <div> that is panned/zoomed via CSS transform.
-export function _ptCreateWorldDiv(worldW, worldH) {
+function _ptCreateWorldDiv(worldW, worldH) {
     const world = document.createElement('div');
     world.id = 'pt-world';
     world.style.cssText = `
@@ -1414,7 +1414,7 @@ export function _ptCreateWorldDiv(worldW, worldH) {
 }
 
 // Creates the SVG overlay that all connection <line> elements live in.
-export function _ptCreateSvgOverlay(worldW, worldH) {
+function _ptCreateSvgOverlay(worldW, worldH) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.style.cssText = `
         position: absolute;
@@ -1430,7 +1430,7 @@ export function _ptCreateSvgOverlay(worldW, worldH) {
 }
 
 // Creates the <div> layer that node elements are placed into.
-export function _ptCreateNodesLayer(worldW, worldH) {
+function _ptCreateNodesLayer(worldW, worldH) {
     const layer = document.createElement('div');
     layer.style.cssText = `
         position: absolute;
@@ -1534,7 +1534,7 @@ export function _ptUpdateVirtualViewport(scale, tx, ty) {
 // Fills the hover panel with the totals of every allocated node. Runs on
 // mouseenter only, so a closed panel costs nothing and the numbers are always
 // current (nodes allocated since the last hover are included).
-export function _ptRenderStatSummary() {
+function _ptRenderStatSummary() {
     const body = document.getElementById('pt-summary-body');
     if (!body) return;
     const lang = _ptLang();
@@ -1566,7 +1566,7 @@ export function _ptRenderStatSummary() {
 }
 
 // Wires the hover rebuild once; the panel element lives in index.html.
-export function _ptBindStatSummary() {
+function _ptBindStatSummary() {
     const panel = document.getElementById('pt-summary');
     if (!panel || panel.dataset.ptBound === '1') return;
     panel.dataset.ptBound = '1';
@@ -1580,7 +1580,7 @@ export function _ptBindStatSummary() {
 // Injects search bar DOM children into the pre-existing #pt-search-wrap
 // placeholder element in the topbar.  Only runs when the wrap is empty, so
 // re-renders do not duplicate the search input.
-export function _ptInjectSearchBar() {
+function _ptInjectSearchBar() {
     const existingWrap = document.getElementById('pt-search-wrap');
     if (!existingWrap || existingWrap.hasChildNodes()) return;
 

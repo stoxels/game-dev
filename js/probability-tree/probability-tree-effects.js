@@ -465,7 +465,7 @@ export function playStochasticResonanceEffect(mistakeRow, mistakeCol, targetRow,
 
 // Injects the shared keyframes used by the reusable passive proc effects.
 // Guards with a sentinel style tag so it never runs twice.
-export function _ensurePassiveFxStyles() {
+function _ensurePassiveFxStyles() {
     if (document.getElementById('fx-passive-proc-styles')) return;
     const style = document.createElement('style');
     style.id = 'fx-passive-proc-styles';

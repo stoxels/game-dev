@@ -68,46 +68,46 @@ let _binomialBurstFills = 0; // Correct-fill counter; triggers at every 10th fil
 let _sparsePriorRevealedLines = new Set(); // Keys like "r3" or "c7" to avoid double-reveals
 
 // --- Ergodic Field (node 291) ---
-export const ERGODIC_FIELD_INTERVAL_MS = 3 * 60 * 1000; // Time between solution flashes
-export const ERGODIC_FIELD_FLASH_MS = 1000;             // How long the flash stays on screen
+const ERGODIC_FIELD_INTERVAL_MS = 3 * 60 * 1000; // Time between solution flashes
+const ERGODIC_FIELD_FLASH_MS = 1000;             // How long the flash stays on screen
 let _ergodicFieldNext = null; // Timestamp for next solution flash
 
 // --- Entropy Drain (node 293) ---
-export const ENTROPY_DRAIN_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes before a stalled line reverts
+const ENTROPY_DRAIN_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes before a stalled line reverts
 let _entropyDrainTimestamps = {}; // "r-{row}" / "c-{col}" → timestamp of last progress
 
 // --- Random Walk (node 294) ---
-export const RANDOM_WALK_INTERVAL_MS = 30 * 1000; // Time between auto-actions
-export const RANDOM_WALK_MAX_MISTAKES = 2;         // Level is lost at this many mistakes
+const RANDOM_WALK_INTERVAL_MS = 30 * 1000; // Time between auto-actions
+const RANDOM_WALK_MAX_MISTAKES = 2;         // Level is lost at this many mistakes
 let _randomWalkNext = null; // Timestamp for next random cell action
 
 // --- Frequentist's Burden (node 295) ---
-export const FREQUENTIST_FILLS_PER_REVEAL = 5; // One clue revealed per this many correct fills
+const FREQUENTIST_FILLS_PER_REVEAL = 5; // One clue revealed per this many correct fills
 let _frequentistsFills = 0;    // Correct-fill counter; reveals a clue every 5 fills
 let _frequentistsBurdenActive = false;
 
 // --- Signal to Noise (node 296) ---
-export const SIGNAL_NOISE_CORRUPT_RATIO = 0.15; // Fraction of clue spans to falsify
-export const SIGNAL_NOISE_RESTORE_RATIO = 0.75; // Board completion % to trigger restore
+const SIGNAL_NOISE_CORRUPT_RATIO = 0.15; // Fraction of clue spans to falsify
+const SIGNAL_NOISE_RESTORE_RATIO = 0.75; // Board completion % to trigger restore
 let _signalToNoiseActive = false;
 let _signalToNoiseFakeClues = []; // Array of { spanId, originalVal, fakeVal }
 
 // --- Degrees of Freedom (node 298) ---
-export const DOF_FLASH_INTERVAL_MS = 30 * 1000; // Time between brief reveals
-export const DOF_FLASH_DURATION_MS = 5 * 1000;  // How long clues stay visible during flash
+const DOF_FLASH_INTERVAL_MS = 30 * 1000; // Time between brief reveals
+const DOF_FLASH_DURATION_MS = 5 * 1000;  // How long clues stay visible during flash
 let _degreesOfFreedomChoice = null; // 'row' | 'col' - player's chosen hidden clue axis
 let _degreesOfFreedomNext = null; // Timestamp for next brief clue reveal
 let _degreesOfFreedomFlashTimeout = null; // Pending re-hide timeout of an active flash
 let _dofFlashToken = 0; // Bumps on every choice/reset; stale flash timeouts no-op on mismatch
 
 // --- Overfitting (node 299) - local var, not on window ---
-export const OVERFITTING_PHASE_THRESHOLD = 0.15; // Board fill % at which mistakes stop being free
-export const OVERFITTING_HARD_THRESHOLD = 0.50;  // Board fill % at which mistakes cost triple
-export let _lastOverfittingPhase = 'free'; // Tracks phase transitions to prevent toast spam
+const OVERFITTING_PHASE_THRESHOLD = 0.15; // Board fill % at which mistakes stop being free
+const OVERFITTING_HARD_THRESHOLD = 0.50;  // Board fill % at which mistakes cost triple
+let _lastOverfittingPhase = 'free'; // Tracks phase transitions to prevent toast spam
 
 // --- The Oracle (node 300) ---
-export const ORACLE_MIN_CELL_COUNT = 200; // Minimum grid size to activate
-export const ORACLE_FLASH_DURATION_MS = 5000;
+const ORACLE_MIN_CELL_COUNT = 200; // Minimum grid size to activate
+const ORACLE_FLASH_DURATION_MS = 5000;
 // oracleActive now lives in window.LEVEL_FLAGS (state.js) - true for the
 // entire level after Oracle fires; blocks all auto-actions. Per-level reset
 // happens in _resetNewNodeState() below.
@@ -119,12 +119,12 @@ export const ORACLE_FLASH_DURATION_MS = 5000;
 //------------------------------------------------------------------------
 
 // Returns the total number of filled solution cells (value === 1).
-export function _countTotalSolutionCells(sol) {
+function _countTotalSolutionCells(sol) {
     return sol.reduce((sum, row) => sum + row.filter(v => v === 1).length, 0);
 }
 
 // Returns the number of solution cells the player has already filled or that are revealed.
-export function _countFilledSolutionCells(sol) {
+function _countFilledSolutionCells(sol) {
     const rows = sol.length, cols = sol[0].length;
     let filled = 0;
     for (let r = 0; r < rows; r++)
@@ -135,7 +135,7 @@ export function _countFilledSolutionCells(sol) {
 }
 
 // Returns completion ratio 0.0–1.0 for the current puzzle.
-export function _getBoardCompletionRatio() {
+function _getBoardCompletionRatio() {
     if (!cur) return 0;
     const sol = cur.grid;
     const total = _countTotalSolutionCells(sol);
@@ -151,12 +151,12 @@ export function _getBoardCompletionRatio() {
 //------------------------------------------------------------------------
 
 // Adds or removes the blackout class on every element matching a selector.
-export function _setClueBlackout(selector, hidden) {
+function _setClueBlackout(selector, hidden) {
     document.querySelectorAll(selector).forEach(el => el.classList.toggle('clue-blackout', hidden));
 }
 
 // Hides all row and column clue elements using the blackout class.
-export function _hideAllClues() {
+function _hideAllClues() {
     _setClueBlackout('.rct, .cch', true);
 }
 
@@ -171,7 +171,7 @@ export function _hideRowClues(rowIndex) {
 }
 
 // Reveals clues for a single row index.
-export function _revealRowClues(rowIndex) {
+function _revealRowClues(rowIndex) {
     _setClueBlackout(`.rct-${rowIndex}`, false);
 }
 
@@ -181,7 +181,7 @@ export function _hideColClues(colIndex) {
 }
 
 // Reveals clues for a single column index.
-export function _revealColClues(colIndex) {
+function _revealColClues(colIndex) {
     _setClueBlackout(`.cch-${colIndex}`, false);
 }
 
@@ -194,7 +194,7 @@ export function _revealColClues(colIndex) {
 //------------------------------------------------------------------------
 
 // Swaps a cell's state classes for the "scan reveal" flash animation.
-export function _applyScanRevealClasses(el, isSolutionCell) {
+function _applyScanRevealClasses(el, isSolutionCell) {
     el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned');
     if (isSolutionCell) el.classList.add('filled', 'scan-reveal');
 }
@@ -208,7 +208,7 @@ export function _applyScanRevealClasses(el, isSolutionCell) {
 //------------------------------------------------------------------------
 
 // Returns true if auto-reveals and auto-marks are currently blocked.
-export function _autoActionsBlocked() {
+function _autoActionsBlocked() {
     return ptHasSkill('keystone_ergodic_field') || window.LEVEL_FLAGS.oracleActive;
 }
 
@@ -265,7 +265,7 @@ export function _onMistakeBayesianUpdate() {
 
 // Rolls against (baseChance + bayesianBonus). Resets the bonus pool on success.
 // Returns true if the trigger should fire.
-export function _bayesianRoll(baseChance) {
+function _bayesianRoll(baseChance) {
     const totalChance = baseChance + _getBayesianBonus();
     const triggered = Math.random() < totalChance;
     if (triggered) _resetBayesianBonus();
@@ -286,7 +286,7 @@ export function _bayesianRoll(baseChance) {
 //------------------------------------------------------------------------
 
 // Returns the current firing interval in seconds based on unlocked tiers.
-export function _poissonGetInterval() {
+function _poissonGetInterval() {
     if (ptHasSkill('poisson_process_3')) return 60;
     if (ptHasSkill('poisson_process_2')) return 90;
     return 120;
@@ -294,7 +294,7 @@ export function _poissonGetInterval() {
 
 // Checks if the Bayesian bonus pool should yield an extra mark this tick, then resets.
 // Returns 1 if an extra mark fires, 0 otherwise.
-export function _poissonCheckBayesianExtra() {
+function _poissonCheckBayesianExtra() {
     const bonus = _getBayesianBonus();
     if (bonus > 0 && Math.random() < bonus) {
         _resetBayesianBonus();
@@ -336,7 +336,7 @@ export function _poissonProcessTick() {
 //------------------------------------------------------------------------
 
 // Reads the DOM cell element's screen-centre position for VFX targeting.
-export function _getBurstCellCenter(row, col) {
+function _getBurstCellCenter(row, col) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return null;
     const rect = el.getBoundingClientRect();
@@ -344,7 +344,7 @@ export function _getBurstCellCenter(row, col) {
 }
 
 // Calculates the cumulative trigger chance across all unlocked tiers.
-export function _binomialBurstGetChance() {
+function _binomialBurstGetChance() {
     let chance = 0.20; // Tier 1 base
     if (ptHasSkill('binomial_burst_2')) chance += 0.10;
     if (ptHasSkill('binomial_burst_3')) chance += 0.20;
@@ -353,7 +353,7 @@ export function _binomialBurstGetChance() {
 
 // Normalises the cell coordinate object coming from markWrongTiles(),
 // which can return either { r, c } objects or [row, col] arrays.
-export function _normaliseCellCoord(cell) {
+function _normaliseCellCoord(cell) {
     return {
         row: cell.r !== undefined ? cell.r : cell[0],
         col: cell.c !== undefined ? cell.c : cell[1],
@@ -361,7 +361,7 @@ export function _normaliseCellCoord(cell) {
 }
 
 // Generates the initial particle array for the burst VFX animation.
-export function _createBurstParticles(cx, cy) {
+function _createBurstParticles(cx, cy) {
     const COLORS = ['#ff4757', '#ff6b81', '#ffa502', '#eccc68'];
     const count = 20 + Math.floor(Math.random() * 15);
     const particles = [];
@@ -383,7 +383,7 @@ export function _createBurstParticles(cx, cy) {
 }
 
 // Draws the expanding shockwave ring for the current animation frame.
-export function _drawBurstRing(ctx, cx, cy, t) {
+function _drawBurstRing(ctx, cx, cy, t) {
     if (t >= 0.5) return;
     const progress = t / 0.5;
     const ringAlpha = 1 - progress;
@@ -398,7 +398,7 @@ export function _drawBurstRing(ctx, cx, cy, t) {
 
 // Updates particle physics and draws each living spark for the current frame.
 // Returns true if at least one particle is still alive.
-export function _updateAndDrawBurstParticles(ctx, particles) {
+function _updateAndDrawBurstParticles(ctx, particles) {
     let anyAlive = false;
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
@@ -422,7 +422,7 @@ export function _updateAndDrawBurstParticles(ctx, particles) {
 }
 
 // Creates a canvas overlay and plays the burst explosion VFX on the target cell.
-export function _playBinomialBurstVFX(row, col) {
+function _playBinomialBurstVFX(row, col) {
     const center = _getBurstCellCenter(row, col);
     if (!center) return;
 
@@ -498,7 +498,7 @@ export function _binomialBurstOnCorrectFill(row, col) {
 //------------------------------------------------------------------------
 
 // Returns the index of the row with the most filled solution cells.
-export function _findDensestRow(sol) {
+function _findDensestRow(sol) {
     let bestRow = 0, bestCount = -1;
     for (let r = 0; r < sol.length; r++) {
         const count = sol[r].filter(v => v === 1).length;
@@ -508,7 +508,7 @@ export function _findDensestRow(sol) {
 }
 
 // Returns the index of the column with the most filled solution cells.
-export function _findDensestCol(sol) {
+function _findDensestCol(sol) {
     const cols = sol[0].length;
     let bestCol = 0, bestCount = -1;
     for (let c = 0; c < cols; c++) {
@@ -520,7 +520,7 @@ export function _findDensestCol(sol) {
 
 // Reveals a single solution cell if it isn't already filled/revealed.
 // Returns true if the cell's state actually changed.
-export function _revealSolutionCell(sol, r, c) {
+function _revealSolutionCell(sol, r, c) {
     if (sol[r][c] !== 1 || globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c]) return false;
     globalThis.revealedGrid[r][c] = true;
     globalThis.userGrid[r][c] = 1;
@@ -530,7 +530,7 @@ export function _revealSolutionCell(sol, r, c) {
 }
 
 // Reveals all unfilled solution cells along a single row. Returns IDs of affected elements.
-export function _revealRow(sol, rowIndex) {
+function _revealRow(sol, rowIndex) {
     const affected = [];
     const cols = sol[0].length;
     for (let c = 0; c < cols; c++)
@@ -539,7 +539,7 @@ export function _revealRow(sol, rowIndex) {
 }
 
 // Reveals all unfilled solution cells along a single column. Returns IDs of affected elements.
-export function _revealCol(sol, colIndex) {
+function _revealCol(sol, colIndex) {
     const affected = [];
     const rows = sol.length;
     for (let r = 0; r < rows; r++)
@@ -624,18 +624,18 @@ export function _applySparsePrior() {
 }
 
 // Returns the list of adjacent line indices (clamps to valid grid range).
-export function _getAdjacentLineIndices(lineIndex, maxIndex) {
+function _getAdjacentLineIndices(lineIndex, maxIndex) {
     return [lineIndex - 1, lineIndex, lineIndex + 1].filter(i => i >= 0 && i < maxIndex);
 }
 
 // Reveals clues for a completed row and its immediate row-neighbours.
-export function _sparsePriorRevealRow(lineIndex) {
+function _sparsePriorRevealRow(lineIndex) {
     const rows = cur.grid.length;
     _getAdjacentLineIndices(lineIndex, rows).forEach(_revealRowClues);
 }
 
 // Reveals clues for a completed column and its immediate column-neighbours.
-export function _sparsePriorRevealCol(lineIndex) {
+function _sparsePriorRevealCol(lineIndex) {
     const cols = cur.grid[0].length;
     _getAdjacentLineIndices(lineIndex, cols).forEach(_revealColClues);
 }
@@ -671,7 +671,7 @@ export function _sparsePriorOnLineComplete(lineIndex, isRow) {
 //------------------------------------------------------------------------
 
 // Collects all DOM cell elements that are not yet in the solved / revealed state.
-export function _ergodicFieldGetFlashCells(sol) {
+function _ergodicFieldGetFlashCells(sol) {
     const rows = sol.length, cols = sol[0].length;
     const cells = [];
     for (let r = 0; r < rows; r++) {
@@ -687,7 +687,7 @@ export function _ergodicFieldGetFlashCells(sol) {
 }
 
 // Removes the scan-reveal class and fully re-renders all cells after the flash ends.
-export function _ergodicFieldRestoreBoard(flashedCells, sol) {
+function _ergodicFieldRestoreBoard(flashedCells, sol) {
     const rows = sol.length, cols = sol[0].length;
     flashedCells.forEach(el => el.classList.remove('scan-reveal'));
     for (let r = 0; r < rows; r++)
@@ -734,21 +734,21 @@ export function _ergodicFieldTick() {
 //------------------------------------------------------------------------
 
 // Checks whether a row has any progress but is not yet complete.
-export function _entropyRowIsStalled(sol, rowIndex) {
+function _entropyRowIsStalled(sol, rowIndex) {
     const hasAny = sol[rowIndex].some((v, c) => v === 1 && (globalThis.userGrid[rowIndex][c] === 1 || globalThis.revealedGrid[rowIndex][c]));
     const isDone = sol[rowIndex].every((v, c) => v === 0 || globalThis.userGrid[rowIndex][c] === 1 || globalThis.revealedGrid[rowIndex][c]);
     return hasAny && !isDone;
 }
 
 // Checks whether a column has any progress but is not yet complete.
-export function _entropyColIsStalled(sol, colIndex) {
+function _entropyColIsStalled(sol, colIndex) {
     const hasAny = sol.some((row, r) => row[colIndex] === 1 && (globalThis.userGrid[r][colIndex] === 1 || globalThis.revealedGrid[r][colIndex]));
     const isDone = sol.every((row, r) => row[colIndex] === 0 || globalThis.userGrid[r][colIndex] === 1 || globalThis.revealedGrid[r][colIndex]);
     return hasAny && !isDone;
 }
 
 // Clears reveals and marks from a row and re-renders it.
-export function _entropyDrainRevertRow(rowIndex, cols) {
+function _entropyDrainRevertRow(rowIndex, cols) {
     const drainedIds = [];
     for (let c = 0; c < cols; c++) {
         if (globalThis.revealedGrid[rowIndex][c]) { globalThis.revealedGrid[rowIndex][c] = false; globalThis.userGrid[rowIndex][c] = 0; }
@@ -764,7 +764,7 @@ export function _entropyDrainRevertRow(rowIndex, cols) {
 }
 
 // Clears reveals and marks from a column and re-renders it.
-export function _entropyDrainRevertCol(colIndex, rows) {
+function _entropyDrainRevertCol(colIndex, rows) {
     const drainedIds = [];
     for (let r = 0; r < rows; r++) {
         if (globalThis.revealedGrid[r][colIndex]) { globalThis.revealedGrid[r][colIndex] = false; globalThis.userGrid[r][colIndex] = 0; }
@@ -803,7 +803,7 @@ export function _entropyDrainUpdateProgress(row, col) {
 
 // Checks a single row/col timer entry: refreshes its timestamp if no longer
 // stalled, or reverts the line once the stall exceeds the timeout.
-export function _entropyDrainProcessLine(key, isStalled, revert, now) {
+function _entropyDrainProcessLine(key, isStalled, revert, now) {
     const ts = _entropyDrainTimestamps[key];
     if (!ts) return;
 
@@ -849,7 +849,7 @@ export function _entropyDrainTick() {
 //------------------------------------------------------------------------
 
 // Triggers the level-failed overlay with a Random Walk specific message.
-export function _randomWalkFail() {
+function _randomWalkFail() {
     globalThis.dead = true;
     stopTimer();
     window.LEVEL_FLAGS.lastFailedGi = cur.gIdx;
@@ -859,7 +859,7 @@ export function _randomWalkFail() {
 }
 
 // Builds a list of all cells that have not yet been touched by the player.
-export function _randomWalkGetUnfilledCells() {
+function _randomWalkGetUnfilledCells() {
     const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
     const unfilled = [];
@@ -871,7 +871,7 @@ export function _randomWalkGetUnfilledCells() {
 }
 
 // Handles the case where the randomly chosen cell belongs to the solution (reveals it).
-export function _randomWalkRevealCell(r, c) {
+function _randomWalkRevealCell(r, c) {
     globalThis.revealedGrid[r][c] = true;
     globalThis.userGrid[r][c] = 1;
     renderCell(r, c);
@@ -890,7 +890,7 @@ export function _randomWalkRevealCell(r, c) {
 
 // Handles the case where the randomly chosen cell is empty (marks it as wrong).
 // Note: This does NOT increment mistakeCount - it is a neutral wrong mark.
-export function _randomWalkMarkEmpty(r, c) {
+function _randomWalkMarkEmpty(r, c) {
     globalThis.userGrid[r][c] = 2; // Mark as wrong without counting as a player mistake
     renderCell(r, c);
     globalThis.systemMarkedGrid[r][c] = true;
@@ -954,7 +954,7 @@ export function _randomWalkTick() {
 //------------------------------------------------------------------------
 
 // Collects all row/col indices that still have at least one blacked-out clue element.
-export function _frequentistGetHiddenLines() {
+function _frequentistGetHiddenLines() {
     if (!cur) return [];
     const rows = cur.grid.length, cols = cur.grid[0].length;
     const hidden = [];
@@ -971,7 +971,7 @@ export function _frequentistGetHiddenLines() {
 }
 
 // Reveals all clue elements for the randomly chosen line.
-export function _frequentistRevealLine(line) {
+function _frequentistRevealLine(line) {
     if (line.type === 'row') {
         _revealRowClues(line.idx);
         globalThis.showToast(`📜 ${t('pt_freq_row').replace('{n}', line.idx + 1)}`);
@@ -1019,7 +1019,7 @@ export function _frequentistsBurdenOnCorrectFill() {
 //------------------------------------------------------------------------
 
 // Collects every clue number span across all rows and columns.
-export function _signalToNoiseCollectAllSpans(sol) {
+function _signalToNoiseCollectAllSpans(sol) {
     const rows = sol.length, cols = sol[0].length;
     const spans = [];
 
@@ -1033,7 +1033,7 @@ export function _signalToNoiseCollectAllSpans(sol) {
 }
 
 // Generates a fake value that is different from the original and non-negative.
-export function _signalToNoiseGenerateFakeValue(original) {
+function _signalToNoiseGenerateFakeValue(original) {
     let fake;
     do {
         fake = original + (Math.random() < 0.5 ? -1 : 1) * (1 + Math.floor(Math.random() * 3));
@@ -1042,7 +1042,7 @@ export function _signalToNoiseGenerateFakeValue(original) {
 }
 
 // Overwrites a span's text with a fake value and colours it red.
-export function _signalToNoiseCorruptSpan(spanEntry) {
+function _signalToNoiseCorruptSpan(spanEntry) {
     const { span } = spanEntry;
     const original = parseInt(span.textContent) || 0;
     const fake = _signalToNoiseGenerateFakeValue(original);
@@ -1053,7 +1053,7 @@ export function _signalToNoiseCorruptSpan(spanEntry) {
 }
 
 // Restores one fake clue span back to its original value.
-export function _signalToNoiseRestoreSpan({ spanId, originalVal }) {
+function _signalToNoiseRestoreSpan({ spanId, originalVal }) {
     const span = document.getElementById(spanId);
     if (span) { span.textContent = originalVal; span.style.color = ''; }
 }
@@ -1104,7 +1104,7 @@ export function _signalToNoiseCheckRestore() {
 //------------------------------------------------------------------------
 
 // Returns the clue-cell selector for a hidden axis choice.
-export function _dofSelectorFor(choice) {
+function _dofSelectorFor(choice) {
     return choice === 'row' ? '[class*="rct-"]' : '[class*="cch-"]';
 }
 
@@ -1112,7 +1112,7 @@ export function _dofSelectorFor(choice) {
 // Mirrors the Data Strike row/column choice modal (_dataStrikeOverlayHTML):
 // stone panel + title plaque + prompt + ROWS / COLS buttons. No cancel
 // button - the keystone downside is mandatory, so a choice is required.
-export function _dofOverlayHTML() {
+function _dofOverlayHTML() {
     const title = t('pt_dof_title');
     const question = t('pt_dof_question');
     const detail = t('pt_tip_degrees_of_freedom');
@@ -1134,7 +1134,7 @@ export function _dofOverlayHTML() {
 }
 
 // Builds and appends the axis-selection modal to the page.
-export function _dofShowModal() {
+function _dofShowModal() {
     // Drop any stale modal first (e.g. leftover from a level restart).
     // Without this, duplicate #dof-modal nodes pile up behind each other.
     _dofRemoveModal();
@@ -1147,7 +1147,7 @@ export function _dofShowModal() {
 }
 
 // Removes every selection modal instance if present.
-export function _dofRemoveModal() {
+function _dofRemoveModal() {
     document.querySelectorAll('#dof-modal').forEach(m => m.remove());
 }
 
@@ -1162,13 +1162,13 @@ export function _dofNudge() {
 }
 
 // Hides the clues for the chosen axis across the whole board.
-export function _dofHideChosenAxis(type) {
+function _dofHideChosenAxis(type) {
     if (!cur) return;
     _setClueBlackout(_dofSelectorFor(type), true);
 }
 
 // Cancels a pending flash re-hide timeout, if any.
-export function _dofClearFlashTimeout() {
+function _dofClearFlashTimeout() {
     if (_degreesOfFreedomFlashTimeout) {
         clearTimeout(_degreesOfFreedomFlashTimeout);
         _degreesOfFreedomFlashTimeout = null;
@@ -1195,7 +1195,7 @@ export function _dofChoose(type) {
 // duration. The re-hide re-queries the live DOM (instead of re-hiding a
 // stale snapshot) and is guarded by the flash token, so a level restart or
 // a new choice mid-flash can never hide the wrong grid.
-export function _dofFlashElements(token, choice) {
+function _dofFlashElements(token, choice) {
     document.querySelectorAll(_dofSelectorFor(choice))
         .forEach(el => el.classList.remove('clue-blackout'));
 
@@ -1250,7 +1250,7 @@ export function _degreesOfFreedomTick() {
 //------------------------------------------------------------------------
 
 // Calculates the current phase without side effects.
-export function _overfittingCalculatePhase() {
+function _overfittingCalculatePhase() {
     if (!cur) return 'off';
     const ratio = _getBoardCompletionRatio();
     if (ratio < OVERFITTING_PHASE_THRESHOLD) return 'free';
@@ -1301,7 +1301,7 @@ export function resetOverfittingTracker() {
 //------------------------------------------------------------------------
 
 // Lights up all solution cells with the scan-reveal animation class.
-export function _oracleFlashSolution(sol) {
+function _oracleFlashSolution(sol) {
     const rows = sol.length, cols = sol[0].length;
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -1313,7 +1313,7 @@ export function _oracleFlashSolution(sol) {
 }
 
 // Restores all cells to their blank pre-fill state and removes the scan-reveal class.
-export function _oracleHideSolution(sol) {
+function _oracleHideSolution(sol) {
     const rows = sol.length, cols = sol[0].length;
     for (let r = 0; r < rows; r++)
         for (let c = 0; c < cols; c++)

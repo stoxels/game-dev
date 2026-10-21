@@ -24,7 +24,7 @@ try { Object.defineProperty(globalThis, '_ptReturnWorldIndex', { get() { return 
 // The legacy ID 1 is the Ascendancy Gate in the development layout. The
 // playable roots are the three character-start nodes.
 export const PT_START_ID = 1;
-export const PT_CLASS_START_IDS = Object.freeze({
+const PT_CLASS_START_IDS = Object.freeze({
     statistician: 1001,
     mathmagician: 1002,
     probabilist: 1003,
@@ -180,7 +180,7 @@ export function _ptShowLoadingPlaceholder(lang) {
 }
 
 // Writes the current available-points count into the points display element.
-export function _ptUpdatePointsDisplay(lang, points) {
+function _ptUpdatePointsDisplay(lang, points) {
     const pointsEl = document.getElementById('pt-points');
     if (!pointsEl) return;
 
@@ -190,7 +190,7 @@ export function _ptUpdatePointsDisplay(lang, points) {
 // buildPassiveTreeScreen - entry point called by the UI.
 // Updates the points counter, shows a brief loading state,
 // then triggers the full tree render.
-export function buildPassiveTreeScreen() {
+function buildPassiveTreeScreen() {
     const lang = (typeof LANG !== 'undefined') ? LANG : 'en';
     if (reconcilePassiveTreeForClass()) save();
     const points = (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;
@@ -267,10 +267,10 @@ export function ptGoBack() {
 // effects that read ptHasSkill() live apply at once, level-start effects
 // (timer bonuses etc.) take effect on the next level.
 
-export let _ptGameOverlay = false;
+let _ptGameOverlay = false;
 // True only if THIS overlay open paused the game (a pause menu may already
 // have been up when K was pressed - then pause state is left untouched).
-export let _ptOverlayPaused = false;
+let _ptOverlayPaused = false;
 
 // True while the tree is open as an overlay over a running puzzle.
 export function isTreeGameOverlay() {
@@ -279,7 +279,7 @@ export function isTreeGameOverlay() {
 
 // Silently pauses the run WITHOUT the pause overlay. No-op unless a level
 // is actually running.
-export function _ptOverlayPause() {
+function _ptOverlayPause() {
     _ptOverlayPaused = false;
     try {
         if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return;
@@ -294,7 +294,7 @@ export function _ptOverlayPause() {
 
 // Resumes a run paused by _ptOverlayPause. Never touches pause state owned
 // by someone else (pause menu, tutorial lessons, spell book).
-export function _ptOverlayResume() {
+function _ptOverlayResume() {
     if (!_ptOverlayPaused) return;
     _ptOverlayPaused = false;
     try {
@@ -304,12 +304,12 @@ export function _ptOverlayResume() {
     } catch (e) {}
 }
 
-export function _ptHideAvatars() {
+function _ptHideAvatars() {
     try { if (typeof globalThis._hidePlayerAvatarSimple === 'function') globalThis._hidePlayerAvatarSimple(); } catch (e) {}
     try { if (typeof globalThis._hidePlayerAvatar === 'function') globalThis._hidePlayerAvatar(); } catch (e) {}
 }
 
-export function _ptShowAvatars() {
+function _ptShowAvatars() {
     try { if (typeof globalThis._showPlayerAvatarSimple === 'function') globalThis._showPlayerAvatarSimple(); } catch (e) {}
     try { if (typeof globalThis._showPlayerAvatar === 'function') globalThis._showPlayerAvatar(); } catch (e) {}
 }
@@ -434,7 +434,7 @@ export function closeTreeToGame() {
 // Creates one item instance from a definition ID and adds it to the
 // player's inventory. Saves state and refreshes the inventory panel.
 // Does nothing if the defId does not exist in ITEM_DEFS.
-export function _ptGrantItem(defId) {
+function _ptGrantItem(defId) {
     const def = globalThis.ITEM_DEFS[defId];
     if (!def) return;
 
@@ -457,7 +457,7 @@ export function _ptGrantItem(defId) {
 // given skill and the chance hits, grants the item and shows a toast.
 // Used by the per-class reward helpers below to avoid repeating the
 // hasSkill/random/grant/toast pattern for every gear node.
-export function _ptRollGearReward(skillStatKey, chance, itemDefId, msgKey) {
+function _ptRollGearReward(skillStatKey, chance, itemDefId, msgKey) {
     if (!ptHasSkill(skillStatKey) || Math.random() >= chance) return;
 
     _ptGrantItem(itemDefId);
@@ -465,7 +465,7 @@ export function _ptRollGearReward(skillStatKey, chance, itemDefId, msgKey) {
 }
 
 // Statistician gear drops - base gear: 33% magnifier, improved: 33% error gem
-export function _ptApplyStatisticianRewards() {
+function _ptApplyStatisticianRewards() {
     _ptRollGearReward('gear_of_the_statistician', 0.33, 'reveal2',
         'pt_gear_statistician_magnifier');
 
@@ -474,7 +474,7 @@ export function _ptApplyStatisticianRewards() {
 }
 
 // Mathmagician gear drops - base gear: 25% professor, improved: 15% chronobolt
-export function _ptApplyMathmagicianRewards() {
+function _ptApplyMathmagicianRewards() {
     _ptRollGearReward('gear_of_the_mathmagician', 0.25, 'tutor4',
         'pt_gear_mathmagician_professor');
 
@@ -483,7 +483,7 @@ export function _ptApplyMathmagicianRewards() {
 }
 
 // Probabilist gear drops - base gear: 25% sweeper, improved: 15% error magnet
-export function _ptApplyProbabilistRewards() {
+function _ptApplyProbabilistRewards() {
     // Odds Maker: +10 percentage points on both Probabilist gear drops.
     const oddsBonus = ptHasSkill('odds_maker') ? 0.10 : 0;
 
