@@ -126,6 +126,11 @@ import { PT, PT_COL_ALLOCATED_BG, PT_COL_ALLOCATED_BORDER, PT_COL_ALLOCATED_DOT,
 import { PassiveTracker } from '../../js/probability-tree/probability-tree-tracker.js';
 import { createBeamEffect, playConfidenceIntervalEffect, playResidualAnalysisEffect, playSampleEfficiencyEffect, playShieldChargePulseEffect, playStasisOverlayEffect, playStochasticResonanceEffect, playTimeGainEffect } from '../../js/probability-tree/probability-tree-effects.js';
 import { _ptxRunExpansion } from '../../js/probability-tree/probability-tree-expansion.js';
+import '../../js/probability-tree/ptx-core.js';
+import '../../js/probability-tree/ptx-start-effects.js';
+import '../../js/probability-tree/ptx-fill-mistake-effects.js';
+import '../../js/probability-tree/ptx-line-tick-effects.js';
+import '../../js/probability-tree/ptx-misc-effects.js';
 import { activateTargetingReticle } from '../../js/classes/targeting-reticle.js';
 import { _sraAfter, _sraAuthoredLevels, _sraBuildLayoutHTML, _sraBuildModel, _sraClassProjDef, _sraClearStage, _sraCreateScreen, _sraDamage, _sraDef, _sraDmgMult, _sraEffects, _sraEl, _sraEnsureStyles, _sraFireFlight, _sraFooterHTML, _sraFxNote, _sraFxTimers, _sraHitBurst, _sraMana, _sraManaMult, _sraMaxRank, _sraOnPick, _sraPickerOptionsHTML, _sraPlayVisual, _sraPushRosterEntry, _sraRank, _sraRankAdditive, _sraRankClampFor, _sraRefreshChrome, _sraRender, _sraRoster, _sraSelected, _sraSetRank, _sraStageFlash, _sraStageOverlay, _sraStagePoints, _sraStep, _sraSupportLabelText, _sraSyncPicker, _sraUniversal, _sraWireDevTest, authorsEffects, ensureSpellRankAuditScreen, showSpellRankAudit } from '../../js/dev/spell-rank-audit.js';
 import { LEDGER_GROUPS, _atlasTierCheck, LEDGER_CATEGORIES, _MILESTONE_MAP } from '../../js/inference/inference-data.js';
