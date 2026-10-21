@@ -1,28 +1,17 @@
 //------------------------------------------------------------------------
-// PHASE 4 split (2026-09-16): extracted into a focused module. The original
-// path is now a facade that re-exports this module, so existing import sites
-// are unaffected. See MIGRATION.md "splitting giants".
+//-------------------HUB SCREEN-------------------------------------------
+//------------------------------------------------------------------------
+// The character sheet and stash screen: the paperdoll, currency strip, stash
+// panel and full-screen assembly, the render functions, and the open / close
+// logic (including the in-puzzle overlay). Stash, currency, mass-sell, topbar,
+// save/load, unique UI and the stats panel live in their own modules and are
+// re-exported at the bottom, so other files keep importing everything from here.
 //------------------------------------------------------------------------
 
-// ENDGAME HUB SCREEN - facade module. Handles the Endgame Hub UI:
-//   - Character panel with paperdoll equipment slots and stats
-//   - Currency strip (Runes & Orbs row) + full-width equipment stash
-//   - Floating item tooltip on mouseover (+ Alt-hold compare tooltip)
-//   - Drag-and-drop is handled in hub-drag-and-drop.js
-//   - The Probability Gate (map device + map stash) - see endgame-gate.js
-//
-// Phase 4 split: stash/currency/map-stash/mass-sell/topbar/load/modal
-// now live in their own modules and are re-exported below unchanged.
-// This file keeps screen assembly, render orchestration, overlay control
-// and the stats panel.
-
-// Phase 4 split: write-through globalThis accessors. The facade and sibling
-// split modules rebind these lets through globalThis.<name> assignment
-// (imported module bindings are read-only views) - the established
-// step-9/step-10 pattern.
-import { Audio_Manager } from '../audio/audio.js';
+import '../audio/audio.js';
 import { cur } from '../state.js';
 
+// Accessor: other files reassign the previewed item through globalThis.
 try { Object.defineProperty(globalThis, '_tooltipItem', { get() { return _tooltipItem; }, set(v) { _tooltipItem = v; }, configurable: true }); } catch (e) {}
 
 import { buildClassHUD } from '../classes/class-hud.js';
@@ -30,47 +19,34 @@ import { _getPlayerMaxMana, updateClassHUDManaBar } from '../classes/class-mana.
 import { switchScreen } from '../screens/screens.js';
 import { renderSkillHotbar } from '../skills/skill-hotbar.js';
 import { pauseTimer, resumeTimer } from '../timer/timer.js';
-import { LANG, t } from '../translation/translations.js';
+import { t } from '../translation/translations.js';
 import { GAME_ART } from '../combat/combat-art.js';
-import { _showHubTooltip } from '../loot/loot-currency-tooltip.js';
+import '../loot/loot-currency-tooltip.js';
 import { _onPause, _onResume } from '../combat/encounter-tick-support.js';
-import { _getEncounterBaseLevel, _getTarget, _renderPanel } from '../combat/encounter.js';
+import { _renderPanel } from '../combat/encounter.js';
 import { _buildEssenceTabHTML, _renderEssenceStash } from '../loot/loot-essences-render.js';
 import { _egRenderMapSlot, _egRenderMapStash } from '../endgame/endgame-gate.js';
 import { _flushRunLootToStash } from '../combat/combat-grid-pickups-loot.js';
 import { _bindDragEvents, _renderCurrencyCell } from './hub-drag-and-drop.js';
-import { _buildTooltipBodyHTML, _clearTooltip } from './hub-tooltips.js';
-import { _ensureUniqueStash, _getUniqueCount, _isUniqueCollected, _moveUniqueToInventory, _updateUniqueTabBadge } from './hub-uniques.js';
-import { LEVELING_CONFIG, _getPlayerLevel, _renderLevelHUD } from './hub-leveling.js';
+import { _clearTooltip } from './hub-tooltips.js';
+import { _updateUniqueTabBadge } from './hub-uniques.js';
+import { _renderLevelHUD } from './hub-leveling.js';
 import { _egMapPlayerLifeMult } from '../endgame/endgame-map-launch.js';
 import { showEndgameNexus } from '../endgame/endgame-nexus.js';
-import { PLAYER_STATS, _buildGroupedStats, _calcAccuracyMissChance, _calcArmourReductionPct, _calcEvasionDodgeChance, _computePlayerStats } from '../combat/combat-player-stats.js';
+import { PLAYER_STATS, _computePlayerStats } from '../combat/combat-player-stats.js';
 import { _isItemBlocked } from '../loot/loot-requirements.js';
 import { CURRENCY_COLS, CURRENCY_ROWS, _buildCraftingBenchSlotHTML, _currencyDefForId, _currencyIdForSlot, _currencyStash } from '../loot/hub-currency.js';
 import { _pendingHandMigrationToast, _showHandMigrationToast } from './hub-save.js';
 import { _cancelMassSellConfirm, _closeMassSellModal } from './hub-mass-sell-modal.js';
 
-export { _injectMassSellStyles } from './hub-mass-sell-styles.js';
 import { _injectMassSellStyles } from './hub-mass-sell-styles.js';
 import { _buildItemChipHTML, _showItemLevel } from './hub-mass-sell.js';
 import { INV_COLS, _ensureInvRows, _equipped, _getInvCapacity, _getInvRows, _inventory, _stashTab } from './hub-stash.js';
 import { _buildTopbarHTML, _updateItemLevelToggleButton, _updatePassiveTreeButton } from './hub-topbar.js';
 import { UNIQUE_ITEMS } from '../loot/unique-item-data.js';
-
-
-//------------------------------------------------------------------------
-//-------------------ENDGAME HUB SCREEN----------------------------------
-//------------------------------------------------------------------------
-// Handles the Endgame Hub UI:
-//   - Character panel with paperdoll equipment slots and stats
-//   - Currency strip (Runes & Orbs row)
-//   - Full-width equipment stash (below the currency strip)
-//   - Floating item tooltip on mouseover (+ Alt-hold compare tooltip
-//     against the equipped item in the matching paperdoll slot)
-//   - Drag-and-drop is handled in hub-drag-and-drop.js
-//   - The Probability Gate (map device + map stash) lives on its own
-//     screen - see endgame-gate.js
-//------------------------------------------------------------------------
+// Imported last so the module evaluation order inside the hub import cycle is unchanged.
+import { _buildUniqueGridHTML, _renderUniqueStash } from './hub-unique-ui.js';
+import { _renderStatsList } from './hub-stats-panel.js';
 
 
 //------------------------------------------------------------------------
@@ -107,11 +83,8 @@ export const EQUIP_SLOTS = [
 ];
 
 
-// Tooltip state: tracks which item is currently being previewed in the tooltip panel
+// The item currently previewed in the tooltip panel.
 let _tooltipItem = null;
-
-
-
 
 
 //------------------------------------------------------------------------
@@ -353,209 +326,6 @@ export function _buildStashPanelHTML() {
     </div>
 </div>`;
 }
-export function _switchStashTab(tab) {
-    Audio_Manager.playSFX('ui_tab_switch');
-    globalThis._stashTab = (tab === 'uniques' ? 'uniques' : 'inventory');
-    const invBody = document.getElementById('sx-stash-tab-inventory');
-    const uniqBody = document.getElementById('sx-stash-tab-uniques');
-    const invTab = document.getElementById('sx-tab-inventory');
-    const uniqTab = document.getElementById('sx-tab-uniques');
-    if (invBody) invBody.classList.toggle('active', _stashTab === 'inventory');
-    if (uniqBody) uniqBody.classList.toggle('active', _stashTab === 'uniques');
-    if (invTab) invTab.classList.toggle('active', _stashTab === 'inventory');
-    if (uniqTab) uniqTab.classList.toggle('active', _stashTab === 'uniques');
-    if (_stashTab === 'uniques') _renderUniqueStash();
-    else _renderInventory();
-}
-export function _buildUniqueGridHTML() {
-    if (typeof UNIQUE_ITEMS === 'undefined' || !Array.isArray(UNIQUE_ITEMS)) return '<div class="sx-unique-empty">No uniques defined</div>';
-    let html = '';
-    for (let i = 0; i < UNIQUE_ITEMS.length; i++) {
-        const def = UNIQUE_ITEMS[i];
-        const uid = def.uniqueId;
-        const collected = _isUniqueCollected(uid);
-        const count = _getUniqueCount(uid);
-        const items = collected ? (globalThis._uniqueStash[uid] || []) : [];
-        const displayName = (LANG === 'de' ? (def.nameDe || def.nameEn) : def.nameEn) || uid;
-        let cellCls;
-        if (!collected) cellCls = 'locked';
-        else if (count === 0) cellCls = 'collected-empty';
-        else cellCls = 'collected';
-        const icon = collected ? (items[0] ? (items[0].icon || def.icon || '❓') : (def.icon || '❓')) : '?';
-        const countBadge = count > 1 ? `<span class="sx-unique-count-badge">${t('eg_unique_count').replace('{n}', count)}</span>` : (count === 0 && collected ? `<span class="sx-unique-count-badge" style="background:#888;">0</span>` : '');
-        const lockedOverlay = !collected ? '<span class="sx-unique-lock">?</span>' : '';
-        html += `<div class="sx-unique-cell ${cellCls}" data-unique-id="${uid}" data-uid="${uid}" data-eg-dropzone="uniques"
-            ondragover="hubDragOver(event)" ondragleave="hubDragLeave(event)"
-            onmouseenter="_onUniqueCellEnter('${uid}', event)"
-            onmousemove="_onUniqueCellMove('${uid}', event)"
-            onmouseleave="_onUniqueCellLeave('${uid}', event)"
-            oncontextmenu="_onUniqueCellRightClick(event, '${uid}')"
-            onclick="_onUniqueCellClick(event, '${uid}')">
-            <div class="sx-unique-cell-name">${displayName}</div>
-            <div class="sx-unique-cell-icon">${GAME_ART ? GAME_ART.html('item', uid, icon) : icon}${countBadge}${lockedOverlay}</div>
-        </div>`;
-    }
-    return html;
-}
-export function _renderUniqueStash() {
-    const grid = document.getElementById('sx-unique-grid');
-    if (!grid) return;
-    grid.innerHTML = _buildUniqueGridHTML();
-    const total = (typeof UNIQUE_ITEMS !== 'undefined' ? UNIQUE_ITEMS.length : 0);
-    const found = (globalThis._uniqueCollected ? globalThis._uniqueCollected.size : 0);
-    const cntEl = document.getElementById('sx-unique-count');
-    if (cntEl) cntEl.textContent = t('eg_uniques_collected').replace('{found}', found).replace('{total}', total);
-    const fillEl = document.getElementById('sx-unique-progress-fill');
-    if (fillEl) fillEl.style.width = (total ? Math.round(found / total * 100) : 0) + '%';
-    _updateUniqueTabBadge();
-}
-export function _onUniqueCellClick(e, uid) {
-    // left click does nothing except ensure tooltip stays; right-click handles transfer via contextmenu
-    if (e.button === 0) e.preventDefault();
-}
-export function _onUniqueCellRightClick(e, uid) {
-    e.preventDefault();
-    _ensureUniqueStash();
-    const arr = globalThis._uniqueStash[uid];
-    if (!arr || arr.length === 0) {
-        if (typeof _showStashInfo === 'function') _showStashInfo(t('eg_unique_not_collected'), {type:'info'});
-        return;
-    }
-    _clearTooltip();
-    globalThis.hideGameTooltip();
-    const ok = _moveUniqueToInventory(uid);
-    if (ok) _renderInventory();
-}
-export function _onUniqueCellEnter(uid, e) {
-    _ensureUniqueStash();
-    const arr = globalThis._uniqueStash[uid];
-    // Ensure previous multi-tip inline overrides don't leak into next tooltip
-    const prevTip = document.getElementById('ghud-floating-tip');
-    if (prevTip && prevTip.classList.contains('sx-unique-multi')) {
-        prevTip.classList.remove('sx-unique-multi','sx-wide-tip');
-        prevTip.style.maxWidth = '380px';
-        prevTip.style.width = '';
-        prevTip.style.maxHeight = '';
-        prevTip.style.overflowY = '';
-        prevTip.style.pointerEvents = 'none';
-        // remove multi hover handlers if any
-        prevTip.onmouseenter = null;
-        prevTip.onmouseleave = null;
-    }
-    if (!arr || arr.length === 0) {
-        const isCollected = _isUniqueCollected(uid);
-        const def = (typeof UNIQUE_ITEMS !== 'undefined') ? UNIQUE_ITEMS.find(u=>u.uniqueId===uid) : null;
-        const name = def ? ((LANG==='de'?def.nameDe:def.nameEn)||def.nameEn) : uid;
-        const icon = def ? (def.icon || '?') : '?';
-        if (isCollected) {
-            const html = `<div class="sx-tt-frame" style="--tt-border:#c8a84b;"><div class="sx-tt-header"><div class="sx-tt-icon" style="opacity:0.6;">${GAME_ART ? GAME_ART.html('item', uid, icon) : icon}</div><div class="sx-tt-name" style="color:#c8a84b;">${name}</div><div class="sx-tt-rarity-line" style="color:#f5d98a;">${t('eg_unique_in_inventory') || 'Collected - in Inventory (0 remaining)'}</div></div><div class="sx-tt-section"><div class="sx-tt-desc" style="opacity:.8;">${t('eg_unique_empty_hint') || 'All copies moved to Inventory. Drag one back or loot another.'}</div></div></div>`;
-            globalThis.showGameTooltip(html, e);
-        } else {
-            const html = `<div class="sx-tt-frame" style="--tt-border:#555;"><div class="sx-tt-header"><div class="sx-tt-icon">?</div><div class="sx-tt-name" style="color:#888;">${name}</div><div class="sx-tt-rarity-line" style="color:#888;">${t('eg_unique_not_collected')}</div></div><div class="sx-tt-section"><div class="sx-tt-desc" style="opacity:.6;">${t('eg_unique_stash_hint')}</div></div></div>`;
-            globalThis.showGameTooltip(html, e);
-        }
-        return;
-    }
-    // Build multi-tooltip: container with flex row of each variant's full tooltip body
-    if (arr.length === 1) {
-        _showHubTooltip(arr[0], e);
-        // append right-click hint
-        // we could inject after, but just let normal tooltip; right-click hint via extra line handled in custom?
-        // add hint via stash info? Instead append to tooltip DOM after show
-        setTimeout(()=>{
-            const tip=document.getElementById('ghud-floating-tip');
-            if(tip && !tip.querySelector('.sx-unique-tip-hint')){
-                const h=document.createElement('div');
-                h.className='sx-unique-tip-hint';
-                h.textContent=t('eg_unique_right_click_hint');
-                h.style.cssText='margin-top:6px;padding-top:4px;border-top:1px dashed #444;font-size:9px;color:#f5d98a;text-align:center;';
-                tip.appendChild(h);
-            }
-        },10);
-        return;
-    }
-    // Multiple copies: build side-by-side frames – scrollable, stays open while hovering tip
-    const frames = arr.map(it=>_buildTooltipBodyHTML(it)).join('');
-    const header = `<div style="text-align:center;font-family:var(--PX);font-size:9px;color:#f5d98a;margin-bottom:6px;letter-spacing:1px;">${t('eg_unique_tooltip_count').replace('{n}', arr.length)} - ${t('eg_unique_right_click_hint')}</div>`;
-    const html = `<div class="sx-unique-multi-tip">${header}<div class="sx-unique-multi-row">${frames}</div></div>`;
-    globalThis.showGameTooltip(html, e);
-    const tip=document.getElementById('ghud-floating-tip');
-    if(tip){
-        tip.classList.add('sx-wide-tip','sx-unique-multi');
-        tip.style.maxWidth = '96vw';
-        tip.style.width = 'auto';
-        tip.style.maxHeight = '85vh';
-        tip.style.overflowY = 'auto';
-        tip.style.pointerEvents = 'auto';
-        // keep tip open when mouse moves from cell onto the tip itself
-        tip.onmouseenter = null;
-        tip.onmouseleave = (ev) => {
-            // hide when leaving the tip unless re-entering the originating cell
-            const stillOverCell = document.querySelector(`.sx-unique-cell[data-uid="${uid}"]:hover`);
-            if (!stillOverCell) {
-                globalThis.hideGameTooltip();
-                tip.classList.remove('sx-wide-tip','sx-unique-multi');
-                tip.style.maxWidth = '380px';
-                tip.style.width = '';
-                tip.style.maxHeight = '';
-                tip.style.overflowY = '';
-                tip.style.pointerEvents = 'none';
-                tip.onmouseenter = null;
-                tip.onmouseleave = null;
-            }
-        };
-        if (typeof moveGameTooltip === 'function') globalThis.moveGameTooltip(e);
-        else if (typeof _calcGameTooltipPos === 'function') {
-            const pos = globalThis._calcGameTooltipPos(e, tip.offsetWidth, tip.offsetHeight);
-            tip.style.left = pos.x + 'px';
-            tip.style.top = pos.y + 'px';
-        }
-    }
-}
-export function _onUniqueCellMove(uid, e){
-    // support both signatures: (uid, e) and (e)
-    if (e === undefined) { e = uid; uid = null; }
-    const tip=document.getElementById('ghud-floating-tip');
-    if (tip && tip.classList.contains('sx-unique-multi')) return; // multi tip is pinned, don't follow mouse
-    if(typeof moveGameTooltip==='function') globalThis.moveGameTooltip(e);
-}
-export function _onUniqueCellLeave(uid, e){
-    if (e === undefined && typeof uid === 'object' && uid && uid.type) { e = uid; uid = null; }
-    const tip=document.getElementById('ghud-floating-tip');
-    if(tip && tip.classList.contains('sx-unique-multi')) {
-        // don't hide immediately – let tip's own mouseleave handle it, or delay to allow moving onto tip
-        setTimeout(()=>{
-            const tipNow=document.getElementById('ghud-floating-tip');
-            if(!tipNow) return;
-            const overTip = tipNow.matches(':hover');
-            const overCell = uid ? document.querySelector(`.sx-unique-cell[data-uid="${uid}"]:hover`) : null;
-            if (!overTip && !overCell) {
-                globalThis.hideGameTooltip();
-                tipNow.classList.remove('sx-wide-tip','sx-unique-multi');
-                tipNow.style.maxWidth = '380px';
-                tipNow.style.width = '';
-                tipNow.style.maxHeight = '';
-                tipNow.style.overflowY = '';
-                tipNow.style.pointerEvents = 'none';
-                tipNow.onmouseenter = null;
-                tipNow.onmouseleave = null;
-            }
-        }, 80);
-        return;
-    }
-    globalThis.hideGameTooltip();
-    if(tip) {
-        tip.classList.remove('sx-wide-tip','sx-unique-multi');
-        tip.style.maxWidth = '380px';
-        tip.style.width = '';
-        tip.style.maxHeight = '';
-        tip.style.overflowY = '';
-        tip.style.pointerEvents = 'none';
-        tip.onmouseenter = null;
-        tip.onmouseleave = null;
-    }
-}
-
 export let _stashInfoTimer = null;
 
 export function _ensureStashInfoEl() {
@@ -617,7 +387,7 @@ export function _buildFullScreenHTML() {
                 ${_buildCharPanelHTML()}
             </div>
             <div class="sx-essence-col">
-                ${typeof _buildEssenceTabHTML === 'function' ? _buildEssenceTabHTML() : ''}
+                ${_buildEssenceTabHTML()}
             </div>
         </div>
         ${_buildStashPanelHTML()}
@@ -743,16 +513,9 @@ export function _updateInvCount() {
 //-------------------RENDER: CURRENCY STASH-------------------------------
 //------------------------------------------------------------------------
 
-// Re-renders a single cell in the currency stash grid.
-// Empty assigned slots show a faint placeholder icon and dashed border.
-// _renderCurrencyCell is defined ONCE, in
-// hub-drag-and-drop.js: it renders a currency-stash cell into BOTH
-// the hub grid (sx-currency-cell-*) and the gate grid
-// (eg-gate-currency-cell-*) using drag-and-drop chips. The earlier copy
-// that lived here (hub-only, non-dnd chips) was removed in 2026-09 - the
-// drag-and-drop version already won via load order, so behaviour is
-// unchanged; hub's stash render loop below calls the shared global.
-// Re-renders the entire currency stash grid.
+// Re-renders the entire currency stash grid. Each cell is drawn by
+// _renderCurrencyCell (hub-drag-and-drop.js), which fills both the hub grid and
+// the gate screen's grid.
 export function _renderCurrencyStash() {
     for (let r = 0; r < CURRENCY_ROWS; r++) {
         for (let c = 0; c < CURRENCY_COLS; c++) {
@@ -778,183 +541,13 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 //------------------------------------------------------------------------
 //-------------------RENDER: MAP STASH / MAP DEVICE-----------------------
 //------------------------------------------------------------------------
-// Moved to endgame-gate.js - the map stash and map device live on the
-// separate Probability Gate screen. _renderAll() still calls
-// _egRenderMapSlot() / _egRenderMapStash(); they no-op while the gate
-// screen is not in the DOM.
+// Lives in endgame-gate.js; _renderAll() calls _egRenderMapSlot() and
+// _egRenderMapStash(), which do nothing while the gate screen is not shown.
 
 
 //------------------------------------------------------------------------
-//-------------------RENDER: FULL REFRESH---------------------------------
+//-------------------RENDER: CRAFTING SLOT & FULL REFRESH-----------------
 //------------------------------------------------------------------------
-
-
-// Re-renders the three aggregated stat regions of the character panel:
-//   offense - upper left corner block, defense - upper right corner block,
-//   puzzle  - center column between the paperdoll slots.
-// Reads live gear via _computePlayerStats() / _buildGroupedStats()
-// (combat-player-stats.js) so it always reflects whatever is equipped.
-export function _renderStatsList() {
-    const stats = _computePlayerStats();
-    const groups = _buildGroupedStats(stats);
-
-    const emptyHTML = `
-<div class="sx-stat-row sx-stat-placeholder">
-    <span class="sx-stat-name">${t('eg_no_stats_yet')}</span>
-</div>`;
-
-    function renderSide(listId, categories) {
-        const el = document.getElementById(listId);
-        if (!el) return;
-        if (!categories.length) {
-            el.innerHTML = emptyHTML;
-            return;
-        }
-        el.innerHTML = categories.map(cat => `
-<div class="sx-stats-category">
-    <div class="sx-stats-category-title">${cat.title}</div>
-    ${cat.lines.map(line => `
-    <div class="sx-stat-row" data-desc-key="${line.descKey}" data-desc-label="${line.label}"${line.resTotal != null ? ` data-res-total="${line.resTotal}" data-res-cap="${line.resCap}" data-res-penalty="${line.resPenalty || 0}"` : ''}>
-        <span class="sx-stat-name">${line.label}</span>
-        <span class="sx-stat-value">${line.value}</span>
-    </div>`).join('')}
-</div>`).join('');
-    }
-
-    renderSide('sx-offense-stats-list', groups.offense);
-    renderSide('sx-defense-stats-list', groups.defense);
-    renderSide('sx-stats-list', groups.puzzle);
-    _bindStatTooltips();
-}
-
-
-// Builds the hover tooltip body for a single stat row: stat name as the
-// title plus its mechanic description. For armour and evasion the live
-// combat values (damage reduction / dodge chance) are appended, using the
-// exact formulas from combat-player-stats.js. For resistance rows the
-// uncapped gear total and the effective cap are revealed (the row itself
-// shows the capped value).
-export function _buildStatDescTooltipHTML(descKey, label, row) {
-    let html = `<strong style="color:var(--accent,#66fcf1)">${label}</strong>`;
-    if (descKey) {
-        const desc = t(descKey);
-        // t() falls back to the raw key when a translation is missing
-        if (desc && desc !== descKey) {
-            html += `<br><span style="opacity:.75;font-size:.9em">${desc}</span>`;
-        }
-        // Resistance rows carry data-res-total / data-res-cap: show the
-        // uncapped total, and flag when the cap is clipping it.
-        if (row && row.dataset && row.dataset.resTotal != null) {
-            const total = parseFloat(row.dataset.resTotal);
-            const cap = parseFloat(row.dataset.resCap);
-            const capped = total > cap;
-            html += `<br><span style="color:var(--accent,#66fcf1)">`
-                + t('eg_statdesc_res_total').replace('{t}', total.toFixed(0))
-                + (capped ? ` - ${t('eg_statdesc_res_capped').replace('{c}', cap.toFixed(0))}` : '')
-                + `</span>`;
-            const penalty = parseFloat(row.dataset.resPenalty) || 0;
-            if (penalty > 0) {
-                html += `<br><span style="color:#ff8a6a">${t('eg_statdesc_res_penalty').replace('{p}', penalty.toFixed(0))}</span>`;
-            }
-        }
-        const stats = _computePlayerStats();
-        // Armour/evasion live values are measured against a representative
-        // monster: the current target's level, else the encounter's base
-        // level - same convention as the accuracy tooltip below.
-        const hasLevelCtx = typeof _getTarget === 'function' && typeof _getEncounterBaseLevel === 'function';
-        const refMonsterLevel = hasLevelCtx
-            ? ((_getTarget() && _getTarget().level) || _getEncounterBaseLevel() || 1)
-            : 1;
-        // Character level for multi-level display (falls back to ref level if unavailable)
-        const playerLevel = (typeof _getPlayerLevel === 'function')
-            ? Math.max(1, Number(_getPlayerLevel()) || 1)
-            : refMonsterLevel;
-        const maxLvl = (typeof LEVELING_CONFIG !== 'undefined' && LEVELING_CONFIG.maxLevel)
-            ? LEVELING_CONFIG.maxLevel : 100;
-
-        if (descKey === 'eg_statdesc_armour') {
-            // Show damage reduction vs monster levels: playerLevel-1 .. playerLevel+3
-            const levels = [];
-            for (let d = -1; d <= 3; d++) {
-                const lvl = playerLevel + d;
-                if (lvl < 1) continue;
-                if (lvl > maxLvl) break;
-                levels.push(lvl);
-            }
-            if (!levels.length) levels.push(refMonsterLevel);
-            const lines = levels.map(lvl => {
-                // Representative raw hit size at this monster level
-                const refDamage = Math.round(12 * (1 + 0.12 * (lvl - 1)));
-                const reductionPct = _calcArmourReductionPct(stats.armour, refDamage) * 100;
-                const labelPart = t('eg_statdesc_armour_value').replace('{p}', reductionPct.toFixed(1));
-                return `${labelPart} (L${lvl})`;
-            });
-            html += `<br><span style="color:var(--accent,#66fcf1)">${lines.join('<br>')}</span>`;
-        } else if (descKey === 'eg_statdesc_evasion') {
-            // Show dodge chance vs monster levels: playerLevel-1 .. playerLevel+3
-            const levels = [];
-            for (let d = -1; d <= 3; d++) {
-                const lvl = playerLevel + d;
-                if (lvl < 1) continue;
-                if (lvl > maxLvl) break;
-                levels.push(lvl);
-            }
-            if (!levels.length) levels.push(refMonsterLevel);
-            const lines = levels.map(lvl => {
-                const dodgeChance = Math.min(75, stats.dodgeChance + _calcEvasionDodgeChance(stats.evasion, lvl));
-                const labelPart = t('eg_statdesc_evasion_value').replace('{p}', dodgeChance.toFixed(1));
-                return `${labelPart} (L${lvl})`;
-            });
-            html += `<br><span style="color:var(--accent,#66fcf1)">${lines.join('<br>')}</span>`;
-        } else if (descKey === 'eg_statdesc_accuracy') {
-            // Miss chance scaled to the character's own level and the next
-            // three monster levels (e.g. at player level 12 -> 12/13/14/15).
-            // Falls back to level 1 when the leveling system is unavailable.
-            const levels = [];
-            for (let d = 0; d < 4; d++) {
-                const lvl = playerLevel + d;
-                if (lvl > maxLvl) break;
-                levels.push(lvl);
-            }
-            if (!levels.length) levels.push(playerLevel);
-            const lines = levels.map(lvl => {
-                const missPct = (typeof _calcAccuracyMissChance === 'function')
-                    ? _calcAccuracyMissChance(stats.accuracy, lvl) : 0;
-                return t('eg_statdesc_accuracy_value')
-                    .replace('{p}', missPct.toFixed(1))
-                    .replace('{n}', lvl);
-            });
-            html += `<br><span style="color:var(--accent,#66fcf1)">${lines.join('<br>')}</span>`;
-        }
-    }
-    return html;
-}
-
-// Wires delegated mouseover tooltips onto the three stat list containers
-// (delegation survives frequent innerHTML re-renders; the dataset guard
-// makes repeated calls after each _renderStatsList() a no-op).
-export function _bindStatTooltips() {
-    ['sx-offense-stats-list', 'sx-stats-list', 'sx-defense-stats-list'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el || el.dataset.statTipBound) return;
-        el.dataset.statTipBound = '1';
-
-        el.addEventListener('mouseover', e => {
-            const row = e.target.closest ? e.target.closest('.sx-stat-row') : null;
-            if (row && !row.classList.contains('sx-stat-placeholder')) {
-                globalThis.showGameTooltip(_buildStatDescTooltipHTML(row.dataset.descKey, row.dataset.descLabel, row), e);
-            }
-        });
-        el.addEventListener('mousemove', e => {
-            if (e.target.closest && e.target.closest('.sx-stat-row')) globalThis.moveGameTooltip(e);
-        });
-        el.addEventListener('mouseout', e => {
-            const row = e.target.closest ? e.target.closest('.sx-stat-row') : null;
-            if (row && !(e.relatedTarget && row.contains(e.relatedTarget))) globalThis.hideGameTooltip();
-        });
-    });
-}
-
 
 // Re-renders the launcher slot for the crafting bench (in the currency panel).
 export function _updateCraftingBenchLauncherSlot() {
@@ -987,15 +580,10 @@ export function _renderAll() {
     _egRenderMapStash();
     _updateInvCount();
     _renderStatsList();
-    if (typeof _renderLevelHUD === 'function') _renderLevelHUD();
+    _renderLevelHUD();
     _updatePassiveTreeButton();
-    const craftingSlot = document.getElementById('sx-crafting-bench-launch-slot');
-    if (craftingSlot) {
-        const item = typeof _craftingBenchItem !== 'undefined' ? globalThis._craftingBenchItem : null;
-        craftingSlot.innerHTML = item ? _buildItemChipHTML(item) : 'Drop equipment here';
-    }
+    _updateCraftingBenchLauncherSlot();
 }
-
 
 
 //------------------------------------------------------------------------
@@ -1026,13 +614,7 @@ export function ensureHubScreen() {
 export function showHub() {
     ensureHubScreen();
 
-    // Use the global screen-switcher if available, otherwise manually show/hide.
-    if (typeof switchScreen === 'function') {
-        switchScreen('screen-hub');
-    } else {
-        document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
-        document.getElementById('screen-hub').style.display = 'block';
-    }
+    switchScreen('screen-hub');
 
     globalThis._loadHubState();
     _updateItemLevelToggleButton();
@@ -1040,8 +622,7 @@ export function showHub() {
     _applyOverlayChrome();
     // Flush any deferred legacy-hand-migration notice on the visible sheet.
     try {
-        if (_pendingHandMigrationToast && _pendingHandMigrationToast.length
-            && typeof _showHandMigrationToast === 'function') {
+        if (_pendingHandMigrationToast && _pendingHandMigrationToast.length) {
             _showHandMigrationToast(_pendingHandMigrationToast);
         }
     } catch (e) {}
@@ -1093,9 +674,9 @@ export function _hubOverlayPause() {
         if (typeof dead !== 'undefined' && globalThis.dead) return;
         if (typeof cur === 'undefined' || !cur) return;
         if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;  // pause menu already up
-        if (typeof pauseTimer === 'function') pauseTimer();
+        pauseTimer();
         globalThis._gamePaused = true;
-        if (typeof _onPause === 'function') { try { _onPause(); } catch (e) {} }
+        try { _onPause(); } catch (e) {}
         _hubOverlayPaused = true;
     } catch (e) {}
 }
@@ -1107,8 +688,8 @@ export function _hubOverlayResume() {
     _hubOverlayPaused = false;
     try {
         globalThis._gamePaused = false;
-        if (typeof _onResume === 'function') { try { _onResume(); } catch (e) {} }
-        if (typeof resumeTimer === 'function') resumeTimer();
+        try { _onResume(); } catch (e) {}
+        resumeTimer();
     } catch (e) {}
 }
 
@@ -1139,7 +720,7 @@ export function openHubFromGame(returnScreen = 'screen-game') {
     // stash instantly (see _checkLootClaim), but a pending item from an
     // older save or a pre-flush code path would otherwise stay hidden in
     // _runLoot until map clear. The flush is idempotent (_stashed skip).
-    try { if (typeof _flushRunLootToStash === 'function') _flushRunLootToStash(); } catch (e) {}
+    try { _flushRunLootToStash(); } catch (e) {}
     showHub();
 }
 
@@ -1152,17 +733,14 @@ export function openHubFromGame(returnScreen = 'screen-game') {
 // so the new values are visible the instant B closes the sheet.
 export function _syncOverlayGearPools() {
     try {
-        if (typeof _computePlayerStats !== 'function') return;
         if (typeof cur === 'undefined' || !cur) return;
         const stats = _computePlayerStats() || {};
         // ── HP ──
         if (typeof playerMaxHP !== 'undefined' && typeof playerCurrentHP !== 'undefined') {
-            const baseHP = (typeof PLAYER_STATS !== 'undefined') ? PLAYER_STATS.baseHP : 100;
+            const baseHP = PLAYER_STATS.baseHP;
             let newMax = baseHP + (Number(stats.health) || 0);
             if (Number(stats.healthMorePct) > 0) newMax = Math.round(newMax * (1 + stats.healthMorePct / 100));
-            if (typeof _egMapPlayerLifeMult === 'function') {
-                try { newMax = Math.round(newMax * _egMapPlayerLifeMult()); } catch (e) {}
-            }
+            try { newMax = Math.round(newMax * _egMapPlayerLifeMult()); } catch (e) {}
             if (Number(stats.lifeBecomesOne) > 0) newMax = 1;
             newMax = Math.max(1, newMax);
             const delta = newMax - globalThis.playerMaxHP;
@@ -1171,8 +749,7 @@ export function _syncOverlayGearPools() {
             else globalThis.playerCurrentHP = Math.max(0, Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP));
         }
         // ── Mana snapshot (bar itself reads live max, snapshot keeps regen/clamp sane) ──
-        if (typeof playerMaxMana !== 'undefined' && typeof playerCurrentMana !== 'undefined'
-            && typeof _getPlayerMaxMana === 'function') {
+        if (typeof playerMaxMana !== 'undefined' && typeof playerCurrentMana !== 'undefined') {
             try {
                 const newManaMax = _getPlayerMaxMana();
                 const deltaM = newManaMax - globalThis.playerMaxMana;
@@ -1198,17 +775,17 @@ export function closeHubToGame() {
     _hubGameOverlay = false;
     const returnScreen = _hubReturnScreen;
     _hubReturnScreen = 'screen-game';
-    if (typeof switchScreen === 'function') switchScreen(returnScreen);
+    switchScreen(returnScreen);
     if (returnScreen !== 'screen-game') return;   // map / level select: nothing to resync
     _hubShowAvatars();
     // Gear edited mid-puzzle must apply instantly: sync pools first, then
     // repaint every HUD surface that displays damage done/received or pools.
     try { _syncOverlayGearPools(); } catch (e) {}
     try { if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth(); } catch (e) {}
-    try { if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar(); } catch (e) {}
-    try { if (typeof _renderPanel === 'function') _renderPanel(); } catch (e) {}
-    try { if (typeof buildClassHUD === 'function') buildClassHUD(); } catch (e) {}
-    try { if (typeof renderSkillHotbar === 'function') renderSkillHotbar(); } catch (e) {}
+    try { updateClassHUDManaBar(); } catch (e) {}
+    try { _renderPanel(); } catch (e) {}
+    try { buildClassHUD(); } catch (e) {}
+    try { renderSkillHotbar(); } catch (e) {}
     _hubOverlayResume();
 }
 
@@ -1351,6 +928,25 @@ export {
     _showHandMigrationToast,
     saveHubState,
 } from './hub-save.js';
+
+export {
+    _bindStatTooltips,
+    _buildStatDescTooltipHTML,
+    _renderStatsList,
+} from './hub-stats-panel.js';
+
+export {
+    _buildUniqueGridHTML,
+    _onUniqueCellClick,
+    _onUniqueCellEnter,
+    _onUniqueCellLeave,
+    _onUniqueCellMove,
+    _onUniqueCellRightClick,
+    _renderUniqueStash,
+    _switchStashTab,
+} from './hub-unique-ui.js';
+
+export { _injectMassSellStyles } from './hub-mass-sell-styles.js';
 
 export {
     _cancelMassSellConfirm,
