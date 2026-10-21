@@ -1,19 +1,16 @@
 //------------------------------------------------------------------------
-// PHASE 4 split (2026-09-16): extracted into a focused module. The original
-// path is now a facade that re-exports this module, so existing import sites
-// are unaffected. See MIGRATION.md "splitting giants".
+//-------------------HUB TOPBAR & TOOLTIPS--------------------------------
 //------------------------------------------------------------------------
-
-// Endgame hub: topbar, item-level toggle, mass-sell/hub info tooltips.
-// The toggle flips _showItemLevel (declared in hub-mass-sell.js) through
-// that module's write-through globalThis accessor, then persists it.
+// The hub's top bar, the item-level display toggle, the build export and the
+// sell / info tooltips. The toggle flips _showItemLevel (owned by
+// hub-mass-sell.js) through that module's globalThis accessor, then saves.
+//------------------------------------------------------------------------
 
 import { t } from '../translation/translations.js';
 import { _renderEquipSlots } from './hub.js';
 import { _saveMassSellSettings, _showItemLevel } from './hub-mass-sell.js';
 import { _rebuildInventoryGrid } from './hub-stash.js';
 import { STATE } from '../state.js';
-
 
 
 //------------------------------------------------------------------------
@@ -114,7 +111,7 @@ export function _exportBuildSnapshot() {
 export function _updatePassiveTreeButton() {
     const btn = document.getElementById('sx-btn-passive-tree');
     if (!btn) return;
-    const points = (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;
+    const points = (STATE && STATE.passiveTreePoints) || 0;
     const hasPoints = points > 0;
     btn.classList.toggle('unspent-points', hasPoints);
     let countEl = document.getElementById('sx-pt-point-count');
@@ -189,9 +186,8 @@ export function _showMassSellTooltip(e) {
 }
 
 
-// Builds the tooltip body shown when hovering the "?" info button in the
-// top-right of the Nexus of Worlds screen. Uses the shared game tooltip
-// engine (tooltips-hud.js) - not the browser title tooltip.
+// Builds the body of the "?" info tooltip in the hub's top-right corner,
+// shown through the shared game tooltip engine.
 export function _buildHubInfoTooltipHTML() {
     const line = (key) => {
         const txt = t(key);
@@ -223,12 +219,10 @@ export function _buildHubInfoTooltipHTML() {
 </div>`;
 }
 
+// Shows the "?" info tooltip, widened to fit its long controls list.
 export function _showHubInfoTooltip(e) {
     globalThis.showGameTooltip(_buildHubInfoTooltipHTML(), e);
-    // The controls list needs much more width than the shared default -
-    // without this the tooltip becomes very narrow and very tall.
-    // sx-controls-tip is exclusive to this tooltip; the engine's inline
-    // max-width only yields to it via the !important rule in CSS.
+    // Widen the tip: the shared default is too narrow for the controls list.
     const tip = document.getElementById('ghud-floating-tip');
     if (tip) tip.classList.add('sx-wide-tip', 'sx-controls-tip');
 }

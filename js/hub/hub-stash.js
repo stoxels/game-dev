@@ -1,18 +1,13 @@
 //------------------------------------------------------------------------
-// PHASE 4 split (2026-09-16): extracted into a focused module. The original
-// path is now a facade that re-exports this module, so existing import sites
-// are unaffected. See MIGRATION.md "splitting giants".
+//-------------------HUB STASH--------------------------------------------
+//------------------------------------------------------------------------
+// The equipment stash grid, the equipped-items map and the unique
+// collection mirrors, plus the helpers that grow the stash. hub.js
+// reassigns the mirrors while loading, so each one has a globalThis
+// accessor below that writes through to the real variable.
 //------------------------------------------------------------------------
 
-// Endgame hub: equipment stash mirrors + unlimited-stash helpers. The
-// facade rebinds the mirrors during _loadHubState(); the write-through
-// accessor prologue below makes those rebinds visible here and to every
-// stash consumer reaching the mirrors through globalThis.
-
-// Phase 4 split: write-through globalThis accessors. The facade and sibling
-// split modules rebind these lets through globalThis.<name> assignment
-// (imported module bindings are read-only views) - the established
-// step-9/step-10 pattern.
+// Accessors: let other files read and reassign the mirrors via globalThis.
 try { Object.defineProperty(globalThis, '_inventory', { get() { return _inventory; }, set(v) { _inventory = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_equipped', { get() { return _equipped; }, set(v) { _equipped = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_stashTab', { get() { return _stashTab; }, set(v) { _stashTab = v; }, configurable: true }); } catch (e) {}
@@ -23,23 +18,38 @@ import { _addUniqueToCollection, _updateUniqueTabBadge } from './hub-uniques.js'
 import { _buildInventoryGridHTML, _renderInventory, _renderInventoryCell, _updateInvCount } from './hub.js';
 
 
-// Main equipment stash dimensions
+//------------------------------------------------------------------------
+//-------------------CONSTANTS & STATE------------------------------------
+//------------------------------------------------------------------------
+
+// Main stash dimensions: starts at 5 rows, grows on demand.
 export const INV_INITIAL_ROWS = 5;
 export const INV_ROWS = INV_INITIAL_ROWS;
 
 export const INV_COLS = 24;
 
-// ── Unique Collection tab state ────────────────────────────────────────
+// Unique Collection tab state.
 let _uniqueStash = {};
 
 let _uniqueCollected = new Set();
 
 export let _stashTab = 'inventory';
 
+// Main equipment stash: 2D grid of item objects (null = empty cell).
+export let _inventory = Array.from({ length: INV_ROWS }, () => Array(INV_COLS).fill(null));
 
-// ── Unlimited stash helpers (must sit after INV_ROWS/COLS so _inventory exists) ──
+// Equipped items on the paperdoll, keyed by slot id, e.g. { head: {...}, chest: {...} }.
+export let _equipped = {};
+
+//------------------------------------------------------------------------
+//-------------------STASH HELPERS----------------------------------------
+//------------------------------------------------------------------------
+
+// Current number of stash rows / total cells.
 export function _getInvRows() { return _inventory ? _inventory.length : INV_INITIAL_ROWS; }
 export function _getInvCapacity() { return _getInvRows() * INV_COLS; }
+
+// Redraws the whole stash grid, keeping the scroll position.
 export function _rebuildInventoryGrid() {
     const grid = document.getElementById('sx-inv-grid');
     if (!grid) return;
@@ -49,6 +59,8 @@ export function _rebuildInventoryGrid() {
     // keep scroll position stable across rebuilds
     grid.scrollTop = scrollTop;
 }
+
+// Adds empty rows until the stash has at least minRows (and redraws if visible).
 export function _ensureInvRows(minRows) {
     if (!_inventory) return;
     if (_inventory.length >= minRows) return;
@@ -58,7 +70,10 @@ export function _ensureInvRows(minRows) {
         _rebuildInventoryGrid();
     }
 }
+
 export function _expandStashByOneRow() { _ensureInvRows(_getInvRows() + 1); }
+
+// First empty stash cell; adds a new row when the stash is full.
 export function _findFreeInvCell() {
     for (let r = 0; r < _inventory.length; r++) {
         for (let c = 0; c < INV_COLS; c++) if (!_inventory[r][c]) return { r, c };
@@ -67,10 +82,9 @@ export function _findFreeInvCell() {
     _ensureInvRows(r + 1);
     return { r, c: 0 };
 }
-// `opts.uniqueToInventory`: loot pickups keep a unique in the regular
-// inventory (the player moves it to the collection by hand) instead of
-// sending it straight to the Unique Collection, which read as a lost pickup.
-// The unique is still marked discovered so its collection cell un-locks.
+// Puts an item into the stash. Uniques go straight to the collection unless
+// `opts.uniqueToInventory` is set (loot pickups: the player moves them by
+// hand, but the unique is still marked discovered).
 export function _addItemToStash(item, opts) {
     if (item && item.isUnique && item.baseId && opts && opts.uniqueToInventory) {
         try {
@@ -90,15 +104,3 @@ export function _addItemToStash(item, opts) {
     _updateInvCount();
     return pos;
 }
-
-
-
-//------------------------------------------------------------------------
-//-------------------STATE------------------------------------------------
-//------------------------------------------------------------------------
-
-// Main equipment stash: 2D grid of item objects (null = empty cell)
-export let _inventory = Array.from({ length: INV_ROWS }, () => Array(INV_COLS).fill(null));
-
-// Equipped items on the paperdoll: keyed by slot id, e.g. { head: {...}, chest: {...} }
-export let _equipped = {};

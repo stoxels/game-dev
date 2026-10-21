@@ -1,26 +1,19 @@
 //------------------------------------------------------------------------
-// PHASE 4 split (2026-09-16): extracted into a focused module. The original
-// path is now a facade that re-exports this module, so existing import sites
-// are unaffected. See MIGRATION.md "splitting giants".
+//-------------------MASS SELL SETTINGS & ITEM CHIPS----------------------
+//------------------------------------------------------------------------
+// Mass-sell protection rules (rarity, unique, level filters), the counts
+// shown in the sell modal, and the shared item-chip builder and registry.
+// Settings load from STATE at module load. Other files (the sell modal, the
+// item-level toggle) reassign the lets below through the globalThis accessors.
 //------------------------------------------------------------------------
 
-// Endgame hub: mass-sell settings, protection rules, counts + the shared
-// item-chip builder/registry. Defaults load from STATE at eval time. The
-// lets are rebound by the modal save-path (hub-mass-sell-modal.js) and the
-// item-level toggle (hub-topbar.js) via the accessors below.
-
-// Phase 4 split: write-through globalThis accessors. The facade and sibling
-// split modules rebind these lets through globalThis.<name> assignment
-// (imported module bindings are read-only views) - the established
-// step-9/step-10 pattern.
-import { STATE } from '../state.js';
 try { Object.defineProperty(globalThis, '_massSellKeepUnique', { get() { return _massSellKeepUnique; }, set(v) { _massSellKeepUnique = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_massSellKeep', { get() { return _massSellKeep; }, set(v) { _massSellKeep = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_massSellMinItemLevel', { get() { return _massSellMinItemLevel; }, set(v) { _massSellMinItemLevel = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_massSellMinReqLevel', { get() { return _massSellMinReqLevel; }, set(v) { _massSellMinReqLevel = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_showItemLevel', { get() { return _showItemLevel; }, set(v) { _showItemLevel = v; }, configurable: true }); } catch (e) {}
 
-import { save } from '../state.js';
+import { STATE, save } from '../state.js';
 import { GAME_ART } from '../combat/combat-art.js';
 import { _showHubTooltip } from '../loot/loot-currency-tooltip.js';
 import { _dndPickUp } from './hub-drag-and-drop.js';
@@ -29,11 +22,15 @@ import { _isItemBlocked } from '../loot/loot-requirements.js';
 import { saveHubState } from './hub-save.js';
 import { INV_COLS, _inventory } from './hub-stash.js';
 
+
+//------------------------------------------------------------------------
+//-------------------CONSTANTS & STATE------------------------------------
+//------------------------------------------------------------------------
+
+// Item chips on screen, by chip id (looked up by hover and drag handlers).
 export const _chipRegistry = new Map();
 export let _chipCounter = 0;
 
-
-// ── Mass-sell filter state ──────────────────────────────────────────────
 // Which rarities are PROTECTED from mass sell (true = keep, false = sell).
 // Ordered low → high so the modal can simply iterate the array.
 export const MASS_SELL_RARITIES = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'artifact', 'cursed'];
@@ -47,9 +44,14 @@ export let _massSellMinItemLevel = 0;
 // Required character level filter: keep items with requirements.level >= this value (0 = disabled)
 export let _massSellMinReqLevel = 0;
 
-// ── Item level display toggle ───────────────────────────────────────────
-// true = show item level (itemLevel), false = show required character level (requirements.level)
+// Item level display toggle: true = show item level (itemLevel), false = show required character level (requirements.level)
 export let _showItemLevel = true;
+
+//------------------------------------------------------------------------
+//-------------------SETTINGS & PROTECTION RULES--------------------------
+//------------------------------------------------------------------------
+
+// The factory protection setting for each rarity.
 export function _defaultMassSellKeep() {
     return {
         common: false,
@@ -61,6 +63,8 @@ export function _defaultMassSellKeep() {
         cursed: false,
     };
 }
+
+// Cleans a saved keep-map: unknown or non-boolean entries fall back to defaults.
 export function _normaliseMassSellKeep(raw) {
     const def = _defaultMassSellKeep();
     if (!raw || typeof raw !== 'object') return { ...def };
@@ -70,6 +74,9 @@ export function _normaliseMassSellKeep(raw) {
     }
     return out;
 }
+
+// Reads the mass-sell and item-level settings out of STATE (reads go through
+// globalThis because this runs while the module is still loading).
 export function _loadMassSellSettings() {
     _massSellKeep = _normaliseMassSellKeep(globalThis.STATE && globalThis.STATE.egMassSellKeep);
     if (typeof globalThis.STATE !== 'undefined' && typeof globalThis.STATE.egMassSellKeepUnique === 'boolean') {
@@ -91,23 +98,23 @@ export function _loadMassSellSettings() {
         _massSellMinReqLevel = 0;
     }
 }
+// Writes the settings into STATE and saves, then saves the hub as well.
 export function _saveMassSellSettings() {
-    if (typeof STATE !== 'undefined') {
+    if (STATE) {
         STATE.egMassSellKeep = { ..._massSellKeep };
         STATE.egMassSellKeepUnique = _massSellKeepUnique;
         STATE.egShowItemLevel = _showItemLevel;
         STATE.egMassSellMinItemLevel = _massSellMinItemLevel;
         STATE.egMassSellMinReqLevel = _massSellMinReqLevel;
-        if (typeof save === 'function') try { save(); } catch (e) {}
+        try { save(); } catch (e) {}
     }
-    // also persist via the main hub save path
-    if (typeof saveHubState === 'function') try { saveHubState(); } catch (e) {}
+    try { saveHubState(); } catch (e) {}
 }
-// Returns true when the item should be KEPT (NOT sold) under the current filter.
-// Protection is an OR across all active keep criteria: unique, rarity,
-// itemLevel threshold and required-level threshold. This matches the live
-// preview in _updateMassSellPreview so the confirmation counts and the
-// actual sell agree.
+
+// True when the item should be KEPT (not sold). Any one active keep rule
+// protects it: unique, rarity, item-level threshold or required-level
+// threshold. Matches the live preview in _updateMassSellPreview, so the
+// confirmation counts and the actual sell agree.
 export function _isProtectedFromMassSell(item) {
     if (!item) return true;
     if (_massSellKeepUnique && item.isUnique) return true;
@@ -119,6 +126,8 @@ export function _isProtectedFromMassSell(item) {
     if (_massSellMinReqLevel > 0 && item.requirements && item.requirements.level != null && item.requirements.level >= _massSellMinReqLevel) return true;
     return false;
 }
+
+// Counts stash items that would be kept vs sold under the current rules.
 export function _massSellCounts() {
     let keep = 0, sell = 0;
     if (!globalThis._inventory) return { keep, sell };
@@ -131,14 +140,21 @@ export function _massSellCounts() {
     }
     return { keep, sell };
 }
-// Load mass-sell defaults immediately (STATE may already hold a save).
+// Load the settings right away (STATE may already hold a save).
 _loadMassSellSettings();
 
+
+//------------------------------------------------------------------------
+//-------------------ITEM CHIPS-------------------------------------------
+//------------------------------------------------------------------------
+
+// Builds the HTML for one item chip and registers the item under a new
+// chip id so the hover and drag handlers can find it again.
 export function _buildItemChipHTML(item, size = 'normal') {
     const rarityClass = item.rarity ? `sx-rarity-${item.rarity}` : '';
     const sizeClass = size === 'large' ? 'sx-item-chip-large' : '';
     // Items whose stat requirements cannot currently be met get a red flag
-    // (see _isItemBlocked in endgame-requirements.js).
+    // (see _isItemBlocked in loot-requirements.js).
     const blockedClass = _isItemBlocked(item) ? 'sx-req-blocked' : '';
     // Equipment items show either item level or required character level in the top-left corner of the slot.
     const itemLevel = item.itemLevel;
@@ -171,8 +187,7 @@ export function _buildItemChipHTML(item, size = 'normal') {
 </div>`;
 }
 
-
-
+// Shows the hover tooltip for the item behind a chip id.
 export function _showTooltipFromChip(chipId, e) {
     const item = _chipRegistry.get(chipId);
     if (item) {
