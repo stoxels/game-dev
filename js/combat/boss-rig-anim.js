@@ -544,6 +544,106 @@ const RIGS = {
         },
     },
     // <<< rig boss_executioner
+    // >>> rig boss_gridlock
+    boss_gridlock: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 78, px: 256, py: 380, par: null },
+            { n: 'dishL', x: 101, y: 102, px: 192, py: 170, par: 'body' },
+            { n: 'dishR', x: 314, y: 102, px: 322, py: 170, par: 'body' },
+            { n: 'head', x: 193, y: 78, px: 256, py: 250, par: 'body' },
+            { n: 'staffArm', x: 4, y: 129, px: 145, py: 290, par: 'body' },
+            { n: 'handR', x: 378, y: 212, px: 385, py: 275, par: 'body' },
+        ],
+        mechanics: {
+            laser_lattice: { anim: 'grd_lattice', ms: () => 2200 },
+            probability_shift: { anim: 'grd_shift', ms: () => 1600 },
+            signal_scramble: { anim: 'grd_scramble', ms: () => 2000 },
+            surge_chaser: { anim: 'grd_surge', ms: () => 1900 },
+        },
+    },
+    // <<< rig boss_gridlock
+    // >>> rig boss_gust
+    boss_gust: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 1, y: 108, px: 256, py: 380, par: null },
+            { n: 'head', x: 196, y: 125, px: 265, py: 245, par: 'body' },
+            { n: 'leafL', x: 5, y: 275, px: 95, py: 372, par: 'body' },
+            { n: 'leafR', x: 416, y: 266, px: 425, py: 376, par: 'body' },
+        ],
+        mechanics: {
+            corrupt_cells: { anim: 'gst_corrupt', ms: () => 2000 },
+        },
+    },
+    // <<< rig boss_gust
+    // >>> rig boss_hunter
+    boss_hunter: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 33, px: 256, py: 400, par: null },
+            { n: 'bow', x: 266, y: 36, px: 372, py: 265, par: 'body' },
+            { n: 'drawHand', x: 82, y: 222, px: 90, py: 258, par: 'body' },
+        ],
+        mechanics: {
+            dormant_seekers: { anim: 'hnt_seekers', ms: () => 2000 },
+            fog_bank: { anim: 'hnt_fog', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_hunter
+    // >>> rig boss_jelly
+    boss_jelly: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 3, y: 10, px: 256, py: 480, par: null },
+            { n: 'eyeL', x: 66, y: 190, px: 110, py: 240, par: 'body' },
+            { n: 'eyeR', x: 194, y: 194, px: 244, py: 245, par: 'body' },
+            { n: 'crown', x: 196, y: 12, px: 265, py: 74, par: 'body' },
+        ],
+        mechanics: {
+            jelly_hops: { anim: 'jly_hop', ms: () => 1800 },
+            probability_shift: { anim: 'jly_shift', ms: () => 1600 },
+        },
+    },
+    // <<< rig boss_jelly
+    // >>> rig boss_jester
+    boss_jester: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 11, px: 256, py: 420, par: null },
+            { n: 'armUL', x: 60, y: 209, px: 170, py: 280, par: 'body' },
+            { n: 'armUR', x: 356, y: 184, px: 365, py: 272, par: 'body' },
+            { n: 'ballA', x: 43, y: 153, px: 73, py: 183, par: 'body' },
+            { n: 'ballB', x: 73, y: 46, px: 104, py: 77, par: 'body' },
+            { n: 'ballC', x: 396, y: 63, px: 425, py: 92, par: 'body' },
+            { n: 'ballD', x: 428, y: 131, px: 458, py: 161, par: 'body' },
+            { n: 'ballE', x: 420, y: 249, px: 455, py: 284, par: 'body' },
+        ],
+        mechanics: {
+            bouncing_mayhem: { anim: 'jst_mayhem', ms: () => 1900 },
+            clue_swap: { anim: 'jst_swap', ms: () => 1600 },
+            card_toss: { anim: 'jst_cards', ms: () => 1800 },
+            jugglers_jinx: { anim: 'jst_jinx', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_jester
+    // >>> rig boss_inferno
+    boss_inferno: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 41, px: 256, py: 420, par: null },
+            { n: 'crown', x: 129, y: 41, px: 260, py: 138, par: 'body' },
+            { n: 'armL', x: 6, y: 250, px: 92, py: 266, par: 'body' },
+            { n: 'fistR', x: 336, y: 248, px: 355, py: 290, par: 'body' },
+        ],
+        mechanics: {
+            magma_tides: { anim: 'inf_tides', ms: () => 2200 },
+            prior_bomb: { anim: 'inf_bomb', ms: () => 1800 },
+            pyroclastic_surge: { anim: 'inf_surge', ms: () => 2000 },
+            eruption_vents: { anim: 'inf_vents', ms: () => 2000 },
+        },
+    },
+    // <<< rig boss_inferno
     boss_guardian: {
         S: 0.382, ox: 1, oy: 115,
         parts: [
@@ -561,7 +661,7 @@ const RIGS = {
 
 const ease = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
 
-// ---- poses (pose objects: rot deg, dx/dy source-art px, sc scale) --------
+// ---- poses (pose objects: rot deg, dx/dy source-art px, sc scale, sx/sy squash)
 const POSES = {
     slam(P, u) {
         let h;
@@ -4062,6 +4162,657 @@ Object.assign(FX, {
 });
 // <<< poses boss_executioner
 
+// >>> poses boss_gridlock
+// ---- The Gridlock ----------------------------------------------------------
+// Laser Lattice: both dishes swivel out and fire, red beams sweep across in
+//   rows, then in columns. Probability Shift: the staff lifts the stone die,
+//   which glows while marks hop between cells. Signal Scramble: the open hand
+//   crackles and broken signal waves leave the dishes. Surge Chaser: the hand
+//   thrusts and a spark runs out, dragging a live cable behind it.
+Object.assign(POSES, {
+    grd_lattice(P, u) {
+        const env = ease(Math.min(u / 0.15, 1, (1 - u) / 0.2));
+        const w = Math.sin(u * Math.PI * 8);
+        P.dishL.rot = (-16 + 4 * w) * env;
+        P.dishR.rot = (16 - 4 * w) * env;
+        P.head.dy = -6 * env;
+        P.handR.rot = -10 * env;
+        P.staffArm.rot = 6 * env;
+        P.body.dy = 2 * env * Math.abs(w);
+    },
+    grd_shift(P, u) {
+        const env = ease(Math.min(u / 0.25, 1, (1 - u) / 0.25));
+        P.staffArm.rot = 18 * env;
+        P.staffArm.dy = -14 * env;
+        P.head.rot = -4 * env;
+        P.handR.rot = 8 * env * Math.sin(u * Math.PI * 4);
+        P.body.rot = -1.5 * env;
+    },
+    grd_scramble(P, u) {
+        const env = ease(Math.min(u / 0.15, 1, (1 - u) / 0.2));
+        const j = Math.sin(u * 90);
+        P.handR.rot = (-14 + 5 * j) * env;
+        P.handR.dx = 3 * j * env;
+        P.dishL.rot = 6 * Math.sin(u * 40) * env;
+        P.dishR.rot = -6 * Math.sin(u * 40 + 1) * env;
+        P.head.dx = 1.5 * j * env;
+        P.body.dx = 1 * j * env;
+    },
+    grd_surge(P, u) {
+        const crouch = ease(u / 0.3), thrust = ease((u - 0.3) / 0.12), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.handR.rot = (10 * crouch * (1 - thrust) - 18 * thrust) * k;
+        P.handR.dx = (-8 * crouch * (1 - thrust) + 16 * thrust) * k;
+        P.body.dy = 6 * crouch * (1 - thrust) * k;
+        P.body.rot = (-2 * crouch + 4 * thrust) * k;
+        P.head.rot = 4 * thrust * k;
+        P.staffArm.rot = -6 * thrust * k;
+    },
+});
+Object.assign(FX, {
+    grd_lattice(ctx, u) {
+        // charge glow in both dishes
+        const charge = ease(u / 0.25) * (1 - ease((u - 0.85) / 0.15));
+        [[150, 165], [365, 165]].forEach(([x, y]) => {
+            const g = ctx.createRadialGradient(x, y, 2, x, y, 55);
+            g.addColorStop(0, 'rgba(255,90,80,' + (0.8 * charge) + ')'); g.addColorStop(1, 'rgba(255,40,40,0)');
+            ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 55, 0, 7); ctx.fill();
+        });
+        // first wave: rows; second wave: columns
+        const wave = (k, vertical) => {
+            if (k <= 0 || k >= 1) return;
+            const a = Math.sin(k * Math.PI);
+            for (let i = 0; i < 5; i++) {
+                const p = -120 + i * 190 + (vertical ? 0 : 40);
+                const w = 10 * a + 2;
+                ctx.fillStyle = 'rgba(255,60,60,' + (0.55 * a) + ')';
+                ctx.strokeStyle = 'rgba(255,230,230,' + (0.9 * a) + ')'; ctx.lineWidth = 2;
+                if (vertical) { ctx.fillRect(p - w / 2, -200, w, 900); ctx.beginPath(); ctx.moveTo(p, -200); ctx.lineTo(p, 700); ctx.stroke(); }
+                else { ctx.fillRect(-200, p - w / 2, 900, w); ctx.beginPath(); ctx.moveTo(-200, p); ctx.lineTo(700, p); ctx.stroke(); }
+            }
+        };
+        wave((u - 0.22) / 0.33, false);
+        wave((u - 0.55) / 0.33, true);
+        return 0;
+    },
+    grd_shift(ctx, u) {
+        const env = ease(Math.min(u / 0.25, 1, (1 - u) / 0.25));
+        // glowing stone die at the top of the staff
+        const x = 55, y = 160;
+        const g = ctx.createRadialGradient(x, y, 4, x, y, 80);
+        g.addColorStop(0, 'rgba(120,230,255,' + (0.7 * env) + ')'); g.addColorStop(1, 'rgba(60,160,255,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 80, 0, 7); ctx.fill();
+        // two marks hop between cells in arcs, fading as they land
+        const k = ease((u - 0.25) / 0.55);
+        if (u > 0.25 && u < 0.85) {
+            [[[130, 470], [380, 470]], [[380, 470], [250, 500]]].forEach(([a, b], i) => {
+                const kk = Math.min(1, k * 1.1 - i * 0.1);
+                if (kk <= 0) return;
+                const px = a[0] + (b[0] - a[0]) * kk, py = a[1] + (b[1] - a[1]) * kk - 140 * Math.sin(kk * Math.PI);
+                ctx.fillStyle = 'rgba(140,230,255,' + (0.9 * env) + ')';
+                ctx.font = 'bold 40px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(i ? '?' : 'X', px, py);
+            });
+        }
+        // empty cells the marks leave from
+        ctx.strokeStyle = 'rgba(140,230,255,' + (0.6 * env) + ')'; ctx.lineWidth = 3;
+        [[130, 470], [380, 470], [250, 500]].forEach(([cx, cy]) => ctx.strokeRect(cx - 22, cy - 22, 44, 44));
+        return 0;
+    },
+    grd_scramble(ctx, u) {
+        const env = ease(Math.min(u / 0.15, 1, (1 - u) / 0.2));
+        // static flecks around the open hand
+        for (let i = 0; i < 26; i++) {
+            const a = i * 2.399 + Math.floor(u * 30) * 0.7, r = 40 + ((i * 37 + Math.floor(u * 30) * 13) % 70);
+            const x = 450 + Math.cos(a) * r, y = 270 + Math.sin(a) * r;
+            ctx.fillStyle = (i % 3 ? 'rgba(180,240,255,' : 'rgba(255,90,90,') + (0.85 * env) + ')';
+            ctx.fillRect(x, y, 4 + (i % 4) * 4, 3);
+        }
+        // broken signal arcs leaving each dish
+        [[150, 165, -1], [365, 165, 1]].forEach(([x, y, s]) => {
+            for (let i = 0; i < 3; i++) {
+                const k = (u * 2 + i / 3) % 1;
+                const r = 30 + k * 160, a = (1 - k) * env;
+                ctx.strokeStyle = 'rgba(255,120,120,' + a + ')'; ctx.lineWidth = 5;
+                ctx.setLineDash([14, 10]);
+                ctx.beginPath(); ctx.arc(x, y, r, s > 0 ? -0.7 : Math.PI - 0.7, s > 0 ? 0.7 : Math.PI + 0.7); ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        });
+        return 0;
+    },
+    grd_surge(ctx, u) {
+        // spark charges in the hand, then runs out and down, trailing a cable
+        const crouch = ease(u / 0.3);
+        if (u < 0.42) {
+            const g = ctx.createRadialGradient(455, 270, 3, 455, 270, 20 + 50 * crouch);
+            g.addColorStop(0, 'rgba(255,250,180,' + (0.9 * crouch) + ')'); g.addColorStop(1, 'rgba(255,220,60,0)');
+            ctx.fillStyle = g; ctx.beginPath(); ctx.arc(455, 270, 20 + 50 * crouch, 0, 7); ctx.fill();
+            return 0;
+        }
+        const k = ease((u - 0.42) / 0.5);
+        const fade = 1 - ease((u - 0.85) / 0.15);
+        const pt = (t) => [455 + 240 * t, 270 + 260 * t * t + 30 * Math.sin(t * 9)];
+        ctx.strokeStyle = 'rgba(60,60,70,' + fade + ')'; ctx.lineWidth = 9;
+        ctx.beginPath();
+        for (let i = 0; i <= 20; i++) { const [x, y] = pt(k * i / 20); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(255,230,90,' + (0.8 * fade) + ')'; ctx.lineWidth = 3; ctx.stroke();
+        const [hx, hy] = pt(k);
+        const g = ctx.createRadialGradient(hx, hy, 2, hx, hy, 40);
+        g.addColorStop(0, 'rgba(255,255,220,' + fade + ')'); g.addColorStop(1, 'rgba(255,210,50,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(hx, hy, 40, 0, 7); ctx.fill();
+        return u > 0.42 && u < 0.47 ? 0.15 : 0;
+    },
+});
+// <<< poses boss_gridlock
+
+// >>> poses boss_gust
+// ---- The Gust --------------------------------------------------------------
+// Corrupt Cells: the leaf pile heaves, the face puffs up and blows a spiral
+//   of leaves, and blighted green cells drift down out of the swirl.
+Object.assign(POSES, {
+    gst_corrupt(P, u) {
+        const inhale = ease(u / 0.3), blow = ease((u - 0.3) / 0.15), rest = ease((u - 0.75) / 0.25);
+        const k = 1 - rest;
+        const flap = Math.sin(u * Math.PI * 10);
+        P.head.sc = 1 + (0.08 * inhale * (1 - blow) - 0.03 * blow) * k;
+        P.head.dy = (-6 * inhale * (1 - blow) + 4 * blow) * k;
+        P.head.rot = -5 * blow * k;
+        P.leafL.rot = (-10 * inhale + 14 * flap * blow) * k;
+        P.leafR.rot = (10 * inhale - 14 * flap * blow) * k;
+        P.body.sc = 1 + 0.03 * inhale * (1 - blow) * k;
+        P.body.dy = -3 * inhale * k;
+    },
+});
+Object.assign(FX, {
+    gst_corrupt(ctx, u) {
+        const blow = ease((u - 0.3) / 0.15), fade = 1 - ease((u - 0.8) / 0.2);
+        if (u < 0.3) return 0;
+        // spiral of leaves leaving the mouth
+        for (let i = 0; i < 14; i++) {
+            const k = ((u - 0.3) * 1.6 + i / 14) % 1;
+            const a = k * Math.PI * 3 + i, r = 30 + k * 260;
+            const x = 285 + Math.cos(a) * r, y = 215 + Math.sin(a) * r * 0.6;
+            const al = Math.sin(k * Math.PI) * blow * fade;
+            ctx.save(); ctx.translate(x, y); ctx.rotate(a * 2);
+            ctx.fillStyle = (i % 3 === 0 ? 'rgba(220,110,40,' : i % 3 === 1 ? 'rgba(240,180,60,' : 'rgba(170,70,30,') + al + ')';
+            ctx.beginPath(); ctx.ellipse(0, 0, 14, 6, 0, 0, 7); ctx.fill();
+            ctx.restore();
+        }
+        // wind streaks
+        ctx.strokeStyle = 'rgba(200,245,230,' + (0.5 * blow * fade) + ')'; ctx.lineWidth = 4;
+        for (let i = 0; i < 4; i++) {
+            const k = ((u - 0.3) * 2 + i / 4) % 1;
+            ctx.beginPath(); ctx.arc(285, 215, 60 + k * 200, -0.4 + i, 0.6 + i); ctx.stroke();
+        }
+        // blighted cells drift down out of the swirl
+        for (let i = 0; i < 4; i++) {
+            const k = ease(Math.min(1, Math.max(0, (u - 0.45 - i * 0.07) / 0.35)));
+            if (k <= 0) continue;
+            const x = 60 + i * 130, y = 160 + 300 * k;
+            const a = fade * Math.min(1, k * 3);
+            ctx.fillStyle = 'rgba(70,140,60,' + (0.55 * a) + ')'; ctx.strokeStyle = 'rgba(150,255,140,' + a + ')'; ctx.lineWidth = 3;
+            ctx.fillRect(x - 22, y - 22, 44, 44); ctx.strokeRect(x - 22, y - 22, 44, 44);
+            ctx.strokeStyle = 'rgba(30,60,25,' + a + ')'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(x - 14, y - 10); ctx.lineTo(x, y + 2); ctx.lineTo(x - 4, y + 14); ctx.moveTo(x, y + 2); ctx.lineTo(x + 14, y - 6); ctx.stroke();
+        }
+        return 0;
+    },
+});
+// <<< poses boss_gust
+
+// >>> poses boss_hunter
+// ---- The Hunter ------------------------------------------------------------
+// Dormant Seekers: the draw hand pulls the string back, the bow kicks on
+//   release, an arrow streaks off and three sleeping stones below wake with
+//   violet flame. Fog Bank: the hunter lowers the bow and fog rolls in from
+//   both sides until only the eyes glint through.
+Object.assign(POSES, {
+    hnt_seekers(P, u) {
+        const draw = ease(u / 0.45), loose = ease((u - 0.45) / 0.06), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.drawHand.dx = (-22 * draw * (1 - loose) + 6 * loose) * k;
+        P.drawHand.rot = (-3 * draw * (1 - loose) + 6 * loose) * k;
+        P.bow.rot = (-2 * draw * (1 - loose) + 6 * loose * Math.cos((u - 0.45) * 40)) * k;
+        P.bow.dx = 4 * loose * k * Math.max(0, 1 - (u - 0.45) * 6);
+        P.body.dy = 3 * draw * (1 - loose) * k;
+        P.body.rot = -1.5 * draw * (1 - loose) * k;
+    },
+    hnt_fog(P, u) {
+        const env = ease(Math.min(u / 0.25, 1, (1 - u) / 0.25));
+        P.bow.rot = 14 * env;
+        P.bow.dy = 10 * env;
+        P.drawHand.rot = 20 * env;
+        P.drawHand.dy = 12 * env;
+        P.drawHand.dx = 10 * env;
+        P.body.dy = 6 * env;
+        P.body.sc = 1 - 0.02 * env;
+    },
+});
+Object.assign(FX, {
+    hnt_seekers(ctx, u) {
+        // the arrow streaks away on release
+        const f = (u - 0.45) / 0.2;
+        if (f > 0 && f < 1) {
+            const x = 300 + f * 520, a = 1 - f;
+            const g = ctx.createLinearGradient(x - 260, 0, x, 0);
+            g.addColorStop(0, 'rgba(200,170,255,0)'); g.addColorStop(1, 'rgba(240,230,255,' + a + ')');
+            ctx.strokeStyle = g; ctx.lineWidth = 7;
+            ctx.beginPath(); ctx.moveTo(x - 260, 248); ctx.lineTo(x, 248); ctx.stroke();
+        }
+        // three dormant stones wake one after another
+        [[90, 470], [256, 495], [420, 470]].forEach(([x, y], i) => {
+            const w = ease((u - 0.55 - i * 0.08) / 0.15);
+            const fade = 1 - ease((u - 0.85) / 0.15);
+            ctx.fillStyle = 'rgba(60,60,72,0.95)'; ctx.strokeStyle = 'rgba(20,20,30,1)'; ctx.lineWidth = 3;
+            ctx.globalAlpha = Math.min(1, u * 6) * fade;
+            ctx.beginPath(); ctx.ellipse(x, y, 26, 18, 0, 0, 7); ctx.fill(); ctx.stroke();
+            if (w > 0) {
+                const g = ctx.createRadialGradient(x, y - 10, 3, x, y - 10, 60);
+                g.addColorStop(0, 'rgba(210,140,255,' + (0.9 * w) + ')'); g.addColorStop(1, 'rgba(140,60,220,0)');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y - 10, 60, 0, 7); ctx.fill();
+                for (let j = 0; j < 3; j++) {
+                    const h = 30 + 18 * Math.sin(u * 30 + j * 2 + i);
+                    ctx.fillStyle = 'rgba(190,120,255,' + (0.8 * w) + ')';
+                    ctx.beginPath(); ctx.moveTo(x - 14 + j * 14 - 7, y - 6); ctx.quadraticCurveTo(x - 14 + j * 14, y - 6 - h * 1.3, x - 14 + j * 14 + 7, y - 6); ctx.fill();
+                }
+                ctx.fillStyle = 'rgba(255,240,255,' + w + ')';
+                ctx.beginPath(); ctx.arc(x - 7, y - 2, 3, 0, 7); ctx.arc(x + 7, y - 2, 3, 0, 7); ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+        });
+        return 0;
+    },
+    hnt_fog(ctx, u) {
+        const env = ease(Math.min(u / 0.3, 1, (1 - u) / 0.25));
+        // fog banks roll in from both sides
+        for (let i = 0; i < 9; i++) {
+            const side = i % 2 ? 1 : -1;
+            const x = 256 + side * (420 - 300 * env) + side * ((i * 31) % 60) + 20 * Math.sin(u * 4 + i);
+            const y = 120 + (i * 47) % 360;
+            const r = 90 + (i * 23) % 50;
+            const g = ctx.createRadialGradient(x, y, 10, x, y, r);
+            g.addColorStop(0, 'rgba(200,215,220,' + (0.75 * env) + ')'); g.addColorStop(1, 'rgba(200,215,220,0)');
+            ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+        }
+        // the eyes glint through the fog
+        const gl = env * (0.6 + 0.4 * Math.sin(u * 20));
+        [[220, 222], [272, 220]].forEach(([x, y]) => {
+            const g = ctx.createRadialGradient(x, y, 1, x, y, 16);
+            g.addColorStop(0, 'rgba(170,255,220,' + gl + ')'); g.addColorStop(1, 'rgba(100,220,180,0)');
+            ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 16, 0, 7); ctx.fill();
+        });
+        return 0;
+    },
+});
+// <<< poses boss_hunter
+
+
+// >>> poses boss_jelly
+// ---- The Jelly -------------------------------------------------------------
+// Jelly Hops: the cube squashes, springs up (its shadow shrinks below),
+//   lands with a splat and wobbles, the crown lagging behind. Probability
+//   Shift: the cube jiggles, the eyes roll and the dice inside glow and trade
+//   places along curved arrows.
+Object.assign(POSES, {
+    jly_hop(P, u) {
+        // squash -> air -> land -> wobble
+        let sx = 1, sy = 1, dy = 0;
+        if (u < 0.22) { const k = ease(u / 0.22); sx = 1 + 0.12 * k; sy = 1 - 0.14 * k; }
+        else if (u < 0.62) {
+            const k = (u - 0.22) / 0.4, arc = Math.sin(k * Math.PI);
+            dy = -95 * arc; sx = 1 - 0.06 * arc; sy = 1 + 0.08 * arc;
+        } else {
+            const k = (u - 0.62) / 0.38, w = Math.cos(k * Math.PI * 4) * (1 - k);
+            sx = 1 + 0.14 * w; sy = 1 - 0.16 * w;
+        }
+        P.body.dy = dy; P.body.sx = sx; P.body.sy = sy;
+        P.crown.dy = (u > 0.22 && u < 0.62 ? 14 * Math.sin((u - 0.22) / 0.4 * Math.PI) : 0);
+        P.crown.rot = 8 * Math.sin(u * Math.PI * 3) * (1 - u);
+        P.eyeL.sc = P.eyeR.sc = u > 0.62 && u < 0.72 ? 0.85 : 1;
+    },
+    jly_shift(P, u) {
+        const env = ease(Math.min(u / 0.2, 1, (1 - u) / 0.25));
+        const w = Math.sin(u * Math.PI * 8);
+        P.body.rot = 2.5 * w * env;
+        P.body.sx = 1 + 0.04 * w * env;
+        P.body.sy = 1 - 0.04 * w * env;
+        const roll = ease(u) * Math.PI * 4;
+        P.eyeL.dx = P.eyeR.dx = 6 * Math.cos(roll) * env;
+        P.eyeL.dy = P.eyeR.dy = 6 * Math.sin(roll) * env;
+        P.crown.rot = -6 * w * env;
+    },
+});
+Object.assign(FX, {
+    jly_hop(ctx, u, rootDy) {
+        // shadow stays on the ground and shrinks while the cube is up
+        const air = Math.min(1, -rootDy / 95);
+        ctx.fillStyle = 'rgba(20,40,30,' + (0.35 - 0.15 * air) + ')';
+        ctx.beginPath(); ctx.ellipse(256, 500, 220 - 90 * air, 22 - 8 * air, 0, 0, 7); ctx.fill();
+        // landing splat droplets
+        if (u > 0.6) {
+            const k = (u - 0.6) / 0.4;
+            for (let i = 0; i < 8; i++) {
+                const side = i % 2 ? 1 : -1, s = 1 + (i >> 1) * 0.5;
+                const x = 256 + side * (200 + 120 * k * s), y = 480 - 90 * Math.sin(k * Math.PI) * (1.2 - (i >> 1) * 0.2);
+                ctx.fillStyle = 'rgba(140,230,130,' + (0.9 * (1 - k)) + ')';
+                ctx.beginPath(); ctx.arc(x, y, 9 - (i >> 1), 0, 7); ctx.fill();
+            }
+        }
+        return 0;
+    },
+    jly_shift(ctx, u) {
+        const env = ease(Math.min(u / 0.2, 1, (1 - u) / 0.25));
+        const dice = [[200, 170], [400, 210], [128, 352], [268, 375]];
+        dice.forEach(([x, y]) => {
+            const g = ctx.createRadialGradient(x, y, 4, x, y, 60);
+            g.addColorStop(0, 'rgba(255,230,120,' + (0.7 * env) + ')'); g.addColorStop(1, 'rgba(255,200,60,0)');
+            ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 60, 0, 7); ctx.fill();
+        });
+        // swap arrows: 0 <-> 3 and 1 <-> 2
+        const k = ease((u - 0.2) / 0.6);
+        [[0, 3], [1, 2]].forEach(([a, b]) => {
+            const [x1, y1] = dice[a], [x2, y2] = dice[b];
+            const mx = (x1 + x2) / 2 + (y2 - y1) * 0.3, my = (y1 + y2) / 2 - (x2 - x1) * 0.3;
+            ctx.strokeStyle = 'rgba(255,245,190,' + (0.9 * env) + ')'; ctx.lineWidth = 5;
+            ctx.setLineDash([16, 10]); ctx.lineDashOffset = -u * 120;
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.quadraticCurveTo(mx, my, x2, y2); ctx.stroke();
+            ctx.setLineDash([]);
+            // a spark rides each arrow
+            const t = k, ix = (1 - t) * (1 - t) * x1 + 2 * (1 - t) * t * mx + t * t * x2, iy = (1 - t) * (1 - t) * y1 + 2 * (1 - t) * t * my + t * t * y2;
+            ctx.fillStyle = 'rgba(255,255,230,' + env + ')';
+            ctx.beginPath(); ctx.arc(ix, iy, 9, 0, 7); ctx.fill();
+        });
+        return 0;
+    },
+});
+// <<< poses boss_jelly
+
+
+// >>> poses boss_jester
+// ---- The Jester ------------------------------------------------------------
+// Bouncing Mayhem: the hands toss and the five juggling balls hop one slot
+//   round the circle, bouncing off with impact stars. Clue Swap: the hands
+//   cross and two number cards trade places overhead. Card Toss: the right
+//   hand flicks a fan of cards that spin out and stick. Juggler's Jinx: the
+//   balls orbit the head, glowing gold and purple in turn.
+const JST_BALLS = ['ballA', 'ballB', 'ballC', 'ballD', 'ballE'];
+const JST_HOME = [[73, 183], [104, 77], [425, 92], [458, 161], [455, 284]];
+Object.assign(POSES, {
+    jst_mayhem(P, u) {
+        const toss = Math.sin(u * Math.PI * 6);
+        const env = ease(Math.min(u / 0.1, 1, (1 - u) / 0.15));
+        P.armUL.rot = -14 * toss * env;
+        P.armUR.rot = 14 * toss * env;
+        P.body.dy = 3 * Math.abs(toss) * env;
+        // each ball hops to the next slot and back again
+        JST_BALLS.forEach((n, i) => {
+            const k = Math.sin(Math.min(1, Math.max(0, (u - 0.05 - i * 0.06) / 0.6)) * Math.PI);
+            const [x1, y1] = JST_HOME[i], [x2, y2] = JST_HOME[(i + 1) % 5];
+            P[n].dx = (x2 - x1) * k;
+            P[n].dy = (y2 - y1) * k - 70 * Math.sin(k * Math.PI);
+            P[n].rot = 360 * k;
+        });
+    },
+    jst_swap(P, u) {
+        const env = ease(Math.min(u / 0.2, 1, (1 - u) / 0.25));
+        P.armUL.rot = 22 * env;
+        P.armUL.dx = 18 * env;
+        P.armUR.rot = -22 * env;
+        P.armUR.dx = -18 * env;
+        P.body.rot = 2 * Math.sin(u * Math.PI * 4) * env;
+        JST_BALLS.forEach((n, i) => { P[n].dy = -6 * Math.sin(u * 20 + i) * env; });
+    },
+    jst_cards(P, u) {
+        const wind = ease(u / 0.3), flick = ease((u - 0.3) / 0.08), rest = ease((u - 0.65) / 0.35);
+        const k = 1 - rest;
+        P.armUR.rot = (20 * wind * (1 - flick) - 30 * flick) * k;
+        P.armUR.dy = (8 * wind * (1 - flick) - 10 * flick) * k;
+        P.armUL.rot = -8 * wind * k;
+        P.body.rot = (2 * wind - 4 * flick) * k;
+        JST_BALLS.forEach((n, i) => { P[n].dy = -10 * Math.abs(Math.sin(u * 12 + i)) * k; });
+    },
+    jst_jinx(P, u) {
+        const env = ease(Math.min(u / 0.2, 1, (1 - u) / 0.2));
+        P.armUL.rot = -10 * env;
+        P.armUR.rot = 10 * env;
+        P.body.dy = -4 * env;
+        // balls leave their slots and orbit the head on an ellipse
+        JST_BALLS.forEach((n, i) => {
+            const a = i * Math.PI * 2 / 5 + u * Math.PI * 4;
+            const [hx, hy] = JST_HOME[i];
+            const ox = 256 + Math.cos(a) * 215, oy = 170 + Math.sin(a) * 110;
+            P[n].dx = (ox - hx) * env;
+            P[n].dy = (oy - hy) * env;
+        });
+    },
+});
+Object.assign(FX, {
+    jst_mayhem(ctx, u) {
+        // impact stars where the balls land
+        JST_HOME.forEach(([x, y], i) => {
+            const t = (u - 0.05 - ((i + 4) % 5) * 0.06) / 0.6;
+            const k = 1 - Math.abs(t - 0.5) * 12;
+            if (k <= 0) return;
+            ctx.strokeStyle = 'rgba(255,230,120,' + k + ')'; ctx.lineWidth = 4;
+            for (let s = 0; s < 6; s++) {
+                const a = s * Math.PI / 3, r1 = 34, r2 = 34 + 22 * k;
+                ctx.beginPath(); ctx.moveTo(x + Math.cos(a) * r1, y + Math.sin(a) * r1); ctx.lineTo(x + Math.cos(a) * r2, y + Math.sin(a) * r2); ctx.stroke();
+            }
+        });
+        // motion arcs
+        const env = ease(Math.min(u / 0.1, 1, (1 - u) / 0.15));
+        ctx.strokeStyle = 'rgba(255,255,255,' + (0.35 * env) + ')'; ctx.lineWidth = 6;
+        ctx.setLineDash([20, 18]); ctx.lineDashOffset = -u * 400;
+        ctx.beginPath(); ctx.ellipse(256, 170, 230, 150, 0, 0, 7); ctx.stroke();
+        ctx.setLineDash([]);
+        return 0;
+    },
+    jst_swap(ctx, u) {
+        const env = ease(Math.min(u / 0.2, 1, (1 - u) / 0.25));
+        const k = ease((u - 0.2) / 0.55);
+        const card = (x, y, label, tilt) => {
+            ctx.save(); ctx.translate(x, y); ctx.rotate(tilt);
+            ctx.fillStyle = 'rgba(250,245,230,' + env + ')'; ctx.strokeStyle = 'rgba(120,40,140,' + env + ')'; ctx.lineWidth = 4;
+            ctx.fillRect(-26, -36, 52, 72); ctx.strokeRect(-26, -36, 52, 72);
+            ctx.fillStyle = 'rgba(160,30,60,' + env + ')'; ctx.font = 'bold 40px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(label, 0, 2); ctx.restore();
+        };
+        const a = [150, -10], b = [362, -10];
+        const lift = 70 * Math.sin(k * Math.PI);
+        card(a[0] + (b[0] - a[0]) * k, a[1] - lift, '3', -0.3 + 0.6 * k);
+        card(b[0] + (a[0] - b[0]) * k, b[1] + lift, '7', 0.3 - 0.6 * k);
+        return 0;
+    },
+    jst_cards(ctx, u) {
+        if (u < 0.32) return 0;
+        const fade = 1 - ease((u - 0.85) / 0.15);
+        for (let i = 0; i < 5; i++) {
+            const k = ease(Math.min(1, Math.max(0, (u - 0.32 - i * 0.04) / 0.38)));
+            if (k <= 0) continue;
+            const tx = -60 + i * 150, ty = 520 - (i % 2) * 30;
+            const x = 440 + (tx - 440) * k, y = 210 + (ty - 210) * k - 160 * Math.sin(k * Math.PI);
+            ctx.save(); ctx.translate(x, y); ctx.rotate(k < 1 ? k * 12 + i : 0.2 * (i - 2));
+            ctx.fillStyle = 'rgba(250,245,230,' + fade + ')'; ctx.strokeStyle = 'rgba(40,30,60,' + fade + ')'; ctx.lineWidth = 3;
+            ctx.fillRect(-18, -26, 36, 52); ctx.strokeRect(-18, -26, 36, 52);
+            ctx.fillStyle = (i % 2 ? 'rgba(200,30,50,' : 'rgba(90,40,150,') + fade + ')';
+            ctx.font = 'bold 26px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(['♠', '♥', '♣', '♦', '♠'][i], 0, 1);
+            ctx.restore();
+            if (k >= 1) {
+                ctx.strokeStyle = 'rgba(255,220,120,' + (0.6 * fade) + ')'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.ellipse(tx, ty + 30, 30, 8, 0, 0, 7); ctx.stroke();
+            }
+        }
+        return 0;
+    },
+    jst_jinx(ctx, u) {
+        const env = ease(Math.min(u / 0.2, 1, (1 - u) / 0.2));
+        // each orbiting ball glows gold or purple in turn
+        JST_HOME.forEach((h, i) => {
+            const a = i * Math.PI * 2 / 5 + u * Math.PI * 4;
+            const x = h[0] + (256 + Math.cos(a) * 215 - h[0]) * env, y = h[1] + (170 + Math.sin(a) * 110 - h[1]) * env;
+            const gold = (i + Math.floor(u * 6)) % 2 === 0;
+            const g = ctx.createRadialGradient(x, y, 10, x, y, 60);
+            g.addColorStop(0, (gold ? 'rgba(255,215,80,' : 'rgba(180,80,255,') + (0.7 * env) + ')');
+            g.addColorStop(1, gold ? 'rgba(255,190,40,0)' : 'rgba(120,40,200,0)');
+            ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 60, 0, 7); ctx.fill();
+        });
+        return 0;
+    },
+});
+// <<< poses boss_jester
+
+// >>> poses boss_inferno
+// ---- The Inferno -----------------------------------------------------------
+// Magma Tides: both arms heave up and smash down, the crater spurts and a
+//   lava flood rises from below. Prior Bomb: the right fist glows and lobs
+//   fused lava bombs. Pyroclastic Surge: the golem leans in, shoves, and a
+//   wall of fire with gaps sweeps across. Eruption Vents: the crater blows,
+//   three vents glow on the ground and jet lava upward.
+Object.assign(POSES, {
+    inf_tides(P, u) {
+        const lift = ease(u / 0.35), slam = ease((u - 0.35) / 0.1), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.armL.rot = (24 * lift * (1 - slam) - 6 * slam) * k;
+        P.armL.dy = (-16 * lift * (1 - slam) + 6 * slam) * k;
+        P.fistR.rot = (-26 * lift * (1 - slam) + 8 * slam) * k;
+        P.fistR.dy = (-18 * lift * (1 - slam) + 8 * slam) * k;
+        P.body.dy = (-6 * lift * (1 - slam) + 6 * slam) * k;
+        P.crown.dy = -8 * slam * k;
+        P.crown.sc = 1 + 0.06 * slam * k;
+    },
+    inf_bomb(P, u) {
+        const wind = ease(u / 0.35), toss = ease((u - 0.35) / 0.1), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.fistR.rot = (16 * wind * (1 - toss) - 30 * toss) * k;
+        P.fistR.dy = (8 * wind * (1 - toss) - 16 * toss) * k;
+        P.armL.rot = 6 * wind * k;
+        P.body.rot = (2 * wind - 3 * toss) * k;
+        P.crown.dy = -3 * Math.abs(Math.sin(u * 20)) * wind * k;
+    },
+    inf_surge(P, u) {
+        const lean = ease(u / 0.3), shove = ease((u - 0.3) / 0.12), rest = ease((u - 0.75) / 0.25);
+        const k = 1 - rest;
+        P.body.rot = (-3 * lean + 6 * shove) * k;
+        P.body.dx = (-8 * lean + 16 * shove) * k;
+        P.fistR.dx = 20 * shove * k;
+        P.fistR.rot = -10 * shove * k;
+        P.armL.rot = (-14 * lean + 10 * shove) * k;
+        P.crown.rot = 4 * shove * k;
+    },
+    inf_vents(P, u) {
+        const build = ease(u / 0.35), blow = ease((u - 0.35) / 0.08), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        const j = Math.sin(u * 70) * build * (1 - blow);
+        P.crown.dy = (-4 * build - 18 * blow) * k;
+        P.crown.sc = 1 + 0.08 * blow * k;
+        P.crown.dx = 2 * j;
+        P.body.dx = 1.5 * j;
+        P.body.dy = 4 * build * (1 - blow) * k;
+        P.armL.rot = 8 * blow * k;
+        P.fistR.rot = -8 * blow * k;
+    },
+});
+// a soft lava blob (shared by the Inferno effects)
+function _infBlob(ctx, x, y, r, a) {
+    const g = ctx.createRadialGradient(x, y, 1, x, y, r);
+    g.addColorStop(0, 'rgba(255,240,150,' + a + ')'); g.addColorStop(0.5, 'rgba(255,140,30,' + a + ')'); g.addColorStop(1, 'rgba(200,40,0,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+}
+Object.assign(FX, {
+    inf_tides(ctx, u) {
+        const slam = ease((u - 0.35) / 0.1), fade = 1 - ease((u - 0.82) / 0.18);
+        // crater spurts on the slam
+        if (u > 0.35) for (let i = 0; i < 6; i++) {
+            const k = Math.min(1, (u - 0.35) / 0.45);
+            const x = 250 + (i - 2.5) * 30 * k, y = 80 - 120 * Math.sin(k * Math.PI) * (0.6 + (i % 3) * 0.2);
+            _infBlob(ctx, x, y, 16, fade);
+        }
+        // a glowing lava wave rises around the feet and fades out below
+        if (u > 0.4) {
+            const h = 90 * ease((u - 0.4) / 0.35);
+            const top = 500 - h, wave = (x) => top + 10 * Math.sin(x / 40 + u * 18);
+            const g = ctx.createLinearGradient(0, top - 10, 0, top + 80);
+            g.addColorStop(0, 'rgba(255,150,30,' + (0.55 * fade) + ')'); g.addColorStop(1, 'rgba(255,80,10,0)');
+            ctx.fillStyle = g;
+            ctx.beginPath(); ctx.moveTo(-40, top + 80);
+            for (let x = -40; x <= 552; x += 16) ctx.lineTo(x, wave(x));
+            ctx.lineTo(552, top + 80); ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = 'rgba(255,230,120,' + fade + ')'; ctx.lineWidth = 5;
+            ctx.beginPath();
+            for (let x = -40; x <= 552; x += 16) x === -40 ? ctx.moveTo(x, wave(x)) : ctx.lineTo(x, wave(x));
+            ctx.stroke();
+            for (let i = 0; i < 5; i++) _infBlob(ctx, 20 + i * 115, top + 25 + 8 * Math.sin(u * 25 + i), 12, 0.8 * fade);
+        }
+        return u > 0.35 && u < 0.41 ? 0.18 * slam : 0;
+    },
+    inf_bomb(ctx, u) {
+        const wind = ease(u / 0.35);
+        if (u < 0.4) { _infBlob(ctx, 440, 270, 20 + 40 * wind, 0.9 * wind); return 0; }
+        const fade = 1 - ease((u - 0.85) / 0.15);
+        [[100, 470], [260, 500], [420, 460]].forEach(([tx, ty], i) => {
+            const k = ease(Math.min(1, Math.max(0, (u - 0.4 - i * 0.05) / 0.35)));
+            if (k <= 0) return;
+            const x = 440 + (tx - 440) * k, y = 270 + (ty - 270) * k - 220 * Math.sin(k * Math.PI);
+            ctx.fillStyle = 'rgba(40,28,24,' + fade + ')'; ctx.strokeStyle = 'rgba(255,140,40,' + fade + ')'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.arc(x, y, 17, 0, 7); ctx.fill(); ctx.stroke();
+            // fuse spark
+            ctx.fillStyle = 'rgba(255,240,140,' + fade * (0.6 + 0.4 * Math.sin(u * 60 + i)) + ')';
+            ctx.beginPath(); ctx.arc(x + 10, y - 16, 6, 0, 7); ctx.fill();
+            // ticking ring once landed
+            if (k >= 1) {
+                const r = 24 + 10 * Math.sin(u * 40);
+                ctx.strokeStyle = 'rgba(255,90,40,' + (0.8 * fade) + ')'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.stroke();
+            }
+        });
+        return 0;
+    },
+    inf_surge(ctx, u) {
+        if (u < 0.3) return 0;
+        const k = ease((u - 0.3) / 0.55), fade = 1 - ease((u - 0.85) / 0.15);
+        const x = -160 + k * 880;
+        // flame columns along a vertical front, with two gaps
+        for (let i = 0; i < 12; i++) {
+            if (i === 3 || i === 8) continue;
+            const y = -40 + i * 50;
+            const h = 70 + 25 * Math.sin(u * 30 + i * 1.7);
+            const g = ctx.createLinearGradient(x - h, 0, x + 20, 0);
+            g.addColorStop(0, 'rgba(200,40,0,0)'); g.addColorStop(0.6, 'rgba(255,120,20,' + (0.75 * fade) + ')'); g.addColorStop(1, 'rgba(255,240,160,' + (0.9 * fade) + ')');
+            ctx.fillStyle = g;
+            ctx.beginPath(); ctx.ellipse(x - h / 2, y, h / 2 + 10, 26, 0, 0, 7); ctx.fill();
+        }
+        return 0;
+    },
+    inf_vents(ctx, u) {
+        const build = ease(u / 0.35), fade = 1 - ease((u - 0.8) / 0.2);
+        // smoke column from the crater
+        for (let i = 0; i < 5; i++) {
+            const k = (u * 1.5 + i / 5) % 1;
+            ctx.fillStyle = 'rgba(80,70,70,' + (0.45 * (1 - k) * fade) + ')';
+            ctx.beginPath(); ctx.arc(255 + 20 * Math.sin(i + u * 3), 70 - k * 200, 25 + k * 40, 0, 7); ctx.fill();
+        }
+        [[80, 480], [256, 505], [430, 480]].forEach(([x, y], i) => {
+            // vent glows on the ground while it builds
+            ctx.fillStyle = 'rgba(255,120,30,' + (0.7 * build * fade) + ')';
+            ctx.beginPath(); ctx.ellipse(x, y, 36, 12, 0, 0, 7); ctx.fill();
+            // then jets lava upward
+            const j = ease((u - 0.38 - i * 0.06) / 0.12) * fade;
+            if (j > 0) {
+                const h = 260 * j;
+                const g = ctx.createLinearGradient(0, y - h, 0, y);
+                g.addColorStop(0, 'rgba(255,240,160,0)'); g.addColorStop(0.3, 'rgba(255,160,40,' + (0.85 * j) + ')'); g.addColorStop(1, 'rgba(255,90,10,' + j + ')');
+                ctx.fillStyle = g; ctx.fillRect(x - 18, y - h, 36, h);
+                _infBlob(ctx, x, y - h, 26, j);
+            }
+        });
+        return u > 0.35 && u < 0.4 ? 0.15 : 0;
+    },
+});
+// <<< poses boss_inferno
+
 const SHAKE = { slam: (u) => (u >= 0.5 ? 9 * Math.max(0, 1 - (u - 0.5) * 4) : 0) };
 
 // ---- plumbing ------------------------------------------------------------
@@ -4103,7 +4854,7 @@ function _renderFrame(ctx, rig, imgs, animName, u) {
         for (const q of chainOf(p)) {
             const o = poses[q.n];
             ctx.translate(o.dx * S, o.dy * S);
-            ctx.translate(q.px, q.py); ctx.rotate(o.rot * Math.PI / 180); ctx.scale(o.sc, o.sc); ctx.translate(-q.px, -q.py);
+            ctx.translate(q.px, q.py); ctx.rotate(o.rot * Math.PI / 180); ctx.scale(o.sc * (o.sx || 1), o.sc * (o.sy || 1)); ctx.translate(-q.px, -q.py);
         }
         ctx.drawImage(imgs[i], p.x, p.y);
         ctx.restore();
