@@ -1085,16 +1085,18 @@ export function _gauntletOnDefeat() {
     return true;
 }
 
-// Ends the arena. reason: undefined (cleared) | 'defeat' | 'skipped' | 'aborted'.
-function _finish(success, reason) {
-    if (!_g.active) return;
-    const wasFighting = !!_g.poll;
+// Marks the run over and stops its polling intervals and pending timers.
+function _stopGauntletTimers() {
     _g.active = false;
     if (_g.poll) { clearInterval(_g.poll); _g.poll = null; }
     if (_g.modPoll) { clearInterval(_g.modPoll); _g.modPoll = null; }
     _g.timers.forEach(clearTimeout);
     _g.timers = [];
+}
 
+// Gives the monster zones and free movement back and clears the field (the
+// encounter itself is torn down by normal navigation).
+function _restoreFieldAfterGauntlet() {
     // Give the monster zones and free movement back.
     _g.fighting = false;
     globalThis._avatarBounds = null;
@@ -1112,7 +1114,11 @@ function _finish(success, reason) {
     try { _hazardsCleanup(); } catch (e) { /* cleanup is best-effort */ }
     try { _uspClearSupportBuffs(); } catch (e) { /* cleanup is best-effort */ }
     try { _renderPanel(); } catch (e) { /* panel optional */ }
+}
 
+// Puts the level and the player back: the level's monster tuning, the gauntlet
+// flags, and (after a loss) the player's life from before the fight.
+function _restorePlayerAfterGauntlet(success, wasFighting) {
     if (cur) {
         cur.gauntlet = false;
         if (_g.pre) {
@@ -1128,6 +1134,39 @@ function _finish(success, reason) {
         globalThis.playerCurrentHP = Math.max(1, Number(_g.pre.hp) || 1);
         if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
     }
+}
+
+// The result banner HTML; a win also pays out gold (more for each bonus goal met).
+function _gauntletResultHtml(success) {
+    let winHtml = '';
+    if (success && _g.parryMode) {
+        winHtml = `<div class="ga-banner ga-win">🛡 ${_tr('PARRY MASTERED!', 'PARADE GEMEISTERT!')}</div>`;
+    } else if (success) {
+        const cfg = GAUNTLET_CONFIG;
+        const elapsedMs = Date.now() - _g.startedAt;
+        const goals = [
+            { ok: !_g.damaged, label: _tr('Untouched', 'Unberührt') },
+            { ok: elapsedMs <= cfg.swiftBaseMs + cfg.swiftPerMonsterMs * _g.totalMonsters, label: _tr('Swift', 'Flink') },
+            { ok: _g.meleeStrikes >= cfg.bruiserStrikes, label: _tr('Bruiser', 'Haudegen') },
+        ];
+        const metCount = goals.filter(x => x.ok).length;
+        const lvlNow = Math.max(1, Number(cur && cur.monsterLevel) || 1);
+        const gold = _goldFor(lvlNow, metCount);
+        try { _addGold(gold); } catch (e) { /* gold optional */ }
+        winHtml = `<div class="ga-banner ga-win">⚔ ${_tr('GAUNTLET CLEARED!', 'GAUNTLET GEMEISTERT!')}</div>
+            <div class="ga-goals">${goals.map(x => `<span class="${x.ok ? 'ga-goal-ok' : 'ga-goal-no'}">${x.ok ? '✔' : '✖'} ${x.label}</span>`).join('')}
+            <span class="ga-gold">💰 +${gold} ${_tr('gold', 'Gold')}</span></div>`;
+    }
+    return winHtml;
+}
+
+// Ends the arena. reason: undefined (cleared) | 'defeat' | 'skipped' | 'aborted'.
+function _finish(success, reason) {
+    if (!_g.active) return;
+    const wasFighting = !!_g.poll;
+    _stopGauntletTimers();
+    _restoreFieldAfterGauntlet();
+    _restorePlayerAfterGauntlet(success, wasFighting);
 
     // Character banter: the result line must go out BEFORE the sprite is
     // hidden below (the bubble needs the avatar to anchor to).
@@ -1159,25 +1198,7 @@ function _finish(success, reason) {
     if (reason === 'skipped') { finish(false); return; }
 
     Audio_Manager.playSFX(success ? 'win' : 'lose');
-    let winHtml = '';
-    if (success && _g.parryMode) {
-        winHtml = `<div class="ga-banner ga-win">🛡 ${_tr('PARRY MASTERED!', 'PARADE GEMEISTERT!')}</div>`;
-    } else if (success) {
-        const cfg = GAUNTLET_CONFIG;
-        const elapsedMs = Date.now() - _g.startedAt;
-        const goals = [
-            { ok: !_g.damaged, label: _tr('Untouched', 'Unberührt') },
-            { ok: elapsedMs <= cfg.swiftBaseMs + cfg.swiftPerMonsterMs * _g.totalMonsters, label: _tr('Swift', 'Flink') },
-            { ok: _g.meleeStrikes >= cfg.bruiserStrikes, label: _tr('Bruiser', 'Haudegen') },
-        ];
-        const metCount = goals.filter(x => x.ok).length;
-        const lvlNow = Math.max(1, Number(cur && cur.monsterLevel) || 1);
-        const gold = _goldFor(lvlNow, metCount);
-        try { _addGold(gold); } catch (e) { /* gold optional */ }
-        winHtml = `<div class="ga-banner ga-win">⚔ ${_tr('GAUNTLET CLEARED!', 'GAUNTLET GEMEISTERT!')}</div>
-            <div class="ga-goals">${goals.map(x => `<span class="${x.ok ? 'ga-goal-ok' : 'ga-goal-no'}">${x.ok ? '✔' : '✖'} ${x.label}</span>`).join('')}
-            <span class="ga-gold">💰 +${gold} ${_tr('gold', 'Gold')}</span></div>`;
-    }
+    const winHtml = _gauntletResultHtml(success);
     _setCenter(success
         ? winHtml
         : `<div class="ga-banner ga-lose">${_tr('Gauntlet failed - bonus lost', 'Gauntlet gescheitert - Bonus verloren')}</div>`,

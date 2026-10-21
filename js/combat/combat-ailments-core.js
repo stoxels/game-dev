@@ -166,13 +166,9 @@ function _applyStatusToMap(statusMap, key, durationS, dps) {
     };
 }
 
-// Applies an ailment to a monster (or refreshes an existing one).
-function _applyMonsterAilment(monster, key, dps) {
-    if (!monster) return;
-    // Active map run: monsters may avoid ailments entirely (purity).
-    if ((monster.avoidAilmentPct || 0) > 0 && Math.random() * 100 < monster.avoidAilmentPct) return;
-    if (!monster.statuses) monster.statuses = {};
-    let durationS = ({
+// Base duration in seconds of each monster ailment (undefined for unknown keys).
+function _ailmentBaseDurationS(key) {
+    return ({
         ignite: AIL_IGNITE_DURATION_S,
         bleed: AIL_BLEED_DURATION_S,
         poison: AIL_POISON_DURATION_S,
@@ -185,7 +181,11 @@ function _applyMonsterAilment(monster, key, dps) {
         confused: AIL_CONFUSION_DURATION_S,
         blind: AIL_BLIND_DURATION_S,
     })[key];
-    if (!durationS) return;
+}
+
+// Passive-tree changes to an ailment's duration, plus the bleed/DoT speed bonus.
+// Returns { durationS, bleedSpeedPct }.
+function _treeAilmentDuration(key, durationS) {
     // Passive tree: per-ailment duration for YOUR ailments on enemies
     // (tithe batch, e.g. reworked nodes 30252/30253). Only ignite and bleed
     // have tree channels; every other ailment keeps its base duration.
@@ -209,35 +209,63 @@ function _applyMonsterAilment(monster, key, dps) {
             if ((Number(extra) || 0) > 0) durationS *= 1 + extra / 100;
         } catch (e) { /* base duration */ }
     }
-    if (key === 'shocked') globalThis._lastShockAt = Date.now();
-    // "More Damage" multipliers (nodes 30355/95 ignite, 30306/30309 bleed):
-    // scale the stored damage-per-second once, when the ailment is applied.
+    return { durationS, bleedSpeedPct };
+}
+
+// "More Damage" multipliers (nodes 30355/95 ignite, 30306/30309 bleed):
+// scale the stored damage-per-second once, when the ailment is applied.
+function _scaledAilmentDps(key, dps) {
     if (dps > 0 && (key === 'ignite' || key === 'bleed' || key === 'poison')) {
         try {
             dps = dps * _ailmentDamageMult(key, _computePlayerStats());
         } catch (e) { /* stats unavailable - base damage */ }
     }
+    return dps;
+}
+
+// Crimson Dance: Bleeding deals less damage but stacks up to N times on one enemy
+// (every stack adds its damage per second; the duration refreshes).
+// Returns the damage per second to store and the stack count.
+function _stackedBleed(monster, dps) {
+    let bleedStacks = 1;
+    try {
+        const bs = _computePlayerStats();
+        const less = Math.min(95, Math.max(0, Number(bs.bleedLessPct) || 0));
+        if (less > 0) dps *= 1 - less / 100;
+        const stackMax = Math.floor(Number(bs.bleedStackMax) || 0);
+        const ex = monster.statuses.bleed;
+        if (stackMax > 1 && ex && ex.until > Date.now()) {
+            const c = ex.stacks || 1;
+            if (c < stackMax) { dps = (ex.dps || 0) + dps; bleedStacks = c + 1; }
+            else { dps = ex.dps || dps; bleedStacks = c; }
+        }
+    } catch (e) { /* base bleed */ }
+    return { dps, bleedStacks };
+}
+
+// Applies an ailment to a monster (or refreshes an existing one).
+function _applyMonsterAilment(monster, key, dps) {
+    if (!monster) return;
+    // Active map run: monsters may avoid ailments entirely (purity).
+    if ((monster.avoidAilmentPct || 0) > 0 && Math.random() * 100 < monster.avoidAilmentPct) return;
+    if (!monster.statuses) monster.statuses = {};
+    let durationS = _ailmentBaseDurationS(key);
+    if (!durationS) return;
+    const tree = _treeAilmentDuration(key, durationS);
+    durationS = tree.durationS;
+    const bleedSpeedPct = tree.bleedSpeedPct;
+    if (key === 'shocked') globalThis._lastShockAt = Date.now();
+    dps = _scaledAilmentDps(key, dps);
     // Bleed speed (nodes 30283/251): the same number of ticks of the same
     // size, just faster - total damage is unchanged, the duration shrinks.
     // The 0.1s slack keeps the final tick from racing the expiry.
     const speedMult = 1 + bleedSpeedPct / 100;
     if (speedMult > 1) durationS = durationS / speedMult + 0.1;
-    // Crimson Dance: Bleeding deals less damage but stacks up to N times on one enemy
-    // (every stack adds its damage per second; the duration refreshes).
     let bleedStacks = 1;
     if (key === 'bleed') {
-        try {
-            const bs = _computePlayerStats();
-            const less = Math.min(95, Math.max(0, Number(bs.bleedLessPct) || 0));
-            if (less > 0) dps *= 1 - less / 100;
-            const stackMax = Math.floor(Number(bs.bleedStackMax) || 0);
-            const ex = monster.statuses.bleed;
-            if (stackMax > 1 && ex && ex.until > Date.now()) {
-                const c = ex.stacks || 1;
-                if (c < stackMax) { dps = (ex.dps || 0) + dps; bleedStacks = c + 1; }
-                else { dps = ex.dps || dps; bleedStacks = c; }
-            }
-        } catch (e) { /* base bleed */ }
+        const stacked = _stackedBleed(monster, dps);
+        dps = stacked.dps;
+        bleedStacks = stacked.bleedStacks;
     }
     // New application only: refreshes of the same ailment stay silent.
     const wasActive = _hasStatus(monster.statuses, key);
@@ -710,24 +738,18 @@ export function _rollIntimidate(target, opts) {
 // `amount` is the actual damage dealt and `elements` the per-element share.
 //------------------------------------------------------------------------
 
-// After a player hit on a monster, rolls which ailments land (ignite, chill,
-// shock, bleed, poison, shadow burn...) from the hit's elements, the player's
-// chances and crit rules.
-function _rollPlayerHitAilments(target, amount, elements, opts) {
-    if (!_isActive() || !target || target.currentHP <= 0) return;
-    const stats = _computePlayerStats();
+// What the ailment rolls need to know about one player hit: the damage, how it
+// splits into elemental and physical shares, whether it was a melee / attack hit,
+// and the damage-over-time multiplier a critical hit gives its ailments.
+function _ailmentHitContext(amount, elements, opts, stats) {
     // Ailments inflicted by a critical hit deal more damage over time.
     // Perfect Agony: only Critical Strikes inflict ailments, and their DoT multiplier is
     // the Critical Strike multiplier.
-    if ((Number(stats.nonCritNoAilments) || 0) > 0 && !(opts && opts.isCrit)) return;
     const critDotMult = (opts && opts.isCrit)
         ? ((Number(stats.dotMultiEqualsCrit) || 0) > 0
             ? 1.5 + Math.max(0, Number(stats.critMultiplierPct) || 0) / 100
             : 1 + Math.max(0, Number(stats.critDotMultiPct) || 0) / 100)
         : 1;
-    const _achPreHas = {};
-    if (target.statuses) { for (const k in target.statuses) if (target.statuses[k] && target.statuses[k].until > Date.now()) _achPreHas[k]=true; }
-
     const fireShare = elements ? (elements.fire || 0) : 0;
     const coldShare = elements ? (elements.cold || 0) : 0;
     const lightningShare = elements ? (elements.lightning || 0) : 0;
@@ -736,6 +758,14 @@ function _rollPlayerHitAilments(target, amount, elements, opts) {
     // hits innately chill, physical hits innately bleed - this is what the
     // tithe duration nodes scale (30252/30253), and what 20036 wards against.
     const physShare = Math.max(0, amount - fireShare - coldShare - lightningShare - shadowShare);
+    const isMeleeHit = !!(opts && opts.isMelee);
+    const isAttackHit = isMeleeHit || !!(opts && opts.isPlayerHit);
+    return { amount, opts, stats, critDotMult, fireShare, coldShare, lightningShare, shadowShare, physShare, isMeleeHit, isAttackHit };
+}
+
+// Bleed: the innate chance of physical hits, then the tree bleed chances.
+function _rollBleedAilments(target, ctx) {
+    const { amount, stats, critDotMult, physShare, isMeleeHit, isAttackHit } = ctx;
     if (physShare > 0 && Math.random() * 100 < PHYS_INNATE_BLEED_CHANCE_PCT) {
         _applyMonsterAilment(target, 'bleed', Math.max(AIL_MIN_DOT_DAMAGE, amount * AIL_BLEED_DMG_SHARE) * critDotMult);
     }
@@ -743,16 +773,17 @@ function _rollPlayerHitAilments(target, amount, elements, opts) {
     // (melee + primary projectile hits; spells never). The bleed deals a
     // share of the hit's PHYSICAL damage, so a hit with no physical share
     // cannot cause it.
-    const isMeleeHit = !!(opts && opts.isMelee);
-    const isAttackHit = isMeleeHit || !!(opts && opts.isPlayerHit);
     const treeBleedPct = (isMeleeHit ? (stats.bleedChanceMeleePct || 0) : 0)
         + (isAttackHit ? (stats.bleedChanceAttackPct || 0) : 0);
     if (physShare > 0 && treeBleedPct > 0 && Math.random() * 100 < Math.min(100, treeBleedPct)) {
         _applyMonsterAilment(target, 'bleed', Math.max(AIL_MIN_DOT_DAMAGE, physShare * AIL_BLEED_DMG_SHARE) * critDotMult);
     }
+}
 
-    // Phase B hooks: Power charge on crit, Endurance charge on melee crit,
-    // Blind on attack hits and the dagger poison lines.
+// Phase B hooks: Power charge on crit, Endurance charge on melee crit, and Blind
+// on attack hits.
+function _rollCritChargesAndBlind(target, ctx) {
+    const { opts, stats, isMeleeHit, isAttackHit } = ctx;
     if (opts && opts.isCrit) {
         const powerCritPct = Math.min(100, Number(stats.powerOnCritPct) || 0);
         if (powerCritPct > 0 && Math.random() * 100 < powerCritPct) _gainPowerCharge(stats.powerChargesMax, stats.powerDurationPct);
@@ -763,6 +794,11 @@ function _rollPlayerHitAilments(target, amount, elements, opts) {
         _applyMonsterAilment(target, 'blind');
         if (target.statuses && target.statuses.blind) target.statuses.blind.effectPct = Math.max(0, Number(stats.blindEffectIncPct) || 0);
     }
+}
+
+// Poison: spell poison chance, the dagger lines, and the shadow-damage attack poison.
+function _rollPoisonAilments(target, ctx) {
+    const { amount, opts, stats, critDotMult, shadowShare, isAttackHit } = ctx;
     if (opts && opts.isPlayerSpell && (Number(stats.poisonChanceSpellPct) || 0) > 0
         && Math.random() * 100 < Math.min(100, stats.poisonChanceSpellPct)) {
         _applyMonsterAilment(target, 'poison', Math.max(AIL_MIN_DOT_DAMAGE, amount * AIL_POISON_DMG_SHARE) * critDotMult);
@@ -781,7 +817,11 @@ function _rollPlayerHitAilments(target, amount, elements, opts) {
         && Math.random() * 100 < Math.min(100, stats.poisonChanceAttackPct)) {
         _applyMonsterAilment(target, 'poison', Math.max(AIL_MIN_DOT_DAMAGE, shadowShare * AIL_POISON_DMG_SHARE) * critDotMult);
     }
+}
 
+// Elemental ailments: ignite from fire damage, chill / freeze from cold, shock from lightning.
+function _rollElementalAilments(target, ctx) {
+    const { amount, stats, critDotMult, fireShare, coldShare, lightningShare } = ctx;
     if (fireShare > 0 && stats.ignitePct > 0 && Math.random() * 100 < stats.ignitePct) {
         _applyMonsterAilment(target, 'ignite', Math.max(AIL_MIN_DOT_DAMAGE, amount * AIL_IGNITE_DMG_SHARE) * critDotMult);
     }
@@ -795,8 +835,12 @@ function _rollPlayerHitAilments(target, amount, elements, opts) {
     if (lightningShare > 0 && stats.shockPct > 0 && Math.random() * 100 < stats.shockPct) {
         _applyMonsterAilment(target, 'shocked');
     }
-    // Signature spells carry an innate ailment chance of their own (stacks
-    // with gear/tree chances; each roll is independent).
+}
+
+// Signature spells carry an innate ailment chance of their own (stacks with
+// gear/tree chances; each roll is independent).
+function _rollSpellInnateAilment(target, ctx) {
+    const { amount, opts, critDotMult } = ctx;
     const spellInnate = (opts && opts.spellId) ? SPELL_INNATE_AILMENT[opts.spellId] : null;
     let spellInnatePct = spellInnate ? spellInnate.pct : 0;
     if (spellInnate && spellInnate.pctPerRank && typeof globalThis.getSkillCastRankFull === 'function') {
@@ -809,6 +853,24 @@ function _rollPlayerHitAilments(target, amount, elements, opts) {
             _applyMonsterAilment(target, spellInnate.key);
         }
     }
+}
+
+// After a player hit on a monster, rolls which ailments land (ignite, chill,
+// shock, bleed, poison, shadow burn...) from the hit's elements, the player's
+// chances and crit rules.
+function _rollPlayerHitAilments(target, amount, elements, opts) {
+    if (!_isActive() || !target || target.currentHP <= 0) return;
+    const stats = _computePlayerStats();
+    if ((Number(stats.nonCritNoAilments) || 0) > 0 && !(opts && opts.isCrit)) return;
+    const _achPreHas = {};
+    if (target.statuses) { for (const k in target.statuses) if (target.statuses[k] && target.statuses[k].until > Date.now()) _achPreHas[k]=true; }
+
+    const ctx = _ailmentHitContext(amount, elements, opts, stats);
+    _rollBleedAilments(target, ctx);
+    _rollCritChargesAndBlind(target, ctx);
+    _rollPoisonAilments(target, ctx);
+    _rollElementalAilments(target, ctx);
+    _rollSpellInnateAilment(target, ctx);
     // Endgame achievement - count newly inflicted ailments on this hit
     if (typeof trackAchStat === 'function') try {
         let _newAil = 0;
@@ -990,14 +1052,9 @@ function _expireFromMap(statusMap, now) {
     });
 }
 
-// The 10 Hz ailment tick: expires statuses and applies damage over time to
-// the player and to monsters, spreading and updating their visuals.
-function _tickAilments() {
-    if (!_isActive()) return;
-    const now = Date.now();
-    const deltaS = 0.1; // 10Hz tick
-
-    // --- Player statuses ---
+// Player ailments: expires old ones, advances the damage-over-time clocks and
+// deals the combined damage of every status whose tick came due.
+function _tickPlayerStatuses(now, deltaS) {
     _expireFromMap(_playerStatuses, now);
     let playerDot = 0;
     let playerIgnoresShield = false;
@@ -1019,9 +1076,11 @@ function _tickAilments() {
         Audio_Manager.playSFX('ail_dot_tick');
         _dealPlayerDotDamage(playerDot, playerIgnoresShield, playerDotKeys.join('+'));
     }
+}
 
-    // --- Ground-fire damage: standing in burning ground burns the player ---
-    // Uses radius-aware overlap check so edge contact counts as burning.
+// Ground-fire damage: standing in burning ground burns the player. Uses a
+// radius-aware overlap check so edge contact counts as burning.
+function _tickGroundFire(deltaS) {
     _addGroundFireAcc(deltaS);
     if (_groundFireAcc >= AIL_PLAYER_FIRE_GROUND_TICK_S) {
         _addGroundFireAcc(-AIL_PLAYER_FIRE_GROUND_TICK_S);
@@ -1035,8 +1094,11 @@ function _tickAilments() {
             }
         }
     }
+}
 
-    // --- Monster statuses ---
+// Monster ailments: expires old ones, applies due damage over time and returns
+// the ids of the monsters it killed.
+function _tickMonsterStatuses(now, deltaS) {
     const deadIds = [];
     globalThis._monsters.forEach(m => {
         if (!m.statuses) return;
@@ -1060,6 +1122,19 @@ function _tickAilments() {
             if (m.currentHP <= 0) deadIds.push(m.id);
         }
     });
+    return deadIds;
+}
+
+// The 10 Hz ailment tick: expires statuses and applies damage over time to the
+// player and to monsters, plus the ground-fire burn.
+function _tickAilments() {
+    if (!_isActive()) return;
+    const now = Date.now();
+    const deltaS = 0.1; // 10Hz tick
+
+    _tickPlayerStatuses(now, deltaS);
+    _tickGroundFire(deltaS);
+    const deadIds = _tickMonsterStatuses(now, deltaS);
 
     // Kill DoT victims after iteration (loot/xp pipeline runs normally)
     deadIds.forEach(id => {
