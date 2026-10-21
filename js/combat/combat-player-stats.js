@@ -620,11 +620,10 @@ export function _getItemEffectiveBlockChance(item) {
     };
 }
 
-// Aggregates every equipped item's implicit defenses + rolled mods into one
-// stats object. Recomputed on demand (cheap - ~19 slots, ≤6 mods each) so it
-// never goes stale after an equip/unequip.
-export function _computePlayerStats() {
-    const passiveTreeBonuses = _syncBaseAttributes() || {};
+// The starting stat object: every stat the sheet reports, seeded from the
+// passive tree's accumulated bonuses (gear and attributes are added by the
+// later phases).
+function _baseStatBlock(passiveTreeBonuses) {
     const s = {
         // Flat maximum Life from allocated passive-tree nodes (effects
         // pipeline, e.g. reworked node 20031 Anvil Guard) seeds the very
@@ -1223,7 +1222,12 @@ export function _computePlayerStats() {
         heartSpawnIncPct: passiveTreeBonuses.heartSpawnIncPct || 0, manaSpawnIncPct: passiveTreeBonuses.manaSpawnIncPct || 0,
         absorptionRegenRatePct: passiveTreeBonuses.absorptionRegenRatePct || 0, fasterAbsorptionRegenStart: 0,
     };
+    return s;
+}
 
+// Per-hand melee damage ranges from the equipped weapons, shield physical
+// damage, dual-wield and manual-melee scaling.
+function _applyWeaponDamageRanges(s, passiveTreeBonuses) {
     // Per-weapon share of the melee ranges, so a wand + melee pair can strike with
     // each hand's OWN damage (see handRanges below).
     const HAND_RANGE_KEYS = ['meleePhysMin', 'meleePhysMax', 'staffShotMin', 'staffShotMax',
@@ -1383,7 +1387,12 @@ export function _computePlayerStats() {
             if (s.handRanges) for (const h of [1, 2]) s.handRanges[h][k] = Math.round(s.handRanges[h][k] * mm);
         }
     }
+}
 
+// Roiling Tempest range skew, the Arcane Surge streak cap, Strength/Agility
+// effects on life and armour, and timed or streak armour from the passive
+// tree.
+function _applyAttributeAndArmourEffects(s, passiveTreeBonuses) {
     // Roiling Tempest: the lightning damage range is skewed (min lower, max higher).
     if ((s.lightningMinLessPct || 0) > 0 || (s.lightningMaxMorePct || 0) > 0) {
         const minMult = 1 - Math.min(100, s.lightningMinLessPct || 0) / 100;
@@ -1413,6 +1422,11 @@ export function _computePlayerStats() {
     if ((s.armourPerStreak || 0) > 0) {
         s.armourFlat += s.armourPerStreak * Math.floor((Number(globalThis.LEVEL_FLAGS && globalThis.LEVEL_FLAGS.fillRun) || 0) / 10);
     }
+}
+
+// Live charge stats: Endurance, Rage, Frenzy, Power and Fortification, plus
+// the per-charge, shield and heavy-weapon tree lines.
+function _applyChargeEffects(s) {
     // Endurance Charges (shield batch, node 285): live charges (shared 10s
     // timer, see combat-ailments-state.js) each add flat Armour and
     // all-elemental resistance. Flat Armour joins the pool BEFORE the %
@@ -1482,6 +1496,11 @@ export function _computePlayerStats() {
             if (absMax > 0 && (Number(globalThis._playerAbsorptionCurrent) || 0) >= absMax) s.damageIncPct += s.dmgFullAbsorptionPct;
         }
     }
+}
+
+// Sets which weapon family is equipped (mace, sword, axe, dagger, staff, wand,
+// bow) as flags on the stats.
+function _applyEquippedWeaponFlags(s) {
     // Weapon family of the equipped melee weapon (swing-config resolver:
     // icon/name based, unknown melee weapons count as swords). Gates the
     // sword/axe tree lines; +accuracy with swords joins the flat pool here
@@ -1498,6 +1517,11 @@ export function _computePlayerStats() {
     if (s.dualMixed) s.isWandEquipped = true;   // a wand in either hand earns the tree's wand lines
     s.isCasterWeapon = s.isWandEquipped || s.isStaffEquipped;
     s.isBowEquipped = weaponFamily === 'bow';
+}
+
+// Wand and bow conditional lines, Onslaught, recent-crit leech, Stalwart
+// Stance and the sword accuracy line.
+function _applyWeaponConditionalLines(s, passiveTreeBonuses) {
     // Phase C-2: wand / bow conditional lines, Onslaught, recent-crit leech.
     if (s.isWandEquipped) s.lightningDamageIncPct = (s.lightningDamageIncPct || 0) + (s.wandLightningDamageIncPct || 0);
     if (s.isBowEquipped) s.areaOfEffectPct += s.bowAoePct || 0;
@@ -1518,6 +1542,11 @@ export function _computePlayerStats() {
     if ((s.movementSpeedLessPct || 0) > 0) s.movementSpeedPct -= s.movementSpeedLessPct;
     if (s.isSwordEquipped) s.accuracy += passiveTreeBonuses.accuracySwordFlat || 0;
     s.accuracy += s.agility;
+}
+
+// Accuracy, Agility, Intelligence and Strength side effects, Acrobatics, the
+// map-run spell damage reduction and the per-level life and mana bonus.
+function _applyAccuracyAttributesAndLevelBonus(s) {
     // "Increased Accuracy Rating" multiplies the fully aggregated rating
     // (gear + tree flat + Agi) before the map-run multiplier and the
     // miss-chance formula downstream read it.
@@ -1547,7 +1576,11 @@ export function _computePlayerStats() {
         ? Math.max(1, Number(_getPlayerLevel()) || 1) : 1;
     s.health += (lvlForBonus - 1) * 5;
     s.mana += (lvlForBonus - 1) * 2;
+}
 
+// Applies the percent-increased life and mana multipliers, Blood Magic, then
+// builds armour, evasion and absorption and the keystone adjustments to them.
+function _composePoolsAndDefences(s) {
     // Apply % increased Health multiplicatively with base + flat health
     if (s.healthIncPct > 0) {
         s.health = Math.round(s.health * (1 + s.healthIncPct / 100));
@@ -1577,7 +1610,10 @@ export function _computePlayerStats() {
     if ((s.absorptionLessPct || 0) > 0) s.absorption = Math.round(s.absorption * (1 - Math.min(95, s.absorptionLessPct) / 100));
     if ((s.ghostDance || 0) > 0) s.absorption = Math.min(s.absorption, s.evasion);
     if ((s.absorptionRemoved || 0) > 0) s.absorption = 0;
+}
 
+// Active map run reductions to defences, block, accuracy and attack speed.
+function _applyMapRunStatMods(s) {
     // Active map run: apply the "% reduced Armour, Evasion and Absorption" mod.
     if (typeof _egMapPlayerDefenceMult === 'function') {
         const defMult = _egMapPlayerDefenceMult();
@@ -1614,6 +1650,22 @@ export function _computePlayerStats() {
         const asMult = _egMapAttackSpeedMult();
         if (asMult < 1) s.attackSpeed = Math.round((s.attackSpeed || 0) * asMult * 100) / 100;
     }
+}
+
+// Aggregates every equipped item's implicit defenses + rolled mods into one
+// stats object. Recomputed on demand (cheap - ~19 slots, ≤6 mods each) so it
+// never goes stale after an equip/unequip.
+export function _computePlayerStats() {
+    const passiveTreeBonuses = _syncBaseAttributes() || {};
+    const s = _baseStatBlock(passiveTreeBonuses);
+    _applyWeaponDamageRanges(s, passiveTreeBonuses);
+    _applyAttributeAndArmourEffects(s, passiveTreeBonuses);
+    _applyChargeEffects(s);
+    _applyEquippedWeaponFlags(s);
+    _applyWeaponConditionalLines(s, passiveTreeBonuses);
+    _applyAccuracyAttributesAndLevelBonus(s);
+    _composePoolsAndDefences(s);
+    _applyMapRunStatMods(s);
 
     return s;
 }
