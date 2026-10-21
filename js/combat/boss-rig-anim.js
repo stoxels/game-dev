@@ -644,6 +644,665 @@ const RIGS = {
         },
     },
     // <<< rig boss_inferno
+    // >>> rig boss_juggernaut
+    boss_juggernaut: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 52, px: 256, py: 400, par: null },
+            { n: 'head', x: 154, y: 131, px: 225, py: 265, par: 'body' },
+            { n: 'fistL', x: 13, y: 206, px: 120, py: 235, par: 'body' },
+            { n: 'fistR', x: 364, y: 236, px: 378, py: 280, par: 'body' },
+        ],
+        mechanics: {
+            bull_barrage: { anim: 'jug_charge', ms: () => 1800 },
+            thwomp_trio: { anim: 'jug_thwomp', ms: () => 2000 },
+            prior_bomb: { anim: 'jug_bomb', ms: () => 1800 },
+        },
+    },
+    // <<< rig boss_juggernaut
+    // >>> rig boss_kraken
+    boss_kraken: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 1, y: 107, px: 256, py: 330, par: null },
+            { n: 'head', x: 164, y: 107, px: 256, py: 300, par: 'body' },
+            { n: 'tentUL', x: 67, y: 155, px: 130, py: 228, par: 'body' },
+            { n: 'tentUR', x: 358, y: 169, px: 375, py: 245, par: 'body' },
+            { n: 'tentL', x: 5, y: 291, px: 120, py: 360, par: 'body' },
+            { n: 'tentR', x: 406, y: 291, px: 420, py: 360, par: 'body' },
+        ],
+        mechanics: {
+            tentacle_sweep: { anim: 'krk_sweep', ms: () => 1800 },
+            fog_bank: { anim: 'krk_ink', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_kraken
+    // >>> rig boss_leviathan
+    boss_leviathan: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 102, px: 200, py: 300, par: null },
+            { n: 'tail', x: 328, y: 102, px: 370, py: 200, par: 'body' },
+            { n: 'finF', x: 258, y: 314, px: 275, py: 330, par: 'body' },
+        ],
+        mechanics: {
+            rising_tide: { anim: 'lev_tide', ms: () => 2200 },
+            corrupt_cells: { anim: 'lev_corrupt', ms: () => 2000 },
+        },
+    },
+    // <<< rig boss_leviathan
+    // >>> rig boss_lodestone
+    boss_lodestone: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 0, y: 113, px: 256, py: 380, par: null },
+            { n: 'head', x: 238, y: 131, px: 282, py: 232, par: 'body' },
+            { n: 'magL', x: 88, y: 246, px: 180, py: 270, par: 'body' },
+            { n: 'magR', x: 341, y: 246, px: 355, py: 270, par: 'body' },
+        ],
+        mechanics: {
+            polarity_field: { anim: 'lod_polarity', ms: () => 2200 },
+            probability_shift: { anim: 'lod_shift', ms: () => 1600 },
+        },
+    },
+    // <<< rig boss_lodestone
+    // >>> rig boss_maelstrom
+    boss_maelstrom: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 0, y: 98, px: 256, py: 400, par: null },
+            { n: 'funnel', x: 132, y: 101, px: 290, py: 245, par: 'body' },
+            { n: 'board', x: 76, y: 251, px: 140, py: 350, par: 'body' },
+            { n: 'books', x: 396, y: 221, px: 450, py: 345, par: 'body' },
+        ],
+        mechanics: {
+            vortex_nova: { anim: 'mae_nova', ms: () => 2200 },
+            corrupt_cells: { anim: 'mae_corrupt', ms: () => 2000 },
+        },
+    },
+    // <<< rig boss_maelstrom
+    // >>> rig boss_marksman
+    boss_marksman: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 54, px: 220, py: 400, par: null },
+            { n: 'head', x: 77, y: 54, px: 180, py: 215, par: 'body' },
+            { n: 'rifle', x: 86, y: 201, px: 110, py: 250, par: 'body' },
+        ],
+        mechanics: {
+            marked_strikes: { anim: 'mrk_strikes', ms: () => 2200 },
+            probability_shift: { anim: 'mrk_shift', ms: () => 1600 },
+        },
+    },
+    // <<< rig boss_marksman
+    // >>> rig boss_medusa
+    boss_medusa: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 47, y: 3, px: 256, py: 450, par: null },
+            { n: 'snL1', x: 93, y: 50, px: 166, py: 80, par: 'body' },
+            { n: 'snL2', x: 68, y: 120, px: 143, py: 142, par: 'body' },
+            { n: 'snL3', x: 58, y: 176, px: 138, py: 200, par: 'body' },
+            { n: 'snL4', x: 88, y: 230, px: 163, py: 255, par: 'body' },
+            { n: 'snR1', x: 366, y: 40, px: 370, py: 70, par: 'body' },
+            { n: 'snR2', x: 386, y: 134, px: 390, py: 160, par: 'body' },
+            { n: 'snR3', x: 386, y: 210, px: 390, py: 235, par: 'body' },
+            { n: 'snR4', x: 376, y: 266, px: 380, py: 285, par: 'body' },
+        ],
+        mechanics: {
+            stone_gaze: { anim: 'med_gaze', ms: () => 2200 },
+            snake_strikes: { anim: 'med_strikes', ms: () => 2000 },
+            petrify_waves: { anim: 'med_petrify', ms: () => 2000 },
+            coil_cage: { anim: 'med_cage', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_medusa
+    // >>> rig boss_minotaur
+    boss_minotaur: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 60, px: 256, py: 420, par: null },
+            { n: 'shield', x: 314, y: 101, px: 380, py: 250, par: 'body' },
+            { n: 'fistL', x: 4, y: 232, px: 95, py: 260, par: 'body' },
+            { n: 'fistR', x: 404, y: 251, px: 420, py: 270, par: 'body' },
+        ],
+        mechanics: {
+            labyrinth_walls: { anim: 'min_walls', ms: () => 2000 },
+            prior_bomb: { anim: 'min_bomb', ms: () => 1800 },
+            hooftread_terrain: { anim: 'min_hoof', ms: () => 2000 },
+            thread_of_ariadne: { anim: 'min_thread', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_minotaur
+    // >>> rig boss_maven
+    boss_maven: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 54, px: 256, py: 420, par: null },
+            { n: 'head', x: 162, y: 56, px: 270, py: 225, par: 'body' },
+            { n: 'handL', x: 81, y: 199, px: 205, py: 290, par: 'body' },
+            { n: 'staff', x: 396, y: 81, px: 430, py: 300, par: 'body' },
+        ],
+        mechanics: {
+            memory_rite: { anim: 'mav_rite', ms: () => 2200 },
+            clue_swap: { anim: 'mav_swap', ms: () => 1600 },
+        },
+    },
+    // <<< rig boss_maven
+    // >>> rig boss_needle
+    boss_needle: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 56, px: 256, py: 420, par: null },
+            { n: 'quills', x: 341, y: 68, px: 380, py: 200, par: 'body' },
+            { n: 'staff', x: 12, y: 71, px: 140, py: 280, par: 'body' },
+            { n: 'clip', x: 356, y: 266, px: 420, py: 300, par: 'body' },
+        ],
+        mechanics: {
+            needle_gates: { anim: 'ndl_gates', ms: () => 2000 },
+            pin_drops: { anim: 'ndl_pins', ms: () => 2000 },
+            stitch_wave: { anim: 'ndl_stitch', ms: () => 2000 },
+            pincushion_burst: { anim: 'ndl_burst', ms: () => 1800 },
+        },
+    },
+    // <<< rig boss_needle
+    // >>> rig boss_maze
+    boss_maze: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 41, px: 256, py: 400, par: null },
+            { n: 'maze', x: 136, y: 142, px: 256, py: 262, par: 'body' },
+            { n: 'bull', x: 213, y: 208, px: 255, py: 262, par: 'maze' },
+            { n: 'diceA', x: 19, y: 300, px: 45, py: 326, par: 'body' },
+            { n: 'diceB', x: 89, y: 381, px: 118, py: 410, par: 'body' },
+            { n: 'diceC', x: 440, y: 302, px: 465, py: 326, par: 'body' },
+            { n: 'diceD', x: 408, y: 367, px: 437, py: 396, par: 'body' },
+        ],
+        mechanics: {
+            ghost_gang: { anim: 'maz_ghosts', ms: () => 2000 },
+            dot_walls: { anim: 'maz_dots', ms: () => 2000 },
+            maze_walls: { anim: 'maz_walls', ms: () => 2200 },
+            lights_out: { anim: 'maz_dark', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_maze
+    // >>> rig boss_monsoon
+    boss_monsoon: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 52, px: 256, py: 420, par: null },
+            { n: 'cloudL', x: 52, y: 97, px: 110, py: 150, par: 'body' },
+            { n: 'cloudR', x: 336, y: 105, px: 395, py: 150, par: 'body' },
+            { n: 'armL', x: 4, y: 237, px: 160, py: 285, par: 'body' },
+            { n: 'armR', x: 351, y: 240, px: 365, py: 285, par: 'body' },
+        ],
+        mechanics: {
+            rain_bands: { anim: 'mon_rain', ms: () => 2200 },
+            thunderbolts: { anim: 'mon_bolts', ms: () => 1800 },
+            storm_surge: { anim: 'mon_surge', ms: () => 2000 },
+            hail_barrage: { anim: 'mon_hail', ms: () => 2000 },
+        },
+    },
+    // <<< rig boss_monsoon
+    // >>> rig boss_nemesis
+    boss_nemesis: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 52, px: 256, py: 420, par: null },
+            { n: 'head', x: 196, y: 56, px: 275, py: 212, par: 'body' },
+            { n: 'staff', x: 2, y: 53, px: 120, py: 270, par: 'body' },
+            { n: 'shield', x: 346, y: 190, px: 365, py: 260, par: 'body' },
+        ],
+        mechanics: {
+            spiral_storm: { anim: 'nem_spiral', ms: () => 2200 },
+            reaper_fans: { anim: 'nem_fans', ms: () => 2000 },
+            soul_tithe: { anim: 'nem_tithe', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_nemesis
+    // >>> rig boss_null
+    boss_null: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 18, px: 256, py: 420, par: null },
+            { n: 'hat', x: 116, y: 18, px: 256, py: 170, par: 'body' },
+            { n: 'eyeball', x: 207, y: 220, px: 255, py: 268, par: 'body' },
+            { n: 'diceL', x: 20, y: 140, px: 55, py: 173, par: 'body' },
+            { n: 'diceR', x: 422, y: 138, px: 457, py: 173, par: 'body' },
+        ],
+        mechanics: {
+            void_lattice: { anim: 'nul_lattice', ms: () => 2000 },
+            prior_bomb: { anim: 'nul_bomb', ms: () => 1800 },
+            hypothesis_erasure: { anim: 'nul_erase', ms: () => 2000 },
+            null_rays: { anim: 'nul_rays', ms: () => 1800 },
+        },
+    },
+    // <<< rig boss_null
+    // >>> rig boss_phantom
+    boss_phantom: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 113, px: 256, py: 400, par: null },
+            { n: 'wingL', x: 2, y: 190, px: 185, py: 260, par: 'body' },
+            { n: 'wingR', x: 318, y: 196, px: 325, py: 260, par: 'body' },
+            { n: 'head', x: 196, y: 113, px: 265, py: 255, par: 'body' },
+        ],
+        mechanics: {
+            vent_ambush: { anim: 'phm_ambush', ms: () => 2000 },
+            fog_bank: { anim: 'phm_fog', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_phantom
+    // >>> rig boss_puddle
+    boss_puddle: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 90, px: 256, py: 400, par: null },
+            { n: 'splash', x: 299, y: 90, px: 360, py: 180, par: 'body' },
+            { n: 'eyeL', x: 146, y: 209, px: 192, py: 255, par: 'body' },
+            { n: 'eyeR', x: 256, y: 218, px: 300, py: 262, par: 'body' },
+        ],
+        mechanics: {
+            fated_cell: { anim: 'pud_fate', ms: () => 1900 },
+        },
+    },
+    // <<< rig boss_puddle
+    // >>> rig boss_nightmare
+    boss_nightmare: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 0, y: 76, px: 330, py: 420, par: null },
+            { n: 'tail', x: 120, y: 203, px: 245, py: 235, par: 'body' },
+            { n: 'head', x: 298, y: 76, px: 380, py: 240, par: 'body' },
+        ],
+        mechanics: {
+            dark_hunt: { anim: 'ngt_hunt', ms: () => 2000 },
+            soul_tithe: { anim: 'ngt_tithe', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_nightmare
+    // >>> rig boss_oblivion
+    boss_oblivion: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 91, px: 290, py: 400, par: null },
+            { n: 'head', x: 219, y: 95, px: 290, py: 250, par: 'body' },
+            { n: 'scythe', x: 8, y: 92, px: 190, py: 290, par: 'body' },
+            { n: 'orbHand', x: 411, y: 157, px: 430, py: 280, par: 'body' },
+        ],
+        mechanics: {
+            singularity: { anim: 'obl_singularity', ms: () => 2200 },
+            event_beams: { anim: 'obl_beams', ms: () => 2000 },
+            fog_bank: { anim: 'obl_fog', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_oblivion
+    // >>> rig boss_overfitter
+    boss_overfitter: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 103, px: 256, py: 420, par: null },
+            { n: 'head', x: 254, y: 131, px: 320, py: 262, par: 'body' },
+            { n: 'handL', x: 156, y: 256, px: 175, py: 270, par: 'body' },
+            { n: 'handR', x: 318, y: 296, px: 360, py: 300, par: 'body' },
+        ],
+        mechanics: {
+            gradient_descent: { anim: 'ovf_descent', ms: () => 2200 },
+            pattern_break: { anim: 'ovf_break', ms: () => 1800 },
+            pattern_lock: { anim: 'ovf_lock', ms: () => 2000 },
+            validation_set: { anim: 'ovf_validate', ms: () => 2000 },
+        },
+    },
+    // <<< rig boss_overfitter
+    // >>> rig boss_razor
+    boss_razor: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 64, px: 256, py: 420, par: null },
+            { n: 'bladeL', x: 4, y: 69, px: 140, py: 290, par: 'body' },
+            { n: 'bladeR', x: 376, y: 100, px: 395, py: 280, par: 'body' },
+        ],
+        mechanics: {
+            blade_cyclone: { anim: 'rzr_cyclone', ms: () => 2000 },
+            probability_shift: { anim: 'rzr_shift', ms: () => 1600 },
+            razor_wires: { anim: 'rzr_wires', ms: () => 2000 },
+            hone_and_cast: { anim: 'rzr_hone', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_razor
+    // >>> rig boss_seraph
+    boss_seraph: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 160, px: 256, py: 260, par: null },
+            { n: 'head', x: 186, y: 166, px: 256, py: 320, par: 'body' },
+        ],
+        mechanics: {
+            judgment_pillars: { anim: 'srp_pillars', ms: () => 2200 },
+            radiant_fans: { anim: 'srp_fans', ms: () => 2000 },
+            fated_cell: { anim: 'srp_fate', ms: () => 1900 },
+        },
+    },
+    // <<< rig boss_seraph
+    // >>> rig boss_shaper
+    boss_shaper: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 42, px: 290, py: 430, par: null },
+            { n: 'head', x: 206, y: 74, px: 290, py: 260, par: 'body' },
+            { n: 'club', x: 96, y: 236, px: 195, py: 330, par: 'body' },
+            { n: 'frostHand', x: 381, y: 146, px: 400, py: 265, par: 'body' },
+        ],
+        mechanics: {
+            glacier_rift: { anim: 'shp_rift', ms: () => 2000 },
+            soul_tithe: { anim: 'shp_tithe', ms: () => 2200 },
+            frost_monoliths: { anim: 'shp_monoliths', ms: () => 2000 },
+            ice_walker: { anim: 'shp_walker', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_shaper
+    // >>> rig boss_siren
+    boss_siren: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 39, px: 256, py: 420, par: null },
+            { n: 'conch', x: 131, y: 163, px: 255, py: 205, par: 'body' },
+            { n: 'handR', x: 376, y: 224, px: 390, py: 280, par: 'body' },
+        ],
+        mechanics: {
+            wail_beam: { anim: 'srn_wail', ms: () => 2200 },
+            frozen_cells: { anim: 'srn_frost', ms: () => 1800 },
+            undertow: { anim: 'srn_undertow', ms: () => 2200 },
+            sirens_reply: { anim: 'srn_reply', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_siren
+    // >>> rig boss_snail
+    boss_snail: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 3, y: 102, px: 200, py: 380, par: null },
+            { n: 'shell', x: 126, y: 107, px: 300, py: 350, par: 'body' },
+            { n: 'eyeL', x: 3, y: 160, px: 45, py: 225, par: 'body' },
+            { n: 'eyeR', x: 77, y: 156, px: 110, py: 225, par: 'body' },
+        ],
+        mechanics: {
+            doom_snail: { anim: 'snl_doom', ms: () => 2200 },
+            corrupt_cells: { anim: 'snl_corrupt', ms: () => 2000 },
+        },
+    },
+    // <<< rig boss_snail
+    // >>> rig boss_sprout
+    boss_sprout: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 75, y: 3, px: 256, py: 400, par: null },
+            { n: 'leaves', x: 106, y: 8, px: 256, py: 150, par: 'body' },
+        ],
+        mechanics: {
+            sproutlings: { anim: 'spr_sprouts', ms: () => 2000 },
+            prior_bomb: { anim: 'spr_bomb', ms: () => 1800 },
+        },
+    },
+    // <<< rig boss_sprout
+    // >>> rig boss_shrine
+    boss_shrine: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 41, px: 256, py: 430, par: null },
+            { n: 'head', x: 154, y: 45, px: 256, py: 245, par: 'body' },
+            { n: 'staff', x: 341, y: 156, px: 370, py: 275, par: 'body' },
+        ],
+        mechanics: {
+            knot_barriers: { anim: 'shr_knots', ms: () => 2000 },
+            fated_cell: { anim: 'shr_fate', ms: () => 1900 },
+            mirror_spirits: { anim: 'shr_mirror', ms: () => 2200 },
+            ofuda_ward: { anim: 'shr_ward', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_shrine
+    // >>> rig boss_stack
+    boss_stack: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 12, y: 4, px: 256, py: 480, par: null },
+            { n: 'head', x: 186, y: 8, px: 300, py: 215, par: 'body' },
+            { n: 'blockTL', x: 46, y: 24, px: 140, py: 140, par: 'body' },
+        ],
+        mechanics: {
+            block_fall: { anim: 'stk_fall', ms: () => 2000 },
+            fog_bank: { anim: 'stk_fog', ms: () => 2200 },
+            probability_shift: { anim: 'stk_shift', ms: () => 1800 },
+        },
+    },
+    // <<< rig boss_stack
+    // >>> rig boss_sirus
+    boss_sirus: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 67, px: 256, py: 420, par: null },
+            { n: 'staff', x: 7, y: 53, px: 128, py: 280, par: 'body' },
+            { n: 'storm', x: 348, y: 49, px: 410, py: 210, par: 'body' },
+            { n: 'handR', x: 370, y: 188, px: 380, py: 250, par: 'body' },
+        ],
+        mechanics: {
+            ion_current: { anim: 'sir_ion', ms: () => 2200 },
+            probability_shift: { anim: 'sir_shift', ms: () => 1600 },
+            chain_lightning: { anim: 'sir_chain', ms: () => 1800 },
+            storm_eye: { anim: 'sir_eye', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_sirus
+    // >>> rig boss_stormqueen
+    boss_stormqueen: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 95, px: 256, py: 420, par: null },
+            { n: 'crown', x: 131, y: 51, px: 256, py: 125, par: 'body' },
+            { n: 'bolt', x: 33, y: 72, px: 115, py: 250, par: 'body' },
+            { n: 'handR', x: 348, y: 138, px: 365, py: 200, par: 'body' },
+        ],
+        mechanics: {
+            queen_storms: { anim: 'sq_storms', ms: () => 2200 },
+            shrapnel_downpour: { anim: 'sq_shrapnel', ms: () => 1900 },
+            fated_cell: { anim: 'sq_fate', ms: () => 1900 },
+        },
+    },
+    // <<< rig boss_stormqueen
+    // >>> rig boss_swarm
+    boss_swarm: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 117, px: 256, py: 350, par: null },
+            { n: 'top', x: 176, y: 88, px: 256, py: 125, par: 'body' },
+            { n: 'ufoA', x: 74, y: 130, px: 100, py: 140, par: 'body' },
+            { n: 'ufoB', x: 4, y: 199, px: 30, py: 225, par: 'body' },
+            { n: 'ufoC', x: 417, y: 130, px: 445, py: 155, par: 'body' },
+            { n: 'ufoD', x: 442, y: 167, px: 470, py: 195, par: 'body' },
+        ],
+        mechanics: {
+            swarm_arc: { anim: 'swm_arc', ms: () => 2000 },
+            prior_bomb: { anim: 'swm_bomb', ms: () => 1800 },
+            mimic_queen: { anim: 'swm_mimic', ms: () => 2200 },
+            hive_eye: { anim: 'swm_eye', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_swarm
+    // >>> rig boss_tactician
+    boss_tactician: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 57, px: 256, py: 420, par: null },
+            { n: 'staff', x: 358, y: 57, px: 390, py: 245, par: 'body' },
+            { n: 'board', x: 15, y: 249, px: 120, py: 300, par: 'body' },
+        ],
+        mechanics: {
+            battle_intent: { anim: 'tac_intent', ms: () => 2000 },
+            fog_bank: { anim: 'tac_fog', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_tactician
+    // >>> rig boss_thwomp
+    boss_thwomp: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 73, px: 256, py: 400, par: null },
+        ],
+        mechanics: {
+            soul_tithe: { anim: 'thw_tithe', ms: () => 2200 },
+            corrupt_cells: { anim: 'thw_corrupt', ms: () => 1800 },
+        },
+    },
+    // <<< rig boss_thwomp
+    // >>> rig boss_striker
+    boss_striker: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 43, y: 1, px: 260, py: 400, par: null },
+            { n: 'ball', x: 52, y: 348, px: 138, py: 428, par: 'body' },
+            { n: 'legR', x: 298, y: 285, px: 320, py: 330, par: 'body' },
+        ],
+        mechanics: {
+            prior_bomb: { anim: 'str_kick', ms: () => 1800 },
+        },
+    },
+    // <<< rig boss_striker
+    // >>> rig boss_tron
+    boss_tron: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 100, px: 200, py: 380, par: null },
+            { n: 'head', x: 93, y: 100, px: 160, py: 225, par: 'body' },
+            { n: 'wave', x: 254, y: 126, px: 300, py: 300, par: 'body' },
+            { n: 'wheelF', x: 248, y: 272, px: 298, py: 322, par: 'body' },
+        ],
+        mechanics: {
+            light_cycle: { anim: 'trn_cycle', ms: () => 1900 },
+            corrupt_cells: { anim: 'trn_corrupt', ms: () => 2000 },
+        },
+    },
+    // <<< rig boss_tron
+    // >>> rig boss_velocity
+    boss_velocity: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 0, y: 111, px: 256, py: 400, par: null },
+            { n: 'head', x: 148, y: 113, px: 250, py: 240, par: 'body' },
+            { n: 'fistR', x: 323, y: 223, px: 335, py: 240, par: 'body' },
+            { n: 'fistL', x: 88, y: 238, px: 180, py: 270, par: 'body' },
+        ],
+        mechanics: {
+            speed_lanes: { anim: 'vel_lanes', ms: () => 2000 },
+            corrupt_cells: { anim: 'vel_corrupt', ms: () => 2000 },
+        },
+    },
+    // <<< rig boss_velocity
+    // >>> rig boss_vise
+    boss_vise: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 88, px: 256, py: 420, par: null },
+            { n: 'jaw', x: 176, y: 173, px: 256, py: 180, par: 'body' },
+            { n: 'armL', x: 4, y: 219, px: 85, py: 240, par: 'body' },
+            { n: 'armR', x: 358, y: 245, px: 375, py: 270, par: 'body' },
+        ],
+        mechanics: {
+            crushing_walls: { anim: 'vis_walls', ms: () => 2200 },
+            probability_shift: { anim: 'vis_shift', ms: () => 1600 },
+            bench_vise: { anim: 'vis_bench', ms: () => 1800 },
+            quench_or_shatter: { anim: 'vis_quench', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_vise
+    // >>> rig boss_voidborn
+    boss_voidborn: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 62, y: 3, px: 256, py: 420, par: null },
+            { n: 'horn', x: 278, y: 16, px: 300, py: 190, par: 'body' },
+            { n: 'tendrilL', x: 109, y: 158, px: 160, py: 270, par: 'body' },
+        ],
+        mechanics: {
+            void_choice: { anim: 'vdb_choice', ms: () => 2200 },
+            void_tendrils: { anim: 'vdb_tendrils', ms: () => 2000 },
+            prior_bomb: { anim: 'vdb_bomb', ms: () => 1800 },
+        },
+    },
+    // <<< rig boss_voidborn
+    // >>> rig boss_warden
+    boss_warden: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 36, px: 256, py: 400, par: null },
+            { n: 'lantern', x: 9, y: 53, px: 80, py: 270, par: 'body' },
+            { n: 'handR', x: 353, y: 243, px: 370, py: 295, par: 'body' },
+        ],
+        mechanics: {
+            pulse_totems: { anim: 'wrd_totems', ms: () => 2200 },
+            frozen_cells: { anim: 'wrd_frost', ms: () => 1800 },
+            arc_link: { anim: 'wrd_arc', ms: () => 2000 },
+        },
+    },
+    // <<< rig boss_warden
+    // >>> rig boss_warlord
+    boss_warlord: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 45, px: 256, py: 420, par: null },
+            { n: 'sword', x: 9, y: 47, px: 130, py: 200, par: 'body' },
+            { n: 'head', x: 268, y: 103, px: 312, py: 220, par: 'body' },
+        ],
+        mechanics: {
+            guard_call: { anim: 'wrl_guard', ms: () => 2200 },
+            triple_rings: { anim: 'wrl_rings', ms: () => 2200 },
+            soul_tithe: { anim: 'wrl_tithe', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_warlord
+    // >>> rig boss_weaver
+    boss_weaver: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 107, px: 256, py: 400, par: null },
+            { n: 'web', x: 6, y: 148, px: 140, py: 250, par: 'body' },
+            { n: 'head', x: 190, y: 82, px: 255, py: 150, par: 'body' },
+            { n: 'abdomen', x: 306, y: 139, px: 330, py: 250, par: 'body' },
+        ],
+        mechanics: {
+            thread_grid: { anim: 'wvr_grid', ms: () => 2200 },
+            prior_bomb: { anim: 'wvr_bomb', ms: () => 1800 },
+        },
+    },
+    // <<< rig boss_weaver
+    // >>> rig boss_wormhole
+    boss_wormhole: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 80, px: 256, py: 300, par: null },
+            { n: 'face', x: 158, y: 123, px: 256, py: 220, par: 'body' },
+        ],
+        mechanics: {
+            portal_wisp: { anim: 'wrm_wisp', ms: () => 2000 },
+            clue_scramble: { anim: 'wrm_scramble', ms: () => 1800 },
+        },
+    },
+    // <<< rig boss_wormhole
+    // >>> rig boss_zenith
+    boss_zenith: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 2, y: 71, px: 256, py: 420, par: null },
+            { n: 'crown', x: 168, y: 33, px: 256, py: 148, par: 'body' },
+            { n: 'staff', x: 20, y: 90, px: 145, py: 290, par: 'body' },
+            { n: 'vortex', x: 364, y: 99, px: 410, py: 230, par: 'body' },
+        ],
+        mechanics: {
+            royal_decree: { anim: 'zen_decree', ms: () => 2000 },
+            crown_rings: { anim: 'zen_rings', ms: () => 2200 },
+            soul_tithe: { anim: 'zen_tithe', ms: () => 2200 },
+        },
+    },
+    // <<< rig boss_zenith
     boss_guardian: {
         S: 0.382, ox: 1, oy: 115,
         parts: [
@@ -660,6 +1319,153 @@ const RIGS = {
 };
 
 const ease = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
+// Fades in over the first `a` of the animation and out over the last `b`.
+const envOf = (u, a, b) => ease(Math.min(u / a, 1, (1 - u) / b));
+
+// ---- shared cues (abilities many bosses share; drawn in 512px art space) --
+// A soft round glow in colour rgb ('r,g,b').
+function _cueGlow(ctx, x, y, r, rgb, a) {
+    if (a <= 0) return;
+    const g = ctx.createRadialGradient(x, y, 1, x, y, r);
+    g.addColorStop(0, 'rgba(' + rgb + ',' + a + ')'); g.addColorStop(1, 'rgba(' + rgb + ',0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+}
+
+// Prior Bomb: glow builds at `from`, then three fused bombs arc out to the
+// ground and tick there with a pulsing ring.
+function _cueBombs(ctx, u, from, rgb) {
+    const [fx, fy] = from;
+    if (u < 0.4) { _cueGlow(ctx, fx, fy, 20 + 45 * ease(u / 0.35), rgb, 0.9 * ease(u / 0.35)); return; }
+    const fade = 1 - ease((u - 0.85) / 0.15);
+    [[90, 480], [256, 505], [425, 475]].forEach(([tx, ty], i) => {
+        const k = ease(Math.min(1, Math.max(0, (u - 0.4 - i * 0.05) / 0.33)));
+        if (k <= 0) return;
+        const x = fx + (tx - fx) * k, y = fy + (ty - fy) * k - 200 * Math.sin(k * Math.PI);
+        ctx.fillStyle = 'rgba(35,30,40,' + fade + ')'; ctx.strokeStyle = 'rgba(' + rgb + ',' + fade + ')'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(x, y, 17, 0, 7); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = 'rgba(255,240,150,' + fade * (0.6 + 0.4 * Math.sin(u * 60 + i)) + ')';
+        ctx.beginPath(); ctx.arc(x + 10, y - 16, 6, 0, 7); ctx.fill();
+        if (k >= 1) {
+            ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.8 * fade) + ')'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.arc(x, y, 25 + 9 * Math.sin(u * 40), 0, 7); ctx.stroke();
+        }
+    });
+}
+
+// Corrupt Cells: a dark pulse at `from`, then four cracked, tainted cells
+// drift down and settle along the bottom.
+function _cueCorrupt(ctx, u, from, rgb) {
+    const env = envOf(u, 0.2, 0.2);
+    _cueGlow(ctx, from[0], from[1], 70, rgb, 0.6 * env);
+    for (let i = 0; i < 4; i++) {
+        const k = ease(Math.min(1, Math.max(0, (u - 0.25 - i * 0.07) / 0.35)));
+        if (k <= 0) continue;
+        const tx = 70 + i * 125, ty = 470 - (i % 2) * 25;
+        const x = from[0] + (tx - from[0]) * k, y = from[1] + (ty - from[1]) * k - 60 * Math.sin(k * Math.PI);
+        const a = env * Math.min(1, k * 3);
+        ctx.fillStyle = 'rgba(' + rgb + ',' + (0.45 * a) + ')'; ctx.strokeStyle = 'rgba(' + rgb + ',' + a + ')'; ctx.lineWidth = 3;
+        ctx.fillRect(x - 22, y - 22, 44, 44); ctx.strokeRect(x - 22, y - 22, 44, 44);
+        ctx.strokeStyle = 'rgba(20,10,25,' + a + ')'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(x - 14, y - 10); ctx.lineTo(x, y + 2); ctx.lineTo(x - 4, y + 14); ctx.moveTo(x, y + 2); ctx.lineTo(x + 14, y - 6); ctx.stroke();
+    }
+}
+
+// Probability Shift: three empty cells along the bottom; an X and a ? hop
+// between them on arcs.
+function _cueShift(ctx, u, rgb) {
+    const env = envOf(u, 0.25, 0.25);
+    const cells = [[130, 480], [380, 480], [255, 505]];
+    ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.6 * env) + ')'; ctx.lineWidth = 3;
+    cells.forEach(([x, y]) => ctx.strokeRect(x - 24, y - 24, 48, 48));
+    const k = ease((u - 0.25) / 0.55);
+    if (u <= 0.25 || u >= 0.85) return;
+    [[0, 1], [1, 2]].forEach(([a, b], i) => {
+        const kk = Math.min(1, Math.max(0, k * 1.1 - i * 0.1));
+        const [x1, y1] = cells[a], [x2, y2] = cells[b];
+        const x = x1 + (x2 - x1) * kk, y = y1 + (y2 - y1) * kk - 150 * Math.sin(kk * Math.PI);
+        ctx.fillStyle = 'rgba(' + rgb + ',' + (0.95 * env) + ')';
+        ctx.font = 'bold 42px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(i ? '?' : 'X', x, y);
+    });
+}
+
+// Fog Bank: grey banks roll in from both sides and thin out again.
+function _cueFog(ctx, u, rgb) {
+    const env = envOf(u, 0.3, 0.25);
+    for (let i = 0; i < 9; i++) {
+        const side = i % 2 ? 1 : -1;
+        const x = 256 + side * (420 - 300 * env) + side * ((i * 31) % 60) + 20 * Math.sin(u * 4 + i);
+        _cueGlow(ctx, x, 120 + (i * 47) % 360, 90 + (i * 23) % 50, rgb, 0.7 * env);
+    }
+}
+
+// Fated Cell: a cell at (x, y) is locked by a shrinking reticle and a rune.
+function _cueFate(ctx, u, x, y, rgb) {
+    const env = envOf(u, 0.2, 0.2), k = ease(u / 0.6);
+    const r = 120 - 80 * k;
+    ctx.strokeStyle = 'rgba(' + rgb + ',' + env + ')'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.stroke();
+    for (let i = 0; i < 4; i++) {
+        const a = i * Math.PI / 2 + u * 3;
+        ctx.beginPath(); ctx.moveTo(x + Math.cos(a) * (r - 14), y + Math.sin(a) * (r - 14)); ctx.lineTo(x + Math.cos(a) * (r + 14), y + Math.sin(a) * (r + 14)); ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(' + rgb + ',' + (0.3 * env * k) + ')'; ctx.fillRect(x - 26, y - 26, 52, 52);
+    ctx.strokeRect(x - 26, y - 26, 52, 52);
+    if (u > 0.6) _cueGlow(ctx, x, y, 60, rgb, 0.8 * env * Math.sin((u - 0.6) / 0.4 * Math.PI));
+}
+
+// Soul Tithe: wisps stream up from the ground into the point (x, y).
+function _cueTithe(ctx, u, x, y, rgb) {
+    const env = envOf(u, 0.2, 0.25);
+    _cueGlow(ctx, x, y, 75, rgb, 0.6 * env);
+    for (let i = 0; i < 7; i++) {
+        const k = (u * 1.6 + i / 7) % 1;
+        const sx = 60 + i * 65, sy = 490;
+        const px = sx + (x - sx) * ease(k) + Math.sin(k * 9 + i) * 14, py = sy + (y - sy) * ease(k);
+        const a = Math.sin(k * Math.PI) * env;
+        ctx.fillStyle = 'rgba(' + rgb + ',' + (0.85 * a) + ')';
+        ctx.beginPath(); ctx.ellipse(px, py, 7, 11, 0, 0, 7); ctx.fill();
+        ctx.fillStyle = 'rgba(' + rgb + ',' + (0.35 * a) + ')';
+        ctx.beginPath(); ctx.ellipse(px, py + 14, 4, 12, 0, 0, 7); ctx.fill();
+    }
+}
+
+// Frozen Cells: ice shards fly from `from` and freeze three cells.
+function _cueFrost(ctx, u, from) {
+    const env = envOf(u, 0.2, 0.2);
+    _cueGlow(ctx, from[0], from[1], 60, '170,225,255', 0.7 * env);
+    [[110, 470], [256, 500], [400, 470]].forEach(([tx, ty], i) => {
+        const k = ease(Math.min(1, Math.max(0, (u - 0.25 - i * 0.06) / 0.3)));
+        if (k <= 0) return;
+        const x = from[0] + (tx - from[0]) * k, y = from[1] + (ty - from[1]) * k;
+        if (k < 1) {
+            ctx.save(); ctx.translate(x, y); ctx.rotate(Math.atan2(ty - from[1], tx - from[0]));
+            ctx.fillStyle = 'rgba(220,245,255,' + env + ')';
+            ctx.beginPath(); ctx.moveTo(18, 0); ctx.lineTo(-14, -6); ctx.lineTo(-14, 6); ctx.closePath(); ctx.fill();
+            ctx.restore();
+        } else {
+            ctx.fillStyle = 'rgba(170,225,255,' + (0.5 * env) + ')'; ctx.strokeStyle = 'rgba(235,250,255,' + env + ')'; ctx.lineWidth = 3;
+            ctx.fillRect(tx - 24, ty - 24, 48, 48); ctx.strokeRect(tx - 24, ty - 24, 48, 48);
+            ctx.beginPath(); ctx.moveTo(tx - 14, ty); ctx.lineTo(tx + 14, ty); ctx.moveTo(tx, ty - 14); ctx.lineTo(tx, ty + 14); ctx.stroke();
+        }
+    });
+}
+
+// Clue Swap / Clue Scramble: two (or, scrambled, three) number tags above
+// the head trade places on arcs.
+function _cueClues(ctx, u, rgb, scramble) {
+    const env = envOf(u, 0.2, 0.25), k = ease((u - 0.2) / 0.55);
+    const slots = scramble ? [[120, 0], [256, -30], [392, 0]] : [[150, -10], [362, -10]];
+    const labels = scramble ? ['2', '5', '1'] : ['3', '7'];
+    slots.forEach(([x1, y1], i) => {
+        const [x2, y2] = slots[(i + 1) % slots.length];
+        const x = x1 + (x2 - x1) * k, y = y1 + (y2 - y1) * k - 60 * Math.sin(k * Math.PI) * (i % 2 ? -1 : 1);
+        ctx.fillStyle = 'rgba(250,245,230,' + env + ')'; ctx.strokeStyle = 'rgba(' + rgb + ',' + env + ')'; ctx.lineWidth = 4;
+        ctx.fillRect(x - 24, y - 30, 48, 60); ctx.strokeRect(x - 24, y - 30, 48, 60);
+        ctx.fillStyle = 'rgba(40,30,60,' + env + ')'; ctx.font = 'bold 36px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(labels[i], x, y + 2);
+    });
+}
 
 // ---- poses (pose objects: rot deg, dx/dy source-art px, sc scale, sx/sy squash)
 const POSES = {
@@ -4813,6 +5619,2453 @@ Object.assign(FX, {
 });
 // <<< poses boss_inferno
 
+// >>> poses boss_juggernaut
+// ---- The Juggernaut --------------------------------------------------------
+// Bull Barrage: the engine rears back, then lunges forward on its rails with
+//   steam blasting from the stack and speed lines. Thwomp Trio: both fists
+//   rise and pound down as three stone blocks drop from above. Prior Bomb:
+//   the right fist winds up and lobs fused bombs.
+Object.assign(POSES, {
+    jug_charge(P, u) {
+        const rear = ease(u / 0.35), lunge = ease((u - 0.35) / 0.12), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.body.dx = (-14 * rear * (1 - lunge) + 30 * lunge) * k;
+        P.body.rot = (-3 * rear * (1 - lunge) + 4 * lunge) * k;
+        P.head.rot = 5 * lunge * k;
+        P.fistL.rot = (12 * rear - 20 * lunge) * k;
+        P.fistR.rot = (-12 * rear + 20 * lunge) * k;
+    },
+    jug_thwomp(P, u) {
+        const lift = ease(u / 0.35), slam = ease((u - 0.35) / 0.08), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.fistL.rot = (30 * lift * (1 - slam) - 8 * slam) * k;
+        P.fistL.dy = (-26 * lift * (1 - slam) + 10 * slam) * k;
+        P.fistR.rot = (-30 * lift * (1 - slam) + 8 * slam) * k;
+        P.fistR.dy = (-26 * lift * (1 - slam) + 10 * slam) * k;
+        P.body.dy = (-6 * lift * (1 - slam) + 8 * slam) * k;
+        P.head.dy = 4 * slam * k;
+    },
+    jug_bomb(P, u) {
+        const wind = ease(u / 0.35), toss = ease((u - 0.35) / 0.1), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.fistR.rot = (18 * wind * (1 - toss) - 34 * toss) * k;
+        P.fistR.dy = (10 * wind * (1 - toss) - 18 * toss) * k;
+        P.body.rot = (2 * wind - 3 * toss) * k;
+        P.head.rot = -3 * toss * k;
+    },
+});
+Object.assign(FX, {
+    jug_charge(ctx, u) {
+        const lunge = ease((u - 0.35) / 0.12), fade = 1 - ease((u - 0.75) / 0.25);
+        // steam puffs from the stack
+        for (let i = 0; i < 6; i++) {
+            const k = (u * 2 + i / 6) % 1;
+            _cueGlow(ctx, 230 - k * 120, 70 - k * 90, 30 + k * 50, '150,240,240', 0.6 * (1 - k) * fade);
+        }
+        // speed lines behind the lunge
+        if (u > 0.35) {
+            ctx.strokeStyle = 'rgba(230,250,255,' + (0.8 * lunge * fade) + ')'; ctx.lineWidth = 5;
+            for (let i = 0; i < 6; i++) {
+                const y = 170 + i * 50, x = -40 - ((u * 900 + i * 70) % 160);
+                ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 120, y); ctx.stroke();
+            }
+        }
+        return u > 0.35 && u < 0.4 ? 0.12 : 0;
+    },
+    jug_thwomp(ctx, u) {
+        const fade = 1 - ease((u - 0.8) / 0.2);
+        // three blocks fall and land on the slam
+        [[90, 470], [256, 500], [420, 470]].forEach(([x, y], i) => {
+            const k = ease(Math.min(1, Math.max(0, (u - 0.15 - i * 0.05) / 0.25)));
+            if (k <= 0) return;
+            const by = -150 + (y + 150) * k;
+            ctx.fillStyle = 'rgba(110,110,120,' + fade + ')'; ctx.strokeStyle = 'rgba(30,30,40,' + fade + ')'; ctx.lineWidth = 4;
+            ctx.fillRect(x - 32, by - 32, 64, 64); ctx.strokeRect(x - 32, by - 32, 64, 64);
+            ctx.fillStyle = 'rgba(120,240,240,' + fade + ')';
+            ctx.fillRect(x - 16, by - 12, 8, 8); ctx.fillRect(x + 8, by - 12, 8, 8);
+            if (k >= 1) {
+                const d = Math.min(1, (u - 0.4 - i * 0.05) / 0.3);
+                ctx.strokeStyle = 'rgba(230,220,200,' + (0.7 * (1 - d) * fade) + ')'; ctx.lineWidth = 5;
+                ctx.beginPath(); ctx.ellipse(x, y + 32, 40 + 50 * d, 10 + 8 * d, 0, 0, 7); ctx.stroke();
+            }
+        });
+        return u > 0.35 && u < 0.4 ? 0.14 : 0;
+    },
+    jug_bomb(ctx, u) { _cueBombs(ctx, u, [440, 290], '120,240,240'); return 0; },
+});
+// <<< poses boss_juggernaut
+
+// >>> poses boss_kraken
+// ---- The Kraken ------------------------------------------------------------
+// Tentacle Sweep: the tentacles coil back and lash across, leaving a curved
+//   water slash over the board. Fog Bank: the kraken puffs up and squirts
+//   ink clouds that spread out to both sides.
+Object.assign(POSES, {
+    krk_sweep(P, u) {
+        const coil = ease(u / 0.35), lash = ease((u - 0.35) / 0.15), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        const s = 18 * coil * (1 - lash) - 26 * lash;
+        P.tentL.rot = s * k; P.tentUL.rot = 0.7 * s * k;
+        P.tentR.rot = -s * k; P.tentUR.rot = -0.7 * s * k;
+        P.head.rot = (-3 * coil + 5 * lash) * k;
+        P.body.dy = (4 * coil - 6 * lash) * k;
+    },
+    krk_ink(P, u) {
+        const env = envOf(u, 0.25, 0.25), w = Math.sin(u * Math.PI * 6);
+        P.head.sc = 1 + 0.06 * env;
+        P.head.dy = -6 * env;
+        P.tentL.rot = 8 * w * env; P.tentR.rot = -8 * w * env;
+        P.tentUL.rot = -6 * w * env; P.tentUR.rot = 6 * w * env;
+    },
+});
+Object.assign(FX, {
+    krk_sweep(ctx, u) {
+        if (u < 0.35) return 0;
+        const k = ease((u - 0.35) / 0.4), fade = 1 - ease((u - 0.75) / 0.25);
+        ctx.strokeStyle = 'rgba(150,230,220,' + (0.85 * fade) + ')'; ctx.lineWidth = 16 * fade + 2;
+        ctx.beginPath(); ctx.arc(256, 120, 360, Math.PI * (0.95 - 0.8 * k), Math.PI * 0.95); ctx.stroke();
+        ctx.strokeStyle = 'rgba(240,255,255,' + fade + ')'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.arc(256, 120, 360, Math.PI * (0.95 - 0.8 * k), Math.PI * 0.95); ctx.stroke();
+        for (let i = 0; i < 8; i++) {
+            const a = Math.PI * (0.95 - 0.8 * k * (i / 8));
+            _cueGlow(ctx, 256 + Math.cos(a) * 360, 120 + Math.sin(a) * 360, 16, '200,250,255', 0.8 * fade);
+        }
+        return 0;
+    },
+    krk_ink(ctx, u) {
+        _cueGlow(ctx, 256, 330, 50, '40,30,70', 0.8 * envOf(u, 0.2, 0.6));
+        _cueFog(ctx, u, '45,40,80');
+        return 0;
+    },
+});
+// <<< poses boss_kraken
+
+// >>> poses boss_leviathan
+// ---- The Leviathan ---------------------------------------------------------
+// Rising Tide: the whale lifts its tail and slaps down, the blowhole sprays
+//   and a band of water rises around it. Corrupt Cells: it bucks and spouts
+//   tainted cells from the blowhole.
+Object.assign(POSES, {
+    lev_tide(P, u) {
+        const lift = ease(u / 0.35), slap = ease((u - 0.35) / 0.1), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.tail.rot = (-22 * lift * (1 - slap) + 12 * slap) * k;
+        P.finF.rot = (-14 * lift + 10 * slap) * k;
+        P.body.rot = (2 * lift - 3 * slap) * k;
+        P.body.dy = (-8 * lift * (1 - slap) + 6 * slap) * k;
+    },
+    lev_corrupt(P, u) {
+        const env = envOf(u, 0.2, 0.25), w = Math.sin(u * Math.PI * 6);
+        P.body.rot = -3 * env * Math.abs(w);
+        P.body.dy = -5 * env * Math.abs(w);
+        P.tail.rot = 10 * w * env;
+        P.finF.rot = -8 * w * env;
+    },
+});
+Object.assign(FX, {
+    lev_tide(ctx, u) {
+        const fade = 1 - ease((u - 0.8) / 0.2);
+        // spout spray from the blowhole
+        if (u > 0.35) for (let i = 0; i < 8; i++) {
+            const k = Math.min(1, (u - 0.35) / 0.4);
+            const x = 172 + (i - 3.5) * 14 * k, y = 145 - 140 * Math.sin(k * Math.PI) * (0.6 + (i % 3) * 0.2);
+            _cueGlow(ctx, x, y, 14, '180,230,255', 0.9 * fade);
+        }
+        // the tide band rises around the body
+        if (u > 0.4) {
+            const top = 460 - 70 * ease((u - 0.4) / 0.35), wave = (x) => top + 9 * Math.sin(x / 35 + u * 16);
+            const g = ctx.createLinearGradient(0, top - 10, 0, top + 80);
+            g.addColorStop(0, 'rgba(80,170,230,' + (0.55 * fade) + ')'); g.addColorStop(1, 'rgba(40,110,200,0)');
+            ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(-30, top + 80);
+            for (let x = -30; x <= 542; x += 16) ctx.lineTo(x, wave(x));
+            ctx.lineTo(542, top + 80); ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = 'rgba(220,245,255,' + fade + ')'; ctx.lineWidth = 4; ctx.beginPath();
+            for (let x = -30; x <= 542; x += 16) x === -30 ? ctx.moveTo(x, wave(x)) : ctx.lineTo(x, wave(x));
+            ctx.stroke();
+        }
+        return u > 0.35 && u < 0.4 ? 0.12 : 0;
+    },
+    lev_corrupt(ctx, u) { _cueCorrupt(ctx, u, [172, 140], '240,160,90'); return 0; },
+});
+// <<< poses boss_leviathan
+
+// >>> poses boss_lodestone
+// ---- The Lodestone ---------------------------------------------------------
+// Polarity Field: the magnets raise, one glows red and one blue, field arcs
+//   pulse between them and then the colours flip. Probability Shift: the
+//   golem drags its magnets and marks hop between cells.
+Object.assign(POSES, {
+    lod_polarity(P, u) {
+        const env = envOf(u, 0.2, 0.2), w = Math.sin(u * Math.PI * 8);
+        P.magL.rot = (-20 + 4 * w) * env; P.magL.dy = -12 * env;
+        P.magR.rot = (20 - 4 * w) * env; P.magR.dy = -12 * env;
+        P.head.dy = -4 * env;
+        P.body.dy = 2 * Math.abs(w) * env;
+    },
+    lod_shift(P, u) {
+        const env = envOf(u, 0.25, 0.25), s = Math.sin(u * Math.PI * 2);
+        P.magL.dx = -10 * s * env; P.magR.dx = -10 * s * env;
+        P.magL.rot = 10 * s * env; P.magR.rot = 10 * s * env;
+        P.body.rot = -2 * s * env;
+        P.head.rot = -4 * s * env;
+    },
+});
+Object.assign(FX, {
+    lod_polarity(ctx, u) {
+        const env = envOf(u, 0.2, 0.2), flip = u > 0.55;
+        const red = '255,90,80', blue = '90,170,255';
+        _cueGlow(ctx, 120, 290, 70, flip ? blue : red, 0.75 * env);
+        _cueGlow(ctx, 410, 290, 70, flip ? red : blue, 0.75 * env);
+        // field arcs between the two poles, flowing
+        for (let i = 0; i < 4; i++) {
+            const h = 70 + i * 55;
+            ctx.strokeStyle = 'rgba(200,255,250,' + (0.6 * env) + ')'; ctx.lineWidth = 3;
+            ctx.setLineDash([12, 12]); ctx.lineDashOffset = (flip ? 1 : -1) * u * 300;
+            ctx.beginPath(); ctx.moveTo(120, 290); ctx.bezierCurveTo(150, 290 + (i % 2 ? h : -h), 380, 290 + (i % 2 ? h : -h), 410, 290); ctx.stroke();
+        }
+        ctx.setLineDash([]);
+        if (u > 0.53 && u < 0.6) _cueGlow(ctx, 265, 290, 200, '255,255,255', 0.5);
+        return 0;
+    },
+    lod_shift(ctx, u) { _cueShift(ctx, u, '120,235,220'); return 0; },
+});
+// <<< poses boss_lodestone
+
+// >>> poses boss_maelstrom
+// ---- The Maelstrom ---------------------------------------------------------
+// Vortex Nova: the funnel sways faster and faster, the chalkboard and books
+//   whirl, then a ring of wind bursts outward. Corrupt Cells: the funnel
+//   tilts and spits tainted cells out of its swirl.
+Object.assign(POSES, {
+    mae_nova(P, u) {
+        const spin = ease(u / 0.6), burst = ease((u - 0.6) / 0.1), rest = ease((u - 0.75) / 0.25);
+        const k = 1 - rest, w = Math.sin(u * u * 70);
+        P.funnel.rot = 6 * w * spin * (1 - burst) * k;
+        P.funnel.sc = 1 + 0.08 * burst * k;
+        P.body.rot = 3 * w * spin * (1 - burst) * k;
+        P.board.rot = 20 * w * spin * k; P.board.dy = -20 * spin * k;
+        P.books.rot = -20 * w * spin * k; P.books.dy = -20 * spin * k;
+    },
+    mae_corrupt(P, u) {
+        const env = envOf(u, 0.2, 0.25), w = Math.sin(u * Math.PI * 8);
+        P.funnel.rot = (-6 + 3 * w) * env;
+        P.body.rot = 2 * w * env;
+        P.board.rot = 8 * w * env;
+        P.books.rot = -8 * w * env;
+    },
+});
+Object.assign(FX, {
+    mae_nova(ctx, u) {
+        const spin = ease(u / 0.6), fade = 1 - ease((u - 0.8) / 0.2);
+        // wind streaks circling the funnel
+        ctx.strokeStyle = 'rgba(200,245,240,' + (0.6 * spin * fade) + ')'; ctx.lineWidth = 5;
+        for (let i = 0; i < 5; i++) {
+            const a = u * u * 40 + i * 1.3;
+            ctx.beginPath(); ctx.ellipse(290, 260, 190 + i * 12, 70 + i * 10, 0, a, a + 1); ctx.stroke();
+        }
+        // the nova ring
+        if (u > 0.6) {
+            const r = (u - 0.6) / 0.4;
+            ctx.strokeStyle = 'rgba(160,240,230,' + (1 - r) + ')'; ctx.lineWidth = 18 * (1 - r) + 3;
+            ctx.beginPath(); ctx.arc(290, 260, 60 + r * 420, 0, 7); ctx.stroke();
+        }
+        return u > 0.6 && u < 0.65 ? 0.15 : 0;
+    },
+    mae_corrupt(ctx, u) { _cueCorrupt(ctx, u, [290, 210], '90,210,190'); return 0; },
+});
+// <<< poses boss_maelstrom
+
+
+// >>> poses boss_marksman
+// ---- The Marksman ----------------------------------------------------------
+// Marked Strikes: he squints down the barrel, three crosshairs lock onto
+//   cells, then the rifle fires three times with recoil and muzzle flashes.
+// Probability Shift: he tips the rifle up and spins it, marks hop cells.
+Object.assign(POSES, {
+    mrk_strikes(P, u) {
+        const aim = ease(u / 0.3), rest = ease((u - 0.85) / 0.15);
+        let kick = 0;
+        for (let i = 0; i < 3; i++) { const t = (u - 0.4 - i * 0.14) / 0.1; if (t > 0 && t < 1) kick = Math.max(kick, 1 - t); }
+        P.rifle.rot = (-2 * aim - 8 * kick) * (1 - rest);
+        P.rifle.dx = -10 * kick;
+        P.head.rot = 3 * aim * (1 - rest) - 2 * kick;
+        P.body.dx = -4 * kick;
+    },
+    mrk_shift(P, u) {
+        const env = envOf(u, 0.25, 0.25);
+        P.rifle.rot = -28 * env;
+        P.rifle.dy = -6 * env;
+        P.head.rot = -4 * env;
+        P.body.dy = 2 * env;
+    },
+});
+Object.assign(FX, {
+    mrk_strikes(ctx, u) {
+        const fade = 1 - ease((u - 0.85) / 0.15);
+        [[120, 470], [300, 500], [440, 455]].forEach(([x, y], i) => {
+            const lock = ease((u - 0.1 - i * 0.08) / 0.2);
+            const r = 70 - 40 * lock, a = lock * fade;
+            ctx.strokeStyle = 'rgba(255,90,70,' + a + ')'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x - r - 10, y); ctx.lineTo(x + r + 10, y); ctx.moveTo(x, y - r - 10); ctx.lineTo(x, y + r + 10); ctx.stroke();
+            // the shot lands
+            const t = (u - 0.4 - i * 0.14) / 0.12;
+            if (t > 0 && t < 1) _cueGlow(ctx, x, y, 50, '255,220,140', 1 - t);
+        });
+        // muzzle flashes
+        for (let i = 0; i < 3; i++) {
+            const t = (u - 0.4 - i * 0.14) / 0.08;
+            if (t > 0 && t < 1) { _cueGlow(ctx, 505, 222, 55, '255,230,150', 1 - t); _cueGlow(ctx, 505, 222, 20, '255,255,255', 1 - t); }
+        }
+        return 0;
+    },
+    mrk_shift(ctx, u) { _cueShift(ctx, u, '255,200,120'); return 0; },
+});
+// <<< poses boss_marksman
+
+
+// >>> poses boss_medusa
+// ---- The Medusa ------------------------------------------------------------
+// Stone Gaze: the snakes rear back, the eyes flare green and twin beams
+//   sweep forward turning the ground to stone. Snake Strikes: the snake
+//   heads lunge out one after another with hiss marks. Petrify Waves: grey
+//   rings ripple out from her gaze. Coil Cage: the snakes writhe and a ring
+//   of coils closes around the board.
+const MED_L = ['snL1', 'snL2', 'snL3', 'snL4'], MED_R = ['snR1', 'snR2', 'snR3', 'snR4'];
+// Pose helper: every snake head gets an angle from f(index, side).
+function _medSnakes(P, f) {
+    MED_L.forEach((n, i) => { P[n].rot = f(i, -1); });
+    MED_R.forEach((n, i) => { P[n].rot = f(i, 1); });
+}
+Object.assign(POSES, {
+    med_gaze(P, u) {
+        const env = envOf(u, 0.25, 0.25);
+        _medSnakes(P, (i, s) => -s * 12 * env + 4 * Math.sin(u * 20 + i) * env);
+        P.body.dy = -3 * env;
+    },
+    med_strikes(P, u) {
+        _medSnakes(P, (i, s) => {
+            const t = (u - 0.1 - (i * 2 + (s > 0 ? 1 : 0)) * 0.08) / 0.18;
+            if (t <= 0 || t >= 1) return 0;
+            return s * (t < 0.4 ? -14 * ease(t / 0.4) : 24 * Math.sin((t - 0.4) / 0.6 * Math.PI));
+        });
+        MED_L.concat(MED_R).forEach((n, j) => {
+            const s = j < 4 ? -1 : 1, i = j % 4;
+            const t = (u - 0.1 - (i * 2 + (s > 0 ? 1 : 0)) * 0.08) / 0.18;
+            P[n].dx = t > 0.4 && t < 1 ? s * 18 * Math.sin((t - 0.4) / 0.6 * Math.PI) : 0;
+        });
+    },
+    med_petrify(P, u) {
+        const env = envOf(u, 0.2, 0.25), w = Math.sin(u * Math.PI * 4);
+        _medSnakes(P, (i, s) => s * 8 * w * env);
+        P.body.sc = 1 + 0.02 * env;
+    },
+    med_cage(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        _medSnakes(P, (i, s) => 14 * Math.sin(u * Math.PI * 6 + i + (s > 0 ? 1.5 : 0)) * env);
+        P.body.dy = -4 * env;
+    },
+});
+Object.assign(FX, {
+    med_gaze(ctx, u) {
+        const flare = ease((u - 0.2) / 0.2), fade = 1 - ease((u - 0.8) / 0.2);
+        _cueGlow(ctx, 258, 215, 40, '200,255,120', flare * fade);
+        _cueGlow(ctx, 325, 215, 40, '200,255,120', flare * fade);
+        if (u > 0.4) {
+            const k = ease((u - 0.4) / 0.4);
+            [258, 325].forEach((x) => {
+                const g = ctx.createLinearGradient(x, 215, x + (x - 290) * 2, 520);
+                g.addColorStop(0, 'rgba(210,255,140,' + (0.9 * fade) + ')'); g.addColorStop(1, 'rgba(160,220,100,0)');
+                ctx.strokeStyle = g; ctx.lineWidth = 14;
+                ctx.beginPath(); ctx.moveTo(x, 215); ctx.lineTo(x + (x - 290) * 2 * k, 215 + 300 * k); ctx.stroke();
+            });
+            // stone creeping over the ground
+            ctx.fillStyle = 'rgba(150,150,150,' + (0.5 * k * fade) + ')';
+            ctx.beginPath(); ctx.ellipse(290, 515, 220 * k, 22 * k, 0, 0, 7); ctx.fill();
+        }
+        return 0;
+    },
+    med_strikes(ctx, u) {
+        // a hiss streak in front of each snake as it lunges
+        const heads = [[95, 75, -1], [72, 140, -1], [62, 200, -1], [92, 258, -1], [448, 66, 1], [453, 160, 1], [448, 236, 1], [428, 288, 1]];
+        heads.forEach(([x, y, s], j) => {
+            const i = j % 4;
+            const t = (u - 0.1 - (i * 2 + (s > 0 ? 1 : 0)) * 0.08) / 0.18;
+            if (t < 0.4 || t > 1) return;
+            const a = Math.sin((t - 0.4) / 0.6 * Math.PI);
+            ctx.strokeStyle = 'rgba(200,255,150,' + a + ')'; ctx.lineWidth = 4;
+            for (let k = 0; k < 3; k++) {
+                ctx.beginPath(); ctx.moveTo(x + s * 10, y - 10 + k * 10); ctx.lineTo(x + s * (40 + 20 * a), y - 14 + k * 14); ctx.stroke();
+            }
+        });
+        return 0;
+    },
+    med_petrify(ctx, u) {
+        _cueGlow(ctx, 290, 215, 60, '210,255,140', 0.8 * envOf(u, 0.15, 0.3));
+        for (let i = 0; i < 3; i++) {
+            const r = (u * 1.4 - i * 0.22);
+            if (r <= 0 || r > 1) continue;
+            ctx.strokeStyle = 'rgba(170,170,165,' + (0.85 * (1 - r)) + ')'; ctx.lineWidth = 16 * (1 - r) + 3;
+            ctx.beginPath(); ctx.arc(290, 215, 40 + r * 420, 0, 7); ctx.stroke();
+        }
+        return 0;
+    },
+    med_cage(ctx, u) {
+        const env = envOf(u, 0.2, 0.25), k = ease(u / 0.6);
+        const r = 330 - 90 * k;
+        // a ring of scaly coils tightening around the centre
+        ctx.strokeStyle = 'rgba(60,120,70,' + (0.9 * env) + ')'; ctx.lineWidth = 26;
+        ctx.beginPath(); ctx.ellipse(256, 300, r, r * 0.75, 0, 0, 7); ctx.stroke();
+        ctx.strokeStyle = 'rgba(220,230,140,' + (0.9 * env) + ')'; ctx.lineWidth = 4;
+        ctx.setLineDash([22, 18]); ctx.lineDashOffset = u * 300;
+        ctx.beginPath(); ctx.ellipse(256, 300, r, r * 0.75, 0, 0, 7); ctx.stroke();
+        ctx.setLineDash([]);
+        return 0;
+    },
+});
+// <<< poses boss_medusa
+
+// >>> poses boss_minotaur
+// ---- The Minotaur ----------------------------------------------------------
+// Labyrinth Walls: the bull rears and pounds both fists, stone walls burst
+//   up from the floor. Prior Bomb: a fist lobs fused bombs. Hooftread
+//   Terrain: it stamps, cracks race out across the ground with dust.
+// Thread of Ariadne: a glowing golden thread unspools along a winding path.
+Object.assign(POSES, {
+    min_walls(P, u) {
+        const lift = ease(u / 0.35), slam = ease((u - 0.35) / 0.08), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.fistL.rot = (26 * lift * (1 - slam) - 8 * slam) * k; P.fistL.dy = (-24 * lift * (1 - slam) + 8 * slam) * k;
+        P.fistR.rot = (-26 * lift * (1 - slam) + 8 * slam) * k; P.fistR.dy = (-24 * lift * (1 - slam) + 8 * slam) * k;
+        P.body.dy = (-8 * lift * (1 - slam) + 8 * slam) * k;
+        P.body.rot = (-2 * lift + 2 * slam) * k;
+        P.shield.rot = 4 * slam * k;
+    },
+    min_bomb(P, u) {
+        const wind = ease(u / 0.35), toss = ease((u - 0.35) / 0.1), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.fistL.rot = (20 * wind * (1 - toss) - 30 * toss) * k;
+        P.fistL.dy = (8 * wind * (1 - toss) - 16 * toss) * k;
+        P.body.rot = (-2 * wind + 3 * toss) * k;
+    },
+    min_hoof(P, u) {
+        let stamp = 0;
+        for (let i = 0; i < 2; i++) { const t = (u - 0.2 - i * 0.25) / 0.15; if (t > 0 && t < 1) stamp = Math.max(stamp, Math.sin(t * Math.PI)); }
+        P.body.dy = -10 * stamp;
+        P.body.rot = 2 * stamp;
+        P.fistL.rot = 8 * stamp; P.fistR.rot = -8 * stamp;
+    },
+    min_thread(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.fistR.rot = -16 * env; P.fistR.dy = -10 * env;
+        P.body.rot = 1.5 * env;
+        P.shield.rot = -3 * env;
+    },
+});
+Object.assign(FX, {
+    min_walls(ctx, u) {
+        if (u < 0.38) { _cueGlow(ctx, 100, 360, 30, '255,200,170', 0.4 * ease(u / 0.38)); return 0; }
+        const fade = 1 - ease((u - 0.82) / 0.18);
+        [[60, 120], [200, 80], [330, 120], [460, 90]].forEach(([x, h], i) => {
+            const k = ease((u - 0.38 - i * 0.04) / 0.15);
+            const top = 500 - h * k;
+            ctx.fillStyle = 'rgba(140,120,100,' + fade + ')'; ctx.strokeStyle = 'rgba(50,35,25,' + fade + ')'; ctx.lineWidth = 4;
+            ctx.fillRect(x - 40, top, 80, 500 - top); ctx.strokeRect(x - 40, top, 80, 500 - top);
+            ctx.beginPath(); ctx.moveTo(x - 40, top + 30); ctx.lineTo(x + 40, top + 30); ctx.moveTo(x, top); ctx.lineTo(x, top + 30); ctx.stroke();
+            for (let j = 0; j < 3; j++) _cueGlow(ctx, x - 30 + j * 30, 500 - 20 * k, 14, '200,180,150', 0.5 * (1 - k) * fade);
+        });
+        return u > 0.35 && u < 0.4 ? 0.14 : 0;
+    },
+    min_bomb(ctx, u) { _cueBombs(ctx, u, [55, 300], '255,120,90'); return 0; },
+    min_hoof(ctx, u) {
+        const fade = 1 - ease((u - 0.8) / 0.2);
+        for (let i = 0; i < 2; i++) {
+            const t = (u - 0.27 - i * 0.25) / 0.4;
+            if (t <= 0) continue;
+            const k = ease(Math.min(1, t)), x0 = i ? 360 : 150;
+            ctx.strokeStyle = 'rgba(60,30,20,' + fade + ')'; ctx.lineWidth = 5;
+            [-1, 1].forEach((s) => {
+                ctx.beginPath(); ctx.moveTo(x0, 495);
+                for (let j = 1; j <= 5; j++) ctx.lineTo(x0 + s * j * 40 * k, 495 + ((j % 2) ? 10 : -6));
+                ctx.stroke();
+            });
+            for (let j = 0; j < 4; j++) _cueGlow(ctx, x0 + (j - 1.5) * 40 * k, 480 - 30 * k, 26, '220,200,170', 0.5 * (1 - k) * fade);
+        }
+        return 0;
+    },
+    min_thread(ctx, u) {
+        const env = envOf(u, 0.2, 0.25), k = ease((u - 0.15) / 0.6);
+        const pt = (t) => [460 - 440 * t, 300 + 160 * Math.sin(t * Math.PI * 2.5)];
+        ctx.strokeStyle = 'rgba(255,220,110,' + env + ')'; ctx.lineWidth = 5;
+        ctx.shadowColor = 'rgba(255,210,90,0.9)'; ctx.shadowBlur = 12;
+        ctx.beginPath();
+        for (let i = 0; i <= 40; i++) { const [x, y] = pt(k * i / 40); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        const [hx, hy] = pt(k);
+        _cueGlow(ctx, hx, hy, 24, '255,240,170', env);
+        return 0;
+    },
+});
+// <<< poses boss_minotaur
+
+// >>> poses boss_maven
+// ---- The Mnemonic ----------------------------------------------------------
+// Memory Rite: the open hand sweeps, the staff dice glow, and remembered
+//   cell patterns flash up as glowing tiles and fade one by one. Clue Swap:
+//   the staff taps and two clue numbers trade places overhead.
+Object.assign(POSES, {
+    mav_rite(P, u) {
+        const env = envOf(u, 0.2, 0.25), w = Math.sin(u * Math.PI * 3);
+        P.handL.rot = 16 * w * env; P.handL.dy = -8 * env;
+        P.staff.rot = -6 * env; P.staff.dy = -8 * env;
+        P.head.rot = -3 * w * env;
+        P.body.dy = -2 * env;
+    },
+    mav_swap(P, u) {
+        const tap = Math.sin(Math.min(1, u / 0.3) * Math.PI), env = envOf(u, 0.2, 0.25);
+        P.staff.dy = 10 * tap; P.staff.rot = 4 * tap;
+        P.handL.rot = -10 * env;
+        P.head.rot = 4 * env;
+    },
+});
+Object.assign(FX, {
+    mav_rite(ctx, u) {
+        const env = envOf(u, 0.2, 0.25);
+        _cueGlow(ctx, 470, 130, 70, '255,210,120', 0.6 * env);
+        // a 3x3 pattern lights up, then fades tile by tile
+        const lit = [0, 2, 4, 5, 7];
+        for (let i = 0; i < 9; i++) {
+            const x = 160 + (i % 3) * 60, y = -40 + Math.floor(i / 3) * 60;
+            const on = lit.includes(i);
+            const a = env * (on ? 1 - ease((u - 0.55 - lit.indexOf(i) * 0.06) / 0.1) : 0.35);
+            ctx.fillStyle = on ? 'rgba(255,220,130,' + (0.7 * a) + ')' : 'rgba(150,190,200,' + (0.3 * a) + ')';
+            ctx.strokeStyle = 'rgba(255,240,200,' + (0.8 * env) + ')'; ctx.lineWidth = 2;
+            ctx.fillRect(x - 25, y - 25, 50, 50); ctx.strokeRect(x - 25, y - 25, 50, 50);
+        }
+        return 0;
+    },
+    mav_swap(ctx, u) { _cueClues(ctx, u, '200,150,80', false); return 0; },
+});
+// <<< poses boss_maven
+
+
+// >>> poses boss_needle
+// ---- The Needle ------------------------------------------------------------
+// Needle Gates: the staff slams and rows of needles spring up as gates.
+// Pin Drops: the quills on its back shiver and pins rain down point-first.
+// Stitch Wave: a stitched seam zig-zags across the board. Pincushion Burst:
+//   it hunches, then needles burst out in every direction.
+Object.assign(POSES, {
+    ndl_gates(P, u) {
+        const lift = ease(u / 0.3), slam = ease((u - 0.3) / 0.08), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.staff.rot = (14 * lift * (1 - slam) - 4 * slam) * k;
+        P.staff.dy = (-18 * lift * (1 - slam) + 6 * slam) * k;
+        P.body.dy = 4 * slam * k;
+        P.clip.rot = -6 * lift * k;
+    },
+    ndl_pins(P, u) {
+        const env = envOf(u, 0.15, 0.25), j = Math.sin(u * 70) * env;
+        P.quills.rot = 4 * j; P.quills.dy = -4 * env;
+        P.body.dx = 1.5 * j;
+        P.staff.rot = -6 * env;
+    },
+    ndl_stitch(P, u) {
+        const env = envOf(u, 0.2, 0.25), w = Math.sin(u * Math.PI * 8);
+        P.clip.rot = 10 * w * env; P.clip.dy = -6 * env;
+        P.staff.rot = -5 * w * env;
+        P.body.rot = 1.5 * w * env;
+    },
+    ndl_burst(P, u) {
+        const hunch = ease(u / 0.4), burst = ease((u - 0.4) / 0.08), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.body.sc = 1 - 0.05 * hunch * (1 - burst) + 0.05 * burst * k;
+        P.body.dy = 8 * hunch * (1 - burst) * k;
+        P.quills.sc = 1 + 0.12 * burst * k;
+        P.quills.rot = 6 * burst * k;
+        P.staff.rot = 10 * burst * k; P.clip.rot = -10 * burst * k;
+    },
+});
+// One sewing needle with its point at (x, y), pointing in angle a (radians).
+function _ndlDraw(ctx, x, y, a, len, alpha) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(a);
+    ctx.strokeStyle = 'rgba(220,225,230,' + alpha + ')'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-len, 0); ctx.stroke();
+    ctx.fillStyle = 'rgba(200,60,60,' + alpha + ')'; ctx.beginPath(); ctx.arc(-len, 0, 7, 0, 7); ctx.fill();
+    ctx.restore();
+}
+Object.assign(FX, {
+    ndl_gates(ctx, u) {
+        if (u < 0.32) return 0;
+        const fade = 1 - ease((u - 0.82) / 0.18);
+        for (let g = 0; g < 2; g++) {
+            for (let i = 0; i < 7; i++) {
+                const k = ease((u - 0.32 - g * 0.1 - i * 0.02) / 0.12);
+                if (k <= 0) continue;
+                _ndlDraw(ctx, 40 + i * 72, 470 - g * 70 - 60 * k, Math.PI / 2, 60 * k, fade);
+            }
+        }
+        return u > 0.3 && u < 0.34 ? 0.1 : 0;
+    },
+    ndl_pins(ctx, u) {
+        const fade = 1 - ease((u - 0.85) / 0.15);
+        for (let i = 0; i < 10; i++) {
+            const t = ease((u - 0.15 - i * 0.05) / 0.25);
+            if (t <= 0) continue;
+            const x = 30 + (i * 83) % 460, y = -60 + 540 * t;
+            _ndlDraw(ctx, x, y, Math.PI / 2, 45, fade);
+            if (t >= 1) _cueGlow(ctx, x, 480, 20, '255,220,200', 0.6 * fade);
+        }
+        return 0;
+    },
+    ndl_stitch(ctx, u) {
+        const env = envOf(u, 0.2, 0.25), k = ease((u - 0.15) / 0.6);
+        ctx.strokeStyle = 'rgba(220,70,70,' + env + ')'; ctx.lineWidth = 5;
+        ctx.beginPath();
+        const n = Math.floor(14 * k);
+        for (let i = 0; i <= n; i++) { const x = 10 + i * 36, y = 440 + (i % 2 ? -26 : 26); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(255,230,200,' + (0.6 * env) + ')'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(10, 440); ctx.lineTo(10 + 36 * 14 * k, 440); ctx.stroke();
+        _ndlDraw(ctx, 10 + n * 36 + 10, 440 + (n % 2 ? -26 : 26), 0, 50, env);
+        return 0;
+    },
+    ndl_burst(ctx, u) {
+        if (u < 0.4) return 0;
+        const k = ease((u - 0.4) / 0.4), fade = 1 - ease((u - 0.8) / 0.2);
+        for (let i = 0; i < 14; i++) {
+            const a = i * Math.PI * 2 / 14 + 0.2, r = 60 + 300 * k;
+            _ndlDraw(ctx, 256 + Math.cos(a) * r, 260 + Math.sin(a) * r, a, 45, fade);
+        }
+        return u > 0.4 && u < 0.45 ? 0.14 : 0;
+    },
+});
+// <<< poses boss_needle
+
+// >>> poses boss_maze
+// ---- The Maze --------------------------------------------------------------
+// Ghost Gang: the bull in the centre bellows and four little ghosts drift
+//   out of the maze. Dot Walls: rows of dots light up and fuse into walls.
+// Maze Walls: the whole maze turns like a combination lock and slabs slam
+//   down. Lights Out: darkness closes in until only the eyes and the bull glow.
+Object.assign(POSES, {
+    maz_ghosts(P, u) {
+        const env = envOf(u, 0.2, 0.25), w = Math.sin(u * Math.PI * 6);
+        P.bull.sc = 1 + 0.12 * env * Math.abs(w);
+        P.maze.rot = 6 * Math.sin(u * Math.PI * 2) * env;
+        P.body.dy = -4 * env;
+        ['diceA', 'diceB', 'diceC', 'diceD'].forEach((n, i) => { P[n].dy = -8 * Math.sin(u * 10 + i) * env; });
+    },
+    maz_dots(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.maze.rot = -8 * env;
+        P.bull.sc = 1 + 0.06 * env;
+        P.body.sc = 1 + 0.02 * env;
+    },
+    maz_walls(P, u) {
+        // the maze turns in three clicks like a combination lock
+        let r = 0;
+        for (let i = 0; i < 3; i++) r += 40 * ease((u - 0.1 - i * 0.22) / 0.12) * (i % 2 ? -1 : 1);
+        P.maze.rot = r * (1 - ease((u - 0.8) / 0.2));
+        P.bull.rot = -r * 0.5 * (1 - ease((u - 0.8) / 0.2));
+        P.body.dy = 3 * Math.abs(Math.sin(u * Math.PI * 6));
+    },
+    maz_dark(P, u) {
+        const env = envOf(u, 0.25, 0.25);
+        P.body.sc = 1 + 0.03 * env;
+        P.bull.sc = 1 + 0.1 * env;
+        ['diceA', 'diceB', 'diceC', 'diceD'].forEach((n, i) => { P[n].sc = 1 - 0.3 * env; P[n].dy = 10 * env * (i % 2 ? 1 : -1); });
+    },
+});
+Object.assign(FX, {
+    maz_ghosts(ctx, u) {
+        const fade = 1 - ease((u - 0.8) / 0.2);
+        [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sy], i) => {
+            const k = ease((u - 0.15 - i * 0.06) / 0.5);
+            if (k <= 0) return;
+            const x = 256 + sx * 200 * k + 10 * Math.sin(u * 12 + i), y = 262 + sy * 150 * k;
+            const col = ['255,120,120', '120,200,255', '255,180,240', '255,200,100'][i];
+            ctx.globalAlpha = fade * Math.min(1, k * 3);
+            ctx.fillStyle = 'rgba(' + col + ',0.9)';
+            ctx.beginPath(); ctx.arc(x, y - 6, 22, Math.PI, 0); ctx.lineTo(x + 22, y + 20);
+            for (let j = 0; j < 4; j++) ctx.lineTo(x + 22 - (j + 0.5) * 11, y + (j % 2 ? 20 : 10));
+            ctx.lineTo(x - 22, y + 20); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x - 8, y - 6, 6, 0, 7); ctx.arc(x + 8, y - 6, 6, 0, 7); ctx.fill();
+            ctx.fillStyle = '#226'; ctx.beginPath(); ctx.arc(x - 7 + 3 * sx, y - 6, 3, 0, 7); ctx.arc(x + 9 + 3 * sx, y - 6, 3, 0, 7); ctx.fill();
+            ctx.globalAlpha = 1;
+        });
+        _cueGlow(ctx, 255, 250, 60, '210,255,140', 0.5 * envOf(u, 0.2, 0.25));
+        return 0;
+    },
+    maz_dots(ctx, u) {
+        const fade = 1 - ease((u - 0.8) / 0.2);
+        [430, 500].forEach((y, row) => {
+            for (let i = 0; i < 9; i++) {
+                const on = ease((u - 0.1 - row * 0.1 - i * 0.03) / 0.1);
+                if (on <= 0) continue;
+                const x = 20 + i * 59;
+                _cueGlow(ctx, x, y, 16, '230,255,150', 0.9 * on * fade);
+            }
+            const fuse = ease((u - 0.5 - row * 0.08) / 0.15);
+            if (fuse > 0) {
+                ctx.fillStyle = 'rgba(120,200,160,' + (0.8 * fuse * fade) + ')'; ctx.strokeStyle = 'rgba(230,255,150,' + fuse * fade + ')'; ctx.lineWidth = 3;
+                ctx.fillRect(20, y - 8, 472 * fuse, 16); ctx.strokeRect(20, y - 8, 472 * fuse, 16);
+            }
+        });
+        return 0;
+    },
+    maz_walls(ctx, u) {
+        const fade = 1 - ease((u - 0.8) / 0.2);
+        for (let i = 0; i < 3; i++) {
+            const t = (u - 0.22 - i * 0.22) / 0.08;
+            if (t <= 0) continue;
+            const k = ease(Math.min(1, t));
+            const x = 90 + i * 165, y = -100 + 560 * k;
+            ctx.fillStyle = 'rgba(80,130,115,' + fade + ')'; ctx.strokeStyle = 'rgba(20,40,35,' + fade + ')'; ctx.lineWidth = 4;
+            ctx.fillRect(x - 60, y - 14, 120, 28); ctx.strokeRect(x - 60, y - 14, 120, 28);
+            if (t > 1) {
+                const d = Math.min(1, (t - 1) / 2);
+                ctx.strokeStyle = 'rgba(220,255,200,' + (0.6 * (1 - d) * fade) + ')'; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.ellipse(x, y + 14, 70 + 40 * d, 10 + 6 * d, 0, 0, 7); ctx.stroke();
+            }
+        }
+        return 0;
+    },
+    maz_dark(ctx, u) {
+        const env = envOf(u, 0.25, 0.25);
+        // a dark veil closes in from the edges
+        const g = ctx.createRadialGradient(256, 256, 30, 256, 256, 360);
+        g.addColorStop(0, 'rgba(5,10,15,' + (0.55 * env) + ')'); g.addColorStop(0.6, 'rgba(5,10,15,' + (0.85 * env) + ')'); g.addColorStop(1, 'rgba(5,10,15,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(256, 256, 360, 0, 7); ctx.fill();
+        _cueGlow(ctx, 232, 137, 40, '230,255,120', env);
+        _cueGlow(ctx, 298, 137, 40, '230,255,120', env);
+        _cueGlow(ctx, 255, 250, 50, '200,255,150', 0.6 * env);
+        return 0;
+    },
+});
+// <<< poses boss_maze
+
+// >>> poses boss_monsoon
+// ---- The Monsoon -----------------------------------------------------------
+// Rain Bands: the arms open, the clouds swell and slanted rain falls in
+//   bands. Thunderbolts: the clouds crackle and bolts strike the ground.
+// Storm Surge: the arms sweep and a wave rolls across. Hail Barrage: the
+//   clouds shudder and hailstones pelt down and bounce.
+Object.assign(POSES, {
+    mon_rain(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.armL.rot = 14 * env; P.armL.dy = -8 * env;
+        P.armR.rot = -14 * env; P.armR.dy = -8 * env;
+        P.cloudL.sc = P.cloudR.sc = 1 + 0.08 * env;
+        P.cloudL.dy = P.cloudR.dy = -6 * env;
+    },
+    mon_bolts(P, u) {
+        const env = envOf(u, 0.15, 0.25), j = Math.sin(u * 80) * env;
+        P.cloudL.dx = 2 * j; P.cloudR.dx = -2 * j;
+        P.cloudL.sc = P.cloudR.sc = 1 + 0.05 * env;
+        P.armR.rot = -20 * env; P.armR.dy = -12 * env;
+        P.body.dy = -2 * env;
+    },
+    mon_surge(P, u) {
+        const wind = ease(u / 0.35), sweep = ease((u - 0.35) / 0.15), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.armL.rot = (-12 * wind * (1 - sweep) + 24 * sweep) * k;
+        P.armR.rot = (-10 * wind + 18 * sweep) * k;
+        P.body.rot = (-2 * wind + 3 * sweep) * k;
+    },
+    mon_hail(P, u) {
+        const env = envOf(u, 0.15, 0.25), w = Math.sin(u * 50) * env;
+        P.cloudL.rot = 4 * w; P.cloudR.rot = -4 * w;
+        P.cloudL.dy = P.cloudR.dy = -4 * env;
+        P.armL.rot = 6 * env; P.armR.rot = -6 * env;
+    },
+});
+Object.assign(FX, {
+    mon_rain(ctx, u) {
+        const env = envOf(u, 0.2, 0.25);
+        ctx.strokeStyle = 'rgba(160,220,255,' + (0.7 * env) + ')'; ctx.lineWidth = 3;
+        for (let b = 0; b < 3; b++) {
+            const bx = 30 + b * 180;
+            for (let i = 0; i < 9; i++) {
+                const y = ((u * 900 + i * 61 + b * 37) % 520) - 20, x = bx + (i * 17) % 80 - y * 0.2;
+                ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 8, y + 30); ctx.stroke();
+            }
+        }
+        return 0;
+    },
+    mon_bolts(ctx, u) {
+        const fade = 1 - ease((u - 0.85) / 0.15);
+        [[110, 160, 0.25], [395, 160, 0.38], [250, 90, 0.5], [160, 150, 0.6], [360, 150, 0.68]].forEach(([x0, y0, t0], i) => {
+            const t = (u - t0) / 0.2;
+            if (t <= 0 || t > 1) return;
+            const a = (1 - t) * fade;
+            let x = x0, y = y0;
+            ctx.strokeStyle = 'rgba(255,250,200,' + a + ')'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(x, y);
+            for (let s = 0; s < 6; s++) { x += ((i * 37 + s * 53) % 60) - 30; y += (500 - y0) / 6; ctx.lineTo(x, y); }
+            ctx.stroke();
+            _cueGlow(ctx, x, y, 60, '255,250,200', a);
+        });
+        return u > 0.3 && u < 0.33 ? 0.2 : 0;
+    },
+    mon_surge(ctx, u) {
+        if (u < 0.35) return 0;
+        const k = ease((u - 0.35) / 0.5), fade = 1 - ease((u - 0.85) / 0.15);
+        const x = -150 + k * 800;
+        const g = ctx.createLinearGradient(x - 160, 0, x, 0);
+        g.addColorStop(0, 'rgba(60,140,210,0)'); g.addColorStop(1, 'rgba(120,200,255,' + (0.75 * fade) + ')');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.moveTo(x - 160, 520); ctx.quadraticCurveTo(x - 40, 520, x, 360); ctx.quadraticCurveTo(x + 20, 330, x + 40, 360); ctx.lineTo(x + 10, 520); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = 'rgba(240,250,255,' + fade + ')'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(x - 60, 440); ctx.quadraticCurveTo(x - 10, 400, x, 360); ctx.quadraticCurveTo(x + 20, 330, x + 40, 360); ctx.stroke();
+        return 0;
+    },
+    mon_hail(ctx, u) {
+        const fade = 1 - ease((u - 0.85) / 0.15);
+        for (let i = 0; i < 14; i++) {
+            const t = ((u - 0.15) * 1.8 - i * 0.05);
+            if (t <= 0 || t > 1) continue;
+            const x = 20 + (i * 71) % 470;
+            const y = t < 0.7 ? -40 + 540 * (t / 0.7) : 500 - 40 * Math.sin((t - 0.7) / 0.3 * Math.PI);
+            ctx.fillStyle = 'rgba(235,250,255,' + fade + ')'; ctx.strokeStyle = 'rgba(120,170,200,' + fade + ')'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(x, y, 9 + (i % 3) * 3, 0, 7); ctx.fill(); ctx.stroke();
+        }
+        return 0;
+    },
+});
+// <<< poses boss_monsoon
+
+// >>> poses boss_nemesis
+// ---- The Nemesis -----------------------------------------------------------
+// Spiral Storm: the staff rises and red shards spiral out from the die.
+// Reaper Fans: the shield thrusts and three fans of blades sweep outward.
+// Soul Tithe: the staff tips forward and wisps stream into the red die.
+Object.assign(POSES, {
+    nem_spiral(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.staff.rot = 14 * env; P.staff.dy = -16 * env;
+        P.head.rot = -4 * env; P.head.dy = -3 * env;
+        P.shield.rot = -4 * env;
+    },
+    nem_fans(P, u) {
+        let push = 0;
+        for (let i = 0; i < 3; i++) { const t = (u - 0.15 - i * 0.2) / 0.15; if (t > 0 && t < 1) push = Math.max(push, Math.sin(t * Math.PI)); }
+        P.shield.dx = 14 * push; P.shield.rot = -6 * push;
+        P.body.dx = 4 * push;
+        P.staff.rot = -5 * push;
+    },
+    nem_tithe(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.staff.rot = -12 * env;
+        P.head.rot = 3 * env;
+        P.body.dy = 2 * env;
+    },
+});
+Object.assign(FX, {
+    nem_spiral(ctx, u) {
+        const env = envOf(u, 0.2, 0.25);
+        _cueGlow(ctx, 80, 90, 70, '255,110,90', 0.7 * env);
+        for (let i = 0; i < 18; i++) {
+            const k = ((u - 0.15) * 1.3 + i / 18) % 1;
+            if (u < 0.15) break;
+            const a = i * 0.9 + k * 6, r = 20 + k * 360;
+            const x = 80 + Math.cos(a) * r, y = 90 + Math.sin(a) * r * 0.8;
+            ctx.save(); ctx.translate(x, y); ctx.rotate(a);
+            ctx.fillStyle = 'rgba(255,120,100,' + (env * (1 - k)) + ')';
+            ctx.beginPath(); ctx.moveTo(14, 0); ctx.lineTo(-8, -6); ctx.lineTo(-8, 6); ctx.closePath(); ctx.fill();
+            ctx.restore();
+        }
+        return 0;
+    },
+    nem_fans(ctx, u) {
+        for (let i = 0; i < 3; i++) {
+            const t = (u - 0.2 - i * 0.2) / 0.4;
+            if (t <= 0 || t > 1) continue;
+            const r = 40 + 340 * t, a = 1 - t;
+            for (let j = -2; j <= 2; j++) {
+                const ang = j * 0.28 + (i - 1) * 0.15;
+                const x = 430 + Math.cos(ang) * r, y = 300 + Math.sin(ang) * r;
+                ctx.save(); ctx.translate(x, y); ctx.rotate(ang);
+                ctx.fillStyle = 'rgba(220,235,245,' + a + ')'; ctx.strokeStyle = 'rgba(200,70,60,' + a + ')'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(18, 0); ctx.quadraticCurveTo(0, -14, -14, -4); ctx.lineTo(-10, 4); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.restore();
+            }
+        }
+        return 0;
+    },
+    nem_tithe(ctx, u) { _cueTithe(ctx, u, 80, 100, '255,110,90'); return 0; },
+});
+// <<< poses boss_nemesis
+
+
+// >>> poses boss_null
+// ---- The Null --------------------------------------------------------------
+// Void Lattice: the eye stares, the hat lifts and a purple grid spreads out
+//   from the pupil. Prior Bomb: the eye spits fused bombs. Hypothesis Erasure:
+//   the eye tracks across and an eraser beam wipes a strip clean. Null Rays:
+//   the eye flares and rays shoot out on every side.
+Object.assign(POSES, {
+    nul_lattice(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.eyeball.sc = 1 + 0.1 * env;
+        P.hat.dy = -10 * env;
+        P.diceL.dy = -10 * env * Math.sin(u * 8); P.diceR.dy = 10 * env * Math.sin(u * 8);
+    },
+    nul_bomb(P, u) {
+        const pulse = ease(u / 0.35), out = ease((u - 0.35) / 0.1), k = 1 - ease((u - 0.6) / 0.3);
+        P.eyeball.sc = 1 + (0.15 * pulse - 0.2 * out) * k;
+        P.body.sc = 1 + 0.03 * out * k;
+        P.hat.dy = -6 * out * k;
+    },
+    nul_erase(P, u) {
+        const env = envOf(u, 0.15, 0.2);
+        P.eyeball.dx = (-22 + 44 * ease((u - 0.15) / 0.6)) * env;
+        P.hat.rot = 3 * Math.sin(u * Math.PI * 2) * env;
+    },
+    nul_rays(P, u) {
+        const charge = ease(u / 0.4), fire = ease((u - 0.4) / 0.08), k = 1 - ease((u - 0.75) / 0.25);
+        P.eyeball.sc = 1 + (0.1 * charge + 0.1 * fire) * k;
+        P.body.sc = 1 - 0.03 * charge * (1 - fire) * k;
+        P.hat.dy = (-4 * charge - 8 * fire) * k;
+        P.diceL.dx = -20 * fire * k; P.diceR.dx = 20 * fire * k;
+    },
+});
+Object.assign(FX, {
+    nul_lattice(ctx, u) {
+        const env = envOf(u, 0.2, 0.25), k = ease((u - 0.15) / 0.5);
+        _cueGlow(ctx, 255, 268, 90, '160,110,255', 0.6 * env);
+        ctx.strokeStyle = 'rgba(180,130,255,' + (0.7 * env) + ')'; ctx.lineWidth = 3;
+        const R = 40 + 300 * k;
+        for (let i = -5; i <= 5; i++) {
+            const o = i * 50;
+            if (Math.abs(o) > R) continue;
+            const h = Math.sqrt(R * R - o * o);
+            ctx.beginPath(); ctx.moveTo(255 + o, 268 - h); ctx.lineTo(255 + o, 268 + h); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(255 - h, 268 + o); ctx.lineTo(255 + h, 268 + o); ctx.stroke();
+        }
+        return 0;
+    },
+    nul_bomb(ctx, u) { _cueBombs(ctx, u, [255, 268], '170,120,255'); return 0; },
+    nul_erase(ctx, u) {
+        const env = envOf(u, 0.15, 0.2), k = ease((u - 0.15) / 0.6);
+        const x = -20 + 560 * k;
+        ctx.fillStyle = 'rgba(240,240,255,' + (0.25 * env) + ')'; ctx.fillRect(-20, 455, x + 20, 50);
+        ctx.strokeStyle = 'rgba(200,170,255,' + (0.8 * env) + ')'; ctx.lineWidth = 10;
+        ctx.beginPath(); ctx.moveTo(255 + 44 * (k * 2 - 1), 268); ctx.lineTo(x, 480); ctx.stroke();
+        ctx.fillStyle = 'rgba(255,190,210,' + env + ')'; ctx.fillRect(x - 22, 462, 44, 36);
+        ctx.strokeStyle = 'rgba(120,60,90,' + env + ')'; ctx.lineWidth = 3; ctx.strokeRect(x - 22, 462, 44, 36);
+        return 0;
+    },
+    nul_rays(ctx, u) {
+        const charge = ease(u / 0.4);
+        _cueGlow(ctx, 255, 268, 30 + 70 * charge, '190,150,255', 0.8 * charge * (1 - ease((u - 0.75) / 0.25)));
+        if (u > 0.4) {
+            const t = (u - 0.4) / 0.5, a = 1 - t;
+            for (let i = 0; i < 10; i++) {
+                const ang = i * Math.PI / 5 + 0.3, r1 = 60, r2 = 60 + 420 * Math.min(1, t * 2);
+                ctx.strokeStyle = 'rgba(200,160,255,' + a + ')'; ctx.lineWidth = 12 * a + 2;
+                ctx.beginPath(); ctx.moveTo(255 + Math.cos(ang) * r1, 268 + Math.sin(ang) * r1); ctx.lineTo(255 + Math.cos(ang) * r2, 268 + Math.sin(ang) * r2); ctx.stroke();
+            }
+        }
+        return u > 0.4 && u < 0.45 ? 0.15 : 0;
+    },
+});
+// <<< poses boss_null
+
+
+
+// >>> poses boss_phantom
+// ---- The Phantom -----------------------------------------------------------
+// Vent Ambush: the score-sheet cape folds in, three floor vents glow and
+//   ghostly hands burst up out of them. Fog Bank: the cape spreads wide and
+//   teal mist rolls in.
+Object.assign(POSES, {
+    phm_ambush(P, u) {
+        const fold = ease(u / 0.3), open = ease((u - 0.5) / 0.15), k = 1 - ease((u - 0.8) / 0.2);
+        P.wingL.rot = (-14 * fold * (1 - open) + 10 * open) * k;
+        P.wingR.rot = (14 * fold * (1 - open) - 10 * open) * k;
+        P.head.dy = 6 * fold * (1 - open) * k;
+        P.body.dy = 4 * fold * (1 - open) * k;
+    },
+    phm_fog(P, u) {
+        const env = envOf(u, 0.25, 0.25), w = Math.sin(u * Math.PI * 4);
+        P.wingL.rot = (12 + 4 * w) * env;
+        P.wingR.rot = (-12 - 4 * w) * env;
+        P.head.dy = -4 * env;
+    },
+});
+Object.assign(FX, {
+    phm_ambush(ctx, u) {
+        const fade = 1 - ease((u - 0.8) / 0.2);
+        [[90, 490], [256, 510], [420, 490]].forEach(([x, y], i) => {
+            const glow = ease((u - 0.1 - i * 0.05) / 0.25);
+            ctx.fillStyle = 'rgba(120,255,210,' + (0.5 * glow * fade) + ')';
+            ctx.beginPath(); ctx.ellipse(x, y, 40, 12, 0, 0, 7); ctx.fill();
+            const k = ease((u - 0.45 - i * 0.05) / 0.15);
+            if (k <= 0) return;
+            const h = 90 * k;
+            ctx.fillStyle = 'rgba(150,255,220,' + (0.75 * fade) + ')';
+            ctx.beginPath(); ctx.moveTo(x - 14, y); ctx.lineTo(x - 14, y - h); ctx.lineTo(x + 14, y - h); ctx.lineTo(x + 14, y); ctx.fill();
+            for (let f = 0; f < 4; f++) {
+                ctx.beginPath(); ctx.ellipse(x - 15 + f * 10, y - h - 14, 5, 14, (f - 1.5) * 0.25, 0, 7); ctx.fill();
+            }
+        });
+        return 0;
+    },
+    phm_fog(ctx, u) { _cueFog(ctx, u, '140,230,200'); return 0; },
+});
+// <<< poses boss_phantom
+
+// >>> poses boss_puddle
+// ---- The Puddle ------------------------------------------------------------
+// Fated Cell: the puddle squashes and quivers, its eyes narrow, the splash
+//   flicks up and a reticle locks onto a cell.
+Object.assign(POSES, {
+    pud_fate(P, u) {
+        const env = envOf(u, 0.2, 0.25), w = Math.sin(u * Math.PI * 8);
+        P.body.sx = 1 + 0.06 * env * w; P.body.sy = 1 - 0.06 * env * w;
+        P.eyeL.sc = P.eyeR.sc = 1 - 0.12 * env;
+        P.eyeL.dx = P.eyeR.dx = 6 * env;
+        P.splash.rot = -10 * env * Math.abs(w); P.splash.dy = -8 * env;
+    },
+});
+Object.assign(FX, {
+    pud_fate(ctx, u) { _cueFate(ctx, u, 256, 470, '150,240,220'); return 0; },
+});
+// <<< poses boss_puddle
+
+// >>> poses boss_nightmare
+// ---- The Nightmare ---------------------------------------------------------
+// Dark Hunt: the horse rears, the eyes burn violet, and shadow horses gallop
+//   out to both sides. Soul Tithe: it lowers its head and wisps stream into
+//   the glowing eye.
+Object.assign(POSES, {
+    ngt_hunt(P, u) {
+        const rear = ease(u / 0.3), drop = ease((u - 0.45) / 0.15), k = 1 - drop;
+        P.body.rot = -8 * rear * k;
+        P.body.dy = -10 * rear * k + 4 * drop * (1 - ease((u - 0.7) / 0.3));
+        P.head.rot = -10 * rear * k;
+        P.tail.rot = 20 * Math.sin(u * Math.PI * 4) * (1 - ease((u - 0.8) / 0.2));
+    },
+    ngt_tithe(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.head.rot = 12 * env; P.head.dy = 8 * env;
+        P.tail.rot = 10 * Math.sin(u * Math.PI * 4) * env;
+        P.body.dy = 3 * env;
+    },
+});
+Object.assign(FX, {
+    ngt_hunt(ctx, u, dy, at) {
+        const env = envOf(u, 0.2, 0.2), [ex, ey] = at('head', 435, 188);
+        _cueGlow(ctx, ex, ey, 40, '190,110,255', env);
+        // shadow horses dash out
+        [[-1, 420], [1, 470]].forEach(([s, y], i) => {
+            const k = ease((u - 0.4 - i * 0.08) / 0.45);
+            if (k <= 0 || k >= 1) return;
+            const x = 256 + s * 420 * k, a = Math.sin(k * Math.PI);
+            ctx.save(); ctx.translate(x, y); ctx.scale(s, 1);
+            ctx.fillStyle = 'rgba(90,50,140,' + (0.7 * a) + ')';
+            ctx.beginPath(); ctx.ellipse(0, 0, 55, 22, 0, 0, 7); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(50, -28, 20, 14, -0.6, 0, 7); ctx.fill();
+            const g = Math.sin(u * 40) * 10;
+            ctx.fillRect(-40 + g, 10, 8, 30); ctx.fillRect(30 - g, 10, 8, 30);
+            _cueGlow(ctx, 58, -32, 10, '220,160,255', a);
+            ctx.restore();
+            for (let j = 1; j < 4; j++) _cueGlow(ctx, x - s * j * 40, y, 30, '120,70,180', 0.3 * a / j);
+        });
+        return 0;
+    },
+    ngt_tithe(ctx, u, dy, at) { const [ex, ey] = at('head', 435, 188); _cueTithe(ctx, u, ex, ey, '190,120,255'); return 0; },
+});
+// <<< poses boss_nightmare
+
+// >>> poses boss_oblivion
+// ---- The Oblivion ----------------------------------------------------------
+// Singularity: the galaxy in the open hand collapses into a black hole that
+//   pulls in streaks of light. Event Beams: the scythe swings and dark beams
+//   lash out from the orb. Fog Bank: starry dusk rolls in from both sides.
+Object.assign(POSES, {
+    obl_singularity(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.orbHand.rot = -10 * env; P.orbHand.dy = -10 * env;
+        P.head.rot = 4 * env;
+        P.scythe.rot = -6 * env;
+        P.body.dy = -3 * env;
+    },
+    obl_beams(P, u) {
+        const wind = ease(u / 0.3), swing = ease((u - 0.3) / 0.15), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.scythe.rot = (-18 * wind * (1 - swing) + 22 * swing) * k;
+        P.orbHand.rot = -14 * swing * k;
+        P.body.rot = (-2 * wind + 3 * swing) * k;
+        P.head.rot = 4 * swing * k;
+    },
+    obl_fog(P, u) {
+        const env = envOf(u, 0.25, 0.25);
+        P.scythe.rot = 8 * env;
+        P.orbHand.dy = 6 * env;
+        P.head.dy = 4 * env;
+    },
+});
+Object.assign(FX, {
+    obl_singularity(ctx, u, dy, at) {
+        const env = envOf(u, 0.2, 0.25), k = ease(u / 0.6);
+        const [x, y] = at('orbHand', 460, 200);
+        for (let i = 0; i < 16; i++) {
+            const t = (u * 1.5 + i / 16) % 1;
+            const a = i * 2.4 + t * 3, r = 300 * (1 - t);
+            ctx.strokeStyle = 'rgba(200,210,255,' + (env * t) + ')'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+            ctx.lineTo(x + Math.cos(a - 0.3) * (r + 30), y + Math.sin(a - 0.3) * (r + 30)); ctx.stroke();
+        }
+        _cueGlow(ctx, x, y, 70 + 30 * k, '150,120,255', 0.6 * env);
+        ctx.fillStyle = 'rgba(0,0,8,' + (0.95 * env) + ')';
+        ctx.beginPath(); ctx.arc(x, y, 10 + 30 * k, 0, 7); ctx.fill();
+        ctx.strokeStyle = 'rgba(230,220,255,' + env + ')'; ctx.lineWidth = 3; ctx.stroke();
+        return 0;
+    },
+    obl_beams(ctx, u) {
+        if (u < 0.35) { _cueGlow(ctx, 460, 200, 60, '150,120,255', ease(u / 0.35)); return 0; }
+        const t = (u - 0.35) / 0.5, a = 1 - ease((u - 0.7) / 0.3);
+        [-0.5, 0.1, 0.7].forEach((ang, i) => {
+            const len = 500 * ease(t * 1.5 - i * 0.15);
+            if (len <= 0) return;
+            ctx.save(); ctx.translate(460, 200); ctx.rotate(Math.PI * 0.55 + ang);
+            ctx.fillStyle = 'rgba(40,20,80,' + (0.8 * a) + ')'; ctx.fillRect(0, -14, len, 28);
+            ctx.fillStyle = 'rgba(210,190,255,' + a + ')'; ctx.fillRect(0, -4, len, 8);
+            ctx.restore();
+        });
+        return 0;
+    },
+    obl_fog(ctx, u) { _cueFog(ctx, u, '60,60,120'); return 0; },
+});
+// <<< poses boss_oblivion
+
+// >>> poses boss_overfitter
+// ---- The Overfitter --------------------------------------------------------
+// Gradient Descent: it reaches out and a glowing ball rolls down a bumpy
+//   loss curve into the lowest dip. Pattern Break: it slaps the ground and a
+//   row of pattern tiles shatters. Pattern Lock: it grins and chains snap
+//   around three tiles. Validation Set: tiles flash ticks and crosses.
+Object.assign(POSES, {
+    ovf_descent(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.handL.rot = -14 * env; P.handL.dx = -6 * env;
+        P.head.rot = -5 * env; P.head.dy = 3 * env;
+        P.body.rot = -1.5 * env;
+    },
+    ovf_break(P, u) {
+        const lift = ease(u / 0.3), slam = ease((u - 0.3) / 0.08), rest = ease((u - 0.65) / 0.35);
+        const k = 1 - rest;
+        P.handL.rot = (12 * lift * (1 - slam) - 6 * slam) * k;
+        P.handL.dy = (-10 * lift * (1 - slam) + 6 * slam) * k;
+        P.body.dy = 5 * slam * k;
+        P.head.dy = 6 * slam * k;
+    },
+    ovf_lock(P, u) {
+        const env = envOf(u, 0.2, 0.25), w = Math.sin(u * Math.PI * 6);
+        P.head.rot = 6 * w * env;
+        P.handR.rot = -10 * env;
+        P.body.sc = 1 + 0.02 * env;
+    },
+    ovf_validate(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.head.rot = 8 * Math.sin(u * Math.PI * 5) * env;
+        P.handL.rot = -8 * env; P.handR.rot = 8 * env;
+    },
+});
+Object.assign(FX, {
+    ovf_descent(ctx, u) {
+        const env = envOf(u, 0.2, 0.25);
+        const curve = (x) => 300 + 60 * Math.sin(x / 50) + 0.0015 * (x - 300) * (x - 300) - 40;
+        ctx.strokeStyle = 'rgba(180,240,140,' + (0.85 * env) + ')'; ctx.lineWidth = 4;
+        ctx.beginPath();
+        for (let x = 0; x <= 500; x += 10) x ? ctx.lineTo(x, curve(x) + 120) : ctx.moveTo(x, curve(x) + 120);
+        ctx.stroke();
+        const k = ease((u - 0.2) / 0.6), bx = 250 - 205 * k + 10 * Math.sin(k * 20) * (1 - k);
+        _cueGlow(ctx, bx, curve(bx) + 105, 26, '255,240,150', env);
+        ctx.fillStyle = 'rgba(255,250,200,' + env + ')'; ctx.beginPath(); ctx.arc(bx, curve(bx) + 105, 10, 0, 7); ctx.fill();
+        return 0;
+    },
+    ovf_break(ctx, u) {
+        if (u < 0.32) return 0;
+        const fade = 1 - ease((u - 0.8) / 0.2);
+        for (let i = 0; i < 6; i++) {
+            const t = Math.max(0, (u - 0.32 - i * 0.03) / 0.4), x = 30 + i * 85, y = 480;
+            for (let s = 0; s < 4; s++) {
+                const a = -Math.PI / 2 + (s - 1.5) * 0.6;
+                const px = x + Math.cos(a) * 60 * t, py = y + Math.sin(a) * 60 * t + 120 * t * t;
+                ctx.save(); ctx.translate(px, py); ctx.rotate(t * (s + 1) * 2);
+                ctx.fillStyle = 'rgba(' + (i % 2 ? '230,210,140' : '170,210,120') + ',' + fade * (1 - t * 0.5) + ')';
+                ctx.fillRect(-12, -12, 24, 24); ctx.restore();
+            }
+        }
+        return u > 0.3 && u < 0.34 ? 0.12 : 0;
+    },
+    ovf_lock(ctx, u) {
+        const env = envOf(u, 0.2, 0.25);
+        [[110, 470], [256, 495], [400, 470]].forEach(([x, y], i) => {
+            const k = ease((u - 0.2 - i * 0.1) / 0.15);
+            ctx.fillStyle = 'rgba(170,210,120,' + (0.4 * env) + ')'; ctx.fillRect(x - 26, y - 26, 52, 52);
+            if (k <= 0) return;
+            ctx.strokeStyle = 'rgba(200,200,215,' + (env * k) + ')'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(x - 34, y - 34); ctx.lineTo(x + 34, y + 34); ctx.moveTo(x + 34, y - 34); ctx.lineTo(x - 34, y + 34); ctx.stroke();
+            ctx.fillStyle = 'rgba(220,180,60,' + (env * k) + ')'; ctx.fillRect(x - 12, y - 6, 24, 20);
+            ctx.strokeStyle = 'rgba(220,180,60,' + (env * k) + ')'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.arc(x, y - 6, 8, Math.PI, 0); ctx.stroke();
+        });
+        return 0;
+    },
+    ovf_validate(ctx, u) {
+        const env = envOf(u, 0.2, 0.25);
+        for (let i = 0; i < 5; i++) {
+            const x = 50 + i * 103, y = 480, on = ease((u - 0.2 - i * 0.08) / 0.1);
+            const ok = i % 2 === 0;
+            ctx.strokeStyle = 'rgba(230,230,200,' + (0.6 * env) + ')'; ctx.lineWidth = 3; ctx.strokeRect(x - 24, y - 24, 48, 48);
+            if (on <= 0) continue;
+            ctx.strokeStyle = (ok ? 'rgba(120,240,120,' : 'rgba(255,90,80,') + (env * on) + ')'; ctx.lineWidth = 7;
+            ctx.beginPath();
+            if (ok) { ctx.moveTo(x - 14, y); ctx.lineTo(x - 3, y + 12); ctx.lineTo(x + 16, y - 14); }
+            else { ctx.moveTo(x - 13, y - 13); ctx.lineTo(x + 13, y + 13); ctx.moveTo(x + 13, y - 13); ctx.lineTo(x - 13, y + 13); }
+            ctx.stroke();
+        }
+        return 0;
+    },
+});
+// <<< poses boss_overfitter
+
+// >>> poses boss_razor
+// ---- The Razor -------------------------------------------------------------
+// Blade Cyclone: both blades whirl and a ring of cutting wind spins around.
+// Probability Shift: a blade flicks and marks hop between cells. Razor
+//   Wires: the blades cross and glowing wires snap taut across the board.
+// Hone and Cast: the blades scrape together in sparks, then one is flung in
+//   a spinning arc.
+Object.assign(POSES, {
+    rzr_cyclone(P, u) {
+        const env = envOf(u, 0.15, 0.2), w = Math.sin(u * Math.PI * 10);
+        P.bladeL.rot = -30 * w * env; P.bladeR.rot = 30 * w * env;
+        P.body.rot = 3 * w * env;
+        P.body.dy = -4 * env;
+    },
+    rzr_shift(P, u) {
+        const flick = Math.sin(Math.min(1, u / 0.35) * Math.PI);
+        P.bladeR.rot = -24 * flick; P.bladeR.dy = -8 * flick;
+        P.body.rot = 1.5 * flick;
+    },
+    rzr_wires(P, u) {
+        const env = envOf(u, 0.25, 0.25);
+        P.bladeL.rot = 30 * env; P.bladeL.dx = 18 * env;
+        P.bladeR.rot = -30 * env; P.bladeR.dx = -18 * env;
+        P.body.dy = 3 * env;
+    },
+    rzr_hone(P, u) {
+        const scrape = u < 0.45 ? Math.sin(u / 0.45 * Math.PI * 4) : 0;
+        const env = envOf(u, 0.15, 0.25);
+        const toss = ease((u - 0.5) / 0.1) * (1 - ease((u - 0.75) / 0.25));
+        P.bladeL.rot = (14 + 6 * scrape) * env * (u < 0.5 ? 1 : 1 - toss);
+        P.bladeR.rot = (-14 + 6 * scrape) * env - 40 * toss;
+        P.bladeR.dy = -12 * toss;
+        P.body.rot = 2 * toss;
+    },
+});
+Object.assign(FX, {
+    rzr_cyclone(ctx, u) {
+        const env = envOf(u, 0.15, 0.2);
+        for (let i = 0; i < 3; i++) {
+            const a0 = u * 20 + i * 2.1;
+            ctx.strokeStyle = 'rgba(150,220,255,' + (0.7 * env) + ')'; ctx.lineWidth = 8 - i * 2;
+            ctx.beginPath(); ctx.ellipse(256, 300, 230 + i * 25, 120 + i * 15, 0, a0, a0 + 1.6); ctx.stroke();
+            ctx.strokeStyle = 'rgba(200,140,255,' + (0.6 * env) + ')';
+            ctx.beginPath(); ctx.ellipse(256, 300, 230 + i * 25, 120 + i * 15, 0, a0 + Math.PI, a0 + Math.PI + 1.2); ctx.stroke();
+        }
+        return 0;
+    },
+    rzr_shift(ctx, u) { _cueShift(ctx, u, '150,220,255'); return 0; },
+    rzr_wires(ctx, u) {
+        const env = envOf(u, 0.25, 0.25);
+        [[-40, 380, 552, 450], [-40, 470, 552, 400], [100, 520, 420, 330]].forEach(([x1, y1, x2, y2], i) => {
+            const k = ease((u - 0.2 - i * 0.08) / 0.15);
+            if (k <= 0) return;
+            const x = x1 + (x2 - x1) * k, y = y1 + (y2 - y1) * k;
+            ctx.strokeStyle = 'rgba(150,230,255,' + env + ')'; ctx.lineWidth = 3;
+            ctx.shadowColor = 'rgba(150,230,255,0.9)'; ctx.shadowBlur = 10;
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x, y); ctx.stroke();
+            ctx.shadowBlur = 0;
+        });
+        return 0;
+    },
+    rzr_hone(ctx, u) {
+        if (u < 0.45) {
+            for (let i = 0; i < 10; i++) {
+                const k = (u * 6 + i / 10) % 1;
+                const a = -Math.PI / 2 + (i - 5) * 0.3;
+                ctx.fillStyle = 'rgba(255,240,170,' + (1 - k) + ')';
+                ctx.beginPath(); ctx.arc(256 + Math.cos(a) * 80 * k, 220 + Math.sin(a) * 80 * k + 60 * k * k, 3, 0, 7); ctx.fill();
+            }
+            return 0;
+        }
+        const t = (u - 0.5) / 0.4;
+        if (t <= 0 || t >= 1) return 0;
+        const x = 440 - 420 * t, y = 220 - 150 * Math.sin(t * Math.PI) + 200 * t;
+        ctx.save(); ctx.translate(x, y); ctx.rotate(t * 18);
+        ctx.strokeStyle = 'rgba(170,220,255,' + (1 - t * 0.5) + ')'; ctx.lineWidth = 10;
+        ctx.beginPath(); ctx.arc(0, 0, 40, 0, 4); ctx.stroke();
+        ctx.restore();
+        return 0;
+    },
+});
+// <<< poses boss_razor
+
+// >>> poses boss_seraph
+// ---- The Seraph ------------------------------------------------------------
+// Judgment Pillars: the wings beat, the halo blazes and columns of light
+//   slam down onto three cells. Radiant Fans: the head tilts and fans of
+//   golden rays sweep out. Fated Cell: a calm stare and a reticle locks on.
+Object.assign(POSES, {
+    srp_pillars(P, u) {
+        const env = envOf(u, 0.2, 0.25), beat = Math.sin(u * Math.PI * 6);
+        P.body.sx = 1 + 0.06 * beat * env; P.body.sy = 1 - 0.03 * beat * env;
+        P.body.dy = -8 * env;
+        P.head.sc = 1 + 0.04 * env;
+    },
+    srp_fans(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.head.rot = 8 * Math.sin(u * Math.PI * 2) * env;
+        P.body.sx = 1 + 0.05 * env;
+    },
+    srp_fate(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.head.dy = -6 * env;
+        P.body.dy = -4 * env;
+    },
+});
+Object.assign(FX, {
+    srp_pillars(ctx, u, dy, at) {
+        const env = envOf(u, 0.2, 0.25);
+        const [hx, hy] = at('head', 256, 195);
+        _cueGlow(ctx, hx, hy, 80, '255,230,140', 0.7 * env);
+        [[100, 0.35], [256, 0.45], [410, 0.55]].forEach(([x, t0]) => {
+            const t = (u - t0) / 0.3;
+            if (t <= 0 || t > 1) return;
+            const a = Math.sin(t * Math.PI);
+            const g = ctx.createLinearGradient(0, -150, 0, 500);
+            g.addColorStop(0, 'rgba(255,240,180,0)'); g.addColorStop(1, 'rgba(255,240,180,' + (0.85 * a) + ')');
+            ctx.fillStyle = g; ctx.fillRect(x - 26, -150, 52, 650);
+            _cueGlow(ctx, x, 495, 60, '255,240,180', a);
+        });
+        return 0;
+    },
+    srp_fans(ctx, u) {
+        const env = envOf(u, 0.2, 0.25);
+        for (let i = 0; i < 9; i++) {
+            const ang = Math.PI / 2 + (i - 4) * 0.22 + 0.4 * Math.sin(u * Math.PI * 2);
+            const len = 380 * ease((u - 0.15) / 0.4);
+            ctx.strokeStyle = 'rgba(255,220,120,' + (0.7 * env) + ')'; ctx.lineWidth = 8;
+            ctx.beginPath(); ctx.moveTo(256, 290); ctx.lineTo(256 + Math.cos(ang) * len, 290 + Math.sin(ang) * len); ctx.stroke();
+        }
+        return 0;
+    },
+    srp_fate(ctx, u) { _cueFate(ctx, u, 256, 440, '255,225,140'); return 0; },
+});
+// <<< poses boss_seraph
+
+// >>> poses boss_shaper
+// ---- The Frostwright -------------------------------------------------------
+// Glacier Rift: the ice club rises and smashes down, a jagged rift of ice
+//   races across the floor. Soul Tithe: the frost hand opens and wisps
+//   stream into it. Frost Monoliths: the hand lifts and ice pillars grow up
+//   from the ground. Ice Walker: it strides and frozen footprints march away.
+Object.assign(POSES, {
+    shp_rift(P, u) {
+        const lift = ease(u / 0.35), slam = ease((u - 0.35) / 0.08), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.club.rot = (30 * lift * (1 - slam) - 10 * slam) * k;
+        P.club.dy = (-16 * lift * (1 - slam) + 6 * slam) * k;
+        P.body.dy = (-4 * lift * (1 - slam) + 6 * slam) * k;
+        P.head.rot = 3 * slam * k;
+    },
+    shp_tithe(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.frostHand.rot = -12 * env; P.frostHand.dy = -8 * env;
+        P.head.rot = -3 * env;
+    },
+    shp_monoliths(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.frostHand.rot = -22 * env; P.frostHand.dy = -16 * env;
+        P.club.rot = -6 * env;
+        P.body.dy = -3 * env;
+    },
+    shp_walker(P, u) {
+        const env = envOf(u, 0.15, 0.2), step = Math.sin(u * Math.PI * 6);
+        P.body.rot = 2.5 * step * env;
+        P.body.dy = -5 * Math.abs(step) * env;
+        P.club.rot = -6 * step * env;
+        P.frostHand.rot = 6 * step * env;
+    },
+});
+Object.assign(FX, {
+    shp_rift(ctx, u) {
+        if (u < 0.38) return 0;
+        const k = ease((u - 0.38) / 0.35), fade = 1 - ease((u - 0.8) / 0.2);
+        ctx.strokeStyle = 'rgba(200,240,255,' + fade + ')'; ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.moveTo(140, 470);
+        for (let i = 1; i <= 8; i++) { const x = 140 + i * 50 * k; ctx.lineTo(x, 470 + (i % 2 ? -14 : 14)); }
+        ctx.stroke();
+        for (let i = 0; i < 6; i++) {
+            const x = 160 + i * 60 * k;
+            ctx.fillStyle = 'rgba(170,225,255,' + (0.85 * fade) + ')';
+            ctx.beginPath(); ctx.moveTo(x - 12, 475); ctx.lineTo(x, 475 - 40 * k * (0.6 + (i % 3) * 0.2)); ctx.lineTo(x + 12, 475); ctx.fill();
+        }
+        return u > 0.36 && u < 0.4 ? 0.14 : 0;
+    },
+    shp_tithe(ctx, u, dy, at) { const [x, y] = at('frostHand', 450, 200); _cueTithe(ctx, u, x, y, '170,225,255'); return 0; },
+    shp_monoliths(ctx, u) {
+        const fade = 1 - ease((u - 0.8) / 0.2);
+        [[80, 140], [250, 110], [430, 150]].forEach(([x, h], i) => {
+            const k = ease((u - 0.25 - i * 0.08) / 0.25);
+            if (k <= 0) return;
+            const top = 495 - h * k;
+            ctx.fillStyle = 'rgba(170,225,255,' + (0.85 * fade) + ')'; ctx.strokeStyle = 'rgba(240,252,255,' + fade + ')'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(x - 28, 495); ctx.lineTo(x - 22, top + 20); ctx.lineTo(x, top); ctx.lineTo(x + 22, top + 20); ctx.lineTo(x + 28, 495); ctx.closePath(); ctx.fill(); ctx.stroke();
+        });
+        return 0;
+    },
+    shp_walker(ctx, u) {
+        const fade = 1 - ease((u - 0.85) / 0.15);
+        for (let i = 0; i < 6; i++) {
+            const t = ease((u - 0.1 - i * 0.1) / 0.1);
+            if (t <= 0) continue;
+            const x = 300 - i * 55, y = 490 + (i % 2 ? 14 : -4);
+            ctx.fillStyle = 'rgba(190,235,255,' + (0.8 * t * fade) + ')';
+            ctx.beginPath(); ctx.ellipse(x, y, 18, 9, 0, 0, 7); ctx.fill();
+            _cueGlow(ctx, x, y, 26, '220,245,255', 0.4 * t * fade);
+        }
+        return 0;
+    },
+});
+// <<< poses boss_shaper
+
+
+// >>> poses boss_siren
+// ---- The Siren -------------------------------------------------------------
+// Wail Beam: she raises the conch and blows, a cone of sound rings pours out
+//   to the left. Frozen Cells: the open hand flings ice shards. Undertow: the
+//   whirlpool under her spins faster and drags spray inward. Siren's Reply:
+//   she lowers the conch and echo rings and notes ripple back to her.
+Object.assign(POSES, {
+    srn_wail(P, u) {
+        const env = envOf(u, 0.2, 0.2), w = Math.sin(u * 60) * env;
+        P.conch.rot = (-10 + 2 * w) * env; P.conch.dy = -4 * env;
+        P.body.rot = -2 * env;
+        P.handR.rot = 6 * env;
+    },
+    srn_frost(P, u) {
+        const wind = ease(u / 0.25), fling = ease((u - 0.25) / 0.1), rest = ease((u - 0.65) / 0.35);
+        const k = 1 - rest;
+        P.handR.rot = (14 * wind * (1 - fling) - 24 * fling) * k;
+        P.handR.dy = (6 * wind - 12 * fling) * k;
+        P.body.rot = 2 * fling * k;
+    },
+    srn_undertow(P, u) {
+        const env = envOf(u, 0.2, 0.25), w = Math.sin(u * Math.PI * 6);
+        P.body.rot = 3 * w * env;
+        P.body.dy = 4 * Math.abs(w) * env;
+        P.handR.rot = -10 * w * env;
+        P.conch.rot = 6 * w * env;
+    },
+    srn_reply(P, u) {
+        const env = envOf(u, 0.25, 0.25);
+        P.conch.rot = 16 * env; P.conch.dy = 10 * env;
+        P.handR.rot = -14 * env; P.handR.dy = -8 * env;
+        P.body.dy = -3 * env;
+    },
+});
+Object.assign(FX, {
+    srn_wail(ctx, u, dy, at) {
+        const env = envOf(u, 0.2, 0.2);
+        const [x, y] = at('conch', 150, 215);
+        for (let i = 0; i < 6; i++) {
+            const k = (u * 2.2 + i / 6) % 1;
+            const r = 20 + k * 340;
+            ctx.strokeStyle = 'rgba(160,240,230,' + (env * (1 - k)) + ')'; ctx.lineWidth = 10 * (1 - k) + 2;
+            ctx.beginPath(); ctx.arc(x, y, r, Math.PI - 0.5, Math.PI + 0.5); ctx.stroke();
+        }
+        return 0;
+    },
+    srn_frost(ctx, u) { _cueFrost(ctx, u, [450, 260]); return 0; },
+    srn_undertow(ctx, u) {
+        const env = envOf(u, 0.2, 0.25);
+        for (let i = 0; i < 4; i++) {
+            const a0 = -u * 18 + i * Math.PI / 2;
+            ctx.strokeStyle = 'rgba(170,240,255,' + (0.7 * env) + ')'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.ellipse(270, 400, 230 - i * 40, 70 - i * 12, 0, a0, a0 + 1.4); ctx.stroke();
+        }
+        for (let i = 0; i < 10; i++) {
+            const k = (u * 1.5 + i / 10) % 1, a = i * 0.63 - k * 4, r = 260 * (1 - k);
+            _cueGlow(ctx, 270 + Math.cos(a) * r, 400 + Math.sin(a) * r * 0.3, 10, '220,250,255', env * k);
+        }
+        return 0;
+    },
+    srn_reply(ctx, u) {
+        const env = envOf(u, 0.25, 0.25);
+        for (let i = 0; i < 4; i++) {
+            const k = 1 - ((u * 1.8 + i / 4) % 1);
+            ctx.strokeStyle = 'rgba(160,240,230,' + (env * (1 - k)) + ')'; ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.arc(270, 230, 40 + k * 320, 0, 7); ctx.stroke();
+        }
+        ctx.fillStyle = 'rgba(220,255,250,' + env + ')'; ctx.font = 'bold 34px serif'; ctx.textAlign = 'center';
+        ['♪', '♫', '♪'].forEach((n, i) => {
+            const k = (u * 1.2 + i / 3) % 1;
+            ctx.fillText(n, 60 + i * 190 + 20 * Math.sin(k * 6), 120 + 200 * k);
+        });
+        return 0;
+    },
+});
+// <<< poses boss_siren
+
+// >>> poses boss_snail
+// ---- The Snail -------------------------------------------------------------
+// Doom Snail: the eye stalks swivel, the shell rune ring glows and spins and
+//   a slime trail oozes forward. Corrupt Cells: the shell rocks and spits
+//   tainted cells.
+Object.assign(POSES, {
+    snl_doom(P, u) {
+        const env = envOf(u, 0.2, 0.25), w = Math.sin(u * Math.PI * 4);
+        P.eyeL.rot = 14 * w * env; P.eyeR.rot = -14 * w * env;
+        P.shell.rot = 3 * w * env;
+        P.body.dx = -6 * env;
+    },
+    snl_corrupt(P, u) {
+        const env = envOf(u, 0.2, 0.25), w = Math.sin(u * Math.PI * 8);
+        P.shell.rot = 5 * w * env; P.shell.dy = -6 * env;
+        P.eyeL.dy = P.eyeR.dy = 6 * env;
+    },
+});
+Object.assign(FX, {
+    snl_doom(ctx, u, dy, at) {
+        const env = envOf(u, 0.2, 0.25);
+        const [cx, cy] = at('shell', 296, 252);
+        _cueGlow(ctx, cx, cy, 120, '90,230,240', 0.5 * env);
+        ctx.strokeStyle = 'rgba(140,250,250,' + env + ')'; ctx.lineWidth = 4;
+        ctx.setLineDash([18, 14]); ctx.lineDashOffset = -u * 400;
+        ctx.beginPath(); ctx.arc(cx, cy, 80, 0, 7); ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, 45, 0, 7); ctx.stroke();
+        ctx.setLineDash([]);
+        // slime oozing forward
+        const k = ease((u - 0.2) / 0.6);
+        ctx.fillStyle = 'rgba(90,200,150,' + (0.5 * env) + ')';
+        ctx.beginPath(); ctx.ellipse(60 - 120 * k, 400, 80 + 60 * k, 14, 0, 0, 7); ctx.fill();
+        return 0;
+    },
+    snl_corrupt(ctx, u) { _cueCorrupt(ctx, u, [296, 200], '90,220,230'); return 0; },
+});
+// <<< poses boss_snail
+
+// >>> poses boss_sprout
+// ---- The Sprout ------------------------------------------------------------
+// Sproutlings: it hops, its leaves flutter, and little sprouts pop out of the
+//   ground around it. Prior Bomb: it shakes its leaves and seed bombs fly out.
+Object.assign(POSES, {
+    spr_sprouts(P, u) {
+        const hop = Math.sin(Math.min(1, u / 0.4) * Math.PI);
+        const env = envOf(u, 0.15, 0.25);
+        P.body.dy = -30 * hop;
+        P.body.sx = 1 + 0.06 * (1 - hop) * env; P.body.sy = 1 - 0.06 * (1 - hop) * env;
+        P.leaves.rot = 8 * Math.sin(u * Math.PI * 8) * env;
+        P.leaves.sc = 1 + 0.05 * env;
+    },
+    spr_bomb(P, u) {
+        const env = envOf(u, 0.15, 0.3), w = Math.sin(u * 50) * (u < 0.45 ? 1 : 0);
+        P.leaves.rot = 10 * w * env;
+        P.body.rot = 3 * w * env;
+        P.body.dy = -6 * ease((u - 0.4) / 0.1) * (1 - ease((u - 0.6) / 0.3));
+    },
+});
+Object.assign(FX, {
+    spr_sprouts(ctx, u) {
+        const fade = 1 - ease((u - 0.85) / 0.15);
+        [[60, 470], [150, 500], [360, 500], [450, 470]].forEach(([x, y], i) => {
+            const k = ease((u - 0.35 - i * 0.07) / 0.2);
+            if (k <= 0) return;
+            ctx.fillStyle = 'rgba(120,80,50,' + fade + ')';
+            ctx.beginPath(); ctx.ellipse(x, y, 24, 7, 0, 0, 7); ctx.fill();
+            ctx.strokeStyle = 'rgba(90,170,80,' + fade + ')'; ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y - 30 * k); ctx.stroke();
+            ctx.fillStyle = 'rgba(110,200,90,' + fade + ')';
+            ctx.beginPath(); ctx.ellipse(x - 12 * k, y - 32 * k, 12 * k, 6 * k, -0.5, 0, 7); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(x + 12 * k, y - 34 * k, 12 * k, 6 * k, 0.5, 0, 7); ctx.fill();
+        });
+        return 0;
+    },
+    spr_bomb(ctx, u) { _cueBombs(ctx, u, [256, 90], '140,220,100'); return 0; },
+});
+// <<< poses boss_sprout
+
+// >>> poses boss_shrine
+// ---- The Shrine Maiden -----------------------------------------------------
+// Knot Barriers: she sweeps the gohei staff and sacred ropes with zig-zag
+//   papers stretch across the board. Fated Cell: a bow of the head and a
+//   reticle locks on. Mirror Spirits: two pale copies of her drift out to the
+//   sides. Ofuda Ward: paper charms fly up and wheel round her in a ring.
+Object.assign(POSES, {
+    shr_knots(P, u) {
+        const wind = ease(u / 0.3), sweep = ease((u - 0.3) / 0.2), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.staff.rot = (16 * wind * (1 - sweep) - 26 * sweep) * k;
+        P.head.rot = (-3 * wind + 3 * sweep) * k;
+        P.body.rot = -1.5 * sweep * k;
+    },
+    shr_fate(P, u) {
+        const env = envOf(u, 0.25, 0.25);
+        P.head.rot = 6 * env; P.head.dy = 4 * env;
+        P.staff.rot = -6 * env;
+    },
+    shr_mirror(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.staff.rot = -12 * env;
+        P.head.rot = -4 * Math.sin(u * Math.PI * 2) * env;
+    },
+    shr_ward(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.staff.rot = -20 * env; P.staff.dy = -12 * env;
+        P.head.dy = -3 * env;
+        P.body.dy = -3 * env;
+    },
+});
+Object.assign(FX, {
+    shr_knots(ctx, u) {
+        const fade = 1 - ease((u - 0.8) / 0.2);
+        [400, 470].forEach((y, r) => {
+            const k = ease((u - 0.35 - r * 0.1) / 0.25);
+            if (k <= 0) return;
+            const x2 = -20 + 552 * k;
+            ctx.strokeStyle = 'rgba(200,160,90,' + fade + ')'; ctx.lineWidth = 10;
+            ctx.beginPath(); ctx.moveTo(-20, y); ctx.quadraticCurveTo(x2 / 2, y + 24, x2, y); ctx.stroke();
+            for (let i = 0; i < 6; i++) {
+                const x = 30 + i * 85;
+                if (x > x2) break;
+                ctx.strokeStyle = 'rgba(250,248,240,' + fade + ')'; ctx.lineWidth = 6;
+                ctx.beginPath(); ctx.moveTo(x, y + 10); ctx.lineTo(x + 10, y + 22); ctx.lineTo(x, y + 34); ctx.lineTo(x + 10, y + 46); ctx.stroke();
+            }
+        });
+        return 0;
+    },
+    shr_fate(ctx, u) { _cueFate(ctx, u, 256, 470, '220,60,70'); return 0; },
+    shr_mirror(ctx, u) {
+        // two round spirit mirrors drift out to the sides, flashing a sheen
+        const env = envOf(u, 0.2, 0.25), k = ease((u - 0.1) / 0.5);
+        [-1, 1].forEach((s, i) => {
+            const x = 256 + s * 190 * k, y = 300 - 40 * k + 8 * Math.sin(u * 10 + i);
+            _cueGlow(ctx, x, y, 80, '200,230,255', 0.5 * env);
+            ctx.fillStyle = 'rgba(190,140,70,' + env + ')'; ctx.strokeStyle = 'rgba(90,50,20,' + env + ')'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.arc(x, y, 44, 0, 7); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = 'rgba(215,235,250,' + env + ')';
+            ctx.beginPath(); ctx.arc(x, y, 34, 0, 7); ctx.fill();
+            const sh = (u * 2 + i * 0.5) % 1;
+            ctx.strokeStyle = 'rgba(255,255,255,' + (env * Math.sin(sh * Math.PI)) + ')'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(x - 30 + 60 * sh, y - 20); ctx.lineTo(x - 50 + 60 * sh, y + 20); ctx.stroke();
+            ctx.strokeStyle = 'rgba(220,60,70,' + env + ')'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(x, y + 44); ctx.lineTo(x - 8, y + 70); ctx.moveTo(x, y + 44); ctx.lineTo(x + 8, y + 70); ctx.stroke();
+        });
+        return 0;
+    },
+    shr_ward(ctx, u) {
+        const env = envOf(u, 0.2, 0.25), r = 60 + 190 * ease(u / 0.5);
+        for (let i = 0; i < 8; i++) {
+            const a = i * Math.PI / 4 + u * 5;
+            const x = 256 + Math.cos(a) * r, y = 250 + Math.sin(a) * r * 0.85;
+            ctx.save(); ctx.translate(x, y); ctx.rotate(a + Math.PI / 2);
+            ctx.fillStyle = 'rgba(250,240,215,' + env + ')'; ctx.strokeStyle = 'rgba(80,30,110,' + env + ')'; ctx.lineWidth = 3;
+            ctx.fillRect(-14, -24, 28, 48); ctx.strokeRect(-14, -24, 28, 48);
+            ctx.strokeStyle = 'rgba(200,40,50,' + env + ')'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, -16); ctx.lineTo(0, 16); ctx.moveTo(-8, -6); ctx.lineTo(8, -6); ctx.stroke();
+            ctx.restore();
+        }
+        return 0;
+    },
+});
+// <<< poses boss_shrine
+
+// >>> poses boss_stack
+// ---- The Stack -------------------------------------------------------------
+// Block Fall: the head block chomps and puzzle blocks tumble down onto the
+//   board. Fog Bank: the tower sways and grey dust rolls in. Probability
+//   Shift: the loose top block flips over and marks hop between cells.
+Object.assign(POSES, {
+    stk_fall(P, u) {
+        const env = envOf(u, 0.15, 0.25), chomp = Math.abs(Math.sin(u * Math.PI * 5));
+        P.head.rot = -6 * chomp * env; P.head.dy = -6 * chomp * env;
+        P.blockTL.rot = -10 * env;
+        P.body.dy = 3 * chomp * env;
+    },
+    stk_fog(P, u) {
+        const env = envOf(u, 0.25, 0.25), w = Math.sin(u * Math.PI * 4);
+        P.body.rot = 2 * w * env;
+        P.head.rot = 4 * w * env;
+        P.blockTL.rot = -6 * w * env;
+    },
+    stk_shift(P, u) {
+        const flip = ease((u - 0.1) / 0.4);
+        P.blockTL.rot = -180 * flip * (1 - ease((u - 0.6) / 0.35));
+        P.blockTL.dy = -40 * Math.sin(Math.min(1, flip) * Math.PI);
+        P.head.rot = 4 * envOf(u, 0.2, 0.25);
+    },
+});
+Object.assign(FX, {
+    stk_fall(ctx, u) {
+        const fade = 1 - ease((u - 0.85) / 0.15);
+        for (let i = 0; i < 5; i++) {
+            const k = ease((u - 0.15 - i * 0.07) / 0.3);
+            if (k <= 0) continue;
+            const x = 40 + i * 108, y = -80 + 560 * k;
+            ctx.save(); ctx.translate(x, y); ctx.rotate((1 - k) * (i % 2 ? 2 : -2));
+            ctx.fillStyle = (i % 2 ? 'rgba(170,120,80,' : 'rgba(100,150,140,') + fade + ')';
+            ctx.strokeStyle = 'rgba(30,30,35,' + fade + ')'; ctx.lineWidth = 4;
+            ctx.fillRect(-26, -26, 52, 52); ctx.strokeRect(-26, -26, 52, 52);
+            ctx.beginPath(); ctx.arc(26, 0, 10, -1.5, 1.5); ctx.stroke();
+            ctx.restore();
+        }
+        return 0;
+    },
+    stk_fog(ctx, u) { _cueFog(ctx, u, '150,160,155'); return 0; },
+    stk_shift(ctx, u) { _cueShift(ctx, u, '255,200,90'); return 0; },
+});
+// <<< poses boss_stack
+
+// >>> poses boss_sirus
+// ---- The Stormcaller -------------------------------------------------------
+// Ion Current: the dice staff crackles and a current of sparks flows in a
+//   wave across the board. Probability Shift: the rune storm spins and marks
+//   hop. Chain Lightning: a bolt jumps from the staff through three cells.
+// Storm Eye: the hand lifts the whirlwind high and it grows into a ring.
+Object.assign(POSES, {
+    sir_ion(P, u) {
+        const env = envOf(u, 0.2, 0.25), j = Math.sin(u * 70) * env;
+        P.staff.rot = (8 + 2 * j) * env; P.staff.dy = -8 * env;
+        P.body.dx = j;
+    },
+    sir_shift(P, u) {
+        const env = envOf(u, 0.25, 0.25);
+        P.storm.rot = 20 * Math.sin(u * Math.PI * 4) * env;
+        P.handR.rot = -8 * env;
+    },
+    sir_chain(P, u) {
+        const wind = ease(u / 0.3), strike = ease((u - 0.3) / 0.08), k = 1 - ease((u - 0.7) / 0.3);
+        P.staff.rot = (14 * wind * (1 - strike) - 14 * strike) * k;
+        P.body.rot = -2 * strike * k;
+    },
+    sir_eye(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.handR.rot = -16 * env; P.handR.dy = -18 * env;
+        P.storm.dy = -24 * env; P.storm.sc = 1 + 0.15 * env;
+        P.storm.rot = 15 * Math.sin(u * 20) * env;
+    },
+});
+Object.assign(FX, {
+    sir_ion(ctx, u, dy, at) {
+        const env = envOf(u, 0.2, 0.25), [sx, sy] = at('staff', 80, 110);
+        _cueGlow(ctx, sx, sy, 90, '160,230,255', 0.7 * env);
+        for (let i = 0; i < 18; i++) {
+            const k = (u * 1.6 + i / 18) % 1;
+            const x = -20 + 560 * k, y = 470 + 30 * Math.sin(k * 12 + i);
+            _cueGlow(ctx, x, y, 12, '200,245,255', env * Math.sin(k * Math.PI));
+        }
+        return 0;
+    },
+    sir_shift(ctx, u) { _cueShift(ctx, u, '160,230,255'); return 0; },
+    sir_chain(ctx, u, dy, at) {
+        if (u < 0.32) return 0;
+        const a = 1 - ease((u - 0.6) / 0.3), [sx, sy] = at('staff', 80, 110);
+        const pts = [[sx, sy], [180, 470], [330, 440], [460, 490]];
+        const n = Math.min(3, Math.floor((u - 0.32) / 0.06) + 1);
+        ctx.strokeStyle = 'rgba(220,245,255,' + a + ')'; ctx.lineWidth = 5;
+        for (let s = 0; s < n; s++) {
+            const [x1, y1] = pts[s], [x2, y2] = pts[s + 1];
+            ctx.beginPath(); ctx.moveTo(x1, y1);
+            for (let j = 1; j < 6; j++) ctx.lineTo(x1 + (x2 - x1) * j / 6 + ((j * 37 + s * 11) % 30) - 15, y1 + (y2 - y1) * j / 6 + ((j * 23) % 20) - 10);
+            ctx.lineTo(x2, y2); ctx.stroke();
+            _cueGlow(ctx, x2, y2, 40, '180,235,255', a);
+        }
+        return u > 0.32 && u < 0.36 ? 0.15 : 0;
+    },
+    sir_eye(ctx, u, dy, at) {
+        const env = envOf(u, 0.2, 0.25), [x, y] = at('storm', 430, 100);
+        for (let i = 0; i < 3; i++) {
+            const r = 60 + i * 50 + 60 * ease(u / 0.6), a0 = u * 12 * (i % 2 ? -1 : 1);
+            ctx.strokeStyle = 'rgba(170,230,255,' + (0.7 * env) + ')'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.ellipse(x, y, r, r * 0.45, 0, a0, a0 + 4); ctx.stroke();
+        }
+        return 0;
+    },
+});
+// <<< poses boss_sirus
+
+// >>> poses boss_stormqueen
+// ---- The Stormqueen --------------------------------------------------------
+// Queen Storms: she raises the lightning staff, the crown flares and bolts
+//   rain down around her. Shrapnel Downpour: the open hand flings and dice
+//   shards pelt the ground. Fated Cell: a regal nod and a reticle locks on.
+Object.assign(POSES, {
+    sq_storms(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.bolt.rot = 10 * env; P.bolt.dy = -16 * env;
+        P.crown.dy = -4 * env;
+        P.handR.rot = -10 * env;
+    },
+    sq_shrapnel(P, u) {
+        const wind = ease(u / 0.3), fling = ease((u - 0.3) / 0.1), k = 1 - ease((u - 0.65) / 0.35);
+        P.handR.rot = (14 * wind * (1 - fling) - 26 * fling) * k;
+        P.handR.dy = (8 * wind - 14 * fling) * k;
+        P.body.rot = 2 * fling * k;
+    },
+    sq_fate(P, u) {
+        const env = envOf(u, 0.25, 0.25);
+        P.crown.rot = 5 * env; P.crown.dy = 3 * env;
+        P.bolt.rot = -6 * env;
+    },
+});
+Object.assign(FX, {
+    sq_storms(ctx, u, dy, at) {
+        const fade = 1 - ease((u - 0.85) / 0.15), [cx, cy] = at('crown', 256, 70);
+        _cueGlow(ctx, cx, cy, 70, '200,190,255', 0.6 * envOf(u, 0.2, 0.25));
+        [[60, 0.3], [440, 0.4], [180, 0.5], [340, 0.6]].forEach(([x0, t0], i) => {
+            const t = (u - t0) / 0.18;
+            if (t <= 0 || t > 1) return;
+            const a = (1 - t) * fade;
+            let x = x0, y = -60;
+            ctx.strokeStyle = 'rgba(210,220,255,' + a + ')'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(x, y);
+            for (let s = 0; s < 6; s++) { x += ((i * 41 + s * 53) % 50) - 25; y += 95; ctx.lineTo(x, y); }
+            ctx.stroke();
+            _cueGlow(ctx, x, y, 50, '200,200,255', a);
+        });
+        return 0;
+    },
+    sq_shrapnel(ctx, u) {
+        if (u < 0.32) return 0;
+        const fade = 1 - ease((u - 0.85) / 0.15);
+        for (let i = 0; i < 9; i++) {
+            const k = ease((u - 0.32 - i * 0.03) / 0.35);
+            if (k <= 0) continue;
+            const tx = 30 + i * 55, ty = 480 - (i % 3) * 15;
+            const x = 390 + (tx - 390) * k, y = 170 + (ty - 170) * k - 120 * Math.sin(k * Math.PI);
+            ctx.save(); ctx.translate(x, y); ctx.rotate(k * 9 + i);
+            ctx.fillStyle = 'rgba(170,150,230,' + fade + ')'; ctx.strokeStyle = 'rgba(40,30,80,' + fade + ')'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, -12); ctx.lineTo(11, 6); ctx.lineTo(-11, 6); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.restore();
+        }
+        return 0;
+    },
+    sq_fate(ctx, u) { _cueFate(ctx, u, 256, 470, '200,180,255'); return 0; },
+});
+// <<< poses boss_stormqueen
+
+
+// >>> poses boss_swarm
+// ---- The Swarm -------------------------------------------------------------
+// Swarm Arc: the little saucers loop out in a wide arc and zip back. Prior
+//   Bomb: the mothership dips and saucers drop fused bombs. Mimic Queen: the
+//   top dome lifts, eyes flash and a violet copy of the mothership flickers.
+// Hive Eye: the top tilts and a purple tractor beam sweeps the ground.
+const SWM_UFOS = ['ufoA', 'ufoB', 'ufoC', 'ufoD'];
+Object.assign(POSES, {
+    swm_arc(P, u) {
+        const env = envOf(u, 0.15, 0.2);
+        SWM_UFOS.forEach((n, i) => {
+            const a = u * Math.PI * 2 + i;
+            P[n].dx = Math.cos(a) * 60 * env * (i < 2 ? 1 : -1);
+            P[n].dy = Math.sin(a) * 40 * env;
+        });
+        P.body.rot = 3 * Math.sin(u * Math.PI * 2) * env;
+    },
+    swm_bomb(P, u) {
+        const env = envOf(u, 0.2, 0.3);
+        P.body.dy = 10 * env; P.top.dy = 8 * env;
+        SWM_UFOS.forEach((n, i) => { P[n].dy = 30 * env + 6 * Math.sin(u * 20 + i); });
+    },
+    swm_mimic(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.top.dy = -18 * env; P.top.rot = 6 * Math.sin(u * 30) * env;
+        P.body.sc = 1 + 0.03 * env;
+    },
+    swm_eye(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.top.rot = 10 * Math.sin(u * Math.PI * 2) * env;
+        P.body.rot = 4 * Math.sin(u * Math.PI * 2) * env;
+    },
+});
+Object.assign(FX, {
+    swm_arc(ctx, u) {
+        const env = envOf(u, 0.15, 0.2);
+        ctx.strokeStyle = 'rgba(220,235,255,' + (0.5 * env) + ')'; ctx.lineWidth = 5;
+        ctx.setLineDash([20, 16]); ctx.lineDashOffset = -u * 500;
+        ctx.beginPath(); ctx.ellipse(256, 200, 280, 140, 0, 0, 7); ctx.stroke();
+        ctx.setLineDash([]);
+        return 0;
+    },
+    swm_bomb(ctx, u) { _cueBombs(ctx, u, [256, 330], '200,110,255'); return 0; },
+    swm_mimic(ctx, u, dy, at) {
+        const env = envOf(u, 0.2, 0.25), fl = Math.sin(u * 40) > 0 ? 1 : 0.4;
+        [[230, 100], [150, 210], [350, 210]].forEach(([x, y]) => { const [ex, ey] = at('body', x, y); _cueGlow(ctx, ex, ey, 30, '230,140,255', env * fl); });
+        ctx.strokeStyle = 'rgba(200,110,255,' + (0.6 * env * fl) + ')'; ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.ellipse(256 + 30 * Math.sin(u * 9), 220, 230, 60, 0, 0, 7); ctx.stroke();
+        return 0;
+    },
+    swm_eye(ctx, u) {
+        const env = envOf(u, 0.2, 0.25), x = 256 + 200 * Math.sin(u * Math.PI * 2);
+        const g = ctx.createLinearGradient(0, 300, 0, 500);
+        g.addColorStop(0, 'rgba(210,120,255,' + (0.7 * env) + ')'); g.addColorStop(1, 'rgba(210,120,255,0.05)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.moveTo(240, 300); ctx.lineTo(272, 300); ctx.lineTo(x + 60, 500); ctx.lineTo(x - 60, 500); ctx.closePath(); ctx.fill();
+        return 0;
+    },
+});
+// <<< poses boss_swarm
+
+// >>> poses boss_tactician
+// ---- The Tactician ---------------------------------------------------------
+// Battle Intent: the staff points, the die glows and red arrows sweep out
+//   over the board like a battle plan. Fog Bank: the chessboard tilts and the
+//   fog of war rolls in.
+Object.assign(POSES, {
+    tac_intent(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.staff.rot = -14 * env; P.staff.dx = -6 * env;
+        P.board.rot = -3 * env;
+        P.body.rot = -1.5 * env;
+    },
+    tac_fog(P, u) {
+        const env = envOf(u, 0.25, 0.25);
+        P.board.rot = 6 * env; P.board.dy = -6 * env;
+        P.staff.rot = 4 * env;
+    },
+});
+Object.assign(FX, {
+    tac_intent(ctx, u, dy, at) {
+        const env = envOf(u, 0.2, 0.25), [sx, sy] = at('staff', 420, 110);
+        _cueGlow(ctx, sx, sy, 80, '200,230,240', 0.7 * env);
+        [[60, 470, 200, 400], [250, 500, 330, 420], [450, 470, 360, 400]].forEach(([x1, y1, x2, y2], i) => {
+            const k = ease((u - 0.2 - i * 0.1) / 0.3);
+            if (k <= 0) return;
+            const x = x1 + (x2 - x1) * k, y = y1 + (y2 - y1) * k;
+            ctx.strokeStyle = 'rgba(230,70,70,' + env + ')'; ctx.lineWidth = 6;
+            ctx.setLineDash([12, 8]);
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x, y); ctx.stroke();
+            ctx.setLineDash([]);
+            const a = Math.atan2(y2 - y1, x2 - x1);
+            ctx.fillStyle = 'rgba(230,70,70,' + env + ')';
+            ctx.beginPath(); ctx.moveTo(x + Math.cos(a) * 14, y + Math.sin(a) * 14);
+            ctx.lineTo(x + Math.cos(a + 2.4) * 14, y + Math.sin(a + 2.4) * 14); ctx.lineTo(x + Math.cos(a - 2.4) * 14, y + Math.sin(a - 2.4) * 14); ctx.fill();
+        });
+        return 0;
+    },
+    tac_fog(ctx, u) { _cueFog(ctx, u, '170,180,190'); return 0; },
+});
+// <<< poses boss_tactician
+
+// >>> poses boss_thwomp
+// ---- The Thwomp ------------------------------------------------------------
+// Soul Tithe: the block shudders and soul wisps are sucked into its face.
+// Corrupt Cells: it lifts, slams down and tainted cells crack out of the floor.
+Object.assign(POSES, {
+    thw_tithe(P, u) {
+        const env = envOf(u, 0.2, 0.25), j = Math.sin(u * 60) * env;
+        P.body.dx = 2 * j; P.body.sc = 1 + 0.03 * env;
+    },
+    thw_corrupt(P, u) {
+        const lift = ease(u / 0.35), slam = ease((u - 0.35) / 0.06), k = 1 - ease((u - 0.65) / 0.35);
+        P.body.dy = (-40 * lift * (1 - slam)) * k;
+        P.body.sx = 1 + 0.08 * slam * k; P.body.sy = 1 - 0.08 * slam * k;
+    },
+});
+Object.assign(FX, {
+    thw_tithe(ctx, u) { _cueTithe(ctx, u, 300, 300, '150,240,180'); return 0; },
+    thw_corrupt(ctx, u) {
+        if (u > 0.4 && u < 0.7) {
+            const d = (u - 0.4) / 0.3;
+            ctx.strokeStyle = 'rgba(220,220,210,' + (0.7 * (1 - d)) + ')'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.ellipse(256, 470, 220 + 80 * d, 20 + 10 * d, 0, 0, 7); ctx.stroke();
+        }
+        if (u > 0.38) _cueCorrupt(ctx, (u - 0.38) / 0.62, [256, 470], '90,220,150');
+        return u > 0.36 && u < 0.4 ? 0.15 : 0;
+    },
+});
+// <<< poses boss_thwomp
+
+// >>> poses boss_striker
+// ---- The Striker -----------------------------------------------------------
+// Prior Bomb: he winds the back leg up, the glowing ball spins, then he
+//   kicks it and fused bombs scatter from the impact.
+Object.assign(POSES, {
+    str_kick(P, u) {
+        const wind = ease(u / 0.35), kick = ease((u - 0.35) / 0.08), k = 1 - ease((u - 0.65) / 0.35);
+        P.legR.rot = (-26 * wind * (1 - kick) + 30 * kick) * k;
+        P.body.rot = (-3 * wind + 4 * kick) * k;
+        P.ball.rot = 360 * ease(u);
+        P.ball.dx = -30 * kick * k; P.ball.dy = -40 * Math.sin(kick * Math.PI) * k;
+    },
+});
+Object.assign(FX, {
+    str_kick(ctx, u) {
+        _cueGlow(ctx, 138, 428, 90, '90,230,255', 0.5 * envOf(u, 0.15, 0.3));
+        _cueBombs(ctx, u, [138, 410], '90,230,255');
+        return 0;
+    },
+});
+// <<< poses boss_striker
+
+// >>> poses boss_tron
+// ---- The Tron --------------------------------------------------------------
+// Light Cycle: the rider leans in, the bike lurches forward and a glowing
+//   light trail streaks out behind it. Corrupt Cells: the grid wave behind
+//   glitches and spits tainted cells.
+Object.assign(POSES, {
+    trn_cycle(P, u) {
+        const lean = ease(u / 0.3), go = ease((u - 0.3) / 0.1), k = 1 - ease((u - 0.7) / 0.3);
+        P.body.dx = (-8 * lean * (1 - go) + 24 * go) * k;
+        P.body.rot = (-2 * lean + 3 * go) * k;
+        P.head.rot = 6 * lean * k;
+        P.wheelF.rot = 720 * u;
+        P.wave.sx = 1 + 0.15 * go * k;
+    },
+    trn_corrupt(P, u) {
+        const env = envOf(u, 0.15, 0.25), j = Math.sin(u * 80) * env;
+        P.wave.dx = 4 * j; P.wave.dy = -2 * j;
+        P.head.rot = 3 * env;
+    },
+});
+Object.assign(FX, {
+    trn_cycle(ctx, u) {
+        if (u < 0.3) return 0;
+        const k = ease((u - 0.3) / 0.4), fade = 1 - ease((u - 0.75) / 0.25);
+        ctx.fillStyle = 'rgba(90,240,255,' + (0.6 * fade) + ')';
+        ctx.fillRect(-150, 395, 170 + 200 * k, 12);
+        ctx.fillStyle = 'rgba(230,255,255,' + fade + ')';
+        ctx.fillRect(-150, 399, 170 + 200 * k, 4);
+        for (let i = 0; i < 5; i++) {
+            ctx.strokeStyle = 'rgba(150,250,255,' + (0.5 * fade) + ')'; ctx.lineWidth = 3;
+            const y = 200 + i * 40, x = -60 - ((u * 900 + i * 60) % 160);
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 100, y); ctx.stroke();
+        }
+        return 0;
+    },
+    trn_corrupt(ctx, u) { _cueCorrupt(ctx, u, [400, 230], '90,240,255'); return 0; },
+});
+// <<< poses boss_tron
+
+// >>> poses boss_velocity
+// ---- The Velocity ----------------------------------------------------------
+// Speed Lanes: it pumps its arms, the gauge needles spin and three glowing
+//   lanes rush across with arrows. Corrupt Cells: it skids to a stop and
+//   tainted cells scatter in its wake.
+Object.assign(POSES, {
+    vel_lanes(P, u) {
+        const env = envOf(u, 0.15, 0.2), pump = Math.sin(u * Math.PI * 10);
+        P.fistR.rot = 20 * pump * env; P.fistL.rot = -20 * pump * env;
+        P.body.dy = -4 * Math.abs(pump) * env;
+        P.head.rot = 2 * pump * env;
+    },
+    vel_corrupt(P, u) {
+        const skid = ease(u / 0.3), k = 1 - ease((u - 0.6) / 0.4);
+        P.body.rot = -6 * skid * k; P.body.dx = 10 * skid * k;
+        P.head.rot = -4 * skid * k;
+    },
+});
+Object.assign(FX, {
+    vel_lanes(ctx, u, dy, at) {
+        const env = envOf(u, 0.15, 0.2);
+        [[180, 210], [255, 210]].forEach(([x, y]) => {
+            const [gx, gy] = at('head', x, y), a = u * 30;
+            ctx.strokeStyle = 'rgba(255,90,80,' + env + ')'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx + Math.cos(a) * 22, gy + Math.sin(a) * 22); ctx.stroke();
+        });
+        [420, 465, 510].forEach((y, i) => {
+            const off = (u * 1200 + i * 90) % 140;
+            ctx.fillStyle = 'rgba(120,230,255,' + (0.3 * env) + ')'; ctx.fillRect(-40, y - 14, 592, 28);
+            ctx.fillStyle = 'rgba(230,255,255,' + (0.9 * env) + ')';
+            for (let x = 500 - off; x > -60; x -= 140) {
+                ctx.beginPath(); ctx.moveTo(x - 22, y - 10); ctx.lineTo(x - 30, y); ctx.lineTo(x - 22, y + 10); ctx.lineTo(x - 40, y); ctx.fill();
+            }
+        });
+        return 0;
+    },
+    vel_corrupt(ctx, u) { _cueCorrupt(ctx, u, [200, 380], '230,200,90'); return 0; },
+});
+// <<< poses boss_velocity
+
+// >>> poses boss_vise
+// ---- The Vise --------------------------------------------------------------
+// Crushing Walls: both arms push inward and two brick walls slide in from the
+//   sides. Probability Shift: the jaw clacks and marks hop. Bench Vise: the
+//   jaw clamps down hard with a shudder. Quench or Shatter: the fist glows
+//   red-hot, then steam hisses up as it is quenched.
+Object.assign(POSES, {
+    vis_walls(P, u) {
+        const env = envOf(u, 0.25, 0.25);
+        P.armL.dx = 22 * env; P.armL.rot = -8 * env;
+        P.armR.dx = -22 * env; P.armR.rot = 8 * env;
+        P.body.sc = 1 - 0.02 * env;
+    },
+    vis_shift(P, u) {
+        const env = envOf(u, 0.2, 0.25), clack = Math.abs(Math.sin(u * Math.PI * 6));
+        P.jaw.dy = 10 * clack * env;
+        P.armR.rot = -6 * env;
+    },
+    vis_bench(P, u) {
+        const open = ease(u / 0.35), clamp = ease((u - 0.35) / 0.06), k = 1 - ease((u - 0.7) / 0.3);
+        P.jaw.dy = (16 * open * (1 - clamp) - 4 * clamp) * k;
+        P.body.dy = 5 * clamp * k;
+        P.armL.rot = 6 * clamp * k; P.armR.rot = -6 * clamp * k;
+    },
+    vis_quench(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.armR.rot = -16 * env; P.armR.dy = -12 * env;
+        P.body.rot = -1.5 * env;
+    },
+});
+Object.assign(FX, {
+    vis_walls(ctx, u) {
+        const env = envOf(u, 0.25, 0.25), k = ease((u - 0.1) / 0.5);
+        [-1, 1].forEach((s) => {
+            const x = s < 0 ? -140 + 140 * k : 512 + 80 - 140 * k;
+            ctx.fillStyle = 'rgba(190,90,70,' + env + ')'; ctx.strokeStyle = 'rgba(60,25,20,' + env + ')'; ctx.lineWidth = 3;
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 2; c++) {
+                const bx = x - 30 + c * 30 + (r % 2 ? 15 : 0), by = 60 + r * 52;
+                ctx.fillRect(bx - 30, by, 28, 24); ctx.strokeRect(bx - 30, by, 28, 24);
+            }
+        });
+        return 0;
+    },
+    vis_shift(ctx, u) { _cueShift(ctx, u, '230,180,90'); return 0; },
+    vis_bench(ctx, u) {
+        if (u < 0.38) return 0;
+        const d = (u - 0.38) / 0.4;
+        if (d > 1) return 0;
+        ctx.strokeStyle = 'rgba(255,230,180,' + (1 - d) + ')'; ctx.lineWidth = 6;
+        for (let i = 0; i < 8; i++) {
+            const a = Math.PI * (0.1 + i * 0.1), r1 = 100, r2 = 100 + 60 * d;
+            ctx.beginPath(); ctx.moveTo(265 + Math.cos(a) * r1, 205 - Math.sin(a) * r1 * 0.4); ctx.lineTo(265 + Math.cos(a) * r2, 205 - Math.sin(a) * r2 * 0.4); ctx.stroke();
+        }
+        return u > 0.36 && u < 0.4 ? 0.12 : 0;
+    },
+    vis_quench(ctx, u, dy, at) {
+        const [x, y] = at('armR', 440, 310), heat = ease(u / 0.45) * (1 - ease((u - 0.5) / 0.15));
+        _cueGlow(ctx, x, y, 80, '255,110,40', 0.9 * heat);
+        if (u > 0.5) for (let i = 0; i < 8; i++) {
+            const k = ((u - 0.5) * 2.5 + i / 8) % 1;
+            _cueGlow(ctx, x - 30 + i * 9, y - k * 200, 20 + k * 30, '230,235,240', 0.6 * (1 - k) * (1 - ease((u - 0.85) / 0.15)));
+        }
+        return 0;
+    },
+});
+// <<< poses boss_vise
+
+// >>> poses boss_voidborn
+// ---- The Voidborn ----------------------------------------------------------
+// Void Choice: the hood tilts left and right as two violet portals open, one
+//   glowing, one dark. Void Tendrils: the tendril whips and shadowy tentacles
+//   rise from the ground. Prior Bomb: the horn blade flares and lobs bombs.
+Object.assign(POSES, {
+    vdb_choice(P, u) {
+        const env = envOf(u, 0.2, 0.25), s = Math.sin(u * Math.PI * 3);
+        P.body.rot = 4 * s * env;
+        P.horn.rot = 6 * s * env;
+    },
+    vdb_tendrils(P, u) {
+        const env = envOf(u, 0.2, 0.25), w = Math.sin(u * Math.PI * 6);
+        P.tendrilL.rot = -20 * w * env;
+        P.body.dy = -4 * env;
+        P.horn.rot = -4 * env;
+    },
+    vdb_bomb(P, u) {
+        const wind = ease(u / 0.35), swing = ease((u - 0.35) / 0.1), k = 1 - ease((u - 0.65) / 0.35);
+        P.horn.rot = (-10 * wind * (1 - swing) + 18 * swing) * k;
+        P.body.rot = (-2 * wind + 3 * swing) * k;
+    },
+});
+Object.assign(FX, {
+    vdb_choice(ctx, u) {
+        const env = envOf(u, 0.2, 0.25), k = ease(u / 0.4);
+        [[90, 1], [430, 0]].forEach(([x, lit]) => {
+            const r = 55 * k;
+            ctx.fillStyle = lit ? 'rgba(200,120,255,' + (0.5 * env) + ')' : 'rgba(20,10,30,' + (0.85 * env) + ')';
+            ctx.beginPath(); ctx.ellipse(x, 430, r, r * 1.3, 0, 0, 7); ctx.fill();
+            ctx.strokeStyle = 'rgba(220,150,255,' + env + ')'; ctx.lineWidth = 5;
+            ctx.setLineDash([14, 10]); ctx.lineDashOffset = u * 200 * (lit ? 1 : -1);
+            ctx.beginPath(); ctx.ellipse(x, 430, r, r * 1.3, 0, 0, 7); ctx.stroke();
+            ctx.setLineDash([]);
+        });
+        return 0;
+    },
+    vdb_tendrils(ctx, u) {
+        const fade = 1 - ease((u - 0.8) / 0.2);
+        [70, 200, 330, 450].forEach((x, i) => {
+            const k = ease((u - 0.2 - i * 0.06) / 0.25);
+            if (k <= 0) return;
+            const h = 150 * k;
+            ctx.strokeStyle = 'rgba(70,60,95,' + fade + ')'; ctx.lineWidth = 18; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(x, 500);
+            ctx.quadraticCurveTo(x + 40 * Math.sin(u * 8 + i), 500 - h / 2, x + 20 * Math.sin(u * 10 + i), 500 - h); ctx.stroke();
+            ctx.strokeStyle = 'rgba(200,130,255,' + (0.7 * fade) + ')'; ctx.lineWidth = 4; ctx.stroke();
+            ctx.lineCap = 'butt';
+        });
+        return 0;
+    },
+    vdb_bomb(ctx, u) { _cueBombs(ctx, u, [340, 80], '210,120,255'); return 0; },
+});
+// <<< poses boss_voidborn
+
+// >>> poses boss_warden
+// ---- The Warden ------------------------------------------------------------
+// Pulse Totems: the lantern lifts and pulses, and three glowing totems rise
+//   from the floor and ring out. Frozen Cells: the open hand flings ice.
+// Arc Link: the lantern sparks and arcs of light link the totems together.
+Object.assign(POSES, {
+    wrd_totems(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.lantern.rot = 8 * env; P.lantern.dy = -14 * env;
+        P.handR.rot = -6 * env;
+    },
+    wrd_frost(P, u) {
+        const wind = ease(u / 0.25), fling = ease((u - 0.25) / 0.1), k = 1 - ease((u - 0.65) / 0.35);
+        P.handR.rot = (14 * wind * (1 - fling) - 24 * fling) * k;
+        P.body.rot = 1.5 * fling * k;
+    },
+    wrd_arc(P, u) {
+        const env = envOf(u, 0.2, 0.25), j = Math.sin(u * 70) * env;
+        P.lantern.rot = (10 + 2 * j) * env; P.lantern.dy = -10 * env;
+        P.body.dx = 0.8 * j;
+    },
+});
+// The three totem spots shared by the Warden's effects.
+const WRD_TOTEMS = [[110, 480], [256, 505], [400, 480]];
+// Draws a lit totem post at (x, y), raised by k (0..1).
+function _wrdTotem(ctx, x, y, k, a) {
+    const h = 70 * k;
+    ctx.fillStyle = 'rgba(70,80,100,' + a + ')'; ctx.strokeStyle = 'rgba(200,170,90,' + a + ')'; ctx.lineWidth = 3;
+    ctx.fillRect(x - 14, y - h, 28, h); ctx.strokeRect(x - 14, y - h, 28, h);
+    _cueGlow(ctx, x, y - h, 26, '255,230,150', a * k);
+}
+Object.assign(FX, {
+    wrd_totems(ctx, u, dy, at) {
+        const fade = 1 - ease((u - 0.8) / 0.2), [lx, ly] = at('lantern', 50, 90);
+        _cueGlow(ctx, lx, ly, 60 + 20 * Math.sin(u * 20), '255,230,150', 0.7 * envOf(u, 0.2, 0.25));
+        WRD_TOTEMS.forEach(([x, y], i) => {
+            const k = ease((u - 0.2 - i * 0.07) / 0.2);
+            if (k <= 0) return;
+            _wrdTotem(ctx, x, y, k, fade);
+            const r = ((u - 0.4 - i * 0.07) * 2) % 1;
+            if (u > 0.4 + i * 0.07) {
+                ctx.strokeStyle = 'rgba(255,230,150,' + (0.7 * (1 - r) * fade) + ')'; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.ellipse(x, y, 30 + 60 * r, 10 + 20 * r, 0, 0, 7); ctx.stroke();
+            }
+        });
+        return 0;
+    },
+    wrd_frost(ctx, u) { _cueFrost(ctx, u, [460, 300]); return 0; },
+    wrd_arc(ctx, u) {
+        const env = envOf(u, 0.2, 0.25);
+        WRD_TOTEMS.forEach(([x, y]) => _wrdTotem(ctx, x, y, 1, env));
+        ctx.strokeStyle = 'rgba(255,245,200,' + env + ')'; ctx.lineWidth = 4;
+        for (let s = 0; s < 2; s++) {
+            const [x1, y1] = WRD_TOTEMS[s], [x2, y2] = WRD_TOTEMS[s + 1];
+            if (((u * 12 + s) | 0) % 3 === 0) continue;
+            ctx.beginPath(); ctx.moveTo(x1, y1 - 70);
+            for (let j = 1; j < 6; j++) ctx.lineTo(x1 + (x2 - x1) * j / 6, y1 - 70 + (y2 - y1) * j / 6 + (((j * 31 + (u * 40 | 0)) % 26) - 13));
+            ctx.lineTo(x2, y2 - 70); ctx.stroke();
+        }
+        return 0;
+    },
+});
+// <<< poses boss_warden
+
+// >>> poses boss_warlord
+// ---- The Warlord -----------------------------------------------------------
+// Guard Call: he raises the greatsword overhead and shouts, and two shield
+//   guards stamp in. Triple Rings: three sword slams send three shockwave
+//   rings out. Soul Tithe: the sword dips and wisps stream into the blade.
+Object.assign(POSES, {
+    wrl_guard(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.sword.rot = 12 * env; P.sword.dy = -14 * env;
+        P.head.rot = -4 * env; P.head.dy = -4 * env;
+    },
+    wrl_rings(P, u) {
+        let s = 0;
+        for (let i = 0; i < 3; i++) { const t = (u - 0.1 - i * 0.25) / 0.2; if (t > 0 && t < 1) s = Math.max(s, Math.sin(t * Math.PI)); }
+        P.sword.rot = -16 * s; P.sword.dy = 10 * s;
+        P.body.dy = 4 * s;
+        P.head.dy = 3 * s;
+    },
+    wrl_tithe(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.sword.rot = -8 * env;
+        P.head.rot = 4 * env;
+    },
+});
+Object.assign(FX, {
+    wrl_guard(ctx, u) {
+        const fade = 1 - ease((u - 0.85) / 0.15);
+        for (let i = 0; i < 3; i++) {
+            const r = (u * 1.4 - i * 0.2);
+            if (r <= 0 || r > 1) continue;
+            ctx.strokeStyle = 'rgba(255,150,110,' + (0.6 * (1 - r)) + ')'; ctx.lineWidth = 8;
+            ctx.beginPath(); ctx.arc(312, 170, 40 + r * 200, -2.4, -0.7); ctx.stroke();
+        }
+        [-1, 1].forEach((s, i) => {
+            const k = ease((u - 0.35 - i * 0.08) / 0.25);
+            if (k <= 0) return;
+            const x = 256 + s * (420 - 220 * k), y = 450;
+            ctx.fillStyle = 'rgba(110,90,70,' + fade + ')'; ctx.strokeStyle = 'rgba(210,170,100,' + fade + ')'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(x - 30, y - 50); ctx.lineTo(x + 30, y - 50); ctx.lineTo(x + 26, y + 20); ctx.lineTo(x, y + 45); ctx.lineTo(x - 26, y + 20); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x, y - 40); ctx.lineTo(x, y + 30); ctx.moveTo(x - 18, y - 10); ctx.lineTo(x + 18, y - 10); ctx.stroke();
+        });
+        return 0;
+    },
+    wrl_rings(ctx, u) {
+        for (let i = 0; i < 3; i++) {
+            const t = (u - 0.2 - i * 0.25) / 0.45;
+            if (t <= 0 || t > 1) continue;
+            ctx.strokeStyle = 'rgba(240,220,180,' + (0.8 * (1 - t)) + ')'; ctx.lineWidth = 12 * (1 - t) + 2;
+            ctx.beginPath(); ctx.ellipse(256, 480, 60 + t * 320, 16 + t * 70, 0, 0, 7); ctx.stroke();
+        }
+        return 0;
+    },
+    wrl_tithe(ctx, u, dy, at) { const [x, y] = at('sword', 300, 130); _cueTithe(ctx, u, x, y, '230,120,110'); return 0; },
+});
+// <<< poses boss_warlord
+
+// >>> poses boss_weaver
+// ---- The Weaver ------------------------------------------------------------
+// Thread Grid: the spider tugs the web, its eyes glow and glowing threads
+//   lace across the board into a grid. Prior Bomb: the abdomen pulses and
+//   lobs silk-wrapped bombs.
+Object.assign(POSES, {
+    wvr_grid(P, u) {
+        const env = envOf(u, 0.2, 0.25), tug = Math.sin(u * Math.PI * 4);
+        P.web.rot = 6 * tug * env; P.web.dx = -6 * env;
+        P.head.rot = -3 * tug * env;
+        P.abdomen.rot = 2 * tug * env;
+    },
+    wvr_bomb(P, u) {
+        const pulse = ease(u / 0.35), out = ease((u - 0.35) / 0.1), k = 1 - ease((u - 0.65) / 0.35);
+        P.abdomen.sc = 1 + (0.08 * pulse - 0.06 * out) * k;
+        P.abdomen.rot = -6 * out * k;
+        P.head.dy = 3 * out * k;
+    },
+});
+Object.assign(FX, {
+    wvr_grid(ctx, u, dy, at) {
+        const env = envOf(u, 0.2, 0.25);
+        [[205, 115], [250, 110], [295, 115]].forEach(([x, y]) => { const [ex, ey] = at('head', x, y); _cueGlow(ctx, ex, ey, 18, '120,255,230', env); });
+        ctx.strokeStyle = 'rgba(200,255,240,' + (0.75 * env) + ')'; ctx.lineWidth = 2;
+        for (let i = 0; i < 6; i++) {
+            const k = ease((u - 0.2 - i * 0.05) / 0.25);
+            if (k <= 0) continue;
+            const y = 370 + i * 28, x = 30 + i * 90;
+            ctx.beginPath(); ctx.moveTo(-20, y); ctx.lineTo(-20 + 552 * k, y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x, 350); ctx.lineTo(x, 350 + 170 * k); ctx.stroke();
+        }
+        return 0;
+    },
+    wvr_bomb(ctx, u) { _cueBombs(ctx, u, [420, 230], '120,240,220'); return 0; },
+});
+// <<< poses boss_weaver
+
+// >>> poses boss_wormhole
+// ---- The Wormhole ----------------------------------------------------------
+// Portal Wisp: the coil spins, the maw opens wide and a glowing wisp flies
+//   out through a small portal. Clue Scramble: the face spins and three clue
+//   numbers swap places overhead.
+Object.assign(POSES, {
+    wrm_wisp(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.body.rot = 20 * ease(u) * env;
+        P.face.sc = 1 + 0.08 * env;
+        P.face.rot = -20 * ease(u) * env;
+    },
+    wrm_scramble(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.face.rot = 30 * Math.sin(u * Math.PI * 2) * env;
+        P.body.rot = -8 * Math.sin(u * Math.PI * 2) * env;
+    },
+});
+Object.assign(FX, {
+    wrm_wisp(ctx, u) {
+        const env = envOf(u, 0.2, 0.25);
+        _cueGlow(ctx, 256, 260, 70, '230,90,90', 0.6 * env);
+        const k = ease((u - 0.3) / 0.5);
+        if (k > 0) {
+            const x = 256 + 230 * k, y = 260 - 200 * Math.sin(k * Math.PI * 0.8);
+            ctx.strokeStyle = 'rgba(255,200,140,' + env + ')'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.ellipse(470, 120, 30, 46, 0.3, 0, 7); ctx.stroke();
+            _cueGlow(ctx, x, y, 30, '255,220,170', env);
+            for (let i = 1; i < 5; i++) {
+                const kk = Math.max(0, k - i * 0.05);
+                _cueGlow(ctx, 256 + 230 * kk, 260 - 200 * Math.sin(kk * Math.PI * 0.8), 16, '255,190,140', 0.4 * env / i);
+            }
+        }
+        return 0;
+    },
+    wrm_scramble(ctx, u) { _cueClues(ctx, u, '230,90,90', true); return 0; },
+});
+// <<< poses boss_wormhole
+
+
+// >>> poses boss_zenith
+// ---- The Zenith ------------------------------------------------------------
+// Royal Decree: the staff slams, the crown flares and a golden scroll unrolls
+//   with a seal. Crown Rings: the crown lifts and golden rings ripple out.
+// Soul Tithe: the vortex hand opens and wisps spiral into it.
+Object.assign(POSES, {
+    zen_decree(P, u) {
+        const lift = ease(u / 0.3), slam = ease((u - 0.3) / 0.08), k = 1 - ease((u - 0.7) / 0.3);
+        P.staff.rot = (10 * lift * (1 - slam) - 4 * slam) * k;
+        P.staff.dy = (-16 * lift * (1 - slam) + 6 * slam) * k;
+        P.crown.dy = -6 * slam * k;
+        P.body.dy = 3 * slam * k;
+    },
+    zen_rings(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.crown.dy = -16 * env; P.crown.sc = 1 + 0.06 * env;
+        P.vortex.rot = 20 * u * env;
+    },
+    zen_tithe(P, u) {
+        const env = envOf(u, 0.2, 0.25);
+        P.vortex.rot = 60 * u * env; P.vortex.sc = 1 + 0.08 * env;
+    },
+});
+Object.assign(FX, {
+    zen_decree(ctx, u) {
+        if (u < 0.32) return 0;
+        const k = ease((u - 0.32) / 0.3), fade = 1 - ease((u - 0.82) / 0.18);
+        const w = 260 * k;
+        ctx.fillStyle = 'rgba(250,235,190,' + fade + ')'; ctx.strokeStyle = 'rgba(150,110,40,' + fade + ')'; ctx.lineWidth = 3;
+        ctx.fillRect(256 - w / 2, 430, w, 70); ctx.strokeRect(256 - w / 2, 430, w, 70);
+        ctx.fillStyle = 'rgba(200,160,70,' + fade + ')';
+        ctx.fillRect(256 - w / 2 - 10, 424, 12, 82); ctx.fillRect(256 + w / 2 - 2, 424, 12, 82);
+        if (k > 0.8) {
+            ctx.fillStyle = 'rgba(190,40,40,' + fade + ')';
+            ctx.beginPath(); ctx.arc(256, 465, 18, 0, 7); ctx.fill();
+        }
+        return u > 0.3 && u < 0.34 ? 0.12 : 0;
+    },
+    zen_rings(ctx, u, dy, at) {
+        const [x, y] = at('crown', 256, 110);
+        for (let i = 0; i < 3; i++) {
+            const r = (u * 1.4 - i * 0.22);
+            if (r <= 0 || r > 1) continue;
+            ctx.strokeStyle = 'rgba(255,210,90,' + (0.85 * (1 - r)) + ')'; ctx.lineWidth = 10 * (1 - r) + 2;
+            ctx.beginPath(); ctx.ellipse(x, y, 50 + r * 360, 20 + r * 140, 0, 0, 7); ctx.stroke();
+        }
+        return 0;
+    },
+    zen_tithe(ctx, u, dy, at) { const [x, y] = at('vortex', 430, 160); _cueTithe(ctx, u, x, y, '120,230,255'); return 0; },
+});
+// <<< poses boss_zenith
+
 const SHAKE = { slam: (u) => (u >= 0.5 ? 9 * Math.max(0, 1 - (u - 0.5) * 4) : 0) };
 
 // ---- plumbing ------------------------------------------------------------
@@ -4861,7 +8114,19 @@ function _renderFrame(ctx, rig, imgs, animName, u) {
     });
     ctx.save();
     ctx.translate(rig.ox, rig.oy); ctx.scale(S, S);
-    const flash = FX[animName](ctx, u, poses[rootName].dy);
+    // at(part, x, y): where an art point on that part sits this frame, so an
+    // effect can stay pinned to a moving eye or hand (S: 1 rigs only).
+    const at = (name, x, y) => {
+        let m = new DOMMatrix();
+        for (const q of chainOf(by[name])) {
+            const o = poses[q.n];
+            m = m.translate(o.dx * S, o.dy * S).translate(q.px, q.py).rotate(o.rot)
+                .scale(o.sc * (o.sx || 1), o.sc * (o.sy || 1)).translate(-q.px, -q.py);
+        }
+        const pt = m.transformPoint({ x, y });
+        return [pt.x, pt.y];
+    };
+    const flash = FX[animName](ctx, u, poses[rootName].dy, at);
     ctx.restore();
     ctx.restore();
     if (flash > 0) {
