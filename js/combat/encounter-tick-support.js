@@ -90,6 +90,8 @@ export let _lastLifeRegenAt = 0;
 let _lastLifePulseAt = 0;
 const LIFE_REGEN_CHUNK_MS = 3000;
 let _lastMainRegenAt = 0;
+// Life regeneration tick (at most once per interval): applies regen, Life
+// Recoup draining and related stats to the player's life.
 export function _tickLifeRegen() {
     const now = Date.now();
     if (now - _lastLifeRegenAt < LIFE_REGEN_INTERVAL_MS) return;
@@ -178,6 +180,8 @@ export let _pauseStartedAt = 0;
 // keep going behind the pause menu (and fire their on-arrival hit + sound).
 // Freeze them on pause, thaw only what we froze on resume.
 const _frozenFlightAnims = new Set();
+// Pauses running projectile and spell animations (used while the game is
+// paused).
 function _freezeFlightFx() {
     try {
         document.getAnimations().forEach(a => {
@@ -189,11 +193,14 @@ function _freezeFlightFx() {
         });
     } catch (e) { /* cosmetic */ }
 }
+// Resumes the animations paused by _freezeFlightFx.
 function _thawFlightFx() {
     _frozenFlightAnims.forEach(a => { try { a.play(); } catch (e) { /* already finished */ } });
     _frozenFlightAnims.clear();
 }
 
+// Called when the game pauses: records the pause start, freezes flight
+// effects and pauses grid drops.
 export function _onPause() {
     if (typeof _isActive === 'function' && !_isActive()) return;
     _pauseStartedAt = Date.now();

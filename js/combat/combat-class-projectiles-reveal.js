@@ -52,6 +52,7 @@ const BOOTSTRAP_EXTRA_HIT_CHANCE_PCT = 25;
 // a cast stays attributed to its ability for this long.
 const REVEAL_CAST_MEMORY_MS = 4000;
 
+// True when the player has the given passive-tree skill.
 function _hasNode(key) {
     return typeof globalThis.ptHasSkill === 'function' && !!globalThis.ptHasSkill(key);
 }
@@ -65,6 +66,7 @@ function _castingBaseAbilityId(source) {
     return null;
 }
 
+// Number of cells the player has marked as empty (X marks).
 function _countMarkedCells() {
     const grid = globalThis.userGrid;
     if (!Array.isArray(grid)) return 0;

@@ -23,6 +23,7 @@ import { _hzFirewall, _hzFrostNova, _hzVolatile, _setHzFirewall, _setHzFrostNova
 // in on the player. When close (or after a lifetime) they flash briefly,
 // then detonate - shadow damage in a blast radius, may inflict Shadow Burn.
 
+// Starts the volatile wisps hazard (count and speed depend on intensity).
 export function _hzInitVolatile(intensity) {
     const maxWisps = Math.min(6, 1 + Math.round(intensity / 22));
     _setHzVolatile({
@@ -47,6 +48,7 @@ export function _hzInitVolatile(intensity) {
     }
 }
 
+// Puts a wisp at a spot outside the grid and starts its hunt.
 export function _hzActivateVolatileWisp(wisp) {
     const pos = _hzPointOutsideGrid(40);
     wisp.x = pos.x;
@@ -59,6 +61,7 @@ export function _hzActivateVolatileWisp(wisp) {
     wisp.el = el;
 }
 
+// Blows up a wisp with a blast visual; it respawns later.
 export function _hzDetonateVolatile(wisp) {
     const st = _hzVolatile;
     wisp.state = 'dead';
@@ -82,6 +85,8 @@ export function _hzDetonateVolatile(wisp) {
     }
 }
 
+// Per-frame update: wisps hunt the player and detonate; destroyed ones
+// respawn after a delay.
 export function _hzTickVolatile(dtMs) {
     const st = _hzVolatile;
     const dtS = dtMs / 1000;
@@ -147,6 +152,7 @@ export function _hzTickVolatile(dtMs) {
 // expanding ring damages anything it passes through once (chill + freeze
 // chance). Cold Resistance mitigates; dodging out of the ring radius works.
 
+// Starts the frost nova hazard.
 export function _hzInitFrostNova(intensity) {
     _setHzFrostNova({
         novas: [],
@@ -156,6 +162,7 @@ export function _hzInitFrostNova(intensity) {
     });
 }
 
+// Erupts a frost ring near the player.
 export function _hzSpawnFrostNova() {
     // Erupt close to the player so the expanding ring must be reacted to.
     let x = window.innerWidth * 0.5;
@@ -178,6 +185,7 @@ export function _hzSpawnFrostNova() {
     _hzFrostNova.novas.push({ x, y, t: HZ_FROSTNOVA_EXPAND_MS, r: 0, el, hitDone: false });
 }
 
+// Per-frame update: expands the frost rings and applies their damage.
 export function _hzTickFrostNova(dtMs) {
     const st = _hzFrostNova;
 
@@ -260,6 +268,7 @@ export function _hzTickFrostNova(dtMs) {
 // the player's tight sprite hitbox; for gap variants the hit is
 // suppressed when the hitbox is fully inside the gap.
 
+// Starts the firewall hazard.
 export function _hzInitFirewall(intensity) {
     _setHzFirewall({
         pending: [],
@@ -269,6 +278,8 @@ export function _hzInitFirewall(intensity) {
     });
 }
 
+// Builds the wall elements of a firewall (full width, or with a gap up or
+// down).
 export function _hzCreateFirewallWallEls(variant, gapX, gapW, startY) {
     const h = HZ_FIREWALL_HEIGHT;
     const hasGap = variant === 'gapDown' || variant === 'gapUp';
@@ -318,6 +329,7 @@ export function _hzCreateFirewallWallEls(variant, gapX, gapW, startY) {
     return els;
 }
 
+// Builds the matching warning strips shown before a firewall arrives.
 export function _hzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
     const h = HZ_FIREWALL_HEIGHT;
     const hasGap = variant === 'gapDown' || variant === 'gapUp';
@@ -362,6 +374,9 @@ export function _hzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
     return els;
 }
 
+// Per-frame update: schedules a firewall (never a second one while one is
+// active), shows the warning, advances the wall and damages the player it
+// touches.
 export function _hzTickFirewall(dtMs) {
     const st = _hzFirewall;
     const dtS = dtMs / 1000;

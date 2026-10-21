@@ -36,6 +36,7 @@ export function _itemDropRarityClass(rarity) {
         .includes(rarity) ? rarity : 'common';
 }
 
+// Draws an item drop on a grid cell, tinted by the item's rarity.
 export function _renderItemDropOverlay(row, col, drop) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
@@ -50,12 +51,14 @@ export function _renderItemDropOverlay(row, col, drop) {
     el.appendChild(span);
 }
 
+// Removes the item drop overlay for a 'row-col' key.
 export function _removeItemDropOverlay(key) {
     const [r, c] = key.split('-').map(Number);
     const span = document.getElementById(`sx-item-drop-${r}-${c}`);
     if (span) span.remove();
 }
 
+// Plays the floating claim animation of an item drop from its cell.
 export function _animateItemDropClaim(row, col, drop) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;

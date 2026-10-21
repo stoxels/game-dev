@@ -71,6 +71,8 @@ function _meleeKillExplode(dying) {
 // freeze_timer_on_stun (tree): stunning an enemy pauses the level Timer. A
 // short cooldown keeps repeated stuns from pinning the clock.
 const STUN_FREEZE_COOLDOWN_MS = 6000;
+// Freezes the puzzle timer when a stun lands, if the player has the stat; has
+// a cooldown. Returns true when it froze.
 function _freezeTimerOnStun(stats) {
     const secs = Number(stats && stats.timerFreezeOnStun) || 0;
     const flags = globalThis.LEVEL_FLAGS;
@@ -87,6 +89,8 @@ const PUSHBACK_BUDGET = 0.5;
 const PUSHBACK_BUDGET_BOSS = 0.3;
 const PUSHBACK_BURST = 1.6;
 
+// Subtracts a hit from a monster's life and applies the knockback to its
+// charge bar (high-level monsters resist it).
 export function _applyHitToMonster(target, amount, opts) {
     const stats = _computePlayerStats();
     target.currentHP = Math.max(0, target.currentHP - amount);
@@ -410,6 +414,8 @@ export const CHARGED_RICOCHET_SCALE = 0.62;
 
 export const CHARGED_RICOCHET_DURATION_MS = 350;
 
+// When a charged hit kills a monster with damage to spare, may carry the
+// overkill over to another living monster.
 export function _tryChargedOverkillRicochet(dyingTarget, appliedDamage, hpBefore, elements, opts) {
     if (!_rollOverkillSpread()) return;
     const overkill = Math.round(appliedDamage - (hpBefore != null ? hpBefore : 0));

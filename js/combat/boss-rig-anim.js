@@ -4066,6 +4066,7 @@ const SHAKE = { slam: (u) => (u >= 0.5 ? 9 * Math.max(0, 1 - (u - 0.5) * 4) : 0)
 
 // ---- plumbing ------------------------------------------------------------
 const _imgCache = {};
+// The cached image for a boss rig part (loaded on first use).
 function _partImg(bossId, part) {
     const key = bossId + '/' + part;
     if (!_imgCache[key]) {
@@ -4078,6 +4079,7 @@ function _partImg(bossId, part) {
 
 const _running = {};   // monsterId -> true while an animation owns that card
 
+// The monster art element on a monster's card.
 function _findArt(monsterId) {
     const card = document.getElementById('sx-card-' + monsterId);
     return card ? card.querySelector('.sx-monster-emoji-compact') : null;
@@ -4118,6 +4120,8 @@ function _renderFrame(ctx, rig, imgs, animName, u) {
     }
 }
 
+// Plays a rig animation on a boss's art for the given time. Skips the cue if
+// the part images are not decoded yet or one is already running.
 function _play(monsterId, bossId, animName, ms) {
     const rig = RIGS[bossId];
     if (!rig || !POSES[animName] || _running[monsterId]) return;
@@ -4165,6 +4169,8 @@ function _play(monsterId, bossId, animName, ms) {
     requestAnimationFrame(frame);
 }
 
+// Reacts to a boss mechanic event by playing the matching rig animation on
+// that boss's art.
 function _onBossMechanic(ev) {
     try {
         const d = (ev && ev.detail) || {};

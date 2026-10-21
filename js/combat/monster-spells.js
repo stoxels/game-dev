@@ -105,23 +105,28 @@ function _msTimeout(fn, ms) {
     setTimeout(step, Math.min(left, 100));
 }
 
+// Spell name in the current language.
 function _msName(id) {
     const s = SPELLS[id];
     return LANG === 'de' ? s.de : s.en;
 }
 
+// True while the monster is alive and an encounter is running.
 function _msAlive(monster) {
     return !!(monster && _isActive() && (globalThis._monsters || []).some(m => m.id === monster.id && m.currentHP > 0));
 }
 
+// The monster's card element.
 function _msCard(monster) {
     return document.getElementById(`sx-card-${monster.id}`);
 }
 
+// The player avatar element.
 function _msPlayerEl() {
     return document.getElementById('player-avatar-wrapper');
 }
 
+// Center point of an element (null if there is none).
 function _msCentre(el) {
     return el ? _getElementCentre(el) : null;
 }
@@ -138,6 +143,7 @@ function _msFx(el, x, y, ms, inner) {
     return holder;
 }
 
+// Sprays a burst of small particles around a point.
 function _msParticles(el, x, y, count, extraClass, spread) {
     let html = '';
     for (let i = 0; i < count; i++) {
@@ -148,6 +154,8 @@ function _msParticles(el, x, y, count, extraClass, spread) {
     return _msFx(el, x, y, 800, html);
 }
 
+// Impact flash and particles at a point (ice shards for cold, sparks
+// otherwise).
 function _msImpact(el, pos) {
     if (!pos) return;
     _msFx(el, pos.x, pos.y, 700,
@@ -218,6 +226,8 @@ function _msProjectile(orbClass, trailClass, from, to, ms, easing, onArrive) {
 //-------------------THE SPELLS-------------------------------------------
 //------------------------------------------------------------------------
 
+// Fire Bolt: after the windup, a fire orb flies from the monster to the
+// player.
 function _castFireBolt(monster) {
     const cfg = MONSTER_SPELL_CONFIG;
     _msWindup(monster, 'fire_bolt', cfg.windupMs, () => {
@@ -233,6 +243,8 @@ function _castFireBolt(monster) {
     });
 }
 
+// Frost Nova: telegraphs a ring where the player stands now; it hits whoever
+// is still inside when it goes off.
 function _castFrostNova(monster) {
     const cfg = MONSTER_SPELL_CONFIG;
     _msWindup(monster, 'frost_nova', cfg.windupMs, () => {
@@ -261,6 +273,7 @@ function _castFrostNova(monster) {
     });
 }
 
+// SVG path for a jagged lightning bolt between two points.
 function _boltSvg(a, b) {
     const dx = b.x - a.x;
     const dy = b.y - a.y;
@@ -278,6 +291,7 @@ function _boltSvg(a, b) {
     return `<svg class="ms-bolt" xmlns="http://www.w3.org/2000/svg"><polyline class="ms-bolt-glow" points="${p}"/><polyline class="ms-bolt-core" points="${p}"/></svg>`;
 }
 
+// Chain Lightning: three lightning strikes in sequence.
 function _castChainLightning(monster) {
     const cfg = MONSTER_SPELL_CONFIG;
     _msWindup(monster, 'chain_lightning', cfg.windupMs - 150, () => {
@@ -301,6 +315,7 @@ function _castChainLightning(monster) {
     });
 }
 
+// Soul Drain: a shadow bolt at the player after a windup.
 function _castSoulDrain(monster) {
     const cfg = MONSTER_SPELL_CONFIG;
     _msWindup(monster, 'soul_drain', cfg.windupMs, () => {
@@ -346,6 +361,7 @@ function _castSoulDrain(monster) {
     });
 }
 
+// The most wounded ally below the mend threshold (null if none).
 function _woundedAlly(monster) {
     const cfg = MONSTER_SPELL_CONFIG;
     let best = null;
@@ -358,6 +374,7 @@ function _woundedAlly(monster) {
     return best || (monster.currentHP < monster.maxHP * cfg.mendWoundedBelow ? monster : null);
 }
 
+// Mend: heals the most wounded ally after a windup.
 function _castMend(monster) {
     const cfg = MONSTER_SPELL_CONFIG;
     const target = _woundedAlly(monster);
@@ -385,6 +402,8 @@ function _castMend(monster) {
     });
 }
 
+// Summon: calls in minions through a portal, up to the concurrent monster
+// cap.
 function _castSummon(monster) {
     const cfg = MONSTER_SPELL_CONFIG;
     _msWindup(monster, 'summon', cfg.windupMs + 150, () => {
@@ -429,18 +448,21 @@ function _msGroundStrike(monster, el, x, y, r, teleMs, mult, fall, onResolve) {
     }, teleMs);
 }
 
+// Shows the 'Dodged!' toast.
 function _msDodgeToast() {
     if (typeof globalThis.showToast === 'function') {
         globalThis.showCombatToast(LANG === 'de' ? '💨 Ausgewichen!' : '💨 Dodged!');
     }
 }
 
+// A random point within a radius of a center.
 function _msScatter(centre, spread) {
     const a = Math.random() * Math.PI * 2;
     const d = spread * Math.sqrt(Math.random());
     return { x: centre.x + Math.cos(a) * d, y: centre.y + Math.sin(a) * d };
 }
 
+// Meteor: a large ground strike on the player's position after a long windup.
 function _castMeteor(monster) {
     _msWindup(monster, 'meteor', MONSTER_SPELL_CONFIG.windupMs + 150, () => {
         const c = _msCentre(_msPlayerEl());
@@ -451,6 +473,7 @@ function _castMeteor(monster) {
     });
 }
 
+// Ember Rain: four small fire strikes around the player.
 function _castEmberRain(monster) {
     _msWindup(monster, 'ember_rain', MONSTER_SPELL_CONFIG.windupMs, () => {
         const c = _msCentre(_msPlayerEl());
@@ -465,6 +488,7 @@ function _castEmberRain(monster) {
     });
 }
 
+// Ice Lance: a fast cold bolt at the player.
 function _castIceLance(monster) {
     _msWindup(monster, 'ice_lance', MONSTER_SPELL_CONFIG.windupMs - 150, () => {
         const from = _msCentre(_msCard(monster));
@@ -479,6 +503,7 @@ function _castIceLance(monster) {
     });
 }
 
+// Hailstorm: five ice strikes around the player.
 function _castHailstorm(monster) {
     _msWindup(monster, 'hailstorm', MONSTER_SPELL_CONFIG.windupMs, () => {
         const c = _msCentre(_msPlayerEl());
@@ -493,6 +518,8 @@ function _castHailstorm(monster) {
     });
 }
 
+// Thunder Strike: three lightning strikes, each aimed where the player stands
+// at that moment.
 function _castThunderStrike(monster) {
     _msWindup(monster, 'thunder_strike', MONSTER_SPELL_CONFIG.windupMs - 100, () => {
         // Three strikes, each aimed where the player stands at that moment:
@@ -508,6 +535,7 @@ function _castThunderStrike(monster) {
     });
 }
 
+// Doom Orb: a big, slow shadow orb at the player.
 function _castDoomOrb(monster) {
     _msWindup(monster, 'doom_orb', MONSTER_SPELL_CONFIG.windupMs + 250, () => {
         const from = _msCentre(_msCard(monster));
@@ -524,6 +552,7 @@ function _castDoomOrb(monster) {
     });
 }
 
+// Shadow Volley: three shadow bolts in a row.
 function _castShadowVolley(monster) {
     _msWindup(monster, 'shadow_volley', MONSTER_SPELL_CONFIG.windupMs, () => {
         for (let i = 0; i < 3; i++) {
@@ -733,6 +762,8 @@ const CASTERS = {
 //-------------------SELECTION / ENTRY POINT------------------------------
 //------------------------------------------------------------------------
 
+// Chance that a monster casts instead of attacking: grows with level, higher
+// for elites, adjusted for gauntlet fights.
 export function _monsterSpellChance(monster) {
     const cfg = MONSTER_SPELL_CONFIG;
     const lvl = Math.min(cfg.levelCap, Math.max(1, Number(monster.level) || 1));
@@ -742,6 +773,8 @@ export function _monsterSpellChance(monster) {
     return Math.min(cfg.maxChance * (cur && cur.gauntlet ? cfg.gauntletMult : 1), chance);
 }
 
+// True when a spell makes sense right now (e.g. Mend needs a wounded ally,
+// Summon only once per monster).
 function _msCanUse(id, monster) {
     if (id === 'mend') return !!_woundedAlly(monster);
     if (id === 'enrage') {
@@ -755,6 +788,7 @@ function _msCanUse(id, monster) {
     return true;
 }
 
+// Picks a random usable spell from the monster's element pool (null if none).
 function _msPick(monster) {
     const pool = (POOLS[monster.element] || POOLS.none).filter(id => _msCanUse(id, monster));
     if (!pool.length) return null;

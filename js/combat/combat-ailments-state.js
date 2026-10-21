@@ -27,26 +27,32 @@ export function _setPlayerStatusBarTicker(nextTimer) {
     _playerStatusBarTicker = nextTimer;
 }
 
+// Adds to the ground-fire damage accumulator.
 export function _addGroundFireAcc(delta) {
     _groundFireAcc += delta;
 }
 
+// Sets the ice-redirect recursion depth.
 export function _setIceRedirectDepth(value) {
     _iceRedirectDepth = value;
 }
 
+// Stores the spark element that follows the cursor.
 export function _setSparkFollowerEl(value) {
     _sparkFollowerEl = value;
 }
 
+// Stores the mousemove handler used by the shocked-cursor effect.
 export function _setSparkMoveHandler(value) {
     _sparkMoveHandler = value;
 }
 
+// Stores the interval that spawns cursor sparks.
 export function _setSparkSpawnTimer(value) {
     _sparkSpawnTimer = value;
 }
 
+// Remembers the last cursor position used for sparks.
 export function _setSparkLastPosition(x, y) {
     _sparkLastX = x;
     _sparkLastY = y;
@@ -125,6 +131,7 @@ export const FRENZY_DAMAGE_PER_CHARGE = 4;
 let _frenzyCharges = 0;
 let _frenzyUntil = 0;
 
+// Current Frenzy charges (they drop to 0 once the timer has run out).
 export function _getFrenzyCharges() {
     if (_frenzyCharges > 0 && Date.now() >= _frenzyUntil) _frenzyCharges = 0;
     return _frenzyCharges;
@@ -140,6 +147,7 @@ export function _gainFrenzyCharge(max, durationPct = 0) {
     return _frenzyCharges;
 }
 
+// Clears Frenzy charges.
 function _resetFrenzyCharges() {
     _frenzyCharges = 0;
     _frenzyUntil = 0;
@@ -156,14 +164,17 @@ export const ONSLAUGHT_SPEED_PCT = 20;
 
 let _onslaughtUntil = 0;
 
+// True while Onslaught is active.
 export function _onslaughtActive() {
     return Date.now() < _onslaughtUntil;
 }
 
+// Starts (or extends) Onslaught.
 export function _gainOnslaught() {
     _onslaughtUntil = Date.now() + ONSLAUGHT_DURATION_MS;
 }
 
+// Ends Onslaught.
 export function _resetOnslaught() {
     _onslaughtUntil = 0;
 }
@@ -177,6 +188,8 @@ export const GHOST_SHROUD_INTERVAL_MS = 2000;
 let _ghostShrouds = 0;
 let _ghostShroudClock = 0;
 
+// Adds the Ghost Shrouds earned since the last check (one per interval, up to
+// the cap).
 function _syncGhostShrouds(max) {
     const now = Date.now();
     const cap = Math.max(0, Math.floor(Number(max) || 0));
@@ -189,6 +202,7 @@ function _syncGhostShrouds(max) {
     if (_ghostShrouds > cap) _ghostShrouds = cap;
 }
 
+// Current Ghost Shrouds for the given maximum.
 export function _getGhostShrouds(max) {
     _syncGhostShrouds(max);
     return _ghostShrouds;
@@ -202,6 +216,7 @@ export function _consumeGhostShroud(max) {
     return true;
 }
 
+// Clears Ghost Shrouds and restarts their clock.
 export function _resetGhostShrouds() {
     _ghostShrouds = 0;
     _ghostShroudClock = Date.now();
@@ -221,6 +236,7 @@ export const POWER_CRIT_PER_CHARGE = 1.5;
 let _powerCharges = 0;
 let _powerUntil = 0;
 
+// Current Power charges (they drop to 0 once the timer has run out).
 export function _getPowerCharges() {
     if (_powerCharges > 0 && Date.now() >= _powerUntil) _powerCharges = 0;
     return _powerCharges;
@@ -236,6 +252,7 @@ export function _gainPowerCharge(max, durationPct = 0) {
     return _powerCharges;
 }
 
+// Clears Power charges.
 export function _resetPowerCharges() {
     _powerCharges = 0;
     _powerUntil = 0;
@@ -254,11 +271,14 @@ export const FORTIFY_DR_PER_STACK = 1;
 let _fortifyStacks = 0;
 let _fortifyUntil = 0;
 
+// Current Fortification stacks (0 once expired).
 export function _getFortifyStacks() {
     if (_fortifyStacks > 0 && Date.now() >= _fortifyUntil) _fortifyStacks = 0;
     return _fortifyStacks;
 }
 
+// Adds a Fortification stack up to the cap and refreshes its duration;
+// returns the new count.
 export function _gainFortify(max, durationPct = 0) {
     const cap = Math.max(1, Math.floor(Number(max) || FORTIFY_BASE_MAX));
     const durationMult = 1 + Math.max(0, Number(durationPct) || 0) / 100;
@@ -267,6 +287,7 @@ export function _gainFortify(max, durationPct = 0) {
     return _fortifyStacks;
 }
 
+// Clears Fortification.
 export function _resetFortify() {
     _fortifyStacks = 0;
     _fortifyUntil = 0;
@@ -282,10 +303,12 @@ export const RIPOSTE_BASE_MORE_PCT = 25;
 
 let _riposteUntil = 0;
 
+// Arms the Riposte bonus for its duration (extended by a duration percent).
 export function _armRiposte(durationPct = 0) {
     _riposteUntil = Date.now() + RIPOSTE_DURATION_MS * (1 + Math.max(0, Number(durationPct) || 0) / 100);
 }
 
+// True while the Riposte bonus is armed.
 export function _riposteReady() {
     return Date.now() < _riposteUntil;
 }
@@ -297,6 +320,7 @@ export function _consumeRiposte() {
     return ready;
 }
 
+// Disarms Riposte.
 export function _resetRiposte() {
     _riposteUntil = 0;
 }
@@ -316,10 +340,12 @@ let _rage = 0;
 let _rageDecayAt = 0;
 // Tree line "Inherent loss of Rage is X% slower": stretches the 1s fade step.
 let _rageDecayMult = 1;
+// Sets how much slower Rage fades (1 or more).
 export function _setRageDecayMult(mult) {
     _rageDecayMult = Math.max(1, Number(mult) || 1);
 }
 
+// Current Rage; one point fades per decay step.
 export function _getRage() {
     const now = Date.now();
     while (_rage > 0 && now >= _rageDecayAt) {
@@ -345,11 +371,13 @@ export function _rageOnPlayerHit(gain = 0, max = 0) {
     else if (_getRage() > 0) _rageDecayAt = Date.now() + RAGE_DECAY_GRACE_MS;
 }
 
+// Clears Rage.
 export function _resetRage() {
     _rage = 0;
     _rageDecayAt = 0;
 }
 
+// Clears Endurance charges.
 export function _resetEnduranceCharges() {
     _enduranceCharges = 0;
     _enduranceUntil = 0;
@@ -364,6 +392,7 @@ export function _resetEnduranceCharges() {
 let _enduranceRaf = null;
 let _enduranceLayer = null;
 
+// Screen rectangle of the player sprite, used to place the Endurance orbs.
 function _enduranceSpriteRect() {
     const ids = ['avatar-sprite-img', 'avatar-sprite-img-simple'];
     for (const id of ids) {
@@ -375,6 +404,8 @@ function _enduranceSpriteRect() {
     return null;
 }
 
+// One animation frame of the Endurance orbs circling the player; removes them
+// when there are no charges.
 function _enduranceFrame(now) {
     _enduranceRaf = null;
     const count = _getEnduranceCharges();
@@ -412,6 +443,7 @@ function _enduranceFrame(now) {
     _enduranceRaf = requestAnimationFrame(_enduranceFrame);
 }
 
+// Starts the orb animation loop if it is not running.
 function _startEnduranceOrbs() {
     if (_enduranceRaf != null || typeof document === 'undefined'
         || typeof requestAnimationFrame !== 'function') return;

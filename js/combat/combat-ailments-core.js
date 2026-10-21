@@ -126,6 +126,8 @@ function _playerAilmentTip(key) {
     return `${_ailmentLabel(key)}${lvl}`;
 }
 
+// Display name of an ailment key (capitalised; shadowburn reads 'Shadow
+// Burn').
 function _ailmentLabel(key) {
     if (key === 'shadowburn') return 'Shadow Burn';
     return String(key || '').charAt(0).toUpperCase() + String(key || '').slice(1);
@@ -141,11 +143,15 @@ function _ailmentLabel(key) {
 //-------------------GENERIC STATUS HELPERS------------------------------
 //------------------------------------------------------------------------
 
+// True while the named status in a status map has not expired.
 function _hasStatus(statusMap, key) {
     const st = statusMap[key];
     return !!(st && st.until > Date.now());
 }
 
+// Sets or refreshes a status (duration and damage per second) in a status
+// map. The dev time-scale setting stretches or shrinks the duration
+// centrally.
 function _applyStatusToMap(statusMap, key, durationS, dps) {
     // DEV_EFFECT_TIME_SCALE (dev testing harness, see js/dev/dev-testing.js):
     // ×1 = exact shipped behaviour. Scaled centrally so every ailment
@@ -291,6 +297,9 @@ function _stunChanceFromHit(lost, maxHP) {
     return Math.min(AIL_STUN_MAX_CHANCE_PCT, ratio * 100 * AIL_STUN_CHANCE_PER_LIFE_PCT);
 }
 
+// Stuns the player for the given seconds unless an encounter is not active,
+// the player cannot be stunned, is already stunned, or is in the post-stun
+// immunity window.
 function _stunPlayer(durationS = AIL_STUN_DURATION_S) {
     if (!_isActive()) return false;
     // Unwavering Stance: cannot be Stunned.
@@ -326,6 +335,8 @@ function _rollPlayerStunFromHit(lost) {
 // _rollMonsterHitAilment). Hazards and boss mechanics that apply ailments
 // outside a monster hit fall back to the encounter's monster level.
 let _ailSrcLevel = 0;
+// Level of the monster that caused the ailment being applied (falls back to
+// the encounter base level, then 1).
 function _ailmentSourceLevel() {
     if (_ailSrcLevel > 0) return _ailSrcLevel;
     try {
@@ -353,6 +364,8 @@ export function _cleansePlayerAilments(keys, maxLevel, dryRun) {
     return { removed, blocked };
 }
 
+// Puts an ailment on the player (ignite, shock, chill, poison, shadow...)
+// with its duration, after immunity checks, and starts its visuals.
 function _applyPlayerAilment(key, dps) {
     // Shadow Inoculation: immune to Shadow damage, so shadow-type ailments never land.
     if (key === 'shadow' || key === 'shadowburn' || key === 'poison') {
@@ -423,6 +436,7 @@ function _ensurePlayerStatusBar() {
     return bar;
 }
 
+// Starts the 10-per-second refresh of the player's ailment chips.
 function _startPlayerStatusBarTicker() {
     if (_playerStatusBarTicker) return;
     _setPlayerStatusBarTicker(setInterval(_renderPlayerAilmentChips, 100));
@@ -473,6 +487,7 @@ function _renderPlayerAilmentChips() {
     }
 }
 
+// Stops the chip refresh and removes the status bar.
 function _stopPlayerStatusBarTicker() {
     if (_playerStatusBarTicker) {
         clearInterval(_playerStatusBarTicker);
@@ -500,6 +515,7 @@ function _getPolymorphVictim(attackerId) {
     return others[Math.floor(Math.random() * others.length)];
 }
 
+// True while the player has the given ailment.
 function _playerHasAilment(key) {
     return _hasStatus(_playerStatuses, key);
 }
@@ -555,6 +571,8 @@ function _playerHitChanceMultiplier() {
     return _playerHasAilment('shadow') && _isPlayerInsideCloud() ? AIL_BLIND_HIT_CHANCE : 1;
 }
 
+// Increases damage taken by the player while shocked, reduced by the
+// shock-effect-taken stats (capped at 90% reduction).
 function _applyPlayerShockAmp(amount) {
     if (!_isActive()) return amount;
     if (!_playerHasAilment('shocked')) return amount;
@@ -594,6 +612,9 @@ function _chilledColdTakenMult(target, stats, coldShare) {
     return 1 + (slowPct / 100) * coldShare;
 }
 
+// Impale: adds the stored damage of the target's impale stacks to a hit and
+// consumes a stack, or starts storing a share of this hit. Returns the new
+// hit amount.
 function _applyImpaleToHit(target, amount, elements, opts) {
     if (!target || !(amount > 0)) return amount;
     const now = Date.now();
@@ -689,6 +710,9 @@ export function _rollIntimidate(target, opts) {
 // `amount` is the actual damage dealt and `elements` the per-element share.
 //------------------------------------------------------------------------
 
+// After a player hit on a monster, rolls which ailments land (ignite, chill,
+// shock, bleed, poison, shadow burn...) from the hit's elements, the player's
+// chances and crit rules.
 function _rollPlayerHitAilments(target, amount, elements, opts) {
     if (!_isActive() || !target || target.currentHP <= 0) return;
     const stats = _computePlayerStats();
@@ -836,6 +860,8 @@ function _tryRetaliationWard(element, attacker) {
     return warded;
 }
 
+// After a monster hits the player, rolls the ailment its element can inflict
+// (physical hits only bleed, and only from a real attacker).
 function _rollMonsterHitAilment(element, dealt, attacker) {
     // Applications below happen synchronously; the level is cleared right after.
     _ailSrcLevel = Number(attacker && attacker.level) || 0;
@@ -901,6 +927,8 @@ function _rollMonsterHitAilment(element, dealt, attacker) {
 // Shadow Burn ignores the shield entirely and burns straight from HP.
 //------------------------------------------------------------------------
 
+// Applies damage over time to the player; absorption takes it first unless
+// the source ignores shields. Kills the player when life runs out.
 function _dealPlayerDotDamage(rawAmount, ignoreShield, dotKeys) {
     if (typeof dead !== 'undefined' && globalThis.dead) return;
     // Shadow Inoculation: with Life 1 every damage over time (shadow burn included)
@@ -955,12 +983,15 @@ function _dealPlayerDotDamage(rawAmount, ignoreShield, dotKeys) {
 //-------------------AILMENTS TICK (called at 10Hz)----------------------
 //------------------------------------------------------------------------
 
+// Deletes every expired status from a status map.
 function _expireFromMap(statusMap, now) {
     Object.keys(statusMap).forEach(key => {
         if (statusMap[key].until <= now) delete statusMap[key];
     });
 }
 
+// The 10 Hz ailment tick: expires statuses and applies damage over time to
+// the player and to monsters, spreading and updating their visuals.
 function _tickAilments() {
     if (!_isActive()) return;
     const now = Date.now();
@@ -1055,6 +1086,7 @@ function _statusSignature(statusMap) {
         .join(',');
 }
 
+// HTML chips for the active statuses of a map (bleed shows its stack count).
 function _buildStatusIconsHTML(statusMap) {
     const now = Date.now();
     return Object.keys(statusMap)
@@ -1147,6 +1179,7 @@ const AIL_BANNER_TEXT = {
 const AIL_BANNER_MAX = 4;          // more than this collapse into a "+N" chip
 const AIL_BANNER_STEP_PX = 40;     // banner height + gap (keep in sync with CSS)
 
+// Keeps the banner list above the player in step with the active ailments.
 function _syncAilmentBanners() {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
@@ -1220,10 +1253,12 @@ let _playerFxLayer = null;
 let _playerFxRaf = null;
 let _playerFxActive = [];
 
+// The player's sprite image elements (full and simple avatar).
 function _playerSpriteImgs() {
     return ['avatar-sprite-img', 'avatar-sprite-img-simple'].map(id => document.getElementById(id)).filter(Boolean);
 }
 
+// One animation frame of the ailment effects drawn over the player's sprite.
 function _playerFxFrame() {
     _playerFxRaf = null;
     const layer = _playerFxLayer;
@@ -1242,6 +1277,8 @@ function _playerFxFrame() {
     _playerFxRaf = requestAnimationFrame(_playerFxFrame);
 }
 
+// Turns the sprite effect classes on or off to match the live ailments (does
+// nothing when unchanged).
 function _syncPlayerSpriteFx(liveKeys) {
     const keys = liveKeys.filter(k => PLAYER_FX_KEYS[k]);
     const sig = keys.join(',');
@@ -1266,10 +1303,12 @@ function _syncPlayerSpriteFx(liveKeys) {
     if (!_playerFxRaf) _playerFxRaf = requestAnimationFrame(_playerFxFrame);
 }
 
+// Screen rectangle of the player avatar, or null.
 function _getPlayerRectForAilment() {
     const el = document.getElementById('player-avatar-wrapper');
     return el ? el.getBoundingClientRect() : null;
 }
+// True when a circle touches a rectangle.
 function _circleOverlapsRect(cx, cy, radius, rect) {
     const closestX = Math.max(rect.left, Math.min(cx, rect.right));
     const closestY = Math.max(rect.top, Math.min(cy, rect.bottom));
@@ -1277,12 +1316,14 @@ function _circleOverlapsRect(cx, cy, radius, rect) {
     const dy = cy - closestY;
     return dx * dx + dy * dy <= radius * radius;
 }
+// True when the player stands inside a fire puddle.
 function _isPlayerInsideFire() {
     const r = _getPlayerRectForAilment();
     if (!r) return false;
     return _puzzleEffects.some(e => e.type === 'playerfire' &&
         _circleOverlapsRect(e.x, e.y, AIL_PLAYER_FIRE_RADIUS_PX, r));
 }
+// True when the player stands inside a fire puddle or shadow cloud.
 function _isPlayerInsideCloud() {
     const r = _getPlayerRectForAilment();
     if (!r) return false;
@@ -1292,6 +1333,7 @@ function _isPlayerInsideCloud() {
         return false;
     });
 }
+// Drops a fire or shadow ground effect at the player's position.
 function _dropPlayerGround(type) {
     const r = _getPlayerRectForAilment();
     if (!r) return;
@@ -1305,10 +1347,12 @@ function _dropPlayerGround(type) {
     Audio_Manager.playSFX(type === 'fire' ? 'hz_ground_fire_burn' : 'hz_shadow_cloud');
     setTimeout(() => { el.remove(); _replacePuzzleEffects(_puzzleEffects.filter(e => e !== effect)); }, AIL_PLAYER_GROUND_DURATION_MS);
 }
+// While ignited, drops a fire puddle at the player every interval.
 function _startPlayerFireDrops() {
     _dropPlayerGround('fire');
     setTimeout(() => { if (_playerHasAilment('ignite')) _startPlayerFireDrops(); }, AIL_PLAYER_FIRE_DROP_INTERVAL_MS);
 }
+// While shadowed, drops a shadow cloud at the player every interval.
 function _startPlayerShadowClouds() {
     _dropPlayerGround('shadow');
     setTimeout(() => { if (_playerHasAilment('shadow')) _startPlayerShadowClouds(); }, AIL_PLAYER_FIRE_DROP_INTERVAL_MS);

@@ -13,6 +13,8 @@ import { _hzLava, _hzLayer, _setHzLava } from './combat-hazards.js';
 //-------------------LAVA BALLS-------------------------------------------
 //------------------------------------------------------------------------
 
+// Creates one lava ball with a random size, speed and direction, outside the
+// grid.
 export function _hzCreateLavaPool() {
     const r = _hzRand(HZ_LAVA_MIN_R, HZ_LAVA_MAX_R);
     const pos = _hzPointOutsideGrid(r + 24);
@@ -37,6 +39,7 @@ export function _hzCreateLavaPool() {
     };
 }
 
+// Lights the fuse of a lava ball that touched the grid.
 export function _hzTriggerLavaFuse(pool) {
     if (!pool || pool.state !== 'active') return;
     pool.state = 'fusing';
@@ -45,6 +48,7 @@ export function _hzTriggerLavaFuse(pool) {
     if (pool.el) pool.el.classList.add('sx-hz-lava-fuse');
 }
 
+// Blows up a lava ball with a blast visual and its damage.
 export function _hzDetonateLava(pool) {
     if (!pool) return;
     Audio_Manager.playSFX('hz_lava_detonate');
@@ -101,6 +105,7 @@ export function _hzDetonateLava(pool) {
     pool.fuseT = 0;
 }
 
+// Reuses a detonated pool object as a fresh lava ball.
 export function _hzRespawnLavaPool(pool) {
     const fresh = _hzCreateLavaPool();
     // Reuse the same object identity so the pools array stays stable
@@ -115,6 +120,8 @@ export function _hzRespawnLavaPool(pool) {
     // Ensure blast/fuse classes are clean (fresh element is clean by construction)
 }
 
+// Starts the lava hazard with a ball count that grows with intensity (5 to
+// 14).
 export function _hzInitLava(intensity) {
     // ~8 balls at low intensity (tier 3), scaling up to a cap of 14 at high
     // intensity (tier 1):  25 → 7 | 45 → 8 | 50 → 9 | 75 → 10 | 80 → 11 | 100 → 12
@@ -126,6 +133,8 @@ export function _hzInitLava(intensity) {
     _setHzLava({ pools, dmgMult: _hzMult(intensity), intensity });
 }
 
+// Per-frame update: moves the balls, bounces them, fuses and detonates them,
+// and respawns used ones.
 export function _hzTickLava(dtMs) {
     const dtS = dtMs / 1000;
     const grid = _hzGridRect(10);

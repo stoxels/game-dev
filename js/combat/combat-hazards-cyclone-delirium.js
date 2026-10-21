@@ -16,6 +16,7 @@ import { _hzCyclone, _hzDelirium, _setHzCyclone, _setHzDelirium } from './combat
 // Fast wind vortices that race across the whole screen (grid included),
 // damaging the player continuously while they stand inside one.
 
+// Starts the cyclone hazard: 2 to 5 vortices, faster with intensity.
 export function _hzInitCyclone(intensity) {
     const count = Math.min(5, 2 + Math.round(intensity / 33));
     const vortices = [];
@@ -45,6 +46,8 @@ export function _hzInitCyclone(intensity) {
     _setHzCyclone({ vortices, dmgMult: _hzMult(intensity) });
 }
 
+// Per-frame update: moves the vortices and applies their effect to the player
+// near one.
 export function _hzTickCyclone(dtMs) {
     const st = _hzCyclone;
     const dtS = dtMs / 1000;
@@ -81,6 +84,7 @@ export function _hzTickCyclone(dtMs) {
 // Delirium: a purple mist periodically floods the screen. While it holds,
 // there is one chance roll to polymorph the player into chaos.
 
+// Starts the delirium hazard, which waits and then fades in a mist.
 export function _hzInitDelirium(intensity) {
     _setHzDelirium({
         phase: 'idle',
@@ -92,6 +96,8 @@ export function _hzInitDelirium(intensity) {
     });
 }
 
+// Per-frame update of the delirium phases: it starts idle, then runs the mist
+// effect.
 export function _hzTickDelirium(dtMs) {
     const st = _hzDelirium;
 

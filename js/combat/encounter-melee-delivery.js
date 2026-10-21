@@ -19,6 +19,7 @@ export const MELEE_DELIVERY_ARRIVAL_BEAT_MS = 170;
 export const MELEE_DELIVERY_RETURN_MS = 550;
 export const MELEE_DELIVERY_LEAP_MS = 700;
 
+// True when the user prefers reduced motion.
 function _meleeReducedMotion() {
     try {
         return !!(typeof window !== 'undefined' && window.matchMedia
@@ -40,6 +41,7 @@ export function _meleeDeliveryAvailable(targetId) {
     } catch (e) { return false; }
 }
 
+// A promise that resolves after the given milliseconds.
 function _meleeWaitMs(ms) {
     return new Promise((resolve) => {
         try { setTimeout(resolve, Math.max(0, ms || 0)); }

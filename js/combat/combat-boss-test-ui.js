@@ -135,6 +135,7 @@ export function _bossTestBuildBossTooltipHTML(def, level) {
     return html;
 }
 
+// Shows the stat tooltip for the boss card under the cursor.
 export function _bossTestShowTooltip(cardEl, e) {
     const bossId = cardEl.dataset.bossId;
     const level = Number(cardEl.dataset.bossLevel);
@@ -180,6 +181,7 @@ export function _bossTestToggleTestHP(checkbox, bossId, level, hpMult) {
 //-------------------HTML BUILDERS------------------------------------------
 //------------------------------------------------------------------------
 
+// Boss art if it exists, otherwise the boss emoji.
 function _bossTestBossIconHTML(def) {
     // Real boss art when it exists (see images/combat/monsters/boss_*.jpeg),
     // otherwise the emoji fallback - same helper the arena cards use.
@@ -187,6 +189,7 @@ function _bossTestBossIconHTML(def) {
     return def.emoji || '💀';
 }
 
+// HTML of one boss card with its scaled preview stats and hover handlers.
 function _bossTestBuildBossCardHTML(def, level) {
     const preview = _bossTestScaledPreview(def, level);
     const hpMult = _bossTestCalcTestHPMultiplier(def, level);
@@ -240,6 +243,8 @@ function _bossTestBuildSections() {
     return sections;
 }
 
+// HTML of one tier section (title with tier and monster level, then its boss
+// cards).
 function _bossTestBuildSectionHTML(section) {
     const level = section.tier > 0 ? _bossTestTierMonsterLevel(section.tier) : BOSS_TEST_DEFAULT_LEVEL;
     const title = section.tier > 0
@@ -252,6 +257,7 @@ function _bossTestBuildSectionHTML(section) {
 </div>`;
 }
 
+// Fills the boss grid with all tier sections and updates the boss count.
 export function _bossTestRenderGrid() {
     const container = document.getElementById('sx-bosstest-boss-grid');
     if (!container) return;
@@ -264,6 +270,7 @@ export function _bossTestRenderGrid() {
     if (count) count.textContent = t('eg_boss_test_count').replace('{n}', total);
 }
 
+// HTML of the whole boss-test screen: top bar and boss grid.
 export function _bossTestBuildFullScreenHTML() {
     return `
 <div class="sx-bosstest-hub-layout">
@@ -295,6 +302,7 @@ export function _bossTestBuildFullScreenHTML() {
 // Injected via JS, same pattern as _egtEnsureStyles() in
 // endgame-testing-screen.js - avoids needing to touch the main CSS files.
 
+// Adds the boss-test stylesheet once.
 export function _bossTestEnsureStyles() {
     if (document.getElementById('sx-bosstest-boss-test-style')) return;
 

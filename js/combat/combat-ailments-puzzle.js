@@ -9,6 +9,8 @@ import { cur } from '../state.js';
 import { _iceRedirectDepth, _puzzleEffects, _replacePuzzleEffects, _setIceRedirectDepth, _setSparkFollowerEl, _setSparkLastPosition, _setSparkMoveHandler, _setSparkSpawnTimer, _sparkFollowerEl, _sparkLastX, _sparkLastY, _sparkMoveHandler, _sparkSpawnTimer, SPARK_GLYPHS } from './combat-ailments-state.js';
 import { PUZZLE_ATTACK_CHANCE_PCT, PUZZLE_EFFECT_DURATION_MS, PUZZLE_HAZARD_CELLS, ICE_SLIP_CHANCE, SHOCK_MARK_STRIP_CHANCE } from './combat-ailments-core.js';
 
+// Lets a monster strike the puzzle instead of the player (base chance plus
+// the map-mod bonus). Returns true when it did.
 function _maybePuzzleAttack(monster) {
     if (!_isActive()) return false;
     if (!monster || !monster.element) return false;
@@ -35,6 +37,8 @@ function _maybePuzzleAttack(monster) {
     return true;
 }
 
+// Applies the puzzle hazard that matches a monster's element (lava, ice,
+// shocked cursor, shadow blackout...).
 function _applyPuzzleAilment(element) {
     if (!_isActive()) return;
     switch (element) {
@@ -70,6 +74,7 @@ function _pickHazardCell(existingKeys, radiusCenter) {
     return null;
 }
 
+// Tracks a puzzle effect and schedules its natural expiry.
 function _registerPuzzleEffect(effect) {
     effect.until = Date.now() + PUZZLE_EFFECT_DURATION_MS;
     // Natural expiry (vs. encounter cleanup / map swaps) so expiry cues like the
@@ -78,6 +83,8 @@ function _registerPuzzleEffect(effect) {
     _puzzleEffects.push(effect);
 }
 
+// Ends a puzzle effect and cleans up its visuals; 'natural' marks an expiry
+// rather than a cleanup.
 function _removePuzzleEffect(effect, natural) {
     clearTimeout(effect.timer);
     _replacePuzzleEffects(_puzzleEffects.filter(e => e !== effect));
@@ -109,6 +116,7 @@ function _clearAllPuzzleEffects() {
 // The doubling itself lives in penalty.js (_isLavaCell check).
 //------------------------------------------------------------------------
 
+// Marks a few cells near the grid center as lava for a while.
 function _puzzleLava() {
     if (_puzzleEffects.some(e => e.type === 'lava')) return;
     const rows = cur.grid.length, cols = cur.grid[0].length;
@@ -134,6 +142,7 @@ function _puzzleLava() {
     globalThis.showCombatToast('🌋 Lava cells - wrong clicks hurt double!');
 }
 
+// True when the cell is currently lava.
 function _isLavaCell(row, col) {
     return _puzzleEffects.some(e => e.type === 'lava' && e.cells.has(`${row}-${col}`));
 }
@@ -146,6 +155,7 @@ function _isLavaCell(row, col) {
 // Registered as a click intercept in mouse-button-handlers.js.
 //------------------------------------------------------------------------
 
+// Marks a few cells near the grid center as ice for a while.
 function _puzzleIce() {
     if (_puzzleEffects.some(e => e.type === 'ice')) return;
     const rows = cur.grid.length, cols = cur.grid[0].length;
@@ -171,6 +181,7 @@ function _puzzleIce() {
     globalThis.showCombatToast('🧊 Icy grid - clicks may slip!');
 }
 
+// True when the cell is currently ice.
 function _isIceCell(row, col) {
     return _puzzleEffects.some(e => e.type === 'ice' && e.cells.has(`${row}-${col}`));
 }
@@ -211,6 +222,8 @@ function _puzzleIceRedirect(row, col) {
 // the grid, regardless of its distance from the revealed cell.
 //------------------------------------------------------------------------
 
+// Starts the shocked-cursor effect once: reveals scatter the player's X
+// marks.
 function _puzzleShockedCursor() {
     if (_puzzleEffects.some(e => e.type === 'shockcursor')) return;
     _startShockedCursor();
@@ -218,6 +231,7 @@ function _puzzleShockedCursor() {
     globalThis.showCombatToast('⚡ Shocked - reveals scatter your ✕ marks!');
 }
 
+// Adds the spark follower and the cursor styling for the shocked effect.
 function _startShockedCursor() {
     if (_sparkFollowerEl) return;
     document.body.classList.add('sx-cursor-shocked');
@@ -242,6 +256,7 @@ function _startShockedCursor() {
     }, 110));
 }
 
+// Spawns one spark particle around a point.
 function _spawnCursorSpark(x = _sparkLastX, y = _sparkLastY) {
     const spark = document.createElement('div');
     spark.className = 'sx-spark-particle';
@@ -282,6 +297,7 @@ function _spawnCrossZapFX(row, col) {
     for (let i = 0; i < 5; i++) _spawnCursorSpark(cx, cy);
 }
 
+// Removes the spark follower, handlers and cursor styling.
 function _stopShockedCursor() {
     document.body.classList.remove('sx-cursor-shocked');
     if (_sparkSpawnTimer) { clearInterval(_sparkSpawnTimer); _setSparkSpawnTimer(null); }
@@ -323,6 +339,7 @@ function _onCorrectCellPuzzleFX(row, col) {
 //------------------------------------------------------------------------
 
 
+// Places an arcane bomb on a random free cell.
 function _applyPuzzleArcaneBomb() {
     if (!_isActive() || _puzzleEffects.some(e => e.type === 'arcanebomb')) return;
     const pick = _pickHazardCell(new Set());
@@ -345,6 +362,7 @@ function _applyPuzzleArcaneBomb() {
     globalThis.showCombatToast('🔮 Arcane bomb - clear nearby ✕ marks!');
 }
 
+// Hides the clue numbers of one random row or column for a while.
 function _puzzleShadowBlackout() {
     if (_puzzleEffects.some(e => e.type === 'shadowline')) return;
     const rows = cur.grid.length, cols = cur.grid[0].length;
@@ -367,6 +385,7 @@ function _puzzleShadowBlackout() {
     globalThis.showCombatToast(`🌑 Shadow veils a ${isRow ? 'row' : 'column'}!`);
 }
 
+// Puts the original clue numbers back on a blacked-out line.
 function _restoreLineClues(line) {
     if (!line) return;
     const prefix = line.dir === 'row' ? `rn-${line.idx}-` : `cn-${line.idx}-`;

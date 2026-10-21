@@ -43,6 +43,8 @@ const KILL_DROP_CHANCE_NORMAL = 0.6;   // P(something drops) per normal kill
 // way into the endgame now that the vendor no longer sells a free map.
 const CAMPAIGN_MAP_DROP_WORLD = 12;   // 1-based first world with map drops (second half only)
 
+// True when the current campaign world allows map drops (looked up from the
+// world list).
 function _campaignMapDropsOpen() {
     try {
         const c = globalThis.cur;

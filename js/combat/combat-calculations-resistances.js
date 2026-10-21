@@ -30,6 +30,7 @@ export const RESIST_PENALTY_PER_STAGE = 30;
 export const RESIST_PENALTY_MAX_STAGE = 2;
 export const RESIST_FLOOR_PCT = -100;
 
+// Resistance penalty in percent for the current penalty stage.
 export function _getResistPenaltyPct() {
     const s = globalThis.STATE;
     const stage = Math.max(0, Math.min(RESIST_PENALTY_MAX_STAGE, Number(s && s.resistPenaltyStage) || 0));
@@ -130,6 +131,9 @@ function _extraMults(stats, passed) {
     return d;
 }
 
+// Applies damage conversion (keystones turning damage into fire, cold,
+// lightning or shadow, plus extra-as bonuses). Returns the new { physical,
+// elements }.
 export function _applyDamageConversion(stats, physical, elements, multsArg = 1) {
     const el = elements || {};
     const mults = _extraMults(stats, multsArg);
@@ -246,6 +250,8 @@ export function _leechHealMult(stats) {
 // refills the Absorption layer instantly, scaled by the leech-effect line.
 // Sub-point amounts accumulate so 0.3% leeches are not rounded away.
 let _absorptionLeechRemainder = 0;
+// Adds absorption equal to a share of the damage dealt (up to the maximum);
+// fractions carry over to the next hit. Returns the whole points gained.
 export function _leechAbsorption(stats, dmg, pct) {
     const max = Number(stats && stats.absorption) || 0;
     if (!(pct > 0) || !(dmg > 0) || max <= 0) return 0;
@@ -267,6 +273,8 @@ export const SECONDARY_EFFECTIVENESS = Object.freeze({
 // Each further chain bounce keeps this share of the previous bounce.
 export const CHAIN_FALLOFF = 0.85;
 
+// Damage of a secondary hit (chain, splash...) from the base hit:
+// effectiveness, the secondary damage bonus and chain falloff, at least 1.
 export function _secondaryDamage(base, kind, stats, bounce = 0) {
     const eff = SECONDARY_EFFECTIVENESS[kind] || 1;
     const inc = 1 + Math.max(0, Number(stats && stats.secondaryDamagePct) || 0) / 100;
@@ -277,6 +285,8 @@ export function _secondaryDamage(base, kind, stats, bounce = 0) {
 // Mana leech (tree, attack hits): `pct` of the hit's damage becomes Mana, scaled by the
 // leech-effect line. Sub-point amounts accumulate like the Absorption leech.
 let _manaLeechRemainder = 0;
+// Gains mana equal to a share of the damage dealt (scaled by the leech effect
+// stat); fractions carry over. Returns the whole points gained.
 export function _leechMana(stats, dmg, pct) {
     if (!(pct > 0) || !(dmg > 0) || typeof globalThis.gainMana !== 'function' || !(globalThis.playerMaxMana > 0)) return 0;
     const effect = 1 + Math.max(0, Number(stats && stats.manaLeechEffectPct) || 0) / 100;

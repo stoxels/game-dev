@@ -20,6 +20,7 @@ import { _currencyDrops, _isActive } from './combat-state.js';
 // the grid and must be claimed by filling the correct cell - they no
 // longer go straight into the currency strip on kill.
 
+// Draws a currency drop (orb or essence art, else its icon) on a grid cell.
 export function _renderCurrencyDropOverlay(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
@@ -32,12 +33,14 @@ export function _renderCurrencyDropOverlay(row, col, def) {
     el.appendChild(span);
 }
 
+// Removes the currency drop overlay for a 'row-col' key.
 export function _removeCurrencyDropOverlay(key) {
     const [r, c] = key.split('-').map(Number);
     const span = document.getElementById(`sx-currency-drop-${r}-${c}`);
     if (span) span.remove();
 }
 
+// Plays the floating claim animation of a currency drop from its cell.
 export function _animateCurrencyDropClaim(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;

@@ -62,6 +62,8 @@ export function _pauseGridDrops() {
     });
 }
 
+// After a pause, restarts the pickup spawner and re-arms the expiry timers
+// with the time they had left.
 export function _resumeGridDrops() {
     const now = Date.now();
     // Resume pickup spawner

@@ -317,6 +317,9 @@ function _tryHealLegacyDualMod(mod) {
     }
 }
 
+// Turns an item's mods into display lines, merging mods that share a stat
+// into one combined line. Also repairs legacy dual-stat mods saved with a
+// stray '@' placeholder.
 export function _buildMergedModLines(mods) {
     // Heal legacy dual-stat mods that were saved with a stray '@' placeholder
     // (shield_bash / arcane_surge / channel rolled with min/min2 before fix).
@@ -1685,6 +1688,8 @@ function _getPlayerAttackIntervalBreakdown(weaponOverride) {
     return { base, reduction, interval };
 }
 
+// Seconds the melee charge bar needs to fill (the interval from the
+// breakdown).
 export function _getPlayerAttackInterval() {
     return _getPlayerAttackIntervalBreakdown().interval;
 }
@@ -1747,6 +1752,7 @@ export function _calcArmourReductionPct(armour, rawDamage) {
     return Math.min(ARMOUR_MAX_REDUCTION, armourVal / (armourVal + ARMOUR_DAMAGE_FACTOR * dmg));
 }
 
+// Damage left after armour: raw damage times one minus the armour reduction.
 export function _calcArmourMitigation(rawDamage, armour) {
     const reductionPct = _calcArmourReductionPct(armour, rawDamage);
     return rawDamage * (1 - reductionPct);
@@ -1760,6 +1766,8 @@ const EVASION_DODGE_K = 200;        // dodge% = evasion / (evasion + K) at monst
 const EVASION_LEVEL_GROWTH = 1.035; // per-level growth of the evasion benchmark (was 1.045 - retuned so 350 evasion = ~11% dodge at 90, ~50% at 30; was too punishing at 1.045, too generous at 1.03)
 const EVASION_DODGE_CAP_PCT = 75;
 
+// Dodge chance in percent from evasion against a monster level (capped);
+// higher monster levels need more evasion.
 export function _calcEvasionDodgeChance(evasion, monsterLevel) {
     if (!evasion) return 0;
     const lvl = Math.max(1, Number(monsterLevel) || 1);
@@ -1775,6 +1783,8 @@ const OVER_LEVEL_AVOID_GRACE = 2;
 const OVER_LEVEL_AVOID_PER_LEVEL = 0.03;
 const OVER_LEVEL_AVOID_MIN = 0.25;
 
+// Multiplier below 1 on the player's avoidance when the attacker is more than
+// a grace range above the player's level (1 means no penalty).
 export function _overLevelAvoidMult(attackerLevel, playerLevel) {
     const a = Number(attackerLevel) || 0;
     const p = Number(playerLevel) || 0;
@@ -1803,6 +1813,7 @@ const ACCURACY_MISS_MAX_PCT = 60;  // attacks always retain some threat
 const ACCURACY_INNATE_BASE = 25;       // innate accuracy at player level 1 (was 30)
 const ACCURACY_INNATE_PER_LEVEL = 13;  // extra innate accuracy per player level (was 15)
 
+// Accuracy every character has from level alone.
 function _getInnateAccuracy() {
     const lvl = (typeof _getPlayerLevel === 'function')
         ? Math.max(1, Number(_getPlayerLevel()) || 1) : 1;
@@ -1830,6 +1841,7 @@ const DRAG_MISS_REDUCTION_T1 = 6;   // percentage points
 const DRAG_MISS_REDUCTION_T2 = 12;
 const DRAG_MISS_REDUCTION_T3 = 19;
 
+// Accuracy bonus for a Drag stack count (three thresholds).
 export function _getDragAccuracyBonus(stacks) {
     const n = Number(stacks) || 0;
     if (n >= DRAG_ACCURACY_T3) return DRAG_ACCURACY_BONUS_T3;
@@ -1838,6 +1850,7 @@ export function _getDragAccuracyBonus(stacks) {
     return 0;
 }
 
+// Miss-chance reduction for a Drag stack count (three thresholds).
 export function _getDragMissReduction(stacks) {
     const n = Number(stacks) || 0;
     if (n >= DRAG_ACCURACY_T3) return DRAG_MISS_REDUCTION_T3;
@@ -1846,6 +1859,7 @@ export function _getDragMissReduction(stacks) {
     return 0;
 }
 
+// Drag tier 0-3 for a stack count.
 export function _getDragTier(stacks) {
     const n = Number(stacks) || 0;
     if (n >= DRAG_ACCURACY_T3) return 3;
@@ -1854,6 +1868,7 @@ export function _getDragTier(stacks) {
     return 0;
 }
 
+// Translation key of the Drag tier label (null at tier 0).
 export function _getDragTierLabelKey(stacks) {
     const tier = _getDragTier(stacks);
     if (tier === 3) return 'eg_drag_t3';
@@ -1862,6 +1877,8 @@ export function _getDragTierLabelKey(stacks) {
     return null;
 }
 
+// Chance in percent that a player attack misses a monster of the given level,
+// from accuracy (plus innate and Drag bonuses), clamped to the min and max.
 export function _calcAccuracyMissChance(accuracy, monsterLevel, dragStacks) {
     const lvl = Math.max(1, Number(monsterLevel) || 1);
     const bonus = _getDragAccuracyBonus(dragStacks);
@@ -1927,6 +1944,7 @@ const ABSORPTION_REGEN_BASE_DELAY_MS = 18000; // was 12000 - 200 dmg hits at L41
 // Base share of max Absorption restored per regen tick (scaled by absorptionRegenRatePct).
 const ABSORPTION_REGEN_BASE_STEP_PCT = 0.04; // was 0.06 - 5s to full (was 3.3s), so even after delay a full shield takes longer
 
+// Stops the absorption regeneration timers.
 export function _cancelAbsorptionRegen() {
     if (globalThis._playerAbsorptionRegenDelayTimer) { clearTimeout(globalThis._playerAbsorptionRegenDelayTimer); globalThis._playerAbsorptionRegenDelayTimer = null; }
     if (globalThis._playerAbsorptionRegenInterval) { clearInterval(globalThis._playerAbsorptionRegenInterval); globalThis._playerAbsorptionRegenInterval = null; }

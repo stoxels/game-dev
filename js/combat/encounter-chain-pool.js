@@ -15,12 +15,16 @@ const CHAIN_MAX_COLS = 30;
 const CHAIN_TALL_ROW_THRESHOLD = 15;
 const CHAIN_MAX_COLS_WHEN_TALL = 20;
 
+// True when a puzzle is small enough for an encounter chain (row and column
+// caps, with a tighter column cap for tall grids).
 export function _chainPuzzleSizeAllowed(rows, cols) {
     if (rows > CHAIN_MAX_ROWS || cols > CHAIN_MAX_COLS) return false;
     if (rows > CHAIN_TALL_ROW_THRESHOLD && cols > CHAIN_MAX_COLS_WHEN_TALL) return false;
     return true;
 }
 
+// True when a level fits the chain criteria (size cap and the criteria's own
+// filters).
 function _puzzlePassesCriteria(level, criteria) {
     const rows = level.grid.length;
     const cols = level.grid[0].length;
@@ -42,6 +46,8 @@ function _puzzlePassesCriteria(level, criteria) {
     return true;
 }
 
+// Builds the list of levels a chain may pick from, skipping sandbox,
+// generated, kill-gated and (unless told otherwise) recently used levels.
 export function _buildChainPool(criteria) {
     const avoidRecent = criteria.avoidRecent !== false;
 
@@ -62,6 +68,7 @@ export function _buildChainPool(criteria) {
     return pool;
 }
 
+// Picks a random level from the pool and remembers it as recent.
 function _pickFromPool(pool, recentWindow, rng) {
     const R = rng || Math.random;
     const picked = pool[Math.floor(R() * pool.length)];
@@ -70,6 +77,7 @@ function _pickFromPool(pool, recentWindow, rng) {
     return picked.gIdx;
 }
 
+// Remembers a level as recently used (keeps the last few).
 export function _trackChainRecentGi(gi, recentWindow) {
     _chainRecentGis.push(gi);
     if (_chainRecentGis.length > (recentWindow || 8)) {

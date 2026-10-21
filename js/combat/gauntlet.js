@@ -181,6 +181,7 @@ const _g = {
 //-------------------PUBLIC QUERIES---------------------------------------
 //------------------------------------------------------------------------
 
+// True while a gauntlet run is active.
 export function _gauntletActive() {
     return _g.active;
 }
@@ -236,6 +237,8 @@ export function _gauntletFighting() {
 // The cells are plain decoration - they never touch the puzzle grid and are
 // gone right after the volley. Returns how many cells were created.
 const _SUMMON_CELL_PX = 44;
+// Spawns 1 to 10 reveal cells in the arena. Returns how many (0 outside a
+// fight).
 export function _gauntletSummonRevealCells(count) {
     if (!_gauntletFighting()) return 0;
     const n = Math.max(1, Math.min(10, Math.round(Number(count) || 1)));
@@ -299,10 +302,13 @@ function _gauntletBanter(eventKey) {
     }
 }
 
+// Picks the English or German text for the current language.
 function _tr(en, de) {
     return LANG === 'de' ? de : en;
 }
 
+// setTimeout that the gauntlet tracks, so a run can cancel all pending timers
+// when it ends.
 function _later(fn, ms) {
     const id = setTimeout(() => {
         _g.timers = _g.timers.filter(x => x !== id);
@@ -312,6 +318,7 @@ function _later(fn, ms) {
     return id;
 }
 
+// Number of monsters still alive.
 function _alive() {
     return (globalThis._monsters || []).filter(m => m.currentHP > 0).length;
 }
@@ -360,10 +367,13 @@ function _earlyHpBudgetEach() {
     } catch (e) { return 0; }
 }
 
+// Config of the chosen difficulty tier (falls back to normal).
 function _tierCfg() {
     return GAUNTLET_CONFIG.tiers[_g.tier] || GAUNTLET_CONFIG.tiers.normal;
 }
 
+// Plans the monster count of each wave for a level, with an easier start at
+// low levels.
 function _planWaves(level) {
     const cfg = GAUNTLET_CONFIG;
     const early = _earlyEaseBlend(level);
@@ -403,6 +413,8 @@ function _arenaRect() {
 // the frame (monster cards simply render behind it).
 const _CARD_BAND_PX = 8;
 
+// Positions the arena overlay over the puzzle area and re-fits it when the
+// area moves.
 function _layout() {
     if (!_g.overlay) return;
     const r = _arenaRect();
@@ -457,6 +469,8 @@ function _layout() {
 
 const _MODIFIERS = ['lava', 'shrink', 'shrine'];
 
+// Icon and EN/DE description of a gauntlet modifier (lava, shrinking floor,
+// healing shrine).
 function _modInfo(id) {
     return {
         lava:   { icon: '🌋', en: 'Drifting lava pools burn you - keep clear of them', de: 'Wandernde Lavapfützen verbrennen dich - meide sie' },
@@ -465,6 +479,7 @@ function _modInfo(id) {
     }[id];
 }
 
+// A random spot on the arena floor, optionally away from the center.
 function _randomFloorSpot(r, avoidCentre) {
     for (let i = 0; i < 12; i++) {
         const x = r.width * (0.1 + Math.random() * 0.8);
@@ -476,6 +491,8 @@ function _randomFloorSpot(r, avoidCentre) {
     return { x: r.width * 0.2, y: _CARD_BAND_PX + 60 };
 }
 
+// Creates the hazards for the chosen modifier: lava pools, the shrinking
+// floor or the moving shrine.
 function _setupModifier() {
     const cfg = GAUNTLET_CONFIG;
     const r = _arenaRect();
@@ -512,6 +529,8 @@ function _setupModifier() {
     }
 }
 
+// The player's feet position in arena coordinates (null if there is no
+// avatar).
 function _playerCentreLocal() {
     const a = document.getElementById('player-avatar-wrapper');
     const r = _arenaRect();
@@ -521,6 +540,8 @@ function _playerCentreLocal() {
     return { x: b.left + b.width / 2 - r.left, y: b.top + b.height * 0.7 - r.top };
 }
 
+// Runs the active modifier each tick (lava pools, shrinking floor or healing
+// shrine). While the game is paused nothing advances.
 function _modifierTick() {
     if (!_g.modifier || !_g.fighting) return;
     const cfg = GAUNTLET_CONFIG;
@@ -598,6 +619,7 @@ function _modifierTick() {
 // (positions in gauntlet.css); spawns pick the emptiest spot at random.
 const _ZONE_IDS = Array.from({ length: 8 }, (_, i) => `ga-zone-${i}`);
 
+// Builds the arena overlay element with its wave counter and center panel.
 function _buildOverlay() {
     const old = document.getElementById('gauntlet-arena');
     if (old) old.remove();
@@ -631,6 +653,7 @@ function _buildOverlay() {
     return el;
 }
 
+// Shows HTML in the arena's center panel (empty string clears it).
 function _setCenter(html, cls) {
     const c = document.getElementById('ga-center');
     if (!c) return;
@@ -638,6 +661,8 @@ function _setCenter(html, cls) {
     c.innerHTML = html;
 }
 
+// Updates the wave and monsters-left display (shows the parry-training status
+// in parry mode).
 function _hud() {
     const w = document.getElementById('ga-wave');
     const l = document.getElementById('ga-left');
@@ -731,6 +756,8 @@ export function startParryTutorial(onDone) {
     _beginParry();
 }
 
+// Starts the parry tutorial fight (life topped up to 80%, monster settings
+// from PARRY_TUTORIAL_CONFIG).
 function _beginParry() {
     const cfg = PARRY_TUTORIAL_CONFIG;
     _setCenter('');
@@ -791,6 +818,8 @@ function _parryTopUp(staggered) {
     }
 }
 
+// Parry training tick: keeps the player's life above a floor so training can
+// never kill them.
 function _parryTick() {
     const cfg = PARRY_TUTORIAL_CONFIG;
     // Training can never kill the player: life is held above a floor.
@@ -804,12 +833,14 @@ function _parryTick() {
     _parryTopUp(false);
 }
 
+// Gold reward for a level, scaled by tier and the number of challenges met.
 function _goldFor(lvl, challengesMet) {
     const cfg = GAUNTLET_CONFIG;
     const base = cfg.goldBase + cfg.goldPerLevel * lvl;
     return Math.round(base * _tierCfg().gold * (1 + cfg.challengeGoldShare * challengesMet));
 }
 
+// Draws the intro card where the player picks a tier and starts the run.
 function _renderIntro(lvl) {
     const mod = _modInfo(_g.modifier);
     const tierBtn = (id, label) =>
@@ -847,6 +878,8 @@ function _renderIntro(lvl) {
     }));
 }
 
+// Starts the fight: switches to fighting form (life and mana topped up,
+// absorption refilled) and begins the waves.
 function _begin() {
     if (!_g.active) return;
     const cfg = GAUNTLET_CONFIG;
@@ -951,6 +984,8 @@ function _makeChampion(m) {
     try { _renderPanel(); } catch (e) { /* panel optional */ }
 }
 
+// Spawns the next wave (with a remark from the characters) until the last one
+// is out.
 function _spawnNextWave() {
     if (!_g.active) return;
     const count = _g.waves[_g.wave];
@@ -1001,6 +1036,8 @@ function _syncArenaVisibility() {
     _g.overlay.style.visibility = blocked ? 'hidden' : '';
 }
 
+// Main loop: aborts quietly if the player left, ends the run on defeat, and
+// keeps the arena, modifier and waves running.
 function _tick() {
     if (!_g.active) return;
     _syncArenaVisibility();

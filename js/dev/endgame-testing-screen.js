@@ -739,6 +739,7 @@ export function _egLaunchTestMap(mapId) {
 //-------------------HTML BUILDERS------------------------------------------
 //------------------------------------------------------------------------
 
+// HTML of one test-map card with its boss and question requirements.
 function _egtBuildMapCardHTML(mapDef) {
     const bossLine = mapDef.hasBoss
         ? `<div class="egt-map-stat">💀 ${t('egt_boss')}${mapDef.maxBosses > 1 ? ` ×${mapDef.maxBosses}` : ''}</div>`
@@ -763,6 +764,7 @@ function _egtBuildMapCardHTML(mapDef) {
 </div>`;
 }
 
+// HTML of the whole test-map screen.
 function _egtBuildFullScreenHTML() {
     return `
 <div class="egt-hub-layout">
@@ -783,6 +785,7 @@ function _egtBuildFullScreenHTML() {
 // Injected via JS, same pattern as ensureLSTooltipStyles() in
 // screens-level-select.js - avoids needing to touch the (large) main CSS file.
 
+// Adds the test screen's stylesheet once.
 export function _egtEnsureStyles() {
     if (document.getElementById('egt-test-hub-style')) return;
 
@@ -851,6 +854,7 @@ export function _egtEnsureStyles() {
 //-------------------SCREEN BOOTSTRAP----------------------------------------
 //------------------------------------------------------------------------
 
+// Creates the test-map screen element.
 function _egtCreateScreen() {
     _egtEnsureStyles();
     const screen = document.createElement('div');
@@ -860,6 +864,7 @@ function _egtCreateScreen() {
     document.body.appendChild(screen);
 }
 
+// Creates the test-map screen on first use.
 function ensureEndgameTestHubScreen() {
     if (!document.getElementById('screen-endgame-test-hub')) _egtCreateScreen();
 }

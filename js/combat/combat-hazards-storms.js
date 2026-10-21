@@ -23,6 +23,8 @@ import {
 //-------------------LIGHTNING STORM--------------------------------------
 //------------------------------------------------------------------------
 
+// Starts the lightning hazard; higher intensity means shorter gaps and more
+// damage.
 export function _hzInitLightning(intensity) {
     _setHzLightning({
         pending: [],
@@ -32,6 +34,8 @@ export function _hzInitLightning(intensity) {
     });
 }
 
+// Per-frame update: schedules lightning warnings and strikes and applies
+// their damage.
 export function _hzTickLightning(dtMs) {
     const st = _hzLightning;
 
@@ -77,6 +81,7 @@ export function _hzTickLightning(dtMs) {
 //-------------------BLIZZARD---------------------------------------------
 //------------------------------------------------------------------------
 
+// Starts the blizzard: a snow layer plus falling icicles.
 export function _hzInitBlizzard(intensity) {
     // Full-screen snow layer (visual only - never blocks clicks).
     const overlay = document.createElement('div');
@@ -107,6 +112,7 @@ export function _hzInitBlizzard(intensity) {
     });
 }
 
+// Creates one icicle that hangs, then falls.
 export function _hzSpawnIcicle() {
     const w = _hzRand(28, 44);
     const h = _hzRand(60, 115);
@@ -126,6 +132,7 @@ export function _hzSpawnIcicle() {
     };
 }
 
+// Per-frame update: spawns icicles, drops them and applies their damage.
 export function _hzTickBlizzard(dtMs) {
     const st = _hzBlizzard;
 
@@ -194,6 +201,8 @@ export function _hzTickBlizzard(dtMs) {
 //-------------------DARKNESS CLOUDS--------------------------------------
 //------------------------------------------------------------------------
 
+// Starts the darkness hazard: drifting clouds, thinner with more shadow
+// resistance.
 export function _hzInitDarkness(intensity) {
     // Shadow Resistance thins the clouds (min opacity floor keeps them fair).
     let shadowResist = 0;
@@ -234,6 +243,8 @@ export function _hzInitDarkness(intensity) {
     _setHzDarkness({ clouds, layer: darkLayer, blinded: false });
 }
 
+// Per-frame update: moves the clouds (wrapping at the screen edge) and blinds
+// the player inside one.
 export function _hzTickDarkness(dtMs) {
     const dtS = dtMs / 1000;
     const vw = window.innerWidth;
@@ -266,6 +277,7 @@ export function _hzTickDarkness(dtMs) {
     }
 }
 
+// True while the player is blinded by a darkness cloud.
 export function _isPlayerInDarknessCloud() {
     return !!(_hzActive && _hzDarkness && _hzDarkness.blinded);
 }
@@ -275,6 +287,7 @@ export function _isPlayerInDarknessCloud() {
 //-------------------ARCANE STORM-----------------------------------------
 //------------------------------------------------------------------------
 
+// Starts the arcane hazard: charging orbs that fire beams.
 export function _hzInitArcane(intensity) {
     _setHzArcane({
         charge: null,
@@ -285,6 +298,7 @@ export function _hzInitArcane(intensity) {
     });
 }
 
+// Creates an orb at a random height that charges up for a beam.
 export function _hzStartArcaneCharge() {
     const y = _hzRand(120, Math.max(140, window.innerHeight - 180));
     const chargeMs = _hzRand(HZ_ARCANE_CHARGE_MIN_MS, HZ_ARCANE_CHARGE_MAX_MS);
@@ -305,6 +319,7 @@ export function _hzStartArcaneCharge() {
     _hzArcane.charge = { y, t: chargeMs, total: chargeMs, orb, size };
 }
 
+// Per-frame update: charges the orb, then fires the beam.
 export function _hzTickArcane(dtMs) {
     const st = _hzArcane;
 
@@ -357,6 +372,7 @@ export function _hzTickArcane(dtMs) {
     }
 }
 
+// Fires the beam at the height the orb charged at.
 export function _hzFireArcaneBeam() {
     const st = _hzArcane;
     if (!st.charge) return;
@@ -388,6 +404,7 @@ export function _hzFireArcaneBeam() {
 // Meteor volleys: every interval a salvo of meteors telegraphs
 // impact circles, then slams down from above. Fire damage, may ignite.
 
+// Starts the meteor hazard.
 export function _hzInitMeteor(intensity) {
     _setHzMeteor({
         pending: [],
@@ -397,6 +414,7 @@ export function _hzInitMeteor(intensity) {
     });
 }
 
+// Shows a warning ring outside the grid and schedules the impact.
 export function _hzSpawnMeteor(delayMs) {
     const pos = _hzPointOutsideGrid(HZ_METEOR_RADIUS * 0.6);
     const el = document.createElement('div');
@@ -415,6 +433,7 @@ export function _hzSpawnMeteor(delayMs) {
     });
 }
 
+// Per-frame update: counts down meteor warnings and lands the meteors.
 export function _hzTickMeteor(dtMs) {
     const st = _hzMeteor;
 
