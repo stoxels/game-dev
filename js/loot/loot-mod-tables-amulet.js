@@ -1,18 +1,9 @@
-//  endgame-mod-tables-amulet.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------AMULET MODIFIER TABLE--------------------------------
 //------------------------------------------------------------------------
-// Amulets are the prestige jewelry slot - they bridge offense and defense.
-// They can roll elemental damage, crit, spell damage, and status effect
-// chances alongside the usual life/mana/resist/attribute suffixes.
-// No local armor/evasion/absorption - jewelry never grants those.
-// Values are slightly higher than earring equivalents to reflect the
-// importance of the slot.
+// Amulets are the prestige jewelry slot, slightly above earring values. They can roll
+// elemental damage, crit, spell damage and status chances next to the usual
+// life/mana/resist/attribute suffixes. Jewelry never has local defences.
 
 export const MOD_TABLE_AMULET = {
     prefixes: {

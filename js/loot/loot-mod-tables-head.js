@@ -1,9 +1,8 @@
-//  endgame-mod-tables-head.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
+//------------------------------------------------------------------------
+//-------------------HEAD MODIFIER TABLE----------------------------------
+//------------------------------------------------------------------------
+// The helmet is a major armour slot; its values set the scale the shoulders match.
+
 export const MOD_TABLE_HEAD = {
     prefixes: {
         // --- LIFE & MANA ---

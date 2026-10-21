@@ -1,20 +1,9 @@
-//  endgame-mod-tables-chest.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------CHEST MODIFIER TABLE---------------------------------
 //------------------------------------------------------------------------
-// The chest is the largest and most important armour slot. It has the
-// highest flat defence values of any slot, the strongest block values,
-// and hosts some powerful exclusive mods: a spell damage multiplier
-// (inscribed into the breastplate), precision (the stacking puzzle buff),
-// and the heaviest absorption mods outside of dedicated shield builds.
-// Block/dodge both appear here - the chest handles both archetypes.
-// No elemental damage, crit, chain, splash, multishot, or pushback -
-// those belong to weapons, amulets, and cloaks respectively.
+// The chest has the highest flat defences and block values of any slot, plus
+// exclusive spell damage and precision mods and the heaviest absorption outside
+// shields. No elemental damage, crit, chain, splash, multishot or pushback.
 
 export const MOD_TABLE_CHEST = {
     prefixes: {

@@ -1,33 +1,9 @@
-//  endgame-mod-tables-arcane.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------ARCANE MODIFIER TABLE--------------------------------
 //------------------------------------------------------------------------
-// The Arcane slot holds a sigil - an inscribed mark of invoked power.
-// It is an offensive magical utility slot: it bends combat rules rather
-// than simply adding stats. Mana is its primary resource; damage
-// amplification and mana-fuelled effects are its output identity.
-// No local defences. Values sit at amulet/ring scale.
-//
-// Arcane-exclusive mods:
-//   arcane_surge - after a streak of # consecutive correct cells with
-//                  no mistake, the sigil fires and grants a burst of
-//                  mana. Rewards precision and focus. The streak counter
-//                  resets on any mistake. Pairs naturally with precision
-//                  (chest) for builds that reward long mistake-free runs.
-//   mana_to_damage - a % of your current mana is added as flat bonus
-//                    damage to your next hit, then that mana is consumed.
-//                    A high-risk, high-reward conversion: hoarding mana
-//                    for a single empowered strike. Pairs with high mana
-//                    pool builds (flat_mana, mana_regen across slots).
-//
-// No block/dodge, no local defences, no precision (chest), no quiz
-// exclusives (gloves), no heart_heal multiplier (belt), no charge
-// interaction mods (boots/pants/shoulders), no echo (rings).
+// The Arcane slot is a magical utility sigil with no local defences; values sit at amulet/ring
+// scale. Exclusive mods: arcane_surge (mana burst after a mistake-free streak) and
+// mana_to_damage (spend a % of current mana as bonus damage on the next hit).
 
 export const MOD_TABLE_ARCANE = {
     prefixes: {

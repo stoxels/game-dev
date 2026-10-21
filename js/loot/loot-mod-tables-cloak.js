@@ -1,18 +1,8 @@
-//  endgame-mod-tables-cloak.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------CLOAK MODIFIER TABLE---------------------------------
 //------------------------------------------------------------------------
-// Cloaks are flowing garments - they favour evasion over raw armour.
-// Their thematic identity is concealment and mobility: dodge, blind,
-// chain, multishot, and splash live here as exclusive or near-exclusive
-// mods. No block (that's shoulders/chest). No elemental damage or crit
-// (that's weapons/amulets). Evasion values are the best of any armour
-// slot; armour and absorption values are slightly below helmet scale.
+// Cloaks favour evasion (the best of any armour slot) over armour and absorption. Dodge,
+// blind, chain, multishot and splash live here. No block, no elemental damage or crit.
 
 export const MOD_TABLE_CLOAK = {
     prefixes: {

@@ -1,19 +1,9 @@
-//  endgame-mod-tables-bracers.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------BRACERS MODIFIER TABLE-------------------------------
 //------------------------------------------------------------------------
-// Bracers are wrist guards - the point where arm meets weapon. They are
-// the melee-flavoured offensive slot: flat physical damage, crit chance
-// and multiplier, and on-hit status effects (ignite/freeze/shock) all
-// live here as either exclusives or primaries. Defence values are modest
-// (smaller piece than helm/chest/shoulders) and comparable to the cloak.
-// No block/dodge, no spell damage, no chain/splash/multishot/pushback,
-// no absorption regen, no precision.
+// Bracers are the melee-flavoured offensive slot: flat physical damage, crit chance
+// and multiplier, and on-hit ignite/freeze/shock. Defences are modest (cloak scale).
+// No block/dodge, spell damage, chain/splash/multishot, absorption regen or precision.
 
 export const MOD_TABLE_BRACERS = {
     prefixes: {

@@ -1,36 +1,10 @@
-//  endgame-mod-tables-pants.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------PANTS MODIFIER TABLE---------------------------------
 //------------------------------------------------------------------------
-// Pants are the lower body - legs carry the fighter forward. They sit
-// between the belt (primary sustain) in thematic
-// identity. Their defensive emphasis is evasion (you move your legs to
-// avoid blows) while still offering all three defence types. Life values
-// are belt-adjacent - a large piece that wraps the thighs and hips.
-// Defences are bracer/gloves scale since the legs are less armoured
-// than chest or shoulders.
-//
-// Pants-exclusive mods:
-//   stagger - chance on hit to delay a monster's charge timer by briefly
-//             staggering them (disrupting their footing). Similar in
-//             concept to pushback (shoulders) but more volatile -
-//             stagger is a short random interrupt rather than a fixed
-//             pushback amount.
-//   preemptive_dodge - chance to automatically dodge the very first
-//                      attack from any monster that hasn't yet hit the
-//                      player this map. The legs are coiled, ready.
-//                      Resets per monster instance.
-//
-// No block/spell block (that's shoulders/chest), no crit, no status
-// effect applications (bracers), no chain/splash/multishot (cloak/gloves),
-// no spell damage (chest), no precision (chest), no quiz exclusives
-// (gloves), no heart_heal multiplier (belt), no pushback/overkill
-// (shoulders), no life_on_kill (belt-exclusive).
+// Pants lean on evasion, with modest life and bracer-scale defences. Exclusive mods:
+// stagger (chance to delay a monster's charge timer) and preemptive_dodge (dodges the
+// first attack of each monster). Block, crit, status effects, chain/splash/multishot,
+// spell damage and precision belong to other slots.
 
 export const MOD_TABLE_PANTS = {
     prefixes: {

@@ -1,26 +1,9 @@
-//  endgame-mod-tables-belt.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------BELT MODIFIER TABLE----------------------------------
 //------------------------------------------------------------------------
-// The belt girds the body - it is the premier sustain and vitality slot.
-// It has the highest flat life values of any non-chest piece and the
-// strongest heart_heal numbers in the game. The belt-exclusive
-// inc_heart_heal (% multiplier on heart healing) makes it the
-// centrepiece of any heart-focused sustain build. life_on_kill sits
-// here as a natural partner to gloves' mana_on_kill - the belt absorbs
-// the fallen enemy's vitality directly.
-//
-// Defences are modest (bracers/gloves scale) - a belt is not a major
-// armour piece, but it does carry all three defence types since it wraps
-// the whole torso. No block/dodge, no crit, no status effect chances,
-// no chain/splash/multishot, no spell damage, no quiz exclusives, no
-// pushback/overkill, no precision. Strength is the primary attribute
-// here - a heavy belt implies physical bulk.
+// The belt is the sustain slot: the highest flat life outside the chest and the strongest
+// heart_heal values. Exclusive mods: inc_heart_heal (% heart-heal multiplier) and life_on_kill.
+// Defences are modest and strength is the main attribute.
 
 export const MOD_TABLE_BELT = {
     prefixes: {

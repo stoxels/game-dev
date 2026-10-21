@@ -1,39 +1,9 @@
-//  endgame-mod-tables-boots.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------BOOTS MODIFIER TABLE---------------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
-//-------------------BOOTS MODIFIER TABLE---------------------------------
-//------------------------------------------------------------------------
-// Boots are solid, grounded footwear - they are about stability and
-// readiness rather than mobility. Their primary defence is armour
-// (hard soles, reinforced toe caps) rather than evasion (that's pants
-// and cloaks). Life values are slightly below pants - boots are a
-// smaller piece. Defences sit at bracer/gloves scale.
-//
-// Boots-exclusive mods:
-//   grounded - when a monster's charge attack lands, there is a chance
-//              the damage is reduced by a flat amount. Your planted feet
-//              brace the impact. Distinct from block (full negation with
-//              downtime), dodge (full avoidance, random), and armour
-//              (always-on reduction) - grounded only fires on charge
-//              hits specifically, but the reduction is significant.
-//   first_step - when a monster spawns, it does not charge-up its
-//                attacks for the first # seconds. Your boots give you
-//                an edge against fresh spawns before they find their
-//                footing. A powerful stat that rewards aggressive
-//                play against newly arrived enemies.
-//
-// No block/dodge (those are shoulders/chest/cloak/pants), no crit,
-// no status effects (bracers), no chain/splash/multishot (cloak/gloves),
-// no spell damage (chest), no precision (chest), no quiz exclusives
-// (gloves), no stagger/preemptive_dodge (pants), no heart_heal
-// multiplier (belt), no pushback/overkill (shoulders).
+// Boots favour armour over evasion, with life slightly below pants. Exclusive mods:
+// grounded (flat damage reduction on charge hits) and first_step (new monsters cannot
+// charge their attacks for the first # seconds). Other effects live on other slots.
 
 export const MOD_TABLE_BOOTS = {
     prefixes: {

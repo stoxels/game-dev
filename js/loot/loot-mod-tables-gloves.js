@@ -1,25 +1,9 @@
-//  endgame-mod-tables-gloves.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------GLOVES MODIFIER TABLE--------------------------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
-//-------------------GLOVES MODIFIER TABLE--------------------------------
-//------------------------------------------------------------------------
-// Gloves are the hand-to-puzzle and hand-to-weapon interface. They share
-// bracer-scale defences (modest flat values) and lean into accuracy,
-// mana-on-kill, and life-leech as their offensive sustain flavour.
-// Their exclusive identity is the quiz/puzzle interaction layer:
-// reveal_hint (chance to show a hint on exercise questions) and
-// chance_for_new_question (retry chance on failed quiz questions) only
-// roll on gloves. Multishot also lives here as a prefix - the gloved
-// hand that draws the extra arrow. No block/dodge, no pushback/overkill,
-// no chain/splash, no spell damage multiplier, no crit, no status effect
-// chance applications (those are bracers), no precision (that's chest).
+// Gloves have bracer-scale defences and lean on accuracy, mana on kill and life leech.
+// Exclusive quiz mods: reveal_hint and chance_for_new_question. Multishot is a prefix here.
+// No block/dodge, pushback/overkill, chain/splash, spell damage, crit, status effects or precision.
 
 export const MOD_TABLE_GLOVES = {
     prefixes: {

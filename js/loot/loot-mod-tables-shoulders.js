@@ -1,17 +1,9 @@
-//  endgame-mod-tables-shoulders.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) - data only, no logic.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every MOD_TABLE_* at load time - it MUST load last.
-//
 //------------------------------------------------------------------------
 //-------------------SHOULDERS MODIFIER TABLE-----------------------------
 //------------------------------------------------------------------------
-// Shoulders are a primary armour piece - emphasis on defenses, damage
-// mitigation, and pushback/overkill as thematic offensive flavour.
-// Block, dodge, and spell-versions live exclusively here and on the chest.
-// Values match helmet scale since both are major armour slots.
-// No elemental damage, no crit, no status effect chances, no leech.
+// Shoulders are a primary armour piece (helmet-scale values) with block, dodge and spell
+// versions shared only with the chest, plus pushback/overkill as offensive flavour.
+// No elemental damage, crit, status effect chances or leech.
 
 export const MOD_TABLE_SHOULDERS = {
     prefixes: {
