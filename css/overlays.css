@@ -853,3 +853,17 @@ body.question-modal-open #player-avatar-simple {
         min-width: 220px;
     }
 }
+
+
+/* The middle button column has a fixed width: the REPLAY pair and the bonus
+   objective note share it, and a long objective text wraps inside it instead
+   of stretching both buttons to its full single-line width. */
+#ov-win .ov-btns-win-grid .ov-btns-col:nth-child(2) {
+    width: clamp(260px, 16vw, 300px);
+    align-items: stretch;
+}
+#ov-win .ov-btns-col .bonus-badge {
+    white-space: normal;
+    line-height: 1.5;
+    text-align: center;
+}
