@@ -739,7 +739,7 @@ export function _egLaunchTestMap(mapId) {
 //-------------------HTML BUILDERS------------------------------------------
 //------------------------------------------------------------------------
 
-export function _egtBuildMapCardHTML(mapDef) {
+function _egtBuildMapCardHTML(mapDef) {
     const bossLine = mapDef.hasBoss
         ? `<div class="egt-map-stat">💀 ${t('egt_boss')}${mapDef.maxBosses > 1 ? ` ×${mapDef.maxBosses}` : ''}</div>`
         : '';
@@ -763,7 +763,7 @@ export function _egtBuildMapCardHTML(mapDef) {
 </div>`;
 }
 
-export function _egtBuildFullScreenHTML() {
+function _egtBuildFullScreenHTML() {
     return `
 <div class="egt-hub-layout">
     <div class="egt-topbar">
@@ -851,7 +851,7 @@ export function _egtEnsureStyles() {
 //-------------------SCREEN BOOTSTRAP----------------------------------------
 //------------------------------------------------------------------------
 
-export function _egtCreateScreen() {
+function _egtCreateScreen() {
     _egtEnsureStyles();
     const screen = document.createElement('div');
     screen.id = 'screen-endgame-test-hub';
@@ -860,7 +860,7 @@ export function _egtCreateScreen() {
     document.body.appendChild(screen);
 }
 
-export function ensureEndgameTestHubScreen() {
+function ensureEndgameTestHubScreen() {
     if (!document.getElementById('screen-endgame-test-hub')) _egtCreateScreen();
 }
 

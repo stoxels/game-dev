@@ -16,7 +16,7 @@ export const BOSS_TEST_TIME_LIMIT = 3600;
 // Fallback monster level per map tier (T1–T16), used when
 // _egMapTierMonsterLevel() (endgame-maps.js) is unavailable. Mirrors
 // EG_MAP_TIER_MONSTER_LEVELS.
-export const BOSS_TEST_TIER_LEVELS = [3, 6, 10, 14, 19, 24, 30, 36, 43, 50, 57, 64, 71, 78, 84, 90];
+const BOSS_TEST_TIER_LEVELS = [3, 6, 10, 14, 19, 24, 30, 36, 43, 50, 57, 64, 71, 78, 84, 90];
 
 // Fallback test level for bosses with no atlas region assigned.
 export const BOSS_TEST_DEFAULT_LEVEL = 50;

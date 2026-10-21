@@ -32,7 +32,7 @@ export function _currentMeleeDamage(chargePct = 1) {
 // Execution tuning: a melee strike on a monster below this HP share is a
 // finisher - multiplied damage. Gives melee the "cleanup kill" niche while
 // spells handle wave-clear.
-export const MELEE_EXECUTE_ENABLED = false;
+const MELEE_EXECUTE_ENABLED = false;
 export const MELEE_EXECUTE_HP_PCT = 0.25;
 export const MELEE_EXECUTE_MULT = 3;
 

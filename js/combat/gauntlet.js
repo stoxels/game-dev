@@ -40,7 +40,7 @@ import { _renderPanel } from './encounter.js';
 //-------------------TUNING-----------------------------------------------
 //------------------------------------------------------------------------
 
-export const GAUNTLET_CONFIG = {
+const GAUNTLET_CONFIG = {
     minMonsters: 12,
     maxMonsters: 18,
     monstersBase: 12,         // total monsters = base + level * perLevel
@@ -133,7 +133,7 @@ export const GAUNTLET_CONFIG = {
 // Parry tutorial (tutorial quest, final lesson): a stripped-down arena with
 // three unkillable monsters in three different spots. The player only has to
 // parry a few attacks by holding the parry key - no kills, no waves, no gold.
-export const PARRY_TUTORIAL_CONFIG = {
+const PARRY_TUTORIAL_CONFIG = {
     targetParries: 5,
     monsterCount: 3,
     zoneIndexes: [1, 5, 7],   // top-centre, bottom-left, bottom-right arena spots

@@ -645,7 +645,7 @@ function _applyImpaleToHit(target, amount, elements, opts) {
 // Intimidate (node 125): a melee hit may intimidate the enemy for
 // INTIMIDATE_DURATION_S seconds; while it lasts, melee hits against it
 // deal intimidateMeleeAmpPct % more damage (the node's second line).
-export const INTIMIDATE_DURATION_S = 10;
+const INTIMIDATE_DURATION_S = 10;
 
 // Amplifies a melee hit on an intimidated enemy. Non-melee and
 // un-intimidated hits pass through unchanged.

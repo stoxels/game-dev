@@ -16,7 +16,7 @@ export const WEAPON_SWING_COOLDOWN_MS = 400;
 // Per weapon family - a dagger is a short reach, a staff a long one. The
 // old flat rule was 340px centre-to-centre, which is ~270px to the edge of
 // a normal card, hence the sword/axe value.
-export const MELEE_REACH_PX = {
+const MELEE_REACH_PX = {
     sword: 270, dagger: 230, axe: 270, mace: 260,
     wand: 300, staff: 320, bow: 400, unarmed: 200,
 };
@@ -160,7 +160,7 @@ const MELEE_TIE_PX = 12;
 // Current reach in px: the equipped weapon family's base reach plus
 // Champion's Vigor (reworked node 20033) bonus meters. Guarded like the
 // ailment channels - no stats, no bonus.
-export function _meleeReachPx() {
+function _meleeReachPx() {
     let family = 'unarmed';
     try { family = _getEquippedWeaponInfo().family || 'unarmed'; } catch (e) { family = 'unarmed'; }
     const base = MELEE_REACH_PX[family] != null ? MELEE_REACH_PX[family] : MELEE_REACH_PX.sword;

@@ -180,14 +180,14 @@ export function _bossTestToggleTestHP(checkbox, bossId, level, hpMult) {
 //-------------------HTML BUILDERS------------------------------------------
 //------------------------------------------------------------------------
 
-export function _bossTestBossIconHTML(def) {
+function _bossTestBossIconHTML(def) {
     // Real boss art when it exists (see images/combat/monsters/boss_*.jpeg),
     // otherwise the emoji fallback - same helper the arena cards use.
     if (typeof GAME_ART !== 'undefined' && GAME_ART.html) return GAME_ART.html('monster', def.id, def.emoji || '💀');
     return def.emoji || '💀';
 }
 
-export function _bossTestBuildBossCardHTML(def, level) {
+function _bossTestBuildBossCardHTML(def, level) {
     const preview = _bossTestScaledPreview(def, level);
     const hpMult = _bossTestCalcTestHPMultiplier(def, level);
     return `
@@ -218,7 +218,7 @@ export function _bossTestBuildBossCardHTML(def, level) {
 
 // Groups boss defs into tier sections (1–16, then unassigned as tier 0),
 // honouring the search query. Empty tiers are omitted.
-export function _bossTestBuildSections() {
+function _bossTestBuildSections() {
     const all = (typeof BOSS_DEFS !== 'undefined') ? Object.values(globalThis.BOSS_DEFS) : [];
     const query = String(window._bossTestSearch || '').trim().toLowerCase();
     const matches = def => !query
@@ -240,7 +240,7 @@ export function _bossTestBuildSections() {
     return sections;
 }
 
-export function _bossTestBuildSectionHTML(section) {
+function _bossTestBuildSectionHTML(section) {
     const level = section.tier > 0 ? _bossTestTierMonsterLevel(section.tier) : BOSS_TEST_DEFAULT_LEVEL;
     const title = section.tier > 0
         ? `${t('eg_boss_test_tier').replace('{n}', section.tier)} · ${t('eg_boss_test_tier_level').replace('{lv}', level)}`

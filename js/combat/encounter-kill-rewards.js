@@ -36,7 +36,7 @@ function _tutorialSuppressesDrops() {
 // frequencies players know are preserved). Charms and gold coins carry
 // deliberately small weights. The chosen bucket's own chance roll is skipped (force = true);
 // its other rules (board caps, free cells, level gates) still apply.
-export const KILL_DROP_CHANCE_NORMAL = 0.6;   // P(something drops) per normal kill
+const KILL_DROP_CHANCE_NORMAL = 0.6;   // P(something drops) per normal kill
 
 // Late campaign: Tier 1 maps drop from regular monsters in the second half of
 // world 12 and in all of worlds 13 and 14 (the Nexus world). This is the main

@@ -26,32 +26,32 @@ import { _egMapHasBloodMagic } from '../endgame/endgame-map-launch.js';
 
 // Damage per stack - each correct quiz answer adds +10% additively
 // (3 stacks = +30%, etc.). Each stack lasts QUIZ_BUFF_DURATION_MS.
-export const QUIZ_BUFF_DAMAGE_PER_STACK = 0.10;
+const QUIZ_BUFF_DAMAGE_PER_STACK = 0.10;
 // Legacy constant - single-stack multiplier, kept for backward compatibility.
 export const QUIZ_BUFF_DAMAGE_MULT = 1 + QUIZ_BUFF_DAMAGE_PER_STACK;
 // Duration of each damage stack (30 minutes).
-export const QUIZ_BUFF_DURATION_MS = 30 * 60 * 1000;
+const QUIZ_BUFF_DURATION_MS = 30 * 60 * 1000;
 // Array of expiry timestamps (one entry per active +10% stack).
-export let _quizDmgBuffStacks = [];
+let _quizDmgBuffStacks = [];
 // Timestamp until which at least one stack is still active (0 = inactive).
 // Derived as max(_quizDmgBuffStacks); kept for debug / backward compat.
 export let _quizDmgBuffUntil = 0;
 
 // Timeout handle for the barrier visual's expiry.
-export let _quizShieldTimer = null;
+let _quizShieldTimer = null;
 
 // Summary lines of every reward granted since the last chain countdown.
 // Each correctly answered interstitial question pushes one entry; all are
 // joined and consumed together by _buildChainBonusGainHTML. This fixes
 // the map_extra_questions mod (+# additional Quiz Questions per Puzzle)
 // which previously overwrote a single string and only the last reward was shown.
-export let _pendingQuizRewardLines = [];
+let _pendingQuizRewardLines = [];
 // Legacy alias - kept for backward compatibility / debug inspection.
-export let _pendingQuizRewardLine = '';
+let _pendingQuizRewardLine = '';
 
 // Removes expired stacks and refreshes the derived _quizDmgBuffUntil.
 // Returns the number of still-active stacks.
-export function _pruneQuizDamageStacks() {
+function _pruneQuizDamageStacks() {
     const now = Date.now();
     if (_quizDmgBuffStacks.length) {
         _quizDmgBuffStacks = _quizDmgBuffStacks.filter(t => t > now);
@@ -74,7 +74,7 @@ export function _quizDamageBuffMult() {
 }
 
 // Human-readable duration for toasts / labels (e.g. "30m").
-export function _formatQuizBuffDuration(ms) {
+function _formatQuizBuffDuration(ms) {
     const mins = Math.round(ms / 60000);
     if (mins >= 60) {
         const h = Math.floor(mins / 60);
@@ -87,7 +87,7 @@ export function _formatQuizBuffDuration(ms) {
 // Schedules the shield visual to re-evaluate at the next stack expiry.
 // When the earliest stack expires we prune and either reschedule for the
 // next expiry or remove the wings if no stacks remain.
-export function _scheduleQuizShieldExpiry() {
+function _scheduleQuizShieldExpiry() {
     if (_quizShieldTimer) {
         clearTimeout(_quizShieldTimer);
         _quizShieldTimer = null;
@@ -165,15 +165,15 @@ export function _consumePendingQuizRewardHTML() {
 //------------------------------------------------------------------------
 
 // Spark burst colours per reward type (heal / mana bursts).
-export const QUIZ_BUFF_COLORS = {
+const QUIZ_BUFF_COLORS = {
     damage: '#ff5533',
     heal: '#4caf50',
     mana: '#4fc3f7',
 };
 
-export const QUIZ_BUFF_SPARK_COUNT = 12;
-export const QUIZ_BUFF_FX_DURATION_MS = 900;
-export const QUIZ_SHIELD_FADE_MS = 400;
+const QUIZ_BUFF_SPARK_COUNT = 12;
+const QUIZ_BUFF_FX_DURATION_MS = 900;
+const QUIZ_SHIELD_FADE_MS = 400;
 
 // Stacks at which the aura reaches full intensity.
 const QUIZ_AURA_FULL_STACKS = 8;
@@ -190,7 +190,7 @@ function _syncQuizAuraIntensity() {
 
 // Adds the damage-buff aura: a red ring around the character sprite that
 // pulses while at least one damage stack is active and scales with stacks.
-export function _addQuizShieldFX(durationMs) {
+function _addQuizShieldFX(durationMs) {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
 
@@ -219,7 +219,7 @@ export function _addQuizShieldFX(durationMs) {
 }
 
 // Removes the aura - immediately, or after a short fade-out.
-export function _removeQuizShieldFX(immediate) {
+function _removeQuizShieldFX(immediate) {
     const wings = document.querySelectorAll('.sx-quiz-shield-wing');
     if (!wings.length) return;
 
@@ -233,7 +233,7 @@ export function _removeQuizShieldFX(immediate) {
 
 // Spark burst + floating label anchored to the player HUD. Used for the
 // heal / mana rewards; the damage buff uses the barrier wings instead.
-export function _showQuizBuffBurst(type, labelText) {
+function _showQuizBuffBurst(type, labelText) {
     const hud = document.getElementById('player-avatar-wrapper');
     const color = QUIZ_BUFF_COLORS[type] || '#ffffff';
 
@@ -288,7 +288,7 @@ export function _showQuizBuffBurst(type, labelText) {
 //------------------------------------------------------------------------
 
 // Helper: grant one stacking +10% damage stack and its visuals/toast.
-export function _grantQuizDamageReward() {
+function _grantQuizDamageReward() {
     // DEV_EFFECT_TIME_SCALE (dev testing harness, see js/dev/dev-testing.js):
     // ×1 = exact shipped behaviour (30 min stacks are unobservable in tests).
     const scale = (typeof window !== 'undefined' && window.DEV_EFFECT_TIME_SCALE > 0 && window.DEV_EFFECT_TIME_SCALE !== 1)

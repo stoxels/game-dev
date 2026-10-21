@@ -55,7 +55,7 @@ export const PLAYER_STATS = {
 // DUAL_WIELD_DAMAGE_MULT (~1.4x a single 1H, below a 2H's ~1.6-1.7x), and
 // grants DUAL_WIELD_PARRY_PCT base parry chance WITHOUT holding the parry key
 // (gear parry adds on top; successful projectile parries can still deflect).
-export const DUAL_WIELD_DAMAGE_MULT = 0.7;
+const DUAL_WIELD_DAMAGE_MULT = 0.7;
 export const DUAL_WIELD_PARRY_PCT = 15;
 
 
@@ -217,7 +217,7 @@ export const STAT_KEY_MAP = {
 // these keys are routed per source slot: weapon items feed ONLY their melee
 // counterpart, ranged items feed only the shared (projectile) bucket, and
 // every other slot feeds both channels.
-export const MELEE_BUCKET_MAP = {
+const MELEE_BUCKET_MAP = {
     physFlatMin: 'meleePhysMin',
     physFlatMax: 'meleePhysMax',
     physIncPct: 'meleePhysIncPct',
@@ -244,7 +244,7 @@ export const MELEE_BUCKET_MAP = {
 // Returns [{ label: string, downside: bool, tierLabel: string }] for tooltip rendering.
 // tierLabel is the affix tier badge: "P4" for prefix tier 4, "S1" for suffix tier 1,
 // and "P2+S3" when multiple mods were merged into one combined line (including hybrids).
-export function _tryHealLegacyDualMod(mod) {
+function _tryHealLegacyDualMod(mod) {
     // Legacy items rolled before the min/min2 -> min1/min2 fix stored a single
     // rolledStat whose label still contains the '@' placeholder and no second
     // stat was created, so the damage value was never shown and never counted
@@ -397,7 +397,7 @@ export function _getAllEquippedItems() {
 // item they rolled on, not the character-wide totals.
 //
 // Effective item value = round((base + localFlat) * (1 + localIncPct / 100)).
-export const LOCAL_DEFENSE_FLAT_KEYS = {
+const LOCAL_DEFENSE_FLAT_KEYS = {
     flat_armour: 'armour',
     flat_evasion: 'evasion',
     flat_absorption: 'absorption',
@@ -411,7 +411,7 @@ export const LOCAL_DEFENSE_FLAT_KEYS = {
     hybrid_evasion_absorption_1: 'evasion', hybrid_evasion_absorption_2: 'absorption',
 };
 
-export const LOCAL_DEFENSE_INC_KEYS = {
+const LOCAL_DEFENSE_INC_KEYS = {
     inc_armour: 'armour',
     inc_evasion: 'evasion',
     inc_absorption: 'absorption',
@@ -476,7 +476,7 @@ export function _getItemEffectiveDefenses(item) {
 // by % increased Physical), matching the combat order in
 // _calcPlayerDamage() where elemental damage is added AFTER the
 // % increased Physical multiplier.
-export const LOCAL_DAMAGE_FLAT_KEYS = {
+const LOCAL_DAMAGE_FLAT_KEYS = {
     flat_physical_damage_1: 'physMin',
     flat_physical_damage_2: 'physMax',
     fire_damage_1: 'fireMin',       fire_damage_2: 'fireMax',
@@ -485,7 +485,7 @@ export const LOCAL_DAMAGE_FLAT_KEYS = {
     shadow_damage_1: 'shadowMin',   shadow_damage_2: 'shadowMax',
 };
 
-export const LOCAL_DAMAGE_INC_KEYS = {
+const LOCAL_DAMAGE_INC_KEYS = {
     inc_physical_damage: 'physInc',
 };
 
@@ -1630,7 +1630,7 @@ export function _computePlayerStats() {
 // is the effective time-to-full-charge.
 // weaponOverride: dual-wielding charges one bar per hand, each on its own
 // weapon's base time (see _getPlayerAttackIntervalForHand).
-export function _getPlayerAttackIntervalBreakdown(weaponOverride) {
+function _getPlayerAttackIntervalBreakdown(weaponOverride) {
     const defBase = PLAYER_DEFAULT_ATTACK_INTERVAL;
     let base = defBase;
     // Only the melee weapon slot defines the manual-strike charge time -
@@ -1709,7 +1709,7 @@ export function _getPlayerAttackIntervalForHand(hand) {
 // weighted by each weapon's base damage (even split when unknown). The two
 // shares add up to 1, so landing both hands once deals the same total as the
 // old single combined strike - the second bar adds rhythm, not extra damage.
-export function _dualHandShare(hand) {
+function _dualHandShare(hand) {
     const avg = (w) => (w && w.damage) ? ((Number(w.damage.min) || 0) + (Number(w.damage.max) || 0)) / 2 : 0;
     const a = avg(_getDualHandWeapon(1));
     const b = avg(_getDualHandWeapon(2));
@@ -1735,8 +1735,8 @@ export function _strikeHandMult() {
 // Armour mitigation is damage-relative (ARPG-style): the same armour value
 // mitigates many small hits strongly but large hits weakly, so it never
 // trivially caps once gear values grow and stays relevant at every level.
-export const ARMOUR_DAMAGE_FACTOR = 12;   // reduction% = armour / (armour + factor * rawDamage) - was 10, raised so armour is less dominant at high tiers (more challenging when lacking)
-export const ARMOUR_MAX_REDUCTION = 0.75; // hard cap on mitigation
+const ARMOUR_DAMAGE_FACTOR = 12;   // reduction% = armour / (armour + factor * rawDamage) - was 10, raised so armour is less dominant at high tiers (more challenging when lacking)
+const ARMOUR_MAX_REDUCTION = 0.75; // hard cap on mitigation
 
 // Returns armour's % reduction (0..ARMOUR_MAX_REDUCTION) against a hit of
 // the given raw size. Used by both the combat path and stat tooltips so the
@@ -1756,9 +1756,9 @@ export function _calcArmourMitigation(rawDamage, armour) {
 // 75%. The benchmark constant scales with the ATTACKER's level (ARPG-style):
 // higher-level monsters are harder to dodge, so evasion keeps requiring
 // upgrades instead of permanently sitting at the cap once gear values grow.
-export const EVASION_DODGE_K = 200;        // dodge% = evasion / (evasion + K) at monster level 1
-export const EVASION_LEVEL_GROWTH = 1.035; // per-level growth of the evasion benchmark (was 1.045 - retuned so 350 evasion = ~11% dodge at 90, ~50% at 30; was too punishing at 1.045, too generous at 1.03)
-export const EVASION_DODGE_CAP_PCT = 75;
+const EVASION_DODGE_K = 200;        // dodge% = evasion / (evasion + K) at monster level 1
+const EVASION_LEVEL_GROWTH = 1.035; // per-level growth of the evasion benchmark (was 1.045 - retuned so 350 evasion = ~11% dodge at 90, ~50% at 30; was too punishing at 1.045, too generous at 1.03)
+const EVASION_DODGE_CAP_PCT = 75;
 
 export function _calcEvasionDodgeChance(evasion, monsterLevel) {
     if (!evasion) return 0;
@@ -1771,9 +1771,9 @@ export function _calcEvasionDodgeChance(evasion, monsterLevel) {
 // each attacker level above the player's (past a small grace gap) cuts the
 // chance by OVER_LEVEL_AVOID_PER_LEVEL, never below OVER_LEVEL_AVOID_MIN of it.
 // Returns a multiplier in [OVER_LEVEL_AVOID_MIN, 1]; 1 for equal/lower levels.
-export const OVER_LEVEL_AVOID_GRACE = 2;
-export const OVER_LEVEL_AVOID_PER_LEVEL = 0.03;
-export const OVER_LEVEL_AVOID_MIN = 0.25;
+const OVER_LEVEL_AVOID_GRACE = 2;
+const OVER_LEVEL_AVOID_PER_LEVEL = 0.03;
+const OVER_LEVEL_AVOID_MIN = 0.25;
 
 export function _overLevelAvoidMult(attackerLevel, playerLevel) {
     const a = Number(attackerLevel) || 0;
@@ -1797,13 +1797,13 @@ export function _overLevelAvoidMult(attackerLevel, playerLevel) {
 // gear lets you comfortably fight content ABOVE your level. Fighting
 // higher-level monsters without that investment now gets noticeably shaky
 // (retuned: higher scale so gear matters for T16; innate slightly lowered).
-export const ACCURACY_MISS_SCALE = 185;   // miss% = scale * monsterLevel / effectiveAccuracy (was 150)
-export const ACCURACY_MISS_MIN_PCT = 5;   // never perfectly reliable
-export const ACCURACY_MISS_MAX_PCT = 60;  // attacks always retain some threat
-export const ACCURACY_INNATE_BASE = 25;       // innate accuracy at player level 1 (was 30)
-export const ACCURACY_INNATE_PER_LEVEL = 13;  // extra innate accuracy per player level (was 15)
+const ACCURACY_MISS_SCALE = 185;   // miss% = scale * monsterLevel / effectiveAccuracy (was 150)
+const ACCURACY_MISS_MIN_PCT = 5;   // never perfectly reliable
+const ACCURACY_MISS_MAX_PCT = 60;  // attacks always retain some threat
+const ACCURACY_INNATE_BASE = 25;       // innate accuracy at player level 1 (was 30)
+const ACCURACY_INNATE_PER_LEVEL = 13;  // extra innate accuracy per player level (was 15)
 
-export function _getInnateAccuracy() {
+function _getInnateAccuracy() {
     const lvl = (typeof _getPlayerLevel === 'function')
         ? Math.max(1, Number(_getPlayerLevel()) || 1) : 1;
     return ACCURACY_INNATE_BASE + ACCURACY_INNATE_PER_LEVEL * (lvl - 1);
@@ -1818,17 +1818,17 @@ export function _getInnateAccuracy() {
 //  miss reduction guarantees the bonus is felt even at high innate
 //  accuracy where extra accuracy alone would be marginal.
 // ──────────────────────────────────────────────────────────────────────────
-export const DRAG_ACCURACY_T1 = 6;   // >5 correct
-export const DRAG_ACCURACY_T2 = 11;  // >10 correct
-export const DRAG_ACCURACY_T3 = 16;  // >15 correct
+const DRAG_ACCURACY_T1 = 6;   // >5 correct
+const DRAG_ACCURACY_T2 = 11;  // >10 correct
+const DRAG_ACCURACY_T3 = 16;  // >15 correct
 
-export const DRAG_ACCURACY_BONUS_T1 = 40;
-export const DRAG_ACCURACY_BONUS_T2 = 85;
-export const DRAG_ACCURACY_BONUS_T3 = 145;
+const DRAG_ACCURACY_BONUS_T1 = 40;
+const DRAG_ACCURACY_BONUS_T2 = 85;
+const DRAG_ACCURACY_BONUS_T3 = 145;
 
-export const DRAG_MISS_REDUCTION_T1 = 6;   // percentage points
-export const DRAG_MISS_REDUCTION_T2 = 12;
-export const DRAG_MISS_REDUCTION_T3 = 19;
+const DRAG_MISS_REDUCTION_T1 = 6;   // percentage points
+const DRAG_MISS_REDUCTION_T2 = 12;
+const DRAG_MISS_REDUCTION_T3 = 19;
 
 export function _getDragAccuracyBonus(stacks) {
     const n = Number(stacks) || 0;
@@ -1922,10 +1922,10 @@ export function _fireSurgeActive(now = Date.now()) {
 // gear: absorption_regen_rate increases the refill speed (%).
 
 // Base delay before regeneration starts (reduced by fasterAbsorptionRegenStart).
-export const ABSORPTION_REGEN_BASE_DELAY_MS = 18000; // was 12000 - 200 dmg hits at L41 every ~6s can no longer fully regen (needs 18s quiet)
+const ABSORPTION_REGEN_BASE_DELAY_MS = 18000; // was 12000 - 200 dmg hits at L41 every ~6s can no longer fully regen (needs 18s quiet)
 
 // Base share of max Absorption restored per regen tick (scaled by absorptionRegenRatePct).
-export const ABSORPTION_REGEN_BASE_STEP_PCT = 0.04; // was 0.06 - 5s to full (was 3.3s), so even after delay a full shield takes longer
+const ABSORPTION_REGEN_BASE_STEP_PCT = 0.04; // was 0.06 - 5s to full (was 3.3s), so even after delay a full shield takes longer
 
 export function _cancelAbsorptionRegen() {
     if (globalThis._playerAbsorptionRegenDelayTimer) { clearTimeout(globalThis._playerAbsorptionRegenDelayTimer); globalThis._playerAbsorptionRegenDelayTimer = null; }
@@ -2000,7 +2000,7 @@ export function _scheduleAbsorptionRegen() {
 // _computePlayerStats(). Buckets not listed here are either internal/derived
 // (armour/evasion/absorption totals, physFlatMin/Max, elemental dmg pairs)
 // and are handled explicitly by _buildStatLine() instead.
-export const STAT_DISPLAY_LABELS = {
+const STAT_DISPLAY_LABELS = {
     health: { label: t('eg_stat_health'), suffix: '' },
     healthIncPct: { label: t('eg_stat_inc_health'), suffix: '%' },
     mana: { label: t('eg_stat_mana'), suffix: '' },

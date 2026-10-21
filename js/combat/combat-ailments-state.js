@@ -117,7 +117,7 @@ export function _gainEnduranceCharge(max, durationPct = 0) {
 // against the clock like Endurance Charges, so no timer exists.
 // Nothing GRANTS charges yet - _gainFrenzyCharge is the hook for future
 // sources (nodes, gear, skills).
-export const FRENZY_DURATION_MS = 10000;
+const FRENZY_DURATION_MS = 10000;
 export const FRENZY_BASE_MAX = 3;
 export const FRENZY_MELEE_SPEED_PER_CHARGE = 4;
 export const FRENZY_DAMAGE_PER_CHARGE = 4;
@@ -140,7 +140,7 @@ export function _gainFrenzyCharge(max, durationPct = 0) {
     return _frenzyCharges;
 }
 
-export function _resetFrenzyCharges() {
+function _resetFrenzyCharges() {
     _frenzyCharges = 0;
     _frenzyUntil = 0;
 }
@@ -151,7 +151,7 @@ export function _resetFrenzyCharges() {
 // Timed speed buff (Onslaught): while active, melee charge-up, cast and
 // movement speed rise by ONSLAUGHT_SPEED_PCT (scaled by the effect line).
 // Gained on kill through the tree; every gain refreshes the timer.
-export const ONSLAUGHT_DURATION_MS = 4000;
+const ONSLAUGHT_DURATION_MS = 4000;
 export const ONSLAUGHT_SPEED_PCT = 20;
 
 let _onslaughtUntil = 0;
@@ -214,7 +214,7 @@ export function _resetGhostShrouds() {
 // POWER_CRIT_PER_CHARGE % crit chance (attacks and spells) and feeds the
 // tree's damage-per-charge line (folded in _computePlayerStats). Shared
 // timer like Frenzy/Endurance; resolved lazily against the clock.
-export const POWER_DURATION_MS = 10000;
+const POWER_DURATION_MS = 10000;
 export const POWER_BASE_MAX = 3;
 export const POWER_CRIT_PER_CHARGE = 1.5;
 
@@ -247,7 +247,7 @@ export function _resetPowerCharges() {
 // Defensive stacks (Fortify, stack form): each stack takes
 // FORTIFY_DR_PER_STACK % less damage from hits (scaled by the effect line).
 // Gaining a stack refreshes the shared timer; all stacks expire together.
-export const FORTIFY_DURATION_MS = 4000;
+const FORTIFY_DURATION_MS = 4000;
 export const FORTIFY_BASE_MAX = 10;
 export const FORTIFY_DR_PER_STACK = 1;
 
@@ -277,7 +277,7 @@ export function _resetFortify() {
 //------------------------------------------------------------------------
 // A successful Parry with a sword readies a riposte: the next melee strike
 // deals RIPOSTE_BASE_MORE_PCT (+ tree) % more damage and consumes it.
-export const RIPOSTE_DURATION_MS = 4000;
+const RIPOSTE_DURATION_MS = 4000;
 export const RIPOSTE_BASE_MORE_PCT = 25;
 
 let _riposteUntil = 0;
@@ -309,8 +309,8 @@ export function _resetRiposte() {
 // restarts a 5s grace timer; once it lapses one Rage fades per second.
 // Like the endurance charges the count is resolved lazily against the
 // clock, so no timer exists.
-export const RAGE_DECAY_GRACE_MS = 5000;
-export const RAGE_DECAY_STEP_MS = 1000;
+const RAGE_DECAY_GRACE_MS = 5000;
+const RAGE_DECAY_STEP_MS = 1000;
 
 let _rage = 0;
 let _rageDecayAt = 0;
