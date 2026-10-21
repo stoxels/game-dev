@@ -176,37 +176,10 @@ export function _getDominantElement(elements) {
     return bestVal > 0 ? best : 'physical';
 }
 
-// Applies incoming player damage to a specific monster by id.
-// Handles boss immunity, elemental resistances, stat changes, phase
-// transitions, and kill detection.
-// Called by the projectile onfinish callback so the impact matches visually.
-// `elements` optionally maps each element to the elemental share of `amount`.
-// `opts.isEcho` marks the delayed echo instance so echoes can't chain into
-// further echoes (they still trigger on-hit effects like leech/ailments).
-// `opts.isCharged` marks a drag-paint charged shot (or its ricochet chain)
-// so overkill can ricochet as a smaller projectile (gear chance).
-export function _damageTargetById(monsterId, amount, elements, opts) {
-    if (!_isActive()) return;
-
-    const target = globalThis._monsters.find(m => m.id === monsterId);
-    if (!target) return;
-
-    // Boss immunity window - ignore damage and show the immune flash
-    if (target.bossImmune) {
-        _flashImmune(target.id);
-        return;
-    }
-
-    if (opts && opts.isPlayerSpell) target._lastSpellHitAt = Date.now();
-
-    const hpBefore = target.currentHP;
-    // Crush (node 331) is decided on the state BEFORE the hit: only an
-    // enemy that was at full Life when the melee strike landed is crushed.
-    const wasFullLife = target.maxHP > 0 && hpBefore >= target.maxHP;
-
-    // Flat player damage that carries no element breakdown (shield bash,
-    // reflect, channel release) is physical; the Primal Flame keystone
-    // (fire conversion / fire-only) converts or drops it like any other hit.
+// Flat player damage with no element breakdown (shield bash, reflect, channel
+// release) counts as physical; the Primal Flame keystone converts or drops it
+// like any other hit. Returns the possibly converted { amount, elements }.
+function _convertFlatPlayerDamage(amount, elements, opts) {
     if (opts && opts.isPlayerFlat && !elements) {
         const flatStats = _computePlayerStats();
         if (_hasDamageConversion(flatStats) === true) {
@@ -216,12 +189,12 @@ export function _damageTargetById(monsterId, amount, elements, opts) {
                 + elements.fire + elements.cold + elements.lightning + elements.shadow));
         }
     }
+    return { amount, elements };
+}
 
-    // Intimidate (node 125): melee hits on an intimidated enemy deal more.
-    // Applied before resistances so it scales the whole hit.
-    amount = _applyIntimidateAmp(target, amount, opts);
-
-    // Phase C-1 conditional damage (tree): enemies on Low Life (<=35%), recently Shocked an enemy.
+// Tree lines that add damage against an enemy on Low Life (35% or less) or one
+// that was recently shocked. Returns the new amount.
+function _applyConditionalDamage(target, amount, opts, hpBefore) {
     if (opts && (opts.isMelee || opts.isPlayerHit || opts.isPlayerSpell)) {
         const cs = _computePlayerStats();
         let condInc = 0;
@@ -229,9 +202,13 @@ export function _damageTargetById(monsterId, amount, elements, opts) {
         if ((Number(cs.dmgRecentShockPct) || 0) > 0 && Date.now() - (Number(globalThis._lastShockAt) || 0) < 4000) condInc += cs.dmgRecentShockPct;
         if (condInc > 0) amount = Math.max(1, Math.round(amount * (1 + condInc / 100)));
     }
+    return amount;
+}
 
-    // Keystone "more" lines: Elemental Overload (after a crit), Pain Attunement (spells
-    // on Low Life), Precise Technique (accuracy above max Life), Bitter Frost (chilled).
+// Keystone "more" lines: Elemental Overload (after a crit), Pain Attunement (spells
+// on Low Life), Precise Technique (accuracy above max Life), Bitter Frost (chilled)
+// and Elemental Equilibrium. Returns the new amount.
+function _applyKeystoneDamageMods(target, amount, elements, opts) {
     if (opts && (opts.isMelee || opts.isPlayerHit || opts.isPlayerSpell)) {
         const ks = _computePlayerStats();
         let kMult = 1;
@@ -267,21 +244,26 @@ export function _damageTargetById(monsterId, amount, elements, opts) {
         }
         if (kMult !== 1) amount = Math.max(1, Math.round(amount * kMult));
     }
+    return amount;
+}
 
-    // Armour pierce (node 147): per-hit roll to skip the target's physical
-    // reduction. Only tagged player hits (melee strikes / primary projectile
-    // hits) roll; untagged boss and monster-side damage never does.
+// Armour pierce (node 147): per-hit roll to skip the target's physical
+// reduction. Only tagged player hits (melee strikes / primary projectile
+// hits) roll; untagged boss and monster-side damage never does. Returns the
+// opts to use for the resistance step.
+function _rollArmourPierce(target, opts) {
     if (opts && (opts.isMelee || opts.isPlayerHit)
         && ((target.resistances && target.resistances.physical) || 0) > 0) {
         const pierce = Math.min(100, Number(_computePlayerStats().ignorePhysReductionPct) || 0);
         if (pierce > 0 && Math.random() * 100 < pierce) opts = Object.assign({}, opts, { ignorePhysReduction: true });
     }
+    return opts;
+}
 
-    // Elemental resistances reduce only the elemental share of the hit;
-    // the physical portion passes through untouched. opts carries source
-    // tags (isMelee) read by Spellproof inside.
-    // Penetration (tree lines pen_*): player hits ignore a share of the
-    // monster's elemental resistance. Untagged boss / monster damage is untouched.
+// Penetration (tree lines pen_*): player hits ignore a share of the monster's
+// elemental resistance. Untagged boss / monster damage is untouched. Returns
+// the opts to use for the resistance step.
+function _withPenetration(opts) {
     if (opts && (opts.isMelee || opts.isPlayerHit || opts.isPlayerSpell)) {
         const penStats = _computePlayerStats();
         const penAll = Number(penStats.penElementalPct) || 0;
@@ -293,34 +275,13 @@ export function _damageTargetById(monsterId, amount, elements, opts) {
         };
         if (pen.fire || pen.cold || pen.lightning || pen.shadow) opts = Object.assign({}, opts, { penetration: pen });
     }
-    amount = _applyTargetResistances(amount, target, elements, opts);
+    return opts;
+}
 
-    // Ailments: shocked monsters take amplified damage; elemental hits can
-    // ignite / chill / freeze / shock the monster (gear ailment chances).
-    if (typeof _applyAilmentShockAmpOnMonster === 'function') {
-        amount = _applyAilmentShockAmpOnMonster(target, amount);
-    }
-    if (typeof _rollPlayerHitAilments === 'function') {
-        _rollPlayerHitAilments(target, amount, elements, opts);
-    }
-    // Impale (heavy-weapon batch): any hit on an impaled enemy deals its
-    // stored damage on top; a heavy melee hit can impale. Runs after the
-    // ailment roll so the extra damage never feeds bleed/ignite sizing.
-    if (typeof _applyImpaleToHit === 'function') {
-        const impaleBefore = target.impale;
-        amount = _applyImpaleToHit(target, amount, elements, opts);
-        if (target.impale && target.impale !== impaleBefore) _showStatusLabel(target.id, t('eg_impaled'));
-    }
-
-    // Intimidate roll: after the hit's own damage so the hit that
-    // intimidates does not benefit from the amp it just caused.
-    if (_rollIntimidate(target, opts)) _showStatusLabel(target.id, t('eg_intimidated'));
-
-    // Crush (node 331): applied after the hit, like Intimidate, so the
-    // strike that crushes does not benefit from its own debuff.
-    if (_rollCrush(target, opts, wasFullLife)) _showStatusLabel(target.id, t('eg_crushed'));
-
-    // Rage (axe notable 369): melee hits while wielding an Axe grant Rage.
+// Melee hit side effects: Rage for axes, then the mace / heavy-weapon / generic
+// stun rolls (a stun pauses the monster's charge timer and can grant Power or
+// Fortify charges).
+function _applyMeleeHitProcs(target, opts) {
     if (opts && opts.isMelee) {
         const rageStats = _computePlayerStats();
         if (rageStats.isAxeEquipped && (rageStats.rageOnHitAxe || 0) > 0) {
@@ -353,8 +314,10 @@ export function _damageTargetById(monsterId, amount, elements, opts) {
             }
         }
     }
+}
 
-    _applyHitToMonster(target, amount, opts);
+// Hit feedback: run stats, damage number, card flash, burst effect and hit sound.
+function _showHitFeedback(target, amount, elements, opts) {
     if (globalThis.RunStats) globalThis.RunStats.hitDealt(amount, opts);
     // Pass crit + elemental info so the number can pop with the right colour/size
     const isCrit = !!(opts && opts.isCrit);
@@ -362,26 +325,108 @@ export function _damageTargetById(monsterId, amount, elements, opts) {
     _flashDamageCard(target.id);
     _spawnHitBurst(target.id, elements, isCrit);
     if (!(opts && opts.uspSfx)) _playHitSound(amount, elements, isCrit);
+}
+
+// A killing blow: charged overkill ricochet or the normal overkill spread, the
+// melee-kill explosion, then the kill itself.
+function _resolveKill(target, amount, hpBefore, elements, opts) {
+    const isCrit = !!(opts && opts.isCrit);
+    // Charged overkill ricochet - with the gear overkill chance, fires a
+    // smaller projectile carrying the surplus to the next monster (chainable).
+    const isChargedHit = !!(opts && opts.isCharged);
+    if (isChargedHit) {
+        _tryChargedOverkillRicochet(target, amount, hpBefore, elements, opts);
+    } else {
+        // Gear: overkill - chance for excess damage to bleed into another monster
+        _tryOverkillSpread(target, amount, hpBefore, isCrit, elements);
+    }
+    if (opts && opts.isMelee) _meleeKillExplode(target);
+    _killMonster(target.id);
+}
+
+// Applies incoming player damage to a specific monster by id.
+// Handles boss immunity, elemental resistances, stat changes, phase
+// transitions, and kill detection.
+// Called by the projectile onfinish callback so the impact matches visually.
+// `elements` optionally maps each element to the elemental share of `amount`.
+// `opts.isEcho` marks the delayed echo instance so echoes can't chain into
+// further echoes (they still trigger on-hit effects like leech/ailments).
+// `opts.isCharged` marks a drag-paint charged shot (or its ricochet chain)
+// so overkill can ricochet as a smaller projectile (gear chance).
+export function _damageTargetById(monsterId, amount, elements, opts) {
+    if (!_isActive()) return;
+
+    const target = globalThis._monsters.find(m => m.id === monsterId);
+    if (!target) return;
+
+    // Boss immunity window - ignore damage and show the immune flash
+    if (target.bossImmune) {
+        _flashImmune(target.id);
+        return;
+    }
+
+    if (opts && opts.isPlayerSpell) target._lastSpellHitAt = Date.now();
+
+    const hpBefore = target.currentHP;
+    // Crush (node 331) is decided on the state BEFORE the hit: only an
+    // enemy that was at full Life when the melee strike landed is crushed.
+    const wasFullLife = target.maxHP > 0 && hpBefore >= target.maxHP;
+
+    ({ amount, elements } = _convertFlatPlayerDamage(amount, elements, opts));
+
+    // Intimidate (node 125): melee hits on an intimidated enemy deal more.
+    // Applied before resistances so it scales the whole hit.
+    amount = _applyIntimidateAmp(target, amount, opts);
+
+    amount = _applyConditionalDamage(target, amount, opts, hpBefore);
+    amount = _applyKeystoneDamageMods(target, amount, elements, opts);
+    opts = _rollArmourPierce(target, opts);
+
+    // Elemental resistances reduce only the elemental share of the hit;
+    // the physical portion passes through untouched. opts carries source
+    // tags (isMelee) read by Spellproof inside.
+    opts = _withPenetration(opts);
+    amount = _applyTargetResistances(amount, target, elements, opts);
+
+    // Ailments: shocked monsters take amplified damage; elemental hits can
+    // ignite / chill / freeze / shock the monster (gear ailment chances).
+    if (typeof _applyAilmentShockAmpOnMonster === 'function') {
+        amount = _applyAilmentShockAmpOnMonster(target, amount);
+    }
+    if (typeof _rollPlayerHitAilments === 'function') {
+        _rollPlayerHitAilments(target, amount, elements, opts);
+    }
+    // Impale (heavy-weapon batch): any hit on an impaled enemy deals its
+    // stored damage on top; a heavy melee hit can impale. Runs after the
+    // ailment roll so the extra damage never feeds bleed/ignite sizing.
+    if (typeof _applyImpaleToHit === 'function') {
+        const impaleBefore = target.impale;
+        amount = _applyImpaleToHit(target, amount, elements, opts);
+        if (target.impale && target.impale !== impaleBefore) _showStatusLabel(target.id, t('eg_impaled'));
+    }
+
+    // Intimidate roll: after the hit's own damage so the hit that
+    // intimidates does not benefit from the amp it just caused.
+    if (_rollIntimidate(target, opts)) _showStatusLabel(target.id, t('eg_intimidated'));
+
+    // Crush (node 331): applied after the hit, like Intimidate, so the
+    // strike that crushes does not benefit from its own debuff.
+    if (_rollCrush(target, opts, wasFullLife)) _showStatusLabel(target.id, t('eg_crushed'));
+
+    _applyMeleeHitProcs(target, opts);
+
+    _applyHitToMonster(target, amount, opts);
+    _showHitFeedback(target, amount, elements, opts);
 
     // Gear: echo (rings) - chance for the hit to repeat as a delayed
     // second instance of echoDamagePct of its damage
-    if (!(opts && opts.isEcho)) _tryEchoHit(target.id, amount, elements, isCrit);
+    if (!(opts && opts.isEcho)) _tryEchoHit(target.id, amount, elements, !!(opts && opts.isCrit));
 
     // Check for boss phase transition before checking death
     if (target.isBoss) globalThis._bossCheckPhase(target);
 
     if (target.currentHP <= 0) {
-        // Charged overkill ricochet - with the gear overkill chance, fires a
-        // smaller projectile carrying the surplus to the next monster (chainable).
-        const isChargedHit = !!(opts && opts.isCharged);
-        if (isChargedHit) {
-            _tryChargedOverkillRicochet(target, amount, hpBefore, elements, opts);
-        } else {
-            // Gear: overkill - chance for excess damage to bleed into another monster
-            _tryOverkillSpread(target, amount, hpBefore, isCrit, elements);
-        }
-        if (opts && opts.isMelee) _meleeKillExplode(target);
-        _killMonster(target.id);
+        _resolveKill(target, amount, hpBefore, elements, opts);
         return;
     }
 

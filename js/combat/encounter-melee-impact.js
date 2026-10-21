@@ -43,30 +43,12 @@ const MELEE_EXECUTE_ENABLED = false;
 export const MELEE_EXECUTE_HP_PCT = 0.25;
 export const MELEE_EXECUTE_MULT = 3;
 
-// Applies a manual melee strike at the moment of impact (Secret-of-Mana-
-// style). The strike deals charge% of full damage - linear: 100% charge =
-// 100% damage, 30% charge = 30% damage - and the charge was already spent
-// (reset to zero) at key-press time by _doWeaponAttack. The damage (and
-// its elemental breakdown) is rolled ONCE per swing so cleaved side targets
-// take the same hit as the primary target.
-// Tiered range rule: plain strikes (below 200% - taps and charged hits
-// without an art) only connect in melee reach, so positioning matters for
-// quick hits. Weapon arts (200%+: dash, leap, novas) carry the sprite to the
-// target across the screen, so range never gates an overcharged
-// release - the dash IS the delivery.
-// opts.sequenced (delivered arts): the avatar was visibly flown onto the
-// target first - the tier art plays its sequenced follow-through (sky-leap
-// legs with hits on arrival) and a Promise is returned that resolves when
-// it lands, so the caller can glide the avatar home afterwards. Without
-// the flag everything is synchronous (and the return is undefined).
-export function _applyPlayerMeleeImpact(targetId, opts) {
-    if (!_isActive() || !globalThis._monsters.some(m => m.id === targetId)) return undefined;
-
-    // Charge share snapshotted at key-press (null = legacy caller, full hit).
-    // May exceed 1 when the player overcharged past 100% (see _tickPlayer).
-    // Delivered arts (opts.chargePct) carry their release-time share in the
-    // delivery closure instead - the global is left untouched so a second
-    // strike released mid-flight can never steal or eat this strike's share.
+// Charge share of the strike, snapshotted at key-press (null = legacy caller,
+// full hit). May exceed 1 when the player overcharged past 100% (see
+// _tickPlayer). Delivered arts (opts.chargePct) carry their release-time share
+// in the delivery closure instead - the global is left untouched so a second
+// strike released mid-flight can never steal or eat this strike's share.
+function _meleeChargeShare(opts) {
     let chargePct;
     if (opts && typeof opts.chargePct === 'number') {
         chargePct = Math.min(MELEE_OVERCHARGE_MULT, Math.max(0, opts.chargePct));
@@ -75,7 +57,14 @@ export function _applyPlayerMeleeImpact(targetId, opts) {
             ? Math.min(MELEE_OVERCHARGE_MULT, Math.max(0, globalThis._pendingMeleeChargePct)) : 1;
         globalThis._pendingMeleeChargePct = null;
     }
+    return chargePct;
+}
 
+// The checks that can end a strike before it deals damage: out of reach,
+// accuracy miss, ethereal dodge, melee immunity. Returns true when the strike
+// is over (the spent charge is not refunded in any of these cases). Also pulses
+// the struck card when the swing landed on a monster that is not the selected one.
+function _meleeStrikeAvoided(targetId, chargePct, opts) {
     // Out-of-reach whiff for plain strikes only: a sub-200% blade can't
     // reach a distant target - no damage, no procs, no reflect, and no
     // "too far" text either: the swing playing next to the hero IS the
@@ -85,7 +74,7 @@ export function _applyPlayerMeleeImpact(targetId, opts) {
     // instead, so this gate never fires.
     if (!(opts && opts.shot) && _meleeTierForCharge(chargePct) < 1
         && typeof _meleeTargetInRange === 'function' && !_meleeTargetInRange(targetId)) {
-        return;
+        return true;
     }
 
     // The swing landed on a monster that is NOT the selected (yellow) one:
@@ -105,14 +94,14 @@ export function _applyPlayerMeleeImpact(targetId, opts) {
 
     // Accuracy: the swing can whiff entirely (no gear procs on a miss).
     // A whiffed swing does NOT refund the spent charge.
-    if (_rollPlayerMiss(targetId)) return;
+    if (_rollPlayerMiss(targetId)) return true;
 
     // Map mod: ethereal monsters evade melee strikes.
     const meleeTarget = globalThis._monsters.find(m => m.id === targetId);
     if (meleeTarget && (meleeTarget.etherealPct || 0) > 0
         && Math.random() * 100 < meleeTarget.etherealPct) {
         _showStatusLabel(targetId, t('eg_dodged'));
-        return;
+        return true;
     }
 
     // Melee-immune monsters (tutorial ghost lesson) shrug blades off with
@@ -120,8 +109,72 @@ export function _applyPlayerMeleeImpact(targetId, opts) {
     // only the melee channel is refused. The spent charge is NOT refunded.
     if (meleeTarget && meleeTarget.meleeImmune) {
         _flashImmune(targetId);
-        return;
+        return true;
     }
+    return false;
+}
+
+// What a connecting strike does besides damage: life and mana on hit (passive
+// tree), the impact squash on the card, and the active map mod that reflects a
+// share of melee damage back at the player.
+function _afterMeleeHit(targetId, dmg, chargePct) {
+    // Life on a connecting strike (passive tree): melee-only line plus the
+    // generic "per Enemy hit with Attacks" line shared with projectiles.
+    {
+        const meleeStats = _computePlayerStats();
+        const lifeGain = (Number(meleeStats.lifeOnMeleeHit) || 0) + (Number(meleeStats.lifeOnAttackHit) || 0);
+        if (lifeGain > 0 && globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP) {
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._lifeGain ? globalThis._lifeGain(lifeGain) : (lifeGain)));
+            if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+        }
+    }
+
+    // Mana on a connecting strike above 50% charge-up (passive tree only -
+    // melee strikes grant no mana by default).
+    const manaOnHit = Number(_computePlayerStats().manaOnMeleeHitChargedPct) || 0;
+    if (manaOnHit > 0 && chargePct > 0.5 && typeof globalThis.gainMana === 'function') globalThis.gainMana(manaOnHit);
+
+    // Impact feel: squash the struck card so the connect lands with weight
+    // (miss/dodge/immune returned above, so this only plays on real hits).
+    if (typeof _meleeImpactThump === 'function') {
+        try { _meleeImpactThump(targetId); } catch (e) {}
+    }
+
+    // Active map run: monsters reflect #% of melee damage back at you.
+    if (typeof _egGetActiveMapModValue === 'function') {
+        const reflectPct = _egGetActiveMapModValue('map_reflect_melee');
+        const reflectTarget = globalThis._monsters.find(m => m.id === targetId);
+        if (reflectPct > 0 && reflectTarget) {
+            const reflected = Math.max(1, Math.round(dmg * reflectPct / 100));
+            globalThis.showCombatToast(`🪞 ${t('eg_mm_toast_reflect') || 'Reflected!'} (-${reflected})`);
+            _playerTakeDamage(reflected, false, null);
+        }
+    }
+}
+
+// Applies a manual melee strike at the moment of impact (Secret-of-Mana-
+// style). The strike deals charge% of full damage - linear: 100% charge =
+// 100% damage, 30% charge = 30% damage - and the charge was already spent
+// (reset to zero) at key-press time by _doWeaponAttack. The damage (and
+// its elemental breakdown) is rolled ONCE per swing so cleaved side targets
+// take the same hit as the primary target.
+// Tiered range rule: plain strikes (below 200% - taps and charged hits
+// without an art) only connect in melee reach, so positioning matters for
+// quick hits. Weapon arts (200%+: dash, leap, novas) carry the sprite to the
+// target across the screen, so range never gates an overcharged
+// release - the dash IS the delivery.
+// opts.sequenced (delivered arts): the avatar was visibly flown onto the
+// target first - the tier art plays its sequenced follow-through (sky-leap
+// legs with hits on arrival) and a Promise is returned that resolves when
+// it lands, so the caller can glide the avatar home afterwards. Without
+// the flag everything is synchronous (and the return is undefined).
+export function _applyPlayerMeleeImpact(targetId, opts) {
+    if (!_isActive() || !globalThis._monsters.some(m => m.id === targetId)) return undefined;
+
+    const chargePct = _meleeChargeShare(opts);
+    if (_meleeStrikeAvoided(targetId, chargePct, opts)) return;
+
+    const meleeTarget = globalThis._monsters.find(m => m.id === targetId);
 
     // Gear: channel stacks + mana-to-damage are consumed by this hit. The
     // melee roll above is already charge-scaled (including its elemental
@@ -158,38 +211,7 @@ export function _applyPlayerMeleeImpact(targetId, opts) {
 
     if (gauntletHooks) gauntletHooks.post(targetId, chargePct, comboMult > 1);
 
-    // Life on a connecting strike (passive tree): melee-only line plus the
-    // generic "per Enemy hit with Attacks" line shared with projectiles.
-    {
-        const meleeStats = _computePlayerStats();
-        const lifeGain = (Number(meleeStats.lifeOnMeleeHit) || 0) + (Number(meleeStats.lifeOnAttackHit) || 0);
-        if (lifeGain > 0 && globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP) {
-            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._lifeGain ? globalThis._lifeGain(lifeGain) : (lifeGain)));
-            if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
-        }
-    }
-
-    // Mana on a connecting strike above 50% charge-up (passive tree only -
-    // melee strikes grant no mana by default).
-    const manaOnHit = Number(_computePlayerStats().manaOnMeleeHitChargedPct) || 0;
-    if (manaOnHit > 0 && chargePct > 0.5 && typeof globalThis.gainMana === 'function') globalThis.gainMana(manaOnHit);
-
-    // Impact feel: squash the struck card so the connect lands with weight
-    // (miss/dodge/immune returned above, so this only plays on real hits).
-    if (typeof _meleeImpactThump === 'function') {
-        try { _meleeImpactThump(targetId); } catch (e) {}
-    }
-
-    // Active map run: monsters reflect #% of melee damage back at you.
-    if (typeof _egGetActiveMapModValue === 'function') {
-        const reflectPct = _egGetActiveMapModValue('map_reflect_melee');
-        const reflectTarget = globalThis._monsters.find(m => m.id === targetId);
-        if (reflectPct > 0 && reflectTarget) {
-            const reflected = Math.max(1, Math.round(dmg * reflectPct / 100));
-            globalThis.showCombatToast(`🪞 ${t('eg_mm_toast_reflect') || 'Reflected!'} (-${reflected})`);
-            _playerTakeDamage(reflected, false, null);
-        }
-    }
+    _afterMeleeHit(targetId, dmg, chargePct);
 
     _tryCleaveHit(targetId, dmg, elements);
 
