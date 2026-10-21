@@ -48,7 +48,10 @@ import { PLAYER_STATS, _buildGroupedStats, _calcAccuracyMissChance, _calcArmourR
 import { _isItemBlocked } from '../loot/loot-requirements.js';
 import { CURRENCY_COLS, CURRENCY_ROWS, _buildCraftingBenchSlotHTML, _currencyDefForId, _currencyIdForSlot, _currencyStash } from '../loot/hub-currency.js';
 import { _pendingHandMigrationToast, _showHandMigrationToast } from './hub-save.js';
-import { _cancelMassSellConfirm, _closeMassSellModal, _injectMassSellStyles } from './hub-mass-sell-modal.js';
+import { _cancelMassSellConfirm, _closeMassSellModal } from './hub-mass-sell-modal.js';
+
+export { _injectMassSellStyles } from './hub-mass-sell-styles.js';
+import { _injectMassSellStyles } from './hub-mass-sell-styles.js';
 import { _buildItemChipHTML, _showItemLevel } from './hub-mass-sell.js';
 import { INV_COLS, _ensureInvRows, _equipped, _getInvCapacity, _getInvRows, _inventory, _stashTab } from './hub-stash.js';
 import { _buildTopbarHTML, _updateItemLevelToggleButton, _updatePassiveTreeButton } from './hub-topbar.js';
@@ -1355,7 +1358,6 @@ export {
     _confirmMassSell,
     _ensureMassSellModal,
     _executeMassSell,
-    _injectMassSellStyles,
     _massSellRenderStaticText,
     _openMassSellModal,
     _rarityColor,
