@@ -13,27 +13,13 @@ import { CURRENCY_COLS, INV_COLS, EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_T
 import { _canEquipInSlot, _checkMoveAllowed, _checkUnequipSlot, _getWeaponHands, _isTwoHandedWeapon, _showRequirementsToast, _tryAutoUnequipOffhandForTwoHander } from '../loot/loot-requirements.js';
 
 //------------------------------------------------------------------------
-//-------------------ENDGAME HUB DRAG AND DROP---------------------------
+//-------------------HUB DRAG AND DROP------------------------------------
 //------------------------------------------------------------------------
-// Custom mouse-based drag-and-drop system for the Endgame Hub.
-//
-// Responsibilities:
-//   - Item pick-up via mousedown, movement via mousemove, drop via mouseup
-//   - Floating ghost icon that follows the cursor during a drag
-//   - Type-safe zone validation (equip / map / currency must go to matching zones)
-//   - Slot-type validation (items only fit their matching paperdoll slot)
-//   - Currency stack merging (same currency id dropped on same id → merge counts)
-//   - Right-click quick-equip (stash → char slot) and quick-unequip (char slot → stash)
-//   - Stat requirement gating on every equip/unequip path (endgame-requirements.js)
-//   - Escape key to cancel a drag and return the item to its origin
-//   - CSS style injection for drag visuals (dragover highlight, reject flash, ghost)
-//
-// Dependencies (must be loaded before this file):
-//   hub.js - exposes all _eg* state variables and render helpers
-//
-// Entry point:
-//   Call initHubDnD() once after the hub screen has been created.
-//   (showHub() calls this via _bindDragEvents())
+// Mouse-based drag-and-drop for the hub: pick up by mousedown, a ghost icon
+// follows the cursor, drop on mouseup with zone and slot validation, currency
+// stack merging, requirement checks on every equip path, Escape to cancel, and
+// right-click quick equip / unequip / map load. initHubDnD() binds it once the
+// hub screen exists (showHub does this through _bindDragEvents).
 //------------------------------------------------------------------------
 
 
@@ -41,21 +27,12 @@ import { _canEquipInSlot, _checkMoveAllowed, _checkUnequipSlot, _getWeaponHands,
 //-------------------CONSTANTS--------------------------------------------
 //------------------------------------------------------------------------
 
-// Maps each inventory zone type to the set of item categories it accepts.
-// A drop is rejected if the dragged item's category is not in the target zone's set.
-export const ZONE_CATEGORIES = {
-    equip: new Set(['equip']),     // main stash + paperdoll char slots
-    map: new Set(['map']),       // map device orb slot + map stash
-    currency: new Set(['currency']), // runes & orbs strip
-    essence: new Set(['essence']),   // essence tab grid
-};
-
 // Maps each paperdoll slot id to the item slotType it accepts.
 // Multi-slot types (rings, earrings) share the same slotType value.
 // weapon1 takes melee weapons (1H or 2H, never shields - so dual shields
 // are impossible); weapon2 takes shields or ONE-handed weapons (dual-wield).
 // The 1H/2H distinction is enforced hand-aware in _dndSlotAcceptsItem below
-// (see _getWeaponHands in endgame-requirements.js), not by this table alone.
+// (see _getWeaponHands in loot-requirements.js), not by this table alone.
 export const SLOT_ACCEPTS = {
     head: 'head',
     shoulders: 'shoulders',
@@ -85,7 +62,7 @@ export const SLOT_ACCEPTS = {
 
 // Tracks the full state of the current drag operation.
 // Reset to its default shape by _dndReset() at the end of every drop or cancel.
-export let _dnd = {
+let _dnd = {
     active: false,  // true while an item is being carried
     item: null,   // full item object being dragged
     sourceZone: null,   // 'inv' | 'equip' | 'map' | 'currency' | 'mapstash'
@@ -96,7 +73,7 @@ export let _dnd = {
 };
 
 // The floating ghost div that follows the cursor during a drag.
-export let _dndGhost = null;
+let _dndGhost = null;
 
 
 //------------------------------------------------------------------------
@@ -105,7 +82,7 @@ export let _dndGhost = null;
 
 // Resets the drag session to its inactive default state.
 // Always called as the final step of a drop or a cancel.
-export function _dndReset() {
+function _dndReset() {
     _dnd = {
         active: false,
         item: null,
@@ -118,7 +95,7 @@ export function _dndReset() {
 }
 
 // Returns true when the current dragged item is allowed into the given target zone.
-export function _dndZoneAccepts(targetZone) {
+function _dndZoneAccepts(targetZone) {
     if (!_dnd.item) return false;
     const itemCat = _dnd.item.category;
     // Equipment may go to both the main stash and the paperdoll char slots.
@@ -139,7 +116,7 @@ export function _dndZoneAccepts(targetZone) {
 // Returns true when the dragged item's slotType matches what the given char slot accepts.
 // weapon1: melee weapons only (any hands, never shields).
 // weapon2: shields or ONE-handed weapons only (dual-wield off-hand; 2H rejected).
-export function _dndSlotAcceptsItem(slotId) {
+function _dndSlotAcceptsItem(slotId) {
     if (!_dnd.item || _dnd.item.category !== 'equip') return false;
     if (slotId === 'weapon1') return _dnd.item.slotType === 'weapon';
     if (slotId === 'weapon2') {
@@ -162,7 +139,7 @@ export function _dndSlotAcceptsItem(slotId) {
 // Creates the floating ghost div and appends it to the body.
 // The ghost shows the item icon so the player can see what they are carrying.
 // Any existing ghost is destroyed first to ensure there is never more than one.
-export function _dndCreateGhost(item) {
+function _dndCreateGhost(item) {
     _dndDestroyGhost();
 
     _dndGhost = document.createElement('div');
@@ -189,14 +166,14 @@ export function _dndCreateGhost(item) {
 
 // Moves the ghost to the given screen coordinates.
 // Called on every mousemove event while a drag is active.
-export function _dndMoveGhost(clientX, clientY) {
+function _dndMoveGhost(clientX, clientY) {
     if (!_dndGhost) return;
     _dndGhost.style.left = clientX + 'px';
     _dndGhost.style.top = clientY + 'px';
 }
 
 // Removes the ghost element from the DOM and clears the reference.
-export function _dndDestroyGhost() {
+function _dndDestroyGhost() {
     if (_dndGhost) {
         _dndGhost.remove();
         _dndGhost = null;
@@ -212,7 +189,7 @@ export function _dndDestroyGhost() {
 // Returns a partial _dnd descriptor, or null if no recognised zone was found.
 // Currency and map-stash cells must be checked before generic inv-cells
 // because they share the sx-inv-cell class.
-export function _dndResolvePickupZone(chip) {
+function _dndResolvePickupZone(chip) {
     const currencyCell = chip.closest('.sx-currency-cell');
     const essenceCell = chip.closest('.sx-essence-cell');
     const mapStashCell = chip.closest('.eg-map-stash-cell');
@@ -331,7 +308,7 @@ export function _dndPickUp(e, chip) {
 
 // Writes the dragged item into a grid cell, swapping any displaced occupant
 // back to the drag source. renderFn(row, col) re-renders the affected cell.
-export function _dndDropOnCell(grid, renderFn, row, col) {
+function _dndDropOnCell(grid, renderFn, row, col) {
     const displaced = grid[row][col];
     grid[row][col] = _dnd.item;
     renderFn(row, col);
@@ -343,7 +320,7 @@ export function _dndDropOnCell(grid, renderFn, row, col) {
 
 // Scans a grid for the first empty cell and places the item there.
 // Unlimited main stash: grows by one row if the grid is the main stash and is full.
-export function _dndPlaceInFirstFreeSlot(item, grid, renderFn, rows, cols) {
+function _dndPlaceInFirstFreeSlot(item, grid, renderFn, rows, cols) {
     // Use actual grid length for stash (may have grown beyond passed rows)
     const actualRows = (grid === _inventory && typeof _getInvRows === 'function') ? _getInvRows() : rows;
     for (let r = 0; r < actualRows; r++) {
@@ -368,7 +345,7 @@ export function _dndPlaceInFirstFreeSlot(item, grid, renderFn, rows, cols) {
 
 // Returns the dragged item to the zone it was picked up from.
 // Used when a drop is invalid or the drag is cancelled.
-export function _dndReturnToSource() {
+function _dndReturnToSource() {
     if (!_dnd.item) return;
     _dndReturnDisplacedToSource(_dnd.item);
 }
@@ -376,7 +353,7 @@ export function _dndReturnToSource() {
 // Writes any item back to the current drag session's source location.
 // Used both for returning the dragged item on cancel, and for sending
 // a displaced item back when a swap happens.
-export function _dndReturnDisplacedToSource(item) {
+function _dndReturnDisplacedToSource(item) {
     const { sourceZone, sourceRow, sourceCol, sourceSlot, sourceTier } = _dnd;
 
     if (sourceZone === 'inv') {
@@ -417,7 +394,7 @@ export function _dndReturnDisplacedToSource(item) {
 
 // Briefly flashes a red reject animation on the given element,
 // then returns the dragged item to its source.
-export function _dndShowRejectFlash(el) {
+function _dndShowRejectFlash(el) {
     Audio_Manager.playSFX('ui_error');
     el.classList.add('sx-slot-reject');
     setTimeout(() => el.classList.remove('sx-slot-reject'), 600);
@@ -430,7 +407,7 @@ export function _dndShowRejectFlash(el) {
 // Also re-renders the map device slot and map stash - those elements live on
 // the Probability Gate screen and no-op when that screen is not in the DOM.
 let _dndEquipSfxPlayed = false;
-export function _dndFinalizeDrop() {
+function _dndFinalizeDrop() {
     // An equip already played its own sound; don't stack the generic drop on it.
     if (!_dndEquipSfxPlayed) Audio_Manager.playSFX('item_drag_drop');
     _dndEquipSfxPlayed = false;
@@ -460,7 +437,7 @@ export function hubDropOnCraftingBench(event) {
     event.preventDefault();
 }
 
-export function _dndDrop(e) {
+function _dndDrop(e) {
     if (!_dnd.active) return;
 
     _dndDestroyGhost();
@@ -673,7 +650,7 @@ export function _dndDrop(e) {
 // Handles dropping onto a currency cell (fixed-slot tab).
 // Only the assigned currency id for that slot is accepted; otherwise reject.
 // Same-id drops merge stack counts.
-export function _dndDropOnCurrencyCell(currencyCell) {
+function _dndDropOnCurrencyCell(currencyCell) {
     const r = +currencyCell.dataset.row, c = +currencyCell.dataset.col;
     const assignedId = (typeof _currencyIdForSlot === 'function') ? _currencyIdForSlot(r, c) : null;
     // Unassigned decorative cells never accept drops
@@ -705,7 +682,7 @@ export function _dndDropOnCurrencyCell(currencyCell) {
 // Handles dropping onto an essence tab cell (fixed-slot tab, like Orbs & Shards).
 // Only the assigned essence id for that slot is accepted; otherwise reject.
 // Same-id drops merge stack counts.
-export function _dndDropOnEssenceCell(essenceCell) {
+function _dndDropOnEssenceCell(essenceCell) {
     const r = +essenceCell.dataset.row, c = +essenceCell.dataset.col;
     const assignedId = (typeof _essenceIdForSlot === 'function') ? _essenceIdForSlot(r, c) : null;
     if (!assignedId) {
@@ -738,7 +715,7 @@ export function _dndDropOnEssenceCell(essenceCell) {
 // endgame-requirements.js). Shows a reject flash and returns to source when
 // either check fails.
 // Returns true when the drop was accepted.
-export function _dndDropOnEquipSlot(equipSlotEl) {
+function _dndDropOnEquipSlot(equipSlotEl) {
     const slotId = equipSlotEl.dataset.slotId;
     if (!slotId || !_dndSlotAcceptsItem(slotId)) {
         const name = (_dnd.item && _dnd.item.name) || '?';
@@ -827,7 +804,7 @@ export function _dndFindTargetSlot(item) {
 
 // Finds the first empty cell in the main equipment stash.
 // Unlimited stash: always returns a cell (expands by one row if needed).
-export function _dndFirstFreeInvCell() {
+function _dndFirstFreeInvCell() {
     if (typeof _findFreeInvCell === 'function') return _findFreeInvCell();
     for (let r = 0; r < _inventory.length; r++) {
         for (let c = 0; c < INV_COLS; c++) {
@@ -844,7 +821,7 @@ export function _dndFirstFreeInvCell() {
 // Stat requirements are checked against the simulated final loadout first
 // (see endgame-requirements.js). The displaced item (if any) is placed back
 // into the source stash cell.
-export function _dndQuickEquipFromStash(invCell) {
+function _dndQuickEquipFromStash(invCell) {
     const r = +invCell.dataset.row, c = +invCell.dataset.col;
     const item = _inventory[r][c];
     if (!item || item.category !== 'equip') return;
@@ -888,7 +865,7 @@ export function _dndQuickEquipFromStash(invCell) {
 
 // Right-click on a paperdoll slot item → send it to the first free stash cell.
 // Unlimited stash: always has room (grows on demand).
-export function _dndQuickUnequipToStash(equipSlotEl) {
+function _dndQuickUnequipToStash(equipSlotEl) {
     const slotId = equipSlotEl.dataset.slotId;
     const item = _equipped[slotId] || null;
     if (!item) return;
@@ -918,7 +895,7 @@ export function _dndQuickUnequipToStash(equipSlotEl) {
 // Contextmenu handler - dispatches to quick-equip or quick-unequip based on
 // which zone the right-clicked chip belongs to. On the Probability Gate
 // screen, maps are quick-moved between the map stash and the map device slot.
-export function _dndHandleRightClick(e) {
+function _dndHandleRightClick(e) {
     const chip = e.target.closest('.sx-item-chip');
     if (!chip) return;
     const screenEl = _dndChipScreenEl(chip);
@@ -950,7 +927,7 @@ export function _dndHandleRightClick(e) {
 // Tier check: only allow if displaced (if any) belongs to the active tier's stash?
 // Actually device can hold any tier, so stash->device always allowed; device->stash via swap
 // checks tier of displaced map vs active tier.
-export function _dndQuickLoadMapToDevice(mapStashCell) {
+function _dndQuickLoadMapToDevice(mapStashCell) {
     if (typeof _egMapStash === 'undefined') return;
     const r = +mapStashCell.dataset.row, c = +mapStashCell.dataset.col;
     const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? globalThis._egMapStashActiveTier : 1);
@@ -1003,7 +980,7 @@ export function _dndQuickLoadMapToDevice(mapStashCell) {
 
 // Right-click on a map in the map device slot → return it to the first free
 // map stash cell of its own tier (infinite, so always succeeds - expands if needed).
-export function _dndQuickUnloadMapFromDevice() {
+function _dndQuickUnloadMapFromDevice() {
     if (typeof _egMapSlotItem === 'undefined' || !globalThis._egMapSlotItem) return;
     const map = globalThis._egMapSlotItem;
     const tier = (map.mapTier != null ? map.mapTier : (globalThis._egMapStashActiveTier || 1));
@@ -1183,7 +1160,7 @@ export function addCurrency(id, amount = 1, def = null) {
 // Injects the minimal CSS rules required for drag visuals.
 // Runs once on init - skips injection if the style tag already exists.
 // These rules can be moved to a .css file if preferred.
-export function _dndInjectStyles() {
+function _dndInjectStyles() {
     if (document.getElementById('sx-dnd-styles')) return;
 
     const style = document.createElement('style');
@@ -1294,7 +1271,7 @@ export function _dndChipScreenEl(chip) {
 // Uses capture-phase mousedown so it fires before any chip's own handlers.
 // Mousemove and mouseup are on window so the ghost and drop work even if
 // the pointer leaves the hub container during a fast drag.
-export function _dndBindListeners() {
+function _dndBindListeners() {
     // Pick-up: left-click on any item chip inside the hub or gate screen.
     document.addEventListener('mousedown', e => {
         const chip = e.target.closest('.sx-item-chip');
