@@ -310,7 +310,7 @@ function grantBonusItem(gi) {
 
 // Returns the HTML for the "bonus already claimed" notice shown on repeat clears.
 function buildBonusClaimedNote() {
-    return `<div class="item-reward" style="border-color:var(--border2);color:#666;">
+    return `<div class="item-reward item-reward-note">
         ${t('ov_bonus_claimed_note')}
     </div>`;
 }

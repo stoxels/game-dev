@@ -1125,8 +1125,8 @@ const USP_CHARGE_SPELLS = {
         descDE: 'Halte die Taste, um arkane Kraft zu sammeln, und entlade sie als Explosion. Kurzes Aufladen macht etwa 60 % Schaden, volles Aufladen 150 %.',
     },
     usp_pyroblast: {
-        descEn: 'Hold the button to swell a huge ball of fire and release when you are ready. Charge it for up to 150% damage, or let it go early for about 60%.',
-        descDE: 'Halte die Taste, um einen riesigen Feuerball anschwellen zu lassen, und lasse los, wenn du bereit bist. Voll aufgeladen macht er bis zu 150 % Schaden, früh losgelassen etwa 60 %.',
+        descEn: 'Hold the button to swell a huge ball of fire and release when you are ready. Charge it for up to 150% damage, or let it go early for about 60%. 35% chance to Ignite, +5% for every spell rank.',
+        descDE: 'Halte die Taste, um einen riesigen Feuerball anschwellen zu lassen, und lasse los, wenn du bereit bist. Voll aufgeladen macht er bis zu 150 % Schaden, früh losgelassen etwa 60 %. 35 % Chance zu entzünden, +5 % pro Zauberrang.',
     },
     usp_flameblast: {
         descEn: 'Hold the button to grow a ring of flame around EVERY enemy - the longer you hold, the wider it gets. Release and the flames erupt inward from the outer edge, detonating everything inside. A quick release does about 60% damage, a full charge 150%.',

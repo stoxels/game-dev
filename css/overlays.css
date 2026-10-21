@@ -815,3 +815,41 @@ body.question-modal-open #player-avatar-simple {
 }
 /* room for the full "Projectiles" label in the win-screen damage bars */
 #ov-win .rs-col .rs-kind { grid-template-columns: 112px minmax(0, 1fr) 42px; }
+
+
+/* ── Win screen: reward notes (lucky drop / bonus already claimed / item earned)
+   Dark rune plates stacked in the free space at the far left of the button
+   row, between the score plate and the offense plate. Rarity colours stay on
+   the cards (set inline by the builders); the plain "already claimed" note
+   is a muted cream. Narrow windows keep the old row under the buttons. */
+#ov-win #item-reward-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+}
+#ov-win #item-reward-zone:empty { display: none; }
+#ov-win .item-reward {
+    box-sizing: border-box;
+    max-width: none;
+    padding: 8px 12px;
+    font-family: var(--C, inherit);
+    font-size: clamp(13px, 1.9vh, 16px);
+    line-height: 1.35;
+    background: rgba(10, 8, 18, 0.78);
+    border-width: 1px;
+    border-left-width: 4px;
+    border-radius: 4px;
+    box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.55);
+    text-shadow: 0 1px 2px #000;
+}
+#ov-win .item-reward-note { color: #cdbf95; border-color: rgba(200, 168, 75, 0.5); }
+@media (min-width: 1500px) {
+    #ov-win #item-reward-zone {
+        grid-area: btns;
+        justify-self: start;
+        align-self: center;
+        width: calc(50% - 400px);
+        min-width: 220px;
+    }
+}
