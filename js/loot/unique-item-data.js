@@ -1,14 +1,11 @@
 //------------------------------------------------------------------------
-// PHASE 4 split (2026-09-16): extracted into a focused module. The original
-// path is now a facade that re-exports this module, so existing import sites
-// are unaffected. See MIGRATION.md "splitting giants".
+//-------------------UNIQUE ITEM DEFINITIONS (DATA)-----------------------
 //------------------------------------------------------------------------
-
-// Unique item definitions (data). The golden tier: fixed-modifier named
-// items with a built-in downside. Uniques are NOT rolled - every copy has
-// the exact same stats. The requirements-rebalance IIFE at the end mutates
-// UNIQUE_ITEMS entries at module-eval time, so importers deterministically
-// see the rebalanced curves.
+// The golden tier: fixed-modifier named items with a built-in downside.
+// Uniques are never rolled - every copy has the exact same stats. Rarity is
+// 'legendary' plus `isUnique: true`, so existing rendering (glow, toasts,
+// chips, vendor) works while tooltips and crafting gates can special-case them.
+//------------------------------------------------------------------------
 
 import '../grid.js';
 import '../probability-tree/probability-tree-state-points.js';
@@ -17,27 +14,9 @@ import '../translation/translations.js';
 import './equipment-base-items.js';
 import '../hub/hub.js';
 import './loot-implicits.js';
-import { requirementStatTarget, scaleRequirements } from './equipment-base-types.js';
+import { applyUniqueRequirementRebalance } from './unique-item-requirements.js';
 import '../endgame/endgame-map-launch.js';
 import { applyUniqueReworks } from './unique-item-reworks.js';
-
-//------------------------------------------------------------------------
-//-------------------UNIQUE ITEMS (ARPG-STYLE)-----------------------------
-//------------------------------------------------------------------------
-// Fixed-modifier named items with a built-in downside - the golden tier
-// above epics. Uniques are NOT rolled: every copy of a unique has the exact
-// same stats, but each one carries a twist that makes it build-defining in
-// the right setup and a trap in the wrong one.
-//
-// Load AFTER endgame-equipment-generator.js (uses _egMapLootRarityWeightMult,
-// SLOT_ICONS) - the drop hook is applied inside _spawnLootDrop
-// (endgame-grid-pickups.js), which tries _tryGenerateUniqueDrop() first.
-//
-// Rarity string is 'legendary' (the game's golden tier) plus `isUnique:true`
-// so all existing rendering (glow, toasts, chips, vendor) works out of the
-// box while tooltips / crafting gates can special-case uniques.
-//------------------------------------------------------------------------
-
 
 //------------------------------------------------------------------------
 //-------------------CONFIGURATION----------------------------------------
@@ -45,14 +24,11 @@ import { applyUniqueReworks } from './unique-item-reworks.js';
 
 // Chance that an equipment drop is replaced by a random unique
 // (~2% of equipment drops → roughly 1 in 150 normal monster kills).
+// The active map's loot-rarity bonus raises it too (see _tryGenerateUniqueDrop).
 export const UNIQUE_DROP_CHANCE = 0.02;
 
-// The active map's loot-rarity bonus also makes uniques more likely
-// (applied as a square-root so rarity farming helps, but softly).
-
-// Unique-only QoL perk text for the zero-line auto-mark modifier.
-// Rendered as a special (blue) tooltip line, NOT a stat mod - it never
-// touches STAT_KEY_MAP / _computePlayerStats.
+// Tooltip text for the zero-line auto-mark perk. Shown as a special (blue)
+// line, not a stat mod - it never feeds the player stat computation.
 export const UNIQUE_ZERO_AUTOMARK_EN = 'Rows and Columns with zero filled cells are automatically marked incorrect on level start';
 export const UNIQUE_ZERO_AUTOMARK_DE = 'Reihen und Spalten ohne gefüllte Zellen werden bei Levelstart automatisch als falsch markiert';
 
@@ -6244,81 +6220,6 @@ export const UNIQUE_ITEMS = [
 // reworked uniques before the requirement curve is applied.
 applyUniqueReworks(UNIQUE_ITEMS);
 
-//========================================================================
-//-------------------UNIQUE STAT REQUIREMENT REBALANCE (2026)-------------
-//========================================================================
-// Zero-req chase uniques were free for any build - now enforce identity.
-// 2026-10: the curve now follows the passive-tree attribute supply (see
-// equipment-base-types.js) instead of the old 5-free-points-per-level
-// economy. Hand-authored literals are scaled by the same curve first, then
-// anything still below the curve is raised to it. Jewelry asks ~82% of armour
-// (pure) / 80% (hybrid), as before. Keeps starter uniques (minLevel <=10)
-// from being bumped.
-(() => {
-    const pureForArmor = (lvl) => Math.round(requirementStatTarget(lvl, 1));
-    const pureForJewelry = (lvl) => Math.round(16 + (requirementStatTarget(lvl, 1) - 20) * 0.82);
-    const hybridForArmor = (lvl) => { if(lvl<40) return null; return Math.round(requirementStatTarget(lvl, 2)); };
-    const hybridForJewelry = (lvl) => { if(lvl<40) return null; return Math.round(16 + (requirementStatTarget(lvl, 2) - 20) * 0.80); };
-    const JEWELRY = new Set(['ring','earring','amulet','talisman']);
-    new Set(['head','chest','pants','shoulders','cloak','bracers','gloves','boots','belt','weapon','shield','ranged','arcane']);
-    for (const u of UNIQUE_ITEMS) {
-        const lvl = u.minLevel || 1;
-        // Authored literals were written for the old economy: scale them first.
-        if (u.requirements) scaleRequirements(u.requirements);
-        if (lvl <= 10) continue;
-        const cur = u.requirements || { level: lvl, str:0, agi:0, int:0 };
-        const hasStat = (cur.str||0)+(cur.agi||0)+(cur.int||0) > 0;
-        if (hasStat) {
-            // Bump existing pure/hybrid uniques that are too low (<70% of curve)
-            const isHybrid = ((cur.str>0?1:0)+(cur.agi>0?1:0)+(cur.int>0?1:0))===2;
-            const isTriple = ((cur.str>0?1:0)+(cur.agi>0?1:0)+(cur.int>0?1:0))===3;
-            if (isHybrid && !isTriple) {
-                const target = (JEWELRY.has(u.slotType) ? hybridForJewelry(lvl) : hybridForArmor(lvl));
-                const curPer = Math.max(cur.str||0,cur.agi||0,cur.int||0);
-                if (target > curPer) {
-                    if (cur.str>0) cur.str = target;
-                    if (cur.agi>0) cur.agi = target;
-                    if (cur.int>0) cur.int = target;
-                }
-            } else if (!isHybrid && !isTriple) {
-                // pure single-stat
-                const target = JEWELRY.has(u.slotType) ? pureForJewelry(lvl) : pureForArmor(lvl);
-                const curVal = cur.str||cur.agi||cur.int;
-                if (target > curVal && curVal>0) {
-                    if (cur.str>0) cur.str = target;
-                    else if (cur.agi>0) cur.agi = target;
-                    else if (cur.int>0) cur.int = target;
-                }
-            }
-            u.requirements = cur;
-            continue;
-        }
-        // Zero-stat -> assign based on power and slot
-        // Jewelry any keeps lighter pure, armor/weapons get full pure, high-impact chase gets hybrid/triple
-        // Prefer archetype if not any
-        let arch = u.archetype;
-        if (arch === 'any' || !arch) {
-            // Infer from flavor: default to single stat 70% of pure for jewelry flex, so still requires investment but allows off-build with gear
-            const target = JEWELRY.has(u.slotType) ? pureForJewelry(lvl) : pureForArmor(lvl);
-            // Use least-committed: require int for amulet/arcane, agi for ranged/bracers, str for weapon/shield, any for talisman -> pick str for talisman hybrid?
-            if (JEWELRY.has(u.slotType)) {
-                // jewelry any: give single stat of lowest barrier (agi for generic, but keep as int to push spell builds? Choose agi for universal)
-                // Assign to agi for jewelry free-for-all? Instead assign to int for amulet, agi for ring, etc.
-                if (u.slotType === 'amulet' || u.slotType === 'arcane') { cur.int = target; }
-                else if (u.slotType === 'ring') { cur.agi = target; }
-                else if (u.slotType === 'earring') { cur.agi = target; }
-                else { cur.int = target; }
-            } else {
-                // armor any: give str (most common)
-                cur.str = target;
-            }
-        } else if (arch === 'strength') cur.str = JEWELRY.has(u.slotType) ? pureForJewelry(lvl) : pureForArmor(lvl);
-        else if (arch === 'agility') cur.agi = JEWELRY.has(u.slotType) ? pureForJewelry(lvl) : pureForArmor(lvl);
-        else if (arch === 'intellect') cur.int = JEWELRY.has(u.slotType) ? pureForJewelry(lvl) : pureForArmor(lvl);
-        else if (arch === 'str_agi') { const t = JEWELRY.has(u.slotType) ? hybridForJewelry(lvl) : hybridForArmor(lvl); cur.str=t; cur.agi=t; }
-        else if (arch === 'str_int') { const t = JEWELRY.has(u.slotType) ? hybridForJewelry(lvl) : hybridForArmor(lvl); cur.str=t; cur.int=t; }
-        else if (arch === 'agi_int') { const t = JEWELRY.has(u.slotType) ? hybridForJewelry(lvl) : hybridForArmor(lvl); cur.agi=t; cur.int=t; }
-        cur.level = lvl;
-        u.requirements = cur;
-    }
-})();
+// Raise the requirements to the attribute curve now, so every importer
+// sees the rebalanced values.
+applyUniqueRequirementRebalance(UNIQUE_ITEMS);

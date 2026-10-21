@@ -37,7 +37,7 @@ import { CURRENCY_COLS, CURRENCY_ROWS, _currencyDefForId, _currencySlotForId, _c
 import { EG_MAP_STASH_COLS, EG_MAP_STASH_INITIAL_ROWS, EG_MAP_TIER_COUNT, _egIsTieredMapStash, _egMakeAllMapStashes, _egMakeMapTierGrid, _egMapStash, _egMapTierToIndex } from '../endgame/endgame-map-stash.js';
 import { _loadMassSellSettings, _massSellKeep, _massSellKeepUnique, _massSellMinItemLevel, _massSellMinReqLevel } from './hub-mass-sell.js';
 import { INV_COLS, INV_INITIAL_ROWS, _ensureInvRows, _equipped, _inventory } from './hub-stash.js';
-import { _healUniqueItem } from '../loot/unique-item-logic.js';
+import { _healUniqueItem } from '../loot/unique-item-heal.js';
 import { _healItemRequirements } from '../loot/equipment-base-types.js';
 
 
