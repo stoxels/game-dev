@@ -731,3 +731,46 @@
 #screen-save-slots .ssc-info .ssc-score { font-size: 15px; margin: 1px 0 0; }
 #screen-save-slots .ssc-info .ssc-levels { font-size: 13px; }
 #screen-save-slots .ssc-info .ssc-player-level { margin: 2px 0 0; padding: 1px 8px; font-size: 10px; }
+
+/* ------------------------------------------------------------
+   SPREAD-OUT CARD INFO
+   Instead of one tall stack: slot ribbon and level badge share the top row,
+   name and title sit under them, and Score / Stoxels done are two stat
+   plates side by side along the bottom - uses the card's full width.
+   ------------------------------------------------------------ */
+#screen-save-slots .ssc-info {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 10px;
+    row-gap: 0;
+    align-content: center;
+    align-items: center;
+    justify-items: stretch;
+}
+#screen-save-slots .ssc-info .ssc-num { grid-column: 1; grid-row: 1; justify-self: start; margin: 0; }
+#screen-save-slots .ssc-info .ssc-player-level { grid-column: 2; grid-row: 1; justify-self: end; margin: 0; }
+#screen-save-slots .ssc-info .ssc-name { grid-column: 1 / -1; grid-row: 2; margin: 8px 0 0; font-size: 15px; text-align: left; }
+#screen-save-slots .ssc-info .ssc-title {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin: 4px 0 0;
+    padding-bottom: 8px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(200, 168, 75, 0.3);
+}
+#screen-save-slots .ssc-info .ssc-score,
+#screen-save-slots .ssc-info .ssc-levels {
+    grid-row: 4;
+    margin: 10px 0 0;
+    padding: 8px 6px;
+    box-sizing: border-box;
+    text-align: center;
+    line-height: 1.25;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(200, 168, 75, 0.35);
+    border-radius: 2px;
+}
+#screen-save-slots .ssc-info .ssc-score { grid-column: 1; font-size: 15px; color: #ffe9a8; }
+#screen-save-slots .ssc-info .ssc-levels { grid-column: 2; font-size: 13px; color: #cdbf95; }
+/* No title earned yet: the divider moves onto the name / ribbon row instead */
+#screen-save-slots .ssc-info .ssc-name:last-of-type { margin-bottom: 0; }
