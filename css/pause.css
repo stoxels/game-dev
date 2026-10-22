@@ -378,3 +378,37 @@
 #pause-overlay .pm-resume:hover { border: none; filter: brightness(1.2) drop-shadow(0 0 14px rgba(255, 190, 70, 0.8)); }
 
 #pause-overlay #pause-hint { color: rgba(240, 225, 190, 0.6); text-shadow: 0 1px 2px #000; }
+
+
+/* ── Two-column layout ─────────────────────────────────────────────────────
+   Run info / loot on the left, hero + system buttons on the right, and the
+   big RETURN TO GAME across the bottom, so the menu stays short even when the
+   loot list grows. Narrow screens fall back to the single stacked column. */
+@media (min-width: 760px) {
+    #pause-overlay .pause-menu {
+        width: min(880px, 94vw);
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-areas:
+            "title title"
+            "info  feat"
+            "info  sys"
+            "resume resume"
+            "hint  hint";
+        column-gap: 18px;
+        row-gap: 12px;
+        align-items: start;
+    }
+    #pause-overlay .pm-title { grid-area: title; justify-self: center; width: min(360px, 60%); }
+    #pause-overlay .pm-info { grid-area: info; align-self: stretch; margin-bottom: 0; }
+    #pause-overlay .pm-features { grid-area: feat; }
+    #pause-overlay .pm-section:not(.pm-features) { grid-area: sys; }
+    #pause-overlay .pm-resume { grid-area: resume; justify-self: center; width: min(420px, 100%); }
+    #pause-overlay #pause-hint { grid-area: hint; }
+
+    /* A long loot list scrolls inside the left panel instead of stretching the menu. */
+    #pause-overlay #pause-loot-summary { max-height: 46vh; overflow-y: auto; }
+
+    /* Tutorial pause has no hero buttons: let the system block take the right column. */
+    #pause-overlay.tq-pause .pm-section:not(.pm-features) { grid-row: 2 / 4; }
+}

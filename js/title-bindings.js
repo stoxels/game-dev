@@ -617,7 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof globalThis._resetQuizDamageBuff === 'function') globalThis._resetQuizDamageBuff();
                 safeCall('_hidePlayerAvatarSimple');
                 safeCall('_hidePlayerAvatar');
-                globalThis.showEndgameNexus();
+                leaveToNexusOrTrialWorld();
             });
             return;
         }
@@ -630,6 +630,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof globalThis._resetQuizDamageBuff === 'function') globalThis._resetQuizDamageBuff();
         safeCall('_hidePlayerAvatarSimple');
         safeCall('_hidePlayerAvatar');
+        leaveToNexusOrTrialWorld();
+    }
+
+    // After the run is torn down: a campaign trial goes back to its world map,
+    // any other map run goes to the Nexus.
+    function leaveToNexusOrTrialWorld() {
+        if (typeof globalThis._routeTrialReturn === 'function' && globalThis._routeTrialReturn()) return;
         globalThis.showEndgameNexus();
     }
 

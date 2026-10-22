@@ -563,6 +563,7 @@ export const T = {
         pause_settings: 'SETTINGS',
         pause_levels: 'LEAVE LEVEL',
         pause_nexus: 'RETURN TO NEXUS',
+        pause_trial_exit: 'LEAVE TRIAL',
 
         // Convergence modal
         convergence: 'Convergence',
@@ -1117,6 +1118,7 @@ export const T = {
         pause_settings: 'EINSTELLUNGEN',
         pause_levels: 'LEVEL VERLASSEN',
         pause_nexus: 'ZUM NEXUS',
+        pause_trial_exit: 'PRÜFUNG VERLASSEN',
 
         // Convergence modal
         convergence: 'Konvergenz',

@@ -12,7 +12,7 @@ import { _refreshQuestionModalFlag, goToPreviousScreen, hideResultOverlays } fro
 import { SETTINGS, applySettings, initSettingsControls } from './js/settings.js';
 import { closeSpellbook } from './js/skills/skill-spellbook.js';
 import { pauseTimer, resumeTimer } from './js/timer/timer.js';
-import { setLang } from './js/translation/translations.js';
+import { setLang, t } from './js/translation/translations.js';
 import { cur } from './js/state.js';
 
 //------------------------------------------------------------------------
@@ -97,6 +97,17 @@ function _updatePauseMenuReturnButtons() {
     const nexusBtn = document.getElementById('btn-go-nexus');
     if (levelsBtn) levelsBtn.style.display = (onEndgameMap || onTutorial) ? 'none' : '';
     if (nexusBtn) nexusBtn.style.display = onEndgameMap ? '' : 'none';
+    // Campaign trials (convergence / ascension) share the map engine but belong
+    // to the campaign: their exit goes back to the world map, not the Nexus.
+    const onTrial = onEndgameMap && !!globalThis._isTrialRun?.();
+    const nexusLabel = document.getElementById('pause-nexus-label');
+    const nexusIco = document.getElementById('pause-nexus-ico');
+    if (nexusLabel) {
+        const key = onTrial ? 'pause_trial_exit' : 'pause_nexus';
+        nexusLabel.setAttribute('data-t', key);
+        nexusLabel.textContent = t(key);
+    }
+    if (nexusIco) nexusIco.textContent = onTrial ? '◀' : '🌌';
     const pauseEl = document.getElementById('pause-overlay');
     if (pauseEl) pauseEl.classList.toggle('tq-pause', onTutorial);
     return onEndgameMap;
