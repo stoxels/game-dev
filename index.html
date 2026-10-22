@@ -1206,6 +1206,9 @@
                 </div>
                 <!-- Unspent Probability Tree points reminder (js/start-level.js) -->
                 <div class="hud-unspent-points hidden" id="hud-unspent-points"></div>
+                <!-- Map objectives (js/combat/encounter-chain.js): last in the stack, so it
+                     sits underneath everything else and never covers the column clues. -->
+                <div id="sx-objectives-strip" class="sx-hidden"></div>
             </div>
 
             <!-- Kept separate, still in normal flow above the grid -->
@@ -1261,8 +1264,6 @@
             <div class="toast-stack" id="toast-stack"></div>
             <div id="inv-panel"></div>
         </div>
-        <!-- ENDGAME OBJECTIVES - fixed left panel, zero layout impact -->
-        <div id="sx-objectives-strip" class="sx-hidden"></div>
     </div>
     <!-- XP bar: root-level (not inside #screen-game) so it paints above the win/lose overlays; shown only while the game screen is active (css/combat/monsters.css; js/hub/hub-leveling.js) -->
     <div id="sx-xp-bar"><div id="sx-xp-bar-fill"></div><div id="sx-xp-bar-gain"></div></div>

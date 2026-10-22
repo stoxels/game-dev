@@ -274,6 +274,18 @@
     min-width: clamp(180px, 26vw, 280px);
 }
 
+/* With the analytics beside it, an invisible spacer the width of that panel
+   sits on the other side, so the ASCENSION / TRIAL COMPLETE panel stays
+   centred on screen and the analytics hangs off its right. On windows too
+   narrow for both, the spacer shrinks first (it gives way before the panel
+   or the analytics do), so nothing gets squeezed. */
+.sx-leave-map-transition.sx-has-side::before {
+    content: '';
+    flex: 0 100 430px;
+    min-width: 0;
+    visibility: hidden;
+}
+
 /* Wide enough for loot + analytics side by side; stack below that */
 @media (max-width: 1150px) {
     .sx-leave-map-transition.sx-has-side {
@@ -282,6 +294,10 @@
         justify-content: flex-start;
         gap: 12px;
         padding: 12px 0;
+    }
+
+    .sx-leave-map-transition.sx-has-side::before {
+        display: none;
     }
 
     .sx-leave-map-transition.sx-has-side .sx-leave-map-panel {

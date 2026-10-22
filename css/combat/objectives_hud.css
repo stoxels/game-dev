@@ -1,20 +1,17 @@
-/* ── Objectives HUD - top-center stone chips ─────────────────────
+/* ── Objectives HUD - top-left stone chips ───────────────────────
    Each open objective is a rune-edged slate plaque (same art as the reset
    dialog's note banner) with the objective's icon overlapping the left edge.
    Icons match the trial briefing (css/trial-intro.css). Action buttons use
-   the stone button art with a coloured glow. */
+   the stone button art with a coloured glow. The strip lives inside the
+   top-left HUD stack (#game-hud-corner), underneath the clock, mistakes and
+   bonus lines, so it never covers the column clues. */
 #sx-objectives-strip {
-    position: fixed;
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 250;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 6px;
+    margin-top: 4px;
     pointer-events: auto;
-    max-width: 96vw;
 }
 
     #sx-objectives-strip.sx-hidden {
@@ -23,10 +20,9 @@
 
 .sx-obj-line {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 6px clamp(8px, 1.4vw, 16px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.55));
 }
 
@@ -85,8 +81,8 @@
 /* Action buttons that appear underneath the chips */
 .sx-obj-actions {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 8px;
 }
 
