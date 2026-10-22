@@ -91,17 +91,32 @@ function _buildQueuedTrapsHTML(trapsQueue) {
             </div>`;
 }
 
-// Builds one button for each trap type available in the current slot.
+// Builds one card for each trap type available in the current slot: a
+// coloured icon tile on the left, the name and hint on the right.
 function _buildTrapTypeButtonsHTML(availableTraps) {
     return `<div class="bayes-trap-list">` + availableTraps.map(type => {
         const info = _bayesTrapTypeInfo(type);
         return `
             <button onclick="_bayesTrapsSelectType('${type}')"
                 class="bayes-trap-btn" style="--trap-color:${info.color};">
-                ${info.icon} <span class="bayes-trap-btn-name">${info.label}</span>
-                <span class="bayes-trap-btn-hint">${info.hint}</span>
+                <span class="bayes-trap-btn-icon">${info.icon}</span>
+                <span class="bayes-trap-btn-text">
+                    <span class="bayes-trap-btn-name">${info.label}</span>
+                    <span class="bayes-trap-btn-hint">${info.hint}</span>
+                </span>
             </button>`;
     }).join('') + `</div>`;
+}
+
+// Builds the row of progress dots: filled for chosen slots, a ring for the
+// slot being chosen now, dim for the slots still to come.
+function _buildTrapPipsHTML(selected, trapCount) {
+    let pips = '';
+    for (let i = 0; i < trapCount; i++) {
+        const cls = i < selected ? ' is-done' : (i === selected ? ' is-current' : '');
+        pips += `<span class="bayes-pip${cls}"></span>`;
+    }
+    return `<div class="bayes-pips">${pips}</div>`;
 }
 
 // Builds the selection overlay for the current trap queue.
@@ -115,11 +130,15 @@ function _buildSelectOverlayHTML(state) {
 
     const trapBtns = _buildTrapTypeButtonsHTML(state.availableTraps);
     const queuedHTML = _buildQueuedTrapsHTML(state.trapsQueue);
+    const pipsHTML = _buildTrapPipsHTML(selected, state.trapCount);
 
     return `
         <div class="modal-box bayes-modal">
-            <div class="bayes-modal-title">🧪 ${title}</div>
-            <div class="bayes-modal-prompt">${prompt}</div>
+            <div class="bayes-modal-head">
+                <div class="bayes-modal-title">🧪 ${title}</div>
+                ${pipsHTML}
+                <div class="bayes-modal-prompt">${prompt}</div>
+            </div>
             ${queuedHTML}
             ${trapBtns}
             <button onclick="_bayesTrapsCancel()" class="bayes-modal-cancel">${cancelLabel}</button>

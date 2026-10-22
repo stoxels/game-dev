@@ -85,8 +85,10 @@ const DECO_PANELS = [
 function _updatePauseMenuReturnButtons() {
     // Campaign levels also carry isMonsterLevel (their light monster pack),
     // but they are NOT endgame maps - they keep the normal "Levels" button.
-    const onEndgameMap = typeof cur !== 'undefined' && cur &&
-        ((cur.isMonsterLevel && !cur.campaignMonsters) || cur.isEndgameSandbox);
+    // Coerced to a real boolean: classList.toggle(name, undefined) FLIPS the
+    // class instead of clearing it.
+    const onEndgameMap = !!(typeof cur !== 'undefined' && cur &&
+        ((cur.isMonsterLevel && !cur.campaignMonsters) || cur.isEndgameSandbox));
     // Tutorial quest is mandatory - no LEVELS exit mid-lesson (the HUD and
     // overlay buttons are hidden by _tqUpdateLevelExitButtons; the pause
     // menu button is hidden here where its visibility is owned).

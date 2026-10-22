@@ -319,10 +319,22 @@
 /* Run-info plate: dark rune slab */
 #pause-overlay .pm-info {
     box-sizing: border-box;
-    padding: 18px 28px 30px;
+    /* The banner art has a ~12% top and ~29% bottom decorative band, so the
+       text needs that much clearance to sit inside the dark inner area. */
+    padding: 32px 30px 58px;
+    margin-bottom: -22px;
+    gap: 6px;
     background: url('../images/Game-Reset/Note-Banner.webp') center / 100% 100% no-repeat;
     border: none;
     border-radius: 0;
+}
+
+/* Compact bonus line inside the banner (no extra box, so it fits). */
+#pause-overlay .pause-bonus {
+    gap: 2px;
+    padding: 2px 8px;
+    background: none;
+    border-left: none;
 }
 
 #pause-overlay .pm-section-label { color: #e0cfa2; text-shadow: 0 1px 2px #000; }

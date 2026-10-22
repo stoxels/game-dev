@@ -60,6 +60,7 @@ body.gauntlet-open #puzzle-scaler-wrap { pointer-events: none; }
     align-items: flex-start;
     justify-content: center;
     pointer-events: auto;
+    z-index: 2;                  /* above the shrinking-floor dim (.ga-safe) so cards outside it stay in colour */
 }
 /* eight scattered spots: top row, two middle sides, lower row + centre */
 .ga-zone-0 { left: 3%;  top: 40px; }

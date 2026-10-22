@@ -171,7 +171,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_cone_of_cold', icon: '🧊', theme: 'frost', element: 'cold', damageKind: 'cold',
-        behavior: 'nova', dmg: [5, 8], manaCost: 36, cooldownSeconds: 16, castTimeSeconds: 0.8, perTarget: true,
+        behavior: 'nova', dmg: [8, 12], manaCost: 36, cooldownSeconds: 16, castTimeSeconds: 0.8, perTarget: true,
         tags: ['Spell', 'Cold', 'Area'], scalingTags: ['spell', 'cold', 'area'],
         nameEn: 'Glacial Breath', nameDE: 'Eisatem',
         descEn: 'Freezing wind in a cone toward the cursor. Hits every enemy inside.',
@@ -200,7 +200,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_arcane_explosion', icon: '💫', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
-        behavior: 'nova', dmg: [5, 9], manaCost: 39, cooldownSeconds: 16, castTimeSeconds: 0.8, perTarget: true,
+        behavior: 'nova', dmg: [9, 13], manaCost: 39, cooldownSeconds: 16, castTimeSeconds: 0.8, perTarget: true,
         tags: ['Spell', 'Arcane', 'Area'], scalingTags: ['spell', 'arcane', 'area'],
         nameEn: 'Mana Burst', nameDE: 'Manaschub',
         descEn: 'Arcane energy detonates around you and hits every enemy.',
@@ -499,7 +499,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_multi_shot', icon: '🏹', theme: 'arrow', element: 'physical', damageKind: 'physical',
-        behavior: 'nova', dmg: [5, 8], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0, perTarget: true,
+        behavior: 'nova', dmg: [8, 12], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area', 'projectile'],
         nameEn: 'Arrow Fan', nameDE: 'Pfeilfächer',
         descEn: 'A fan of arrows toward the cursor hits every enemy inside the cone.',
@@ -555,7 +555,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_flameblast', icon: '💣', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'delayed', dmg: [8, 11], delayMs: 350, hitsAll: true, manaCost: 49, cooldownSeconds: 22, castTimeSeconds: 1.4,
+        behavior: 'delayed', dmg: [12, 16], delayMs: 350, hitsAll: true, manaCost: 49, cooldownSeconds: 22, castTimeSeconds: 1.4,
         tags: ['Spell', 'Fire', 'Area'], scalingTags: ['spell', 'fire', 'area'],
         nameEn: 'Pyre Blast', nameDE: 'Feuersbrunst',
         descEn: 'Charges a blast that detonates on every enemy after a delay.',
@@ -602,7 +602,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_cold_snap', icon: '🥶', theme: 'frost', element: 'cold', damageKind: 'cold',
-        behavior: 'nova', dmg: [7, 10], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0, perTarget: true,
+        behavior: 'nova', dmg: [9, 13], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0, perTarget: true,
         tags: ['Spell', 'Cold', 'Area'], scalingTags: ['spell', 'cold', 'area'],
         nameEn: 'Glacial Crack', nameDE: 'Eisbruch',
         descEn: 'A burst of absolute cold hits every enemy.',
@@ -631,7 +631,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_storm_call', icon: '⛈️', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'delayed', dmg: [7, 9], delayMs: 1000, hitsAll: true, manaCost: 47, cooldownSeconds: 20, castTimeSeconds: 1.2,
+        behavior: 'delayed', dmg: [12, 16], delayMs: 1000, hitsAll: true, manaCost: 47, cooldownSeconds: 20, castTimeSeconds: 1.2,
         tags: ['Spell', 'Lightning', 'Area'], scalingTags: ['spell', 'lightning', 'area'],
         nameEn: 'Thunder Mark', nameDE: 'Donnermal',
         descEn: 'Marks every enemy; lightning strikes them all after a delay.',
@@ -667,7 +667,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_discharge', icon: '💥', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'nova', dmg: [10, 13], manaCost: 48, cooldownSeconds: 24, castTimeSeconds: 1.6, perTarget: true,
+        behavior: 'nova', dmg: [14, 18], manaCost: 48, cooldownSeconds: 24, castTimeSeconds: 1.6, perTarget: true,
         tags: ['Spell', 'Lightning', 'Area'], scalingTags: ['spell', 'lightning', 'area'],
         nameEn: 'Surge Release', nameDE: 'Stromstoß',
         descEn: 'Releases all stored power in one blast on every enemy.',
@@ -687,7 +687,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_bane', icon: '🌑', theme: 'shadow', element: 'shadow', damageKind: 'shadow',
-        behavior: 'nova', dmg: [7, 9], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0, perTarget: true,
+        behavior: 'nova', dmg: [10, 14], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0, perTarget: true,
         tags: ['Spell', 'Shadow', 'Area'], scalingTags: ['spell', 'shadow', 'area'],
         nameEn: 'Dread Wave', nameDE: 'Schreckenswelle',
         descEn: 'A wave of dread hits every enemy.',

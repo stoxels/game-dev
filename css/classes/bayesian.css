@@ -10,19 +10,80 @@
 
 .bayes-modal {
     text-align: center;
-    border-left: 4px solid #27ae60;
-    max-width: 400px;
-    max-height: 80vh;
+    border: 1px solid #2f5d45;
+    border-top: 3px solid #27ae60;
+    max-width: 440px;
+    max-height: 86vh;
     overflow-y: auto;
+    padding: 26px 24px 22px;
+    background:
+        radial-gradient(ellipse at 50% -10%, rgba(39, 174, 96, .22), transparent 60%),
+        var(--panel);
+    box-shadow: 0 0 40px rgba(39, 174, 96, .18), 0 12px 40px rgba(0, 0, 0, .55);
+    animation: bayes-modal-in .22s ease-out both;
+}
+
+@keyframes bayes-modal-in {
+    from {
+        transform: translateY(10px) scale(.97);
+        opacity: 0;
+    }
+
+    to {
+        transform: none;
+        opacity: 1;
+    }
+}
+
+/* Header block: title, progress dots and prompt, closed off by a divider */
+.bayes-modal-head {
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid transparent;
+    border-image: linear-gradient(90deg, transparent, rgba(39, 174, 96, .6), transparent) 1;
 }
 
 .bayes-modal-title {
     font-family: var(--PX);
-    font-size: 13px;
-    color: #27ae60;
+    font-size: 14px;
+    color: #4ee08a;
     letter-spacing: 3px;
-    margin-bottom: 4px;
-    text-shadow: 0 0 8px rgba(39, 174, 96, .45);
+    margin-bottom: 12px;
+    text-shadow: 0 0 10px rgba(39, 174, 96, .6);
+}
+
+/* Progress dots, one per trap slot */
+.bayes-pips {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.bayes-pip {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid #3c5a4a;
+    background: rgba(255, 255, 255, .06);
+}
+
+.bayes-pip.is-done {
+    background: #27ae60;
+    border-color: #4ee08a;
+    box-shadow: 0 0 6px rgba(39, 174, 96, .7);
+}
+
+.bayes-pip.is-current {
+    border-color: #4ee08a;
+    box-shadow: 0 0 0 2px rgba(78, 224, 138, .25);
+    animation: bayes-pip-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes bayes-pip-pulse {
+    50% {
+        box-shadow: 0 0 0 4px rgba(78, 224, 138, .12);
+    }
 }
 
 .bayes-modal-prompt {
@@ -30,7 +91,6 @@
     font-size: 9px;
     color: var(--accent2);
     opacity: .85;
-    margin-bottom: 16px;
     line-height: 1.8;
 }
 
@@ -40,14 +100,14 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 6px;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
 }
 
 .bayes-queued-label {
     width: 100%;
     font-family: var(--PX);
     font-size: 8px;
-    color: #aaa;
+    color: #8d98b3;
     letter-spacing: 1px;
     margin-bottom: 2px;
 }
@@ -55,9 +115,9 @@
 .bayes-queued-chip {
     font-family: var(--PX);
     font-size: 8px;
-    padding: 4px 10px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, .04);
+    padding: 5px 11px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .05);
     animation: bayes-chip-in .25s ease-out both;
 }
 
@@ -76,56 +136,83 @@
 .bayes-trap-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     align-items: stretch;
 }
 
-/* Trap-type selection button; coloured via --trap-color */
+/* Trap-type card; coloured via --trap-color */
 .bayes-trap-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
     font-family: var(--PX);
-    font-size: 9px;
-    background: transparent;
-    border: 1px solid var(--trap-color);
-    border-left-width: 4px;
+    font-size: 10px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--trap-color) 14%, var(--surface)), var(--surface) 70%);
+    border: 1px solid color-mix(in srgb, var(--trap-color) 55%, transparent);
+    border-radius: 6px;
     color: var(--trap-color);
-    padding: 9px 14px;
+    padding: 10px 14px 10px 10px;
     cursor: pointer;
     letter-spacing: 1px;
     text-align: left;
     line-height: 1.6;
-    transition: background .15s ease, box-shadow .15s ease, transform .15s ease;
+    transition: background .15s ease, box-shadow .15s ease, transform .15s ease, border-color .15s ease;
 }
 
-.bayes-trap-btn:hover {
-    background: color-mix(in srgb, var(--trap-color) 12%, transparent);
-    box-shadow: 0 0 12px color-mix(in srgb, var(--trap-color) 35%, transparent), inset 0 0 6px color-mix(in srgb, var(--trap-color) 15%, transparent);
-    transform: translateX(4px);
+.bayes-trap-btn:hover,
+.bayes-trap-btn:focus-visible {
+    border-color: var(--trap-color);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--trap-color) 40%, transparent), inset 0 0 10px color-mix(in srgb, var(--trap-color) 14%, transparent);
+    transform: translateY(-2px);
+    outline: none;
 }
 
 .bayes-trap-btn:active {
-    transform: translateX(4px) scale(.98);
+    transform: translateY(0) scale(.98);
+}
+
+/* Square icon tile on the left of each card */
+.bayes-trap-btn-icon {
+    flex: 0 0 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--trap-color) 18%, #12151c);
+    border: 1px solid color-mix(in srgb, var(--trap-color) 50%, transparent);
+}
+
+.bayes-trap-btn-text {
+    flex: 1;
+    min-width: 0;
 }
 
 .bayes-trap-btn-name {
+    display: block;
     font-weight: bold;
 }
 
 .bayes-trap-btn-hint {
     display: block;
-    opacity: .65;
+    color: var(--accent2);
+    opacity: .6;
     font-size: 8px;
     letter-spacing: 0;
-    margin-top: 2px;
+    line-height: 1.7;
+    margin-top: 4px;
 }
 
 .bayes-modal-cancel {
-    margin-top: 16px;
+    margin-top: 18px;
     font-family: var(--PX);
     font-size: 9px;
     background: transparent;
     border: 1px solid #444;
-    color: #777;
-    padding: 6px 18px;
+    border-radius: 4px;
+    color: #8a8a8a;
+    padding: 7px 20px;
     cursor: pointer;
     letter-spacing: 1px;
     transition: color .15s ease, border-color .15s ease;
@@ -135,6 +222,19 @@
     color: #e74c3c;
     border-color: #e74c3c;
 }
+
+@media (max-width: 480px) {
+    .bayes-modal {
+        padding: 20px 14px 16px;
+    }
+
+    .bayes-trap-btn-icon {
+        flex-basis: 38px;
+        height: 38px;
+        font-size: 20px;
+    }
+}
+
 
 
 
