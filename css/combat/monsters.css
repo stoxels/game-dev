@@ -2914,6 +2914,15 @@
 .st-polymorph { border-color: #e879f9; box-shadow: 0 0 6px rgba(232,121,249,0.8); }
 .st-bleed      { border-color: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.9); background: rgba(80,0,0,0.85); color: #fecaca; font-weight: 700; }
 .st-poison     { border-color: #84cc16; box-shadow: 0 0 6px rgba(132,204,22,0.8); }
+.st-brittle    { border-color: #bae6fd; box-shadow: 0 0 6px rgba(186,230,253,0.9); }
+.st-conductive { border-color: #fbbf24; box-shadow: 0 0 6px rgba(251,191,36,0.8); }
+.st-withered   { border-color: #a16207; box-shadow: 0 0 6px rgba(161,98,7,0.9); background: rgba(40,25,0,0.85); }
+.st-exposed    { border-color: #fb7185; box-shadow: 0 0 6px rgba(251,113,133,0.8); }
+.st-marked     { border-color: #f0abfc; box-shadow: 0 0 6px rgba(240,171,252,0.9); }
+.st-doomed     { border-color: #7c3aed; box-shadow: 0 0 6px rgba(124,58,237,0.9); background: rgba(30,0,60,0.85); }
+.st-soaked     { border-color: #38bdf8; box-shadow: 0 0 6px rgba(56,189,248,0.8); }
+.st-frostbite  { border-color: #7dd3fc; box-shadow: 0 0 6px rgba(125,211,252,0.8); }
+.st-static     { border-color: #fde68a; box-shadow: 0 0 6px rgba(253,230,138,0.8); }
 .sx-status-strip .sx-status-icon { font-size: 12px; padding: 2px 4px; }
 
 /* Bleeding monster card: red drip badge on the card (class set from the status strip). */

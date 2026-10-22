@@ -9,6 +9,7 @@ import { STAGGER_DURATION_MS } from './encounter-lifecycle.js';
 import { _flashDamageCard, _flashImmune, _showDamageNumber, _spawnHitBurst, _updateBars } from './encounter.js';
 import { PLAYER_STATS, _computePlayerStats } from './combat-player-stats.js';
 import { _isActive } from './combat-state.js';
+import { _spellComboOnKill, _spellComboPost, _spellComboPre } from './combat-spell-combos.js';
 import { startTimerFreeze } from '../timer/timer-freeze.js';
 import { _gainFortify, _gainPowerCharge, _gainRage } from './combat-ailments-state.js';
 
@@ -341,6 +342,7 @@ function _resolveKill(target, amount, hpBefore, elements, opts) {
         _tryOverkillSpread(target, amount, hpBefore, isCrit, elements);
     }
     if (opts && opts.isMelee) _meleeKillExplode(target);
+    _spellComboOnKill(target);
     _killMonster(target.id);
 }
 
@@ -380,6 +382,9 @@ export function _damageTargetById(monsterId, amount, elements, opts) {
 
     amount = _applyConditionalDamage(target, amount, opts, hpBefore);
     amount = _applyKeystoneDamageMods(target, amount, elements, opts);
+    // Spell combos: debuffs on the enemy add bonus damage and trigger reactions.
+    const combo = _spellComboPre(target, amount, elements, opts);
+    amount = combo.amount;
     opts = _rollArmourPierce(target, opts);
 
     // Elemental resistances reduce only the elemental share of the hit;
@@ -417,6 +422,7 @@ export function _damageTargetById(monsterId, amount, elements, opts) {
 
     _applyHitToMonster(target, amount, opts);
     _showHitFeedback(target, amount, elements, opts);
+    _spellComboPost(target, combo, amount, elements, opts);
 
     // Gear: echo (rings) - chance for the hit to repeat as a delayed
     // second instance of echoDamagePct of its damage

@@ -36,6 +36,7 @@ import { _isDualWielding } from '../loot/loot-requirements.js';
 import { _egGetActiveMapModValue, _egMapDamageTakenAmpMult } from '../endgame/endgame-map-launch.js';
 import { _calcArmourMitigation, _calcEvasionDodgeChance, _computePlayerStats, _getAllEquippedItems, _overLevelAvoidMult, _scheduleAbsorptionRegen } from './combat-player-stats.js';
 import { _isActive } from './combat-state.js';
+import { _applyWitheredDamageLess } from './combat-spell-combos.js';
 import { STATE } from '../state.js';
 
 
@@ -118,6 +119,7 @@ function _rsAvoid(kind) {
 // land unless the telegraphed mechanic itself was avoided by movement.
 export function _playerTakeDamage(amount, isSpell = false, element = null, attackerLevel = null, opts = null) {
     if (!_isActive()) return 0;
+    amount = _applyWitheredDamageLess(amount, opts);
 
     // GODMODE - developer/test-only: blocks ALL incoming damage before any
     // mitigation runs, so mechanic testing can ignore the player's health.

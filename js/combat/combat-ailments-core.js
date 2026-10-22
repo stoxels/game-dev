@@ -7,6 +7,8 @@ import { _gameOver, _killMonster, _playerTakeDamage, _showDamageNumber } from '.
 import { _egGetActiveMapModValue, _egHasActiveMapMod } from '../endgame/endgame-map-launch.js';
 import { _computePlayerStats } from './combat-player-stats.js';
 import { _isActive } from './combat-state.js';
+import { SPELL_DEBUFFS, comboStatusName, comboStatusTip } from './combat-spell-debuff-defs.js';
+import { _tickSpellDebuffs } from './combat-spell-combos.js';
 import { CRUSH_DURATION_S, _ailmentDamageMult } from './combat-calculations-resistances.js';
 import { _gainEnduranceCharge, _gainPowerCharge, _addGroundFireAcc, _groundFireAcc, _playerStatuses, _puzzleEffects, _playerStatusBarTicker, _replacePuzzleEffects, _setPlayerStatusBarTicker } from './combat-ailments-state.js';
 
@@ -116,6 +118,11 @@ const AILMENT_ICONS = {
     stunned: '💫',
 };
 
+// Chip symbol of a status; spell debuffs (combat-spell-debuff-defs.js) share the chips.
+function _statusIcon(key) {
+    return AILMENT_ICONS[key] || (SPELL_DEBUFFS[key] && SPELL_DEBUFFS[key].icon) || '?';
+}
+
 // The display name of an ailment. Only shadowburn needs the mapping (it is
 // one word in the data and two on screen); everything else title-cases.
 // Tooltip text for a player status chip: the name, plus what makes it special.
@@ -130,6 +137,7 @@ function _playerAilmentTip(key) {
 // Burn').
 function _ailmentLabel(key) {
     if (key === 'shadowburn') return 'Shadow Burn';
+    if (SPELL_DEBUFFS[key]) return comboStatusName(key);
     return String(key || '').charAt(0).toUpperCase() + String(key || '').slice(1);
 }
 
@@ -1134,6 +1142,7 @@ function _tickAilments() {
 
     _tickPlayerStatuses(now, deltaS);
     _tickGroundFire(deltaS);
+    _tickSpellDebuffs();
     const deadIds = _tickMonsterStatuses(now, deltaS);
 
     // Kill DoT victims after iteration (loot/xp pipeline runs normally)
@@ -1157,7 +1166,7 @@ function _statusSignature(statusMap) {
     return Object.keys(statusMap)
         .filter(key => statusMap[key].until > now)
         .sort()
-        .map(key => `${key}:${Math.ceil((statusMap[key].until - now) / 1000)}`)
+        .map(key => `${key}:${Math.ceil((statusMap[key].until - now) / 1000)}:${statusMap[key].stacks || ''}`)
         .join(',');
 }
 
@@ -1168,8 +1177,9 @@ function _buildStatusIconsHTML(statusMap) {
         .filter(key => statusMap[key].until > now)
         .map(key => {
             // Crimson Dance stacks: show the stack count on the bleed chip.
-            const stacks = (key === 'bleed' && statusMap[key].stacks > 1) ? `×${statusMap[key].stacks} ` : '';
-            return `<span class="sx-status-icon st-${key}" data-tip="${globalThis._tipAttr(_ailmentLabel(key))}">${AILMENT_ICONS[key] || '?'}${stacks}${Math.ceil((statusMap[key].until - now) / 1000)}</span>`;
+            const stacks = ((key === 'bleed' || (SPELL_DEBUFFS[key] && SPELL_DEBUFFS[key].stackMax)) && statusMap[key].stacks > 1) ? `×${statusMap[key].stacks} ` : '';
+            const tip = SPELL_DEBUFFS[key] ? comboStatusTip(key) : _ailmentLabel(key);
+            return `<span class="sx-status-icon st-${key}" data-tip="${globalThis._tipAttr(tip)}">${_statusIcon(key)}${stacks}${Math.ceil((statusMap[key].until - now) / 1000)}</span>`;
         })
         .join('');
 }
@@ -1439,6 +1449,8 @@ function _startPlayerShadowClouds() {
 
 export {
     _applyMonsterAilment,
+    _applyStatusToMap,
+    _hasStatus,
     _freezeAllMonsters,
     AIL_IGNITE_DMG_SHARE,
     AIL_BLEED_DURATION_S,

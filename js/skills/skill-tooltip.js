@@ -7,6 +7,7 @@ import { CHARM_ORB_DAMAGE_PCT, charmRankMeetsPlayerLevel, getCharmArtForSkill, g
 import { canAffordSkill, getPassiveSkillDef, getPlayerTraits, getSkillCooldown, getSkillDamage, getSkillDef, getSkillDesc, getSkillLevel, getSkillManaCost, getSkillName, isSkillPassive } from './skill-registry.js';
 import { getSkillCastTimeSeconds } from './spell-casttime.js';
 import { getUniversalSpellCastKind, getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellDef, getUniversalSpellMovementEstimate, getUniversalSpellSupportEstimate } from './universal-spells.js';
+import { getSpellComboLines } from '../combat/combat-spell-debuff-defs.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -372,6 +373,15 @@ function buildSkillTooltipHTML(skillId, charmKey) {
     return _buildSkillTooltipHTML(skillId, charmKey);
 }
 
+// "Combo" lines of a spell: the enemy debuffs it applies, consumes or amplifies
+// (see combat-spell-debuff-defs.js). Empty for spells without combo behaviour.
+function _skillTooltipCombo(skillId) {
+    const lines = getSpellComboLines(skillId);
+    if (!lines.length) return '';
+    const title = LANG === 'de' ? 'Kombo' : 'Combo';
+    return `<div class="skl-tip-combo"><b>${title}</b>` + lines.map((l) => `<div>• ${l}</div>`).join('') + `</div>`;
+}
+
 function _buildSkillTooltipHTML(skillId, charmKey, previewRank) {
     const def = getSkillDef(skillId);
     if (!def) return '';
@@ -394,6 +404,7 @@ function _buildSkillTooltipHTML(skillId, charmKey, previewRank) {
         + (hovered || previewRank ? '' : _skillTooltipNextRank(skillId))
         + `<div class="skl-tip-sep"></div>`
         + `<div class="skl-tip-desc">${desc}</div>`
+        + _skillTooltipCombo(skillId)
         + _skillTooltipDamage(def)
         + (hovered || previewRank ? '' : _skillTooltipCharmBonus(skillId))
         + _skillTooltipGating(def)
