@@ -519,13 +519,13 @@ export function goToPreviousScreen() {
 // Snapshots every unclaimed (still on the grid, i.e. unexpired) drop so the
 // NEXT-level path can carry it forward. Mirrors the endgame encounter chain
 // (_transitionToChainPuzzle): loot / currency (incl. essences) / regular
-// items / maps / charms ride along, instant-effect pickups (hearts, mana,
+// items / gold / maps / charms ride along, instant-effect pickups (hearts, mana,
 // mistake erasers, cooldown surges) are intentionally left behind. Values are
 // captured by reference; the subsequent startLevel's encounter teardown
 // cancels their old expiry timers, and the restore step below re-places them
 // with fresh lifetimes via the shared _replaceCarried* helpers.
 function _campaignSnapshotCarriedDrops() {
-    const carried = { loot: [], currency: [], items: [], maps: [], charms: [] };
+    const carried = { loot: [], currency: [], items: [], gold: [], maps: [], charms: [] };
     try {
         if (typeof globalThis._lootDrops !== 'undefined' && globalThis._lootDrops instanceof Map) {
             carried.loot = Array.from(globalThis._lootDrops.values());
@@ -539,6 +539,11 @@ function _campaignSnapshotCarriedDrops() {
     try {
         if (typeof globalThis._itemDrops !== 'undefined' && globalThis._itemDrops instanceof Map) {
             carried.items = Array.from(globalThis._itemDrops.values());
+        }
+    } catch (e) {}
+    try {
+        if (globalThis._goldDrops instanceof Map) {
+            carried.gold = Array.from(globalThis._goldDrops.values());
         }
     } catch (e) {}
     try {
@@ -561,7 +566,7 @@ function _campaignSnapshotCarriedDrops() {
 function _campaignRestoreCarriedDrops(carried, nextIndex) {
     if (!carried) return;
     const total = (carried.loot?.length || 0) + (carried.currency?.length || 0)
-        + (carried.items?.length || 0) + (carried.maps?.length || 0)
+        + (carried.items?.length || 0) + (carried.gold?.length || 0) + (carried.maps?.length || 0)
         + (carried.charms?.length || 0);
     if (total === 0) return;
 
@@ -575,6 +580,9 @@ function _campaignRestoreCarriedDrops(carried, nextIndex) {
         }
         if (carried.items.length > 0 && typeof globalThis._replaceCarriedItemDrops === 'function') {
             try { globalThis._replaceCarriedItemDrops(carried.items); } catch (e) {}
+        }
+        if (carried.gold.length > 0 && typeof globalThis._replaceCarriedGoldDrops === 'function') {
+            try { globalThis._replaceCarriedGoldDrops(carried.gold); } catch (e) {}
         }
         if (carried.maps.length > 0 && typeof globalThis._egReplaceCarriedMapDrops === 'function') {
             try { globalThis._egReplaceCarriedMapDrops(carried.maps); } catch (e) {}

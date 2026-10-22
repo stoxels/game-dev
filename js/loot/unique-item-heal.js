@@ -87,6 +87,18 @@ export function _healUniqueItem(item) {
         item.damage = { min: expDmg.min, max: expDmg.max };
         if (expInterval != null) item.attackIntervalSeconds = expInterval;
         changed = true;
+    } else if (def && def.damage && item.slotType === 'weapon') {
+        // A unique weapon's damage and charge time are fixed by its definition,
+        // so a copy saved before a rebalance (e.g. the faster Splintered Oak
+        // Club) must follow the new numbers.
+        if (item.damage.min !== def.damage.min || item.damage.max !== def.damage.max) {
+            item.damage = { min: def.damage.min, max: def.damage.max };
+            changed = true;
+        }
+        if (def.attackIntervalSeconds != null && item.attackIntervalSeconds !== def.attackIntervalSeconds) {
+            item.attackIntervalSeconds = def.attackIntervalSeconds;
+            changed = true;
+        }
     }
     // --- blockChance (shields) ---
     if (item.slotType === 'shield') {

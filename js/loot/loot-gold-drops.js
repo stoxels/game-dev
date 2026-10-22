@@ -198,6 +198,10 @@ export function _stopGoldDrops() {
     _goldDrops.clear();
 }
 
-// Coins are not carried into the next level (they would only be a few seconds
-// old); kept so the shared drop code keeps calling the same names.
-export function _replaceCarriedGoldDrops(drops) {}
+// Carries unclaimed coins into the next campaign puzzle: each one lands on a
+// fresh free cell with a fresh lifetime. Ironman discards them, like items.
+export function _replaceCarriedGoldDrops(drops) {
+    if (!drops || drops.length === 0) return;
+    if (typeof curMods !== 'undefined' && globalThis.curMods.ironman) return;
+    drops.forEach(drop => _spawnGoldDrop(drop.amount));
+}

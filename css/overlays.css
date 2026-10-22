@@ -859,8 +859,15 @@ body.question-modal-open #player-avatar-simple {
    objective note share it, and a long objective text wraps inside it instead
    of stretching both buttons to its full single-line width. */
 #ov-win .ov-btns-win-grid .ov-btns-col:nth-child(2) {
-    width: clamp(260px, 16vw, 300px);
+    width: clamp(300px, 20vw, 340px);
     align-items: stretch;
+}
+/* the long "REPLAY (NEW SETUP)" label (and its German twin) must stay inside the stone plate */
+#ov-win .ov-btns-win-grid .ov-btns-col:nth-child(2) .ob {
+    min-width: 0;
+    padding-left: 30px;
+    padding-right: 30px;
+    letter-spacing: 0;
 }
 #ov-win .ov-btns-col .bonus-badge {
     white-space: normal;
