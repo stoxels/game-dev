@@ -1117,8 +1117,11 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box { /* neutralized - see s
 
 .skl-tip-scaling { color: #b8a9ff; margin-top: 4px; }
 .skl-tip-note { color: #9a9ab0; font-size: 10px; margin-top: 4px; }
-.skl-tip-combo { color: #9fe7ff; font-size: 11px; margin: 2px 0 4px; }
-.skl-tip-combo b { color: #7fd9ff; letter-spacing: 0.06em; }
+.skl-tip-combo { border-top: 1px solid rgba(127,217,255,0.25); margin: 6px 0 4px; padding-top: 4px; color: #cfeaf5; font-size: 11px; line-height: 1.35; }
+.skl-tip-combo-title { color: #7fd9ff; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 10px; }
+.skl-tip-combo-sec { color: #f1c40f; margin-top: 4px; font-size: 10px; letter-spacing: 0.04em; }
+.skl-tip-combo-row { margin: 1px 0 1px 6px; }
+.skl-tip-combo b { color: #9fe7ff; }
 .skl-tip-warn { color: #ff6b6b; font-size: 10px; margin-top: 4px; }
 
 .skl-tip-foot {

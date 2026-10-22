@@ -7,7 +7,7 @@ import { CHARM_ORB_DAMAGE_PCT, charmRankMeetsPlayerLevel, getCharmArtForSkill, g
 import { canAffordSkill, getPassiveSkillDef, getPlayerTraits, getSkillCooldown, getSkillDamage, getSkillDef, getSkillDesc, getSkillLevel, getSkillManaCost, getSkillName, isSkillPassive } from './skill-registry.js';
 import { getSkillCastTimeSeconds } from './spell-casttime.js';
 import { getUniversalSpellCastKind, getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellDef, getUniversalSpellMovementEstimate, getUniversalSpellSupportEstimate } from './universal-spells.js';
-import { getSpellComboLines } from '../combat/combat-spell-debuff-defs.js';
+import { getSpellComboSections } from '../combat/combat-spell-debuff-defs.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -373,13 +373,18 @@ function buildSkillTooltipHTML(skillId, charmKey) {
     return _buildSkillTooltipHTML(skillId, charmKey);
 }
 
-// "Combo" lines of a spell: the enemy debuffs it applies, consumes or amplifies
-// (see combat-spell-debuff-defs.js). Empty for spells without combo behaviour.
+// The "Combo" block of a spell tooltip: which enemy debuffs it applies, which
+// bonus damage it earns against them, and the element reactions its damage type
+// can trigger (see combat-spell-debuff-defs.js). Empty for spells with none.
 function _skillTooltipCombo(skillId) {
-    const lines = getSpellComboLines(skillId);
-    if (!lines.length) return '';
-    const title = LANG === 'de' ? 'Kombo' : 'Combo';
-    return `<div class="skl-tip-combo"><b>${title}</b>` + lines.map((l) => `<div>• ${l}</div>`).join('') + `</div>`;
+    const spell = getUniversalSpellDef(skillId);
+    const sections = getSpellComboSections(skillId, spell && spell.element);
+    if (!sections.length) return '';
+    const title = LANG === 'de' ? 'Kombos' : 'Combos';
+    const hint = LANG === 'de' ? 'Tipp: Statussymbole auf Gegnern zeigen ihre Wirkung beim Darüberfahren.' : 'Tip: hover a status icon on an enemy to read what it does.';
+    return `<div class="skl-tip-combo"><div class="skl-tip-combo-title">${title}</div>`
+        + sections.map((sec) => `<div class="skl-tip-combo-sec">${sec.title}</div>` + sec.rows.map((r) => `<div class="skl-tip-combo-row">${r}</div>`).join('')).join('')
+        + `<div class="skl-tip-note">${hint}</div></div>`;
 }
 
 function _buildSkillTooltipHTML(skillId, charmKey, previewRank) {

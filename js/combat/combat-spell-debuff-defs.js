@@ -100,12 +100,12 @@ export const COMBO_TUNING = {
     perStatusMax: 5,
 };
 
-// The three element reactions the engine knows, for the Combo tooltip line.
+// The element reactions the engine knows (and which spell elements trigger them), for the tooltip.
 export const COMBO_REACTIONS = [
-    { key: 'melt', en: 'Melt: fire on a chilled / brittle / frostbitten enemy +35%, thaws it.', de: 'Schmelzen: Feuer auf einen verkühlten / spröden / erfrorenen Gegner +35%, taut ihn auf.' },
-    { key: 'thermal', en: 'Thermal Shock: cold on a burning enemy +25%, puts the fire out.', de: 'Temperaturschock: Kälte auf einen brennenden Gegner +25%, löscht das Feuer.' },
-    { key: 'superconduct', en: 'Superconduct: lightning on a chilled enemy +10% and Exposed.', de: 'Supraleitung: Blitz auf einen verkühlten Gegner +10% und Entblößt.' },
-    { key: 'overload', en: 'Overload: fire on shocked (or lightning on burning) enemies blasts the others for 40%.', de: 'Überlast: Feuer auf geschockte (oder Blitz auf brennende) Gegner sprengt die anderen für 40%.' },
+    { key: 'melt', elements: ['fire'], en: 'Melt: fire on a chilled / brittle / frostbitten enemy +35%, thaws it.', de: 'Schmelzen: Feuer auf einen verkühlten / spröden / erfrorenen Gegner +35%, taut ihn auf.' },
+    { key: 'thermal', elements: ['cold'], en: 'Thermal Shock: cold on a burning enemy +25%, puts the fire out.', de: 'Temperaturschock: Kälte auf einen brennenden Gegner +25%, löscht das Feuer.' },
+    { key: 'superconduct', elements: ['lightning'], en: 'Superconduct: lightning on a chilled enemy +10% and Exposed.', de: 'Supraleitung: Blitz auf einen verkühlten Gegner +10% und Entblößt.' },
+    { key: 'overload', elements: ['fire', 'lightning'], en: 'Overload: fire on shocked (or lightning on burning) enemies blasts the others for 40%.', de: 'Überlast: Feuer auf geschockte (oder Blitz auf brennende) Gegner sprengt die anderen für 40%.' },
 ];
 
 //------------------------------------------------------------------------
@@ -204,33 +204,61 @@ export function comboStatusName(key) {
     return old[key] || key;
 }
 
-// One short line per effect of a spell, for its tooltip. Empty when the spell
-// has no combo behaviour.
-export function getSpellComboLines(spellId) {
-    const row = SPELL_COMBOS[spellId];
-    if (!row) return [];
-    const de = LANG === 'de';
-    const lines = [];
-    (row.applies || []).forEach((a) => {
-        lines.push(de ? `${a.pct}% Chance: ${comboStatusName(a.key)}` : `${a.pct}% chance: ${comboStatusName(a.key)}`);
-    });
-    (row.consumes || []).forEach((c) => {
-        const verb = c.remove ? (de ? 'verbraucht' : 'consumes') : (de ? 'gegen' : 'vs');
-        lines.push(de ? `+${c.pct}% Schaden ${verb} ${comboStatusName(c.key)}` : `+${c.pct}% damage ${verb} ${comboStatusName(c.key)}`);
-    });
-    if (row.perStatus) {
-        lines.push(de ? `+${COMBO_TUNING.perStatusStepPct}% Schaden pro verschiedenem Debuff` : `+${COMBO_TUNING.perStatusStepPct}% damage per different debuff on the target`);
-    }
-    if (row.spreadOnCrit) {
-        lines.push(de ? 'Kritische Treffer verbreiten Schaden-über-Zeit-Debuffs' : 'Crits spread damage-over-time debuffs to a neighbour');
-    }
-    return lines;
-}
-
 // Tooltip text of a status chip: new debuffs explain themselves, others fall
 // back to their name.
 export function comboStatusTip(key) {
     const def = SPELL_DEBUFFS[key];
     if (!def) return '';
     return `${comboStatusName(key)}: ${LANG === 'de' ? def.tipDE : def.tipEn}`;
+}
+
+// What the old ailments do, in one line each (the new debuffs carry their own text).
+const OLD_STATUS_INFO = {
+    ignite: { en: 'burns for damage over time (5s)', de: 'brennt und erleidet Schaden über Zeit (5 s)' },
+    chill: { en: 'its attack bar fills 50% slower (8s)', de: 'seine Angriffsleiste füllt sich 50% langsamer (8 s)' },
+    frozen: { en: 'its attack bar is stopped', de: 'seine Angriffsleiste steht still' },
+    shocked: { en: 'takes +25% damage from every hit (5s)', de: 'erleidet +25% Schaden von jedem Treffer (5 s)' },
+    poison: { en: 'takes shadow damage over time (5s)', de: 'erleidet Schattenschaden über Zeit (5 s)' },
+    bleed: { en: 'takes physical damage over time (5s)', de: 'erleidet physischen Schaden über Zeit (5 s)' },
+};
+
+// "Name (8s): what it does" for any status key, name in bold.
+function _statusExplained(key) {
+    const de = LANG === 'de';
+    const def = SPELL_DEBUFFS[key];
+    if (def) return `<b>${comboStatusName(key)}</b> (${def.durationS}${de ? ' s' : 's'}): ${de ? def.tipDE : def.tipEn}`;
+    const old = OLD_STATUS_INFO[key];
+    return `<b>${comboStatusName(key)}</b>: ${old ? (de ? old.de : old.en) : ''}`;
+}
+
+// The tooltip's combo block for one spell as sections of ready-to-show lines:
+// debuffs it applies, bonus damage against debuffs, and the element reactions
+// its damage type can trigger. Empty when there is nothing to say.
+export function getSpellComboSections(spellId, element) {
+    const de = LANG === 'de';
+    const row = SPELL_COMBOS[spellId] || {};
+    const sections = [];
+    if (row.applies && row.applies.length) {
+        sections.push({
+            title: de ? 'Wendet Debuffs an' : 'Applies debuffs',
+            rows: row.applies.map((a) => `${a.pct}% ${de ? 'Chance' : 'chance'}: ${_statusExplained(a.key)}`),
+        });
+    }
+    const bonus = [];
+    (row.consumes || []).forEach((c) => {
+        const used = c.remove ? (de ? ' - wird verbraucht' : ' - used up') : '';
+        bonus.push(`+${c.pct}% ${de ? 'Schaden gegen' : 'damage vs'} ${_statusExplained(c.key)}${used}`);
+    });
+    if (row.perStatus) {
+        bonus.push(de ? `+${COMBO_TUNING.perStatusStepPct}% Schaden pro verschiedenem Debuff auf dem Ziel (max. ${COMBO_TUNING.perStatusMax})` : `+${COMBO_TUNING.perStatusStepPct}% damage for each different debuff on the target (max ${COMBO_TUNING.perStatusMax})`);
+    }
+    if (row.spreadOnCrit) {
+        bonus.push(de ? 'Kritische Treffer kopieren Brand, Gift und Blutung (halbe Stärke) auf einen Nachbarn' : 'Critical hits copy burn, poison and bleed (half strength) to a neighbouring enemy');
+    }
+    if (bonus.length) sections.push({ title: de ? 'Bonus' : 'Bonus', rows: bonus });
+    const reactions = COMBO_REACTIONS.filter((r) => r.elements.includes(element));
+    if (reactions.length) {
+        sections.push({ title: de ? 'Elementreaktionen' : 'Element reactions', rows: reactions.map((r) => (de ? r.de : r.en)) });
+    }
+    return sections;
 }
