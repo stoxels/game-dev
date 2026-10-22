@@ -1291,15 +1291,16 @@ export const CLASS_SKILL_FX = {
             { p: 'star', n: 12, motion: 'burst', colors: VIOLET, size: [5, 9], dist: [30, 100], spin: 200, dur: [500, 800] },
         ],
     },
-    // Absolute Zero: a giant ice crystal stamped with the infinity sign
-    // freezes the board while snow drifts over it.
+    // Absolute Zero: a small ice crystal stamped with the infinity sign
+    // flashes over the board and is gone in under a second, so the frozen
+    // grid stays readable.
     mathmagician_active2: {
         grid: [
-            { css: 'sfx-zero-crystal', ms: 1500 },
-            { ring: { color: '#e3f6ff', glow: '#3da9ff', size: 420, width: 5, dur: 900, at: [50, 50] } },
+            { css: 'sfx-zero-crystal', ms: 700 },
+            { ring: { color: '#e3f6ff', glow: '#3da9ff', size: 420, width: 5, dur: 700, at: [50, 50] } },
             { p: 'flake', n: 26, motion: 'fall', colors: ICE, glow: ['#7fd9ff'], size: [6, 11], dist: [60, 140], sway: [20, 50], spin: 300, atX: [0, 100], atY: [10, 100], dur: [900, 1500], delay: [0, 500] },
             { p: 'shard', n: 14, motion: 'burst', colors: ICE, glow: ['#2a8fe0'], size: [5, 9], dist: [80, 200], spin: 400, dur: [600, 900] },
-            { css: 'sfx-grid-frost', ms: 1600 },
+            { css: 'sfx-grid-frost', ms: 1000 },
         ],
         hero: [{ css: 'sfx-sigil sfx-sigil-frost', ms: 650 }],
     },
