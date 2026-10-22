@@ -259,7 +259,7 @@ const OLD_STATUS_INFO = {
 
 // Any status in one record: name, adjective, duration and the sentence that
 // says what it does (spell debuffs and old ailments alike).
-function _statusRecord(key) {
+export function getStatusRecord(key) {
     const de = LANG === 'de';
     const def = SPELL_DEBUFFS[key];
     if (def) return { name: de ? def.nameDE : def.nameEn, adj: de ? def.adjDE : def.adjEn, durationS: def.durationS, what: de ? def.tipDE : def.tipEn };
@@ -270,12 +270,12 @@ function _statusRecord(key) {
 
 // Name of an old ailment or new debuff key in the current language.
 export function comboStatusName(key) {
-    return _statusRecord(key).name;
+    return getStatusRecord(key).name;
 }
 
 // Tooltip text of a status chip on an enemy: its name and what it does.
 export function comboStatusTip(key) {
-    const rec = _statusRecord(key);
+    const rec = getStatusRecord(key);
     return SPELL_DEBUFFS[key] ? `${rec.name}: ${rec.what}` : '';
 }
 
@@ -287,7 +287,7 @@ function _forSeconds(seconds) {
 
 // One "applies" row: the chance to afflict the target, then what the debuff does.
 function _appliesRow(entry) {
-    const rec = _statusRecord(entry.key);
+    const rec = getStatusRecord(entry.key);
     const de = LANG === 'de';
     const text = de
         ? `${entry.pct}% Chance pro Treffer, das Ziel ${_forSeconds(rec.durationS)}mit <b>${rec.name}</b> zu belegen.`
@@ -297,7 +297,7 @@ function _appliesRow(entry) {
 
 // One "bonus damage" row for a spell that hits harder against a debuff.
 function _consumesRow(entry) {
-    const rec = _statusRecord(entry.key);
+    const rec = getStatusRecord(entry.key);
     const de = LANG === 'de';
     const text = de
         ? `Verursacht ${entry.pct}% mehr Schaden gegen ${rec.adj} Gegner${entry.remove ? ' und verbraucht den Effekt' : ''}.`

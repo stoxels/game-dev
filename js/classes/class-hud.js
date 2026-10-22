@@ -4,6 +4,7 @@ import { ASCENDENCY_DEFS } from './ascendency-defs.js';
 import { _formatCooldown, cooldownState, getEffectiveCooldown } from './class-cooldown-state.js';
 import { CLASS_DEFS, COMBAT_HEARTBLOOM_DEF } from './class-defs.js';
 import { _abilityCanAfford, _bloodMagicActive, _getAbilityManaCost, updateClassHUDManaBar } from './class-mana.js';
+import { getClassSkillMonsterRows } from './class-monster-effects-defs.js';
 import { _clsGetLocalizedName } from './class-ui.js';
 import { getSkillCastRankClampedForSlot } from '../skills/skill-charms.js';
 import { renderSkillHotbar } from '../skills/skill-hotbar.js';
@@ -278,6 +279,13 @@ function _getActiveCastRank(slot, trainedLevel) {
     return trainedLevel;
 }
 
+// The "what it does to monsters" lines of a class skill tooltip (empty when it
+// has none). Each row is a sentence plus a short explanation of the debuff.
+function _buildMonsterEffectHTML(skillKey, rank) {
+    return getClassSkillMonsterRows(skillKey, rank).map((r) =>
+        `<br><span style="color:#9fe7ff">${r.text}</span>` + (r.note ? `<br><span style="opacity:.6;font-size:.85em;font-style:italic">${r.note}</span>` : '')).join('');
+}
+
 // Builds the tooltip HTML for an active skill button on the compact HUD.
 // The cooldown footer reflects the effective cooldown after passive tree
 // and endgame gear reductions (see getEffectiveCooldown in class-cooldown-state.js).
@@ -290,6 +298,7 @@ function _buildActiveTooltipHTML(def, key) {
     return `<strong style="color:${HUD_COLOR_ACTIVE}">${getLocalName(skill)}</strong>`
         + ` <span style="opacity:.6;font-size:.85em">- ${_getRankWord()} ${skillLv}</span>`
         + `<br>${getLocalDesc(skillData)}`
+        + _buildMonsterEffectHTML(`${STATE.playerClass}_${key}`, skillLv)
         + `<br>${_buildTooltipCooldownLine(effCd, baseCd)}${_buildTooltipManaLine(_getAbilityManaCost(key))}`;
 }
 
@@ -316,6 +325,7 @@ function buildAscendencySkillTooltip(hudSlot) {
     return `<strong style="color:#f1c40f">${getLocalName(skill)}</strong>`
         + ` <span style="opacity:.6;font-size:.85em">- ${_getRankWord()} ${skillLv}</span>`
         + `<br>${getLocalDesc(skillData)}`
+        + _buildMonsterEffectHTML(`${STATE.playerAscendency}_${ascSlot}`, skillLv)
         + `<br>${_buildTooltipCooldownLine(effCd, baseCd)}${_buildTooltipManaLine(_getAbilityManaCost(hudSlot))}`;
 }
 

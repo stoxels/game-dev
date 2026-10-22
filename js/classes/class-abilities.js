@@ -17,6 +17,7 @@ import { CLASS_HUD_HINT_MAX_USES, buildClassHUD, updateMomentumBar } from './cla
 import { _abilityCanAfford, _bloodMagicActive, _getAbilityManaCost, payAbilityCost } from './class-mana.js';
 import { _executeStateRollback, resetMarkovianState } from './class-markovian.js';
 import { _clearTransitionMatrix, _executeTransitionMatrix, _transitionMatrixCascade } from './class-markovian-transition.js';
+import { _applyClassSkillMonsterEffects } from './class-monster-effects.js';
 import { _executeArcaneReveal } from './class-mathmagician.js';
 import { _executeArcaneFreeze } from './class-mathmagician-absolute-zero.js';
 import { _varianceShield_playCometImpact, _varianceShield_removeBubble, _varianceShield_updateVisibility } from './class-mathmagician-variance-shield.js';
@@ -295,6 +296,9 @@ function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
         try { globalThis._playAvatarSkillAnimationForSlot(activeKey); } catch (e) {}
     }
 
+    // In a fight the skill also acts on the monsters (debuffs, stagger, attack-bar rewind).
+    _applyClassSkillMonsterEffects(`${playerClass}_${activeKey}`, getSkillCastRankClampedForSlot(activeKey));
+
     if (activeKey === 'active1') {
         _dispatchBaseActive1(playerClass, row, col, effect);
     } else {
@@ -390,6 +394,8 @@ function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
     }
 
     updateQuestStats('classAbilityUsed', {});
+
+    _applyClassSkillMonsterEffects(`${ascendency}_${ascSlot}`, getSkillCastRankClampedForSlot(hudSlot));
 
     switch (ascendency) {
         case 'outlier':

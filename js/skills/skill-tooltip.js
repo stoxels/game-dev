@@ -8,6 +8,7 @@ import { canAffordSkill, getPassiveSkillDef, getPlayerTraits, getSkillCooldown, 
 import { getSkillCastTimeSeconds } from './spell-casttime.js';
 import { getUniversalSpellCastKind, getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellDef, getUniversalSpellMovementEstimate, getUniversalSpellSupportEstimate } from './universal-spells.js';
 import { getSpellComboSections } from '../combat/combat-spell-debuff-defs.js';
+import { getClassSkillMonsterRows } from '../classes/class-monster-effects-defs.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -373,12 +374,22 @@ function buildSkillTooltipHTML(skillId, charmKey) {
     return _buildSkillTooltipHTML(skillId, charmKey);
 }
 
+// What a class or ascendency skill does to monsters at a rank (rows for the tooltip).
+function _classSkillMonsterRows(skillId, rank) {
+    const def = getSkillDef(skillId);
+    const src = def && def.source;
+    if (!src || !src.ownerId || !src.slot) return [];
+    return getClassSkillMonsterRows(`${src.ownerId}_${src.slot}`, rank);
+}
+
 // The "Combo" block of a spell tooltip: which enemy debuffs it applies, which
 // bonus damage it earns against them, and the element reactions its damage type
 // can trigger (see combat-spell-debuff-defs.js). Empty for spells with none.
-function _skillTooltipCombo(skillId) {
+function _skillTooltipCombo(skillId, rank) {
     const spell = getUniversalSpellDef(skillId);
     const sections = getSpellComboSections(skillId, spell && spell.element);
+    const classRows = _classSkillMonsterRows(skillId, rank);
+    if (classRows.length) sections.push({ title: LANG === 'de' ? 'Wirkung auf Monster' : 'On monsters', rows: classRows });
     if (!sections.length) return '';
     const title = LANG === 'de' ? 'Kombos' : 'Combos';
     const intro = LANG === 'de'
@@ -417,7 +428,7 @@ function _buildSkillTooltipHTML(skillId, charmKey, previewRank) {
         + (hovered || previewRank ? '' : _skillTooltipNextRank(skillId))
         + `<div class="skl-tip-sep"></div>`
         + `<div class="skl-tip-desc">${desc}</div>`
-        + _skillTooltipCombo(skillId)
+        + _skillTooltipCombo(skillId, rank)
         + _skillTooltipDamage(def)
         + (hovered || previewRank ? '' : _skillTooltipCharmBonus(skillId))
         + _skillTooltipGating(def)

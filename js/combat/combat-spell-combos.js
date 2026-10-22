@@ -105,7 +105,7 @@ function _syncExposed(target, until) {
 }
 
 // Puts a new spell debuff on an enemy (stacks, refreshes, or pops a full stack).
-function _applySpellDebuff(target, key, ctx) {
+export function _applySpellDebuff(target, key, ctx) {
     const def = SPELL_DEBUFFS[key];
     if (!def || !target || target.currentHP <= 0 || _avoidsAilment(target)) return;
     if (!target.statuses) target.statuses = {};
