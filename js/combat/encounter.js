@@ -212,7 +212,7 @@ export function _buildMonsterCardHTML(m) {
         <!-- Emoji icon with level badge and hover tooltip -->
         <div class="sx-emoji-wrapper${m.isBoss ? ' sx-boss-emoji-wrapper' : ''}${((m.enrageStacks || 0) > 0 || m.enraged) ? ' sx-boss-enraged' : ''} ${isTarget ? 'sx-compact-targeted' : ''}">
             ${m.isBoss ? '<span class="sx-boss-crown">👑</span><span class="sx-boss-rage-fire"></span><span class="sx-boss-rage-badge">😡</span>' : ''}
-            <span class="sx-monster-emoji-compact${m.isBoss ? ' sx-boss-emoji' : ''}">${GAME_ART.html('monster', m.artId || m.baseId, m.emoji)}</span>
+            <span class="sx-monster-emoji-compact${m.isBoss ? ' sx-boss-emoji' : ''}">${GAME_ART.html('monster', m.artId || m.baseId, m.emoji, true)}</span>
             <span class="sx-level-bottom-left">${m.level}</span>
             <span class="sx-grace-badge" id="sx-grace-${m.id}" style="display:none"></span>
             ${m.gauntletTrait ? `<span class="ga-trait-badge" title="${m.gauntletTrait === 'warded' ? 'Spell Ward: takes 65% less damage from spells - melee works best' : (m.gauntletTrait === 'champion' ? 'Champion: tougher and hits harder' : 'Phased: takes 65% less damage from melee - spells work best')}">${m.gauntletTrait === 'warded' ? '🛡' : (m.gauntletTrait === 'champion' ? '👑' : '👻')}</span>` : ''}

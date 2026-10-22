@@ -225,10 +225,12 @@ export const GAME_ART = (function () {
     // HTML helper for template strings: <img> when art exists, else the emoji.
     // Images decode async and load lazily so big grids (inventory, stash,
     // essence tab) never stall the frame or fetch off-screen icons eagerly.
-    function html(kind, id, fallbackEmoji) {
+    // `eager` skips the lazy loading: combat cards are rebuilt often and can sit
+    // at the screen edge or under the grid, where a lazy image may stay empty.
+    function html(kind, id, fallbackEmoji, eager) {
         const u = url(kind, id);
         if (u) {
-            return '<img src="' + u + '" alt="" class="sx-art-img" draggable="false" loading="lazy" decoding="async">';
+            return '<img src="' + u + '" alt="" class="sx-art-img" draggable="false" loading="' + (eager ? 'eager' : 'lazy') + '" decoding="async">';
         }
         return fallbackEmoji || '';
     }

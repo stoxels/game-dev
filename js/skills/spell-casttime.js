@@ -1,6 +1,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { isSkillCharmUnlocked } from './skill-charms.js';
 import { activateSkill, canAffordSkill, getSkillCooldownRemaining, getSkillDef, getSkillName, isSkillUsableNow } from './skill-registry.js';
+import { getSpellChargeProfile, startSpellChargeFx } from './spell-charge-fx.js';
 import { endUniversalChannel, fireUniversalChannelTick, getUniversalSpellCastKind, isUniversalMovementSpell, isUniversalSupportSpell } from './universal-spells.js';
 // spell-casttime.js
 //------------------------------------------------------------------------
@@ -176,6 +177,9 @@ export function isSkillHoldCast(skillId) {
 
 // Live hold state, or null while nothing is charging.
 let _holdCast = null;
+
+// The spell's own charge visual (see spell-charge-fx.js), or null.
+let _chargeFx = null;
 
 // True while a hold-to-cast is running: the player is holding a hotbar button
 // on a cast-time spell and the cast has neither completed nor been cancelled.
@@ -462,6 +466,10 @@ function _holdCastPositionBar() {
 function _holdCastOrbEl(theme) {
     _holdCastRemoveOrb();
     const anchor = _holdCastAvatarCentre();
+    // Spells with their own charge visual (flame, ground circle, shards...) skip the plain orb.
+    if (_chargeFx) { _chargeFx.end(true); _chargeFx = null; }
+    if (_holdCast && getSpellChargeProfile(_holdCast.skillId)) _chargeFx = startSpellChargeFx(_holdCast.skillId, anchor);
+    const skipOrb = !!(_chargeFx && _chargeFx.profile.noOrb);
     const orb = document.createElement('div');
     orb.id = 'spell-charge-orb';
     orb.className = `spell-charge-orb spell-charge-orb-${theme || 'arcane'}`;
@@ -493,7 +501,7 @@ function _holdCastOrbEl(theme) {
         orb.style.left = '50%';
         orb.style.top = '40%';
     }
-    document.body.appendChild(orb);
+    if (!skipOrb) document.body.appendChild(orb);
     // Discharge gathers an overcharge shell around the caster while held
     // (not a ball): the aura-shell art at a fixed span, intensifying with
     // the hold, popping with the blast on release.
@@ -585,6 +593,7 @@ function _holdCastPaint(p, theme) {
         // A fully drawn charge glows: it is at maximum power, release any time.
         els.bar.classList.toggle('is-ready', !!_holdCast && _holdCast.mode === 'charge' && p >= 1);
         _holdCastPositionBar();
+        if (_chargeFx) _chargeFx.paint(p, _holdCastAvatarCentre());
         const orb = document.getElementById('spell-charge-orb');
         if (orb) {
             const s = 0.45 + p * 1.65;
@@ -627,6 +636,7 @@ function _holdCastHide(cancelled) {
     try {
         const bar = document.getElementById('spell-castbar');
         if (bar) bar.classList.remove('show');
+        if (_chargeFx) { _chargeFx.end(!!cancelled); _chargeFx = null; }
         const orb = document.getElementById('spell-charge-orb');
         if (orb) {
             if (!cancelled) {

@@ -97,7 +97,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_pyroblast', icon: '☄️', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'single', dmg: [19, 24], manaCost: 51, cooldownSeconds: 10, castTimeSeconds: 2.0,
+        behavior: 'single', dmg: [19, 24], manaCost: 51, cooldownSeconds: 6, castTimeSeconds: 2.0,
         tags: ['Spell', 'Fire', 'Projectile'], scalingTags: ['spell', 'fire', 'projectile'],
         nameEn: 'Magma Shot', nameDE: 'Magmageschoss',
         descEn: 'A slow, heavy molten blast. Big single-target fire damage. 35% chance to Ignite, +5% for every spell rank.',
@@ -106,7 +106,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_flamestrike', icon: '🔥', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'nova', dmg: [12, 16], manaCost: 42, cooldownSeconds: 10, castTimeSeconds: 1.2, perTarget: true,
+        behavior: 'nova', dmg: [12, 16], manaCost: 42, cooldownSeconds: 6, castTimeSeconds: 1.2, perTarget: true,
         tags: ['Spell', 'Fire', 'Area'], scalingTags: ['spell', 'fire', 'area'],
         nameEn: 'Blazing Column', nameDE: 'Flammensäule',
         descEn: 'A pillar of flame scorches every enemy.',
@@ -115,7 +115,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_immolate', icon: '🕯️', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'ticks', dmg: [4, 5], tickDmg: [2, 4], ticks: 5, scorchFireResPct: 20, manaCost: 34, cooldownSeconds: 14, castTimeSeconds: 0.8,
+        behavior: 'ticks', dmg: [4, 5], tickDmg: [2, 4], ticks: 5, scorchFireResPct: 20, manaCost: 34, cooldownSeconds: 8, castTimeSeconds: 0.8,
         tags: ['Spell', 'Fire', 'Damage over Time'], scalingTags: ['spell', 'fire', 'dot'],
         nameEn: 'Scorching Brand', nameDE: 'Sengendes Mal',
         descEn: 'Instant fire damage, then burning for 5 seconds. While burning, the enemy is Scorched: -20% Fire Resistance.',
@@ -133,7 +133,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_rain_of_fire', icon: '🎆', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 4, hitsAll: true, manaCost: 47, cooldownSeconds: 14, castTimeSeconds: 1.2,
+        behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 4, hitsAll: true, manaCost: 47, cooldownSeconds: 9, castTimeSeconds: 1.2,
         tags: ['Spell', 'Fire', 'Area', 'Damage over Time'], scalingTags: ['spell', 'fire', 'area', 'dot'],
         nameEn: 'Ember Shower', nameDE: 'Glutschauer',
         descEn: 'Embers rain on the aimed area for 4 seconds, hitting every enemy inside each second.',
@@ -142,7 +142,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_holy_fire', icon: '☀️', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'ticks', dmg: [6, 9], tickDmg: [2, 4], ticks: 3, manaCost: 34, cooldownSeconds: 14, castTimeSeconds: 0.6,
+        behavior: 'ticks', dmg: [6, 9], tickDmg: [2, 4], ticks: 3, manaCost: 34, cooldownSeconds: 8, castTimeSeconds: 0.6,
         tags: ['Spell', 'Fire', 'Damage over Time'], scalingTags: ['spell', 'fire', 'dot'],
         nameEn: 'Solar Scorch', nameDE: 'Sonnenglut',
         descEn: 'Instant fire damage, then 3 more seconds of burning.',
@@ -153,7 +153,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // ── FROST ───────────────────────────────────────────────────────────
     {
         id: 'usp_frostbolt', icon: '❄️', theme: 'frost', element: 'cold', damageKind: 'cold',
-        behavior: 'single', dmg: [8, 10], manaCost: 21, cooldownSeconds: 6, castTimeSeconds: 0.5,
+        behavior: 'single', dmg: [8, 10], manaCost: 21, cooldownSeconds: 3, castTimeSeconds: 0.5,
         tags: ['Spell', 'Cold', 'Projectile'], scalingTags: ['spell', 'cold', 'projectile'],
         nameEn: 'Frost Shard', nameDE: 'Frostsplitter',
         descEn: 'A quick shard of ice. Cheap, reliable cold damage.',
@@ -162,7 +162,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_blizzard', icon: '🌨️', theme: 'frost', element: 'cold', damageKind: 'cold',
-        behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 4, hitsAll: true, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
+        behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 4, hitsAll: true, manaCost: 47, cooldownSeconds: 12, castTimeSeconds: 1.2,
         tags: ['Spell', 'Cold', 'Area', 'Damage over Time'], scalingTags: ['spell', 'cold', 'area', 'dot'],
         nameEn: 'Whiteout', nameDE: 'Eissturm',
         descEn: 'A freezing storm rages on the aimed area for 4 seconds, hitting every enemy inside each second.',
@@ -171,7 +171,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_cone_of_cold', icon: '🧊', theme: 'frost', element: 'cold', damageKind: 'cold',
-        behavior: 'nova', dmg: [8, 12], manaCost: 36, cooldownSeconds: 16, castTimeSeconds: 0.8, perTarget: true,
+        behavior: 'nova', dmg: [8, 12], manaCost: 36, cooldownSeconds: 8, castTimeSeconds: 0.8, perTarget: true,
         tags: ['Spell', 'Cold', 'Area'], scalingTags: ['spell', 'cold', 'area'],
         nameEn: 'Glacial Breath', nameDE: 'Eisatem',
         descEn: 'Freezing wind in a cone toward the cursor. Hits every enemy inside.',
@@ -180,7 +180,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_ice_lance', icon: '💎', theme: 'frost', element: 'cold', damageKind: 'cold',
-        behavior: 'single', dmg: [9, 11], manaCost: 21, cooldownSeconds: 6, castTimeSeconds: 0.6,
+        behavior: 'single', dmg: [9, 11], manaCost: 21, cooldownSeconds: 3, castTimeSeconds: 0.6,
         tags: ['Spell', 'Cold', 'Projectile'], scalingTags: ['spell', 'cold', 'projectile'],
         nameEn: 'Rime Needle', nameDE: 'Reifnadel',
         descEn: 'A needle of ice at the target. The fastest spell.',
@@ -200,7 +200,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_arcane_explosion', icon: '💫', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
-        behavior: 'nova', dmg: [9, 13], manaCost: 39, cooldownSeconds: 16, castTimeSeconds: 0.8, perTarget: true,
+        behavior: 'nova', dmg: [9, 13], manaCost: 39, cooldownSeconds: 8, castTimeSeconds: 0.8, perTarget: true,
         tags: ['Spell', 'Arcane', 'Area'], scalingTags: ['spell', 'arcane', 'area'],
         nameEn: 'Mana Burst', nameDE: 'Manaschub',
         descEn: 'Arcane energy detonates around you and hits every enemy.',
@@ -209,7 +209,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_arcane_blast', icon: '🔮', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
-        behavior: 'single', dmg: [15, 19], manaCost: 42, cooldownSeconds: 14, castTimeSeconds: 1.2,
+        behavior: 'single', dmg: [15, 19], manaCost: 42, cooldownSeconds: 7, castTimeSeconds: 1.2,
         tags: ['Spell', 'Arcane', 'Projectile'], scalingTags: ['spell', 'arcane', 'projectile'],
         nameEn: 'Force Pulse', nameDE: 'Kraftstoß',
         descEn: 'A concentrated blast of arcane force. Heavy single-target damage.',
@@ -229,7 +229,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // ── SHADOW ──────────────────────────────────────────────────────────
     {
         id: 'usp_shadow_bolt', icon: '💜', theme: 'shadow', element: 'shadow', damageKind: 'shadow',
-        behavior: 'single', dmg: [10, 12], manaCost: 23, cooldownSeconds: 7, castTimeSeconds: 0.6,
+        behavior: 'single', dmg: [10, 12], manaCost: 23, cooldownSeconds: 3, castTimeSeconds: 0.6,
         tags: ['Spell', 'Shadow', 'Projectile'], scalingTags: ['spell', 'shadow', 'projectile'],
         nameEn: 'Gloom Bolt', nameDE: 'Düsterblitz',
         descEn: 'A bolt of darkness. Solid shadow damage for modest mana.',
@@ -238,7 +238,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_corruption', icon: '☠️', theme: 'shadow', element: 'shadow', damageKind: 'shadow',
-        behavior: 'ticks', dmg: [3, 4], tickDmg: [2, 4], ticks: 6, manaCost: 34, cooldownSeconds: 14, castTimeSeconds: 0.8,
+        behavior: 'ticks', dmg: [3, 4], tickDmg: [2, 4], ticks: 6, manaCost: 34, cooldownSeconds: 8, castTimeSeconds: 0.8,
         tags: ['Spell', 'Shadow', 'Damage over Time'], scalingTags: ['spell', 'shadow', 'dot'],
         nameEn: 'Withering Curse', nameDE: 'Welkfluch',
         descEn: 'Shadow damage over 6 seconds.',
@@ -247,7 +247,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_shadow_word_pain', icon: '🖤', theme: 'shadow', element: 'shadow', damageKind: 'shadow',
-        behavior: 'ticks', dmg: [5, 6], tickDmg: [3, 5], ticks: 4, manaCost: 36, cooldownSeconds: 16, castTimeSeconds: 0.8,
+        behavior: 'ticks', dmg: [5, 6], tickDmg: [3, 5], ticks: 4, manaCost: 36, cooldownSeconds: 8, castTimeSeconds: 0.8,
         tags: ['Spell', 'Shadow', 'Damage over Time'], scalingTags: ['spell', 'shadow', 'dot'],
         nameEn: 'Torment', nameDE: 'Qual',
         descEn: 'Instant shadow damage, then 4 seconds of lingering pain.',
@@ -256,7 +256,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_chaos_bolt', icon: '🟣', theme: 'shadow', element: 'shadow', damageKind: 'shadow',
-        behavior: 'single', dmg: [20, 27], manaCost: 55, cooldownSeconds: 24, castTimeSeconds: 2.2,
+        behavior: 'single', dmg: [20, 27], manaCost: 55, cooldownSeconds: 12, castTimeSeconds: 2.2,
         tags: ['Spell', 'Shadow', 'Projectile'], scalingTags: ['spell', 'shadow', 'projectile'],
         nameEn: 'Ruin Bolt', nameDE: 'Ruinblitz',
         descEn: 'A cataclysmic bolt. The hardest-hitting single-target spell.',
@@ -276,7 +276,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // ── LIGHTNING ──────────────────────────────────────────────────────────
     {
         id: 'usp_lightning_bolt', icon: '⚡', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'single', dmg: [11, 13], manaCost: 26, cooldownSeconds: 8, castTimeSeconds: 0.6,
+        behavior: 'single', dmg: [11, 13], manaCost: 26, cooldownSeconds: 4, castTimeSeconds: 0.6,
         tags: ['Spell', 'Lightning', 'Projectile'], scalingTags: ['spell', 'lightning', 'projectile'],
         nameEn: 'Lightning Bolt', nameDE: 'Blitzschlag',
         descEn: 'A fast, fierce bolt of lightning.',
@@ -285,7 +285,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_chain_lightning', icon: '🌩️', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'chain', dmg: [13, 17], chainFalloff: 0.72, chainMax: 3, manaCost: 44, cooldownSeconds: 18, castTimeSeconds: 1.0,
+        behavior: 'chain', dmg: [13, 17], chainFalloff: 0.72, chainMax: 3, manaCost: 44, cooldownSeconds: 9, castTimeSeconds: 1.0,
         tags: ['Spell', 'Lightning', 'Chaining'], scalingTags: ['spell', 'lightning', 'chain'],
         nameEn: 'Chain Lightning', nameDE: 'Kettenblitz',
         descEn: 'Leaps from the target to up to 2 more enemies, weakening with each jump.',
@@ -294,7 +294,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_wrath', icon: '🍃', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'single', dmg: [10, 12], manaCost: 23, cooldownSeconds: 7, castTimeSeconds: 0.5,
+        behavior: 'single', dmg: [10, 12], manaCost: 23, cooldownSeconds: 3, castTimeSeconds: 0.5,
         tags: ['Spell', 'Lightning', 'Projectile'], scalingTags: ['spell', 'lightning', 'projectile'],
         nameEn: 'Storm Lash', nameDE: 'Sturmpeitsche',
         descEn: 'A lash of storm energy. Lightning damage for modest mana.',
@@ -303,7 +303,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_starfall', icon: '🌟', theme: 'arcane', element: 'fire', damageKind: 'shadow',
-        behavior: 'starfall', dmg: [3, 5], count: 6, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
+        behavior: 'starfall', dmg: [3, 5], count: 6, manaCost: 47, cooldownSeconds: 12, castTimeSeconds: 1.2,
         tags: ['Spell', 'Arcane', 'Area'], scalingTags: ['spell', 'arcane', 'area'],
         nameEn: 'Star Shower', nameDE: 'Sternenregen',
         descEn: '6 burning star shards crash onto random enemies.',
@@ -312,7 +312,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_smite', icon: '🌦️', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'single', dmg: [9, 12], manaCost: 23, cooldownSeconds: 7, castTimeSeconds: 0.5,
+        behavior: 'single', dmg: [9, 12], manaCost: 23, cooldownSeconds: 3, castTimeSeconds: 0.5,
         tags: ['Spell', 'Lightning', 'Projectile'], scalingTags: ['spell', 'lightning', 'projectile'],
         nameEn: 'Storm Smite', nameDE: 'Sturmschlag',
         descEn: 'A bolt from the sky strikes the target. Reliable lightning damage.',
@@ -334,7 +334,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_mortal_strike', icon: '⚔️', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'single', dmg: [17, 23], manaCost: 49, cooldownSeconds: 10, castTimeSeconds: 1.4,
+        behavior: 'single', dmg: [17, 23], manaCost: 49, cooldownSeconds: 7, castTimeSeconds: 1.4,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Fatal Blow', nameDE: 'Fataler Hieb',
         descEn: 'Instant heavy blow in front of you. Heavy physical damage.',
@@ -343,7 +343,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_whirlwind', icon: '🌪️', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'nova', dmg: [5, 9], manaCost: 42, cooldownSeconds: 9, castTimeSeconds: 0.8, perTarget: true,
+        behavior: 'nova', dmg: [5, 9], manaCost: 42, cooldownSeconds: 6, castTimeSeconds: 0.8, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Whirlwind', nameDE: 'Wirbelwind',
         descEn: 'Spin and slash every enemy in reach.',
@@ -352,7 +352,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_rend', icon: '✂️', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'ticks', dmg: [3, 4], tickDmg: [2, 4], ticks: 5, manaCost: 31, cooldownSeconds: 7, castTimeSeconds: 0.7,
+        behavior: 'ticks', dmg: [3, 4], tickDmg: [2, 4], ticks: 5, manaCost: 31, cooldownSeconds: 5, castTimeSeconds: 0.7,
         tags: ['Spell', 'Physical', 'Damage over Time'], scalingTags: ['spell', 'physical', 'dot'],
         nameEn: 'Gash', nameDE: 'Aufschlitzen',
         descEn: 'Instant damage, then bleeding for 5 seconds.',
@@ -361,7 +361,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_execute', icon: '💀', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'single', dmg: [20, 27], manaCost: 53, cooldownSeconds: 12, castTimeSeconds: 1.8,
+        behavior: 'single', dmg: [20, 27], manaCost: 53, cooldownSeconds: 8, castTimeSeconds: 1.8,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Finishing Blow', nameDE: 'Gnadenstoß',
         descEn: 'Instant strike in front of you. The hardest-hitting physical attack.',
@@ -370,7 +370,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_cleave', icon: '🪓', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'nova', dmg: [5, 8], manaCost: 36, cooldownSeconds: 8, castTimeSeconds: 0.8, perTarget: true,
+        behavior: 'nova', dmg: [5, 8], manaCost: 36, cooldownSeconds: 5, castTimeSeconds: 0.8, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Cleave', nameDE: 'Spalten',
         descEn: 'A wide arc that hits every enemy inside it. Instant.',
@@ -385,7 +385,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // restored when the swing connects).
     {
         id: 'usp_crushing_blow', icon: '🔨', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'single', dmg: [15, 19], manaCost: 38, cooldownSeconds: 9, castTimeSeconds: 0.8,
+        behavior: 'single', dmg: [15, 19], manaCost: 38, cooldownSeconds: 6, castTimeSeconds: 0.8,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Crushing Blow', nameDE: 'Vernichtender Schlag',
         descEn: 'A heavy hammer blow. Staggers the victim for 1.5 seconds.',
@@ -394,7 +394,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_blade_flurry', icon: '💫', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'single', dmg: [3, 4], manaCost: 33, cooldownSeconds: 8, castTimeSeconds: 0,
+        behavior: 'single', dmg: [3, 4], manaCost: 33, cooldownSeconds: 5, castTimeSeconds: 0,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Rapid Cuts', nameDE: 'Schnittsalve',
         descEn: 'Hits whatever is in front of you 4 times. Instant.',
@@ -403,7 +403,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_piercing_lunge', icon: '🗡️', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'single', dmg: [11, 14], manaCost: 30, cooldownSeconds: 7, castTimeSeconds: 0,
+        behavior: 'single', dmg: [11, 14], manaCost: 30, cooldownSeconds: 5, castTimeSeconds: 0,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Piercing Lunge', nameDE: 'Durchbohrender Ausfall',
         descEn: 'A long, narrow thrust that skewers every enemy in the line. Instant.',
@@ -412,7 +412,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_seismic_slam', icon: '🌍', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'nova', dmg: [6, 9], manaCost: 40, cooldownSeconds: 13, castTimeSeconds: 1.0, perTarget: true,
+        behavior: 'nova', dmg: [6, 9], manaCost: 40, cooldownSeconds: 8, castTimeSeconds: 1.0, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Seismic Slam', nameDE: 'Erdbebenschlag',
         descEn: 'Smashes the ground: hits every enemy in reach and staggers them for 1.2 seconds.',
@@ -421,7 +421,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_vampiric_strike', icon: '🧛', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'single', dmg: [10, 13], manaCost: 31, cooldownSeconds: 10, castTimeSeconds: 0,
+        behavior: 'single', dmg: [10, 13], manaCost: 31, cooldownSeconds: 7, castTimeSeconds: 0,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Vampiric Strike', nameDE: 'Vampirhieb',
         descEn: 'Strike in front of you; restores 6% of max life on hit. Instant.',
@@ -443,7 +443,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_blade_dance', icon: '💃', theme: 'blade', element: 'physical', damageKind: 'physical', reaction: 'parry',
-        behavior: 'nova', dmg: [4, 6], manaCost: 28, cooldownSeconds: 6, castTimeSeconds: 0, perTarget: true,
+        behavior: 'nova', dmg: [4, 6], manaCost: 28, cooldownSeconds: 4, castTimeSeconds: 0, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Dance of Blades', nameDE: 'Klingentanz',
         descEn: 'REACTION (5s after a PARRY): spin and slash every enemy in reach 3 times.',
@@ -461,7 +461,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_bastion_burst', icon: '🏰', theme: 'blade', element: 'physical', damageKind: 'physical', reaction: 'block',
-        behavior: 'nova', dmg: [8, 11], manaCost: 28, cooldownSeconds: 6, castTimeSeconds: 0, perTarget: true,
+        behavior: 'nova', dmg: [8, 11], manaCost: 28, cooldownSeconds: 4, castTimeSeconds: 0, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Bastion Burst', nameDE: 'Bastionswelle',
         descEn: 'REACTION (5s after a BLOCK): shockwave hits every enemy in reach and staggers for 1.2 seconds.',
@@ -479,7 +479,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_flicker_slash', icon: '🌗', theme: 'blade', element: 'physical', damageKind: 'physical', reaction: 'dodge',
-        behavior: 'nova', dmg: [3, 5], manaCost: 24, cooldownSeconds: 5, castTimeSeconds: 0, perTarget: true,
+        behavior: 'nova', dmg: [3, 5], manaCost: 24, cooldownSeconds: 4, castTimeSeconds: 0, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Flicker Slash', nameDE: 'Flackerschnitt',
         descEn: 'REACTION (4s after a DODGE): slashes every enemy in front of you 3 times.',
@@ -490,7 +490,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // ── ARROWS (ranger shots - arrow-flight visuals) ────────────────────
     {
         id: 'usp_aimed_shot', icon: '🎯', theme: 'arrow', element: 'physical', damageKind: 'physical',
-        behavior: 'single', dmg: [19, 24], manaCost: 51, cooldownSeconds: 22, castTimeSeconds: 2.0,
+        behavior: 'single', dmg: [19, 24], manaCost: 51, cooldownSeconds: 11, castTimeSeconds: 2.0,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Deadeye Shot', nameDE: 'Meisterschuss',
         descEn: 'A perfectly aimed arrow. Massive single-target physical damage.',
@@ -499,7 +499,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_multi_shot', icon: '🏹', theme: 'arrow', element: 'physical', damageKind: 'physical',
-        behavior: 'nova', dmg: [8, 12], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0, perTarget: true,
+        behavior: 'nova', dmg: [8, 12], manaCost: 42, cooldownSeconds: 9, castTimeSeconds: 1.0, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area', 'projectile'],
         nameEn: 'Arrow Fan', nameDE: 'Pfeilfächer',
         descEn: 'A fan of arrows toward the cursor hits every enemy inside the cone.',
@@ -508,7 +508,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_barrage', icon: '➶', theme: 'arrow', element: 'physical', damageKind: 'physical',
-        behavior: 'volley', dmg: [3, 5], count: 5, manaCost: 39, cooldownSeconds: 16, castTimeSeconds: 1.0,
+        behavior: 'volley', dmg: [3, 5], count: 5, manaCost: 39, cooldownSeconds: 8, castTimeSeconds: 1.0,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Arrow Burst', nameDE: 'Pfeilsalve',
         descEn: '5 arrows in rapid succession at the target.',
@@ -517,7 +517,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_arrow_volley', icon: '🌧️', theme: 'arrow', element: 'physical', damageKind: 'physical',
-        behavior: 'ticks', dmg: [3, 5], tickDmg: [4, 6], ticks: 4, hitsAll: true, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
+        behavior: 'ticks', dmg: [3, 5], tickDmg: [4, 6], ticks: 4, hitsAll: true, manaCost: 47, cooldownSeconds: 12, castTimeSeconds: 1.2,
         tags: ['Spell', 'Physical', 'Area', 'Damage over Time'], scalingTags: ['spell', 'physical', 'area', 'dot'],
         nameEn: 'Skyfall Arrows', nameDE: 'Himmelspfeile',
         descEn: 'Arrows fall on the aimed square for 4 seconds, hitting every enemy inside each second.',
@@ -526,7 +526,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_serpent_sting', icon: '🧪', theme: 'arrow', element: 'lightning', damageKind: 'lightning',
-        behavior: 'ticks', dmg: [4, 5], tickDmg: [2, 4], ticks: 4, manaCost: 34, cooldownSeconds: 14, castTimeSeconds: 0.7,
+        behavior: 'ticks', dmg: [4, 5], tickDmg: [2, 4], ticks: 4, manaCost: 34, cooldownSeconds: 8, castTimeSeconds: 0.7,
         tags: ['Spell', 'Lightning', 'Damage over Time'], scalingTags: ['spell', 'lightning', 'dot', 'projectile'],
         nameEn: 'Poison Arrow', nameDE: 'Giftpfeil',
         descEn: 'Instant lightning damage, then poison for 4 seconds.',
@@ -535,7 +535,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_explosive_shot', icon: '🧨', theme: 'arrow', element: 'fire', damageKind: 'fire',
-        behavior: 'single', dmg: [20, 27], manaCost: 53, cooldownSeconds: 24, castTimeSeconds: 1.6,
+        behavior: 'single', dmg: [20, 27], manaCost: 53, cooldownSeconds: 12, castTimeSeconds: 1.6,
         tags: ['Spell', 'Fire', 'Projectile'], scalingTags: ['spell', 'fire', 'projectile'],
         nameEn: 'Bomb Arrow', nameDE: 'Bombenpfeil',
         descEn: 'An arrow with a bomb: massive fire damage on impact.',
@@ -546,7 +546,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // ── FIRE SCHOOL ─────────────────────────────────────────────
     {
         id: 'usp_firestorm', icon: '🌋', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 5, hitsAll: true, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
+        behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 5, hitsAll: true, manaCost: 47, cooldownSeconds: 12, castTimeSeconds: 1.2,
         tags: ['Spell', 'Fire', 'Area', 'Damage over Time'], scalingTags: ['spell', 'fire', 'area', 'dot'],
         nameEn: 'Inferno Swirl', nameDE: 'Feuerwirbel',
         descEn: 'A fire whirlwind burns the aimed area for 5 seconds, hitting every enemy inside each second.',
@@ -555,7 +555,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_flameblast', icon: '💣', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'delayed', dmg: [12, 16], delayMs: 350, hitsAll: true, manaCost: 49, cooldownSeconds: 22, castTimeSeconds: 1.4,
+        behavior: 'delayed', dmg: [12, 16], delayMs: 350, hitsAll: true, manaCost: 49, cooldownSeconds: 12, castTimeSeconds: 1.4,
         tags: ['Spell', 'Fire', 'Area'], scalingTags: ['spell', 'fire', 'area'],
         nameEn: 'Pyre Blast', nameDE: 'Feuersbrunst',
         descEn: 'Charges a blast that detonates on every enemy after a delay.',
@@ -575,7 +575,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // ── COLD SCHOOL ─────────────────────────────────────────────
     {
         id: 'usp_freezing_pulse', icon: '🌊', theme: 'frost', element: 'cold', damageKind: 'cold',
-        behavior: 'volley', dmg: [4, 5], count: 3, manaCost: 29, cooldownSeconds: 11, castTimeSeconds: 0.6,
+        behavior: 'volley', dmg: [4, 5], count: 3, manaCost: 29, cooldownSeconds: 6, castTimeSeconds: 0.6,
         tags: ['Spell', 'Cold', 'Projectile'], scalingTags: ['spell', 'cold', 'projectile'],
         nameEn: 'Chill Wave', nameDE: 'Kältewelle',
         descEn: '3 pulses of cold hit the target.',
@@ -584,7 +584,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_ice_spear', icon: '🔱', theme: 'frost', element: 'cold', damageKind: 'cold',
-        behavior: 'single', dmg: [16, 20], manaCost: 44, cooldownSeconds: 16, castTimeSeconds: 1.4,
+        behavior: 'single', dmg: [16, 20], manaCost: 44, cooldownSeconds: 8, castTimeSeconds: 1.4,
         tags: ['Spell', 'Cold', 'Projectile'], scalingTags: ['spell', 'cold', 'projectile'],
         nameEn: 'Hoarfrost Javelin', nameDE: 'Reifspeer',
         descEn: 'A huge, precise ice shard. Devastating single-target cold damage.',
@@ -602,7 +602,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_cold_snap', icon: '🥶', theme: 'frost', element: 'cold', damageKind: 'cold',
-        behavior: 'nova', dmg: [9, 13], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0, perTarget: true,
+        behavior: 'nova', dmg: [9, 13], manaCost: 42, cooldownSeconds: 9, castTimeSeconds: 1.0, perTarget: true,
         tags: ['Spell', 'Cold', 'Area'], scalingTags: ['spell', 'cold', 'area'],
         nameEn: 'Glacial Crack', nameDE: 'Eisbruch',
         descEn: 'A burst of absolute cold hits every enemy.',
@@ -613,7 +613,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // ── LIGHTNING SCHOOL ────────────────────────────────────────
     {
         id: 'usp_spark', icon: '🎇', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'wild', dmg: [3, 5], count: 6, volleyDelayMs: 150, manaCost: 42, cooldownSeconds: 16, castTimeSeconds: 1.0,
+        behavior: 'wild', dmg: [3, 5], count: 6, volleyDelayMs: 150, manaCost: 42, cooldownSeconds: 8, castTimeSeconds: 1.0,
         tags: ['Spell', 'Lightning', 'Projectile'], scalingTags: ['spell', 'lightning', 'projectile'],
         nameEn: 'Stray Sparks', nameDE: 'Streufunken',
         descEn: '6 sparks bounce into random enemies.',
@@ -622,7 +622,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_arc', icon: '🔗', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'chain', dmg: [10, 13], chainFalloff: 0.8, chainMax: 5, manaCost: 47, cooldownSeconds: 20, castTimeSeconds: 1.2,
+        behavior: 'chain', dmg: [10, 13], chainFalloff: 0.8, chainMax: 5, manaCost: 47, cooldownSeconds: 10, castTimeSeconds: 1.2,
         tags: ['Spell', 'Lightning', 'Chaining'], scalingTags: ['spell', 'lightning', 'chain'],
         nameEn: 'Jolt Chain', nameDE: 'Zuckkette',
         descEn: 'Lightning chains across up to 5 enemies, barely weakening.',
@@ -631,7 +631,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_storm_call', icon: '⛈️', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'delayed', dmg: [12, 16], delayMs: 1000, hitsAll: true, manaCost: 47, cooldownSeconds: 20, castTimeSeconds: 1.2,
+        behavior: 'delayed', dmg: [12, 16], delayMs: 1000, hitsAll: true, manaCost: 47, cooldownSeconds: 11, castTimeSeconds: 1.2,
         tags: ['Spell', 'Lightning', 'Area'], scalingTags: ['spell', 'lightning', 'area'],
         nameEn: 'Thunder Mark', nameDE: 'Donnermal',
         descEn: 'Marks every enemy; lightning strikes them all after a delay.',
@@ -640,7 +640,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_ball_lightning', icon: '🔵', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'single', dmg: [12, 20], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0,
+        behavior: 'single', dmg: [12, 20], manaCost: 42, cooldownSeconds: 9, castTimeSeconds: 1.0,
         tags: ['Spell', 'Lightning', 'Projectile'], scalingTags: ['spell', 'lightning', 'projectile'],
         nameEn: 'Storm Sphere', nameDE: 'Sturmkugel',
         descEn: 'A slow ball of lightning drifts onto the target. 25% chance to Shock. Faster with Projectile Speed.',
@@ -649,7 +649,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_crackling_lance', icon: '🦯', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'single', dmg: [15, 19], manaCost: 42, cooldownSeconds: 14, castTimeSeconds: 1.2,
+        behavior: 'single', dmg: [15, 19], manaCost: 42, cooldownSeconds: 7, castTimeSeconds: 1.2,
         tags: ['Spell', 'Lightning', 'Projectile'], scalingTags: ['spell', 'lightning', 'projectile'],
         nameEn: 'Voltage Spear', nameDE: 'Voltspeer',
         descEn: 'A piercing lance along a line to the cursor. Heavy lightning damage to every enemy on it.',
@@ -667,7 +667,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_discharge', icon: '💥', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'nova', dmg: [14, 18], manaCost: 48, cooldownSeconds: 24, castTimeSeconds: 1.6, perTarget: true,
+        behavior: 'nova', dmg: [14, 18], manaCost: 48, cooldownSeconds: 12, castTimeSeconds: 1.6, perTarget: true,
         tags: ['Spell', 'Lightning', 'Area'], scalingTags: ['spell', 'lightning', 'area'],
         nameEn: 'Surge Release', nameDE: 'Stromstoß',
         descEn: 'Releases all stored power in one blast on every enemy.',
@@ -678,7 +678,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // ── SHADOW & CHAOS SCHOOL ───────────────────────────────────
     {
         id: 'usp_contagion', icon: '🤢', theme: 'shadow', element: 'shadow', damageKind: 'shadow',
-        behavior: 'ticks', dmg: [3, 4], tickDmg: [2, 4], ticks: 5, hitsAll: true, manaCost: 42, cooldownSeconds: 20, castTimeSeconds: 0.9,
+        behavior: 'ticks', dmg: [3, 4], tickDmg: [2, 4], ticks: 5, hitsAll: true, manaCost: 42, cooldownSeconds: 11, castTimeSeconds: 0.9,
         tags: ['Spell', 'Shadow', 'Area', 'Damage over Time'], scalingTags: ['spell', 'shadow', 'area', 'dot'],
         nameEn: 'Plague Seed', nameDE: 'Seuchensaat',
         descEn: 'A plague spreads to every enemy and festers for 5 seconds.',
@@ -687,7 +687,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_bane', icon: '🌑', theme: 'shadow', element: 'shadow', damageKind: 'shadow',
-        behavior: 'nova', dmg: [10, 14], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0, perTarget: true,
+        behavior: 'nova', dmg: [10, 14], manaCost: 42, cooldownSeconds: 9, castTimeSeconds: 1.0, perTarget: true,
         tags: ['Spell', 'Shadow', 'Area'], scalingTags: ['spell', 'shadow', 'area'],
         nameEn: 'Dread Wave', nameDE: 'Schreckenswelle',
         descEn: 'A wave of dread hits every enemy.',
@@ -705,7 +705,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_blight', icon: '☣️', theme: 'shadow', element: 'shadow', damageKind: 'shadow',
-        behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 3, hitsAll: true, manaCost: 44, cooldownSeconds: 20, castTimeSeconds: 0.8,
+        behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 3, hitsAll: true, manaCost: 44, cooldownSeconds: 11, castTimeSeconds: 0.8,
         tags: ['Spell', 'Shadow', 'Area', 'Damage over Time'], scalingTags: ['spell', 'shadow', 'area', 'dot'],
         nameEn: 'Rot Cloud', nameDE: 'Fäulniswolke',
         descEn: 'Rotting decay eats every enemy for 3 seconds.',
@@ -716,7 +716,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // ── BLOOD & BLADES SCHOOL ───────────────────────────────────
     {
         id: 'usp_exsanguinate', icon: '🩸', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'single', dmg: [15, 19], manaCost: 42, cooldownSeconds: 8, castTimeSeconds: 1.2,
+        behavior: 'single', dmg: [15, 19], manaCost: 42, cooldownSeconds: 5, castTimeSeconds: 1.2,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Blood Cascade', nameDE: 'Blutkaskade',
         descEn: 'Rips blood from whatever is in melee range. A physical SPELL, not a strike.',
@@ -725,7 +725,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_reap', icon: '🌾', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'nova', dmg: [7, 9], manaCost: 42, cooldownSeconds: 9, castTimeSeconds: 1.0, perTarget: true,
+        behavior: 'nova', dmg: [7, 9], manaCost: 42, cooldownSeconds: 6, castTimeSeconds: 1.0, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Spectral Scythe', nameDE: 'Geistersense',
         descEn: 'A spectral scythe sweeps a wide arc and hits every enemy in it.',
@@ -734,7 +734,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_ethereal_knives', icon: '🔪', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'volley', dmg: [3, 5], count: 5, manaCost: 39, cooldownSeconds: 16, castTimeSeconds: 1.0,
+        behavior: 'volley', dmg: [3, 5], count: 5, manaCost: 39, cooldownSeconds: 8, castTimeSeconds: 1.0,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Spirit Daggers', nameDE: 'Geisterdolche',
         descEn: '5 spirit daggers slice through the target.',
@@ -743,7 +743,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_bladefall', icon: '🗡️', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'starfall', dmg: [3, 5], count: 6, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
+        behavior: 'starfall', dmg: [3, 5], count: 6, manaCost: 47, cooldownSeconds: 12, castTimeSeconds: 1.2,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Blade Downpour', nameDE: 'Klingenschauer',
         descEn: 'Aim a square: 6 blades rain onto the enemies inside.',
@@ -761,7 +761,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_blade_blast', icon: '✴️', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'delayed', dmg: [19, 24], delayMs: 800, manaCost: 51, cooldownSeconds: 22, castTimeSeconds: 1.6,
+        behavior: 'delayed', dmg: [19, 24], delayMs: 800, manaCost: 51, cooldownSeconds: 12, castTimeSeconds: 1.6,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Detonating Blade', nameDE: 'Sprengklinge',
         descEn: 'A bomb-lashed blade sticks in the aimed spot and detonates after a delay, hitting every enemy in the square.',
@@ -777,7 +777,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // casting (and to be castable at all).
     {
         id: 'usp_mend_wounds', icon: '🩹', theme: 'holy', element: 'fire', damageKind: 'holy',
-        behavior: 'heal', selfCast: true, manaCost: 26, cooldownSeconds: 25,
+        behavior: 'heal', selfCast: true, manaCost: 26, cooldownSeconds: 15,
         healFlat: 28, healPct: 10,
         tags: ['Spell', 'Holy', 'Support', 'Heal'], scalingTags: ['spell', 'holy', 'support', 'heal'],
         nameEn: 'Mend Wounds', nameDE: 'Wunden schließen',
@@ -787,7 +787,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_renewal', icon: '🌿', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'hot', selfCast: true, manaCost: 22, cooldownSeconds: 22,
+        behavior: 'hot', selfCast: true, manaCost: 22, cooldownSeconds: 14,
         healTickFlat: 6, healTickPct: 2, ticks: 6, tickMs: 1000,
         tags: ['Spell', 'Lightning', 'Support', 'Heal over Time'], scalingTags: ['spell', 'lightning', 'support', 'heal'],
         nameEn: 'Verdant Bloom', nameDE: 'Blütenheilung',
@@ -797,7 +797,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_barrier', icon: '🔷', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
-        behavior: 'shield', selfCast: true, manaCost: 31, cooldownSeconds: 28,
+        behavior: 'shield', selfCast: true, manaCost: 31, cooldownSeconds: 16,
         absorbFlat: 26, absorbPct: 45,
         tags: ['Spell', 'Arcane', 'Support', 'Shield'], scalingTags: ['spell', 'arcane', 'support', 'shield'],
         nameEn: 'Barrier', nameDE: 'Barriere',
@@ -807,7 +807,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_bulwark', icon: '🛡️', theme: 'holy', element: 'fire', damageKind: 'holy',
-        behavior: 'guard', selfCast: true, manaCost: 26, cooldownSeconds: 30, buffSeconds: 8,
+        behavior: 'guard', selfCast: true, manaCost: 26, cooldownSeconds: 20, buffSeconds: 8,
         drPct: 18, drPctPerRank: 1.5, drPctCap: 32,
         armourPct: 40, armourPctPerRank: 4, armourPctCap: 76,
         tags: ['Spell', 'Holy', 'Support', 'Buff'], scalingTags: ['spell', 'holy', 'support'],
@@ -818,7 +818,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_windward', icon: '💨', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'evade', selfCast: true, manaCost: 22, cooldownSeconds: 28, buffSeconds: 8,
+        behavior: 'evade', selfCast: true, manaCost: 22, cooldownSeconds: 18, buffSeconds: 8,
         dodgePct: 12, dodgePctPerRank: 1, dodgePctCap: 21,
         tags: ['Spell', 'Lightning', 'Support', 'Buff'], scalingTags: ['spell', 'lightning', 'support'],
         nameEn: 'Windward', nameDE: 'Windwärts',
@@ -828,7 +828,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_aegis_ward', icon: '✨', theme: 'holy', element: 'fire', damageKind: 'holy',
-        behavior: 'ward', selfCast: true, manaCost: 38, cooldownSeconds: 40, buffSeconds: 12,
+        behavior: 'ward', selfCast: true, manaCost: 38, cooldownSeconds: 28, buffSeconds: 12,
         wardCharges: 2, wardChargesPerRank: 0.34, wardChargesCap: 5,
         tags: ['Spell', 'Holy', 'Support', 'Buff'], scalingTags: ['spell', 'holy', 'support'],
         nameEn: 'Aegis Ward', nameDE: 'Ägis-Schutz',
@@ -838,7 +838,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_retribution', icon: '🔥', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'thorns', selfCast: true, manaCost: 29, cooldownSeconds: 32, buffSeconds: 10,
+        behavior: 'thorns', selfCast: true, manaCost: 29, cooldownSeconds: 22, buffSeconds: 10,
         thornsPct: 25, thornsPctPerRank: 3, thornsPctCap: 52,
         tags: ['Spell', 'Fire', 'Support', 'Buff'], scalingTags: ['spell', 'fire', 'support'],
         nameEn: 'Reprisal Flame', nameDE: 'Racheflamme',
@@ -852,7 +852,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // was within reach of the charm rank (see USP_CLEANSE_MAX_LEVEL_BY_RANK).
     {
         id: 'usp_staunch', icon: '🩸', theme: 'holy', element: 'fire', damageKind: 'holy',
-        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 10,
+        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 6,
         cleanses: ['bleed'], cleanseNameEn: 'Bleeding', cleanseNameDe: 'Blutung',
         tags: ['Spell', 'Holy', 'Support', 'Cleanse'], scalingTags: ['spell', 'holy', 'support'],
         nameEn: 'Staunch', nameDE: 'Blutstillung',
@@ -862,7 +862,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_antidote', icon: '🧪', theme: 'shadow', element: 'shadow', damageKind: 'shadow',
-        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 10,
+        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 6,
         cleanses: ['poison'], cleanseNameEn: 'Poison', cleanseNameDe: 'Gift',
         tags: ['Spell', 'Holy', 'Support', 'Cleanse'], scalingTags: ['spell', 'holy', 'support'],
         nameEn: 'Antidote', nameDE: 'Gegengift',
@@ -872,7 +872,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_quench', icon: '💧', theme: 'frost', element: 'cold', damageKind: 'cold',
-        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 10,
+        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 6,
         cleanses: ['ignite', 'shadowburn'], cleanseNameEn: 'Burning', cleanseNameDe: 'Brennen',
         tags: ['Spell', 'Holy', 'Support', 'Cleanse'], scalingTags: ['spell', 'holy', 'support'],
         nameEn: 'Quench', nameDE: 'Löschen',
@@ -882,7 +882,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_thaw', icon: '🔆', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 10,
+        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 6,
         cleanses: ['chill', 'frozen'], cleanseNameEn: 'Chill and Freeze', cleanseNameDe: 'Kälte und Frost',
         tags: ['Spell', 'Holy', 'Support', 'Cleanse'], scalingTags: ['spell', 'holy', 'support'],
         nameEn: 'Thaw', nameDE: 'Auftauen',
@@ -892,7 +892,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_purify', icon: '✨', theme: 'holy', element: 'fire', damageKind: 'holy',
-        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 10,
+        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 6,
         cleanses: ['shocked', 'shadow', 'blind', 'confused', 'polymorph'], cleanseNameEn: 'Shock, Blindness, Confusion and Polymorph', cleanseNameDe: 'Schock, Blindheit, Verwirrung und Verwandlung',
         tags: ['Spell', 'Holy', 'Support', 'Cleanse'], scalingTags: ['spell', 'holy', 'support'],
         nameEn: 'Purify', nameDE: 'Läuterung',
@@ -935,12 +935,12 @@ export const UNIVERSAL_SPELL_DEFS = [
     //   Rift Anchor  two-stage: plant it, then leave from anywhere
     {
         id: 'usp_blink', icon: '🌀', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
-        behavior: 'blink', selfCast: true, manaCost: 34, cooldownSeconds: 18,
+        behavior: 'blink', selfCast: true, manaCost: 34, cooldownSeconds: 10,
         // Charge pool instead of a single cooldown: each cast spends one
         // charge, spent charges recharge individually and in parallel (see
         // CHARGE-BASED COOLDOWNS below). cooldownSeconds is kept as the
         // historical reference value; the runtime reads the charge fields.
-        chargeMax: 3, chargeRechargeSeconds: 18,
+        chargeMax: 3, chargeRechargeSeconds: 10,
         moveBasePx: 220, movePxPerRank: 20, movePxCap: 400,
         tags: ['Spell', 'Arcane', 'Movement', 'Teleport'], scalingTags: ['spell', 'arcane', 'movement'],
         nameEn: 'Blink', nameDE: 'Blinzeln',
@@ -950,10 +950,10 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_dash', icon: '💫', theme: 'shadow', element: 'physical', damageKind: 'physical',
-        behavior: 'dash', selfCast: true, manaCost: 17, cooldownSeconds: 7, glideMs: 170,
+        behavior: 'dash', selfCast: true, manaCost: 17, cooldownSeconds: 5, glideMs: 170,
         // Charge pool like Blink - short recharges, so the rhythm is
         // burst-burst-wait instead of one long lockout.
-        chargeMax: 3, chargeRechargeSeconds: 7,
+        chargeMax: 3, chargeRechargeSeconds: 5,
         moveBasePx: 130, movePxPerRank: 8, movePxCap: 210,
         tags: ['Spell', 'Physical', 'Movement', 'Dash'], scalingTags: ['spell', 'physical', 'movement'],
         nameEn: 'Shadow Dash', nameDE: 'Schattensprint',
@@ -963,7 +963,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_disengage', icon: '🦘', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'disengage', selfCast: true, manaCost: 22, cooldownSeconds: 16, glideMs: 300,
+        behavior: 'disengage', selfCast: true, manaCost: 22, cooldownSeconds: 9, glideMs: 300,
         buffSeconds: 3, speedPct: 35, speedPctPerRank: 3, speedPctCap: 65,
         moveBasePx: 190, movePxPerRank: 14, movePxCap: 320,
         tags: ['Spell', 'Physical', 'Movement', 'Leap'], scalingTags: ['spell', 'physical', 'movement'],
@@ -974,7 +974,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_leap_strike', icon: '🤸', theme: 'blade', element: 'physical', damageKind: 'physical',
-        behavior: 'leap', selfCast: true, dmg: [6, 9], manaCost: 24, cooldownSeconds: 14, castTimeSeconds: 0, glideMs: 460,
+        behavior: 'leap', selfCast: true, dmg: [6, 9], manaCost: 24, cooldownSeconds: 8, castTimeSeconds: 0, glideMs: 460,
         moveBasePx: 420, movePxPerRank: 25, movePxCap: 600, stagger: 700,
         tags: ['Spell', 'Physical', 'Movement', 'Leap'], scalingTags: ['spell', 'physical', 'movement'],
         nameEn: 'Leap Strike', nameDE: 'Sprungschlag',
@@ -984,7 +984,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_windstep', icon: '🪶', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'windstep', selfCast: true, manaCost: 19, cooldownSeconds: 20, buffSeconds: 6,
+        behavior: 'windstep', selfCast: true, manaCost: 19, cooldownSeconds: 12, buffSeconds: 6,
         speedPct: 30, speedPctPerRank: 3.5, speedPctCap: 62,
         tags: ['Spell', 'Lightning', 'Movement', 'Buff'], scalingTags: ['spell', 'lightning', 'movement'],
         nameEn: 'Windstep', nameDE: 'Windschritt',
@@ -994,7 +994,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_rift_anchor', icon: '📍', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
-        behavior: 'anchor', selfCast: true, manaCost: 17, cooldownSeconds: 26,
+        behavior: 'anchor', selfCast: true, manaCost: 17, cooldownSeconds: 15,
         anchorSeconds: 15, anchorPlaceCooldownSeconds: 3,
         tags: ['Spell', 'Arcane', 'Movement', 'Recall'], scalingTags: ['spell', 'arcane', 'movement'],
         nameEn: 'Rift Anchor', nameDE: 'Spaltanker',
@@ -1083,12 +1083,12 @@ const USP_MELEE_SPELLS = {
 // to hit; the cooldown starts when the channel ends. dmg is damage PER TICK.
 const USP_CHANNEL_SPELLS = {
     usp_arcane_missiles: {
-        tickSeconds: 0.5, dmg: [2, 4], manaCost: 6, cooldownSeconds: 6,
+        tickSeconds: 0.5, dmg: [2, 4], manaCost: 6, cooldownSeconds: 4,
         descEn: 'Hold the button to channel a stream of arcane missiles at your target, one every half second, for as long as you keep holding and have mana to pay for it. Release to stop.',
         descDE: 'Halte die Taste, um einen Strom arkaner Geschosse auf dein Ziel zu lenken, alle halbe Sekunde eines, solange du hältst und Mana dafür hast. Loslassen beendet den Zauber.',
     },
     usp_disintegrate: {
-        tickSeconds: 0.5, dmg: [3, 5], manaCost: 7, cooldownSeconds: 8,
+        tickSeconds: 0.5, dmg: [3, 5], manaCost: 7, cooldownSeconds: 5,
         // The longer the beam is held, the hungrier it gets: the per-tick cost
         // grows by this much of the base cost per second held, up to the cap.
         costRampPerSecond: 0.6, costRampMax: 8,
@@ -1096,12 +1096,12 @@ const USP_CHANNEL_SPELLS = {
         descDE: 'Halte die Taste, um einen Strahl zersetzender Energie auf dein Ziel zu bündeln. Er trifft alle halbe Sekunde und zieht die ganze Zeit Mana ab - je länger du hältst, desto mehr Mana kostet jede Sekunde. Loslassen beendet den Zauber.',
     },
     usp_incinerate: {
-        tickSeconds: 0.4, dmg: [2, 4], manaCost: 7, cooldownSeconds: 8,
+        tickSeconds: 0.4, dmg: [2, 4], manaCost: 7, cooldownSeconds: 5,
         descEn: 'Hold the button to spray a flamethrower stream of fire at your target: rapid fire damage for as long as you hold and can pay for it. Release to stop.',
         descDE: 'Halte die Taste, um einen flammenwerferartigen Feuerstrahl auf dein Ziel zu sprühen: schneller Feuerschaden, solange du hältst und zahlen kannst. Loslassen beendet den Zauber.',
     },
     usp_soulrend: {
-        tickSeconds: 0.5, dmg: [3, 4], manaCost: 6, cooldownSeconds: 7,
+        tickSeconds: 0.5, dmg: [3, 4], manaCost: 6, cooldownSeconds: 4,
         descEn: 'Hold the button to rend your target\'s soul: a steady drain of shadow damage every half second while you channel. Release to stop.',
         descDE: 'Halte die Taste, um die Seele deines Ziels zu zerreißen: ein stetiger Schattenschaden alle halbe Sekunde, solange du kanalisierst. Loslassen beendet den Zauber.',
     },
