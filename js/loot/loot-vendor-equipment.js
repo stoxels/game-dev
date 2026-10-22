@@ -328,7 +328,7 @@ export function _vendorBuildBaseItemFromBase(base) {
         slotType: base.slotType,
         archetype: base.archetype,
         rarity: 'common',
-        itemLevel: base.minLevel,
+        itemLevel: Math.max(base.minLevel || 1, _getPlayerLevel()),
         requirements: { ...base.requirements },
         defenses: { ...base.defenses },
         ..._baseWeaponFields(base),
@@ -350,8 +350,8 @@ export function _vendorHideBaseTooltip() {
     _clearTooltip();
 }
 
-// Buys a specific equipment base type as a fresh common (white) item at its
-// minimum item level and places it in the first free hub inventory slot.
+// Buys a specific equipment base type as a fresh common (white) item at the
+// player's character level (never below the base's minimum) and places it in the first free hub inventory slot.
 export function _vendorBuyBaseItem(baseId) {
     const base = ALL_BASE_TYPES.find(b => b.id === baseId);
     if (!base) return;
