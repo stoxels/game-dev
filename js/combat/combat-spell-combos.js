@@ -1,7 +1,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { LANG } from '../translation/translations.js';
 import { _applyMonsterAilment, _applyStatusToMap, _hasStatus } from './combat-ailments-core.js';
-import { SPELL_COMBOS, SPELL_DEBUFFS, COMBO_TUNING as T } from './combat-spell-debuff-defs.js';
+import { SPELL_COMBOS, SPELL_DEBUFFS, COMBO_TUNING as T, comboStatusName } from './combat-spell-debuff-defs.js';
 import { _damageTargetById, _showStatusLabel } from './encounter-monster-damage.js';
 import { STAGGER_DURATION_MS } from './encounter-lifecycle.js';
 import { _isActive } from './combat-state.js';
@@ -117,6 +117,12 @@ function _applySpellDebuff(target, key, ctx) {
     st.stacks = stacks;
     st.stored = stored;
     st.srcSpell = ctx && ctx.spellId;
+    // A floating name when a debuff lands (or a stack is added), so it is noticed.
+    if (!prev || def.stackMax) {
+        const name = comboStatusName(key);
+        const text = def.stackMax ? `${name} ${stacks}/${def.stackMax}` : name;
+        _label(target, text, text);
+    }
     if (key === 'exposed') _syncExposed(target, st.until);
     if (def.stackMax && stacks >= def.stackMax) {
         if (key === 'frostbite') _frostbitePop(target);

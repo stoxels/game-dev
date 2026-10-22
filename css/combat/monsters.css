@@ -3017,6 +3017,93 @@
     to   { transform: translateY(-70px) scale(0.4); opacity: 0; }
 }
 
+/* ── Spell debuff effects on monsters ───────────────────────────────────
+   One overlay piece per debuff (see AILMENT_FX_HTML), so several debuffs
+   can show at once without fighting over the same element. */
+@keyframes sx-fx-spin { to { transform: rotate(360deg); } }
+@keyframes sx-fx-bob { from { transform: translateY(0); } to { transform: translateY(8px); } }
+@keyframes sx-fx-pulse-ring { from { transform: scale(0.94); opacity: 0.75; } to { transform: scale(1.06); opacity: 1; } }
+@keyframes sx-fx-glint { from { opacity: 0.65; } to { opacity: 1; } }
+@keyframes sx-fx-drip { from { transform: translateY(0); opacity: 1; } to { transform: translateY(100px); opacity: 0; } }
+@keyframes sx-fx-leaf-fall { from { transform: translate(0, 0) rotate(0); opacity: 1; } to { transform: translate(16px, 95px) rotate(220deg); opacity: 0; } }
+
+/* BRITTLE: cracked ice across the whole monster */
+.sx-ail-brittle .sx-fx-crack {
+    display: block; inset: 0;
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M50 0 L46 22 L56 38 L44 56 L52 78 L48 100'/%3E%3Cpath d='M46 22 L22 30 L10 48'/%3E%3Cpath d='M56 38 L80 36 L94 52'/%3E%3Cpath d='M44 56 L24 70 L14 90'/%3E%3Cpath d='M52 78 L74 84 L88 96'/%3E%3C/g%3E%3C/svg%3E") center / 100% 100% no-repeat,
+        rgba(186, 230, 253, 0.22);
+    filter: drop-shadow(0 0 3px #7dd3fc);
+    animation: sx-fx-glint 1.3s ease-in-out infinite alternate;
+}
+
+/* CONDUCTIVE: a ring of crackling current circling the monster */
+.sx-ail-conductive .sx-fx-orbit {
+    display: block; inset: -6%;
+    border: 3px dashed #fbbf24; border-radius: 50%;
+    box-shadow: 0 0 12px #fbbf24, inset 0 0 10px rgba(251, 191, 36, 0.5);
+    animation: sx-fx-spin 2.2s linear infinite;
+}
+
+/* WITHERED: drained, browned art and leaves falling off it */
+.sx-ail-withered .sx-emoji-wrapper img.sx-art-img { filter: sepia(0.85) saturate(0.7) brightness(0.82); }
+.sx-ail-withered .sx-fx-leaf { display: block; top: 0; font-size: 20px; filter: drop-shadow(0 0 3px rgba(120, 70, 0, 0.9)); animation: sx-fx-leaf-fall 2.2s ease-in infinite; }
+.sx-ail-withered .sx-fx-leaf.l1 { left: 18%; }
+.sx-ail-withered .sx-fx-leaf.l2 { left: 66%; animation-delay: -1.1s; }
+
+/* EXPOSED: a red target reticle over the monster */
+.sx-ail-exposed .sx-fx-reticle {
+    display: block; inset: 8%;
+    border: 3px solid #fb7185; border-radius: 50%;
+    background:
+        linear-gradient(#fb7185, #fb7185) center / 3px 100% no-repeat,
+        linear-gradient(#fb7185, #fb7185) center / 100% 3px no-repeat;
+    box-shadow: 0 0 10px rgba(251, 113, 133, 0.9);
+    animation: sx-fx-pulse-ring 0.8s ease-in-out infinite alternate;
+}
+
+/* MARKED: a bobbing magenta arrow above the monster */
+.sx-ail-marked .sx-fx-mark {
+    display: block; left: 50%; top: -22px; margin-left: -14px;
+    font-size: 30px; color: #f0abfc;
+    text-shadow: 0 0 8px #e879f9, 0 0 16px #c026d3, 0 2px 0 #000;
+    animation: sx-fx-bob 0.65s ease-in-out infinite alternate;
+}
+
+/* DOOMED: a dark violet ring that throbs, with a skull on it */
+.sx-ail-doomed .sx-fx-doom {
+    display: block; inset: -4%;
+    border: 3px solid #7c3aed; border-radius: 50%;
+    box-shadow: 0 0 16px 3px rgba(124, 58, 237, 0.9), inset 0 0 20px rgba(30, 0, 60, 0.9);
+    animation: sx-fx-pulse-ring 0.55s ease-in-out infinite alternate;
+}
+.sx-ail-doomed .sx-fx-doom::after {
+    content: '☠'; position: absolute; right: -6px; top: -10px;
+    font-size: 20px; color: #ddd6fe; text-shadow: 0 0 6px #7c3aed, 0 1px 0 #000;
+}
+
+/* SOAKED: blue sheen and water dripping off */
+.sx-ail-soaked .sx-emoji-wrapper img.sx-art-img { filter: saturate(1.25) drop-shadow(0 0 5px #38bdf8); }
+.sx-ail-soaked .sx-fx-drop { display: block; top: 0; font-size: 15px; animation: sx-fx-drip 1.4s ease-in infinite; }
+.sx-ail-soaked .sx-fx-drop.d1 { left: 12%; }
+.sx-ail-soaked .sx-fx-drop.d2 { left: 48%; animation-delay: -0.5s; }
+.sx-ail-soaked .sx-fx-drop.d3 { left: 82%; animation-delay: -0.95s; }
+
+/* FROSTBITE: frost creeps in from the edges as stacks build (1, 2, 3) */
+.sx-ail-frostbite .sx-fx-rime {
+    display: block; inset: 0;
+    border: 2px solid rgba(186, 230, 253, 0.55);
+    box-shadow: inset 0 0 10px 3px rgba(186, 230, 253, 0.5);
+}
+.sx-ail-frostbite[data-frostbite="2"] .sx-fx-rime { border-width: 3px; border-color: rgba(186, 230, 253, 0.8); box-shadow: inset 0 0 20px 8px rgba(186, 230, 253, 0.75); }
+.sx-ail-frostbite[data-frostbite="3"] .sx-fx-rime { border-width: 4px; border-color: #e0f2fe; box-shadow: inset 0 0 30px 14px rgba(224, 242, 254, 0.95), 0 0 14px rgba(125, 211, 252, 0.9); animation: sx-fx-glint 0.4s ease-in-out infinite alternate; }
+
+/* STATIC: one more spark gathers around the monster per stack */
+.sx-ail-static .sx-fx-spark { display: none; font-size: 22px; filter: drop-shadow(0 0 6px rgba(255, 235, 60, 0.95)); animation: sx-fx-zap 0.6s steps(1, end) infinite; }
+.sx-ail-static .sx-fx-spark.s1 { display: block; left: -8%; top: 10%; }
+.sx-ail-static[data-static="2"] .sx-fx-spark.s2, .sx-ail-static[data-static="3"] .sx-fx-spark.s2 { display: block; right: -8%; top: 40%; animation-delay: -0.2s; }
+.sx-ail-static[data-static="3"] .sx-fx-spark.s3 { display: block; left: 44%; bottom: -8%; animation-delay: -0.4s; }
+
 /* Purple DoT numbers for ailment ticks - keep RPG pop but tinted */
 .sx-dot-damage {
     color: #c084fc !important;

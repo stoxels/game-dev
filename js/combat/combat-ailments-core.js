@@ -1191,13 +1191,21 @@ const AILMENT_CARD_FX = {
     ignite: 'sx-ail-ignite', shocked: 'sx-ail-shocked', chill: 'sx-ail-chill',
     frozen: 'sx-ail-frozen', shadowburn: 'sx-ail-shadowburn', poison: 'sx-ail-poison',
     polymorph: 'sx-ail-polymorph', bleed: 'sx-bleeding',
+    // Spell debuffs (combat-spell-debuff-defs.js): each has its own overlay piece below.
+    brittle: 'sx-ail-brittle', conductive: 'sx-ail-conductive', withered: 'sx-ail-withered',
+    exposed: 'sx-ail-exposed', marked: 'sx-ail-marked', doomed: 'sx-ail-doomed',
+    soaked: 'sx-ail-soaked', frostbite: 'sx-ail-frostbite', static: 'sx-ail-static',
 };
 const AILMENT_FX_HTML =
     '<i class="sx-fx-flame f1">🔥</i><i class="sx-fx-flame f2">🔥</i><i class="sx-fx-flame f3">🔥</i>'
     + '<i class="sx-fx-flame f4">🔥</i><i class="sx-fx-flame f5">🔥</i>'
     + '<i class="sx-fx-zap z1">⚡</i><i class="sx-fx-zap z2">⚡</i><i class="sx-fx-zap z3">⚡</i><i class="sx-fx-zap z4">⚡</i>'
     + '<i class="sx-fx-frost r1">❄</i><i class="sx-fx-frost r2">❄</i><i class="sx-fx-frost r3">❄</i>'
-    + '<i class="sx-fx-wisp w1"></i><i class="sx-fx-wisp w2"></i><i class="sx-fx-wisp w3"></i>';
+    + '<i class="sx-fx-wisp w1"></i><i class="sx-fx-wisp w2"></i><i class="sx-fx-wisp w3"></i>'
+    + '<i class="sx-fx-crack"></i><i class="sx-fx-orbit"></i><i class="sx-fx-leaf l1">🍂</i><i class="sx-fx-leaf l2">🍂</i>'
+    + '<i class="sx-fx-reticle"></i><i class="sx-fx-mark">▼</i><i class="sx-fx-doom"></i>'
+    + '<i class="sx-fx-drop d1">💧</i><i class="sx-fx-drop d2">💧</i><i class="sx-fx-drop d3">💧</i>'
+    + '<i class="sx-fx-rime"></i><i class="sx-fx-spark s1">⚡</i><i class="sx-fx-spark s2">⚡</i><i class="sx-fx-spark s3">⚡</i>';
 
 // Per-monster icon strip - cheap DOM update driven by _updateMonsterBars.
 function _renderMonsterStatusStrip(m) {
@@ -1214,6 +1222,12 @@ function _renderMonsterStatusStrip(m) {
         Object.keys(AILMENT_CARD_FX).forEach(key => {
             const st = m.statuses[key];
             card.classList.toggle(AILMENT_CARD_FX[key], !!(st && st.until > now));
+        });
+        // Stacking debuffs show how full they are (frost creeps in, sparks gather).
+        ['frostbite', 'static'].forEach(key => {
+            const st = m.statuses[key];
+            if (st && st.until > now) card.dataset[key] = String(st.stacks || 1);
+            else delete card.dataset[key];
         });
         // Overlay for the animated flames/sparks/frost, parked inside the art
         // frame so it follows the monster's size (flames sit on its bottom edge).
