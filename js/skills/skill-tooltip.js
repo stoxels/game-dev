@@ -381,9 +381,17 @@ function _skillTooltipCombo(skillId) {
     const sections = getSpellComboSections(skillId, spell && spell.element);
     if (!sections.length) return '';
     const title = LANG === 'de' ? 'Kombos' : 'Combos';
-    const hint = LANG === 'de' ? 'Tipp: Statussymbole auf Gegnern zeigen ihre Wirkung beim Darüberfahren.' : 'Tip: hover a status icon on an enemy to read what it does.';
+    const intro = LANG === 'de'
+        ? 'Zauber können Gegner schwächen. Andere Zauber verursachen dann mehr Schaden gegen sie.'
+        : 'Spells can weaken enemies. Other spells then deal extra damage to them.';
+    const hint = LANG === 'de' ? 'Tipp: Fahre über ein Statussymbol auf einem Gegner, um seine Wirkung zu lesen.' : 'Tip: hover a status icon on an enemy to read what it does.';
+    const rowHtml = (r) => `<div class="skl-tip-combo-row">${r.text}${r.note ? `<div class="skl-tip-combo-note">${r.note}</div>` : ''}</div>`;
+    const secHtml = (sec) => `<div class="skl-tip-combo-sec">${sec.title}</div>`
+        + (sec.note ? `<div class="skl-tip-combo-note">${sec.note}</div>` : '')
+        + sec.rows.map(rowHtml).join('');
     return `<div class="skl-tip-combo"><div class="skl-tip-combo-title">${title}</div>`
-        + sections.map((sec) => `<div class="skl-tip-combo-sec">${sec.title}</div>` + sec.rows.map((r) => `<div class="skl-tip-combo-row">${r}</div>`).join('')).join('')
+        + `<div class="skl-tip-combo-note">${intro}</div>`
+        + sections.map(secHtml).join('')
         + `<div class="skl-tip-note">${hint}</div></div>`;
 }
 

@@ -3,77 +3,18 @@ import { LANG } from '../translation/translations.js';
 //------------------------------------------------------------------------
 //-------------------SPELL DEBUFFS & COMBO TABLE (DATA)-------------------
 //------------------------------------------------------------------------
-// Data for the spell combo system: the new enemy debuffs spells can apply,
-// which spells apply or react to them, and the text shown on tooltips and
-// status chips. The rules that use this data live in combat-spell-combos.js.
+// Data for the spell combo system: the numbers, the new enemy debuffs spells
+// can apply, which spells apply or react to them, and the plain-language text
+// shown on tooltips and status chips. The rules that use this data live in
+// combat-spell-combos.js. Every number in a text is read from COMBO_TUNING,
+// so a retune changes the tooltips too.
 //------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE------------------------------------
 //------------------------------------------------------------------------
 
-// Every debuff a spell can put on an enemy. They live in monster.statuses next
-// to the old ailments, so the status chips and expiry work for them unchanged.
-//   icon      chip symbol            durationS   how long it lasts
-//   stackMax  stacking debuffs only  (frostbite / static fill up, then pop)
-export const SPELL_DEBUFFS = {
-    brittle: {
-        icon: '🧊', durationS: 8,
-        nameEn: 'Brittle', nameDE: 'Spröde',
-        tipEn: 'The next physical or lightning hit shatters it for +40% damage.',
-        tipDE: 'Der nächste physische oder Blitz-Treffer zerschmettert es für +40% Schaden.',
-    },
-    conductive: {
-        icon: '🔌', durationS: 6,
-        nameEn: 'Conductive', nameDE: 'Leitend',
-        tipEn: 'Every hit arcs 25% of its damage to another enemy.',
-        tipDE: 'Jeder Treffer springt mit 25% Schaden auf einen anderen Gegner über.',
-    },
-    withered: {
-        icon: '🥀', durationS: 8,
-        nameEn: 'Withered', nameDE: 'Verdorrt',
-        tipEn: 'Takes +20% shadow damage and deals 20% less damage. Spreads when it dies.',
-        tipDE: 'Erleidet +20% Schattenschaden und verursacht 20% weniger Schaden. Breitet sich beim Tod aus.',
-    },
-    exposed: {
-        icon: '🎯', durationS: 8,
-        nameEn: 'Exposed', nameDE: 'Entblößt',
-        tipEn: 'Physical damage reduction is lowered by 25%.',
-        tipDE: 'Physische Schadensreduktion ist um 25% gesenkt.',
-    },
-    marked: {
-        icon: '📍', durationS: 10,
-        nameEn: 'Marked', nameDE: 'Markiert',
-        tipEn: 'The next hit from a DIFFERENT spell deals +30% damage.',
-        tipDE: 'Der nächste Treffer eines ANDEREN Zaubers verursacht +30% Schaden.',
-    },
-    doomed: {
-        icon: '⏳', durationS: 6,
-        nameEn: 'Doomed', nameDE: 'Verdammt',
-        tipEn: 'Stores 40% of the spell damage it takes and releases it as shadow damage when the timer ends (or onto a neighbour if it dies first).',
-        tipDE: 'Speichert 40% des erlittenen Zauberschadens und setzt ihn als Schattenschaden frei, wenn die Zeit abläuft (oder auf einen Nachbarn, wenn er vorher stirbt).',
-    },
-    soaked: {
-        icon: '💧', durationS: 8,
-        nameEn: 'Soaked', nameDE: 'Durchnässt',
-        tipEn: 'Cold and lightning deal +15% damage and chill / shock more easily. A fire hit evaporates it for +20% fire damage.',
-        tipDE: 'Kälte und Blitz verursachen +15% Schaden und kühlen / schocken leichter. Ein Feuertreffer verdampft es für +20% Feuerschaden.',
-    },
-    frostbite: {
-        icon: '🥶', durationS: 8, stackMax: 3,
-        nameEn: 'Frostbite', nameDE: 'Erfrierung',
-        tipEn: 'Builds with cold spells. At 3 stacks the enemy freezes solid for 2 seconds.',
-        tipDE: 'Baut sich mit Kälte-Zaubern auf. Bei 3 Stapeln friert der Gegner 2 Sekunden lang ein.',
-    },
-    static: {
-        icon: '🌩️', durationS: 8, stackMax: 3,
-        nameEn: 'Static', nameDE: 'Statisch',
-        tipEn: 'Builds with lightning spells. At 3 stacks the enemy is stunned.',
-        tipDE: 'Baut sich mit Blitz-Zaubern auf. Bei 3 Stapeln wird der Gegner betäubt.',
-    },
-};
-
-// Combo tuning (the numbers behind the tooltips above and the reactions below).
+// Combo tuning (the numbers behind the debuff and reaction texts).
 export const COMBO_TUNING = {
     brittleShatterPct: 40,
     conductiveArcPct: 25,
@@ -99,13 +40,100 @@ export const COMBO_TUNING = {
     perStatusStepPct: 10,
     perStatusMax: 5,
 };
+const T = COMBO_TUNING;
 
-// The element reactions the engine knows (and which spell elements trigger them), for the tooltip.
+// Every debuff a spell can put on an enemy. They live in monster.statuses next
+// to the old ailments, so the status chips and expiry work for them unchanged.
+//   icon      chip symbol            durationS   how long it lasts
+//   stackMax  stacking debuffs only  (frostbite / static fill up, then pop)
+//   adjEn/adjDE  how the enemy is described: "against ... enemies"
+//   tipEn/tipDE  what the debuff does, as whole sentences
+export const SPELL_DEBUFFS = {
+    brittle: {
+        icon: '🧊', durationS: 8,
+        nameEn: 'Brittle', nameDE: 'Spröde', adjEn: 'brittle', adjDE: 'spröde',
+        tipEn: `A Brittle enemy shatters on the next physical or lightning hit and takes ${T.brittleShatterPct}% extra damage. Shattering uses the debuff up.`,
+        tipDE: `Ein spröder Gegner zerschellt beim nächsten physischen oder Blitz-Treffer und erleidet ${T.brittleShatterPct}% zusätzlichen Schaden. Das Zerschellen verbraucht den Debuff.`,
+    },
+    conductive: {
+        icon: '🔌', durationS: 6,
+        nameEn: 'Conductive', nameDE: 'Leitend', adjEn: 'conductive', adjDE: 'leitende',
+        tipEn: `A Conductive enemy passes damage on: every hit sends ${T.conductiveArcPct}% of its damage as lightning to another enemy, at most twice a second.`,
+        tipDE: `Ein leitender Gegner gibt Schaden weiter: Jeder Treffer schickt ${T.conductiveArcPct}% seines Schadens als Blitz auf einen anderen Gegner, höchstens zweimal pro Sekunde.`,
+    },
+    withered: {
+        icon: '🥀', durationS: 8,
+        nameEn: 'Withered', nameDE: 'Verdorrt', adjEn: 'withered', adjDE: 'verdorrte',
+        tipEn: `A Withered enemy takes ${T.witheredShadowTakenPct}% more shadow damage and hits you ${T.witheredDamageLessPct}% weaker. If it dies, Withered jumps to another enemy.`,
+        tipDE: `Ein verdorrter Gegner erleidet ${T.witheredShadowTakenPct}% mehr Schattenschaden und trifft dich ${T.witheredDamageLessPct}% schwächer. Stirbt er, springt Verdorrt auf einen anderen Gegner über.`,
+    },
+    exposed: {
+        icon: '🎯', durationS: 8,
+        nameEn: 'Exposed', nameDE: 'Entblößt', adjEn: 'exposed', adjDE: 'entblößte',
+        tipEn: `An Exposed enemy has lost its protection: its physical damage reduction is ${T.exposedPhysReductionPct}% lower.`,
+        tipDE: `Ein entblößter Gegner hat seinen Schutz verloren: Seine physische Schadensreduktion ist um ${T.exposedPhysReductionPct}% gesenkt.`,
+    },
+    marked: {
+        icon: '📍', durationS: 10,
+        nameEn: 'Marked', nameDE: 'Markiert', adjEn: 'marked', adjDE: 'markierte',
+        tipEn: `The next hit from a different spell deals ${T.markedBonusPct}% extra damage to a Marked enemy. The mark is then used up.`,
+        tipDE: `Der nächste Treffer eines anderen Zaubers verursacht bei einem markierten Gegner ${T.markedBonusPct}% zusätzlichen Schaden. Danach ist die Markierung verbraucht.`,
+    },
+    doomed: {
+        icon: '⏳', durationS: 6,
+        nameEn: 'Doomed', nameDE: 'Verdammt', adjEn: 'doomed', adjDE: 'verdammte',
+        tipEn: `A Doomed enemy stores ${Math.round(T.doomedStoreShare * 100)}% of the spell damage it takes. When the timer runs out, all of it is released as shadow damage. If the enemy dies first, the stored damage hits another enemy instead.`,
+        tipDE: `Ein verdammter Gegner speichert ${Math.round(T.doomedStoreShare * 100)}% des erlittenen Zauberschadens. Läuft die Zeit ab, wird alles als Schattenschaden freigesetzt. Stirbt der Gegner vorher, trifft der gespeicherte Schaden stattdessen einen anderen Gegner.`,
+    },
+    soaked: {
+        icon: '💧', durationS: 8,
+        nameEn: 'Soaked', nameDE: 'Durchnässt', adjEn: 'soaked', adjDE: 'durchnässte',
+        tipEn: `A Soaked enemy takes ${T.soakedColdLightningPct}% more cold and lightning damage and is easier to chill or shock. A fire hit evaporates the water for ${T.soakedSteamPct}% extra fire damage.`,
+        tipDE: `Ein durchnässter Gegner erleidet ${T.soakedColdLightningPct}% mehr Kälte- und Blitzschaden und lässt sich leichter verkühlen oder schocken. Ein Feuertreffer verdampft das Wasser für ${T.soakedSteamPct}% zusätzlichen Feuerschaden.`,
+    },
+    frostbite: {
+        icon: '🥶', durationS: 8, stackMax: 3,
+        nameEn: 'Frostbite', nameDE: 'Erfrierung', adjEn: 'frostbitten', adjDE: 'erfrorene',
+        tipEn: `Every cold hit adds one stack of Frostbite. At 3 stacks the enemy freezes solid for ${T.frostbiteFreezeS} seconds and cannot attack.`,
+        tipDE: `Jeder Kälte-Treffer fügt einen Stapel Erfrierung hinzu. Bei 3 Stapeln friert der Gegner ${T.frostbiteFreezeS} Sekunden lang ein und kann nicht angreifen.`,
+    },
+    static: {
+        icon: '🌩️', durationS: 8, stackMax: 3,
+        nameEn: 'Static', nameDE: 'Statisch', adjEn: 'charged', adjDE: 'aufgeladene',
+        tipEn: 'Every lightning hit adds one stack of Static. At 3 stacks the enemy is stunned for a moment.',
+        tipDE: 'Jeder Blitz-Treffer fügt einen Stapel Statik hinzu. Bei 3 Stapeln wird der Gegner kurz betäubt.',
+    },
+};
+
+// The element reactions the engine knows. `elements` are the spell elements that
+// can trigger them; a text can differ per element (Overload works both ways).
 export const COMBO_REACTIONS = [
-    { key: 'melt', elements: ['fire'], en: 'Melt: fire on a chilled / brittle / frostbitten enemy +35%, thaws it.', de: 'Schmelzen: Feuer auf einen verkühlten / spröden / erfrorenen Gegner +35%, taut ihn auf.' },
-    { key: 'thermal', elements: ['cold'], en: 'Thermal Shock: cold on a burning enemy +25%, puts the fire out.', de: 'Temperaturschock: Kälte auf einen brennenden Gegner +25%, löscht das Feuer.' },
-    { key: 'superconduct', elements: ['lightning'], en: 'Superconduct: lightning on a chilled enemy +10% and Exposed.', de: 'Supraleitung: Blitz auf einen verkühlten Gegner +10% und Entblößt.' },
-    { key: 'overload', elements: ['fire', 'lightning'], en: 'Overload: fire on shocked (or lightning on burning) enemies blasts the others for 40%.', de: 'Überlast: Feuer auf geschockte (oder Blitz auf brennende) Gegner sprengt die anderen für 40%.' },
+    {
+        key: 'melt', elements: ['fire'],
+        en: `<b>Melt</b>: fire hitting a chilled, brittle or frostbitten enemy deals ${T.meltPct}% extra damage and ends the cold effects.`,
+        de: `<b>Schmelzen</b>: Feuer auf einen verkühlten, spröden oder erfrorenen Gegner verursacht ${T.meltPct}% zusätzlichen Schaden und beendet die Kälte-Effekte.`,
+    },
+    {
+        key: 'thermal', elements: ['cold'],
+        en: `<b>Thermal Shock</b>: cold hitting a burning enemy deals ${T.thermalShockPct}% extra damage and puts the fire out.`,
+        de: `<b>Temperaturschock</b>: Kälte auf einen brennenden Gegner verursacht ${T.thermalShockPct}% zusätzlichen Schaden und löscht das Feuer.`,
+    },
+    {
+        key: 'superconduct', elements: ['lightning'],
+        en: `<b>Superconduct</b>: lightning hitting a chilled enemy deals ${T.superconductPct}% extra damage, ends the chill and leaves the enemy Exposed for ${T.superconductExposedS} seconds.`,
+        de: `<b>Supraleitung</b>: Blitz auf einen verkühlten Gegner verursacht ${T.superconductPct}% zusätzlichen Schaden, beendet die Kälte und macht den Gegner ${T.superconductExposedS} Sekunden lang entblößt.`,
+    },
+    {
+        key: 'overload', elements: ['fire', 'lightning'],
+        en: {
+            fire: `<b>Overload</b>: fire hitting a shocked enemy ends the shock and blasts every other enemy for ${Math.round(T.overloadShare * 100)}% of the damage.`,
+            lightning: `<b>Overload</b>: lightning hitting a burning enemy puts out the fire and blasts every other enemy for ${Math.round(T.overloadShare * 100)}% of the damage.`,
+        },
+        de: {
+            fire: `<b>Überlast</b>: Feuer auf einen geschockten Gegner beendet den Schock und sprengt alle anderen Gegner mit ${Math.round(T.overloadShare * 100)}% des Schadens.`,
+            lightning: `<b>Überlast</b>: Blitz auf einen brennenden Gegner löscht das Feuer und sprengt alle anderen Gegner mit ${Math.round(T.overloadShare * 100)}% des Schadens.`,
+        },
+    },
 ];
 
 //------------------------------------------------------------------------
@@ -195,43 +223,89 @@ export const SPELL_COMBOS = {
 //-------------------TEXT HELPERS-----------------------------------------
 //------------------------------------------------------------------------
 
-// Name of an old ailment or new debuff key in the current language (ailments
-// keep their plain English label, like the rest of the status chips).
-export function comboStatusName(key) {
-    const def = SPELL_DEBUFFS[key];
-    if (def) return LANG === 'de' ? def.nameDE : def.nameEn;
-    const old = { ignite: 'Ignite', chill: 'Chill', frozen: 'Frozen', shocked: 'Shock', poison: 'Poison', bleed: 'Bleed' };
-    return old[key] || key;
-}
-
-// Tooltip text of a status chip: new debuffs explain themselves, others fall
-// back to their name.
-export function comboStatusTip(key) {
-    const def = SPELL_DEBUFFS[key];
-    if (!def) return '';
-    return `${comboStatusName(key)}: ${LANG === 'de' ? def.tipDE : def.tipEn}`;
-}
-
-// What the old ailments do, in one line each (the new debuffs carry their own text).
+// The old ailments, in both languages: name, how long they last and what they do.
 const OLD_STATUS_INFO = {
-    ignite: { en: 'burns for damage over time (5s)', de: 'brennt und erleidet Schaden über Zeit (5 s)' },
-    chill: { en: 'its attack bar fills 50% slower (8s)', de: 'seine Angriffsleiste füllt sich 50% langsamer (8 s)' },
-    frozen: { en: 'its attack bar is stopped', de: 'seine Angriffsleiste steht still' },
-    shocked: { en: 'takes +25% damage from every hit (5s)', de: 'erleidet +25% Schaden von jedem Treffer (5 s)' },
-    poison: { en: 'takes shadow damage over time (5s)', de: 'erleidet Schattenschaden über Zeit (5 s)' },
-    bleed: { en: 'takes physical damage over time (5s)', de: 'erleidet physischen Schaden über Zeit (5 s)' },
+    ignite: {
+        nameEn: 'Ignite', nameDE: 'Brand', adjEn: 'burning', adjDE: 'brennende', durationS: 5,
+        en: 'A burning enemy takes damage every second.',
+        de: 'Ein brennender Gegner erleidet jede Sekunde Schaden.',
+    },
+    chill: {
+        nameEn: 'Chill', nameDE: 'Verkühlung', adjEn: 'chilled', adjDE: 'verkühlte', durationS: 8,
+        en: 'A chilled enemy fills its attack bar 50% slower.',
+        de: 'Ein verkühlter Gegner füllt seine Angriffsleiste 50% langsamer.',
+    },
+    frozen: {
+        nameEn: 'Frozen', nameDE: 'Eingefroren', adjEn: 'frozen', adjDE: 'eingefrorene', durationS: 0,
+        en: 'A frozen enemy cannot attack.',
+        de: 'Ein eingefrorener Gegner kann nicht angreifen.',
+    },
+    shocked: {
+        nameEn: 'Shock', nameDE: 'Schock', adjEn: 'shocked', adjDE: 'geschockte', durationS: 5,
+        en: 'A shocked enemy takes 25% more damage from every hit.',
+        de: 'Ein geschockter Gegner erleidet 25% mehr Schaden von jedem Treffer.',
+    },
+    poison: {
+        nameEn: 'Poison', nameDE: 'Gift', adjEn: 'poisoned', adjDE: 'vergiftete', durationS: 5,
+        en: 'A poisoned enemy takes damage every second.',
+        de: 'Ein vergifteter Gegner erleidet jede Sekunde Schaden.',
+    },
+    bleed: {
+        nameEn: 'Bleed', nameDE: 'Blutung', adjEn: 'bleeding', adjDE: 'blutende', durationS: 5,
+        en: 'A bleeding enemy takes damage every second.',
+        de: 'Ein blutender Gegner erleidet jede Sekunde Schaden.',
+    },
 };
 
-// "Name (8s): what it does" for any status key, name in bold.
-function _statusExplained(key) {
+// Any status in one record: name, adjective, duration and the sentence that
+// says what it does (spell debuffs and old ailments alike).
+function _statusRecord(key) {
     const de = LANG === 'de';
     const def = SPELL_DEBUFFS[key];
-    if (def) return `<b>${comboStatusName(key)}</b> (${def.durationS}${de ? ' s' : 's'}): ${de ? def.tipDE : def.tipEn}`;
+    if (def) return { name: de ? def.nameDE : def.nameEn, adj: de ? def.adjDE : def.adjEn, durationS: def.durationS, what: de ? def.tipDE : def.tipEn };
     const old = OLD_STATUS_INFO[key];
-    return `<b>${comboStatusName(key)}</b>: ${old ? (de ? old.de : old.en) : ''}`;
+    if (old) return { name: de ? old.nameDE : old.nameEn, adj: de ? old.adjDE : old.adjEn, durationS: old.durationS, what: de ? old.de : old.en };
+    return { name: key, adj: key, durationS: 0, what: '' };
 }
 
-// The tooltip's combo block for one spell as sections of ready-to-show lines:
+// Name of an old ailment or new debuff key in the current language.
+export function comboStatusName(key) {
+    return _statusRecord(key).name;
+}
+
+// Tooltip text of a status chip on an enemy: its name and what it does.
+export function comboStatusTip(key) {
+    const rec = _statusRecord(key);
+    return SPELL_DEBUFFS[key] ? `${rec.name}: ${rec.what}` : '';
+}
+
+// "for 8 seconds" / "für 8 Sekunden" (empty when the status has no timer).
+function _forSeconds(seconds) {
+    if (!(seconds > 0)) return '';
+    return LANG === 'de' ? `für ${seconds} Sekunden ` : ` for ${seconds} seconds`;
+}
+
+// One "applies" row: the chance to afflict the target, then what the debuff does.
+function _appliesRow(entry) {
+    const rec = _statusRecord(entry.key);
+    const de = LANG === 'de';
+    const text = de
+        ? `${entry.pct}% Chance pro Treffer, das Ziel ${_forSeconds(rec.durationS)}mit <b>${rec.name}</b> zu belegen.`
+        : `Each hit has a ${entry.pct}% chance to afflict the target with <b>${rec.name}</b>${_forSeconds(rec.durationS)}.`;
+    return { text, note: rec.what };
+}
+
+// One "bonus damage" row for a spell that hits harder against a debuff.
+function _consumesRow(entry) {
+    const rec = _statusRecord(entry.key);
+    const de = LANG === 'de';
+    const text = de
+        ? `Verursacht ${entry.pct}% mehr Schaden gegen ${rec.adj} Gegner${entry.remove ? ' und verbraucht den Effekt' : ''}.`
+        : `Deals ${entry.pct}% more damage to ${rec.adj} enemies${entry.remove ? ' and uses the effect up' : ''}.`;
+    return { text, note: rec.what };
+}
+
+// The tooltip's combo block for one spell as sections of rows ({ text, note }):
 // debuffs it applies, bonus damage against debuffs, and the element reactions
 // its damage type can trigger. Empty when there is nothing to say.
 export function getSpellComboSections(spellId, element) {
@@ -239,26 +313,38 @@ export function getSpellComboSections(spellId, element) {
     const row = SPELL_COMBOS[spellId] || {};
     const sections = [];
     if (row.applies && row.applies.length) {
-        sections.push({
-            title: de ? 'Wendet Debuffs an' : 'Applies debuffs',
-            rows: row.applies.map((a) => `${a.pct}% ${de ? 'Chance' : 'chance'}: ${_statusExplained(a.key)}`),
+        sections.push({ title: de ? 'Wirkung beim Treffer' : 'On hit', rows: row.applies.map(_appliesRow) });
+    }
+    const bonus = (row.consumes || []).map(_consumesRow);
+    if (row.perStatus) {
+        const max = T.perStatusStepPct * T.perStatusMax;
+        bonus.push({
+            text: de
+                ? `Verursacht ${T.perStatusStepPct}% mehr Schaden für jeden verschiedenen Debuff auf dem Gegner, bis zu ${max}%.`
+                : `Deals ${T.perStatusStepPct}% more damage for every different debuff on the enemy, up to ${max}%.`,
         });
     }
-    const bonus = [];
-    (row.consumes || []).forEach((c) => {
-        const used = c.remove ? (de ? ' - wird verbraucht' : ' - used up') : '';
-        bonus.push(`+${c.pct}% ${de ? 'Schaden gegen' : 'damage vs'} ${_statusExplained(c.key)}${used}`);
-    });
-    if (row.perStatus) {
-        bonus.push(de ? `+${COMBO_TUNING.perStatusStepPct}% Schaden pro verschiedenem Debuff auf dem Ziel (max. ${COMBO_TUNING.perStatusMax})` : `+${COMBO_TUNING.perStatusStepPct}% damage for each different debuff on the target (max ${COMBO_TUNING.perStatusMax})`);
-    }
     if (row.spreadOnCrit) {
-        bonus.push(de ? 'Kritische Treffer kopieren Brand, Gift und Blutung (halbe Stärke) auf einen Nachbarn' : 'Critical hits copy burn, poison and bleed (half strength) to a neighbouring enemy');
+        bonus.push({
+            text: de
+                ? 'Bei einem kritischen Treffer breiten sich Brand, Gift und Blutung des Ziels mit halber Stärke auf einen anderen Gegner aus.'
+                : 'On a critical hit, burning, poison and bleeding on the target also spread to another enemy at half strength.',
+        });
     }
-    if (bonus.length) sections.push({ title: de ? 'Bonus' : 'Bonus', rows: bonus });
+    if (bonus.length) sections.push({ title: de ? 'Bonusschaden' : 'Bonus damage', rows: bonus });
     const reactions = COMBO_REACTIONS.filter((r) => r.elements.includes(element));
     if (reactions.length) {
-        sections.push({ title: de ? 'Elementreaktionen' : 'Element reactions', rows: reactions.map((r) => (de ? r.de : r.en)) });
+        const label = { fire: ['Fire', 'Feuer'], cold: ['Cold', 'Kälte'], lightning: ['Lightning', 'Blitz'] }[element];
+        sections.push({
+            title: de ? `Reaktionen (${label[1]})` : `${label[0]} reactions`,
+            note: de
+                ? 'Eine Reaktion passiert, wenn der Schaden dieses Zaubers auf einen Gegner trifft, der bereits den passenden Effekt hat.'
+                : 'A reaction happens when this spell\'s damage hits an enemy that already has the matching effect.',
+            rows: reactions.map((r) => {
+                const text = de ? r.de : r.en;
+                return { text: typeof text === 'string' ? text : text[element] };
+            }),
+        });
     }
     return sections;
 }
