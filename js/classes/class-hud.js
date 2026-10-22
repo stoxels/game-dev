@@ -151,6 +151,9 @@ function _calcTooltipPosition(e, tipWidth, tipHeight) {
     let y = e.clientY + 14;
     if (x + tipWidth > window.innerWidth - 8) x = e.clientX - tipWidth - 10;
     if (y + tipHeight > window.innerHeight - 8) y = e.clientY - tipHeight - 10;
+    // Flipping can push a tall tooltip off the top or left edge: clamp it back in.
+    x = Math.max(8, Math.min(x, window.innerWidth - tipWidth - 8));
+    y = Math.max(8, Math.min(y, window.innerHeight - tipHeight - 8));
     return { x, y };
 }
 
