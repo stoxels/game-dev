@@ -39,7 +39,7 @@ try { Object.defineProperty(globalThis, 'setHotbarSlot', { get() { return setHot
 //   <classId>_active2     e.g. statistician_active2   (Diagonal Strike)
 //   <ascId>_active1       e.g. outlier_active1        (Tail Risk)
 //   <ascId>_active2       e.g. markovian_active2      (Transition Matrix)
-//   heartbloom            universal endgame skill
+//   heartbloom            universal skill (levels with monsters)
 //
 // Each castable skill resolves to a "legacy slot" (active1…active5) - the
 // key the existing execution + cooldown engine already understands. For the
@@ -185,7 +185,7 @@ const SKILL_META = {
         castTime: 'instant',
     },
 
-    // ── UNIVERSAL ENDGAME SKILL ─────────────────────────────────────────
+    // ── UNIVERSAL SKILL ─────────────────────────────────────────────────
     heartbloom: {
         tags: ['Spell', 'Summon', 'Heart'],
         scaling: ['Cooldown Recovery'],
@@ -539,9 +539,9 @@ export function canAffordSkill(skillId) {
     return true;
 }
 
-// True while the skill's own usability gate allows casting (Heartbloom is
-// endgame-only; sealed universal spells are locked; everything else is
-// always available).
+// True while the skill's own usability gate allows casting (skills flagged
+// combatOnly need a level with monsters; sealed universal spells are locked;
+// everything else is always available).
 export function isSkillUsableNow(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return false;

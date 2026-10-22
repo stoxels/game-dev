@@ -351,7 +351,7 @@ function _getSkillBtnState(hudSlot, accentColor) {
     const canAfford = _abilityCanAfford(hudSlot);
     const noMana = !canAfford && !isOnCD;
 
-    // Heartbloom (active5) is endgame-only - lock when not on an endgame map.
+    // Heartbloom (active5) needs a level with monsters - locked in pure puzzle levels.
     const isCombatLocked = hudSlot === 'active5'
         && !isCombatLevel();
     const isLocked = isCombatLocked && !isOnCD;
@@ -381,7 +381,7 @@ function _buildSkillBtnHTML(hudSlot, displayIdx, accentColor, extraClasses) {
         = _getSkillBtnState(hudSlot, accentColor);
 
     const label = _buildSkillBtnLabel(isOnCD, isArmed, cdRemaining);
-    const stateClasses = `${isArmed ? 'armed' : ''} ${isOnCD ? 'on-cd' : ''} ${noMana ? 'no-mana' : ''} ${isLocked ? 'endgame-locked' : ''}`.trim();
+    const stateClasses = `${isArmed ? 'armed' : ''} ${isOnCD ? 'on-cd' : ''} ${noMana ? 'no-mana' : ''} ${isLocked ? 'combat-locked' : ''}`.trim();
     const allClasses = ['chud-skill-btn', extraClasses, stateClasses]
         .filter(Boolean).join(' ');
 
@@ -891,11 +891,11 @@ function injectCompactHUDStyles(def) {
             border-color: #ff6b9d !important;
         }
 
-        .chud-heart-btn:hover:not(.on-cd):not(.endgame-locked) {
+        .chud-heart-btn:hover:not(.on-cd):not(.combat-locked) {
             background: rgba(255,107,157,0.18) !important;
         }
 
-        .chud-skill-btn.endgame-locked {
+        .chud-skill-btn.combat-locked {
             opacity: .45;
             border-color: #555 !important;
         }

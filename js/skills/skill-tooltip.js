@@ -3,7 +3,7 @@ import { LANG, t } from '../translation/translations.js';
 import { _formatCooldown } from '../classes/class-cooldown-state.js';
 import { hideHUDTooltip, moveHUDTooltip, showHUDTooltip } from '../classes/class-hud.js';
 import { _bloodMagicActive } from '../classes/class-mana.js';
-import { CHARM_ORB_DAMAGE_PCT, charmRankMeetsPlayerLevel, getCharmArtForSkill, getCharmByKey, getCharmRankMinPlayerLevel, getCharmSkillOrbBonusPct, getCharmSlottedRank, isSkillCharmUnlocked, withPreviewCastRank } from './skill-charms.js';
+import { CHARM_ORB_DAMAGE_PCT, charmRankMeetsPlayerLevel, getCharmArtForSkill, getCharmByKey, getCharmNextRankGate, getCharmRankMinPlayerLevel, getCharmSkillOrbBonusPct, getCharmSlottedRank, isSkillCharmUnlocked, withPreviewCastRank } from './skill-charms.js';
 import { canAffordSkill, getPassiveSkillDef, getPlayerTraits, getSkillCooldown, getSkillDamage, getSkillDef, getSkillDesc, getSkillLevel, getSkillManaCost, getSkillName, isSkillPassive } from './skill-registry.js';
 import { getSkillCastTimeSeconds } from './spell-casttime.js';
 import { getUniversalSpellCastKind, getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellDef, getUniversalSpellMovementEstimate, getUniversalSpellSupportEstimate } from './universal-spells.js';
@@ -290,7 +290,7 @@ function _skillTooltipCharmBonus(skillId) {
     return `<div class="skl-tip-stat">${t('charm_tip_orb_bonus')}: <b style="color:#7fd9ff">+${pct}%</b></div>`;
 }
 
-// Endgame-only warning for Heartbloom.
+// Warning for skills that need a level with monsters (combatOnly).
 function _skillTooltipGating(def) {
     if (!def.combatOnly) return '';
     const active = isCombatLevel();
@@ -307,8 +307,8 @@ function _skillTooltipCharmLock(skillId) {
     if (isSkillCharmUnlocked(skillId)) return '';
     try {
         const slotted = getCharmSlottedRank(skillId);
-        if (slotted && !charmRankMeetsPlayerLevel(slotted)) {
-            const need = getCharmRankMinPlayerLevel(slotted);
+        if (slotted && !charmRankMeetsPlayerLevel(slotted, skillId)) {
+            const need = getCharmRankMinPlayerLevel(slotted, skillId);
             return `<div class="skl-tip-note">🔒 ${t('charm_rank_locked_toast').replace('{r}', slotted).replace('{n}', need)}</div>`;
         }
     } catch (e) { /* fall through to generic hint */ }
@@ -335,8 +335,8 @@ function _skillTooltipTitle(skillId, rank) {
 // is no separate charm tooltip any more.
 function _skillTooltipCharmInfo(charm) {
     if (!charm) return '';
-    const usable = charmRankMeetsPlayerLevel(charm.rank);
-    const need = getCharmRankMinPlayerLevel(charm.rank);
+    const usable = charmRankMeetsPlayerLevel(charm.rank, charm.skillId);
+    const need = getCharmRankMinPlayerLevel(charm.rank, charm.skillId);
     const reqColor = usable ? '#2ecc71' : '#e06c55';
     let html = `<div class="skl-tip-stat">${t('charm_tip_req_player')}: <b style="color:${reqColor}">${need}</b></div>`;
     if (!usable) html += `<div class="skl-tip-note" style="color:#e06c55">${t('charm_tip_locked_level')}</div>`;
@@ -345,6 +345,18 @@ function _skillTooltipCharmInfo(charm) {
         html += `<div class="skl-tip-stat">${t('charm_tip_orb_bonus')}: <b style="color:#7fd9ff">+${bonus}%</b></div>`;
     }
     return html;
+}
+
+// "Next rank at character level N": when the spell's next rank opens up. Green
+// once the character has reached that level (the charm is then there to find
+// or buy), grey while it is still ahead.
+function _skillTooltipNextRank(skillId) {
+    let gate = null;
+    try { gate = getCharmNextRankGate(skillId); } catch (e) { gate = null; }
+    if (!gate) return '';
+    const reached = (Number(STATE && STATE.playerLevel) || 1) >= gate.level;
+    const color = reached ? '#2ecc71' : '#9aa7bd';
+    return `<div class="skl-tip-stat">${t('skill_tip_next_rank').replace('{r}', gate.rank)}: <b style="color:${color}">${t('skill_tip_next_rank_lv').replace('{n}', gate.level)}</b></div>`;
 }
 
 // Builds the full tooltip HTML for a castable skill. `charmKey` (optional)
@@ -379,6 +391,7 @@ function _buildSkillTooltipHTML(skillId, charmKey, previewRank) {
         + _skillTooltipCastTime(def)
         + _skillTooltipCooldown(def)
         + _skillTooltipCharmInfo(hovered)
+        + (hovered || previewRank ? '' : _skillTooltipNextRank(skillId))
         + `<div class="skl-tip-sep"></div>`
         + `<div class="skl-tip-desc">${desc}</div>`
         + _skillTooltipDamage(def)

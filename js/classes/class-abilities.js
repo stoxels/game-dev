@@ -458,7 +458,7 @@ function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
 // _isInstantAbility - returns true if the given slot fires immediately on button press.
 //   Instant abilities skip the arm → click flow entirely.
 function _isInstantAbility(slot) {
-    // Heartbloom (active5) is always instant - endgame-only
+    // Heartbloom (active5) is always instant
     if (slot === 'active5') return true;
 
     // Base class instants
@@ -499,7 +499,7 @@ function _isInstantAbility(slot) {
 function _canFireInstantAbility(slot) {
     if (slot === 'active5') {
         if (!isCombatLevel()) {
-            globalThis.showToast('💚 Heartbloom cannot be used here!', '#ff6b9d');
+            globalThis.showToast(t('skill_endgame_only'), '#ff6b9d');
             return false;
         }
         // Also ensure there is at least one eligible cell - otherwise toast and abort
@@ -613,7 +613,7 @@ function _fireInstantAscendencyAbility(slot) {
 //------------------------------------------------------------------------
 //------------------HEARTBLOOM (ACTIVE5) EXECUTION------------------------
 //------------------------------------------------------------------------
-// Spawns the endgame heart reward without changing the normal pickup cap.
+// Spawns the Heartbloom hearts without changing the normal pickup cap.
 
 // Picks a random heart pickup def weighted like normal hearts:
 // 60% small, 30% medium, 10% large. Falls back to small if defs missing.
@@ -676,7 +676,7 @@ function _spawnHeartbloomHearts(count) {
                     globalThis._schedulePickupExpiry(key, def);
                 }
             } else {
-                // Fallback when endgame pickup system not loaded (e.g. outside endgame map)
+                // Fallback when the pickup system is not loaded
                 // just render a simple overlay if possible
                 const el = document.getElementById(`g-${r}-${c}`);
                 if (el) {
@@ -779,9 +779,9 @@ function toggleActiveAbility(slot) {
 
     if (globalThis.dead || !cd || cd.remaining > 0) return;
 
-    // Heartbloom is endgame-only - block entirely outside endgame (HUD also shows locked)
+    // Heartbloom needs a level with monsters - block it elsewhere (HUD also shows locked)
     if (newSlot === 'active5' && !isCombatLevel()) {
-        globalThis.showToast('💚 Heartbloom cannot be used here!', '#ff6b9d');
+        globalThis.showToast(t('skill_endgame_only'), '#ff6b9d');
         return;
     }
 

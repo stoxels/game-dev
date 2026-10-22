@@ -155,13 +155,24 @@ const CHARM_RANK_RARITY = ['common', 'rare', 'epic'];
 // only guarantees A drop, never a rank above its monster level.
 const CHARM_RANK_MIN_MONSTER_LEVEL = [1, 10, 22, 35, 50, 68, 74, 79, 84, 89];
 
-// Minimum PLAYER level required to SLOT (use) each rank. Ranks 1-3 stay free
-// so the class/ascendency progression (which grants up to rank 3 via upgrades
-// at any character level) never bricks: the gate only bites on ranks 4+,
-// which are drop-only and mirror their drop thresholds. A player finding a
-// rank at monster level N is therefore roughly at the player level needed to
-// use it, while a twinked low-level character cannot slot a high rank early.
+// The shared fallback for the player level required to SLOT each rank (used
+// only when no spell is named). Real gates are per spell, see below.
 const CHARM_RANK_MIN_PLAYER_LEVEL = [1, 1, 1, 35, 50, 68, 74, 79, 84, 89];
+
+// PER-SPELL RANK GATES. Like gem levels in Path of Exile, a spell's ranks do
+// not all open up at the same character level. CHARM_RANK_MIN_MONSTER_LEVEL is
+// the milestone for each rank; every spell sits its own few levels earlier or
+// later (CHARM_RANK_GATE_SPREAD levels either way, fixed per spell + rank), so
+// across the arsenal some spell gains a new rank every few character levels
+// instead of every one of them jumping at once. A spell's gates always rise by
+// at least CHARM_RANK_GATE_MIN_STEP levels and rank 10 never needs more than
+// CHARM_RANK_GATE_MAX. One gate rules both the drop (monster level) and the
+// slot (player level) of that spell's rank. Class / ascendency spells keep
+// ranks 1-3 free (their upgrades grant those at any level - see
+// getCharmRankMinPlayerLevel).
+const CHARM_RANK_GATE_SPREAD = [0, 5, 6, 7, 8, 6, 5, 4, 3, 2];
+const CHARM_RANK_GATE_MIN_STEP = 3;
+const CHARM_RANK_GATE_MAX = 89;
 
 
 //------------------------------------------------------------------------
@@ -240,27 +251,73 @@ export function getSpellRankManaMult(rank) {
 //----------------------RANK LEVEL REQUIREMENTS---------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-// Minimum monster level that can drop a rank (1 when unknown).
-function getCharmRankMinMonsterLevel(rank) {
+// A stable number in [-spread, +spread] for a spell + rank (same every run).
+function _charmGateOffset(skillId, rank, spread) {
+    if (!(spread > 0)) return 0;
+    let h = 2166136261;
+    const text = `${skillId}#${rank}`;
+    for (let i = 0; i < text.length; i++) {
+        h ^= text.charCodeAt(i);
+        h = Math.imul(h, 16777619) >>> 0;
+    }
+    return (h % (spread * 2 + 1)) - spread;
+}
+
+// The ten rank gates (character levels) of one spell, index = rank - 1.
+const _charmGateCache = {};
+function _charmGateTable(skillId) {
+    if (_charmGateCache[skillId]) return _charmGateCache[skillId];
+    const gates = [1];
+    for (let r = 2; r <= SPELL_MAX_RANK; r++) {
+        const base = CHARM_RANK_MIN_MONSTER_LEVEL[r - 1];
+        const shifted = base + _charmGateOffset(skillId, r, CHARM_RANK_GATE_SPREAD[r - 1]);
+        gates.push(Math.max(shifted, gates[r - 2] + CHARM_RANK_GATE_MIN_STEP));
+    }
+    // Keep the top ranks inside the level cap without breaking the spacing.
+    for (let r = SPELL_MAX_RANK; r >= 2; r--) {
+        gates[r - 1] = Math.min(gates[r - 1], CHARM_RANK_GATE_MAX - (SPELL_MAX_RANK - r) * CHARM_RANK_GATE_MIN_STEP);
+    }
+    _charmGateCache[skillId] = gates;
+    return gates;
+}
+
+// Minimum monster level that can drop a rank of a spell (1 when unknown).
+function getCharmRankMinMonsterLevel(rank, skillId) {
     const r = _spellRankClamp(rank);
-    const v = CHARM_RANK_MIN_MONSTER_LEVEL[r - 1];
+    const v = skillId ? _charmGateTable(skillId)[r - 1] : CHARM_RANK_MIN_MONSTER_LEVEL[r - 1];
     return Number.isFinite(Number(v)) ? Math.max(1, Math.round(v)) : 1;
 }
 
-// Highest rank a monster of `monsterLevel` may drop. Low-level creatures can
-// therefore never produce high-rank charms, no matter the weight table.
-function getCharmRankMaxForMonsterLevel(monsterLevel) {
+// Highest rank a monster of `monsterLevel` may drop (of one spell when a skill
+// is named). Low-level creatures can therefore never produce high-rank
+// charms, no matter the weight table.
+function getCharmRankMaxForMonsterLevel(monsterLevel, skillId) {
     const mlvl = Math.max(1, Math.round(Number(monsterLevel) || 1));
     let max = 1;
     for (let r = 1; r <= SPELL_MAX_RANK; r++) {
-        if (getCharmRankMinMonsterLevel(r) <= mlvl) max = r;
+        if (getCharmRankMinMonsterLevel(r, skillId) <= mlvl) max = r;
     }
     return max;
 }
 
-// Minimum player level required to slot/use a rank (1 when unknown).
-export function getCharmRankMinPlayerLevel(rank) {
+// True for the class / ascendency spells, whose first ranks come from
+// upgrades at any character level.
+function _charmIsProgressionSkill(skillId) {
+    try {
+        const def = getSkillDef(skillId);
+        const kind = def && def.slotKind;
+        return kind === 'base1' || kind === 'base2' || kind === 'asc1' || kind === 'asc2';
+    } catch (e) { return false; }
+}
+
+// Minimum player level required to slot/use a rank (1 when unknown). With a
+// skill id it is that spell's own gate; without one the shared fallback.
+export function getCharmRankMinPlayerLevel(rank, skillId) {
     const r = _spellRankClamp(rank);
+    if (skillId) {
+        if (r <= 3 && _charmIsProgressionSkill(skillId)) return 1;
+        return _charmGateTable(skillId)[r - 1];
+    }
     const v = CHARM_RANK_MIN_PLAYER_LEVEL[r - 1];
     return Number.isFinite(Number(v)) ? Math.max(1, Math.round(v)) : 1;
 }
@@ -281,8 +338,18 @@ function _charmGetPlayerLevel() {
 }
 
 // True when the character meets the player-level requirement of a rank.
-export function charmRankMeetsPlayerLevel(rank) {
-    return _charmGetPlayerLevel() >= getCharmRankMinPlayerLevel(rank);
+export function charmRankMeetsPlayerLevel(rank, skillId) {
+    return _charmGetPlayerLevel() >= getCharmRankMinPlayerLevel(rank, skillId);
+}
+
+// The next rank a spell can reach and the character level it needs, or null
+// when the spell is at its top rank or the next rank is free (class spells'
+// first ranks come from upgrades). Drives the "Next rank at Lv N" tooltip line.
+export function getCharmNextRankGate(skillId) {
+    const next = getSkillCastRankFull(skillId) + 1;
+    if (next > getSkillMaxRank(skillId)) return null;
+    const level = getCharmRankMinPlayerLevel(next, skillId);
+    return level > 1 ? { rank: next, level } : null;
 }
 
 
@@ -628,7 +695,7 @@ export function isSkillCharmUnlocked(skillId) {
     ensureCharmState();
     return STATE.charmSlots.some((key) => {
         const charm = getCharmByKey(key);
-        return !!charm && charm.skillId === skillId && charmRankMeetsPlayerLevel(charm.rank);
+        return !!charm && charm.skillId === skillId && charmRankMeetsPlayerLevel(charm.rank, skillId);
     });
 }
 
@@ -713,7 +780,7 @@ function getCharmUsableSlottedRank(skillId) {
     if (!STATE) return null;
     for (const key of STATE.charmSlots) {
         const charm = getCharmByKey(key);
-        if (charm && charm.skillId === skillId && charmRankMeetsPlayerLevel(charm.rank)) return charm.rank;
+        if (charm && charm.skillId === skillId && charmRankMeetsPlayerLevel(charm.rank, skillId)) return charm.rank;
     }
     return null;
 }
@@ -812,7 +879,7 @@ export function getSpellRankManaMultForSkill(skillId) {
 // slot simply returns to the inventory (ownership is tracked by the
 // inventory, so no data is lost). Charms above the character's player level
 // are rejected with a toast - they stay owned until the level requirement is
-// met (see CHARM_RANK_MIN_PLAYER_LEVEL).
+// met (see the per-spell rank gates above).
 export function setCharmSlot(slotIndex, charmKey, opts) {
     ensureCharmState();
     if (slotIndex < 0 || slotIndex >= CHARM_SLOT_COUNT) return false;
@@ -820,8 +887,8 @@ export function setCharmSlot(slotIndex, charmKey, opts) {
     const bypassLevel = !!(opts && opts.bypassLevel);
     if (charmKey !== null && !bypassLevel) {
         const charm = getCharmByKey(charmKey);
-        if (charm && !charmRankMeetsPlayerLevel(charm.rank)) {
-            const need = getCharmRankMinPlayerLevel(charm.rank);
+        if (charm && !charmRankMeetsPlayerLevel(charm.rank, charm.skillId)) {
+            const need = getCharmRankMinPlayerLevel(charm.rank, charm.skillId);
             const msg = t('charm_rank_locked_toast').replace('{r}', charm.rank).replace('{n}', need);
             showToast(`🔒 ${msg}`, '#e06c55');
             return false;
@@ -1440,7 +1507,7 @@ export function _charmCellHasDrop(row, col) {
 // actives are PROGRESSION-ONLY: their ranks come from upgrading the spell
 // itself (applyClassUpgrade / applyAscendencyUpgrade -> grantCharm), never
 // from monster or boss drops. So the pool is the universal arsenal plus the
-// endgame Heartbloom skill; Heartbloom stays three times as likely as one
+// Heartbloom skill; Heartbloom stays three times as likely as one
 // universal-spell charm.
 function _charmBuildDropSkillPool() {
     const pool = [];
@@ -1457,15 +1524,15 @@ function _charmBuildDropSkillPool() {
     return pool;
 }
 
-// Rolls a drop rank, capped by the killer's monster level: only ranks whose
-// CHARM_RANK_MIN_MONSTER_LEVEL the monster meets participate in the roll, so
-// a low-level creature can never produce a high-rank charm. Rank and skill
-// are rolled independently so the huge universal arsenal can never dilute
-// the chance of a high-rank own-class charm (which was the case when every
-// skill×rank pair went into one pool).
-function _charmRollDropRank(isBoss, monsterLevel) {
+// Rolls a drop rank for a spell, capped by the killer's monster level: only
+// ranks whose gate (see the per-spell rank gates above) the monster meets
+// participate in the roll, so a low-level creature can never produce a
+// high-rank charm. Rank and skill are rolled independently so the huge
+// universal arsenal can never dilute the chance of a high-rank own-class
+// charm (which was the case when every skill×rank pair went into one pool).
+function _charmRollDropRank(isBoss, monsterLevel, skillId) {
     const table = isBoss ? SPELL_RANK_DROP_WEIGHT_BOSS : SPELL_RANK_DROP_WEIGHT_NORMAL;
-    const maxRank = getCharmRankMaxForMonsterLevel(monsterLevel);
+    const maxRank = getCharmRankMaxForMonsterLevel(monsterLevel, skillId);
     const eligible = Math.max(1, Math.min(table.length, maxRank));
     let total = 0;
     for (let i = 0; i < eligible; i++) total += table[i];
@@ -1483,7 +1550,7 @@ function _charmRollDropKey(isBoss, monsterLevel) {
     const skills = _charmBuildDropSkillPool();
     if (!skills.length) return null;
     const skillId = skills[Math.floor(Math.random() * skills.length)];
-    const rank = Math.min(_charmRollDropRank(!!isBoss, monsterLevel), getSkillMaxRank(skillId));
+    const rank = Math.min(_charmRollDropRank(!!isBoss, monsterLevel, skillId), getSkillMaxRank(skillId));
     return charmKeyFor(skillId, rank);
 }
 

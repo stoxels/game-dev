@@ -2791,8 +2791,7 @@ const TQ_FIREBALL_ID = 'usp_fireball';
             try {
                 if ((typeof _tqIsTutorialActive === 'function') && !_tqIsTutorialActive()) return r;
             } catch (e) { return r; }
-            // A classless TUTORIAL player must not see Heartbloom (endgame-
-            // only) auto-seeded onto the bar - it renders locked and clutters
+            // A classless TUTORIAL player must not see Heartbloom auto-seeded onto the bar - it renders locked and clutters
             // exactly the slot the Fireball lesson invites the drop into. It
             // comes back legitimately once a class is chosen. Tutorial-only: a
             // classless campaign character who slots the Heartbloom charm must

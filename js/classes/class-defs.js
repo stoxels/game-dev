@@ -322,12 +322,13 @@ export const CLASS_SPELL_ICONS = {
 };
 
 //------------------------------------------------------------------------
-//-------------------ENDGAME HEARTBLOOM ABILITY---------------------------
+//-------------------HEARTBLOOM ABILITY-----------------------------------
 //------------------------------------------------------------------------
-// Universal 5th ability: spawns 3 hearts onto the grid. Endgame-only,
-// instant cast, 5-minute cooldown, ~50 mana. Rendered in the HUD's
-// third row, first column (slot active5). Not tied to a class or
-// ascendency - available to every class but gated by isCombatLevel().
+// Universal 5th ability: spawns 3 hearts onto the grid. Usable in every
+// level that runs monsters (campaign and endgame alike), instant cast,
+// 5-minute cooldown, ~50 mana. Rendered in the HUD's third row, first
+// column (slot active5). Not tied to a class or ascendency - available to
+// every class but gated by isCombatLevel().
 export const COMBAT_HEARTBLOOM_DEF = {
     id: 'heartbloom',
     icon: '💚',
