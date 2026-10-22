@@ -64,12 +64,15 @@ function _skillTooltipTags(def) {
 // switches to Life under Blood Magic maps. `preview` (shop / rank preview)
 // never shows the unaffordable red: nothing is being cast there, so the
 // current mana pool is irrelevant and the cost keeps its normal colour.
+// The same goes for any screen other than a running level (e.g. the level
+// select), where mana is empty and red would just be noise.
 function _skillTooltipCost(def, preview) {
     const cost = getSkillManaCost(def.id);
     if (!cost) return '';
     const blood = _bloodMagicActive();
     const label = blood ? t('cls_life') : t('cls_mana');
-    const affordable = preview || canAffordSkill(def.id);
+    const inLevel = !!document.getElementById('screen-game')?.classList.contains('active');
+    const affordable = preview || !inLevel || canAffordSkill(def.id);
     const color = blood ? '#ff7a7a' : '#7fb3ff';
     // Channels and auras drain continuously: their cost is per second.
     let per = '';

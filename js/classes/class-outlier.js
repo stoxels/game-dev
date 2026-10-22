@@ -10,6 +10,7 @@ import { ptHasAscendencySkill, ptHasSkill } from '../probability-tree/probabilit
 import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
+import { playClassSkillFlourish } from './class-skill-fx.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS--------------------
@@ -221,6 +222,7 @@ export function _tailRiskResolve() {
 
     const count = parseInt(slider.value, 10);
     const data = window._tailRiskData;
+    playClassSkillFlourish('outlier_active1');
     // Free Lunch (Outlier wheel): each revealed cell has a 20% chance to cost no time.
     let paidCells = count;
     if (ptHasAscendencySkill('outlier', 'free_lunch')) {

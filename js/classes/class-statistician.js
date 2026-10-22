@@ -12,6 +12,7 @@ import { getSkillCastRankClamped } from '../skills/skill-charms.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
+import { playClassSkillFlourish } from './class-skill-fx.js';
 
 //------------------------------------------------------------------------
 //-----------------STATISTICIAN-------------------------------------------
@@ -698,6 +699,7 @@ export function _dataStrikeResolve(type) {
 
     // Play horizontal slashes for row strikes, vertical for column strikes
     _playSlashEffect(type === 'cols');
+    playClassSkillFlourish('statistician_active1', null, null, { sweep: type });
 
     if (revealed > 0) {
         const msg = t('cls_data_strike_solved')

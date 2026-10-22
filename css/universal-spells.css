@@ -1723,6 +1723,57 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
 }
 @keyframes usp-pillar-base{ 0%{transform:scale(.4); opacity:0} 18%{transform:scale(1.1); opacity:1} 100%{transform:scale(1.25); opacity:0} }
 
+/* Blazing Column extras (built in _uspPillarFx): flash, shock rings, scorch,
+   side flames and rising embers around the pillar. */
+.usp-pillar-fx{ position:absolute; inset:0; pointer-events:none; z-index:6; }
+.usp-pillar-fx > span{ position:absolute; display:block; }
+.upf-flash{
+    left:-20%; right:-20%; bottom:-14%; height:90%;
+    background: radial-gradient(ellipse at 50% 100%, rgba(255,250,220,.95) 0%, rgba(255,190,70,.60) 30%, rgba(255,90,20,.25) 55%, transparent 75%);
+    opacity:0; animation: upf-flash .45s ease-out forwards;
+}
+@keyframes upf-flash{ 0%{opacity:0; transform:scale(.6)} 20%{opacity:1; transform:scale(1)} 100%{opacity:0; transform:scale(1.25)} }
+.upf-ring{
+    left:50%; bottom:2%; width:130%; height:30%; margin-left:-65%;
+    border-radius:50%; border:3px solid #ffb300;
+    box-shadow:0 0 14px #ff9100, 0 0 30px rgba(255,61,0,.60), inset 0 0 12px rgba(255,171,0,.70);
+    opacity:0; transform:scale(.25); animation: upf-ring .7s cubic-bezier(.2,.7,.3,1) forwards;
+}
+.upf-ring-late{ border-color:#ff6f00; animation-delay:.14s; animation-duration:.85s; }
+@keyframes upf-ring{ 0%{opacity:0; transform:scale(.25)} 15%{opacity:1} 100%{opacity:0; transform:scale(1.35)} }
+.upf-scorch{
+    left:-6%; right:-6%; bottom:-2%; height:18%;
+    background: radial-gradient(ellipse at 50% 50%, rgba(30,6,0,.80) 0%, rgba(90,16,0,.55) 45%, transparent 75%);
+    opacity:0; animation: upf-scorch 1.4s ease-out forwards;
+}
+@keyframes upf-scorch{ 0%{opacity:0} 15%{opacity:1} 70%{opacity:.8} 100%{opacity:0} }
+.upf-tongue{
+    bottom:6%; width:15%; height:78%; transform-origin:50% 100%;
+    background: linear-gradient(to top, #ffe27a 0%, #ff9100 32%, #e83b12 66%, transparent 100%);
+    border-radius:50% 50% 0 0 / 70% 70% 0 0;
+    filter: blur(.6px) drop-shadow(0 0 8px rgba(255,122,0,.85));
+    opacity:0; animation: upf-tongue .95s ease-out forwards;
+}
+.upf-tongue-l{ left:10%; --lean:-12deg; animation-delay:.08s; }
+.upf-tongue-r{ right:10%; --lean:12deg; animation-delay:.16s; }
+@keyframes upf-tongue{
+    0%{opacity:0; transform:scaleY(.1) rotate(0deg)}
+    25%{opacity:1; transform:scaleY(1) rotate(var(--lean))}
+    45%{transform:scaleY(.82) rotate(calc(var(--lean) * -.5))}
+    65%{opacity:.9; transform:scaleY(1) rotate(var(--lean))}
+    100%{opacity:0; transform:scaleY(1.1) rotate(0deg)}
+}
+.upf-ember{
+    left:var(--x); bottom:10%; width:var(--s); height:var(--s); border-radius:50%;
+    background:#ffd54f; box-shadow:0 0 6px #ff9100, 0 0 12px rgba(255,111,0,.70);
+    opacity:0; animation: upf-ember var(--d) ease-out var(--dl) forwards;
+}
+@keyframes upf-ember{
+    0%{opacity:0; transform:translate(0,0) scale(1)}
+    15%{opacity:1}
+    100%{opacity:0; transform:translate(var(--dx), calc(var(--rise) * -1)) scale(.3)}
+}
+
 /* ━━━ FLAMEBLAST (usp_flameblast) — charged ring detonation ━━━━━━━━━━━━ */
 /* Signature impact: a ring of flame starts at the outer radius (--blast
    scales it with the held charge: 0.6 quick tap → 1.5 full charge) and
@@ -3951,3 +4002,208 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
 .usp-phantom-mist-1{ --mx:30px; --my:-18px; } .usp-phantom-mist-2{ --mx:54px; --my:6px; animation-delay:.06s; }
 .usp-phantom-mist-3{ --mx:78px; --my:-8px; animation-delay:.12s; } .usp-phantom-mist-4{ --mx:98px; --my:16px; animation-delay:.18s; }
 @keyframes usp-phantom-mist{ 0%{opacity:0; transform:translate(var(--mx), var(--my)) scale(.4)} 30%{opacity:.9} 100%{opacity:0; transform:translate(calc(var(--mx) - 22px), var(--my)) scale(2.2)} }
+
+/* ━━━ METEOR (usp_meteor) — big skyfall overhaul ━━━━━━━━━━━━━━━━━━━━━━ */
+/* Warning rune: a glowing fire circle on the victim with a huge "incoming"
+   ring that closes in as the rock drops. */
+.usp-mark-meteor{
+    inset:3px; border-radius:10px;
+    border:2px solid rgba(255,120,30,.92);
+    background: radial-gradient(ellipse at 50% 50%, rgba(255,90,0,.34) 0%, rgba(232,59,18,.12) 55%, transparent 75%), rgba(255,80,0,.06);
+    box-shadow: inset 0 0 22px rgba(255,120,30,.40), 0 0 18px rgba(255,90,0,.40);
+    animation: usp-mark-meteor-pulse .26s ease-in-out infinite alternate;
+}
+.usp-mark-meteor::before{
+    content:''; position:absolute; left:50%; top:50%; width:46px; height:46px; margin:-23px 0 0 -23px;
+    border-radius:50%; border:2px dashed #ffd27a;
+    box-shadow:0 0 12px #ff9100, inset 0 0 10px rgba(255,120,0,.65);
+    animation: usp-mark-meteor-spin 1.4s linear infinite;
+}
+.usp-mark-meteor::after{
+    content:''; position:absolute; left:50%; top:50%; width:150px; height:150px; margin:-75px 0 0 -75px;
+    border-radius:50%; border:3px solid rgba(255,150,40,.85);
+    box-shadow:0 0 16px rgba(255,90,0,.7);
+    animation: usp-mark-meteor-close 1.15s ease-in forwards;
+}
+@keyframes usp-mark-meteor-pulse{ from{opacity:.62} to{opacity:1} }
+@keyframes usp-mark-meteor-spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+@keyframes usp-mark-meteor-close{ 0%{transform:scale(1.5); opacity:0} 20%{opacity:1} 100%{transform:scale(.18); opacity:.9} }
+
+/* The falling rock: bigger flaming tail, heavier glow. */
+.usp-proj-meteor-big{
+    filter: drop-shadow(0 0 18px rgba(255,160,40,1)) drop-shadow(0 0 38px rgba(255,90,0,.8)) drop-shadow(0 0 70px rgba(220,40,0,.5));
+    z-index:1400;
+}
+.usp-proj-meteor-big .usp-p-meteor-tail{ left:-40px; width:70px; }
+.usp-meteor-puff{
+    position:fixed; width:26px; height:26px; margin:-13px 0 0 -13px; border-radius:50%;
+    pointer-events:none; z-index:1390;
+    background: radial-gradient(circle, rgba(255,220,130,.95) 0%, rgba(255,120,20,.75) 35%, rgba(80,30,10,.45) 70%, transparent 100%);
+    animation: usp-meteor-puff .62s ease-out forwards;
+}
+@keyframes usp-meteor-puff{ 0%{opacity:1; transform:scale(.6)} 100%{opacity:0; transform:scale(2.6) translateY(-14px)} }
+
+/* Landing blast (built in _uspMeteorImpactFx). */
+.usp-meteor-impact{ position:absolute; inset:0; pointer-events:none; z-index:6; }
+.usp-meteor-impact > span{ position:absolute; display:block; }
+.umi-flash{
+    left:50%; top:50%; width:340%; height:340%; margin:-170% 0 0 -170%;
+    background: radial-gradient(circle, rgba(255,255,240,1) 0%, rgba(255,210,120,.75) 18%, rgba(255,100,20,.35) 40%, transparent 65%);
+    opacity:0; animation: umi-flash .5s ease-out forwards;
+}
+@keyframes umi-flash{ 0%{opacity:0; transform:scale(.4)} 12%{opacity:1; transform:scale(1)} 100%{opacity:0; transform:scale(1.4)} }
+.umi-fireball{
+    left:50%; top:56%; width:200%; height:200%; margin:-100% 0 0 -100%; border-radius:50%;
+    background: radial-gradient(circle, #fff 0%, #ffe27a 16%, #ff9100 36%, #e83b12 56%, rgba(120,20,0,.55) 72%, transparent 80%);
+    filter: blur(1.5px) drop-shadow(0 0 24px rgba(255,120,0,.9));
+    opacity:0; animation: umi-fireball .85s cubic-bezier(.15,.8,.3,1) forwards;
+}
+@keyframes umi-fireball{ 0%{opacity:0; transform:scale(.2)} 14%{opacity:1; transform:scale(.9)} 60%{opacity:.85; transform:scale(1.25)} 100%{opacity:0; transform:scale(1.5)} }
+.umi-ring{
+    left:50%; bottom:-4%; width:170%; height:44%; margin-left:-85%;
+    border-radius:50%; border:4px solid #ffc04d;
+    box-shadow:0 0 18px #ff9100, 0 0 40px rgba(255,61,0,.6), inset 0 0 14px rgba(255,171,0,.7);
+    opacity:0; transform:scale(.2); animation: umi-ring .8s cubic-bezier(.15,.7,.3,1) forwards;
+}
+.umi-ring-late{ border-color:#ff6f00; animation-delay:.12s; animation-duration:1s; }
+@keyframes umi-ring{ 0%{opacity:0; transform:scale(.2)} 12%{opacity:1} 100%{opacity:0; transform:scale(1.9)} }
+.umi-column{
+    left:14%; right:14%; bottom:-6%; height:170%; transform-origin:50% 100%;
+    background: linear-gradient(to top, #fff8dc 0%, #ffd060 12%, #ff9100 34%, #e83b12 62%, rgba(120,20,0,.6) 84%, transparent 100%);
+    border-radius:46% 54% 0 0 / 20% 22% 0 0;
+    filter: blur(.6px) drop-shadow(0 0 16px rgba(255,122,0,.9));
+    opacity:0; animation: umi-column 1s ease-out .08s forwards;
+}
+@keyframes umi-column{ 0%{opacity:0; transform:scaleY(.1) scaleX(.5)} 25%{opacity:1; transform:scaleY(1) scaleX(1)} 70%{opacity:.85; transform:scaleY(1.05) scaleX(.9)} 100%{opacity:0; transform:scaleY(1.15) scaleX(.6)} }
+.umi-debris{
+    left:50%; top:60%; width:var(--s); height:var(--s); border-radius:30% 60% 40% 55%;
+    background: radial-gradient(circle at 35% 30%, #7a5a40 0%, #2a1a12 70%);
+    box-shadow:0 0 8px #ff7a00, 0 0 14px rgba(255,61,0,.7);
+    opacity:0; animation: umi-debris var(--d) cubic-bezier(.2,.6,.4,1) .04s forwards;
+}
+@keyframes umi-debris{
+    0%{opacity:0; transform:translate(0,0) rotate(0)}
+    8%{opacity:1}
+    45%{transform:translate(calc(var(--dx) * .6), var(--peak)) rotate(180deg)}
+    100%{opacity:0; transform:translate(var(--dx), 30px) rotate(420deg)}
+}
+.umi-flame{
+    left:var(--x); bottom:2%; width:15%; height:52%; transform-origin:50% 100%;
+    background: linear-gradient(to top, #ffe27a 0%, #ff9100 36%, #e83b12 70%, transparent 100%);
+    border-radius:50% 50% 0 0 / 70% 70% 0 0;
+    filter: blur(.5px) drop-shadow(0 0 8px rgba(255,122,0,.85));
+    opacity:0; animation: umi-flame 1.3s ease-in-out forwards;
+}
+@keyframes umi-flame{
+    0%{opacity:0; transform:scaleY(.1)}
+    18%{opacity:1; transform:scaleY(1)}
+    36%{transform:scaleY(.7) skewX(5deg)}
+    54%{transform:scaleY(1) skewX(-5deg)}
+    72%{opacity:.9; transform:scaleY(.8) skewX(4deg)}
+    100%{opacity:0; transform:scaleY(.2)}
+}
+.umi-smoke{
+    left:var(--x); bottom:14%; width:34px; height:34px; margin-left:-17px; border-radius:50%;
+    background: radial-gradient(circle, rgba(70,56,50,.80) 0%, rgba(40,30,28,.50) 55%, transparent 80%);
+    opacity:0; animation: umi-smoke 1.4s ease-out forwards;
+}
+@keyframes umi-smoke{
+    0%{opacity:0; transform:translate(0,0) scale(.5)}
+    25%{opacity:.85}
+    100%{opacity:0; transform:translate(var(--dx), -120px) scale(2.6)}
+}
+.umi-crater{
+    left:-10%; right:-10%; bottom:-6%; height:26%;
+    background: radial-gradient(ellipse at 50% 50%, rgba(20,6,2,.9) 0%, rgba(90,20,4,.65) 40%, rgba(255,90,0,.25) 62%, transparent 78%);
+    opacity:0; animation: umi-crater 1.8s ease-out forwards;
+}
+@keyframes umi-crater{ 0%{opacity:0; transform:scale(.3)} 12%{opacity:1; transform:scale(1)} 70%{opacity:.85} 100%{opacity:0} }
+.usp-quake{ animation: usp-quake .5s ease-out; }
+@keyframes usp-quake{
+    0%{transform:translate(0,0)} 12%{transform:translate(-7px,4px)} 25%{transform:translate(6px,-5px)}
+    38%{transform:translate(-5px,3px)} 52%{transform:translate(4px,-3px)} 68%{transform:translate(-2px,2px)} 100%{transform:translate(0,0)}
+}
+.usp-meteor-screenflash{
+    position:fixed; inset:0; pointer-events:none; z-index:1500;
+    background: radial-gradient(circle at 50% 55%, rgba(255,200,110,.40) 0%, rgba(255,90,20,.16) 50%, transparent 80%);
+    animation: usp-meteor-screenflash .42s ease-out forwards;
+}
+@keyframes usp-meteor-screenflash{ 0%{opacity:0} 15%{opacity:1} 100%{opacity:0} }
+
+/* ━━━ SCORCHING BRAND (usp_immolate) — burning sigil ━━━━━━━━━━━━━━━━━━ */
+/* Stamped on the victim by the opening hit (built in _uspBrandFx); the burn
+   ticks re-flare it with .usp-brand-puff. */
+.usp-brand-flame{ position:absolute; inset:0; pointer-events:none; z-index:6; }
+.usp-brand-flame > span{ position:absolute; display:block; }
+.ubr-flash{
+    left:50%; top:50%; width:220%; height:220%; margin:-110% 0 0 -110%;
+    background: radial-gradient(circle, rgba(255,250,215,.95) 0%, rgba(255,170,60,.55) 24%, rgba(255,80,10,.22) 48%, transparent 70%);
+    opacity:0; animation: ubr-flash .4s ease-out forwards;
+}
+@keyframes ubr-flash{ 0%{opacity:0; transform:scale(.5)} 15%{opacity:1; transform:scale(1)} 100%{opacity:0; transform:scale(1.3)} }
+.ubr-sigil{
+    left:50%; top:50%; width:74px; height:74px; margin:-37px 0 0 -37px; border-radius:50%;
+    border:3px solid #ff9a1e;
+    background: radial-gradient(circle, rgba(255,230,150,.55) 0%, rgba(255,120,20,.30) 45%, rgba(255,80,0,.08) 70%, transparent 100%);
+    box-shadow:0 0 16px #ff9100, 0 0 34px rgba(255,61,0,.65), inset 0 0 16px rgba(255,171,0,.75);
+    opacity:0; animation: ubr-sigil 1.45s cubic-bezier(.2,.8,.3,1) forwards;
+}
+.ubr-sigil::before{
+    content:''; position:absolute; left:50%; top:50%; width:46px; height:46px; margin:-23px 0 0 -23px;
+    border:2.5px solid #ffe27a; transform:rotate(45deg);
+    box-shadow:0 0 10px #ff9100, inset 0 0 8px rgba(255,150,0,.7);
+}
+.ubr-sigil::after{
+    content:''; position:absolute; left:50%; top:50%; width:16px; height:16px; margin:-8px 0 0 -8px; border-radius:50%;
+    background: radial-gradient(circle, #fff 0%, #ffe27a 40%, #ff7a00 80%);
+    box-shadow:0 0 14px #fff, 0 0 26px #ff9100;
+}
+@keyframes ubr-sigil{
+    0%{opacity:0; transform:scale(1.9) rotate(-40deg)}
+    14%{opacity:1; transform:scale(.92) rotate(0deg)}
+    22%{transform:scale(1.06)}
+    32%{transform:scale(1)}
+    70%{opacity:.95; transform:scale(1) rotate(12deg)}
+    100%{opacity:0; transform:scale(1.08) rotate(24deg)}
+}
+.ubr-lick{
+    left:50%; top:50%; width:11px; height:34px; margin:-17px 0 0 -5.5px; transform-origin:50% 50%;
+    background: linear-gradient(to top, #ffe27a 0%, #ff9100 45%, #e83b12 80%, transparent 100%);
+    border-radius:50% 50% 0 0 / 80% 80% 0 0;
+    filter: drop-shadow(0 0 6px rgba(255,122,0,.9));
+    opacity:0; animation: ubr-lick .9s ease-out forwards;
+}
+@keyframes ubr-lick{
+    0%{opacity:0; transform:rotate(var(--a)) translateY(-18px) scaleY(.2)}
+    25%{opacity:1; transform:rotate(var(--a)) translateY(-44px) scaleY(1.15)}
+    60%{opacity:.9; transform:rotate(var(--a)) translateY(-48px) scaleY(.85)}
+    100%{opacity:0; transform:rotate(var(--a)) translateY(-56px) scaleY(.3)}
+}
+.ubr-ember{
+    left:var(--x); top:56%; width:3px; height:3px; border-radius:50%;
+    background:#ffd54f; box-shadow:0 0 6px #ff9100, 0 0 12px rgba(255,111,0,.7);
+    opacity:0; animation: ubr-ember var(--d) ease-out var(--dl) forwards;
+}
+@keyframes ubr-ember{ 0%{opacity:0; transform:translate(0,0)} 15%{opacity:1} 100%{opacity:0; transform:translate(var(--dx), calc(var(--rise) * -1)) scale(.3)} }
+.usp-brand-puff{
+    position:absolute; left:50%; top:50%; width:58px; height:58px; margin:-29px 0 0 -29px; border-radius:50%;
+    pointer-events:none; z-index:6;
+    border:2px solid rgba(255,160,40,.95);
+    background: radial-gradient(circle, rgba(255,230,150,.55) 0%, rgba(255,110,20,.28) 55%, transparent 80%);
+    box-shadow:0 0 12px #ff9100, inset 0 0 10px rgba(255,150,0,.6);
+    animation: usp-brand-puff .75s ease-out forwards;
+}
+@keyframes usp-brand-puff{ 0%{opacity:0; transform:scale(.5)} 20%{opacity:1; transform:scale(.95)} 100%{opacity:0; transform:scale(1.35)} }
+
+/* SCORCHED label (Scorching Brand): hovers over the card while it burns. */
+.usp-scorched-tag{
+    position:absolute; left:50%; top:-6px; transform:translateX(-50%);
+    padding:1px 8px; border-radius:6px; pointer-events:none; z-index:7; white-space:nowrap;
+    font:700 11px/1.3 sans-serif; letter-spacing:.14em; color:#ffe9a8;
+    background: linear-gradient(to bottom, rgba(120,20,0,.88), rgba(60,8,0,.88));
+    border:1px solid #ff9a1e;
+    text-shadow:0 0 6px #ff9100, 0 0 12px rgba(255,61,0,.8);
+    box-shadow:0 0 10px rgba(255,90,0,.7);
+    animation: usp-scorched-pulse .5s ease-in-out infinite alternate;
+}
+@keyframes usp-scorched-pulse{ from{opacity:.78; box-shadow:0 0 6px rgba(255,90,0,.5)} to{opacity:1; box-shadow:0 0 14px rgba(255,120,20,.95)} }

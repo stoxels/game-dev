@@ -324,7 +324,10 @@ export function _applyTargetResistances(amount, target, elements, opts) {
     // for the duration; monsters without a resistance table are treated as
     // having 0% so the lowering still amplifies physical hits.
     const crushed = (target.crushedUntil > Date.now()) ? Math.max(0, Number(target.crushPhysRedPct) || 0) : 0;
-    if (!target.resistances && !(crushed > 0)) return amount;
+    // Scorched (Scorching Brand): fire resistance is lowered while it lasts.
+    // Monsters without a resistance table count as 0%, so it still amplifies.
+    const scorchFire = (target.scorchedUntil > Date.now()) ? Math.max(0, Number(target.scorchFireResPct) || 0) : 0;
+    if (!target.resistances && !(crushed > 0) && !(scorchFire > 0)) return amount;
     const res = target.resistances || {};
     const clampRes = (v) => Math.max(-RESIST_CAP_PCT, Math.min(RESIST_CAP_PCT, Number(v) || 0));
     let physRes = (typeof res.physical === 'number') ? clampRes(res.physical) : 0;
@@ -350,7 +353,7 @@ export function _applyTargetResistances(amount, target, elements, opts) {
                 if (part <= 0) return;
                 // Penetration (opts.penetration, ARPG port phase A) lowers the
                 // monster's resistance for this hit only.
-                const penV = (opts && opts.penetration && opts.penetration[el]) || 0;
+                const penV = ((opts && opts.penetration && opts.penetration[el]) || 0) + (el === 'fire' ? scorchFire : 0);
                 mitigated += part * (1 - clampRes((Number(res[el]) || 0) - penV) / 100);
             });
             physical = amount - elemTotal;

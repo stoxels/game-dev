@@ -1,4 +1,6 @@
 import { Audio_Manager } from '../audio/audio.js';
+import { sfkAtPoint, sfkCardPoint, sfkFly, sfkHeroPoint, sfkLightning, sfkOnCard, sfkPlay, sfkPointLayer } from './spell-fx-kit.js';
+import { SPELL_FX, SPELL_FX_THEME } from './spell-fx-recipes.js';
 // universal-spell-fx.js
 //------------------------------------------------------------------------
 //-------------------UNIVERSAL SPELL VISUAL EFFECTS-----------------------
@@ -603,6 +605,38 @@ export function _uspProjDefFor(spell) {
 
 
 //------------------------------------------------------------------------
+//---------------------------RECIPE LOOKUP--------------------------------
+//------------------------------------------------------------------------
+
+// The visual recipe of a spell: its own signature fields on top of its
+// school's defaults (js/skills/spell-fx-recipes.js). Never null.
+function _uspFx(spell) {
+    const theme = SPELL_FX_THEME[(spell && spell.theme) || 'arcane'] || SPELL_FX_THEME.arcane;
+    const own = (spell && spell.id && SPELL_FX[spell.id]) || {};
+    return {
+        cast: own.noCast ? null : (own.cast || theme.cast),
+        trail: own.noTrail ? null : (own.trail || theme.trail),
+        flight: own.flight || {},
+        impact: own.impact || theme.impact,
+        impactBig: own.impactBig || own.impact || theme.impact,
+        tick: own.tick || theme.tick,
+        nova: own.nova || null,
+    };
+}
+
+// Cast flourish: the school sigil and sparks flare at the hero the moment
+// a spell commits (mana paid). Cosmetic, never throws.
+export function _uspCastFlourish(spell) {
+    try {
+        const steps = _uspFx(spell).cast;
+        if (!steps) return;
+        const at = sfkHeroPoint();
+        if (at) sfkAtPoint(at.x, at.y, steps, 1400, 'sfk-front');
+    } catch (e) { /* flourish is cosmetic */ }
+}
+
+
+//------------------------------------------------------------------------
 //---------------------------OVERLAY HELPERS------------------------------
 //------------------------------------------------------------------------
 
@@ -636,11 +670,17 @@ const USP_IMPACT_SFX = {
 const USP_SPELL_IMPACT = {
     // Flamestrike - pillar of flame: a column that rips up from
     // under the victim's feet and swallows the whole card. Replaces the ring.
-    usp_flamestrike: { cssClass: 'usp-pillar-flamestrike', ms: 950, skipNova: true },
+    // No flight: the column erupts straight from under each victim.
+    usp_flamestrike: { noFlight: true, cssClass: 'usp-pillar-flamestrike', ms: 950, skipNova: true, pillarFx: true },
     // Immolate - no projectile at all: the opening hit lands instantly with
     // the regular impact flash, then the usual DoT ticks burn on. noFlight
     // reuses the shared impact path, so no new art was needed.
-    usp_immolate: { noFlight: true },
+    // Scorching Brand: the brand also stamps a burning sigil on the victim
+    // (brandFx) and flares it again on every burn tick (tickPuff).
+    usp_immolate: { noFlight: true, cssClass: 'usp-brand-flame', ms: 1500, skipNova: true, brandFx: true, tickPuff: 'usp-brand-puff' },
+    // Meteor: a huge rock falls at an angle (meteorFall) and lands in a big
+    // fiery blast with debris, shock rings, lingering flames and a quake.
+    usp_meteor: { cssClass: 'usp-meteor-impact', ms: 1900, skipNova: true, meteorFall: true, meteorFx: true },
     // Storm Smite - smitten from above: the strike falls from the sky like
     // Meteor's instead of flying flat. The bolt visual lives in the
     // projectile overrides below.
@@ -692,7 +732,10 @@ const USP_SPELL_IMPACT = {
     // Cold Snap - a real icy snap: the victim flash-freezes solid. A sheet
     // of ice with radiating cracks crystallizes over the card in one snap
     // and holds briefly before thawing. Replaces the soft nova ring.
-    usp_cold_snap: { cssClass: 'usp-coldsnap-freeze', ms: 950, skipNova: true },
+    usp_cold_snap: { noFlight: true, cssClass: 'usp-coldsnap-freeze', ms: 950, skipNova: true },
+    // Mana Burst / Surge Release: the blast goes off around the hero, so
+    // every victim is hit in place (Surge Release also arcs to each one).
+    usp_arcane_explosion: { noFlight: true },
     // Crackling Lance - a piercing rail-discharge, not a thrown bolt: the
     // beam itself is the hit, so nothing flies. Victims along the line
     // take the strike instantly with the regular lightning treatment
@@ -701,7 +744,7 @@ const USP_SPELL_IMPACT = {
     // Discharge - the full overcharge let loose: every victim erupts in a
     // violet-white super-detonation with forking arcs, on top of the
     // regular lightning impact and nova rings.
-    usp_discharge: { cssClass: 'usp-discharge-blast', ms: 1000 },
+    usp_discharge: { noFlight: true, cssClass: 'usp-discharge-blast', ms: 1000 },
     // Contagion - a spreading disease cloud, not a thrown orb: the opener
     // blooms the miasma directly on every victim (no flight), and each of
     // the 5 ticks exhales a fresh puff so the plague visibly spreads for
@@ -753,7 +796,38 @@ const USP_ZONE_BLAST = {
     usp_crackling_lance: { arcs: 8 },
 };
 
+// Plays recipe steps inside a placed ground zone, again every `every` ms for
+// as long as the zone is on screen (children die with the zone). A one-shot
+// burst (every = 0) gets its own layer with the zone's shape instead, so its
+// particles outlive the short-lived burst zone.
+function _uspZoneRecipe(steps, zoneEl, every) {
+    if (!steps || !zoneEl) return;
+    const layer = document.createElement('div');
+    layer.className = 'sfk-layer';
+    if (every) {
+        zoneEl.appendChild(layer);
+    } else {
+        const z = zoneEl.style;
+        layer.style.cssText = `position:fixed;inset:auto;left:${z.left};top:${z.top};width:${z.width};height:${z.height};`
+            + `transform:${z.transform || 'none'};clip-path:${z.clipPath || 'none'};z-index:9990;`;
+        document.body.appendChild(layer);
+        setTimeout(() => { try { layer.remove(); } catch (e) { /* already gone */ } }, 1800);
+        sfkPlay(layer, steps);
+        return;
+    }
+    const beat = () => {
+        if (!zoneEl.isConnected) return;
+        sfkPlay(layer, steps);
+        if (every) setTimeout(beat, every);
+    };
+    beat();
+}
+
 export function _uspZoneBlast(spell, zoneEl) {
+    try {
+        const own = spell && spell.id && SPELL_FX[spell.id];
+        if (own && own.zoneBurst && zoneEl) _uspZoneRecipe(own.zoneBurst, zoneEl, 0);
+    } catch (e) { /* burst is cosmetic */ }
     const cfg = spell && spell.id && USP_ZONE_BLAST[spell.id];
     if (!cfg || !zoneEl || typeof document === 'undefined') return;
     try {
@@ -788,6 +862,10 @@ export function _uspZoneBlast(spell, zoneEl) {
 }
 
 export function _uspZoneRain(spell, zoneEl) {
+    try {
+        const own = spell && spell.id && SPELL_FX[spell.id];
+        if (own && own.zone && zoneEl) _uspZoneRecipe(own.zone.steps, zoneEl, own.zone.every || 0);
+    } catch (e) { /* weather is cosmetic */ }
     const cfg = spell && spell.id && USP_ZONE_RAIN[spell.id];
     if (!cfg || !zoneEl || typeof document === 'undefined') return;
     try {
@@ -823,10 +901,171 @@ function _uspImpact(spell, monsterId, opts) {
         // a full charge erupts visibly wider than a quick release.
         const bp = opts && opts.blastPower;
         if (el && Number.isFinite(bp)) el.style.setProperty('--blast', Math.max(0.6, Math.min(1.5, bp)).toFixed(2));
+        if (sig.pillarFx) _uspPillarFx(monsterId);
+        if (sig.brandFx && el) _uspBrandFx(el);
+        if (sig.brandFx) _uspScorchedTag(monsterId, ((spell && spell.ticks) || 5) * 1000 + 250);
+        if (sig.meteorFx && el) _uspMeteorImpactFx(el);
     }
     if (opts && opts.isAoE && !(sig && sig.skipNova)) {
         _uspCardOverlay(monsterId, `usp-nova usp-nova-${theme}`, 800);
     }
+    // Recipe bloom on the victim (particles, rings, signature pieces).
+    try {
+        const fx = _uspFx(spell);
+        const steps = (opts && (opts.isBig || opts.isCrit)) ? fx.impactBig : fx.impact;
+        sfkOnCard(monsterId, _uspAimAtHero(steps, monsterId), 1800,
+            (opts && opts.isCrit && !opts.isBig) ? 1.25 : 1);
+    } catch (e) { /* bloom is cosmetic */ }
+}
+
+// Particle steps marked `toHero: true` fly from the victim to the hero (life
+// drain, souls): their angle and distance are resolved here from the live
+// card -> hero vector. Other steps pass through untouched.
+function _uspAimAtHero(steps, monsterId) {
+    if (!Array.isArray(steps) || !steps.some((s) => s && s.toHero)) return steps;
+    const from = sfkCardPoint(monsterId);
+    const to = sfkHeroPoint();
+    if (!from || !to) return steps.filter((s) => !(s && s.toHero));
+    const ang = Math.atan2(to.y - from.y, to.x - from.x) * 180 / Math.PI;
+    const dist = Math.hypot(to.x - from.x, to.y - from.y);
+    return steps.map((s) => (s && s.toHero)
+        ? Object.assign({}, s, { angle: [ang - (s.cone || 6), ang + (s.cone || 6)], dist: [dist * 0.92, dist * 1.02] })
+        : s);
+}
+
+// Blazing Column extras around the pillar: a white-hot flash, a shock ring
+// and a scorch mark on the ground, two licking side flames and a shower of
+// rising embers. Lives on its own layer so the pillar's stretch animation does
+// not squash it. Purely cosmetic.
+function _uspPillarFx(monsterId) {
+    const layer = _uspCardOverlay(monsterId, 'usp-pillar-fx', 1500);
+    if (!layer) return;
+    const add = (cls, style) => {
+        const el = document.createElement('span');
+        el.className = cls;
+        if (style) el.style.cssText = style;
+        layer.appendChild(el);
+    };
+    add('upf-scorch');
+    add('upf-flash');
+    add('upf-ring');
+    add('upf-ring upf-ring-late');
+    add('upf-tongue upf-tongue-l');
+    add('upf-tongue upf-tongue-r');
+    for (let i = 0; i < 14; i++) {
+        const size = 2 + Math.random() * 3;
+        add('upf-ember',
+            `--x:${(12 + Math.random() * 76).toFixed(0)}%;--dx:${(Math.random() * 44 - 22).toFixed(0)}px;`
+            + `--rise:${(70 + Math.random() * 90).toFixed(0)}px;--s:${size.toFixed(1)}px;`
+            + `--d:${(650 + Math.random() * 600).toFixed(0)}ms;--dl:${(60 + Math.random() * 380).toFixed(0)}ms;`);
+    }
+}
+
+// SCORCHED label: stays on the monster's card for as long as it burns (a
+// recast replaces it). Cosmetic only.
+function _uspScorchedTag(monsterId, ms) {
+    try {
+        const card = document.getElementById(`sx-card-${monsterId}`);
+        if (!card) return;
+        card.querySelectorAll('.usp-scorched-tag').forEach((e) => e.remove());
+        const de = (typeof globalThis.LANG !== 'undefined' && globalThis.LANG === 'de');
+        const tag = _uspCardOverlay(monsterId, 'usp-scorched-tag', ms);
+        if (tag) tag.textContent = de ? 'VERSENGT' : 'SCORCHED';
+    } catch (e) { /* cosmetic */ }
+}
+
+// Scorching Brand: a burning sigil stamps onto the victim - a hot flash, a
+// spinning rune ring that slams in, eight flame licks fanning out from it and
+// a few rising embers. Added into the brand overlay (el). Cosmetic only.
+function _uspBrandFx(el) {
+    const add = (cls, style) => {
+        const s = document.createElement('span');
+        s.className = cls;
+        if (style) s.style.cssText = style;
+        el.appendChild(s);
+    };
+    add('ubr-flash');
+    add('ubr-sigil');
+    for (let i = 0; i < 8; i++) add('ubr-lick', `--a:${i * 45}deg;animation-delay:${(60 + i * 18)}ms;`);
+    for (let i = 0; i < 9; i++) {
+        add('ubr-ember',
+            `--x:${(30 + Math.random() * 40).toFixed(0)}%;--dx:${(Math.random() * 40 - 20).toFixed(0)}px;`
+            + `--rise:${(50 + Math.random() * 60).toFixed(0)}px;--d:${(600 + Math.random() * 500).toFixed(0)}ms;`
+            + `--dl:${(80 + Math.random() * 300).toFixed(0)}ms;`);
+    }
+}
+
+// Meteor, the fall: a huge burning rock arrives at an angle from high above,
+// growing as it comes, shedding a trail of fire and smoke; onArrive (the
+// damage + impact) runs when it lands. Fixed-position and self-removing.
+function _uspMeteorFall(spell, targetCard, onArrive) {
+    const def = _uspProjDefFor(spell);
+    const c = globalThis._getElementCentre(targetCard);
+    const side = Math.random() < 0.5 ? -1 : 1;
+    const start = { x: c.x + side * 360, y: c.y - 620 };
+    const angle = Math.atan2(c.y - start.y, c.x - start.x) * 180 / Math.PI;
+    const proj = document.createElement('div');
+    proj.className = 'sx-projectile sx-built usp-proj-meteor usp-proj-meteor-big';
+    proj.style.left = '0px';
+    proj.style.top = '0px';
+    def.build(proj);
+    document.body.appendChild(proj);
+    const trail = setInterval(() => {
+        try {
+            const r = proj.getBoundingClientRect();
+            const puff = document.createElement('div');
+            puff.className = 'usp-meteor-puff';
+            puff.style.left = (r.left + r.width / 2) + 'px';
+            puff.style.top = (r.top + r.height / 2) + 'px';
+            document.body.appendChild(puff);
+            setTimeout(() => puff.remove(), 650);
+        } catch (e) { /* trail is cosmetic */ }
+    }, 38);
+    const anim = proj.animate([
+        { transform: `translate(${start.x}px, ${start.y}px) rotate(${angle}deg) scale(1.4)` },
+        { transform: `translate(${c.x}px, ${c.y}px) rotate(${angle}deg) scale(5.2)` },
+    ], { duration: 760, easing: 'cubic-bezier(.55,0,.9,.6)' });
+    anim.onfinish = () => { clearInterval(trail); proj.remove(); onArrive(); };
+}
+
+// Meteor, the landing: a white-hot flash and fireball, two ground shock
+// rings, a column of fire, flying rock debris, flames that keep burning on the
+// ground and rising smoke, plus a short screen quake and flash. Added into
+// the meteor impact overlay (el). Cosmetic only.
+function _uspMeteorImpactFx(el) {
+    const add = (cls, style) => {
+        const s = document.createElement('span');
+        s.className = cls;
+        if (style) s.style.cssText = style;
+        el.appendChild(s);
+    };
+    add('umi-crater');
+    add('umi-flash');
+    add('umi-fireball');
+    add('umi-ring');
+    add('umi-ring umi-ring-late');
+    add('umi-column');
+    for (let i = 0; i < 14; i++) {
+        const dir = Math.random() < 0.5 ? -1 : 1;
+        add('umi-debris',
+            `--dx:${(dir * (30 + Math.random() * 110)).toFixed(0)}px;--peak:${(-(60 + Math.random() * 120)).toFixed(0)}px;`
+            + `--s:${(4 + Math.random() * 7).toFixed(0)}px;--d:${(650 + Math.random() * 450).toFixed(0)}ms;`);
+    }
+    for (let i = 0; i < 6; i++) add('umi-flame', `--x:${(8 + i * 15 + Math.random() * 6).toFixed(0)}%;animation-delay:${(200 + Math.random() * 300).toFixed(0)}ms;`);
+    for (let i = 0; i < 5; i++) add('umi-smoke', `--x:${(20 + Math.random() * 60).toFixed(0)}%;--dx:${(Math.random() * 50 - 25).toFixed(0)}px;animation-delay:${(150 + i * 110)}ms;`);
+    try {
+        const scr = document.getElementById('screen-game');
+        if (scr) {
+            scr.classList.remove('usp-quake');
+            void scr.offsetWidth;
+            scr.classList.add('usp-quake');
+            setTimeout(() => scr.classList.remove('usp-quake'), 520);
+        }
+        const flash = document.createElement('div');
+        flash.className = 'usp-meteor-screenflash';
+        document.body.appendChild(flash);
+        setTimeout(() => flash.remove(), 450);
+    } catch (e) { /* cosmetic */ }
 }
 
 // Word brands (Pain, Corruption) - a shadowy word that
@@ -855,6 +1094,7 @@ function _uspDotTick(spell, monsterId) {
     try {
         const sig = spell && spell.id && USP_SPELL_IMPACT[spell.id];
         if (sig && sig.tickPuff) _uspCardOverlay(monsterId, sig.tickPuff, 750);
+        sfkOnCard(monsterId, _uspFx(spell).tick, 1200);
     } catch (e) { /* puff is cosmetic */ }
 }
 
@@ -1000,6 +1240,13 @@ export function _uspMeleeSwing(spell, origin, aim) {
                     '<div class="usp-sword-pommel"></div>' +
                 '</div>';
         document.body.appendChild(el);
+        // Recipe swing particles, turned onto the swing direction (angle 0 =
+        // toward the aim point).
+        const swing = (SPELL_FX[spell && spell.id] || {}).swing;
+        if (swing) {
+            const layer = sfkPointLayer(origin.x, origin.y, 1300, 'sfk-front');
+            if (layer) { layer.style.transform = `rotate(${ang}rad)`; sfkPlay(layer, swing); }
+        }
         setTimeout(() => { try { el.remove(); } catch (x) { /* already gone */ } }, USP_MELEE_EXTRA[weapon] ? USP_MELEE_EXTRA[weapon].ms : weapon === 'sword' ? 480 : (weapon === 'greatsword' ? 750 : (weapon === 'cleave' ? 680 : (weapon === 'whirl' ? 700 : (weapon === 'scythe' ? 700 : 620)))));
     } catch (e) { /* swing is cosmetic */ }
 }
@@ -1098,6 +1345,8 @@ const USP_SPELL_MARK = {
     // Storm Call - marker: a crackling rune circle etched
     // onto the victim, counting down to the skyfall.
     usp_storm_call: { cssClass: 'usp-mark-storm' },
+    // Meteor - a glowing fire rune with a shrinking "incoming" ring.
+    usp_meteor: { cssClass: 'usp-mark-meteor' },
 };
 
 // Meteor / delayed-spell warning marker on the target card.
@@ -2384,6 +2633,12 @@ export function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
         if (sigHit.beam) _uspBeamFlash(spell, monsterId);
         else if (sigHit.flamejet) _uspFlameJet(spell, monsterId);
         else if (sigHit.soulbeam) _uspSoulBeam(spell, monsterId);
+        // Lightning signatures without a flight still crack an arc from the
+        // hero to the victim.
+        const noFlightBolt = _uspFx(spell).flight.bolt;
+        if (noFlightBolt) {
+            try { sfkLightning(sfkHeroPoint(), sfkCardPoint(monsterId), noFlightBolt.color, noFlightBolt.ms || 240, noFlightBolt.width || 3, noFlightBolt.kinks); } catch (e) { /* arc is cosmetic */ }
+        }
         damageFn(monsterId, hit.amount, hit.elements, { isCrit: !!hit.isCrit, isPlayerSpell: true, uspSfx: !!USP_IMPACT_SFX[spell && spell.theme] });
         if (sigHit.wordImpact) { _uspWordBrand(spell, monsterId, sigHit.word); _uspDotTick(spell, monsterId); }
         else _uspImpact(spell, monsterId, opts);
@@ -2410,6 +2665,12 @@ export function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
         return;
     }
 
+    // Meteor: its own angled, growing fall (the generic flight shrinks).
+    if (sigHit && sigHit.meteorFall) {
+        try { _uspMeteorFall(spell, targetCard, impact); } catch (e) { impact(); }
+        return;
+    }
+
     let centre = globalThis._getElementCentre(targetCard);
     // Volley spread (Barrage): fan the shafts across the victim so rapid
     // followers don't land on the exact same pixel - cosmetic only, the
@@ -2428,14 +2689,23 @@ export function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
             flightMs = Math.max(60, Math.round(flightMs / (1 + pct / 100)));
         } catch (e) { /* no stats - base speed */ }
     }
+    // Kit flight: keeps its size on arrival, may curve, sheds the recipe trail.
     try {
-        globalThis._fireProjectile(
-            projDef, projDef.cssClass,
-            start, centre,
-            flightMs,
-            opts.fromSky ? 'ease-in' : projDef.easing,
-            impact, null, scale
-        );
+        const fx = _uspFx(spell);
+        // Lightning spells also crack a real jagged arc along the path: once
+        // at launch and once as the strike lands.
+        const bolt = fx.flight.bolt;
+        if (bolt) {
+            sfkLightning(start, centre, bolt.color, bolt.ms || 240, bolt.width || 3, bolt.kinks);
+            setTimeout(() => sfkLightning(start, centre, bolt.color, (bolt.ms || 240) * 0.8, (bolt.width || 3) * 0.7, bolt.kinks), Math.max(40, flightMs * 0.6));
+        }
+        sfkFly({
+            def: projDef, cssClass: projDef.cssClass, start, end: centre, ms: flightMs,
+            easing: opts.fromSky ? 'ease-in' : projDef.easing,
+            scale, scaleTo: (fx.flight.scaleTo != null && !opts.volleyIndex) ? fx.flight.scaleTo : scale * 0.85,
+            arc: opts.fromSky ? 0 : (fx.flight.arc || 0) * (opts.volleyIndex % 2 ? -1 : 1),
+            trail: fx.trail, onArrive: impact,
+        });
     } catch (e) {
         impact();
     }

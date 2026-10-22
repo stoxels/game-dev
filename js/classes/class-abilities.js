@@ -27,6 +27,7 @@ import { _executeBrownianMotion, _executeSummonDrifter } from './class-random-wa
 import { _executeDegreesOfFreedom, _executeResidual, resetRecursionistState } from './class-recursionist.js';
 import { _executeDataStrike, _executeDiagonalStrike, _momentumClearParticlesImmediate, _momentumParticlesOnMistake, _momentumSpawnParticle, _statisticianTriggerMomentum } from './class-statistician.js';
 import { activateTargetingReticle } from './targeting-reticle.js';
+import { playClassSkillFlourish } from './class-skill-fx.js';
 import { playShieldChargePulseEffect, playTimeGainEffect } from '../probability-tree/probability-tree-effects.js';
 import { ptHasAscendencySkill, ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { getCharmLockedSkillForLegacySlot, getSkillCastRankClampedForSlot, getSkillIdForLegacySlot, noteCharmCast } from '../skills/skill-charms.js';
@@ -726,6 +727,10 @@ function _fireInstantHeartbloomAbility() {
 
 // _fireInstantAbility - router that fires the correct instant handler based on slot.
 function _fireInstantAbility(slot) {
+    // Icon-styled cast flourish (Data Strike / Tail Risk play theirs once the
+    // player answers their dialog).
+    const fxId = getSkillIdForLegacySlot(slot);
+    if (fxId !== 'statistician_active1' && fxId !== 'outlier_active1') playClassSkillFlourish(fxId);
     if (slot === 'active5') {
         _fireInstantHeartbloomAbility();
     } else if (slot === 'active1' || slot === 'active2') {
@@ -878,6 +883,7 @@ export function executeActiveAbility(row, col) {
     trackAchStat('classAbilitiesUsedTotal'); 
 
     const activeKey = STATE.classActiveChoice || 'active1';
+    playClassSkillFlourish(getSkillIdForLegacySlot(activeKey), row, col);
 
     if (activeKey === 'active3' || activeKey === 'active4') {
         _executeAscendencySkillOnCell(activeKey, row, col);

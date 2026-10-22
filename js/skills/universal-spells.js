@@ -7,7 +7,7 @@ import { _applyManaCostModifiers, _bloodMagicActive, _scaleAbilityManaCost, canA
 import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellManaCostOverrideForSkill, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill, isSkillCharmUnlocked, noteCharmCast } from './skill-charms.js';
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
 import { SKILL_REGISTRY } from './skill-registry.js';
-import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspArrowFan, _uspAuraClear, _uspAuraPulse, _uspAuraShow, _uspBladeBlastPlant, _uspBarrierRaise, _uspBarrierStart, _uspBulwarkClear, _uspBulwarkWall, _uspWindwardClear, _uspWindwardGale, _uspAegisWardClear, _uspAegisWardHit, _uspAegisWardShow, _uspRetributionClear, _uspRetributionFlare, _uspRetributionShow, _uspWindstepClear, _uspWindstepTailwind, _uspBlinkFX, _uspRenewalBloom, _uspRenewalClear, _uspRenewalPulse, _uspMendHearts, _uspFireThemedProjectile, _uspMeleeSwing, _uspMoveSpriteOffset, _uspLeapImpactFX, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph, _uspZoneBlast, _uspZoneRain } from './universal-spell-fx.js';
+import { _uspAnchorMarkerClear, _uspCastFlourish, _uspAnchorMarkerShow, _uspArrowFan, _uspAuraClear, _uspAuraPulse, _uspAuraShow, _uspBladeBlastPlant, _uspBarrierRaise, _uspBarrierStart, _uspBulwarkClear, _uspBulwarkWall, _uspWindwardClear, _uspWindwardGale, _uspAegisWardClear, _uspAegisWardHit, _uspAegisWardShow, _uspRetributionClear, _uspRetributionFlare, _uspRetributionShow, _uspWindstepClear, _uspWindstepTailwind, _uspBlinkFX, _uspRenewalBloom, _uspRenewalClear, _uspRenewalPulse, _uspMendHearts, _uspFireThemedProjectile, _uspMeleeSwing, _uspMoveSpriteOffset, _uspLeapImpactFX, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph, _uspZoneBlast, _uspZoneRain } from './universal-spell-fx.js';
 import { beginSpellTargeting, cancelSpellTargeting, getAvatarCentre, getCursorPoint, isSpellTargeting, resolveGroundShape, shapeHitsRect, showSpellZone } from './spell-casttime.js';
 import { updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
@@ -106,7 +106,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_flamestrike', icon: '🔥', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'nova', dmg: [6, 9], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.2, perTarget: true,
+        behavior: 'nova', dmg: [12, 16], manaCost: 42, cooldownSeconds: 10, castTimeSeconds: 1.2, perTarget: true,
         tags: ['Spell', 'Fire', 'Area'], scalingTags: ['spell', 'fire', 'area'],
         nameEn: 'Blazing Column', nameDE: 'Flammensäule',
         descEn: 'A pillar of flame scorches every enemy.',
@@ -115,16 +115,16 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_immolate', icon: '🕯️', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'ticks', dmg: [4, 5], tickDmg: [2, 4], ticks: 5, manaCost: 34, cooldownSeconds: 14, castTimeSeconds: 0.8,
+        behavior: 'ticks', dmg: [4, 5], tickDmg: [2, 4], ticks: 5, scorchFireResPct: 20, manaCost: 34, cooldownSeconds: 14, castTimeSeconds: 0.8,
         tags: ['Spell', 'Fire', 'Damage over Time'], scalingTags: ['spell', 'fire', 'dot'],
         nameEn: 'Scorching Brand', nameDE: 'Sengendes Mal',
-        descEn: 'Instant fire damage, then burning for 5 seconds.',
-        descDE: 'Sofortiger Feuerschaden, danach 5 Sekunden Brand.',
+        descEn: 'Instant fire damage, then burning for 5 seconds. While burning, the enemy is Scorched: -20% Fire Resistance.',
+        descDE: 'Sofortiger Feuerschaden, danach 5 Sekunden Brand. Solange er brennt, ist der Gegner versengt: -20% Feuerresistenz.',
         sfx: 'dofBurn',
     },
     {
         id: 'usp_meteor', icon: '🌠', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'delayed', dmg: [20, 27], delayMs: 900, manaCost: 53, cooldownSeconds: 24, castTimeSeconds: 1.6,
+        behavior: 'delayed', dmg: [26, 35], delayMs: 900, manaCost: 53, cooldownSeconds: 30, castTimeSeconds: 1.6,
         tags: ['Spell', 'Fire', 'Area'], scalingTags: ['spell', 'fire', 'area'],
         nameEn: 'Meteor', nameDE: 'Meteor',
         descEn: 'A meteor hits the aimed spot after a short delay. Heavy fire damage in an area.',
@@ -133,7 +133,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_rain_of_fire', icon: '🎆', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 4, hitsAll: true, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
+        behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 4, hitsAll: true, manaCost: 47, cooldownSeconds: 14, castTimeSeconds: 1.2,
         tags: ['Spell', 'Fire', 'Area', 'Damage over Time'], scalingTags: ['spell', 'fire', 'area', 'dot'],
         nameEn: 'Ember Shower', nameDE: 'Glutschauer',
         descEn: 'Embers rain on the aimed area for 4 seconds, hitting every enemy inside each second.',
@@ -3084,16 +3084,16 @@ function _uspCastSfxKey(spell) {
         case 'shield': case 'guard': return 'spell_barrier';
         case 'ward': case 'evade': case 'thorns': return 'spell_buff';
         case 'blink': case 'anchor': return 'spell_blink';
-        case 'dash': case 'disengage': case 'windstep': case 'leap': return 'spell_dash';
+        case 'dash': case 'disengage': case 'windstep': case 'leap': return 'spell_shadow_dash';
         default: break;
     }
     switch (spell.id) {
         case 'usp_whirlwind': case 'usp_blade_vortex': return 'spell_whirlwind';
-        case 'usp_execute': return 'spell_execute';
+        case 'usp_execute': return 'spell_finishing_blow';
         case 'usp_fireball': return 'spell_fireball';
         case 'usp_pyroblast': return 'spell_magma_shot';
-        case 'usp_explosive_shot': return 'spell_explosive_arrow';
-        case 'usp_arrow_volley': case 'usp_barrage': return 'spell_arrow_volley';
+        case 'usp_explosive_shot': return 'spell_bomb_arrow';
+        case 'usp_arrow_volley': case 'usp_barrage': return 'spell_skyfall_arrows';
         default: break;
     }
     const byTheme = {
@@ -3102,6 +3102,19 @@ function _uspCastSfxKey(spell) {
         shadow: 'spell_shadow_cast', holy: 'spell_holy_cast',
     };
     return byTheme[spell.theme] || null;
+}
+
+// Scorched (Scorching Brand): for as long as the burn lasts, the target takes
+// extra fire damage - its fire resistance is lowered by `pct` (applied in
+// _applyTargetResistances while scorchedUntil is in the future). Recasting
+// refreshes it.
+function _uspScorchTarget(monsterId, pct, ms) {
+    try {
+        const m = (globalThis._monsters || []).find((x) => x.id === monsterId);
+        if (!m) return;
+        m.scorchedUntil = Date.now() + ms;
+        m.scorchFireResPct = pct;
+    } catch (e) { /* cosmetic-safe: no scorch, normal damage */ }
 }
 
 function _uspPlaySfx(spell) {
@@ -3342,7 +3355,8 @@ function _uspApplyGroundSpell(spell, point) {
         }
         setTimeout(() => {
             if (!live()) return;
-            showSpellZone(shape, point, origin, spell.theme, 600, 'burst');
+            const burstEl = showSpellZone(shape, point, origin, spell.theme, 600, 'burst');
+            try { _uspZoneBlast(spell, burstEl); } catch (e) { /* blast is cosmetic */ }
             victims().forEach((m, i) => {
                 setTimeout(() => {
                     if (!live()) return;
@@ -3355,7 +3369,8 @@ function _uspApplyGroundSpell(spell, point) {
 
     if (spell.behavior === 'starfall') {
         const n = spell.count || 6;
-        showSpellZone(shape, point, origin, spell.theme, n * 260 + 500, 'burst');
+        const showerEl = showSpellZone(shape, point, origin, spell.theme, n * 260 + 500, 'burst');
+        try { _uspZoneRain(spell, showerEl); } catch (e) { /* weather is cosmetic */ }
         for (let i = 0; i < n; i++) {
             setTimeout(() => {
                 if (!live()) return;
@@ -3460,6 +3475,7 @@ function _uspPlayerDead() {
 // Per-cast bookkeeping shared by every sustained spell's FIRST action.
 function _uspSustainedCastBegan(spell) {
     _uspPlaySfx(spell);
+    _uspCastFlourish(spell);
     try {
         if (typeof globalThis.updateQuestStats === 'function') updateQuestStats('classAbilityUsed', {});
         if (typeof globalThis.triggerSkillBanter === 'function') globalThis.triggerSkillBanter(spell.id);
@@ -3826,6 +3842,7 @@ export function castUniversalSpell(spellId, opts) {
         startUniversalSpellCooldown(spellId);
     }
     _uspPlaySfx(spell);
+    _uspCastFlourish(spell);
     try {
         if (typeof globalThis.updateQuestStats === 'function') updateQuestStats('classAbilityUsed', {});
         if (typeof globalThis.triggerSkillBanter === 'function') globalThis.triggerSkillBanter(spellId);
@@ -3934,6 +3951,7 @@ export function castUniversalSpell(spellId, opts) {
             const td = spell.tickDmg || spell.dmg;
             const total = spell.ticks || 3;
             const hitAll = !!spell.hitsAll;
+            if (spell.scorchFireResPct) _uspScorchTarget(targetId, spell.scorchFireResPct, total * 1000 + 150);
             for (let i = 0; i < total; i++) {
                 setTimeout(() => {
                     try {
