@@ -500,7 +500,7 @@ export function _awardXP(xpGain) {
             gainMana(levelsGained * 2);
         }
 
-        _playLevelUpEffect(_getPlayerLevel());
+        _playLevelUpEffect(_getPlayerLevel(), passiveGained);
         _playLevelUpReward();
         // Absorption shield: fully replenish even when not in an active encounter
         // (_playLevelUpReward already handles the active case and early-returns otherwise).
@@ -752,22 +752,59 @@ function _playLevelUpReward() {
 //-------------------LEVEL-UP EFFECT--------------------------------------
 //------------------------------------------------------------------------
 
-// Full-screen gold flash + expanding "LEVEL UP!" banner. Pure CSS animation,
-// element removes itself after the effect finishes. Safe mid-combat (the
-// overlay ignores pointer events).
-function _playLevelUpEffect(newLevel) {
+const LEVELUP_FX_MS = 3800;
+const LEVELUP_SPARK_COUNT = 18;
+
+// A burst of gold sparks flying outward from the banner; each spark gets its
+// own direction, distance and delay through CSS variables.
+function _buildLevelUpSparksHTML() {
+    let html = '';
+    for (let i = 0; i < LEVELUP_SPARK_COUNT; i++) {
+        const angle = (i / LEVELUP_SPARK_COUNT) * 360 + Math.random() * 14;
+        const dist = 150 + Math.random() * 170;
+        const delay = Math.random() * 0.25;
+        html += `<i class="sx-levelup-spark" style="--a:${angle.toFixed(1)}deg;--d:${dist.toFixed(0)}px;--t:${delay.toFixed(2)}s"></i>`;
+    }
+    return html;
+}
+
+// The "Press [K] to spend your Passive Point(s)" line, with the key shown as
+// a key cap using the player's CURRENT binding (default K). Empty when the
+// level-up granted no passive points.
+function _buildLevelUpKeyPromptHTML(passiveGained) {
+    if (!(passiveGained > 0)) return '';
+    const treeKey = (typeof keybindDisplayLabel === 'function' && typeof keybindKeyFor === 'function')
+        ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('passive-tree')) : 'K';
+    const text = t('eg_lvl_press_key').replace('{key}', '\u0001');
+    const [before, after] = text.split('\u0001');
+    return `<div class="sx-levelup-prompt">${before}<kbd class="sx-levelup-key">${treeKey}</kbd>${after || ''}
+        <span class="sx-levelup-pts">+${passiveGained}</span></div>`;
+}
+
+// Level-up celebration: gold flash, spinning light rays, a shockwave ring,
+// flying sparks and a stone banner with the new level and the passive-point
+// key prompt. Pure CSS animation; the element removes itself afterwards and
+// ignores the mouse, so it is safe mid-combat.
+function _playLevelUpEffect(newLevel, passiveGained) {
     Audio_Manager.playSFX('level_up');
     // Character banter: lands just after the kill / quest line that caused it.
     if (typeof globalThis.triggerBanter === 'function') setTimeout(() => globalThis.triggerBanter('level_up'), 700);
     const el = document.createElement('div');
     el.className = 'sx-levelup-fx';
     el.innerHTML = `
+<div class="sx-levelup-rays"></div>
+<div class="sx-levelup-ring"></div>
+<div class="sx-levelup-ring sx-levelup-ring2"></div>
+${_buildLevelUpSparksHTML()}
 <div class="sx-levelup-banner">
-    <div class="sx-levelup-title">${t('eg_lvl_banner')}</div>
-    <div class="sx-levelup-sub">${t('eg_lvl_levelup_sub').replace('{n}', newLevel)}</div>
+    <div class="sx-levelup-plate">
+        <div class="sx-levelup-title">${t('eg_lvl_banner')}</div>
+        <div class="sx-levelup-sub">${t('eg_lvl_levelup_sub').replace('{n}', `<b>${newLevel}</b>`)}</div>
+    </div>
+    ${_buildLevelUpKeyPromptHTML(passiveGained)}
 </div>`;
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2800);
+    setTimeout(() => el.remove(), LEVELUP_FX_MS);
 }
 
 
@@ -1034,38 +1071,131 @@ function _injectLevelingStyles() {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at center, rgba(245,185,66,.28) 0%, rgba(245,185,66,.08) 35%, transparent 65%);
-    animation: sx-lvl-flash 2.8s ease-out forwards;
+    background: radial-gradient(circle at center, rgba(245,185,66,.34) 0%, rgba(245,185,66,.1) 38%, transparent 68%);
+    animation: sx-lvl-flash 3.8s ease-out forwards;
 }
 @keyframes sx-lvl-flash {
     0% { opacity: 0; }
-    12% { opacity: 1; }
-    70% { opacity: 1; }
+    8% { opacity: 1; }
+    75% { opacity: 1; }
     100% { opacity: 0; }
 }
-.sx-levelup-banner { text-align: center; animation: sx-lvl-pop 2.8s ease-out forwards; }
+.sx-levelup-rays {
+    position: absolute;
+    width: 160vmax; height: 160vmax;
+    background: repeating-conic-gradient(from 0deg, rgba(255,220,130,.22) 0deg 7deg, transparent 7deg 22deg);
+    -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 38%);
+    mask-image: radial-gradient(circle, #000 0%, transparent 38%);
+    animation: sx-lvl-rays 3.8s linear forwards;
+}
+@keyframes sx-lvl-rays {
+    from { transform: rotate(0deg) scale(.6); }
+    to { transform: rotate(50deg) scale(1.1); }
+}
+.sx-levelup-ring {
+    position: absolute;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 4px solid rgba(255,226,150,.95);
+    box-shadow: 0 0 24px rgba(245,185,66,.8), inset 0 0 18px rgba(245,185,66,.6);
+    opacity: 0;
+    animation: sx-lvl-ring 1.3s ease-out .1s forwards;
+}
+.sx-levelup-ring2 { border-color: rgba(160,255,200,.8); animation-delay: .35s; }
+@keyframes sx-lvl-ring {
+    0% { transform: scale(.2); opacity: .95; }
+    100% { transform: scale(9); opacity: 0; }
+}
+.sx-levelup-spark {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #f5d98a 45%, rgba(245,185,66,0) 75%);
+    opacity: 0;
+    animation: sx-lvl-spark 1.4s ease-out var(--t) forwards;
+}
+@keyframes sx-lvl-spark {
+    0% { transform: rotate(var(--a)) translateX(0) scale(1.4); opacity: 1; }
+    100% { transform: rotate(var(--a)) translateX(var(--d)) scale(.2); opacity: 0; }
+}
+.sx-levelup-banner {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 14px;
+    text-align: center;
+    animation: sx-lvl-pop 3.8s ease-out forwards;
+}
 @keyframes sx-lvl-pop {
-    0% { transform: scale(.4); opacity: 0; }
-    15% { transform: scale(1.15); opacity: 1; }
-    25% { transform: scale(1); }
-    80% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(1.05) translateY(-14px); opacity: 0; }
+    0% { transform: scale(.3); opacity: 0; }
+    10% { transform: scale(1.18); opacity: 1; }
+    16% { transform: scale(.96); }
+    21% { transform: scale(1); }
+    84% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.04) translateY(-16px); opacity: 0; }
+}
+.sx-levelup-plate {
+    width: min(86vw, 520px);
+    padding: clamp(26px, 5vh, 46px) 40px;
+    box-sizing: border-box;
+    background: url('images/Game-Reset/Title-Plate.webp') center / 100% 100% no-repeat;
+    filter: drop-shadow(0 0 22px rgba(245,185,66,.6));
 }
 .sx-levelup-title {
-    font-family: var(--PX, monospace);
-    font-size: 44px;
-    font-weight: 700;
-    letter-spacing: 4px;
+    font-family: var(--C, serif);
+    font-size: clamp(26px, 5vw, 44px);
+    font-weight: 900;
+    letter-spacing: 5px;
     color: #f5d98a;
-    text-shadow: 0 0 18px rgba(245,185,66,.9), 0 0 40px rgba(245,185,66,.5), 0 2px 0 #6b5316;
+    text-shadow: 0 0 18px rgba(245,185,66,.9), 0 0 40px rgba(245,185,66,.5), 0 3px 0 #4a3510;
 }
 .sx-levelup-sub {
     margin-top: 6px;
-    font-family: var(--PX, monospace);
-    font-size: 15px;
-    letter-spacing: 2px;
-    color: #fff;
-    text-shadow: 0 0 10px rgba(245,185,66,.8);
+    font-family: var(--B, serif);
+    font-size: clamp(14px, 2vw, 18px);
+    letter-spacing: 1px;
+    color: #e6dcc0;
+    text-shadow: 0 2px 3px rgba(0,0,0,.9);
+}
+.sx-levelup-sub b { color: #fff; font-size: 1.5em; text-shadow: 0 0 10px rgba(245,185,66,.9); }
+.sx-levelup-prompt {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 18px;
+    border-radius: 10px;
+    background: rgba(18,14,12,.92);
+    border: 2px solid #7a5a2c;
+    box-shadow: 0 4px 14px rgba(0,0,0,.6), 0 0 18px rgba(245,185,66,.35);
+    font-family: var(--B, serif);
+    font-weight: 700;
+    font-size: clamp(13px, 1.8vw, 17px);
+    color: #e6dcc0;
+    animation: sx-lvl-prompt 1s ease-in-out .9s infinite;
+}
+.sx-levelup-key {
+    display: inline-block;
+    min-width: 1.6em;
+    padding: 2px 9px;
+    border-radius: 6px;
+    border: 2px solid #f5d98a;
+    border-bottom-width: 4px;
+    background: linear-gradient(180deg, #4a3a22, #2a2012);
+    color: #fff1cf;
+    font-family: var(--C, serif);
+    font-weight: 900;
+    text-align: center;
+}
+.sx-levelup-pts {
+    padding: 0 8px;
+    border-radius: 9px;
+    background: #c8a84b;
+    color: #1a1408;
+}
+@keyframes sx-lvl-prompt {
+    0%, 100% { transform: translateY(0); filter: brightness(1); }
+    50% { transform: translateY(-3px); filter: brightness(1.25); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sx-levelup-rays, .sx-levelup-ring, .sx-levelup-spark, .sx-levelup-prompt { animation: none; }
+    .sx-levelup-spark, .sx-levelup-ring { display: none; }
 }
 
 `;

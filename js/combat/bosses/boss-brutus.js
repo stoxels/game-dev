@@ -1,6 +1,6 @@
 import { t } from '../../translation/translations.js';
 import { GAME_ART } from '../combat-art.js';
-import { _hpBarClass, _updateTargetAfterKill } from '../encounter.js';
+import { _updateTargetAfterKill } from '../encounter.js';
 import { _buildMonster } from '../combat-monsters.js';
 import { _bossCorrupted, _isActive } from '../combat-state.js';
 import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
@@ -474,7 +474,7 @@ export function _brutusRenderZombieCard(z) {
     card.innerHTML =
         '<div class="sx-compact-bars">' +
             '<div class="sx-charge-track-compact"><div class="sx-charge-bar" id="sx-charge-bar-' + z.id + '" style="width:0%"></div></div>' +
-            '<div class="sx-hp-track-compact"><div class="sx-hp-bar-compact ' + _hpBarClass(hpPct) + '" id="sx-hp-bar-' + z.id + '" style="width:' + hpPct + '%"></div></div>' +
+            '<div class="sx-hp-track-compact"><div class="sx-hp-bar-compact" id="sx-hp-bar-' + z.id + '" style="width:' + hpPct + '%"></div></div>' +
         '</div>' +
         '<div class="sx-status-strip" id="sx-status-' + z.id + '"></div>' +
         '<div class="sx-emoji-wrapper">' +

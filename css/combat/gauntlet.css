@@ -23,6 +23,13 @@
 /* The sealed grid underneath must not be reachable. */
 body.gauntlet-open #puzzle-scaler-wrap { pointer-events: none; }
 
+/* Column / row clue headers normally sit at z-index 950 (above the HUD) and
+   would poke through the arena when the grid is zoomed in; while the arena
+   is open they drop below it (the arena is 40). */
+body.gauntlet-open .cch,
+body.gauntlet-open .rct,
+body.gauntlet-open td.corner { z-index: 1; }
+
 .ga-floor {
     position: absolute;
     inset: 0;

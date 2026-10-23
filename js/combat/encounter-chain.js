@@ -1124,23 +1124,21 @@ export function _buildChainBonusGainHTML() {
     if (puzzleGain <= 0 && quizGain <= 0 && !quizRewardLine) return '';
 
     const parts = [];
-    if (puzzleGain > 0) parts.push(`<span style="color:#7fd67f">+${puzzleGain}%</span> ${t('eg_bonus_src_puzzle')}`);
-    if (quizGain > 0) parts.push(`<span style="color:#7fb8ff">+${quizGain}%</span> ${t('eg_bonus_src_quiz')}`);
+    if (puzzleGain > 0) parts.push(`<span class="sx-cc-src"><b class="sx-cc-gain-puzzle">+${puzzleGain}%</b> ${t('eg_bonus_src_puzzle')}</span>`);
+    if (quizGain > 0) parts.push(`<span class="sx-cc-src"><b class="sx-cc-gain-quiz">+${quizGain}%</b> ${t('eg_bonus_src_quiz')}</span>`);
 
     const total = Math.round(_getBonusLootChance() * 100);
-    return `
-        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem;padding:6px 14px;
-                    background:rgba(245,217,138,0.08);border:1px solid rgba(245,217,138,0.35);border-radius:6px;">
-            <span>🎁</span>
-            <span style="font-size:0.85rem;color:#f5d98a;">${t('eg_bonus_chance_title')}</span>
-            <span style="font-size:0.85rem;color:#ccc;">${parts.join('<span style="opacity:.5">·</span>')}</span>
-            <span style="font-size:0.85rem;color:#fff;font-weight:700;">${t('eg_bonus_total').replace('{p}', total)}</span>
-        </div>
-        ${quizRewardLine ? `
-        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem;padding:6px 14px;
-                    background:rgba(255,85,51,0.08);border:1px solid rgba(255,85,51,0.35);border-radius:6px;">
-            <span style="font-size:0.85rem;color:#ccc;">${quizRewardLine}</span>
-        </div>` : ''}`;
+    const lootChip = parts.length ? `
+        <div class="sx-cc-chip sx-cc-chip-loot">
+            <div class="sx-cc-chip-title">${t('eg_bonus_chance_title')}</div>
+            <div class="sx-cc-chip-body">${parts.join('<span class="sx-cc-dot">◆</span>')}</div>
+            <div class="sx-cc-chip-total">${t('eg_bonus_total').replace('{p}', total)}</div>
+        </div>` : '';
+    const rewardChip = quizRewardLine ? `
+        <div class="sx-cc-chip sx-cc-chip-reward">
+            <div class="sx-cc-chip-body sx-cc-reward-lines">${quizRewardLine}</div>
+        </div>` : '';
+    return `<div class="sx-cc-chips">${lootChip}${rewardChip}</div>`;
 }
 
 // Called only by the Leave Map button after _canLeaveMap() returns true.
@@ -1466,25 +1464,28 @@ export function _showChainCountdownOverlay(secs) {
     if (!el) {
         el = document.createElement('div');
         el.id = 'sx-chain-countdown';
-        el.style.cssText = [
-            'position:fixed', 'inset:0', 'display:flex',
-            'flex-direction:column', 'align-items:center', 'justify-content:center',
-            'background:rgba(0,0,0,0.55)', 'z-index:9999',
-            'font-family:inherit', 'pointer-events:none',
-        ].join(';');
+        el.className = 'sx-cc';
         document.body.appendChild(el);
     }
     el.innerHTML = `
-        ${_buildChainBonusGainHTML()}
-        <div style="font-size:1.1rem;color:#aaa;margin-bottom:0.4rem;letter-spacing:.1em;">${t('eg_countdown_solved')}</div>
-        <div id="sx-chain-countdown-num" style="font-size:4rem;font-weight:700;color:#fff;line-height:1;">${secs}</div>
-        <div style="font-size:0.9rem;color:#888;margin-top:0.5rem;">${t('eg_countdown_next')}</div>`;
+        <div class="sx-cc-bonus">${_buildChainBonusGainHTML()}</div>
+        <div class="sx-cc-plate"><span class="sx-cc-solved">${t('eg_countdown_solved')}</span></div>
+        <div class="sx-cc-portal">
+            <div class="sx-cc-ring"></div>
+            <div id="sx-chain-countdown-num" class="sx-cc-num sx-cc-tick">${secs}</div>
+        </div>
+        <div class="sx-cc-next">${t('eg_countdown_next')}</div>`;
     el.style.display = 'flex';
 }
 
+// Shows the new number and replays its pop-in animation.
 export function _updateChainCountdownOverlay(secs) {
     const num = document.getElementById('sx-chain-countdown-num');
-    if (num) num.textContent = secs;
+    if (!num) return;
+    num.textContent = secs;
+    num.classList.remove('sx-cc-tick');
+    void num.offsetWidth;
+    num.classList.add('sx-cc-tick');
 }
 
 export function _hideChainCountdownOverlay() {

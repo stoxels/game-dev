@@ -13,7 +13,7 @@ import { _dndChipScreenEl } from '../hub/hub-drag-and-drop.js';
 import { _clearTooltip } from '../hub/hub-tooltips.js';
 import { _equipped, _inventory, _renderEquipSlot, _renderEquipSlots, _renderInventory, _renderInventoryCell, _renderStatsList, _showStashInfo, saveHubState } from '../hub/hub.js';
 import { _cancelCurrencyUse, _pendingCurrencyUse } from './loot-currency-use.js';
-import { ESSENCE_REASON_KEYS, _essenceIncompatibilityReason, _essenceStash } from './loot-essences.js';
+import { ESSENCE_REASON_KEYS, _essenceIncompatibilityReason, _essenceMinLevelForItem, _essenceStash } from './loot-essences.js';
 import { _applyEssenceCraft } from './loot-essences-craft.js';
 import { ESSENCE_DEFS } from './loot-essences-defs.js';
 import { _renderEssenceCell } from './loot-essences-render.js';
@@ -26,9 +26,11 @@ export let _pendingEssenceUse = null; // { defId, sourceRow, sourceCol }
 export function _rejectEssenceUse(reasonKey, chipEl, opts = {}) {
     const isDe = (typeof LANG !== 'undefined' && LANG === 'de');
     const fallback = reasonKey ? (isDe ? 'Gegenstand nicht kompatibel.' : 'Item not compatible.') : (isDe ? 'Nicht anwendbar.' : 'Cannot be applied.');
-    const msg = reasonKey
-        ? (t(reasonKey) !== reasonKey ? t(reasonKey) : fallback)
-        : fallback;
+    const msg = opts.message
+        ? opts.message
+        : reasonKey
+            ? (t(reasonKey) !== reasonKey ? t(reasonKey) : fallback)
+            : fallback;
     globalThis.showToast(msg);
     if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error', duration: opts.duration || 5000 });
     if (chipEl) {
@@ -73,6 +75,17 @@ export function _refreshEssenceUseHighlight() {
     }
 }
 
+// For the "item level too low" rejection: says which level the item needs
+// and which it has. Returns null for every other rejection reason.
+function _essenceLevelMessage(reason, familyId, item) {
+    if (reason !== 'no_eligible_tier') return null;
+    const need = _essenceMinLevelForItem(familyId, item);
+    if (!need) return null;
+    return t('eg_essence_no_eligible_tier_lvl')
+        .replace('{need}', need)
+        .replace('{have}', item.itemLevel || 1);
+}
+
 export function _applyEssenceToItem(item, applyFn, chipEl, keepActive) {
     if (!_pendingEssenceUse) return;
     const { sourceRow, sourceCol, defId } = _pendingEssenceUse;
@@ -102,7 +115,7 @@ export function _applyEssenceToItem(item, applyFn, chipEl, keepActive) {
     if (famForCheck) {
         const reason = _essenceIncompatibilityReason(famForCheck, item);
         if (reason) {
-            _rejectEssenceUse(ESSENCE_REASON_KEYS[reason] || null, chipEl);
+            _rejectEssenceUse(ESSENCE_REASON_KEYS[reason] || null, chipEl, { message: _essenceLevelMessage(reason, famForCheck, item) });
             return;
         }
     }

@@ -2714,6 +2714,84 @@ BASE_TYPES_WEAPON.push(
     },
 );
 
+// ---- EXTRA WAND BASES (added 2026-10-23) ----
+// Player feedback: the wand line jumped from level 2 straight to level 14 (and
+// had other 8-12 level holes). Same stat curve as the neighbouring arcane rods.
+BASE_TYPES_WEAPON.push(
+    {
+        id: 'wpn_rusted_arcane_rod_4', name: 'Rusted Arcane Rod', nameDe: 'Rost-Arkanstab',
+        archetype: 'intellect', slotType: 'weapon', icon: '🪄',
+        minLevel: 4,
+        hands: 1,
+        requirements: { level: 4, str: 0, agi: 0, int: 24 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 20, max: 41 }, attackIntervalSeconds: 7.5,
+    },
+    {
+        id: 'wpn_worn_arcane_rod_7', name: 'Worn Arcane Rod', nameDe: 'Alt-Arkanstab',
+        archetype: 'intellect', slotType: 'weapon', icon: '🪄',
+        minLevel: 7,
+        hands: 1,
+        requirements: { level: 7, str: 0, agi: 0, int: 35 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 31, max: 63 }, attackIntervalSeconds: 7.5,
+    },
+    {
+        id: 'wpn_worn_arcane_rod_10', name: 'Worn Arcane Rod', nameDe: 'Alt-Arkanstab',
+        archetype: 'intellect', slotType: 'weapon', icon: '🪄',
+        minLevel: 10,
+        hands: 1,
+        requirements: { level: 10, str: 0, agi: 0, int: 46 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 42, max: 85 }, attackIntervalSeconds: 7.5,
+    },
+    {
+        id: 'wpn_steel_arcane_rod_22', name: 'Steel Arcane Rod', nameDe: 'Stahl-Arkanstab',
+        archetype: 'intellect', slotType: 'weapon', icon: '🪄',
+        minLevel: 22,
+        hands: 1,
+        requirements: { level: 22, str: 0, agi: 0, int: 87 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 87, max: 175 }, attackIntervalSeconds: 7.5,
+    },
+    {
+        id: 'wpn_soldier_arcane_rod_26', name: 'Soldier Arcane Rod', nameDe: 'Soldaten-Arkanstab',
+        archetype: 'intellect', slotType: 'weapon', icon: '🪄',
+        minLevel: 26,
+        hands: 1,
+        requirements: { level: 26, str: 0, agi: 0, int: 102 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 103, max: 207 }, attackIntervalSeconds: 7.5,
+    },
+    {
+        id: 'wpn_frost_arcane_rod_50', name: 'Frost Arcane Rod', nameDe: 'Frost-Arkanstab',
+        archetype: 'intellect', slotType: 'weapon', icon: '🪄',
+        minLevel: 50,
+        hands: 1,
+        requirements: { level: 50, str: 0, agi: 0, int: 198 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 194, max: 389 }, attackIntervalSeconds: 7.5,
+    },
+    {
+        id: 'wpn_dawn_arcane_rod_62', name: 'Dawn Arcane Rod', nameDe: 'Morgen-Arkanstab',
+        archetype: 'intellect', slotType: 'weapon', icon: '🪄',
+        minLevel: 62,
+        hands: 1,
+        requirements: { level: 62, str: 0, agi: 0, int: 254 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 239, max: 479 }, attackIntervalSeconds: 7.5,
+    },
+    {
+        id: 'wpn_dawn_arcane_rod_66', name: 'Dawn Arcane Rod', nameDe: 'Morgen-Arkanstab',
+        archetype: 'intellect', slotType: 'weapon', icon: '🪄',
+        minLevel: 66,
+        hands: 1,
+        requirements: { level: 66, str: 0, agi: 0, int: 274 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 255, max: 511 }, attackIntervalSeconds: 7.5,
+    },
+);
+
 // ---- EXTRA AXE / MACE BASES (added 2026-10-16) ----
 // Player feedback: very few axes and no one-handed maces. Same art (emoji icon
 // decides the swing family), damage taken from the nearest-level sword / 2H

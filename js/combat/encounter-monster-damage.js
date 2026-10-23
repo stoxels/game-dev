@@ -379,6 +379,8 @@ export function _damageTargetById(monsterId, amount, elements, opts) {
     // Intimidate (node 125): melee hits on an intimidated enemy deal more.
     // Applied before resistances so it scales the whole hit.
     amount = _applyIntimidateAmp(target, amount, opts);
+    // Exposed (The Warden's own sentry bolt hit it): takes more from everything for a while.
+    if (target.exposedUntil > Date.now() && target.exposedMult > 1) amount *= target.exposedMult;
 
     amount = _applyConditionalDamage(target, amount, opts, hpBefore);
     amount = _applyKeystoneDamageMods(target, amount, elements, opts);

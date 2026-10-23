@@ -6,7 +6,7 @@
 // modifier it promises and the bases that can actually roll it.
 
 import { LANG, t } from '../translation/translations.js';
-import { _essenceCompatibleSlotTypes, _essenceItemLevelRange } from './loot-essences.js';
+import { _essenceCompatibleSlotTypes, _essenceItemLevelBySlot } from './loot-essences.js';
 import { _essenceFamilyDisplayName } from './loot-essences-names.js';
 
 
@@ -40,13 +40,21 @@ export function _buildEssenceDetailHTML(def) {
         html += `<div class="sx-tt-essence-line"><span class="sx-tt-essence-slots" style="color:#e74c3c;">${noneStr}</span></div>`;
     }
 
-    // Item level the target item must have for the modifier to be able to roll.
-    const range = _essenceItemLevelRange(familyId);
-    if (range) {
-        const lvl = range.min === range.max ? `${range.min}+` : `${range.min}+ (${range.min}–${range.max})`;
+    // Item level the target item must have for the modifier to be able to
+    // roll. It differs per item type, so one line per level, lowest first.
+    const byLevel = new Map();
+    for (const { slotType, ilvl } of _essenceItemLevelBySlot(familyId)) {
+        if (!byLevel.has(ilvl)) byLevel.set(ilvl, []);
+        byLevel.get(ilvl).push(slotLabel(slotType));
+    }
+    if (byLevel.size > 0) {
         const titleIlvl = isDe ? 'Benötigtes Itemlevel:' : 'Required item level:';
         html += `<div class="sx-tt-essence-title" style="margin-top:6px;">${titleIlvl}</div>`;
-        html += `<div class="sx-tt-essence-line"><span class="sx-tt-essence-slots">${lvl}</span></div>`;
+        const levels = Array.from(byLevel.keys()).sort((a, b) => a - b);
+        for (const lvl of levels) {
+            const text = levels.length === 1 ? `${lvl}+` : `${lvl}+ - ${byLevel.get(lvl).join(', ')}`;
+            html += `<div class="sx-tt-essence-line"><span class="sx-tt-essence-slots">${text}</span></div>`;
+        }
     }
 
     html += '</div>';

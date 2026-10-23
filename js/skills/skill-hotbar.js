@@ -60,12 +60,22 @@ function _hotbarHomeHost() {
         || document.body;
 }
 
+// True while the Probability Tree screen is the visible one (opened over a
+// running puzzle with K, or from a menu). The bar stays on screen there so
+// spells can be read while points are spent.
+function _isPassiveTreeScreenActive() {
+    return !!document.getElementById('screen-passive-tree')?.classList.contains('active');
+}
+
 // Where the bar should be mounted right now. While the spell book is open it
 // must escape the game screen's stacking context (otherwise the modal backdrop
 // traps it and spells cannot be dropped on it), so it hops onto <body> above
 // the backdrop. The book's open/close handlers call setHotbarAboveModal().
+// The passive tree hides the game screen itself, so the bar has to leave it
+// too - otherwise the hidden screen takes the bar with it.
 function _hotbarMountHost() {
     if (document.body.classList.contains('spellbook-open')) return document.body;
+    if (_isPassiveTreeScreenActive()) return document.body;
     return _hotbarHomeHost();
 }
 
@@ -285,13 +295,14 @@ export function renderSkillHotbar() {
     // anything castable (a hotbar spell, a slotted charm, or an inventory
     // charm) - universal spells need no class.
     const tqActive = (typeof globalThis._tqIsTutorialActive === 'function') && globalThis._tqIsTutorialActive();
+    const treeActive = _isPassiveTreeScreenActive();
     const classlessHidden = (!STATE)
         || (((!STATE.playerClass && !tqActive)
             || ((typeof globalThis.isClassless === 'function') && globalThis.isClassless()))
             && !_hotbarClasslessHasSpells()
             && !_hotbarNeededForSpellbook());
     if (classlessHidden
-        || !(_isGameScreenActive() || _hotbarNeededForSpellbook())) {
+        || !(_isGameScreenActive() || _hotbarNeededForSpellbook() || treeActive)) {
         bar.style.display = 'none';
         document.body.classList.remove('skill-hotbar-visible');
         hideHUDTooltip();
@@ -542,6 +553,14 @@ export function initSkillHotbar() {
     if (screen && typeof MutationObserver !== 'undefined') {
         new MutationObserver(() => renderSkillHotbar())
             .observe(screen, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    // The passive tree hides the game screen while it is up: without this the
+    // bar stayed hidden there (and did not come back on the way out).
+    const treeScreen = document.getElementById('screen-passive-tree');
+    if (treeScreen && typeof MutationObserver !== 'undefined') {
+        new MutationObserver(() => renderSkillHotbar())
+            .observe(treeScreen, { attributes: true, attributeFilter: ['class'] });
     }
 }
 

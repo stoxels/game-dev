@@ -995,7 +995,9 @@ const RIGS = {
         ],
         mechanics: {
             glacier_rift: { anim: 'shp_rift', ms: () => 2000 },
-            soul_tithe: { anim: 'shp_tithe', ms: () => 2200 },
+            icicle_volley: { anim: 'shp_icicles', ms: () => 1800 },
+            frozen_cells: { anim: 'shp_frost', ms: () => 1800 },
+            blizzard: { anim: 'shp_blizzard', ms: () => 2200 },
             frost_monoliths: { anim: 'shp_monoliths', ms: () => 2000 },
             ice_walker: { anim: 'shp_walker', ms: () => 2200 },
         },
@@ -1240,7 +1242,8 @@ const RIGS = {
         mechanics: {
             pulse_totems: { anim: 'wrd_totems', ms: () => 2200 },
             frozen_cells: { anim: 'wrd_frost', ms: () => 1800 },
-            arc_link: { anim: 'wrd_arc', ms: () => 2000 },
+            sentry_fire: { anim: 'wrd_arc', ms: () => 2000 },
+            solitary: { anim: 'wrd_arc', ms: () => 2000 },
         },
     },
     // <<< rig boss_warden
@@ -6974,9 +6977,11 @@ Object.assign(FX, {
 // >>> poses boss_shaper
 // ---- The Frostwright -------------------------------------------------------
 // Glacier Rift: the ice club rises and smashes down, a jagged rift of ice
-//   races across the floor. Soul Tithe: the frost hand opens and wisps
-//   stream into it. Frost Monoliths: the hand lifts and ice pillars grow up
-//   from the ground. Ice Walker: it strides and frozen footprints march away.
+//   races across the floor. Icicle Volley: the frost hand rears back and
+//   hurls icicles that rain down. Frozen Cells: the hand flings frost bolts.
+//   Blizzard: the hand lifts and snow whirls around the arena. Frost
+//   Monoliths: the hand lifts and ice pillars grow up from the ground.
+//   Ice Walker: it strides and frozen footprints march away.
 Object.assign(POSES, {
     shp_rift(P, u) {
         const lift = ease(u / 0.35), slam = ease((u - 0.35) / 0.08), rest = ease((u - 0.7) / 0.3);
@@ -6986,10 +6991,24 @@ Object.assign(POSES, {
         P.body.dy = (-4 * lift * (1 - slam) + 6 * slam) * k;
         P.head.rot = 3 * slam * k;
     },
-    shp_tithe(P, u) {
+    shp_frost(P, u) {
         const env = envOf(u, 0.2, 0.25);
         P.frostHand.rot = -12 * env; P.frostHand.dy = -8 * env;
         P.head.rot = -3 * env;
+    },
+    shp_icicles(P, u) {
+        const wind = ease(u / 0.3), hurl = ease((u - 0.3) / 0.1), rest = ease((u - 0.7) / 0.3);
+        const k = 1 - rest;
+        P.frostHand.rot = (-30 * wind * (1 - hurl) + 14 * hurl) * k;
+        P.frostHand.dy = (-20 * wind * (1 - hurl) + 8 * hurl) * k;
+        P.body.dy = (-3 * wind * (1 - hurl) + 4 * hurl) * k;
+        P.head.rot = -2 * wind * (1 - hurl) * k;
+    },
+    shp_blizzard(P, u) {
+        const env = envOf(u, 0.2, 0.25), w = Math.sin(u * Math.PI * 8);
+        P.frostHand.rot = (-24 + 6 * w) * env; P.frostHand.dy = -14 * env;
+        P.club.rot = 8 * env;
+        P.body.rot = 1.5 * w * env;
     },
     shp_monoliths(P, u) {
         const env = envOf(u, 0.2, 0.25);
@@ -7020,7 +7039,29 @@ Object.assign(FX, {
         }
         return u > 0.36 && u < 0.4 ? 0.14 : 0;
     },
-    shp_tithe(ctx, u, dy, at) { const [x, y] = at('frostHand', 450, 200); _cueTithe(ctx, u, x, y, '170,225,255'); return 0; },
+    shp_frost(ctx, u, dy, at) { const [x, y] = at('frostHand', 450, 200); _cueFrost(ctx, u, [x, y]); return 0; },
+    shp_icicles(ctx, u) {
+        const fade = 1 - ease((u - 0.8) / 0.2);
+        [[90, 0.35], [200, 0.42], [320, 0.5], [430, 0.38]].forEach(([x, from]) => {
+            const k = ease((u - from) / 0.18);
+            if (k <= 0) return;
+            const y = -40 + k * 530;
+            ctx.fillStyle = 'rgba(200,238,255,' + (0.9 * fade) + ')';
+            ctx.beginPath(); ctx.moveTo(x - 10, y - 50); ctx.lineTo(x + 10, y - 50); ctx.lineTo(x, y); ctx.closePath(); ctx.fill();
+            if (k >= 1) _cueGlow(ctx, x, 495, 34, '200,238,255', 0.5 * fade);
+        });
+        return 0;
+    },
+    shp_blizzard(ctx, u) {
+        const env = envOf(u, 0.2, 0.25);
+        _cueGlow(ctx, 256, 260, 200, '200,235,255', 0.18 * env);
+        for (let i = 0; i < 22; i++) {
+            const k = (u * 1.4 + i / 22) % 1;
+            ctx.fillStyle = 'rgba(240,250,255,' + (0.8 * env) + ')';
+            ctx.beginPath(); ctx.arc((i * 47 + k * 160) % 512, k * 512, 3 + (i % 3), 0, 7); ctx.fill();
+        }
+        return 0;
+    },
     shp_monoliths(ctx, u) {
         const fade = 1 - ease((u - 0.8) / 0.2);
         [[80, 140], [250, 110], [430, 150]].forEach(([x, h], i) => {

@@ -30,6 +30,10 @@ const SCALE_BREATHING_ROOM = 0.97;
 // leftover space. 0 = stay pinned top, 1 = fully centered.
 const VERTICAL_CENTER_FACTOR = 0.6;
 
+// Making room for monsters above the grid may shrink the puzzle to at most this
+// fraction of its normal fit (1 = never shrink).
+const MONSTER_ROOM_MIN_FRACTION = 0.9;
+
 // The zoom level currently applied to the puzzle scaler element.
 export let currentZoom = 1;
 
@@ -338,7 +342,11 @@ export function scalePuzzle() {
     // The grid stays centred, so a free band of B px above it means the
     // leftover space (of which the top gets VERTICAL_CENTER_FACTOR) must be B/factor.
     const band = monsterRoom ? monsterBand / VERTICAL_CENTER_FACTOR : 0;
-    const autoScale = Math.min(avail.w / natural.w, (avail.h - band) / natural.h, SCALE_MAX);
+    const fullFit = Math.min(avail.w / natural.w, avail.h / natural.h, SCALE_MAX);
+    const bandFit = Math.min(avail.w / natural.w, (avail.h - band) / natural.h, SCALE_MAX);
+    // Making room for monsters may only cost a little: wide, short grids would
+    // otherwise shrink so far that the clue numbers become unreadable.
+    const autoScale = Math.max(bandFit, fullFit * MONSTER_ROOM_MIN_FRACTION);
 
     if (!manualZoomActive) {
         currentZoom = autoScale;

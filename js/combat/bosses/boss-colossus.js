@@ -4,11 +4,12 @@ import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkKillRun,
 //------------------------------------------------------------------------
 //-------------------BOSS: THE COLOSSUS (boss_colossus)--------------------
 //------------------------------------------------------------------------
-// Tier-7 rework "The Mountain That Walks": seismic strides that walk
-// through your spot (step out of each footprint's dashed shockwave circle),
-// boulder rain with landing shadows that shatters into rolling fragments,
-// and rammable granite golems. TITAN'S FALL at ≤10%: ram three joint seals
-// (3 separate charges each) while rock chutes sweep, or face the CAVE-IN.
+// Tier-7 rework "The Mountain That Walks": seismic strides that follow your
+// spot (step out of each footprint's dashed shockwave circle), avalanche
+// walls with a gap to slip through, boulder rain that shatters into rolling
+// fragments, and granite golems that detonate unless you crumble them.
+// TITAN'S FALL at ≤10%: walk into three joint seals (3 separate charges each)
+// while rock chutes sweep, or face the CAVE-IN.
 //
 // Shared mechanics (corrupt_cells) live in shared-boss-abilities.js and
 // are referenced by handler-name string.
@@ -41,10 +42,11 @@ Object.assign(BOSS_MECHANICS, {
             // Signature keeps the historic handler name (save-compat with
             // existing scheduled timers / debug docs): the old double-ring
             // slam is now the walking Stride inside it.
-            { name: 'seismic_stride', intervalBase: 20000, intervalVariance: 4500, handler: '_mechSeismicSlam' },
+            { name: 'seismic_stride', intervalBase: 17000, intervalVariance: 4000, handler: '_mechSeismicSlam' },
             { name: 'corrupt_cells', intervalBase: 18000, intervalVariance: 4000, handler: '_mechCorruptCells' },
-            { name: 'boulder_rain', intervalBase: 21000, intervalVariance: 5000, handler: '_mechColoBoulders', phase2Only: true },
-            { name: 'granite_golems', intervalBase: 24000, intervalVariance: 5000, handler: '_mechColoGolems', phase2Only: true },
+            { name: 'avalanche', intervalBase: 21000, intervalVariance: 4500, handler: '_mechColoAvalanche' },
+            { name: 'boulder_rain', intervalBase: 18000, intervalVariance: 4000, handler: '_mechColoBoulders', phase2Only: true },
+            { name: 'granite_golems', intervalBase: 22000, intervalVariance: 4500, handler: '_mechColoGolems', phase2Only: true },
         ],
         onPhaseEnter: _coloOnPhaseEnter,
     },
@@ -57,6 +59,8 @@ export const COLO_WAVE_DMG   = [0, 0.32, 0.36, 0.40]; // %maxHP for standing in 
 export const COLO_BOULDER_DMG = 0.16;                 // %maxHP boulder impact
 export const COLO_FRAG_DMG   = 0.12;                  // %maxHP rolling fragment
 export const COLO_GOLEM_DMG  = 0.06;                  // %maxHP golem shove (per ram)
+export const COLO_GOLEM_BOOM_DMG = 0.30;              // %maxHP an uncrumbled golem's detonation
+export const COLO_AVALANCHE_DMG = [0, 0.26, 0.30, 0.34]; // %maxHP touching an avalanche wall
 export const COLO_CHUTE_DMG  = [0, 0, 0.10, 0.12];    // %maxHP rock chute (finale)
 export const COLO_SEAL_HITS  = 3;                     // body-checks per joint seal
 export const COLO_CHARGE_DMG = 0.22;                  // %maxHP failing a seal wave
@@ -115,17 +119,18 @@ export function _coloShake(intensity) {
 //------------------------------------------------------------------------
 //-------------------SIGNATURE: SEISMIC STRIDE (all fight)-----------------
 //------------------------------------------------------------------------
-// The Colossus walks THROUGH your spot. Two footprints slam in sequence:
-// the first lands near you, the second one stride further along. Each
-// footprint shows its shockwave reach as a dashed circle during the
-// telegraph; the slam bites the footprint and a shockwave rolls out to that
-// circle. Step out of the circle. Phase 3: the stride runs diagonally.
-export const COLO_STRIDE_STEPS = 2;      // footprints per stride
-export const COLO_FOOT_WARN_MS = 1400;   // footprint telegraph
+// The Colossus walks THROUGH your spot. Footprints slam in sequence and
+// EACH ONE re-aims at where you stand the moment it is raised, so running in
+// a straight line gets you stepped on. Each footprint shows its shockwave
+// reach as a dashed circle during the telegraph; the slam bites the footprint
+// and a shockwave rolls out to that circle. Step out of the circle. More
+// footprints (and shorter telegraphs) per stride as the fight goes on.
+export const COLO_STRIDE_STEPS = [0, 2, 3, 4]; // footprints per stride, by phase
+export const COLO_FOOT_WARN_MS = 1250;   // first footprint telegraph
+const COLO_FOOT_WARN_STEP = 0.8;          // each later footprint's telegraph is this much shorter than the last (floor 0.55)
 export const COLO_WAVE_SPEED = 520;      // px/s shockwave expansion (divided by mult)
 export const COLO_WAVE_MAX_FRAC = 0.75;  // (legacy) old screen-wide reach - waves now stop at COLO_WAVE_R
 const COLO_WAVE_R = 270;                  // px shockwave reach (the dashed circle)
-const COLO_STRIDE_LEN = 330;              // px between the two footprints
 
 export function _mechSeismicSlam(monster, phase) {
     if (_nkDodgeBusy() || _nkFrozen()) return;
@@ -134,19 +139,18 @@ export function _mechSeismicSlam(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _nkNewRun(monster && monster.id, true);
 
-    // Footprint 1 lands near you; footprint 2 one stride further, toward the
-    // side with more room (horizontal, or diagonal in phase 3).
-    const pc0 = _coloPC();
+    // Each footprint picks its spot only when it is raised (so it lands on
+    // wherever you have moved to), with a little scatter.
     const clampX = (x) => Math.max(90, Math.min(W - 90, x));
     const clampY = (y) => Math.max(80, Math.min(H - 80, y));
-    const f1 = { x: clampX(pc0.x + (Math.random() * 120 - 60)), y: clampY(pc0.y + (Math.random() * 80 - 40)) };
-    const sx = f1.x < W / 2 ? 1 : -1, sy = f1.y < H / 2 ? 1 : -1;
-    const dir = p >= 3 ? [0.8 * sx, 0.6 * sy] : [sx, 0];
-    const f2 = { x: clampX(f1.x + dir[0] * COLO_STRIDE_LEN), y: clampY(f1.y + dir[1] * COLO_STRIDE_LEN) };
-    const feet = [f1, f2].slice(0, COLO_STRIDE_STEPS).map(f => ({
-        x: f.x, y: f.y, state: 'wait', t: 0, warned: null, zone: null, slamEl: null, waveEl: null, r: 40,
-    }));
-    _nkToast('eg_mech_quake', '🗿 SEISMIC STRIDE - get OUT of the dashed circle before each footfall!', '#d6c8a8');
+    const feet = [];
+    for (let i = 0; i < COLO_STRIDE_STEPS[p]; i++) {
+        feet.push({
+            x: 0, y: 0, state: 'wait', t: 0, warned: null, zone: null, slamEl: null, waveEl: null, r: 40,
+            warnMs: COLO_FOOT_WARN_MS * Math.max(0.55, Math.pow(COLO_FOOT_WARN_STEP, i)),
+        });
+    }
+    _nkToast('eg_mech_quake', '🗿 SEISMIC STRIDE - every footfall lands where you stand. Keep moving out of the dashed circle!', '#d6c8a8');
 
     // ONE loop drives all feet (each footprint's lifecycle is a state).
     _nkLoop(run, (dtS, now) => {
@@ -159,6 +163,8 @@ export function _mechSeismicSlam(monster, phase) {
                 if (idx === 0 || feet[idx - 1].state === 'wave' || feet[idx - 1].state === 'done') {
                     ft.state = 'warn';
                     ft.t = 0;
+                    ft.x = clampX(pc.x + (Math.random() * 90 - 45));
+                    ft.y = clampY(pc.y + (Math.random() * 60 - 30));
                     ft.zone = _nkEl(run, 'div', 'sx-colo-quake-zone');
                     ft.zone.style.left = Math.round(ft.x - COLO_WAVE_R) + 'px';
                     ft.zone.style.top = Math.round(ft.y - COLO_WAVE_R) + 'px';
@@ -173,7 +179,7 @@ export function _mechSeismicSlam(monster, phase) {
             if (ft.state === 'warn') {
                 pending = true;
                 ft.t += dtS * 1000;
-                if (ft.t >= COLO_FOOT_WARN_MS * _COLO_DEBUG_MULT) {
+                if (ft.t >= ft.warnMs * _COLO_DEBUG_MULT) {
                     // SLAM.
                     try { ft.warned.remove(); } catch (e) {}
                     ft.zone.classList.add('sx-colo-quake-live');
@@ -231,12 +237,16 @@ export function _mechSeismicSlam(monster, phase) {
 //------------------------------------------------------------------------
 // The shoulder quarries hurl boulders. Each one casts a landing shadow
 // (the impact ring) while it falls, then SHATTERS into rolling fragments
-// that keep travelling outward. The first boulder aims at you. Dodge the
-// impact ring AND the fragment lanes. Phase 3 lobs an extra boulder.
-export const BOULDER_COUNT   = [0, 0, 3, 4];
-export const BOULDER_FALL_MS = 1500;   // telegraph (shadow) before impact
-export const BOULDER_FRAGS   = 4;      // rolling fragments per boulder
-const BOULDER_R = 78;                  // px impact radius (= the shadow)
+// that keep travelling outward. Every other boulder is aimed at where you
+// stand right now, the rest are scattered, and several are in the air at
+// once - dodge the impact rings AND the crossing fragment lanes.
+export const BOULDER_COUNT   = [0, 0, 7, 9];
+export const BOULDER_FALL_MS = 1300;   // telegraph (shadow) before impact
+export const BOULDER_FRAGS   = 6;      // rolling fragments per boulder
+const BOULDER_R = 86;                  // px impact radius (= the shadow)
+const BOULDER_GAP_S = [0, 0, 0.8, 0.6]; // s between boulder launches, by phase
+const FRAG_SPEED = 250;                // px/s rolling fragment speed
+const FRAG_REACH = 420;                // px a fragment rolls before it vanishes
 
 export function _mechColoBoulders(monster, phase) {
     if (_nkDodgeBusy() || _nkFrozen()) return;
@@ -244,19 +254,20 @@ export function _mechColoBoulders(monster, phase) {
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _nkNewRun(monster && monster.id, true);
-    _nkToast('eg_mech_colo_boulder', '🗿🪨 BOULDER RAIN - leave the shadows, then dodge the rolling rubble!', '#d6c8a8');
+    _nkToast('eg_mech_colo_boulder', '🗿🪨 BOULDER RAIN - boulders drop on YOUR position! Leave the shadows, then dodge the rolling rubble!', '#d6c8a8');
 
     // ONE loop owns every boulder and every fragment.
     const boulders = [];
     let launched = 0, launchedAt = 0;
-    const launchGap = 2.2; // s between boulder launches
+    const launchGap = BOULDER_GAP_S[p]; // s between boulder launches
 
     _nkLoop(run, (dtS, now) => {
-        // Launch the next boulder (the first one aims at you).
+        // Launch the next boulder (even-numbered ones aim at you).
         if (launched < BOULDER_COUNT[p] && (launched === 0 || launchedAt >= launchGap)) {
             const pcA = _coloPC();
-            const tx = launched === 0 ? Math.max(60, Math.min(W - 60, pcA.x + (Math.random() * 80 - 40))) : W * (0.12 + Math.random() * 0.76);
-            const ty = launched === 0 ? Math.max(60, Math.min(H - 60, pcA.y + (Math.random() * 80 - 40))) : H * (0.15 + Math.random() * 0.7);
+            const aimed = launched % 2 === 0;
+            const tx = aimed ? Math.max(60, Math.min(W - 60, pcA.x + (Math.random() * 60 - 30))) : W * (0.1 + Math.random() * 0.8);
+            const ty = aimed ? Math.max(60, Math.min(H - 60, pcA.y + (Math.random() * 60 - 30))) : H * (0.12 + Math.random() * 0.76);
             launched++; launchedAt = 0;
             const mark = _nkEl(run, 'div', 'sx-colo-boulder-mark');
             mark.style.left = Math.round(tx - BOULDER_R) + 'px';
@@ -304,10 +315,10 @@ export function _mechColoBoulders(monster, phase) {
             } else if (b.state === 'frags') {
                 active++;
                 b.t += dtS;
-                const rollSpd = 210 / _COLO_DEBUG_MULT;
+                const rollSpd = FRAG_SPEED / _COLO_DEBUG_MULT;
                 let anyAlive = false;
                 for (const fr of b.frags) {
-                    if (fr.dist >= 340) { try { fr.el.remove(); } catch (e) {} continue; }
+                    if (fr.dist >= FRAG_REACH) { try { fr.el.remove(); } catch (e) {} continue; }
                     anyAlive = true;
                     fr.dist += rollSpd * dtS;
                     const fx = b.x + Math.cos(fr.ang) * fr.dist;
@@ -328,35 +339,194 @@ export function _mechColoBoulders(monster, phase) {
 
 
 //------------------------------------------------------------------------
+//-------------------AVALANCHE (all fight)---------------------------------
+//------------------------------------------------------------------------
+// A wall of rolling boulders thunders across the whole arena from one edge.
+// A green lane shows the one GAP in the wall before it starts - get into the
+// lane and let the wall roll over the gap. Later in the fight the walls come
+// back to back from alternating sides (left/right, then top/bottom), so you
+// have to be moving to the next gap while the last wall is still rolling.
+export const AVALANCHE_WALLS = [0, 1, 2, 3];   // walls per cast, by phase
+const AVAL_WARN_MS = 1600;                      // lane telegraph before a wall starts rolling
+const AVAL_SPEED = 600;                         // px/s the wall rolls (divided by mult)
+const AVAL_GAP_PX = [0, 200, 170, 150];         // width of the gap, by phase
+const AVAL_THICK = 72;                          // px depth of the wall
+const AVAL_STAGGER_S = 2.0;                     // s between one wall's telegraph and the next
+const AVAL_AXES = ['x', 'y', 'x'];              // wall n travels along this axis ('x' = left/right)
+
+// Picks where a wall's gap sits along its length, preferring a spot away from
+// the player's current position so they have to move.
+function _coloAvalGapCentre(len, gapPx, playerCoord) {
+    let best = len / 2;
+    for (let tries = 0; tries < 6; tries++) {
+        const c = gapPx / 2 + 50 + Math.random() * (len - gapPx - 100);
+        best = c;
+        if (Math.abs(c - playerCoord) > gapPx + 40) break;
+    }
+    return best;
+}
+
+// Sets a box's position and size in pixels.
+function _coloBox(el, x, y, w, h) {
+    el.style.left = Math.round(x) + 'px';
+    el.style.top = Math.round(y) + 'px';
+    el.style.width = Math.round(w) + 'px';
+    el.style.height = Math.round(h) + 'px';
+}
+
+// Builds one wall: the green gap lane, the two wall pieces either side of the
+// gap, and its telegraph state.
+function _coloAvalMake(run, n, p, W, H, pc) {
+    const horiz = AVAL_AXES[n % AVAL_AXES.length] === 'x';
+    const len = horiz ? H : W;
+    const gap = AVAL_GAP_PX[p];
+    const gc = _coloAvalGapCentre(len, gap, horiz ? pc.y : pc.x);
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    const lane = _nkEl(run, 'div', 'sx-colo-aval-lane');
+    const a = _nkEl(run, 'div', 'sx-colo-aval-wall');
+    const b = _nkEl(run, 'div', 'sx-colo-aval-wall');
+    const span = horiz ? W : H;
+    if (horiz) _coloBox(lane, 0, gc - gap / 2, W, gap);
+    else _coloBox(lane, gc - gap / 2, 0, gap, H);
+    return { horiz, len, span, gap, gc, dir, lane, a, b, state: 'warn', t: 0, pos: 0, hit: false };
+}
+
+// Moves a wall's two pieces to its current rolling position.
+function _coloAvalPlace(w) {
+    const x = w.pos - AVAL_THICK / 2;
+    const gTop = w.gc - w.gap / 2, gBot = w.gc + w.gap / 2;
+    if (w.horiz) {
+        _coloBox(w.a, x, 0, AVAL_THICK, gTop);
+        _coloBox(w.b, x, gBot, AVAL_THICK, w.len - gBot);
+    } else {
+        _coloBox(w.a, 0, x, gTop, AVAL_THICK);
+        _coloBox(w.b, gBot, x, w.len - gBot, AVAL_THICK);
+    }
+}
+
+// Removes a finished wall's elements.
+function _coloAvalClear(w) {
+    [w.lane, w.a, w.b].forEach(el => { try { el.remove(); } catch (e) {} });
+    w.state = 'done';
+}
+
+export function _mechColoAvalanche(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
+    const p = Math.max(1, Math.min(3, Number(phase) || 1));
+    const level = monster ? monster.level : 1;
+    const W = window.innerWidth, H = window.innerHeight;
+    const run = _nkNewRun(monster && monster.id, true);
+    _nkToast('eg_mech_colo_avalanche', '🗿🪨 AVALANCHE - a wall of boulders is coming! Stand in the GREEN lane to slip through the gap!', '#d6c8a8');
+
+    const walls = [];
+    let clock = 0;
+    _nkLoop(run, (dtS, now) => {
+        clock += dtS;
+        // Start the next wall's telegraph on its schedule (it reads where you stand NOW).
+        if (walls.length < AVALANCHE_WALLS[p] && clock >= walls.length * AVAL_STAGGER_S) {
+            walls.push(_coloAvalMake(run, walls.length, p, W, H, _coloPC()));
+        }
+        const pr = _nkPlayerRect();
+        const pc = _coloPC();
+        let busy = walls.length < AVALANCHE_WALLS[p];
+        for (const w of walls) {
+            if (w.state === 'done') continue;
+            busy = true;
+            if (w.state === 'warn') {
+                w.t += dtS * 1000;
+                if (w.t >= AVAL_WARN_MS * _COLO_DEBUG_MULT) {
+                    w.state = 'roll';
+                    w.pos = w.dir > 0 ? -AVAL_THICK : w.span + AVAL_THICK;
+                    w.lane.classList.add('sx-colo-aval-lane-live');
+                    _coloShake(0.8);
+                } else {
+                    // Telegraph: the lane plus a pulsing wall outline at the start edge.
+                    w.pos = w.dir > 0 ? AVAL_THICK / 2 : w.span - AVAL_THICK / 2;
+                    w.a.classList.add('sx-colo-aval-wall-warn');
+                    w.b.classList.add('sx-colo-aval-wall-warn');
+                    _coloAvalPlace(w);
+                    continue;
+                }
+                w.a.classList.remove('sx-colo-aval-wall-warn');
+                w.b.classList.remove('sx-colo-aval-wall-warn');
+            }
+            w.pos += w.dir * (AVAL_SPEED / _COLO_DEBUG_MULT) * dtS;
+            _coloAvalPlace(w);
+            // The wall hurts once, unless you are inside its gap as it passes.
+            if (pr && !w.hit) {
+                const along = w.horiz ? pc.x : pc.y;
+                const across = w.horiz ? pc.y : pc.x;
+                if (Math.abs(along - w.pos) < AVAL_THICK / 2 + 12 && Math.abs(across - w.gc) > w.gap / 2 - 8) {
+                    w.hit = true;
+                    _coloTouch(COLO_AVALANCHE_DMG[p], level, 'Avalanche', true);
+                    _coloRubble(run, pc.x, pc.y, true);
+                }
+            }
+            if ((w.dir > 0 && w.pos > w.span + AVAL_THICK) || (w.dir < 0 && w.pos < -AVAL_THICK)) _coloAvalClear(w);
+        }
+        return busy;
+    });
+}
+
+
+//------------------------------------------------------------------------
 //-------------------ACT II: GRANITE GOLEMS (60%)--------------------------
 //------------------------------------------------------------------------
-// Two golem statues climb out of cracks and slow-push toward the player:
-// moving walls that pin you into stride telegraphs. Ram a golem 3× (crack
-// stages, like the Frostwright's monoliths) to crumble it early - every ram
-// shoves you back and costs a small hit, so ramming is a choice, not a
-// trap. They crumble on their own after ~9s.
-export const GOLEM_COUNT     = [0, 0, 2, 2];
-export const GOLEM_SPEED     = 62;      // px/s push (divided by mult)
+// Granite golems climb out of cracks and march toward the player. Ram one 3×
+// (walk into it - every ram shoves you back and costs a small hit) to crumble
+// it safely. A golem that is still standing after ~7s turns red, primes for
+// 1.5s with its blast ring shown, then DETONATES for a big hit on anyone
+// inside the ring. Ramming a primed golem still defuses it.
+export const GOLEM_COUNT     = [0, 0, 2, 3];
+export const GOLEM_SPEED     = 78;      // px/s march (divided by mult)
 export const GOLEM_HITS      = 3;
-export const GOLEM_LIFE_MS   = 9000;
+export const GOLEM_LIFE_MS   = 7000;    // march time before the golem primes
+const GOLEM_FUSE_MS   = 1500;           // priming time (blast ring shown) before it detonates
+const GOLEM_BOOM_R    = 150;            // px detonation radius
 const GOLEM_RAM_CD_MS = 1200;           // per-golem: one ram (crack + shove + hit) per this
 const GOLEM_SHOVE_PX  = 70;             // shove-back on a ram
+const GOLEM_RAM_DIST  = 62;             // px between centres that counts as a ram
+const GOLEM_STOP_DIST = 48;             // px the golem stops short of your centre
+
+// Builds one golem's body: head, shoulders, glowing core, two fists.
+function _coloGolemBody(run) {
+    const el = _nkEl(run, 'div', 'sx-colo-golem');
+    el.innerHTML = '<i class="sx-colo-golem-head"><b></b></i><i class="sx-colo-golem-arm sx-colo-golem-arm-l"></i>' +
+        '<i class="sx-colo-golem-arm sx-colo-golem-arm-r"></i><i class="sx-colo-golem-core"></i><i class="sx-colo-golem-ground"></i>';
+    return el;
+}
+
+// Marks a golem as primed: red body plus the dashed blast ring it will fill.
+function _coloGolemPrime(run, g) {
+    g.primed = true;
+    g.fuse = 0;
+    g.el.classList.add('sx-colo-golem-primed');
+    g.boom = _nkEl(run, 'div', 'sx-colo-golem-boom');
+    g.boom.style.width = g.boom.style.height = (GOLEM_BOOM_R * 2) + 'px';
+}
+
+// Removes a golem for good (crumbled, or after its blast).
+function _coloGolemRemove(g) {
+    g.dead = true;
+    try { g.el.remove(); } catch (e) {}
+    if (g.boom) { try { g.boom.remove(); } catch (e) {} }
+}
 
 export function _mechColoGolems(monster, phase) {
     if (_nkDodgeBusy() || _nkFrozen()) return;
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _nkNewRun(monster && monster.id, true);
-    _nkToast('eg_mech_colo_golem', '🗿🧱 GRANITE GOLEMS - moving walls! Ram one 3 times to crumble it!', '#a8a29e');
+    _nkToast('eg_mech_colo_golem', '🗿🧱 GRANITE GOLEMS - walk into each one 3 times to crumble it, or it EXPLODES!', '#a8a29e');
+    const count = GOLEM_COUNT[Math.max(2, Math.min(3, Number(phase) || 2))];
     const golems = [];
-    for (let i = 0; i < GOLEM_COUNT[Math.max(2, Math.min(3, Number(phase) || 2))]; i++) {
-        const el = _nkEl(run, 'div', 'sx-colo-golem');
-        el.innerHTML = '<i class="sx-colo-golem-eyes"></i>';
-        const gx = W * (i === 0 ? 0.16 : 0.84);
-        const gy = H * (0.2 + Math.random() * 0.5);
-        el.style.left = Math.round(gx - 28) + 'px';
-        el.style.top = Math.round(gy - 28) + 'px';
-        golems.push({ x: gx, y: gy, el, hp: GOLEM_HITS, dead: false, born: 0, ramCd: 0 });
+    for (let i = 0; i < count; i++) {
+        const el = _coloGolemBody(run);
+        const gx = i === 2 ? W * 0.5 : W * (i === 0 ? 0.14 : 0.86);
+        const gy = i === 2 ? H * 0.12 : H * (0.2 + Math.random() * 0.5);
+        el.style.left = Math.round(gx - 42) + 'px';
+        el.style.top = Math.round(gy - 42) + 'px';
+        golems.push({ x: gx, y: gy, el, hp: GOLEM_HITS, dead: false, born: 0, ramCd: 0, primed: false, fuse: 0, boom: null });
     }
     _nkLoop(run, (dtS, now) => {
         const pr = _nkPlayerRect();
@@ -366,16 +536,19 @@ export function _mechColoGolems(monster, phase) {
             if (g.dead) continue;
             active = true;
             g.born += dtS * 1000;
-            // Slow-push toward the player, capped step.
             const dx = pc.x - g.x, dy = pc.y - g.y;
             const d = Math.hypot(dx, dy) || 1;
-            const spd = GOLEM_SPEED / _COLO_DEBUG_MULT;
-            g.x += (dx / d) * Math.min(Math.max(0, d - 40), spd * dtS);
-            g.y += (dy / d) * Math.min(Math.max(0, d - 40), spd * dtS);
-            g.el.style.left = Math.round(g.x - 28) + 'px';
-            g.el.style.top = Math.round(g.y - 28) + 'px';
+            // March toward the player (a primed golem plants its feet).
+            if (!g.primed) {
+                const spd = GOLEM_SPEED / _COLO_DEBUG_MULT;
+                const step = Math.min(Math.max(0, d - GOLEM_STOP_DIST), spd * dtS);
+                g.x += (dx / d) * step;
+                g.y += (dy / d) * step;
+                g.el.style.left = Math.round(g.x - 42) + 'px';
+                g.el.style.top = Math.round(g.y - 42) + 'px';
+            }
             // Contact = a ram: crack the golem, shove you back, small hit.
-            if (pr && d < 52 && now >= g.ramCd) {
+            if (pr && d < GOLEM_RAM_DIST && now >= g.ramCd) {
                 g.ramCd = now + GOLEM_RAM_CD_MS;
                 g.hp--;
                 g.el.classList.remove('sx-colo-golem-crack1', 'sx-colo-golem-crack2');
@@ -385,17 +558,27 @@ export function _mechColoGolems(monster, phase) {
                 _nkNudgeAvatar((dx / d) * GOLEM_SHOVE_PX, (dy / d) * GOLEM_SHOVE_PX);
                 _coloTouch(COLO_GOLEM_DMG, level, 'Golem Shove');
                 if (g.hp <= 0) {
-                    g.dead = true;
                     _coloRubble(run, g.x, g.y, true);
-                    try { g.el.remove(); } catch (e) {}
+                    _coloGolemRemove(g);
                     _nkToast('eg_mech_colo_golem_down', '🧱 Golem crumbled!', '#4ade80');
                     continue;
                 }
             }
-            if (g.born >= GOLEM_LIFE_MS * _COLO_DEBUG_MULT) {
-                g.dead = true;
-                _coloRubble(run, g.x, g.y, true);
-                try { g.el.remove(); } catch (e) {}
+            if (!g.primed && g.born >= GOLEM_LIFE_MS * _COLO_DEBUG_MULT) {
+                _coloGolemPrime(run, g);
+                g.boom.style.left = Math.round(g.x - GOLEM_BOOM_R) + 'px';
+                g.boom.style.top = Math.round(g.y - GOLEM_BOOM_R) + 'px';
+            } else if (g.primed) {
+                g.fuse += dtS * 1000;
+                if (g.fuse >= GOLEM_FUSE_MS * _COLO_DEBUG_MULT) {
+                    // DETONATION: everyone inside the ring eats it.
+                    _coloRubble(run, g.x, g.y, true);
+                    _coloShake(1.2);
+                    if (pr && Math.hypot(pc.x - g.x, pc.y - g.y) < GOLEM_BOOM_R) {
+                        _coloTouch(COLO_GOLEM_BOOM_DMG, level, 'Golem Blast', true);
+                    }
+                    _coloGolemRemove(g);
+                }
             }
         }
         return active;
@@ -407,16 +590,16 @@ export function _mechColoGolems(monster, phase) {
 //-------------------FINALE: TITAN'S FALL (≤10%, one-shot)-----------------
 //------------------------------------------------------------------------
 // The Colossus kneels. Three JOINT SEALS (shoulder, knee, chest) light up
-// one at a time; ram the lit seal 3 times - each ram counts when you charge
-// in from outside, so step back between rams - while falling-rock chutes
+// one at a time; walk into the lit seal 3 times - each ram counts when you walk
+// in from outside, so step back out between rams - while falling-rock chutes
 // (telegraphed lanes) sweep the arena. Break a seal → the titan slumps.
 // All three → collapse for good. A seal that runs out of time collapses on
 // you (22%); the third one brings the CAVE-IN: 3-2-1, then dust everywhere
 // except the glowing ring around that seal (35% outside it).
 // Charge bar frozen for the whole set-piece (gate in _tickPlayer via
 // _coloFinalActive).
-export const COLO_FINALE_SEAL_MS   = 22000;  // ms budget per seal (incl. chutes)
-export const COLO_CHUTE_PERIOD_MS  = 2600;   // a chute lane every ~2.6s
+export const COLO_FINALE_SEAL_MS   = 20000;  // ms budget per seal (incl. chutes)
+export const COLO_CHUTE_PERIOD_MS  = 1900;   // a chute lane every ~1.9s
 export const COLO_CHUTE_WARN_MS    = 1100;   // lane telegraph before rocks
 
 // Set while the finale runs (read by _tickPlayer's charge-freeze gate).
@@ -499,11 +682,11 @@ export function _coloFinalStart(monster) {
     ov.className = 'sx-colo-cd';
     ov.innerHTML =
         '<div class="sx-colo-cd-label">🗿 TITAN\u2019S FALL</div>' +
-        '<div class="sx-colo-cd-hint">Drag your HERO onto the glowing seal, step away, then onto it again - 3 times!</div>';
+        '<div class="sx-colo-cd-hint">WALK into the glowing seal, step back out, then walk into it again - 3 times!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _nkToast('eg_mech_colo_final_cd', '🗿💀 TITAN\u2019S FALL - drag your hero onto the glowing seal, step away, repeat 3 times!', '#d6c8a8');
+    _nkToast('eg_mech_colo_final_cd', '🗿💀 TITAN\u2019S FALL - walk into the glowing seal, back away, repeat 3 times! Dodge the rock chutes!', '#d6c8a8');
     const hintEl = ov.querySelector('.sx-colo-cd-hint');
 
     // Boss immunity for the whole set-piece (released at the end).
@@ -528,7 +711,7 @@ export function _coloFinalStart(monster) {
     g.sealEls = sealSpots.map(s => {
         const el = document.createElement('div');
         el.className = 'sx-colo-seal';
-        el.innerHTML = '<span class="sx-colo-seal-n"></span><span class="sx-colo-seal-cap">DRAG HERO HERE</span>';
+        el.innerHTML = '<span class="sx-colo-seal-n"></span><span class="sx-colo-seal-cap">WALK INTO IT</span>';
         document.body.appendChild(el);
         g.fxRun.els.push(el);
         return { el, fx: s.fx, fy: s.fy, x: 0, y: 0, hp: COLO_SEAL_HITS };
@@ -659,7 +842,7 @@ export function _coloFinalStart(monster) {
         // Seal countdown in the banner.
         if (hintEl) {
             const left = Math.max(0, Math.ceil((COLO_FINALE_SEAL_MS * _COLO_DEBUG_MULT - g.sealTimer) / 1000));
-            const step = g.armed ? 'drag your hero ONTO the glowing seal' : 'step AWAY, then back onto the seal';
+            const step = g.armed ? 'WALK into the glowing seal' : 'step AWAY from it, then walk back in';
             hintEl.textContent = 'Seal ' + (g.seal + 1) + '/3 - ' + step + ' (' + Math.max(0, seal.hp) + ' more) - ' + left + 's left';
         }
         // Keep the lit-seal visuals honest.
@@ -761,7 +944,8 @@ export function _coloFinalEnd(g, monster, collapsed) {
 export function _coloTeardown() {
     if (_coloFinal) { try { _coloFinalEnd(_coloFinal, null, false); } catch (e) {} _coloFinal = null; }
     document.querySelectorAll('.sx-colo-foot-warn, .sx-colo-foot-slam, .sx-colo-wave, .sx-colo-quake-zone, ' +
-        '.sx-colo-boulder, .sx-colo-boulder-mark, .sx-colo-frag, .sx-colo-golem, .sx-colo-chip, ' +
+        '.sx-colo-boulder, .sx-colo-boulder-mark, .sx-colo-frag, .sx-colo-golem, .sx-colo-golem-boom, .sx-colo-chip, ' +
+        '.sx-colo-aval-lane, .sx-colo-aval-wall, ' +
         '.sx-colo-seal, .sx-colo-chute-warn, .sx-colo-chute, .sx-colo-cd, .sx-colo-cavein, .sx-colo-cavein-ring').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
@@ -777,7 +961,7 @@ export function _coloTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _COLO_DEBUG.fire('stride'|'boulders'|'golems', phase) - runs one now
+//   _COLO_DEBUG.fire('stride'|'boulders'|'golems'|'avalanche', phase) - runs one now
 //   _COLO_DEBUG.final()                                   - TITAN'S FALL now
 if (typeof window !== 'undefined') {
     window._COLO_DEBUG = {
@@ -787,7 +971,8 @@ if (typeof window !== 'undefined') {
             if (!monster) return 'no colossus alive';
             const fn = name === 'stride' ? _mechSeismicSlam
                 : name === 'boulders' ? _mechColoBoulders
-                : name === 'golems' ? _mechColoGolems : null;
+                : name === 'golems' ? _mechColoGolems
+                : name === 'avalanche' ? _mechColoAvalanche : null;
             if (!fn) return 'unknown: ' + name;
             if (name !== 'stride' && _nkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for the field to clear)';
             fn(monster, phase || monster.bossPhase || 1);

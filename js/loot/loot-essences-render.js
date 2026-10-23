@@ -13,8 +13,9 @@ import { _dndBuildCurrencyChipHTML } from '../hub/hub-drag-and-drop.js';
 import { t } from '../translation/translations.js';
 import { ALL_BASE_TYPES } from './equipment-base-items.js';
 import { SLOT_MOD_TABLE_MAP } from './loot-equipment-mod-tables.js';
-import { ESSENCE_COLS, ESSENCE_ROWS, _ESSENCE_FAMILIES, _essenceCompatibleSlotTypes, _essenceIdForSlot, _essenceStash } from './loot-essences.js';
+import { ESSENCE_COLS, ESSENCE_ROWS, _ESSENCE_FAMILIES, _essenceCompatibleSlotTypes, _essenceIdForSlot, _essenceItemLevelBySlot, _essenceStash } from './loot-essences.js';
 import { _essenceDefForId, _essenceResolveFamilyId } from './loot-essences-defs.js';
+import { _essenceFamilyDisplayName } from './loot-essences-names.js';
 import { _buildEssenceDetailHTML } from './loot-essences-tooltip.js';
 import {_eligibleTiers, _familyAllowedOnBase} from './loot-mod-application.js';
 
@@ -26,6 +27,12 @@ import {_eligibleTiers, _familyAllowedOnBase} from './loot-mod-application.js';
 // Which slot type the dropdown is set to: 'all', or one slotType like
 // 'shield' or 'weapon'. Only this file reads or writes it.
 let _essenceFilterSlotType = 'all';
+
+// The other filters: text typed in the search box, the "item level" box
+// (0 = off) and the "only essences I own" tick box.
+let _essenceFilterText = '';
+let _essenceFilterIlvl = 0;
+let _essenceFilterOwned = false;
 
 
 //----------------------------------------------------------------------
@@ -46,11 +53,29 @@ export function _getEssenceFilterSlotTypes() {
     return Array.from(slotTypes).sort();
 }
 
-// Checks if an essence (by familyId) is compatible with the current filter
-export function _essenceMatchesFilter(familyId) {
+// True when the essence's modifier can roll at the typed item level, on the
+// selected item type (or on any item type when the dropdown says All).
+function _essenceRollsAtLevel(familyId, ilvl) {
+    return _essenceItemLevelBySlot(familyId).some(e =>
+        (_essenceFilterSlotType === 'all' || e.slotType === _essenceFilterSlotType) && e.ilvl <= ilvl);
+}
+
+// True when the search text appears in the essence's name or modifier name.
+function _essenceMatchesText(def, familyId) {
+    const needle = _essenceFilterText.trim().toLowerCase();
+    if (!needle) return true;
+    const hay = ((def && def.name) || '') + ' ' + _essenceFamilyDisplayName(familyId);
+    return hay.toLowerCase().includes(needle);
+}
+
+// Checks if an essence (by familyId) passes every active filter: item type,
+// item level, search text and "owned only" (hasItem = a stack sits in its cell).
+export function _essenceMatchesFilter(familyId, def, hasItem) {
+    if (_essenceFilterOwned && !hasItem) return false;
+    if (!_essenceMatchesText(def, familyId)) return false;
+    if (_essenceFilterIlvl > 0 && !_essenceRollsAtLevel(familyId, _essenceFilterIlvl)) return false;
     if (_essenceFilterSlotType === 'all') return true;
-    const result = _essenceCanApplyToSlotType(familyId, _essenceFilterSlotType);
-    return result;
+    return _essenceCanApplyToSlotType(familyId, _essenceFilterSlotType);
 }
 
 // More thorough check: verifies the essence family can actually roll on at least one base of the filtered slot type
@@ -104,6 +129,19 @@ export function _setEssenceFilter(slotType) {
     if (select) select.value = slotType;
 }
 
+// The search box, item-level box and "Owned" tick box live in the tab markup;
+// one document-level listener reads them so no inline handlers are needed.
+function _onEssenceFilterInput(e) {
+    const id = e.target && e.target.id;
+    if (id === 'sx-essence-filter-text') _essenceFilterText = e.target.value || '';
+    else if (id === 'sx-essence-filter-ilvl') _essenceFilterIlvl = Math.max(0, parseInt(e.target.value, 10) || 0);
+    else if (id === 'sx-essence-filter-owned') _essenceFilterOwned = !!e.target.checked;
+    else return;
+    _renderEssenceStash();
+}
+document.addEventListener('input', _onEssenceFilterInput);
+document.addEventListener('change', _onEssenceFilterInput);
+
 
 //----------------------------------------------------------------------
 //------------------------------TAB MARKUP------------------------------
@@ -146,6 +184,8 @@ export function _buildEssenceTabHTML() {
         filterOptions += `<option value="${st}"${selected}>${slotLabel(st)}</option>`;
     }
 
+    const tr = (key, fallback) => { const v = t(key); return v && v !== key ? v : fallback; };
+    const esc = (v) => String(v).replace(/"/g, '&quot;');
     return `
 <div class="sx-panel sx-panel-essence">
     <div class="sx-panel-label">
@@ -153,6 +193,16 @@ export function _buildEssenceTabHTML() {
         <select id="sx-essence-filter-select" class="sx-essence-filter-select" onchange="_setEssenceFilter(this.value)" data-tip-t="eg_essence_filter_title">
             ${filterOptions}
         </select>
+    </div>
+    <div class="sx-essence-filter-row">
+        <input id="sx-essence-filter-text" class="sx-essence-filter-input" type="search" autocomplete="off"
+               placeholder="${esc(tr('eg_essence_filter_search', 'Search modifier...'))}" value="${esc(_essenceFilterText)}">
+        <input id="sx-essence-filter-ilvl" class="sx-essence-filter-input sx-essence-filter-ilvl" type="number" min="0" max="100"
+               placeholder="${esc(tr('eg_essence_filter_ilvl', 'Item lvl'))}" title="${esc(tr('eg_essence_filter_ilvl_title', 'Only essences that can roll at this item level'))}"
+               value="${_essenceFilterIlvl > 0 ? _essenceFilterIlvl : ''}">
+        <label class="sx-essence-filter-owned" title="${esc(tr('eg_essence_filter_owned_title', 'Only show essences you own'))}">
+            <input id="sx-essence-filter-owned" type="checkbox"${_essenceFilterOwned ? ' checked' : ''}> ${tr('eg_essence_filter_owned', 'Owned')}
+        </label>
     </div>
     <div class="sx-essence-grid" id="sx-essence-grid"
          style="grid-template-columns: repeat(${ESSENCE_COLS}, 1fr);">
@@ -220,12 +270,12 @@ export function _renderEssenceCell(row, col) {
     let matchesFilter = true;
     if (!item && assignedId && def) {
         const familyId = _essenceResolveFamilyId(def);
-        if (familyId && !_essenceMatchesFilter(familyId)) {
+        if (familyId && !_essenceMatchesFilter(familyId, def, false)) {
             matchesFilter = false;
         }
     } else if (item) {
         const familyId = _essenceResolveFamilyId(item);
-        if (familyId && !_essenceMatchesFilter(familyId)) {
+        if (familyId && !_essenceMatchesFilter(familyId, def || item, true)) {
             matchesFilter = false;
         }
     }
@@ -299,82 +349,3 @@ if (typeof document !== 'undefined' && document.addEventListener) {
         } catch (e) { /* essence tab not open - safe to ignore */ }
     });
 }
-
-
-//----------------------------------------------------------------------
-//--------------------------------STYLES--------------------------------
-//----------------------------------------------------------------------
-
-(function _injectEssenceStyles() {
-    if (document.getElementById('sx-essence-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'sx-essence-styles';
-    style.textContent = `
-        /* Essence tab cells highlight while a drag hovers them */
-        .sx-essence-cell.sx-dragover {
-            outline: 2px solid #a0a0ff;
-            background: rgba(100, 100, 255, 0.18);
-        }
-        /* Essence icon glow */
-        .sx-item-chip.sx-rarity-essence .sx-item-chip-icon {
-            filter: drop-shadow(0 0 4px #b06ae0);
-        }
-        /* Essence detail in tooltip */
-        .sx-tt-essence-detail { padding-top: 6px; }
-        .sx-tt-essence-title { color: #b59248; font-weight: 700; font-size: 0.82rem; margin-bottom: 5px; letter-spacing: 0.02em; }
-        .sx-tt-essence-line { display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.78rem; line-height: 1.45; padding: 3px 0; border-bottom: 1px solid rgba(181,146,72,0.08); }
-        .sx-tt-essence-line:last-of-type { border-bottom: none; }
-        .sx-tt-essence-slots { color: #9aa0b8; flex: 1 1 55%; min-width: 140px; white-space: normal; word-break: break-word; }
-        .sx-tt-essence-mod { color: #f5d98a; font-weight: 600; white-space: normal; flex: 0 0 auto; word-break: break-word; overflow-wrap: anywhere; }
-        .sx-tt-essence-mod.sx-tt-essence-random { color: #ccc; font-style: italic; font-weight: 400; }
-        .sx-tt-essence-note { color: #7a7a8a; font-size: 0.70rem; line-height: 1.35; margin-top: 6px; font-style: italic; opacity: 0.9; }
-        /* Empty assigned essence slot placeholder (mirrors currency) */
-        .sx-essence-cell.sx-essence-assigned-empty {
-            border: 1px dashed rgba(176,106,224,0.35);
-            background: rgba(176,106,224,0.06);
-            position: relative;
-        }
-        .sx-essence-cell.sx-essence-assigned-empty::after {
-            content: attr(data-empty-icon);
-            position: absolute;
-            left: 50%; top: 50%;
-            transform: translate(-50%,-50%);
-            font-size: 1.1rem;
-            opacity: 0.22;
-            pointer-events: none;
-        }
-        .sx-essence-grid { gap: 4px; }
-        .sx-essence-cell { position: relative; min-height: 38px; }
-        .sx-panel-essence .sx-essence-grid { max-height: 560px; overflow-y: auto; padding-right: 4px; }
-        .sx-panel-essence .sx-essence-grid::-webkit-scrollbar { width: 6px; }
-        .sx-panel-essence .sx-essence-grid::-webkit-scrollbar-thumb { background: rgba(176,106,224,0.35); border-radius: 3px; }
-        /* Essence filter dropdown */
-        .sx-panel-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-        .sx-essence-filter-select {
-            font-family: var(--PX);
-            font-size: 12px;
-            letter-spacing: 1px;
-            padding: 2px 6px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--accent);
-            cursor: pointer;
-            min-width: 100px;
-        }
-        .sx-essence-filter-select:hover { border-color: var(--accent2); }
-        .sx-essence-filter-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 4px rgba(102,252,241,0.3); }
-        /* Filtered-out essence cells (dimmed when filter is active) */
-        .sx-essence-cell.sx-essence-filtered-out {
-            opacity: 0.2;
-        }
-        .sx-essence-cell.sx-essence-filtered-out.sx-essence-assigned-empty {
-            border-color: rgba(176,106,224,0.1);
-            background: rgba(176,106,224,0.02);
-        }
-        .sx-essence-cell.sx-essence-filtered-out .sx-item-chip {
-            opacity: 0.3;
-            filter: grayscale(1);
-        }
-    `;
-    document.head.appendChild(style);
-})();

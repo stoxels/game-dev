@@ -98,24 +98,33 @@ export function _essenceCompatibleSlotTypes(familyId) {
     }
     return slots;
 }
-// Lowest item level at which the essence can roll its guaranteed modifier
-// (the family's weakest tier), per compatible slot type. Returns
-// { min, max } across slot types, or null when no slot can roll it.
-export function _essenceItemLevelRange(familyId) {
-    let min = Infinity;
-    let max = 0;
+// For each slot type that can carry the family: the lowest item level at
+// which its weakest tier can roll there. The level differs per slot (e.g.
+// Critical Strike Multiplier is 1+ on weapons but 15+ on arcane items), so
+// the tooltip lists them separately. Returns [{ slotType, ilvl }].
+export function _essenceItemLevelBySlot(familyId) {
+    const out = [];
     for (const slotType of _essenceCompatibleSlotTypes(familyId)) {
         let tbl = null;
         try { tbl = SLOT_MOD_TABLE_MAP[slotType](); } catch (e) { continue; }
         if (!tbl) continue;
         const fam = (tbl.prefixes && tbl.prefixes[familyId]) || (tbl.suffixes && tbl.suffixes[familyId]);
         if (!fam || !fam.tiers || !fam.tiers.length) continue;
-        const lowest = Math.min(...fam.tiers.map(t => t.ilvl || 1));
-        min = Math.min(min, lowest);
-        max = Math.max(max, lowest);
+        out.push({ slotType, ilvl: Math.min(...fam.tiers.map(t => t.ilvl || 1)) });
     }
-    return Number.isFinite(min) ? { min, max } : null;
+    return out;
 }
+
+// The lowest item level at which the family can roll on this particular
+// item's slot type, or null when its slot has no such modifier.
+export function _essenceMinLevelForItem(familyId, item) {
+    const modTable = _getModTable(item);
+    if (!modTable) return null;
+    const fam = (modTable.prefixes && modTable.prefixes[familyId]) || (modTable.suffixes && modTable.suffixes[familyId]);
+    if (!fam || !fam.tiers || !fam.tiers.length) return null;
+    return Math.min(...fam.tiers.map(t => t.ilvl || 1));
+}
+
 export function _essenceCanApplyToItem(familyId, item) {
     return _essenceIncompatibilityReason(familyId, item) === null;
 }

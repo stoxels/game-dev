@@ -158,13 +158,6 @@ export function _spawnHitBurst(monsterId, elements, isCrit) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Returns the CSS class for an HP bar based on the percentage remaining.
-export function _hpBarClass(hpPct) {
-    if (hpPct > 60) return 'sx-hp-high';
-    if (hpPct > 30) return 'sx-hp-mid';
-    return 'sx-hp-low';
-}
-
 // Builds the badge HTML for a monster's name row (level, boss phase, immune, target).
 // NOTE: _buildMonsterBadgesHTML is kept for any external callers.
 export function _buildMonsterBadgesHTML(m, isTarget) {
@@ -202,7 +195,7 @@ export function _buildMonsterCardHTML(m) {
                 <div class="sx-charge-bar" id="sx-charge-bar-${m.id}" style="width:${chargePct}%"></div>
             </div>
             <div class="sx-hp-track-compact">
-                <div class="sx-hp-bar-compact ${_hpBarClass(hpPct)}" id="sx-hp-bar-${m.id}" style="width:${hpPct}%"></div>
+                <div class="sx-hp-bar-compact" id="sx-hp-bar-${m.id}" style="width:${hpPct}%"></div>
             </div>
         </div>
 
@@ -273,10 +266,7 @@ export function _updateMonsterBars(m) {
     const chargeBar = document.getElementById(`sx-charge-bar-${m.id}`);
     const hpLabel = document.getElementById(`sx-hp-label-${m.id}`);
 
-    if (hpBar) {
-        hpBar.style.width = hpPct + '%';
-        hpBar.className = `sx-hp-bar-compact ${_hpBarClass(hpPct)}`;
-    }
+    if (hpBar) hpBar.style.width = hpPct + '%';
     if (chargeBar) {
         chargeBar.style.width = chargePct + '%';
         // Danger glow when the attack is about to fire (>75% charged) - matches RPG pop

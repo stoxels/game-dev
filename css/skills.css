@@ -51,6 +51,13 @@ body.spellbook-open .skill-hotbar,
    the visual focus. */
 body:has(#spellbook-overlay.show) .skill-hotbar { z-index: 10010; }
 
+/* While the Probability Tree screen is open the bar is mounted on <body> (the
+   game screen behind the tree is hidden), so it has to paint above the tree's
+   own layers - the stat summary is the highest of those at z 20 - while
+   staying under the HUD tooltip (z 10050) so hovering a slot still shows the
+   spell tooltip. */
+body:has(#screen-passive-tree.active) .skill-hotbar { z-index: 30; }
+
 /* Question modals (quiz / math gate / scouts primer) take over the screen -
    hide the action bar entirely so it can't be clicked or clutter the modal. */
 body.question-modal-open .skill-hotbar { display: none !important; }

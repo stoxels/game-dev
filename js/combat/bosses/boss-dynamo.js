@@ -1,6 +1,5 @@
 import { t } from '../../translation/translations.js';
 import { GAME_ART } from '../combat-art.js';
-import { _hpBarClass } from '../encounter.js';
 import { MONSTER_DEFS } from '../combat-monsters-data.js';
 import { _isActive } from '../combat-state.js';
 import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
@@ -437,7 +436,7 @@ export function _dynamoRenderConductorCard(m, rec) {
     card.innerHTML =
         '<div class="sx-compact-bars">' +
             '<div class="sx-charge-track-compact"><div class="sx-charge-bar" id="sx-charge-bar-' + m.id + '" style="width:0%"></div></div>' +
-            '<div class="sx-hp-track-compact"><div class="sx-hp-bar-compact ' + _hpBarClass(hpPct) + '" id="sx-hp-bar-' + m.id + '" style="width:' + hpPct + '%"></div></div>' +
+            '<div class="sx-hp-track-compact"><div class="sx-hp-bar-compact" id="sx-hp-bar-' + m.id + '" style="width:' + hpPct + '%"></div></div>' +
         '</div>' +
         '<div class="sx-status-strip" id="sx-status-' + m.id + '"></div>' +
         '<div class="sx-emoji-wrapper">' +
