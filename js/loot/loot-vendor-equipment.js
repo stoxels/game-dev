@@ -7,6 +7,7 @@ import { _clearTooltip } from '../hub/hub-tooltips.js';
 import { _showHubTooltip } from './loot-currency-tooltip.js';
 import { _addItemToStash, _equipped } from '../hub/hub.js';
 import { _getPlayerLevel } from '../hub/hub-leveling.js';
+import { _rollImplicitsForBase } from './loot-implicits.js';
 import { _vendorBuildCardHTML, _vendorIconHTML, _vendorPurchase, _vendorRefreshGoldDisplay, _vendorRefreshTabContent } from './loot-vendor-shared.js';
 
 //------------------------------------------------------------------------
@@ -323,6 +324,7 @@ export function _vendorBuildBaseItemFromBase(base) {
         id: `${base.id}_preview`,
         baseId: base.id,
         name: baseName,
+        baseName,
         icon: base.icon || SLOT_ICONS[base.slotType] || '📦',
         category: 'equip',
         slotType: base.slotType,
@@ -360,6 +362,8 @@ export function _vendorBuyBaseItem(baseId) {
     if (!_vendorPurchase(price, () => {
         const item = _vendorBuildBaseItemFromBase(base);
         item.id = `${base.id}_${Date.now()}`;
+        // Bought bases get their implicit modifier rolled now (not in the preview, so the tooltip never shows a fake roll).
+        item.implicits = _rollImplicitsForBase(base) || [];
         // Free starter gear sells for nothing - prevents a buy-free/sell-shard loop.
         if (price === 0) item.noSellValue = true;
 

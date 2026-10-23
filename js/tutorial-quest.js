@@ -2572,6 +2572,7 @@ function _tqGrantChestGear(entry, idx) {
     const item = _vendorBuildBaseItemFromBase(base);
     item.id = `${base.id}_chest_${Date.now()}_${idx}`;
     item.name = _tqChestItemName(entry, item);   // story name (uniform)
+    item.baseName = item.name;        // later crafting renames from this, not from the decorated name
     item.noSellValue = true;          // loot-filter proof, like the starter gear
     item.isTutorialStarterGear = true;
     const slotId = item.slotType;     // chest / pants / ranged match the paperdoll slot ids
