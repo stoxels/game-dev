@@ -436,6 +436,7 @@ export function ensureCharmState() {
     if (!Number.isFinite(Number(STATE.charmOrbs))) STATE.charmOrbs = 0;
     // UI preference for the charm list (see _charmApplyRankFilter).
     STATE.charmMaxRankOnly = STATE.charmMaxRankOnly === true;
+    STATE.charmAutoUpgrade = STATE.charmAutoUpgrade === true;
 
     // Drop slot references whose charm is no longer owned (save edits,
     // class resets) so a slot can never unlock a spell that isn't held.
@@ -587,6 +588,9 @@ export function grantCharm(skillId, rank) {
         }
     } else {
         STATE.charmInventory.push(_charmMake(skillId, rank));
+        // "Auto-upgrade spells" is on: a newly obtained higher rank replaces
+        // the lower rank of the same spell in its spell slot.
+        if (STATE.charmAutoUpgrade) promoteCharmSlotToRank(skillId, rank);
     }
 
     if (save) { try { save(); } catch (e) { /* best effort */ } }
@@ -1155,11 +1159,25 @@ function _charmBuildCurrencyHTML() {
 function _charmBuildFilterHTML() {
     ensureCharmState();
     const on = !!(STATE && STATE.charmMaxRankOnly);
-    return `<label class="sb3-maxrank">`
+    const tipAttrs = (kind) => ` onmouseenter="handleCharmCurrencyTip(event,'${kind}')"`
+        + ` onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()"`;
+    return `<label class="sb3-maxrank"${tipAttrs('maxrank')}>`
         + `<input type="checkbox" class="charm-filter-cb"${on ? ' checked' : ''}`
         + ` onchange="handleCharmMaxRankToggle(this.checked)">`
         + `<span class="charm-filter-label">${t('charm_filter_max_rank')}</span>`
+        + `</label>`
+        + `<label class="sb3-maxrank sb3-autoup"${tipAttrs('autoup')}>`
+        + `<input type="checkbox" class="charm-autoup-cb"${STATE && STATE.charmAutoUpgrade ? ' checked' : ''}>`
+        + `<span class="charm-filter-label">${t('charm_auto_upgrade')}</span>`
         + `</label>`;
+}
+
+// "Auto-upgrade spells" checkbox: saves the choice (no re-render needed, the
+// box already shows it).
+function _charmSetAutoUpgrade(checked) {
+    if (!STATE) return;
+    STATE.charmAutoUpgrade = !!checked;
+    if (save) { try { save(); } catch (e) { /* best effort */ } }
 }
 
 // Toggles the rank filter and re-renders the book.
@@ -1299,10 +1317,27 @@ export function handleCharmCurrencyTip(e, kind) {
         showHUDTooltip(buildCharmCurrencyTipHTML(kind), e);
 }
 
+// Builds the tooltip for the two spellbook checkboxes: its name, whether it is
+// on right now, and what it does.
+function buildCharmOptionTipHTML(kind) {
+    const isAuto = (kind === 'autoup');
+    const on = isAuto ? !!STATE.charmAutoUpgrade : !!STATE.charmMaxRankOnly;
+    const state = on
+        ? `<b style="color:#86efac">${t('charm_tip_option_on')}</b>`
+        : `<b style="color:#fca5a5">${t('charm_tip_option_off')}</b>`;
+    return `<div class="skl-tip charm-tip">`
+        + `<div class="skl-tip-title">${t(isAuto ? 'charm_auto_upgrade' : 'charm_filter_max_rank')}</div>`
+        + `<div class="skl-tip-stat">${state}</div>`
+        + `<div class="skl-tip-sep"></div>`
+        + `<div class="skl-tip-desc">${t(isAuto ? 'charm_auto_upgrade_tip' : 'charm_filter_max_rank_tip')}</div>`
+        + `</div>`;
+}
+
 // Builds the currency tooltip: what the currency is, how much you hold and
 // what the next one buys you.
 function buildCharmCurrencyTipHTML(kind) {
     ensureCharmState();
+    if (kind === 'maxrank' || kind === 'autoup') return buildCharmOptionTipHTML(kind);
     const isOrb = (kind === 'orbs');
     const count = isOrb ? ((STATE && STATE.charmOrbs) || 0) : ((STATE && STATE.charmShards) || 0);
     // No emoji in the title either - the currency is named in words
@@ -1437,6 +1472,12 @@ function _charmCleanupDrag() {
 export function initCharmPanelInteractions(host) {
     if (!host || host.dataset.charmBound === '1') return;
     host.dataset.charmBound = '1';
+
+    host.addEventListener('change', (e) => {
+        if (e.target && e.target.classList && e.target.classList.contains('charm-autoup-cb')) {
+            _charmSetAutoUpgrade(e.target.checked);
+        }
+    });
 
     // Right-click a charm in the INVENTORY (.sb3-charm-row - filled slots
     // use .sb3-slot and are intentionally excluded) to slot it into the first

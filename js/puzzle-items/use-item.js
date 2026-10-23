@@ -27,6 +27,8 @@ import { _useShield } from './shield/shield.js';
 import { _useSurveyScope } from './survey-scope/survey-scope.js';
 import { _useTheWitch } from './the-witch/the-witch.js';
 import { showItemToast } from '../puzzle-mechanics/toasts-and-popups.js';
+import { _fxItemUse, _fxSlotRect } from '../puzzle-mechanics/fx-helpers.js';
+import { rarityColors } from './item-pool.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
 
@@ -235,7 +237,10 @@ function useItem(uid) {
     const def = ITEM_DEFS[item.defId];
     if (!def) return;
 
+    // Remember where the slot is: consuming the item rebuilds the inventory bar.
+    const slotPos = _fxSlotRect(def.id);
     const msg = _dispatchItemEffect(def.id, def);
+    if (msg !== null) _fxItemUse(def, rarityColors(def.rarity).color, slotPos);
 
     _consumeItem(idx, def, msg);
 }

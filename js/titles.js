@@ -311,10 +311,26 @@ export function showTitlesModal() {
 //-------------------UNLOCK CEREMONY---------------------------------------
 //------------------------------------------------------------------------
 
+// True while something the player is busy with is on screen: the quiz, the
+// win / lose screen, or any other open window.
+function _ceremonyBlocked() {
+    return !!document.querySelector('#quiz-overlay.show, #ov-win.show, #ov-lose.show, .modal-bg.show');
+}
+
+// Looks again in a moment; one waiting check at a time.
+let _ceremonyRetry = 0;
+function _retryCeremonyLater() {
+    if (_ceremonyRetry) return;
+    _ceremonyRetry = setTimeout(() => { _ceremonyRetry = 0; checkTitleUnlocks(); }, 1500);
+}
+
 // Records every newly earned title (so it is celebrated once) and shows the
 // ceremony. Safe to call often: it does nothing when no title is new.
 export function checkTitleUnlocks() {
     if (typeof document === 'undefined' || !STATE) return [];
+    // Never interrupt the quiz, the win / lose screen or another open window:
+    // the new title waits and shows once they are gone.
+    if (_ceremonyBlocked()) { _retryCeremonyLater(); return []; }
     if (!Array.isArray(STATE.titlesSeen)) STATE.titlesSeen = [];
     const fresh = getEarnedTitlesForScore(_score()).filter(def => !STATE.titlesSeen.includes(def.id));
     if (!fresh.length) return [];

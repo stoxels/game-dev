@@ -1300,6 +1300,11 @@ Object.assign(T.en, {
     charm_inventory_title: 'Charms',
     charm_inventory_empty: 'No charms yet - defeat monsters to find some.',
     charm_filter_max_rank: 'Max rank only',
+    charm_filter_max_rank_tip: 'Shows only the highest rank you own of each spell in the charm list. Lower ranks stay in your inventory, and charms sitting in a spell slot are always shown.',
+    charm_tip_option_on: 'On',
+    charm_tip_option_off: 'Off',
+    charm_auto_upgrade: 'Auto-upgrade spells',
+    charm_auto_upgrade_tip: 'When you get a higher rank of a spell (grid pickup or shop), it automatically replaces the lower rank in your spell slot.',
     // Charm currency ladder: Lemma → Theorem. A duplicate charm is recycled
     // into one Lemma; five Lemmas prove one Theorem, and a Theorem bound to a
     // charm permanently sharpens that spell. The prose names line up with the
@@ -4741,6 +4746,11 @@ Object.assign(T.de, {
     charm_inventory_title: 'Anhänger',
     charm_inventory_empty: 'Noch keine Anhänger - besiege Monster, um welche zu finden.',
     charm_filter_max_rank: 'Nur höchster Rang',
+    charm_filter_max_rank_tip: 'Zeigt in der Charm-Liste nur den höchsten Rang, den du von jedem Zauber besitzt. Niedrigere Ränge bleiben im Inventar, und Charms in einem Zauberplatz werden immer angezeigt.',
+    charm_tip_option_on: 'An',
+    charm_tip_option_off: 'Aus',
+    charm_auto_upgrade: 'Zauber automatisch aufwerten',
+    charm_auto_upgrade_tip: 'Erhältst du einen höheren Rang eines Zaubers (Feld-Fund oder Laden), ersetzt er automatisch den niedrigeren Rang in deinem Zauberplatz.',
     charm_currency_shards: 'Lemmata',
     charm_currency_shard_one: 'Lemma',
     charm_currency_orbs: 'Theoreme',

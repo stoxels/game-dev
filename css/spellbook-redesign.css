@@ -292,6 +292,9 @@
     transform-origin: center;
 }
 
+/* Two filter pills side by side on the frame. */
+.sb3-frame-filter { gap: clamp(4px, .6cqw, 10px); }
+
 /* "Max rank only" - centred under the currency pills. */
 .sb3-maxrank {
     flex: 0 0 auto;

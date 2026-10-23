@@ -1,6 +1,8 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { cur } from '../state.js';
 import { GAME_ART } from '../combat/combat-art.js';
+import { ITEM_GROUPS } from '../puzzle-items/item-definitions.js';
+import { _fxItemLanding } from '../puzzle-items/landing/item-landing.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - FX HELPERS----------------------
@@ -528,4 +530,156 @@ export function _fxMakeGoldTintFill(container, r) {
         animation:fx-artifact-fill 2s ease-out forwards;
     `;
     container.appendChild(fill);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------ITEM USE: LAUNCH + GRID IMPACT-----------------------
+//------------------------------------------------------------------------
+// The shared "item was used" show that plays for EVERY puzzle item on top of
+// its own effect: a burst on the inventory slot, the item flying to the
+// puzzle in a glowing arc, and a coloured impact on the grid (shockwave, light
+// sweep, glowing frame, sparkles). Colour follows the item's category.
+
+// Impact colour per item category (ITEM_GROUPS label).
+const FX_GROUP_COLORS = {
+    Reveal: '#2ed573', Mark: '#ffaa00', Time: '#4fc3f7', Utility: '#7aa2ff',
+    Power: '#ffd700', Cursed: '#c04bff', Special: '#f5d98b',
+};
+
+// Category colour for an item id (gold when it belongs to no category).
+function _fxGroupColor(defId) {
+    const group = ITEM_GROUPS.find(g => g.slots.includes(defId));
+    return (group && FX_GROUP_COLORS[group.label]) || '#ffd700';
+}
+
+// Adds a fixed-position element to the page that plays the given keyframes
+// and then removes itself. (Keyframes run through the browser's animation
+// API, so nothing has to be declared in CSS.)
+function _fxFlash(cssText, keyframes, options) {
+    const el = document.createElement('div');
+    el.style.cssText = 'position:fixed; pointer-events:none; z-index:9400;' + cssText;
+    document.body.appendChild(el);
+    const anim = el.animate(keyframes, { fill: 'forwards', ...options });
+    anim.onfinish = () => el.remove();
+    return el;
+}
+
+// Where the used item sat on screen: its inventory slot, else its category
+// button, else the bottom centre of the window. Read BEFORE the item is
+// consumed, because consuming rebuilds the inventory bar.
+export function _fxSlotRect(defId) {
+    const group = ITEM_GROUPS.find(g => g.slots.includes(defId));
+    const el = document.querySelector(`.inv-slot[data-def-id="${defId}"]`)
+        || (group && document.querySelector(`.inv-cat-btn[data-group="${group.label}"]`));
+    const r = el ? el.getBoundingClientRect() : null;
+    if (r && r.width > 0) return { x: r.left + r.width / 2, y: r.top + r.height / 2, size: r.width };
+    return { x: window.innerWidth / 2, y: window.innerHeight - 60, size: 48 };
+}
+
+// Ring + sparks bursting out of a point (the inventory slot).
+function _fxSlotBurst(x, y, color) {
+    _fxFlash(`left:${x - 30}px; top:${y - 30}px; width:60px; height:60px; border-radius:50%;`
+        + `border:3px solid ${color}; box-shadow:0 0 16px ${color};`,
+        [{ transform: 'scale(0.3)', opacity: 1 }, { transform: 'scale(2.1)', opacity: 0 }],
+        { duration: 520, easing: 'ease-out' });
+    for (let i = 0; i < 10; i++) {
+        const ang = (i / 10) * Math.PI * 2 + Math.random() * 0.4;
+        const dist = 34 + Math.random() * 30;
+        _fxFlash(`left:${x - 3}px; top:${y - 3}px; width:6px; height:6px; border-radius:50%;`
+            + `background:#fff; box-shadow:0 0 8px 2px ${color};`,
+            [{ transform: 'translate(0,0) scale(1)', opacity: 1 },
+                { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist}px) scale(0.2)`, opacity: 0 }],
+            { duration: 480 + Math.random() * 200, easing: 'ease-out' });
+    }
+}
+
+// Viewport rectangle of the puzzle grid, or null when no grid is showing.
+function _fxGridViewRect() {
+    const c = _fxGetGridCorners();
+    if (!c) return null;
+    const f = c.first.getBoundingClientRect(), l = c.last.getBoundingClientRect();
+    return { left: f.left, top: f.top, width: l.right - f.left, height: l.bottom - f.top };
+}
+
+// The coloured hit on the grid: an expanding shockwave, a light sweep across
+// the cells, a glowing frame and sparkles drifting up.
+function _fxGridImpact(color) {
+    const g = _fxGridViewRect();
+    if (!g) return;
+    const cx = g.left + g.width / 2, cy = g.top + g.height / 2;
+    const reach = Math.hypot(g.width, g.height);
+
+    _fxFlash(`left:${cx - reach / 2}px; top:${cy - reach / 2}px; width:${reach}px; height:${reach}px; border-radius:50%;`
+        + `border:4px solid ${color}; box-shadow:0 0 30px ${color}, inset 0 0 30px ${color};`,
+        [{ transform: 'scale(0.05)', opacity: 0.95 }, { transform: 'scale(1)', opacity: 0 }],
+        { duration: 750, easing: 'cubic-bezier(.2,.7,.3,1)' });
+
+    _fxFlash(`left:${g.left - 6}px; top:${g.top - 6}px; width:${g.width + 12}px; height:${g.height + 12}px; border-radius:8px;`
+        + `border:3px solid ${color};`,
+        [{ boxShadow: `0 0 0 0 ${color}, inset 0 0 0 0 ${color}`, opacity: 1 },
+            { boxShadow: `0 0 26px 6px ${color}, inset 0 0 40px 4px ${color}`, opacity: 0.9, offset: 0.3 },
+            { boxShadow: `0 0 4px 0 ${color}, inset 0 0 6px 0 ${color}`, opacity: 0 }],
+        { duration: 1100, easing: 'ease-out' });
+
+    const sweep = _fxFlash(`left:${g.left}px; top:${g.top}px; width:${g.width}px; height:${g.height}px; overflow:hidden; border-radius:4px;`,
+        [{ opacity: 1 }, { opacity: 1 }], { duration: 800 });
+    const band = document.createElement('div');
+    band.style.cssText = 'position:absolute; top:-20%; bottom:-20%; width:35%; transform:skewX(-18deg);'
+        + `background:linear-gradient(90deg, transparent, ${color}, #fff, ${color}, transparent); opacity:0.6; mix-blend-mode:screen;`;
+    sweep.appendChild(band);
+    band.animate([{ left: '-45%' }, { left: '115%' }], { duration: 800, easing: 'ease-in-out', fill: 'forwards' });
+
+    for (let i = 0; i < 16; i++) {
+        const x = g.left + Math.random() * g.width;
+        const y = g.top + g.height * (0.4 + Math.random() * 0.6);
+        _fxFlash(`left:${x - 3}px; top:${y - 3}px; width:6px; height:6px; border-radius:50%;`
+            + `background:#fff; box-shadow:0 0 10px 3px ${color};`,
+            [{ transform: 'translateY(0) scale(0.4)', opacity: 0 },
+                { transform: `translateY(${-30 - Math.random() * 40}px) scale(1)`, opacity: 1, offset: 0.25 },
+                { transform: `translateY(${-90 - Math.random() * 70}px) scale(0.2)`, opacity: 0 }],
+            { duration: 900 + Math.random() * 500, delay: Math.random() * 250, easing: 'ease-out' });
+    }
+}
+
+// Flies the item's art from the slot to the middle of the grid on an arc,
+// leaving a fading glow trail, and calls `onArrive` when it lands.
+function _fxItemOrb(defId, fallbackEmoji, from, glow, onArrive) {
+    const g = _fxGridViewRect();
+    if (!g) { onArrive(); return; }
+    const tx = g.left + g.width / 2, ty = g.top + g.height / 2;
+    const size = Math.max(44, Math.min(64, from.size));
+    const url = (typeof GAME_ART !== 'undefined' && GAME_ART) ? GAME_ART.url('item', defId) : null;
+
+    const orb = document.createElement('div');
+    orb.style.cssText = `position:fixed; pointer-events:none; z-index:9401; left:${-size / 2}px; top:${-size / 2}px;`
+        + `width:${size}px; height:${size}px; display:flex; align-items:center; justify-content:center; font-size:${size * 0.8}px;`
+        + `filter:drop-shadow(0 0 10px ${glow}) drop-shadow(0 0 22px ${glow});`;
+    if (url) orb.innerHTML = `<img src="${url}" alt="" draggable="false" style="width:100%;height:100%;object-fit:contain;">`;
+    else orb.textContent = fallbackEmoji || '✦';
+    document.body.appendChild(orb);
+
+    const midX = (from.x + tx) / 2, midY = Math.min(from.y, ty) - 110;
+    const flight = orb.animate([
+        { transform: `translate(${from.x}px,${from.y}px) scale(0.8) rotate(0deg)`, opacity: 1 },
+        { transform: `translate(${midX}px,${midY}px) scale(1.35) rotate(150deg)`, opacity: 1, offset: 0.5 },
+        { transform: `translate(${tx}px,${ty}px) scale(0.7) rotate(320deg)`, opacity: 0.2 },
+    ], { duration: 520, easing: 'cubic-bezier(.35,.1,.6,1)', fill: 'forwards' });
+    const trail = setInterval(() => {
+        const r = orb.getBoundingClientRect();
+        _fxFlash(`left:${r.left + r.width / 2 - 6}px; top:${r.top + r.height / 2 - 6}px; width:12px; height:12px; border-radius:50%;`
+            + `background:${glow}; box-shadow:0 0 12px 4px ${glow};`,
+            [{ transform: 'scale(1)', opacity: 0.8 }, { transform: 'scale(0.1)', opacity: 0 }],
+            { duration: 380, easing: 'ease-out' });
+    }, 32);
+    flight.onfinish = () => { clearInterval(trail); orb.remove(); onArrive(); };
+}
+
+// The full item-use show for item `def` (slot burst, flying item, grid
+// impact). `from` is the slot position read before the item was consumed.
+export function _fxItemUse(def, rarityColor, from) {
+    if (!def || !from) return;
+    const color = _fxGroupColor(def.id);
+    _fxSlotBurst(from.x, from.y, rarityColor || color);
+    _fxItemOrb(def.id, def.icon, from, rarityColor || color, () => { if (!_fxItemLanding(def.id)) _fxGridImpact(color); });
 }

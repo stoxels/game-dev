@@ -37,7 +37,12 @@ import { renderWinOverlay, rollLuckyDrops, formatTime } from '../../js/scoring/s
 import { ITEM_DEFS, ITEM_GROUPS } from '../../js/puzzle-items/item-definitions.js';
 import { RARITY_COLOR_MAP, itemDesc, itemName, pickLuckyItem, pickRandomItem, rarityColors } from '../../js/puzzle-items/item-pool.js';
 import { CELL_FX_DURATION, _applyCellEffect, _ensureCellEffectCSS } from '../../js/puzzle-mechanics/cell-fx.js';
-import { CHAOS_BLAST_COLOURS, CHRONOBOLT_X_FRACTIONS, FX_Z, PARTICLES, PEARL_VARIANTS, TUTOR_ITEM_SFX, _ensureFreezeCountdownStyles, _fxClock, _fxGetGridCorners, _fxGetPuzzleRect, _fxGetPuzzleRectForWrap, _fxMakeClockBurst, _fxMakeClockRays, _fxMakeElement, _fxMakeGoldTintFill, _fxMakeIcon, _fxMakeRing, _fxOverlay, _fxShieldBorderAdd, _fxShieldBorderRemove, _fxSpawnParticles, playFreezeCountdownOverlay } from '../../js/puzzle-mechanics/fx-helpers.js';
+import { CHAOS_BLAST_COLOURS, CHRONOBOLT_X_FRACTIONS, FX_Z, PARTICLES, PEARL_VARIANTS, TUTOR_ITEM_SFX, _ensureFreezeCountdownStyles, _fxItemUse, _fxSlotRect, _fxClock, _fxGetGridCorners, _fxGetPuzzleRect, _fxGetPuzzleRectForWrap, _fxMakeClockBurst, _fxMakeClockRays, _fxMakeElement, _fxMakeGoldTintFill, _fxMakeIcon, _fxMakeRing, _fxOverlay, _fxShieldBorderAdd, _fxShieldBorderRemove, _fxSpawnParticles, playFreezeCountdownOverlay } from '../../js/puzzle-mechanics/fx-helpers.js';
+import { rnd, pick, later, gridBox, piece, glyph, ring, glow, sparks, bar, cellRects, cellWave, tint, shake } from '../../js/puzzle-items/landing/landing-toolkit.js';
+import { LANDING_REVEAL_MARK_TIME } from '../../js/puzzle-items/landing/landing-reveal-mark-time.js';
+import { LANDING_UTILITY } from '../../js/puzzle-items/landing/landing-utility.js';
+import { LANDING_CURSED_SPECIAL } from '../../js/puzzle-items/landing/landing-cursed-special.js';
+import { _fxItemLanding } from '../../js/puzzle-items/landing/item-landing.js';
 import { _applyDenseMarkerBias, _applyTargetedRevealBias, _getPreFilledCols, _getPreFilledRows, shuffle } from '../../js/puzzle-mechanics/puzzle-helpers.js';
 import { _trackWitchImmuneCursedUse } from '../../js/puzzle-mechanics/quest-tracking.js';
 import { _clearBlackoutCountdown, applyCursedRowBlackout, applyCursedColBlackout } from '../../js/puzzle-mechanics/clue-blackout.js';
@@ -839,6 +844,7 @@ try { Object.defineProperty(globalThis, "answerQuizInput", { get() { return answ
 try { Object.defineProperty(globalThis, "applyAscendencyUpgrade", { get() { return applyAscendencyUpgrade; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "applyClassUpgrade", { get() { return applyClassUpgrade; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "awardAtlasClearScore", { get() { return awardAtlasClearScore; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "bar", { get() { return bar; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "beginRetrySetupRun", { get() { return beginRetrySetupRun; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "buildInventoryPanel", { get() { return buildInventoryPanel; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "cancelRetrySetupModal", { get() { return cancelRetrySetupModal; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
