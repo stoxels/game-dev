@@ -601,10 +601,10 @@ export function _mechProbabilityShift(monster, phase) {
     if (p === 1) {
         const n = Math.max(1, Math.round(_bossTierLerp(SHIFT_ERASE_P1, norm)));
         const targets = shuffled.slice(0, Math.min(n, shuffled.length));
-        globalThis.showCombatToast(t('eg_mech_probability_shift').replace('{n}', targets.length));
         targets.forEach(([r, c]) => {
             globalThis.userGrid[r][c] = 0;
             renderCell(r, c);
+            _flashPriorBombCell(r, c);
         });
         return;
     }
@@ -612,7 +612,6 @@ export function _mechProbabilityShift(monster, phase) {
     if (p === 2) {
         const n = Math.max(1, Math.round(_bossTierLerp(SHIFT_RELOCATE_P2, norm)));
         const targets = shuffled.slice(0, Math.min(n, shuffled.length));
-        globalThis.showCombatToast(t('eg_mech_shift_relocate').replace('{n}', targets.length));
         _relocateMarks(targets);
         return;
     }
@@ -622,10 +621,10 @@ export function _mechProbabilityShift(monster, phase) {
     const relocateN = Math.max(1, Math.round(_bossTierLerp(SHIFT_RELOCATE_P3, norm)));
     const erase = shuffled.slice(0, Math.min(eraseN, shuffled.length));
     const relocate = shuffled.slice(erase.length, erase.length + relocateN);
-    globalThis.showCombatToast(t('eg_mech_shift_quantum').replace('{n}', relocate.length));
     erase.forEach(([r, c]) => {
         globalThis.userGrid[r][c] = 0;
         renderCell(r, c);
+        _flashPriorBombCell(r, c);
     });
     _relocateMarks(relocate);
 }

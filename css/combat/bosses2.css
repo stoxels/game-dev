@@ -11308,6 +11308,13 @@ body.sx-shp-flash::after {
    and Razor yellow (rzr).
    ============================================================ */
 
+/* Lightning bolt pictures (white zig-zag) used by ion fronts and sky bolts. */
+:root {
+    --sir-bolt-v: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'><polyline points='0,28 9,6 19,48 30,10 41,46 52,14 64,28' fill='none' stroke='%23f0f9ff' stroke-width='3' stroke-linejoin='bevel'/></svg>");
+    --sir-bolt-h: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'><polyline points='28,0 6,9 48,19 10,30 46,41 14,52 28,64' fill='none' stroke='%23f0f9ff' stroke-width='3' stroke-linejoin='bevel'/></svg>");
+    --sir-bolt-sky: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='400' viewBox='0 0 80 400' preserveAspectRatio='none'><polyline points='40,0 28,70 54,130 26,200 52,270 32,340 44,400' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linejoin='bevel'/></svg>");
+}
+
 /* ── Charge HUD chip (⚡ stacks) ── */
 .sx-sir-charge-chip {
     position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
@@ -11327,76 +11334,162 @@ body.sx-shp-flash::after {
 }
 @keyframes sx-sir-charge-throb { from { filter: brightness(1); } to { filter: brightness(1.35); } }
 
-/* ── Ion Current: full-width fronts with one TANGENT opening ── */
+/* ── Ion Current: crackling fronts with one calm TANGENT opening ── */
 .sx-sir-ion {
     position: fixed; z-index: 8990; pointer-events: none;
     box-sizing: border-box;
 }
-.sx-sir-ion-warn {
-    background:
-        repeating-linear-gradient(90deg, rgba(56, 189, 248, 0.24) 0 14px, rgba(56, 189, 248, 0.06) 14px 28px);
+.sx-sir-ion-v.sx-sir-ion-warn {
+    background: repeating-linear-gradient(90deg, rgba(56, 189, 248, 0.24) 0 14px, rgba(56, 189, 248, 0.06) 14px 28px);
     border-top: 2px dashed rgba(125, 211, 252, 0.9);
     border-bottom: 2px dashed rgba(125, 211, 252, 0.9);
     animation: sx-sr-ion-hum 0.4s ease-in-out infinite alternate;
 }
+.sx-sir-ion-h.sx-sir-ion-warn {
+    background: repeating-linear-gradient(0deg, rgba(56, 189, 248, 0.24) 0 14px, rgba(56, 189, 248, 0.06) 14px 28px);
+    border-left: 2px dashed rgba(125, 211, 252, 0.9);
+    border-right: 2px dashed rgba(125, 211, 252, 0.9);
+    animation: sx-sr-ion-hum 0.4s ease-in-out infinite alternate;
+}
 @keyframes sx-sr-ion-hum { from { opacity: 0.5; } to { opacity: 0.95; } }
 .sx-sir-ion-front {
-    background:
-        linear-gradient(180deg, rgba(186, 230, 253, 0.65), rgba(14, 116, 144, 0.7) 45%, rgba(186, 230, 253, 0.65)),
-        repeating-linear-gradient(100deg, rgba(254, 249, 195, 0.35) 0 3px, transparent 3px 26px);
-    border-top: 2px solid rgba(224, 242, 254, 0.95);
-    border-bottom: 2px solid rgba(224, 242, 254, 0.95);
-    box-shadow: 0 0 22px rgba(56, 189, 248, 0.9);
+    box-shadow: 0 0 26px 4px rgba(56, 189, 248, 0.85), inset 0 0 16px rgba(224, 242, 254, 0.55);
     animation: sx-sr-ion-pulse 0.3s ease-in-out infinite alternate;
 }
+.sx-sir-ion-v.sx-sir-ion-front {
+    background: linear-gradient(180deg, rgba(125, 211, 252, 0.55), rgba(8, 47, 73, 0.9) 50%, rgba(125, 211, 252, 0.55));
+    border-top: 2px solid rgba(224, 242, 254, 0.95);
+    border-bottom: 2px solid rgba(224, 242, 254, 0.95);
+}
+.sx-sir-ion-h.sx-sir-ion-front {
+    background: linear-gradient(90deg, rgba(125, 211, 252, 0.55), rgba(8, 47, 73, 0.9) 50%, rgba(125, 211, 252, 0.55));
+    border-left: 2px solid rgba(224, 242, 254, 0.95);
+    border-right: 2px solid rgba(224, 242, 254, 0.95);
+}
 @keyframes sx-sr-ion-pulse { from { filter: brightness(0.95); } to { filter: brightness(1.3); } }
-/* Direction chevrons painted along the band (down / up). */
-.sx-sir-ion-down::after, .sx-sir-ion-up::after {
-    content: ''; position: absolute; inset: 0;
-    background: repeating-linear-gradient(90deg, transparent 0 46px, rgba(224, 242, 254, 0.9) 46px 50px, transparent 50px 96px);
-    -webkit-mask: linear-gradient(var(--sir-dir, 180deg), transparent 30%, #000 70%);
-            mask: linear-gradient(var(--sir-dir, 180deg), transparent 30%, #000 70%);
-    opacity: 0.55;
+/* Two layers of jittering lightning zig-zags run along the band. */
+.sx-sir-ion-front::before, .sx-sir-ion-front::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    filter: drop-shadow(0 0 4px #7dd3fc);
 }
-.sx-sir-ion-up { --sir-dir: 0deg; }
-.sx-sir-ion-down::before, .sx-sir-ion-up::before {
-    content: '▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼  ▼';
-    position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
-    font: 900 18px/1 system-ui, sans-serif; letter-spacing: 0.6em; white-space: nowrap; overflow: hidden;
-    color: rgba(254, 249, 195, 0.95); text-shadow: 0 0 6px rgba(8, 47, 73, 0.9);
-    text-align: center;
+.sx-sir-ion-v.sx-sir-ion-front::before {
+    background: var(--sir-bolt-v) repeat-x 0 0 / 64px 100%;
+    animation: sx-sr-zap-v 0.16s steps(4) infinite;
 }
-.sx-sir-ion-up::before { content: '▲  ▲  ▲  ▲  ▲  ▲  ▲  ▲  ▲  ▲  ▲  ▲  ▲  ▲  ▲  ▲  ▲  ▲  ▲  ▲'; }
+.sx-sir-ion-v.sx-sir-ion-front::after {
+    background: var(--sir-bolt-v) repeat-x 32px 0 / 48px 72%;
+    background-position: 32px 50%;
+    opacity: 0.7;
+    animation: sx-sr-zap-v 0.23s steps(3) infinite reverse;
+}
+.sx-sir-ion-h.sx-sir-ion-front::before {
+    background: var(--sir-bolt-h) repeat-y 0 0 / 100% 64px;
+    animation: sx-sr-zap-h 0.16s steps(4) infinite;
+}
+.sx-sir-ion-h.sx-sir-ion-front::after {
+    background: var(--sir-bolt-h) repeat-y 50% 32px / 72% 48px;
+    opacity: 0.7;
+    animation: sx-sr-zap-h 0.23s steps(3) infinite reverse;
+}
+@keyframes sx-sr-zap-v { to { background-position-x: 64px; } }
+@keyframes sx-sr-zap-h { to { background-position-y: 64px; } }
+
+/* The tangent: a calm window between two glowing electrodes (no text). */
 .sx-sir-gap {
     position: fixed; z-index: 8992; pointer-events: none;
     box-sizing: border-box;
-    border-left: 3px solid rgba(134, 239, 172, 0.95);
-    border-right: 3px solid rgba(134, 239, 172, 0.95);
-    background: linear-gradient(180deg, rgba(134, 239, 172, 0.08), rgba(134, 239, 172, 0.28), rgba(134, 239, 172, 0.08));
-    box-shadow: 0 0 22px rgba(74, 222, 128, 0.7), inset 0 0 18px rgba(74, 222, 128, 0.35);
-    display: flex; align-items: center; justify-content: center;
-    font: 900 0.95rem/1 system-ui, sans-serif; letter-spacing: 0.22em;
-    color: #dcfce7; text-shadow: 0 0 6px rgba(20, 83, 45, 1), 0 0 2px #000;
+}
+.sx-sir-gap-v {
+    border-left: 3px solid rgba(224, 242, 254, 0.95);
+    border-right: 3px solid rgba(224, 242, 254, 0.95);
+    background: linear-gradient(180deg, rgba(134, 239, 172, 0.05), rgba(134, 239, 172, 0.22), rgba(134, 239, 172, 0.05));
+    box-shadow: 0 0 20px rgba(125, 211, 252, 0.8), inset 0 0 16px rgba(74, 222, 128, 0.3);
+}
+.sx-sir-gap-h {
+    border-top: 3px solid rgba(224, 242, 254, 0.95);
+    border-bottom: 3px solid rgba(224, 242, 254, 0.95);
+    background: linear-gradient(90deg, rgba(134, 239, 172, 0.05), rgba(134, 239, 172, 0.22), rgba(134, 239, 172, 0.05));
+    box-shadow: 0 0 20px rgba(125, 211, 252, 0.8), inset 0 0 16px rgba(74, 222, 128, 0.3);
+}
+.sx-sir-gap::before, .sx-sir-gap::after {
+    content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%;
+    background: radial-gradient(circle, #fff 0 25%, #7dd3fc 60%, transparent 72%);
+    box-shadow: 0 0 14px 3px rgba(56, 189, 248, 0.9);
+    animation: sx-sr-ion-pulse 0.25s ease-in-out infinite alternate;
+}
+.sx-sir-gap-v::before { left: -10px; top: 50%; margin-top: -8px; }
+.sx-sir-gap-v::after  { right: -10px; top: 50%; margin-top: -8px; }
+.sx-sir-gap-h::before { top: -10px; left: 50%; margin-left: -8px; }
+.sx-sir-gap-h::after  { bottom: -10px; left: 50%; margin-left: -8px; }
+
+/* ── Storm Strikes: a cloud gathers over a circle, then lightning hits ── */
+.sx-sir-zone {
+    position: fixed; z-index: 8991; pointer-events: none; box-sizing: border-box;
+    border-radius: 50%;
+    border: 3px dashed rgba(248, 113, 113, 0.95);
+    background: radial-gradient(circle, rgba(239, 68, 68, calc(0.04 + 0.2 * var(--k, 0))), rgba(127, 29, 29, calc(0.1 + 0.32 * var(--k, 0))));
+    box-shadow: 0 0 22px rgba(239, 68, 68, 0.6);
+}
+.sx-sir-zone-cloud {
+    position: absolute; inset: 8%; border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, rgba(100, 116, 139, 0.95), rgba(30, 41, 59, 0.96) 58%, rgba(2, 6, 23, 0.96));
+    box-shadow: 0 0 20px rgba(15, 23, 42, 0.9);
+    transform: scale(calc(0.2 + 0.8 * var(--k, 0)));
+    opacity: calc(0.25 + 0.7 * var(--k, 0));
+}
+.sx-sir-zone-cloud::after {
+    content: ''; position: absolute; inset: 22%; border-radius: 50%;
+    background: radial-gradient(circle, rgba(254, 249, 195, 0.9), transparent 62%);
+    opacity: calc(0.9 * var(--k, 0));
+    animation: sx-sr-zone-flick 0.3s steps(2) infinite;
+}
+@keyframes sx-sr-zone-flick { from { filter: brightness(0.5); } to { filter: brightness(1.5); } }
+.sx-sir-zone-bolt {
+    position: absolute; left: 50%; bottom: 50%; width: 46px; margin-left: -23px; height: 0;
+    background: var(--sir-bolt-sky) no-repeat center / 100% 100%;
+    filter: drop-shadow(0 0 6px #fef9c3) drop-shadow(0 0 16px #facc15);
+    opacity: 0;
+}
+.sx-sir-zone-strike {
+    border-style: solid; border-color: rgba(254, 249, 195, 0.95);
+    animation: sx-sr-zone-hit 0.7s ease-out forwards;
+}
+.sx-sir-zone-strike .sx-sir-zone-bolt { animation: sx-sr-zone-bolt 0.7s ease-out forwards; }
+.sx-sir-zone-strike .sx-sir-zone-cloud { animation: sx-sr-zone-hit 0.7s ease-out forwards; }
+@keyframes sx-sr-zone-hit {
+    0%   { background-color: rgba(254, 249, 195, 0.95); filter: brightness(2.4); opacity: 1; }
+    100% { background-color: rgba(254, 249, 195, 0); filter: brightness(1); opacity: 0; }
+}
+@keyframes sx-sr-zone-bolt {
+    0%   { height: 70vh; opacity: 1; }
+    60%  { height: 70vh; opacity: 1; }
+    100% { height: 70vh; opacity: 0; }
 }
 
-/* ── Chain Lightning: rivers + ball + grounding ── */
-.sx-sir-river {
+/* ── Chain Lightning: ponds + ball + grounding ── */
+.sx-sir-pond {
     position: fixed; z-index: 8988; pointer-events: none;
+    border-radius: 50%; box-sizing: border-box;
 }
-.sx-sir-river-sweep {
-    background: linear-gradient(180deg, transparent, #67e8f9 45%, #0e7490 55%, transparent);
-    box-shadow: 0 0 10px rgba(103, 232, 249, 0.9);
-    transition: opacity 0.6s ease;
+.sx-sir-pond-ring {
+    border: 3px dashed rgba(103, 232, 249, 0.85);
+    background: rgba(14, 116, 144, 0.1);
+    animation: sx-sr-ion-hum 0.5s ease-in-out infinite alternate;
 }
-.sx-sir-river-pool {
+.sx-sir-pond-pool {
     background:
-        radial-gradient(ellipse at 30% 30%, rgba(103, 232, 249, 0.35), transparent 60%),
-        repeating-linear-gradient(90deg, rgba(186, 230, 253, 0.16) 0 2px, transparent 2px 30px),
-        linear-gradient(90deg, rgba(14, 116, 144, 0.45), rgba(8, 51, 68, 0.6), rgba(14, 116, 144, 0.45));
-    border: 1px solid rgba(103, 232, 249, 0.7);
-    box-shadow: inset 0 0 24px rgba(8, 51, 68, 0.7), 0 0 14px rgba(103, 232, 249, 0.45);
+        radial-gradient(circle at 35% 30%, rgba(165, 243, 252, 0.45), rgba(14, 116, 144, 0.55) 55%, rgba(8, 51, 68, 0.8) 100%);
+    border: 2px solid rgba(103, 232, 249, 0.8);
+    box-shadow: inset 0 0 26px rgba(8, 51, 68, 0.8), 0 0 18px rgba(103, 232, 249, 0.5);
     animation: sx-sr-river-in 0.8s ease-out;
 }
+.sx-sir-pond-pool::before, .sx-sir-pond-pool::after {
+    content: ''; position: absolute; inset: 18%; border-radius: 50%;
+    border: 2px solid rgba(207, 250, 254, 0.55);
+    animation: sx-sr-ripple 2.2s ease-out infinite;
+}
+.sx-sir-pond-pool::after { animation-delay: 1.1s; }
+@keyframes sx-sr-ripple { from { transform: scale(0.3); opacity: 0.9; } to { transform: scale(1.05); opacity: 0; } }
 @keyframes sx-sr-river-in { from { opacity: 0; } to { opacity: 1; } }
 /* The ball: a hot white-yellow core inside a spinning ring of arcs (pure CSS). */
 .sx-sir-bolt {
@@ -11434,69 +11527,97 @@ body.sx-shp-flash::after {
     to   { transform: scale(1.3); opacity: 0; }
 }
 
-/* ── Storm Eye (4×4 grid + the storm around it) ── */
-.sx-sir-cell {
-    position: fixed; z-index: 8989; pointer-events: none;
-    border-radius: 8px; box-sizing: border-box;
+/* ── Storm Eye: the whole arena is a storm except one calm circle ── */
+.sx-sir-stormfield {
+    position: fixed; inset: 0; z-index: 8987; pointer-events: none; overflow: hidden;
+    --ex: 50vw; --ey: 50vh; --er: 180px;
+    background: radial-gradient(ellipse at 50% 40%, rgba(30, 41, 59, 0.62), rgba(2, 6, 23, 0.86));
+    -webkit-mask: radial-gradient(circle at var(--ex) var(--ey), transparent calc(var(--er) - 4px), #000 calc(var(--er) + 16px));
+            mask: radial-gradient(circle at var(--ex) var(--ey), transparent calc(var(--er) - 4px), #000 calc(var(--er) + 16px));
+    transition: opacity 0.7s ease;
 }
-.sx-sir-cell-hot {
-    background:
-        radial-gradient(circle at 50% 60%, rgba(250, 204, 21, 0.45), rgba(120, 53, 15, 0.55) 75%),
-        repeating-linear-gradient(45deg, rgba(250, 204, 21, 0.14) 0 8px, transparent 8px 16px);
-    border: 2px solid rgba(250, 204, 21, 0.9);
-    box-shadow: 0 0 14px rgba(250, 204, 21, 0.6), inset 0 0 16px rgba(120, 53, 15, 0.6);
-    animation: sx-sr-cell-hot 0.35s ease-in-out infinite alternate;
+.sx-sir-stormfield-arming { opacity: 0.4; }
+/* Driving rain: stripes slanted ~14 degrees, sliding along their own direction. */
+.sx-sir-stormfield::before {
+    content: ''; position: absolute; inset: -200px -100px 0 -100px;
+    background: repeating-linear-gradient(104deg, rgba(186, 230, 253, 0.42) 0 1.5px, transparent 1.5px 17px);
+    animation: sx-sr-rain 0.4s linear infinite;
 }
-.sx-sir-cell-hot.sx-sir-cell-arming {
-    background: repeating-linear-gradient(45deg, rgba(250, 204, 21, 0.16) 0 8px, transparent 8px 16px);
-    border-style: dashed;
-    animation: sx-sr-cell-hot 0.7s ease-in-out infinite alternate;
+@keyframes sx-sr-rain { to { transform: translate(-50px, 200px); } }
+/* Lightning flicker across the whole cloud deck. */
+.sx-sir-stormfield::after {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(224, 242, 254, 0);
+    animation: sx-sr-sky-flash 2.6s linear infinite;
 }
-@keyframes sx-sr-cell-hot { from { filter: brightness(0.9); } to { filter: brightness(1.3); } }
-.sx-sir-cell-inert {
-    background: rgba(100, 116, 139, 0.12);
-    border: 1px solid rgba(148, 163, 184, 0.35);
+@keyframes sx-sr-sky-flash {
+    0%, 7%, 11%, 15%, 52%, 57%, 100% { background-color: rgba(224, 242, 254, 0); }
+    8% { background-color: rgba(224, 242, 254, 0.34); }
+    13% { background-color: rgba(224, 242, 254, 0.2); }
+    54% { background-color: rgba(224, 242, 254, 0.3); }
 }
-.sx-sir-cell-safe {
-    background: rgba(125, 211, 252, 0.16);
-    border: 2px dashed rgba(125, 211, 252, 0.85);
-    box-shadow: inset 0 0 14px rgba(56, 189, 248, 0.25);
+.sx-sir-eyering {
+    position: fixed; z-index: 8993; pointer-events: none; box-sizing: border-box;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    border: 3px dashed rgba(186, 230, 253, 0.85);
+    box-shadow: 0 0 24px rgba(186, 230, 253, 0.5), inset 0 0 36px rgba(125, 211, 252, 0.16);
 }
-.sx-sir-cell-safe.sx-sir-live {
-    border-style: solid;
-    background: rgba(125, 211, 252, 0.26);
-    box-shadow: 0 0 16px rgba(125, 211, 252, 0.7), inset 0 0 18px rgba(56, 189, 248, 0.35);
+.sx-sir-eyering-live {
+    border-style: solid; border-color: rgba(224, 242, 254, 0.95);
+    box-shadow: 0 0 34px 6px rgba(186, 230, 253, 0.8), inset 0 0 44px rgba(125, 211, 252, 0.26);
 }
-.sx-sir-cell-eye {
-    background: radial-gradient(circle, rgba(224, 242, 254, 0.55), rgba(2, 132, 199, 0.45) 70%, transparent);
-    border: 3px solid rgba(224, 242, 254, 0.95);
-    box-shadow: 0 0 24px rgba(224, 242, 254, 0.9), inset 0 0 20px rgba(2, 132, 199, 0.5);
-    animation: sx-sr-eye-throb 1.1s ease-in-out infinite alternate;
-    display: flex; align-items: center; justify-content: center;
+/* The wall of cloud turning around the eye. */
+.sx-sir-eyering-swirl {
+    position: absolute; inset: -16px; border-radius: 50%;
+    background: repeating-conic-gradient(from 0deg, rgba(224, 242, 254, 0) 0 16deg, rgba(224, 242, 254, 0.55) 16deg 22deg, rgba(224, 242, 254, 0) 22deg 48deg);
+    -webkit-mask: radial-gradient(circle, transparent 80%, #000 86%, #000 94%, transparent 100%);
+            mask: radial-gradient(circle, transparent 80%, #000 86%, #000 94%, transparent 100%);
+    animation: sx-sr-bolt-spin 3s linear infinite;
 }
-@keyframes sx-sr-eye-throb { from { filter: brightness(1); } to { filter: brightness(1.4); } }
 .sx-sir-eye-count {
     font: 900 2.6rem/1 system-ui, sans-serif; color: #fff;
     text-shadow: 0 0 12px rgba(56, 189, 248, 1), 0 2px 6px rgba(0, 0, 0, 0.9);
 }
-.sx-sir-storm {
-    position: fixed; z-index: 8987; pointer-events: none;
+/* Decorative lightning bolts that flash in the storm. */
+.sx-sir-bolt-fx {
+    position: fixed; top: 0; width: 80px; z-index: 8994; pointer-events: none;
+    background: var(--sir-bolt-sky) no-repeat center top / 100% 100%;
+    filter: drop-shadow(0 0 6px #bae6fd) drop-shadow(0 0 16px #38bdf8);
+    animation: sx-sr-bolt-fx 0.26s ease-out forwards;
 }
-.sx-sir-storm-arming {
-    background: repeating-linear-gradient(-55deg, rgba(30, 41, 59, 0.35) 0 22px, rgba(56, 189, 248, 0.12) 22px 44px);
-    animation: sx-sr-ion-hum 0.5s ease-in-out infinite alternate;
+@keyframes sx-sr-bolt-fx { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+.sx-sir-storm {
+    position: fixed; z-index: 8987; pointer-events: none; overflow: hidden;
 }
 .sx-sir-storm-live {
     background:
-        repeating-linear-gradient(100deg, rgba(254, 249, 195, 0.28) 0 2px, transparent 2px 60px),
-        radial-gradient(ellipse at 50% 50%, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.7)),
-        repeating-linear-gradient(-55deg, rgba(56, 189, 248, 0.22) 0 22px, rgba(15, 23, 42, 0.3) 22px 44px);
+        radial-gradient(ellipse at 50% 50%, rgba(15, 23, 42, 0.5), rgba(2, 6, 23, 0.8)),
+        repeating-linear-gradient(-55deg, rgba(56, 189, 248, 0.2) 0 22px, rgba(15, 23, 42, 0.3) 22px 44px);
     box-shadow: inset 0 0 50px rgba(56, 189, 248, 0.45);
     animation: sx-sr-storm-flicker 0.22s steps(2) infinite;
 }
-@keyframes sx-sr-storm-flicker { from { filter: brightness(0.9); } to { filter: brightness(1.35); } }
+.sx-sir-storm-live::before {
+    content: ''; position: absolute; inset: -200px -100px 0 -100px;
+    background: repeating-linear-gradient(104deg, rgba(186, 230, 253, 0.4) 0 1.5px, transparent 1.5px 17px);
+    animation: sx-sr-rain 0.4s linear infinite;
+}
+@keyframes sx-sr-storm-flicker { from { filter: brightness(0.9); } to { filter: brightness(1.3); } }
 
 /* ── PERFECT STORM (finale) ── */
+.sx-sir-sky {
+    position: fixed; inset: 0; z-index: 8985; pointer-events: none; overflow: hidden;
+    background: radial-gradient(ellipse at 50% 40%, rgba(15, 23, 42, 0.12), rgba(2, 6, 23, 0.5));
+}
+.sx-sir-sky::before {
+    content: ''; position: absolute; inset: -200px -100px 0 -100px;
+    background: repeating-linear-gradient(104deg, rgba(186, 230, 253, 0.26) 0 1.5px, transparent 1.5px 19px);
+    animation: sx-sr-rain 0.45s linear infinite;
+}
+.sx-sir-sky::after {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(224, 242, 254, 0);
+    animation: sx-sr-sky-flash 3.2s linear infinite;
+}
 .sx-sir-cd {
     position: fixed; left: 50%; top: 64px; transform: translateX(-50%);
     z-index: 9300; pointer-events: none;
@@ -11522,7 +11643,6 @@ body.sx-shp-flash::after {
     position: fixed; z-index: 8990; pointer-events: none; box-sizing: border-box;
     border: 6px solid rgba(56, 189, 248, 0.95);
     box-shadow: 0 0 28px rgba(56, 189, 248, 0.8), inset 0 0 40px rgba(14, 116, 144, 0.55);
-    background: repeating-linear-gradient(90deg, rgba(254, 249, 195, 0.10) 0 2px, transparent 2px 40px);
 }
 .sx-sir-box-final {
     animation: sx-sr-box-final 0.7s ease-in forwards;
@@ -11537,12 +11657,6 @@ body.sx-shp-flash::after {
     border-radius: 10px; display: flex; align-items: center; justify-content: center;
     font: 900 1.25rem/1 system-ui, sans-serif; letter-spacing: 0.16em;
     text-shadow: 0 0 6px #000, 0 0 2px #000;
-}
-.sx-sir-fin-danger {
-    border: 4px dashed rgba(248, 113, 113, 0.95); color: #fecaca;
-    background: repeating-linear-gradient(45deg, rgba(239, 68, 68, 0.28) 0 12px, rgba(239, 68, 68, 0.08) 12px 24px);
-    box-shadow: 0 0 26px rgba(239, 68, 68, 0.75);
-    animation: sx-sr-mark-pulse 0.4s ease-in-out infinite alternate;
 }
 .sx-sir-fin-safe {
     border: 4px solid rgba(134, 239, 172, 0.95); color: #dcfce7;

@@ -377,15 +377,30 @@ export function _bossClearMechanicTimers(monster) {
 }
 
 
-// Shows the phase transition toast and triggers the transition CSS animation on the card.
-export function _bossPlayTransitionFeedback(monster, newPhase) {
-    const label = BOSS_PHASE_NAMES[newPhase] ? t(BOSS_PHASE_NAMES[newPhase]) : t('eg_phase_badge').replace('{n}', newPhase);
-    globalThis.showCombatToast(`⚡ ${monster.name}: ${label}!`);
+// Plays the phase-change burst on the boss sprite: a flash, shockwave rings
+// and flying sparks around it. The look steps up with the phase (amber ->
+// red -> white-gold). The overlay removes itself.
+function _bossPhaseBurst(card, newPhase) {
+    const wrap = card.querySelector('.sx-emoji-wrapper') || card;
+    const fx = document.createElement('div');
+    fx.className = 'sx-boss-phase-fx sx-boss-phase-fx-' + Math.max(2, Math.min(4, newPhase));
+    fx.innerHTML = '<i class="sx-bpf-flash"></i><i class="sx-bpf-ring"></i><i class="sx-bpf-ring sx-bpf-ring-2"></i>' +
+        '<i class="sx-bpf-spark" style="--a:20deg"></i><i class="sx-bpf-spark" style="--a:90deg"></i>' +
+        '<i class="sx-bpf-spark" style="--a:160deg"></i><i class="sx-bpf-spark" style="--a:230deg"></i>' +
+        '<i class="sx-bpf-spark" style="--a:300deg"></i>';
+    wrap.appendChild(fx);
+    setTimeout(() => { try { fx.remove(); } catch (e) { /* card already gone */ } }, 1500);
+}
 
+
+// Plays the phase transition on the boss card: the card flash plus a burst
+// effect on the sprite. No combat toast - the sprite says it.
+export function _bossPlayTransitionFeedback(monster, newPhase) {
     const card = document.getElementById(`sx-card-${monster.id}`);
     if (card) {
         card.classList.add('sx-boss-transition');
         setTimeout(() => card.classList.remove('sx-boss-transition'), 1500);
+        _bossPhaseBurst(card, newPhase);
     }
 }
 

@@ -1,15 +1,17 @@
 import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
-import { _nkAbilityHitToast, _nkDodgeBusy, _nkDotHit, _nkEl, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkRuns, _nkToast } from './shared-boss-abilities.js';
+import { _nkAbilityHitToast, _nkDodgeBusy, _nkDotHit, _nkEl, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkRuns, _nkToast, _ptSegDist } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE STORMCALLER (boss_sirus)--------------------
 //------------------------------------------------------------------------
 // Tier-8 rework "The Eye of the Storm": ion fronts sweep the arena (step
-// into each front's TANGENT opening), getting zapped CHARGES you, chain
-// lightning hunts the charged faster (lure it over water), and the storm
-// eye's web of safe cells shelters from the raging storm. PERFECT STORM at
-// ≤10%: closing storm walls (red = get out, green = get in), charged
-// bullets, then one reachable eye before the final strike.
+// into each front's TANGENT opening) and get harder the lower his life
+// falls, getting zapped CHARGES you, lightning strikes rain down on telegraphed
+// circles, chain lightning hunts the charged faster (lure it into a pond),
+// and the storm eye - a calm circle that drifts through a raging storm -
+// shelters you. PERFECT STORM at <=10%: lightning strike circles (get out),
+// a closing storm wall (get in), charged bullets, then one reachable eye
+// before the final strike.
 //------------------------------------------------------------------------
 
 // DEBUG: slow The Stormcaller's timing 2.5x so manual playtests /
@@ -28,10 +30,10 @@ Object.assign(BOSS_DEFS, {
 Object.assign(BOSS_MECHANICS, {
 
     // boss_sirus - "The Eye of the Storm" (rework)
-    // Phase 1 (100% → 60%): Ion Current + Probability Shift
+    // Phase 1 (100% → 60%): Ion Current + Storm Strikes + Probability Shift
     // Phase 2 ( 60% → 30%): immune window; Chain Lightning + Storm Eye join
-    // Phase 3 ( 30% →  0%): pincer currents, two lightning balls, the storm
-    //                        eye returns once; at 10% PERFECT STORM begins
+    // Phase 3 ( 30% →  0%): ion pincer finish, bigger strike volleys, faster
+    //                        eye; at 10% PERFECT STORM begins
     boss_sirus: {
         phases: [
             // Basic attacks stay a steady pressure (the framework floors
@@ -42,9 +44,10 @@ Object.assign(BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'ion_current', intervalBase: 14000, intervalVariance: 3000, handler: '_mechSirIon' },
+            { name: 'ion_current', intervalBase: 21000, intervalVariance: 4000, handler: '_mechSirIon' },
+            { name: 'storm_strikes', intervalBase: 15000, intervalVariance: 4000, handler: '_mechSirStrikes' },
             { name: 'probability_shift', intervalBase: 20000, intervalVariance: 5000, handler: '_mechProbabilityShift' },
-            { name: 'chain_lightning', intervalBase: 16000, intervalVariance: 4000, handler: '_mechSirChain', phase2Only: true },
+            { name: 'chain_lightning', intervalBase: 18000, intervalVariance: 4000, handler: '_mechSirChain', phase2Only: true },
             { name: 'storm_eye', intervalBase: 999999999, intervalVariance: 0, handler: '_mechSirEye', phase2Only: true },
         ],
         onPhaseEnter: _sirOnPhaseEnter,
@@ -89,21 +92,103 @@ export function _sirHeal(amount) {
     if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 
+// How far the fight has progressed, 0 (full life) to 1 (nearly dead). The
+// ion currents and strike volleys scale with it, so the fight ramps up
+// smoothly instead of only at the three phase borders.
+function _sirProgress(monster) {
+    if (!monster || !(monster.maxHP > 0)) return 0;
+    return Math.max(0, Math.min(1, (1 - monster.currentHP / monster.maxHP) / 0.9));
+}
+
+// Clamps a point so a box/circle of half-size `h` stays on screen.
+function _sirClampPt(x, y, h) {
+    return {
+        x: Math.max(h + 20, Math.min(window.innerWidth - h - 20, x)),
+        y: Math.max(h + 20, Math.min(window.innerHeight - h - 20, y)),
+    };
+}
+
+// Picks a point a short walk away from `from` (distance between lo and hi).
+function _sirPointNear(from, lo, hi, margin) {
+    const a = Math.random() * Math.PI * 2, d = lo + Math.random() * (hi - lo);
+    return _sirClampPt(from.x + Math.cos(a) * d, from.y + Math.sin(a) * d, margin);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------STORM STRIKE CIRCLES (strikes + finale)---------------
+//------------------------------------------------------------------------
+// A volley is a set of round zones. A dark cloud gathers inside each one
+// while the telegraph runs, then lightning hits all of them at once; being
+// inside any zone at that moment is one real hit. Driven by the caller's
+// loop (volley.tick(dtMs)) so a pause freezes it with everything else.
+const SIR_STRIKE_FLASH_MS = 700;
+
+function _sirMakeVolley(run, pts, radius, teleMs, level, dmgPct, label) {
+    const els = pts.map(pt => {
+        const el = _nkEl(run, 'div', 'sx-sir-zone');
+        el.style.left = Math.round(pt.x - radius) + 'px';
+        el.style.top = Math.round(pt.y - radius) + 'px';
+        el.style.width = el.style.height = (radius * 2) + 'px';
+        el.style.setProperty('--k', '0');
+        el.innerHTML = '<i class="sx-sir-zone-cloud"></i><i class="sx-sir-zone-bolt"></i>';
+        return el;
+    });
+    const v = { t: 0, struck: false, done: false };
+    v.tick = (dtMs) => {
+        v.t += dtMs;
+        if (!v.struck) {
+            const k = Math.min(1, v.t / teleMs);
+            els.forEach(el => el.style.setProperty('--k', k.toFixed(3)));
+            if (v.t >= teleMs) {
+                v.struck = true;
+                els.forEach(el => el.classList.add('sx-sir-zone-strike'));
+                const pc = _sirPC();
+                if (_nkPlayerRect() && pts.some(pt => Math.hypot(pc.x - pt.x, pc.y - pt.y) < radius * 0.94)) {
+                    const dealt = _nkHit(dmgPct, 'lightning', level);
+                    _nkAbilityHitToast(dealt, 'The Stormcaller', label);
+                }
+            }
+        }
+        if (v.t >= teleMs + SIR_STRIKE_FLASH_MS) {
+            els.forEach(el => { try { el.remove(); } catch (e) {} });
+            v.done = true;
+        }
+        return !v.done;
+    };
+    return v;
+}
+
+// One zone sits exactly on the player (they must move); the others ring it
+// at 2.1 radii, so the way out is through the gaps between them.
+function _sirRingZones(center, count, radius) {
+    const pts = [_sirClampPt(center.x, center.y, radius)];
+    const others = count - 1;
+    const base = Math.random() * Math.PI * 2;
+    for (let i = 0; i < others; i++) {
+        const ang = base + (i / others) * Math.PI * 2 + (Math.random() - 0.5) * 0.35;
+        pts.push(_sirClampPt(center.x + Math.cos(ang) * radius * 2.1, center.y + Math.sin(ang) * radius * 2.1, radius));
+    }
+    return pts;
+}
+
 
 //------------------------------------------------------------------------
 //-------------------SIGNATURE: ION CURRENT (all fight)---------------------
 //------------------------------------------------------------------------
-// Glowing ion fronts sweep the arena from the top edge, one after the
-// other. Each front has ONE opening - the TANGENT - where the current is
-// cool; anywhere else the front zaps you once (a real hit) and puts 2
-// CHARGE stacks on you. Charge decays one stack per 4s and makes the Chain
-// Lightning balls hunt you faster. The first tangent always opens within
-// walking reach; the second one shifts sideways (also within reach) so you
-// must step across. Phase 3: a PINCER - one front from the top, one from
-// the bottom at the same time, sharing a single tangent column.
-export const SIR_ION_N      = [0, 2, 2, 2]; // fronts per cast
-export const SIR_ION_WARN   = 1500;         // telegraph before a front moves
-export const SIR_ION_SPD    = [0, 190, 210, 230]; // px/s front travel
+// Crackling ion fronts sweep the arena one after the other. Each front has
+// ONE opening - the TANGENT - where the current is cool; anywhere else the
+// front zaps you once (a real hit) and puts 2 CHARGE stacks on you. Charge
+// decays one stack per 4s and makes the Chain Lightning balls hunt you
+// faster. The cast grows with the fight: the lower his life, the more
+// fronts per cast, the faster they move, the narrower the openings and the
+// shorter the gap between them. From phase 2 a cast may sweep sideways
+// instead of down; in phase 3 it ends with a PINCER (one front from each
+// side sharing a single tangent) after a short breather. Every timer runs on
+// the cast's own clock, so a pause can never make two fronts pile up.
+export const SIR_ION_N      = [0, 2, 2, 2]; // base fronts per cast (+0..3 with progress)
+export const SIR_ION_WARN   = 1500;         // telegraph before the first front moves
+export const SIR_ION_SPD    = [0, 190, 210, 230]; // px/s front travel (+40 with progress)
 export const SIR_ION_HOT    = [0, 6.5, 7.5, 9.0]; // (legacy) old DoT %/s - fronts now hit once
 export const SIR_TANGENT_MS = 900;          // (legacy) old tangent window
 export const SIR_CHARGE_MAX = 5;            // charge stacks
@@ -111,8 +196,8 @@ export const SIR_CHARGE_DECAY_MS = 4000;    // stacks fall off one per this
 export const SIR_AURA_DPS   = [0, 2.0, 2.5, 3.0]; // (legacy) old self-aura DoT - removed
 const SIR_ION_DMG    = [0, 0.15, 0.175, 0.20];    // %maxHP when a front catches you
 const SIR_ION_BAND   = 56;                       // front thickness (px)
-const SIR_ION_GAP    = [0, 210, 190, 180];       // tangent opening width (px)
-const SIR_ION_STAGGER = 1600;                    // ms between the two fronts (phase 1-2)
+const SIR_ION_GAP    = [0, 210, 190, 180];       // tangent opening width (px), -35 with progress
+const SIR_ION_TELE_MS = 700;                     // later fronts show up this long before moving
 const SIR_WALK_PX_S  = 320;                      // avatar speed (AVATAR_MOVE_SPEED_PX_PER_SEC)
 const SIR_REACT_MS   = 700;                      // reaction time we always leave the player
 const SIR_BOLT_PER_STACK = 18;                   // px/s extra ball speed per charge stack
@@ -156,15 +241,15 @@ function _sirAddCharge(n) {
     _sirChargeUntil = performance.now() + _sirCharge * SIR_CHARGE_DECAY_MS;
 }
 
-// Picks a tangent centre the player can walk to before the front arrives:
-// within walk-speed x (time left - reaction), clamped to the screen, and
-// (when there is room) at least `minShift` px away so there is something to do.
-function _sirReachableX(fromX, msLeft, gapW, minShift) {
-    const W = window.innerWidth;
+// Picks a tangent centre the player can walk to in `msLeft`: within walk
+// speed x (time left - reaction), kept on screen (`size` is the screen
+// length along the tangent's axis) and, when there is room, at least
+// `minShift` px away so there is something to do.
+function _sirReachableX(fromX, msLeft, gapW, minShift, size) {
     const edge = gapW / 2 + 10;
     // Never more than ~450px away: the tangent is a step or two, not a sprint.
     const reach = Math.min(450, Math.max(gapW * 0.5, SIR_WALK_PX_S * Math.max(0, msLeft - SIR_REACT_MS) / 1000 * 0.85));
-    const lo = Math.max(edge, fromX - reach), hi = Math.min(W - edge, fromX + reach);
+    const lo = Math.max(edge, fromX - reach), hi = Math.min(size - edge, fromX + reach);
     let x = lo + Math.random() * Math.max(0, hi - lo);
     if (Math.abs(x - fromX) < minShift) {
         const a1 = fromX + (x < fromX ? -minShift : minShift);
@@ -172,7 +257,48 @@ function _sirReachableX(fromX, msLeft, gapW, minShift) {
         if (a1 >= lo && a1 <= hi) x = a1;
         else if (a2 >= lo && a2 <= hi) x = a2;
     }
-    return Math.max(edge, Math.min(W - edge, x));
+    return Math.max(edge, Math.min(size - edge, x));
+}
+
+// Plans one ion cast: which way it sweeps, how many fronts, and where each
+// tangent opens. Every front is { dir, gapC, startAt (ms on the cast clock) }.
+function _sirPlanIon(monster, p) {
+    const W = window.innerWidth, H = window.innerHeight;
+    const d = _sirProgress(monster);
+    const mult = _SIR_DEBUG_MULT;
+    const vertical = !(p >= 2 && Math.random() < 0.15 + 0.4 * d);
+    const travel = vertical ? H : W, across = vertical ? W : H;
+    const band = SIR_ION_BAND;
+    const plan = {
+        vertical, travel, across,
+        spd: SIR_ION_SPD[p] + d * 40,
+        gapW: SIR_ION_GAP[p] - d * 35,
+        warn: SIR_ION_WARN * mult,
+        fronts: [],
+    };
+    const stagger = Math.max(1250, 1700 - d * 350) * mult;
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    const waves = SIR_ION_N[p] + Math.round(d * 3);
+    const pc0 = _sirPC();
+    const along = vertical ? pc0.y : pc0.x;
+    const acrossP = vertical ? pc0.x : pc0.y;
+    // Time until the first front reaches the player's line (if they stand still).
+    const toPlayer = dir > 0 ? along - band : travel - band - along;
+    let gapC = _sirReachableX(acrossP, plan.warn + Math.max(0, toPlayer) / plan.spd * 1000, plan.gapW, plan.gapW / 2 + 50, across);
+    for (let i = 0; i < waves; i++) {
+        if (i > 0) gapC = _sirReachableX(gapC, stagger, plan.gapW, 140, across);
+        plan.fronts.push({ dir, gapC, startAt: plan.warn + i * stagger });
+    }
+    if (p >= 3) {
+        // Pincer: after the last single front has left the arena, one front
+        // from each side shares a single tangent column.
+        const lastStart = plan.fronts[plan.fronts.length - 1].startAt;
+        const pincerAt = lastStart + (travel - band) / plan.spd * 1000 + 300 * mult;
+        const mid = Math.min(toPlayer, travel - band - toPlayer);
+        const gc = _sirReachableX(gapC, 2200 * mult + Math.max(0, mid) / plan.spd * 1000, plan.gapW, plan.gapW / 2 + 50, across);
+        plan.fronts.push({ dir: 1, gapC: gc, startAt: pincerAt }, { dir: -1, gapC: gc, startAt: pincerAt });
+    }
+    return plan;
 }
 
 export function _mechSirIon(monster, phase) {
@@ -183,84 +309,71 @@ export function _mechSirIon(monster, phase) {
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _nkNewRun(monster && monster.id, true);
-    const spd = SIR_ION_SPD[p];
-    const gapW = SIR_ION_GAP[p];
     const band = SIR_ION_BAND;
-    const warn = SIR_ION_WARN * _SIR_DEBUG_MULT;
-    const pc0 = _sirPC();
+    const plan = _sirPlanIon(monster, p);
+    const { vertical, spd, gapW } = plan;
+    const tele = SIR_ION_TELE_MS * _SIR_DEBUG_MULT;
 
-    if (p >= 3) _nkToast('eg_mech_sir_pincer', '⛈️ ION PINCER - two currents close in. Stand in the shared TANGENT column!', '#fde047');
-    else _nkToast('eg_mech_sir_ion', '⛈️ ION CURRENT - step into the TANGENT opening of each front!', '#fde047');
+    _nkToast('eg_mech_sir_ion', '⛈️ ION CURRENT', '#fde047');
 
-    // Fronts: { dir (+1 down, -1 up), y, gapC, startAt, el, gapEl, hit }
-    const fronts = [];
-    const add = (dir, gapC, startAt) => {
-        const el = _nkEl(run, 'div', 'sx-sir-ion sx-sir-ion-warn ' + (dir > 0 ? 'sx-sir-ion-down' : 'sx-sir-ion-up'));
-        const gapEl = _nkEl(run, 'div', 'sx-sir-gap ' + (dir > 0 ? 'sx-sir-gap-down' : 'sx-sir-gap-up'), dir > 0 ? '▼ TANGENT ▼' : '▲ TANGENT ▲');
-        fronts.push({ dir, y: dir > 0 ? 0 : H - band, gapC, startAt, el, gapEl, hit: false, moving: false, done: false });
-    };
-    const now0 = performance.now();
-    if (p < 3) {
-        // Time until front 1 reaches the player's row (if they stand still).
-        const t1 = warn + Math.max(0, pc0.y - band) / spd * 1000;
-        const g1 = _sirReachableX(pc0.x, t1, gapW, gapW / 2 + 50);
-        const stagger = SIR_ION_STAGGER * _SIR_DEBUG_MULT;
-        const g2 = _sirReachableX(g1, stagger, gapW, 140);
-        add(1, g1, now0 + warn);
-        add(1, g2, now0 + warn + stagger);
-    } else {
-        // Pincer: the two fronts meet in the middle - whoever is not in the
-        // shared column is caught by at least one of them.
-        const tFirst = warn + Math.min(Math.max(0, pc0.y - band), Math.max(0, H - band - pc0.y)) / spd * 1000;
-        const gc = _sirReachableX(pc0.x, tFirst, gapW, gapW / 2 + 50);
-        add(1, gc, now0 + warn);
-        add(-1, gc, now0 + warn);
-    }
+    const fronts = plan.fronts.map((f, i) => {
+        const cls = 'sx-sir-ion sx-sir-ion-warn ' + (vertical ? 'sx-sir-ion-v' : 'sx-sir-ion-h');
+        const el = _nkEl(run, 'div', cls);
+        const gapEl = _nkEl(run, 'div', 'sx-sir-gap ' + (vertical ? 'sx-sir-gap-v' : 'sx-sir-gap-h'));
+        el.style.display = gapEl.style.display = 'none';   // shown just before its start
+        return { ...f, pos: f.dir > 0 ? 0 : plan.travel - band, el, gapEl, hit: false, moving: false, done: false, index: i };
+    });
 
     const draw = (f) => {
         const lo = Math.round(f.gapC - gapW / 2), hi = Math.round(f.gapC + gapW / 2);
         // The band is one element with a clip-path hole for the tangent, so
         // the painted band and the hit test (outside the gap) always agree.
-        f.el.style.left = '0px'; f.el.style.width = W + 'px';
-        f.el.style.top = Math.round(f.y) + 'px'; f.el.style.height = band + 'px';
-        f.el.style.clipPath = 'polygon(0 0, ' + lo + 'px 0, ' + lo + 'px 100%, ' + hi + 'px 100%, ' + hi + 'px 0, 100% 0, 100% 100%, 0 100%)';
-        f.gapEl.style.left = lo + 'px'; f.gapEl.style.width = (hi - lo) + 'px';
-        f.gapEl.style.top = Math.round(f.y) + 'px'; f.gapEl.style.height = band + 'px';
+        if (vertical) {
+            f.el.style.left = '0px'; f.el.style.width = W + 'px';
+            f.el.style.top = Math.round(f.pos) + 'px'; f.el.style.height = band + 'px';
+            f.el.style.clipPath = 'polygon(0 0, ' + lo + 'px 0, ' + lo + 'px 100%, ' + hi + 'px 100%, ' + hi + 'px 0, 100% 0, 100% 100%, 0 100%)';
+            f.gapEl.style.left = lo + 'px'; f.gapEl.style.width = (hi - lo) + 'px';
+            f.gapEl.style.top = Math.round(f.pos) + 'px'; f.gapEl.style.height = band + 'px';
+        } else {
+            f.el.style.top = '0px'; f.el.style.height = H + 'px';
+            f.el.style.left = Math.round(f.pos) + 'px'; f.el.style.width = band + 'px';
+            f.el.style.clipPath = 'polygon(0 0, 100% 0, 100% ' + lo + 'px, 0 ' + lo + 'px, 0 ' + hi + 'px, 100% ' + hi + 'px, 100% 100%, 0 100%)';
+            f.gapEl.style.top = lo + 'px'; f.gapEl.style.height = (hi - lo) + 'px';
+            f.gapEl.style.left = Math.round(f.pos) + 'px'; f.gapEl.style.width = band + 'px';
+        }
     };
     fronts.forEach(draw);
-    // The second front (phase 1-2) waits off-board until the first one moves,
-    // so the two telegraphs never stack on top of each other.
-    const hold = p < 3 ? fronts[1] : null;
-    if (hold) { hold.el.style.display = 'none'; hold.gapEl.style.display = 'none'; }
 
-    _nkLoop(run, (dtS, now) => {
+    let T = 0;   // the cast's own clock (ms): frozen while the game is paused
+    _nkLoop(run, (dtS) => {
+        T += dtS * 1000;
         const pc = _sirPC();
         let live = false;
         for (const f of fronts) {
             if (f.done) continue;
             live = true;
-            if (f === hold && fronts[0].moving && f.el.style.display === 'none') {
-                f.el.style.display = ''; f.gapEl.style.display = '';
-            }
-            if (f.el.style.display === 'none') continue;
-            if (!f.moving && now >= f.startAt) {
+            const showAt = f.index === 0 ? 0 : f.startAt - tele;
+            if (T < showAt) continue;
+            if (f.el.style.display === 'none') { f.el.style.display = ''; f.gapEl.style.display = ''; }
+            if (!f.moving && T >= f.startAt) {
                 f.moving = true;
                 f.el.classList.remove('sx-sir-ion-warn');
                 f.el.classList.add('sx-sir-ion-front');
             }
             if (!f.moving) continue;
-            f.y += f.dir * spd * dtS;
+            f.pos += f.dir * spd * dtS;
             draw(f);
             // One real hit when the band passes over you outside the tangent.
-            const inBand = pc.y > f.y && pc.y < f.y + band;
-            const inGap = pc.x > f.gapC - gapW / 2 + 12 && pc.x < f.gapC + gapW / 2 - 12;
+            const a = vertical ? pc.y : pc.x, c = vertical ? pc.x : pc.y;
+            const inBand = a > f.pos && a < f.pos + band;
+            const inGap = c > f.gapC - gapW / 2 + 12 && c < f.gapC + gapW / 2 - 12;
             if (inBand && !inGap && !f.hit) {
                 f.hit = true;
                 const dealt = _nkHit(SIR_ION_DMG[p], 'lightning', level);
                 _nkAbilityHitToast(dealt, 'The Stormcaller', 'Ion Current');
                 _sirAddCharge(2);
             }
-            if (f.y < -band - 10 || f.y > H + 10) {
+            if (f.pos < -band - 10 || f.pos > plan.travel + 10) {
                 f.done = true;
                 try { f.el.remove(); } catch (e) {}
                 try { f.gapEl.remove(); } catch (e) {}
@@ -272,58 +385,97 @@ export function _mechSirIon(monster, phase) {
 
 
 //------------------------------------------------------------------------
+//-------------------STORM STRIKES (all fight)-----------------------------
+//------------------------------------------------------------------------
+// Dark clouds gather over several circles for ~2s, then lightning hits them
+// all at once. One circle always sits on you, the rest are scattered close
+// by - read the picture, step out. More volleys and circles as he weakens.
+const SIR_STRIKE_DMG = [0, 0.12, 0.14, 0.16];   // %maxHP when a strike catches you
+const SIR_STRIKE_GAP_MS = 900;                   // pause between volleys of one cast
+
+export function _mechSirStrikes(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
+    _sirEnsureFinalWatcher(monster);
+    const p = Math.max(1, Math.min(3, Number(phase) || 1));
+    const level = monster ? monster.level : 1;
+    const d = _sirProgress(monster);
+    const run = _nkNewRun(monster && monster.id, true);
+    const R = Math.round(Math.min(window.innerWidth, window.innerHeight) * 0.085);
+    const volleys = 1 + (d > 0.45 ? 1 : 0) + (p >= 3 ? 1 : 0);
+    const count = 3 + (p - 1) + Math.round(d * 2);
+    const teleMs = (1900 - d * 300) * _SIR_DEBUG_MULT;
+    let launched = 0, current = null, gapLeft = 0;
+
+    const launch = () => {
+        const pc = _sirPC();
+        const pts = [_sirClampPt(pc.x, pc.y, R)];
+        for (let i = 1; i < count; i++) pts.push(_sirPointNear(pc, R * 1.6, R * 5.5, R));
+        current = _sirMakeVolley(run, pts, R, teleMs, level, SIR_STRIKE_DMG[p], 'Lightning Strike');
+        launched++;
+    };
+    launch();
+    _nkLoop(run, (dtS) => {
+        if (current) {
+            if (!current.tick(dtS * 1000)) { current = null; gapLeft = SIR_STRIKE_GAP_MS * _SIR_DEBUG_MULT; }
+            return true;
+        }
+        if (launched >= volleys) return false;
+        gapLeft -= dtS * 1000;
+        if (gapLeft <= 0) launch();
+        return true;
+    });
+}
+
+
+//------------------------------------------------------------------------
 //-------------------ACT II: CHAIN LIGHTNING (60%)-------------------------
 //------------------------------------------------------------------------
-// Rivers sweep in and leave standing water first; then a ball of chain
-// lightning charges up on the arena edge farthest from you (1.2s
-// telegraph) and hunts you. It is almost as fast as you - faster while you
-// carry CHARGE - so you beat it by luring it across standing water: it
-// grounds itself on the shore. Cold pools (shared frozen_cells) ground it
-// too. Phase 3: TWO balls.
+// A few ponds mark the ground (dashed rings that fill with water after 2s);
+// then a ball of chain lightning charges up on the arena edge farthest from
+// you (1.2s telegraph) and hunts you. It is almost as fast as you - faster
+// while you carry CHARGE - so you beat it by luring it across a pond: it
+// grounds itself in the water. The ponds never sit on the straight line
+// between the ball and you, so standing still never works, and they are
+// always within a short walk. Cold pools (shared frozen_cells) ground it
+// too. Phase 3: TWO balls, more ponds.
 export const SIR_BOLT_SPD   = [0, 0, 245, 260]; // px/s hunting ball (+18 per charge stack)
 export const SIR_BOLT_DMG   = [0, 0, 0.14, 0.16]; // %maxHP ball hit
 export const SIR_BOLT_LIFE  = [0, 0, 8000, 9000]; // ms the ball hunts
-export const SIR_RIVER_N    = [0, 0, 2, 2];       // water lanes per cast
-export const SIR_RIVER_SPD  = 90;                 // (legacy) px/s river sweep
-export const SIR_RIVER_W    = 64;                 // standing water width
 export const SIR_GROUND_R   = 30;                 // distance at which the ball grounds
-const SIR_RIVER_MS = 2000;                         // sweep line → standing water
+const SIR_POND_N = [0, 0, 3, 4];                   // ponds per cast
+const SIR_POND_R = [0, 0, 88, 78];                 // pond radius (px)
+const SIR_POND_MS = 2000;                          // dashed ring -> standing water
 const SIR_BOLT_CHARGE_MS = 1200;                   // ball charges before it hunts
+
+// Chooses pond centres: a short walk from the player, clear of every
+// ball->player line and of each other (relaxed a little if the screen is cramped).
+function _sirPlacePonds(pc, spots, count, radius) {
+    const ponds = [];
+    for (let i = 0; i < count; i++) {
+        let best = null;
+        for (let tries = 0; tries < 60; tries++) {
+            const slack = tries > 40 ? 0.6 : 1;
+            const pt = _sirPointNear(pc, 150, 460, radius + 10);
+            const clearOfLines = spots.every(s => _ptSegDist(pt.x, pt.y, s[0], s[1], pc.x, pc.y) > (radius + 45) * slack);
+            const clearOfPonds = ponds.every(o => Math.hypot(pt.x - o.x, pt.y - o.y) > (radius * 2 + 20) * slack);
+            if (clearOfLines && clearOfPonds) { best = pt; break; }
+            if (!best) best = pt;
+        }
+        ponds.push({ x: best.x, y: best.y });
+    }
+    return ponds;
+}
 
 export function _mechSirChain(monster, phase) {
     if (_nkDodgeBusy() || _nkFrozen()) return;
     _sirEnsureFinalWatcher(monster);
     _sirEnsureChip();
-    const p = Math.max(1, Math.min(3, Number(phase) || 1));
+    const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _nkNewRun(monster && monster.id, true);
 
-    _nkToast('eg_mech_sir_chain', '⛈️ CHAIN LIGHTNING - the ball hunts you. Lure it across the WATER to ground it!', '#fde047');
-
-    // ── Water lines: rivers sweep across and LEAVE standing water. ───────
-    const rivers = [];
-    const nR = SIR_RIVER_N[p];
-    const riverMs = SIR_RIVER_MS * _SIR_DEBUG_MULT;
-    for (let i = 0; i < nR; i++) {
-        const axis = i === 0 ? 'h' : 'v';
-        const sweepEl = _nkEl(run, 'div', 'sx-sir-river sx-sir-river-sweep');
-        const poolEl = _nkEl(run, 'div', 'sx-sir-river sx-sir-river-pool');
-        const pos = axis === 'h' ? H * (0.32 + Math.random() * 0.36) : W * (0.3 + Math.random() * 0.4);
-        if (axis === 'h') {
-            sweepEl.style.left = '0px'; sweepEl.style.top = Math.round(pos - 3) + 'px';
-            sweepEl.style.width = W + 'px'; sweepEl.style.height = '6px';
-            poolEl.style.left = '0px'; poolEl.style.top = Math.round(pos - SIR_RIVER_W / 2) + 'px';
-            poolEl.style.width = W + 'px'; poolEl.style.height = SIR_RIVER_W + 'px';
-        } else {
-            sweepEl.style.left = Math.round(pos - 3) + 'px'; sweepEl.style.top = '0px';
-            sweepEl.style.width = '6px'; sweepEl.style.height = H + 'px';
-            poolEl.style.left = Math.round(pos - SIR_RIVER_W / 2) + 'px'; poolEl.style.top = '0px';
-            poolEl.style.width = SIR_RIVER_W + 'px'; poolEl.style.height = H + 'px';
-        }
-        poolEl.style.display = 'none';
-        rivers.push({ axis, pos, sweepEl, poolEl, poolAt: performance.now() + riverMs });
-    }
+    _nkToast('eg_mech_sir_chain', '⛈️ CHAIN LIGHTNING - lure it over WATER', '#fde047');
 
     // ── The hunting ball(s): spawn on the edge far from you, charge, hunt.
     const nBolts = p >= 3 ? 2 : 1;
@@ -331,6 +483,7 @@ export function _mechSirChain(monster, phase) {
     const pc0 = _sirPC();
     const spots = [[60, 60], [W - 60, 60], [60, H - 60], [W - 60, H - 60], [W / 2, 60], [W / 2, H - 60]];
     spots.sort((a, b) => Math.hypot(b[0] - pc0.x, b[1] - pc0.y) - Math.hypot(a[0] - pc0.x, a[1] - pc0.y));
+    const pondMs = SIR_POND_MS * _SIR_DEBUG_MULT;
     for (let i = 0; i < nBolts; i++) {
         const [bx, by] = spots[i];
         const el = _nkEl(run, 'div', 'sx-nk-dot sx-sir-bolt sx-sir-bolt-charging');
@@ -338,17 +491,25 @@ export function _mechSirChain(monster, phase) {
         el.style.transform = 'translate(' + Math.round(bx - 17) + 'px,' + Math.round(by - 17) + 'px)';
         bolts.push({
             x: bx, y: by, el, done: false,
-            huntAt: performance.now() + riverMs + (SIR_BOLT_CHARGE_MS + i * 900) * _SIR_DEBUG_MULT,
+            huntAt: pondMs + (SIR_BOLT_CHARGE_MS + i * 900) * _SIR_DEBUG_MULT,
             life: SIR_BOLT_LIFE[p] * _SIR_DEBUG_MULT,
         });
     }
 
+    // ── Ponds: a dashed ring first, then standing water. ─────────────────
+    const radius = SIR_POND_R[p];
+    const ponds = _sirPlacePonds(pc0, spots.slice(0, nBolts), SIR_POND_N[p], radius).map(pt => {
+        const el = _nkEl(run, 'div', 'sx-sir-pond sx-sir-pond-ring');
+        el.style.left = Math.round(pt.x - radius) + 'px';
+        el.style.top = Math.round(pt.y - radius) + 'px';
+        el.style.width = el.style.height = (radius * 2) + 'px';
+        return { x: pt.x, y: pt.y, el, filled: false };
+    });
+
     // Grounding: over standing water or a cold pool, the ball grounds.
     const groundedBy = (bx, by) => {
-        for (const r of rivers) {
-            if (r.poolEl.style.display === 'none') continue;
-            const d = r.axis === 'h' ? Math.abs(by - r.pos) : Math.abs(bx - r.pos);
-            if (d < SIR_GROUND_R) return r;
+        for (const o of ponds) {
+            if (o.filled && Math.hypot(bx - o.x, by - o.y) < radius - 4) return o;
         }
         const cold = document.querySelectorAll('.sx-frozen-cell, .sx-nk-frozen-cell');
         for (const c of cold) {
@@ -358,19 +519,15 @@ export function _mechSirChain(monster, phase) {
         return null;
     };
 
-    _nkLoop(run, (dtS, now) => {
+    let T = 0;   // the cast's own clock (ms): frozen while the game is paused
+    _nkLoop(run, (dtS) => {
+        T += dtS * 1000;
         const pc = _sirPC();
         const pr = _nkPlayerRect();
 
-        // Rivers sweep across the arena, then leave standing water.
-        for (const r of rivers) {
-            if (r.poolEl.style.display !== 'none') continue;
-            if (now < r.poolAt) {
-                const k = 1 - Math.max(0, (r.poolAt - now) / riverMs);
-                r.sweepEl.style.opacity = String(0.3 + 0.7 * Math.min(1, k));
-            } else {
-                r.poolEl.style.display = '';
-                r.sweepEl.style.opacity = '0';
+        if (T >= pondMs) {
+            for (const o of ponds) {
+                if (!o.filled) { o.filled = true; o.el.classList.remove('sx-sir-pond-ring'); o.el.classList.add('sx-sir-pond-pool'); }
             }
         }
 
@@ -378,7 +535,7 @@ export function _mechSirChain(monster, phase) {
         for (const b of bolts) {
             if (b.done) continue;
             pending = true;
-            if (now < b.huntAt) continue;          // still charging at the edge
+            if (T < b.huntAt) continue;          // still charging at the edge
             b.el.classList.remove('sx-sir-bolt-charging');
             b.life -= dtS * 1000;
             const spd = SIR_BOLT_SPD[p] + SIR_BOLT_PER_STACK * _sirChargeNow();
@@ -415,18 +572,29 @@ export function _mechSirChain(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------ACT II: STORM EYE (60% and 30%, once each)------------
 //------------------------------------------------------------------------
-// The Stormcaller settles into a 4×4 grid of storm cells in the arena
-// centre and holds it (immune). 3-2-1, then the storm rages everywhere
-// OUTSIDE the grid and in the hot cells. The SAFE cells are the web
-// connected to the eye (the eye, its four neighbours and the two far arms
-// of the cross); the pattern is rotated each cast. Standing in the storm
-// is a real hit every 0.7s.
-export const SIR_EYE_N      = 4;     // 4×4 grid
-export const SIR_EYE_HOT    = 7;     // hot cells
+// The Stormcaller holds the sky (immune). The whole arena turns into a
+// raging storm - dark cloud, driving rain, flashing lightning - except one
+// calm circle: the EYE. 3-2-1 first (the eye is already visible), then the
+// storm rages and every 0.7s outside the eye is a real hit. The eye drifts
+// slowly across the arena and shrinks as it goes, so you have to follow it.
 export const SIR_EYE_DPS    = [0, 0, 8.5, 10]; // %/s in the storm (paid as hits on the touch cooldown)
-export const SIR_EYE_LIFE   = 6500;  // ms the storm rages (after the telegraph)
-export const SIR_EYE_IMMUNE = true;  // he holds the eye: immune while it stands
+export const SIR_EYE_LIFE   = 8000;  // ms the storm rages (after the telegraph)
+export const SIR_EYE_IMMUNE = true;  // he holds the sky: immune while it stands
 const SIR_EYE_WARN_MS = 3000;        // 3-2-1 before the storm rages
+const SIR_EYE_R_START = [0, 0, 200, 170];   // eye radius when the storm breaks
+const SIR_EYE_R_END   = [0, 0, 140, 115];   // eye radius when it fades
+const SIR_EYE_SPEED   = [0, 0, 55, 80];     // px/s the eye drifts
+
+// Spawns one decorative lightning bolt somewhere in the storm (no damage).
+function _sirStormBolt(run, eye) {
+    const W = window.innerWidth, H = window.innerHeight;
+    let x = 30 + Math.random() * (W - 60);
+    if (Math.abs(x - eye.x) < eye.r + 30) x = x < eye.x ? Math.max(30, eye.x - eye.r - 40) : Math.min(W - 30, eye.x + eye.r + 40);
+    const el = _nkEl(run, 'div', 'sx-sir-bolt-fx');
+    el.style.left = Math.round(x - 40) + 'px';
+    el.style.height = Math.round(H * (0.5 + Math.random() * 0.45)) + 'px';
+    setTimeout(() => { try { el.remove(); } catch (e) {} }, 260);
+}
 
 export function _mechSirEye(monster, phase) {
     // Scheduled once per phase: if another set-piece holds the field, wait
@@ -443,86 +611,69 @@ export function _mechSirEye(monster, phase) {
     }
     if (monster) monster._sirEyeTries = 0;
     _sirEnsureFinalWatcher(monster);
-    const p = Math.max(1, Math.min(3, Number(phase) || 1));
+    const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _nkNewRun(monster && monster.id, true);
 
-    _nkToast('eg_mech_sir_eye', '⛈️ STORM EYE - get onto the BLUE web cells before the storm breaks!', '#fde047');
+    _nkToast('eg_mech_sir_eye', '⛈️ STORM EYE - stay inside the calm eye!', '#fde047');
 
-    // The 4×4 grid, centred.
-    const N = SIR_EYE_N;
-    const cell = Math.min(W, H) * 0.15;
-    const gw = N * cell, gh = N * cell;
-    const gx = W / 2 - gw / 2, gy = H / 2 - gh / 2;
-    // Base pattern around eye (1,1), rotated by a random quarter turn.
-    const rot = Math.floor(Math.random() * 4);
-    const rotRC = (r, c) => { for (let k = 0; k < rot; k++) { const t = r; r = c; c = N - 1 - t; } return [r, c]; };
-    const cells = [];
-    const byKey = {};
-    for (let r = 0; r < N; r++) {
-        for (let c = 0; c < N; c++) {
-            const isEye = (r === 1 && c === 1);
-            const isSafe = isEye || (Math.abs(r - 1) + Math.abs(c - 1) === 1) || (r === 1 && c === 3) || (c === 1 && r === 3);
-            const [rr, cc] = rotRC(r, c);
-            const o = { r: rr, c: cc, hot: false, eye: isEye, safe: isSafe, d: Math.abs(r - 1) + Math.abs(c - 1), br: r, bc: c, el: null };
-            cells.push(o); byKey[rr + ',' + cc] = o;
-        }
-    }
-    // Exactly SIR_EYE_HOT hot cells: the non-web cells closest to the
-    // eye; the farthest stay inert (harmless, but not part of the web).
-    cells.filter(c => !c.safe)
-        .sort((a, b) => a.d - b.d || (a.br - b.br) || (a.bc - b.bc))
-        .slice(0, SIR_EYE_HOT)
-        .forEach(c => { c.hot = true; });
-    cells.forEach(c => {
-        const el = _nkEl(run, 'div', 'sx-sir-cell' + (c.eye ? ' sx-sir-cell-eye sx-sir-cell-safe' : c.safe ? ' sx-sir-cell-safe' : c.hot ? ' sx-sir-cell-hot sx-sir-cell-arming' : ' sx-sir-cell-inert'));
-        el.style.left = Math.round(gx + c.c * cell + 4) + 'px';
-        el.style.top = Math.round(gy + c.r * cell + 4) + 'px';
-        el.style.width = Math.round(cell - 8) + 'px';
-        el.style.height = Math.round(cell - 8) + 'px';
-        if (c.eye) el.innerHTML = '<span class="sx-sir-eye-count"></span>';
-        c.el = el;
-    });
-    // The storm outside the grid: four bands around it (arming → raging).
-    const storm = [
-        [0, 0, W, gy], [0, gy + gh, W, H - gy - gh], [0, gy, gx, gh], [gx + gw, gy, W - gx - gw, gh],
-    ].map(([l, t, w, h]) => {
-        const el = _nkEl(run, 'div', 'sx-sir-storm sx-sir-storm-arming');
-        el.style.left = Math.round(l) + 'px'; el.style.top = Math.round(t) + 'px';
-        el.style.width = Math.round(w) + 'px'; el.style.height = Math.round(h) + 'px';
-        return el;
-    });
-    const countEl = cells.find(c => c.eye).el.querySelector('.sx-sir-eye-count');
+    // The storm fills the arena; the eye is a hole cut out of it.
+    const field = _nkEl(run, 'div', 'sx-sir-stormfield sx-sir-stormfield-arming');
+    const ring = _nkEl(run, 'div', 'sx-sir-eyering');
+    ring.innerHTML = '<i class="sx-sir-eyering-swirl"></i><span class="sx-sir-eye-count"></span>';
+    const countEl = ring.querySelector('.sx-sir-eye-count');
 
-    // Boss holds the eye: immune while the set-piece stands (released on
+    const pc0 = _sirPC();
+    const start = _sirPointNear(pc0, 90, 220, SIR_EYE_R_START[p]);
+    const eye = { x: start.x, y: start.y, r: SIR_EYE_R_START[p] };
+    let target = null;
+    const pickTarget = () => { target = _sirClampPt(60 + Math.random() * (W - 120), 60 + Math.random() * (H - 120), eye.r); };
+    pickTarget();
+    const place = () => {
+        field.style.setProperty('--ex', Math.round(eye.x) + 'px');
+        field.style.setProperty('--ey', Math.round(eye.y) + 'px');
+        field.style.setProperty('--er', Math.round(eye.r) + 'px');
+        ring.style.left = Math.round(eye.x - eye.r) + 'px';
+        ring.style.top = Math.round(eye.y - eye.r) + 'px';
+        ring.style.width = ring.style.height = Math.round(eye.r * 2) + 'px';
+    };
+    place();
+
+    // He holds the sky: immune while the set-piece stands (released on
     // every kill path too).
     if (monster && SIR_EYE_IMMUNE) { try { monster.bossImmune = true; } catch (e) {} }
     run.onKill = () => { if (monster) { try { monster.bossImmune = false; } catch (e) {} } };
 
-    const t0 = performance.now();
     const warnMs = SIR_EYE_WARN_MS * _SIR_DEBUG_MULT;
-    const endAt = t0 + warnMs + SIR_EYE_LIFE * _SIR_DEBUG_MULT;
-    let raging = false;
-    _nkLoop(run, (dtS, now) => {
+    const lifeMs = SIR_EYE_LIFE * _SIR_DEBUG_MULT;
+    let T = 0, raging = false, boltIn = 0;   // T: the cast's own clock (ms), frozen on pause
+    _nkLoop(run, (dtS) => {
+        T += dtS * 1000;
         if (!raging) {
-            const left = warnMs - (now - t0);
+            const left = warnMs - T;
             if (countEl) countEl.textContent = left > 0 ? String(Math.ceil(left / 1000)) : '';
             if (left <= 0) {
                 raging = true;
-                storm.forEach(el => { el.classList.remove('sx-sir-storm-arming'); el.classList.add('sx-sir-storm-live'); });
-                cells.forEach(c => { if (c.hot) c.el.classList.remove('sx-sir-cell-arming'); if (c.safe) c.el.classList.add('sx-sir-live'); });
+                field.classList.remove('sx-sir-stormfield-arming');
+                ring.classList.add('sx-sir-eyering-live');
             }
-        } else {
-            const pc = _sirPC();
-            const c = Math.floor((pc.x - gx) / cell), r = Math.floor((pc.y - gy) / cell);
-            const inGrid = c >= 0 && c < N && r >= 0 && r < N;
-            const here = inGrid ? byKey[r + ',' + c] : null;
-            if (!inGrid || (here && here.hot)) {
-                _sirTouch(SIR_EYE_DPS[p] / 100 * (SIR_TOUCH_CD_MS / 1000), level, inGrid ? 'Storm Cell' : 'Raging Storm');
-            }
+            return true;
         }
-        return now < endAt;
+        // The eye drifts toward its next waypoint and slowly closes.
+        const k = Math.min(1, (T - warnMs) / lifeMs);
+        eye.r = SIR_EYE_R_START[p] + (SIR_EYE_R_END[p] - SIR_EYE_R_START[p]) * k;
+        const dx = target.x - eye.x, dy = target.y - eye.y, dist = Math.hypot(dx, dy);
+        if (dist < 12) pickTarget();
+        else { const step = Math.min(dist, SIR_EYE_SPEED[p] * dtS); eye.x += dx / dist * step; eye.y += dy / dist * step; }
+        place();
+        boltIn -= dtS * 1000;
+        if (boltIn <= 0) { boltIn = 350 + Math.random() * 500; _sirStormBolt(run, eye); }
+        const pc = _sirPC();
+        if (Math.hypot(pc.x - eye.x, pc.y - eye.y) > eye.r) {
+            _sirTouch(SIR_EYE_DPS[p] / 100 * (SIR_TOUCH_CD_MS / 1000), level, 'Raging Storm');
+        }
+        return T - warnMs < lifeMs;
     });
 }
 
@@ -530,20 +681,23 @@ export function _mechSirEye(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------FINALE: PERFECT STORM (≤10%, one-shot)----------------
 //------------------------------------------------------------------------
-// Three storm walls: each one closes from the arena edge onto a marked
-// square. RED square = the strike lands there - be OUTSIDE it. GREEN
-// square = the eye - be INSIDE it, everything else is struck. They
-// alternate red / green / red. Then the storm grows TEETH: charged bullets
-// fly through the spot you stand on for 6s (faster while you carry
-// charge) - keep moving. Last, THE EYE OPENS: one green circle within
-// reach is the only shelter from the final strike. Boss immune throughout.
-export const SIR_FIN_BOXES    = 3;      // closing storm walls
-export const SIR_FIN_BOX_DMG  = 0.19;   // %maxHP caught by a wall
+// The sky goes dark. First a volley of lightning strike circles: one sits
+// on you, the rest ring it - be OUTSIDE every circle when it lands. Then a
+// STORM WALL closes in from the edges around one calm square: be INSIDE it,
+// everything else is struck. Another, bigger volley follows. Then the storm
+// grows TEETH: charged bullets fly through the spot you stand on for 6s
+// (faster while you carry charge) - keep moving. Last, THE EYE OPENS: one
+// green circle within reach is the only shelter from the final strike. Boss
+// immune throughout.
+export const SIR_FIN_BOXES    = 3;      // set-piece waves (strikes, wall, strikes)
+export const SIR_FIN_BOX_DMG  = 0.19;   // %maxHP caught by a strike / the wall
 export const SIR_FIN_BULLET_DMG = 0.09; // %maxHP per bullet hit
 export const SIR_FIN_BULLET_SPD = 260;  // px/s charged bullets
 export const SIR_FIN_BULLET_DPS = 3.5;  // (legacy) old self-aura DoT - removed
 export const SIR_FIN_FAILSAFE_MS = 45000;
-const SIR_FIN_CLOSE_MS = 4500;          // a wall closes in this long
+const SIR_FIN_CLOSE_MS = 4500;          // the storm wall closes in this long
+const SIR_FIN_STRIKE_MS = [0, 2900, 0, 2300];   // strike telegraph per wave
+const SIR_FIN_STRIKE_N  = [0, 3, 0, 5];         // circles per strike wave
 const SIR_FIN_TEETH_MS = 6000;          // charged-bullet phase
 const SIR_FIN_EYE_MS   = 3000;          // final strike countdown
 const SIR_FIN_EYE_R    = 110;           // final safe eye radius
@@ -582,24 +736,18 @@ export function _sirEnsureFinalWatcher(monster) {
 }
 export let _sirWatcherRun = null;
 
-// Pause-safe timeout (mirrors the other finales).
+// Pause-safe timeout (mirrors the other finales): the countdown only
+// advances while the game is running.
 export function _sirAfter(g, ms, fn) {
-    const t0 = performance.now();
+    const TICK = 100;
+    let left = ms;
     const step = () => {
         if (g.finished || !_sirFinal) return;
-        if (_nkFrozen()) { setTimeout(step, 120); return; }
-        if (performance.now() - t0 >= ms) fn();
-        else setTimeout(step, Math.min(120, ms - (performance.now() - t0)));
+        if (!_nkFrozen()) left -= TICK;
+        if (left <= 0) fn();
+        else setTimeout(step, TICK);
     };
-    setTimeout(step, Math.min(120, ms));
-}
-
-// Clamps a point so a box/circle of half-size `h` stays on screen.
-function _sirClampPt(x, y, h) {
-    return {
-        x: Math.max(h + 20, Math.min(window.innerWidth - h - 20, x)),
-        y: Math.max(h + 20, Math.min(window.innerHeight - h - 20, y)),
-    };
+    setTimeout(step, Math.min(TICK, ms));
 }
 
 export function _sirFinalStart(monster) {
@@ -617,6 +765,7 @@ export function _sirFinalStart(monster) {
         finished: false,
         fxRun: null, overlay: null,
         bullets: [],
+        volley: null,
         wave: 0,
         teeth: false,
     };
@@ -631,19 +780,22 @@ export function _sirFinalStart(monster) {
     g.fxRun = _nkNewRun(monster.id, true);
     g.fxRun.passive = true;
 
+    // The sky goes dark and starts to flash for the whole finale.
+    _nkEl(g.fxRun, 'div', 'sx-sir-sky');
+
     // Banner at the top - the arena below must stay readable.
     const ov = document.createElement('div');
     ov.className = 'sx-sir-cd';
     ov.innerHTML =
         '<div class="sx-sir-cd-label">⛈️ PERFECT STORM</div>' +
-        '<div class="sx-sir-cd-hint">RED square: get OUT. GREEN square: get IN.</div>';
+        '<div class="sx-sir-cd-hint">Get out of the lightning circles.</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
     g.fxRun.els.push(ov);
     const hintEl = ov.querySelector('.sx-sir-cd-hint');
     const hint = (txt) => { if (hintEl) hintEl.textContent = txt; };
 
-    _nkToast('eg_mech_sir_final_cd', '⛈️💀 PERFECT STORM - red square = get out, green square = get in!', '#fde047');
+    _nkToast('eg_mech_sir_final_cd', '⛈️💀 PERFECT STORM', '#fde047');
 
     monster.bossImmune = true;
 
@@ -656,61 +808,73 @@ export function _sirFinalStart(monster) {
 
     const level = monster.level || 1;
 
-    // ── Wave: a storm wall closes onto a marked square. ──────────────────
-    const runBoxWave = () => {
-        if (g.finished) return;
-        g.wave++;
-        if (g.wave > SIR_FIN_BOXES) { runTeeth(); return; }
-        const getIn = g.wave === 2;
-        _nkToast(getIn ? 'eg_mech_sir_wave_in' : 'eg_mech_sir_wave', '⛈️ STORM WALL ' + g.wave + '/' + SIR_FIN_BOXES
-            + (getIn ? ' - GREEN: get INTO the eye!' : ' - RED: get OUT of the square!'), getIn ? '#86efac' : '#f87171');
-        hint(getIn ? 'GREEN square: get INSIDE before the wall closes!' : 'RED square: get OUT before the wall closes!');
+    // ── Wave (red): lightning circles - one on you, the rest ring it. ────
+    const runStrikeWave = () => {
+        const teleMs = SIR_FIN_STRIKE_MS[g.wave] * _SIR_DEBUG_MULT;
+        hint('Lightning circles! Get OUT of every circle before the strike.');
+        const R = Math.round(Math.min(W, H) * 0.12);
+        const pts = _sirRingZones(_sirPC(), SIR_FIN_STRIKE_N[g.wave], R);
+        g.volley = _sirMakeVolley(g.fxRun, pts, R, teleMs, level, SIR_FIN_BOX_DMG, 'Lightning Strike');
+        _sirAfter(g, teleMs + SIR_STRIKE_FLASH_MS + 400 * _SIR_DEBUG_MULT, runBoxWave);
+    };
 
+    // ── Wave (green): a storm wall closes in around one calm square. ─────
+    const runWallWave = () => {
+        hint('The storm closes in! Get INSIDE the calm square.');
         const side = Math.round(Math.min(W, H) * 0.24);
         const closeMs = SIR_FIN_CLOSE_MS * _SIR_DEBUG_MULT;
-        const pc0 = _sirPC();
-        let c;
-        if (getIn) {
-            // The eye opens within walking reach (but never right on you).
-            const a = Math.random() * Math.PI * 2, d = 170 + Math.random() * 230;
-            c = _sirClampPt(pc0.x + Math.cos(a) * d, pc0.y + Math.sin(a) * d, side / 2);
-        } else {
-            // The strike lands where you stand now.
-            c = _sirClampPt(pc0.x, pc0.y, side / 2);
-        }
+        // The calm square opens within walking reach (but never right on you).
+        const c = _sirPointNear(_sirPC(), 170, 400, side / 2);
         const tgt = { l: c.x - side / 2, t: c.y - side / 2, r: c.x + side / 2, b: c.y + side / 2 };
-        const mark = _nkEl(g.fxRun, 'div', 'sx-sir-fin-mark ' + (getIn ? 'sx-sir-fin-safe' : 'sx-sir-fin-danger'));
+        const mark = _nkEl(g.fxRun, 'div', 'sx-sir-fin-mark sx-sir-fin-safe');
         mark.style.left = Math.round(tgt.l) + 'px'; mark.style.top = Math.round(tgt.t) + 'px';
         mark.style.width = mark.style.height = side + 'px';
-        mark.innerHTML = '<span>' + (getIn ? 'GET IN' : 'GET OUT') + '</span>';
-        const el = _nkEl(g.fxRun, 'div', 'sx-sir-box' + (getIn ? ' sx-sir-box-in' : ''));
-        const t0 = performance.now();
+        mark.innerHTML = '<span>GET IN</span>';
+        // Four storm panels fill everything outside the hole; the edge glows.
+        const panels = [0, 1, 2, 3].map(() => _nkEl(g.fxRun, 'div', 'sx-sir-storm sx-sir-storm-live'));
+        const edge = _nkEl(g.fxRun, 'div', 'sx-sir-box sx-sir-box-in');
+        const setBox = (el, l, t, w, h) => {
+            el.style.left = Math.round(l) + 'px'; el.style.top = Math.round(t) + 'px';
+            el.style.width = Math.max(0, Math.round(w)) + 'px'; el.style.height = Math.max(0, Math.round(h)) + 'px';
+        };
+        let T = 0;
         const wave = _nkNewRun(monster.id, false);
         wave.passive = true;
-        _nkLoop(wave, (dtS, now) => {
+        _nkLoop(wave, (dtS) => {
             if (g.finished) return false;
-            const k = Math.min(1, (now - t0) / closeMs);
+            T += dtS * 1000;
+            const k = Math.min(1, T / closeMs);
             const l = tgt.l * k, t = tgt.t * k, r = W - (W - tgt.r) * k, b = H - (H - tgt.b) * k;
-            el.style.left = Math.round(l) + 'px'; el.style.top = Math.round(t) + 'px';
-            el.style.width = Math.round(r - l) + 'px'; el.style.height = Math.round(b - t) + 'px';
+            setBox(panels[0], 0, 0, W, t);
+            setBox(panels[1], 0, b, W, H - b);
+            setBox(panels[2], 0, t, l, b - t);
+            setBox(panels[3], r, t, W - r, b - t);
+            setBox(edge, l, t, r - l, b - t);
             if (k < 1) return true;
             const pc = _sirPC();
             const inside = pc.x > tgt.l && pc.x < tgt.r && pc.y > tgt.t && pc.y < tgt.b;
-            if (inside !== getIn) {
+            if (!inside) {
                 const dealt = _nkHit(SIR_FIN_BOX_DMG, 'lightning', level);
                 _nkAbilityHitToast(dealt, 'The Stormcaller', 'Storm Wall');
             }
-            el.classList.add('sx-sir-box-final');
-            setTimeout(() => { try { el.remove(); } catch (e) {} try { mark.remove(); } catch (e) {} }, 700);
+            panels.concat([edge]).forEach(el => el.classList.add('sx-sir-box-final'));
+            setTimeout(() => { panels.concat([edge, mark]).forEach(el => { try { el.remove(); } catch (e) {} }); }, 700);
             return false;
         });
         _sirAfter(g, closeMs + 1100 * _SIR_DEBUG_MULT, runBoxWave);
     };
 
+    const runBoxWave = () => {
+        if (g.finished) return;
+        g.wave++;
+        if (g.wave > SIR_FIN_BOXES) { runTeeth(); return; }
+        if (g.wave === 2) runWallWave(); else runStrikeWave();
+    };
+
     // ── THE STORM GROWS TEETH: charged bullets aim at you. ───────────────
     const runTeeth = () => {
         if (g.finished) return;
-        _nkToast('eg_mech_sir_teeth', '⛈️🦷 THE STORM GROWS TEETH - keep moving, the bullets aim where you stand!', '#f97316');
+        _nkToast('eg_mech_sir_teeth', '⛈️🦷 STORM GROWS TEETH - keep moving!', '#f97316');
         hint('Keep moving - every bullet flies through the spot you stand on.');
         g.teeth = true;
         _sirAfter(g, SIR_FIN_TEETH_MS * _SIR_DEBUG_MULT, runEye);
@@ -722,12 +886,10 @@ export function _sirFinalStart(monster) {
         g.teeth = false;
         _nkToast('eg_mech_sir_eye_open', '⛈️💀 THE EYE OPENS - stand in the GREEN circle!', '#86efac');
         hint('Stand in the GREEN circle before the count runs out!');
-        const pc0 = _sirPC();
         const eyeMs = SIR_FIN_EYE_MS * _SIR_DEBUG_MULT;
         // 3s countdown at 320 px/s minus 0.7s reaction leaves ~730 px of
         // walking; the eye opens 180-380 px away.
-        const a = Math.random() * Math.PI * 2, d = 180 + Math.random() * 200;
-        const e = _sirClampPt(pc0.x + Math.cos(a) * d, pc0.y + Math.sin(a) * d, SIR_FIN_EYE_R);
+        const e = _sirPointNear(_sirPC(), 180, 380, SIR_FIN_EYE_R);
         const eye = _nkEl(g.fxRun, 'div', 'sx-sir-fin-eye sx-sir-fin-safe');
         eye.style.left = Math.round(e.x - SIR_FIN_EYE_R) + 'px';
         eye.style.top = Math.round(e.y - SIR_FIN_EYE_R) + 'px';
@@ -738,12 +900,11 @@ export function _sirFinalStart(monster) {
         dark.style.setProperty('--ey', Math.round(e.y) + 'px');
         dark.style.setProperty('--er', SIR_FIN_EYE_R + 'px');
         const countEl = eye.querySelector('.sx-sir-eye-count');
-        const t0 = performance.now();
+        let leftMs = eyeMs;
         const tick = () => {
             if (g.finished) return;
-            const left = eyeMs - (performance.now() - t0);
-            if (countEl) countEl.textContent = left > 0 ? String(Math.ceil(left / 1000)) : '';
-            if (left > 0) { _sirAfter(g, 100, tick); return; }
+            if (countEl) countEl.textContent = leftMs > 0 ? String(Math.ceil(leftMs / 1000)) : '';
+            if (leftMs > 0) { leftMs -= 100; _sirAfter(g, 100, tick); return; }
             const pc = _sirPC();
             if (Math.hypot(pc.x - e.x, pc.y - e.y) > SIR_FIN_EYE_R) {
                 const dealt = _nkHit(SIR_FIN_FINAL_DMG, 'lightning', level);
@@ -757,15 +918,16 @@ export function _sirFinalStart(monster) {
         tick();
     };
 
-    // ── Main finale loop: charged bullets during the teeth phase. ────────
-    const startAt = performance.now();
-    let bulletCd = 0;
-    _nkLoop(g.fxRun, (dtS, now) => {
+    // ── Main finale loop: strike circles + charged bullets (teeth). ──────
+    let finaleMs = 0, bulletCd = 0;
+    _nkLoop(g.fxRun, (dtS) => {
         if (g.finished) return false;
+        finaleMs += dtS * 1000;
         const pc = _sirPC();
-        if (g.teeth && now >= bulletCd) {
+        if (g.volley && !g.volley.tick(dtS * 1000)) g.volley = null;
+        if (g.teeth && finaleMs >= bulletCd) {
             const charged = _sirChargeNow() >= 3;
-            bulletCd = now + (charged ? 380 : 520) * _SIR_DEBUG_MULT;
+            bulletCd = finaleMs + (charged ? 380 : 520) * _SIR_DEBUG_MULT;
             const el = _nkEl(g.fxRun, 'div', 'sx-nk-dot sx-sir-bullet');
             // Spawned on a ring around you, flying THROUGH the spot you stand on.
             const ang = Math.random() * Math.PI * 2;
@@ -791,20 +953,24 @@ export function _sirFinalStart(monster) {
                 try { b.el.remove(); } catch (e) {} g.bullets.splice(i, 1);
             }
         }
-        if (now - startAt > SIR_FIN_FAILSAFE_MS) { _sirFinalEnd(g, monster); return false; }
+        if (finaleMs > SIR_FIN_FAILSAFE_MS) { _sirFinalEnd(g, monster); return false; }
         return true;
     });
 
     runBoxWave();
 }
 
+// Every CSS class this boss puts on the board (used by finale end + teardown).
+const SIR_BOARD_SELECTOR = '.sx-sir-cd, .sx-sir-box, .sx-sir-bullet, .sx-sir-pond, .sx-sir-stormfield, .sx-sir-eyering, ' +
+    '.sx-sir-bolt-fx, .sx-sir-storm, .sx-sir-zone, .sx-sir-sky, ' +
+    '.sx-sir-ion, .sx-sir-gap, .sx-sir-bolt, .sx-sir-ground, .sx-sir-fin-mark, .sx-sir-fin-eye, .sx-sir-fin-dark';
+
 // Ends the finale: releases immunity + charge bar and cleans the board.
 export function _sirFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _nkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.sx-sir-cd, .sx-sir-box, .sx-sir-bullet, .sx-sir-river, .sx-sir-cell, .sx-sir-storm, ' +
-        '.sx-sir-ion, .sx-sir-gap, .sx-sir-bolt, .sx-sir-ground, .sx-sir-fin-mark, .sx-sir-fin-eye, .sx-sir-fin-dark').forEach(el => {
+    document.querySelectorAll(SIR_BOARD_SELECTOR).forEach(el => {
         try { el.remove(); } catch (e) {}
     });
     const card = document.getElementById('sx-card-' + g.monsterId);
@@ -844,8 +1010,7 @@ export function _sirTeardown() {
             globalThis._monsters.forEach(m => { if (m && m.baseId === 'boss_sirus') m.bossImmune = false; });
         }
     } catch (e) {}
-    document.querySelectorAll('.sx-sir-ion, .sx-sir-gap, .sx-sir-bolt, .sx-sir-ground, .sx-sir-storm, ' +
-        '.sx-sir-river, .sx-sir-cell, .sx-sir-box, .sx-sir-bullet, .sx-sir-cd, .sx-sir-fin-mark, .sx-sir-fin-eye, .sx-sir-fin-dark').forEach(el => {
+    document.querySelectorAll(SIR_BOARD_SELECTOR).forEach(el => {
         try { el.remove(); } catch (e) {}
     });
     document.querySelectorAll('.sx-sir-allin').forEach(el => el.classList.remove('sx-sir-allin'));
@@ -860,8 +1025,8 @@ export function _sirTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _SIR_DEBUG.fire('ion'|'chain'|'eye', phase) - runs one now
-//   _SIR_DEBUG.final()                          - PERFECT STORM now
+//   _SIR_DEBUG.fire('ion'|'strikes'|'chain'|'eye', phase) - runs one now
+//   _SIR_DEBUG.final()                                    - PERFECT STORM now
 if (typeof window !== 'undefined') {
     window._SIR_DEBUG = {
         fire: (name, phase) => {
@@ -869,6 +1034,7 @@ if (typeof window !== 'undefined') {
                 ? globalThis._monsters.find(m => m && m.baseId === 'boss_sirus') : null;
             if (!monster) return 'no stormcaller alive';
             const fn = name === 'ion' ? _mechSirIon
+                : name === 'strikes' ? _mechSirStrikes
                 : name === 'chain' ? _mechSirChain
                 : name === 'eye' ? _mechSirEye : null;
             if (!fn) return 'unknown: ' + name;
