@@ -216,7 +216,7 @@ export const SPELL_COMBOS = {
     usp_multi_shot: { applies: [_a('exposed', 20), _a('bleed', 12)] },
     usp_barrage: { applies: [_a('exposed', 20), _a('bleed', 8)] },
     usp_arrow_volley: { applies: [_a('exposed', 25), _a('bleed', 6)] },
-    usp_serpent_sting: { applies: [_a('conductive', 40), _a('shocked', 15)] },
+    usp_serpent_sting: { applies: [_a('withered', 40), _a('poison', 30)] },
     // ── Added innate ailments ──
     usp_immolate: { applies: [_a('ignite', 35)] },
     usp_firestorm: { applies: [_a('ignite', 10)] },

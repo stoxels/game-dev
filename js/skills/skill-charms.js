@@ -68,7 +68,6 @@ const CHARM_ELEMENT_FILTERS = [
     { id: 'cold', tag: 'Cold' },
     { id: 'lightning', tag: 'Lightning' },
     { id: 'shadow', tag: 'Shadow' },
-    { id: 'arcane', tag: 'Arcane' },
     { id: 'holy', tag: 'Holy' },
     { id: 'physical', tag: 'Physical' },
 ];

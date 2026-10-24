@@ -215,9 +215,11 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'Mini-Thwomp Siege', desc: _bossTestTr('eg_boss_test_thwomp_siege', 'At 30% HP: 3–5 mini-Thwomps hop-chase for 12s; each telegraphs its own slam. Stay mobile - Grand Slam (charge attack) can hit 34% in the core.') }
     ],
     'boss_dancer': () => [
-        { name: 'Spotlight Steps', desc: _bossTestTr('eg_boss_test_dancer_steps', 'All fight: numbered footprints light in rhythm - stand on the lit step in the beat window to heal +8. Miss = zap. The only healing mechanic in the atlas.') },
-        { name: 'Curtain Call', desc: _bossTestTr('eg_boss_test_dancer_curtain', 'At 60% HP: 5–8 stage drops fall staggered, each leaving a dragging backstage patch.') },
-        { name: 'Petal Storm', desc: _bossTestTr('eg_boss_test_dancer_petals', 'At 30% HP: 4 waves of shadow petals cross L→R (dodge vertically), plus a permanent drizzle in final phase.') }
+        { name: 'Dance Partner', desc: _bossTestTr('eg_boss_test_dancer_steps', 'All fight: a dance floor ring moves with the Dancer. Stay inside it to fill the RHYTHM bar; a full bar is a SHOWSTOPPER (the Dancer takes +35% damage for 6s and you heal 6%). Outside the ring for over 2s and the Dancer cuts in with a zap. From 60% it also TANGOs: a telegraphed dash you must follow.') },
+        { name: 'Spotlight Sweep', desc: _bossTestTr('eg_boss_test_dancer_sweep', 'Every ~16s: SPOTLIGHT SWEEP - the Dancer stands still and 2-4 beams spin out of it (dashed first, with the turning direction shown). Step through the gaps.') },
+        { name: 'Curtain Call', desc: _bossTestTr('eg_boss_test_dancer_curtain', 'From 60% HP, every ~25s: CURTAIN CALL - red curtains close in until only a spotlight around the Dancer is left. Be inside it when they meet; you always have time to get there.') },
+        { name: 'Petal Spiral', desc: _bossTestTr('eg_boss_test_dancer_petals', 'From 30% HP, every ~22s: PETAL SPIRAL - three arms of petals spiral out of the Dancer for 6s (dashed spokes show the arms first). Dance between the arms.') },
+        { name: 'Pirouette', desc: _bossTestTr('eg_boss_test_dancer_piro', 'Charge attack: PIROUETTE - three lightning rings bloom out of the Dancer, all with the same opening (green wedge). Step through it.') }
     ],
     'boss_gambler': () => [
         { name: 'Wheel of Fortune', desc: _bossTestTr('eg_boss_test_gambler_wheel', 'At 60% HP: 4s spin - SNAKE (unavoidable 16%), FREE SPIN (re-spin or forced SNAKE), JACKPOT (boss heals 12%), YOU WIN (you heal 10%).') },

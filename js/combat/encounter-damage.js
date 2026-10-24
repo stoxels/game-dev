@@ -337,7 +337,6 @@ export function _playerTakeDamage(amount, isSpell = false, element = null, attac
             _gainEnduranceCharge(stats.enduranceChargesMax, stats.enduranceDurationPct);
         }
         _rsAvoid('block');
-        globalThis.showCombatToast(t('eg_blocked'));
         _applyPlayerBlockFeedback();
         _scheduleAbsorptionRegen();
 

@@ -89,8 +89,8 @@ function _isColdSpell(skillId) {
 // True when the skill is a LIGHTNING spell - the third sibling of the two above.
 // Lightning is one of the four elemental damage types, so both its element and
 // its damageKind are checked: support spells declare element: 'lightning'
-// (Renewal, Windward, Windstep) while the lightning damage spells (Wrath,
-// Serpent Sting) declare damageKind: 'lightning' on a lightning element.
+// (Windward, Windstep) while the lightning damage spells (Wrath, Bolt, ...)
+// declare damageKind: 'lightning' on a lightning element.
 // Drives the passive tree's lightning-only cast speed.
 function _isLightningSpell(skillId) {
     try {

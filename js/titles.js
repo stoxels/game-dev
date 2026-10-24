@@ -284,6 +284,7 @@ function _buildTotalBox(earnedCount) {
 // title shown in front of the character name (bonuses are unaffected: every
 // earned title's bonus is always active).
 export function showTitlesModal() {
+    _markTitlesSeen();
     const modal = _ensureModal('titles-modal', 'titles_modal_title');
     const active = getActiveTitle();
     const earnedCount = getEarnedTitlesForScore(_score()).length;
@@ -308,71 +309,59 @@ export function showTitlesModal() {
 }
 
 //------------------------------------------------------------------------
-//-------------------UNLOCK CEREMONY---------------------------------------
+//-------------------NEW TITLE CHIP----------------------------------------
 //------------------------------------------------------------------------
+// A new title never opens a popup. Instead a small "NEW TITLE" chip sits on
+// the title button of the map / level screens until the player opens the
+// titles list (which marks every earned title as seen).
 
-// True while something the player is busy with is on screen: the quiz, the
-// win / lose screen, or any other open window.
-function _ceremonyBlocked() {
-    return !!document.querySelector('#quiz-overlay.show, #ov-win.show, #ov-lose.show, .modal-bg.show');
+// Earned titles the player has not looked at in the titles list yet.
+function _unseenTitles() {
+    if (!Array.isArray(STATE.titlesSeen)) STATE.titlesSeen = [];
+    return getEarnedTitlesForScore(_score()).filter(def => !STATE.titlesSeen.includes(def.id));
 }
 
-// Looks again in a moment; one waiting check at a time.
-let _ceremonyRetry = 0;
-function _retryCeremonyLater() {
-    if (_ceremonyRetry) return;
-    _ceremonyRetry = setTimeout(() => { _ceremonyRetry = 0; checkTitleUnlocks(); }, 1500);
+// Shows or hides the chip on every screen (CSS keys off this body class).
+export function refreshNewTitleChip() {
+    if (typeof document === 'undefined' || !STATE) return;
+    document.body.classList.toggle('has-new-title', _unseenTitles().length > 0);
 }
 
-// Records every newly earned title (so it is celebrated once) and shows the
-// ceremony. Safe to call often: it does nothing when no title is new.
+// The unseen titles are announced with a sound once each per session.
+const _announcedTitles = new Set();
+
+// Looks for newly earned titles, shows the chip and returns the unseen ones.
+// Safe to call often: it only plays the sound for a title the first time.
 export function checkTitleUnlocks() {
     if (typeof document === 'undefined' || !STATE) return [];
-    // Never interrupt the quiz, the win / lose screen or another open window:
-    // the new title waits and shows once they are gone.
-    if (_ceremonyBlocked()) { _retryCeremonyLater(); return []; }
-    if (!Array.isArray(STATE.titlesSeen)) STATE.titlesSeen = [];
-    const fresh = getEarnedTitlesForScore(_score()).filter(def => !STATE.titlesSeen.includes(def.id));
-    if (!fresh.length) return [];
-    fresh.forEach(def => STATE.titlesSeen.push(def.id));
-    save();
-    showTitleCeremony(fresh);
+    const fresh = _unseenTitles();
+    refreshNewTitleChip();
+    if (fresh.some(def => !_announcedTitles.has(def.id))) {
+        fresh.forEach(def => _announcedTitles.add(def.id));
+        Audio_Manager.playSFX('achievement');
+    }
     return fresh;
 }
 
-// The ceremony: the highest new title in big glowing letters with its
-// bonuses, plus a short list when several unlocked at once.
-function showTitleCeremony(fresh) {
-    const top = fresh[fresh.length - 1];
-    const modal = _ensureModal('title-ceremony', 'titles_ceremony_head');
-    const headKey = fresh.length > 1 ? 'titles_ceremony_head_many' : 'titles_ceremony_head';
-    const stats = fresh.flatMap(getTitleStatLines).map(l => `<div class="tt-bonus-chip">${l}</div>`).join('');
-    const others = fresh.length > 1
-        ? `<div class="tt-also">${fresh.slice(0, -1).map(def => `<span class="tt-also-chip">${getTitleName(def)}</span>`).join('')}</div>` : '';
-    const body = `<div class="tt-ceremony">
-        <div class="tt-hero">
-            <div class="tt-rays"></div>
-            <div class="tt-burst">✦</div>
-            <div class="tt-big">${getTitleName(top)}</div>
-            ${others}
-        </div>
-        <div class="tt-bonus-head">${t('titles_ceremony_stats')}</div>
-        <div class="tt-bonus-scroll"><div class="tt-bonus-grid">${stats}</div></div>
-        <div class="tt-buttons">
-            <button class="tt-equip" data-ceremony="equip">${t('titles_ceremony_equip')}</button>
-            <button class="tt-equip" data-ceremony="list">${t('titles_ceremony_view')}</button>
-            <button class="tt-equip" data-ceremony="close">${t('titles_ceremony_continue')}</button>
-        </div>
-    </div>`;
-    _openModal(modal, headKey, body);
-    Audio_Manager.playSFX('achievement');
-    modal.querySelectorAll('[data-ceremony]').forEach(btn => btn.addEventListener('click', () => {
-        if (btn.dataset.ceremony === 'equip') STATE.activeTitle = top.id;
-        save();
-        _closeModal(modal);
-        if (typeof globalThis.renderLSCharacterAvatar === 'function') globalThis.renderLSCharacterAvatar();
-        if (btn.dataset.ceremony === 'list') showTitlesModal();
-    }));
+// Marks every earned title as seen (called when the list opens).
+function _markTitlesSeen() {
+    const unseen = _unseenTitles();
+    if (!unseen.length) return;
+    unseen.forEach(def => STATE.titlesSeen.push(def.id));
+    save();
+    refreshNewTitleChip();
+}
+
+// Tooltip of the title button: what it opens, plus how much Score is still
+// needed for the next title.
+function _titlesButtonTipHTML() {
+    const next = getNextTitle();
+    const line = next
+        ? t('titles_tip_next').replace('{name}', getTitleName(next))
+            .replace('{score}', next.score.toLocaleString())
+            .replace('{n}', Math.max(0, next.score - _score()).toLocaleString())
+        : `🏆 ${t('ls_all_titles')}`;
+    return `${t('tip_titles_ribbon')}<br><b>${line}</b>`;
 }
 
 // Clicking the score banner of any map / level screen opens the titles list.
@@ -380,8 +369,14 @@ function showTitleCeremony(fresh) {
 // Enter / Space on a focused ribbon opens the list as well.
 if (typeof document !== 'undefined') {
     document.addEventListener('click', e => {
-        if (e.target.closest && e.target.closest('#ls-score, #ls-pts-next, .mv-ribbon-wrap')) showTitlesModal();
+        if (e.target.closest && e.target.closest('#ls-score, #ls-pts-next, #ls-new-title, .mv-ribbon-wrap')) showTitlesModal();
     });
+    // Refresh the title button tooltip (next title + Score still needed) each
+    // time the pointer enters it, before the generic tooltip reads it.
+    document.addEventListener('mouseover', e => {
+        const el = e.target.closest && e.target.closest('#ls-score, #ls-pts-next, #ls-new-title, .mv-ribbon-wrap');
+        if (el) el.setAttribute('data-tip', _titlesButtonTipHTML());
+    }, true);
     document.addEventListener('keydown', e => {
         if ((e.key === 'Enter' || e.key === ' ') && e.target.closest
             && e.target.closest('.mv-ribbon-wrap')) {

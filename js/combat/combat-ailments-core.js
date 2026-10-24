@@ -1183,7 +1183,7 @@ function _statusSignature(statusMap) {
 }
 
 // HTML chips for the active statuses of a map (bleed shows its stack count).
-function _buildStatusIconsHTML(statusMap) {
+function _buildStatusIconsHTML(statusMap, freshKeys, popKeys) {
     const now = Date.now();
     return Object.keys(statusMap)
         .filter(key => statusMap[key].until > now)
@@ -1191,7 +1191,10 @@ function _buildStatusIconsHTML(statusMap) {
             // Crimson Dance stacks: show the stack count on the bleed chip.
             const stacks = ((key === 'bleed' || (SPELL_DEBUFFS[key] && SPELL_DEBUFFS[key].stackMax)) && statusMap[key].stacks > 1) ? `×${statusMap[key].stacks} ` : '';
             const tip = SPELL_DEBUFFS[key] ? comboStatusTip(key) : _ailmentLabel(key);
-            return `<span class="sx-status-icon st-${key}" data-tip="${globalThis._tipAttr(tip)}">${_statusIcon(key)}${stacks}${Math.ceil((statusMap[key].until - now) / 1000)}</span>`;
+            // A status that just landed also spells out its name for a moment.
+            const fresh = freshKeys && freshKeys.has(key);
+            const name = fresh ? `<span class="sx-status-name">${_ailmentLabel(key)}</span>` : '';
+            return `<span class="sx-status-icon st-${key}${fresh ? ' is-new' : ''}${popKeys && popKeys.has(key) ? ' is-pop' : ''}" data-tip="${globalThis._tipAttr(tip)}">${_statusIcon(key)}${name}${stacks}${Math.ceil((statusMap[key].until - now) / 1000)}</span>`;
         })
         .join('');
 }
@@ -1219,15 +1222,27 @@ const AILMENT_FX_HTML =
     + '<i class="sx-fx-drop d1">💧</i><i class="sx-fx-drop d2">💧</i><i class="sx-fx-drop d3">💧</i>'
     + '<i class="sx-fx-rime"></i><i class="sx-fx-spark s1">⚡</i><i class="sx-fx-spark s2">⚡</i><i class="sx-fx-spark s3">⚡</i>';
 
+const STATUS_NAME_SHOW_MS = 2400;   // how long a new status chip shows its name
 // Per-monster icon strip - cheap DOM update driven by _updateMonsterBars.
 function _renderMonsterStatusStrip(m) {
     if (!m || !m.statuses) return;
     const strip = document.getElementById(`sx-status-${m.id}`);
     if (!strip) return;
-    const sig = _statusSignature(m.statuses);
+    // Statuses that appeared since the last refresh keep their name visible
+    // for a couple of seconds, so a burst of new effects can be read. The chips
+    // are only rebuilt when the signature (seconds, statuses, names shown) changes.
+    const nowMs = Date.now();
+    const until = strip._sxNameUntil || (strip._sxNameUntil = {});
+    const known = strip._sxKnown || new Set();
+    const liveKeys = Object.keys(m.statuses).filter(k => m.statuses[k] && m.statuses[k].until > nowMs);
+    const popKeys = new Set(liveKeys.filter(k => !known.has(k)));
+    popKeys.forEach(k => { until[k] = nowMs + STATUS_NAME_SHOW_MS; });
+    strip._sxKnown = new Set(liveKeys);
+    const fresh = new Set(liveKeys.filter(k => (until[k] || 0) > nowMs));
+    const sig = _statusSignature(m.statuses) + '|' + [...fresh].sort().join(',');
     if (strip.dataset.sig === sig) return;
     strip.dataset.sig = sig;
-    strip.innerHTML = _buildStatusIconsHTML(m.statuses);
+    strip.innerHTML = _buildStatusIconsHTML(m.statuses, fresh, popKeys);
     const card = document.getElementById(`sx-card-${m.id}`);
     if (card) {
         const now = Date.now();

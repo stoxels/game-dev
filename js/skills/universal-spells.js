@@ -192,7 +192,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     {
         id: 'usp_arcane_missiles', icon: '✨', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'volley', dmg: [3, 5], count: 5, manaCost: 39, cooldownSeconds: 16, castTimeSeconds: 1.0,
-        tags: ['Spell', 'Arcane', 'Projectile'], scalingTags: ['spell', 'arcane', 'projectile'],
+        tags: ['Spell', 'Shadow', 'Projectile'], scalingTags: ['spell', 'shadow', 'projectile'],
         nameEn: 'Arcane Darts', nameDE: 'Arkane Pfeile',
         descEn: 'Channelled: 5 homing darts hit the target one after another.',
         descDE: 'Kanalisiert: 5 zielsuchende Pfeile treffen das Ziel nacheinander.',
@@ -201,7 +201,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     {
         id: 'usp_arcane_explosion', icon: '💫', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'nova', dmg: [9, 13], manaCost: 39, cooldownSeconds: 8, castTimeSeconds: 0.8, perTarget: true,
-        tags: ['Spell', 'Arcane', 'Area'], scalingTags: ['spell', 'arcane', 'area'],
+        tags: ['Spell', 'Shadow', 'Area'], scalingTags: ['spell', 'shadow', 'area'],
         nameEn: 'Mana Burst', nameDE: 'Manaschub',
         descEn: 'Arcane energy detonates around you and hits every enemy.',
         descDE: 'Arkane Energie explodiert um dich und trifft alle Gegner.',
@@ -210,7 +210,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     {
         id: 'usp_arcane_blast', icon: '🔮', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'single', dmg: [15, 19], manaCost: 42, cooldownSeconds: 7, castTimeSeconds: 1.2,
-        tags: ['Spell', 'Arcane', 'Projectile'], scalingTags: ['spell', 'arcane', 'projectile'],
+        tags: ['Spell', 'Shadow', 'Projectile'], scalingTags: ['spell', 'shadow', 'projectile'],
         nameEn: 'Force Pulse', nameDE: 'Kraftstoß',
         descEn: 'A concentrated blast of arcane force. Heavy single-target damage.',
         descDE: 'Ein gebündelter arkaner Kraftstoß. Hoher Schaden auf ein Ziel.',
@@ -219,7 +219,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     {
         id: 'usp_disintegrate', icon: '⚛️', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'volley', dmg: [4, 6], count: 4, volleyDelayMs: 260, manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0,
-        tags: ['Spell', 'Arcane', 'Channel'], scalingTags: ['spell', 'arcane', 'channel'],
+        tags: ['Spell', 'Shadow', 'Channel'], scalingTags: ['spell', 'shadow', 'channel'],
         nameEn: 'Unravel Beam', nameDE: 'Zerfallsstrahl',
         descEn: 'Channelled: a beam along a line to the cursor hits everything on it 4 times.',
         descDE: 'Kanalisiert: Ein Strahl entlang einer Linie zum Cursor trifft alles darauf 4-mal.',
@@ -304,7 +304,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     {
         id: 'usp_starfall', icon: '🌟', theme: 'arcane', element: 'fire', damageKind: 'shadow',
         behavior: 'starfall', dmg: [3, 5], count: 6, manaCost: 47, cooldownSeconds: 12, castTimeSeconds: 1.2,
-        tags: ['Spell', 'Arcane', 'Area'], scalingTags: ['spell', 'arcane', 'area'],
+        tags: ['Spell', 'Shadow', 'Area'], scalingTags: ['spell', 'shadow', 'area'],
         nameEn: 'Star Shower', nameDE: 'Sternenregen',
         descEn: '6 burning star shards crash onto random enemies.',
         descDE: '6 brennende Sternsplitter schlagen auf zufällige Gegner.',
@@ -525,12 +525,12 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'fieldScan',
     },
     {
-        id: 'usp_serpent_sting', icon: '🧪', theme: 'arrow', element: 'lightning', damageKind: 'lightning',
+        id: 'usp_serpent_sting', icon: '🧪', theme: 'arrow', element: 'shadow', damageKind: 'shadow',
         behavior: 'ticks', dmg: [4, 5], tickDmg: [2, 4], ticks: 4, manaCost: 34, cooldownSeconds: 8, castTimeSeconds: 0.7,
-        tags: ['Spell', 'Lightning', 'Damage over Time'], scalingTags: ['spell', 'lightning', 'dot', 'projectile'],
+        tags: ['Spell', 'Shadow', 'Damage over Time'], scalingTags: ['spell', 'shadow', 'dot', 'projectile'],
         nameEn: 'Poison Arrow', nameDE: 'Giftpfeil',
-        descEn: 'Instant lightning damage, then poison for 4 seconds.',
-        descDE: 'Sofortiger Blitzschaden, danach 4 Sekunden Gift.',
+        descEn: 'Instant shadow damage, then poison for 4 seconds.',
+        descDE: 'Sofortiger Schattenschaden, danach 4 Sekunden Gift.',
         sfx: 'syla_nature',
     },
     {
@@ -786,10 +786,10 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'heart_heals',
     },
     {
-        id: 'usp_renewal', icon: '🌿', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
+        id: 'usp_renewal', icon: '🌿', theme: 'holy', element: 'fire', damageKind: 'holy',
         behavior: 'hot', selfCast: true, manaCost: 22, cooldownSeconds: 14,
         healTickFlat: 6, healTickPct: 2, ticks: 6, tickMs: 1000,
-        tags: ['Spell', 'Lightning', 'Support', 'Heal over Time'], scalingTags: ['spell', 'lightning', 'support', 'heal'],
+        tags: ['Spell', 'Holy', 'Support', 'Heal over Time'], scalingTags: ['spell', 'holy', 'support', 'heal'],
         nameEn: 'Verdant Bloom', nameDE: 'Blütenheilung',
         descEn: 'Heals you once per second for 6 seconds. Cast it before the hit.',
         descDE: 'Heilt dich 6 Sekunden lang jede Sekunde. Wirke es vor dem Treffer.',
@@ -799,7 +799,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         id: 'usp_barrier', icon: '🔷', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'shield', selfCast: true, manaCost: 31, cooldownSeconds: 16,
         absorbFlat: 26, absorbPct: 45,
-        tags: ['Spell', 'Arcane', 'Support', 'Shield'], scalingTags: ['spell', 'arcane', 'support', 'shield'],
+        tags: ['Spell', 'Shadow', 'Support', 'Shield'], scalingTags: ['spell', 'shadow', 'support', 'shield'],
         nameEn: 'Barrier', nameDE: 'Barriere',
         descEn: 'Spends mana to refill your absorption shield instantly.',
         descDE: 'Verbraucht Mana, um dein Absorptionsschild sofort aufzufüllen.',
@@ -911,7 +911,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         id: 'usp_gauntlet_reveal', icon: '🔎', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'gauntlet_reveal', selfCast: true, manaCost: 8, cooldownSeconds: 15,
         gauntletOnly: true,
-        tags: ['Spell', 'Arcane', 'Support', 'Gauntlet'], scalingTags: ['spell', 'arcane', 'support'],
+        tags: ['Spell', 'Shadow', 'Support', 'Gauntlet'], scalingTags: ['spell', 'shadow', 'support'],
         nameEn: 'Summon Reveal Cells', nameDE: 'Aufdeckzellen beschwören',
         descEn: 'Gauntlet only. Conjures reveal cells (one per charm rank) that each fire a reveal projectile at your target. Higher rank costs more mana.',
         descDE: 'Nur Gauntlet. Beschwört Aufdeckzellen (eine pro Zauberrang), die je ein Aufdeck-Projektil auf dein Ziel feuern. Höherer Rang kostet mehr Mana.',
@@ -942,7 +942,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         // historical reference value; the runtime reads the charge fields.
         chargeMax: 3, chargeRechargeSeconds: 10,
         moveBasePx: 220, movePxPerRank: 20, movePxCap: 400,
-        tags: ['Spell', 'Arcane', 'Movement', 'Teleport'], scalingTags: ['spell', 'arcane', 'movement'],
+        tags: ['Spell', 'Shadow', 'Movement', 'Teleport'], scalingTags: ['spell', 'shadow', 'movement'],
         nameEn: 'Blink', nameDE: 'Blinzeln',
         descEn: 'Instantly teleports you to the cursor, up to its range. Nothing on the path can touch you.',
         descDE: 'Teleportiert dich sofort zum Cursor, bis zur Reichweite. Nichts auf dem Weg kann dich treffen.',
@@ -996,7 +996,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         id: 'usp_rift_anchor', icon: '📍', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'anchor', selfCast: true, manaCost: 17, cooldownSeconds: 15,
         anchorSeconds: 15, anchorPlaceCooldownSeconds: 3,
-        tags: ['Spell', 'Arcane', 'Movement', 'Recall'], scalingTags: ['spell', 'arcane', 'movement'],
+        tags: ['Spell', 'Shadow', 'Movement', 'Recall'], scalingTags: ['spell', 'shadow', 'movement'],
         nameEn: 'Rift Anchor', nameDE: 'Spaltanker',
         descEn: 'Cast once to plant an anchor (lasts 15 seconds), cast again to return to it from anywhere.',
         descDE: 'Einmal wirken setzt einen Anker (hält 15 Sekunden), erneut wirken bringt dich von überall dorthin zurück.',
@@ -1185,7 +1185,6 @@ function _uspConvertSustained(d, o, kind, tag) {
 // The tag line the tooltip shows, derived from what the spell really does
 // (cast kind, behaviour, damage type) so it can never drift from the engine:
 //   Spell | Attack      physical damage scales with Attack Damage
-//   Arcane              the arcane school (its damage type is Shadow)
 //   <damage type>       Fire / Cold / Lightning / Shadow / Holy / Physical
 //   delivery            Melee, Projectile, Area, Chaining
 //   mechanic            Damage over Time, Aura, Channelling, Charged
@@ -1196,7 +1195,6 @@ const USP_DAMAGE_TAG = {
 };
 function _uspDeriveTags(d) {
     const tags = [d.damageKind === 'physical' ? 'Attack' : 'Spell'];
-    if (d.theme === 'arcane') tags.push('Arcane');
     if (USP_DAMAGE_TAG[d.damageKind]) tags.push(USP_DAMAGE_TAG[d.damageKind]);
     const add = (x) => { if (tags.indexOf(x) === -1) tags.push(x); };
     const k = d.castKind;

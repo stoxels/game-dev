@@ -255,7 +255,7 @@ export function buildSpellbookHeadHTML(title, sub) {
 // SPELLBOOK_SCHOOL_ORDER is the canonical school set (elemental first,
 // physical last). Themes are read defensively: universal-spells.js loads
 // after the registry in some load orders.
-const SPELLBOOK_SCHOOL_ORDER = ['fire', 'frost', 'lightning', 'holy', 'shadow', 'arcane', 'physical'];
+const SPELLBOOK_SCHOOL_ORDER = ['fire', 'frost', 'lightning', 'holy', 'shadow', 'physical'];
 
 // The offensive school of a universal spell id, or null when the spell is
 // not an offensive universal (support / movement live in their own sections;
@@ -266,8 +266,9 @@ function _sbSpellSchool(skillId) {
     if (isUniversalSupportSpell(spell)) return null;
     if (isUniversalMovementSpell(spell)) return null;
     if (SPELLBOOK_SCHOOL_ORDER.indexOf(spell.theme) !== -1) return spell.theme;
-    // Blade / arrow arts are physical weapon schools, not arcane.
-    return (spell.theme === 'blade' || spell.theme === 'arrow') ? 'physical' : 'arcane';
+    // Blade / arrow arts are physical weapon schools; any other theme (the old
+    // arcane look) is shadow damage.
+    return (spell.theme === 'blade' || spell.theme === 'arrow') ? 'physical' : 'shadow';
 }
 
 // Element/school of a skill for the stone glow. Universal spells read their

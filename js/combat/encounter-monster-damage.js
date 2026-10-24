@@ -152,17 +152,39 @@ function _playHitSound(amount, elements, isCrit) {
     Audio_Manager.playSFX(key);
 }
 
+// Floating status labels on one card come out one after another, each in its
+// own height lane, so several effects landing together stay readable. The same
+// text is not repeated while it is still on screen; labels waiting too long are
+// dropped instead of piling up.
+const STATUS_LABEL_GAP_MS = 320;       // time between two labels on one card
+const STATUS_LABEL_LANES = 3;          // heights a label can float at
+const STATUS_LABEL_LANE_PX = 20;       // distance between the lanes
+const STATUS_LABEL_MAX_WAIT_MS = 1500; // a label that would wait longer is skipped
+
 // Appends a short floating status label (stagger/snipe/...) to a monster card.
 export function _showStatusLabel(monsterId, text) {
     const card = document.getElementById(`sx-card-${monsterId}`);
     if (!card) return;
-    const label = document.createElement('div');
-    label.className = 'sx-damage-number sx-status-label';
-    label.textContent = text;
-    // small random jitter so overlapping labels don't perfectly stack
-    label.style.marginLeft = `${(Math.random() * 10 - 5).toFixed(1)}px`;
-    card.appendChild(label);
-    setTimeout(() => label.remove(), DAMAGE_NUMBER_DURATION_MS);
+    const now = performance.now();
+    const live = card._sxLabelTexts || (card._sxLabelTexts = {});
+    if (live[text] && live[text] > now) return;
+    const start = Math.max(now, card._sxLabelNext || 0);
+    if (start - now > STATUS_LABEL_MAX_WAIT_MS) return;
+    card._sxLabelNext = start + STATUS_LABEL_GAP_MS;
+    live[text] = start + DAMAGE_NUMBER_DURATION_MS;
+    const lane = (card._sxLabelLane = ((card._sxLabelLane || 0) + 1) % STATUS_LABEL_LANES);
+    const spawn = () => {
+        if (!card.isConnected) return;
+        const label = document.createElement('div');
+        label.className = 'sx-damage-number sx-status-label';
+        label.textContent = text;
+        label.style.top = `${-8 - lane * STATUS_LABEL_LANE_PX}px`;
+        label.style.marginLeft = `${(Math.random() * 10 - 5).toFixed(1)}px`;
+        card.appendChild(label);
+        setTimeout(() => label.remove(), DAMAGE_NUMBER_DURATION_MS);
+    };
+    if (start - now < 16) spawn();
+    else setTimeout(spawn, start - now);
 }
 
 // Returns the dominant elemental key for visual choice, or 'physical' when none.

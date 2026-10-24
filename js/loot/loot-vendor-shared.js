@@ -119,7 +119,6 @@ const VENDOR_CHARM_FILTERS = [
     { id: 'cold', test: d => _vendorHasTag(d, 'Cold') },
     { id: 'lightning', test: d => _vendorHasTag(d, 'Lightning') },
     { id: 'shadow', test: d => _vendorHasTag(d, 'Shadow') },
-    { id: 'arcane', test: d => _vendorHasTag(d, 'Arcane') },
     { id: 'holy', test: d => _vendorHasTag(d, 'Holy') },
     { id: 'physical', test: d => _vendorHasTag(d, 'Physical') },
     { id: 'melee', test: d => d.castKind === 'melee' },

@@ -3672,3 +3672,22 @@ body:has(#screen-game.active) #sx-xp-bar { display: block; }
     line-height: 1.2;
     color: #9ca3af;
 }
+
+/* A freshly applied status spells out its name next to the icon for a moment. */
+.sx-status-icon .sx-status-name {
+    font-family: var(--PX, monospace);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin: 0 4px 0 3px;
+    text-transform: uppercase;
+}
+.sx-status-icon.is-new {
+    background: rgba(20, 20, 30, 0.95);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.55);
+}
+.sx-status-icon.is-pop { animation: sx-status-new-pop 0.35s ease-out; }
+@keyframes sx-status-new-pop {
+    from { transform: scale(0.6); }
+    to { transform: scale(1); }
+}

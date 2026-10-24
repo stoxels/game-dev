@@ -124,6 +124,28 @@ const MOD_SCROLL_TEXT_KEYS = {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Tooltip of one difficulty button: Score multiplier, the time lost per
+// mistake and how many mistakes a campaign puzzle allows.
+export function diffTipHTML(diff) {
+    const cfg = DIFF_CFG[diff];
+    const caps = CAMPAIGN_MISTAKE_CAPS[diff];
+    if (!cfg || !caps) return '';
+    const [a, b, c, d] = cfg.pens;
+    return `<strong>${t('diff_' + diff)}</strong>`
+        + `<br>${t('diff_tip_score').replace('{n}', String(cfg.scoreMult))}`
+        + `<br>${t('diff_tip_pen').replace('{a}', a).replace('{b}', b).replace('{c}', c).replace('{d}', d)}`
+        + `<br>${t('diff_tip_cap').replace('{s}', caps.small).replace('{m}', caps.medium).replace('{l}', caps.large)}`;
+}
+
+// Keeps the difficulty buttons' tooltip text fresh (language, tuning) each
+// time the pointer enters one - the generic tooltip then reads data-tip.
+if (typeof document !== 'undefined') {
+    document.addEventListener('mouseover', (e) => {
+        const btn = e.target.closest && e.target.closest('[data-diff]');
+        if (btn) btn.setAttribute('data-tip', diffTipHTML(btn.dataset.diff));
+    }, true);
+}
+
 // Refreshes the difficulty description ribbon to match curDiff.
 export function updDiffDesc() {
     const el = document.getElementById('diff-desc');

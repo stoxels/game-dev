@@ -356,8 +356,9 @@ const RIGS = {
             { n: 'kickLeg', x: 340, y: 286, px: 352, py: 312, par: 'body' },
         ],
         mechanics: {
-            dance_steps: { anim: 'dan_steps', ms: () => 2400 },
-            fated_cell: { anim: 'dan_fate', ms: () => 1900 },
+            spotlight_sweep: { anim: 'dan_steps', ms: () => 2400 },
+            curtain_call: { anim: 'dan_steps', ms: () => 2400 },
+            petal_spiral: { anim: 'dan_steps', ms: () => 2400 },
         },
     },
     // <<< rig boss_dancer
