@@ -17,6 +17,8 @@ export const WD_WORLD_CONFIGS = [
         // Convergence Trial 1 node - top-left of level 1-9 (the 66% milestone
         // that gates the trial), in the open ground between 7/8 and 9.
         trialNode: { x: 35.8, y: 48.2 },
+        // Ascension Trial node - the road continues here after the world's last level.
+        ascensionNode: { x: 67.5, y: 24.0 },
         nodes: [
             { x: 68.6, y: 82.4 },  // 1-1
             { x: 83.6, y: 75.3 },  // 1-2
@@ -48,6 +50,8 @@ export const WD_WORLD_CONFIGS = [
         entrancePos: { x: 3.9, y: 35.0 },
         // Convergence Trial 2 node.
         trialNode: { x: 85.2, y: 41.1 },
+        // Ascension Trial node - the road continues here after the world's last level.
+        ascensionNode: { x: 64.0, y: 13.0 },
         nodes: [
             { x: 17.5, y: 65.9 },  // 2-1
             { x: 31.9, y: 47.5 },  // 2-2
@@ -78,6 +82,8 @@ export const WD_WORLD_CONFIGS = [
         entrancePos: { x: 95.0, y: 93.6 },
         // Convergence Trial 3 node.
         trialNode: { x: 17.5, y: 51.1 },
+        // Ascension Trial node - the road continues here after the world's last level.
+        ascensionNode: { x: 47.0, y: 60.0 },
         nodes: [
             { x: 89.5, y: 75.0 },  // 1
             { x: 72.2, y: 66.5 },  // 2
@@ -103,6 +109,8 @@ export const WD_WORLD_CONFIGS = [
         entrancePos: { x: 5.6, y: 89.2 },
         // Convergence Trial 4 node.
         trialNode: { x: 81.1, y: 39.6 },
+        // Ascension Trial node - the road continues here after the world's last level.
+        ascensionNode: { x: 64.0, y: 45.0 },
         nodes: [
             { x: 12.9, y: 90.1 },  // 1
             { x: 24.7, y: 88.0 },  // 2
@@ -139,6 +147,8 @@ export const WD_WORLD_CONFIGS = [
         entrancePos: { x: 54.8, y: 24.9 },
         // Convergence Trial 5 node.
         trialNode: { x: 52.0, y: 47.3 },
+        // Ascension Trial node - the road continues here after the world's last level.
+        ascensionNode: { x: 38.0, y: 22.0 },
         nodes: [
             { x: 63.0, y: 38.4 },  // 1
             { x: 74.2, y: 17.3 },  // 2
@@ -170,6 +180,8 @@ export const WD_WORLD_CONFIGS = [
         entrancePos: { x: 42.3, y: 91.1 },
         // Convergence Trial 6 node.
         trialNode: { x: 76.3, y: 85.9 },
+        // Ascension Trial node - the road continues here after the world's last level.
+        ascensionNode: { x: 53.5, y: 30.0 },
         nodes: [
             { x: 43.9, y: 68.4 },  // 1
             { x: 29.3, y: 54.3 },  // 2
@@ -203,6 +215,8 @@ export const WD_WORLD_CONFIGS = [
         entrancePos: { x: 50.5, y: 92.7 }, 
         // Convergence Trial 7 node.
         trialNode: { x: 80.7, y: 29.3 },
+        // Ascension Trial node - the road continues here after the world's last level.
+        ascensionNode: { x: 50.0, y: 33.0 },
         nodes: [
             { x: 37.1, y: 82.4 },  // 1
             { x: 27.5, y: 71.6 },  // 2
@@ -233,6 +247,8 @@ export const WD_WORLD_CONFIGS = [
         entrancePos: { x: 39.2, y: 27.3 },
         // Convergence Trial 8 node.
         trialNode: { x: 85.8, y: 70.7 },
+        // Ascension Trial node - the road continues here after the world's last level.
+        ascensionNode: { x: 45.0, y: 86.0 },
         nodes: [
             { x: 43.7, y: 53.4 },  // 1
             { x: 8.6, y: 63.6 },  // 2
@@ -262,6 +278,8 @@ export const WD_WORLD_CONFIGS = [
         entrancePos: { x: 15.8, y: 15.1 },
         // Convergence Trial 9 node.
         trialNode: { x: 85.9, y: 82.3 },
+        // Ascension Trial node - the road continues here after the world's last level.
+        ascensionNode: { x: 65.0, y: 62.0 },
         nodes: [
             { x: 25.6, y: 37.0 },  // 1
             { x: 38.8, y: 33.8 },  // 2
@@ -297,6 +315,8 @@ export const WD_WORLD_CONFIGS = [
         entrancePos: { x: 51.5, y: 91.2 },
         // Convergence Trial 10 node.
         trialNode: { x: 86.9, y: 50.8 },
+        // Ascension Trial node - the road continues here after the world's last level.
+        ascensionNode: { x: 41.0, y: 24.0 },
         nodes: [
             
             { x: 42.4, y: 73.4 },  // 1
@@ -328,6 +348,8 @@ export const WD_WORLD_CONFIGS = [
         entrancePos: { x: 6.1, y: 88.6 },
         // Convergence Trial 11 node.
         trialNode: { x: 87.7, y: 50.0 },
+        // Ascension Trial node - the road continues here after the world's last level.
+        ascensionNode: { x: 63.0, y: 43.0 },
         nodes: [
             
             { x: 26.0, y: 70.4 },  // 1
@@ -360,6 +382,8 @@ export const WD_WORLD_CONFIGS = [
         entrancePos: { x: 89.4, y: 35.5 },
         // Convergence Trial 12 node.
         trialNode: { x: 22.1, y: 66.0 },
+        // Ascension Trial node - the road continues here after the world's last level.
+        ascensionNode: { x: 86.0, y: 80.0 },
         nodes: [
             { x: 84.0, y: 40.0 },  // 12-1 harbor docks
             { x: 85.0, y: 28.0 },  // 12-2 cliff harbor
@@ -393,6 +417,8 @@ export const WD_WORLD_CONFIGS = [
         entrancePos: { x: 89.8, y: 92.1 },
         // Convergence Trial 13 node.
         trialNode: { x: 17.9, y: 55.0 },
+        // Ascension Trial node - the road continues here after the world's last level.
+        ascensionNode: { x: 69.0, y: 27.0 },
         nodes: [
             { x: 80.0, y: 84.0 },  // 13-1 hamlet ruins
             { x: 88.0, y: 70.0 },  // 13-2 tower base

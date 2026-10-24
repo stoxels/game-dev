@@ -1,6 +1,5 @@
 import { trackAchStat } from './achievements/achievements.js';
 import { Audio_Manager } from './audio/audio.js';
-import { _maybeLaunchAscensionTrial } from './campaign-trials.js';
 import { applyClassPassiveOnLevelStart } from './classes/class-abilities.js';
 import { buildClassHUD } from './classes/class-hud.js';
 import { _resetPlayerMana } from './classes/class-mana.js';
@@ -725,12 +724,6 @@ export function _doStartLevel(gi) {
 // If the level is math-gated and the gate has not been passed, opens the gate
 // check flow and defers the actual start to its success callback.
 function startLevel(gi) {
-    // Leveling Rework: campaign ascension levels are entered as mini-map
-    // trial chains (boss finale) instead of plain puzzles. The hook is
-    // self-guarding (stamped/chain/suppressed launches are never hijacked).
-    if (typeof _maybeLaunchAscensionTrial === 'function') {
-        try { if (_maybeLaunchAscensionTrial(gi)) return; } catch (e) {}
-    }
     if (isGatedLevel(gi) && !isMathGatePassed(gi)) {
         tryStartGatedLevel(gi, () => _doStartLevel(gi));
         return;

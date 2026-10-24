@@ -11,7 +11,7 @@ import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
 import { WORLDS } from '../levels/level-world-data.js';
 import { setNexusUnlocked, lvText, ALL } from '../levels/levels.js';
 import { _charIs } from '../sprite/player_sprite.js';
-import { _trialTriggerLevels, _isTrialUnlocked, _isTrialDone, _launchCampaignTrial } from '../campaign-trials.js';
+import { _trialTriggerLevels, _isTrialUnlocked, _isTrialDone, _launchCampaignTrial, _isAscensionTrialDone, _launchAscensionTrial } from '../campaign-trials.js';
 import { showEndgameNexus } from '../endgame/endgame-nexus.js';
 import { checkWorldCompleteAch } from '../achievements/achievements.js';
 import { isMonsterless } from '../difficulty-modifiers.js';
@@ -398,6 +398,7 @@ export function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, monsterP
     if (nextCol) nextCol.style.display = endOfLine ? 'none' : '';
     _updateNexusWinButton(isNexusPoint);
     _updateConvergenceTrialWinButton(gi);
+    _updateAscensionTrialWinButton(gi, isAscensionLevel);
 }
 
 // Ensures the win overlay has a dedicated "Enter Convergence Trial" button.
@@ -438,6 +439,42 @@ function _updateConvergenceTrialWinButton(gi) {
     btn.textContent = (label && label !== 'btn_enter_trial_win') ? label : '🌿 ENTER CONVERGENCE TRIAL';
     // The button is created once, so the world must be read at click time
     // (a closure over `wi` would stay stuck on the first world it was shown for).
+    if (wi !== null) btn.dataset.wi = String(wi);
+    btn.style.display = show ? '' : 'none';
+    if (show && target.classList && target.classList.contains('ov-btns-col')) {
+        target.style.display = '';
+    }
+}
+
+// Ensures the win overlay has a dedicated "Enter Ascension Trial" button.
+// Shown after clearing a world's last level while that world's ascension
+// trial is still open; it takes the Next button's slot (Next is hidden on
+// the last level of a world).
+function _updateAscensionTrialWinButton(gi, isAscensionLevel) {
+    const container = document.querySelector('#ov-win .ov-btns');
+    if (!container) return;
+    const nextBtn = document.getElementById('btn-next-lvl');
+    const target = (nextBtn && nextBtn.closest('.ov-btns-col')) || container;
+    let wi = null;
+    let show = false;
+    try {
+        wi = cur.world - 1;
+        show = !!isAscensionLevel && !_isAscensionTrialDone(wi);
+    } catch (e) { show = false; }
+
+    let btn = document.getElementById('btn-enter-asc-trial-win');
+    if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'btn-enter-asc-trial-win';
+        btn.className = 'ob y';
+        btn.addEventListener('click', () => {
+            hideResultOverlays();
+            _launchAscensionTrial(Number(btn.dataset.wi));
+        });
+        target.appendChild(btn);
+    }
+    const label = t('btn_enter_asc_trial_win');
+    btn.textContent = (label && label !== 'btn_enter_asc_trial_win') ? label : '⚗️ ENTER ASCENSION TRIAL';
     if (wi !== null) btn.dataset.wi = String(wi);
     btn.style.display = show ? '' : 'none';
     if (show && target.classList && target.classList.contains('ov-btns-col')) {

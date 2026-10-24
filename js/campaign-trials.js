@@ -9,18 +9,16 @@ import { _ensureLoseOverlayCombatUI } from './combat/encounter-defeat-overlay.js
 import { _stopEncounter } from './combat/encounter.js';
 import { _flushRunLootToStash } from './combat/combat-grid-pickups-loot.js';
 import { saveHubState } from './hub/hub.js';
-import { LEVELING_CONFIG, _awardXP, _calcXpMultiplier, _campaignExpectedLevel, _getPlayerLevel, _getXpForNextLevel, _grantCampaignLevelXP } from './hub/hub-leveling.js';
+import { LEVELING_CONFIG, _awardXP, _calcXpMultiplier, _campaignExpectedLevel, _getPlayerLevel, _getXpForNextLevel } from './hub/hub-leveling.js';
 import { _egPickMapRunSeedGi } from './endgame/endgame-map-launch.js';
 import { _egBankUnclaimedMapDrops } from './loot/loot-map-drops.js';
 import { _resetQuizDamageBuff } from './combat/combat-quiz-buffs.js';
 import { WORLDS } from './levels/level-world-data.js';
-import { ALL, WORLD_START_GI, isNexusPointLevel, isNexusWorld } from './levels/levels.js';
-import { buildInventoryPanel } from './puzzle-item-inventory/puzzle-item-inventory-panel.js';
-import { ITEM_DEFS } from './puzzle-items/item-definitions.js';
-import { showItemGainPopup, showToast } from './puzzle-mechanics/toasts-and-popups.js';
+import { ALL, WORLD_START_GI, isNexusWorld } from './levels/levels.js';
+import { showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { _incDirect, updateQuestStats } from './inference/inference-stats.js';
 import { isGatedLevel } from './quiz-exercise/mathgate.js';
-import { _wdSyncSpriteToLevel, showWorldDetail } from './screens/screens-world-levels.js';
+import { showWorldDetail } from './screens/screens-world-levels.js';
 import { _maybeShowConvergenceModal, goToLevelSelect } from './screens/screens.js';
 import { _hidePlayerAvatar, _hidePlayerAvatarSimple } from './sprite/player_sprite.js';
 import { save } from './state.js';
@@ -42,7 +40,7 @@ import { cur } from './state.js';
 //     "Finish Trial") grants a passive point + the convergence modal on
 //     first clear. The old 33%/66% convergence puzzle levels are regular
 //     puzzle levels now (isConvergenceLevel() always returns false).
-//   - ASCENSION TRIALS: every ascension level (final level of a world,
+//   - ASCENSION TRIALS: follow every ascension level (final level of a world,
 //     except the Nexus Point) is entered as a mini-map chain that ends in a
 //     boss fight. Finishing marks the ascension level done, grants the
 //     Codex of Completion on first clear and runs the normal
@@ -58,8 +56,8 @@ import { cur } from './state.js';
 //
 // Wiring (typeof-guarded so load order never matters):
 //   world map nodes  → _launchCampaignTrial(wi) / ascension via startLevel()
-//   startLevel()     → _maybeLaunchAscensionTrial() intercepts campaign
-//                      ascension levels into _launchAscensionTrial(wi)
+//   win overlay / world map of a world's last level (once it is cleared)
+//                    → _launchAscensionTrial(wi)
 //   _tryLeaveMap() → branches to _endCampaignTrial() for trial runs
 //   _pickInterstitialWorldNum() → trial world override (patched in
 //                      encounter-chain.js, reads window._campaignTrial)
@@ -458,31 +456,21 @@ export function _launchAscensionTrial(wi) {
     return _launchTrialRun(wi, 'ascension');
 }
 
-// startLevel() hook: campaign ascension levels (final level of a world,
-// except the Nexus Point) start their ascension trial chain instead of the
-// plain puzzle. Returns true when it launched a trial (caller must abort
-// the normal start). Never hijacks stamped/chain/suppressed launches.
-export function _maybeLaunchAscensionTrial(gi) {
-    try {
-        if (typeof ALL === 'undefined' || !ALL[gi]) return false;
-        const level = ALL[gi];
-        if (!level || level.world == null || level.li == null) return false;
-        // Already a stamped run (trial/map/boss-test seed, chain puzzle,
-        // arena, campaign pack): never re-route.
-        if (level.isMapRunSeed || level.isChainedPuzzle || level.isBossArena
-            || level.campaignTrial || level.campaignMonsters
-            || level.isTestMapSeed || level.isBossTestSeed) return false;
-        if (typeof window !== 'undefined' && window
-            && (window._egMapDeviceLaunching || window._egIsMapDeviceRun
-                || window._isBossTestRun || window._suppressEncounterStart)) return false;
-        const wi = level.world - 1;
-        const world = (typeof WORLDS !== 'undefined' && WORLDS) ? WORLDS[wi] : null;
-        if (!world || !world.data || !world.data.length) return false;
-        // Final level of a non-Nexus world = ascension level.
-        if (level.li !== world.data.length) return false;
-        if (typeof isNexusPointLevel === 'function' && isNexusPointLevel(wi, level.li - 1)) return false;
-        return _launchAscensionTrial(wi);
-    } catch (e) { return false; }
+// Global index of a world's ascension level (its last level), -1 when the
+// world has none.
+function _ascensionLevelGi(wi) {
+    const world = (typeof WORLDS !== 'undefined' && WORLDS) ? WORLDS[wi] : null;
+    const start = _trialWorldStartGi(wi);
+    return (world && start >= 0) ? start + world.data.length - 1 : -1;
+}
+
+// The ascension trial opens once the world's own last level is cleared
+// (the Nexus World has no ascension trial).
+export function _isAscensionTrialUnlocked(wi) {
+    if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.done)) return false;
+    if (typeof isNexusWorld === 'function' && isNexusWorld(wi)) return false;
+    const gi = _ascensionLevelGi(wi);
+    return gi >= 0 && STATE.done.includes(gi);
 }
 
 
@@ -527,56 +515,19 @@ export function _grantConvergenceTrialReward(wi) {
     return isFirstClear;
 }
 
-// Ascension Trial finish: the world's ascension level counts as cleared
-// (marks STATE.done so world progress/map view stay correct), grants the
-// Codex of Completion on first clear, pays the ascension level's campaign
-// XP, and runs the normal world-completion class flow (class select /
-// upgrade / ascendency, or the Nexus class-change token).
+// Ascension Trial finish: the world's own last level was already cleared
+// (that is what opens the trial and it paid the Codex and the level XP), so
+// this only records the trial as done, counts it for achievements, and runs
+// the normal world-completion class flow (class select / upgrade /
+// ascendency).
 export function _grantAscensionTrialReward(wi) {
     _ensureTrialState();
     const world = (typeof WORLDS !== 'undefined' && WORLDS) ? WORLDS[wi] : null;
     const key = 'asc_' + (wi + 1);
     const isFirstClear = !STATE.ascensionTrialsDone.includes(key);
-    let ascGi = -1;
-    if (world) {
-        const start = _trialWorldStartGi(wi);
-        if (start >= 0) ascGi = start + world.data.length - 1;
-    }
-    const wasDone = ascGi >= 0 && STATE.done && STATE.done.includes(ascGi);
-    if (ascGi >= 0 && !wasDone) {
-        STATE.done.push(ascGi);
-        if (typeof _wdSyncSpriteToLevel === 'function') try { _wdSyncSpriteToLevel(ascGi); } catch (e) {}
-    }
     if (isFirstClear) {
         STATE.ascensionTrialsDone.push(key);
-        // Codex of Completion (same artifact as the old ascension clear).
-        try {
-            if (typeof ITEM_DEFS !== 'undefined' && ITEM_DEFS['artifactComplete']
-                && STATE && Array.isArray(STATE.inventory)
-                && !(typeof curMods !== 'undefined' && curMods && curMods.ironman)) {
-                STATE.inventory.push({
-                    defId: 'artifactComplete',
-                    uid: 'item_' + Date.now() + '_' + Math.random().toString(36).slice(2),
-                });
-                if (typeof buildInventoryPanel === 'function') try { buildInventoryPanel(); } catch (e) {}
-                if (typeof showItemGainPopup === 'function') try { showItemGainPopup('artifactComplete'); } catch (e) {}
-            }
-        } catch (e) {}
         if (typeof trackAchStat === 'function') try { trackAchStat('egMapsCompleted', 1); } catch (e) {}
-    }
-    // Campaign XP for the ascension level itself (first clear / replay).
-    if (ascGi >= 0 && typeof _grantCampaignLevelXP === 'function') {
-        try {
-            const keepCur = (typeof cur !== 'undefined') ? cur : null;
-            if (typeof ALL !== 'undefined' && ALL[ascGi]) {
-                // _grantCampaignLevelXP guards on `cur`: point it at the
-                // ascension level briefly (trial seeds are map seeds, which
-                // the guard would reject).
-                try { globalThis.cur = ALL[ascGi]; } catch (e) {}
-                _grantCampaignLevelXP(ascGi, !wasDone);
-                try { globalThis.cur = keepCur; } catch (e) {}
-            }
-        } catch (e) {}
     }
     // Resistance penalty stage 1 (-30% to all resistances): the trial that
     // opens the ascendency class selection. Only the FIRST clear counts.

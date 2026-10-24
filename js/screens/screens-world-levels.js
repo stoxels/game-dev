@@ -197,6 +197,7 @@ function _wdImgPctToCanvasPct(imgPctX, imgPctY, canvas, cfg) {
 function _wdGetNodePos(cfg, nodeRef) {
     if (nodeRef === null || nodeRef === 'entrance') return cfg.entrancePos;
     if (nodeRef === 'trial') return cfg.trialNode;
+    if (nodeRef === 'ascension') return cfg.ascensionNode;
     return cfg.nodes[nodeRef];
 }
 
@@ -279,6 +280,17 @@ function _wdBuildRoads(cfg, wi) {
             n1: fromLi,
             n2: 'trial',
             waypoints: [fromPos, cfg.trialNode],
+        });
+    }
+
+    // Ascension Trial spur: the road goes on after the world's last level.
+    if (cfg.ascensionNode && _wdAscensionNodeForWorld(wi)) {
+        const world = globalThis.WORLDS && globalThis.WORLDS[wi];
+        const lastLi = Math.min(cfg.nodes.length, world ? world.data.length : cfg.nodes.length) - 1;
+        roads.push({
+            n1: lastLi,
+            n2: 'ascension',
+            waypoints: [cfg.nodes[lastLi], cfg.ascensionNode],
         });
     }
 
@@ -461,6 +473,10 @@ function _wdIsNodeReached(n, wi) {
         // reads as a real, open road to the trial node.
         return ((typeof globalThis._isTrialDone === 'function') && globalThis._isTrialDone(wi))
             || ((typeof globalThis._isTrialUnlocked === 'function') && globalThis._isTrialUnlocked(wi));
+    }
+    if (n === 'ascension') {
+        return ((typeof globalThis._isAscensionTrialDone === 'function') && globalThis._isAscensionTrialDone(wi))
+            || ((typeof globalThis._isAscensionTrialUnlocked === 'function') && globalThis._isAscensionTrialUnlocked(wi));
     }
     const gi = globalThis.WORLD_START_GI[wi] + n;
     if (STATE && STATE.done && STATE.done.includes(gi)) return true;
@@ -963,8 +979,10 @@ function _wdBuildLevelNode(wi, li, pos) {
     const isDone = !!(STATE && STATE.done && STATE.done.includes(gi));
     const isUnlocked = _wdIsLevelUnlocked(li, gi, wi);
     const isLocked = !isUnlocked;
-    const isLastInWorld = !!(world && li === world.data.length - 1);
     const isNexusPoint = typeof globalThis.isNexusPointLevel === 'function' && globalThis.isNexusPointLevel(wi, li);
+    // Only the Nexus Point still wears the ascension look; every other world ends in a
+    // normal level followed by its own Ascension Trial node.
+    const isLastInWorld = isNexusPoint;
     const isConvergence = !!(world && _wdIsConvergenceNode(li, world));
     const isMathGated = _wdIsMathGated(gi);
 
@@ -1432,6 +1450,137 @@ function _wdAppendLevelNodes(canvas, wi, cfg, levelCount) {
     }
     const trialPos = _wdTrialNodeForWorld(wi);
     if (trialPos) canvas.appendChild(_wdBuildTrialNode(wi, trialPos));
+    const ascPos = _wdAscensionNodeForWorld(wi);
+    if (ascPos) canvas.appendChild(_wdBuildAscensionNode(wi, ascPos));
+}
+
+/**
+ * Returns the Ascension Trial node position for a world, or null when the
+ * world has none (the Nexus World) or the trial system is absent.
+ */
+function _wdAscensionNodeForWorld(wi) {
+    const cfg = (typeof WD_WORLD_CONFIGS !== 'undefined') ? WD_WORLD_CONFIGS[wi] : null;
+    if (!cfg || !cfg.ascensionNode) return null;
+    if (typeof globalThis._trialWorlds === 'function' && globalThis._trialWorlds().indexOf(wi) === -1) return null;
+    return cfg.ascensionNode;
+}
+
+/**
+ * Builds the Ascension Trial node that follows a world's last level: same
+ * base classes as a level node, with the purple ascension star on top. It
+ * opens once the world's last level is cleared.
+ */
+function _wdBuildAscensionNode(wi, pos) {
+    const node = document.createElement('div');
+    node.className = 'wd-level-node wd-trial-node ascension';
+    node.dataset.ascensionTrial = wi;
+    _wdPositionNodeOnCanvas(node, wi, pos);
+
+    const isDone = (typeof globalThis._isAscensionTrialDone === 'function') && globalThis._isAscensionTrialDone(wi);
+    const isLocked = (typeof globalThis._isAscensionTrialUnlocked === 'function') ? !globalThis._isAscensionTrialUnlocked(wi) : true;
+    if (isDone) node.classList.add('done');
+    else if (isLocked) node.classList.add('locked');
+
+    const icon = isLocked ? '🔒' : '⚗️';
+    node.innerHTML = _wdBuildNodeEffectsHtml(icon, _wdBuildStoxelAuraHtml(isDone), '', '', _wdBuildAscensionHtml(isDone));
+
+    if (!isLocked) node.addEventListener('click', () => _wdOnAscensionNodeClick(wi));
+    node.addEventListener('mouseenter', (e) => _wdShowAscensionTooltip(e, wi, isDone, isLocked));
+    node.addEventListener('mousemove', (e) => _wdMoveTooltip(e));
+    node.addEventListener('mouseleave', () => _wdHideTooltip());
+    return node;
+}
+
+/**
+ * Handles a click on the Ascension Trial node: drops any open enter button,
+ * walks the sprite along the road from the last level, then shows the
+ * enter button on arrival.
+ */
+function _wdOnAscensionNodeClick(wi) {
+    const existing = document.getElementById('wd-enter-btn');
+    if (existing) existing.remove();
+    _wdWalkSpriteTo(wi, 'ascension', () => _wdShowAscensionEnterButton(wi));
+}
+
+/**
+ * Shows the "Enter Ascension Trial" button above the Ascension Trial node.
+ */
+function _wdShowAscensionEnterButton(wi) {
+    const existing = document.getElementById('wd-enter-btn');
+    if (existing) existing.remove();
+
+    const cfg = WD_WORLD_CONFIGS[wi];
+    const pos = cfg && cfg.ascensionNode;
+    if (!pos) return;
+
+    const name = (typeof globalThis._ascensionTrialName === 'function') ? globalThis._ascensionTrialName(wi) : ('Ascension Trial - World ' + (wi + 1));
+    const rawEnter = (typeof t === 'function') ? t('scr_enter_trial') : null;
+    const btnText = (rawEnter && rawEnter !== 'scr_enter_trial')
+        ? rawEnter.replace('{n}', name) : ('Enter ' + name);
+
+    const btn = document.createElement('button');
+    btn.id = 'wd-enter-btn';
+    btn.textContent = btnText;
+
+    const canvas = _wdGetCanvas();
+    const pct = _wdImgPctToCanvasPct(pos.x, pos.y, canvas, cfg);
+    btn.style.cssText = `
+        position: absolute;
+        left: ${pct.x}%;
+        top: calc(${pct.y}% - 56px);
+        transform: translateX(-50%);
+        z-index: 10;
+        font-family: var(--PX, monospace);
+        font-size: 11px;
+        padding: 5px 12px;
+        background: #7a4fc0;
+        color: #f3eaff;
+        border: none;
+        cursor: pointer;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    `;
+    btn.addEventListener('click', () => {
+        btn.remove();
+        if (typeof globalThis._launchAscensionTrial === 'function') globalThis._launchAscensionTrial(wi);
+    });
+    _wdWireEnterButtonDismiss(btn);
+    if (canvas) canvas.appendChild(btn);
+}
+
+/**
+ * Ascension Trial tooltip: trial name, status, monster level / boss preview
+ * and a note that it ends in a boss fight.
+ */
+function _wdShowAscensionTooltip(e, wi, isDone, isLocked) {
+    const tip = _wdEnsureTooltip();
+    const name = (typeof globalThis._ascensionTrialName === 'function') ? globalThis._ascensionTrialName(wi) : ('Ascension Trial - World ' + (wi + 1));
+    let status = isLocked ? t('scr_locked') : (isDone ? t('scr_trial_done') : t('scr_not_completed'));
+    if (!status || status.indexOf('scr_') === 0) {
+        status = isLocked ? 'Locked' : (isDone ? 'Completed' : 'Not completed');
+    }
+    let detail = '';
+    if (!isLocked && typeof globalThis._trialMonsterLevel === 'function') {
+        const ml = globalThis._trialMonsterLevel(wi, true);
+        let bossName = '';
+        try {
+            const def = globalThis.BOSS_DEFS && globalThis.BOSS_DEFS[globalThis._trialBossId(wi, 1)];
+            if (def) bossName = ' · ' + (def.emoji ? def.emoji + ' ' : '') + (def.name || '');
+        } catch (err) { /* boss preview is optional */ }
+        const lvlLabel = t('scr_trial_level');
+        detail = `<div class="wd-tip-sub">${(lvlLabel && lvlLabel !== 'scr_trial_level' ? lvlLabel : 'Monster level')}: ${ml}${bossName}</div>`;
+    }
+    let hint = '';
+    if (!isLocked && !isDone) {
+        const rawAsc = t('scr_ascension_trial_hint');
+        hint = `<div class="wd-tip-bonus">${(rawAsc && rawAsc !== 'scr_ascension_trial_hint') ? rawAsc : '⚗️ Trial chain - ends in a boss fight'}</div>`;
+    }
+    const badge = t('scr_ascension_badge');
+    tip.innerHTML = `<div class="wd-tip-title">${(badge && badge.indexOf('scr_') !== 0 ? badge + ' · ' : '⚗️ ')}${name}</div>`
+        + `<div class="wd-tip-status">${status}</div>${detail}${hint}`;
+    tip.classList.add('show');
+    _wdMoveTooltip(e);
 }
 
 /**
@@ -1932,14 +2081,6 @@ function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergenc
         ? `<div class="wd-tip-bonus syla">🌿 ${t('scr_syla_forest_tip')}</div>`
         : '';
 
-    // Ascension levels are fought as mini-map trial chains ending in a boss.
-    const isAscensionNode = isLastInWorld && !isNexusPoint;
-    let ascLine = '';
-    if (isAscensionNode && !isLocked) {
-        const rawAsc = t('scr_ascension_trial_hint');
-        ascLine = `<div class="wd-tip-bonus">${(rawAsc && rawAsc !== 'scr_ascension_trial_hint') ? rawAsc : '⚗️ Trial chain - ends in a boss fight'}</div>`;
-    }
-
     tip.innerHTML = `
         <div class="wd-tip-header">
             <span class="mv-tooltip-title">${typeLabel}${wi + 1}-${li + 1}${hint ? ' · ' + hint : ''}</span>
@@ -1951,7 +2092,6 @@ function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergenc
         ${modTagsHtml}
         ${bonusHtml}
         ${sylaLine}
-        ${ascLine}
     `;
     tip.classList.add('show');
     _wdMoveTooltip(e);

@@ -332,6 +332,12 @@ export function checkWorldCompletion() {
     if (!STATE.classWorldsCompleted) STATE.classWorldsCompleted = [];
     if (STATE.classWorldsCompleted.includes(wi)) return;
 
+    // Every other world finishes with its ascension trial, which runs the
+    // class flow itself once it is won (clearing the last level alone is not
+    // the end of the world any more).
+    const isNexus = typeof globalThis.isNexusWorld === 'function' && globalThis.isNexusWorld(wi);
+    if (!isNexus && !(STATE.ascensionTrialsDone || []).includes('asc_' + (wi + 1))) return;
+
     // Nexus World special case: its Ascension Level grants a one-time
     // CLASS CHANGE TOKEN instead of the normal upgrade/ascendency flow.
     // The token is spent from the class-change screen (topbar button).

@@ -376,7 +376,7 @@ import { TRIX_INTRO_IMAGE_PATH, TRIX_INTRO_SONG } from '../../js/storyline/story
 import { SYLA_INTRO_IMAGE_PATH, SYLA_INTRO_SONG } from '../../js/storyline/storyline-intro-syla.js';
 import { REGION_BEAT_TRIGGER_LEVEL, REPLAY_GALLERY_ENTRIES, STORY_BEATS } from '../../js/storyline/storyline-beats.js';
 import { EG_TEST_MAPS, _egtEnsureStyles, _egtPickSeedGi, showEndgameTestHub, _egLaunchTestMap } from '../../js/dev/endgame-testing-screen.js';
-import { _ascensionTrialName, _cleanupCampaignTrialSeed, _endCampaignTrial, _ensureTrialState, _grantAscensionTrialReward, _grantConvergenceTrialReward, _isAscensionTrialDone, _isAscensionTrialRun, _isConvergenceTrialRun, _isTrialDone, _isTrialRun, _isTrialUnlocked, _launchAscensionTrial, _launchCampaignTrial, _launchTrialRun, _maybeLaunchAscensionTrial, _retitleLeaveMapTransition, _routeTrialReturn, _servePostTrialFlows, _trialBossId, _trialChainParams, _trialCount, _trialIdForWorld, _trialMonsterLevel, _trialName, _trialTriggerLevels, _trialWorldStartGi, _trialWorlds } from '../../js/campaign-trials.js';
+import { _ascensionTrialName, _cleanupCampaignTrialSeed, _endCampaignTrial, _ensureTrialState, _grantAscensionTrialReward, _grantConvergenceTrialReward, _isAscensionTrialDone, _isAscensionTrialRun, _isAscensionTrialUnlocked, _isConvergenceTrialRun, _isTrialDone, _isTrialRun, _isTrialUnlocked, _launchAscensionTrial, _launchCampaignTrial, _launchTrialRun, _retitleLeaveMapTransition, _routeTrialReturn, _servePostTrialFlows, _trialBossId, _trialChainParams, _trialCount, _trialIdForWorld, _trialMonsterLevel, _trialName, _trialTriggerLevels, _trialWorldStartGi, _trialWorlds } from '../../js/campaign-trials.js';
 import { AssetPreload } from '../../js/asset-preload.js';
 import '../../js/boot-loader.js';
 import { DevTest, _devTestNormalizeScale, _devTestParam } from '../../js/dev/dev-testing.js';
@@ -544,6 +544,7 @@ try { Object.defineProperty(globalThis, "_arcaneFreeze_applyPersistentFrost", { 
 try { Object.defineProperty(globalThis, "_arcaneFreeze_clearAllFrostAndStalagmites", { get() { return _arcaneFreeze_clearAllFrostAndStalagmites; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_arcaneFreeze_clearStalagmiteIfWrongMarkGone", { get() { return _arcaneFreeze_clearStalagmiteIfWrongMarkGone; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_arcaneFreeze_spawnStalagmite", { get() { return _arcaneFreeze_spawnStalagmite; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_ascensionTrialName", { get() { return _ascensionTrialName; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_autoClaimDropsOnReveal", { get() { return _autoClaimDropsOnReveal; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_avatarGetMoveSpeed", { get() { return _avatarGetMoveSpeed; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_avatarMoveState", { get() { return _avatarMoveState; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -681,6 +682,8 @@ try { Object.defineProperty(globalThis, "_hidePlayerAvatarSimple", { get() { ret
 try { Object.defineProperty(globalThis, "_hideQuestRewardTooltip", { get() { return _hideQuestRewardTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_incDirect", { get() { return _incDirect; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_isActive", { get() { return _isActive; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_isAscensionTrialDone", { get() { return _isAscensionTrialDone; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_isAscensionTrialUnlocked", { get() { return _isAscensionTrialUnlocked; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_isCampaignRun", { get() { return _isCampaignRun; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_isCellCorrupted", { get() { return _isCellCorrupted; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_isCellFrozen", { get() { return _isCellFrozen; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -696,6 +699,7 @@ try { Object.defineProperty(globalThis, "_keybindNormalize", { get() { return _k
 try { Object.defineProperty(globalThis, "_lapFailPunish", { get() { return _lapFailPunish; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_lapGhostForm", { get() { return _lapGhostForm; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_lastFacingDir", { get() { return _lastFacingDir; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_launchAscensionTrial", { get() { return _launchAscensionTrial; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_launchBossTest", { get() { return _launchBossTest; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_launchCampaignTrial", { get() { return _launchCampaignTrial; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_ledger_openCategory", { get() { return _ledger_openCategory; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

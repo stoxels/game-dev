@@ -350,7 +350,7 @@ function buildLevelCardClass({ isUnlocked, isDone, isMathGated, isLastInWorld, i
         (isUnlocked ? '' : ' locked') +
         (isDone ? ' done' : '') +
         (isMathGated && isUnlocked ? ' math-gated' : '') +
-        (isLastInWorld && w.data.length > 1 ? ' ascension' : '') +
+        (isNexusPoint && w.data.length > 1 ? ' ascension' : '') +
         (isNexusPoint ? ' nexus-point' : '') +
         (isConvergenceLevel ? ' convergence' : '') +
         (isMaxCleared(gi) ? ' max-cleared' : '');
@@ -398,13 +398,12 @@ function buildGridSizeStr(p, w) {
         : (w.size ? `${w.size}×${w.size}` : '?');
 }
 
-// Returns the ASCENSION badge HTML for the final level of a world.
-// Only shown when the world has more than one level.
-// The Nexus Point shows its own badge instead of the Ascension badge.
+// Returns the Nexus Point badge HTML for the final level of the Nexus World.
+// Every other world's last level is a normal level (its Ascension Trial is a
+// separate node on the world map), so it carries no badge.
 function buildAscensionBadge(isLastInWorld, w, isNexusPoint) {
-    if (!isLastInWorld || w.data.length <= 1) return '';
-    if (isNexusPoint) return `<div class="lc-ascension-badge lc-nexus-point-badge">${t('scr_nexus_point_badge')}</div>`;
-    return `<div class="lc-ascension-badge">${t('scr_ascension_badge')}</div>`;
+    if (!isLastInWorld || !isNexusPoint || w.data.length <= 1) return '';
+    return `<div class="lc-ascension-badge lc-nexus-point-badge">${t('scr_nexus_point_badge')}</div>`;
 }
 
 // Returns the CONVERGENCE badge HTML, with a checkmark if the reward is already claimed.
