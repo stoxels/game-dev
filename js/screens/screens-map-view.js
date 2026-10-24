@@ -67,18 +67,18 @@ const MAP_HOME_POS = { x: 7.6, y: 86.3 };
 const MAP_WORLD_POSITIONS = [
     { x: 25, y: 83.1, labelEN: "Probability Peaks", labelDE: "Probability Peaks" },
     { x: 34.5, y: 88.6, labelEN: "The Distribution Den", labelDE: "The Distribution Den" },
-    { x: 14, y: 57, labelEN: "Sampling Savanna", labelDE: "Sampling Savanna" },
+    { x: 7.8, y: 63.5, labelEN: "Sampling Savanna", labelDE: "Sampling Savanna" },
     { x: 42.8, y: 63.1, labelEN: "The Vortex of Possibilities", labelDE: "The Vortex of Possibilities" },
     { x: 64.3, y: 60.4, labelEN: "Regression Rift", labelDE: "Regression Rift" },
     { x: 61.6, y: 51.2, labelEN: "Frequency Forest", labelDE: "Frequency Forest" },
     { x: 73.3, y: 44.1, labelEN: "Stochapolis", labelDE: "Stochapolis" },
-    { x: 78.0, y: 60.0, labelEN: "Hypothesis Hinterlands", labelDE: "Hypothesis Hinterlands" },
-    { x: 87.0, y: 77.3, labelEN: "Data Delta", labelDE: "Data Delta" },
+    { x: 78, y: 60, labelEN: "Hypothesis Hinterlands", labelDE: "Hypothesis Hinterlands" },
+    { x: 87, y: 77.3, labelEN: "Data Delta", labelDE: "Data Delta" },
     { x: 91.5, y: 32.6, labelEN: "Parameter Plains", labelDE: "Parameter Plains" },
     { x: 71.1, y: 16.6, labelEN: "Null Hypothesis Void", labelDE: "Null Hypothesis Void" },
     { x: 37.5, y: 39.9, labelEN: "Bayesian Bay", labelDE: "Bayesian Bay" },
-    { x: 35.1, y: 22.5, labelEN: "Expectation Plateau", labelDE: "Expectation Plateau" },
-    { x: 49.6, y: 15.0, labelEN: "Nexus World", labelDE: "Nexus World" },
+    { x: 32.9, y: 25.3, labelEN: "Expectation Plateau", labelDE: "Expectation Plateau" },
+    { x: 49.6, y: 15, labelEN: "Nexus World", labelDE: "Nexus World" },
 ];
 
 // Road segments that define the visual paths drawn on the map.
@@ -90,262 +90,229 @@ const MAP_WORLD_POSITIONS = [
 // The BFS pathfinder traverses this graph in both directions, so order
 // of n1/n2 does not matter for routing - only the waypoint order matters
 // for visual drawing and sprite movement direction.
+// Optional showAfterWorld: the road only opens for walking once that world
+// (0-based index) is fully cleared. MAP-EDITOR.bat edits this whole table.
 // Coordinates are percentages of the background IMAGE.
 const ROAD_SEGMENTS = [
     {
         n1: 'home',
         n2: 'fork01',
         waypoints: [
-            { x: 7.6, y: 86.3 },  // ← Automatically added MAP_HOME_POS starting point
-            { x: 11.9, y: 91.0 },
-            { x: 13.0, y: 91.6 },
-            { x: 15.5, y: 91.3 },
-            { x: 17.4, y: 91.9 },
-            { x: 19.7, y: 92.2 },
-            { x: 21.5, y: 91.7 },
-            { x: 24.8, y: 91.4 }, // ← Official junction point for 'fork01'
+            { x: 7.6, y: 86.3 },
+            { x: 10.7, y: 88.1 },
+            { x: 13.3, y: 89.1 },
+            { x: 15.5, y: 90.4 },
+            { x: 17.5, y: 91 },
+            { x: 19.8, y: 91.3 },
+            { x: 21.7, y: 91.6 },
+            { x: 24.8, y: 91.4 }
         ]
     },
-
     {
         n1: 'fork01',
-        n2: 0, // World 1: Probability Peaks
+        n2: 0,
         waypoints: [
-            { x: 24.8, y: 91.4 }, // ← Automatically added fork01 junction point
+            { x: 24.8, y: 91.4 },
             { x: 24.7, y: 88.7 },
-            { x: 24.4, y: 84.8 },
-            { x: 25.0, y: 83.1 }, // ← Automatically added World 1 position
+            { x: 25.1, y: 83.6 },
+            { x: 25, y: 83.1 }
         ]
     },
-
     {
         n1: 'fork01',
-        n2: 1, // World 2: The Distribution Den
+        n2: 1,
         waypoints: [
-            { x: 24.8, y: 91.4 }, // ← Automatically added fork01 junction point
+            { x: 24.8, y: 91.4 },
             { x: 26.6, y: 91.4 },
-            { x: 28.0, y: 91.4 },
+            { x: 28, y: 91.4 },
             { x: 29.6, y: 91.4 },
             { x: 30.9, y: 91.4 },
             { x: 33.8, y: 91.4 },
-            { x: 34.5, y: 88.6 }, // ← Automatically added World 2 position
+            { x: 34.5, y: 88.6 }
         ]
     },
-
     {
         n1: 'home',
-        n2: 2, // World 3: Sampling Savanna
+        n2: 2,
         waypoints: [
-            { x: 7.6, y: 86.3 },  // ← Automatically added MAP_HOME_POS starting point
-            { x: 7.4, y: 74.8 },
-            { x: 7.6, y: 71.8 },
-            { x: 8.3, y: 67.9 },
-            { x: 10.6, y: 65.6 },
-            { x: 12.4, y: 63.1 },
-            { x: 13.9, y: 60.7 },
-            { x: 13.4, y: 57.1 },
-            { x: 14.0, y: 57.0 }, // ← Automatically added World 3 position
+            { x: 7.6, y: 86.3 },
+            { x: 7.3, y: 80.4 },
+            { x: 7.1, y: 75.9 },
+            { x: 7.2, y: 73 },
+            { x: 7.2, y: 70.8 },
+            { x: 7.4, y: 68.6 },
+            { x: 7.6, y: 66.5 },
+            { x: 7.7, y: 63.6 },
+            { x: 7.8, y: 63.5 }
         ]
     },
-
     {
         n1: 1,
-        n2: 3, // World 4: The Vortex of Possibilities
+        n2: 3,
         waypoints: [
-            { x: 34.5, y: 88.6 }, // ← Automatically added World 2 starting point
-            { x: 34.0, y: 79.2 },
-            { x: 35.1, y: 75.1 },
-            { x: 37.1, y: 72.7 },
-            { x: 39.0, y: 70.8 },
-            { x: 41.3, y: 68.8 },
-            { x: 43.9, y: 68.1 },
-            { x: 45.4, y: 67.2 },
-            { x: 48.5, y: 66.8 },
-            { x: 42.8, y: 63.1 }, // ← Automatically added World 4 position
+            { x: 34.5, y: 88.6 },
+            { x: 34.5, y: 80.9 },
+            { x: 35.5, y: 76.8 },
+            { x: 37.2, y: 73.7 },
+            { x: 38.1, y: 69.6 },
+            { x: 38.9, y: 66.7 },
+            { x: 39.8, y: 64.6 },
+            { x: 41, y: 63.5 },
+            { x: 42.8, y: 63.5 },
+            { x: 42.8, y: 63.1 }
         ]
     },
-
     {
         n1: 3,
         n2: 'fork45',
         waypoints: [
-            { x: 42.8, y: 63.1 }, // ← Automatically added World 4 starting point
+            { x: 42.8, y: 63.1 },
             { x: 52.3, y: 64.9 },
             { x: 54.7, y: 63.8 },
             { x: 57.7, y: 61.6 },
             { x: 59.6, y: 59.2 },
-            { x: 61.8, y: 56.4 }, // ← Official junction point for 'fork45'
+            { x: 61.8, y: 56.4 }
         ]
     },
-
     {
         n1: 'fork45',
-        n2: 4, // World 5: Regression Rift
+        n2: 4,
         waypoints: [
-            { x: 61.8, y: 56.4 }, // ← Automatically added fork45 junction point
-            { x: 64.3, y: 60.4 }  // ← Automatically added World 5 position
+            { x: 61.8, y: 56.4 },
+            { x: 64.3, y: 60.4 }
         ]
     },
-
     {
         n1: 'fork45',
-        n2: 5, // World 6: Frequency Forest
+        n2: 5,
         waypoints: [
-            { x: 61.8, y: 56.4 }, // ← Automatically added fork45 junction point
-            { x: 61.6, y: 51.2 }  // ← Automatically added World 6 position
+            { x: 61.8, y: 56.4 },
+            { x: 61.6, y: 51.2 }
         ]
     },
-
     {
         n1: 'fork45',
         n2: 'fork67',
         waypoints: [
-            { x: 61.8, y: 56.4 }, // ← Automatically added fork45 junction point
-            { x: 66.5, y: 55.7 },
-            { x: 69.1, y: 55.2 },
-            { x: 71.4, y: 54.2 },
-            { x: 74.0, y: 52.8 }, // ← Official junction point for 'fork67'
+            { x: 61.8, y: 56.4 },
+            { x: 74, y: 52.8 }
         ]
     },
-
     {
-        n1: 4, // World 5: Regression Rift
+        n1: 4,
         n2: 'fork67',
         waypoints: [
-            { x: 64.3, y: 60.4 }, // ← Automatically added World 5 position
-            { x: 74.0, y: 52.8 }  // ← Automatically added fork67 junction point
+            { x: 64.3, y: 60.4 },
+            { x: 74, y: 52.8 }
         ]
     },
-
     {
-        n1: 5, // World 6: Frequency Forest
+        n1: 5,
         n2: 'fork67',
         waypoints: [
-            { x: 61.6, y: 51.2 }, // ← Automatically added World 6 position
-            { x: 74.0, y: 52.8 }  // ← Automatically added fork67 junction point
+            { x: 61.6, y: 51.2 },
+            { x: 74, y: 52.8 }
         ]
     },
-
     {
-        n1: 7, // World 8: Hypothesis Hinterlands
-        n2: 8, // World 9: Data Delta
+        n1: 7,
+        n2: 8,
         waypoints: [
-            { x: 78.0, y: 60.0 }, // ← Automatically added World 8 starting point
-            { x: 78.8, y: 63.6 },
-            { x: 80.0, y: 65.0 },
-            { x: 81.3, y: 67.4 },
-            { x: 82.6, y: 68.9 },
-            { x: 84.4, y: 71.3 },
-            { x: 85.5, y: 73.1 },
-            { x: 86.8, y: 76.6 },
-            { x: 87.0, y: 77.3 }, // ← Automatically added World 9 position
+            { x: 78, y: 60 },
+            { x: 87, y: 77.3 }
         ]
     },
-
     {
         n1: 'fork67',
-        n2: 6, // World 7: Stochapolis
+        n2: 6,
         waypoints: [
-            { x: 74.0, y: 52.8 }, // ← Automatically added fork67 junction point
-            { x: 73.3, y: 44.1 }  // ← Automatically added World 7 position
+            { x: 74, y: 52.8 },
+            { x: 73.3, y: 44.1 }
         ]
     },
-
     {
         n1: 'fork67',
-        n2: 7, // World 8: Hypothesis Hinterlands
+        n2: 7,
         waypoints: [
-            { x: 74.0, y: 52.8 }, // ← Automatically added fork67 junction point
-            { x: 78.0, y: 60.0 }  // ← Automatically added World 8 position
+            { x: 74, y: 52.8 },
+            { x: 78, y: 60 }
         ]
     },
-
     {
         n1: 'fork67',
-        n2: 9, // World 10: Parameter Plains
+        n2: 9,
         waypoints: [
-            { x: 74.0, y: 52.8 }, // ← Automatically added fork67 junction point
+            { x: 74, y: 52.8 },
             { x: 78.5, y: 51.9 },
             { x: 80.4, y: 50.4 },
             { x: 82.8, y: 48.7 },
-            { x: 85.3, y: 47.0 },
-            { x: 86.6, y: 44.9 },
-            { x: 87.3, y: 41.3 },
-            { x: 89.0, y: 38.0 },
-            { x: 91.7, y: 32.8 },
-            { x: 91.5, y: 32.6 }  // ← Automatically added World 10 position
+            { x: 85.3, y: 47 },
+            { x: 86.8, y: 45.1 },
+            { x: 87.8, y: 42.5 },
+            { x: 90.1, y: 38.6 },
+            { x: 91.7, y: 32.9 },
+            { x: 91.5, y: 32.6 }
         ]
     },
-
     {
-        n1: 9, // World 10: Parameter Plains
-        n2: 10, // World 11: Null Hypothesis Void
+        n1: 9,
+        n2: 10,
         waypoints: [
-            { x: 91.5, y: 32.6 }, // ← Automatically added World 10 starting point
-            { x: 85.9, y: 27.6 },
-            { x: 81.1, y: 27.3 },
-            { x: 77.3, y: 26.1 },
-            { x: 75.0, y: 24.2 },
-            { x: 73.1, y: 22.1 },
-            { x: 71.0, y: 17.5 },
-            { x: 71.1, y: 16.6 }  // ← Automatically added World 11 position
+            { x: 91.5, y: 32.6 },
+            { x: 85.9, y: 30.5 },
+            { x: 81.2, y: 28.9 },
+            { x: 77.1, y: 27.2 },
+            { x: 74.9, y: 25.1 },
+            { x: 72.8, y: 22.4 },
+            { x: 71.1, y: 16.5 },
+            { x: 71.1, y: 16.6 }
         ]
     },
-
     {
-        n1: 10, // World 11: Null Hypothesis Void
+        n1: 10,
         n2: 'junction1112nexus',
         waypoints: [
-            { x: 71.1, y: 16.6 }, // ← Automatically added World 11 starting point
-            { x: 67.2, y: 17.6 },
-            { x: 64.9, y: 20.0 },
-            { x: 61.3, y: 21.1 },
-            { x: 58.7, y: 23.1 },
+            { x: 71.1, y: 16.6 },
+            { x: 67.1, y: 18.3 },
+            { x: 64.9, y: 20 },
+            { x: 61.1, y: 22.7 },
+            { x: 58.6, y: 24.4 },
             { x: 56.3, y: 25.9 },
             { x: 53.7, y: 27.3 },
             { x: 51.3, y: 28.6 },
-            { x: 48.4, y: 30.5 }, // ← Official junction point for 'junction1112nexus'
+            { x: 48.4, y: 30.5 }
         ]
     },
-
     {
         n1: 'junction1112nexus',
-        n2: 11, // World 12: Bayesian Bay
+        n2: 11,
         waypoints: [
-            { x: 48.4, y: 30.5 }, // ← Automatically added junction point
-            { x: 37.5, y: 39.9 }  // ← Automatically added World 12 position
+            { x: 48.4, y: 30.5 },
+            { x: 37.5, y: 39.9 }
         ]
     },
-
     {
         n1: 'junction1112nexus',
-        n2: 12, // World 13: Expectation Plateau
+        n2: 12,
         waypoints: [
-            { x: 48.4, y: 30.5 }, // ← Automatically added junction point
-            { x: 35.1, y: 22.5 }  // ← Automatically added World 13 position
+            { x: 48.4, y: 30.5 },
+            { x: 32.9, y: 25.3 }
         ]
     },
-
     {
         n1: 'junction1112nexus',
-        n2: 13, // World 14: Nexus World (secret campaign world)
+        n2: 13,
         waypoints: [
-            { x: 48.4, y: 30.5 }, // ← Automatically added junction point
-            { x: 49.6, y: 15.0 }  // ← Automatically added Nexus World position
+            { x: 48.4, y: 30.5 },
+            { x: 49.6, y: 15 }
         ]
     },
-
     {
-        n1: 12, // World 13: Expectation Plateau
-        n2: 11, // World 12: Bayesian Bay
+        n1: 12,
+        n2: 11,
         waypoints: [
-            { x: 35.1, y: 22.5 }, // ← Automatically added World 13 starting point
-            { x: 36.6, y: 25.1 },
-            { x: 37.6, y: 28.7 },
-            { x: 38.1, y: 30.9 },
-            { x: 37.3, y: 34.9 },
-            { x: 37.3, y: 38.4 },
-            { x: 37.5, y: 39.9 }  // ← Automatically added World 12 position
+            { x: 32.9, y: 25.3 },
+            { x: 37.5, y: 39.9 }
         ]
     },
 ];
@@ -579,7 +546,11 @@ function _buildRoadGraph() {
         adj.get(kb).push({ neighbor: ka, segment, reversed: true });
     };
 
-    ROAD_SEGMENTS.forEach(seg => addEdge(seg.n1, seg.n2, seg));
+    // A road with showAfterWorld only opens once that world is fully cleared.
+    ROAD_SEGMENTS.forEach(seg => {
+        if (seg.showAfterWorld !== undefined && !_isWorldFullyDone(seg.showAfterWorld)) return;
+        addEdge(seg.n1, seg.n2, seg);
+    });
     return adj;
 }
 

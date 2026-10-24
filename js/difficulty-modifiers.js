@@ -30,10 +30,13 @@ export const DIFF_CFG = {
 // timers and no cap.
 export const CAMPAIGN_BUDGET_ACTIVE = true;
 export const CAMPAIGN_BASE_TIME_SECS = { small: 300, medium: 600, large: 900 };
+// Tuning pass 2 (reworked smaller puzzles, validated with the playtest
+// bot in dev/tools/playtest/mc.mjs): halved across the table so the cap
+// binds again for casual players (it decided ~2% of bot losses before).
 export const CAMPAIGN_MISTAKE_CAPS = {
-    easy: { small: 15, medium: 25, large: 35 },
-    normal: { small: 10, medium: 15, large: 20 },
-    hard: { small: 5, medium: 10, large: 15 },
+    easy: { small: 8, medium: 13, large: 18 },
+    normal: { small: 5, medium: 8, large: 10 },
+    hard: { small: 3, medium: 5, large: 8 },
 };
 
 const CAMPAIGN_SIZE_ORDER = ['small', 'medium', 'large'];

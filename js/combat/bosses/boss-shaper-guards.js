@@ -6,7 +6,8 @@ import { SHP_COLOR, _SHP_DEBUG_MULT, _shpPC, _shpPlace, _shpShards, _shpTouch } 
 //------------------------------------------------------------------------
 // Frost Monoliths: rune obelisks rise at the edges and each grows a wall of
 // ice toward the middle. Walk into a monolith three times to shatter it and
-// make its wall crumble. Unbroken ones shatter by themselves after a while.
+// make its wall crumble. The wall runs right across the arena and, once fully
+// grown, sweeps round like a clock hand until the monolith shatters by itself.
 // Ice Walkers: snowmen rise from a frost circle and stalk you, leaving
 // frozen footprints. Touching one shatters it (a hit plus flying shards);
 // left alone it bursts after a few seconds.
@@ -18,8 +19,9 @@ const MONO_HITS = 3;                          // walk-ins that shatter one
 const MONO_RAM_R = 52;                        // px from its centre that counts as a walk-in
 const MONO_RAM_CD_MS = 480;                   // between two walk-ins
 const MONO_WARN_MS = 1100;                    // monolith rises and the wall path shows before the wall grows
-const MONO_GROW = [0, 0, 120, 135];           // px/s the wall extends
-const MONO_LIFE_MS = 10500;                   // unbroken monoliths shatter after this
+const MONO_GROW = [0, 0, 230, 260];           // px/s the wall extends
+const MONO_SWEEP = [0, 0, 15, 21];            // deg/s a fully grown wall turns around its monolith (the unbroken ones sweep the arena)
+const MONO_LIFE_MS = 13000;                   // unbroken monoliths shatter after this
 const MONO_WALL_START = 74;                   // the wall begins this far from the monolith, so ramming never touches it
 const MONO_WALL_REACH = 15;                   // px from the wall's centre line that bites
 const MONO_WALL_DMG = 0.10;                   // %maxHP for touching a wall
@@ -65,7 +67,7 @@ function _monoBuild(run, spot) {
     const W = window.innerWidth, H = window.innerHeight - 70;
     const ang = Math.atan2(H / 2 - y, W / 2 - x);
     const sx = x + Math.cos(ang) * MONO_WALL_START, sy = y + Math.sin(ang) * MONO_WALL_START;
-    const len = Math.max(0, Math.hypot(W / 2 - sx, H / 2 - sy));
+    const len = Math.max(0, Math.hypot(W / 2 - sx, H / 2 - sy)) * 1.9;   // runs right across the arena
     const el = _nkEl(run, 'div', 'sx-shp-mono');
     el.innerHTML = '<i class="sx-shp-mono-ring"></i><b class="sx-shp-mono-body"></b><span class="sx-shp-mono-pips"><i></i><i></i><i></i></span>';
     _shpPlace(el, x, y, 30, 44);
@@ -78,7 +80,7 @@ function _monoBuild(run, spot) {
     });
     preview.style.width = Math.round(len) + 'px';
     wall.style.width = '0px';
-    return { x, y, sx, sy, ang, len, el, preview, wall, hp: MONO_HITS, dead: false, grown: 0 };
+    return { x, y, sx, sy, ang, len, el, preview, wall, hp: MONO_HITS, dead: false, grown: 0, sweepDir: Math.random() < 0.5 ? -1 : 1 };
 }
 
 // Shatters a monolith (broken by the player, or timed out): shards, and the
@@ -109,6 +111,10 @@ function _monoWallStep(m, st, ctx) {
     m.grown = Math.min(m.len, (st.t - MONO_WARN_MS * _SHP_DEBUG_MULT) / 1000 * MONO_GROW[ctx.p] / _SHP_DEBUG_MULT);
     m.wall.style.width = Math.round(Math.max(0, m.grown)) + 'px';
     m.preview.classList.add('sx-shp-wall-preview-off');
+    if (m.grown >= m.len) {
+        m.ang += m.sweepDir * MONO_SWEEP[ctx.p] * Math.PI / 180 * (st.dtS / _SHP_DEBUG_MULT);
+        m.wall.style.rotate = (m.ang * 180 / Math.PI) + 'deg';
+    }
     const ex = m.sx + Math.cos(m.ang) * m.grown, ey = m.sy + Math.sin(m.ang) * m.grown;
     if (_ptSegDist(ctx.pc.x, ctx.pc.y, m.sx, m.sy, ex, ey) < MONO_WALL_REACH) _shpTouch(MONO_WALL_DMG, ctx.level, 'Frost Wall');
 }
@@ -124,6 +130,7 @@ export function _mechShpMonoliths(monster, phase) {
     _nkToast('eg_mech_shp_monos', '❄️ FROST MONOLITHS - walk into each one 3 times to shatter it!', SHP_COLOR);
     _nkLoop(run, (dtS, now) => {
         st.t += dtS * 1000;
+        st.dtS = dtS;
         const ctx = { p, level, pc: _shpPC() };
         if (st.endAt) return st.t < st.endAt;
         if (st.t >= MONO_LIFE_MS * _SHP_DEBUG_MULT) monos.forEach(m => { if (!m.dead) _monoBreak(m, false); });

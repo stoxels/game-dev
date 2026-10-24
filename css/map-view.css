@@ -682,6 +682,43 @@
         fill: #00FF7F;
     }
 
+.wd-tree-leaf-pale {
+    fill: #eaffd0;
+    filter: drop-shadow(0 0 5px #eaffd0);
+    animation: wdLeafGlow 2.5s ease-in-out infinite alternate;
+}
+
+.wd-tree-sparkle {
+    stroke: #eafff0;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    fill: none;
+    animation: wdLeafGlow 1.8s ease-in-out infinite alternate;
+}
+
+.wd-tree-mote {
+    fill: #d6ff7a;
+    opacity: 0;
+    transform-box: fill-box;
+    animation: wdTreeMoteRise 3.4s ease-in-out infinite;
+}
+
+@keyframes wdTreeMoteRise {
+    0% {
+        transform: translateY(8px);
+        opacity: 0;
+    }
+
+    35% {
+        opacity: 0.95;
+    }
+
+    100% {
+        transform: translateY(-18px);
+        opacity: 0;
+    }
+}
+
 
 /* ========================================================================
    3D PROBABILITY GATE (MATH GATE)
@@ -921,6 +958,52 @@
 
     100% {
         transform: rotate(360deg);
+    }
+}
+
+/* Orbiting sparkles + core gem twinkle + rising embers */
+.wd-asc-orbit {
+    transform-origin: 70px 130px;
+    animation: wdAscStarSpin 9s infinite linear;
+}
+
+.wd-asc-orbit-dot {
+    fill: #ffe97a;
+    filter: drop-shadow(0 0 4px rgba(255, 233, 122, 0.9));
+}
+
+.wd-asc-core-gem {
+    animation: wdAscBeamPulse 2s infinite alternate ease-in-out;
+}
+
+.wd-asc-ember {
+    fill: #ffe97a;
+    opacity: 0;
+    transform-box: fill-box;
+    animation: wdAscEmberRise 2.8s ease-in-out infinite;
+}
+
+    .wd-asc-ember.delay-1 {
+        animation-delay: 0.7s;
+    }
+
+    .wd-asc-ember.delay-2 {
+        animation-delay: 1.4s;
+    }
+
+@keyframes wdAscEmberRise {
+    0% {
+        transform: translateY(6px);
+        opacity: 0;
+    }
+
+    35% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-20px);
+        opacity: 0;
     }
 }
 

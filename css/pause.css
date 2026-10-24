@@ -412,3 +412,16 @@
     /* Tutorial pause has no hero buttons: let the system block take the right column. */
     #pause-overlay.tq-pause .pm-section:not(.pm-features) { grid-row: 2 / 4; }
 }
+
+/* ── Trial / endgame pause: plain plate behind the loot list ───────────────
+   In loot mode (.sx-pause) the info panel holds nothing but the loot summary,
+   so the stretched Note-Banner art behind it only adds warped texture and
+   stray rune bands. It becomes a plain dark slab (the cream loot cards and
+   the normal campaign run-info banner are untouched). */
+#pause-overlay.sx-pause .pm-info {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(138, 122, 74, 0.35);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 0;
+}

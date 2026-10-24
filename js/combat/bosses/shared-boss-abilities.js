@@ -2744,7 +2744,7 @@ export function _nkFinaleWaves(monster, cfg) {
             zones.forEach(z => z.el.classList.add('sx-nk-fin-strike'));
             if (hit) {
                 const dealt = _nkHit(wave.dmg, cfg.element || null, level);
-                _nkAbilityHitToast(dealt, cfg.name, wave.label || cfg.title);
+                _nkAbilityHitToast(dealt, cfg.name, wave.label || cfg.title, !!(cfg.quiet || wave.quiet));
             }
             const old = zones.map(z => z.el);
             setTimeout(() => old.forEach(el => { try { el.remove(); } catch (e) {} }), 600);

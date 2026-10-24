@@ -231,6 +231,8 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'Banquet + Devour', desc: _bossTestTr('eg_boss_test_gourmet_devour', 'At 30% HP: 9.5s dessert bombardment. Devour (charge): 1.4s suction → swallow inside R150 (boss heals 2%). Fight the pull, stay out of the ring.') }
     ],
     'boss_stack': () => [
+        { name: 'Fit the Piece', desc: _bossTestTr('eg_boss_test_stack_place', 'All fight: the Stack cuts a gap into its tower and drops the matching piece. The piece FOLLOWS YOU sideways - line it up with the glowing gap to clear rows (boss damage, more for tall pieces and back-to-back fits). A miss seals the gap into garbage and the tower grows - too tall and the garbage floods the arena.') },
+        { name: 'Hold Slam', desc: _bossTestTr('eg_boss_test_stack_hold', 'Every ~22s: HOLD - a giant piece tracks YOUR column with a landing circle. Move out before it slams (shockwave + lingering terrain).') },
         { name: 'Hard Drop', desc: _bossTestTr('eg_boss_test_stack_harddrop', 'At 60% HP: 3 giant blocks fall on your column (touch + shockwave + lingering terrain). Leave the column.') },
         { name: 'Line Clear', desc: _bossTestTr('eg_boss_test_stack_lineclear', 'At 30% HP: 4 full-width rows detonate staggered - dodge vertically between rows.') },
         { name: 'Garbage Rise', desc: _bossTestTr('eg_boss_test_stack_garbage', 'Charge attack: gray rows flood 55% of the screen. Stay high (top 16% always clear) - standing inside ticks + flings.') }

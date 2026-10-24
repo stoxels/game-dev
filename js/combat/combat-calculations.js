@@ -205,9 +205,10 @@ export function _calcPlayerMeleeDamage(chargePct = 1) {
     // that tree's per-element increases.
     const rollEl = (min, max) => (min > 0 || max > 0) ? (min + Math.random() * (max - min)) * charge : 0;
     // A wand's bolt is spell-school damage: it also scales with spell damage and
-    // the tree's wand damage line (its physical share is zero).
-    const wandBoostPct = wandStrike ? (stats.spellDamageIncPct || 0) + (stats.wandDamageIncPct || 0) : 0;
-    const elemBase = (stats.elementalDamageIncPct || 0) + genericPct + wandBoostPct;
+    // the tree's wand damage line (its physical share is zero). Both the
+    // spell-power and the elemental shares only count at 75% for wands.
+    const wandBoostPct = wandStrike ? 0.75 * (stats.spellDamageIncPct || 0) + (stats.wandDamageIncPct || 0) : 0;
+    const elemBase = (wandStrike ? 0.75 : 1) * (stats.elementalDamageIncPct || 0) + genericPct + wandBoostPct;
     const fireMult = 1 + (elemBase + (stats.fireDamageIncPct || 0)) / 100;
     const coldMult = 1 + (elemBase + (stats.coldDamageIncPct || 0)) / 100;
     const lightningMult = 1 + (elemBase + (stats.lightningDamageIncPct || 0)) / 100;

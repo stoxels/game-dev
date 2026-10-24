@@ -1070,12 +1070,11 @@ const RIGS = {
             { n: 'body', x: 12, y: 4, px: 256, py: 480, par: null },
             { n: 'head', x: 186, y: 8, px: 300, py: 215, par: 'body' },
             { n: 'blockTL', x: 46, y: 24, px: 140, py: 140, par: 'body' },
-        ],
-        mechanics: {
-            block_fall: { anim: 'stk_fall', ms: () => 2000 },
-            fog_bank: { anim: 'stk_fog', ms: () => 2200 },
-            probability_shift: { anim: 'stk_shift', ms: () => 1800 },
-        },
+        ],            mechanics: {
+                block_fall: { anim: 'stk_fall', ms: () => 2000 },
+                hold_slam: { anim: 'stk_hold', ms: () => 2000 },
+                probability_shift: { anim: 'stk_shift', ms: () => 1800 },
+            },
     },
     // <<< rig boss_stack
     // >>> rig boss_sirus
@@ -7332,8 +7331,9 @@ Object.assign(FX, {
 // >>> poses boss_stack
 // ---- The Stack -------------------------------------------------------------
 // Block Fall: the head block chomps and puzzle blocks tumble down onto the
-//   board. Fog Bank: the tower sways and grey dust rolls in. Probability
-//   Shift: the loose top block flips over and marks hop between cells.
+//   board. Hold Slam: the tower leans toward your column and a giant piece
+//   slams down. Probability Shift: the loose top block flips over and
+//   marks hop between cells.
 Object.assign(POSES, {
     stk_fall(P, u) {
         const env = envOf(u, 0.15, 0.25), chomp = Math.abs(Math.sin(u * Math.PI * 5));
@@ -7341,11 +7341,13 @@ Object.assign(POSES, {
         P.blockTL.rot = -10 * env;
         P.body.dy = 3 * chomp * env;
     },
-    stk_fog(P, u) {
-        const env = envOf(u, 0.25, 0.25), w = Math.sin(u * Math.PI * 4);
-        P.body.rot = 2 * w * env;
-        P.head.rot = 4 * w * env;
-        P.blockTL.rot = -6 * w * env;
+    stk_hold(P, u) {
+        const env = envOf(u, 0.25, 0.25), slam = ease(u / 0.7);
+        P.body.rot = 3 * Math.sin(u * Math.PI * 2) * env;
+        P.head.dy = 14 * slam * env;
+        P.head.rot = -4 * slam * env;
+        P.blockTL.dy = -46 * Math.sin(Math.min(1, slam) * Math.PI) * env;
+        P.blockTL.rot = -8 * env;
     },
     stk_shift(P, u) {
         const flip = ease((u - 0.1) / 0.4);
@@ -7370,7 +7372,17 @@ Object.assign(FX, {
         }
         return 0;
     },
-    stk_fog(ctx, u) { _cueFog(ctx, u, '150,160,155'); return 0; },
+    stk_hold(ctx, u) {
+        const fade = 1 - ease((u - 0.8) / 0.2);
+        const k = ease(u / 0.7);
+        const x = 256, y = -60 + 420 * k;
+        ctx.save(); ctx.translate(x, y);
+        ctx.fillStyle = 'rgba(165,180,252,' + (0.85 * fade) + ')';
+        ctx.strokeStyle = 'rgba(30,30,35,' + fade + ')'; ctx.lineWidth = 5;
+        for (let i = 0; i < 4; i++) { ctx.fillRect(-78 + i * 40, -20, 38, 38); ctx.strokeRect(-78 + i * 40, -20, 38, 38); }
+        ctx.restore();
+        return 0;
+    },
     stk_shift(ctx, u) { _cueShift(ctx, u, '255,200,90'); return 0; },
 });
 // <<< poses boss_stack

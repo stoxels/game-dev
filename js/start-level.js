@@ -441,9 +441,23 @@ function _updateHUD() {
             nameEl.style.color = (typeof rarityColors === 'function')
                 ? rarityColors(egMap.rarity).color : '';
         } else {
-            nameEl.textContent = `${lvText(cur, 'hint')}`;
-            const { isAscension, isConvergence, isNexusPoint } = _getLevelSpecialStatus(cur);
-            nameEl.style.color = isNexusPoint ? '#7fd4ff' : isAscension ? '#c080ff' : isConvergence ? '#6dbf40' : '';
+            // Campaign trial run: the chained puzzles are random generated
+            // grids with glyph hints (e.g. "Ascending Node") and random
+            // world numbers, so the corner shows the trial's own name.
+            const trial = (typeof cur !== 'undefined' && cur && cur.campaignTrial)
+                || (typeof window !== 'undefined' && window._campaignTrial)
+                || (typeof globalThis !== 'undefined' && globalThis._mapDef && globalThis._mapDef.campaignTrial);
+            if (trial) {
+                nameEl.textContent = trial.name
+                    || t(trial.kind === 'ascension' ? 'eg_trial_kind_ascension' : 'eg_trial_kind_convergence');
+                nameEl.style.color = '';
+            } else {
+                nameEl.textContent = `${lvText(cur, 'hint')}`;
+                // Regular last levels are normal levels now (ascension trials live
+                // on their own nodes), so only the Nexus Point gets a tint here.
+                const { isConvergence, isNexusPoint } = _getLevelSpecialStatus(cur);
+                nameEl.style.color = isNexusPoint ? '#7fd4ff' : isConvergence ? '#6dbf40' : '';
+            }
         }
     }
 }

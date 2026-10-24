@@ -356,6 +356,36 @@ function _buildMapRunTooltipHTML() {
     return html;
 }
 
+// Returns the active campaign trial stamp (convergence / ascension), if the
+// current run is one. Mirrors _isTrialRun(): the stamp lives on the level,
+// on _mapDef, or on window - whichever survived the last chain transition.
+function _activeTrialStamp() {
+    if (typeof cur !== 'undefined' && cur && cur.campaignTrial) return cur.campaignTrial;
+    if (typeof globalThis !== 'undefined' && globalThis._mapDef && globalThis._mapDef.campaignTrial) {
+        return globalThis._mapDef.campaignTrial;
+    }
+    if (typeof window !== 'undefined' && window._campaignTrial) return window._campaignTrial;
+    return null;
+}
+
+// Tooltip for a campaign trial run: the trial name, its kind and the chain
+// limits. Never the chained puzzle's generated glyph hint, its random
+// world number (e.g. "12-0"), or a bonus objective - trials have none.
+function _buildTrialRunTooltipHTML(trial) {
+    const isAscension = trial && trial.kind === 'ascension';
+    const name = (trial && trial.name)
+        || t(isAscension ? 'eg_trial_kind_ascension' : 'eg_trial_kind_convergence');
+    const kindLabel = t(isAscension ? 'eg_trial_kind_ascension' : 'eg_trial_kind_convergence');
+    let html = `<strong>${name}</strong><br><span style="color:${isAscension ? '#c080ff' : '#6dbf40'}">${kindLabel}</span>`;
+    const def = (typeof globalThis !== 'undefined' && globalThis._mapDef) || cur;
+    const timeLimit = def && def.chainTimeLimit;
+    const maxMistakes = def && def.chainMaxMistakes;
+    if (timeLimit && maxMistakes) {
+        html += `<br>${t('eg_trial_run_rules').replace('{m}', Math.round(timeLimit / 60)).replace('{n}', maxMistakes)}`;
+    }
+    return html;
+}
+
 function _buildLevelNameTooltipHTML() {
     // Endgame map-device run: the corner HUD shows the map's name, so the
     // tooltip shows ONLY the map identity + its rolled launch modifiers.
@@ -363,6 +393,11 @@ function _buildLevelNameTooltipHTML() {
         && typeof _egMapModAffects === 'function') {
         return _buildMapRunTooltipHTML();
     }
+
+    // Campaign trial run: the corner HUD shows the trial's name, so the
+    // tooltip describes the trial - not the chained puzzle behind it.
+    const trial = _activeTrialStamp();
+    if (trial) return _buildTrialRunTooltipHTML(trial);
 
     if (!cur) return '';
     const gi = cur.gIdx;
@@ -395,9 +430,10 @@ function _buildLevelNameTooltipHTML() {
         html += `<br>${t('cg_tt_grid_class')} <b>${t(tierLabels[tier])}</b>`;
     }
 
-    const { isAscension, isConvergence, isNexusPoint } = _getLevelSpecialStatus(cur);
+    // Regular last levels are normal levels now (ascension trials live on
+    // their own nodes), so only the Nexus Point earns a special tooltip line.
+    const { isConvergence, isNexusPoint } = _getLevelSpecialStatus(cur);
     if (isNexusPoint) html += `<br><span style="color:#7fd4ff">${t('scr_nexus_point_badge')}</span>`;
-    else if (isAscension) html += `<br><span style="color:#c080ff">${t('cg_ascension_lvl')}</span>`;
     if (isConvergence) html += `<br><span style="color:#6dbf40">${t('cg_convergence_lvl')}</span>`;
 
     return html;

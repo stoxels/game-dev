@@ -900,7 +900,7 @@
     border-color: rgba(248, 113, 113, 0.95) !important;
     background: rgba(248, 113, 113, 0.16) !important;
     box-shadow: 0 0 26px rgba(248, 113, 113, 0.85) !important;
-    opacity: 0.45;
+    opacity: 0.65;
 }
 
 /* Warden totems */
@@ -4869,8 +4869,8 @@ body:has(#screen-hub.active) [class*="sx-gal-"] { display: none !important; }
 
 /* ------------------------------------------------------------------
    THE STACK - persistent construction-site arena (boss-stack.js)
-   Tetromino core, falling pieces, floor terrain, warn columns,
-   line-clear rows, shockwaves, rising garbage.
+   Tetromino core, the playable well (garbage bricks, gap, steered
+   piece), giant pieces, line-clear rows, shockwaves, rising garbage.
    ------------------------------------------------------------------ */
 /* Tetromino cells: shared by the core, pieces, and floor terrain. */
 .sx-stk-cell {
@@ -4899,6 +4899,115 @@ body:has(#screen-hub.active) [class*="sx-gal-"] { display: none !important; }
 }
 @keyframes sx-stk-warn-blink {
     50% { opacity: 0.55; }
+}
+/* The well: faint back panel the Stack builds its tower in. */
+.sx-stk-well {
+    position: fixed; z-index: 8998; pointer-events: none; box-sizing: border-box;
+    background:
+        repeating-linear-gradient(to right, rgba(165, 180, 252, 0.07) 0 1px, transparent 1px 46px),
+        linear-gradient(to top, rgba(99, 102, 241, 0.16), rgba(99, 102, 241, 0.03));
+    border-left: 3px solid rgba(165, 180, 252, 0.55);
+    border-right: 3px solid rgba(165, 180, 252, 0.55);
+    border-bottom: 3px solid rgba(165, 180, 252, 0.55);
+}
+/* Stacked garbage bricks inside the well. */
+.sx-stk-brick {
+    background: linear-gradient(to bottom, #6b7280, #4b5563);
+    border-color: rgba(255, 255, 255, 0.16);
+    z-index: 9001;
+}
+/* The gap cut for the current piece: dashed outline in the piece's colour. */
+.sx-stk-gapcell {
+    position: fixed; left: 0; top: 0; z-index: 9001; pointer-events: none; box-sizing: border-box;
+    border-radius: 6px;
+    border: 3px dashed rgba(255, 255, 255, 0.8);
+    opacity: 0.65;
+    animation: sx-stk-gap-pulse 0.7s ease-in-out infinite alternate;
+}
+.sx-stk-gapcell.on {
+    border-color: #4ade80;
+    opacity: 0.9;
+    box-shadow: 0 0 16px rgba(74, 222, 128, 0.9), inset 0 0 12px rgba(74, 222, 128, 0.6);
+}
+@keyframes sx-stk-gap-pulse {
+    from { filter: brightness(0.8); }
+    to { filter: brightness(1.5); }
+}
+/* The piece you steer: slightly see-through so the puzzle stays readable. */
+.sx-stk-piece {
+    z-index: 9003;
+    opacity: 0.88;
+}
+.sx-stk-piece.aligned {
+    border-color: #4ade80;
+    box-shadow: 0 0 14px rgba(74, 222, 128, 0.95), inset 0 3px 0 rgba(255, 255, 255, 0.28);
+}
+.sx-stk-piece.locked {
+    opacity: 1;
+}
+/* Giants (Hold Slam / Hard Drop). */
+.sx-stk-giant {
+    z-index: 9003;
+    border-color: rgba(248, 113, 113, 0.9);
+}
+/* Strip under the piece showing which columns it will fall through. */
+.sx-stk-guide {
+    position: fixed; left: 0; top: 0; z-index: 9000; pointer-events: none;
+    background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.12) 0 14px, transparent 14px 28px);
+    border-left: 2px dashed rgba(255, 255, 255, 0.4);
+    border-right: 2px dashed rgba(255, 255, 255, 0.4);
+}
+.sx-stk-guide.on {
+    background: repeating-linear-gradient(to bottom, rgba(74, 222, 128, 0.2) 0 14px, transparent 14px 28px);
+    border-color: rgba(74, 222, 128, 0.9);
+}
+/* Rows cleared by a fit: bright band that fades out. */
+.sx-stk-lineflash {
+    position: fixed; z-index: 9004; pointer-events: none;
+    background: linear-gradient(to right, transparent, #fffbeb 20%, #fde047 50%, #fffbeb 80%, transparent);
+    box-shadow: 0 0 30px rgba(253, 224, 71, 0.9);
+    animation: sx-stk-lineflash-pop 0.55s ease-out forwards;
+}
+@keyframes sx-stk-lineflash-pop {
+    0% { opacity: 1; transform: scaleY(1); }
+    100% { opacity: 0; transform: scaleY(1.5); }
+}
+/* NEXT-piece preview chip (fixed corner). */
+.sx-stk-next {
+    position: fixed; top: 64px; right: 12px; z-index: 9001; pointer-events: none;
+    background: rgba(10, 10, 20, 0.72);
+    border: 2px solid rgba(165, 180, 252, 0.6);
+    border-radius: 8px;
+    padding: 6px 8px;
+    text-align: center;
+}
+.sx-stk-next-label {
+    font-family: var(--PX, monospace);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #a5b4fc;
+    margin-bottom: 4px;
+}
+.sx-stk-next-grid {
+    display: grid;
+    gap: 1px;
+    justify-content: center;
+}
+.sx-stk-next-combo {
+    font-family: var(--PX, monospace);
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: #facc15;
+    margin-top: 4px;
+    min-height: 12px;
+}
+.sx-stk-next-cell {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+}
+.sx-stk-next-cell.on {
+    border: 1px solid rgba(255, 255, 255, 0.5);
 }
 /* Full-width line-clear rows: flash, then detonate. */
 .sx-stk-row {
@@ -8794,7 +8903,7 @@ body.sx-shp-flash::after {
     box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.55), 0 0 16px rgba(214, 200, 168, 0.55);
 }
 .sx-colo-aval-wall.sx-colo-aval-wall-warn {
-    opacity: 0.45;
+    opacity: 0.65;
     border: 2px dashed rgba(248, 113, 113, 0.95);
     animation: sx-colo-chute-warn-kf 0.3s ease-in-out infinite alternate;
 }

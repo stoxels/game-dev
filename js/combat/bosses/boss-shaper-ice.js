@@ -131,7 +131,7 @@ function _iciAftermath(st, ctx) {
         const z = st.patches[i];
         if (z.until - ctx.now < 350) z.el.classList.add('sx-shp-patch-out');
         if (ctx.now >= z.until) { try { z.el.remove(); } catch (e) { /* run already cleaned up */ } st.patches.splice(i, 1); continue; }
-        if (Math.hypot(pc.x - z.x, pc.y - z.y) < ICI_PATCH_R) _shpTouch(ICI_PATCH_DMG, ctx.level, 'Frost Patch');
+        if (Math.hypot(pc.x - z.x, pc.y - z.y) < ICI_PATCH_R) _shpTouch(ICI_PATCH_DMG, ctx.level, 'Frost Patch', false, true);
     }
     for (let i = st.splinters.length - 1; i >= 0; i--) {
         const s = st.splinters[i];
@@ -170,7 +170,7 @@ export function _mechShpIcicles(monster, phase) {
     const run = _nkNewRun(monster && monster.id, true);
     const st = { patches: [], splinters: [] };
     let wave = _iciStartWave(run, p), done = 0;
-    _nkToast('eg_mech_shp_icicles', '❄️ ICICLE VOLLEY - leave the red rings! One is aimed at YOU!', SHP_COLOR);
+    _nkToast('eg_mech_shp_icicles', '❄️ ICICLE VOLLEY', SHP_COLOR);
     _nkLoop(run, (dtS, now) => {
         const ctx = { p, level, dtS, now };
         if (wave && !wave.landed) _iciStepWave(run, st, wave, ctx);

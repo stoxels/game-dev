@@ -69,14 +69,15 @@ export function _shpPC() {
 }
 
 // Cold hit on the player with a shared touch cooldown (a hazard that keeps
-// touching you cannot machine-gun). force skips the cooldown.
-export function _shpTouch(pct, level, label, force) {
+// touching you cannot machine-gun). force skips the cooldown; quiet keeps a
+// shield-absorbed hit from toasting (for hazards you stand in).
+export function _shpTouch(pct, level, label, force, quiet) {
     const now = performance.now();
     if (!force && now < _shpHitCd) return false;
     if (!_nkPlayerCenter()) return false;
     _shpHitCd = now + SHP_HIT_CD_MS;
     const dealt = _nkHit(pct, 'cold', level);
-    _nkAbilityHitToast(dealt, SHP_NAME, label);
+    _nkAbilityHitToast(dealt, SHP_NAME, label, quiet);
     return true;
 }
 

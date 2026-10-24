@@ -691,36 +691,83 @@ function _wdBuildStoxelAuraHtml(isDone) {
 }
 
 /**
- * Builds the HTML for the glowing tree SVG that appears on a completed
- * convergence node. Returns an empty string if the node is not yet done.
+ * Builds the HTML for the glowing tree SVG that rises behind a completed
+ * convergence node: rooted trunk, layered canopy, leaf clusters, sparkles
+ * and drifting motes. Returns an empty string if the node is not yet done.
  */
 function _wdBuildConvergenceTreeHtml(isDone) {
     if (!isDone) return '';
     return `
         <div class="wd-3d-beam-tree">
             <div class="wd-tree-backdrop-shadow"></div>
-            <svg class="wd-tree-glow-svg" viewBox="0 0 100 160">
-                <path class="wd-tree-branch trunk"    d="M50,160 Q50,95 50,35"     fill="none" />
-                <path class="wd-tree-branch twig"     d="M50,130 Q30,110 15,100"   fill="none" />
-                <path class="wd-tree-branch twig"     d="M50,115 Q70,95 85,85"     fill="none" />
-                <path class="wd-tree-branch twig"     d="M50,85 Q25,65 18,50"      fill="none" />
-                <path class="wd-tree-branch twig"     d="M50,70 Q75,50 82,35"      fill="none" />
-                <path class="wd-tree-branch twig"     d="M50,48 Q32,32 30,15"      fill="none" />
-                <path class="wd-tree-branch twig-sub" d="M30,110 Q18,118 8,115"    fill="none" />
-                <path class="wd-tree-branch twig-sub" d="M70,93 Q82,98 92,92"      fill="none" />
-                <path class="wd-tree-branch twig-sub" d="M32,56 Q20,46 22,32"      fill="none" />
-                <circle class="wd-tree-leaf" cx="15" cy="100" r="5"   />
-                <circle class="wd-tree-leaf" cx="85" cy="85"  r="5"   />
-                <circle class="wd-tree-leaf" cx="18" cy="50"  r="5.5" />
-                <circle class="wd-tree-leaf" cx="82" cy="35"  r="5.5" />
-                <circle class="wd-tree-leaf" cx="30" cy="15"  r="5"   />
-                <circle class="wd-tree-leaf" cx="50" cy="35"  r="6"   />
-                <circle class="wd-tree-leaf" cx="8"  cy="115" r="4"   />
-                <circle class="wd-tree-leaf" cx="92" cy="92"  r="4"   />
-                <circle class="wd-tree-leaf" cx="22" cy="32"  r="4.5" />
-                <circle class="wd-tree-leaf" cx="30" cy="110" r="3.5" />
-                <circle class="wd-tree-leaf" cx="70" cy="93"  r="3.5" />
-                <circle class="wd-tree-leaf" cx="32" cy="38"  r="4"   />
+            <svg class="wd-tree-glow-svg" viewBox="0 0 120 180">
+                <defs>
+                    <radialGradient id="wdTreeCanopy" cx="50%" cy="38%" r="65%">
+                        <stop offset="0%"  stop-color="#8dff6e" />
+                        <stop offset="45%" stop-color="#2ecc71" />
+                        <stop offset="100%" stop-color="rgba(13,59,34,0.95)" />
+                    </radialGradient>
+                    <linearGradient id="wdTreeTrunk" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%"   stop-color="#4fce7d" />
+                        <stop offset="55%"  stop-color="#2a7a48" />
+                        <stop offset="100%" stop-color="#123620" />
+                    </linearGradient>
+                    <radialGradient id="wdTreeGround" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%"   stop-color="rgba(46,204,113,0.55)" />
+                        <stop offset="100%" stop-color="rgba(46,204,113,0)" />
+                    </radialGradient>
+                </defs>
+                <ellipse cx="60" cy="170" rx="46" ry="10" fill="url(#wdTreeGround)" />
+                <ellipse cx="60" cy="169" rx="34" ry="6" fill="#0e2f1c" opacity="0.85" />
+                <path d="M60,166 Q46,168 34,176 L38,180 Q50,174 60,174 Z" fill="#17452a" />
+                <path d="M60,166 Q74,168 86,176 L82,180 Q70,174 60,174 Z" fill="#17452a" />
+                <path d="M53,172 C54,145 52,118 47,88 L55,86 C60,116 61,145 63,172 Z" fill="url(#wdTreeTrunk)" />
+                <path d="M57,166 C58,142 56,116 52,94" fill="none" stroke="#8dff6e" stroke-width="1.6" stroke-linecap="round" opacity="0.55" />
+                <path d="M54.5,166 C55.5,142 54,118 50,96" fill="none" stroke="#0b2416" stroke-width="1.6" stroke-linecap="round" opacity="0.6" />
+                <path class="wd-tree-branch twig"     d="M54,142 Q40,134 28,124" fill="none" />
+                <path class="wd-tree-branch twig"     d="M60,134 Q74,126 86,116" fill="none" />
+                <path class="wd-tree-branch twig"     d="M52,114 Q40,104 32,90"  fill="none" />
+                <path class="wd-tree-branch twig"     d="M58,106 Q70,96 78,82"   fill="none" />
+                <path class="wd-tree-branch twig"     d="M50,94 Q42,82 38,68"    fill="none" />
+                <path class="wd-tree-branch twig"     d="M56,88 Q64,76 68,62"    fill="none" />
+                <path class="wd-tree-branch twig-sub" d="M52,86 Q52,68 55,52"    fill="none" />
+                <path class="wd-tree-branch twig-sub" d="M40,132 Q33,128 27,128"  fill="none" />
+                <path class="wd-tree-branch twig-sub" d="M72,124 Q79,120 85,120"  fill="none" />
+                <path class="wd-tree-branch twig-sub" d="M41,102 Q35,96 31,90"   fill="none" />
+                <path class="wd-tree-branch twig-sub" d="M69,94 Q75,88 79,82"    fill="none" />
+                <path class="wd-tree-branch twig-sub" d="M44,80 Q40,74 39,68"    fill="none" />
+                <path class="wd-tree-branch twig-sub" d="M62,74 Q66,68 67,62"    fill="none" />
+                <ellipse cx="36" cy="60" rx="23" ry="19" fill="url(#wdTreeCanopy)" />
+                <ellipse cx="84" cy="58" rx="23" ry="19" fill="url(#wdTreeCanopy)" />
+                <ellipse cx="60" cy="36" rx="27" ry="22" fill="url(#wdTreeCanopy)" />
+                <ellipse cx="60" cy="60" rx="19" ry="15" fill="#0a2e1b" opacity="0.5" />
+                <circle class="wd-tree-leaf" cx="18" cy="52" r="4"   />
+                <circle class="wd-tree-leaf" cx="24" cy="38" r="3.5" />
+                <circle class="wd-tree-leaf" cx="36" cy="24" r="4"   />
+                <circle class="wd-tree-leaf" cx="50" cy="18" r="3.5" />
+                <circle class="wd-tree-leaf" cx="64" cy="16" r="4"   />
+                <circle class="wd-tree-leaf" cx="78" cy="20" r="3.5" />
+                <circle class="wd-tree-leaf" cx="92" cy="30" r="4"   />
+                <circle class="wd-tree-leaf" cx="102" cy="44" r="3.5" />
+                <circle class="wd-tree-leaf" cx="104" cy="60" r="4"   />
+                <circle class="wd-tree-leaf" cx="96" cy="72" r="3.5" />
+                <circle class="wd-tree-leaf" cx="84" cy="78" r="4"   />
+                <circle class="wd-tree-leaf" cx="70" cy="80" r="3"   />
+                <circle class="wd-tree-leaf" cx="56" cy="78" r="3"   />
+                <circle class="wd-tree-leaf" cx="42" cy="76" r="3.5" />
+                <circle class="wd-tree-leaf" cx="28" cy="68" r="3"   />
+                <circle class="wd-tree-leaf" cx="16" cy="64" r="3.5" />
+                <circle class="wd-tree-leaf-pale" cx="46" cy="34" r="3"   />
+                <circle class="wd-tree-leaf-pale" cx="66" cy="30" r="3"   />
+                <circle class="wd-tree-leaf-pale" cx="58" cy="50" r="2.5" />
+                <circle class="wd-tree-leaf-pale" cx="74" cy="52" r="2.5" />
+                <circle class="wd-tree-leaf-pale" cx="40" cy="56" r="2.5" />
+                <g transform="translate(30,30)"><path class="wd-tree-sparkle" d="M-4,0H4M0,-4V4" /></g>
+                <g transform="translate(90,40)"><path class="wd-tree-sparkle" d="M-4,0H4M0,-4V4" /></g>
+                <g transform="translate(60,14)"><path class="wd-tree-sparkle" d="M-3,0H3M0,-3V3" /></g>
+                <circle class="wd-tree-mote" cx="44" cy="120" r="2" style="animation-delay: 0s;" />
+                <circle class="wd-tree-mote" cx="76" cy="128" r="2" style="animation-delay: 1.1s;" />
+                <circle class="wd-tree-mote" cx="60" cy="140" r="2" style="animation-delay: 2.2s;" />
             </svg>
         </div>
     `;
@@ -809,6 +856,17 @@ function _wdBuildAscensionDefsHtml() {
                 <stop offset="0%"   stop-color="#f1c40f" stop-opacity="1" />
                 <stop offset="100%" stop-color="#f1c40f" stop-opacity="0" />
             </linearGradient>
+            <radialGradient id="ascStarFace" cx="50%" cy="42%" r="65%">
+                <stop offset="0%"   stop-color="#f5e6ff" />
+                <stop offset="35%"  stop-color="#c39bd3" />
+                <stop offset="70%"  stop-color="#7d3c98" />
+                <stop offset="100%" stop-color="rgba(74,20,110,0.9)" />
+            </radialGradient>
+            <radialGradient id="ascCore" cx="50%" cy="50%" r="50%">
+                <stop offset="0%"   stop-color="#ffffff" />
+                <stop offset="40%"  stop-color="#ffe97a" />
+                <stop offset="100%" stop-color="rgba(241,196,15,0)" />
+            </radialGradient>
             <filter id="ascStarGlow" x="-80%" y="-80%" width="260%" height="260%">
                 <feGaussianBlur stdDeviation="4" result="blur" />
                 <feMerge>
@@ -829,12 +887,29 @@ function _wdBuildAscensionDefsHtml() {
 }
 
 /**
- * Builds the full ascension effect HTML: a purple 5-pointed star SVG with
- * optional golden beams rising from each spike (shown once the level is done).
+ * Builds the rising gold ember dots shown once an ascension node is done.
+ * Returns an empty string while the trial is still open.
+ */
+function _wdBuildAscensionEmbersHtml(isDone) {
+    if (!isDone) return '';
+    return `
+        <g class="wd-asc-embers" filter="url(#ascBeamGlow)">
+            <circle class="wd-asc-ember" cx="58" cy="150" r="2" />
+            <circle class="wd-asc-ember delay-1" cx="82" cy="145" r="2" />
+            <circle class="wd-asc-ember delay-2" cx="70" cy="160" r="2" />
+        </g>
+    `;
+}
+
+/**
+ * Builds the full ascension effect HTML: a faceted crystal star with a
+ * glowing core gem, orbiting sparkles, and golden beams plus rising embers
+ * once the trial is done.
  */
 function _wdBuildAscensionHtml(isDone) {
     const defsHtml = _wdBuildAscensionDefsHtml();
     const beamsHtml = _wdBuildAscensionBeamsHtml(isDone);
+    const embersHtml = _wdBuildAscensionEmbersHtml(isDone);
 
     return `
         <div class="wd-ascension-3d-wrapper">
@@ -852,21 +927,40 @@ function _wdBuildAscensionHtml(isDone) {
                         filter="url(#ascStarGlow)"
                         class="wd-asc-core-glow"/>
 
-                <!-- 5-pointed star shape (outer fill + inner crisp outline) -->
+                <!-- Faceted crystal star (gradient face + gold rim + crisp inner outline) -->
                 <g class="wd-asc-star-group" filter="url(#ascStarGlow)">
                     <path class="wd-asc-star-shape"
                           d="M70.0,86.0 L80.6,115.4 L111.8,116.4 L87.1,135.6 L95.9,165.6 L70.0,148.0 L44.1,165.6 L52.9,135.6 L28.2,116.4 L59.4,115.4 Z"
-                          fill="rgba(155, 89, 182, 0.55)"
-                          stroke="#c39bd3"
+                          fill="url(#ascStarFace)"
+                          stroke="#f7dc6f"
                           stroke-width="2.5"
                           stroke-linejoin="round" />
+                    <g class="wd-asc-facets" stroke="#ffffff" stroke-width="1" opacity="0.35">
+                        <line x1="70" y1="130" x2="70"    y2="86" />
+                        <line x1="70" y1="130" x2="111.8" y2="116.4" />
+                        <line x1="70" y1="130" x2="95.9"  y2="165.6" />
+                        <line x1="70" y1="130" x2="44.1"  y2="165.6" />
+                        <line x1="70" y1="130" x2="28.2"  y2="116.4" />
+                    </g>
                     <path class="wd-asc-star-inner"
                           d="M70.0,86.0 L80.6,115.4 L111.8,116.4 L87.1,135.6 L95.9,165.6 L70.0,148.0 L44.1,165.6 L52.9,135.6 L28.2,116.4 L59.4,115.4 Z"
                           fill="none"
-                          stroke="#e8daef"
+                          stroke="#f5eef8"
                           stroke-width="1"
                           stroke-linejoin="round" />
+                    <circle class="wd-asc-core-gem" cx="70" cy="130" r="10" fill="url(#ascCore)" />
+                    <circle cx="70" cy="130" r="3.5" fill="#ffffff" />
                 </g>
+
+                <!-- Orbiting sparkles circling the star -->
+                <g class="wd-asc-orbit" filter="url(#ascStarGlow)">
+                    <circle class="wd-asc-orbit-dot" cx="70"  cy="78"  r="2.5" />
+                    <circle class="wd-asc-orbit-dot" cx="115" cy="156" r="2" />
+                    <circle class="wd-asc-orbit-dot" cx="25"  cy="156" r="2" />
+                </g>
+
+                <!-- Rising embers (only when done) -->
+                ${embersHtml}
             </svg>
         </div>
     `;
@@ -1467,8 +1561,8 @@ function _wdAscensionNodeForWorld(wi) {
 
 /**
  * Builds the Ascension Trial node that follows a world's last level: same
- * base classes as a level node, with the purple ascension star on top. It
- * opens once the world's last level is cleared.
+ * base classes as a level node, with the purple ascension star on top and
+ * an "A" in the circle. It opens once the world's last level is cleared.
  */
 function _wdBuildAscensionNode(wi, pos) {
     const node = document.createElement('div');
@@ -1481,7 +1575,7 @@ function _wdBuildAscensionNode(wi, pos) {
     if (isDone) node.classList.add('done');
     else if (isLocked) node.classList.add('locked');
 
-    const icon = isLocked ? '🔒' : '⚗️';
+    const icon = isLocked ? '🔒' : 'A';
     node.innerHTML = _wdBuildNodeEffectsHtml(icon, _wdBuildStoxelAuraHtml(isDone), '', '', _wdBuildAscensionHtml(isDone));
 
     if (!isLocked) node.addEventListener('click', () => _wdOnAscensionNodeClick(wi));
