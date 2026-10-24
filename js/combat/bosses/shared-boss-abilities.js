@@ -1974,7 +1974,6 @@ export function _runScreenBlast(opts) {
                     if (dealt > 0) paintStatus('hit', dealt);
                 }
             } else {
-                globalThis.showCombatToast(t('eg_blast_dodged'), '#4ade80');
                 paintStatus('ok');
             }
 
@@ -2686,7 +2685,6 @@ export function _nkFinaleWaves(monster, cfg) {
     banner.querySelector('.sx-nk-fin-title').textContent = cfg.title;
     const hintEl = banner.querySelector('.sx-nk-fin-hint');
     hintEl.textContent = cfg.hint;
-    _nkToast(cfg.toastKey || 'eg_nk_finale', cfg.title + ' - ' + cfg.hint, cfg.color);
 
     const W = () => window.innerWidth, H = () => window.innerHeight;
     const clamp = (x, y, r) => ({
@@ -2696,7 +2694,7 @@ export function _nkFinaleWaves(monster, cfg) {
     });
     const pcNow = () => _nkPlayerCenter() || { x: W() / 2, y: H() / 2 };
     const waves = cfg.waves || [];
-    let wi = 0, stage = 'gap', t = 0, zones = [], countEls = [], wave = null;
+    let wi = 0, stage = 'gap', t = 0, zones = [], countEls = [], wave = null, outEl = null;
 
     _nkLoop(run, (dtS) => {
         if (!_nkBossAlive(monster.id)) return false;
@@ -2720,6 +2718,14 @@ export function _nkFinaleWaves(monster, cfg) {
                     zones.push({ ...clamp(Math.random() * W(), Math.random() * H(), NK_FIN_DANGER_R), r: NK_FIN_DANGER_R, safe: false });
                 }
             }
+            if (wave.kind === 'shelter') {
+                // Everything outside the green circle is the danger: tint it red so
+                // the consequence is visible during the whole countdown.
+                const z0 = zones[0];
+                outEl = _nkEl(run, 'div', 'sx-nk-fin-outside ' + (cfg.cls || ''));
+                outEl.style.background = 'radial-gradient(circle at ' + Math.round(z0.x) + 'px ' + Math.round(z0.y) + 'px, transparent '
+                    + z0.r + 'px, rgba(220, 38, 38, 0.34) ' + (z0.r + 8) + 'px)';
+            }
             countEls = zones.map(z => {
                 const el = _nkEl(run, 'div', 'sx-nk-fin-zone ' + (z.safe ? 'sx-nk-fin-safe ' : 'sx-nk-fin-danger ') + (cfg.cls || ''));
                 el.style.left = Math.round(z.x - z.r) + 'px';
@@ -2742,6 +2748,12 @@ export function _nkFinaleWaves(monster, cfg) {
                 ? !zones.some(z => Math.hypot(pc.x - z.x, pc.y - z.y) < z.r)
                 : zones.some(z => Math.hypot(pc.x - z.x, pc.y - z.y) < z.r);
             zones.forEach(z => z.el.classList.add('sx-nk-fin-strike'));
+            if (outEl) {
+                outEl.classList.add(hit ? 'sx-nk-fin-outside-hit' : 'sx-nk-fin-outside-strike');
+                const oe = outEl;
+                setTimeout(() => { try { oe.remove(); } catch (e) {} }, 600);
+                outEl = null;
+            }
             if (hit) {
                 const dealt = _nkHit(wave.dmg, cfg.element || null, level);
                 _nkAbilityHitToast(dealt, cfg.name, wave.label || cfg.title, !!(cfg.quiet || wave.quiet));

@@ -237,7 +237,6 @@ export function _playerTakeDamage(amount, isSpell = false, element = null, attac
             const missPct = Math.min(90, 50 * (1 + (Number(blindSt.effectPct) || 0) / 100));
             if (Math.random() * 100 < missPct) {
                 _rsAvoid('other');
-                globalThis.showCombatToast(t('eg_blind_miss'));
                 _applyPlayerMissFeedback();
                 _scheduleAbsorptionRegen();
                 return 0;
@@ -258,7 +257,6 @@ export function _playerTakeDamage(amount, isSpell = false, element = null, attac
         if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
             _rsAvoid('dodge');
             try { if (typeof globalThis.noteUniversalReaction === 'function') globalThis.noteUniversalReaction('dodge'); } catch (e) { /* optional */ }
-            globalThis.showCombatToast(t('eg_dodged'));
             _applyPlayerMissFeedback();
             _scheduleAbsorptionRegen();
             return 0;
@@ -270,7 +268,6 @@ export function _playerTakeDamage(amount, isSpell = false, element = null, attac
         && (!element || element === 'physical') && Math.random() * 100 < Math.min(75, stats.avoidPhysHitPct) * avoidMult) {
         _rsAvoid('dodge');
         try { if (typeof globalThis.noteUniversalReaction === 'function') globalThis.noteUniversalReaction('dodge'); } catch (e) { /* optional */ }
-        globalThis.showCombatToast(t('eg_dodged'));
         Audio_Manager.playSFX('player_dodge');
         _scheduleAbsorptionRegen();
         return 0;

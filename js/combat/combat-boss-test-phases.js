@@ -180,8 +180,10 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'Time Freeze', desc: _bossTestTr('eg_boss_test_clock_time_freeze', 'At 15% HP: 2.5s telegraph → 30s global freeze (timer, movement, charge bar). 12 beams hover then strike for ~90% HP if boss survives.') }
     ],
     'boss_puddle': () => [
-        { name: 'Rising Water', desc: _bossTestTr('eg_boss_test_puddle_water', 'At 75% / 50% / 25% HP the flood rises (up to half the arena): standing in water burns %HP/s. Drops in water erupt into fountains; play high.') },
-        { name: 'Gate Wave', desc: _bossTestTr('eg_boss_test_puddle_wave', 'After each rise: 1.3s edge telegraph → a 430px/s wave sweeps the shallows. Get out of the water entirely. Popping bubbles fires shard bursts.') }
+        { name: 'Rising Water', desc: _bossTestTr('eg_boss_test_puddle_water', 'At 75% / 50% / 25% HP the flood rises (up to the grid’s lower edge): standing in water burns %HP/s and the surface flushes red. Some drops landing in water erupt into fountains; play high.') },
+        { name: 'Gate Wave', desc: _bossTestTr('eg_boss_test_puddle_wave', 'After each rise: 1.3s edge telegraph, then a 430px/s wave sweeps the surface (from the second rise on, two waves from both edges). Stay above the crest. Popping bubbles fires shard bursts.') },
+        { name: 'Cloudburst', desc: _bossTestTr('eg_boss_test_puddle_burst', 'Every ~15s: CLOUDBURST - giant drops fall on 3-5 marked circles, one right on you first. The circle fills while the drop falls; step out before it lands.') },
+        { name: 'Geysers', desc: _bossTestTr('eg_boss_test_puddle_geyser', 'Every ~19s (needs standing water): GEYSERS - ripples mark spots on the surface, then tall jets burst from them. Stay away from the marked columns.') }
     ],
     'boss_firefly': () => [
         { name: 'Darkness', desc: _bossTestTr('eg_boss_test_firefly_dark', 'Whole fight in darkness - your 5 fairies are the only light. Outside all light you bleed HP. Command them with F (send), G (cycle), H (recall) or drag.') },

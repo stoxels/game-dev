@@ -15,7 +15,9 @@ import { _egBankUnclaimedMapDrops } from './loot/loot-map-drops.js';
 import { _resetQuizDamageBuff } from './combat/combat-quiz-buffs.js';
 import { WORLDS } from './levels/level-world-data.js';
 import { ALL, WORLD_START_GI, isNexusWorld } from './levels/levels.js';
-import { showToast } from './puzzle-mechanics/toasts-and-popups.js';
+import { buildInventoryPanel } from './puzzle-item-inventory/puzzle-item-inventory-panel.js';
+import { ITEM_DEFS } from './puzzle-items/item-definitions.js';
+import { showItemGainPopup, showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { _incDirect, updateQuestStats } from './inference/inference-stats.js';
 import { isGatedLevel } from './quiz-exercise/mathgate.js';
 import { showWorldDetail } from './screens/screens-world-levels.js';
@@ -40,11 +42,11 @@ import { cur } from './state.js';
 //     "Finish Trial") grants a passive point + the convergence modal on
 //     first clear. The old 33%/66% convergence puzzle levels are regular
 //     puzzle levels now (isConvergenceLevel() always returns false).
-//   - ASCENSION TRIALS: follow every ascension level (final level of a world,
-//     except the Nexus Point) is entered as a mini-map chain that ends in a
-//     boss fight. Finishing marks the ascension level done, grants the
-//     Codex of Completion on first clear and runs the normal
-//     world-completion class flow.
+//   - ASCENSION TRIALS: each campaign world (except the Nexus World) owns
+//     one Ascension Trial node that opens once the world's last level is
+//     cleared. It plays as a mini-map chain that ends in a boss fight.
+//     Finishing grants the Codex of Completion on first clear and runs the
+//     normal world-completion class flow.
 //
 // Both reuse the endgame encounter-chain machinery verbatim: the trial
 // stamps a randomly picked seed story level exactly like
@@ -515,10 +517,10 @@ export function _grantConvergenceTrialReward(wi) {
     return isFirstClear;
 }
 
-// Ascension Trial finish: the world's own last level was already cleared
-// (that is what opens the trial and it paid the Codex and the level XP), so
-// this only records the trial as done, counts it for achievements, and runs
-// the normal world-completion class flow (class select / upgrade /
+// Ascension Trial finish: the world's last level is a normal puzzle now
+// and grants no Codex, so the trial pays the Codex of Completion on first
+// clear. Then it records the trial as done, counts it for achievements,
+// and runs the normal world-completion class flow (class select / upgrade /
 // ascendency).
 export function _grantAscensionTrialReward(wi) {
     _ensureTrialState();
@@ -527,6 +529,20 @@ export function _grantAscensionTrialReward(wi) {
     const isFirstClear = !STATE.ascensionTrialsDone.includes(key);
     if (isFirstClear) {
         STATE.ascensionTrialsDone.push(key);
+        // Codex of Completion (the ascension reward). Ironman mode disables
+        // item rewards, mirroring the old last-level grant.
+        try {
+            if (typeof ITEM_DEFS !== 'undefined' && ITEM_DEFS['artifactComplete']
+                && STATE && Array.isArray(STATE.inventory)
+                && !(typeof curMods !== 'undefined' && curMods && curMods.ironman)) {
+                STATE.inventory.push({
+                    defId: 'artifactComplete',
+                    uid: 'item_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+                });
+                if (typeof buildInventoryPanel === 'function') try { buildInventoryPanel(); } catch (e) {}
+                if (typeof showItemGainPopup === 'function') try { showItemGainPopup('artifactComplete'); } catch (e) {}
+            }
+        } catch (e) {}
         if (typeof trackAchStat === 'function') try { trackAchStat('egMapsCompleted', 1); } catch (e) {}
     }
     // Resistance penalty stage 1 (-30% to all resistances): the trial that

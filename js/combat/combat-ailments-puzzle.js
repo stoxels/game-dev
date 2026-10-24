@@ -185,7 +185,6 @@ function _puzzleIce() {
     if (cells.size === 0) return;
     _registerPuzzleEffect({ type: 'ice', cells });
     Audio_Manager.playSFX('grid_ice_patch');
-    globalThis.showCombatToast('🧊 Icy grid - clicks may slip!');
 }
 
 // True when the cell is currently ice.

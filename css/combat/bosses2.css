@@ -1756,10 +1756,109 @@
     from { transform: translateX(0); }
     to { transform: translateX(92px); }
 }
+/* Storm sky: dark cloud band across the top with drifting banks. */
+.sx-pud-sky {
+    position: fixed; left: 0; top: 0; width: 100vw; height: 16vh; min-height: 90px;
+    pointer-events: none; z-index: 8990;
+    background:
+        radial-gradient(ellipse 22% 60% at 15% 20%, rgba(51, 65, 85, 0.85), transparent 70%),
+        radial-gradient(ellipse 26% 70% at 48% 8%, rgba(30, 41, 59, 0.9), transparent 72%),
+        radial-gradient(ellipse 24% 60% at 82% 22%, rgba(51, 65, 85, 0.85), transparent 70%),
+        linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0));
+    background-size: 140% 100%, 140% 100%, 140% 100%, 100% 100%;
+    animation: sx-pud-clouds 26s linear infinite alternate;
+}
+@keyframes sx-pud-clouds {
+    from { background-position: 0% 0, 0% 0, 0% 0, 0 0; }
+    to { background-position: 40% 0, -30% 0, 25% 0, 0 0; }
+}
+/* Lightning flash (re-triggered by JS on big moments). */
+.sx-pud-flash {
+    position: fixed; inset: 0; pointer-events: none; z-index: 9010;
+    background: radial-gradient(ellipse at 50% 0%, rgba(224, 242, 254, 0.55), rgba(125, 211, 252, 0.12) 60%, transparent);
+    opacity: 0;
+}
+.sx-pud-flash.on { animation: sx-pud-flash 0.5s ease-out; }
+@keyframes sx-pud-flash {
+    0% { opacity: 0.95; }
+    18% { opacity: 0.2; }
+    30% { opacity: 0.7; }
+    100% { opacity: 0; }
+}
+/* Underwater light bands drifting through the flood. */
+.sx-pud-water::after {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+        repeating-linear-gradient(100deg, rgba(186, 230, 253, 0.10) 0 22px, transparent 22px 70px),
+        repeating-linear-gradient(80deg, rgba(125, 211, 252, 0.08) 0 14px, transparent 14px 58px);
+    background-size: 140px 100%, 116px 100%;
+    animation: sx-pud-caustics 5s linear infinite;
+}
+@keyframes sx-pud-caustics {
+    from { background-position: 0 0, 0 0; }
+    to { background-position: 140px 0, -116px 0; }
+}
+/* You are standing in it: the surface flushes red and pulses. */
+.sx-pud-water.hot {
+    border-top-color: rgba(252, 165, 165, 0.98);
+    box-shadow: 0 -2px 22px rgba(248, 113, 113, 0.75), 0 -8px 30px rgba(239, 68, 68, 0.35);
+}
+/* Ripple where a drop lands on calm water. */
+.sx-pud-ripple {
+    position: fixed; z-index: 9003; pointer-events: none;
+    width: 46px; height: 12px; margin: -6px 0 0 -23px;
+    border-radius: 50%;
+    border: 2px solid rgba(224, 242, 254, 0.9);
+    animation: sx-pud-ripple 0.7s ease-out forwards;
+}
+@keyframes sx-pud-ripple {
+    from { transform: scale(0.3); opacity: 1; }
+    to { transform: scale(1.9); opacity: 0; }
+}
+/* Cloudburst: circle that fills up while the giant drop falls into it. */
+.sx-pud-burst-warn {
+    position: fixed; z-index: 9003; pointer-events: none; box-sizing: border-box;
+    --fill: 0%;
+    border-radius: 50%;
+    border: 3px dashed rgba(186, 230, 253, 0.95);
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.5) var(--fill), rgba(56, 189, 248, 0.08) calc(var(--fill) + 1%));
+    box-shadow: 0 0 18px rgba(125, 211, 252, 0.6);
+    animation: sx-nk-warn-pulse 0.3s ease-in-out infinite alternate;
+}
+.sx-pud-burst-drop {
+    position: fixed; left: 0; top: 0; z-index: 9006; pointer-events: none;
+    width: 26px; height: 38px; margin: -19px 0 0 -13px;
+    border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+    background: radial-gradient(circle at 36% 30%, #fff 0 12%, rgba(186, 230, 253, 0.95) 40%, rgba(14, 165, 233, 0.9));
+    filter: drop-shadow(0 0 8px rgba(125, 211, 252, 0.95));
+}
+.sx-pud-burst-splash {
+    position: fixed; z-index: 9005; pointer-events: none; box-sizing: border-box;
+    border-radius: 50%;
+    border: 4px solid rgba(240, 249, 255, 0.95);
+    background: radial-gradient(circle, rgba(224, 242, 254, 0.8), rgba(56, 189, 248, 0.35) 60%, transparent 72%);
+    animation: sx-pud-burst-splash 0.5s ease-out forwards;
+}
+@keyframes sx-pud-burst-splash {
+    from { transform: scale(0.3); opacity: 1; }
+    to { transform: scale(1.25); opacity: 0; }
+}
+/* Geyser ripple on the surface: ring that fills before the jet bursts. */
+.sx-pud-geyser-warn {
+    position: fixed; z-index: 9004; pointer-events: none; box-sizing: border-box;
+    --fill: 0%;
+    height: 22px; margin-top: -11px;
+    border-radius: 50%;
+    border: 3px solid rgba(240, 249, 255, 0.95);
+    background: radial-gradient(ellipse, rgba(224, 242, 254, 0.95) var(--fill), rgba(56, 189, 248, 0.15) calc(var(--fill) + 1%));
+    box-shadow: 0 0 16px rgba(125, 211, 252, 0.8), 0 -80px 30px -20px rgba(125, 211, 252, 0.25);
+    animation: sx-nk-warn-pulse 0.3s ease-in-out infinite alternate;
+}
 /* Rain drop: bright streak with a soft cyan glow. */
 .sx-pud-drop {
     position: fixed; left: 0; top: 0; z-index: 9004;
-    width: 4px; height: 19px; margin: -9.5px 0 0 -2px;
+    width: 3px; height: 26px; margin: -13px 0 0 -1.5px;
     pointer-events: none;
     border-radius: 3px;
     background: linear-gradient(180deg, rgba(125, 211, 252, 0.55), rgba(224, 242, 254, 1));
@@ -12372,6 +12471,27 @@ body.sx-shp-flash::after {
 .sx-nk-fin-hint {
     font: 700 1.02rem/1.35 system-ui, sans-serif; color: #f8fafc;
     text-shadow: 0 1px 5px rgba(0, 0, 0, 0.95); text-align: center; max-width: min(620px, 88vw);
+}
+/* Finale shelter waves: everything outside the green circle is tinted red,
+   pulsing faster until the strike; the strike flashes the whole screen. */
+.sx-nk-fin-outside {
+    position: fixed; inset: 0; pointer-events: none; z-index: 9001;
+    animation: sx-nk-fin-outside-pulse 0.9s ease-in-out infinite alternate;
+}
+@keyframes sx-nk-fin-outside-pulse {
+    from { opacity: 0.45; }
+    to { opacity: 1; }
+}
+.sx-nk-fin-outside.sx-nk-fin-outside-strike,
+.sx-nk-fin-outside.sx-nk-fin-outside-hit {
+    animation: sx-nk-fin-outside-strike 0.55s ease-out forwards;
+}
+.sx-nk-fin-outside.sx-nk-fin-outside-hit {
+    box-shadow: inset 0 0 160px 60px rgba(220, 38, 38, 0.9);
+}
+@keyframes sx-nk-fin-outside-strike {
+    0% { opacity: 1; filter: brightness(2.4); }
+    100% { opacity: 0; filter: brightness(1); }
 }
 .sx-nk-fin-zone {
     position: fixed; z-index: 9002; pointer-events: none; box-sizing: border-box;

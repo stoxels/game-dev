@@ -9,7 +9,6 @@
 // feedback and block-lockout presentation live in encounter-monster-attack-feedback.js.
 
 import { Audio_Manager } from '../audio/audio.js';
-import { t } from '../translation/translations.js';
 import { MELEE_ANIM_DURATION_MS, MONSTER_PROJ_DURATION_MS } from './encounter-constants.js';
 import { _playerTakeDamage } from './encounter-damage.js';
 import { _damageTargetById } from './encounter-monster-damage.js';
@@ -255,7 +254,6 @@ export function _rollPreemptiveDodge(monster) {
     const pct = stats.preemptiveDodgePct || 0;
     if (pct <= 0 || Math.random() * 100 >= pct) return false;
 
-    globalThis.showCombatToast(t('eg_dodged'));
     _applyPlayerMissFeedback();
     return true;
 }

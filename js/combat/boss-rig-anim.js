@@ -904,6 +904,8 @@ const RIGS = {
         ],
         mechanics: {
             fated_cell: { anim: 'pud_fate', ms: () => 1900 },
+            cloudburst: { anim: 'pud_fate', ms: () => 1900 },
+            geysers: { anim: 'pud_fate', ms: () => 1900 },
         },
     },
     // <<< rig boss_puddle

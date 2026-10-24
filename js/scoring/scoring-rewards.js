@@ -32,16 +32,20 @@ function _liveTimerSecs() { return globalThis.timerSecs; }
 //-------------------SCORING REWARDS (scoring-rewards.js)------------------
 //------------------------------------------------------------------------
 // Reward half of the scoring subsystem: bonus-objective evaluation, lucky
-// drops, one-time special rewards (convergence / ascension / Nexus Point),
-// and the win-overlay rendering they feed into. The win-flow entry point
+// drops, one-time special rewards (convergence / Nexus Point), and the
+// win-overlay rendering they feed into. The win-flow entry point
 // (checkWin) lives in scoring.js and calls renderWinOverlay() here.
+// The ascension Codex of Completion is NOT granted here: since trials
+// became their own nodes, the last level of a world is a normal puzzle
+// and the Codex is paid by the ascension trial finish
+// (_grantAscensionTrialReward in campaign-trials.js).
 
 //------------------------------------------------------------------------
 //-------------------ITEM REWARD HELPERS-----------------------------------
 //------------------------------------------------------------------------
 
 // Wraps reward content in the standard item-reward card markup shared by
-// bonus rewards, lucky drops, and the ascension codex reward.
+// bonus rewards and lucky drops.
 function _buildItemRewardCard(defId, def, labelHtml) {
     const rc = rarityColors(def.rarity);
     return `
@@ -77,27 +81,6 @@ export function applyConvergenceReward(gi) {
 //-------------------ASCENSION + NEXUS REWARDS-----------------------------
 //------------------------------------------------------------------------
 
-// Grants the Codex of Completion artifact on the first clear of the final
-// level in a world (the ascension level), and writes its reward HTML into irz.
-// Does nothing in ironman mode - that mode disables item rewards.
-export function applyAscensionReward(irz) {
-    const defId = 'artifactComplete';
-    const codexDef = ITEM_DEFS[defId];
-
-    STATE.inventory.push({
-        defId,
-        uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-    });
-    save();
-
-    buildInventoryPanel();
-    showItemGainPopup(defId);
-
-    const label = `🌟 ${t('cg_ascension_reward')}:
-            ${puzzleItemIconHtml(codexDef)} <strong>${itemName(codexDef)}</strong>`;
-    irz.innerHTML = _buildItemRewardCard(defId, codexDef, label);
-}
-
 // Builds the Nexus Point unlock card shown in the win overlay's reward zone.
 // MONSTERLESS runs end after World 14: no Nexus unlock, no card.
 export function applyNexusPointReward(irz) {
@@ -110,24 +93,23 @@ export function applyNexusPointReward(irz) {
     showToast(`🌌 ${t('scr_nexus_unlocked_title')}`);
 }
 
-// Dispatcher for convergence, ascension and Nexus Point one-time rewards.
-// Called during win-overlay rendering; writes into the item-reward zone (irz)
-// when a special reward applies. The Nexus Point never grants the ascension
-// codex - it unlocks the Nexus instead.
+// Dispatcher for convergence and Nexus Point one-time rewards. Called
+// during win-overlay rendering; writes into the item-reward zone (irz) when
+// a special reward applies. The last level of a world grants nothing extra
+// here - its Codex of Completion moved to the ascension trial finish (see
+// _grantAscensionTrialReward). isAscensionLevel is kept in the signature
+// because callers still pass it (the win overlay uses it for its
+// end-of-line layout), but it no longer triggers a reward.
 export function handleSpecialRewards({ gi, isFirstClear, isAscensionLevel, irz, isNexusPoint }) {
+    void isAscensionLevel;
     const worldData = WORLDS[cur.world - 1];
 
-    if (isConvergenceLevel(worldData, isAscensionLevel) && isFirstClear) {
+    if (isConvergenceLevel(worldData, false) && isFirstClear) {
         applyConvergenceReward(gi);
     }
 
     if (isNexusPoint) {
         if (isFirstClear) applyNexusPointReward(irz);
-        return;
-    }
-
-    if (isAscensionLevel && isFirstClear && !_liveMods().ironman) {
-        applyAscensionReward(irz);
     }
 }
 
@@ -328,7 +310,7 @@ function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel, isNe
     const bonusAlreadyDone = STATE.bonusDone.includes(gi);
     const isQuizBonus = cur.bonusType === 'quiz';
 
-    // Special one-time rewards (convergence points, ascension codex, Nexus unlock) go first
+    // Special one-time rewards (convergence points, Nexus unlock) go first
     handleSpecialRewards({ gi, isFirstClear, isAscensionLevel, irz, isNexusPoint });
 
     // Mark the bonus as done on first clear (before item logic so save() is called once)
