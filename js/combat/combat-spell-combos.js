@@ -134,7 +134,7 @@ export function _applySpellDebuff(target, key, ctx) {
 function _applyEntry(target, key, finalAmount, ctx) {
     if (SPELL_DEBUFFS[key]) { _applySpellDebuff(target, key, ctx); return; }
     if (!OLD_AILMENT_KEYS.includes(key)) return;
-    const dps = key === 'ignite' ? Math.max(MIN_DOT_DAMAGE, finalAmount * IGNITE_DMG_SHARE) : undefined;
+    const dps = (key === 'ignite' || key === 'bleed' || key === 'poison') ? Math.max(MIN_DOT_DAMAGE, finalAmount * IGNITE_DMG_SHARE) : undefined;
     _applyMonsterAilment(target, key, dps);
 }
 

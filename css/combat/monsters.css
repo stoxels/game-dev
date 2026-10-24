@@ -2906,10 +2906,10 @@
 }
 
 .sx-status-icon {
-    font-size: 10px;
+    font-size: 16px;
     line-height: 1;
-    padding: 2px 3px;
-    border-radius: 4px;
+    padding: 3px 5px;
+    border-radius: 5px;
     background: rgba(0, 0, 0, 0.75);
     border: 1px solid rgba(255, 255, 255, 0.25);
     animation: sx-status-pulse 1s ease-in-out infinite alternate;
@@ -2937,7 +2937,7 @@
 .st-soaked     { border-color: #38bdf8; box-shadow: 0 0 6px rgba(56,189,248,0.8); }
 .st-frostbite  { border-color: #7dd3fc; box-shadow: 0 0 6px rgba(125,211,252,0.8); }
 .st-static     { border-color: #fde68a; box-shadow: 0 0 6px rgba(253,230,138,0.8); }
-.sx-status-strip .sx-status-icon { font-size: 12px; padding: 2px 4px; }
+.sx-status-strip .sx-status-icon { font-size: 16px; padding: 3px 5px; }
 
 /* Bleeding monster card: red drip badge on the card (class set from the status strip). */
 .sx-bleeding { position: relative; }

@@ -7,7 +7,7 @@ import { _gameOver, _killMonster, _playerTakeDamage, _showDamageNumber } from '.
 import { _egGetActiveMapModValue, _egHasActiveMapMod } from '../endgame/endgame-map-launch.js';
 import { _computePlayerStats } from './combat-player-stats.js';
 import { _isActive } from './combat-state.js';
-import { SPELL_DEBUFFS, comboStatusName, comboStatusTip } from './combat-spell-debuff-defs.js';
+import { SPELL_COMBOS, SPELL_DEBUFFS, comboStatusName, comboStatusTip } from './combat-spell-debuff-defs.js';
 import { _tickSpellDebuffs } from './combat-spell-combos.js';
 import { CRUSH_DURATION_S, _ailmentDamageMult } from './combat-calculations-resistances.js';
 import { _gainEnduranceCharge, _gainPowerCharge, _addGroundFireAcc, _groundFireAcc, _playerStatuses, _puzzleEffects, _playerStatusBarTicker, _replacePuzzleEffects, _setPlayerStatusBarTicker } from './combat-ailments-state.js';
@@ -94,6 +94,7 @@ const AIL_PLAYER_SHADOW_RADIUS_PX = 55;     // approximate radius for shadow clo
 
 const MONSTER_AILMENT_CHANCE_PCT = 15;     // monster hit → player ailment
 const COLD_INNATE_CHILL_CHANCE_PCT = 10;   // cold hits chill even w/o mods
+const LIGHTNING_INNATE_SHOCK_CHANCE_PCT = 10; // lightning hits shock even w/o mods
 const AIL_MIN_DOT_DAMAGE = 2;              // floor for DoT ticks
 
 // Puzzle-side tuning
@@ -773,8 +774,8 @@ function _ailmentHitContext(amount, elements, opts, stats) {
 
 // Bleed: the innate chance of physical hits, then the tree bleed chances.
 function _rollBleedAilments(target, ctx) {
-    const { amount, stats, critDotMult, physShare, isMeleeHit, isAttackHit } = ctx;
-    if (physShare > 0 && Math.random() * 100 < PHYS_INNATE_BLEED_CHANCE_PCT) {
+    const { amount, opts, stats, critDotMult, physShare, isMeleeHit, isAttackHit } = ctx;
+    if (physShare > 0 && !_spellOwnsAilment(opts, 'bleed') && Math.random() * 100 < PHYS_INNATE_BLEED_CHANCE_PCT) {
         _applyMonsterAilment(target, 'bleed', Math.max(AIL_MIN_DOT_DAMAGE, amount * AIL_BLEED_DMG_SHARE) * critDotMult);
     }
     // Tree bleed chances (bleed batch): melee attacks and attacks in general
@@ -827,21 +828,32 @@ function _rollPoisonAilments(target, ctx) {
     }
 }
 
+// True when this spell has its own chance for the ailment in its combo row
+// (then the generic innate chance of that damage type is skipped).
+function _spellOwnsAilment(opts, key) {
+    const row = opts && opts.spellId ? SPELL_COMBOS[opts.spellId] : null;
+    return !!(row && row.applies && row.applies.some(a => a.key === key));
+}
+
 // Elemental ailments: ignite from fire damage, chill / freeze from cold, shock from lightning.
 function _rollElementalAilments(target, ctx) {
-    const { amount, stats, critDotMult, fireShare, coldShare, lightningShare } = ctx;
+    const { amount, opts, stats, critDotMult, fireShare, coldShare, lightningShare } = ctx;
     if (fireShare > 0 && stats.ignitePct > 0 && Math.random() * 100 < stats.ignitePct) {
         _applyMonsterAilment(target, 'ignite', Math.max(AIL_MIN_DOT_DAMAGE, amount * AIL_IGNITE_DMG_SHARE) * critDotMult);
     }
     if (coldShare > 0) {
         if (stats.freezePct > 0 && Math.random() * 100 < stats.freezePct) {
             _applyMonsterAilment(target, 'chill');
-        } else if (Math.random() * 100 < COLD_INNATE_CHILL_CHANCE_PCT) {
+        } else if (!_spellOwnsAilment(opts, 'chill') && Math.random() * 100 < COLD_INNATE_CHILL_CHANCE_PCT) {
             _applyMonsterAilment(target, 'chill');
         }
     }
-    if (lightningShare > 0 && stats.shockPct > 0 && Math.random() * 100 < stats.shockPct) {
-        _applyMonsterAilment(target, 'shocked');
+    if (lightningShare > 0) {
+        if (stats.shockPct > 0 && Math.random() * 100 < stats.shockPct) {
+            _applyMonsterAilment(target, 'shocked');
+        } else if (!_spellOwnsAilment(opts, 'shocked') && Math.random() * 100 < LIGHTNING_INNATE_SHOCK_CHANCE_PCT) {
+            _applyMonsterAilment(target, 'shocked');
+        }
     }
 }
 

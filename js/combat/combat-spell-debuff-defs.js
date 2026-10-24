@@ -157,66 +157,79 @@ export const SPELL_COMBOS = {
     usp_flamestrike: { applies: [_a('ignite', 30)] },
     usp_meteor: { consumes: [_c('ignite', 50, true)] },
     usp_rain_of_fire: { applies: [_a('ignite', 20)] },
-    usp_holy_fire: { applies: [_a('marked', 50)] },
+    usp_holy_fire: { applies: [_a('marked', 50), _a('ignite', 15)] },
     usp_flameblast: { consumes: [_c('ignite', 60, true)] },
     usp_incinerate: { applies: [_a('ignite', 40)] },
     usp_explosive_shot: { applies: [_a('ignite', 40)], spreadOnCrit: true },
     // ── Cold ──
-    usp_frostbolt: { applies: [_a('frostbite', 60)] },
-    usp_blizzard: { applies: [_a('soaked', 40), _a('frostbite', 40)] },
-    usp_cone_of_cold: { applies: [_a('frostbite', 50)] },
-    usp_ice_lance: { consumes: [_c('chill', 60), _c('frozen', 80)] },
-    usp_freezing_pulse: { applies: [_a('brittle', 35)] },
-    usp_ice_spear: { applies: [_a('brittle', 40), _a('frostbite', 40)] },
-    usp_vortex: { applies: [_a('soaked', 50)] },
-    usp_cold_snap: { applies: [_a('brittle', 60)], consumes: [_c('frostbite', 50)] },
+    usp_frostbolt: { applies: [_a('frostbite', 60), _a('chill', 25)] },
+    usp_blizzard: { applies: [_a('soaked', 40), _a('frostbite', 40), _a('chill', 8)] },
+    usp_cone_of_cold: { applies: [_a('frostbite', 50), _a('chill', 30)] },
+    usp_ice_lance: { applies: [_a('chill', 20)], consumes: [_c('chill', 60), _c('frozen', 80)] },
+    usp_freezing_pulse: { applies: [_a('brittle', 35), _a('chill', 15)] },
+    usp_ice_spear: { applies: [_a('brittle', 40), _a('frostbite', 40), _a('chill', 35)] },
+    usp_vortex: { applies: [_a('soaked', 50), _a('chill', 25)] },
+    usp_cold_snap: { applies: [_a('brittle', 60), _a('chill', 35)], consumes: [_c('frostbite', 50)] },
     // ── Lightning ──
-    usp_lightning_bolt: { applies: [_a('static', 50)] },
-    usp_chain_lightning: { applies: [_a('conductive', 35)] },
-    usp_wrath: { applies: [_a('static', 40)] },
-    usp_smite: { applies: [_a('marked', 50)] },
-    usp_spark: { applies: [_a('static', 40)] },
-    usp_arc: { applies: [_a('conductive', 30)] },
-    usp_storm_call: { applies: [_a('soaked', 50), _a('conductive', 30)] },
+    usp_lightning_bolt: { applies: [_a('static', 50), _a('shocked', 25)] },
+    usp_chain_lightning: { applies: [_a('conductive', 35), _a('shocked', 18)] },
+    usp_wrath: { applies: [_a('static', 40), _a('shocked', 30)] },
+    usp_smite: { applies: [_a('marked', 50), _a('shocked', 30)] },
+    usp_spark: { applies: [_a('static', 40), _a('shocked', 10)] },
+    usp_arc: { applies: [_a('conductive', 30), _a('shocked', 12)] },
+    usp_storm_call: { applies: [_a('soaked', 50), _a('conductive', 30), _a('shocked', 25)] },
     usp_ball_lightning: { applies: [_a('conductive', 40)] },
-    usp_crackling_lance: { applies: [_a('static', 50)], consumes: [_c('soaked', 40)] },
-    usp_orb_of_storms: { applies: [_a('conductive', 35)] },
+    usp_crackling_lance: { applies: [_a('static', 50), _a('shocked', 35)], consumes: [_c('soaked', 40)] },
+    usp_orb_of_storms: { applies: [_a('conductive', 35), _a('shocked', 6)] },
     usp_discharge: { consumes: [_c('shocked', 60, true), _c('static', 40, true)] },
     // ── Shadow & arcane ──
-    usp_shadow_bolt: { applies: [_a('withered', 30)] },
-    usp_corruption: { applies: [_a('withered', 50), _a('doomed', 50)] },
-    usp_shadow_word_pain: { applies: [_a('doomed', 60)] },
-    usp_chaos_bolt: { applies: [_a('marked', 40)] },
-    usp_consecration: { applies: [_a('withered', 35)] },
-    usp_contagion: { applies: [_a('withered', 60)], spreadOnCrit: true },
-    usp_bane: { applies: [_a('doomed', 70)] },
-    usp_soulrend: { applies: [_a('withered', 50)] },
-    usp_blight: { applies: [_a('withered', 40)], spreadOnCrit: true },
+    usp_shadow_bolt: { applies: [_a('withered', 30), _a('poison', 20)] },
+    usp_corruption: { applies: [_a('withered', 50), _a('doomed', 50), _a('poison', 15)] },
+    usp_shadow_word_pain: { applies: [_a('doomed', 60), _a('poison', 20)] },
+    usp_chaos_bolt: { applies: [_a('marked', 40), _a('poison', 30)] },
+    usp_consecration: { applies: [_a('withered', 35), _a('poison', 8)] },
+    usp_contagion: { applies: [_a('withered', 60), _a('poison', 15)], spreadOnCrit: true },
+    usp_bane: { applies: [_a('doomed', 70), _a('poison', 20)] },
+    usp_soulrend: { applies: [_a('withered', 50), _a('poison', 10)] },
+    usp_blight: { applies: [_a('withered', 40), _a('poison', 12)], spreadOnCrit: true },
     usp_arcane_missiles: { applies: [_a('marked', 25)] },
     usp_arcane_explosion: { applies: [_a('marked', 30)] },
     usp_arcane_blast: { applies: [_a('marked', 60)] },
     usp_disintegrate: { perStatus: true },
-    usp_starfall: { applies: [_a('marked', 35)] },
+    usp_starfall: { applies: [_a('marked', 35), _a('ignite', 12)] },
     // ── Blade ──
-    usp_heroic_strike: { applies: [_a('exposed', 25)] },
-    usp_mortal_strike: { applies: [_a('exposed', 40)] },
-    usp_rend: { applies: [_a('exposed', 30)] },
-    usp_execute: { perStatus: true },
-    usp_cleave: { applies: [_a('exposed', 20)] },
-    usp_crushing_blow: { applies: [_a('exposed', 50)] },
-    usp_blade_flurry: { applies: [_a('marked', 20)] },
-    usp_seismic_slam: { applies: [_a('exposed', 30)] },
+    usp_heroic_strike: { applies: [_a('exposed', 25), _a('bleed', 12)] },
+    usp_mortal_strike: { applies: [_a('exposed', 40), _a('bleed', 25)] },
+    usp_rend: { applies: [_a('exposed', 30), _a('bleed', 50)] },
+    usp_execute: { applies: [_a('bleed', 20)], perStatus: true },
+    usp_cleave: { applies: [_a('exposed', 20), _a('bleed', 10)] },
+    usp_crushing_blow: { applies: [_a('exposed', 50), _a('bleed', 10)] },
+    usp_blade_flurry: { applies: [_a('marked', 20), _a('bleed', 6)] },
+    usp_seismic_slam: { applies: [_a('exposed', 30), _a('bleed', 10)] },
     usp_exsanguinate: { consumes: [_c('bleed', 60, true)] },
-    usp_reap: { perStatus: true },
-    usp_ethereal_knives: { applies: [_a('exposed', 15)] },
-    usp_bladefall: { applies: [_a('exposed', 30)] },
-    usp_blade_blast: { applies: [_a('exposed', 30)] },
+    usp_reap: { applies: [_a('bleed', 12)], perStatus: true },
+    usp_ethereal_knives: { applies: [_a('exposed', 15), _a('bleed', 8)] },
+    usp_bladefall: { applies: [_a('exposed', 30), _a('bleed', 8)] },
+    usp_blade_blast: { applies: [_a('exposed', 30), _a('bleed', 25)] },
     // ── Arrows ──
-    usp_aimed_shot: { applies: [_a('marked', 60)] },
-    usp_multi_shot: { applies: [_a('exposed', 20)] },
-    usp_barrage: { applies: [_a('exposed', 20)] },
-    usp_arrow_volley: { applies: [_a('exposed', 25)] },
-    usp_serpent_sting: { applies: [_a('conductive', 40)] },
+    usp_aimed_shot: { applies: [_a('marked', 60), _a('bleed', 25)] },
+    usp_multi_shot: { applies: [_a('exposed', 20), _a('bleed', 12)] },
+    usp_barrage: { applies: [_a('exposed', 20), _a('bleed', 8)] },
+    usp_arrow_volley: { applies: [_a('exposed', 25), _a('bleed', 6)] },
+    usp_serpent_sting: { applies: [_a('conductive', 40), _a('shocked', 15)] },
+    // ── Added innate ailments ──
+    usp_immolate: { applies: [_a('ignite', 35)] },
+    usp_firestorm: { applies: [_a('ignite', 10)] },
+    usp_whirlwind: { applies: [_a('bleed', 8)] },
+    usp_piercing_lunge: { applies: [_a('bleed', 15)] },
+    usp_blade_vortex: { applies: [_a('bleed', 8)] },
+    usp_vampiric_strike: { applies: [_a('bleed', 15)] },
+    usp_counterstrike: { applies: [_a('bleed', 20)] },
+    usp_blade_dance: { applies: [_a('bleed', 8)] },
+    usp_shield_slam: { applies: [_a('bleed', 10)] },
+    usp_bastion_burst: { applies: [_a('bleed', 10)] },
+    usp_phantom_strike: { applies: [_a('bleed', 20)] },
+    usp_flicker_slash: { applies: [_a('bleed', 8)] },
 };
 
 //------------------------------------------------------------------------
@@ -227,8 +240,8 @@ export const SPELL_COMBOS = {
 const OLD_STATUS_INFO = {
     ignite: {
         nameEn: 'Ignite', nameDE: 'Brand', adjEn: 'burning', adjDE: 'brennende', durationS: 5,
-        en: 'A burning enemy takes damage every second.',
-        de: 'Ein brennender Gegner erleidet jede Sekunde Schaden.',
+        en: 'A burning enemy takes fire damage over time: 15% of the igniting hit every second.',
+        de: 'Ein brennender Gegner erleidet Feuerschaden über Zeit: jede Sekunde 15% des entzündenden Treffers.',
     },
     chill: {
         nameEn: 'Chill', nameDE: 'Verkühlung', adjEn: 'chilled', adjDE: 'verkühlte', durationS: 8,
@@ -247,13 +260,13 @@ const OLD_STATUS_INFO = {
     },
     poison: {
         nameEn: 'Poison', nameDE: 'Gift', adjEn: 'poisoned', adjDE: 'vergiftete', durationS: 5,
-        en: 'A poisoned enemy takes damage every second.',
-        de: 'Ein vergifteter Gegner erleidet jede Sekunde Schaden.',
+        en: 'A poisoned enemy takes shadow damage over time: 15% of the poisoning hit every second.',
+        de: 'Ein vergifteter Gegner erleidet Schattenschaden über Zeit: jede Sekunde 15% des vergiftenden Treffers.',
     },
     bleed: {
         nameEn: 'Bleed', nameDE: 'Blutung', adjEn: 'bleeding', adjDE: 'blutende', durationS: 5,
-        en: 'A bleeding enemy takes damage every second.',
-        de: 'Ein blutender Gegner erleidet jede Sekunde Schaden.',
+        en: 'A bleeding enemy takes physical damage over time: 15% of the wounding hit every second.',
+        de: 'Ein blutender Gegner erleidet physischen Schaden über Zeit: jede Sekunde 15% des verwundenden Treffers.',
     },
 };
 
@@ -340,11 +353,39 @@ export function getSpellComboSections(spellId, element) {
             note: de
                 ? 'Eine Reaktion passiert, wenn der Schaden dieses Zaubers auf einen Gegner trifft, der bereits den passenden Effekt hat.'
                 : 'A reaction happens when this spell\'s damage hits an enemy that already has the matching effect.',
+            reactions: true,
             rows: reactions.map((r) => {
                 const text = de ? r.de : r.en;
-                return { text: typeof text === 'string' ? text : text[element] };
+                const full = typeof text === 'string' ? text : text[element];
+                const m = /<b>(.*?)<\/b>/.exec(full);
+                return { text: full, name: m ? m[1] : '' };
             }),
         });
     }
     return sections;
+}
+
+// The spellbook's status guide: every ailment, spell debuff and element
+// reaction with what it does, as ready-made HTML (kept out of the spell
+// tooltips so those stay short).
+export function getStatusGuideHTML() {
+    const de = LANG === 'de';
+    const entry = (name, what, dur) => `<div class="sb-guide-row"><b>${name}</b>${dur > 0 ? ` <span class="sb-guide-dur">${dur}s</span>` : ''}<div>${what}</div></div>`;
+    const ailments = Object.keys(OLD_STATUS_INFO).filter((k) => k !== 'frozen')
+        .map((k) => { const r = getStatusRecord(k); return entry(r.name, r.what, r.durationS); });
+    const debuffs = Object.keys(SPELL_DEBUFFS).map((k) => { const r = getStatusRecord(k); return entry(r.name, r.what, r.durationS); });
+    const seen = new Set();
+    const reactions = [];
+    COMBO_REACTIONS.forEach((r) => {
+        const texts = typeof (de ? r.de : r.en) === 'string' ? [de ? r.de : r.en] : Object.values(de ? r.de : r.en);
+        texts.forEach((x) => { if (!seen.has(x)) { seen.add(x); reactions.push(`<div class="sb-guide-row">${x}</div>`); } });
+    });
+    const h = (en, ge) => `<div class="sb-guide-h">${de ? ge : en}</div>`;
+    const intro = de
+        ? 'Zauber können Gegner schwächen. Andere Zauber verursachen dann mehr Schaden gegen sie.'
+        : 'Spells can weaken enemies. Other spells then deal extra damage to them.';
+    return `<div class="sb-guide-intro">${intro}</div>`
+        + h('Ailments', 'Leiden') + ailments.join('')
+        + h('Spell debuffs', 'Zauber-Schwächungen') + debuffs.join('')
+        + h('Reactions', 'Reaktionen') + reactions.join('');
 }

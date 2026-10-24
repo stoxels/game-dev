@@ -59,6 +59,20 @@ const CHARM_SLOT_COLS = 5;
 // Five duplicate Lemmas prove one Theorem.
 const CHARM_SHARDS_PER_ORB = 5;
 
+// Element options for the charm-list filter. Mirrors the vendor's charm
+// filter chips (same seven elements, same tag tests on the universal spell
+// def) so the book and the shop always agree on what counts as Fire, Cold,
+// etc. 'all' (no filter) is handled separately, not listed here.
+const CHARM_ELEMENT_FILTERS = [
+    { id: 'fire', tag: 'Fire' },
+    { id: 'cold', tag: 'Cold' },
+    { id: 'lightning', tag: 'Lightning' },
+    { id: 'shadow', tag: 'Shadow' },
+    { id: 'arcane', tag: 'Arcane' },
+    { id: 'holy', tag: 'Holy' },
+    { id: 'physical', tag: 'Physical' },
+];
+
 // Every applied Theorem adds this much damage to the charm's spell.
 export const CHARM_ORB_DAMAGE_PCT = 1;
 
@@ -437,6 +451,9 @@ export function ensureCharmState() {
     // UI preference for the charm list (see _charmApplyRankFilter).
     STATE.charmMaxRankOnly = STATE.charmMaxRankOnly === true;
     STATE.charmAutoUpgrade = STATE.charmAutoUpgrade === true;
+    // Element filter for the charm list ('all' = no filtering).
+    if (STATE.charmElementFilter !== 'all'
+        && !CHARM_ELEMENT_FILTERS.some((f) => f.id === STATE.charmElementFilter)) STATE.charmElementFilter = 'all';
 
     // Drop slot references whose charm is no longer owned (save edits,
     // class resets) so a slot can never unlock a spell that isn't held.
@@ -1086,6 +1103,14 @@ function _charmArtOrGlyph(charm) {
         : CHARM_BASE_ICON;
 }
 
+// Display label for a spell slot's hotbar keybind (mirrors the hotbar:
+// the custom binding when one is set, else the default 1…10 number).
+function _charmSlotKeyLabel(slotIndex) {
+    const key = (typeof globalThis.keybindKeyFor === 'function') ? globalThis.keybindKeyFor(`hotbar-${slotIndex + 1}`) : null;
+    if (key === null || key === undefined) return String(slotIndex + 1);
+    return keybindDisplayLabel(key);
+}
+
 // The 2 × 5 spell slot grid.
 function _charmBuildSlotsHTML() {
     ensureCharmState();
@@ -1099,7 +1124,7 @@ function _charmBuildSlotsHTML() {
             cells.push(`<div class="sb3-slot is-empty" data-charm-slot="${i}"`
                 + ` onmouseenter="handleCharmEmptySlotTip(event,${i})"`
                 + ` onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">`
-                + `<span class="sb3-slot-head">${i + 1}</span>`
+                + `<span class="sb3-slot-head">${_charmSlotKeyLabel(i)}</span>`
                 + `<span class="sb3-slot-socket"></span>`
                 + `</div>`);
             continue;
@@ -1117,7 +1142,7 @@ function _charmBuildSlotsHTML() {
         // reads the slotted charm's rank for cast stats.
         cells.push(`<div class="sb3-slot is-filled"${schoolAttr} data-charm-slot="${i}" data-charm-key="${charm.key}"`
             + ` onmouseenter="handleSkillTip(event,'${charm.skillId}')" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">`
-            + `<span class="sb3-slot-head">${i + 1}</span>`
+            + `<span class="sb3-slot-head">${_charmSlotKeyLabel(i)}</span>`
             + `<span class="sb3-slot-socket"><span class="sb3-slot-icon">${_charmArtOrGlyph(charm)}</span></span>`
             + `<span class="sb3-slot-foot">${nameTxt}${bonusTxt}</span>`
             + `</div>`);
@@ -1154,6 +1179,34 @@ function _charmBuildCurrencyHTML() {
         + `</div>`;
 }
 
+// Element of a skill's charm for the list filter, or '' when the skill has
+// none (class skills carry no element). Reads the universal spell def off
+// the globalThis bridge - importing universal-spells.js here would close a
+// load cycle (see the NOTE at the top of this file).
+function _charmElementOf(skillId) {
+    try {
+        const defs = (typeof globalThis !== 'undefined' && Array.isArray(globalThis.UNIVERSAL_SPELL_DEFS))
+            ? globalThis.UNIVERSAL_SPELL_DEFS : [];
+        const def = defs.find((d) => d && d.id === skillId);
+        if (def && Array.isArray(def.tags)) {
+            const hit = CHARM_ELEMENT_FILTERS.find((f) => def.tags.includes(f.tag));
+            if (hit) return hit.id;
+        }
+    } catch (e) { /* unknown skill - no element */ }
+    return '';
+}
+
+// Element dropdown for the charm list. A <select> (not chips like the
+// vendor) so it fits next to the checkboxes on the book frame. Labels reuse
+// the vendor's filter strings so both languages come for free.
+function _charmBuildElementFilterHTML() {
+    const cur = (STATE && STATE.charmElementFilter) || 'all';
+    const opt = (id) => `<option value="${id}"${cur === id ? ' selected' : ''}>${t('eg_vendor_charm_filter_' + id)}</option>`;
+    return `<span class="sb3-maxrank sb3-elemfilter">`
+        + `<select class="charm-elem-select">${opt('all')}${CHARM_ELEMENT_FILTERS.map((f) => opt(f.id)).join('')}</select>`
+        + `</span>`;
+}
+
 // "Max rank only" filter row, above the charm list. Persisted on STATE so the
 // choice survives a reload like every other loadout preference.
 function _charmBuildFilterHTML() {
@@ -1169,7 +1222,8 @@ function _charmBuildFilterHTML() {
         + `<label class="sb3-maxrank sb3-autoup"${tipAttrs('autoup')}>`
         + `<input type="checkbox" class="charm-autoup-cb"${STATE && STATE.charmAutoUpgrade ? ' checked' : ''}>`
         + `<span class="charm-filter-label">${t('charm_auto_upgrade')}</span>`
-        + `</label>`;
+        + `</label>`
+        + _charmBuildElementFilterHTML();
 }
 
 // "Auto-upgrade spells" checkbox: saves the choice (no re-render needed, the
@@ -1188,6 +1242,14 @@ export function handleCharmMaxRankToggle(checked) {
     _charmRefreshSpellbook();
 }
 
+// Stores the charm-list element filter and re-renders the book.
+function _charmSetElementFilter(value) {
+    if (!STATE) return;
+    STATE.charmElementFilter = (value === 'all' || CHARM_ELEMENT_FILTERS.some((f) => f.id === value)) ? value : 'all';
+    if (save) { try { save(); } catch (e) { /* best effort */ } }
+    _charmRefreshSpellbook();
+}
+
 // Collapses the inventory to ONE entry per spell - the highest rank owned -
 // when the "max rank only" filter is on. Charms that are currently sitting in
 // a spell slot are kept regardless of rank: the filter is for tidying the
@@ -1202,6 +1264,15 @@ function _charmApplyRankFilter(charms) {
     return charms.filter((c) => c.rank === topRank[c.skillId] || slotted.includes(c.key));
 }
 
+// Keeps only charms of the chosen element. Slotted charms are not exempt:
+// they stay visible in the spell slots on the right page, so the list can be
+// strict. Skills without an element (class skills) only show under 'All'.
+function _charmApplyElementFilter(charms) {
+    const filter = (STATE && STATE.charmElementFilter) || 'all';
+    if (filter === 'all') return charms;
+    return charms.filter((c) => _charmElementOf(c.skillId) === filter);
+}
+
 // The inventory grid (drag source for the spell slots).
 function _charmBuildInventoryHTML() {
     ensureCharmState();
@@ -1209,11 +1280,15 @@ function _charmBuildInventoryHTML() {
     if (!charms.length) {
         return `<div class="sb3-charm-list"><div class="charm-inv-empty">${t('charm_inventory_empty')}</div></div>`;
     }
-    const sorted = _charmApplyRankFilter(charms).sort((a, b) => {
+    const sorted = _charmApplyElementFilter(_charmApplyRankFilter(charms)).sort((a, b) => {
         const an = getSkillName(a.skillId), bn = getSkillName(b.skillId);
         if (an !== bn) return an.localeCompare(bn);
         return a.rank - b.rank;
     });
+    // The inventory is not empty, so the element filter hid everything.
+    if (!sorted.length) {
+        return `<div class="sb3-charm-list"><div class="charm-inv-empty">${t('charm_filter_no_match')}</div></div>`;
+    }
     const items = sorted.map((charm, index) => {
         const slotted = STATE.charmSlots.includes(charm.key) ? ' is-slotted' : '';
         const bonus = charm.orbs > 0 ? `<span class="sb3-charm-orbs">+${charm.orbs * CHARM_ORB_DAMAGE_PCT}%</span>` : '';
@@ -1221,11 +1296,12 @@ function _charmBuildInventoryHTML() {
         const schoolAttr = school ? ` data-school="${school}"` : '';
         // v3.3: when this exact charm sits in a spell slot, show WHICH one(s)
         // as a cyan chip after the rank (handles the multi-slot edge case).
-        const slotNums = STATE.charmSlots
-            .map((k, si) => (k === charm.key ? si + 1 : null))
-            .filter(Boolean);
-        const slotRef = slotNums.length
-            ? `<span class="sb3-charm-slotref" data-tip-slot="${slotNums.join(',')}">▸ ${slotNums.join(',')}</span>`
+        // The chip prints the slot's hotbar keybind, matching the slot heads.
+        const slotIdxs = STATE.charmSlots
+            .map((k, si) => (k === charm.key ? si : null))
+            .filter((si) => si !== null);
+        const slotRef = slotIdxs.length
+            ? `<span class="sb3-charm-slotref" data-tip-slot="${slotIdxs.map((si) => si + 1).join(',')}">▸ ${slotIdxs.map((si) => _charmSlotKeyLabel(si)).join(',')}</span>`
             : '';
         return `<div class="sb3-charm-row${slotted}"${schoolAttr} data-charm-key="${charm.key}"`
             + ` onmouseenter="handleSkillTip(event,'${charm.skillId}','${charm.key}')" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">`
@@ -1476,6 +1552,9 @@ export function initCharmPanelInteractions(host) {
     host.addEventListener('change', (e) => {
         if (e.target && e.target.classList && e.target.classList.contains('charm-autoup-cb')) {
             _charmSetAutoUpgrade(e.target.checked);
+        }
+        if (e.target && e.target.classList && e.target.classList.contains('charm-elem-select')) {
+            _charmSetElementFilter(e.target.value);
         }
     });
 

@@ -391,19 +391,14 @@ function _skillTooltipCombo(skillId, rank) {
     const classRows = _classSkillMonsterRows(skillId, rank);
     if (classRows.length) sections.push({ title: LANG === 'de' ? 'Wirkung auf Monster' : 'On monsters', rows: classRows });
     if (!sections.length) return '';
-    const title = LANG === 'de' ? 'Kombos' : 'Combos';
-    const intro = LANG === 'de'
-        ? 'Zauber können Gegner schwächen. Andere Zauber verursachen dann mehr Schaden gegen sie.'
-        : 'Spells can weaken enemies. Other spells then deal extra damage to them.';
-    const hint = LANG === 'de' ? 'Tipp: Fahre über ein Statussymbol auf einem Gegner, um seine Wirkung zu lesen.' : 'Tip: hover a status icon on an enemy to read what it does.';
-    const rowHtml = (r) => `<div class="skl-tip-combo-row">${r.text}${r.note ? `<div class="skl-tip-combo-note">${r.note}</div>` : ''}</div>`;
+    // Short on purpose: what the spell does on hit and which reactions it can
+    // trigger. The explanations live in the spellbook's status guide.
+    const rowHtml = (r) => `<div class="skl-tip-combo-row">${r.text}</div>`;
     const secHtml = (sec) => `<div class="skl-tip-combo-sec">${sec.title}</div>`
-        + (sec.note ? `<div class="skl-tip-combo-note">${sec.note}</div>` : '')
-        + sec.rows.map(rowHtml).join('');
-    return `<div class="skl-tip-combo"><div class="skl-tip-combo-title">${title}</div>`
-        + `<div class="skl-tip-combo-note">${intro}</div>`
-        + sections.map(secHtml).join('')
-        + `<div class="skl-tip-note">${hint}</div></div>`;
+        + (sec.reactions
+            ? `<div class="skl-tip-combo-row">${sec.rows.map((r) => `<b>${r.name}</b>`).join(' · ')}</div>`
+            : sec.rows.map(rowHtml).join(''));
+    return `<div class="skl-tip-combo">${sections.map(secHtml).join('')}</div>`;
 }
 
 function _buildSkillTooltipHTML(skillId, charmKey, previewRank) {

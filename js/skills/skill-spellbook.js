@@ -1,5 +1,6 @@
 import { Audio_Manager } from '../audio/audio.js';
-import { t } from '../translation/translations.js';
+import { LANG, t } from '../translation/translations.js';
+import { getStatusGuideHTML } from '../combat/combat-spell-debuff-defs.js';
 import { hideHUDTooltip } from '../classes/class-hud.js';
 import { CHARM_SLOT_COUNT, initCharmPanelInteractions, renderSpellbookCharmPanel } from './skill-charms.js';
 import { _isGameScreenActive, renderSkillHotbar, setHotbarAboveModal } from './skill-hotbar.js';
@@ -28,6 +29,17 @@ import { STATE } from '../state.js';
 //---------------------------DOM CONTAINER--------------------------------
 //------------------------------------------------------------------------
 
+// Shows or hides the status guide (what every ailment, debuff and reaction does).
+function _toggleStatusGuide(overlay) {
+    const panel = overlay.querySelector('#spellbook-guide');
+    if (!panel) return;
+    if (!panel.hidden) { panel.hidden = true; return; }
+    const title = LANG === 'de' ? 'Status-Leitfaden' : 'Status guide';
+    panel.innerHTML = `<div class="sb-guide-title">${title}</div>` + getStatusGuideHTML();
+    panel.scrollTop = 0;
+    panel.hidden = false;
+}
+
 // Returns the spell book overlay, creating it on first use.
 function _ensureSpellbookOverlay() {
     let overlay = document.getElementById('spellbook-overlay');
@@ -39,6 +51,8 @@ function _ensureSpellbookOverlay() {
     overlay.innerHTML = `
         <div class="modal-box spellbook-box">
             <button class="modal-close" id="btn-spellbook-close">${t('reset_close')}</button>
+            <button class="sb-guide-btn" id="btn-spellbook-guide" type="button">?</button>
+            <div class="sb-guide-panel" id="spellbook-guide" hidden></div>
             <!-- "Max rank only" sits on the frame itself, top-left, level with
                  the SPELLBOOK plaque and above the CHARMS header (filled by
                  renderSpellbookCharmPanel). -->
@@ -65,6 +79,8 @@ function _ensureSpellbookOverlay() {
 
     overlay.querySelector('#btn-spellbook-close')
         .addEventListener('click', closeSpellbook);
+    overlay.querySelector('#btn-spellbook-guide')
+        .addEventListener('click', () => _toggleStatusGuide(overlay));
     // Charm drag & drop / shift-click interactions (js/skills/skill-charms.js).
     initCharmPanelInteractions(overlay);
     // Clicking the dimmed backdrop (but not the box) closes the book.
