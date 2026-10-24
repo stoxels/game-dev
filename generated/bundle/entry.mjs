@@ -312,7 +312,7 @@ import { _MZ_DEBUG_SLOW, _MZ_DEBUG_MULT, MZ_GANG_DMG, MZ_WALL_DMG, MZ_MAZEWALL_D
 import { _mechLightCycle } from '../../js/combat/bosses/boss-tron.js';
 import { _mechSplitterRocks } from '../../js/combat/bosses/boss-belt.js';
 import { _mechDormantSeekers } from '../../js/combat/bosses/boss-hunter.js';
-import { _mechEyeBursts } from '../../js/combat/bosses/boss-cyclops.js';
+import { _mechEyeBursts, _mechCyclopsGaze } from '../../js/combat/bosses/boss-cyclops.js';
 import { _mechBulletWalls } from '../../js/combat/bosses/boss-barricade.js';
 import { _mechLockOn } from '../../js/combat/bosses/boss-guardian.js';
 import { _mechFlurry } from '../../js/combat/bosses/boss-duelist.js';
@@ -1267,6 +1267,7 @@ try { globalThis["_mechLightCycle"] = _mechLightCycle; } catch (e) {} // PHASE3-
 try { globalThis["_mechSplitterRocks"] = _mechSplitterRocks; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-belt.js)
 try { globalThis["_mechDormantSeekers"] = _mechDormantSeekers; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-hunter.js)
 try { globalThis["_mechEyeBursts"] = _mechEyeBursts; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-cyclops.js)
+try { globalThis["_mechCyclopsGaze"] = _mechCyclopsGaze; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-cyclops.js)
 try { globalThis["_mechBulletWalls"] = _mechBulletWalls; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-barricade.js)
 try { globalThis["_mechLockOn"] = _mechLockOn; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-guardian.js)
 try { globalThis["_mechFlurry"] = _mechFlurry; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-duelist.js)

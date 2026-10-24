@@ -4956,6 +4956,7 @@ body:has(#screen-hub.active) [class*="sx-gal-"] { display: none !important; }
 .sx-nk-fin-stack { --nk-fin: #a5b4fc; }
 .sx-nk-fin-water { --nk-fin: #7dd3fc; }
 .sx-nk-fin-dance { --nk-fin: #f9a8d4; }
+.sx-nk-fin-cyc { --nk-fin: #fb923c; }
 
 /* THE CREEPER: real blast reach (pack fuses, TNT cluster) + finale edge. */
 .sx-crp-reach {
@@ -12522,4 +12523,39 @@ body.sx-shp-flash::after {
 @keyframes sx-ward-cell-strike {
     0% { filter: brightness(3); background: rgba(254, 249, 195, 0.85); }
     100% { filter: brightness(1); opacity: 0; }
+}
+
+/* THE CYCLOPS: the painted eye, ring rays, and the gaze lane. */
+.sx-cyc-eye {
+    position: fixed; top: 0; left: 0; z-index: 9000; pointer-events: none; box-sizing: border-box;
+    width: 60px; height: 60px; border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #fff, #fde68a 70%, #f59e0b);
+    border: 3px solid #7f1d1d;
+    box-shadow: 0 0 22px rgba(248, 113, 113, 0.9);
+    display: flex; align-items: center; justify-content: center;
+}
+.sx-cyc-pupil {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, #000 0 38%, #dc2626 42% 100%);
+    box-shadow: 0 0 8px rgba(220, 38, 38, 0.9);
+}
+.sx-cyc-eye-charge { box-shadow: 0 0 34px 8px rgba(255, 255, 255, 0.95); animation: sx-nk-warn-pulse 0.25s ease-in-out infinite alternate; }
+.sx-cyc-ray {
+    position: fixed; top: 0; left: 0; z-index: 8998; pointer-events: none;
+    width: 1800px; height: 2px; margin-top: -1px; transform-origin: 0 50%;
+    background: linear-gradient(90deg, rgba(248, 113, 113, 0.85), rgba(248, 113, 113, 0.25));
+}
+.sx-cyc-lane {
+    position: fixed; top: 0; left: 0; z-index: 8999; pointer-events: none; box-sizing: border-box;
+    transform-origin: 0 50%;
+    border-top: 3px dashed rgba(251, 191, 36, 0.9); border-bottom: 3px dashed rgba(251, 191, 36, 0.9);
+    background: linear-gradient(90deg, rgba(251, 191, 36, 0.18), rgba(251, 191, 36, 0.05));
+}
+.sx-cyc-lane-locked {
+    border-color: rgba(239, 68, 68, 0.98); background: linear-gradient(90deg, rgba(239, 68, 68, 0.34), rgba(239, 68, 68, 0.1));
+    animation: sx-nk-warn-pulse 0.15s ease-in-out infinite alternate;
+}
+.sx-cyc-lane-fire {
+    border: 0; background: linear-gradient(90deg, #fff, rgba(254, 215, 170, 0.95) 8%, rgba(249, 115, 22, 0.85) 60%, rgba(249, 115, 22, 0.5));
+    box-shadow: 0 0 30px rgba(249, 115, 22, 0.95);
 }
