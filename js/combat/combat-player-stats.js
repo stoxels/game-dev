@@ -1379,12 +1379,23 @@ function _applyWeaponDamageRanges(s, passiveTreeBonuses) {
     // (base ranges + "to Melee Strikes" mods, both channels for unscoped
     // slots) hits MELEE_DAMAGE_MULT times harder. Applied here so the
     // char-sheet ranges and combat agree. % increased multipliers are NOT
-    // scaled (only flat ranges are).
+    // scaled (only flat ranges are). A wand's bolt is not a melee blow: it keeps
+    // its plain damage and only scales with its charge bar, so a hand holding a
+    // wand is left out.
     if (typeof MELEE_DAMAGE_MULT !== 'undefined' && MELEE_DAMAGE_MULT !== 1) {
         const mm = MELEE_DAMAGE_MULT;
+        const w1 = _equipped && _equipped.weapon1;
+        const w2 = _equipped && _equipped.weapon2;
+        const handMult = (w) => (_weaponShoots(w) ? 1 : mm);
+        const pooledMult = s.dualMixed ? mm
+            : s.isDualWielding ? (_weaponShoots(w1) && _weaponShoots(w2) ? 1 : mm)
+            : (_weaponShoots(_getEquippedWeaponInfo().item) ? 1 : mm);
         for (const k of HAND_RANGE_KEYS) {
-            s[k] = Math.round((s[k] || 0) * mm);
-            if (s.handRanges) for (const h of [1, 2]) s.handRanges[h][k] = Math.round(s.handRanges[h][k] * mm);
+            s[k] = Math.round((s[k] || 0) * pooledMult);
+            if (s.handRanges) {
+                s.handRanges[1][k] = Math.round(s.handRanges[1][k] * handMult(w1));
+                s.handRanges[2][k] = Math.round(s.handRanges[2][k] * handMult(w2));
+            }
         }
     }
 }
@@ -1544,6 +1555,8 @@ function _applyWeaponConditionalLines(s, passiveTreeBonuses) {
     s.accuracy += s.agility;
 }
 
+const INT_SPELL_DAMAGE_PER_POINT = 0.5;   // flat Spell Damage per point of Intelligence
+
 // Accuracy, Agility, Intelligence and Strength side effects, Acrobatics, the
 // map-run spell damage reduction and the per-level life and mana bonus.
 function _applyAccuracyAttributesAndLevelBonus(s) {
@@ -1554,9 +1567,12 @@ function _applyAccuracyAttributesAndLevelBonus(s) {
     // Iron Reflexes: Agility grants no Evasion Rating.
     if (!((s.agilityNoEvasion || 0) > 0)) s.evasionFlat += s.agility;
     s.mana += s.intelligence * 2;
-    s.spellDamageFlat += s.intelligence;
+    // Flat spell damage is added before every % bonus multiplies it, so a full
+    // point per Intelligence outgrew the level curve: a point counts half.
+    s.spellDamageFlat += s.intelligence * INT_SPELL_DAMAGE_PER_POINT;
     // Iron Will: Strength also adds flat Spell Damage like Intelligence.
-    if ((s.strengthSpellDamage || 0) > 0) s.spellDamageFlat += s.strength;
+    if ((s.strengthSpellDamage || 0) > 0) s.spellDamageFlat += s.strength * INT_SPELL_DAMAGE_PER_POINT;
+    s.spellDamageFlat = Math.round(s.spellDamageFlat);
     // Acrobatics: extra chance to Evade Attacks from the tree.
     s.dodgeChance = (s.dodgeChance || 0) + (s.dodgeChanceTreePct || 0);
 

@@ -207,7 +207,10 @@ export function _applyPlayerMeleeImpact(targetId, opts) {
     // Uses the existing damage application logic[cite: 1] - tagged isMelee
     // so Spellproof monsters (spellproofPct) take full melee damage while
     // all non-melee sources (spells, reveal projectiles, DoTs) are resisted.
-    _damageTargetById(targetId, dmg, elements, { isCrit: wasCrit, isMelee: true, chargePct });
+    // A wand's bolt is a ranged attack, not a melee blow: no melee tags (no melee
+    // push-back, melee leech or melee-only bleed).
+    const hitTags = (opts && opts.shot) ? { isPlayerHit: true } : { isMelee: true };
+    _damageTargetById(targetId, dmg, elements, { isCrit: wasCrit, ...hitTags, chargePct });
 
     if (gauntletHooks) gauntletHooks.post(targetId, chargePct, comboMult > 1);
 

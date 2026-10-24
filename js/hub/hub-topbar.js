@@ -73,8 +73,24 @@ export function _exportBuildSnapshot() {
             if (/^(class|ascend|skill|charm|player|passive|difficulty|eg(Gold|Level))/i.test(k)
                 && k !== 'passiveTreeAllocated' && k !== 'charmInventory') pick[k] = S[k];
         }
+        // The spells on the hotbar with the numbers they really cast with: rank,
+        // damage per hit and per cast, cooldown, mana and cast time.
+        const hotbar = (Array.isArray(S.skillHotbar) ? S.skillHotbar : []).map((id, slot) => {
+            if (!id) return null;
+            const row = { slot: slot + 1, skillId: id };
+            try { row.name = g.getSkillName(id); } catch (e) { /* name is optional */ }
+            try { row.rank = g.getSkillCastRankFull(id); } catch (e) { /* rank is optional */ }
+            try {
+                const d = g.getSkillDamage(id);
+                if (d) row.damage = { perHitMin: d.perHitMin, perHitMax: d.perHitMax, count: d.count, totalMin: d.totalMin, totalMax: d.totalMax };
+            } catch (e) { /* no damage estimate */ }
+            try { row.cooldownSeconds = g.getSkillCooldown(id); } catch (e) { /* optional */ }
+            try { row.manaCost = g.getSkillManaCost(id); } catch (e) { /* optional */ }
+            try { row.castTimeSeconds = g.getSkillCastTimeSeconds(id); } catch (e) { /* optional */ }
+            return row;
+        });
         const snapshot = {
-            exportVersion: 1,
+            exportVersion: 2,
             exportedAt: new Date().toISOString(),
             game: document.title,
             level: S.playerLevel,
@@ -86,6 +102,7 @@ export function _exportBuildSnapshot() {
             passiveTreeAllocated: Array.from(S.passiveTreeAllocated || []),
             passiveTreePoints: S.passiveTreePoints,
             charmInventory: S.charmInventory,
+            hotbar,
             equipped: g._equipped || S.egEquipped || {},
             sheet,
             state: pick,

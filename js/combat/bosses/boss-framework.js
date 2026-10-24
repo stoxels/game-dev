@@ -106,38 +106,13 @@ export function _scaleBossChargeMax(raw) {
     return Math.max(3, Math.round(raw * BOSS_CHARGE_SPEED_MULT));
 }
 
-// Early bosses used to die in seconds to geared characters: their HP only
-// followed the level curve, while a character's output follows its gear.
-// This multiplier compares what the current character hits for (best of
-// grid projectile and spell) with a bare character, and fades out by L50
-// where the late-HP curve takes over. Capped so it can never become a wall.
-const BOSS_GEAR_HP_CAP = 2.5;
-const BOSS_GEAR_HP_EXP = 0.5;
-const BOSS_GEAR_HP_FADE_FROM = 20;
-const BOSS_GEAR_HP_FADE_TO = 50;
-function _bossGearHpMult(lvl) {
-    if (lvl >= BOSS_GEAR_HP_FADE_TO) return 1;
-    try {
-        const g = globalThis;
-        if (typeof g._computePlayerStats !== 'function') return 1;
-        const st = g._computePlayerStats() || {};
-        const base = (g.PLAYER_STATS && g.PLAYER_STATS.baseDamage) || 10;
-        const mid = (a, b) => ((Number(a) || 0) + (Number(b) || 0)) / 2;
-        const phys = (base + mid(st.physFlatMin, st.physFlatMax)) * (1 + (Number(st.physIncPct) || 0) / 100);
-        const elem = (mid(st.fireDmgMin, st.fireDmgMax) + mid(st.coldDmgMin, st.coldDmgMax)
-            + mid(st.lightningDmgMin, st.lightningDmgMax) + mid(st.shadowDmgMin, st.shadowDmgMax))
-            * (1 + ((Number(st.elementalDamageIncPct) || 0) + (Number(st.projectileElementalDamageIncPct) || 0)) / 100);
-        const proj = (phys + elem) * (1 + (Number(st.damageIncPct) || 0) / 100) * (1 + (Number(st.projectileDamageIncPct) || 0) / 100);
-        const spell = (base + (Number(st.spellDamageFlat) || 0)) * (1 + (Number(st.spellDamageIncPct) || 0) / 100) * 0.5;
-        const ratio = Math.max(1, Math.max(proj, spell) / base);
-        let m = Math.min(BOSS_GEAR_HP_CAP, Math.pow(ratio, BOSS_GEAR_HP_EXP));
-        if (lvl > BOSS_GEAR_HP_FADE_FROM) {
-            const f = (lvl - BOSS_GEAR_HP_FADE_FROM) / (BOSS_GEAR_HP_FADE_TO - BOSS_GEAR_HP_FADE_FROM);
-            m = 1 + (m - 1) * (1 - Math.min(1, f));
-        }
-        return Math.max(1, m);
-    } catch (e) { return 1; }
-}
+// Boss life is FIXED per boss and level: it never looks at the character's
+// gear, so every player faces the same base difficulty (a stronger build just
+// wins faster, a weaker one slower).
+// The basic-attack damage floor (a share of the player's life) fades out
+// between these levels, where the damage curve itself takes over.
+const BOSS_DMG_FLOOR_FADE_FROM = 20;
+const BOSS_DMG_FLOOR_FADE_TO = 50;
 
 // Returns the scaled stats for a boss at the given level.
 // Accepts either a string id (looks up BOSS_DEFS) or a def object directly.
@@ -154,7 +129,7 @@ export function _buildBoss(defOrId, level = 1, hpMult = 1) {
     const hpScale = baseHpScale * lateMult;
     const dmgScale = 1 + BOSS_LEVEL_DAMAGE_SCALE * (lvl - 1);
 
-    const maxHP = Math.round(def.baseHP * hpScale * hpMult * _bossGearHpMult(lvl));
+    const maxHP = Math.round(def.baseHP * hpScale * hpMult);
     // Early bosses must always be able to hurt: their level-curve damage can
     // be a rounding error next to a geared character's life pool. Floor the
     // basic attack at a share of the player's max life (fades out by L50,
@@ -162,9 +137,9 @@ export function _buildBoss(defOrId, level = 1, hpMult = 1) {
     let damage = Math.round(def.baseDamage * dmgScale);
     try {
         const pMax = Number(globalThis.playerMaxHP) || 0;
-        if (pMax > 0 && lvl < BOSS_GEAR_HP_FADE_TO) {
-            const fade = lvl <= BOSS_GEAR_HP_FADE_FROM ? 1
-                : 1 - (lvl - BOSS_GEAR_HP_FADE_FROM) / (BOSS_GEAR_HP_FADE_TO - BOSS_GEAR_HP_FADE_FROM);
+        if (pMax > 0 && lvl < BOSS_DMG_FLOOR_FADE_TO) {
+            const fade = lvl <= BOSS_DMG_FLOOR_FADE_FROM ? 1
+                : 1 - (lvl - BOSS_DMG_FLOOR_FADE_FROM) / (BOSS_DMG_FLOOR_FADE_TO - BOSS_DMG_FLOOR_FADE_FROM);
             damage = Math.max(damage, Math.round(pMax * 0.13 * fade));
         }
     } catch (e) { /* floor is best-effort */ }

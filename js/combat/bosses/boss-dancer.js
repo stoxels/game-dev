@@ -76,14 +76,15 @@ const DAN_TOUCH_FLING = [0, 120, 145, 170];
 const DAN_RING_R = [0, 250, 228, 206];         // dance floor radius per phase
 const DAN_RHYTHM_FILL = [0, 15, 17, 19];       // rhythm per second while inside
 const DAN_RHYTHM_DRAIN = 22;                   // rhythm per second lost outside
-const DAN_OUT_GRACE_S = 2.2;                   // seconds outside before the Dancer cuts in
-const DAN_CUTIN_DMG = [0, 0.05, 0.06, 0.07];   // %maxHP per cut-in zap
+const DAN_OUT_GRACE_S = 2.0;                   // seconds outside before the Dancer cuts in
+const DAN_CUTIN_DMG = [0, 0.07, 0.08, 0.09];   // %maxHP per cut-in zap
+const DAN_CUTIN_PULL = 180;                    // px the Dancer yanks you back toward the floor
 const DAN_CUTIN_GAP_MS = 1400;                 // time between zaps while still outside
 const DAN_SHOW_MS = 6000;                      // SHOWSTOPPER duration
 const DAN_SHOW_MULT = 1.35;                    // damage the Dancer takes during it
 const DAN_SHOW_HEAL_PCT = 0.06;                // share of max life you heal
 const DAN_SHOW_REST_MS = 2500;                 // pause before the rhythm can fill again
-const DAN_START_GRACE_S = 4;                   // extra seconds outside before the first zap
+const DAN_START_GRACE_S = 2;                   // extra seconds outside before the first zap
 const DAN_HINT_MS = 7000;                      // the "stay close" hint on the bar
 // Tango (phase 2+): a telegraphed dash you have to follow
 const DAN_TANGO_EVERY_MS = [0, 0, 14000, 9500];
@@ -383,6 +384,22 @@ function _danStartShowstopper(st, live, now) {
     _danSfx();
 }
 
+// The Dancer cuts in: a lightning bolt strikes where you stand and yanks you
+// back toward the dance floor.
+function _danCutIn(st, c, p) {
+    const b = st.ball;
+    const bolt = _nkEl(st.run, 'div', 'sx-dan-bolt');
+    bolt.style.left = Math.round(c.x) + 'px';
+    bolt.style.top = Math.round(c.y) + 'px';
+    st.run.timers.push(setTimeout(() => { try { bolt.remove(); } catch (e) {} }, 450));
+    _nkAbilityHitToast(_nkHit(DAN_CUTIN_DMG[p], 'lightning', st.level), 'The Dancer', 'Cut-in', true);
+    const dx = b.x - c.x, dy = b.y - c.y, d = Math.hypot(dx, dy) || 1;
+    const pull = Math.min(DAN_CUTIN_PULL, Math.max(0, d - (st.ringR || DAN_RING_R[p]) * 0.6));
+    if (pull > 20) _nkFlingAvatar(dx / d * pull, dy / d * pull, c.x, c.y);
+    st.ring.classList.remove('zap'); void st.ring.offsetWidth; st.ring.classList.add('zap');
+    _danSfx();
+}
+
 // One frame of the dance floor rules: inside fills the rhythm, outside drains it
 // and, after the grace time, the Dancer cuts in.
 function _danStepRhythm(st, live, dtS, now, p, finale) {
@@ -414,9 +431,7 @@ function _danStepRhythm(st, live, dtS, now, p, finale) {
             else st.outS += dtS;
             if (st.outS >= DAN_OUT_GRACE_S && now >= st.cutCd) {
                 st.cutCd = now + DAN_CUTIN_GAP_MS;
-                _nkAbilityHitToast(_nkHit(DAN_CUTIN_DMG[p], 'lightning', st.level), 'The Dancer', 'Cut-in', true);
-                st.ring.classList.remove('zap'); void st.ring.offsetWidth; st.ring.classList.add('zap');
-                _danSfx();
+                _danCutIn(st, c, p);
             }
         }
         if (st.rhythm >= 100 && !show) _danStartShowstopper(st, live, now);

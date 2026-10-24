@@ -4380,6 +4380,16 @@ body.sx-gust-spike-hot-r .sx-nk-gust-spike-right {
 @keyframes sx-dan-ring-out { from { opacity: .65; } to { opacity: 1; } }
 @keyframes sx-dan-ring-zap { 0% { filter: brightness(3); } 100% { filter: brightness(1); } }
 
+/* The cut-in bolt: a lightning strike on the spot you stood. */
+.sx-dan-bolt {
+    position: fixed; z-index: 9005; pointer-events: none; width: 70px; height: 420px; margin: -400px 0 0 -35px;
+    background: linear-gradient(180deg, transparent, rgba(253, 224, 71, 0.95) 55%, #fff 100%);
+    clip-path: polygon(46% 0, 58% 30%, 44% 34%, 62% 70%, 50% 72%, 54% 100%, 40% 70%, 52% 66%, 36% 32%, 48% 28%);
+    filter: drop-shadow(0 0 14px rgba(250, 204, 21, 1));
+    animation: sx-dan-bolt .45s ease-out forwards;
+}
+@keyframes sx-dan-bolt { 0% { opacity: 1; transform: scaleY(0.4); } 30% { opacity: 1; transform: scaleY(1); } 100% { opacity: 0; } }
+
 /* The line that ties you to the Dancer while you drift away. */
 .sx-dan-link {
     position: fixed; left: 0; top: 0; z-index: 9001; pointer-events: none;
