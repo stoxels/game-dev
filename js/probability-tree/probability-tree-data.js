@@ -23134,7 +23134,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_power_charge_duration_31401",
    "effects": [
     "power_duration:20",
-    "power_on_line:6"
+    "power_on_line:15"
    ],
    "tier": "small"
   },
