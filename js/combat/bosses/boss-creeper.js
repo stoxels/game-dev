@@ -1,19 +1,17 @@
-import { _renderPanel } from '../encounter.js';
-import { BOSS_DEFS, BOSS_MECHANICS, _bossScheduleMechanics } from './boss-framework.js';
-import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkRuns, _nkToast } from './shared-boss-abilities.js';
-import { cur } from '../../state.js';
+import { t } from '../../translation/translations.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE CREEPER (boss_creeper)---------------------
 //------------------------------------------------------------------------
-// Green nest-mother siege: stalking creeper packs whose fuses heat while you
-// are close and cool while you keep distance, TNT chains raining at 60%, and
-// at ≤10% the SSSS…BOOM finale - the boss goes immune, counts 3…2…1, then
-// mega-detonates. Be outside the ring.
+// A walking bomb. Creeperlings stalk you in silence, stop close by and HISS: a
+// red pie-timer fills on the floor, then they blow. From 60% a lit FUSE TRAIL
+// burns through rows of TNT, from 30% a creeperling is struck by lightning
+// and charged, and at 10% the Creeper itself swells for SSSS…BOOM. The charge
+// attack is the POUNCE. No combat toasts: the floor rings carry everything.
+// (Fuse Trail: boss-creeper-fuse.js. Finale, teardown, debug hook: boss-creeper-finale.js.)
 //------------------------------------------------------------------------
-
-export const _CRP_DEBUG_SLOW = false;
-export const _CRP_DEBUG_MULT = _CRP_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(BOSS_DEFS, {
     boss_creeper: {
@@ -26,132 +24,125 @@ Object.assign(BOSS_DEFS, {
 Object.assign(BOSS_MECHANICS, {
     boss_creeper: {
         phases: [
-            // Basic attacks stay a steady pressure (the framework floors
-            // them at 13% of max life); the creepers are the real threat.
+            // The charge attack IS the Pounce: keep its tempo readable.
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
             { threshold: 0.60, chargeMax: 11, damageMultiplier: 1.20 },
             { threshold: 0.30, chargeMax: 10, damageMultiplier: 1.40 },
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'creeper_pack', intervalBase: 17000, intervalVariance: 4000, handler: '_mechCreeperPack' },
-            { name: 'fuse_pounce', intervalBase: 15000, intervalVariance: 4000, handler: '_mechCreeperPounce' },
-            { name: 'tnt_chain', intervalBase: 21000, intervalVariance: 5000, handler: '_mechTntChain', phase2Only: true },
+            { name: 'creeper_pack', intervalBase: 15000, intervalVariance: 3000, handler: '_mechCreeperPack' },
+            { name: 'fuse_trail', intervalBase: 21000, intervalVariance: 4000, handler: '_mechFuseTrail', phase2Only: true },
         ],
-        onPhaseEnter: _crpOnPhaseEnter,
+        // onInit (the SSSS…BOOM watcher) is attached by boss-creeper-finale.js.
     },
 });
 
 
-// ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-export const CRP_PACK_DMG = [0, 0.20, 0.24, 0.28];      // per creeper blast, by phase
-export const CRP_PACK_DMG_CHARGED = 0.34;               // charged creeper blast (P3)
-export const CRP_TNT_DMG = [0, 0, 0.15, 0.18];          // per TNT block, by phase
-export const CRP_POUNCE_DMG = [0, 0.17, 0.20, 0.23];    // per pounce blast, by phase
-export const CRP_FINAL_DMG = 0.32;                      // SSSS…BOOM mega blast
-export const CRP_HIT_CD_MS = 700;                       // shared blast-hit cooldown
+//------------------------------------------------------------------------
+//-------------------TUNING------------------------------------------------
+//------------------------------------------------------------------------
+// Index 0 of each phase table is unused: phases are 1-3.
+const CRP_HIT_CD_MS = 700;                      // one blast hit per this long, whoever blew up
+// Creeperlings
+const CRP_PACK_COUNT = [0, 2, 3, 4];
+const CRP_PACK_SPEED = [0, 88, 104, 120];       // px/s (you walk at 320)
+const CRP_PACK_BLAST_R = [0, 125, 140, 155];
+const CRP_PACK_HISS_MS = [0, 1500, 1350, 1200]; // the fuse: how long the pie-timer takes to fill
+const CRP_PACK_DMG = [0, 0.10, 0.12, 0.14];
+const CRP_PACK_TRIGGER = 0.85;                  // hiss starts when you are this close (share of the blast radius)
+const CRP_PACK_WINDOW_MS = 11000;
+const CRP_PACK_STAGGER_MS = 450;
+const CRP_PACK_SPAWN_GAP = 380;                 // creeperlings never pop up closer than this
+const CRP_PACK_RAMP_AFTER_MS = 4000;            // after this they get 5% faster every second (max +50%)
+const CRP_SYMPATHY_MS = 1000;                   // a neighbour's blast leaves this much fuse
+// Charged creeperling (phase 3)
+const CRP_CHARGE_WARN_MS = 600;
+const CRP_CHARGE_ZAP_MS = 1500;
+const CRP_CHARGE_R_MULT = 1.4;
+const CRP_CHARGE_DMG_MULT = 1.4;
+// Pounce (charge attack)
+const CRP_POUNCE_FALL_MS = 700;
+const CRP_POUNCE_HISS_MS = 1200;
+const CRP_POUNCE_R = 140;
+const CRP_POUNCE_GAP_MS = 1800;                 // phase 3: the second pounce follows this long after
+const CRP_POUNCE_DMG = [0, 0.14, 0.16, 0.18];
+
+let _crpHitUntil = 0;                           // blast-hit cooldown (performance.now clock)
+const _crpHinted = new Set();                   // hint chips already shown this fight
 
 
 //------------------------------------------------------------------------
-//-------------------SHARED VISUAL HELPERS---------------------------------
+//-------------------SMALL HELPERS-----------------------------------------
 //------------------------------------------------------------------------
 
-// Center of the playable grid (from corner cells), or viewport fallback.
-export function _crpGridCenter() {
-    if (typeof cur !== 'undefined' && cur && cur.grid && cur.grid.length && cur.grid[0]) {
-        const a = document.getElementById('g-0-0');
-        const b = document.getElementById('g-' + (cur.grid.length - 1) + '-' + (cur.grid[0].length - 1));
-        if (a && b && a.isConnected && b.isConnected) {
-            const ra = a.getBoundingClientRect();
-            const rb = b.getBoundingClientRect();
-            if (ra.width && rb.width) {
-                return { x: (ra.left + rb.right) / 2, y: (ra.top + rb.bottom) / 2 };
-            }
-        }
-    }
-    return { x: window.innerWidth / 2, y: window.innerHeight * 0.42 };
+// Boss phase 1-3 from the live monster.
+export function _crpPhaseOf(monster) {
+    return Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
 }
 
-// One creeper detonation: white-hot flash + orange core + smoke ring, plus
-// a lingering scorch crater (the creeper signature). Always spawned
-// body-level (run-independent) so the visuals survive the run ending in
-// the same frame - the layer self-removes. pct > 0 damages the player when
-// their hitbox overlaps the blast disc.
-export function _crpBoom(x, y, radius, pct, level, label) {
-    const R = Math.max(10, radius);
-    const layer = document.createElement('div');
-    layer.className = 'sx-crp-burst';
-    layer.style.left = Math.round(x - R) + 'px';
-    layer.style.top = Math.round(y - R) + 'px';
-    layer.style.width = (R * 2) + 'px';
-    layer.style.height = (R * 2) + 'px';
-    document.body.appendChild(layer);
-
-    const core = document.createElement('div');
-    core.className = 'sx-crp-core';
-    layer.appendChild(core);
-    const ring = document.createElement('div');
-    ring.className = 'sx-crp-ring';
-    layer.appendChild(ring);
-    for (let i = 0; i < 6; i++) {
-        const s = document.createElement('div');
-        s.className = 'sx-crp-smoke';
-        const ang = Math.random() * Math.PI * 2;
-        const dist = (R * 0.3) + Math.random() * (R * 0.8);
-        s.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
-        s.style.setProperty('--dy', Math.round(Math.sin(ang) * dist) + 'px');
-        s.style.animationDelay = (Math.random() * 120) + 'ms';
-        layer.appendChild(s);
-    }
-    // Lingering scorch crater: a dark circle that fades out slowly.
-    const crater = document.createElement('div');
-    crater.className = 'sx-crp-crater';
-    crater.style.width = Math.round(R * 1.1) + 'px';
-    crater.style.height = Math.round(R * 1.1) + 'px';
-    crater.style.left = Math.round(x - R * 0.55) + 'px';
-    crater.style.top = Math.round(y - R * 0.55) + 'px';
-    document.body.appendChild(crater);
-    setTimeout(() => { try { crater.remove(); } catch (e) {} }, _CRP_DEBUG_SLOW ? 6000 : 4200);
-
-    setTimeout(() => { try { layer.remove(); } catch (e) {} }, _CRP_DEBUG_SLOW ? 2600 : 950);
-
-    if (pct > 0) {
-        const pr = _nkPlayerRect();
-        if (pr && _nkCircleHit(x, y, R, pr, 0)) {
-            const dealt = _nkHit(pct, 'fire', level);
-            _nkAbilityHitToast(dealt, 'The Creeper', label);
-        }
-    }
+// Forgets the per-fight state (called by the teardown).
+export function _crpReset() {
+    _crpHitUntil = 0;
+    _crpHinted.clear();
 }
 
-// A dashed circle showing a blast's real reach (radius r) at (x, y).
-function _crpReach(run, x, y, r, cls) {
-    const el = _nkEl(run, 'div', 'sx-crp-reach' + (cls ? ' ' + cls : ''));
-    el.style.left = Math.round(x - r) + 'px';
-    el.style.top = Math.round(y - r) + 'px';
-    el.style.width = el.style.height = Math.round(r * 2) + 'px';
+// One short instruction chip at the top of the arena, shown once per fight
+// per key (it replaces the old combat toasts).
+export function _crpHint(key, fallback) {
+    if (_crpHinted.has(key)) return;
+    _crpHinted.add(key);
+    let msg = fallback;
+    try { const raw = t(key); if (raw && raw !== key) msg = raw; } catch (e) {}
+    const el = document.createElement('div');
+    el.className = 'sx-crp-hint';
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => { try { el.remove(); } catch (e) {} }, 4600);
+}
+
+// A floor circle of a blast's real reach. Its red pie fills clockwise as the
+// fuse burns down (setFuse); `cls` adds a look (charged, land, final).
+export function _crpFuseRing(run, x, y, R, cls) {
+    const el = _nkEl(run, 'div', 'sx-crp-fuse' + (cls ? ' ' + cls : ''));
+    el.style.left = Math.round(x - R) + 'px';
+    el.style.top = Math.round(y - R) + 'px';
+    el.style.width = el.style.height = Math.round(R * 2) + 'px';
     return el;
 }
 
-// Builds one creeper sprite: a fixed outer dot (translate-positioned) with
-// the classic green cube + face as CHILD elements (scale/filter animations
-// run on the child - never on the fixed wrapper).
-export function _crpSprite(run, charged) {
+// Sets how far the fuse has burnt (0 to 1) on a fuse ring.
+export function _crpSetFuse(el, k) {
+    el.style.setProperty('--p', (Math.max(0, Math.min(1, k)) * 360).toFixed(1) + 'deg');
+}
+
+// A harmless ground puff (a creeperling popping up, a pounce landing).
+function _crpPuff(x, y, size) {
+    const el = document.createElement('div');
+    el.className = 'sx-crp-puff';
+    el.style.left = Math.round(x - size / 2) + 'px';
+    el.style.top = Math.round(y - size / 2) + 'px';
+    el.style.width = el.style.height = Math.round(size) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => { try { el.remove(); } catch (e) {} }, 650);
+}
+
+// Builds one creeper sprite: a fixed outer dot (translate-positioned) with the
+// green cube + face as a CHILD (scale and flash animations run on the child,
+// never on the fixed wrapper). `big` is the pouncing mother.
+function _crpSprite(run, charged, big) {
     const dot = _nkEl(run, 'div', 'sx-nk-dot sx-crp-creeper' + (charged ? ' sx-crp-charged' : ''));
     const body = document.createElement('div');
     body.className = 'sx-crp-body';
     dot.appendChild(body);
-    return { dot, body };
+    return { dot, body, base: big ? 1.7 : 1 };
 }
 
-// Updates a creeper sprite from its fuse (0..1): swell + white flash as the
-// fuse climbs. All style writes go on the body child.
-export function _crpFuseVisual(sprite, fuse) {
-    if (!sprite.body) return;
-    const swell = 1 + fuse * 0.4;
+// Swells the sprite and blinks it faster as its fuse (0 to 1) climbs.
+function _crpFuseVisual(sprite, fuse) {
+    const swell = sprite.base * (1 + fuse * 0.4);
     sprite.body.style.scale = swell.toFixed(3);
-    if (fuse > 0.35) {
-        // Blink faster the hotter the fuse gets.
+    if (fuse > 0.02) {
         const blinkMs = Math.max(70, 260 - fuse * 190);
         sprite.body.style.animation = 'sx-crp-flash ' + blinkMs + 'ms steps(2) infinite';
     } else {
@@ -159,504 +150,261 @@ export function _crpFuseVisual(sprite, fuse) {
     }
 }
 
-// Teardown - registered in boss-framework.js cleanup chain (startsWith
-// 'boss_creeper'; runtime ids are suffixed). Clears the set-piece.
-export function _crpTeardown() {
-    if (_crpFinal) _crpFinalEnd(_crpFinal);
-    document.body.classList.remove('sx-crp-flash');
-    document.querySelectorAll('.sx-crp-flying').forEach(el => el.classList.remove('sx-crp-flying'));
-    document.querySelectorAll('.sx-crp-finaledge, .sx-crp-finalring').forEach(el => { try { el.remove(); } catch (e) {} });
+// Puts the sprite's centre at (x, y).
+function _crpPlaceSprite(sprite, x, y) {
+    sprite.dot.style.transform = 'translate(' + Math.round(x - 22) + 'px,' + Math.round(y - 22) + 'px)';
+}
+
+// The look of one explosion: white-hot core, smoke ring and puffs, flying
+// blocks and a scorch crater. Body-level, so it survives its run ending.
+function _crpBlastVisual(x, y, R) {
+    const layer = document.createElement('div');
+    layer.className = 'sx-crp-burst';
+    layer.style.left = Math.round(x - R) + 'px';
+    layer.style.top = Math.round(y - R) + 'px';
+    layer.style.width = layer.style.height = (R * 2) + 'px';
+    document.body.appendChild(layer);
+    ['sx-crp-core', 'sx-crp-ring'].forEach(cls => {
+        const d = document.createElement('div');
+        d.className = cls;
+        layer.appendChild(d);
+    });
+    for (let i = 0; i < 6; i++) {
+        const s = document.createElement('div');
+        s.className = 'sx-crp-smoke';
+        const ang = Math.random() * Math.PI * 2, dist = R * 0.3 + Math.random() * R * 0.8;
+        s.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
+        s.style.setProperty('--dy', Math.round(Math.sin(ang) * dist) + 'px');
+        s.style.animationDelay = (Math.random() * 120) + 'ms';
+        layer.appendChild(s);
+    }
+    for (let i = 0; i < 9; i++) {
+        const c = document.createElement('div');
+        c.className = 'sx-crp-chunk c' + (i % 3);
+        const ang = Math.random() * Math.PI * 2, dist = R * (0.55 + Math.random() * 0.55);
+        c.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
+        c.style.setProperty('--dy', Math.round(Math.sin(ang) * dist - R * 0.25) + 'px');
+        c.style.setProperty('--rot', Math.round(Math.random() * 540 - 270) + 'deg');
+        layer.appendChild(c);
+    }
+    const crater = document.createElement('div');
+    crater.className = 'sx-crp-crater';
+    crater.style.width = crater.style.height = Math.round(R * 1.1) + 'px';
+    crater.style.left = Math.round(x - R * 0.55) + 'px';
+    crater.style.top = Math.round(y - R * 0.55) + 'px';
+    document.body.appendChild(crater);
+    setTimeout(() => { try { crater.remove(); } catch (e) {} }, 4200);
+    setTimeout(() => { try { layer.remove(); } catch (e) {} }, 1100);
+}
+
+// One creeper detonation at (x, y). pct > 0 hurts you when you stand inside
+// the disc; blasts share a short cooldown so a chain never stacks hits
+// (`force` skips it - the finale always lands).
+export function _crpBlast(x, y, radius, pct, level, label, force) {
+    const R = Math.max(10, radius);
+    _crpBlastVisual(x, y, R);
+    if (pct <= 0) return false;
+    const now = performance.now();
+    if (!force && now < _crpHitUntil) return false;
+    const pr = _nkPlayerRect();
+    if (!pr || !_nkCircleHit(x, y, R, pr, 0)) return false;
+    _crpHitUntil = now + CRP_HIT_CD_MS;
+    _nkAbilityHitToast(_nkHit(pct, 'fire', level), 'The Creeper', label, true);
+    return true;
 }
 
 
 //------------------------------------------------------------------------
-//-------------------CREEPER PACK (all phases, signature)------------------
+//-------------------CREEPERLINGS (all phases)-----------------------------
 //------------------------------------------------------------------------
-// 2–4 creepers scuttle in from the screen edges and stalk the player: the
-// fuse HEATS while the player is close (hiss: white flash + swell) and
-// COOLS while they keep their distance. Once a fuse is warm its blast reach
-// follows it as a dashed ring. Fuse ≥ 1 → detonation. Standing
-// still = surrounded by simultaneous booms; perfect kiting = they cool off
-// and wander away when the pack window ends.
-export const CRP_PACK_COUNT = [0, 2, 3, 4];
-export const CRP_PACK_SPEED = [0, 80, 95, 112];
-export const CRP_PACK_HEAT_RATE = [0, 0.40, 0.50, 0.62];    // fuse/s inside range
-export const CRP_PACK_COOL_RATE = 0.35;                     // fuse/s outside range
-export const CRP_PACK_RANGE = 130;
-export const CRP_PACK_BLAST_R = [0, 150, 170, 190];
-export const CRP_PACK_DUR_MS = 14000;
+// 2-4 creeperlings pop up away from you and stalk. Close enough, one stops and
+// hisses: its blast circle appears and a red pie fills over ~1.4 s, then BOOM.
+// Leave the circle and nothing happens; a blast sets neighbours off early, so
+// lure them apart. Phase 3: lightning charges one (blue, bigger circle).
 
+// A random spot on the arena edge, well away from you.
+function _crpSpawnPoint(c) {
+    const W = window.innerWidth, H = window.innerHeight;
+    let best = null, bestD = -1;
+    for (let i = 0; i < 14; i++) {
+        const side = Math.floor(Math.random() * 4);
+        const x = side === 0 ? 60 : side === 2 ? W - 60 : 60 + Math.random() * (W - 120);
+        const y = side === 1 ? 110 : side === 3 ? H - 150 : 110 + Math.random() * (H - 260);
+        const d = c ? Math.hypot(x - c.x, y - c.y) : CRP_PACK_SPAWN_GAP;
+        if (d >= CRP_PACK_SPAWN_GAP) return { x, y };
+        if (d > bestD) { bestD = d; best = { x, y }; }
+    }
+    return best;
+}
+
+// A creeperling starts hissing where it stands: its blast circle and the
+// "SSSS" tag appear. `fuseLeft` (ms) lets a neighbour's blast shorten it.
+function _crpIgnite(run, cr, fuseLeftMs) {
+    cr.state = 'hiss';
+    cr.hiss = Math.max(0, cr.hissMs - fuseLeftMs);
+    cr.ring = _crpFuseRing(run, cr.x, cr.y, cr.R, cr.charged ? 'charged' : '');
+    cr.label = _nkEl(run, 'div', 'sx-crp-hiss', 'SSSS…');
+    cr.label.style.transform = 'translate(' + Math.round(cr.x - 28) + 'px,' + Math.round(cr.y - 58) + 'px)';
+}
+
+// Removes a finished creeperling's sprite, ring and tag.
+function _crpDropCreeper(cr, delayMs) {
+    cr.state = 'done';
+    [cr.ring, cr.label].forEach(el => { if (el) { try { el.remove(); } catch (e) {} } });
+    cr.ring = cr.label = null;
+    setTimeout(() => { try { cr.sprite.dot.remove(); } catch (e) {} }, delayMs);
+}
+
+// Lightning charges a creeperling: telegraph pulse, then the bolt.
+function _crpChargeStep(run, cr) {
+    if (!cr.willCharge || cr.charged || cr.state !== 'stalk') return;
+    if (cr.age >= CRP_CHARGE_WARN_MS && !cr.zapWarn) { cr.zapWarn = true; cr.sprite.dot.classList.add('sx-crp-zapwarn'); }
+    if (cr.age < CRP_CHARGE_ZAP_MS) return;
+    cr.charged = true;
+    cr.R *= CRP_CHARGE_R_MULT;
+    cr.dmg *= CRP_CHARGE_DMG_MULT;
+    cr.sprite.dot.classList.remove('sx-crp-zapwarn');
+    cr.sprite.dot.classList.add('sx-crp-charged');
+    const bolt = _nkEl(run, 'div', 'sx-crp-bolt');
+    bolt.style.left = Math.round(cr.x - 4) + 'px';
+    bolt.style.height = Math.round(cr.y) + 'px';
+}
+
+// One stalking step: walk at you (with a scuttling wobble), hiss once close.
+function _crpStalkStep(run, cr, c, dtS, tMs) {
+    cr.age += dtS * 1000;
+    const dx = c.x - cr.x, dy = c.y - cr.y, d = Math.hypot(dx, dy) || 1;
+    const ramp = 1 + Math.min(0.5, Math.max(0, (tMs - CRP_PACK_RAMP_AFTER_MS) / 1000) * 0.05);
+    const wob = Math.sin(cr.age / 260 + cr.seed) * 0.35;
+    cr.x += ((dx / d) - (dy / d) * wob) * cr.speed * ramp * dtS;
+    cr.y += ((dy / d) + (dx / d) * wob) * cr.speed * ramp * dtS;
+    _crpPlaceSprite(cr.sprite, cr.x, cr.y);
+    _crpChargeStep(run, cr);
+    if (d <= cr.R * CRP_PACK_TRIGGER) _crpIgnite(run, cr, cr.hissMs);
+}
+
+// One hissing step: the fuse burns, then the blast; neighbours catch fire.
+function _crpHissStep(run, cr, dtS, level, creepers) {
+    cr.hiss += dtS * 1000;
+    const k = cr.hiss / cr.hissMs;
+    _crpFuseVisual(cr.sprite, k);
+    _crpSetFuse(cr.ring, k);
+    if (k < 1) return;
+    _crpBlast(cr.x, cr.y, cr.R, cr.dmg, level, 'Creeper');
+    creepers.forEach(o => {
+        if (o === cr || o.state === 'done' || o.state === 'wait') return;
+        if (Math.hypot(o.x - cr.x, o.y - cr.y) > cr.R + 40) return;
+        if (o.state === 'stalk') _crpIgnite(run, o, CRP_SYMPATHY_MS);
+        else o.hiss = Math.max(o.hiss, o.hissMs - CRP_SYMPATHY_MS);
+    });
+    _crpDropCreeper(cr, 150);
+}
+
+// Builds the pack for this phase (the last one is the charged one in phase 3).
+function _crpMakePack(run, p) {
+    const creepers = [];
+    for (let i = 0; i < CRP_PACK_COUNT[p]; i++) {
+        creepers.push({
+            state: 'wait', delay: i * CRP_PACK_STAGGER_MS, age: 0, hiss: 0, seed: Math.random() * 6.28,
+            speed: CRP_PACK_SPEED[p], R: CRP_PACK_BLAST_R[p], hissMs: CRP_PACK_HISS_MS[p], dmg: CRP_PACK_DMG[p],
+            willCharge: p >= 3 && i === CRP_PACK_COUNT[p] - 1, charged: false, zapWarn: false,
+            x: 0, y: 0, sprite: null, ring: null, label: null,
+        });
+    }
+    return creepers;
+}
+
+// Scheduled mechanic: the creeperlings arrive and stalk for ~11 s.
 export function _mechCreeperPack(monster, phase) {
     if (_nkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
     const run = _nkNewRun(monster && monster.id, true);
-    // Field mechanic: passive so it never trips _nkDodgeBusy() - packs
-    // overlap TNT chains and pounces instead of starving them (same fix as
-    // the Bomber's Mine Collar).
+    // Field mechanic: passive, so packs overlap the trail and the pounce.
     run.passive = true;
-    const speed = CRP_PACK_SPEED[p];
-    const heatRate = CRP_PACK_HEAT_RATE[p];
-    const blastR = CRP_PACK_BLAST_R[p];
-    const durMs = CRP_PACK_DUR_MS * _CRP_DEBUG_MULT;
-    const dmgPct = CRP_PACK_DMG[p];
-
-    _nkToast('eg_mech_creeper_pack', '💥 The Creeper: CREEPER PACK - mind the fuses!', '#22c55e');
-
-    const creepers = [];
-    for (let i = 0; i < CRP_PACK_COUNT[p]; i++) {
-        // One CHARGED creeper joins the pack in phase 3 (blue aura, faster,
-        // bigger boom) - the Minecraft lightning-charged homage.
-        const charged = p >= 3 && i === CRP_PACK_COUNT[p] - 1;
-        const sprite = _crpSprite(run, charged);
-        const side = i % 4;
-        const x = side === 0 ? 60 : side === 2 ? window.innerWidth - 60 : Math.random() * window.innerWidth;
-        const y = side === 1 ? 90 : side === 3 ? window.innerHeight - 120 : Math.random() * (window.innerHeight - 200) + 90;
-        creepers.push({
-            sprite, x, y, fuse: 0, blown: false,
-            rate: heatRate * (charged ? 1.6 : 1),
-            speed: speed * (charged ? 1.25 : 1),
-            radius: blastR + (charged ? 55 : 0),
-            dmg: charged ? CRP_PACK_DMG_CHARGED : dmgPct,
-        });
-    }
-
-    let t = 0;
+    _crpHint('eg_crp_hint_pack', 'Creeperlings hiss when they get close - leave the red ring before it fills!');
+    const creepers = _crpMakePack(run, p);
+    let t0 = 0;
     _nkLoop(run, (dtS) => {
-        t += dtS * 1000;
-        let pending = false;
+        t0 += dtS * 1000;
         const c = _nkPlayerCenter();
-
-        creepers.forEach(s => {
-            if (s.blown) return;
-            // Creepers despawn un-blown when the pack window ends.
-            if (t >= durMs) {
-                s.blown = true;
-                if (s.sprite.dot) { s.sprite.dot.classList.add('sx-crp-flee'); }
-                if (s.reach) { try { s.reach.remove(); } catch (e) {} s.reach = null; }
-                setTimeout(() => { try { s.sprite.dot.remove(); } catch (e) {} }, 600);
-                return;
-            }
+        let pending = false;
+        creepers.forEach(cr => {
+            if (cr.state === 'done') return;
             pending = true;
-            if (c) {
-                const dx = c.x - s.x, dy = c.y - s.y;
-                const d = Math.sqrt(dx * dx + dy * dy) || 1;
-                s.x += (dx / d) * s.speed * dtS;
-                s.y += (dy / d) * s.speed * dtS;
-                s.fuse += (d < CRP_PACK_RANGE ? s.rate : -CRP_PACK_COOL_RATE) * dtS;
-                s.fuse = Math.max(0, Math.min(1, s.fuse));
+            if (cr.state === 'wait') {
+                if (t0 < cr.delay) return;
+                const sp = _crpSpawnPoint(c);
+                cr.x = sp.x; cr.y = sp.y; cr.state = 'stalk';
+                cr.sprite = _crpSprite(run, false, false);
+                cr.sprite.dot.classList.add('sx-crp-rise');
+                _crpPlaceSprite(cr.sprite, cr.x, cr.y);
+                _crpPuff(cr.x, cr.y + 14, 70);
             }
-            if (s.sprite.dot) s.sprite.dot.style.transform = 'translate(' + Math.round(s.x - 22) + 'px,' + Math.round(s.y - 22) + 'px)';
-            _crpFuseVisual(s.sprite, s.fuse);
-            // Warm fuse: its real blast reach follows it as a dashed ring
-            // (the blast is far bigger than the creeper itself).
-            if (s.fuse > 0.3) {
-                if (!s.reach) s.reach = _crpReach(run, s.x, s.y, s.radius, 'sx-crp-reach-pack');
-                s.reach.style.left = Math.round(s.x - s.radius) + 'px';
-                s.reach.style.top = Math.round(s.y - s.radius) + 'px';
-                s.reach.style.opacity = Math.min(1, (s.fuse - 0.3) / 0.4).toFixed(2);
-            } else if (s.reach) { try { s.reach.remove(); } catch (e) {} s.reach = null; }
-            if (s.fuse >= 1) {
-                s.blown = true;
-                if (s.reach) { try { s.reach.remove(); } catch (e) {} s.reach = null; }
-                _crpBoom(s.x, s.y, s.radius, s.dmg, level, 'Creeper Pack');
-                setTimeout(() => { try { s.sprite.dot.remove(); } catch (e) {} }, 300);
+            if (cr.state === 'stalk' && t0 >= CRP_PACK_WINDOW_MS) {
+                cr.sprite.dot.classList.add('sx-crp-flee');
+                _crpDropCreeper(cr, 600);
+            } else if (cr.state === 'stalk') {
+                if (c) _crpStalkStep(run, cr, c, dtS, t0);
+            } else if (cr.state === 'hiss') {
+                _crpHissStep(run, cr, dtS, level, creepers);
             }
         });
-
         return pending;
     });
 }
 
 
 //------------------------------------------------------------------------
-//-------------------FUSE POUNCE (all phases)------------------------------
+//-------------------POUNCE (charge attack)--------------------------------
 //------------------------------------------------------------------------
-// A creeper leaps from above onto your CURRENT position: a shadow marker
-// grows while it falls, it lands, hisses (fast white blink + swell) for a
-// short fuse, then blows. One pounce per trigger; two staggered in P3.
-export const CRP_POUNCE_FALL_MS = 550;
-export const CRP_POUNCE_FUSE_MS = 1500;
-export const CRP_POUNCE_BLAST_R = 140;
+// The attack bar sends the Creeper's mother leaping onto YOUR spot: the circle
+// is marked first, she lands, hisses (the pie fills) and blows. Phase 3 follows
+// up with a second pounce on wherever you went. Dispatched from _fireMonsterAttack.
 
-export function _mechCreeperPounce(monster, phase) {
-    if (_nkFrozen()) return;
-    const p = Math.max(1, Math.min(3, Number(phase) || 1));
-    const level = monster ? monster.level : 1;
-    const run = _nkNewRun(monster && monster.id, true);
-    const pounces = p >= 3 ? 2 : 1;
-    const gapMs = p >= 3 ? 2500 * _CRP_DEBUG_MULT : 0;
-    const fallMs = CRP_POUNCE_FALL_MS * _CRP_DEBUG_MULT;
-    const fuseMs = CRP_POUNCE_FUSE_MS * _CRP_DEBUG_MULT;
-    const dmgPct = CRP_POUNCE_DMG[p];
-
-    _nkToast('eg_mech_creeper_pounce', '💥 The Creeper: FUSE POUNCE - move from your spot!', '#22c55e');
-
-    for (let i = 0; i < pounces; i++) {
-        const at = i * gapMs;
-        const pc = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-        const x = Math.max(70, Math.min(window.innerWidth - 70, pc.x));
-        const y = Math.max(110, Math.min(window.innerHeight - 110, pc.y));
-        const sprite = _crpSprite(run, false);
-        // The marker is the real blast disc (it was 84px for a 140px blast).
-        const R = CRP_POUNCE_BLAST_R;
-        const marker = _nkEl(run, 'div', 'sx-crp-marker');
-        marker.style.width = (R * 2) + 'px';
-        marker.style.height = (R * 2) + 'px';
-        marker.style.left = Math.round(x - R) + 'px';
-        marker.style.top = Math.round(y - R) + 'px';
-
-        const state = { phase: 'wait', t: -at };
-        _nkLoop(run, (dtS) => {
-            if (state.phase === 'done') return false;
-            state.t += dtS * 1000;
-            let t2 = state.t;
-            if (t2 < 0) return true;
-
-            if (state.phase === 'wait') {
-                state.phase = 'fall';
-            }
-            if (state.phase === 'fall') {
-                // Creeper descends onto the marker while it grows.
-                const k = Math.min(1, t2 / fallMs);
-                const ease = k * k;
-                if (sprite.dot) sprite.dot.style.transform = 'translate(' + Math.round(x - 22) + 'px,' + Math.round(y - 190 * (1 - ease) - 22) + 'px)';
-                marker.style.opacity = String(0.35 + ease * 0.65);
-                if (k >= 1) {
-                    state.phase = 'hiss';
-                    state.t = 0;
-                    t2 = 0;
-                }
-                return true;
-            }
-            if (state.phase === 'hiss') {
-                _crpFuseVisual(sprite, Math.min(1, t2 / fuseMs) * 1.15);
-                if (t2 >= fuseMs) {
-                    state.phase = 'done';
-                    _crpBoom(x, y, CRP_POUNCE_BLAST_R, dmgPct, level, 'Fuse Pounce');
-                    setTimeout(() => {
-                        try { sprite.dot.remove(); marker.remove(); } catch (e) {}
-                    }, 200);
-                }
-                return true;
-            }
-            return true;
-        });
-    }
-}
-
-
-//------------------------------------------------------------------------
-//-------------------TNT CHAIN (phase 2+, signature)-----------------------
-//------------------------------------------------------------------------
-// A cluster of primed TNT blocks rains down around your position. The
-// blocks flash faster and faster during the wind-up, then detonate in a
-// rolling CHAIN REACTION outward from the centre block (~85 ms steps).
-// The blast wave travels visibly - leave the cluster entirely.
-export const CRP_TNT_COUNT = [0, 0, 6, 9];
-export const CRP_TNT_CLUSTER_R = [0, 0, 190, 230];
-export const CRP_TNT_WINDUP_MS = 2100;
-export const CRP_TNT_CASCADE_MS = 85;
-export const CRP_TNT_BLAST_R = 110;
-
-export function _mechTntChain(monster, phase) {
-    if (_nkDodgeBusy() || _nkFrozen()) return;
-    const p = Math.max(2, Math.min(3, Number(phase) || 2));
-    const level = monster ? monster.level : 1;
-    const run = _nkNewRun(monster && monster.id, true);
-    const count = CRP_TNT_COUNT[p];
-    const clusterR = CRP_TNT_CLUSTER_R[p];
-    const windupMs = CRP_TNT_WINDUP_MS * _CRP_DEBUG_MULT;
-    const dmgPct = CRP_TNT_DMG[p];
-    const pc = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    // Cluster centre biased toward the player, clamped on-screen.
-    const cx = Math.max(clusterR * 0.7, Math.min(window.innerWidth - clusterR * 0.7, pc.x + (Math.random() * 2 - 1) * 60));
-    const cy = Math.max(clusterR * 0.7 + 40, Math.min(window.innerHeight - clusterR * 0.7 - 30, pc.y + (Math.random() * 2 - 1) * 60));
-
-    _nkToast('eg_mech_creeper_tnt', '💥 The Creeper: TNT CHAIN - get out of the cluster!', '#f87171');
-
-    const blocks = [];
-    for (let i = 0; i < count; i++) {
-        const ang = (Math.PI * 2 * i) / count + Math.random() * 0.5;
-        const dist = clusterR * (0.25 + Math.random() * 0.75);
-        const x = Math.max(60, Math.min(window.innerWidth - 60, cx + Math.cos(ang) * dist));
-        const y = Math.max(90, Math.min(window.innerHeight - 90, cy + Math.sin(ang) * dist));
-        const el = _nkEl(run, 'div', 'sx-nk-dot sx-crp-tnt', 'TNT');
-        el.style.transform = 'translate(' + Math.round(x - 24) + 'px,' + Math.round(y - 16) + 'px)';
-        blocks.push({ x, y, el, dCenter: Math.hypot(x - cx, y - cy), blown: false });
-    }
-    blocks.sort((a, b) => a.dCenter - b.dCenter);
-    // The whole danger area: every block's blast disc, outlined as one ring.
-    let far = 0;
-    blocks.forEach(b => { far = Math.max(far, b.dCenter + CRP_TNT_BLAST_R); });
-    _crpReach(run, cx, cy, far, 'sx-crp-reach-tnt');
-
-    let t = 0;
-    let boomIdx = 0;
-    _nkLoop(run, (dtS) => {
-        t += dtS * 1000;
-
-        // Wind-up: flash accelerates; CSS handles the blink rate ramp.
-        if (t < windupMs) {
-            const frac = t / windupMs;
-            blocks.forEach(b => {
-                if (b.el) b.el.style.animationDuration = (0.9 - frac * 0.62).toFixed(2) + 's';
-            });
-            return true;
-        }
-
-        // Chain reaction: centre block first, cascading outward.
-        while (boomIdx < blocks.length && t >= windupMs + boomIdx * CRP_TNT_CASCADE_MS) {
-            const b = blocks[boomIdx];
-            boomIdx++;
-            if (b.blown) continue;
-            b.blown = true;
-            if (b.el) { try { b.el.remove(); } catch (e) {} b.el = null; }
-            _crpBoom(b.x, b.y, CRP_TNT_BLAST_R, dmgPct, level, 'TNT Chain');
-        }
-        // Keep the run alive for the tail of the last blasts.
-        return boomIdx < blocks.length || t < windupMs + blocks.length * CRP_TNT_CASCADE_MS + 800;
-    });
-}
-
-
-//------------------------------------------------------------------------
-//-------------------SSSS… BOOM (≤10% HP one-shot finale)------------------
-//------------------------------------------------------------------------
-// The boss swells, goes immune + shielded, and a 3…2…1 fuse counts down
-// while a huge red blast ring grows around it. At zero: MEGA detonation
-// (huge radius + screen flash + a long-lasting crater) and the immunity
-// releases. The auto-attack charge bar freezes for the whole set-piece
-// (gate in _tickPlayer, encounter.js - _crpFinalActive).
-export const CRP_FINAL_CD_TICK_MS = 1000;
-export const CRP_FINAL_CD_TICKS = 3;
-export const CRP_FINAL_BLAST_R_PCT = 0.42;              // of min(vw, vh)
-
-// Set while the finale runs (read by _tickPlayer's charge-freeze gate).
-export let _crpFinal = null;
-
-export function _crpFinalActive() {
-    return !!_crpFinal && !_crpFinal.finished;
-}
-
-// Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
-// onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-export function _crpOnPhaseEnter(monster, newPhase) {
-    if (newPhase !== 3) return false;
-    try { _crpStartFinalWatcher(monster); } catch (e) {}
-    return false;
-}
-
-export function _crpStartFinalWatcher(monster) {
-    if (!monster || _crpFinal) return;
+// One pounce: marks the ground where you stand, falls, hisses, blows.
+function _crpPounceOne(monster, p, level, delayMs) {
     const run = _nkNewRun(monster.id, true);
     run.passive = true;
-    _nkLoop(run, () => {
-        if (_crpFinal) return false;
-        try {
-            if (monster.currentHP <= monster.maxHP * 0.10) {
-                _crpFinalStart(monster);
-                return false;
-            }
-        } catch (e) { return false; }
-        return true;
-    });
-}
-
-export function _crpFinalStart(monster) {
-    if (_crpFinal || !monster) return;
-
-    // The arena goes quiet: kill every other run of this boss.
-    Array.from(_nkRuns.values()).forEach(r => {
-        if (r.bossId === monster.id) { try { _nkKillRun(r); } catch (e) {} }
-    });
-
-    const g = {
-        monsterId: monster.id,
-        finished: false,
-        count: CRP_FINAL_CD_TICKS,
-        overlay: null,
-        ringEl: null,
-        run: null,
-        cdTimer: null,
-        bangAt: 0,
-        boomed: false,
-        center: _crpGridCenter(),
-        blastR: Math.min(window.innerWidth, window.innerHeight) * CRP_FINAL_BLAST_R_PCT,
-    };
-    _crpFinal = g;
-
-    // Freeze the auto-attack charge bar for the whole set-piece (the gate
-    // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('sx-charge-paused');
-    });
-
-    // Growing blast-radius ring (red, dashed) centred on the boss.
-    const ring = document.createElement('div');
-    ring.className = 'sx-crp-finalring';
-    ring.style.width = '0px';
-    ring.style.height = '0px';
-    ring.style.left = Math.round(g.center.x) + 'px';
-    ring.style.top = Math.round(g.center.y) + 'px';
-    document.body.appendChild(ring);
-    g.ringEl = ring;
-    // The blast's FULL size is outlined from the first moment (the filling
-    // ring alone only revealed it at the end of the countdown).
-    const edge = document.createElement('div');
-    edge.className = 'sx-crp-finaledge';
-    edge.style.left = Math.round(g.center.x - g.blastR) + 'px';
-    edge.style.top = Math.round(g.center.y - g.blastR) + 'px';
-    edge.style.width = edge.style.height = Math.round(g.blastR * 2) + 'px';
-    document.body.appendChild(edge);
-    g.edgeEl = edge;
-    // Animate to full size over the countdown (debug-stretched so it can
-    // be screenshot mid-growth).
-    const growS = _CRP_DEBUG_SLOW ? 8 : 2.8;
-    requestAnimationFrame(() => {
-        ring.style.transition = 'width ' + growS + 's ease-in, height ' + growS + 's ease-in, margin ' + growS + 's ease-in';
-        ring.style.width = Math.round(g.blastR * 2) + 'px';
-        ring.style.height = Math.round(g.blastR * 2) + 'px';
-        ring.style.marginLeft = Math.round(-g.blastR) + 'px';
-        ring.style.marginTop = Math.round(-g.blastR) + 'px';
-    });
-
-    // Boss swell: the card grows and pulses like a primed creeper.
-    const card = document.getElementById('sx-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
-    if (wrap) {
-        wrap.classList.add('sx-crp-flying');
-        wrap.classList.add('sx-nk-shielded');
-    }
-
-    // Countdown overlay.
-    const ov = document.createElement('div');
-    ov.className = 'sx-crp-cd';
-    ov.innerHTML =
-        '<div class="sx-crp-cd-label">💥 SSSS…</div>' +
-        '<div class="sx-crp-cd-num sx-crp-cd-pop">' + g.count + '</div>' +
-        '<div class="sx-crp-cd-hint">The Creeper is priming - get OUT of the red ring!</div>';
-    document.body.appendChild(ov);
-    g.overlay = ov;
-
-    _nkToast('eg_mech_creeper_final_cd', '💥 SSSS… BOOM INCOMING - flee the red ring!', '#f87171');
-
-    // Boss immunity so the set-piece reads as a hold (released at the end).
-    monster.bossImmune = true;
-
-    // Debug: extra-long ticks so screenshots can catch the ring + countdown.
-    const cdTick = CRP_FINAL_CD_TICK_MS * (_CRP_DEBUG_SLOW ? 10 : 1);
-    g.cdTimer = setInterval(() => {
-        if (!_crpFinal || _crpFinal !== g || g.finished) return;
-        if (_nkFrozen()) return;   // pause / death / inactive hold the count
-        g.count--;
-        if (g.count <= 0) {
-            clearInterval(g.cdTimer);
-            g.cdTimer = null;
-            try { g.overlay.remove(); } catch (e) {}
-            g.overlay = null;
-            _crpFinalBang(g, monster);
-            return;
+    const R = CRP_POUNCE_R;
+    let stage = 'wait', t0 = -delayMs, x = 0, y = 0, sprite = null, ring = null;
+    _nkLoop(run, (dtS) => {
+        t0 += dtS * 1000;
+        if (t0 < 0) return true;
+        if (stage === 'wait') {
+            const pc = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            x = Math.max(R * 0.6, Math.min(window.innerWidth - R * 0.6, pc.x));
+            y = Math.max(R * 0.6 + 40, Math.min(window.innerHeight - R * 0.6 - 60, pc.y));
+            ring = _crpFuseRing(run, x, y, R, 'land');
+            sprite = _crpSprite(run, false, true);
+            stage = 'fall'; t0 = 0;
         }
-        const num = g.overlay && g.overlay.querySelector('.sx-crp-cd-num');
-        if (num) {
-            num.textContent = g.count;
-            num.classList.remove('sx-crp-cd-pop');
-            void num.offsetWidth;
-            num.classList.add('sx-crp-cd-pop');
+        if (stage === 'fall') {
+            const k = Math.min(1, t0 / CRP_POUNCE_FALL_MS);
+            _crpPlaceSprite(sprite, x, y - 300 * (1 - k * k));
+            if (k < 1) return true;
+            stage = 'hiss'; t0 = 0;
+            ring.classList.remove('land');
+            _crpPuff(x, y + 10, 150);
         }
-    }, cdTick);
-}
-
-// The BOOM: one gigantic blast around the boss position + screen flash +
-// a long crater. Damage test once, globally (outside the ring = hit).
-export function _crpFinalBang(g, monster) {
-    const level = monster ? monster.level : 1;
-    const run = _nkNewRun(g.monsterId, true);
-    g.run = run;
-    run.onKill = () => { if (_crpFinal === g) { try { _crpFinalEnd(g); } catch (e) {} } };
-    g.bangAt = performance.now();
-
-    _nkToast('eg_mech_creeper_final_bang', '💥💀 SSSS… BOOM!', '#f87171');
-
-    // Screen flash at the moment of the bang.
-    document.body.classList.add('sx-crp-flash');
-    setTimeout(() => document.body.classList.remove('sx-crp-flash'), 700);
-
-    // Mega blast, centred on the boss (run-independent visuals).
-    _crpBoom(g.center.x, g.center.y, g.blastR, CRP_FINAL_DMG, level, 'SSSS…BOOM');
-
-    // Small shockwave ring expanding past the blast edge (visual only).
-    for (let i = 1; i <= 3; i++) {
-        const id = setTimeout(() => {
-            _crpBoom(g.center.x + (Math.random() * 2 - 1) * g.blastR * 0.6,
-                g.center.y + (Math.random() * 2 - 1) * g.blastR * 0.6,
-                g.blastR * (0.4 + i * 0.18), 0, level, '');
-        }, i * 160);
-        run.timers.push(id);
-    }
-
-    // Wind down, then hand control back to the boss (debug: linger long
-    // enough for the blast visuals to be captured).
-    const id2 = setTimeout(() => _crpFinalEnd(g), _CRP_DEBUG_SLOW ? 7000 : 1400);
-    run.timers.push(id2);
-}
-
-export function _crpFinalEnd(g) {
-    if (!g || g.finished) return;
-    g.finished = true;
-    if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
-    if (g.overlay) { try { g.overlay.remove(); } catch (e) {} g.overlay = null; }
-    if (g.ringEl) { try { g.ringEl.remove(); } catch (e) {} g.ringEl = null; }
-    if (g.edgeEl) { try { g.edgeEl.remove(); } catch (e) {} g.edgeEl = null; }
-    if (g.run) { try { _nkKillRun(g.run); } catch (e) {} g.run = null; }
-    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.remove('sx-charge-paused');
+        const k = Math.min(1, t0 / CRP_POUNCE_HISS_MS);
+        _crpFuseVisual(sprite, k * 1.15);
+        _crpSetFuse(ring, k);
+        if (k < 1) return true;
+        _crpBlast(x, y, R, CRP_POUNCE_DMG[p], level, 'Pounce');
+        return false;
     });
-    document.body.classList.remove('sx-crp-flash');
-    document.querySelectorAll('.sx-crp-flying').forEach(el => el.classList.remove('sx-crp-flying'));
-
-    const m = (g.monsterId && typeof _monsters !== 'undefined')
-        ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
-    if (m && m.bossImmune) {
-        m.bossImmune = false;
-        if (typeof _bossScheduleMechanics === 'function') {
-            try { _bossScheduleMechanics(m, 3); } catch (e) {}
-        }
-        if (typeof _renderPanel === 'function') { try { _renderPanel(); } catch (e) {} }
-    }
-    if (_crpFinal === g) _crpFinal = null;
 }
 
-
-//------------------------------------------------------------------------
-//-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
-//------------------------------------------------------------------------
-// Tiny console API for playtesting with stretched debug timings:
-//   _CRP_DEBUG.fire('pack'|'chain'|'pounce') - runs one mechanic now
-//   _CRP_DEBUG.final()                       - SSSS…BOOM now
-if (typeof window !== 'undefined') {
-    window._CRP_DEBUG = {
-        fire: (name, phase) => {
-            const monster = (typeof _monsters !== 'undefined')
-                ? globalThis._monsters.find(m => m && m.baseId === 'boss_creeper') : null;
-            if (!monster) return 'no creeper alive';
-            const fn = name === 'pack' ? _mechCreeperPack
-                : name === 'chain' ? _mechTntChain
-                : name === 'pounce' ? _mechCreeperPounce : null;
-            if (!fn) return 'unknown: ' + name;
-            if (name === 'chain' && _nkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for pounces to land)';
-            fn(monster, phase || monster.bossPhase || 1);
-            return 'fired ' + name;
-        },
-        final: () => {
-            const monster = (typeof _monsters !== 'undefined')
-                ? globalThis._monsters.find(m => m && m.baseId === 'boss_creeper') : null;
-            if (!monster) return 'no creeper alive';
-            _crpFinalStart(monster);
-            return 'SSSS…BOOM started';
-        },
-    };
+// Charge attack entry point: one pounce, two in phase 3.
+export function _crpPounce(monster, phaseOverride) {
+    if (!monster || _nkFrozen()) return;
+    const p = phaseOverride || _crpPhaseOf(monster);
+    const level = monster.level || 1;
+    try {
+        document.dispatchEvent(new CustomEvent('sx-boss-mechanic', { detail: { monsterId: monster.id, mech: 'fuse_pounce', phase: p } }));
+    } catch (e) {}
+    _crpHint('eg_crp_hint_pounce', 'The Creeper leaps onto your spot - leave the circle!');
+    _crpPounceOne(monster, p, level, 0);
+    if (p >= 3) _crpPounceOne(monster, p, level, CRP_POUNCE_GAP_MS);
 }

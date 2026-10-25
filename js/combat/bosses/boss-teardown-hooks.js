@@ -66,8 +66,8 @@ export const BOSS_TEARDOWN_HOOKS = [
     // The Bomber (rework): mine field, keeper run, TOTAL CARPET set-piece
     // and the flying presentation (target pip).
     ['boss_bomber', '_bmbTeardown'],
-    // The Creeper (rework): creeper packs, TNT chains, SSSS…BOOM set-piece
-    // and the primed-boss presentation.
+    // The Creeper (rework): creeperlings, fuse trails, pounce, SSSS…BOOM
+    // set-piece and the swollen-boss presentation.
     ['boss_creeper', '_crpTeardown'],
     // The Buzzsaw (rework): ricochet saws, cut lines, saw traps, pendulum
     // blades and the FINAL CUT set-piece.

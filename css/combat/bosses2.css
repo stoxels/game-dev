@@ -5217,23 +5217,6 @@ body:has(#screen-hub.active) [class*="sx-gal-"] { display: none !important; }
 .sx-nk-fin-dance { --nk-fin: #f9a8d4; }
 .sx-nk-fin-cyc { --nk-fin: #fb923c; }
 
-/* THE CREEPER: real blast reach (pack fuses, TNT cluster) + finale edge. */
-.sx-crp-reach {
-    position: fixed; z-index: 8999; pointer-events: none; box-sizing: border-box;
-    border-radius: 50%;
-    border: 3px dashed rgba(248, 113, 113, 0.9);
-    background: radial-gradient(circle, rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.16) 92%, transparent 100%);
-}
-.sx-crp-reach-pack { border-color: rgba(134, 239, 172, 0.9); background: radial-gradient(circle, rgba(34, 197, 94, 0.04), rgba(34, 197, 94, 0.14) 92%, transparent 100%); }
-.sx-crp-reach-tnt { animation: sx-nk-warn-pulse 0.3s ease-in-out infinite alternate; }
-.sx-crp-finaledge {
-    position: fixed; z-index: 9002; pointer-events: none; box-sizing: border-box;
-    border-radius: 50%;
-    border: 4px dashed rgba(248, 113, 113, 0.95);
-    box-shadow: 0 0 24px rgba(239, 68, 68, 0.6);
-    animation: sx-nk-warn-pulse 0.3s ease-in-out infinite alternate;
-}
-
 /* ------------------------------------------------------------------
    THE TACTICIAN - persistent chess-siege arena (boss-tactician.js)
    Gliding queen, intent banners, knight orbs, pawn ranks, rook
@@ -5600,109 +5583,212 @@ body.sx-bmb-flash::after {
 
 
 /* ============================================================
-   ============ The Creeper - reworked nest mother ============
-   ============================================================
-   Green-homage arena: stalking creeper sprites with fuse
-   swell/flash, TNT chain clusters, pounce shadow markers,
-   detonation bursts with lingering craters, and the SSSS…BOOM
-   finale (growing red blast ring + fuse countdown + screen
-   flash). All layers pointer-events: none; animated elements
-   are translate-positioned fixed dots whose motion/effects run
-   on filter/opacity only (Chromium fixed-element transform
-   rule). */
+   THE CREEPER (boss_creeper): hissing creeperlings, red pie-timer
+   fuse circles, fuse trail (TNT lane + gunpowder + spark), the
+   pounce, and SSSS…BOOM. Everything is pointer-events: none.
+   Fixed elements are placed by inline transform / left+top only;
+   scale and flash animations run on child elements (Chromium
+   fixed-element transform rule).
+   ============================================================ */
 
-/* ── Creeper sprite: fixed outer dot + body child ──
-   The body child carries scale/animation so the wrapper's
-   inline translate never fights a keyframe transform. */
+/* Creeperling: fixed outer dot + a blocky green body child with a face and feet. */
 .sx-crp-creeper {
     width: 44px;
     height: 44px;
     z-index: 9002;
 }
 .sx-crp-body {
-    width: 30px;
-    height: 30px;
-    border-radius: 5px;
-    background: linear-gradient(160deg, #4ade80 0%, #22c55e 55%, #15803d 100%);
-    box-shadow: 0 0 12px rgba(34, 197, 94, 0.8), inset 0 -4px 8px rgba(0, 0, 0, 0.35), inset 0 3px 6px rgba(255, 255, 255, 0.25);
-    transform-origin: 50% 60%;
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    background:
+        linear-gradient(#14532d, #14532d) 12% 16% / 24% 18% no-repeat,
+        linear-gradient(#14532d, #14532d) 72% 60% / 22% 16% no-repeat,
+        linear-gradient(#86efac, #86efac) 78% 12% / 16% 14% no-repeat,
+        linear-gradient(#4ade80, #4ade80) 6% 64% / 20% 20% no-repeat,
+        linear-gradient(160deg, #4ade80 0%, #22c55e 55%, #15803d 100%);
+    box-shadow: 0 0 0 2px #052e16, 0 0 12px rgba(34, 197, 94, 0.8), inset 0 -4px 8px rgba(0, 0, 0, 0.35);
+    transform-origin: 50% 70%;
     transition: scale 0.2s ease-out;
 }
-/* Classic creeper face (pure CSS): dark eyes + mouth on the cube. */
 .sx-crp-body::before {
     content: '';
     position: absolute;
     inset: 0;
     background:
-        /* eyes */
-        radial-gradient(circle at 32% 34%, #0f172a 0 22%, transparent 24%),
-        radial-gradient(circle at 68% 34%, #0f172a 0 22%, transparent 24%),
-        /* mouth */
-        linear-gradient(#0f172a, #0f172a) 50% 62% / 36% 30% no-repeat,
-        linear-gradient(#0f172a, #0f172a) 34% 82% / 14% 16% no-repeat,
-        linear-gradient(#0f172a, #0f172a) 66% 82% / 14% 16% no-repeat;
+        linear-gradient(#0f172a, #0f172a) 14% 20% / 24% 24% no-repeat,
+        linear-gradient(#0f172a, #0f172a) 62% 20% / 24% 24% no-repeat,
+        linear-gradient(#0f172a, #0f172a) 38% 46% / 24% 30% no-repeat,
+        linear-gradient(#0f172a, #0f172a) 24% 60% / 16% 30% no-repeat,
+        linear-gradient(#0f172a, #0f172a) 60% 60% / 16% 30% no-repeat;
     border-radius: inherit;
-    opacity: 0.92;
 }
-/* Fuse flash: white-hot blink (rate scaled by JS inline animationDuration). */
+.sx-crp-body::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    bottom: -8px;
+    width: 9px;
+    height: 7px;
+    background: #15803d;
+    box-shadow: 17px 0 0 0 #15803d, 0 0 0 2px #052e16, 17px 0 0 2px #052e16;
+}
+.sx-crp-rise { animation: sx-crp-rise-kf 0.6s ease-out; }
+@keyframes sx-crp-rise-kf { from { opacity: 0; } to { opacity: 1; } }
+/* Fuse flash: white-hot blink (rate set inline by the script). */
 @keyframes sx-crp-flash {
     0%, 100% { filter: brightness(1) drop-shadow(0 0 6px rgba(34, 197, 94, 0.7)); }
     50%      { filter: brightness(2.4) drop-shadow(0 0 16px rgba(255, 255, 255, 0.95)); }
 }
-/* Charged creeper: blue lightning aura + crackle. */
+/* Charged creeperling: lightning-blue with a crackle; the warning pulse shows the strike coming. */
 .sx-crp-charged .sx-crp-body {
     background: linear-gradient(160deg, #60a5fa 0%, #3b82f6 55%, #1d4ed8 100%);
-    box-shadow: 0 0 16px rgba(96, 165, 250, 0.95), 0 0 34px rgba(59, 130, 246, 0.5), inset 0 -4px 8px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 0 0 2px #172554, 0 0 16px rgba(96, 165, 250, 0.95), 0 0 34px rgba(59, 130, 246, 0.5), inset 0 -4px 8px rgba(0, 0, 0, 0.35);
     animation: sx-crp-charge-crackle 0.32s steps(2) infinite;
+}
+.sx-crp-zapwarn .sx-crp-body {
+    box-shadow: 0 0 0 2px #052e16, 0 0 18px rgba(147, 197, 253, 0.95), 0 0 36px rgba(96, 165, 250, 0.6);
+    animation: sx-crp-charge-crackle 0.4s steps(2) infinite;
 }
 @keyframes sx-crp-charge-crackle {
     0%, 100% { filter: brightness(1.1); }
     50%      { filter: brightness(1.8) drop-shadow(0 0 18px rgba(147, 197, 253, 1)); }
 }
-/* Pack end: un-blown creepers scurry away and fade. */
-.sx-crp-flee {
-    animation: sx-crp-flee-kf 0.6s ease-in forwards;
-}
-@keyframes sx-crp-flee-kf {
-    0%   { opacity: 1; }
-    100% { opacity: 0; }
-}
-
-/* ── Pounce shadow marker: grows while the creeper falls ── */
-.sx-crp-marker {
+.sx-crp-flee { animation: sx-crp-flee-kf 0.6s ease-in forwards; }
+@keyframes sx-crp-flee-kf { from { opacity: 1; } to { opacity: 0; } }
+.sx-crp-bolt {
     position: fixed;
-    border-radius: 50%;
+    top: 0;
+    width: 8px;
+    z-index: 9005;
     pointer-events: none;
-    z-index: 9001;
-    border: 3px dashed rgba(248, 113, 113, 0.9);
-    background: radial-gradient(circle, rgba(239, 68, 68, 0.16) 0%, rgba(239, 68, 68, 0.05) 60%, transparent 70%);
-    box-shadow: inset 0 0 26px rgba(239, 68, 68, 0.3), 0 0 18px rgba(248, 113, 113, 0.45);
-    animation: sx-bmb-ring-pulse 0.5s ease-in-out infinite alternate;
+    background: linear-gradient(#ffffff, #bfdbfe 55%, #60a5fa);
+    box-shadow: 0 0 16px 4px rgba(96, 165, 250, 0.9);
+    animation: sx-crp-bolt-kf 0.45s ease-out forwards;
+}
+@keyframes sx-crp-bolt-kf {
+    0%   { opacity: 1; filter: brightness(2.2); }
+    100% { opacity: 0; filter: brightness(1); }
 }
 
-/* ── TNT block sprite: primed, label, blink rate driven by JS ── */
+/* Floor circle: the blast's real reach. Its red pie fills clockwise as the fuse burns. */
+.sx-crp-fuse {
+    position: fixed;
+    z-index: 8999;
+    pointer-events: none;
+    box-sizing: border-box;
+    border-radius: 50%;
+    --p: 0deg;
+    border: 3px dashed rgba(248, 113, 113, 0.95);
+    background: conic-gradient(from 0deg, rgba(239, 68, 68, 0.40) var(--p), rgba(239, 68, 68, 0.08) 0);
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.45), inset 0 0 26px rgba(239, 68, 68, 0.22);
+}
+.sx-crp-fuse.charged {
+    border-color: rgba(147, 197, 253, 0.95);
+    background: conic-gradient(from 0deg, rgba(96, 165, 250, 0.45) var(--p), rgba(59, 130, 246, 0.09) 0);
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.55), inset 0 0 28px rgba(59, 130, 246, 0.25);
+}
+/* Pounce, before the landing: the marked spot, no pie yet. */
+.sx-crp-fuse.land {
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.04) 70%);
+    animation: sx-nk-warn-pulse 0.35s ease-in-out infinite alternate;
+}
+.sx-crp-fuse.final {
+    z-index: 9002;
+    border-width: 5px;
+    box-shadow: 0 0 40px rgba(239, 68, 68, 0.55), inset 0 0 70px rgba(239, 68, 68, 0.3);
+}
+.sx-crp-hiss {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 9004;
+    pointer-events: none;
+    font: 900 14px/1 system-ui, sans-serif;
+    letter-spacing: 0.12em;
+    color: #fecaca;
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.95), 0 1px 3px #000;
+    animation: sx-crp-hiss-kf 0.22s steps(2) infinite;
+}
+@keyframes sx-crp-hiss-kf { from { opacity: 1; } to { opacity: 0.35; } }
+.sx-crp-puff {
+    position: fixed;
+    z-index: 8998;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(187, 247, 208, 0.55), rgba(120, 113, 108, 0.35) 55%, transparent 72%);
+    animation: sx-crp-puff-kf 0.6s ease-out forwards;
+}
+@keyframes sx-crp-puff-kf {
+    0%   { transform: scale(0.4); opacity: 0.95; }
+    100% { transform: scale(1.25); opacity: 0; }
+}
+
+/* Fuse trail: red lane, gunpowder line, TNT crates, the running spark. */
+.sx-crp-lane {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 8997;
+    pointer-events: none;
+    box-sizing: border-box;
+    transform-origin: 0 50%;
+    border-top: 3px dashed rgba(248, 113, 113, 0.9);
+    border-bottom: 3px dashed rgba(248, 113, 113, 0.9);
+    background: repeating-linear-gradient(135deg, rgba(239, 68, 68, 0.17) 0 14px, rgba(239, 68, 68, 0.05) 14px 28px);
+    animation: sx-nk-warn-pulse 0.35s ease-in-out infinite alternate;
+}
+.sx-crp-powder {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 8998;
+    height: 8px;
+    margin-top: -4px;
+    pointer-events: none;
+    transform-origin: 0 50%;
+    border-radius: 4px;
+    background: repeating-linear-gradient(90deg, #57534e 0 7px, #1c1917 7px 11px, #78716c 11px 14px, #1c1917 14px 18px);
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+}
+.sx-crp-lane.done,
+.sx-crp-powder.done { animation: sx-crp-lane-out 0.5s ease-out forwards; }
+@keyframes sx-crp-lane-out { to { opacity: 0; } }
 .sx-crp-tnt {
     width: 48px;
-    height: 32px;
-    font-size: 0.72rem;
-    font-weight: 900;
+    height: 34px;
+    z-index: 9002;
+    font: 900 0.72rem/1 system-ui, sans-serif;
     letter-spacing: 0.08em;
-    color: #fff;
-    background: linear-gradient(180deg, #b91c1c 0%, #7f1d1d 100%);
+    color: #1c1917;
     border: 2px solid #450a0a;
     border-radius: 4px;
-    box-shadow: 0 0 12px rgba(239, 68, 68, 0.75), inset 0 2px 4px rgba(255, 255, 255, 0.2);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-    z-index: 9002;
-    animation: sx-crp-tnt-blink 0.9s steps(2) infinite;
+    background: linear-gradient(180deg, #dc2626 0 26%, #fef2f2 26% 74%, #b91c1c 74%);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.7), inset 0 2px 3px rgba(255, 255, 255, 0.25);
 }
+.sx-crp-tnt.fuse-start { animation: sx-crp-tnt-blink 0.5s steps(2) infinite; }
+.sx-crp-tnt.lit { animation: sx-crp-tnt-blink 0.09s steps(2) infinite; }
 @keyframes sx-crp-tnt-blink {
     0%, 100% { filter: brightness(1); }
-    50%      { filter: brightness(1.9) drop-shadow(0 0 14px rgba(254, 202, 202, 0.9)); }
+    50%      { filter: brightness(2) drop-shadow(0 0 14px rgba(255, 255, 255, 0.95)); }
 }
+.sx-crp-spark {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    z-index: 9003;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffffff 0 25%, #fde047 45%, #f97316 70%, transparent 75%);
+    box-shadow: 0 0 14px 6px rgba(251, 146, 60, 0.85), 0 0 30px 12px rgba(250, 204, 21, 0.45);
+    animation: sx-crp-spark-kf 0.12s steps(2) infinite;
+}
+@keyframes sx-crp-spark-kf { from { filter: brightness(1); } to { filter: brightness(1.5); } }
 
-/* ── One detonation: flash core + smoke ring + drifting smoke puffs ──
-   Wrapper positioned at the blast centre; children animate locally. */
+/* One detonation: white-hot core, smoke ring and puffs, flying blocks, scorch crater. */
 .sx-crp-burst {
     position: fixed;
     pointer-events: none;
@@ -5744,7 +5830,23 @@ body.sx-bmb-flash::after {
     0%   { transform: translate(0, 0) scale(0.7); opacity: 0.95; }
     100% { transform: translate(var(--dx, 30px), var(--dy, -40px)) scale(1.7); opacity: 0; }
 }
-/* Lingering scorch crater (creeper signature footprint). */
+.sx-crp-chunk {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
+    animation: sx-crp-chunk-kf 0.9s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+}
+.sx-crp-chunk.c0 { background: #22c55e; border: 2px solid #052e16; }
+.sx-crp-chunk.c1 { background: #78716c; border: 2px solid #1c1917; width: 8px; height: 8px; }
+.sx-crp-chunk.c2 { background: #a16207; border: 2px solid #451a03; }
+@keyframes sx-crp-chunk-kf {
+    0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    70%  { opacity: 1; }
+    100% { transform: translate(var(--dx, 40px), calc(var(--dy, -40px) + 60px)) rotate(var(--rot, 180deg)); opacity: 0; }
+}
 .sx-crp-crater {
     position: fixed;
     border-radius: 50%;
@@ -5761,56 +5863,58 @@ body.sx-bmb-flash::after {
     100% { opacity: 0; }
 }
 
-/* ── SSSS…BOOM finale: countdown overlay, growing red blast ring, screen flash ── */
-.sx-crp-cd {
+/* One-line instruction chip (once per mechanic per fight). */
+.sx-crp-hint {
     position: fixed;
     left: 50%;
-    top: 26%;
-    transform: translate(-50%, -50%);
+    bottom: 124px;
+    transform: translateX(-50%);
+    z-index: 9300;
+    pointer-events: none;
+    max-width: min(560px, 88vw);
+    text-align: center;
+    padding: 7px 16px;
+    border-radius: 12px;
+    background: rgba(2, 20, 10, 0.82);
+    border: 1px solid rgba(74, 222, 128, 0.8);
+    box-shadow: 0 0 18px rgba(34, 197, 94, 0.4);
+    font: 700 0.95rem/1.3 system-ui, sans-serif;
+    color: #dcfce7;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    animation: sx-crp-hint-kf 4.6s ease-in-out forwards;
+}
+@keyframes sx-crp-hint-kf {
+    0%   { opacity: 0; }
+    8%   { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* SSSS…BOOM: banner colour, the big countdown number, the swelling boss card, the flash. */
+.sx-crp-fin { --nk-fin: #4ade80; }
+.sx-crp-final-num {
+    position: fixed;
     z-index: 9003;
     pointer-events: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    text-align: center;
+    transform: translate(-50%, -50%);
+    font: 900 clamp(5rem, 13vw, 9rem)/1 system-ui, sans-serif;
+    color: #fecaca;
+    opacity: 0.88;
+    text-shadow: 0 0 34px rgba(239, 68, 68, 1), 0 0 90px rgba(220, 38, 38, 0.7), 0 3px 8px rgba(0, 0, 0, 0.9);
 }
-.sx-crp-cd-label {
-    font-weight: 900;
-    letter-spacing: 0.18em;
-    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
-    color: #bbf7d0;
-    text-shadow: 0 0 16px rgba(34, 197, 94, 0.9), 0 2px 6px rgba(0, 0, 0, 0.85);
-    white-space: nowrap;
+.sx-crp-final-num.pop { animation: sx-crp-num-pop 0.8s ease-out; }
+@keyframes sx-crp-num-pop {
+    0%   { transform: translate(-50%, -50%) scale(1.6); opacity: 0.15; }
+    45%  { opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0.88; }
 }
-.sx-crp-cd-num {
-    font-weight: 900;
-    font-variant-numeric: tabular-nums;
-    font-size: clamp(4.2rem, 11vw, 7.5rem);
-    line-height: 1;
-    color: #4ade80;
-    text-shadow: 0 0 34px rgba(34, 197, 94, 1), 0 0 90px rgba(22, 163, 74, 0.7), 0 3px 8px rgba(0, 0, 0, 0.9);
+.sx-crp-swell {
+    transform-origin: 50% 65%;
+    animation: sx-crp-swell-kf 0.42s ease-in-out infinite alternate;
 }
-.sx-crp-cd-num.sx-crp-cd-pop {
-    animation: sx-bmb-cd-pop 0.8s ease-out;
-}
-.sx-crp-cd-hint {
-    font-size: clamp(0.8rem, 1.8vw, 1.05rem);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: #fca5a5;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
-    max-width: 90vw;
-}
-.sx-crp-finalring {
-    position: fixed;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9002;
-    border: 5px dashed rgba(248, 113, 113, 0.95);
-    background: radial-gradient(circle, rgba(239, 68, 68, 0.16) 0%, rgba(239, 68, 68, 0.06) 62%, transparent 72%);
-    box-shadow: 0 0 40px rgba(239, 68, 68, 0.55), inset 0 0 70px rgba(239, 68, 68, 0.3);
-    animation: sx-bmb-ring-pulse 0.5s ease-in-out infinite alternate;
+@keyframes sx-crp-swell-kf {
+    from { scale: 1; filter: brightness(1); }
+    to   { scale: 1.16; filter: brightness(1.9) drop-shadow(0 0 16px rgba(255, 255, 255, 0.95)); }
 }
 body.sx-crp-flash::after {
     content: '';

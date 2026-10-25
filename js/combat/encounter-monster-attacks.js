@@ -65,6 +65,13 @@ export function _fireMonsterAttack(monster) {
         globalThis._dancerPirouette(monster);
         return;
     }
+    // The Creeper: the attack bar sends its mother leaping onto your spot -
+    // marked circle, landing, hiss, then boom (boss-creeper.js).
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_creeper')
+        && typeof _crpPounce === 'function') {
+        globalThis._crpPounce(monster);
+        return;
+    }
     // The Gale: a wind lance lane telegraphs, then a compressed air bolt
     // blasts across it, flinging anyone hit (boss-gale.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_gale')

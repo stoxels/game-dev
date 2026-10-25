@@ -27,11 +27,11 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'Total Carpet', desc: _bossTestTr('eg_boss_test_bomber_final', 'At 10% HP: 3…2…1 countdown → a green SAFE dome plants at your position, then every live mine + a rolling detonation front goes off. OUTSIDE the dome = hit, twice (charge bar frozen).') },
     ],
     'boss_creeper': () => [
-        { name: 'Creeper Pack', desc: _bossTestTr('eg_boss_test_creeper_pack', 'All fight: creepers scuttle in and STALK you - their fuse HEATS (white flash + swell) while you are close and COOLS while you keep your distance. Fuse full = detonation. Keep moving!') },
-        { name: 'Fuse Pounce', desc: _bossTestTr('eg_boss_test_creeper_pounce', 'All fight: a creeper drops onto your current position - shadow marker first, then hiss, then boom. Move from your spot!') },
-        { name: 'TNT Chain', desc: _bossTestTr('eg_boss_test_creeper_tnt', 'At 60% HP: primed TNT blocks rain down around you, flashing faster and faster, then detonate in a rolling chain reaction outward from the centre. Leave the cluster entirely!') },
-        { name: 'Charged Creeper', desc: _bossTestTr('eg_boss_test_creeper_charged', 'At 30% HP: packs gain a lightning-charged creeper ⚡ (blue aura) - faster fuse, bigger blast radius. Prioritize it!') },
-        { name: 'SSSS…BOOM', desc: _bossTestTr('eg_boss_test_creeper_final', 'At 10% HP: the boss primes - 3…2…1 fuse countdown while a huge red blast ring grows around it, then it mega-detonates. Be OUTSIDE the ring! (charge bar frozen)') },
+        { name: 'Creeperlings', desc: _bossTestTr('eg_boss_test_creeper_pack', 'All fight: creeperlings pop up at the edges and stalk you. Close enough, one stops and HISSES - a red pie fills its blast circle, then it blows. Leave the circle in time; a blast sets nearby creeperlings off early.') },
+        { name: 'Pounce', desc: _bossTestTr('eg_boss_test_creeper_pounce', 'Charge attack: POUNCE - the Creeper’s mother leaps onto your spot. The circle is marked, she lands, hisses (the pie fills) and blows. Phase 3 follows up with a second pounce.') },
+        { name: 'Fuse Trail', desc: _bossTestTr('eg_boss_test_creeper_tnt', 'At 60% HP, every ~21s: FUSE TRAIL - a row of TNT crates and a gunpowder fuse is laid through your spot (red lane). The fuse is lit at the crate nearest you and the spark runs both ways. Leave the lane! Phase 3 lays a second trail across the first.') },
+        { name: 'Charged Creeper', desc: _bossTestTr('eg_boss_test_creeper_charged', 'At 30% HP: lightning strikes one creeperling and CHARGES it (blue) - a bigger blast circle and a harder hit.') },
+        { name: 'SSSS…BOOM', desc: _bossTestTr('eg_boss_test_creeper_final', 'At 10% HP: SSSS…BOOM - the Creeper turns immune and swells; a giant red circle fills like a pie-timer for 3…2…1, then blows. Be OUTSIDE the circle!') }
     ],
     'boss_buzz': () => [
         { name: 'Ricochet Saws', desc: _bossTestTr('eg_boss_test_bz_ricochet', 'All fight: blades are flung in from the edges at you, bounce off the walls up to 3 times, then embed in the floor as spinning hazards. Watch the bounce!') },

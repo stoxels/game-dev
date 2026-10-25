@@ -297,7 +297,7 @@ const RIGS = {
         mechanics: {
             creeper_pack: { anim: 'cre_pack', ms: () => 2300 },
             fuse_pounce: { anim: 'cre_pounce', ms: () => 1800 },
-            tnt_chain: { anim: 'cre_tnt', ms: () => 2400 },
+            fuse_trail: { anim: 'cre_tnt', ms: () => 2400 },
         },
     },
     // <<< rig boss_creeper
