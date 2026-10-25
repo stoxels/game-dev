@@ -730,9 +730,10 @@ const USP_SPELL_IMPACT = {
     // regular frost impact flash.
     usp_freezing_pulse: { cssClass: 'usp-freeze-wave', ms: 850 },
     // Cold Snap - a real icy snap: the victim flash-freezes solid. A sheet
-    // of ice with radiating cracks crystallizes over the card in one snap
-    // and holds briefly before thawing. Replaces the soft nova ring.
-    usp_cold_snap: { noFlight: true, cssClass: 'usp-coldsnap-freeze', ms: 950, skipNova: true },
+    // of ice with radiating cracks crystallizes over the card in one snap,
+    // holds briefly, then SHATTERS outward (the recipe fires the burst
+    // layer at the break). Replaces the soft nova ring.
+    usp_cold_snap: { noFlight: true, cssClass: 'usp-coldsnap-freeze', ms: 1150, skipNova: true },
     // Mana Burst / Surge Release: the blast goes off around the hero, so
     // every victim is hit in place (Surge Release also arcs to each one).
     usp_arcane_explosion: { noFlight: true },

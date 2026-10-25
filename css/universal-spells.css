@@ -2719,11 +2719,14 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
     100%{opacity:0}
 }
 
-/* ━━━ COLD SNAP (usp_cold_snap) — flash-freeze ━━━━━━━━━━━━━━━━━━━━━━━━━ */
-/* Signature impact: the victim freezes solid in one snap. A sheet of ice
-   crystallizes over the card almost instantly, crack lines radiate from
-   the centre, a crystalline rim bites the edges - then it holds a beat
-   and thaws away. Replaces the generic nova ring. Purely additive. */
+/* ━━━ COLD SNAP (usp_cold_snap) — flash-freeze into shatter ━━━━━━━━━━━━━ */
+/* Signature impact: the victim snap-freezes solid - a sheet of ice with
+   radiating cracks crystallizes over the card almost instantly and holds
+   a beat. Then the tension breaks: the sheet flares bright, the cracks
+   split wider, and the whole shell SHATTERS outward into glittering
+   fragments instead of melting away. Replaces the generic nova ring.
+   The burst layer below fires on a recipe delay at the break instant.
+   Purely additive. */
 .usp-coldsnap-freeze{
     position:absolute; inset:0; border-radius:10px;
     pointer-events:none; z-index:5;
@@ -2732,38 +2735,80 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
         repeating-linear-gradient(-41deg, rgba(179,229,252,.28) 0 2px, transparent 2px 9px),
         radial-gradient(circle at 50% 46%, rgba(255,255,255,.92) 0%, rgba(225,245,254,.72) 30%, rgba(129,212,250,.55) 58%, rgba(2,119,189,.42) 82%, rgba(1,87,155,.30) 100%);
     box-shadow: inset 0 0 22px rgba(225,245,254,.85);
-    animation: usp-coldsnap-hold .95s ease-out forwards;
+    animation: usp-coldsnap-hold 1.15s ease-out forwards;
 }
 .usp-coldsnap-freeze::before{
     content:''; position:absolute; inset:0; border-radius:10px;
     background: repeating-conic-gradient(from 0deg at 50% 46%, rgba(255,255,255,.85) 0deg 1.2deg, transparent 1.2deg 14deg, rgba(179,229,252,.5) 14deg 15deg, transparent 15deg 29deg);
     filter: blur(.4px);
-    animation: usp-coldsnap-cracks .95s ease-out forwards;
+    animation: usp-coldsnap-cracks 1.15s ease-out forwards;
 }
 .usp-coldsnap-freeze::after{
     content:''; position:absolute; inset:3px; border-radius:8px;
     border:2px solid rgba(225,245,254,.95);
     box-shadow:0 0 14px rgba(129,212,250,.9), inset 0 0 12px rgba(225,245,254,.7);
-    animation: usp-coldsnap-rim .95s ease-out forwards;
+    animation: usp-coldsnap-rim 1.15s ease-out forwards;
 }
 @keyframes usp-coldsnap-hold{
-    0%{opacity:0; transform:scale(.7)}
-    12%{opacity:1; transform:scale(1.04)}
-    22%{transform:scale(1)}
-    62%{opacity:1}
-    100%{opacity:0; transform:scale(1.06)}
+    0%{opacity:0; transform:scale(.7); filter:brightness(1)}
+    10%{opacity:1; transform:scale(1.04); filter:brightness(1.1)}
+    18%{transform:scale(1); filter:brightness(1)}
+    50%{opacity:1; transform:scale(1); filter:brightness(1)}
+    58%{opacity:1; transform:scale(1.03); filter:brightness(1.4)}
+    70%{opacity:.85; transform:scale(1.08); filter:brightness(1.2) blur(1px)}
+    100%{opacity:0; transform:scale(1.16); filter:brightness(1.1) blur(2px)}
 }
 @keyframes usp-coldsnap-cracks{
     0%{opacity:0; transform:scale(.4) rotate(-8deg)}
-    14%{opacity:1}
-    65%{opacity:1}
-    100%{opacity:0; transform:scale(1.15) rotate(4deg)}
+    12%{opacity:1}
+    50%{opacity:1; transform:scale(1) rotate(0deg)}
+    58%{opacity:1; transform:scale(1.06) rotate(1deg)}
+    70%{opacity:.9; transform:scale(1.28) rotate(5deg)}
+    100%{opacity:0; transform:scale(1.45) rotate(7deg)}
 }
 @keyframes usp-coldsnap-rim{
     0%{opacity:0}
-    16%{opacity:1}
-    60%{opacity:1}
+    14%{opacity:1}
+    50%{opacity:1}
+    58%{opacity:1; box-shadow:0 0 22px rgba(200,240,255,1), inset 0 0 18px rgba(255,255,255,.9)}
+    70%{opacity:.4}
     100%{opacity:0}
+}
+/* Shatter burst: fired by the recipe at the break instant. A white-blue
+   core flash plus a star of ice wedges that flies outward and is gone
+   in half a second. Sits above the breaking sheet (z-index 6). */
+.usp-coldsnap-shatter{
+    position:absolute; inset:0; border-radius:10px;
+    pointer-events:none; z-index:6;
+    opacity:0; animation:usp-coldsnap-burst .55s ease-out forwards;
+}
+.usp-coldsnap-shatter::before{
+    content:''; position:absolute; left:50%; top:46%; width:120px; height:120px; margin:-60px 0 0 -60px; border-radius:50%;
+    background:radial-gradient(circle, #fff 0%, rgba(200,240,255,.95) 35%, rgba(127,217,255,.55) 60%, transparent 75%);
+    animation:usp-coldsnap-core .55s ease-out forwards;
+}
+.usp-coldsnap-shatter::after{
+    content:''; position:absolute; inset:-12px; border-radius:10px;
+    background:repeating-conic-gradient(from 0deg at 50% 46%, rgba(255,255,255,.95) 0deg 3deg, transparent 3deg 22deg, rgba(179,229,252,.8) 22deg 24deg, transparent 24deg 47deg);
+    -webkit-mask:radial-gradient(circle at 50% 46%, transparent 0 26%, #000 30%, #000 52%, transparent 68%);
+            mask:radial-gradient(circle at 50% 46%, transparent 0 26%, #000 30%, #000 52%, transparent 68%);
+    filter:drop-shadow(0 0 6px #bfeaff) drop-shadow(0 0 12px rgba(60,160,255,.7));
+    animation:usp-coldsnap-frags .55s cubic-bezier(.2,.9,.3,1) forwards;
+}
+@keyframes usp-coldsnap-burst{
+    0%{opacity:0}
+    8%{opacity:1}
+    100%{opacity:0}
+}
+@keyframes usp-coldsnap-core{
+    0%{opacity:0; transform:scale(.3)}
+    15%{opacity:1; transform:scale(1)}
+    100%{opacity:0; transform:scale(1.6)}
+}
+@keyframes usp-coldsnap-frags{
+    0%{opacity:0; transform:scale(.45) rotate(-6deg)}
+    18%{opacity:1}
+    100%{opacity:0; transform:scale(1.5) rotate(8deg)}
 }
 
 /* ━━━ MEND WOUNDS (usp_mend_wounds) — circling hearts ━━━━━━━━━━━━━━━ */

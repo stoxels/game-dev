@@ -489,6 +489,13 @@ export const SPELL_FX = {
             { p: 'shard', n: 14, motion: 'arc', colors: ICE, glow: ['#2a8fe0'], size: [4, 8], dist: [30, 80], angle: [-170, -10], lift: [20, 50], grav: [20, 40], spin: 400, dur: [550, 850] },
             { p: 'smoke', n: 5, motion: 'billow', colors: FROST_MIST, size: [22, 34], dist: [14, 40], angle: [150, 390], lift: [0, 6], end: 1.6, dur: [700, 1000], opacity: 0.7, at: [50, 86] },
             { shake: 2 },
+            // Shatter beat: timed to the sheet breaking (~640ms) - a hard
+            // flash, an outward shard volley, the burst layer and a shock
+            // ring as the frozen shell flies apart.
+            { flash: { color: 'rgba(255,255,255,1)', color2: 'rgba(150,220,255,.6)', size: 200, dur: 380, delay: 640 } },
+            { p: 'shard', n: 16, motion: 'burst', colors: ICE, glow: ['#bfeaff'], size: [5, 10], dist: [40, 110], spin: 500, dur: [500, 800], even: true, delay: 640 },
+            { css: 'usp-coldsnap-shatter', ms: 550, delay: 640 },
+            { ring: { color: '#ffffff', glow: '#7fd9ff', size: 190, width: 3, dur: 500, delay: 640 } },
         ],
     },
     // Glacial Breath: a freezing gale pours down the cone in mist and
