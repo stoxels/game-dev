@@ -51,6 +51,10 @@ export const WD_WORLD_CONFIGS = [
         trialNode: { x: 89.2, y: 41.8 },
         // Ascension Trial node - the road continues here after the world's last level.
         ascensionNode: { x: 50, y: 14.4 },
+        // Companion meeting nodes (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'den_reunion', from: 2, x: 35, y: 86 },
+        ],
         nodes: [
             { x: 17.2, y: 64.7 },  // 1
             { x: 31.9, y: 47.5 },  // 2

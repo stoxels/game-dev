@@ -199,6 +199,9 @@ function _wdGetNodePos(cfg, nodeRef) {
     if (nodeRef === 'trial') return cfg.trialNode;
     if (nodeRef === 'ascension') return cfg.ascensionNode;
     if (nodeRef === 'story') return cfg.storyNode;
+    if (typeof nodeRef === 'string' && nodeRef.startsWith('comp:')) {
+        return (cfg.companionNodes || []).find(c => 'comp:' + c.id === nodeRef);
+    }
     return cfg.nodes[nodeRef];
 }
 
@@ -302,6 +305,15 @@ function _wdBuildRoads(cfg, wi) {
             n1: story.from,
             n2: 'story',
             waypoints: [cfg.nodes[story.from], story],
+        });
+    }
+
+    // Companion meeting spurs, same idea as the story node.
+    for (const cn of _wdCompanionNodesForWorld(wi)) {
+        roads.push({
+            n1: cn.from,
+            n2: 'comp:' + cn.id,
+            waypoints: [cfg.nodes[cn.from], cn],
         });
     }
 
@@ -487,7 +499,7 @@ function _wdIsNodeReached(n, wi) {
     }
     // The story node only exists once its anchor level is cleared, so its
     // spur is always lit.
-    if (n === 'story') return true;
+    if (n === 'story' || (typeof n === 'string' && n.startsWith('comp:'))) return true;
     if (n === 'ascension') {
         return ((typeof globalThis._isAscensionTrialDone === 'function') && globalThis._isAscensionTrialDone(wi))
             || ((typeof globalThis._isAscensionTrialUnlocked === 'function') && globalThis._isAscensionTrialUnlocked(wi));
@@ -1562,6 +1574,111 @@ function _wdAppendLevelNodes(canvas, wi, cfg, levelCount) {
     if (ascPos) canvas.appendChild(_wdBuildAscensionNode(wi, ascPos));
     const story = _wdStoryNodeForWorld(wi);
     if (story) canvas.appendChild(_wdBuildStoryNode(wi, story));
+    for (const cn of _wdCompanionNodesForWorld(wi)) canvas.appendChild(_wdBuildCompanionNode(wi, cn));
+}
+
+//------------------------------------------------------------------------
+//-------------------COMPANION NODES (MEETING SCENES)----------------------
+//------------------------------------------------------------------------
+// Optional nodes where the player's hero meets one of the other two heroes
+// (scripts in js/storyline/companion-scenes.js). Config:
+// WD_WORLD_CONFIGS[wi].companionNodes = [{ id, from, x, y }].
+
+/**
+ * Returns the world's companion nodes that should be on the map: the scene
+ * has a script for the picked character and the level it hangs off is cleared.
+ */
+function _wdCompanionNodesForWorld(wi) {
+    const cfg = WD_WORLD_CONFIGS[wi];
+    if (!cfg || !cfg.companionNodes || !STATE) return [];
+    return cfg.companionNodes.filter(cn => {
+        if (!cfg.nodes[cn.from] || !globalThis.getCompanionPairing(cn.id)) return false;
+        return STATE.done && STATE.done.includes(globalThis.WORLD_START_GI[wi] + cn.from);
+    });
+}
+
+/**
+ * Builds a companion node: the companion's face in the circle, green once
+ * the meeting has been watched. Clicking walks the sprite there and offers
+ * the "talk" button.
+ */
+function _wdBuildCompanionNode(wi, cn) {
+    const pairing = globalThis.getCompanionPairing(cn.id);
+    const cast = globalThis.COMPANION_CAST[pairing.companion];
+    const node = document.createElement('div');
+    node.className = 'wd-level-node wd-companion-node';
+    node.dataset.companionNode = cn.id;
+    _wdPositionNodeOnCanvas(node, wi, cn);
+
+    const isDone = globalThis.hasMetCompanion(cn.id);
+    if (isDone) node.classList.add('done');
+    const cap = pairing.companion.charAt(0).toUpperCase() + pairing.companion.slice(1);
+    const face = `<img class="wd-companion-face" src="images/sprites/${cap}_${pairing.look}.webp" alt="" draggable="false">`;
+    node.innerHTML = _wdBuildNodeEffectsHtml(face, '', '', '', '');
+
+    node.addEventListener('click', () => {
+        const existing = document.getElementById('wd-enter-btn');
+        if (existing) existing.remove();
+        _wdWalkSpriteTo(wi, 'comp:' + cn.id, () => _wdShowCompanionButton(wi, cn, cast));
+    });
+    node.addEventListener('mouseenter', (e) => _wdShowCompanionTooltip(e, cast, isDone));
+    node.addEventListener('mousemove', (e) => _wdMoveTooltip(e));
+    node.addEventListener('mouseleave', () => _wdHideTooltip());
+    return node;
+}
+
+/**
+ * Shows the "Talk to <hero>" button above a companion node; pressing it
+ * plays the meeting and then redraws the map.
+ */
+function _wdShowCompanionButton(wi, cn, cast) {
+    const existing = document.getElementById('wd-enter-btn');
+    if (existing) existing.remove();
+
+    const cfg = WD_WORLD_CONFIGS[wi];
+    const canvas = _wdGetCanvas();
+    const pct = _wdImgPctToCanvasPct(cn.x, cn.y, canvas, cfg);
+
+    const btn = document.createElement('button');
+    btn.id = 'wd-enter-btn';
+    btn.textContent = (LANG === 'de' ? '▶ Mit ' + cast.name + ' sprechen' : '▶ Talk to ' + cast.name);
+    btn.style.cssText = `
+        position: absolute;
+        left: ${pct.x}%;
+        top: calc(${pct.y}% - 56px);
+        transform: translateX(-50%);
+        z-index: 10;
+        font-family: var(--PX, monospace);
+        font-size: 11px;
+        padding: 5px 12px;
+        background: #2f5f9a;
+        color: #eaf4ff;
+        border: none;
+        cursor: pointer;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    `;
+    btn.addEventListener('click', () => {
+        btn.remove();
+        globalThis.playCompanionScene(cn.id, () => showWorldDetail(wi));
+    });
+    _wdWireEnterButtonDismiss(btn);
+    if (canvas) canvas.appendChild(btn);
+}
+
+/**
+ * Companion-node tooltip: who is there and whether the meeting was seen.
+ */
+function _wdShowCompanionTooltip(e, cast, isDone) {
+    const tip = _wdEnsureTooltip();
+    const status = LANG === 'de'
+        ? (isDone ? 'Getroffen ✓' : 'Optionale Begegnung')
+        : (isDone ? 'Met ✓' : 'Optional meeting');
+    tip.innerHTML = `<div class="wd-tip-title">💬 ${cast.name}</div>`
+        + `<div class="wd-tip-status">${status}</div>`;
+    tip.classList.add('show');
+    _wdMoveTooltip(e);
 }
 
 //------------------------------------------------------------------------

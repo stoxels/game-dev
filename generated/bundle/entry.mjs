@@ -377,6 +377,8 @@ import { STOX_INTRO_IMAGE_PATH, STOX_INTRO_SONG } from '../../js/storyline/story
 import { TRIX_INTRO_IMAGE_PATH, TRIX_INTRO_SONG } from '../../js/storyline/storyline-intro-trix.js';
 import { SYLA_INTRO_IMAGE_PATH, SYLA_INTRO_SONG } from '../../js/storyline/storyline-intro-syla.js';
 import { REGION_BEAT_TRIGGER_LEVEL, REPLAY_GALLERY_ENTRIES, STORY_BEATS } from '../../js/storyline/storyline-beats.js';
+import { COMPANION_CAST, COMPANION_SCENES, getCompanionPairing, hasMetCompanion } from '../../js/storyline/companion-scenes.js';
+import { playCompanionScene } from '../../js/storyline/companion-stage.js';
 import { EG_TEST_MAPS, _egtEnsureStyles, _egtPickSeedGi, showEndgameTestHub, _egLaunchTestMap } from '../../js/dev/endgame-testing-screen.js';
 import { _ascensionTrialName, _cleanupCampaignTrialSeed, _endCampaignTrial, _ensureTrialState, _grantAscensionTrialReward, _grantConvergenceTrialReward, _isAscensionTrialDone, _isAscensionTrialRun, _isAscensionTrialUnlocked, _isConvergenceTrialRun, _isTrialDone, _isTrialRun, _isTrialUnlocked, _launchAscensionTrial, _launchCampaignTrial, _launchTrialRun, _retitleLeaveMapTransition, _routeTrialReturn, _servePostTrialFlows, _trialBossId, _trialChainParams, _trialCount, _trialIdForWorld, _trialMonsterLevel, _trialName, _trialTriggerLevels, _trialWorldStartGi, _trialWorlds } from '../../js/campaign-trials.js';
 import { AssetPreload } from '../../js/asset-preload.js';
@@ -500,6 +502,7 @@ try { Object.defineProperty(globalThis, "BOSS_SOFT_ENRAGE_DMG_STEP", { get() { r
 try { Object.defineProperty(globalThis, "CHARACTERS", { get() { return CHARACTERS; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "CLASS_DEFS", { get() { return CLASS_DEFS; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "CLASS_PROJECTILES", { get() { return CLASS_PROJECTILES; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "COMPANION_CAST", { get() { return COMPANION_CAST; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "CURRENCY_COLS", { get() { return CURRENCY_COLS; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "CURRENCY_ROWS", { get() { return CURRENCY_ROWS; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "DIFF_CFG", { get() { return DIFF_CFG; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -894,6 +897,7 @@ try { Object.defineProperty(globalThis, "getCharmArtForSkill", { get() { return 
 try { Object.defineProperty(globalThis, "getCharmByKey", { get() { return getCharmByKey; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getCharmRankMinPlayerLevel", { get() { return getCharmRankMinPlayerLevel; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getClassPenaltyMultiplier", { get() { return getClassPenaltyMultiplier; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "getCompanionPairing", { get() { return getCompanionPairing; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getGameTooltip", { get() { return getGameTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getSkillCastRankFull", { get() { return getSkillCastRankFull; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getSkillDef", { get() { return getSkillDef; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -912,6 +916,7 @@ try { Object.defineProperty(globalThis, "handleSkillTip", { get() { return handl
 try { Object.defineProperty(globalThis, "handleSkillTipLeave", { get() { return handleSkillTipLeave; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "handleSkillTipMove", { get() { return handleSkillTipMove; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "handleSkillTipRank", { get() { return handleSkillTipRank; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "hasMetCompanion", { get() { return hasMetCompanion; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "hasSeen", { get() { return hasSeen; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "hideClassTooltip", { get() { return hideClassTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "hideGameTooltip", { get() { return hideGameTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -965,6 +970,7 @@ try { Object.defineProperty(globalThis, "openSpellbook", { get() { return openSp
 try { Object.defineProperty(globalThis, "pauseGame", { get() { return pauseGame; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "pickLuckyItem", { get() { return pickLuckyItem; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "pickRandomItem", { get() { return pickRandomItem; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "playCompanionScene", { get() { return playCompanionScene; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "playConfidenceIntervalEffect", { get() { return playConfidenceIntervalEffect; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "playResidualAnalysisEffect", { get() { return playResidualAnalysisEffect; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "playSampleEfficiencyEffect", { get() { return playSampleEfficiencyEffect; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

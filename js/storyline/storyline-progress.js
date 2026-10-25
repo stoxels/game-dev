@@ -17,6 +17,7 @@ import { REPLAY_GALLERY_ENTRIES } from './storyline-beats.js';
 
 export function _seenKey(beatId, options = {}) {
     const suffix = options.character ? `_${options.character}`
+        : options.sceneId ? `_${options.sceneId}`
         : options.className ? `_${options.className}`
             : options.ascendencyClass ? `_${options.ascendencyClass}` : '';
     const slot = (typeof getActiveSlot === 'function' ? getActiveSlot() : null) || 1;
