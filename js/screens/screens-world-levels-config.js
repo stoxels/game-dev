@@ -102,6 +102,10 @@ export const WD_WORLD_CONFIGS = [
         ],
         extraRoads: [
         ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'w3_assembly', from: 3, x: 79, y: 30 },
+        ],
     },
 
     // -----------------------------------------------------------------------
@@ -137,6 +141,10 @@ export const WD_WORLD_CONFIGS = [
             { x: 58, y: 53.8 },  // 19
         ],
         extraRoads: [
+        ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'w4_forest', from: 6, x: 20, y: 30 },
         ],
     },
 
@@ -243,6 +251,10 @@ export const WD_WORLD_CONFIGS = [
         extraRoads: [
             { from: 'entrance', to: 4, showAfter: 3 },
         ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'w7_loom', from: 6, x: 90, y: 36 },
+        ],
     },
 
 
@@ -273,6 +285,10 @@ export const WD_WORLD_CONFIGS = [
             { from: 3, to: 5, showAfter: 4 },
             { from: 0, to: 7, showAfter: 6 },
             { from: 3, to: 8, showAfter: 7 },
+        ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'w8_fieldbase', from: 6, x: 86, y: 86 },
         ],
     },
 
@@ -309,6 +325,10 @@ export const WD_WORLD_CONFIGS = [
         extraRoads: [
             { from: 3, to: 6, showAfter: 5 },
         ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'w9_vortex', from: 15, x: 56, y: 34 },
+        ],
     },
 
 
@@ -339,6 +359,10 @@ export const WD_WORLD_CONFIGS = [
         ],
         extraRoads: [
         ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'w10_enclave', from: 11, x: 14, y: 80 },
+        ],
     },
 
 
@@ -367,6 +391,10 @@ export const WD_WORLD_CONFIGS = [
             { x: 53.9, y: 64.8 },  // 11
         ],
         extraRoads: [
+        ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'w11_ghost', from: 8, x: 63, y: 79 },
         ],
     },
 
@@ -403,6 +431,10 @@ export const WD_WORLD_CONFIGS = [
         ],
         extraRoads: [
         ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'w12_wreck', from: 6, x: 11, y: 66 },
+        ],
     },
 
 
@@ -436,6 +468,10 @@ export const WD_WORLD_CONFIGS = [
         ],
         extraRoads: [
         ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'w13_peak', from: 14, x: 62, y: 17 },
+        ],
     },
 
 
@@ -464,6 +500,10 @@ export const WD_WORLD_CONFIGS = [
             { x: 51, y: 34 },  // 15
         ],
         extraRoads: [
+        ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'w14_sanctum', from: 14, x: 79, y: 57 },
         ],
     },
 

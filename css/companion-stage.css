@@ -60,6 +60,14 @@
 .cmp-bubble-left  { left: 12%; }
 .cmp-bubble-right { right: 12%; }
 .cmp-bubble-mid   { left: 31%; }
+.cmp-bubble-voice {
+    left: 50%;
+    margin-left: calc(-1 * clamp(120px, 19vw, 260px));
+    top: 5%;
+    background: #e9efff;
+    font-style: italic;
+    box-shadow: 0 0 22px rgba(159, 180, 255, 0.85);
+}
 .cmp-name {
     font-family: var(--PX, monospace);
     font-size: 0.7em;

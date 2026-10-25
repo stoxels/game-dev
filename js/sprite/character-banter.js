@@ -88,9 +88,9 @@ const _BANTER_LINES = {
             { en: "A textbook execution.", de: "Eine lehrbuchreife Ausführung." },
         ],
         tutorial_farewell: [
-            { en: "Tutorial complete. Stox signs off - the archive awaits.", de: "Tutorial abgeschlossen. Stox meldet sich ab - das Archiv wartet." },
-            { en: "All hypotheses verified. This was Stox, over and out.", de: "Alle Hypothesen verifiziert. Hier war Stox, bis zum nächsten Mal." },
-            { en: "End of the lesson series. Stox will now apply the theory. Alone. Preferably.", de: "Ende der Lektionen. Stox wird die Theorie nun anwenden. Allein. Vorzugsweise." },
+            { en: "Tutorial complete. Signing off - the archive awaits.", de: "Tutorial abgeschlossen. Ich melde mich ab - das Archiv wartet." },
+            { en: "All hypotheses verified. Over and out.", de: "Alle Hypothesen verifiziert. Bis zum nächsten Mal." },
+            { en: "End of the lesson series. I will now apply the theory. Alone. Preferably.", de: "Ende der Lektionen. Ich wende die Theorie nun an. Allein. Vorzugsweise." },
         ],
         level_start: [
             { en: "Let's see the distribution of this one.", de: "Schauen wir uns die Verteilung an." },
@@ -263,8 +263,8 @@ const _BANTER_LINES = {
             { en: "Legendary execution. Naturally.", de: "Legendäre Ausführung. Natürlich." },
         ],
         tutorial_farewell: [
-            { en: "Graduated with top marks, obviously. Trix never misses.", de: "Mit Bestnoten bestanden, offensichtlich. Trix verfehlt nie." },
-            { en: "That's Trix - first try, every time. The Professor knows by now.", de: "Das ist Trix - erster Versuch, jedes Mal. Das weiß der Professor inzwischen." },
+            { en: "Graduated with top marks, obviously. I never miss.", de: "Mit Bestnoten bestanden, offensichtlich. Ich verfehle nie." },
+            { en: "That's me - first try, every time. The Professor knows by now.", de: "Das bin ich - erster Versuch, jedes Mal. Das weiß der Professor inzwischen." },
             { en: "Remember what you saw today. The name is Trix.", de: "Denk dran, was du heute gesehen hast. Der Name ist Trix." },
         ],
         level_start: [
@@ -314,7 +314,7 @@ const _BANTER_LINES = {
             { en: "Good thing my safety net is as brilliant as I am.", de: "Gut, dass mein Sicherheitsnetz genauso genial ist wie ich." },
             { en: "See? Even my mistakes come with insurance.", de: "Siehst du? Selbst meine Fehler haben eine Versicherung." },
             { en: "Contingency number three. I planned three contingencies.", de: "Notfallplan Nummer drei. Ich hatte drei Notfallpläne." },
-            { en: "Nothing gets past Trix. Official policy.", de: "Nichts kommt an Trix vorbei. Offizielle Richtlinie." },
+            { en: "Nothing gets past me. Official policy.", de: "Nichts kommt an mir vorbei. Offizielle Richtlinie." },
             { en: "You almost embarrassed us there. Almost.", de: "Da hättest uns fast in Verlegenheit gebracht. Fast." },
         ],
         correct_streak: [
@@ -327,7 +327,7 @@ const _BANTER_LINES = {
             { en: "See, when I actually try, it's not even close.", de: "Siehst du, wenn ich mich wirklich anstrenge, ist es nicht mal knapp." },
             { en: "My name was in the archive. Turns out that counts for something.", de: "Mein Name stand im Archiv. Stellt sich raus, das zählt für was." },
             { en: "This streak is going in my memoirs.", de: "Diese Serie kommt in meine Memoiren." },
-            { en: "They should study this in the Guild. Chapter one: Trix.", de: "Das sollte man in der Gilde studieren. Kapitel eins: Trix." },
+            { en: "They should study this in the Guild. Chapter one: me.", de: "Das sollte man in der Gilde studieren. Kapitel eins: ich." },
             { en: "Perfection isn't a goal for me. It's a baseline.", de: "Perfektion ist für mich kein Ziel. Sie ist die Basislinie." },
             { en: "Keep up! This pace is entirely my fault.", de: "Halte durch! Dieses Tempo ist komplett meine Schuld." },
             { en: "I'd applaud, but my hands are busy being excellent.", de: "Ich würde klatschen, aber meine Hände sind damit beschäftigt, großartig zu sein." },
@@ -437,9 +437,9 @@ const _BANTER_LINES = {
             { en: "Boom! Best day ever!", de: "Bumm! Bester Tag überhaupt!" },
         ],
         tutorial_farewell: [
-            { en: "Bye-bye, Professor! Syla will make you proud!", de: "Tschüss, Professor! Syla macht dich stolz!" },
-            { en: "That was the best lesson ever! - Syla, future legend.", de: "Das war die schönste Lektion aller Zeiten! - Syla, künftige Legende." },
-            { en: "I'm off to an adventure! Signed: Syla.", de: "Ich breche ins Abenteuer auf! Unterschrift: Syla." },
+            { en: "Bye-bye, Professor! I will make you proud!", de: "Tschüss, Professor! Ich mache dich stolz!" },
+            { en: "That was the best lesson ever! I will be a legend someday.", de: "Das war die schönste Lektion aller Zeiten! Eines Tages werde ich eine Legende sein." },
+            { en: "I'm off to an adventure! Wish me luck.", de: "Ich breche ins Abenteuer auf! Wünscht mir Glück." },
         ],
         level_start: [
             { en: "Ooh, this grid looks like a little garden plot!", de: "Ooh, dieses Raster sieht aus wie ein kleines Gartenbeet!" },
@@ -769,7 +769,7 @@ const _BANTER_ITEM_LINES = {
         ],
         addTime600: [
             { en: "Ten minutes?! Fine, I'll stay a little longer.", de: "Zehn Minuten?! Na gut, ich bleib noch etwas länger." },
-            { en: "The clock bends for Trix. As it should.", de: "Die Uhr beugt sich vor Trix. Wie es sich gehört." },
+            { en: "The clock bends for me. As it should.", de: "Die Uhr beugt sich vor mir. Wie es sich gehört." },
         ],
         addTime900: [
             { en: "Fifteen minutes! Now it's officially unfair - for the puzzle.", de: "Fünfzehn Minuten! Jetzt ist es offiziell unfair - für das Rätsel." },
@@ -797,7 +797,7 @@ const _BANTER_ITEM_LINES = {
         ],
         freeze: [
             { en: "Time froze. Even the clock wanted to watch me longer.", de: "Die Zeit stand still. Sogar die Uhr wollte mir länger zusehen." },
-            { en: "Frozen time, flawless Trix. Perfect combination.", de: "Eingefrorene Zeit, makellose Trix. Perfekte Kombination." },
+            { en: "Frozen time, flawless execution. Perfect combination.", de: "Eingefrorene Zeit, makellose Ausführung. Perfekte Kombination." },
         ],
         cursedReveal: [
             { en: "Six reveals, some marks lost. Fair trade - I adapt faster than curses.", de: "Sechs Enthüllungen, ein paar Kreuze weg. Fairer Deal - ich passe mich schneller an als Flüche." },
@@ -833,7 +833,7 @@ const _BANTER_ITEM_LINES = {
         ],
         pearlOfSwiftness: [
             { en: "Second skill, always ready. Like me. Always amazing.", de: "Zweite Fähigkeit, immer bereit. Wie ich. Immer großartig." },
-            { en: "Another pearl for the legend of Trix.", de: "Noch eine Perle für die Legende von Trix." },
+            { en: "Another pearl for my legend.", de: "Noch eine Perle für meine Legende." },
         ],
         grandPearl: [
             { en: "BOTH pearls. I collect treasures AND cooldown cuts.", de: "BEIDE Perlen. Ich sammle Schätze UND Abklingzeit-Rabatte." },

@@ -67,12 +67,13 @@ function _showLine(i) {
     const { root, pairing, playerId } = _stage;
     const line = pairing.lines[i];
     const speakerId = line.who === 'player' ? playerId
-        : line.who === 'companion2' ? pairing.companion2 : pairing.companion;
+        : line.who === 'voice' ? 'verun'
+            : line.who === 'companion2' ? pairing.companion2 : pairing.companion;
     const cast = COMPANION_CAST[speakerId];
-    const side = { player: 'left', companion: 'right', companion2: 'mid' }[line.who];
+    const side = { player: 'left', companion: 'right', companion2: 'mid', voice: 'voice' }[line.who];
 
     const bubble = root.querySelector('.cmp-bubble');
-    bubble.classList.remove('cmp-bubble-left', 'cmp-bubble-right', 'cmp-bubble-mid', 'show');
+    bubble.classList.remove('cmp-bubble-left', 'cmp-bubble-right', 'cmp-bubble-mid', 'cmp-bubble-voice', 'show');
     bubble.classList.add('cmp-bubble-' + side);
     bubble.style.setProperty('--cmp-color', cast.color);
     root.querySelector('.cmp-name').textContent = cast.name;
@@ -82,7 +83,7 @@ function _showLine(i) {
 
     ['left', 'right', 'mid'].forEach(pos => {
         const hero = root.querySelector('.cmp-' + pos);
-        if (hero) hero.classList.toggle('cmp-dim', pos !== side);
+        if (hero) hero.classList.toggle('cmp-dim', side !== 'voice' && pos !== side);
     });
 }
 
