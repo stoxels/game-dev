@@ -61,7 +61,7 @@ function _buildOverlay(pairing, playerId) {
     root.innerHTML = `
         <div class="cmp-bg" style="background-image:url('${pairing.bg}')"></div>
         <div class="cmp-vignette"></div>
-        <img class="cmp-hero cmp-left" src="${_getPlayerCharacterImage()}" alt="" draggable="false">
+        <img class="cmp-hero cmp-left" src="${pairing.stage === 'none' ? _spritePath(playerId, 'noclass') : _getPlayerCharacterImage()}" alt="" draggable="false">
         <img class="cmp-hero cmp-right" src="${_spritePath(pairing.companion, pairing.looks[pairing.companion])}" alt="" draggable="false">
         ${pairing.companion2 ? `<img class="cmp-hero cmp-mid" src="${_spritePath(pairing.companion2, pairing.looks[pairing.companion2])}" alt="" draggable="false">` : ''}
         ${_petHtml(pairing, playerId)}

@@ -12,7 +12,7 @@ import { hasSeen } from './storyline-progress.js';
 // player character ("pairing"), so every pairing is written separately and
 // the player never has to meet both companions at once.
 //
-// A scene has `stage` ('base' | 'ascended', see COMPANION_LOOKS) and an optional
+// A scene has `stage` ('none' | 'base' | 'ascended', see COMPANION_LOOKS) and an optional
 // `pet` ('browney' | 'drifter') that stands beside Syla in ascended scenes.
 // A line is { who: 'player' | 'companion' | 'companion2' | 'voice', en, de };
 // { beat: 'character_intro' } plays the player's own intro as a flashback. `look` is the sprite
@@ -31,14 +31,15 @@ export const COMPANION_CAST = {
     verun: { name: 'Verun Vors', color: '#9fb4ff' },
 };
 
-// The class sprite each hero wears as a companion. Scenes before the first
-// meeting after the player can pick an ascendency (end of world 8, so from
-// world 9 on) use 'base'; later scenes use 'ascended'. A scene sets this with
-// its `stage` field. Class sprites live in images/sprites/<Hero>_<class>.webp.
+// The class sprite each hero wears as a companion. World 1 happens before the
+// class is chosen (end of world 1), so its scene uses 'none' (no class, for the
+// player too). Scenes before the first meeting after the player can pick an
+// ascendency (end of world 8, so from world 9 on) use 'base'; later scenes use
+// 'ascended'. A scene sets this with its `stage` field. Class sprites live in images/sprites/<Hero>_<class>.webp.
 export const COMPANION_LOOKS = {
-    stox: { base: 'statistician', ascended: 'actuary' },
-    trix: { base: 'mathmagician', ascended: 'markovian' },
-    syla: { base: 'probabilist', ascended: 'random_walker' },
+    stox: { none: 'noclass', base: 'statistician', ascended: 'actuary' },
+    trix: { none: 'noclass', base: 'mathmagician', ascended: 'markovian' },
+    syla: { none: 'noclass', base: 'probabilist', ascended: 'random_walker' },
 };
 
 //------------------------------------------------------------------------
@@ -93,9 +94,9 @@ export const COMPANION_SCENES = {
         },
     },
     home_stox: {
-        note: 'World 1 (Probability Peaks), near the Hypothesis Testing Hamlet. Syla and Trix visit Stox; he tells the safe half aloud, his full intro plays as a private flashback (the beat marker). The secret half (the faceless portrait) is NOT said aloud.',
+        note: 'World 1 (Probability Peaks), near the Hypothesis Testing Hamlet. Syla and Trix visit Stox; he tells the safe half aloud, his full intro plays as a private flashback (the beat marker). The secret half (the faceless portrait) is NOT said aloud. All heroes (the player too) have no class yet: the class is chosen at the end of world 1.',
         bg: 'images/backgrounds/Probability-Peaks-Background.webp',
-        stage: 'base',
+        stage: 'none',
         pairings: {
             stox: {
                 companion: 'syla',
@@ -434,8 +435,8 @@ export const COMPANION_SCENES = {
                     { who: 'companion', en: 'It feels like every river ends here.', de: 'Es fühlt sich an, als endete hier jeder Fluss.' },
                     { who: 'player', en: 'Because they do. Every channel in the Delta drains into the Vortex. And from the Vortex...', de: 'Weil sie das tun. Jeder Kanal im Delta mündet in den Wirbel. Und vom Wirbel...' },
                     { who: 'companion', en: '...to the middle of the map. Stox, look at the stone by the water. It has a mark.', de: '...zur Mitte der Karte. Stox, sieh dir den Stein am Wasser an. Er hat ein Zeichen.' },
-                    { who: 'player', en: 'A survey mark. "V. Vors". That name was struck from the register in the archive. Trix, is that not...?', de: 'Ein Vermessungszeichen. "V. Vors". Dieser Name wurde im Archiv aus dem Register gestrichen. Trix, ist das nicht...?' },
-                    { who: 'companion', en: 'Stox. Not now. She is standing very still.', de: 'Stox. Nicht jetzt. Sie steht ganz still da.' },
+                    { who: 'player', en: 'A survey mark. "V. Vors". That name was struck from the register in the archive. I have only ever seen it crossed out.', de: 'Ein Vermessungszeichen. "V. Vors". Dieser Name wurde im Archiv aus dem Register gestrichen. Ich habe ihn bisher nur durchgestrichen gesehen.' },
+                    { who: 'companion', en: 'Then someone wanted it forgotten. ...Stox, you are gripping that stone very hard.', de: 'Dann wollte jemand, dass er vergessen wird. ...Stox, du hältst diesen Stein sehr fest.' },
                 ],
             },
             trix: {
@@ -558,7 +559,7 @@ export const COMPANION_SCENES = {
                     { who: 'companion', en: 'The mist is full of faces. Hypotheses that were rejected. They are all staring at us.', de: 'Der Nebel ist voller Gesichter. Hypothesen, die verworfen wurden. Sie starren uns alle an.' },
                     { who: 'player', en: 'Browney is shaking. Even he does not like this mist.', de: 'Browney zittert. Sogar ihm gefällt dieser Nebel nicht.' },
                     { who: 'player', en: 'They look so lonely. Hello. We are not here to reject you.', de: 'Sie sehen so einsam aus. Hallo. Wir sind nicht hier, um euch zu verwerfen.' },
-                    { who: 'voice', en: '...Kind. Kinder are always kind. It is very annoying.', de: '...Freundlich. Kinder sind immer freundlich. Das ist sehr lästig.' },
+                    { who: 'voice', en: '...Kind. Children are always kind. It is very annoying.', de: '...Freundlich. Kinder sind immer freundlich. Das ist sehr lästig.' },
                     { who: 'companion2', en: 'Who are you?', de: 'Wer bist du?' },
                     { who: 'voice', en: 'Verun Vors. I wrote the book they hid. I said the Apex was being changed from inside. They called it heresy and struck my name from the page.', de: 'Verun Vors. Ich habe das Buch geschrieben, das sie versteckt haben. Ich sagte, der Apex werde von innen verändert. Sie nannten es Ketzerei und strichen meinen Namen von der Seite.' },
                     { who: 'companion', en: '...Vors. That is my name too. A hundred times removed, but mine. I found your book.', de: '...Vors. Das ist auch mein Name. Hundertmal entfernt, aber meiner. Ich habe dein Buch gefunden.' },
@@ -687,7 +688,7 @@ export const COMPANION_SCENES = {
                     { who: 'companion', en: 'Not on the exile list. Not on any list.', de: 'Nicht auf der Verbanntenliste. Auf keiner Liste.' },
                     { who: 'player', en: 'I have seen that signature. On the back of a portrait frame in the archive, the one with no face. I never told either of you.', de: 'Ich habe diese Unterschrift gesehen. Auf der Rückseite eines Porträtrahmens im Archiv, dem ohne Gesicht. Ich habe es keinem von euch erzählt.' },
                     { who: 'companion2', en: 'Verun wrote the book. Quell used it. And the Guild buried the one who warned them.', de: 'Verun hat das Buch geschrieben. Quell hat es benutzt. Und die Gilde hat den begraben, der sie gewarnt hat.' },
-                    { who: 'companion', en: 'Then we say his name loudly. In the place where it belongs.', de: 'Dann sagen wir seinen Namen laut. An dem Ort, an den er gehört.' },
+                    { who: 'companion', en: 'In the Void he asked us to say his name where they could hear it. This is that place. So we say it loudly.', de: 'In der Leere hat er uns gebeten, seinen Namen dort zu sagen, wo sie ihn hören können. Dies ist dieser Ort. Also sagen wir ihn laut.' },
                     { who: 'voice', en: '...Verun Vors. Say it. Say it again.', de: '...Verun Vors. Sag es. Sag es noch einmal.' },
                 ],
             },
@@ -702,6 +703,7 @@ export const COMPANION_SCENES = {
                     { who: 'companion', en: 'I know that signature. It is on the back of a portrait frame in the archive. The portrait with no face. I never told you.', de: 'Ich kenne diese Unterschrift. Sie steht auf der Rückseite eines Porträtrahmens im Archiv. Dem Porträt ohne Gesicht. Ich habe es dir nie erzählt.' },
                     { who: 'player', en: 'Then it was never Verun. It was never a Vors. They crossed out my family for her crime.', de: 'Dann war es nie Verun. Es war nie ein Vors. Sie haben meine Familie für ihr Verbrechen gestrichen.' },
                     { who: 'companion2', en: 'We will make them read it out loud. All of it.', de: 'Wir werden sie zwingen, es laut vorzulesen. Alles.' },
+                    { who: 'companion', en: 'In the Void he asked for his name to be said where they could hear it. This is that place.', de: 'In der Leere hat er darum gebeten, dass sein Name dort gesagt wird, wo sie ihn hören können. Dies ist dieser Ort.' },
                     { who: 'voice', en: '...Vors. A Vors. Say my name where they can hear it.', de: '...Vors. Eine Vors. Sag meinen Namen, dort, wo sie ihn hören können.' },
                     { who: 'player', en: 'Verun Vors. Remember it. Everyone will.', de: 'Verun Vors. Merkt euch den Namen. Alle werden es.' },
                 ],
@@ -717,6 +719,7 @@ export const COMPANION_SCENES = {
                     { who: 'companion2', en: 'That signature is on the back of a portrait in the archive. The one without a face. I should have said so earlier.', de: 'Diese Unterschrift steht auf der Rückseite eines Porträts im Archiv. Dem ohne Gesicht. Das hätte ich früher sagen sollen.' },
                     { who: 'companion', en: 'The Guild exiled my family for her crime. For this woman, who is probably still in here somewhere.', de: 'Die Gilde hat meine Familie für ihr Verbrechen verbannt. Für diese Frau, die wahrscheinlich noch irgendwo hier drin ist.' },
                     { who: 'player', en: 'Then we finish what Verun started. All of us.', de: 'Dann bringen wir zu Ende, was Verun begonnen hat. Wir alle.' },
+                    { who: 'companion2', en: 'In the Void he asked us to say his name where they could hear it. This is that place.', de: 'In der Leere hat er uns gebeten, seinen Namen dort zu sagen, wo sie ihn hören können. Dies ist dieser Ort.' },
                     { who: 'voice', en: '...Say it. Say my name.', de: '...Sag es. Sag meinen Namen.' },
                     { who: 'player', en: 'Verun Vors. We hear you.', de: 'Verun Vors. Wir hören dich.' },
                 ],
@@ -738,7 +741,7 @@ export function getCompanionPairing(sceneId) {
     if (!pairing) return null;
     // A script with no English text yet is still a draft from the story editor: keep it hidden.
     if (!pairing.lines.some(l => l.en && l.en.trim())) return null;
-    const stage = scene.stage === 'ascended' ? 'ascended' : 'base';
+    const stage = ['none', 'ascended'].includes(scene.stage) ? scene.stage : 'base';
     const looks = Object.fromEntries(Object.keys(COMPANION_LOOKS).map(h => [h, COMPANION_LOOKS[h][stage]]));
     return { bg: scene.bg, stage, pet: stage === 'ascended' ? (scene.pet || '') : '', looks, ...pairing };
 }
