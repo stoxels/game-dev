@@ -1,3 +1,5 @@
+import { t } from '../translation/translations.js';
+
 //------------------------------------------------------------------------
 //-------------------SHARED AILMENT STATE-------------------------------
 //------------------------------------------------------------------------
@@ -115,14 +117,15 @@ export function _gainEnduranceCharge(max, durationPct = 0) {
 //------------------------------------------------------------------------
 //-------------------FRENZY CHARGES---------------------------------------
 //------------------------------------------------------------------------
-// Offensive charge resource (like Frenzy Charges). Each
-// active charge grants FRENZY_MELEE_SPEED_PER_CHARGE % increased melee
-// charge-up speed and FRENZY_DAMAGE_PER_CHARGE % more projectile damage
-// (folded in _computePlayerStats). Charges share one timer: gaining a
-// charge refreshes it, and when it lapses they all expire. Resolved lazily
+// Offensive charge resource (Frenzy Charges). Each active charge grants
+// FRENZY_MELEE_SPEED_PER_CHARGE % increased melee charge-up speed and
+// FRENZY_DAMAGE_PER_CHARGE % more projectile damage (folded in
+// _computePlayerStats). Charges share one timer: gaining a charge
+// refreshes it, and when it lapses they all expire. Resolved lazily
 // against the clock like Endurance Charges, so no timer exists.
-// Nothing GRANTS charges yet - _gainFrenzyCharge is the hook for future
-// sources (nodes, gear, skills).
+// Granted by the tree's frenzy_on_kill / frenzy_on_block / frenzy_on_line
+// lines (see encounter-kills.js, encounter-damage.js and
+// combat-grid-pickups-claims.js).
 const FRENZY_DURATION_MS = 10000;
 export const FRENZY_BASE_MAX = 3;
 export const FRENZY_MELEE_SPEED_PER_CHARGE = 4;
@@ -144,6 +147,7 @@ export function _gainFrenzyCharge(max, durationPct = 0) {
     const durationMult = 1 + Math.max(0, Number(durationPct) || 0) / 100;
     _frenzyCharges = Math.min(cap, _getFrenzyCharges() + 1);
     _frenzyUntil = Date.now() + FRENZY_DURATION_MS * durationMult;
+    _startFrenzyOrbs();
     return _frenzyCharges;
 }
 
@@ -228,8 +232,9 @@ export function _resetGhostShrouds() {
 // Critical-strike charge resource (Power Charges). Each live charge adds
 // POWER_CRIT_PER_CHARGE % crit chance (attacks and spells) and feeds the
 // tree's damage-per-charge line (folded in _computePlayerStats). Shared
-// timer like Frenzy/Endurance; resolved lazily against the clock.
-const POWER_DURATION_MS = 10000;
+// timer like Frenzy/Endurance; resolved lazily against the clock. The base
+// duration is 30 seconds so charges survive most of a level.
+const POWER_DURATION_MS = 30000;
 export const POWER_BASE_MAX = 3;
 export const POWER_CRIT_PER_CHARGE = 1.5;
 
@@ -249,6 +254,7 @@ export function _gainPowerCharge(max, durationPct = 0) {
     const durationMult = 1 + Math.max(0, Number(durationPct) || 0) / 100;
     _powerCharges = Math.min(cap, _getPowerCharges() + 1);
     _powerUntil = Date.now() + POWER_DURATION_MS * durationMult;
+    _startPowerOrbs();
     return _powerCharges;
 }
 
@@ -409,6 +415,7 @@ function _enduranceSpriteRect() {
 function _enduranceFrame(now) {
     _enduranceRaf = null;
     const count = _getEnduranceCharges();
+    _syncChargeBuffChip('endurance', count, _enduranceMsLeft());
     if (count <= 0) {
         if (_enduranceLayer) { _enduranceLayer.remove(); _enduranceLayer = null; }
         return;
@@ -448,4 +455,225 @@ function _startEnduranceOrbs() {
     if (_enduranceRaf != null || typeof document === 'undefined'
         || typeof requestAnimationFrame !== 'function') return;
     _enduranceRaf = requestAnimationFrame(_enduranceFrame);
+}
+
+//------------------------------------------------------------------------
+//-------------------POWER CHARGE ORBS------------------------------------
+//------------------------------------------------------------------------
+// Blue crackling orbs circling the player, one per live Power charge -
+// the Endurance visual mirrored so a gained charge is actually visible.
+// Wider orbit and opposite spin so both charge kinds read side by side.
+// Frame loop runs only while charges exist and removes the layer the frame
+// after the last charge lapses. Purely cosmetic - it never writes state.
+let _powerRaf = null;
+let _powerLayer = null;
+
+// One animation frame of the Power orbs circling the player; removes them
+// when there are no charges.
+function _powerFrame(now) {
+    _powerRaf = null;
+    const count = _getPowerCharges();
+    _syncChargeBuffChip('power', count, _powerMsLeft());
+    if (count <= 0) {
+        if (_powerLayer) { _powerLayer.remove(); _powerLayer = null; }
+        return;
+    }
+    if (!_powerLayer || !_powerLayer.isConnected) {
+        _powerLayer = document.createElement('div');
+        _powerLayer.id = 'sx-power-orbs';
+        _powerLayer.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;z-index:1001;pointer-events:none;';
+        document.body.appendChild(_powerLayer);
+    }
+    while (_powerLayer.children.length < count) {
+        const orb = document.createElement('div');
+        orb.className = 'sx-power-orb';
+        orb.style.cssText = 'position:absolute;width:14px;height:14px;border-radius:50%;'
+            + 'background:radial-gradient(circle at 35% 30%,#e8f4ff 0%,#5aa2ff 45%,#1e40af 100%);'
+            + 'box-shadow:0 0 8px 2px rgba(90,162,255,0.9);';
+        _powerLayer.appendChild(orb);
+    }
+    while (_powerLayer.children.length > count) _powerLayer.lastElementChild.remove();
+
+    const rect = _enduranceSpriteRect();
+    const orbs = _powerLayer.children;
+    for (let i = 0; i < orbs.length; i++) {
+        if (!rect) { orbs[i].style.display = 'none'; continue; }
+        const angle = -now * 0.0028 + (i * 2 * Math.PI) / count;
+        const rx = rect.width * 0.55;
+        const ry = rect.height * 0.28;
+        orbs[i].style.display = 'block';
+        orbs[i].style.left = `${rect.left + rect.width / 2 + Math.cos(angle) * rx - 7}px`;
+        orbs[i].style.top = `${rect.top + rect.height * 0.5 + Math.sin(angle) * ry - 7}px`;
+    }
+    _powerRaf = requestAnimationFrame(_powerFrame);
+}
+
+// Starts the orb animation loop if it is not running.
+function _startPowerOrbs() {
+    if (_powerRaf != null || typeof document === 'undefined'
+        || typeof requestAnimationFrame !== 'function') return;
+    _powerRaf = requestAnimationFrame(_powerFrame);
+}
+
+//------------------------------------------------------------------------
+//-------------------FRENZY CHARGE ORBS-----------------------------------
+//------------------------------------------------------------------------
+// Green crackling orbs circling the player, one per live Frenzy charge -
+// the same mirror as Power and Endurance so a gained charge is visible.
+// Tightest orbit and fastest spin so all three charge kinds read apart.
+// Frame loop runs only while charges exist and removes the layer the frame
+// after the last charge lapses. Purely cosmetic - it never writes state.
+let _frenzyRaf = null;
+let _frenzyLayer = null;
+
+// One animation frame of the Frenzy orbs circling the player; removes them
+// when there are no charges.
+function _frenzyFrame(now) {
+    _frenzyRaf = null;
+    const count = _getFrenzyCharges();
+    _syncChargeBuffChip('frenzy', count, _frenzyMsLeft());
+    if (count <= 0) {
+        if (_frenzyLayer) { _frenzyLayer.remove(); _frenzyLayer = null; }
+        return;
+    }
+    if (!_frenzyLayer || !_frenzyLayer.isConnected) {
+        _frenzyLayer = document.createElement('div');
+        _frenzyLayer.id = 'sx-frenzy-orbs';
+        _frenzyLayer.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;z-index:1001;pointer-events:none;';
+        document.body.appendChild(_frenzyLayer);
+    }
+    while (_frenzyLayer.children.length < count) {
+        const orb = document.createElement('div');
+        orb.className = 'sx-frenzy-orb';
+        orb.style.cssText = 'position:absolute;width:12px;height:12px;border-radius:50%;'
+            + 'background:radial-gradient(circle at 35% 30%,#ecfdf5 0%,#4ade80 45%,#166534 100%);'
+            + 'box-shadow:0 0 8px 2px rgba(74,222,128,0.9);';
+        _frenzyLayer.appendChild(orb);
+    }
+    while (_frenzyLayer.children.length > count) _frenzyLayer.lastElementChild.remove();
+
+    const rect = _enduranceSpriteRect();
+    const orbs = _frenzyLayer.children;
+    for (let i = 0; i < orbs.length; i++) {
+        if (!rect) { orbs[i].style.display = 'none'; continue; }
+        const angle = now * 0.0035 + Math.PI / 3 + (i * 2 * Math.PI) / count;
+        const rx = rect.width * 0.34;
+        const ry = rect.height * 0.38;
+        orbs[i].style.display = 'block';
+        orbs[i].style.left = `${rect.left + rect.width / 2 + Math.cos(angle) * rx - 6}px`;
+        orbs[i].style.top = `${rect.top + rect.height * 0.45 + Math.sin(angle) * ry - 6}px`;
+    }
+    _frenzyRaf = requestAnimationFrame(_frenzyFrame);
+}
+
+// Starts the orb animation loop if it is not running.
+function _startFrenzyOrbs() {
+    if (_frenzyRaf != null || typeof document === 'undefined'
+        || typeof requestAnimationFrame !== 'function') return;
+    _frenzyRaf = requestAnimationFrame(_frenzyFrame);
+}
+
+//------------------------------------------------------------------------
+//-------------------CHARGE BUFF BAR--------------------------------------
+//------------------------------------------------------------------------
+// WoW-style buff chips above the spell hotbar: one chip per live charge
+// kind (Endurance / Power / Frenzy) showing the stack count and a live
+// seconds countdown. Each orb frame loop above syncs its own kind's chip,
+// so chips appear and vanish together with the charges and need no ticker
+// of their own. The bar is a child of #skill-hotbar, so it follows the bar
+// when the bar re-homes (spell book, passive tree) and hides with it under
+// question modals. Purely cosmetic - it never writes state.
+const _BUFF_CHIP_DEFS = {
+    endurance: { nameKey: 'eg_stat_endurance_charges', descKey: 'eg_statdesc_enduranceCharges' },
+    power: { nameKey: 'eg_stat_power_charges', descKey: 'eg_statdesc_powerCharges' },
+    frenzy: { nameKey: 'eg_stat_frenzy_charges', descKey: 'eg_statdesc_frenzyCharges' },
+};
+const _buffChipShown = {};
+
+// Remaining shared-timer milliseconds for a charge kind (0 when none live).
+function _enduranceMsLeft() {
+    return _getEnduranceCharges() > 0 ? Math.max(0, _enduranceUntil - Date.now()) : 0;
+}
+
+// Remaining shared-timer milliseconds for a charge kind (0 when none live).
+function _frenzyMsLeft() {
+    return _getFrenzyCharges() > 0 ? Math.max(0, _frenzyUntil - Date.now()) : 0;
+}
+
+// Remaining shared-timer milliseconds for a charge kind (0 when none live).
+function _powerMsLeft() {
+    return _getPowerCharges() > 0 ? Math.max(0, _powerUntil - Date.now()) : 0;
+}
+
+// Syncs one buff chip with the live count and countdown. Called every orb
+// frame; only touches the DOM when the displayed second or count changed.
+function _syncChargeBuffChip(kind, count, msLeft) {
+    const def = _BUFF_CHIP_DEFS[kind];
+    const tip = `<b>${t(def.nameKey)} x${count}</b><br>${t(def.descKey)}`;
+    _syncBuffBarChip(`sx-buff-${kind}`, {
+        chipClass: `sx-buff-chip sx-buff-${kind}`,
+        iconHtml: '<span class="sx-buff-dot"></span>',
+        stacksText: count > 0 ? `x${count}` : '',
+        msLeft: count > 0 ? msLeft : 0,
+        tipHtml: tip,
+    });
+}
+
+// Generic buff-bar chip behind the charge wrapper above and the support
+// spell buffs (synced from the universal-spell sweep). `id` is the chip's
+// DOM id; `opts` carries the chip class, the leading icon/dot markup, the
+// stack count text, the remaining milliseconds (drives the countdown and
+// removes the chip at zero), and the already-translated tooltip HTML.
+// No-ops without a DOM or a hotbar; only touches the DOM when the
+// displayed content changed or its node went missing. Exported so the
+// spell buff registry in
+// universal-spells.js can share the one buff bar.
+export function _syncBuffBarChip(id, opts) {
+    if (typeof document === 'undefined') return;
+    const o = opts || {};
+    const msLeft = Math.max(0, Number(o.msLeft) || 0);
+    const secs = msLeft > 0 ? Math.ceil(msLeft / 1000) : 0;
+    const sig = `${o.iconHtml || ''}|${o.stacksText || ''}|${secs}|${o.tipHtml || ''}`;
+    // A matching signature alone is not enough: the hotbar rebuild wipes its
+    // children (see renderSkillHotbar), dropping the node while the cache
+    // still matches. The chip must exist too, or it is rebuilt here.
+    let chip = document.getElementById(id);
+    if (_buffChipShown[id] === sig && chip) return;
+    _buffChipShown[id] = sig;
+    if (msLeft <= 0) {
+        if (chip) chip.remove();
+        return;
+    }
+    if (!chip) {
+        let bar = document.getElementById('sx-buff-bar');
+        if (!bar) {
+            const hotbar = document.getElementById('skill-hotbar');
+            if (!hotbar) return;
+            bar = document.createElement('div');
+            bar.id = 'sx-buff-bar';
+            hotbar.insertBefore(bar, hotbar.firstChild);
+        }
+        chip = document.createElement('div');
+        chip.id = id;
+        chip.className = o.chipClass || 'sx-buff-chip';
+        chip.innerHTML = '<span class="sx-buff-icon"></span>'
+            + '<span class="sx-buff-stacks"></span>'
+            + '<span class="sx-buff-secs"></span>';
+        bar.appendChild(chip);
+    }
+    // data-tip holds ready-made HTML (rendered via innerHTML by the tooltip
+    // engine); setAttribute needs no quote escaping, so store it raw.
+    chip.setAttribute('data-tip', o.tipHtml || '');
+    chip.children[0].innerHTML = o.iconHtml || '';
+    chip.children[1].textContent = o.stacksText || '';
+    chip.children[2].textContent = `${secs}s`;
+}
+
+// Removes one buff-bar chip by id (spell buff expiry / encounter cleanup).
+// No-ops without a DOM.
+export function _removeBuffBarChip(id) {
+    if (typeof document === 'undefined') return;
+    delete _buffChipShown[id];
+    const chip = document.getElementById(id);
+    if (chip) chip.remove();
 }

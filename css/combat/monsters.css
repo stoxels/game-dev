@@ -2896,15 +2896,6 @@
     min-height: 0;
 }
 
-.sx-player-status-strip {
-    position: absolute;
-    top: -16px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-    pointer-events: none;
-}
-
 .sx-status-icon {
     font-size: 16px;
     line-height: 1;

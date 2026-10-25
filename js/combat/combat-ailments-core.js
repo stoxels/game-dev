@@ -1,6 +1,5 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
-import { _uspBuildSupportStatusIconsHTML, _uspSupportStatusSignature } from '../skills/universal-spells.js';
 import { cancelHoldCast, isHoldCasting } from '../skills/spell-casttime.js';
 import { _maybeShowAbsorptionBroken } from './encounter-overlays.js';
 import { _gameOver, _killMonster, _playerTakeDamage, _showDamageNumber } from './encounter.js';
@@ -1268,31 +1267,6 @@ function _renderMonsterStatusStrip(m) {
     }
 }
 
-// Player icon strip above the avatar - created lazily, refreshed per tick.
-function _refreshPlayerStatusIcons() {
-    if (!_isActive()) return;
-    let strip = document.getElementById('sx-player-status-strip');
-    const hud = document.getElementById('player-avatar-wrapper');
-    if (!hud) return;
-    if (!strip) {
-        strip = document.createElement('div');
-        strip.id = 'sx-player-status-strip';
-        strip.className = 'sx-status-strip sx-player-status-strip';
-        hud.appendChild(strip);
-    }
-    // Support-spell buffs (js/skills/universal-spells.js) share this strip:
-    // they are player statuses too, and reusing it keeps them inside the
-    // existing per-tick DOM patch instead of adding a second ticker.
-    const supportSig = (typeof _uspSupportStatusSignature === 'function') ? _uspSupportStatusSignature() : '';
-    const supportHtml = (typeof _uspBuildSupportStatusIconsHTML === 'function') ? _uspBuildSupportStatusIconsHTML() : '';
-    const sig = supportSig;
-    if (strip.dataset.sig === sig) return;
-    strip.dataset.sig = sig;
-    // Timed ailments are shown as big banners above the sprite instead
-    // (_syncAilmentBanners); the strip only carries support-spell buffs.
-    strip.innerHTML = supportHtml;
-}
-
 // Big readable ailment banners above the player sprite. One banner per active
 // timed ailment, stacked upward (soonest-ending nearest the sprite), each with
 // a bar that drains right-to-left as the effect runs out. Driven by the
@@ -1522,7 +1496,6 @@ export {
     _rollMonsterHitAilment,
     _tickAilments,
     _renderMonsterStatusStrip,
-    _refreshPlayerStatusIcons,
     _stopPlayerStatusBarTicker,
     _getPlayerRectForAilment,
     _circleOverlapsRect,

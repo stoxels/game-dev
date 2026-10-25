@@ -75,6 +75,65 @@ body.question-modal-open .skill-hotbar { display: none !important; }
     }
 }
 
+/* Buff bar: one WoW-style chip per live charge kind (Endurance / Power /
+   Frenzy) with the stack count and a live seconds countdown. Absolutely
+   positioned so the chips float above the bar's top-right corner. The bar
+   is a child of #skill-hotbar (see _syncChargeBuffChip in
+   js/combat/combat-ailments-state.js), so it follows the hotbar when the
+   bar re-homes and hides with it under question modals. The bar box itself
+   takes no clicks; the chips re-enable them so their tooltips still open. */
+#sx-buff-bar {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 6px);
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+    pointer-events: none;
+}
+#sx-buff-bar:empty { display: none; }
+.sx-buff-chip {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    background: rgba(10, 10, 20, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.2;
+    color: #fff;
+    white-space: nowrap;
+    user-select: none;
+}
+.sx-buff-dot { width: 10px; height: 10px; border-radius: 50%; }
+.sx-buff-endurance .sx-buff-dot {
+    background: radial-gradient(circle at 35% 30%, #ffe2a8 0%, #ff9b2f 45%, #c85a00 100%);
+    box-shadow: 0 0 6px 1px rgba(255, 150, 40, 0.85);
+}
+.sx-buff-power .sx-buff-dot {
+    background: radial-gradient(circle at 35% 30%, #e8f4ff 0%, #5aa2ff 45%, #1e40af 100%);
+    box-shadow: 0 0 6px 1px rgba(90, 162, 255, 0.9);
+}
+.sx-buff-frenzy .sx-buff-dot {
+    background: radial-gradient(circle at 35% 30%, #ecfdf5 0%, #4ade80 45%, #166534 100%);
+    box-shadow: 0 0 6px 1px rgba(74, 222, 128, 0.9);
+}
+.sx-buff-stacks { font-weight: 700; }
+.sx-buff-secs { opacity: 0.85; min-width: 3ch; text-align: right; }
+/* Support-spell chips reuse the same shape with the spell's own icon instead
+   of a charge dot; the border takes the buff kind's colour (mirroring the
+   old avatar strip) so each blessing reads at a glance. */
+.sx-buff-chip .sx-buff-icon { display: inline-flex; align-items: center; font-size: 14px; line-height: 1; }
+.sx-buff-chip .sx-buff-icon img { width: 14px; height: 14px; }
+.sx-buff-usp-guard { border-color: #ffd54f; }
+.sx-buff-usp-evade { border-color: #69f0ae; }
+.sx-buff-usp-ward { border-color: #7fd9ff; }
+.sx-buff-usp-thorns { border-color: #ff8a65; }
+.sx-buff-usp-hot { border-color: #a5d6a7; }
+.sx-buff-usp-windstep { border-color: #69f0ae; }
+
 /* Slots that belong to the hotbar shouldn't drag-select their emoji. */
 .skill-hotbar-icon,
 .skill-hotbar-key,

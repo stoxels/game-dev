@@ -17,8 +17,6 @@ export function _ailmentsReset() {
     _stopShockedCursor();
     _stopPlayerStatusBarTicker();
     _hideBlockLockoutOverlay();
-    const strip = document.getElementById('sx-player-status-strip');
-    if (strip) strip.remove();
 }
 
 // Cleanup - called when the encounter stops (also covers game over).
@@ -29,6 +27,4 @@ export function _ailmentsCleanup() {
     _stopShockedCursor();
     _stopPlayerStatusBarTicker();
     _hideBlockLockoutOverlay();
-    const strip = document.getElementById('sx-player-status-strip');
-    if (strip) strip.remove();
 }

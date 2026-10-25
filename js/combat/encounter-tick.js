@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { _getMonsterChargeMultiplier, _getPlayerChargeMultiplier, _refreshPlayerStatusIcons, _tickAilments } from './combat-ailments-core.js';
+import { _getMonsterChargeMultiplier, _getPlayerChargeMultiplier, _tickAilments } from './combat-ailments-core.js';
 import { _maybeShowLowHealthWarning } from './encounter-overlays.js';
 import { MELEE_OVERCHARGE_RATIO, _fireMonsterAttack, _meleeTierForCharge, _overchargeRateForTier, _updateBars } from './encounter.js';
 import { _hazardsTick } from './combat-hazards-lifecycle.js';
@@ -488,7 +488,6 @@ export function _tickLoop() {
     _tickPlayer();
     // Keep the manual melee charge bar (width + paused/ready styling) live.
     if (typeof _updatePlayerChargeBar === 'function') _updatePlayerChargeBar();
-    if (typeof _refreshPlayerStatusIcons === 'function') _refreshPlayerStatusIcons();
     // Don't resurrect the sprite after defeat - the tick may have set
     // dead = true mid-iteration (DoT / hazard kill).
     if (typeof dead !== 'undefined' && globalThis.dead) return;
