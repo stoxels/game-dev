@@ -16,6 +16,7 @@ import { _egTryDropMap } from '../loot/loot-map-drops.js';
 
 import { _tryGenerateUniqueDrop } from '../loot/unique-items.js';
 import { _isActive, _lootDrops } from './combat-state.js';
+import { _escapeToastHtml, showHtmlToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import {
 
 //------------------------------------------------------------------------
@@ -273,9 +274,14 @@ export function _checkLootClaim(row, col) {
     const nameSuffix = (item.category === 'equip' && Number.isFinite(requiredLevel))
         ? ` [${requiredLevel}]`
         : '';
-    globalThis.showToast(t('eg_loot_claimed')
-        .replace('{icon}', item.isUnique ? '✨' : (item.icon || ''))
-        .replace('{name}', item.name + nameSuffix), _rarityToastColor(item.rarity));
+    // The pickup toast shows the equipment's real art, not the emoji
+    // fallback - the {icon} slot in the translation is dropped here because
+    // the art image takes its place.
+    const lootClaimText = t('eg_loot_claimed')
+        .replace('{icon} ', '')
+        .replace('{icon}', '')
+        .replace('{name}', item.name + nameSuffix);
+    showHtmlToast(`${GAME_ART.html('item', _lootArtId(item), item.isUnique ? '✨' : (item.icon || '📦'))} ${_escapeToastHtml(lootClaimText)}`, _rarityToastColor(item.rarity));
     Audio_Manager.playSFX('player_equip_pickup');
     return true;
 }

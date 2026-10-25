@@ -14,6 +14,7 @@ import {
 } from './combat-grid-pickups.js';
 import { _isActive, _itemDrops } from './combat-state.js';
 import { STATE, save } from '../state.js';
+import { showItemToast } from '../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------
 //-------------------GRID ITEM DROPS--------------------------------------
@@ -52,8 +53,7 @@ export function _renderItemDropOverlay(row, col, drop) {
     const span = document.createElement('span');
     span.className = `sx-pickup-overlay sx-pickup-rarity-${rarityCls} sx-item-drop-overlay`;
     span.id = `sx-item-drop-${row}-${col}`;
-    // Puzzle items have no art in the manifest yet - wires the def id so
-    // future art shows automatically, emoji fallback until then.
+    // Real item art when the manifest has it, emoji fallback otherwise.
     GAME_ART.fillElement(span, 'item', drop && drop.defId, (def && def.icon) || '📦');
     el.appendChild(span);
 }
@@ -149,9 +149,16 @@ export function _checkItemDropClaim(row, col) {
     });
 
     Audio_Manager.playSFX('player_equip_pickup');
-    globalThis.showToast(t('eg_item_claimed')
-        .replace('{icon}', (def && def.icon) || '')
-        .replace('{name}', globalThis.itemName(def)), _rarityToastColor(def && def.rarity));
+    // The pickup toast shows the item's real art (via showItemToast), not
+    // the def emoji - the {icon} slot in the translation is dropped here
+    // because the art image takes its place. Falls back to the plain toast
+    // when the def is somehow unknown.
+    const itemClaimText = t('eg_item_claimed')
+        .replace('{icon} ', '')
+        .replace('{icon}', '')
+        .replace('{name}', globalThis.itemName(def));
+    if (def) showItemToast(def, itemClaimText, _rarityToastColor(def && def.rarity));
+    else globalThis.showToast(itemClaimText, _rarityToastColor(def && def.rarity));
     return true;
 }
 

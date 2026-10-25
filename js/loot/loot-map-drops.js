@@ -8,6 +8,7 @@ import { LOOT_DROP_LIFETIME_MS, _animatePickupDiscard, _buildPickupEligiblePool,
 import { EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_TIER_COUNT, _egFindFreeMapCellForTier, _egGetMapTierGrid, _egMapStash, _egRebuildMapStashGrid, saveHubState } from '../hub/hub.js';
 import { _egActiveMapItem, _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
 import { _isActive } from '../combat/combat-state.js';
+import { _escapeToastHtml, showHtmlToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { _egGetMapRewardBonuses } from './loot-map-mod-rewards.js';
 import { _egGenerateMapDrop, _egResolveAtlasDropTarget } from './loot-maps.js';
 import { EG_MAP_DROP_CHANCE_NORMAL } from './loot-map-config.js';
@@ -268,10 +269,15 @@ export function _egCheckMapDropClaim(row, col) {
     // Track for the leave-map summary screen (mirrors _trackRunCurrency)
     if (typeof _runMaps !== 'undefined') globalThis._runMaps.push(map);
 
-    globalThis.showToast(t('eg_map_claimed')
-        .replace('{icon}', map.icon || '')
+    // The pickup toast shows the map's real art, not the emoji fallback -
+    // the {icon} slot in the translation is dropped here because the art
+    // image takes its place.
+    const mapClaimText = t('eg_map_claimed')
+        .replace('{icon} ', '')
+        .replace('{icon}', '')
         .replace('{name}', map.name)
-        .replace('{tier}', map.mapTier != null ? map.mapTier : '?'), _rarityToastColor(map.rarity));
+        .replace('{tier}', map.mapTier != null ? map.mapTier : '?');
+    showHtmlToast(`${GAME_ART.html('item', (GAME_ART.artIdForItem ? GAME_ART.artIdForItem(map) : null) || map.id, map.icon || '🗺️')} ${_escapeToastHtml(mapClaimText)}`, _rarityToastColor(map.rarity));
     Audio_Manager.playSFX('pickup_map', 'player_equip_pickup');
     saveHubState();
     return true;

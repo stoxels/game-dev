@@ -15,6 +15,7 @@ import {
     _scheduleTrackedExpiry,
 } from './combat-grid-pickups.js';
 import { _currencyDrops, _isActive } from './combat-state.js';
+import { _escapeToastHtml, showHtmlToast } from '../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------
 //-------------------GRID CURRENCY DROPS----------------------------------
@@ -135,9 +136,16 @@ export function _checkCurrencyDropClaim(row, col) {
         _trackRunCurrency(def);
     }
 
-    if (added) globalThis.showToast(t('eg_currency_acquired')
-        .replace('{icon}', def.icon)
-        .replace('{name}', def.name), _rarityToastColor('currency'));
+    // The pickup toast shows the orb's real art, not the emoji fallback -
+    // the {icon} slot in the translation is dropped here because the art
+    // image takes its place.
+    if (added) {
+        const curClaimText = t('eg_currency_acquired')
+            .replace('{icon} ', '')
+            .replace('{icon}', '')
+            .replace('{name}', def.name);
+        showHtmlToast(`${GAME_ART.html('item', def && def.id, (def && def.icon) || '💰')} ${_escapeToastHtml(curClaimText)}`, _rarityToastColor('currency'));
+    }
     Audio_Manager.playSFX(isEssence ? 'pickup_essence' : 'pickup_currency', 'player_equip_pickup');
     return true;
 }
