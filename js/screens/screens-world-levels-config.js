@@ -18,8 +18,6 @@ export const WD_WORLD_CONFIGS = [
         trialNode: { x: 41.7, y: 59.9 },
         // Ascension Trial node - the road continues here after the world's last level.
         ascensionNode: { x: 64.6, y: 37.9 },
-        // Story node (character intro): only for that character, opens once level `from` (0-based) is cleared.
-        storyNode: { character: 'stox', from: 4, x: 8.5, y: 89, label: 'Stox - Where It Started', labelDE: 'Stox - Wo alles begann' },
         nodes: [
             { x: 68.6, y: 82.4 },  // 1
             { x: 83.6, y: 75.3 },  // 2
@@ -37,6 +35,10 @@ export const WD_WORLD_CONFIGS = [
         ],
         extraRoads: [
         ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'home_stox', from: 4, x: 8.5, y: 89 },
+        ],
     },
 
 
@@ -51,10 +53,6 @@ export const WD_WORLD_CONFIGS = [
         trialNode: { x: 89.2, y: 41.8 },
         // Ascension Trial node - the road continues here after the world's last level.
         ascensionNode: { x: 50, y: 14.4 },
-        // Companion meeting nodes (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
-        companionNodes: [
-            { id: 'den_reunion', from: 2, x: 35, y: 86 },
-        ],
         nodes: [
             { x: 17.2, y: 64.7 },  // 1
             { x: 31.9, y: 47.5 },  // 2
@@ -69,6 +67,10 @@ export const WD_WORLD_CONFIGS = [
             { x: 50.1, y: 38.5 },  // 11
         ],
         extraRoads: [
+        ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'den_reunion', from: 2, x: 35, y: 86 },
         ],
     },
 
@@ -150,8 +152,6 @@ export const WD_WORLD_CONFIGS = [
         trialNode: { x: 47.3, y: 37.4 },
         // Ascension Trial node - the road continues here after the world's last level.
         ascensionNode: { x: 23.2, y: 36.1 },
-        // Story node (character intro): only for that character, opens once level `from` (0-based) is cleared.
-        storyNode: { character: 'trix', from: 1, x: 62.5, y: 30.5, label: 'Trix - The Ruined Observatory', labelDE: 'Trix - Das zerstörte Observatorium' },
         nodes: [
             { x: 72.1, y: 18.5 },  // 1
             { x: 70.8, y: 38.1 },  // 2
@@ -170,6 +170,10 @@ export const WD_WORLD_CONFIGS = [
         extraRoads: [
             { from: 6, to: 9, showAfter: 8 },
         ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'home_trix', from: 1, x: 62.5, y: 30.5 },
+        ],
     },
 
 
@@ -184,8 +188,6 @@ export const WD_WORLD_CONFIGS = [
         trialNode: { x: 85.7, y: 72.7 },
         // Ascension Trial node - the road continues here after the world's last level.
         ascensionNode: { x: 54.1, y: 51.7 },
-        // Story node (character intro): only for that character, opens once level `from` (0-based) is cleared.
-        storyNode: { character: 'syla', from: 3, x: 23.5, y: 83.5, label: 'Syla - Her Childhood Home', labelDE: 'Syla - Ihr Elternhaus' },
         nodes: [
             { x: 43.9, y: 68.4 },  // 1
             { x: 29.3, y: 54.3 },  // 2
@@ -204,6 +206,10 @@ export const WD_WORLD_CONFIGS = [
             { from: 0, to: 4, showAfter: 3 },
             { from: 0, to: 8, showAfter: 7 },
             { from: 0, to: 11, showAfter: 10 },
+        ],
+        // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
+        companionNodes: [
+            { id: 'home_syla', from: 3, x: 23.5, y: 83.5 },
         ],
     },
 

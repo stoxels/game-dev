@@ -688,6 +688,13 @@ document.addEventListener('DOMContentLoaded', () => {
     onClick('btn-next-lvl', () => goToNextLevel());
 
     onClick('btn-win-levels', onGoToLevelsFromOverlay);
+    onClick('btn-win-story', () => {
+        const btn = document.getElementById('btn-win-story');
+        const wi = Number(btn.dataset.wi);
+        const id = btn.dataset.scene;
+        onGoToLevelsFromOverlay();
+        globalThis.wdOpenStoryNode(wi, id);
+    });
     onClick('btn-win-retry', onRetryLevelFromOverlay);
 
     // "Retry with other difficulty/modifier" - opens the settings modal;

@@ -373,6 +373,13 @@ export function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, monsterP
     if (nextBtn) nextBtn.style.display = endOfLine ? 'none' : '';
     if (retryBtn) retryBtn.style.display = endOfLine ? 'none' : '';
     if (levelsBtn) levelsBtn.className = endOfLine ? 'ob p' : 'ob s';
+    // A story scene hangs off this level: offer a shortcut to it (NEXT stays).
+    const storyBtn = document.getElementById('btn-win-story');
+    const storyTarget = storyBtn ? globalThis.getWinStoryTarget(gi) : null;
+    if (storyBtn) {
+        storyBtn.style.display = storyTarget ? '' : 'none';
+        if (storyTarget) { storyBtn.dataset.wi = storyTarget.wi; storyBtn.dataset.scene = storyTarget.id; }
+    }
     // The buttons live in per-column wrappers (LEVELS | REPLAY pair | NEXT);
     // a fully hidden column must collapse so the row re-centres instead of
     // leaving an empty gap (ascension / Nexus Point wins hide Next+Replay).

@@ -198,7 +198,6 @@ function _wdGetNodePos(cfg, nodeRef) {
     if (nodeRef === null || nodeRef === 'entrance') return cfg.entrancePos;
     if (nodeRef === 'trial') return cfg.trialNode;
     if (nodeRef === 'ascension') return cfg.ascensionNode;
-    if (nodeRef === 'story') return cfg.storyNode;
     if (typeof nodeRef === 'string' && nodeRef.startsWith('comp:')) {
         return (cfg.companionNodes || []).find(c => 'comp:' + c.id === nodeRef);
     }
@@ -298,17 +297,7 @@ function _wdBuildRoads(cfg, wi) {
         });
     }
 
-    // Story node spur: a short side road from its anchor level to the node.
-    const story = _wdStoryNodeForWorld(wi);
-    if (story) {
-        roads.push({
-            n1: story.from,
-            n2: 'story',
-            waypoints: [cfg.nodes[story.from], story],
-        });
-    }
-
-    // Companion meeting spurs, same idea as the story node.
+    // Companion meeting spurs: a short side road from the anchor level to each node.
     for (const cn of _wdCompanionNodesForWorld(wi)) {
         roads.push({
             n1: cn.from,
@@ -497,9 +486,9 @@ function _wdIsNodeReached(n, wi) {
         return ((typeof globalThis._isTrialDone === 'function') && globalThis._isTrialDone(wi))
             || ((typeof globalThis._isTrialUnlocked === 'function') && globalThis._isTrialUnlocked(wi));
     }
-    // The story node only exists once its anchor level is cleared, so its
+    // A companion node only exists once its anchor level is cleared, so its
     // spur is always lit.
-    if (n === 'story' || (typeof n === 'string' && n.startsWith('comp:'))) return true;
+    if (typeof n === 'string' && n.startsWith('comp:')) return true;
     if (n === 'ascension') {
         return ((typeof globalThis._isAscensionTrialDone === 'function') && globalThis._isAscensionTrialDone(wi))
             || ((typeof globalThis._isAscensionTrialUnlocked === 'function') && globalThis._isAscensionTrialUnlocked(wi));
@@ -1572,8 +1561,6 @@ function _wdAppendLevelNodes(canvas, wi, cfg, levelCount) {
     if (trialPos) canvas.appendChild(_wdBuildTrialNode(wi, trialPos));
     const ascPos = _wdAscensionNodeForWorld(wi);
     if (ascPos) canvas.appendChild(_wdBuildAscensionNode(wi, ascPos));
-    const story = _wdStoryNodeForWorld(wi);
-    if (story) canvas.appendChild(_wdBuildStoryNode(wi, story));
     for (const cn of _wdCompanionNodesForWorld(wi)) canvas.appendChild(_wdBuildCompanionNode(wi, cn));
 }
 
@@ -1661,7 +1648,7 @@ function _wdShowCompanionButton(wi, cn, cast) {
     `;
     btn.addEventListener('click', () => {
         btn.remove();
-        globalThis.playCompanionScene(cn.id, () => showWorldDetail(wi));
+        _wdPlayStoryWithCatchUp(wi, { key: cn.id, meet: cn.id });
     });
     _wdWireEnterButtonDismiss(btn);
     if (canvas) canvas.appendChild(btn);
@@ -1681,119 +1668,62 @@ function _wdShowCompanionTooltip(e, cast, isDone) {
     _wdMoveTooltip(e);
 }
 
-//------------------------------------------------------------------------
-//-------------------STORY NODE (CHARACTER INTRO)--------------------------
-//------------------------------------------------------------------------
-// An optional side node that plays the picked character's intro. Config:
-// WD_WORLD_CONFIGS[wi].storyNode = { character, from, x, y, label, labelDE }.
-// It only exists for that character, and only once level `from` is cleared.
-
 /**
- * Returns the world's story node config when it should be on the map: the
- * player picked this node's character and has cleared the level it hangs
- * off. Returns null otherwise.
+ * Every story scene (companion meeting or home visit) the player can watch
+ * right now, in world order. Entries are { key, meet }.
  */
-function _wdStoryNodeForWorld(wi) {
-    const cfg = WD_WORLD_CONFIGS[wi];
-    const story = cfg && cfg.storyNode;
-    if (!story || !STATE || STATE.playerCharacter !== story.character) return null;
-    if (!cfg.nodes[story.from]) return null;
-    const anchorGi = globalThis.WORLD_START_GI[wi] + story.from;
-    return (STATE.done && STATE.done.includes(anchorGi)) ? story : null;
-}
-
-/**
- * Display name of a story node in the current language.
- */
-function _wdStoryNodeName(story) {
-    return (LANG === 'de' && story.labelDE) ? story.labelDE : story.label;
-}
-
-/**
- * Builds the story node: a level-style circle with a book icon, green once
- * the intro has been watched. Clicking walks the sprite there and offers
- * the "play" button.
- */
-function _wdBuildStoryNode(wi, story) {
-    const node = document.createElement('div');
-    node.className = 'wd-level-node wd-story-node';
-    node.dataset.storyNode = wi;
-    _wdPositionNodeOnCanvas(node, wi, story);
-
-    const isDone = globalThis.hasSeen('character_intro', { character: story.character });
-    if (isDone) node.classList.add('done');
-    node.innerHTML = _wdBuildNodeEffectsHtml('📖', '', '', '', '');
-
-    node.addEventListener('click', () => {
-        const existing = document.getElementById('wd-enter-btn');
-        if (existing) existing.remove();
-        _wdWalkSpriteTo(wi, 'story', () => _wdShowStoryEnterButton(wi, story));
+function _wdStoryChain() {
+    const chain = [];
+    WD_WORLD_CONFIGS.forEach((cfg, wi) => {
+        for (const cn of _wdCompanionNodesForWorld(wi)) chain.push({ key: cn.id, meet: cn.id });
     });
-    node.addEventListener('mouseenter', (e) => _wdShowStoryTooltip(e, story, isDone));
-    node.addEventListener('mousemove', (e) => _wdMoveTooltip(e));
-    node.addEventListener('mouseleave', () => _wdHideTooltip());
-    return node;
+    return chain;
 }
 
 /**
- * Shows the "play story" button above the story node. Playing always uses
- * force, so a watched intro can be revisited.
+ * True when the player has watched this scene, or chose to skip it when
+ * asked ("Skip them" in the catch-up prompt).
  */
-function _wdShowStoryEnterButton(wi, story) {
-    const existing = document.getElementById('wd-enter-btn');
-    if (existing) existing.remove();
-
-    const cfg = WD_WORLD_CONFIGS[wi];
-    const canvas = _wdGetCanvas();
-    const pct = _wdImgPctToCanvasPct(story.x, story.y, canvas, cfg);
-
-    const btn = document.createElement('button');
-    btn.id = 'wd-enter-btn';
-    btn.textContent = (LANG === 'de' ? '▶ Geschichte ansehen' : '▶ Watch story');
-    btn.style.cssText = `
-        position: absolute;
-        left: ${pct.x}%;
-        top: calc(${pct.y}% - 56px);
-        transform: translateX(-50%);
-        z-index: 10;
-        font-family: var(--PX, monospace);
-        font-size: 11px;
-        padding: 5px 12px;
-        background: #2f5f9a;
-        color: #eaf4ff;
-        border: none;
-        cursor: pointer;
-        letter-spacing: 1px;
-        white-space: nowrap;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.7);
-    `;
-    btn.addEventListener('click', () => {
-        btn.remove();
-        globalThis.showBeat('character_intro', {
-            character: story.character,
-            force: true,
-            onComplete: () => {
-                globalThis._setReplayGloballyUnlocked('intro_' + story.character);
-                showWorldDetail(wi);
-            }
-        });
-    });
-    _wdWireEnterButtonDismiss(btn);
-    if (canvas) canvas.appendChild(btn);
+function _wdStoryEntryHandled(entry) {
+    return globalThis.hasMetCompanion(entry.meet)
+        || globalThis.hasSeen('story_declined', { sceneId: entry.key });
 }
 
 /**
- * Story-node tooltip: its name and whether the story was already seen.
+ * Plays one story scene and then calls onDone.
  */
-function _wdShowStoryTooltip(e, story, isDone) {
-    const tip = _wdEnsureTooltip();
-    const status = LANG === 'de'
-        ? (isDone ? 'Gesehen ✓' : 'Optionale Geschichte')
-        : (isDone ? 'Watched ✓' : 'Optional story');
-    tip.innerHTML = `<div class="wd-tip-title">📖 ${_wdStoryNodeName(story)}</div>`
-        + `<div class="wd-tip-status">${status}</div>`;
-    tip.classList.add('show');
-    _wdMoveTooltip(e);
+function _wdPlayStoryEntry(entry, onDone) {
+    globalThis.playCompanionScene(entry.meet, onDone);
+}
+
+/**
+ * Plays the missed scenes one after the other, then redraws the map.
+ */
+function _wdPlayMissedStories(wi, missed) {
+    if (!missed.length) { showWorldDetail(wi); return; }
+    _wdPlayStoryEntry(missed[0], () => _wdPlayMissedStories(wi, missed.slice(1)));
+}
+
+/**
+ * Plays a story scene. If earlier scenes were never watched, first asks
+ * whether to watch them: "yes" plays them and returns to the map (the scene
+ * is not started), "no" remembers they were skipped and plays this scene.
+ */
+function _wdPlayStoryWithCatchUp(wi, entry) {
+    const chain = _wdStoryChain();
+    const idx = chain.findIndex(e => e.key === entry.key);
+    const missed = _wdStoryEntryHandled(entry) ? []
+        : chain.slice(0, Math.max(idx, 0)).filter(e => !_wdStoryEntryHandled(e));
+    const playThis = () => _wdPlayStoryEntry(entry, () => showWorldDetail(wi));
+    if (!missed.length) { playThis(); return; }
+    globalThis.askStoryCatchUp(
+        missed.length,
+        () => _wdPlayMissedStories(wi, missed),
+        () => {
+            missed.forEach(e => globalThis.markSeen('story_declined', { sceneId: e.key }));
+            playThis();
+        }
+    );
 }
 
 /**
@@ -2524,4 +2454,33 @@ export function showWorldDetail(wi) {
     _wdBuildTopBar(wi);
     _wdBuildCanvas(wi);
     switchScreen('screen-world-detail');
+}
+
+/**
+ * For the win screen: the story scene (companion meeting or home visit) that
+ * hangs off the level `gi` the player just cleared, if the player's hero has
+ * one they have not watched yet. Returns { wi, id } or null.
+ */
+export function getWinStoryTarget(gi) {
+    for (let wi = 0; wi < WD_WORLD_CONFIGS.length; wi++) {
+        const cfg = WD_WORLD_CONFIGS[wi];
+        for (const cn of (cfg.companionNodes || [])) {
+            if (globalThis.WORLD_START_GI[wi] + cn.from !== gi) continue;
+            if (!globalThis.getCompanionPairing(cn.id) || globalThis.hasMetCompanion(cn.id)) continue;
+            return { wi, id: cn.id };
+        }
+    }
+    return null;
+}
+
+/**
+ * Opens a world map and walks to the given story node, as if the player had
+ * clicked it (used by the win screen's STORY button).
+ */
+export function wdOpenStoryNode(wi, id) {
+    showWorldDetail(wi);
+    setTimeout(() => {
+        const node = document.querySelector('.wd-companion-node[data-companion-node="' + id + '"]');
+        if (node) node.click();
+    }, 700);
 }

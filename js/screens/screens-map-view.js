@@ -78,7 +78,7 @@ const MAP_WORLD_POSITIONS = [
     { x: 71.1, y: 16.6, labelEN: "Null Hypothesis Void", labelDE: "Null Hypothesis Void" },
     { x: 37.5, y: 39.9, labelEN: "Bayesian Bay", labelDE: "Bayesian Bay" },
     { x: 32.9, y: 25.3, labelEN: "Expectation Plateau", labelDE: "Expectation Plateau" },
-    { x: 49.6, y: 15, labelEN: "Nexus World", labelDE: "Nexus World" },
+    { x: 49.6, y: 15, labelEN: "The Apex Remnant", labelDE: "The Apex Remnant" },
 ];
 
 // Road segments that define the visual paths drawn on the map.
@@ -446,12 +446,24 @@ function _isWorldComplete(wi) {
 }
 
 /**
+ * Returns true when the player has cleared any level in world `wi` or in a
+ * later campaign world. Saves made while every world was open keep their
+ * access this way instead of being locked out.
+ */
+function _hasProgressFromWorld(wi) {
+    if (!STATE || !STATE.done || !globalThis.WORLD_START_GI) return false;
+    const start = globalThis.WORLD_START_GI[wi];
+    return STATE.done.some(gi => gi >= start);
+}
+
+/**
  * Returns true if the player is allowed to enter a given world.
  *
- * Open-world unlock: every world (1..13) is accessible once the tutorial
- * is done. The Nexus World (World 14, wi 13) is secret: it only opens
- * once the player has finished ALL levels of every other world, making it
- * the last interlude world before the endgame.
+ * Linear unlock: World 1 opens once the tutorial is done; every later
+ * campaign world opens once the Ascension Trial of the previous world is
+ * beaten. Saves that already have progress in a world (or beyond) keep it.
+ * The Nexus World (World 14, wi 13) is secret: it only opens once the player
+ * has finished ALL levels of every other world.
  *
  * @param {number} wi - World index
  * @returns {boolean}
@@ -463,8 +475,9 @@ function _isWorldAccessible(wi) {
         return typeof globalThis.isNexusWorldUnlocked === 'function' ? globalThis.isNexusWorldUnlocked() : false;
     }
 
-    // All campaign worlds require tutorial completion only
-    return !!(STATE && STATE.tutorialDone);
+    if (!(STATE && STATE.tutorialDone)) return false;
+    if (wi === 0) return true;
+    return globalThis._isAscensionTrialDone(wi - 1) || _hasProgressFromWorld(wi);
 }
 
 /**
@@ -1132,6 +1145,14 @@ function _getWorldClassUpgradeText(wi) {
 }
 
 /**
+ * Tooltip text for a locked campaign world: which Ascension Trial opens it.
+ */
+function _lockedWorldText(wi) {
+    if (!STATE || !STATE.tutorialDone || wi === 0) return t('scr_locked');
+    return t('scr_world_locked_prev').replace('{w}', _getWorldLabel(wi - 1));
+}
+
+/**
  * Builds the inner HTML content for the world tooltip.
  *
  * @param {number}  wi          - World index
@@ -1154,7 +1175,7 @@ function _buildTooltipContent(wi, isDone, isLocked, healingTier) {
         // The secret Nexus World explains its own unlock condition.
         statusText = (typeof globalThis.isNexusWorld === 'function' && globalThis.isNexusWorld(wi))
             ? t('scr_nexus_tooltip_locked')
-            : t('scr_locked');
+            : _lockedWorldText(wi);
     } else {
         statusText = t('scr_level_count').replace('{n}', levelCount);
     }

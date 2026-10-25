@@ -3939,7 +3939,7 @@ export const WORLDS = [
     { label: 'NULL HYPOTHESIS VOID', labelDE: 'NULL HYPOTHESIS VOID', data: W11 },
     { label: 'BAYESIAN BAY', labelDE: 'BAYESIAN BAY', data: W12 },
     { label: 'EXPECTATION PLATEAU', labelDE: 'EXPECTATION PLATEAU', data: W13 },
-    { label: 'NEXUS WORLD', labelDE: 'NEXUS WORLD', data: W14 },
+    { label: 'THE APEX REMNANT', labelDE: 'THE APEX REMNANT', data: W14 },
 
 ];
 

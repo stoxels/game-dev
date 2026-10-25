@@ -86,7 +86,7 @@ import { MOD_LABELS, MOD_CLASSES, buildNextTitleStr, applyClassStatusActiveStyle
 import { _ensureTooltipElement, _trackTooltipToMouse, _hideWorldTooltip, _renderTopBarScore, _renderTopBarNextCode, _renderTopBarClassStatus, _renderTopBarQuestBadge, _renderTopBarTreePoints, _wireTopBarButtons, initMapViewToggle, showMapView } from '../../js/screens/screens-map-view.js';
 import { onSaveSlotChosen, renderSaveSlotScreen, showSaveSlotSelect, confirmSlotName, cancelSlotName } from '../../js/screens/screens-save-slots.js';
 import { WD_WORLD_CONFIGS } from '../../js/screens/screens-world-levels-config.js';
-import { _wdCurrentWi, wdGoBackToMap, _wdSyncSpriteToLevel, showWorldDetail } from '../../js/screens/screens-world-levels.js';
+import { _wdCurrentWi, wdGoBackToMap, _wdSyncSpriteToLevel, showWorldDetail, getWinStoryTarget, wdOpenStoryNode } from '../../js/screens/screens-world-levels.js';
 import { switchScreen, showModal, hideModal, _refreshQuestionModalFlag, hideResultOverlays, _maybeShowConvergenceModal, showTitle, enterNexusFromSetup, showSetup, confirmSetup, launchExistingGame, launchEndgameTestMode, launchVendor, goToLevelSelect, goToPreviousScreen, goToNextLevel } from '../../js/screens/screens.js';
 import { initWorldProto, showWorldProto } from '../../js/world-proto/world-proto.js';
 import { CLASS_DEFS, CLASS_LIST, CLASS_SPELL_ICONS, COMBAT_HEARTBLOOM_DEF } from '../../js/classes/class-defs.js';
@@ -378,7 +378,7 @@ import { TRIX_INTRO_IMAGE_PATH, TRIX_INTRO_SONG } from '../../js/storyline/story
 import { SYLA_INTRO_IMAGE_PATH, SYLA_INTRO_SONG } from '../../js/storyline/storyline-intro-syla.js';
 import { REGION_BEAT_TRIGGER_LEVEL, REPLAY_GALLERY_ENTRIES, STORY_BEATS } from '../../js/storyline/storyline-beats.js';
 import { COMPANION_CAST, COMPANION_SCENES, getCompanionPairing, hasMetCompanion } from '../../js/storyline/companion-scenes.js';
-import { playCompanionScene } from '../../js/storyline/companion-stage.js';
+import { askStoryCatchUp, playCompanionScene } from '../../js/storyline/companion-stage.js';
 import { EG_TEST_MAPS, _egtEnsureStyles, _egtPickSeedGi, showEndgameTestHub, _egLaunchTestMap } from '../../js/dev/endgame-testing-screen.js';
 import { _ascensionTrialName, _cleanupCampaignTrialSeed, _endCampaignTrial, _ensureTrialState, _grantAscensionTrialReward, _grantConvergenceTrialReward, _isAscensionTrialDone, _isAscensionTrialRun, _isAscensionTrialUnlocked, _isConvergenceTrialRun, _isTrialDone, _isTrialRun, _isTrialUnlocked, _launchAscensionTrial, _launchCampaignTrial, _launchTrialRun, _retitleLeaveMapTransition, _routeTrialReturn, _servePostTrialFlows, _trialBossId, _trialChainParams, _trialCount, _trialIdForWorld, _trialMonsterLevel, _trialName, _trialTriggerLevels, _trialWorldStartGi, _trialWorlds } from '../../js/campaign-trials.js';
 import { AssetPreload } from '../../js/asset-preload.js';
@@ -784,7 +784,6 @@ try { Object.defineProperty(globalThis, "_servePostTrialFlows", { get() { return
 try { Object.defineProperty(globalThis, "_setAvatarPos", { get() { return _setAvatarPos; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_setEssenceFilter", { get() { return _setEssenceFilter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_setMistakeCounterText", { get() { return _setMistakeCounterText; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
-try { Object.defineProperty(globalThis, "_setReplayGloballyUnlocked", { get() { return _setReplayGloballyUnlocked; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_showHubInfoTooltip", { get() { return _showHubInfoTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_showHubTooltip", { get() { return _showHubTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_showItemLevelToggleTooltip", { get() { return _showItemLevelToggleTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -860,6 +859,7 @@ try { Object.defineProperty(globalThis, "advanceTutStep", { get() { return advan
 try { Object.defineProperty(globalThis, "answerQuizInput", { get() { return answerQuizInput; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "applyAscendencyUpgrade", { get() { return applyAscendencyUpgrade; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "applyClassUpgrade", { get() { return applyClassUpgrade; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "askStoryCatchUp", { get() { return askStoryCatchUp; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "awardAtlasClearScore", { get() { return awardAtlasClearScore; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "bar", { get() { return bar; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "beginRetrySetupRun", { get() { return beginRetrySetupRun; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -905,6 +905,7 @@ try { Object.defineProperty(globalThis, "getSkillName", { get() { return getSkil
 try { Object.defineProperty(globalThis, "getTitleEffectSpecs", { get() { return getTitleEffectSpecs; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getTitleForScore", { get() { return getTitleForScore; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getTitleName", { get() { return getTitleName; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "getWinStoryTarget", { get() { return getWinStoryTarget; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "goToPreviousScreen", { get() { return goToPreviousScreen; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "grantCharm", { get() { return grantCharm; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "handleCharmCurrencyTip", { get() { return handleCharmCurrencyTip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -1057,6 +1058,7 @@ try { Object.defineProperty(globalThis, "updateClassHUDManaBar", { get() { retur
 try { Object.defineProperty(globalThis, "updateQuestStats", { get() { return updateQuestStats; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "updateRetryKeepModal", { get() { return updateRetryKeepModal; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "wdGoBackToMap", { get() { return wdGoBackToMap; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "wdOpenStoryNode", { get() { return wdOpenStoryNode; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "withTitle", { get() { return withTitle; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "zoomInBtn", { get() { return zoomInBtn; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "zoomOutBtn", { get() { return zoomOutBtn; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

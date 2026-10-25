@@ -36,6 +36,7 @@
 }
 .cmp-left  { left: 16%; }
 .cmp-right { right: 16%; transform: scaleX(-1); }
+.cmp-mid   { right: 36%; transform: scaleX(-1); }
 .cmp-hero.cmp-dim { filter: brightness(0.55) drop-shadow(0 8px 10px rgba(0,0,0,0.6)); }
 
 .cmp-bubble {
@@ -58,6 +59,7 @@
 .cmp-bubble.show { opacity: 1; transform: translateY(0) scale(1); }
 .cmp-bubble-left  { left: 12%; }
 .cmp-bubble-right { right: 12%; }
+.cmp-bubble-mid   { left: 31%; }
 .cmp-name {
     font-family: var(--PX, monospace);
     font-size: 0.7em;
@@ -111,3 +113,37 @@
     transform-origin: 50% 20%;
     pointer-events: none;
 }
+
+/* "Watch earlier story scenes first?" prompt */
+.cmp-ask {
+    position: fixed;
+    inset: 0;
+    z-index: 5100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+}
+.cmp-ask-box {
+    max-width: min(480px, 88vw);
+    padding: 22px 26px;
+    background: #1d1508;
+    border: 2px solid #c8a84b;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.8);
+    font-family: var(--F, sans-serif);
+    color: #f5e9c8;
+    text-align: center;
+}
+.cmp-ask-text { font-size: 15px; line-height: 1.45; margin-bottom: 18px; }
+.cmp-ask-buttons { display: flex; gap: 12px; justify-content: center; }
+.cmp-ask-buttons button {
+    font-family: var(--PX, monospace);
+    font-size: 12px;
+    padding: 8px 16px;
+    cursor: pointer;
+    border: 1px solid #c8a84b;
+    background: rgba(0,0,0,0.5);
+    color: #f5e9c8;
+}
+.cmp-ask-yes { background: #2f5f9a !important; border-color: #6fb0ff !important; }
+.cmp-ask-buttons button:hover { filter: brightness(1.25); }
