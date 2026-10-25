@@ -448,6 +448,17 @@
     box-shadow: 0 0 12px rgba(127, 212, 255, 0.6);
 }
 
+/* Story node (character intro) - blue ring; turns green via .done */
+.wd-level-node.wd-story-node .wd-node-circle {
+    border-color: #6fb0ff;
+    box-shadow: 0 0 10px rgba(111, 176, 255, 0.55);
+    font-size: 18px;
+}
+.wd-level-node.wd-story-node.done .wd-node-circle {
+    border-color: #6fcf6f;
+    box-shadow: 0 0 8px rgba(111, 207, 111, 0.4);
+}
+
 /* Convergence level node - green ring */
 .wd-level-node.convergence .wd-node-circle {
     border-color: #6fcf6f;

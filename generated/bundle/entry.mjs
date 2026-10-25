@@ -781,6 +781,7 @@ try { Object.defineProperty(globalThis, "_servePostTrialFlows", { get() { return
 try { Object.defineProperty(globalThis, "_setAvatarPos", { get() { return _setAvatarPos; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_setEssenceFilter", { get() { return _setEssenceFilter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_setMistakeCounterText", { get() { return _setMistakeCounterText; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_setReplayGloballyUnlocked", { get() { return _setReplayGloballyUnlocked; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_showHubInfoTooltip", { get() { return _showHubInfoTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_showHubTooltip", { get() { return _showHubTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_showItemLevelToggleTooltip", { get() { return _showItemLevelToggleTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

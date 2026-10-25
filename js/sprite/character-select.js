@@ -1,7 +1,6 @@
 import { _ensureTooltipElement, _hideWorldTooltip, _trackTooltipToMouse } from '../screens/screens-map-view.js';
 import { switchScreen } from '../screens/screens.js';
 import { save, reconcilePassiveTreeForClass } from '../state.js';
-import { showBeat } from '../storyline/storyline-engine.js';
 import { unlockReplayIntroBundle } from '../storyline/storyline-progress.js';
 import { _tipAttr } from '../tooltips-hud.js';
 import { LANG, t } from '../translation/translations.js';
@@ -309,25 +308,16 @@ function _csiHideTip() {
 }
 
 // The shared confirm handler (image UI + legacy card fallback both funnel
-// here): persist the pick, unlock the intro replays, then roll the chosen
-// character's intro beat.
+// here): persist the pick, unlock the opening cinematic replay, then carry
+// on. The character's intro is no longer played here - it waits on a story
+// node out in the world (see storyNode in screens-world-levels-config.js).
 function _csiConfirmSelection(selectedId, onSelect) {
-    // The character-intro beat takes over the screen next; without this the
-    // hover tooltip would ride along on top of the cinematic.
     _csiHideTip();
     STATE.playerCharacter = selectedId;
     reconcilePassiveTreeForClass(true);
-    // Picking any character permanently unlocks the opening cinematic and
-    // all three character-intro replays in the Replay Gallery, regardless
-    // of which save slot is active (see storyline-engine.js).
     unlockReplayIntroBundle();
     save();
-    showBeat('character_intro', {
-        character: selectedId,
-        onComplete: () => {
-            if (typeof onSelect === 'function') onSelect(selectedId);
-        }
-    });
+    if (typeof onSelect === 'function') onSelect(selectedId);
 }
 
 // Builds the image-based select UI (see block comment above).

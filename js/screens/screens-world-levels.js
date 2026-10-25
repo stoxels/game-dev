@@ -198,6 +198,7 @@ function _wdGetNodePos(cfg, nodeRef) {
     if (nodeRef === null || nodeRef === 'entrance') return cfg.entrancePos;
     if (nodeRef === 'trial') return cfg.trialNode;
     if (nodeRef === 'ascension') return cfg.ascensionNode;
+    if (nodeRef === 'story') return cfg.storyNode;
     return cfg.nodes[nodeRef];
 }
 
@@ -291,6 +292,16 @@ function _wdBuildRoads(cfg, wi) {
             n1: lastLi,
             n2: 'ascension',
             waypoints: [cfg.nodes[lastLi], cfg.ascensionNode],
+        });
+    }
+
+    // Story node spur: a short side road from its anchor level to the node.
+    const story = _wdStoryNodeForWorld(wi);
+    if (story) {
+        roads.push({
+            n1: story.from,
+            n2: 'story',
+            waypoints: [cfg.nodes[story.from], story],
         });
     }
 
@@ -474,6 +485,9 @@ function _wdIsNodeReached(n, wi) {
         return ((typeof globalThis._isTrialDone === 'function') && globalThis._isTrialDone(wi))
             || ((typeof globalThis._isTrialUnlocked === 'function') && globalThis._isTrialUnlocked(wi));
     }
+    // The story node only exists once its anchor level is cleared, so its
+    // spur is always lit.
+    if (n === 'story') return true;
     if (n === 'ascension') {
         return ((typeof globalThis._isAscensionTrialDone === 'function') && globalThis._isAscensionTrialDone(wi))
             || ((typeof globalThis._isAscensionTrialUnlocked === 'function') && globalThis._isAscensionTrialUnlocked(wi));
@@ -1546,6 +1560,123 @@ function _wdAppendLevelNodes(canvas, wi, cfg, levelCount) {
     if (trialPos) canvas.appendChild(_wdBuildTrialNode(wi, trialPos));
     const ascPos = _wdAscensionNodeForWorld(wi);
     if (ascPos) canvas.appendChild(_wdBuildAscensionNode(wi, ascPos));
+    const story = _wdStoryNodeForWorld(wi);
+    if (story) canvas.appendChild(_wdBuildStoryNode(wi, story));
+}
+
+//------------------------------------------------------------------------
+//-------------------STORY NODE (CHARACTER INTRO)--------------------------
+//------------------------------------------------------------------------
+// An optional side node that plays the picked character's intro. Config:
+// WD_WORLD_CONFIGS[wi].storyNode = { character, from, x, y, label, labelDE }.
+// It only exists for that character, and only once level `from` is cleared.
+
+/**
+ * Returns the world's story node config when it should be on the map: the
+ * player picked this node's character and has cleared the level it hangs
+ * off. Returns null otherwise.
+ */
+function _wdStoryNodeForWorld(wi) {
+    const cfg = WD_WORLD_CONFIGS[wi];
+    const story = cfg && cfg.storyNode;
+    if (!story || !STATE || STATE.playerCharacter !== story.character) return null;
+    if (!cfg.nodes[story.from]) return null;
+    const anchorGi = globalThis.WORLD_START_GI[wi] + story.from;
+    return (STATE.done && STATE.done.includes(anchorGi)) ? story : null;
+}
+
+/**
+ * Display name of a story node in the current language.
+ */
+function _wdStoryNodeName(story) {
+    return (LANG === 'de' && story.labelDE) ? story.labelDE : story.label;
+}
+
+/**
+ * Builds the story node: a level-style circle with a book icon, green once
+ * the intro has been watched. Clicking walks the sprite there and offers
+ * the "play" button.
+ */
+function _wdBuildStoryNode(wi, story) {
+    const node = document.createElement('div');
+    node.className = 'wd-level-node wd-story-node';
+    node.dataset.storyNode = wi;
+    _wdPositionNodeOnCanvas(node, wi, story);
+
+    const isDone = globalThis.hasSeen('character_intro', { character: story.character });
+    if (isDone) node.classList.add('done');
+    node.innerHTML = _wdBuildNodeEffectsHtml('📖', '', '', '', '');
+
+    node.addEventListener('click', () => {
+        const existing = document.getElementById('wd-enter-btn');
+        if (existing) existing.remove();
+        _wdWalkSpriteTo(wi, 'story', () => _wdShowStoryEnterButton(wi, story));
+    });
+    node.addEventListener('mouseenter', (e) => _wdShowStoryTooltip(e, story, isDone));
+    node.addEventListener('mousemove', (e) => _wdMoveTooltip(e));
+    node.addEventListener('mouseleave', () => _wdHideTooltip());
+    return node;
+}
+
+/**
+ * Shows the "play story" button above the story node. Playing always uses
+ * force, so a watched intro can be revisited.
+ */
+function _wdShowStoryEnterButton(wi, story) {
+    const existing = document.getElementById('wd-enter-btn');
+    if (existing) existing.remove();
+
+    const cfg = WD_WORLD_CONFIGS[wi];
+    const canvas = _wdGetCanvas();
+    const pct = _wdImgPctToCanvasPct(story.x, story.y, canvas, cfg);
+
+    const btn = document.createElement('button');
+    btn.id = 'wd-enter-btn';
+    btn.textContent = (LANG === 'de' ? '▶ Geschichte ansehen' : '▶ Watch story');
+    btn.style.cssText = `
+        position: absolute;
+        left: ${pct.x}%;
+        top: calc(${pct.y}% - 56px);
+        transform: translateX(-50%);
+        z-index: 10;
+        font-family: var(--PX, monospace);
+        font-size: 11px;
+        padding: 5px 12px;
+        background: #2f5f9a;
+        color: #eaf4ff;
+        border: none;
+        cursor: pointer;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    `;
+    btn.addEventListener('click', () => {
+        btn.remove();
+        globalThis.showBeat('character_intro', {
+            character: story.character,
+            force: true,
+            onComplete: () => {
+                globalThis._setReplayGloballyUnlocked('intro_' + story.character);
+                showWorldDetail(wi);
+            }
+        });
+    });
+    _wdWireEnterButtonDismiss(btn);
+    if (canvas) canvas.appendChild(btn);
+}
+
+/**
+ * Story-node tooltip: its name and whether the story was already seen.
+ */
+function _wdShowStoryTooltip(e, story, isDone) {
+    const tip = _wdEnsureTooltip();
+    const status = LANG === 'de'
+        ? (isDone ? 'Gesehen ✓' : 'Optionale Geschichte')
+        : (isDone ? 'Watched ✓' : 'Optional story');
+    tip.innerHTML = `<div class="wd-tip-title">📖 ${_wdStoryNodeName(story)}</div>`
+        + `<div class="wd-tip-status">${status}</div>`;
+    tip.classList.add('show');
+    _wdMoveTooltip(e);
 }
 
 /**

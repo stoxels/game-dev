@@ -99,11 +99,12 @@ export const REPLAY_GALLERY_ENTRIES = [
     // flags (see storyline-engine.js). `thumb` is the artwork shown in the
     // row; `descKey` resolves to a translated subtitle. Entries flagged
     // `globalUnlock: true` are unlocked forever the moment the player picks
-    // any character (opening cinematic + all three character intros).
+    // any character (the opening cinematic). Character intros unlock when
+    // their story node is watched (see screens-world-levels.js).
     { id: 'opening_cinematic', beatId: 'intro_cinematic', label: 'Opening Cinematic', thumb: 'images/Replay_Cutscene_Screen/Replay_Opening_Camera.webp', descKey: 'scr_replay_desc_cinematic', globalUnlock: true },
-    { id: 'intro_stox', beatId: 'character_intro', label: 'Stox - Character Intro', options: { character: 'stox' }, thumb: 'images/sprites/Stox_noclass.webp', descKey: 'scr_replay_desc_intro_stox', globalUnlock: true },
-    { id: 'intro_trix', beatId: 'character_intro', label: 'Trix - Character Intro', options: { character: 'trix' }, thumb: 'images/sprites/Trix_noclass.webp', descKey: 'scr_replay_desc_intro_trix', globalUnlock: true },
-    { id: 'intro_syla', beatId: 'character_intro', label: 'Syla - Character Intro', options: { character: 'syla' }, thumb: 'images/sprites/Syla_noclass.webp', descKey: 'scr_replay_desc_intro_syla', globalUnlock: true },
+    { id: 'intro_stox', beatId: 'character_intro', label: 'Stox - Character Intro', options: { character: 'stox' }, thumb: 'images/sprites/Stox_noclass.webp', descKey: 'scr_replay_desc_intro_stox' },
+    { id: 'intro_trix', beatId: 'character_intro', label: 'Trix - Character Intro', options: { character: 'trix' }, thumb: 'images/sprites/Trix_noclass.webp', descKey: 'scr_replay_desc_intro_trix' },
+    { id: 'intro_syla', beatId: 'character_intro', label: 'Syla - Character Intro', options: { character: 'syla' }, thumb: 'images/sprites/Syla_noclass.webp', descKey: 'scr_replay_desc_intro_syla' },
 
     // Region interludes (region_1 … region_14, Nexus world included) are
     // intentionally NOT listed yet - their cutscenes don't exist. Re-add each
