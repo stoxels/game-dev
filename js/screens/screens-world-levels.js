@@ -1600,7 +1600,7 @@ function _wdBuildCompanionNode(wi, cn) {
     const isDone = globalThis.hasMetCompanion(cn.id);
     if (isDone) node.classList.add('done');
     const cap = pairing.companion.charAt(0).toUpperCase() + pairing.companion.slice(1);
-    const face = `<img class="wd-companion-face" src="images/sprites/${cap}_${pairing.look}.webp" alt="" draggable="false">`;
+    const face = `<img class="wd-companion-face" src="images/sprites/${cap}_${pairing.looks[pairing.companion]}.webp" alt="" draggable="false">`;
     node.innerHTML = _wdBuildNodeEffectsHtml(face, '', '', '', '');
 
     node.addEventListener('click', () => {

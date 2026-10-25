@@ -12,7 +12,9 @@ import { hasSeen } from './storyline-progress.js';
 // player character ("pairing"), so every pairing is written separately and
 // the player never has to meet both companions at once.
 //
-// A line is { who: 'player' | 'companion' | 'companion2', en, de };
+// A scene has `stage` ('base' | 'ascended', see COMPANION_LOOKS) and an optional
+// `pet` ('browney' | 'drifter') that stands beside Syla in ascended scenes.
+// A line is { who: 'player' | 'companion' | 'companion2' | 'voice', en, de };
 // { beat: 'character_intro' } plays the player's own intro as a flashback. `look` is the sprite
 // variant the companion wears (noclass, statistician, ... see images/sprites).
 
@@ -29,6 +31,16 @@ export const COMPANION_CAST = {
     verun: { name: 'Verun Vors', color: '#9fb4ff' },
 };
 
+// The class sprite each hero wears as a companion. Scenes before the first
+// meeting after the player can pick an ascendency (end of world 8, so from
+// world 9 on) use 'base'; later scenes use 'ascended'. A scene sets this with
+// its `stage` field. Class sprites live in images/sprites/<Hero>_<class>.webp.
+export const COMPANION_LOOKS = {
+    stox: { base: 'statistician', ascended: 'actuary' },
+    trix: { base: 'mathmagician', ascended: 'markovian' },
+    syla: { base: 'probabilist', ascended: 'random_walker' },
+};
+
 //------------------------------------------------------------------------
 // SCENES
 //------------------------------------------------------------------------
@@ -37,10 +49,10 @@ export const COMPANION_SCENES = {
     den_reunion: {
         note: 'World 2 (Distribution Den): the three trained together at the Outpost under the same Professor, so this is a reunion out in the field.',
         bg: 'images/backgrounds/Distribution-Den-Background.webp',
+        stage: 'base',
         pairings: {
             stox: {
                 companion: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Stox! Over here - and mind the crack. The stone next to it hums.', de: 'Stox! Hier drüben - und pass auf den Riss auf. Der Stein daneben summt.' },
                     { who: 'player', en: 'Syla. It repeats every four seconds. That is not a hum, that is a period.', de: 'Syla. Es wiederholt sich alle vier Sekunden. Das ist kein Summen, das ist eine Periode.' },
@@ -54,7 +66,6 @@ export const COMPANION_SCENES = {
             },
             trix: {
                 companion: 'stox',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Trix. You are standing on a fault line.', de: 'Trix. Du stehst auf einer Verwerfungslinie.' },
                     { who: 'player', en: 'Stox. Of course it is you. Still taking notes next to a pit?', de: 'Stox. Natürlich bist du es. Machst du immer noch Notizen neben einem Abgrund?' },
@@ -68,7 +79,6 @@ export const COMPANION_SCENES = {
             },
             syla: {
                 companion: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Forest Girl! You are humming again. Something behind that wall is humming back.', de: 'Waldmädchen! Du summst schon wieder. Hinter der Wand summt etwas zurück.' },
                     { who: 'player', en: 'Trix! Oh - sorry. I hum when a place feels sad. The Professor said it made the whole class nervous.', de: 'Trix! Oh - Entschuldigung. Ich summe, wenn sich ein Ort traurig anfühlt. Der Professor meinte, das mache die ganze Klasse nervös.' },
@@ -85,11 +95,11 @@ export const COMPANION_SCENES = {
     home_stox: {
         note: 'World 1 (Probability Peaks), near the Hypothesis Testing Hamlet. Syla and Trix visit Stox; he tells the safe half aloud, his full intro plays as a private flashback (the beat marker). The secret half (the faceless portrait) is NOT said aloud.',
         bg: 'images/backgrounds/Probability-Peaks-Background.webp',
+        stage: 'base',
         pairings: {
             stox: {
                 companion: 'syla',
                 companion2: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Stox, you have gone quiet. We are a few steps from the Outpost walls and you keep looking back at them.', de: 'Stox, du bist still geworden. Wir sind ein paar Schritte von den Mauern des Außenpostens entfernt und du schaust ständig zurück.' },
                     { who: 'player', en: 'I grew up behind those walls. The archive, mostly. I know every shelf.', de: 'Ich bin hinter diesen Mauern aufgewachsen. Im Archiv, vor allem. Ich kenne jedes Regal.' },
@@ -107,7 +117,6 @@ export const COMPANION_SCENES = {
             },
             trix: {
                 companion: 'stox',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Welcome to the Hypothesis Testing Hamlet. Population: me, a great many ruins, and a fence I have measured twice.', de: 'Willkommen im Hypothesentest-Weiler. Einwohner: ich, sehr viele Ruinen und ein Zaun, den ich zweimal vermessen habe.' },
                     { who: 'player', en: 'You grew up next to THIS? It looks like a hypothesis somebody failed to confirm.', de: 'Du bist neben DEM hier aufgewachsen? Das sieht aus wie eine Hypothese, die jemand nicht bestätigen konnte.' },
@@ -121,7 +130,6 @@ export const COMPANION_SCENES = {
             },
             syla: {
                 companion: 'stox',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Syla. You are humming next to the Hamlet. It is not a restful place.', de: 'Syla. Du summst neben dem Weiler. Er ist kein erholsamer Ort.' },
                     { who: 'player', en: 'Oh, sorry! But it is a hopeful place. The walls remember people trying.', de: 'Oh, Entschuldigung! Aber es ist ein hoffnungsvoller Ort. Die Mauern erinnern sich daran, dass Leute es versucht haben.' },
@@ -137,10 +145,10 @@ export const COMPANION_SCENES = {
     home_trix: {
         note: 'World 5 (Regression Rift), the ruined OLS Observatory. Stox and Syla visit Trix; she tells the safe half aloud, her full intro plays as a private flashback. The secret half (Warden, key, vault, Verun Vors book) is NOT said aloud.',
         bg: 'images/backgrounds/Regression-Rift-Background.webp',
+        stage: 'base',
         pairings: {
             stox: {
                 companion: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'player', en: 'The logbook is still on the desk. May I?', de: 'Das Logbuch liegt noch auf dem Tisch. Darf ich?' },
                     { who: 'companion', en: 'Touch nothing. ...Fine. The last page only. Do not turn it back.', de: 'Fass nichts an. ...Na gut. Nur die letzte Seite. Nicht zurückblättern.' },
@@ -155,7 +163,6 @@ export const COMPANION_SCENES = {
             trix: {
                 companion: 'stox',
                 companion2: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'The instruments are still bolted to the floor. Somebody left in a hurry.', de: 'Die Instrumente sind noch am Boden festgeschraubt. Jemand ist in Eile gegangen.' },
                     { who: 'player', en: 'Nobody left in a hurry. We were sent away. Slowly. Stop touching that dial.', de: 'Niemand ist in Eile gegangen. Wir wurden weggeschickt. Langsam. Lass die Finger von dem Regler.' },
@@ -173,7 +180,6 @@ export const COMPANION_SCENES = {
             },
             syla: {
                 companion: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'player', en: 'Oh... it is so quiet here. Like the place is holding its breath.', de: 'Oh... es ist so still hier. Als hielte der Ort den Atem an.' },
                     { who: 'companion', en: 'It is not holding its breath. It is waiting. There is a difference.', de: 'Er hält nicht den Atem an. Er wartet. Das ist ein Unterschied.' },
@@ -190,10 +196,10 @@ export const COMPANION_SCENES = {
     home_syla: {
         note: 'World 6 (Frequency Forest), her home by the Normal Grove. Trix and Stox visit Syla; she tells the safe half aloud, her full intro plays as a private flashback. The secret half (parents, fox) is NOT said aloud.',
         bg: 'images/backgrounds/Frequency-Forest-Background.webp',
+        stage: 'base',
         pairings: {
             stox: {
                 companion: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Listen, Stox. The birds. Do you hear it?', de: 'Hör zu, Stox. Die Vögel. Hörst du es?' },
                     { who: 'player', en: 'Eight notes, the same order. Then a pause of exactly six seconds, and again.', de: 'Acht Töne, immer dieselbe Reihenfolge. Dann eine Pause von genau sechs Sekunden, und wieder von vorn.' },
@@ -206,7 +212,6 @@ export const COMPANION_SCENES = {
             },
             trix: {
                 companion: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'player', en: 'So this is the famous Grove. Why does every window have a curtain that moves at the exact same moment?', de: 'Das ist also der berühmte Hain. Warum bewegt sich in jedem Fenster der Vorhang im selben Moment?' },
                     { who: 'companion', en: 'Oh, you noticed. Most people say it is the wind.', de: 'Oh, du hast es bemerkt. Die meisten sagen, es sei der Wind.' },
@@ -221,7 +226,6 @@ export const COMPANION_SCENES = {
             syla: {
                 companion: 'trix',
                 companion2: 'stox',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'So this is the famous Grove. It looks like every other forest to me.', de: 'Das ist also der berühmte Hain. Für mich sieht er aus wie jeder andere Wald.' },
                     { who: 'player', en: 'It is not like every other forest. Listen closely.', de: 'Er ist nicht wie jeder andere Wald. Hört genau hin.' },
@@ -242,10 +246,10 @@ export const COMPANION_SCENES = {
     w3_assembly: {
         note: 'World 3 (Sampling Savanna): The Bimodal Assembly. Two camps of scholars shout past each other: the Collapse was an accident / was deliberate. A bimodal crowd. The heroes show how they handle a split. Trix hints that she knows which camp gets thrown out.',
         bg: 'images/backgrounds/Sampling-Savanna-Background.webp',
+        stage: 'base',
         pairings: {
             stox: {
                 companion: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Listen to them. Two groups, two loud answers, nothing in between.', de: 'Hör sie dir an. Zwei Gruppen, zwei laute Antworten, nichts dazwischen.' },
                     { who: 'player', en: 'A bimodal distribution. One camp says the Collapse was an accident. The other says someone caused it.', de: 'Eine bimodale Verteilung. Das eine Lager sagt, der Kollaps war ein Unfall. Das andere sagt, jemand hat ihn verursacht.' },
@@ -258,7 +262,6 @@ export const COMPANION_SCENES = {
             },
             trix: {
                 companion: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'They are so loud. Both sides. It makes my ears ache.', de: 'Sie sind so laut. Beide Seiten. Davon tun mir die Ohren weh.' },
                     { who: 'player', en: 'Loud is cheap. Pick a side, shout, go home. That is the whole Guild in one square.', de: 'Laut ist billig. Seite wählen, brüllen, nach Hause gehen. Das ist die ganze Gilde auf einem Platz.' },
@@ -271,7 +274,6 @@ export const COMPANION_SCENES = {
             },
             syla: {
                 companion: 'stox',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Two peaks and a valley between them. Textbook bimodal.', de: 'Zwei Gipfel und dazwischen ein Tal. Lehrbuchmäßig bimodal.' },
                     { who: 'player', en: 'It sounds like two songs sung at once. Neither one is wrong, they just do not fit together yet.', de: 'Es klingt wie zwei Lieder, die gleichzeitig gesungen werden. Keines ist falsch, sie passen nur noch nicht zusammen.' },
@@ -287,10 +289,10 @@ export const COMPANION_SCENES = {
     w4_forest: {
         note: 'World 4 (Vortex of Possibilities): The Branching Bifurcation Forests. Foreshadowing: the glowing centre is not corruption leaving, it is gathering. Everything leans toward the middle (the Nexus).',
         bg: 'images/backgrounds/Vortex-of-Possibilities-Background.webp',
+        stage: 'base',
         pairings: {
             stox: {
                 companion: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'player', en: 'Every branch in this forest splits in two, and each half splits again. Probability, in wood.', de: 'Jeder Ast in diesem Wald teilt sich in zwei, und jede Hälfte teilt sich wieder. Wahrscheinlichkeit, in Holz.' },
                     { who: 'companion', en: 'They all lean toward the middle. Look. The whole forest bends toward the light.', de: 'Alle neigen sich zur Mitte. Sieh nur. Der ganze Wald biegt sich dem Licht entgegen.' },
@@ -304,7 +306,6 @@ export const COMPANION_SCENES = {
             trix: {
                 companion: 'stox',
                 companion2: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Fork after fork after fork. If I had a coin for every one of these branches, I would never need to roll one.', de: 'Gabelung um Gabelung. Hätte ich für jeden dieser Äste eine Münze, müsste ich nie wieder eine werfen.' },
                     { who: 'player', en: 'Do not start with the coin jokes, bookworm.', de: 'Fang nicht mit den Münzwitzen an, Bücherwurm.' },
@@ -317,7 +318,6 @@ export const COMPANION_SCENES = {
             },
             syla: {
                 companion: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Do not stand so close to the edge, Forest Girl. This place does not like being looked at.', de: 'Steh nicht so nah am Rand, Waldmädchen. Dieser Ort mag es nicht, angesehen zu werden.' },
                     { who: 'player', en: 'But look at the trees, Trix. They all bow to the same spot.', de: 'Aber sieh die Bäume an, Trix. Sie verneigen sich alle vor derselben Stelle.' },
@@ -333,11 +333,11 @@ export const COMPANION_SCENES = {
     w7_loom: {
         note: 'World 7 (Stochapolis): The Bayes\' Theorem Loom. It weaves prior beliefs into updated ones, but its threads are stuck on one old pattern. Theme: updating beliefs (and the Guild that refused to).',
         bg: 'images/backgrounds/Stochapolis-Background.webp',
+        stage: 'base',
         pairings: {
             stox: {
                 companion: 'syla',
                 companion2: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'The Loom is still running. Look at the threads. Hundreds of colours, each one a belief.', de: 'Der Webstuhl läuft noch. Sieh dir die Fäden an. Hunderte Farben, jede eine Überzeugung.' },
                     { who: 'player', en: 'Prior times likelihood, divided by evidence. It weaves an old belief into a new one.', de: 'A-priori mal Likelihood, geteilt durch Evidenz. Er webt eine alte Überzeugung zu einer neuen.' },
@@ -350,7 +350,6 @@ export const COMPANION_SCENES = {
             },
             trix: {
                 companion: 'stox',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Prior times likelihood over evidence. A machine that makes you change your mind.', de: 'A-priori mal Likelihood durch Evidenz. Eine Maschine, die einen dazu bringt, seine Meinung zu ändern.' },
                     { who: 'player', en: '"Update." Funny word. Sounds so much nicer than "admit you were wrong".', de: '"Aktualisieren." Lustiges Wort. Klingt so viel netter als "zugeben, dass man sich geirrt hat".' },
@@ -363,7 +362,6 @@ export const COMPANION_SCENES = {
             },
             syla: {
                 companion: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'player', en: 'The threads look sad. All pulled the same way, none of them allowed to turn.', de: 'Die Fäden sehen traurig aus. Alle in dieselbe Richtung gezogen, keiner darf sich drehen.' },
                     { who: 'companion', en: 'You talk to everything, do you not? Even a pile of string.', de: 'Du redest mit allem, oder? Sogar mit einem Haufen Fäden.' },
@@ -379,10 +377,10 @@ export const COMPANION_SCENES = {
     w8_fieldbase: {
         note: 'World 8 (Hypothesis Hinterlands): The Field Research Base: an abandoned Guild camp. The last researcher noted that every bearing of the corruption points to one centre, reported it three times, and was told to stop measuring. Foreshadows the suppression.',
         bg: 'images/backgrounds/Hypothesis-Hinterlands-Background.webp',
+        stage: 'base',
         pairings: {
             stox: {
                 companion: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Tents, a fire pit and a stack of notebooks nobody burned. Interesting.', de: 'Zelte, eine Feuerstelle und ein Stapel Notizbücher, den niemand verbrannt hat. Interessant.' },
                     { who: 'player', en: 'These are bearings. The same angle, recorded in every region, week after week. They all meet at a single point.', de: 'Das sind Peilungen. Derselbe Winkel, in jeder Region aufgezeichnet, Woche für Woche. Sie treffen sich alle in einem Punkt.' },
@@ -395,7 +393,6 @@ export const COMPANION_SCENES = {
             },
             trix: {
                 companion: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Somebody lived here. There are still warm-looking ashes, even after all this time.', de: 'Hier hat jemand gelebt. Die Asche sieht noch immer warm aus, nach all der Zeit.' },
                     { who: 'player', en: 'Do not fall for the cosy camp, Forest Girl. Read the last page.', de: 'Fall nicht auf das gemütliche Lager herein, Waldmädchen. Lies die letzte Seite.' },
@@ -409,7 +406,6 @@ export const COMPANION_SCENES = {
             },
             syla: {
                 companion: 'stox',
-                look: 'noclass',
                 lines: [
                     { who: 'player', en: 'Somebody made tea here. There is still a cup on the log.', de: 'Hier hat jemand Tee gekocht. Auf dem Baumstamm steht noch eine Tasse.' },
                     { who: 'companion', en: 'Somebody also made notes. Several hundred of them. Come and look at this, Syla.', de: 'Jemand hat auch Notizen gemacht. Mehrere hundert. Komm und sieh dir das an, Syla.' },
@@ -426,12 +422,14 @@ export const COMPANION_SCENES = {
     w9_vortex: {
         note: 'World 9 (Data Delta): The Principal Vortex: all the data reduces to one axis. Trix finds a survey stone stamped VORS (Verun mapped these regions). She goes silent. Stox knows the name from the struck-off register.',
         bg: 'images/backgrounds/Data-Delta-Background.webp',
+        stage: 'ascended',
+        pet: 'browney',
         pairings: {
             stox: {
                 companion: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'It is so beautiful. All those colours, winding into one single thread.', de: 'Es ist so schön. All diese Farben, die sich zu einem einzigen Faden verdrehen.' },
+                    { who: 'companion', en: 'Browney keeps trying to wade into the colours. I have to hold him back by the collar.', de: 'Browney will ständig in die Farben hineinwaten. Ich muss ihn am Halsband festhalten.' },
                     { who: 'player', en: 'Dimensionality reduction. Thousands of variables collapsing onto one axis. The most information in the least space.', de: 'Dimensionsreduktion. Tausende Variablen fallen auf eine Achse zusammen. Die meiste Information auf dem wenigsten Raum.' },
                     { who: 'companion', en: 'It feels like every river ends here.', de: 'Es fühlt sich an, als endete hier jeder Fluss.' },
                     { who: 'player', en: 'Because they do. Every channel in the Delta drains into the Vortex. And from the Vortex...', de: 'Weil sie das tun. Jeder Kanal im Delta mündet in den Wirbel. Und vom Wirbel...' },
@@ -442,7 +440,6 @@ export const COMPANION_SCENES = {
             },
             trix: {
                 companion: 'stox',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Every channel in the Delta drains into this Vortex. A tidy system. Efficient.', de: 'Jeder Kanal im Delta mündet in diesen Wirbel. Ein ordentliches System. Effizient.' },
                     { who: 'player', en: 'Pretty, too. Do not tell anyone I said it.', de: 'Hübsch auch. Sag niemandem, dass ich das gesagt habe.' },
@@ -455,9 +452,9 @@ export const COMPANION_SCENES = {
             },
             syla: {
                 companion: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'So many colours, all swirling together. Pretty. Dangerous. Probably both.', de: 'So viele Farben, die sich alle verwirbeln. Hübsch. Gefährlich. Wahrscheinlich beides.' },
+                    { who: 'player', en: 'Browney keeps trying to wade into the colours. I have to hold him back by the collar.', de: 'Browney will ständig in die Farben hineinwaten. Ich muss ihn am Halsband festhalten.' },
                     { who: 'player', en: 'Everything in the Delta ends up here. It is like a heart.', de: 'Alles im Delta endet hier. Es ist wie ein Herz.' },
                     { who: 'companion', en: 'There is a mark on that stone. ...A survey mark.', de: 'Auf diesem Stein ist ein Zeichen. ...Ein Vermessungszeichen.' },
                     { who: 'player', en: 'Trix? You have gone very quiet.', de: 'Trix? Du bist sehr still geworden.' },
@@ -471,13 +468,15 @@ export const COMPANION_SCENES = {
     w10_enclave: {
         note: 'World 10 (Parameter Plains): The Estimated Enclave. The hooded estimators explain: the Apex parameters did not drift, they were SET by someone with a First Cartographer key. The heroes share what they have learned so far.',
         bg: 'images/backgrounds/Parameter-Plains-Background.webp',
+        stage: 'ascended',
+        pet: 'drifter',
         pairings: {
             stox: {
                 companion: 'syla',
                 companion2: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'The estimators were kind. They showed us their ledger of Apex parameters.', de: 'Die Schätzer waren freundlich. Sie haben uns ihr Verzeichnis der Apex-Parameter gezeigt.' },
+                    { who: 'companion', en: 'Drifter keeps wagging at the estimators. They keep pretending not to see him.', de: 'Drifter wedelt ständig die Schätzer an. Sie tun so, als würden sie ihn nicht sehen.' },
                     { who: 'player', en: 'And every parameter that changed, changed in the same direction. By exact amounts. That is not drift.', de: 'Und jeder Parameter, der sich verändert hat, hat sich in dieselbe Richtung verändert. Um genaue Beträge. Das ist keine Abweichung.' },
                     { who: 'companion2', en: 'They said it plainly. The Apex was edited from inside. By someone with a First Cartographer\'s key.', de: 'Sie haben es klar gesagt. Der Apex wurde von innen bearbeitet. Von jemandem mit dem Schlüssel eines Ersten Kartografen.' },
                     { who: 'companion', en: 'A key. So it was not a mistake. Someone chose this.', de: 'Ein Schlüssel. Es war also kein Fehler. Jemand hat das gewollt.' },
@@ -489,9 +488,9 @@ export const COMPANION_SCENES = {
             trix: {
                 companion: 'stox',
                 companion2: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'The estimators showed us their ledger. Every Apex parameter that changed, changed in the same direction.', de: 'Die Schätzer haben uns ihr Verzeichnis gezeigt. Jeder Apex-Parameter, der sich verändert hat, hat sich in dieselbe Richtung verändert.' },
+                    { who: 'companion2', en: 'Drifter keeps wagging at the estimators. They keep pretending not to see him.', de: 'Drifter wedelt ständig die Schätzer an. Sie tun so, als würden sie ihn nicht sehen.' },
                     { who: 'companion2', en: 'They said: someone with a First Cartographer\'s key rewrote them. From inside the Apex.', de: 'Sie sagten: Jemand mit dem Schlüssel eines Ersten Kartografen hat sie neu geschrieben. Von innen, im Apex.' },
                     { who: 'player', en: '...A key. Of course it is a key.', de: '...Ein Schlüssel. Natürlich ist es ein Schlüssel.' },
                     { who: 'companion', en: 'You touched your collar when she said it, Trix. I did not see anything. I am simply saying that I did not see anything.', de: 'Du hast dir an den Kragen gefasst, als sie das sagte, Trix. Ich habe nichts gesehen. Ich sage nur, dass ich nichts gesehen habe.' },
@@ -503,9 +502,9 @@ export const COMPANION_SCENES = {
             syla: {
                 companion: 'trix',
                 companion2: 'stox',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Nobody told me estimators were so grim. Hoods, ledgers, candles. It is practically my childhood.', de: 'Mir hat niemand gesagt, dass Schätzer so düster sind. Kapuzen, Verzeichnisse, Kerzen. Das ist praktisch meine Kindheit.' },
+                    { who: 'player', en: 'Drifter keeps wagging at the estimators. They keep pretending not to see him.', de: 'Drifter wedelt ständig die Schätzer an. Sie tun so, als würden sie ihn nicht sehen.' },
                     { who: 'companion2', en: 'The ledger is clear. Every changed parameter moved by exact amounts. Somebody edited the Apex, using a First Cartographer\'s key.', de: 'Das Verzeichnis ist eindeutig. Jeder veränderte Parameter hat sich um genaue Beträge verschoben. Jemand hat den Apex bearbeitet, mit dem Schlüssel eines Ersten Kartografen.' },
                     { who: 'player', en: 'So the Collapse was not a mistake... somebody did it on purpose.', de: 'Der Kollaps war also kein Fehler... jemand hat es absichtlich getan.' },
                     { who: 'companion', en: 'Not quite news, Forest Girl. Some of us were exiled for saying it.', de: 'Nicht ganz neu, Waldmädchen. Manche von uns wurden dafür verbannt, es zu sagen.' },
@@ -519,13 +518,15 @@ export const COMPANION_SCENES = {
     w11_ghost: {
         note: 'World 11 (Null Hypothesis Void): In the Mists of Type II Errors the heroes meet Verun\'s ghost: restless, angry that nobody believed him, but wanting the truth revealed. He hints that \'she\' used his pages (the culprit is a woman), names no name. No art for the ghost yet: he speaks as a voice.',
         bg: 'images/backgrounds/Null-Hypothesis-Void.webp',
+        stage: 'ascended',
+        pet: 'browney',
         pairings: {
             stox: {
                 companion: 'syla',
                 companion2: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'The mist is full of faces. Hypotheses that were rejected. They are all looking at us.', de: 'Der Nebel ist voller Gesichter. Hypothesen, die verworfen wurden. Sie alle sehen uns an.' },
+                    { who: 'companion', en: 'Browney is shaking. Even he does not like this mist.', de: 'Browney zittert. Sogar ihm gefällt dieser Nebel nicht.' },
                     { who: 'voice', en: 'Another observer. Another person who thinks I am a Type II error.', de: 'Noch ein Beobachter. Noch jemand, der mich für einen Fehler zweiter Art hält.' },
                     { who: 'player', en: 'You are not a Type II error. You are a witness who was ignored.', de: 'Du bist kein Fehler zweiter Art. Du bist ein Zeuge, den man ignoriert hat.' },
                     { who: 'voice', en: 'I wrote the book. I told them the Apex was being changed from inside. They called it heresy and struck my name from the page.', de: 'Ich habe das Buch geschrieben. Ich sagte ihnen, dass der Apex von innen verändert wird. Sie nannten es Ketzerei und strichen meinen Namen von der Seite.' },
@@ -538,9 +539,9 @@ export const COMPANION_SCENES = {
             trix: {
                 companion: 'stox',
                 companion2: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'The mist is full of faces. Rejected hypotheses, every one of them. And they are all looking at you, Trix.', de: 'Der Nebel ist voller Gesichter. Verworfene Hypothesen, jede einzelne. Und alle sehen dich an, Trix.' },
+                    { who: 'companion2', en: 'Browney is shaking. Even he does not like this mist.', de: 'Browney zittert. Sogar ihm gefällt dieser Nebel nicht.' },
                     { who: 'voice', en: '...Vors. I know that chin.', de: '...Vors. Dieses Kinn kenne ich.' },
                     { who: 'player', en: 'Who are you?', de: 'Wer bist du?' },
                     { who: 'voice', en: 'Verun. I wrote the book they hid. I told them the Apex was being changed from inside. They called it heresy and struck my name from the page.', de: 'Verun. Ich habe das Buch geschrieben, das sie versteckt haben. Ich sagte ihnen, dass der Apex von innen verändert wird. Sie nannten es Ketzerei und strichen meinen Namen von der Seite.' },
@@ -553,9 +554,9 @@ export const COMPANION_SCENES = {
             syla: {
                 companion: 'trix',
                 companion2: 'stox',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'The mist is full of faces. Hypotheses that were rejected. They are all staring at us.', de: 'Der Nebel ist voller Gesichter. Hypothesen, die verworfen wurden. Sie starren uns alle an.' },
+                    { who: 'player', en: 'Browney is shaking. Even he does not like this mist.', de: 'Browney zittert. Sogar ihm gefällt dieser Nebel nicht.' },
                     { who: 'player', en: 'They look so lonely. Hello. We are not here to reject you.', de: 'Sie sehen so einsam aus. Hallo. Wir sind nicht hier, um euch zu verwerfen.' },
                     { who: 'voice', en: '...Kind. Kinder are always kind. It is very annoying.', de: '...Freundlich. Kinder sind immer freundlich. Das ist sehr lästig.' },
                     { who: 'companion2', en: 'Who are you?', de: 'Wer bist du?' },
@@ -570,13 +571,15 @@ export const COMPANION_SCENES = {
     w12_wreck: {
         note: 'World 12 (Bayesian Bay): A Guild flagship wreck. The heroes find the PRIOR half of the key to the Nexus and the captain\'s log: the Council ordered "do not update". All three heroes together.',
         bg: 'images/backgrounds/Bayesian-Bay-Background.webp',
+        stage: 'ascended',
+        pet: 'drifter',
         pairings: {
             stox: {
                 companion: 'syla',
                 companion2: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'The ship is called the Steadfast Prior. A Guild flagship, by the seal on the stern.', de: 'Das Schiff heißt Steadfast Prior. Ein Flaggschiff der Gilde, nach dem Siegel am Heck.' },
+                    { who: 'companion', en: 'Drifter smells the sea and does not like it. He keeps nosing at the old cabin door.', de: 'Drifter riecht das Meer und mag es nicht. Er stupst immer wieder die alte Kajütentür an.' },
                     { who: 'companion2', en: 'And the captain\'s cabin is still dry. Somebody sealed it. Stand back, I can pick that lock.', de: 'Und die Kajüte des Kapitäns ist noch trocken. Jemand hat sie versiegelt. Tretet zurück, ich knacke das Schloss.' },
                     { who: 'player', en: 'The log\'s last line: "Council order: do not update the chart. Hold course." They sailed into the maelstrom because they were told not to change their mind.', de: 'Die letzte Zeile des Logbuchs: "Befehl des Rates: Karte nicht aktualisieren. Kurs halten." Sie segelten in den Mahlstrom, weil man ihnen verbot, ihre Meinung zu ändern.' },
                     { who: 'companion', en: 'That is the Guild that refused to update its beliefs. And it killed these people.', de: 'Das ist die Gilde, die sich weigerte, ihre Überzeugungen zu aktualisieren. Und sie hat diese Leute getötet.' },
@@ -589,9 +592,9 @@ export const COMPANION_SCENES = {
             trix: {
                 companion: 'stox',
                 companion2: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Steadfast Prior. A Guild flagship. The captain locked his cabin and the lock is still good.', de: 'Steadfast Prior. Ein Flaggschiff der Gilde. Der Kapitän hat seine Kajüte abgeschlossen, und das Schloss ist noch gut.' },
+                    { who: 'companion2', en: 'Drifter smells the sea and does not like it. He keeps nosing at the old cabin door.', de: 'Drifter riecht das Meer und mag es nicht. Er stupst immer wieder die alte Kajütentür an.' },
                     { who: 'player', en: 'Stand back. I have wanted to pick a Guild lock since I was nine.', de: 'Tretet zurück. Ich wollte schon seit meinem neunten Lebensjahr ein Gildenschloss knacken.' },
                     { who: 'companion2', en: 'It opened! Trix, you are wonderful. Look, a log, and a strongbox!', de: 'Es ging auf! Trix, du bist wunderbar. Sieh nur, ein Logbuch und ein Tresor!' },
                     { who: 'companion', en: 'The last line: "Council order: do not update the chart. Hold course." They sailed into the maelstrom on purpose.', de: 'Die letzte Zeile: "Befehl des Rates: Karte nicht aktualisieren. Kurs halten." Sie segelten absichtlich in den Mahlstrom.' },
@@ -603,9 +606,9 @@ export const COMPANION_SCENES = {
             syla: {
                 companion: 'trix',
                 companion2: 'stox',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'Steadfast Prior. I do not like ships that stay upright after being wrecked. It looks smug.', de: 'Steadfast Prior. Ich mag keine Schiffe, die nach einem Schiffbruch aufrecht bleiben. Das sieht selbstgefällig aus.' },
+                    { who: 'player', en: 'Drifter smells the sea and does not like it. He keeps nosing at the old cabin door.', de: 'Drifter riecht das Meer und mag es nicht. Er stupst immer wieder die alte Kajütentür an.' },
                     { who: 'player', en: 'The poor sailors. They can still feel everything that happened here.', de: 'Die armen Seeleute. Sie spüren noch alles, was hier geschehen ist.' },
                     { who: 'companion2', en: 'The log says the Council ordered them to hold course. "Do not update." They obeyed.', de: 'Das Logbuch sagt, der Rat habe ihnen befohlen, den Kurs zu halten. "Nicht aktualisieren." Sie gehorchten.' },
                     { who: 'companion', en: 'That is the Guild in one sentence. Open that strongbox, Forest Girl.', de: 'Das ist die Gilde in einem Satz. Mach den Tresor auf, Waldmädchen.' },
@@ -619,13 +622,15 @@ export const COMPANION_SCENES = {
     w13_peak: {
         note: 'World 13 (Expectation Plateau): Foot of Peak mu. The POSTERIOR half of the key. The proof stone on the plateau has been defaced recently: the ink is fresh, someone is still erasing. All three heroes together.',
         bg: 'images/backgrounds/Expectation-Plateau-Background.webp',
+        stage: 'ascended',
+        pet: 'browney',
         pairings: {
             stox: {
                 companion: 'syla',
                 companion2: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'The Peak glows brighter every step. It is humming the same note as the first half of the key.', de: 'Der Gipfel leuchtet mit jedem Schritt heller. Er summt denselben Ton wie die erste Schlüsselhälfte.' },
+                    { who: 'companion', en: 'Browney is sniffing the whole mountain. I think he wants to climb it.', de: 'Browney beschnuppert den ganzen Berg. Ich glaube, er will hinaufklettern.' },
                     { who: 'companion2', en: 'Here. In a crack of the stone. The seal of the First Cartographers, and "POSTERIOR" under it.', de: 'Hier. In einer Felsspalte. Das Siegel der Ersten Kartografen, und darunter "POSTERIOR".' },
                     { who: 'player', en: 'Join them. Prior and posterior, side by side.', de: 'Fügt sie zusammen. Prior und Posterior, nebeneinander.' },
                     { who: 'companion', en: 'It clicked! The whole key is warm. It wants to go home.', de: 'Es hat eingerastet! Der ganze Schlüssel ist warm. Er will heim.' },
@@ -638,9 +643,9 @@ export const COMPANION_SCENES = {
             trix: {
                 companion: 'stox',
                 companion2: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'The Peak is bright. And the key in my bag is humming along with it.', de: 'Der Gipfel leuchtet hell. Und der Schlüssel in meiner Tasche summt mit.' },
+                    { who: 'companion2', en: 'Browney is sniffing the whole mountain. I think he wants to climb it.', de: 'Browney beschnuppert den ganzen Berg. Ich glaube, er will hinaufklettern.' },
                     { who: 'companion2', en: 'Here! In the crack. "POSTERIOR". Trix, it is so warm.', de: 'Hier! In der Spalte. "POSTERIOR". Trix, er ist so warm.' },
                     { who: 'player', en: 'Hand it over. Let us see if the Guild\'s greatest secret fits together like a toy.', de: 'Gib her. Mal sehen, ob das größte Geheimnis der Gilde zusammenpasst wie ein Spielzeug.' },
                     { who: 'companion', en: 'It did. The whole key hums as one note.', de: 'Hat es. Der ganze Schlüssel summt als ein Ton.' },
@@ -652,9 +657,9 @@ export const COMPANION_SCENES = {
             syla: {
                 companion: 'trix',
                 companion2: 'stox',
-                look: 'noclass',
                 lines: [
                     { who: 'player', en: 'The Peak is singing, Trix. I can feel the key\'s first half answering it.', de: 'Der Gipfel singt, Trix. Ich spüre, wie die erste Schlüsselhälfte antwortet.' },
+                    { who: 'player', en: 'Browney is sniffing the whole mountain. I think he wants to climb it.', de: 'Browney beschnuppert den ganzen Berg. Ich glaube, er will hinaufklettern.' },
                     { who: 'companion2', en: 'Found it. In a crack, under the seal. "POSTERIOR".', de: 'Gefunden. In einer Spalte, unter dem Siegel. "POSTERIOR".' },
                     { who: 'companion', en: 'Give me that. ...There. The whole key. It is almost purring.', de: 'Gib her. ...So. Der ganze Schlüssel. Er schnurrt fast.' },
                     { who: 'player', en: 'Oh, it is so happy. It has been apart for three hundred years.', de: 'Oh, er ist so glücklich. Er war dreihundert Jahre lang getrennt.' },
@@ -668,13 +673,15 @@ export const COMPANION_SCENES = {
     w14_sanctum: {
         note: 'World 14 (The Apex Remnant): The First Cartographers\' Sanctum. The last maintenance log is signed by C. Quell, with \'Variance: 0\'. The villain\'s name is revealed (Calista Quell). Stox recognises the signature from the faceless portrait frame. All three heroes together; Verun\'s voice closes the scene.',
         bg: 'images/backgrounds/The-Nexus-Background.webp',
+        stage: 'ascended',
+        pet: 'drifter',
         pairings: {
             stox: {
                 companion: 'syla',
                 companion2: 'trix',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'The door opened for the key without a sound. Listen to how quiet this room is.', de: 'Die Tür hat sich für den Schlüssel ohne ein Geräusch geöffnet. Hört, wie still dieser Raum ist.' },
+                    { who: 'companion', en: 'Drifter will not go in first. He is waiting for us to lead.', de: 'Drifter will nicht als Erster hinein. Er wartet darauf, dass wir vorangehen.' },
                     { who: 'companion2', en: 'There is a maintenance log on the desk. Last entry before the Collapse. Stox, you will want to read this.', de: 'Auf dem Tisch liegt ein Wartungslog. Letzter Eintrag vor dem Kollaps. Stox, das willst du lesen.' },
                     { who: 'player', en: '"Variance: zero. Procedure complete." Signed: C. Quell. ...Calista Quell.', de: '"Varianz: null. Vorgang abgeschlossen." Gezeichnet: C. Quell. ...Calista Quell.' },
                     { who: 'companion', en: 'Not on the exile list. Not on any list.', de: 'Nicht auf der Verbanntenliste. Auf keiner Liste.' },
@@ -687,9 +694,9 @@ export const COMPANION_SCENES = {
             trix: {
                 companion: 'stox',
                 companion2: 'syla',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'The door opened for the key without a sound. The room feels like it has been holding its breath for three centuries.', de: 'Die Tür hat sich für den Schlüssel ohne ein Geräusch geöffnet. Der Raum fühlt sich an, als hielte er seit drei Jahrhunderten den Atem an.' },
+                    { who: 'companion2', en: 'Drifter will not go in first. He is waiting for us to lead.', de: 'Drifter will nicht als Erster hinein. Er wartet darauf, dass wir vorangehen.' },
                     { who: 'companion2', en: 'Trix, there is a maintenance log. Last entry before the Collapse.', de: 'Trix, hier liegt ein Wartungslog. Letzter Eintrag vor dem Kollaps.' },
                     { who: 'player', en: '"Variance: zero. Procedure complete." Signed: C. Quell. ...Calista Quell.', de: '"Varianz: null. Vorgang abgeschlossen." Gezeichnet: C. Quell. ...Calista Quell.' },
                     { who: 'companion', en: 'I know that signature. It is on the back of a portrait frame in the archive. The portrait with no face. I never told you.', de: 'Ich kenne diese Unterschrift. Sie steht auf der Rückseite eines Porträtrahmens im Archiv. Dem Porträt ohne Gesicht. Ich habe es dir nie erzählt.' },
@@ -702,9 +709,9 @@ export const COMPANION_SCENES = {
             syla: {
                 companion: 'trix',
                 companion2: 'stox',
-                look: 'noclass',
                 lines: [
                     { who: 'companion', en: 'The door opened for the key without a sound. It is so quiet. Even you have stopped humming, Forest Girl.', de: 'Die Tür hat sich für den Schlüssel ohne ein Geräusch geöffnet. Es ist so still. Sogar du hast aufgehört zu summen, Waldmädchen.' },
+                    { who: 'player', en: 'Drifter will not go in first. He is waiting for us to lead.', de: 'Drifter will nicht als Erster hinein. Er wartet darauf, dass wir vorangehen.' },
                     { who: 'companion2', en: 'There is a maintenance log. "Variance: zero. Procedure complete." Signed: C. Quell. Calista Quell.', de: 'Hier liegt ein Wartungslog. "Varianz: null. Vorgang abgeschlossen." Gezeichnet: C. Quell. Calista Quell.' },
                     { who: 'player', en: 'Quell? A woman. And she wrote "Variance: zero" like she was closing a ledger.', de: 'Quell? Eine Frau. Und sie schrieb "Varianz: null", als würde sie ein Buch schließen.' },
                     { who: 'companion2', en: 'That signature is on the back of a portrait in the archive. The one without a face. I should have said so earlier.', de: 'Diese Unterschrift steht auf der Rückseite eines Porträts im Archiv. Dem ohne Gesicht. Das hätte ich früher sagen sollen.' },
@@ -731,7 +738,9 @@ export function getCompanionPairing(sceneId) {
     if (!pairing) return null;
     // A script with no English text yet is still a draft from the story editor: keep it hidden.
     if (!pairing.lines.some(l => l.en && l.en.trim())) return null;
-    return { bg: scene.bg, ...pairing };
+    const stage = scene.stage === 'ascended' ? 'ascended' : 'base';
+    const looks = Object.fromEntries(Object.keys(COMPANION_LOOKS).map(h => [h, COMPANION_LOOKS[h][stage]]));
+    return { bg: scene.bg, stage, pet: stage === 'ascended' ? (scene.pet || '') : '', looks, ...pairing };
 }
 
 // True once the player has watched this scene in the current save.

@@ -27,16 +27,28 @@
 .cmp-hero {
     position: absolute;
     bottom: 4%;
-    height: 62%;
+    height: 54%;
     width: auto;
     filter: drop-shadow(0 8px 10px rgba(0,0,0,0.6));
     transition: filter 0.25s ease, opacity 0.25s ease;
     user-select: none;
     pointer-events: none;
 }
-.cmp-left  { left: 16%; }
-.cmp-right { right: 16%; transform: scaleX(-1); }
-.cmp-mid   { right: 36%; transform: scaleX(-1); }
+.cmp-left  { left: 5%; }
+.cmp-right { right: 5%; transform: scaleX(-1); }
+.cmp-mid   { right: 35%; transform: scaleX(-1); }
+.cmp-pet {
+    position: absolute;
+    bottom: 3%;
+    height: 22%;
+    width: auto;
+    filter: drop-shadow(0 6px 8px rgba(0,0,0,0.6));
+    pointer-events: none;
+    user-select: none;
+}
+.cmp-pet-left  { left: 1%; }
+.cmp-pet-right { right: 1%; transform: scaleX(-1); }
+.cmp-pet-mid   { right: 31%; transform: scaleX(-1); }
 .cmp-hero.cmp-dim { filter: brightness(0.55) drop-shadow(0 8px 10px rgba(0,0,0,0.6)); }
 
 .cmp-bubble {
@@ -57,9 +69,9 @@
     transition: opacity 0.18s ease, transform 0.18s ease;
 }
 .cmp-bubble.show { opacity: 1; transform: translateY(0) scale(1); }
-.cmp-bubble-left  { left: 12%; }
-.cmp-bubble-right { right: 12%; }
-.cmp-bubble-mid   { left: 31%; }
+.cmp-bubble-left  { left: 6%; }
+.cmp-bubble-right { right: 6%; }
+.cmp-bubble-mid   { left: 30%; }
 .cmp-bubble-voice {
     left: 50%;
     margin-left: calc(-1 * clamp(120px, 19vw, 260px));

@@ -42,6 +42,17 @@ function _lineText(line) {
 // DOM
 //------------------------------------------------------------------------
 
+// Syla's pet (Browney or Drifter) standing next to her, when the scene has
+// one and Syla is on stage. Returns '' otherwise.
+function _petHtml(pairing, playerId) {
+    if (!pairing.pet) return '';
+    const spot = playerId === 'syla' ? 'left'
+        : pairing.companion === 'syla' ? 'right'
+            : pairing.companion2 === 'syla' ? 'mid' : null;
+    if (!spot) return '';
+    return `<img class="cmp-pet cmp-pet-${spot}" src="images/sprites/companion_${pairing.pet}.webp" alt="" draggable="false">`;
+}
+
 // Builds the overlay: background, two hero sprites, the bubble and the skip
 // button. Returns the root element (not yet attached).
 function _buildOverlay(pairing, playerId) {
@@ -51,8 +62,9 @@ function _buildOverlay(pairing, playerId) {
         <div class="cmp-bg" style="background-image:url('${pairing.bg}')"></div>
         <div class="cmp-vignette"></div>
         <img class="cmp-hero cmp-left" src="${_getPlayerCharacterImage()}" alt="" draggable="false">
-        <img class="cmp-hero cmp-right" src="${_spritePath(pairing.companion, pairing.look)}" alt="" draggable="false">
-        ${pairing.companion2 ? `<img class="cmp-hero cmp-mid" src="${_spritePath(pairing.companion2, pairing.look)}" alt="" draggable="false">` : ''}
+        <img class="cmp-hero cmp-right" src="${_spritePath(pairing.companion, pairing.looks[pairing.companion])}" alt="" draggable="false">
+        ${pairing.companion2 ? `<img class="cmp-hero cmp-mid" src="${_spritePath(pairing.companion2, pairing.looks[pairing.companion2])}" alt="" draggable="false">` : ''}
+        ${_petHtml(pairing, playerId)}
         <div class="cmp-bubble"><div class="cmp-name"></div><div class="cmp-text"></div></div>
         <button class="cmp-skip" type="button">${LANG === 'de' ? 'Überspringen ▶' : 'Skip ▶'}</button>
         <div class="cmp-hint">${LANG === 'de' ? 'Klicken zum Fortfahren' : 'Click to continue'}</div>`;
