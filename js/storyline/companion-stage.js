@@ -1,5 +1,5 @@
 import { LANG } from '../translation/translations.js';
-import { COMPANION_CAST, getCompanionPairing } from './companion-scenes.js';
+import { COMPANION_CAST, getCompanionPairing, resolveCompanionLayout } from './companion-scenes.js';
 import { _getPlayerCharacterImage } from '../sprite/player_sprite.js';
 import { STATE } from '../state.js';
 import { _setReplayGloballyUnlocked, markSeen } from './storyline-progress.js';
@@ -14,7 +14,8 @@ import { _setReplayGloballyUnlocked, markSeen } from './storyline-progress.js';
 //
 // A script item { beat: 'character_intro' } pauses the dialogue and plays the
 // player's own intro as a private flashback (what the hero remembers while
-// talking); the conversation then carries on.
+// talking); the conversation then carries on. A script item
+// { beat: 'background', bg } fades the backdrop to another picture.
 
 //------------------------------------------------------------------------
 // STATE
@@ -38,6 +39,58 @@ function _lineText(line) {
     return (LANG === 'de' && line.de) ? line.de : line.en;
 }
 
+// Normal height of a sprite as a share of the screen; a layout's `s` scales it.
+const SPRITE_HEIGHT = { left: 54, right: 54, mid: 54, pet: 22 };
+// Sprites that face the other way (drawn mirrored).
+const MIRRORED = { left: false, right: true, mid: true, pet: false };
+
+// CSS value for a backdrop: the story image, with the scene's default image
+// underneath so a picture that is not made yet never leaves the stage empty.
+function _bgCss(path, fallback) {
+    return `url('${path}')` + (fallback && fallback !== path ? `,url('${fallback}')` : '');
+}
+
+//------------------------------------------------------------------------
+// LAYOUT (custom positions from the story editor)
+//------------------------------------------------------------------------
+
+// Puts one sprite where the layout says: (x, y) is the middle of its feet in percent of
+// the screen, `s` scales its height, `r` rotates it around its feet. `spot` is
+// 'left' | 'right' | 'mid' | 'pet'. Without a layout entry the stylesheet's own place is used.
+function _placeSprite(img, spot, v) {
+    const props = ['left', 'right', 'top', 'bottom', 'height', 'transform', 'transformOrigin'];
+    if (!v) { props.forEach(p => { img.style[p] = ''; }); return; }
+    img.style.left = v.x + '%';
+    img.style.right = 'auto';
+    img.style.top = v.y + '%';
+    img.style.bottom = 'auto';
+    img.style.height = (SPRITE_HEIGHT[spot] * v.s) + '%';
+    img.style.transformOrigin = '50% 100%';
+    img.style.transform = `translate(-50%, -100%) rotate(${v.r}deg)` + (MIRRORED[spot] ? ' scaleX(-1)' : '');
+}
+
+// Moves a speech bubble's top-middle to (x, y) percent; without an entry the stylesheet decides.
+function _placeBubble(bubble, v) {
+    ['left', 'right', 'top', 'marginLeft'].forEach(p => { bubble.style[p] = ''; });
+    if (!v) return;
+    bubble.style.left = `calc(${v.x}% - var(--cmp-bw) / 2)`;
+    bubble.style.right = 'auto';
+    bubble.style.top = v.y + '%';
+    bubble.style.marginLeft = '0';
+}
+
+// Applies the layout for the picture that is on screen to all sprites.
+function _applySpriteLayout() {
+    const { root, pairing, pic } = _stage;
+    const layout = resolveCompanionLayout(pairing, pic);
+    ['left', 'right', 'mid'].forEach(spot => {
+        const img = root.querySelector('.cmp-' + spot);
+        if (img) _placeSprite(img, spot, layout.sprites[spot]);
+    });
+    const pet = root.querySelector('.cmp-pet');
+    if (pet) _placeSprite(pet, 'pet', layout.sprites.pet);
+}
+
 //------------------------------------------------------------------------
 // DOM
 //------------------------------------------------------------------------
@@ -59,7 +112,7 @@ function _buildOverlay(pairing, playerId) {
     const root = document.createElement('div');
     root.className = 'cmp-stage';
     root.innerHTML = `
-        <div class="cmp-bg" style="background-image:url('${pairing.bg}')"></div>
+        <div class="cmp-bg" style="background-image:${_bgCss(pairing.bg, pairing.fallbackBg)}"></div>
         <div class="cmp-vignette"></div>
         <img class="cmp-hero cmp-left" src="${pairing.stage === 'none' ? _spritePath(playerId, 'noclass') : _getPlayerCharacterImage()}" alt="" draggable="false">
         <img class="cmp-hero cmp-right" src="${_spritePath(pairing.companion, pairing.looks[pairing.companion])}" alt="" draggable="false">
@@ -87,6 +140,7 @@ function _showLine(i) {
     const bubble = root.querySelector('.cmp-bubble');
     bubble.classList.remove('cmp-bubble-left', 'cmp-bubble-right', 'cmp-bubble-mid', 'cmp-bubble-voice', 'show');
     bubble.classList.add('cmp-bubble-' + side);
+    _placeBubble(bubble, resolveCompanionLayout(pairing, _stage.pic).bubbles[side]);
     bubble.style.setProperty('--cmp-color', cast.color);
     root.querySelector('.cmp-name').textContent = cast.name;
     root.querySelector('.cmp-text').textContent = _lineText(line);
@@ -134,13 +188,35 @@ function _playFlashback() {
     });
 }
 
+// Fades the backdrop over to another story image (a { beat: 'background' } item).
+function _changeBackground(path) {
+    const { root, pairing } = _stage;
+    const old = root.querySelector('.cmp-bg');
+    const next = document.createElement('div');
+    next.className = 'cmp-bg cmp-bg-in';
+    next.style.backgroundImage = _bgCss(path, pairing.fallbackBg);
+    old.after(next);
+    _stage.pic = path;
+    _applySpriteLayout();
+    setTimeout(() => { old.remove(); next.classList.remove('cmp-bg-in'); }, 700);
+}
+
+// Shows script item `i`: a spoken line, the flashback, or a silent backdrop
+// change (which moves straight on to the next item).
+function _showItem(i) {
+    const { pairing } = _stage;
+    if (i >= pairing.lines.length) { _finish(); return; }
+    const item = pairing.lines[i];
+    _stage.index = i;
+    if (item.beat === 'character_intro') { _playFlashback(); return; }
+    if (item.beat === 'background') { _changeBackground(item.bg); _showItem(i + 1); return; }
+    _showLine(i);
+}
+
 // Moves to the next script item, or ends the scene after the last one.
 function _advance() {
     if (!_stage || _stage.flashback) return;
-    _stage.index += 1;
-    if (_stage.index >= _stage.pairing.lines.length) { _finish(); return; }
-    if (_stage.pairing.lines[_stage.index].beat) { _playFlashback(); return; }
-    _showLine(_stage.index);
+    _showItem(_stage.index + 1);
 }
 
 // Plays the companion scene `sceneId` for the current player's character.
@@ -156,13 +232,14 @@ export function playCompanionScene(sceneId, onComplete) {
         if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); e.stopPropagation(); _advance(); }
         else if (e.code === 'Escape') { e.preventDefault(); e.stopPropagation(); _finish(); }
     };
-    _stage = { root, pairing, playerId, sceneId, onComplete, onKey, index: 0 };
+    _stage = { root, pairing, playerId, sceneId, onComplete, onKey, index: 0, pic: pairing.bg };
+    _applySpriteLayout();
 
     root.addEventListener('click', _advance);
     root.querySelector('.cmp-skip').addEventListener('click', (e) => { e.stopPropagation(); _finish(); });
     document.addEventListener('keydown', onKey, true);
     document.body.appendChild(root);
-    _showLine(0);
+    _showItem(0);
 }
 
 // Asks whether to watch earlier story scenes first. `count` is how many were
