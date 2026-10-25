@@ -202,14 +202,25 @@ export function _vendorEnsureStyles() {
             opacity: 0.45; border-color: var(--border2, #444); color: var(--accent2, #888);
         }
         /* ── Spell charm cards ───────────────────────────────────────── */
-        .sx-vendor-charm-ranks { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+        /* Charm cards span two columns so the ten rank pills get roomy
+           (~95px): OWNED / LV labels and gold prices fit on one line and
+           the buy buttons are easier to hit. minmax(0, 1fr) + min-width: 0
+           is the safety net below that: on narrow screens wide labels wrap
+           to a second line instead of forcing their column past the card
+           edge and painting over the neighbouring card. */
+        .sx-vendor-charm-card { grid-column: span 2; min-width: 0; }
+        .sx-vendor-charm-ranks { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
         .sx-vendor-charm-rank {
             display: flex; flex-direction: column; align-items: center; gap: 3px;
+            min-width: 0; text-align: center;
             font-family: var(--PX, monospace); font-size: 11px; padding: 6px 2px;
             border: 1px solid var(--border2, #444); border-radius: 5px;
             background: rgba(0,0,0,0.35); color: var(--accent2, #bbb);
         }
-        .sx-vendor-charm-rank small { font-size: 9px; letter-spacing: 0; }
+        .sx-vendor-charm-rank small {
+            font-size: 9px; letter-spacing: 0; line-height: 1.4;
+            white-space: normal; overflow-wrap: break-word; max-width: 100%;
+        }
         .sx-vendor-charm-buy { cursor: pointer; border-color: var(--accent, #c8a84b); color: #f5d98a; transition: all 0.12s; }
         .sx-vendor-charm-buy:hover { box-shadow: 0 0 10px rgba(200,168,75,0.4); }
         .sx-vendor-charm-buy.sx-vendor-charm-short { opacity: 0.5; border-color: #8a4a3a; color: #e0a090; }

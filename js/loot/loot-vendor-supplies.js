@@ -398,7 +398,9 @@ export function _vendorBuildCharmsTabHTML(ignoreFilter) {
             const rank = i + 1;
             const tip = ` onmouseenter="handleSkillTipRank(event, '${id}', ${rank})" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()"`;
             if (_vendorCharmOwned(id, rank)) {
-                return `<span class="sx-vendor-charm-rank sx-vendor-charm-owned"${tip}>R${rank}<small>${t('eg_vendor_charm_owned')}</small></span>`;
+                // Owned ranks show a universal green checkmark (no text,
+                // no translation needed) - the green pill already says it all.
+                return `<span class="sx-vendor-charm-rank sx-vendor-charm-owned"${tip}>R${rank}<small>✓</small></span>`;
             }
             const need = globalThis.getCharmRankMinPlayerLevel(rank, id);
             if (lv < need) {
