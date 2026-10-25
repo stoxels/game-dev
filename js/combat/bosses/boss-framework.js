@@ -37,6 +37,7 @@ export const BOSS_MECHANICS = {};
 // Boss level scaling 
 // Applied per level above 1. 
 export const BOSS_LEVEL_HP_SCALE = 0.28; // +28% HP per level above 1
+const BOSS_HP_GLOBAL_MULT = 1.25;  // every boss (trials, endgame) has 25% more life
 
 
 export const BOSS_LEVEL_DAMAGE_SCALE = 0.12; // +12% damage per level above 1
@@ -129,7 +130,7 @@ export function _buildBoss(defOrId, level = 1, hpMult = 1) {
     const hpScale = baseHpScale * lateMult;
     const dmgScale = 1 + BOSS_LEVEL_DAMAGE_SCALE * (lvl - 1);
 
-    const maxHP = Math.round(def.baseHP * hpScale * hpMult);
+    const maxHP = Math.round(def.baseHP * hpScale * hpMult * BOSS_HP_GLOBAL_MULT);
     // Early bosses must always be able to hurt: their level-curve damage can
     // be a rounding error next to a geared character's life pool. Floor the
     // basic attack at a share of the player's max life (fades out by L50,
