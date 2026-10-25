@@ -324,7 +324,13 @@ export function renderSkillHotbar() {
     for (let i = 0; i < SKILL_HOTBAR_SIZE; i++) {
         html += _buildHotbarSlotHTML(i, getHotbarSkill(i));
     }
+    // The buff bar lives inside the hotbar so it follows it when it re-homes.
+    // Lift it out before the wipe and put it back after, or every rebuild
+    // destroys live chips and they blink back a countdown-tick later.
+    const buffBar = document.getElementById('sx-buff-bar');
+    const keepChips = buffBar && buffBar.parentElement === bar ? buffBar : null;
     bar.innerHTML = html;
+    if (keepChips) bar.insertBefore(keepChips, bar.firstChild);
 
     // Tell the inventory dock how much bottom-right room the bar needs, so on
     // narrower viewports its (centred) box shifts clear of the corner instead

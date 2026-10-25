@@ -149,7 +149,12 @@ export function hideGameTooltip() {
 // exactly one tooltip look and exactly one place to change it.
 //
 //   data-tip-t="key"       translation key; {n} is replaced from data-tip-n
-//   data-tip="<b>&#8230;</b>"  already-translated, already-escaped HTML (wins)
+//   data-tip="<b>&#8230;</b>"  ready-made HTML (wins). Escape it ONLY when the
+//                           attribute is written inline in an HTML string
+//                           (the parser decodes the entities back). Code that
+//                           calls setAttribute must pass RAW markup - escaping
+//                           there stores the entities verbatim and the tooltip
+//                           shows literal <b> tags instead of bold text.
 //   data-tip-n="3"         the value for {n} in data-tip-t
 //
 // `data-tip` deliberately takes priority over `data-tip-t` so a caller can

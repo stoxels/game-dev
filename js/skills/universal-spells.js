@@ -11,6 +11,7 @@ import { _uspAnchorMarkerClear, _uspCastFlourish, _uspAnchorMarkerShow, _uspArro
 import { beginSpellTargeting, cancelSpellTargeting, getAvatarCentre, getCursorPoint, isSpellTargeting, resolveGroundShape, shapeHitsRect, showSpellZone } from './spell-casttime.js';
 import { updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
+import { _removeBuffBarChip, _syncBuffBarChip } from '../combat/combat-ailments-state.js';
 
 // universal-spells.js
 //------------------------------------------------------------------------
@@ -1616,7 +1617,6 @@ function _uspSweepSupportBuffs() {
         if (b.ticksLeft <= 0) b.until = 0;
     }
 
-    const before = _uspActiveBuffs.length;
     _uspActiveBuffs = _uspActiveBuffs.filter((b) => b.until > now);
 
     // An armed Rift Anchor is dropped by the same clock its chip counts down
@@ -1626,7 +1626,11 @@ function _uspSweepSupportBuffs() {
     // A ward that expired (or was consumed) takes its charges with it.
     if (_uspWardCharges > 0 && !_uspActiveBuffs.some((b) => b.kind === 'ward')) _uspWardCharges = 0;
 
-    if (_uspActiveBuffs.length !== before) _uspForceBuffIconRefresh();
+    // Buff bar: one chip per live support buff, sharing the bar above the
+    // hotbar with the charge chips (see combat-ailments-state.js). Runs on
+    // the same sweep, so chips appear, tick down and vanish together with
+    // the buffs, in combat and puzzle alike.
+    _syncSupportBuffBarChips(now);
     if (!_uspActiveBuffs.some((x) => x.kind === 'hot')) {
         try { _uspRenewalClear(); } catch (e) { /* bloom is cosmetic */ }
     }
@@ -1650,6 +1654,37 @@ function _uspSweepSupportBuffs() {
     }
 }
 
+// Buff-bar chip ids this registry has created, so the sweep can drop chips
+// whose buff lapsed (and the encounter cleanup can drop them all).
+const _uspBuffBarIds = new Set();
+
+// Syncs the buff-bar chips for the live support buffs and drops chips whose
+// buff lapsed. Ward chips also carry the remaining ward charges. Runs on
+// the buff sweep, so no ticker of its own is needed.
+function _syncSupportBuffBarChips(now) {
+    const live = new Set();
+    for (const b of _uspActiveBuffs) {
+        const msLeft = b.until - now;
+        if (!(msLeft > 0)) continue;
+        const id = `sx-buff-usp-${b.spellId}`;
+        live.add(id);
+        _uspBuffBarIds.add(id);
+        const de = (typeof LANG !== 'undefined' && LANG === 'de');
+        const label = de ? (b.nameDE || b.nameEn) : b.nameEn;
+        const desc = de ? (b.descDE || b.descEn) : b.descEn;
+        _syncBuffBarChip(id, {
+            chipClass: `sx-buff-chip sx-buff-usp sx-buff-usp-${b.kind}`,
+            iconHtml: b.icon || '',
+            stacksText: (b.kind === 'ward' && _uspWardCharges > 0) ? `x${_uspWardCharges}` : '',
+            msLeft,
+            tipHtml: desc ? `<b>${label}</b><br>${desc}` : `<b>${label}</b>`,
+        });
+    }
+    for (const id of [..._uspBuffBarIds]) {
+        if (!live.has(id)) { _uspBuffBarIds.delete(id); _removeBuffBarChip(id); }
+    }
+}
+
 // Adds (or refreshes) a buff. The payload carries the pre-computed, already
 // rank-scaled axis values so the combat hooks never re-derive anything.
 function _uspAddBuff(spell, payload) {
@@ -1661,11 +1696,11 @@ function _uspAddBuff(spell, payload) {
     } else {
         _uspActiveBuffs.push(Object.assign({
             spellId: spell.id, kind: spell.behavior, icon: spell.icon,
-            nameEn: spell.nameEn, nameDE: spell.nameDE, until,
+            nameEn: spell.nameEn, nameDE: spell.nameDE,
+            descEn: spell.descEn, descDE: spell.descDE, until,
         }, payload || {}));
     }
     _uspStartBuffSweep();
-    _uspForceBuffIconRefresh();
 }
 
 // Drops every buff. Called when an encounter stops and when a level starts -
@@ -1673,6 +1708,8 @@ function _uspAddBuff(spell, payload) {
 // rides the same registry, so a Windstep and an armed Rift Anchor are cleared
 // here for free.
 export function _uspClearSupportBuffs() {
+    for (const id of _uspBuffBarIds) _removeBuffBarChip(id);
+    _uspBuffBarIds.clear();
     _uspActiveBuffs = [];
     _uspWardCharges = 0;
     _uspAnchor = null;
@@ -1684,7 +1721,6 @@ export function _uspClearSupportBuffs() {
     try { _uspRetributionClear(); } catch (e) { /* wreath is cosmetic */ }
     try { _uspWindstepClear(); } catch (e) { /* tailwind is cosmetic */ }
     if (_uspBuffSweepInterval) { clearInterval(_uspBuffSweepInterval); _uspBuffSweepInterval = null; }
-    _uspForceBuffIconRefresh();
 }
 
 // ---------------------------------------------------------------------
@@ -1743,7 +1779,7 @@ export function _uspTryWardNegate(incoming) {
     if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
         try { Audio_Manager.playSFX('player_shield_damage_taken'); } catch (e) { /* audio is best-effort */ }
     }
-    _uspForceBuffIconRefresh();
+    _syncSupportBuffBarChips(Date.now());
     return true;
 }
 
@@ -1771,39 +1807,6 @@ export function _uspReflectThorns(attacker, incoming) {
 function isUspSupportBuffActive(kind) {
     const now = Date.now();
     return _uspActiveBuffs.some((b) => b.until > now && (!kind || b.kind === kind));
-}
-
-// ---------------------------------------------------------------------
-// Player status-strip icons (js/combat/combat-ailments-core.js appends this)
-// ---------------------------------------------------------------------
-
-export function _uspSupportStatusSignature() {
-    const now = Date.now();
-    return _uspActiveBuffs
-        .filter((b) => b.until > now)
-        .map((b) => `${b.spellId}:${Math.ceil((b.until - now) / 1000)}:${b.kind === 'ward' ? _uspWardCharges : ''}`)
-        .join(',');
-}
-
-export function _uspBuildSupportStatusIconsHTML() {
-    const now = Date.now();
-    const de = (typeof LANG !== 'undefined' && LANG === 'de');
-    return _uspActiveBuffs
-        .filter((b) => b.until > now)
-        .map((b) => {
-            const secs = Math.ceil((b.until - now) / 1000);
-            const label = de ? (b.nameDE || b.nameEn) : b.nameEn;
-            const charges = (b.kind === 'ward' && _uspWardCharges > 0) ? `×${_uspWardCharges} ` : '';
-            return `<span class="sx-status-icon usp-buff-icon usp-buff-${b.kind}" data-tip="${globalThis._tipAttr(label)}">${b.icon}${charges}${secs}</span>`;
-        })
-        .join('');
-}
-
-// Forces the shared player status strip to rebuild on its next tick without
-// waiting for an ailment change (the sentinel never matches a real signature).
-function _uspForceBuffIconRefresh() {
-    const strip = document.getElementById('sx-player-status-strip');
-    if (strip) strip.dataset.sig = '__usp_dirty__';
 }
 
 // ---------------------------------------------------------------------
