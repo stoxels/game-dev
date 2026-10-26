@@ -58,16 +58,16 @@ export const COMPANION_SCENES = {
         stage: 'base',
         pictureLayouts: {
             'images/story/den_reunion/humming_stone.webp': {
-                sprites: { left: { x: 49.9, y: 64.3, s: 0.22, r: 0 }, right: { x: 55.4, y: 59.5, s: 0.2, r: 0 } },
-                bubbles: { left: { x: 47.7, y: 35.2 }, right: { x: 56.5, y: 30.9 } },
+                sprites: { left: { x: 48, y: 65.6, s: 0.22, r: 0, pose: 'right' }, right: { x: 55.9, y: 63.3, s: 0.2, r: 0 } },
+                bubbles: { left: { x: 48.3, y: 39.2 }, right: { x: 57.2, y: 35.9 } },
             },
             'images/story/den_reunion/fault_pit.webp': {
-                sprites: { left: { x: 36.1, y: 47.5, s: 0.25, r: 0 }, right: { x: 55.8, y: 43.7, s: 0.22, r: 0 } },
-                bubbles: { left: { x: 35.8, y: 20.5 }, right: { x: 57, y: 18.5 } },
+                sprites: { left: { x: 37.6, y: 46.9, s: 0.25, r: 0, pose: 'right' }, right: { x: 55.3, y: 43.1, s: 0.22, r: 0, pose: 'left' } },
+                bubbles: { left: { x: 36.1, y: 20.9 }, right: { x: 57, y: 18.5 } },
             },
             'images/story/den_reunion/humming_wall.webp': {
-                sprites: { left: { x: 37.4, y: 90.6, s: 0.48, r: 0 }, right: { x: 70.7, y: 88.3, s: 0.5, r: 0 } },
-                bubbles: { left: { x: 37.9, y: 50.3 }, right: { x: 70.2, y: 47 } },
+                sprites: { left: { x: 37.3, y: 90, s: 0.48, r: 0, pose: 'right' }, right: { x: 71.6, y: 88.2, s: 0.5, r: 0, pose: 'left' } },
+                bubbles: { left: { x: 37.9, y: 50.3 }, right: { x: 71.5, y: 47.8 } },
             },
         },
         pairings: {
@@ -125,11 +125,12 @@ export const COMPANION_SCENES = {
         },
         pictureLayouts: {
             'images/story/home_stox/outpost_view.webp': {
-                bubbles: { mid: { x: 45.2, y: 34.1 } },
+                sprites: { left: { x: 47.5, y: 84.3, s: 0.55, r: 0, pose: 'up' }, right: { x: 63.6, y: 84.6, s: 0.55, r: 0, pose: 'left' }, mid: { x: 26.6, y: 84.8, s: 0.57, r: 0, pose: 'right' } },
+                bubbles: { left: { x: 47.2, y: 40.9 }, right: { x: 62.8, y: 41.2 }, mid: { x: 25.4, y: 40.1 } },
             },
             'images/story/home_stox/hamlet_ruins.webp': {
-                sprites: { left: { x: 25, y: 70.7, s: 0.4, r: 0 }, right: { x: 50.1, y: 66.9, s: 0.39, r: 0 } },
-                bubbles: { left: { x: 23.4, y: 36.9 }, right: { x: 52.8, y: 32.6 } },
+                sprites: { left: { x: 24.6, y: 78.3, s: 0.4, r: 0, pose: 'right' }, right: { x: 80, y: 76, s: 0.39, r: 0, pose: 'left' } },
+                bubbles: { left: { x: 24.1, y: 40.5 }, right: { x: 80.5, y: 40 } },
             },
         },
         pairings: {
@@ -187,11 +188,11 @@ export const COMPANION_SCENES = {
         stage: 'base',
         pictureLayouts: {
             'images/story/home_trix/logbook_desk.webp': {
-                sprites: { left: { x: 32.3, y: 100.5, s: 1.06, r: 0 }, right: { x: 66.9, y: 99.6, s: 1, r: 0 } },
+                sprites: { left: { x: 32.3, y: 100.5, s: 1.06, r: 0, pose: 'up' }, right: { x: 66.9, y: 99.6, s: 1, r: 0, pose: 'up' } },
                 bubbles: { left: { x: 32.1, y: 28 }, right: { x: 67.3, y: 30.9 } },
             },
             'images/story/home_trix/instrument_room.webp': {
-                sprites: { left: { x: 22.8, y: 96.2, s: 1, r: 0 }, right: { x: 81.6, y: 96, s: 1.04, r: 0 }, mid: { x: 56.3, y: 97.1, s: 1, r: 0 } },
+                sprites: { left: { x: 22.8, y: 96.2, s: 1, r: 0, pose: 'up' }, right: { x: 81.7, y: 96, s: 1.04, r: 0, pose: 'up' }, mid: { x: 56.3, y: 97.1, s: 1, r: 0, pose: 'up' } },
                 bubbles: { left: { x: 23.1, y: 27.4 }, right: { x: 81.8, y: 26.1 }, mid: { x: 55.1, y: 28.9 } },
             },
         },
@@ -251,11 +252,11 @@ export const COMPANION_SCENES = {
         stage: 'base',
         pictureLayouts: {
             'images/story/home_syla/grove_birds.webp': {
-                sprites: { left: { x: 36, y: 95.6, s: 0.42, r: 0 }, right: { x: 55.3, y: 94.4, s: 0.4, r: 0 } },
+                sprites: { left: { x: 36, y: 95.6, s: 0.42, r: 0, pose: 'up' }, right: { x: 55.3, y: 94.4, s: 0.4, r: 0, pose: 'up' } },
                 bubbles: { left: { x: 34.5, y: 57.6 }, right: { x: 57.9, y: 57.7 } },
             },
             'images/story/home_syla/grove_windows.webp': {
-                sprites: { left: { x: 38.1, y: 97.2, s: 0.53, r: 0 }, right: { x: 59.1, y: 97.9, s: 0.55, r: 0 }, mid: { x: 74.5, y: 98.2, s: 0.57, r: 0 } },
+                sprites: { left: { x: 38.1, y: 97.2, s: 0.53, r: 0, pose: 'up' }, right: { x: 59.1, y: 97.9, s: 0.55, r: 0, pose: 'up' }, mid: { x: 74.5, y: 98.2, s: 0.57, r: 0, pose: 'up' } },
                 bubbles: { left: { x: 37.5, y: 52.7 }, right: { x: 61.4, y: 53.1 }, mid: { x: 78.2, y: 53.1 } },
             },
         },
@@ -313,7 +314,7 @@ export const COMPANION_SCENES = {
         bg: 'images/backgrounds/Sampling-Savanna-Background.webp',
         stage: 'base',
         layout: {
-            sprites: { left: { x: 31.3, y: 77.5, s: 0.37, r: 0 }, right: { x: 64.7, y: 74.9, s: 0.35, r: 0 } },
+            sprites: { left: { x: 31.9, y: 78, s: 0.37, r: 0, pose: 'up' }, right: { x: 64.7, y: 74.9, s: 0.35, r: 0, pose: 'up' } },
             bubbles: { left: { x: 31.9, y: 41.8 }, right: { x: 66.8, y: 41.6 } },
         },
         pairings: {
@@ -364,11 +365,11 @@ export const COMPANION_SCENES = {
         stage: 'base',
         pictureLayouts: {
             'images/story/w4_forest/forest_fork.webp': {
-                sprites: { left: { x: 40.5, y: 90.7, s: 0.37, r: 0 }, right: { x: 60.3, y: 92.2, s: 0.4, r: 0 }, mid: { x: 71, y: 92.1, s: 0.4, r: 0 } },
+                sprites: { left: { x: 40.5, y: 90.7, s: 0.37, r: 0, pose: 'right' }, right: { x: 60.3, y: 91.7, s: 0.4, r: 0, pose: 'up' }, mid: { x: 71, y: 92.1, s: 0.4, r: 0, pose: 'up' } },
                 bubbles: { left: { x: 41.2, y: 55.7 }, right: { x: 64.8, y: 55.5 }, mid: { x: 76.1, y: 55.5 } },
             },
             'images/story/w4_forest/vortex_edge.webp': {
-                sprites: { left: { x: 54.5, y: 63.7, s: 0.2, r: 0 }, right: { x: 66.7, y: 87.5, s: 0.35, r: 0 } },
+                sprites: { left: { x: 54.5, y: 63.7, s: 0.2, r: 0, pose: 'right' }, right: { x: 66.7, y: 87.5, s: 0.35, r: 0, pose: 'up' } },
                 bubbles: { left: { x: 55.9, y: 38.9 }, right: { x: 68.2, y: 54.1 } },
             },
         },
@@ -421,11 +422,11 @@ export const COMPANION_SCENES = {
         stage: 'base',
         pictureLayouts: {
             'images/story/w7_loom/loom_hall.webp': {
-                sprites: { left: { x: 43.3, y: 97.3, s: 0.72, r: 0 }, right: { x: 90.3, y: 97.2, s: 0.7, r: 0 }, mid: { x: 73.4, y: 97.5, s: 0.7, r: 0 } },
+                sprites: { left: { x: 43.3, y: 97.3, s: 0.72, r: 0, pose: 'up' }, right: { x: 90.3, y: 97.2, s: 0.7, r: 0, pose: 'up' }, mid: { x: 73.4, y: 97.5, s: 0.7, r: 0, pose: 'up' } },
                 bubbles: { left: { x: 42.4, y: 43.1 }, right: { x: 85.5, y: 43.6 }, mid: { x: 72.5, y: 43.5 } },
             },
             'images/story/w7_loom/loom_threads.webp': {
-                sprites: { left: { x: 30.2, y: 98.5, s: 0.7, r: 0 }, right: { x: 76.6, y: 97.3, s: 0.74, r: 0 } },
+                sprites: { left: { x: 30.2, y: 98.5, s: 0.7, r: 0, pose: 'up' }, right: { x: 76.6, y: 97.3, s: 0.74, r: 0, pose: 'up' } },
                 bubbles: { left: { x: 30.5, y: 46.6 }, right: { x: 77.4, y: 42.9 } },
             },
         },
@@ -478,11 +479,11 @@ export const COMPANION_SCENES = {
         stage: 'base',
         pictureLayouts: {
             'images/story/w8_fieldbase/camp_notebooks.webp': {
-                sprites: { left: { x: 36, y: 92, s: 0.74, r: 0 }, right: { x: 55.4, y: 68.2, s: 0.46, r: 0 } },
+                sprites: { left: { x: 36, y: 92, s: 0.74, r: 0, pose: 'up' }, right: { x: 55.4, y: 68.2, s: 0.46, r: 0, pose: 'left' } },
                 bubbles: { left: { x: 36.2, y: 37.5 }, right: { x: 57.2, y: 28.5 } },
             },
             'images/story/w8_fieldbase/camp_cup.webp': {
-                sprites: { left: { x: 31, y: 83.4, s: 0.76, r: 0 }, right: { x: 45.8, y: 59, s: 0.42, r: 0 } },
+                sprites: { left: { x: 31, y: 83.4, s: 0.76, r: 0, pose: 'right' }, right: { x: 45.8, y: 59, s: 0.42, r: 0, pose: 'left' } },
                 bubbles: { left: { x: 31.2, y: 27.9 }, right: { x: 47.5, y: 22.4 } },
             },
         },
@@ -535,6 +536,9 @@ export const COMPANION_SCENES = {
         bg: 'images/backgrounds/Data-Delta-Background.webp',
         stage: 'ascended',
         pet: 'browney',
+        layout: {
+            sprites: { left: { x: 11.9, y: 96, s: 1, r: 0, pose: 'right' }, right: { x: 88, y: 96, s: 1, r: 0, pose: 'left' }, pet: { x: 94.8, y: 97, s: 1, r: 0 } },
+        },
         pictureLayouts: {
             'images/story/w9_vortex/vortex_stone.webp': {
                 sprites: { left: { x: 52.9, y: 93.6, s: 0.74, r: 0 }, right: { x: 72.3, y: 94.3, s: 0.7, r: 0 }, pet: { x: 84.1, y: 93.8, s: 0.86, r: 0 } },
@@ -591,7 +595,7 @@ export const COMPANION_SCENES = {
         stage: 'ascended',
         pet: 'drifter',
         layout: {
-            sprites: { left: { x: 22.7, y: 93.7, s: 0.72, r: 0 }, right: { x: 77.5, y: 94.7, s: 0.74, r: 0 }, mid: { x: 54.2, y: 93.6, s: 0.72, r: 0 }, pet: { x: 59.4, y: 53.7, s: 0.37, r: 0 } },
+            sprites: { left: { x: 22.7, y: 93.7, s: 0.72, r: 0, pose: 'up' }, right: { x: 77.5, y: 94.7, s: 0.74, r: 0, pose: 'up' }, mid: { x: 54.2, y: 93.6, s: 0.72, r: 0, pose: 'up' }, pet: { x: 59.4, y: 53.7, s: 0.37, r: 0 } },
             bubbles: { left: { x: 23, y: 40.5 }, right: { x: 80.2, y: 39.1 }, mid: { x: 53.6, y: 39.9 } },
         },
         pairings: {
@@ -649,11 +653,11 @@ export const COMPANION_SCENES = {
         pet: 'browney',
         pictureLayouts: {
             'images/story/w11_ghost/mist_faces.webp': {
-                sprites: { left: { x: 20.8, y: 94.8, s: 0.65, r: 0 }, right: { x: 73.1, y: 95.2, s: 0.64, r: 0 }, mid: { x: 50.1, y: 96.5, s: 0.68, r: 0 }, pet: { x: 35.2, y: 80.9, s: 0.54, r: 0 } },
+                sprites: { left: { x: 20.8, y: 94.8, s: 0.65, r: 0, pose: 'up' }, right: { x: 73.1, y: 95.2, s: 0.64, r: 0, pose: 'up' }, mid: { x: 50.1, y: 96.5, s: 0.68, r: 0, pose: 'up' }, pet: { x: 35.2, y: 80.9, s: 0.54, r: 0 } },
                 bubbles: { left: { x: 21.2, y: 43.5 }, right: { x: 78.6, y: 45.7 }, mid: { x: 50.8, y: 45.7 } },
             },
             'images/story/w11_ghost/mist_ghost.webp': {
-                sprites: { left: { x: 50.1, y: 96.1, s: 0.7, r: 0 }, right: { x: 90.7, y: 95.8, s: 0.7, r: 0 }, mid: { x: 74, y: 95.3, s: 0.7, r: 0 }, pet: { x: 30.4, y: 86.3, s: 0.58, r: 0 } },
+                sprites: { left: { x: 50.1, y: 96.1, s: 0.7, r: 0, pose: 'up' }, right: { x: 90.7, y: 95.8, s: 0.7, r: 0, pose: 'up' }, mid: { x: 74, y: 95.3, s: 0.7, r: 0, pose: 'up' }, pet: { x: 30.4, y: 86.3, s: 0.58, r: 0 } },
                 bubbles: { left: { x: 47.5, y: 42.8 }, right: { x: 85.6, y: 42.6 }, mid: { x: 72.7, y: 42.8 } },
             },
         },
@@ -718,11 +722,11 @@ export const COMPANION_SCENES = {
         pet: 'drifter',
         pictureLayouts: {
             'images/story/w12_wreck/wreck_deck.webp': {
-                sprites: { left: { x: 24.3, y: 94.3, s: 0.52, r: 0 }, right: { x: 69.7, y: 97.7, s: 0.57, r: 0 }, mid: { x: 47.6, y: 96.5, s: 0.57, r: 0 }, pet: { x: 37.3, y: 55.9, s: 0.2, r: 0 } },
+                sprites: { left: { x: 24.3, y: 94.3, s: 0.52, r: 0, pose: 'up' }, right: { x: 69.7, y: 97.7, s: 0.57, r: 0, pose: 'up' }, mid: { x: 47.6, y: 96.5, s: 0.57, r: 0, pose: 'up' }, pet: { x: 37.3, y: 55.9, s: 0.2, r: 0 } },
                 bubbles: { left: { x: 22.4, y: 50.4 }, right: { x: 71.6, y: 52.6 }, mid: { x: 48.3, y: 50.4 } },
             },
             'images/story/w12_wreck/captain_cabin.webp': {
-                sprites: { left: { x: 36.3, y: 98.8, s: 1.08, r: 0 }, right: { x: 88.3, y: 95.6, s: 1, r: 0 }, mid: { x: 76.8, y: 98.1, s: 1, r: 0 }, pet: { x: 5, y: 95.3, s: 0.95, r: 0 } },
+                sprites: { left: { x: 36.3, y: 98.8, s: 1.08, r: 0, pose: 'right' }, right: { x: 88.3, y: 95.6, s: 1, r: 0, pose: 'left' }, mid: { x: 76.8, y: 98.1, s: 1, r: 0, pose: 'left' }, pet: { x: 5, y: 95.3, s: 0.95, r: 0 } },
                 bubbles: { left: { x: 37.3, y: 26 }, right: { x: 85.7, y: 26.9 }, mid: { x: 75.2, y: 29 } },
             },
         },
@@ -785,11 +789,11 @@ export const COMPANION_SCENES = {
         pet: 'browney',
         pictureLayouts: {
             'images/story/w13_peak/peak_foot.webp': {
-                sprites: { left: { x: 25.9, y: 90.7, s: 0.52, r: 0 }, right: { x: 78.3, y: 89.9, s: 0.64, r: 0 }, mid: { x: 61.3, y: 87.8, s: 0.57, r: 0 }, pet: { x: 45.9, y: 72.7, s: 0.41, r: 0 } },
+                sprites: { left: { x: 25.9, y: 90.7, s: 0.52, r: 0, pose: 'up' }, right: { x: 78.3, y: 89.9, s: 0.64, r: 0, pose: 'up' }, mid: { x: 61.3, y: 87.8, s: 0.57, r: 0, pose: 'up' }, pet: { x: 45.9, y: 72.7, s: 0.41, r: 0 } },
                 bubbles: { left: { x: 24.2, y: 46.9 }, right: { x: 77.3, y: 41.3 }, mid: { x: 59.7, y: 42.2 } },
             },
             'images/story/w13_peak/proof_stone.webp': {
-                sprites: { left: { x: 34.4, y: 94.4, s: 0.59, r: 0 }, right: { x: 87, y: 95.5, s: 0.64, r: 0 }, mid: { x: 54.5, y: 95.2, s: 0.61, r: 0 }, pet: { x: 11.1, y: 54.7, s: 0.37, r: 0 } },
+                sprites: { left: { x: 34.4, y: 94.4, s: 0.59, r: 0, pose: 'right' }, right: { x: 87, y: 95.5, s: 0.64, r: 0, pose: 'left' }, mid: { x: 54.5, y: 95.2, s: 0.61, r: 0, pose: 'right' }, pet: { x: 11.1, y: 54.7, s: 0.37, r: 0 } },
                 bubbles: { left: { x: 33.6, y: 49.4 }, right: { x: 85.2, y: 46.3 }, mid: { x: 54.6, y: 49 } },
             },
         },
@@ -852,15 +856,15 @@ export const COMPANION_SCENES = {
         pet: 'drifter',
         pictureLayouts: {
             'images/story/w14_sanctum/sanctum_door.webp': {
-                sprites: { left: { x: 22.3, y: 95.4, s: 0.74, r: 0 }, right: { x: 79.2, y: 96.9, s: 0.79, r: 0 }, mid: { x: 54.5, y: 97, s: 0.78, r: 0 }, pet: { x: 94.5, y: 96.3, s: 0.82, r: 0 } },
+                sprites: { left: { x: 22.3, y: 95.4, s: 0.74, r: 0, pose: 'up' }, right: { x: 79.2, y: 96.9, s: 0.79, r: 0, pose: 'up' }, mid: { x: 54.5, y: 97, s: 0.78, r: 0, pose: 'up' }, pet: { x: 94.5, y: 96.3, s: 0.82, r: 0 } },
                 bubbles: { left: { x: 22.4, y: 40.6 }, right: { x: 80.7, y: 39.9 }, mid: { x: 54.2, y: 40.2 } },
             },
             'images/story/w14_sanctum/sanctum_desk.webp': {
-                sprites: { left: { x: 17.2, y: 95.2, s: 1, r: 0 }, right: { x: 84.1, y: 96, s: 1, r: 0 }, mid: { x: 61.4, y: 97.5, s: 1, r: 0 }, pet: { x: 37.1, y: 95.3, s: 1, r: 0 } },
+                sprites: { left: { x: 17.2, y: 95.2, s: 1, r: 0, pose: 'right' }, right: { x: 84.1, y: 96, s: 1, r: 0, pose: 'left' }, mid: { x: 61.4, y: 97.5, s: 1, r: 0, pose: 'left' }, pet: { x: 37.1, y: 95.3, s: 1, r: 0 } },
                 bubbles: { left: { x: 16.7, y: 27.1 }, right: { x: 84.3, y: 28.4 }, mid: { x: 61, y: 28.9 } },
             },
             'images/story/w14_sanctum/sanctum_register.webp': {
-                sprites: { left: { x: 24, y: 94.8, s: 0.85, r: 0 }, right: { x: 83.2, y: 95.9, s: 0.89, r: 0 }, mid: { x: 62.7, y: 94.9, s: 0.87, r: 0 }, pet: { x: 41.2, y: 94.3, s: 0.84, r: 0 } },
+                sprites: { left: { x: 24, y: 94.8, s: 0.85, r: 0, pose: 'up' }, right: { x: 83.2, y: 95.9, s: 0.89, r: 0, pose: 'up' }, mid: { x: 62.7, y: 94.9, s: 0.87, r: 0, pose: 'up' }, pet: { x: 41.2, y: 94.3, s: 0.84, r: 0 } },
                 bubbles: { left: { x: 21.9, y: 34.2 }, right: { x: 81.1, y: 33.2 }, mid: { x: 60.4, y: 34.3 } },
             },
         },
@@ -965,9 +969,10 @@ export function getCompanionPairing(sceneId) {
 // Where the heroes and speech bubbles stand while picture `path` is on screen.
 // The node's own `layout` is the default for all its pictures; `pictureLayouts[path]`
 // replaces it for single spots. Spots with no entry keep the stage's built-in position.
-// Shape: { sprites: { left|right|mid|pet: { x, y, s, r } }, bubbles: { left|right|mid|voice: { x, y } } }
+// Shape: { sprites: { left|right|mid|pet: { x, y, s, r, pose? } }, bubbles: { left|right|mid|voice: { x, y } } }
 // (x/y in percent of the screen: sprites by their feet-centre, bubbles by their top-centre;
-// s = size factor, r = rotation in degrees).
+// s = size factor, r = rotation in degrees, pose = which idle picture a hero shows:
+// 'down' (default), 'up', 'left' or 'right').
 export function resolveCompanionLayout(pairing, path) {
     const base = pairing.layout || {};
     const pic = (pairing.pictureLayouts || {})[path] || {};

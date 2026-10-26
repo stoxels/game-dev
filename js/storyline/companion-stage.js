@@ -1,6 +1,5 @@
 import { LANG } from '../translation/translations.js';
 import { COMPANION_CAST, getCompanionPairing, resolveCompanionLayout } from './companion-scenes.js';
-import { _getPlayerCharacterImage } from '../sprite/player_sprite.js';
 import { STATE } from '../state.js';
 import { _setReplayGloballyUnlocked, markSeen } from './storyline-progress.js';
 
@@ -28,10 +27,28 @@ let _stage = null;
 // LOW-LEVEL HELPERS
 //------------------------------------------------------------------------
 
-// Sprite file of a hero wearing the given class look (e.g. 'noclass').
-function _spritePath(characterId, look) {
+// Picture of a hero wearing the given class look (e.g. 'noclass'): the
+// standing frame from the animations folder, facing `pose` ('down' unless the
+// story editor picked 'up', 'left' or 'right' for this spot).
+function _spritePath(characterId, look, pose = 'down') {
     const cap = characterId.charAt(0).toUpperCase() + characterId.slice(1);
-    return `images/sprites/${cap}_${look}.webp`;
+    return `animations/${cap}/idle/${look}/${pose}/${cap}_${look}_idle_${pose}_1.webp`;
+}
+
+// The same picture for the player's own hero, in the class they currently wear
+// (ascendency first, like the menu portrait).
+function _playerSpritePath(playerId, pose = 'down') {
+    const look = STATE.playerAscendency || STATE.playerClass || 'noclass';
+    return _spritePath(playerId, look, pose);
+}
+
+// Picture of whoever stands on `spot` ('left' = the player, 'right' = the
+// companion, 'mid' = the second companion), facing `pose`.
+function _spotSpritePath(spot, pose) {
+    const { pairing, playerId } = _stage;
+    if (spot === 'left') return pairing.stage === 'none' ? _spritePath(playerId, 'noclass', pose) : _playerSpritePath(playerId, pose);
+    const heroId = spot === 'right' ? pairing.companion : pairing.companion2;
+    return _spritePath(heroId, pairing.looks[heroId], pose);
 }
 
 // The line text in the current language.
@@ -57,6 +74,7 @@ function _bgCss(path, fallback) {
 // Puts one sprite where the layout says: (x, y) is the middle of its feet in percent of
 // the screen, `s` scales its height, `r` rotates it around its feet. `spot` is
 // 'left' | 'right' | 'mid' | 'pet'. Without a layout entry the stylesheet's own place is used.
+// Heroes drawn looking left or right are shown as drawn; only front/back views get mirrored.
 function _placeSprite(img, spot, v) {
     const props = ['left', 'right', 'top', 'bottom', 'height', 'transform', 'transformOrigin'];
     if (!v) { props.forEach(p => { img.style[p] = ''; }); return; }
@@ -66,7 +84,7 @@ function _placeSprite(img, spot, v) {
     img.style.bottom = 'auto';
     img.style.height = (SPRITE_HEIGHT[spot] * v.s) + '%';
     img.style.transformOrigin = '50% 100%';
-    img.style.transform = `translate(-50%, -100%) rotate(${v.r}deg)` + (MIRRORED[spot] ? ' scaleX(-1)' : '');
+    img.style.transform = `translate(-50%, -100%) rotate(${v.r}deg)` + (MIRRORED[spot] && (!v.pose || v.pose === 'down' || v.pose === 'up') ? ' scaleX(-1)' : '');
 }
 
 // Moves a speech bubble's top-middle to (x, y) percent; without an entry the stylesheet decides.
@@ -85,7 +103,10 @@ function _applySpriteLayout() {
     const layout = resolveCompanionLayout(pairing, pic);
     ['left', 'right', 'mid'].forEach(spot => {
         const img = root.querySelector('.cmp-' + spot);
-        if (img) _placeSprite(img, spot, layout.sprites[spot]);
+        if (!img) return;
+        const src = _spotSpritePath(spot, (layout.sprites[spot] || {}).pose || 'down');
+        if (!img.src.endsWith(src)) img.src = src;
+        _placeSprite(img, spot, layout.sprites[spot]);
     });
     const pet = root.querySelector('.cmp-pet');
     if (pet) _placeSprite(pet, 'pet', layout.sprites.pet);
@@ -114,7 +135,7 @@ function _buildOverlay(pairing, playerId) {
     root.innerHTML = `
         <div class="cmp-bg" style="background-image:${_bgCss(pairing.bg, pairing.fallbackBg)}"></div>
         <div class="cmp-vignette"></div>
-        <img class="cmp-hero cmp-left" src="${pairing.stage === 'none' ? _spritePath(playerId, 'noclass') : _getPlayerCharacterImage()}" alt="" draggable="false">
+        <img class="cmp-hero cmp-left" src="${pairing.stage === 'none' ? _spritePath(playerId, 'noclass') : _playerSpritePath(playerId)}" alt="" draggable="false">
         <img class="cmp-hero cmp-right" src="${_spritePath(pairing.companion, pairing.looks[pairing.companion])}" alt="" draggable="false">
         ${pairing.companion2 ? `<img class="cmp-hero cmp-mid" src="${_spritePath(pairing.companion2, pairing.looks[pairing.companion2])}" alt="" draggable="false">` : ''}
         ${_petHtml(pairing, playerId)}
