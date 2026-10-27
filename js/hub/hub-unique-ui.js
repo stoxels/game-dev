@@ -102,7 +102,6 @@ export function _onUniqueCellRightClick(e, uid) {
         return;
     }
     _clearTooltip();
-    globalThis.hideGameTooltip();
     const ok = _moveUniqueToInventory(uid);
     if (ok) _renderInventory();
 }
@@ -176,7 +175,7 @@ export function _onUniqueCellEnter(uid, e) {
             // hide when leaving the tip unless re-entering the originating cell
             const stillOverCell = document.querySelector(`.sx-unique-cell[data-uid="${uid}"]:hover`);
             if (!stillOverCell) {
-                globalThis.hideGameTooltip();
+                _clearTooltip();
                 tip.classList.remove('sx-wide-tip','sx-unique-multi');
                 tip.style.maxWidth = '380px';
                 tip.style.width = '';
@@ -217,7 +216,7 @@ export function _onUniqueCellLeave(uid, e){
             const overTip = tipNow.matches(':hover');
             const overCell = uid ? document.querySelector(`.sx-unique-cell[data-uid="${uid}"]:hover`) : null;
             if (!overTip && !overCell) {
-                globalThis.hideGameTooltip();
+                _clearTooltip();
                 tipNow.classList.remove('sx-wide-tip','sx-unique-multi');
                 tipNow.style.maxWidth = '380px';
                 tipNow.style.width = '';
@@ -230,7 +229,7 @@ export function _onUniqueCellLeave(uid, e){
         }, 80);
         return;
     }
-    globalThis.hideGameTooltip();
+    _clearTooltip();
     if(tip) {
         tip.classList.remove('sx-wide-tip','sx-unique-multi');
         tip.style.maxWidth = '380px';
