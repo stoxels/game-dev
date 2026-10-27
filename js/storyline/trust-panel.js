@@ -104,9 +104,7 @@ function _levelText(friendId, level) {
         parts.push(_tr(`Filled and crossed-out cells together cover at most ${share}% of the picture.`,
             `Ausgefüllte und durchgestrichene Felder zusammen machen höchstens ${share}% des Bildes aus.`));
     }
-    parts.push(t.monsterStyle
-        ? _tr(`Against monsters, each hit takes ${hit}% of their life.`, `Gegen Monster nimmt jeder Treffer ${hit}% ihres Lebens.`)
-        : _tr(`Every cell ${name} fills shoots a reveal at the monsters.`, `Jedes Feld, das ${name} füllt, schießt eine Enthüllung auf die Monster.`));
+    parts.push(_tr(`Against monsters, each hit takes ${hit}% of their life.`, `Gegen Monster nimmt jeder Treffer ${hit}% ihres Lebens.`));
     return parts.join(' ');
 }
 

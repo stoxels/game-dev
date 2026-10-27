@@ -13,6 +13,44 @@ export const CHANGELOG_DATA = [
 
 
     {
+        version: "v0.34 BETA",
+        date: "27.10.2026",
+        changes: [
+            {
+                category: ["New Features", "Neue Funktionen"],
+                items: [
+                    ["Story: every world map now has optional story nodes where your hero meets the other two heroes (14 meetings with dialogue scenes, 28 story pictures, class sprites, Syla's pet and the voice of Verun's ghost). Each meeting has its own name, and the character intros moved to story nodes too. The win screen has a STORY button, and a prompt offers to catch up on scenes you skipped.", "Story: Auf jeder Weltkarte gibt es jetzt optionale Story-Knoten, an denen dein Held die anderen beiden Helden trifft (14 Begegnungen mit Dialogszenen, 28 Story-Bilder, Klassen-Sprites, Sylas Begleiter und die Stimme von Veruns Geist). Jede Begegnung hat einen eigenen Namen, und die Charakter-Intros sind ebenfalls zu Story-Knoten geworden. Der Siegbildschirm hat einen STORY-Knopf, und eine Abfrage bietet an, übersprungene Szenen nachzuholen."],
+                    ["Co-op encounters: special levels you play together with a friend. They appear on the map after the meeting they follow, give a story scene when cleared, and the first clear of each one earns trust and a quest item. Some are puzzles, some have monsters or a boss.", "Gemeinsame Abenteuer: besondere Level, die du zusammen mit einem Freund spielst. Sie erscheinen nach der Begegnung, auf die sie folgen, schalten nach dem Sieg eine Story-Szene frei, und der erste Sieg bringt Vertrauen und einen Quest-Gegenstand. Manche sind Rätsel, manche haben Monster oder einen Boss."],
+                    ["Trust: each hero now trusts the other two, from level 1 to 5. Watch meetings and clear co-op encounters together to grow it. A new Trust window (button on the world maps) shows every level and what the friend does at it, and a friend you summon helps more the more they trust you: hints, fills, marks and hits on monsters. After a first co-op clear a trust bar fills up on the result screen.", "Vertrauen: Jeder Held vertraut den anderen beiden, von Stufe 1 bis 5. Seht euch Begegnungen an und schafft gemeinsame Abenteuer, damit es wächst. Ein neues Vertrauens-Fenster (Knopf auf den Weltkarten) zeigt jede Stufe und was der Freund darauf tut, und ein beschworener Freund hilft mehr, je stärker er dir vertraut: Hinweise, Füllungen, Markierungen und Treffer auf Monster. Nach dem ersten gemeinsamen Sieg füllt sich auf dem Ergebnisbildschirm eine Vertrauensleiste."],
+                    ["Summon charms: friends can be called onto a level as allies with their own look and gear, which gets better as the story moves on. Stox fights with melee, Trix with spells, Syla with a mix of both.", "Beschwörungs-Amulette: Freunde können als Verbündete in ein Level gerufen werden, mit eigenem Aussehen und Ausrüstung, die mit der Geschichte besser wird. Stox kämpft im Nahkampf, Trix mit Zaubern, Syla mit beidem."],
+                    ["New QUEST tab in the stash for story items earned in co-op encounters, and a reward card with the item on the result screen.", "Neuer QUEST-Reiter im Lager für Story-Gegenstände aus gemeinsamen Abenteuern, und eine Belohnungskarte mit dem Gegenstand auf dem Ergebnisbildschirm."],
+                    ["The Ascension Trial is now its own node on each world map after the last level, and worlds unlock one after another.", "Die Aufstiegsprüfung ist jetzt ein eigener Knoten auf jeder Weltkarte nach dem letzten Level, und Welten werden nacheinander freigeschaltet."],
+                    ["Spell combos: 9 new enemy debuffs with consume, amplify and spread effects and element reactions, shown in the spell tooltips. Class and ascendency skills now also affect monsters in a fight (debuffs, stagger, attack bar rewind).", "Zauber-Kombos: 9 neue Gegner-Debuffs mit Verbrauchs-, Verstärkungs- und Ausbreitungseffekten sowie Elementreaktionen, erklärt in den Zauber-Tooltips. Klassen- und Aufstiegsfähigkeiten wirken jetzt auch im Kampf auf Monster (Debuffs, Taumeln, Angriffsleiste zurücksetzen)."],
+                    ["Charge orbs, a 30 second power duration and a buff bar above the spell hotbar. Support spell buffs show up in it. Spells have charge-up visuals and shorter cooldowns, and each charm rank has its own player level gate.", "Ladekugeln, 30 Sekunden Kraftdauer und eine Buff-Leiste über der Zauberleiste, in der auch Unterstützungs-Buffs erscheinen. Zauber haben Aufladeeffekte und kürzere Abklingzeiten, und jeder Amulett-Rang hat eine eigene Spielerlevel-Sperre."],
+                    ["8 new wand bases fill the level gaps and show up on your hero. 18 new sound effects, a new wand attack sound and Fireball and Magma Shot sounds.", "8 neue Zauberstab-Basen füllen die Level-Lücken und sind am Helden sichtbar. 18 neue Soundeffekte, ein neuer Zauberstab-Angriffssound sowie Sounds für Feuerball und Magmaschuss."],
+                ],
+            },
+            {
+                category: ["Combat & Gameplay", "Kampf & Gameplay"],
+                items: [
+                    ["Bosses rebuilt or reworked: the Frostwright, the Warden, the Stormcaller, the Cyclops, the Puddle, the Stack (now a playable Tetris boss), the Dancer and the Creeper. The remaining 48 bosses got animations, and all bosses have 25 percent more life.", "Bosse neu gebaut oder überarbeitet: der Frostwright, der Wächter, der Sturmrufer, der Zyklop, die Pfütze, der Stapel (jetzt ein spielbarer Tetris-Boss), der Tänzer und der Kriecher. Die übrigen 48 Bosse haben Animationen bekommen, und alle Bosse haben 25 Prozent mehr Leben."],
+                    ["Wand bolts no longer count as melee hits, and intellect spell damage was halved. Shop items use your character level as item level, and shop items roll their implicit when bought.", "Zauberstab-Geschosse zählen nicht mehr als Nahkampftreffer, und der Schaden von Intelligenz-Zaubern wurde halbiert. Shop-Gegenstände verwenden dein Charakterlevel als Gegenstandslevel und würfeln ihr Implizit beim Kauf."],
+                    ["Every puzzle item has its own landing effect, items are thrown at the grid, and cell effects are stronger. Pickup toasts and the tutorial chest show real item art. Trials get a Leave Trial button, and the pause menu has two columns.", "Jeder Rätselgegenstand hat einen eigenen Landeeffekt, Gegenstände werden auf das Gitter geworfen, und Zelleneffekte sind stärker. Aufheb-Meldungen und die Tutorial-Truhe zeigen echte Gegenstandsbilder. Prüfungen haben einen Knopf zum Verlassen, und das Pausenmenü hat zwei Spalten."],
+                    ["Syla's ally now fights monsters with melee and spells and carries an axe or sword with a shield instead of a bow. Allies help less often than before, so they are a bonus and not a shortcut.", "Sylas Verbündete kämpft jetzt mit Nahkampf und Zaubern und trägt eine Axt oder ein Schwert mit Schild statt eines Bogens. Verbündete helfen seltener als zuvor, sie sind also ein Bonus und keine Abkürzung."],
+                ],
+            },
+            {
+                category: ["Bug Fixes & Technical", "Fehlerbehebungen & Technik"],
+                items: [
+                    ["Fixed the empty Data Wizard art, the win screen replay button text, the gauntlet shrink dim, a pause menu toggle bug, the charm filter, doubled prefixes in crafted item names, and tall skill tooltips running off the top of the screen.", "Behoben: die leere Daten-Zauberer-Grafik, der Text des Wiederholen-Knopfs im Siegbildschirm, das Abdunkeln beim Schrumpfen der Arena, ein Fehler beim Umschalten des Pausenmenüs, der Amulett-Filter, doppelte Vorsilben in hergestellten Gegenstandsnamen und hohe Fertigkeits-Tooltips, die oben aus dem Bildschirm ragten."],
+                    ["Fixed a Regression Rift scene where Trix and Stox talked as if someone had left the Observatory recently.", "Behoben: Eine Szene im Regressionsriss, in der Trix und Stox so sprachen, als hätte jemand das Observatorium erst kürzlich verlassen."],
+                    ["Behind the scenes, many combat, loot, hub and probability tree files were split and tidied. Saved games load unchanged.", "Im Hintergrund wurden viele Kampf-, Beute-, Hub- und Wahrscheinlichkeitsbaum-Dateien aufgeteilt und aufgeräumt. Spielstände laden unverändert."],
+                ],
+            },
+        ],
+    },
+
+    {
         version: "v0.33 BETA",
         date: "21.10.2026",
         changes: [

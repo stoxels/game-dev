@@ -196,10 +196,8 @@ function _doFill(cell) {
     renderCell(r, c);
     updClues(r, c);
     _tagCell(r, c, _bot.heroId);
-    // Only Syla's fills shoot (reveal projectiles are her way of fighting).
-    const shot = _bot.tuning.monsterStyle === null
-        ? { strengthMult: _bot.tuning.revealStrength } : { skip: true };
-    _applyCellEffect([`g-${r}-${c}`], 'reveal', 'companion', shot);
+    // A friend's fill is only a fill: no reveal projectile at the monsters.
+    _applyCellEffect([`g-${r}-${c}`], 'reveal', 'companion', { skip: true });
     _bot.fills++;
     globalThis.checkWin();
 }
@@ -250,22 +248,23 @@ function _monsterTarget() {
     return list.find(m => m.id === globalThis._targetId && m.currentHP > 0) || list.find(m => m.currentHP > 0) || null;
 }
 
-// Applies the friend's hit to a monster when it lands: a melee strike (Stox)
-// or a lightning spell (Trix). Does nothing if the monster is already gone.
-function _landHit(bot, targetId, amount) {
+// Applies the friend's hit to a monster when it lands: a melee strike or a
+// lightning spell, as `style` says. Does nothing if the monster is already gone.
+function _landHit(bot, targetId, amount, style) {
     if (_bot !== bot || !(globalThis._monsters || []).some(m => m.id === targetId && m.currentHP > 0)) return;
     _showStatusLabel(targetId, `${COMPANION_CAST[bot.heroId].name} -${amount}`);
     if (Math.random() < 0.35) _say('strike');
-    if (bot.tuning.monsterStyle === 'melee') _damageTargetById(targetId, amount, {}, { isMelee: true, isCompanion: true });
+    if (style === 'melee') _damageTargetById(targetId, amount, {}, { isMelee: true, isCompanion: true });
     else _damageTargetById(targetId, amount, { lightning: amount }, { isPlayerSpell: true, isCompanion: true });
 }
 
-// One hit on a monster in the friend's style. The friend is seen running to
-// the monster (Stox) or throwing a spell (Trix); the damage lands at the
-// moment of impact. Damage is a share of the monster's max life.
+// One hit on a monster in the friend's style (Syla picks melee or a spell each
+// time). The friend is seen running to the monster or throwing a spell; the
+// damage lands at the moment of impact. Damage is a share of the monster's max life.
 async function _monsterAction() {
     const bot = _bot;
-    const style = bot.tuning.monsterStyle;
+    const fightStyle = bot.tuning.monsterStyle;
+    const style = fightStyle === 'mixed' ? (Math.random() < 0.5 ? 'melee' : 'spell') : fightStyle;
     const target = _monsterTarget();
     // A shielded monster (a co-op boss before its shield breaks) cannot be hurt: the friend waits.
     if (!style || !target || bot.busy || target.bossImmune) return;
@@ -273,7 +272,7 @@ async function _monsterAction() {
     bot.busy = true;
     try {
         const play = style === 'melee' ? botSpriteStrike : botSpriteCast;
-        await play(target.id, () => _landHit(bot, target.id, amount));
+        await play(target.id, () => _landHit(bot, target.id, amount, style));
     } finally {
         bot.busy = false;
     }

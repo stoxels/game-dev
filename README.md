@@ -5,7 +5,7 @@ Solve grid puzzles against the clock, learn real maths from the quizzes,
 level up a class, grow a 2,000-node passive tree and push into an
 endgame of loot, maps and bosses - all in the browser, no install.
 
-**[▶ Play it online](https://stoxels.github.io/game-dev/)** · Version 0.33 BETA · English and German
+**[▶ Play it online](https://stoxels.github.io/game-dev/)** · Version 0.34 BETA · English and German
 
 ---
 

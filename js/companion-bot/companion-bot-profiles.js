@@ -27,18 +27,16 @@ const ACTION_WEIGHTS = [
 ];
 // Share of the solution cells the bot may fill / mark in one level at most.
 const FILL_CAP_SHARE = [0.06, 0.1, 0.14, 0.18, 0.22];
-// Strength of the reveal projectile each bot fill shoots (1 = a normal reveal).
-const REVEAL_STRENGTH = [0.3, 0.4, 0.5, 0.6, 0.7];
 // Monster damage per hit as a share of the target's max life, per level.
 const MONSTER_HIT_SHARE = [0.015, 0.02, 0.028, 0.036, 0.045];
 
 // What each hero is like. `speed` scales the wait between actions (below 1 =
 // faster), `bias` scales the action weights, `monster` is how the hero fights
-// ('melee' | 'spell' | null: Syla's damage comes from her reveal shots).
+// ('melee' | 'spell' | 'mixed': Syla uses a melee strike or a spell, her pick each hit).
 export const BOT_HEROES = {
     stox: { speed: 1.15, bias: { hint: 1, fill: 0.9, mark: 1.5 }, monster: 'melee', pickLine: true },
     trix: { speed: 0.8, bias: { hint: 0.8, fill: 1.1, mark: 1 }, monster: 'spell', pickLine: false },
-    syla: { speed: 1, bias: { hint: 0.9, fill: 1.5, mark: 0.5 }, monster: null, pickLine: false },
+    syla: { speed: 1, bias: { hint: 0.9, fill: 1.5, mark: 0.5 }, monster: 'mixed', pickLine: false },
 };
 
 //------------------------------------------------------------------------
@@ -64,7 +62,6 @@ export function botTuning(heroId, trustLevel) {
         actionMs: Math.round(ACTION_SECONDS[i] * hero.speed * 1000),
         weights,
         fillCapShare: FILL_CAP_SHARE[i],
-        revealStrength: REVEAL_STRENGTH[i],
         monsterStyle: hero.monster,
         monsterHitShare: hero.monster ? MONSTER_HIT_SHARE[i] : 0,
         monsterMs: 7000,
