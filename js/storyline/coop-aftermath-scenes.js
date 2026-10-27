@@ -18,6 +18,10 @@ export const COOP_AFTERMATH_SCENES = {
         noAffinity: true,
         bg: 'images/backgrounds/Vortex-of-Possibilities-Background.webp',
         stage: 'base',
+        layout: {
+            sprites: { left: { x: 36.1, y: 99, s: 0.8, r: 0, pose: 'right' }, right: { x: 63, y: 97.8, s: 0.79, r: 0, pose: 'left' }, item: { x: 49.6, y: 82.8, s: 0.63, r: 0 } },
+            bubbles: { left: { x: 33.1, y: 37.1 }, right: { x: 64.7, y: 37.6 } },
+        },
         pairings: {
             stox: {
                 companion: 'syla',
@@ -63,6 +67,10 @@ export const COOP_AFTERMATH_SCENES = {
         noAffinity: true,
         bg: 'images/backgrounds/Frequency-Forest-Background.webp',
         stage: 'base',
+        layout: {
+            sprites: { left: { x: 35.8, y: 100.9, s: 0.72, r: 0, pose: 'right' }, right: { x: 66.4, y: 97.3, s: 0.66, r: 0, pose: 'left' }, item: { x: 51.3, y: 90.4, s: 0.72, r: 0 } },
+            bubbles: { left: { x: 36, y: 44.2 }, right: { x: 67.2, y: 45.5 } },
+        },
         pairings: {
             stox: {
                 companion: 'syla',
@@ -108,6 +116,10 @@ export const COOP_AFTERMATH_SCENES = {
         noAffinity: true,
         bg: 'images/backgrounds/Hypothesis-Hinterlands-Background.webp',
         stage: 'base',
+        layout: {
+            sprites: { left: { x: 38.5, y: 98.1, s: 0.76, r: 0, pose: 'right' }, right: { x: 71, y: 97.4, s: 0.7, r: 0, pose: 'left' }, item: { x: 54, y: 80.8, s: 0.76, r: 0 } },
+            bubbles: { left: { x: 37.3, y: 38.4 }, right: { x: 71, y: 43 } },
+        },
         pairings: {
             stox: {
                 companion: 'trix',
@@ -154,6 +166,10 @@ export const COOP_AFTERMATH_SCENES = {
         bg: 'images/backgrounds/Data-Delta-Background.webp',
         stage: 'ascended',
         pet: 'browney',
+        layout: {
+            sprites: { left: { x: 24, y: 97.8, s: 0.72, r: 0, pose: 'right' }, right: { x: 50.2, y: 99.3, s: 0.7, r: 0, pose: 'left' }, pet: { x: 70.1, y: 47.8, s: 0.24, r: 0 }, item: { x: 35.8, y: 76.1, s: 1, r: 0 } },
+            bubbles: { left: { x: 24.3, y: 41.7 }, right: { x: 52.2, y: 44.7 } },
+        },
         pairings: {
             stox: {
                 companion: 'syla',
@@ -200,6 +216,10 @@ export const COOP_AFTERMATH_SCENES = {
         bg: 'images/backgrounds/Null-Hypothesis-Void.webp',
         stage: 'ascended',
         pet: 'browney',
+        layout: {
+            sprites: { left: { x: 29.6, y: 94.2, s: 0.72, r: 0, pose: 'right' }, right: { x: 73.9, y: 97.1, s: 0.72, r: 0, pose: 'left' }, item: { x: 53.2, y: 94.7, s: 0.8, r: 0 } },
+            bubbles: { left: { x: 30.5, y: 38.3 }, right: { x: 74.3, y: 40.4 } },
+        },
         pairings: {
             stox: {
                 companion: 'trix',
@@ -246,6 +266,10 @@ export const COOP_AFTERMATH_SCENES = {
         bg: 'images/backgrounds/Expectation-Plateau-Background.webp',
         stage: 'ascended',
         pet: 'browney',
+        layout: {
+            sprites: { left: { x: 58.7, y: 77.4, s: 0.55, r: 0, pose: 'right' }, right: { x: 85.7, y: 79.3, s: 0.55, r: 0, pose: 'left' }, item: { x: 71.7, y: 67.4, s: 0.72, r: 0 } },
+            bubbles: { left: { x: 57, y: 33.4 }, right: { x: 84.1, y: 33.2 } },
+        },
         pairings: {
             stox: {
                 companion: 'trix',
