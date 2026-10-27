@@ -23,8 +23,8 @@ import { questItemFor } from './quest-items.js';
 // (art made for that hero's version, in images/story/<scene>/), and
 // { beat: 'background', bg } switches the backdrop in the middle of a script.
 // A missing story image falls back to the scene's `bg`.
-// `layout` (node default) and `pictureLayouts` (per picture) move the heroes and speech
-// bubbles; see resolveCompanionLayout.
+// `layout` (node default), `pictureLayouts` (per picture) and a script's `heroLayout` (per
+// hero version) move the heroes and speech bubbles; see resolveCompanionLayout.
 
 //------------------------------------------------------------------------
 // CAST
@@ -1012,7 +1012,8 @@ export function getCompanionPairing(sceneId) {
 
 // Where the heroes and speech bubbles stand while picture `path` is on screen.
 // The node's own `layout` is the default for all its pictures; `pictureLayouts[path]`
-// replaces it for single spots. Spots with no entry keep the stage's built-in position.
+// replaces it for single spots, and the script's own `heroLayout` (the version played by
+// one hero) replaces both. Spots with no entry keep the stage's built-in position.
 // Shape: { sprites: { left|right|mid|pet: { x, y, s, r, pose? } }, bubbles: { left|right|mid|voice: { x, y } } }
 // (x/y in percent of the screen: sprites by their feet-centre, bubbles by their top-centre;
 // s = size factor, r = rotation in degrees, pose = which idle picture a hero shows:
@@ -1020,7 +1021,8 @@ export function getCompanionPairing(sceneId) {
 export function resolveCompanionLayout(pairing, path) {
     const base = pairing.layout || {};
     const pic = (pairing.pictureLayouts || {})[path] || {};
-    return { sprites: { ...base.sprites, ...pic.sprites }, bubbles: { ...base.bubbles, ...pic.bubbles } };
+    const hero = pairing.heroLayout || {};
+    return { sprites: { ...base.sprites, ...pic.sprites, ...hero.sprites }, bubbles: { ...base.bubbles, ...pic.bubbles, ...hero.bubbles } };
 }
 
 // True once the player has watched this scene in the current save.

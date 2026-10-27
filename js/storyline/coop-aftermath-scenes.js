@@ -19,7 +19,7 @@ export const COOP_AFTERMATH_SCENES = {
         bg: 'images/backgrounds/Vortex-of-Possibilities-Background.webp',
         stage: 'base',
         layout: {
-            sprites: { left: { x: 36.1, y: 99, s: 0.8, r: 0, pose: 'right' }, right: { x: 63, y: 97.8, s: 0.79, r: 0, pose: 'left' }, item: { x: 49.6, y: 82.8, s: 0.63, r: 0 } },
+            sprites: { left: { x: 36.1, y: 99, s: 0.8, r: 0, pose: 'right' }, right: { x: 60.1, y: 97.3, s: 0.79, r: 0, pose: 'left' }, item: { x: 54.4, y: 94.4, s: 0.39, r: -2 } },
             bubbles: { left: { x: 33.1, y: 37.1 }, right: { x: 64.7, y: 37.6 } },
         },
         pairings: {
@@ -38,6 +38,9 @@ export const COOP_AFTERMATH_SCENES = {
             trix: {
                 companion: 'stox',
                 bg: 'images/story/after_coop_w4/aftermath.webp',
+                heroLayout: {
+                    sprites: { item: { x: 60.2, y: 86.9, s: 0.39, r: -2 } },
+                },
                 lines: [
                     { who: 'companion', en: 'Trix. That spiral had an exit, and you found it before I finished the calculation.', de: 'Trix. Diese Spirale hatte einen Ausgang, und du hast ihn gefunden, bevor ich die Rechnung fertig hatte.' },
                     { who: 'player', en: 'Obviously. What is that in your hand?', de: 'Offensichtlich. Was hast du da in der Hand?' },

@@ -116,7 +116,8 @@ function _applySpriteLayout() {
 }
 
 // The quest item of a scene after a co-op encounter: drawn only where the story editor
-// placed it (a layout entry `item`), and removed again on pictures that have none.
+// placed it (a layout entry `item`), and removed again on pictures that have none. It stands
+// in front of the heroes and the pet and behind the speech bubble.
 function _applyQuestItem(root, pairing, v) {
     let img = root.querySelector('.cmp-item');
     if (!v || !pairing.questItem) {
@@ -128,7 +129,7 @@ function _applyQuestItem(root, pairing, v) {
         img.className = 'cmp-item';
         img.alt = '';
         img.draggable = false;
-        root.querySelector('.cmp-vignette').after(img);
+        root.querySelector('.cmp-bubble').before(img);
     }
     if (!img.src.endsWith(pairing.questItem.art)) img.src = pairing.questItem.art;
     _placeSprite(img, 'item', v);
