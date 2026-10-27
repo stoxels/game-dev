@@ -57,7 +57,7 @@ export const GAME_ART = (function () {
     // ?v= cache-buster: bump whenever art moves or ids are renamed, so
     // returning visitors never use a cached manifest pointing at old paths
     // (relaid out 2026-09-21: per-slot folders + puzzle_items + new ids).
-    const ITEMS_MANIFEST_URL = 'images/items/manifest.json?v=4';
+    const ITEMS_MANIFEST_URL = 'images/items/manifest.json?v=5';
     let _itemsManifestStarted = false;
     let _itemsManifestSettled = false;
 

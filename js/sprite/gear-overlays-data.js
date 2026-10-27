@@ -6128,7 +6128,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.306,
-    0.729
+    0.728
    ],
    "scale": 0.475,
    "offsetByDir": null,
@@ -6147,14 +6147,14 @@ export const GEAR_GRIP_DATA = {
     0.1
    ],
    "nat": [
-    727,
-    727
+    512,
+    512
    ],
    "bbox": [
-    0.184,
-    0.168,
-    0.816,
-    0.832
+    0.076,
+    0.074,
+    0.924,
+    0.924
    ],
    "tuned": true
   },
@@ -6167,7 +6167,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.306,
-    0.729
+    0.728
    ],
    "scale": 0.475,
    "offsetByDir": null,
@@ -6186,14 +6186,14 @@ export const GEAR_GRIP_DATA = {
     0.1
    ],
    "nat": [
-    727,
-    727
+    512,
+    512
    ],
    "bbox": [
-    0.184,
-    0.168,
-    0.816,
-    0.832
+    0.088,
+    0.074,
+    0.912,
+    0.924
    ],
    "tuned": true
   },
@@ -6201,20 +6201,20 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.702,
+    0.331,
     0.684
    ],
    "autoHandle": [
-    0.687,
-    0.728
+    0.686,
+    0.725
    ],
-   "scale": 0.545,
+   "scale": 0.5,
    "offsetByDir": null,
    "rotByDir": {
-    "down": 40,
-    "up": 70,
-    "left": -10,
-    "right": 90
+    "down": -10,
+    "up": -10,
+    "left": -90,
+    "right": 5
    },
    "recScale": null,
    "recSx": null,
@@ -6225,14 +6225,14 @@ export const GEAR_GRIP_DATA = {
     0.1
    ],
    "nat": [
-    738,
-    738
+    512,
+    512
    ],
    "bbox": [
-    0.176,
-    0.172,
-    0.824,
-    0.828
+    0.074,
+    0.088,
+    0.924,
+    0.912
    ],
    "tuned": true
   },
@@ -6244,7 +6244,7 @@ export const GEAR_GRIP_DATA = {
     0.684
    ],
    "autoHandle": [
-    0.304,
+    0.303,
     0.726
    ],
    "scale": 0.635,
@@ -6264,14 +6264,14 @@ export const GEAR_GRIP_DATA = {
     0.1
    ],
    "nat": [
-    735,
-    735
+    512,
+    512
    ],
    "bbox": [
-    0.18,
-    0.172,
-    0.82,
-    0.828
+    0.086,
+    0.074,
+    0.912,
+    0.924
    ],
    "tuned": true
   },
@@ -6283,7 +6283,7 @@ export const GEAR_GRIP_DATA = {
     0.684
    ],
    "autoHandle": [
-    0.304,
+    0.303,
     0.726
    ],
    "scale": 0.635,
@@ -6303,14 +6303,14 @@ export const GEAR_GRIP_DATA = {
     0.1
    ],
    "nat": [
-    735,
-    735
+    512,
+    512
    ],
    "bbox": [
-    0.18,
-    0.172,
-    0.82,
-    0.828
+    0.078,
+    0.074,
+    0.92,
+    0.924
    ],
    "tuned": true
   },
@@ -6342,14 +6342,14 @@ export const GEAR_GRIP_DATA = {
     0.1
    ],
    "nat": [
-    725,
-    725
+    512,
+    512
    ],
    "bbox": [
-    0.184,
-    0.168,
-    0.816,
-    0.832
+    0.096,
+    0.074,
+    0.904,
+    0.924
    ],
    "tuned": true
   },
@@ -6361,8 +6361,8 @@ export const GEAR_GRIP_DATA = {
     0.715
    ],
    "autoHandle": [
-    0.296,
-    0.752
+    0.298,
+    0.749
    ],
    "scale": 0.56,
    "offsetByDir": {
@@ -6386,14 +6386,14 @@ export const GEAR_GRIP_DATA = {
     0.1
    ],
    "nat": [
-    695,
-    695
+    512,
+    512
    ],
    "bbox": [
-    0.203,
-    0.152,
-    0.797,
-    0.848
+    0.078,
+    0.084,
+    0.91,
+    0.924
    ],
    "tuned": true
   },
@@ -6405,8 +6405,8 @@ export const GEAR_GRIP_DATA = {
     0.738
    ],
    "autoHandle": [
-    0.297,
-    0.737
+    0.295,
+    0.739
    ],
    "scale": 0.565,
    "offsetByDir": {
@@ -6430,16 +6430,3032 @@ export const GEAR_GRIP_DATA = {
     0.1
    ],
    "nat": [
-    714,
-    714
+    512,
+    512
    ],
    "bbox": [
-    0.188,
-    0.16,
-    0.813,
-    0.836
+    0.109,
+    0.076,
+    0.887,
+    0.924
    ],
    "tuned": true
+  },
+  "wpn_axe1h_hatchet_8": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.274,
+    0.212
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.102,
+    0.074,
+    0.897,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_axe1h_cleaver_14": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.255,
+    0.188
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.076,
+    0.074,
+    0.924,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_axe1h_tomahawk_21": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.233,
+    0.2
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.076,
+    0.924,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_axe1h_bearded_axe_30": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.245,
+    0.19
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.094,
+    0.074,
+    0.904,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_axe1h_battle_axe_38": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.249,
+    0.2
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.084,
+    0.074,
+    0.916,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_axe1h_reaver_axe_46": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.239,
+    0.194
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.076,
+    0.924,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_axe1h_dwarven_axe_54": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.229,
+    0.208
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.078,
+    0.924,
+    0.92
+   ],
+   "tuned": true
+  },
+  "wpn_axe1h_executioner_axe_63": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.225,
+    0.214
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.078,
+    0.924,
+    0.92
+   ],
+   "tuned": true
+  },
+  "wpn_axe1h_obsidian_axe_72": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.237,
+    0.219
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.1,
+    0.924,
+    0.9
+   ],
+   "tuned": true
+  },
+  "wpn_axe1h_titan_cleaver_81": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.245,
+    0.221
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.094,
+    0.074,
+    0.904,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_axe1h_doomcleaver_90": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.214,
+    0.196
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.084,
+    0.924,
+    0.912
+   ],
+   "tuned": true
+  },
+  "wpn_mace1h_cudgel_6": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.241,
+    0.2
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.086,
+    0.074,
+    0.912,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_mace1h_flanged_mace_12": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.221,
+    0.225
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.09,
+    0.074,
+    0.91,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_mace1h_morning_star_18": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.241,
+    0.21
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.076,
+    0.924,
+    0.922
+   ],
+   "tuned": true
+  },
+  "wpn_mace1h_war_hammer_25": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.274,
+    0.217
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.109,
+    0.074,
+    0.889,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_mace1h_spiked_mace_33": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.225,
+    0.212
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.074,
+    0.924,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_mace1h_bonecrusher_41": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.217,
+    0.204
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.076,
+    0.924,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_mace1h_iron_flail_mace_49": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.237,
+    0.229
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.09,
+    0.924,
+    0.91
+   ],
+   "tuned": true
+  },
+  "wpn_mace1h_skullcrusher_57": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.214,
+    0.249
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.088,
+    0.074,
+    0.91,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_mace1h_dread_mace_68": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.219,
+    0.194
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.092,
+    0.074,
+    0.908,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_mace1h_thunder_hammer_77": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.219,
+    0.208
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.076,
+    0.924,
+    0.922
+   ],
+   "tuned": true
+  },
+  "wpn_mace1h_sunforged_mace_86": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.216,
+    0.217
+   ],
+   "autoHandle": null,
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.078,
+    0.074,
+    0.92,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_axe2h_woodsplitter_12": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.217,
+    0.194
+   ],
+   "autoHandle": null,
+   "scale": 0.835,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.076,
+    0.924,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_axe2h_bearded_greataxe_19": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.235,
+    0.188
+   ],
+   "autoHandle": null,
+   "scale": 0.835,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.09,
+    0.074,
+    0.908,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_axe2h_headsman_axe_34": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.237,
+    0.188
+   ],
+   "autoHandle": null,
+   "scale": 0.835,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.094,
+    0.074,
+    0.906,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_axe2h_berserker_axe_42": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.257,
+    0.212
+   ],
+   "autoHandle": null,
+   "scale": 0.835,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.1,
+    0.074,
+    0.898,
+    0.924
+   ],
+   "tuned": true
+  },
+  "wpn_axe2h_warlord_greataxe_56": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.192,
+    0.309
+   ],
+   "autoHandle": null,
+   "scale": 0.835,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.121,
+    0.924,
+    0.877
+   ],
+   "tuned": true
+  },
+  "wpn_axe2h_stormcleaver_70": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.212,
+    0.204
+   ],
+   "autoHandle": null,
+   "scale": 0.835,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.082,
+    0.074,
+    0.918,
+    0.922
+   ],
+   "tuned": true
+  },
+  "wpn_axe2h_abyssal_greataxe_78": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.223,
+    0.2
+   ],
+   "autoHandle": null,
+   "scale": 0.835,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -90,
+    "up": -105,
+    "left": -180,
+    "right": -80
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.08,
+    0.074,
+    0.92,
+    0.924
+   ],
+   "tuned": true
+  },
+  "aegis_of_the_last_king": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.5,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.139,
+    0.074,
+    0.861,
+    0.924
+   ],
+   "tuned": false
+  },
+  "hungering_edge": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.5,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.159,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.377,
+    0.074,
+    0.623,
+    0.924
+   ],
+   "tuned": false
+  },
+  "butchers_cleaver": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.666,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.388,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.199,
+    0.074,
+    0.799,
+    0.924
+   ],
+   "tuned": false
+  },
+  "spell_eater_aegis": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.076,
+    0.074,
+    0.922,
+    0.924
+   ],
+   "tuned": false
+  },
+  "worldsplitter": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.361,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.311,
+    0.074,
+    0.69,
+    0.924
+   ],
+   "tuned": false
+  },
+  "sanctum_wardens_bulwark": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.5,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.221,
+    0.074,
+    0.779,
+    0.924
+   ],
+   "tuned": false
+  },
+  "buckler_of_bad_ideas": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.078,
+    0.074,
+    0.92,
+    0.924
+   ],
+   "tuned": false
+  },
+  "kindling_brand": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.469,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.245,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.311,
+    0.074,
+    0.69,
+    0.924
+   ],
+   "tuned": false
+  },
+  "retaliators_tower": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.166,
+    0.074,
+    0.832,
+    0.924
+   ],
+   "tuned": false
+  },
+  "doomcallers_maul": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.44,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.559,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.207,
+    0.074,
+    0.793,
+    0.924
+   ],
+   "tuned": false
+  },
+  "torch_stub": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.492,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.181,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.359,
+    0.074,
+    0.639,
+    0.924
+   ],
+   "tuned": false
+  },
+  "cracked_mirror_shield": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.5,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.08,
+    0.074,
+    0.92,
+    0.924
+   ],
+   "tuned": false
+  },
+  "vampiric_fang": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.314,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.494,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.117,
+    0.074,
+    0.881,
+    0.924
+   ],
+   "tuned": false
+  },
+  "mirrorplate_aegis": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.164,
+    0.074,
+    0.834,
+    0.924
+   ],
+   "tuned": false
+  },
+  "aegis_absolute": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.107,
+    0.074,
+    0.891,
+    0.924
+   ],
+   "tuned": false
+  },
+  "apex_predator_fang": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.311,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.482,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.127,
+    0.074,
+    0.871,
+    0.924
+   ],
+   "tuned": false
+  },
+  "splintered_oak_club": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.508,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.292,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.273,
+    0.074,
+    0.725,
+    0.924
+   ],
+   "tuned": false
+  },
+  "carving_knife_of_endless_portions": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.526,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.187,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.356,
+    0.074,
+    0.645,
+    0.924
+   ],
+   "tuned": false
+  },
+  "oathbreaker_estoc": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.504,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.311,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.26,
+    0.074,
+    0.74,
+    0.924
+   ],
+   "tuned": false
+  },
+  "hammer_of_reasonable_doubt": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.512,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.689,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.139,
+    0.074,
+    0.861,
+    0.924
+   ],
+   "tuned": false
+  },
+  "requiem_needle": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.144,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.389,
+    0.074,
+    0.611,
+    0.924
+   ],
+   "tuned": false
+  },
+  "pot_lid_shield": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.5,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.127,
+    0.074,
+    0.873,
+    0.924
+   ],
+   "tuned": false
+  },
+  "door_of_last_resort": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.5,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.129,
+    0.074,
+    0.871,
+    0.924
+   ],
+   "tuned": false
+  },
+  "tidepool_buckler": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.092,
+    0.924,
+    0.906
+   ],
+   "tuned": false
+  },
+  "rampart_of_ruined_vows": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.109,
+    0.074,
+    0.889,
+    0.924
+   ],
+   "tuned": false
+  },
+  "ruler_of_measurable_ruin": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.498,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.151,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.383,
+    0.074,
+    0.615,
+    0.924
+   ],
+   "tuned": false
+  },
+  "slide_rule_scythe": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.369,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.646,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.16,
+    0.074,
+    0.838,
+    0.924
+   ],
+   "tuned": false
+  },
+  "chalksword_of_corrected_errors": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.498,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.29,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.275,
+    0.074,
+    0.723,
+    0.924
+   ],
+   "tuned": false
+  },
+  "abacus_flail": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.498,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.47,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.137,
+    0.074,
+    0.863,
+    0.924
+   ],
+   "tuned": false
+  },
+  "protractor_polearm": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.501,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.732,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.115,
+    0.074,
+    0.883,
+    0.924
+   ],
+   "tuned": false
+  },
+  "compass_needle_dirk": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.498,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.183,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.357,
+    0.074,
+    0.641,
+    0.924
+   ],
+   "tuned": false
+  },
+  "graders_red_pen": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.498,
+    0.771
+   ],
+   "autoHandle": null,
+   "scale": 0.236,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.316,
+    0.074,
+    0.682,
+    0.924
+   ],
+   "tuned": false
+  },
+  "parasol_of_point_defense": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.088,
+    0.074,
+    0.91,
+    0.924
+   ],
+   "tuned": false
+  },
+  "riot_shield_of_reading_breaks": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.125,
+    0.074,
+    0.873,
+    0.924
+   ],
+   "tuned": false
+  },
+  "mirrored_manhole_cover": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.104,
+    0.074,
+    0.895,
+    0.924
+   ],
+   "tuned": false
+  },
+  "binder_shield_of_bureaucracy": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.106,
+    0.074,
+    0.893,
+    0.924
+   ],
+   "tuned": false
+  },
+  "colander_of_collected_hits": {
+   "role": "shield",
+   "category": "misc",
+   "handle": [
+    0.5,
+    0.499
+   ],
+   "autoHandle": null,
+   "scale": 0.6,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": 0,
+    "right": 10,
+    "left": 5,
+    "up": -15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.12
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.199,
+    0.074,
+    0.801,
+    0.924
+   ],
+   "tuned": false
+  },
+  "whisperwind_screamer": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.48,
+    0.788
+   ],
+   "autoHandle": [
+    0.48,
+    0.788
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.115,
+    0.074,
+    0.885,
+    0.924
+   ],
+   "tuned": false
+  },
+  "apprentices_blunderbuss": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.433,
+    0.707
+   ],
+   "autoHandle": [
+    0.433,
+    0.707
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.193,
+    0.924,
+    0.805
+   ],
+   "tuned": false
+  },
+  "deadeye_scope": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.283,
+    0.682
+   ],
+   "autoHandle": [
+    0.283,
+    0.682
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.234,
+    0.924,
+    0.768
+   ],
+   "tuned": false
+  },
+  "splinterstorm_crossbow": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.47,
+    0.78
+   ],
+   "autoHandle": [
+    0.47,
+    0.78
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.088,
+    0.924,
+    0.912
+   ],
+   "tuned": false
+  },
+  "longshot_of_the_lonely_peak": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.25,
+    0.788
+   ],
+   "autoHandle": [
+    0.25,
+    0.788
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.1,
+    0.074,
+    0.9,
+    0.924
+   ],
+   "tuned": false
+  },
+  "hurricane_string": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.485,
+    0.781
+   ],
+   "autoHandle": [
+    0.485,
+    0.781
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.084,
+    0.924,
+    0.914
+   ],
+   "tuned": false
+  },
+  "slingshot_of_grudges": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.503,
+    0.788
+   ],
+   "autoHandle": [
+    0.503,
+    0.788
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.104,
+    0.074,
+    0.897,
+    0.924
+   ],
+   "tuned": false
+  },
+  "fowling_piece": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.457,
+    0.707
+   ],
+   "autoHandle": [
+    0.457,
+    0.707
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.195,
+    0.924,
+    0.805
+   ],
+   "tuned": false
+  },
+  "harpoon_rifle": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.714
+   ],
+   "autoHandle": [
+    0.499,
+    0.714
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.186,
+    0.924,
+    0.815
+   ],
+   "tuned": false
+  },
+  "starfall_ballista": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.359,
+    0.725
+   ],
+   "autoHandle": [
+    0.359,
+    0.725
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.17,
+    0.924,
+    0.83
+   ],
+   "tuned": false
+  },
+  "spitball_sniper": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.493,
+    0.602
+   ],
+   "autoHandle": [
+    0.493,
+    0.602
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.348,
+    0.924,
+    0.65
+   ],
+   "tuned": false
+  },
+  "boomerang_of_returning_regrets": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.471,
+    0.755
+   ],
+   "autoHandle": [
+    0.471,
+    0.755
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.125,
+    0.924,
+    0.875
+   ],
+   "tuned": false
+  },
+  "nerf_crossbow_of_near_misses": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.566,
+    0.765
+   ],
+   "autoHandle": [
+    0.566,
+    0.765
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.107,
+    0.924,
+    0.891
+   ],
+   "tuned": false
+  },
+  "trebuchet_of_tutoring": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.496,
+    0.788
+   ],
+   "autoHandle": [
+    0.496,
+    0.788
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.084,
+    0.074,
+    0.914,
+    0.924
+   ],
+   "tuned": false
+  },
+  "dart_deck_of_doomed_division": {
+   "role": "weapon",
+   "category": "misc",
+   "handle": [
+    0.499,
+    0.724
+   ],
+   "autoHandle": [
+    0.499,
+    0.724
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.15
+   ],
+   "nat": [
+    512,
+    512
+   ],
+   "bbox": [
+    0.074,
+    0.168,
+    0.924,
+    0.83
+   ],
+   "tuned": false
   }
  },
  "sprites": {
