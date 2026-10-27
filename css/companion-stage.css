@@ -52,6 +52,20 @@
 .cmp-pet-left  { left: 1%; }
 .cmp-pet-right { right: 1%; transform: scaleX(-1); }
 .cmp-pet-mid   { right: 31%; transform: scaleX(-1); }
+/* The quest item of a scene after a co-op encounter. Placed by the story editor; the stage only
+   draws it when a layout entry exists, so this resting place is what the editor shows before that. */
+.cmp-item {
+    position: absolute;
+    left: 50%;
+    bottom: 38%;
+    height: 24%;
+    width: auto;
+    transform: translateX(-50%);
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.6));
+    transition: left 0.6s ease, top 0.6s ease, height 0.6s ease, transform 0.6s ease;
+    pointer-events: none;
+    user-select: none;
+}
 .cmp-hero.cmp-dim { filter: brightness(0.55) drop-shadow(0 8px 10px rgba(0,0,0,0.6)); }
 
 .cmp-bubble {

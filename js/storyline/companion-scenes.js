@@ -2,6 +2,7 @@ import { STATE } from '../state.js';
 import { hasSeen } from './storyline-progress.js';
 import { COOP_AFTERMATH_SCENES } from './coop-aftermath-scenes.js';
 import { REVEAL_SCENES } from './reveal-scenes.js';
+import { questItemFor } from './quest-items.js';
 
 //------------------------------------------------------------------------
 //-------------------COMPANION SCENES--------------------------------------
@@ -999,8 +1000,11 @@ export function getCompanionPairing(sceneId) {
     if (!pairing.lines.some(l => l.en && l.en.trim())) return null;
     const stage = ['none', 'ascended'].includes(scene.stage) ? scene.stage : 'base';
     const looks = Object.fromEntries(Object.keys(COMPANION_LOOKS).map(h => [h, COMPANION_LOOKS[h][stage]]));
+    // A scene after a co-op encounter can show the quest item that encounter handed over (once a layout places it).
+    const quest = scene.coop ? questItemFor(scene.coop) : null;
     return {
         ...pairing, bg: pairing.bg || scene.bg, fallbackBg: scene.bg, stage, pet: stage === 'ascended' ? (scene.pet || '') : '', looks,
+        questItem: quest && quest.art ? { art: quest.art } : null,
         noAffinity: !!scene.noAffinity,
         layout: scene.layout || null, pictureLayouts: scene.pictureLayouts || {},
     };

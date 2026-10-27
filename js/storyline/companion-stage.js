@@ -59,9 +59,9 @@ function _lineText(line) {
 }
 
 // Normal height of a sprite as a share of the screen; a layout's `s` scales it.
-const SPRITE_HEIGHT = { left: 54, right: 54, mid: 54, pet: 22 };
+const SPRITE_HEIGHT = { left: 54, right: 54, mid: 54, pet: 22, item: 24 };
 // Sprites that face the other way (drawn mirrored).
-const MIRRORED = { left: false, right: true, mid: true, pet: false };
+const MIRRORED = { left: false, right: true, mid: true, pet: false, item: false };
 
 // CSS value for a backdrop: the story image, with the scene's default image
 // underneath so a picture that is not made yet never leaves the stage empty.
@@ -112,6 +112,26 @@ function _applySpriteLayout() {
     });
     const pet = root.querySelector('.cmp-pet');
     if (pet) _placeSprite(pet, 'pet', layout.sprites.pet);
+    _applyQuestItem(root, pairing, layout.sprites.item);
+}
+
+// The quest item of a scene after a co-op encounter: drawn only where the story editor
+// placed it (a layout entry `item`), and removed again on pictures that have none.
+function _applyQuestItem(root, pairing, v) {
+    let img = root.querySelector('.cmp-item');
+    if (!v || !pairing.questItem) {
+        if (img) img.remove();
+        return;
+    }
+    if (!img) {
+        img = document.createElement('img');
+        img.className = 'cmp-item';
+        img.alt = '';
+        img.draggable = false;
+        root.querySelector('.cmp-vignette').after(img);
+    }
+    if (!img.src.endsWith(pairing.questItem.art)) img.src = pairing.questItem.art;
+    _placeSprite(img, 'item', v);
 }
 
 //------------------------------------------------------------------------
