@@ -3,7 +3,7 @@ import { LANG } from '../translation/translations.js';
 import { renderCell, updClues } from '../grid.js';
 import { _applyCellEffect } from '../puzzle-mechanics/cell-fx.js';
 import { _damageTargetById, _showStatusLabel } from '../combat/encounter-monster-damage.js';
-import { getTrustLevel } from '../storyline/companion-trust.js';
+import { getAffinityLevel } from '../storyline/companion-affinity.js';
 import { COMPANION_CAST } from '../storyline/companion-scenes.js';
 import {
     botSpriteCast, botSpriteGesture, botSpriteSay, botSpriteStrike, removeBotSprite, spawnBotSprite,
@@ -21,7 +21,7 @@ import {
 // marks a cell that is certainly empty, each in the friend's own colour, and
 // it hits the monsters in its own style (Stox melee, Trix spells, Syla's
 // fills shoot reveal projectiles). It never does anything that hurts the
-// player. How often it helps depends on the trust between the two heroes
+// player. How often it helps depends on the affinity between the two heroes
 // (see companion-bot-profiles.js). Summon and dismiss are the entry points.
 
 //------------------------------------------------------------------------
@@ -41,7 +41,7 @@ const LEAVE_AFTER_MS = 2500;
 const SAY_GAP_MS = 7000;
 // Least mark weight of a friend in a mark-focus encounter (hints weigh about 1).
 const MARK_FOCUS_FLOOR = 0.5;
-// Least share of the picture such a friend may mark (the normal cap at trust 1 is 10%).
+// Least share of the picture such a friend may mark (the normal cap at affinity 1 is 10%).
 const MARK_FOCUS_CAP_SHARE = 0.2;
 const IDLE_TALK_MIN_MS = 16000;
 const IDLE_TALK_MAX_MS = 28000;
@@ -86,7 +86,7 @@ function _ensureStyles() {
     document.head.appendChild(style);
 }
 
-// Shows (or refreshes) the small badge with the friend's name and trust level.
+// Shows (or refreshes) the small badge with the friend's name and affinity level.
 function _renderBadge() {
     let badge = document.getElementById('companion-bot-badge');
     if (!_bot) { if (badge) badge.remove(); return; }
@@ -96,7 +96,7 @@ function _renderBadge() {
         document.body.appendChild(badge);
     }
     badge.dataset.hero = _bot.heroId;
-    badge.textContent = `${COMPANION_CAST[_bot.heroId].name} · Trust ${_bot.tuning.level}`;
+    badge.textContent = `${COMPANION_CAST[_bot.heroId].name} · Affinity ${_bot.tuning.level}`;
 }
 
 // Takes every hint glow off the grid.
@@ -213,7 +213,7 @@ function _doMark(cell) {
     _bot.marks++;
 }
 
-// One puzzle action: picks hint / fill / mark by trust and personality and
+// One puzzle action: picks hint / fill / mark by affinity and personality and
 // does it. Does nothing when there is nothing useful left.
 function _puzzleAction() {
     const { sol, user, revealed, wrong } = _gridView();
@@ -320,18 +320,18 @@ function _tick() {
 //------------------------------------------------------------------------
 
 // Calls the friend onto the running level. The player cannot call themselves,
-// only one friend at a time, and only while a level is running. Trust with
+// only one friend at a time, and only while a level is running. Affinity with
 // that friend sets how strong they are. Returns true when the friend came.
 // `opts.markFocus` (a multiplier) makes them favour wrong-marks.
 export function summonCompanionBot(friendId, opts = {}) {
     if (_bot || !_levelRunning() || !BOT_TINTS[friendId] || friendId === STATE.playerCharacter) return false;
-    const trust = getTrustLevel(STATE.companionTrust || {}, STATE.playerCharacter, friendId);
-    const tuning = botTuning(friendId, trust);
+    const affinity = getAffinityLevel(STATE.companionAffinity || {}, STATE.playerCharacter, friendId);
+    const tuning = botTuning(friendId, affinity);
     // `markFocus` makes the friend lean on wrong-marks (special encounters),
-    // even at low trust where they would not mark at all.
+    // even at low affinity where they would not mark at all.
     if (opts.markFocus) {
         tuning.weights = { ...tuning.weights, mark: Math.max(tuning.weights.mark * opts.markFocus, MARK_FOCUS_FLOOR) };
-        // Marks share the fill cap, which is tiny at low trust: give a mark-focus friend room to mark.
+        // Marks share the fill cap, which is tiny at low affinity: give a mark-focus friend room to mark.
         tuning.fillCapShare = Math.max(tuning.fillCapShare, MARK_FOCUS_CAP_SHARE);
     }
     _ensureStyles();

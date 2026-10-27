@@ -235,7 +235,7 @@ export const WD_WORLD_CONFIGS = [
         aftermathNodes: [
             { id: 'after_coop_w6', coop: 'coop_w6', from: 3, x: 41, y: 84 },
         ],
-        // A hero's secret half (js/storyline/reveal-scenes.js): opens once the player's hero trusts the teller enough.
+        // A hero's secret half (js/storyline/reveal-scenes.js): opens once the player's hero has enough affinity with the teller.
         revealNodes: [
             { id: 'reveal_syla', after: 'home_syla', teller: 'syla', needPoints: 3, from: 3, x: 14, y: 78 },
         ],
@@ -318,7 +318,7 @@ export const WD_WORLD_CONFIGS = [
         aftermathNodes: [
             { id: 'after_coop_w8', coop: 'coop_w8', from: 6, x: 68, y: 91 },
         ],
-        // A hero's secret half (js/storyline/reveal-scenes.js): opens once the player's hero trusts the teller enough.
+        // A hero's secret half (js/storyline/reveal-scenes.js): opens once the player's hero has enough affinity with the teller.
         revealNodes: [
             { id: 'reveal_stox', after: 'w8_fieldbase', teller: 'stox', needPoints: 6, from: 6, x: 93, y: 78 },
         ],
@@ -444,7 +444,7 @@ export const WD_WORLD_CONFIGS = [
         aftermathNodes: [
             { id: 'after_coop_w11', coop: 'coop_w11', from: 8, x: 73, y: 70 },
         ],
-        // A hero's secret half (js/storyline/reveal-scenes.js): opens once the player's hero trusts the teller enough.
+        // A hero's secret half (js/storyline/reveal-scenes.js): opens once the player's hero has enough affinity with the teller.
         revealNodes: [
             { id: 'reveal_trix', after: 'w11_ghost', teller: 'trix', needPoints: 9, from: 8, x: 64, y: 92 },
         ],

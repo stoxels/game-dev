@@ -2,7 +2,7 @@
 //-------------------COMPANION BOT PROFILES--------------------------------
 //------------------------------------------------------------------------
 // How the summoned friend behaves: how fast and how often it helps at each
-// trust level, what each hero is like, and which cell it picks. Everything
+// affinity level, what each hero is like, and which cell it picks. Everything
 // here is plain data and pure functions (no game state, no DOM) so the rules
 // can be tested alone. The bot never makes a mistake that hurts the player:
 // it only places correct fills and correct wrong-marks. Numbers are untuned.
@@ -15,9 +15,9 @@
 // cyan fill and from the teal of ordinary reveals so they stay recognisable).
 export const BOT_TINTS = { stox: '#6c7bff', trix: '#e056c8', syla: '#ffd93d' };
 
-// Seconds between two puzzle actions at trust level 1..5 (index 0 = level 1).
+// Seconds between two puzzle actions at affinity level 1..5 (index 0 = level 1).
 const ACTION_SECONDS = [20, 17, 14, 12, 10];
-// Chance weights of hint / fill / mark per trust level.
+// Chance weights of hint / fill / mark per affinity level.
 const ACTION_WEIGHTS = [
     { hint: 1, fill: 0, mark: 0 },
     { hint: 0.7, fill: 0.3, mark: 0 },
@@ -43,17 +43,17 @@ export const BOT_HEROES = {
 // TUNING
 //------------------------------------------------------------------------
 
-// Trust level 0 (a bot summoned before any trust) behaves like level 1;
+// Affinity level 0 (a bot summoned before any affinity) behaves like level 1;
 // anything above 5 like level 5.
-function _levelIndex(trustLevel) {
-    return Math.min(4, Math.max(0, (Number(trustLevel) || 1) - 1));
+function _levelIndex(affinityLevel) {
+    return Math.min(4, Math.max(0, (Number(affinityLevel) || 1) - 1));
 }
 
-// All numbers for one hero at one trust level.
-export function botTuning(heroId, trustLevel) {
+// All numbers for one hero at one affinity level.
+export function botTuning(heroId, affinityLevel) {
     const hero = BOT_HEROES[heroId];
     if (!hero) return null;
-    const i = _levelIndex(trustLevel);
+    const i = _levelIndex(affinityLevel);
     const weights = {};
     for (const k of ['hint', 'fill', 'mark']) weights[k] = ACTION_WEIGHTS[i][k] * hero.bias[k];
     return {

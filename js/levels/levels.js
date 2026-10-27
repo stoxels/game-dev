@@ -2,6 +2,8 @@ import { save } from '../state.js';
 import { LANG } from '../translation/translations.js';
 import { WORLDS } from './level-world-data.js';
 import { STATE } from '../state.js';
+import { hasNexusKey } from '../storyline/quest-items.js';
+import { hasMetCompanion } from '../storyline/companion-scenes.js';
 
 //------------------------------------------------------------------------
 //-------------------TRANSLATION HELPER----------------------------------
@@ -113,11 +115,25 @@ export function getNexusPointGi() {
     return WORLD_START_GI[NEXUS_WORLD_INDEX] + (WORLDS[NEXUS_WORLD_INDEX].data.length - 1);
 }
 
+// True when the player needs no key halves: they already carry both, they were
+// inside World 14 before (a saved Nexus unlock or a cleared World 14 level), or
+// they watched both key meetings before the keys existed as items.
+function _hasNexusAccess() {
+    if (hasNexusKey(STATE.questItems) || STATE.nexusUnlocked) return true;
+    if (hasMetCompanion('w12_wreck') && hasMetCompanion('w13_peak')) return true;
+    const start = WORLD_START_GI[NEXUS_WORLD_INDEX];
+    const world = WORLDS[NEXUS_WORLD_INDEX];
+    if (!world || typeof start !== 'number') return false;
+    return STATE.done.some(gi => gi >= start && gi < start + world.data.length);
+}
+
 // Returns true if the player has finished ALL campaign worlds before the
-// Nexus World (every level in worlds 1..13). This gates access to World 14.
+// Nexus World (every level in worlds 1..13) and holds both halves of the Nexus
+// key (found in the meetings of worlds 12 and 13). This gates access to World 14.
 export function isNexusWorldUnlocked() {
     if (typeof STATE === 'undefined' || !STATE || !STATE.done) return false;
     if (typeof WORLDS === 'undefined' || typeof WORLD_START_GI === 'undefined') return false;
+    if (!_hasNexusAccess()) return false;
     for (let wi = 0; wi < NEXUS_WORLD_INDEX; wi++) {
         const w = WORLDS[wi];
         if (!w) continue;

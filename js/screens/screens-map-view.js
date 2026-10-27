@@ -6,7 +6,7 @@ import { showWorldDetail, wdGoBackToMap, wdStoryProgress } from './screens-world
 import { launchVendor, showModal, showSetup, switchScreen } from './screens.js';
 import { showQuestLog } from '../inference/inference-ui.js';
 import { showPassiveTree } from '../probability-tree/probability-tree.js';
-import { ensureTrustButton } from '../storyline/trust-panel.js';
+import { ensureAffinityButton } from '../storyline/affinity-panel.js';
 import { STATE } from '../state.js';
 
 /*
@@ -2007,7 +2007,7 @@ export function showMapView() {
     _updateToggleButtonLabels();
     _buildMapViewTopBar();
     _buildMapCanvas();
-    ensureTrustButton('screen-map-view');
+    ensureAffinityButton('screen-map-view');
 
     switchScreen('screen-map-view');
 }

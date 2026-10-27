@@ -10,7 +10,7 @@ import { getUniversalSpellCastKind, getUniversalSpellChargeRechargeRemaining, ge
 import { getSpellComboSections } from '../combat/combat-spell-debuff-defs.js';
 import { getClassSkillMonsterRows } from '../classes/class-monster-effects-defs.js';
 import { STATE } from '../state.js';
-import { summonTrustLevel } from './summon-cast.js';
+import { summonAffinityLevel } from './summon-cast.js';
 
 //------------------------------------------------------------------------
 //-------------------CROSS-MODULE CONSTRAINT------------------------------
@@ -59,9 +59,9 @@ function _skillFormatCooldown(secs) {
 
 // The coloured type line: "Spell, Reveal, Area".
 function _skillTooltipTags(def) {
-    // Summon charms show how much the two heroes trust each other instead of spell tags.
+    // Summon charms show how much affinity the two heroes have instead of spell tags.
     if (def.usp && def.usp.behavior === 'summon') {
-        return `<div class="skl-tip-tags">${LANG === 'de' ? 'Beschwörung' : 'Summon'} · ${LANG === 'de' ? 'Vertrauen' : 'Trust'} ${summonTrustLevel(def.usp.summonHero)} / 5</div>`;
+        return `<div class="skl-tip-tags">${LANG === 'de' ? 'Beschwörung' : 'Summon'} · ${LANG === 'de' ? 'Verbundenheit' : 'Affinity'} ${summonAffinityLevel(def.usp.summonHero)} / 5</div>`;
     }
     if (!def.tags || !def.tags.length) return '';
     return `<div class="skl-tip-tags">${def.tags.join(', ')}</div>`;

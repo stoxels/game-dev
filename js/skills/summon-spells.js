@@ -30,10 +30,10 @@ function _summonDef(heroId, nameEn, nameDE, icon) {
         nameEn, nameDE,
         descEn: `Calls ${nameEn.replace('Summon ', '')} onto the grid for the rest of this puzzle (or map). `
             + `${nameEn.replace('Summon ', '')} helps with hints, fills and marks and fights the monsters. `
-            + `Costs ${TETHER_STONE_COST} Tether Stones, once per puzzle. The more you trust each other, the stronger the help.`,
+            + `Costs ${TETHER_STONE_COST} Tether Stones, once per puzzle. The higher your affinity, the stronger the help.`,
         descDE: `Ruft ${nameDE.replace('Beschwöre ', '')} für den Rest dieses Rätsels (oder der Karte) aufs Gitter. `
             + `${nameDE.replace('Beschwöre ', '')} hilft mit Hinweisen, Füllungen und Markierungen und bekämpft die Monster. `
-            + `Kostet ${TETHER_STONE_COST} Bindungssteine, einmal pro Rätsel. Je mehr ihr euch vertraut, desto stärker die Hilfe.`,
+            + `Kostet ${TETHER_STONE_COST} Bindungssteine, einmal pro Rätsel. Je stärker eure Verbundenheit, desto stärker die Hilfe.`,
         sfx: 'classSelected',
     };
 }

@@ -1001,7 +1001,7 @@ export function getCompanionPairing(sceneId) {
     const looks = Object.fromEntries(Object.keys(COMPANION_LOOKS).map(h => [h, COMPANION_LOOKS[h][stage]]));
     return {
         ...pairing, bg: pairing.bg || scene.bg, fallbackBg: scene.bg, stage, pet: stage === 'ascended' ? (scene.pet || '') : '', looks,
-        noTrust: !!scene.noTrust,
+        noAffinity: !!scene.noAffinity,
         layout: scene.layout || null, pictureLayouts: scene.pictureLayouts || {},
     };
 }

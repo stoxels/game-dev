@@ -10,8 +10,8 @@ import { grantSummonCharm } from '../skills/summon-cast.js';
 import { startCoopBoss, stopCoopBoss } from './coop-boss.js';
 import { grantQuestItem, hasQuestItem, questIconHtml, questItemFor } from './quest-items.js';
 import { COMPANION_CAST, hasMetCompanion } from './companion-scenes.js';
-import { getTrustPoints, recordCoopClear } from './companion-trust.js';
-import { buildTrustGainCard } from './trust-gain-card.js';
+import { getAffinityPoints, recordCoopClear } from './companion-affinity.js';
+import { buildAffinityGainCard } from './affinity-gain-card.js';
 
 //------------------------------------------------------------------------
 //-------------------CO-OP ENCOUNTERS--------------------------------------
@@ -20,7 +20,7 @@ import { buildTrustGainCard } from './trust-gain-card.js';
 // section 4f). A co-op node sits on the world map next to a story meeting and
 // opens once that meeting has been watched. The level is a normal Stoxel
 // puzzle with the friend's bot already helping for free (companion-bot/). The
-// first clear with a friend gives trust (2 points); replays are just for fun.
+// first clear with a friend gives affinity (2 points); replays are just for fun.
 // Co-op levels never touch the campaign record (levels done, score, XP).
 
 //------------------------------------------------------------------------
@@ -221,10 +221,10 @@ export function coopAnchor(coopId) {
     return def ? def.anchor : null;
 }
 
-// True once the player has cleared this encounter with its friend (trust was earned).
+// True once the player has cleared this encounter with its friend (affinity was earned).
 export function coopCleared(coopId) {
     const friend = coopFriend(coopId);
-    const rec = friend && STATE.companionTrust && STATE.companionTrust[`${STATE.playerCharacter}>${friend}`];
+    const rec = friend && STATE.companionAffinity && STATE.companionAffinity[`${STATE.playerCharacter}>${friend}`];
     return !!(rec && rec.coop && rec.coop[coopId]);
 }
 
@@ -341,25 +341,25 @@ function _showBox(text, buttons, extra) {
     document.body.appendChild(root);
 }
 
-// The result after the puzzle is solved: the trust bar filling up (first clear
+// The result after the puzzle is solved: the affinity bar filling up (first clear
 // only), the charm and quest item earned, then back to the map.
 function _showResult(friend, firstClear, pointsBefore, pointsAfter, unlockedCharm, questItem) {
     const de = LANG === 'de';
     const friendName = COMPANION_CAST[friend].name;
-    const trust = firstClear ? ''
-        : (de ? 'Schon früher geschafft: diesmal gibt es kein weiteres Vertrauen, nur den Spaß.' : 'Done before: no more trust this time, just for fun.');
+    const affinity = firstClear ? ''
+        : (de ? 'Schon früher geschafft: diesmal gibt es keine weitere Verbundenheit, nur den Spaß.' : 'Done before: no more affinity this time, just for fun.');
     const charm = !unlockedCharm ? ''
         : (de ? `\nNeues Amulett: Beschwöre ${friendName}. Bindungssteine findest du bei Bestien.` : `\nNew charm: Summon ${friendName}. Tether Stones drop from beasts.`);
-    const text = (de ? `Gemeinsam mit ${friendName} gelöst!\n` : `Solved together with ${friendName}!\n`) + trust + charm;
+    const text = (de ? `Gemeinsam mit ${friendName} gelöst!\n` : `Solved together with ${friendName}!\n`) + affinity + charm;
     _showBox(text, [[de ? 'Zurück zur Karte' : 'Back to the map', 'cmp-ask-yes', () => { dismissCompanionBot(); _removeMist(); stopCoopBoss(); goToLevelSelect(); }]],
         _resultExtras(friend, firstClear, pointsBefore, pointsAfter, friendName, questItem));
 }
 
-// What the result box shows below its text: the trust bar of a first clear
+// What the result box shows below its text: the affinity bar of a first clear
 // and the quest item, or nothing.
 function _resultExtras(friend, firstClear, pointsBefore, pointsAfter, friendName, questItem) {
     const parts = [];
-    if (firstClear) parts.push(buildTrustGainCard(friend, pointsBefore, pointsAfter));
+    if (firstClear) parts.push(buildAffinityGainCard(friend, pointsBefore, pointsAfter));
     if (questItem) parts.push(_buildRewardCard(friendName, questItem));
     if (!parts.length) return null;
     const wrap = document.createElement('div');
@@ -412,7 +412,7 @@ export function startCoopEncounter(coopId) {
     return true;
 }
 
-// The puzzle was solved: stops the level, gives the trust on the first clear
+// The puzzle was solved: stops the level, gives the affinity on the first clear
 // and shows the result. Never records anything in the campaign progress.
 export function onCoopSolved() {
     // A boss encounter is won by both: the boss down AND the picture finished.
@@ -435,7 +435,7 @@ function _onBossDown() {
     globalThis.showCombatToast(LANG === 'de' ? 'Der Gegner ist besiegt. Vollendet das Bild!' : 'The beast is down. Finish the picture!');
 }
 
-// Both goals reached: stops the level, gives the trust (and the charm) on the
+// Both goals reached: stops the level, gives the affinity (and the charm) on the
 // first clear and shows the result.
 function _finishCoop() {
     globalThis.dead = true;
@@ -443,11 +443,11 @@ function _finishCoop() {
     Audio_Manager.playSFX('win');
     companionBotSay('win');
     const friend = coopFriend(cur.coopId);
-    const pointsBefore = getTrustPoints(STATE.companionTrust, STATE.playerCharacter, friend);
-    const first = recordCoopClear(STATE.companionTrust, cur.coopId, STATE.playerCharacter, friend);
+    const pointsBefore = getAffinityPoints(STATE.companionAffinity, STATE.playerCharacter, friend);
+    const first = recordCoopClear(STATE.companionAffinity, cur.coopId, STATE.playerCharacter, friend);
     const unlocked = first && COOP_ENCOUNTERS[cur.coopId].unlocksSummon && grantSummonCharm(friend);
     const questItem = grantQuestItem(STATE.questItems, cur.coopId);
     save();
-    const points = getTrustPoints(STATE.companionTrust, STATE.playerCharacter, friend);
+    const points = getAffinityPoints(STATE.companionAffinity, STATE.playerCharacter, friend);
     setTimeout(() => _showResult(friend, first, pointsBefore, points, unlocked, questItem), 2600);
 }

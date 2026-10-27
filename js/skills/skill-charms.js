@@ -415,7 +415,7 @@ function _charmParseKey(key) {
 export function getSkillMaxRank(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return 1;
-    // A Summon charm has no ranks: its strength comes from trust (summon-cast.js).
+    // A Summon charm has no ranks: its strength comes from affinity (summon-cast.js).
     if (def.usp && def.usp.behavior === 'summon') return 1;
     return SPELL_MAX_RANK;
 }

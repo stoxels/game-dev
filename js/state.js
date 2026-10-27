@@ -554,10 +554,10 @@ export function buildFreshState() {
         trialsDone: [],
         ascensionTrialsDone: [],
 
-        // Trust between the player's hero and each other hero, per pair
+        // Affinity between the player's hero and each other hero, per pair
         // ('trix>syla'): { meetings: {sceneId: true}, coop: {coopId: true} }.
-        // Only grows; see js/storyline/companion-trust.js.
-        companionTrust: {},
+        // Only grows; see js/storyline/companion-affinity.js.
+        companionAffinity: {},
         // Tether Stones: the item a Summon charm costs (monster drops only).
         tetherStones: 0,
         // Quest items earned in co-op encounters: { itemId: { from, at } } (storyline/quest-items.js).
@@ -645,7 +645,10 @@ export function _migrateCoreFields(s) {
     if (!s.convergenceDone) s.convergenceDone = [];
     if (!s.trialsDone) s.trialsDone = [];
     if (!s.ascensionTrialsDone) s.ascensionTrialsDone = [];
-    if (!s.companionTrust || typeof s.companionTrust !== 'object' || Array.isArray(s.companionTrust)) s.companionTrust = {};
+    // Saves from before the Trust -> Affinity rename carry the old key.
+    if (s.companionTrust && !s.companionAffinity) s.companionAffinity = s.companionTrust;
+    delete s.companionTrust;
+    if (!s.companionAffinity || typeof s.companionAffinity !== 'object' || Array.isArray(s.companionAffinity)) s.companionAffinity = {};
     if (!Number.isFinite(Number(s.tetherStones)) || s.tetherStones < 0) s.tetherStones = 0;
     if (!s.questItems || typeof s.questItems !== 'object' || Array.isArray(s.questItems)) s.questItems = {};
     if (s.nexusUnlocked === undefined) s.nexusUnlocked = false;

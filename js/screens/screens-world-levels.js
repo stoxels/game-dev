@@ -6,8 +6,8 @@ import { WD_WORLD_CONFIGS } from './screens-world-levels-config.js';
 import { switchScreen } from './screens.js';
 import { STATE } from '../state.js';
 import { coopAnchor, coopAvailable, coopCleared, coopFriend, coopName, startCoopEncounter } from '../storyline/coop-levels.js';
-import { ensureTrustButton } from '../storyline/trust-panel.js';
-import { getTrustPoints } from '../storyline/companion-trust.js';
+import { ensureAffinityButton } from '../storyline/affinity-panel.js';
+import { getAffinityPoints } from '../storyline/companion-affinity.js';
 import { COMPANION_CAST, COMPANION_LOOKS, companionSceneTitle } from '../storyline/companion-scenes.js';
 /*
     ========================================================================
@@ -1502,7 +1502,7 @@ function _wdBuildTopBar(wi) {
     _renderTopBarQuestBadge('wd');
     _renderTopBarTreePoints('wd');
     _wireTopBarButtons('wd');
-    ensureTrustButton();
+    ensureAffinityButton();
     // Class-change token entry button - only visible while a token is held.
     if (typeof globalThis.updateClassChangeButtons === 'function') globalThis.updateClassChangeButtons();
 
@@ -1785,14 +1785,14 @@ const REVEAL_LOOK = {
 
 /**
  * Returns the world's secret-half scene nodes that should be on the map: the
- * teller is another hero, the player's hero trusts them enough, the story node
+ * teller is another hero, the player's hero has enough affinity with them, the story node
  * of the world was watched, and the scene has a script for the picked character.
  */
 function _wdRevealNodesForWorld(wi) {
     const cfg = WD_WORLD_CONFIGS[wi];
     if (!cfg || !cfg.revealNodes || !STATE) return [];
     return cfg.revealNodes.filter(rn => cfg.nodes[rn.from] && rn.teller !== STATE.playerCharacter
-        && getTrustPoints(STATE.companionTrust, STATE.playerCharacter, rn.teller) >= rn.needPoints
+        && getAffinityPoints(STATE.companionAffinity, STATE.playerCharacter, rn.teller) >= rn.needPoints
         && globalThis.hasMetCompanion(rn.after) && !!globalThis.getCompanionPairing(rn.id));
 }
 

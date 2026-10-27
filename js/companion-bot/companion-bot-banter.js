@@ -51,7 +51,7 @@ export const BANTER_LINES = {
         ],
         win: [
             { en: 'Q.E.D. Together, the error was zero.', de: 'Q.E.D. Zusammen war der Fehler null.' },
-            { en: 'Solved. Your trust has been noted.', de: 'Gelöst. Dein Vertrauen wurde vermerkt.' },
+            { en: 'Solved. Your affinity has been noted.', de: 'Gelöst. Deine Verbundenheit wurde vermerkt.' },
         ],
     },
     trix: {

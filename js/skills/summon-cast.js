@@ -2,7 +2,7 @@ import { STATE, cur, save } from '../state.js';
 import { LANG } from '../translation/translations.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { summonCompanionBot } from '../companion-bot/companion-bot.js';
-import { getTrustLevel } from '../storyline/companion-trust.js';
+import { getAffinityLevel } from '../storyline/companion-affinity.js';
 import { COMPANION_CAST } from '../storyline/companion-scenes.js';
 import { grantCharm } from './skill-charms.js';
 import { SUMMON_HEROES, TETHER_STONE_COST, TETHER_STONE_DROP_CHANCE, summonSpellId } from './summon-spells.js';
@@ -35,10 +35,10 @@ function _ownsSummonCharm() {
     return inv.some(c => c && SUMMON_HEROES.some(h => c.skillId === summonSpellId(h)));
 }
 
-// The trust level (1-5) between the player's hero and `heroId`, as shown to the
-// player. A summon always helps at least like level 1, even before any trust is earned.
-export function summonTrustLevel(heroId) {
-    return Math.max(1, getTrustLevel((STATE && STATE.companionTrust) || {}, STATE && STATE.playerCharacter, heroId));
+// The affinity level (1-5) between the player's hero and `heroId`, as shown to the
+// player. A summon always helps at least like level 1, even before any affinity is earned.
+export function summonAffinityLevel(heroId) {
+    return Math.max(1, getAffinityLevel((STATE && STATE.companionAffinity) || {}, STATE && STATE.playerCharacter, heroId));
 }
 
 //------------------------------------------------------------------------
@@ -69,7 +69,7 @@ export function castSummonSpell(spell) {
     STATE.tetherStones = getTetherStones() - TETHER_STONE_COST;
     cur._summonUsed = true;
     save();
-    showToast(_say(`${name} joins you! (Trust ${summonTrustLevel(hero)})`, `${name} schließt sich dir an! (Vertrauen ${summonTrustLevel(hero)})`), '#7fe0b0');
+    showToast(_say(`${name} joins you! (Affinity ${summonAffinityLevel(hero)})`, `${name} schließt sich dir an! (Verbundenheit ${summonAffinityLevel(hero)})`), '#7fe0b0');
     return true;
 }
 

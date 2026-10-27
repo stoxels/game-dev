@@ -6,16 +6,16 @@
 // Stox (the faceless portrait) and Trix (the Warden, the key, the vault and
 // Verun's book). Three scenes, each with a script for the two OTHER heroes as
 // the player, so 3 x 2 = 6. A scene opens on the map (config `revealNodes`)
-// once the player's hero trusts the teller enough (Syla 3 points, Stox 6, Trix
+// once the player's hero has enough affinity with the teller (Syla 3 points, Stox 6, Trix
 // 9: she opens up last) and the world's story node was watched. Same shape as
 // COMPANION_SCENES (companion-scenes.js, which also reads this table);
-// `noTrust` means watching earns nothing, so all pairs stay equal.
+// `noAffinity` means watching earns nothing, so all pairs stay equal.
 // Lines: { who: 'player' | 'companion', en, de }.
 
 export const REVEAL_SCENES = {
     reveal_syla: {
         note: 'World 6, after the Grove visit. Syla tells the secret half: her father at the window, her mother and the eight notes, the fox going quiet. The safe half was told in home_syla.',
-        teller: 'syla', noTrust: true, stage: 'base',
+        teller: 'syla', noAffinity: true, stage: 'base',
         bg: 'images/backgrounds/Frequency-Forest-Background.webp',
         pairings: {
             stox: { companion: 'syla', lines: [
@@ -46,7 +46,7 @@ export const REVEAL_SCENES = {
 
     reveal_stox: {
         note: 'World 8, after the field base. Stox tells the secret half: the faceless portrait in the archive, the too-clean records, the unreadable signature under varnish (he does NOT yet say whose signature it is; that comes in world 14).',
-        teller: 'stox', noTrust: true, stage: 'base',
+        teller: 'stox', noAffinity: true, stage: 'base',
         bg: 'images/backgrounds/Hypothesis-Hinterlands-Background.webp',
         pairings: {
             trix: { companion: 'stox', lines: [
@@ -77,7 +77,7 @@ export const REVEAL_SCENES = {
 
     reveal_trix: {
         note: 'World 11, after Verun\'s ghost. Trix tells the secret half last and only after the ghost: the Observatory exile, the Warden, the stolen key, the vault, Verun\'s book with her people\'s names in it, the debt.',
-        teller: 'trix', noTrust: true, stage: 'ascended', pet: 'browney',
+        teller: 'trix', noAffinity: true, stage: 'ascended', pet: 'browney',
         bg: 'images/backgrounds/Null-Hypothesis-Void.webp',
         pairings: {
             stox: { companion: 'trix', lines: [

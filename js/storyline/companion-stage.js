@@ -2,7 +2,8 @@ import { LANG } from '../translation/translations.js';
 import { COMPANION_CAST, getCompanionPairing, resolveCompanionLayout } from './companion-scenes.js';
 import { STATE, save } from '../state.js';
 import { _setReplayGloballyUnlocked, markSeen } from './storyline-progress.js';
-import { recordMeetingWatched } from './companion-trust.js';
+import { recordMeetingWatched } from './companion-affinity.js';
+import { grantSceneQuestItem } from './quest-items.js';
 
 //------------------------------------------------------------------------
 //-------------------COMPANION STAGE---------------------------------------
@@ -10,7 +11,7 @@ import { recordMeetingWatched } from './companion-trust.js';
 // Full-screen dialogue scene: the world's painted background, the player's
 // hero on the left, the companion on the right, and one speech bubble at a
 // time above whoever is talking. Click / Space / Enter moves on; Skip ends
-// the scene early (it still counts as seen, but earns no trust).
+// the scene early (it still counts as seen, but earns no affinity).
 //
 // A script item { beat: 'character_intro' } pauses the dialogue and plays the
 // player's own intro as a private flashback (what the hero remembers while
@@ -179,25 +180,27 @@ function _showLine(i) {
 // ENTRY POINTS
 //------------------------------------------------------------------------
 
-// Gives the player's trust with the heroes in this scene one point, once per
+// Gives the player's affinity with the heroes in this scene one point, once per
 // scene, and saves it. Only called when the scene was played to its end.
-function _earnTrust(sceneId, playerId, pairing) {
-    if (!STATE.companionTrust) STATE.companionTrust = {};
+function _earnAffinity(sceneId, playerId, pairing) {
+    if (!STATE.companionAffinity) STATE.companionAffinity = {};
     const friends = [pairing.companion, pairing.companion2].filter(Boolean);
-    if (recordMeetingWatched(STATE.companionTrust, sceneId, playerId, friends)) save();
+    if (recordMeetingWatched(STATE.companionAffinity, sceneId, playerId, friends)) save();
 }
 
 // Closes the scene, marks it seen and hands control back to the caller.
 // `watched` is true when the last line was reached, false when the player
-// skipped; only a watched scene earns trust.
+// skipped; only a watched scene earns affinity.
 function _finish(watched) {
     if (!_stage) return;
     const { root, sceneId, onComplete, onKey, playerId, pairing } = _stage;
     _stage = null;
     document.removeEventListener('keydown', onKey, true);
     markSeen('companion_scene', { sceneId });
-    // Only meetings earn trust: the scenes after a co-op encounter never do.
-    if (watched && !pairing.noTrust) _earnTrust(sceneId, playerId, pairing);
+    // The meetings in worlds 12 and 13 hand over the Nexus key halves, watched or skipped.
+    if (STATE.questItems && grantSceneQuestItem(STATE.questItems, sceneId)) save();
+    // Only meetings earn affinity: the scenes after a co-op encounter never do.
+    if (watched && !pairing.noAffinity) _earnAffinity(sceneId, playerId, pairing);
     root.classList.add('cmp-out');
     setTimeout(() => root.remove(), 250);
     if (typeof onComplete === 'function') onComplete();

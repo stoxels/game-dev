@@ -5,8 +5,8 @@
 // section 4f). After the player and their friend cleared the encounter, a
 // "talk" node appears on the map: the two look at the quest item they just
 // found and say what it means. Same shape as COMPANION_SCENES (companion-
-// scenes.js, which also reads this table), with two differences: `noTrust`
-// (watching earns no trust, trust comes only from meetings and clears, so
+// scenes.js, which also reads this table), with two differences: `noAffinity`
+// (watching earns no affinity, affinity comes only from meetings and clears, so
 // every pair stays equal) and `coop` (the encounter that opens it). The friend
 // in each script is the friend of that encounter for that hero.
 // Lines: { who: 'player' | 'companion' | 'voice', en, de }.
@@ -14,7 +14,7 @@
 export const COOP_AFTERMATH_SCENES = {
     after_coop_w4: {
         note: 'World 4, after the spiral puzzle. Quest item: Torn Vortex Chart (the vortex is wider than the Guild charts say).',
-        coop: 'coop_w4', noTrust: true, stage: 'base',
+        coop: 'coop_w4', noAffinity: true, stage: 'base',
         bg: 'images/backgrounds/Vortex-of-Possibilities-Background.webp',
         pairings: {
             stox: { companion: 'syla', lines: [
@@ -46,7 +46,7 @@ export const COOP_AFTERMATH_SCENES = {
 
     after_coop_w6: {
         note: 'World 6, after the fight in the Grove. Quest item: The Grove\'s Eight Notes (a written-down page of the birds\' song). The secret half of Syla\'s story is NOT said aloud.',
-        coop: 'coop_w6', noTrust: true, stage: 'base',
+        coop: 'coop_w6', noAffinity: true, stage: 'base',
         bg: 'images/backgrounds/Frequency-Forest-Background.webp',
         pairings: {
             stox: { companion: 'syla', lines: [
@@ -78,7 +78,7 @@ export const COOP_AFTERMATH_SCENES = {
 
     after_coop_w8: {
         note: 'World 8, after the lantern puzzle. Quest item: The Last Bearing (the last researcher\'s notebook page; every bearing points to one centre; stamped stop measuring).',
-        coop: 'coop_w8', noTrust: true, stage: 'base',
+        coop: 'coop_w8', noAffinity: true, stage: 'base',
         bg: 'images/backgrounds/Hypothesis-Hinterlands-Background.webp',
         pairings: {
             stox: { companion: 'trix', lines: [
@@ -110,7 +110,7 @@ export const COOP_AFTERMATH_SCENES = {
 
     after_coop_w9: {
         note: 'World 9, after the Delta boss. Quest item: Survey Stone Rubbing (stamp V. Vors). Trix goes quiet; Stox knows the name from the struck-off register.',
-        coop: 'coop_w9', noTrust: true, stage: 'ascended', pet: 'browney',
+        coop: 'coop_w9', noAffinity: true, stage: 'ascended', pet: 'browney',
         bg: 'images/backgrounds/Data-Delta-Background.webp',
         pairings: {
             stox: { companion: 'syla', lines: [
@@ -142,7 +142,7 @@ export const COOP_AFTERMATH_SCENES = {
 
     after_coop_w11: {
         note: 'World 11, after the mist puzzle. Quest item: Verun\'s Page (margin note: she used my pages, she smiled). The ghost speaks once more and asks again for his name to be said where they can hear it.',
-        coop: 'coop_w11', noTrust: true, stage: 'ascended', pet: 'browney',
+        coop: 'coop_w11', noAffinity: true, stage: 'ascended', pet: 'browney',
         bg: 'images/backgrounds/Null-Hypothesis-Void.webp',
         pairings: {
             stox: { companion: 'trix', lines: [
@@ -174,7 +174,7 @@ export const COOP_AFTERMATH_SCENES = {
 
     after_coop_w13: {
         note: 'World 13, after the Warden. Quest item: Proof Stone Shard (the proof stone was defaced recently: someone is still erasing).',
-        coop: 'coop_w13', noTrust: true, stage: 'ascended', pet: 'browney',
+        coop: 'coop_w13', noAffinity: true, stage: 'ascended', pet: 'browney',
         bg: 'images/backgrounds/Expectation-Plateau-Background.webp',
         pairings: {
             stox: { companion: 'trix', lines: [
