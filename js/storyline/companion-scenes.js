@@ -1,5 +1,7 @@
 import { STATE } from '../state.js';
 import { hasSeen } from './storyline-progress.js';
+import { COOP_AFTERMATH_SCENES } from './coop-aftermath-scenes.js';
+import { REVEAL_SCENES } from './reveal-scenes.js';
 
 //------------------------------------------------------------------------
 //-------------------COMPANION SCENES--------------------------------------
@@ -216,8 +218,8 @@ export const COMPANION_SCENES = {
                 companion2: 'syla',
                 bg: 'images/story/home_trix/instrument_room.webp',
                 lines: [
-                    { who: 'companion', en: 'The instruments are still bolted to the floor. Somebody left in a hurry.', de: 'Die Instrumente sind noch am Boden festgeschraubt. Jemand ist in Eile gegangen.' },
-                    { who: 'player', en: 'Nobody left in a hurry. We were sent away. Slowly. Stop touching that dial.', de: 'Niemand ist in Eile gegangen. Wir wurden weggeschickt. Langsam. Lass die Finger von dem Regler.' },
+                    { who: 'companion', en: 'The instruments are still bolted to the floor, and the dust lies thick on every dial. Nobody has touched this place in years.', de: 'Die Instrumente sind noch am Boden festgeschraubt, und auf jedem Regler liegt dicker Staub. Seit Jahren hat niemand diesen Ort berührt.' },
+                    { who: 'player', en: 'Longer than you think. The ones who built it were sent away generations ago, and nobody came back. Stop touching that dial.', de: 'Länger, als du denkst. Die, die es gebaut haben, wurden vor Generationen weggeschickt, und niemand kam zurück. Lass die Finger von dem Regler.' },
                     { who: 'companion2', en: 'Oh, Trix... it is so quiet here. Like the place is holding its breath.', de: 'Oh, Trix... es ist so still hier. Als hielte der Ort den Atem an.' },
                     { who: 'companion', en: 'In all those months at the Outpost, you never said where you came from.', de: 'In all den Monaten am Außenposten hast du nie gesagt, woher du kommst.' },
                     { who: 'player', en: 'And I will not say much now. ...Sit down, both of you. One time.', de: 'Und ich werde jetzt auch nicht viel sagen. ...Setzt euch, beide. Einmal.' },
@@ -385,6 +387,10 @@ export const COMPANION_SCENES = {
                     { who: 'player', en: 'A hypothesis. I will need data to confirm it.', de: 'Eine Hypothese. Ich brauche Daten, um sie zu bestätigen.' },
                     { who: 'companion', en: 'It does not feel like corruption leaving, Stox. It feels like something gathering.', de: 'Es fühlt sich nicht an, als würde die Verderbnis verschwinden, Stox. Es fühlt sich an, als würde sich etwas sammeln.' },
                     { who: 'player', en: '...I dislike how plausible that sounds.', de: '...Mir gefällt nicht, wie plausibel das klingt.' },
+                    { who: 'companion', en: 'Look past the fork, Stox. There is a path that winds inward, round and round. It has no name on any chart.', de: 'Sieh hinter die Gabelung, Stox. Dort windet sich ein Pfad nach innen, rund und rund. Auf keiner Karte hat er einen Namen.' },
+                    { who: 'player', en: 'A spiral. It would take two readers: one to walk it, one to check every turn.', de: 'Eine Spirale. Dafür braucht es zwei Leser: einen, der geht, und einen, der jede Biegung prüft.' },
+                    { who: 'companion', en: 'Then it is you and me. Trix said she would stay at the fork and keep the way back open.', de: 'Dann sind wir zwei es. Trix hat gesagt, sie bleibt an der Gabelung und hält den Rückweg offen.' },
+                    { who: 'player', en: 'Sensible. Stay close, and tell me when the branches shift.', de: 'Vernünftig. Bleib dicht bei mir und sag mir, wenn sich die Äste verschieben.' },
                 ],
             },
             trix: {
@@ -399,6 +405,10 @@ export const COMPANION_SCENES = {
                     { who: 'player', en: 'So the bright thing in the middle is eating the world. Great.', de: 'Das helle Ding in der Mitte frisst also die Welt. Wunderbar.' },
                     { who: 'companion2', en: 'Or collecting it. I think it is calling everything home.', de: 'Oder sammelt sie. Ich glaube, es ruft alles heim.' },
                     { who: 'player', en: 'Home. Wonderful. Remind me to avoid it.', de: 'Heim. Wunderbar. Erinnert mich daran, ihn zu meiden.' },
+                    { who: 'companion', en: 'We cannot avoid it. Past the fork a path winds inward, round and round. The Guild charts show nothing there.', de: 'Wir können ihn nicht meiden. Hinter der Gabelung windet sich ein Pfad nach innen, rund und rund. Die Karten der Gilde zeigen dort nichts.' },
+                    { who: 'companion2', en: 'It will only let two through, I think. The branches pull apart when all three of us step closer. I will stay at the fork and keep the way back open.', de: 'Ich glaube, er lässt nur zwei durch. Die Äste weichen auseinander, sobald wir zu dritt näher kommen. Ich bleibe an der Gabelung und halte den Rückweg offen.' },
+                    { who: 'player', en: 'Convenient. Fine, bookworm. You and me, one path, and no coin jokes.', de: 'Praktisch. Gut, Bücherwurm. Du und ich, ein Pfad, und keine Münzwitze.' },
+                    { who: 'companion', en: 'I will read the turns. You walk fast and complain quietly.', de: 'Ich lese die Biegungen. Du gehst schnell und beschwerst dich leise.' },
                 ],
             },
             syla: {
@@ -412,6 +422,10 @@ export const COMPANION_SCENES = {
                     { who: 'companion', en: 'And at the end of that leaning is a hole in the world. Cheerful.', de: 'Und am Ende dieser Neigung ist ein Loch in der Welt. Erfreulich.' },
                     { who: 'player', en: 'Not a hole. A middle. Every circle has one. We just have to find out what lives there.', de: 'Kein Loch. Eine Mitte. Jeder Kreis hat eine. Wir müssen nur herausfinden, was dort lebt.' },
                     { who: 'companion', en: 'I will go first. Do not argue.', de: 'Ich gehe zuerst. Widersprich nicht.' },
+                    { who: 'player', en: 'Wait. Do you see it, past the bowing trees? A path that winds inward, round and round.', de: 'Warte. Siehst du es hinter den sich verneigenden Bäumen? Ein Pfad, der sich nach innen windet, rund und rund.' },
+                    { who: 'companion', en: 'It is narrow. Two can walk it at most. Stox can stay at the fork with his maps and shout if the branches shift.', de: 'Er ist schmal. Höchstens zwei können ihn gehen. Stox kann mit seinen Karten an der Gabelung bleiben und rufen, wenn sich die Äste verschieben.' },
+                    { who: 'player', en: 'Then it is you and me. Together, like the Professor taught us.', de: 'Dann sind wir zwei es. Zusammen, so wie der Professor es uns beigebracht hat.' },
+                    { who: 'companion', en: 'Do not hum on the way in. The path will hear you.', de: 'Summ nicht auf dem Weg hinein. Der Pfad hört dich sonst.' },
                 ],
             },
         },
@@ -949,11 +963,36 @@ export const COMPANION_SCENES = {
 // LOOKUPS
 //------------------------------------------------------------------------
 
+// Names of the story meetings, shown on the world map instead of the hero's name.
+const COMPANION_SCENE_TITLES = {
+    home_stox: { en: 'A Hamlet Under Test', de: 'Ein Weiler auf dem Prüfstand' },
+    den_reunion: { en: 'The Stone That Hums', de: 'Der Stein, der summt' },
+    w3_assembly: { en: 'The Bimodal Assembly', de: 'Die bimodale Versammlung' },
+    w4_forest: { en: 'Where the Branches Lean', de: 'Wo sich die Äste neigen' },
+    home_trix: { en: 'The Silent Observatory', de: 'Das stille Observatorium' },
+    home_syla: { en: 'Under the Old Grove', de: 'Unter dem alten Hain' },
+    w7_loom: { en: 'The Loom That Will Not Update', de: 'Der Webstuhl, der nichts dazulernt' },
+    w8_fieldbase: { en: 'Three Reports, No Reply', de: 'Drei Berichte, keine Antwort' },
+    w9_vortex: { en: 'The Stone Stamped VORS', de: 'Der Stein mit dem Stempel VORS' },
+    w10_enclave: { en: 'What the Estimators Said', de: 'Was die Schätzer sagten' },
+    w11_ghost: { en: 'Verun in the Mist', de: 'Verun im Nebel' },
+    w12_wreck: { en: 'The Order Not to Update', de: 'Der Befehl, nichts zu ändern' },
+    w13_peak: { en: 'Fresh Ink on Peak Mu', de: 'Frische Tinte am Gipfel Mu' },
+    w14_sanctum: { en: 'Variance: Zero', de: 'Varianz: Null' },
+};
+
+// The map name of a story meeting in the given language ('de' or English), or
+// '' when the scene has none.
+export function companionSceneTitle(sceneId, lang) {
+    const title = COMPANION_SCENE_TITLES[sceneId];
+    return title ? (lang === 'de' ? title.de : title.en) : '';
+}
+
 // The current player's script for a scene (companion id, sprite look, lines,
 // background), or null when the scene doesn't exist or has no script for the
 // chosen character.
 export function getCompanionPairing(sceneId) {
-    const scene = COMPANION_SCENES[sceneId];
+    const scene = COMPANION_SCENES[sceneId] || COOP_AFTERMATH_SCENES[sceneId] || REVEAL_SCENES[sceneId];
     const pairing = scene && scene.pairings[STATE && STATE.playerCharacter];
     if (!pairing) return null;
     // A script with no English text yet is still a draft from the story editor: keep it hidden.
@@ -962,6 +1001,7 @@ export function getCompanionPairing(sceneId) {
     const looks = Object.fromEntries(Object.keys(COMPANION_LOOKS).map(h => [h, COMPANION_LOOKS[h][stage]]));
     return {
         ...pairing, bg: pairing.bg || scene.bg, fallbackBg: scene.bg, stage, pet: stage === 'ascended' ? (scene.pet || '') : '', looks,
+        noTrust: !!scene.noTrust,
         layout: scene.layout || null, pictureLayouts: scene.pictureLayouts || {},
     };
 }

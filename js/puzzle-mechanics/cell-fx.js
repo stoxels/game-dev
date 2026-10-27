@@ -159,14 +159,16 @@ export function _ensureCellEffectCSS() {
 // then strips the class once the animation finishes.
 // Forces a DOM reflow before re-adding the class so rapid
 // reuse on the same cell always restarts the animation cleanly.
-export function _applyCellEffect(cellIds, type, source) {
+export function _applyCellEffect(cellIds, type, source, projectileOpts) {
     if (!cellIds.length) return;
     _ensureCellEffectCSS();
 
     // Programmatic reveals (items, passives, class abilities) feed the
     // endgame projectile system - guarded, so it is a no-op outside endgame.
-    if (type === 'reveal' && typeof _onProgrammaticReveal === 'function') {
-        _onProgrammaticReveal(cellIds, source);
+    // `projectileOpts` (optional) goes along to the volley; { skip: true }
+    // shows the glow without shooting (a friend's fill that should not hit).
+    if (type === 'reveal' && typeof _onProgrammaticReveal === 'function' && !(projectileOpts && projectileOpts.skip)) {
+        _onProgrammaticReveal(cellIds, source, projectileOpts);
     }
 
     const cls = `cell-fx-${type}`;

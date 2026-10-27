@@ -155,6 +155,8 @@ function _shouldPrepareCampaignEncounter() {
     if (!cur) return false;
     if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return false;
     if (cur.isEndgameSandbox) return false;
+    // Co-op encounters are pure puzzles with a friend, unless they ask for a pack.
+    if (cur.isCoop && !cur.coopMonsters) return false;
     // Active map-device run / sandbox seed - already a monster level that is
     // NOT a campaign level.
     if (cur.isMonsterLevel && !cur.campaignMonsters) return false;
@@ -174,19 +176,22 @@ export function _prepareCampaignEncounter() {
     const cfg = CAMPAIGN_MONSTER_CONFIG;
     const cells = _countSolutionCells();
     const level = (typeof _campaignMonsterLevel === 'function')
-        ? _campaignMonsterLevel(cur.gIdx) : 1;
+        ? _campaignMonsterLevel(cur.monsterRefGi != null ? cur.monsterRefGi : cur.gIdx) : 1;
     const world = cur.world || 1;
     let count = cfg.countBase + Math.floor((world - 1) / cfg.countPerWorlds);
     count = Math.max(1, Math.min(cfg.countMax, count));
     count += Math.min(cfg.sizeBonusMax, Math.floor(cells / cfg.cellsPerExtraMonster));
     count = Math.min(count, cfg.earlyCountBase + Math.ceil(level / cfg.earlyCountLevelDivisor));
     count = Math.min(count, Math.max(1, Math.floor(cells / cfg.minCellsPerMonster)));
+    // A co-op boss encounter fields one big monster instead of a pack.
+    const boss = cur.coopBoss || null;
+    if (boss) count = 1;
 
     const ramp = Math.max(0, Math.min(1, (level - 1) / Math.max(1, cfg.earlyHpRampLevels)));
     const hits = cfg.hitsToKill * (cfg.earlyHitsFraction + (1 - cfg.earlyHitsFraction) * ramp);
-    const perHp = Math.max(cfg.minHp, Math.round(_campaignRefHit(level) * hits));
+    const perHp = Math.max(cfg.minHp, Math.round(_campaignRefHit(level) * hits * (boss ? boss.hpMult : 1)));
     const easeDamage = 1 - (1 - cfg.earlyDamageMult) * _earlyEaseBlend(level);
-    const damage = Math.max(1, Math.round(_campaignRefDamage(level) * easeDamage));
+    const damage = Math.max(1, Math.round(_campaignRefDamage(level) * easeDamage * (boss ? boss.dmgMult : 1)));
 
     cur.campaignMonsters = true;
     cur.isMonsterLevel = true;
@@ -195,7 +200,7 @@ export function _prepareCampaignEncounter() {
     cur.campaignMonsterCount = count;
     cur.campaignMonsterHp = perHp;
     cur.campaignMonsterDamage = damage;
-    cur.monsters = _buildCampaignMonsterList(count, level);
+    cur.monsters = boss ? [{ id: boss.monsterId, level }] : _buildCampaignMonsterList(count, level);
     return true;
 }
 

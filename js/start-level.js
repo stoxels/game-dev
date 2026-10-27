@@ -42,6 +42,7 @@ import { addTimeSecs } from './timer/timer-adjust.js';
 import { t } from './translation/translations.js';
 import { STATE } from './state.js';
 import { cur } from './state.js';
+import { onCoopLevelStart } from './storyline/coop-levels.js';
 
 // Live accessors preserve the level-start patch seams.
 try { Object.defineProperty(globalThis, 'startLevel', { get() { return startLevel; }, set(v) { startLevel = v; }, configurable: true }); } catch (e) {}
@@ -256,7 +257,7 @@ function _calcBaseTime() {
         // in both cases (tree time_added is added in the _initTimer patch).
         const gearBonus = (typeof _computePlayerStats === 'function')
             ? (_computePlayerStats().timeAdded || 0) : 0;
-        const authored = (CAMPAIGN_BUDGET_ACTIVE && !cur.isTutorialQuest && cur.grid && cur.grid[0])
+        const authored = (CAMPAIGN_BUDGET_ACTIVE && !cur.isTutorialQuest && !cur.coopFixedTimer && cur.grid && cur.grid[0])
             ? campaignBaseTimeSecs(cur.grid.length * cur.grid[0].length)
             : (cur.timer || cfg.timerStart);
         baseTimer = authored + gearBonus;
@@ -722,6 +723,9 @@ export function _doStartLevel(gi) {
         }
         _onPuzzleComplete();
     }
+
+    // Co-op encounter: the friend joins for free (also on a retry); any other level clears leftover mist.
+    if (cur) onCoopLevelStart();
 
     // 9. Background music
     // Tutorial quest levels keep the random tutorial track started on entry;

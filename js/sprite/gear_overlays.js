@@ -121,7 +121,11 @@ function framesFor(info) {
 // Loadout — straight from the equipped paperdoll (endgame equipment).
 //------------------------------------------------------------------------
 
-function readLoadout() {
+// `img.__gearLoadout` (a companion's own gear, set by js/companion-bot/
+// companion-bot-sprite.js) takes the place of the player's paperdoll for
+// that one sprite.
+function readLoadout(img) {
+    if (img && img.__gearLoadout) return img.__gearLoadout;
     let eq = null;
     try { eq = _equipped || null; } catch (e) { eq = null; }
     if (!eq) return null;
@@ -382,7 +386,7 @@ function syncImg(img) {
     const info = parseAnimSrc(img.getAttribute('src') || '');
     if (!stages || !info) { hideStages(stages); return; }
 
-    const loadout = readLoadout();
+    const loadout = readLoadout(img);
     if (!loadout || !loadout.mainId) { hideStages(stages); return; }
 
     const frames = framesFor(info);
@@ -476,6 +480,8 @@ function sweep() {
         const img = document.getElementById(id);
         if (img) syncImg(img);
     }
+    // Extra sprites that carry their own gear (a summoned friend).
+    document.querySelectorAll('img[data-gear-extra]').forEach(syncImg);
 }
 
 function startGearOverlays() {

@@ -15,21 +15,27 @@ import { _buildTooltipBodyHTML, _clearTooltip } from './hub-tooltips.js';
 import { _ensureUniqueStash, _getUniqueCount, _isUniqueCollected, _moveUniqueToInventory, _updateUniqueTabBadge } from './hub-uniques.js';
 import { _stashTab } from './hub-stash.js';
 import { _renderInventory, _showStashInfo } from './hub.js';
+import { _renderQuestStash } from './hub-quest-ui.js';
 
 
 // Switches the stash between the Inventory and Uniques tabs.
 export function _switchStashTab(tab) {
     Audio_Manager.playSFX('ui_tab_switch');
-    globalThis._stashTab = (tab === 'uniques' ? 'uniques' : 'inventory');
+    globalThis._stashTab = (tab === 'uniques' || tab === 'quests') ? tab : 'inventory';
     const invBody = document.getElementById('sx-stash-tab-inventory');
     const uniqBody = document.getElementById('sx-stash-tab-uniques');
+    const questBody = document.getElementById('sx-stash-tab-quests');
     const invTab = document.getElementById('sx-tab-inventory');
     const uniqTab = document.getElementById('sx-tab-uniques');
+    const questTab = document.getElementById('sx-tab-quests');
     if (invBody) invBody.classList.toggle('active', _stashTab === 'inventory');
     if (uniqBody) uniqBody.classList.toggle('active', _stashTab === 'uniques');
+    if (questBody) questBody.classList.toggle('active', _stashTab === 'quests');
     if (invTab) invTab.classList.toggle('active', _stashTab === 'inventory');
     if (uniqTab) uniqTab.classList.toggle('active', _stashTab === 'uniques');
+    if (questTab) questTab.classList.toggle('active', _stashTab === 'quests');
     if (_stashTab === 'uniques') _renderUniqueStash();
+    else if (_stashTab === 'quests') _renderQuestStash();
     else _renderInventory();
 }
 

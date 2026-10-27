@@ -86,7 +86,7 @@ import { MOD_LABELS, MOD_CLASSES, buildNextTitleStr, applyClassStatusActiveStyle
 import { _ensureTooltipElement, _trackTooltipToMouse, _hideWorldTooltip, _renderTopBarScore, _renderTopBarNextCode, _renderTopBarClassStatus, _renderTopBarQuestBadge, _renderTopBarTreePoints, _wireTopBarButtons, initMapViewToggle, showMapView } from '../../js/screens/screens-map-view.js';
 import { onSaveSlotChosen, renderSaveSlotScreen, showSaveSlotSelect, confirmSlotName, cancelSlotName } from '../../js/screens/screens-save-slots.js';
 import { WD_WORLD_CONFIGS } from '../../js/screens/screens-world-levels-config.js';
-import { _wdCurrentWi, wdGoBackToMap, _wdSyncSpriteToLevel, showWorldDetail, getWinStoryTarget, wdOpenStoryNode } from '../../js/screens/screens-world-levels.js';
+import { _wdCurrentWi, wdGoBackToMap, wdStoryProgress, _wdSyncSpriteToLevel, showWorldDetail, getWinStoryTarget, wdOpenStoryNode } from '../../js/screens/screens-world-levels.js';
 import { switchScreen, showModal, hideModal, _refreshQuestionModalFlag, hideResultOverlays, _maybeShowConvergenceModal, showTitle, enterNexusFromSetup, showSetup, confirmSetup, launchExistingGame, launchEndgameTestMode, launchVendor, goToLevelSelect, goToPreviousScreen, goToNextLevel } from '../../js/screens/screens.js';
 import { initWorldProto, showWorldProto } from '../../js/world-proto/world-proto.js';
 import { CLASS_DEFS, CLASS_LIST, CLASS_SPELL_ICONS, COMBAT_HEARTBLOOM_DEF } from '../../js/classes/class-defs.js';
@@ -378,7 +378,22 @@ import { TRIX_INTRO_IMAGE_PATH, TRIX_INTRO_SONG } from '../../js/storyline/story
 import { SYLA_INTRO_IMAGE_PATH, SYLA_INTRO_SONG } from '../../js/storyline/storyline-intro-syla.js';
 import { REGION_BEAT_TRIGGER_LEVEL, REPLAY_GALLERY_ENTRIES, STORY_BEATS } from '../../js/storyline/storyline-beats.js';
 import { COMPANION_CAST, COMPANION_SCENES, getCompanionPairing, hasMetCompanion } from '../../js/storyline/companion-scenes.js';
+import '../../js/storyline/companion-trust.js';
 import { askStoryCatchUp, playCompanionScene } from '../../js/storyline/companion-stage.js';
+import '../../js/companion-bot/companion-bot-profiles.js';
+import '../../js/companion-bot/companion-bot-gear.js';
+import '../../js/companion-bot/companion-bot-banter.js';
+import '../../js/companion-bot/companion-bot-sprite.js';
+import { summonCompanionBot, dismissCompanionBot, activeCompanionBot } from '../../js/companion-bot/companion-bot.js';
+import '../../js/storyline/coop-levels.js';
+import '../../js/storyline/coop-boss.js';
+import '../../js/storyline/coop-aftermath-scenes.js';
+import '../../js/storyline/reveal-scenes.js';
+import '../../js/storyline/quest-items.js';
+import '../../js/storyline/trust-panel.js';
+import '../../js/storyline/trust-gain-card.js';
+import '../../js/skills/summon-spells.js';
+import '../../js/skills/summon-cast.js';
 import { EG_TEST_MAPS, _egtEnsureStyles, _egtPickSeedGi, showEndgameTestHub, _egLaunchTestMap } from '../../js/dev/endgame-testing-screen.js';
 import { _ascensionTrialName, _cleanupCampaignTrialSeed, _endCampaignTrial, _ensureTrialState, _grantAscensionTrialReward, _grantConvergenceTrialReward, _isAscensionTrialDone, _isAscensionTrialRun, _isAscensionTrialUnlocked, _isConvergenceTrialRun, _isTrialDone, _isTrialRun, _isTrialUnlocked, _launchAscensionTrial, _launchCampaignTrial, _launchTrialRun, _retitleLeaveMapTransition, _routeTrialReturn, _servePostTrialFlows, _trialBossId, _trialChainParams, _trialCount, _trialIdForWorld, _trialMonsterLevel, _trialName, _trialTriggerLevels, _trialWorldStartGi, _trialWorlds } from '../../js/campaign-trials.js';
 import { AssetPreload } from '../../js/asset-preload.js';
@@ -435,6 +450,7 @@ import { _ensureUniqueStash, _addUniqueToCollection, _getUniqueCount, _isUniqueC
 import { EQUIP_SLOTS, _buildEquipSlotHTML, _buildEquipColHTML, _buildCharPanelHTML, _buildCurrencyCellHTML, _buildCurrencyGridHTML, _buildCurrencyPanelHTML, _buildCurrencyStripHTML, _onCurrencyCellEnter, _onCurrencyCellMove, _onCurrencyCellLeave, _buildInventoryCellHTML, _buildInventoryGridHTML, _buildStashPanelHTML, _stashInfoTimer, _ensureStashInfoEl, _showStashInfo, _clearStashInfo, _buildFullScreenHTML, _renderEquipSlot, _renderEquipSlots, RARITY_CELL_FILL, REQ_BLOCKED_FILL, _getCellFill, _renderInventoryCell, _renderInventory, _updateInvCount, _renderCurrencyStash, _updateCraftingBenchLauncherSlot, _renderAll, _createScreen, ensureHubScreen, showHub, safeGoBackFromHub, _hubGameOverlay, _hubOverlayPaused, isHubGameOverlay, _applyOverlayChrome, _hubOverlayPause, _hubOverlayResume, _hubHideAvatars, _hubShowAvatars, openHubFromGame, _syncOverlayGearPools, closeHubToGame, addTestItems } from '../../js/hub/hub.js';
 import { _switchStashTab, _buildUniqueGridHTML, _renderUniqueStash, _onUniqueCellClick, _onUniqueCellRightClick, _onUniqueCellEnter, _onUniqueCellMove, _onUniqueCellLeave } from '../../js/hub/hub-unique-ui.js';
 import { _renderStatsList, _buildStatDescTooltipHTML, _bindStatTooltips } from '../../js/hub/hub-stats-panel.js';
+import { _buildQuestGridHTML, _renderQuestStash, _onQuestCellEnter, _onQuestCellMove, _onQuestCellLeave } from '../../js/hub/hub-quest-ui.js';
 import { LEVELING_CONFIG, _getTreeTimerStartSecs, _getTreeChannel, _lifeGain, _getPlayerLevel, _getPlayerXP, _getUnspentPoints, _getXpForNextLevel, _syncBaseAttributes, _calcXpMultiplier, _awardXP, _grantMonsterXP, _showXpGainText, _campaignExpectedLevel, _campaignMonsterLevel, _grantCampaignLevelXP, _allocateAttribute, _refundAttribute, _loadLevelingState, _renderLevelHUD, _showLevelBtnTooltip } from '../../js/hub/hub-leveling.js';
 import { _egActiveMapItem, EG_TIER1_MAX_MONSTERS, EG_LOW_TIER_MONSTER_STEPS, EG_MAP_BASE_BOSS_CHANCE, EG_TIER1_MAX_TOTAL_MONSTERS, EG_TIER2_MAX_TOTAL_MONSTERS, _egGetActiveMapModValue, _egHasActiveMapMod, _egMapHasBloodMagic, _egMapPlayerLifeMult, _egMapPlayerDamageMult, _egMapPlayerDefenceMult, _egMapManaGainMult, _egMapPlayerMeleeMult, _egMapPlayerProjectileMult, _egMapItemRevealMult, _egMapAbilityRevealMult, _egMapSpellDamageMult, _egMapTimeGainMult, _egMapResistMult, _egMapDamageTakenAmpMult, _egMapKillRecoveryMult, _egMapEvasionMult, _egMapAbsorptionMult, _egMapBlockMult, _egMapActionSlowMult, _egRollMonsterCritMult, _egOnQuizWrongAnswer, _egMapAccuracyMult, _egMapAttackSpeedMult, _egApplyMonsterHitMods, _egApplyMapModsToMonster, _egMapQuestionsPerInterstitial, _egActiveMapRewardBonuses, _egMapXpMult, _egMapLootQuantityMult, _egMapLootRarityWeightMult, _egBuildSizeQueue, _egRollMapRunBaseline, _egApplyModsToBaseline, _egPickMapRunSeedGi, _egCleanupMapRunSeedLevel, _egLaunchMapFromDevice } from '../../js/endgame/endgame-map-launch.js';
 import '../../js/loot/loot-filter-state.js';
@@ -739,6 +755,9 @@ try { Object.defineProperty(globalThis, "_onMistake", { get() { return _onMistak
 try { Object.defineProperty(globalThis, "_onMistakeBayesianUpdate", { get() { return _onMistakeBayesianUpdate; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_onPause", { get() { return _onPause; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_onProgrammaticReveal", { get() { return _onProgrammaticReveal; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_onQuestCellEnter", { get() { return _onQuestCellEnter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_onQuestCellLeave", { get() { return _onQuestCellLeave; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_onQuestCellMove", { get() { return _onQuestCellMove; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_onResume", { get() { return _onResume; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_onUniqueCellClick", { get() { return _onUniqueCellClick; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_onUniqueCellEnter", { get() { return _onUniqueCellEnter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

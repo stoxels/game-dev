@@ -1,4 +1,5 @@
 import { CHARM_DROP_CHANCE_NORMAL, _charmTryMonsterDrop } from '../skills/skill-charms.js';
+import { rollTetherStoneDrop } from '../skills/summon-cast.js';
 import { LOOT_DROP_CHANCE_NORMAL } from './combat-grid-pickups.js';
 import { ITEM_DROP_CHANCE_NORMAL } from './combat-grid-pickups-items.js';
 import { CURRENCY_DROP_CHANCE_NORMAL } from '../loot/loot-currency-drops.js';
@@ -145,6 +146,8 @@ export function _handleNormalMonsterKill(dying) {
             case 'gold': _tryDropGold(false, dying.level, true); break;
             default: break;
         }
+        // Tether Stones (pay for Summon charms) drop on top of the normal roll.
+        rollTetherStoneDrop(false);
     }
 }
 
@@ -175,5 +178,6 @@ export function _handleBossKill(dying) {
         if (typeof _charmTryMonsterDrop === 'function') _charmTryMonsterDrop(true, dying.level);
         // ...and a boss coin worth several regular ones.
         _tryDropGold(true, dying.level, true);
+        rollTetherStoneDrop(true);
     }
 }

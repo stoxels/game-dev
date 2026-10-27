@@ -22,6 +22,7 @@ import { triggerBanter } from '../sprite/character-banter.js';
 import { checkWorldCodes, checkWorldCodesSync } from '../codes.js';
 import { showQuiz } from '../quiz-exercise/quiz.js';
 import { _grantCampaignLevelXP } from '../hub/hub-leveling.js';
+import { onCoopSolved } from '../storyline/coop-levels.js';
 
 //------------------------------------------------------------------------
 //-------------------SCORING ORCHESTRATOR (scoring.js)---------------------
@@ -97,6 +98,9 @@ function checkWin() {
     if (window._egIsMapDeviceRun && cur && cur.isMonsterLevel && !_isActive()) {
         return;
     }
+
+    // Co-op encounters have their own win flow (trust, no campaign record).
+    if (cur && cur.isCoop) { onCoopSolved(); return; }
 
     // Stop any active visual effects and freeze the game state
     if (typeof window.clearActiveRandomWalkers === 'function') window.clearActiveRandomWalkers();

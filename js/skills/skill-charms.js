@@ -70,6 +70,7 @@ const CHARM_ELEMENT_FILTERS = [
     { id: 'shadow', tag: 'Shadow' },
     { id: 'holy', tag: 'Holy' },
     { id: 'physical', tag: 'Physical' },
+    { id: 'summon', tag: 'Summon' },
 ];
 
 // Every applied Theorem adds this much damage to the charm's spell.
@@ -412,7 +413,10 @@ function _charmParseKey(key) {
 // every rank gets its own charm (getSkillCastRankClamped keeps the authored
 // effect tables itself at ranks 1..levels.length).
 export function getSkillMaxRank(skillId) {
-    if (!getSkillDef(skillId)) return 1;
+    const def = getSkillDef(skillId);
+    if (!def) return 1;
+    // A Summon charm has no ranks: its strength comes from trust (summon-cast.js).
+    if (def.usp && def.usp.behavior === 'summon') return 1;
     return SPELL_MAX_RANK;
 }
 
@@ -1175,7 +1179,17 @@ function _charmBuildCurrencyHTML() {
     return `<div class="sb3-charm-tools">`
         + `<span class="sb3-lemma"${tipAttrs('shards')}><b>${shards}</b>/${CHARM_SHARDS_PER_ORB} ${t('charm_currency_shards')}</span>`
         + `<span class="sb3-theorem${_charmTheoremMode ? ' is-armed' : ''}"${tipAttrs('orbs')}><b>${orbs}</b> ${orbLabel}</span>`
+        + _charmTetherStoneHTML()
         + `</div>`;
+}
+
+// The Tether Stone counter (pays for Summon charms); only shown once the player
+// owns a Summon charm or holds stones.
+function _charmTetherStoneHTML() {
+    const stones = Math.max(0, Math.floor(Number(STATE && STATE.tetherStones) || 0));
+    const owns = (STATE.charmInventory || []).some((c) => c && /^usp_summon_/.test(c.skillId));
+    if (!owns && !stones) return '';
+    return `<span class="sb3-lemma" title="${t('charm_tether_stones_tip')}"><b>${stones}</b> ${t('charm_tether_stones')}</span>`;
 }
 
 // Element of a skill's charm for the list filter, or '' when the skill has
@@ -1637,6 +1651,8 @@ function _charmBuildDropSkillPool() {
         if (!def) continue;
         const kind = def.slotKind;
         if (kind === 'base1' || kind === 'base2' || kind === 'asc1' || kind === 'asc2') continue;
+        // Summon charms are never found as drops; co-op clears hand them over.
+        if (def.usp && def.usp.behavior === 'summon') continue;
         const weight = (kind === 'universal') ? 1 : 3;
         for (let i = 0; i < weight; i++) pool.push(id);
     }

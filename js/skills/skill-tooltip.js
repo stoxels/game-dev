@@ -10,6 +10,7 @@ import { getUniversalSpellCastKind, getUniversalSpellChargeRechargeRemaining, ge
 import { getSpellComboSections } from '../combat/combat-spell-debuff-defs.js';
 import { getClassSkillMonsterRows } from '../classes/class-monster-effects-defs.js';
 import { STATE } from '../state.js';
+import { summonTrustLevel } from './summon-cast.js';
 
 //------------------------------------------------------------------------
 //-------------------CROSS-MODULE CONSTRAINT------------------------------
@@ -58,6 +59,10 @@ function _skillFormatCooldown(secs) {
 
 // The coloured type line: "Spell, Reveal, Area".
 function _skillTooltipTags(def) {
+    // Summon charms show how much the two heroes trust each other instead of spell tags.
+    if (def.usp && def.usp.behavior === 'summon') {
+        return `<div class="skl-tip-tags">${LANG === 'de' ? 'Beschwörung' : 'Summon'} · ${LANG === 'de' ? 'Vertrauen' : 'Trust'} ${summonTrustLevel(def.usp.summonHero)} / 5</div>`;
+    }
     if (!def.tags || !def.tags.length) return '';
     return `<div class="skl-tip-tags">${def.tags.join(', ')}</div>`;
 }
@@ -387,7 +392,7 @@ function _classSkillMonsterRows(skillId, rank) {
 // can trigger (see combat-spell-debuff-defs.js). Empty for spells with none.
 function _skillTooltipCombo(skillId, rank) {
     const spell = getUniversalSpellDef(skillId);
-    const sections = getSpellComboSections(skillId, spell && spell.element);
+    const sections = getSpellComboSections(skillId, spell && spell.behavior !== 'summon' ? spell.element : null);
     const classRows = _classSkillMonsterRows(skillId, rank);
     if (classRows.length) sections.push({ title: LANG === 'de' ? 'Wirkung auf Monster' : 'On monsters', rows: classRows });
     if (!sections.length) return '';

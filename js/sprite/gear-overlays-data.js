@@ -6118,6 +6118,328 @@ export const GEAR_GRIP_DATA = {
     0.848
    ],
    "tuned": true
+  },
+  "wpn_rusted_arcane_rod_4": {
+   "role": "weapon",
+   "category": "rod",
+   "handle": [
+    0.331,
+    0.672
+   ],
+   "autoHandle": [
+    0.306,
+    0.729
+   ],
+   "scale": 0.475,
+   "offsetByDir": null,
+   "rotByDir": {
+    "down": -10,
+    "up": -10,
+    "left": -90,
+    "right": 5
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.1
+   ],
+   "nat": [
+    727,
+    727
+   ],
+   "bbox": [
+    0.184,
+    0.168,
+    0.816,
+    0.832
+   ],
+   "tuned": true
+  },
+  "wpn_worn_arcane_rod_7": {
+   "role": "weapon",
+   "category": "rod",
+   "handle": [
+    0.331,
+    0.672
+   ],
+   "autoHandle": [
+    0.306,
+    0.729
+   ],
+   "scale": 0.475,
+   "offsetByDir": null,
+   "rotByDir": {
+    "down": -10,
+    "up": -10,
+    "left": -90,
+    "right": 5
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.1
+   ],
+   "nat": [
+    727,
+    727
+   ],
+   "bbox": [
+    0.184,
+    0.168,
+    0.816,
+    0.832
+   ],
+   "tuned": true
+  },
+  "wpn_worn_arcane_rod_10": {
+   "role": "weapon",
+   "category": "rod",
+   "handle": [
+    0.702,
+    0.684
+   ],
+   "autoHandle": [
+    0.687,
+    0.728
+   ],
+   "scale": 0.545,
+   "offsetByDir": null,
+   "rotByDir": {
+    "down": 40,
+    "up": 70,
+    "left": -10,
+    "right": 90
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.1
+   ],
+   "nat": [
+    738,
+    738
+   ],
+   "bbox": [
+    0.176,
+    0.172,
+    0.824,
+    0.828
+   ],
+   "tuned": true
+  },
+  "wpn_steel_arcane_rod_22": {
+   "role": "weapon",
+   "category": "rod",
+   "handle": [
+    0.331,
+    0.684
+   ],
+   "autoHandle": [
+    0.304,
+    0.726
+   ],
+   "scale": 0.635,
+   "offsetByDir": null,
+   "rotByDir": {
+    "down": 0,
+    "up": -20,
+    "left": -90,
+    "right": 10
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.1
+   ],
+   "nat": [
+    735,
+    735
+   ],
+   "bbox": [
+    0.18,
+    0.172,
+    0.82,
+    0.828
+   ],
+   "tuned": true
+  },
+  "wpn_soldier_arcane_rod_26": {
+   "role": "weapon",
+   "category": "rod",
+   "handle": [
+    0.331,
+    0.684
+   ],
+   "autoHandle": [
+    0.304,
+    0.726
+   ],
+   "scale": 0.635,
+   "offsetByDir": null,
+   "rotByDir": {
+    "down": 0,
+    "up": -20,
+    "left": -90,
+    "right": 10
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.1
+   ],
+   "nat": [
+    735,
+    735
+   ],
+   "bbox": [
+    0.18,
+    0.172,
+    0.82,
+    0.828
+   ],
+   "tuned": true
+  },
+  "wpn_frost_arcane_rod_50": {
+   "role": "weapon",
+   "category": "rod",
+   "handle": [
+    0.319,
+    0.7
+   ],
+   "autoHandle": [
+    0.29,
+    0.733
+   ],
+   "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": {
+    "down": 5,
+    "up": -30,
+    "left": -85,
+    "right": -5
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.1
+   ],
+   "nat": [
+    725,
+    725
+   ],
+   "bbox": [
+    0.184,
+    0.168,
+    0.816,
+    0.832
+   ],
+   "tuned": true
+  },
+  "wpn_dawn_arcane_rod_62": {
+   "role": "weapon",
+   "category": "rod",
+   "handle": [
+    0.324,
+    0.715
+   ],
+   "autoHandle": [
+    0.296,
+    0.752
+   ],
+   "scale": 0.56,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -15,
+    "up": -15,
+    "left": -85,
+    "right": 5
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.1
+   ],
+   "nat": [
+    695,
+    695
+   ],
+   "bbox": [
+    0.203,
+    0.152,
+    0.797,
+    0.848
+   ],
+   "tuned": true
+  },
+  "wpn_dawn_arcane_rod_66": {
+   "role": "weapon",
+   "category": "rod",
+   "handle": [
+    0.307,
+    0.738
+   ],
+   "autoHandle": [
+    0.297,
+    0.737
+   ],
+   "scale": 0.565,
+   "offsetByDir": {
+    "down": [
+     0,
+     0
+    ]
+   },
+   "rotByDir": {
+    "down": -15,
+    "up": -15,
+    "left": -90,
+    "right": 15
+   },
+   "recScale": null,
+   "recSx": null,
+   "recTint": null,
+   "recMirrored": false,
+   "axis": [
+    0.5,
+    0.1
+   ],
+   "nat": [
+    714,
+    714
+   ],
+   "bbox": [
+    0.188,
+    0.16,
+    0.813,
+    0.836
+   ],
+   "tuned": true
   }
  },
  "sprites": {

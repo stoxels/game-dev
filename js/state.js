@@ -554,6 +554,15 @@ export function buildFreshState() {
         trialsDone: [],
         ascensionTrialsDone: [],
 
+        // Trust between the player's hero and each other hero, per pair
+        // ('trix>syla'): { meetings: {sceneId: true}, coop: {coopId: true} }.
+        // Only grows; see js/storyline/companion-trust.js.
+        companionTrust: {},
+        // Tether Stones: the item a Summon charm costs (monster drops only).
+        tetherStones: 0,
+        // Quest items earned in co-op encounters: { itemId: { from, at } } (storyline/quest-items.js).
+        questItems: {},
+
         // Nexus World (World 14) / Nexus Point progress.
         // Set to true on the first clear of the Nexus Point level; unlocks
         // the Nexus screen and the setup-screen "Enter the Nexus" button.
@@ -636,6 +645,9 @@ export function _migrateCoreFields(s) {
     if (!s.convergenceDone) s.convergenceDone = [];
     if (!s.trialsDone) s.trialsDone = [];
     if (!s.ascensionTrialsDone) s.ascensionTrialsDone = [];
+    if (!s.companionTrust || typeof s.companionTrust !== 'object' || Array.isArray(s.companionTrust)) s.companionTrust = {};
+    if (!Number.isFinite(Number(s.tetherStones)) || s.tetherStones < 0) s.tetherStones = 0;
+    if (!s.questItems || typeof s.questItems !== 'object' || Array.isArray(s.questItems)) s.questItems = {};
     if (s.nexusUnlocked === undefined) s.nexusUnlocked = false;
     // Older saves: derive the penalty stage from progress already made.
     if (s.resistPenaltyStage === undefined) s.resistPenaltyStage = s.nexusUnlocked ? 2 : (s.playerAscendency ? 1 : 0);

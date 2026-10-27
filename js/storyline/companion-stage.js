@@ -1,7 +1,8 @@
 import { LANG } from '../translation/translations.js';
 import { COMPANION_CAST, getCompanionPairing, resolveCompanionLayout } from './companion-scenes.js';
-import { STATE } from '../state.js';
+import { STATE, save } from '../state.js';
 import { _setReplayGloballyUnlocked, markSeen } from './storyline-progress.js';
+import { recordMeetingWatched } from './companion-trust.js';
 
 //------------------------------------------------------------------------
 //-------------------COMPANION STAGE---------------------------------------
@@ -9,7 +10,7 @@ import { _setReplayGloballyUnlocked, markSeen } from './storyline-progress.js';
 // Full-screen dialogue scene: the world's painted background, the player's
 // hero on the left, the companion on the right, and one speech bubble at a
 // time above whoever is talking. Click / Space / Enter moves on; Skip ends
-// the scene early (it still counts as seen).
+// the scene early (it still counts as seen, but earns no trust).
 //
 // A script item { beat: 'character_intro' } pauses the dialogue and plays the
 // player's own intro as a private flashback (what the hero remembers while
@@ -178,13 +179,25 @@ function _showLine(i) {
 // ENTRY POINTS
 //------------------------------------------------------------------------
 
+// Gives the player's trust with the heroes in this scene one point, once per
+// scene, and saves it. Only called when the scene was played to its end.
+function _earnTrust(sceneId, playerId, pairing) {
+    if (!STATE.companionTrust) STATE.companionTrust = {};
+    const friends = [pairing.companion, pairing.companion2].filter(Boolean);
+    if (recordMeetingWatched(STATE.companionTrust, sceneId, playerId, friends)) save();
+}
+
 // Closes the scene, marks it seen and hands control back to the caller.
-function _finish() {
+// `watched` is true when the last line was reached, false when the player
+// skipped; only a watched scene earns trust.
+function _finish(watched) {
     if (!_stage) return;
-    const { root, sceneId, onComplete, onKey } = _stage;
+    const { root, sceneId, onComplete, onKey, playerId, pairing } = _stage;
     _stage = null;
     document.removeEventListener('keydown', onKey, true);
     markSeen('companion_scene', { sceneId });
+    // Only meetings earn trust: the scenes after a co-op encounter never do.
+    if (watched && !pairing.noTrust) _earnTrust(sceneId, playerId, pairing);
     root.classList.add('cmp-out');
     setTimeout(() => root.remove(), 250);
     if (typeof onComplete === 'function') onComplete();
@@ -226,7 +239,7 @@ function _changeBackground(path) {
 // change (which moves straight on to the next item).
 function _showItem(i) {
     const { pairing } = _stage;
-    if (i >= pairing.lines.length) { _finish(); return; }
+    if (i >= pairing.lines.length) { _finish(true); return; }
     const item = pairing.lines[i];
     _stage.index = i;
     if (item.beat === 'character_intro') { _playFlashback(); return; }
@@ -251,13 +264,13 @@ export function playCompanionScene(sceneId, onComplete) {
     const onKey = (e) => {
         if (_stage && _stage.flashback) return;
         if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); e.stopPropagation(); _advance(); }
-        else if (e.code === 'Escape') { e.preventDefault(); e.stopPropagation(); _finish(); }
+        else if (e.code === 'Escape') { e.preventDefault(); e.stopPropagation(); _finish(false); }
     };
     _stage = { root, pairing, playerId, sceneId, onComplete, onKey, index: 0, pic: pairing.bg };
     _applySpriteLayout();
 
     root.addEventListener('click', _advance);
-    root.querySelector('.cmp-skip').addEventListener('click', (e) => { e.stopPropagation(); _finish(); });
+    root.querySelector('.cmp-skip').addEventListener('click', (e) => { e.stopPropagation(); _finish(false); });
     document.addEventListener('keydown', onKey, true);
     document.body.appendChild(root);
     _showItem(0);

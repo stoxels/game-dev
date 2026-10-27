@@ -30,6 +30,9 @@ import { _flushRunLootToStash } from '../combat/combat-grid-pickups-loot.js';
 import { _bindDragEvents, _renderCurrencyCell } from './hub-drag-and-drop.js';
 import { _clearTooltip } from './hub-tooltips.js';
 import { _updateUniqueTabBadge } from './hub-uniques.js';
+import { _buildQuestGridHTML, _renderQuestStash } from './hub-quest-ui.js';
+import { STATE } from '../state.js';
+import { QUEST_ITEMS, questItemCount } from '../storyline/quest-items.js';
 import { _renderLevelHUD } from './hub-leveling.js';
 import { _egMapPlayerLifeMult } from '../endgame/endgame-map-launch.js';
 import { showEndgameNexus } from '../endgame/endgame-nexus.js';
@@ -278,8 +281,9 @@ export function _buildInventoryGridHTML() {
 // Assembles the full-width stash panel at the bottom of the screen.
 // Now with two tabs: INVENTORY (regular stash) and UNIQUES (stash collection).
 export function _buildStashPanelHTML() {
-    const invActive = _stashTab !== 'uniques';
+    const invActive = _stashTab !== 'uniques' && _stashTab !== 'quests';
     const uniqActive = _stashTab === 'uniques';
+    const questActive = _stashTab === 'quests';
     const totalUniques = (typeof UNIQUE_ITEMS !== 'undefined' ? UNIQUE_ITEMS.length : 0);
     const foundUniques = (globalThis._uniqueCollected ? globalThis._uniqueCollected.size : 0);
     return `
@@ -288,6 +292,7 @@ export function _buildStashPanelHTML() {
         <div class="sx-stash-tabs" id="sx-stash-tabs">
             <button class="sx-stash-tab ${invActive ? 'active' : ''}" id="sx-tab-inventory" data-tab="inventory" onclick="_switchStashTab('inventory')">${t('eg_tab_inventory') || 'INVENTORY'}</button>
             <button class="sx-stash-tab ${uniqActive ? 'active' : ''}" id="sx-tab-uniques" data-tab="uniques" onclick="_switchStashTab('uniques')">${t('eg_tab_uniques') || 'UNIQUES'} <span class="sx-tab-count">${foundUniques}/${totalUniques}</span></button>
+            <button class="sx-stash-tab ${questActive ? 'active' : ''}" id="sx-tab-quests" data-tab="quests" onclick="_switchStashTab('quests')">${t('quest_tab') || 'QUEST'} <span class="sx-tab-count">${questItemCount(STATE.questItems)}/${QUEST_ITEMS.length}</span></button>
         </div>
         <div id="sx-stash-info" class="sx-stash-info" aria-live="polite"></div>
         <div class="sx-stash-actions">
@@ -322,6 +327,14 @@ export function _buildStashPanelHTML() {
         <div class="sx-unique-progress"><i id="sx-unique-progress-fill" style="width:${totalUniques ? Math.round(foundUniques / totalUniques * 100) : 0}%"></i></div>
         <div class="sx-unique-grid" id="sx-unique-grid" data-eg-dropzone="uniques" ondragover="hubDragOver(event)" ondragleave="hubDragLeave(event)">
             ${_buildUniqueGridHTML()}
+        </div>
+    </div>
+    <div class="sx-stash-tab-body ${questActive ? 'active' : ''}" id="sx-stash-tab-quests">
+        <div class="sx-unique-hint">${t('quest_stash_hint') || 'Quest rewards from special encounters'}</div>
+        <div class="sx-unique-count" id="sx-quest-count">${(t('quest_items_collected') || 'Quest items found: {found} / {total}').replace('{found}', questItemCount(STATE.questItems)).replace('{total}', QUEST_ITEMS.length)}</div>
+        <div class="sx-unique-progress"><i id="sx-quest-progress-fill" style="width:${Math.round(questItemCount(STATE.questItems) / QUEST_ITEMS.length * 100)}%"></i></div>
+        <div class="sx-unique-grid" id="sx-quest-grid">
+            ${_buildQuestGridHTML()}
         </div>
     </div>
 </div>`;
@@ -570,10 +583,16 @@ export function _renderAll() {
     const uniqBody = document.getElementById('sx-stash-tab-uniques');
     const invTab = document.getElementById('sx-tab-inventory');
     const uniqTab = document.getElementById('sx-tab-uniques');
-    if (invBody) invBody.classList.toggle('active', _stashTab !== 'uniques');
+    const questBody = document.getElementById('sx-stash-tab-quests');
+    const questTab = document.getElementById('sx-tab-quests');
+    const onInv = _stashTab !== 'uniques' && _stashTab !== 'quests';
+    if (invBody) invBody.classList.toggle('active', onInv);
     if (uniqBody) uniqBody.classList.toggle('active', _stashTab === 'uniques');
-    if (invTab) invTab.classList.toggle('active', _stashTab !== 'uniques');
+    if (questBody) questBody.classList.toggle('active', _stashTab === 'quests');
+    if (invTab) invTab.classList.toggle('active', onInv);
     if (uniqTab) uniqTab.classList.toggle('active', _stashTab === 'uniques');
+    if (questTab) questTab.classList.toggle('active', _stashTab === 'quests');
+    _renderQuestStash();
     _egRenderMapSlot();
     _renderCurrencyStash();
     _renderEssenceStash();

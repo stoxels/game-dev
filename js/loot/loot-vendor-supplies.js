@@ -376,7 +376,8 @@ function _vendorPlayerLevel() {
 // One row per universal spell (the arsenal charms drop for), in registry order.
 function _vendorCharmSkillIds() {
     const defs = Array.isArray(globalThis.UNIVERSAL_SPELL_DEFS) ? globalThis.UNIVERSAL_SPELL_DEFS : [];
-    return defs.map(d => d && d.id).filter(id => id && globalThis.getSkillDef(id));
+    // Summon charms are never sold (co-op clears hand them over).
+    return defs.filter(d => d && d.behavior !== 'summon').map(d => d.id).filter(id => id && globalThis.getSkillDef(id));
 }
 
 // True when the charm for this skill + rank is already in the inventory.

@@ -146,6 +146,14 @@ export const WD_WORLD_CONFIGS = [
         companionNodes: [
             { id: 'w4_forest', from: 6, x: 20, y: 30 },
         ],
+        // Co-op encounters (js/storyline/coop-levels.js): open once the meeting they follow was watched.
+        coopNodes: [
+            { id: 'coop_w4', from: 6, x: 31, y: 36 },
+        ],
+        // Scenes after a co-op encounter (js/storyline/coop-aftermath-scenes.js): open once the encounter was cleared.
+        aftermathNodes: [
+            { id: 'after_coop_w4', coop: 'coop_w4', from: 6, x: 31, y: 26 },
+        ],
     },
 
 
@@ -219,6 +227,18 @@ export const WD_WORLD_CONFIGS = [
         companionNodes: [
             { id: 'home_syla', from: 3, x: 23.5, y: 83.5 },
         ],
+        // Co-op encounters (js/storyline/coop-levels.js): open once the meeting they follow was watched.
+        coopNodes: [
+            { id: 'coop_w6', from: 3, x: 36, y: 80 },
+        ],
+        // Scenes after a co-op encounter (js/storyline/coop-aftermath-scenes.js): open once the encounter was cleared.
+        aftermathNodes: [
+            { id: 'after_coop_w6', coop: 'coop_w6', from: 3, x: 41, y: 84 },
+        ],
+        // A hero's secret half (js/storyline/reveal-scenes.js): opens once the player's hero trusts the teller enough.
+        revealNodes: [
+            { id: 'reveal_syla', after: 'home_syla', teller: 'syla', needPoints: 3, from: 3, x: 14, y: 78 },
+        ],
     },
 
 
@@ -290,6 +310,18 @@ export const WD_WORLD_CONFIGS = [
         companionNodes: [
             { id: 'w8_fieldbase', from: 6, x: 86, y: 86 },
         ],
+        // Co-op encounters (js/storyline/coop-levels.js): open once the meeting they follow was watched.
+        coopNodes: [
+            { id: 'coop_w8', from: 6, x: 77, y: 90 },
+        ],
+        // Scenes after a co-op encounter (js/storyline/coop-aftermath-scenes.js): open once the encounter was cleared.
+        aftermathNodes: [
+            { id: 'after_coop_w8', coop: 'coop_w8', from: 6, x: 68, y: 91 },
+        ],
+        // A hero's secret half (js/storyline/reveal-scenes.js): opens once the player's hero trusts the teller enough.
+        revealNodes: [
+            { id: 'reveal_stox', after: 'w8_fieldbase', teller: 'stox', needPoints: 6, from: 6, x: 93, y: 78 },
+        ],
     },
 
 
@@ -328,6 +360,14 @@ export const WD_WORLD_CONFIGS = [
         // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
         companionNodes: [
             { id: 'w9_vortex', from: 15, x: 56, y: 34 },
+        ],
+        // Co-op encounters (js/storyline/coop-levels.js): open once the meeting they follow was watched.
+        coopNodes: [
+            { id: 'coop_w9', from: 15, x: 47, y: 30 },
+        ],
+        // Scenes after a co-op encounter (js/storyline/coop-aftermath-scenes.js): open once the encounter was cleared.
+        aftermathNodes: [
+            { id: 'after_coop_w9', coop: 'coop_w9', from: 15, x: 53, y: 27 },
         ],
     },
 
@@ -395,6 +435,18 @@ export const WD_WORLD_CONFIGS = [
         // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
         companionNodes: [
             { id: 'w11_ghost', from: 8, x: 63, y: 79 },
+        ],
+        // Co-op encounters (js/storyline/coop-levels.js): open once the meeting they follow was watched.
+        coopNodes: [
+            { id: 'coop_w11', from: 8, x: 67, y: 72 },
+        ],
+        // Scenes after a co-op encounter (js/storyline/coop-aftermath-scenes.js): open once the encounter was cleared.
+        aftermathNodes: [
+            { id: 'after_coop_w11', coop: 'coop_w11', from: 8, x: 73, y: 70 },
+        ],
+        // A hero's secret half (js/storyline/reveal-scenes.js): opens once the player's hero trusts the teller enough.
+        revealNodes: [
+            { id: 'reveal_trix', after: 'w11_ghost', teller: 'trix', needPoints: 9, from: 8, x: 64, y: 92 },
         ],
     },
 
@@ -471,6 +523,14 @@ export const WD_WORLD_CONFIGS = [
         // Story meetings (js/storyline/companion-scenes.js): optional, open once level `from` (0-based) is cleared.
         companionNodes: [
             { id: 'w13_peak', from: 14, x: 62, y: 17 },
+        ],
+        // Co-op encounters (js/storyline/coop-levels.js): open once the meeting they follow was watched.
+        coopNodes: [
+            { id: 'coop_w13', from: 14, x: 72, y: 24 },
+        ],
+        // Scenes after a co-op encounter (js/storyline/coop-aftermath-scenes.js): open once the encounter was cleared.
+        aftermathNodes: [
+            { id: 'after_coop_w13', coop: 'coop_w13', from: 14, x: 79, y: 29 },
         ],
     },
 

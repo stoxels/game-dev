@@ -2,10 +2,11 @@ import { Audio_Manager } from '../audio/audio.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { MOD_CLASSES, MOD_LABELS, applyClassStatusActiveStyle, applyClassStatusEmptyStyle, buildNextTitleStr, isLevelConvergence, isMaxCleared, renderLevelSelect } from './screens-level-select.js';
-import { showWorldDetail, wdGoBackToMap } from './screens-world-levels.js';
+import { showWorldDetail, wdGoBackToMap, wdStoryProgress } from './screens-world-levels.js';
 import { launchVendor, showModal, showSetup, switchScreen } from './screens.js';
 import { showQuestLog } from '../inference/inference-ui.js';
 import { showPassiveTree } from '../probability-tree/probability-tree.js';
+import { ensureTrustButton } from '../storyline/trust-panel.js';
 import { STATE } from '../state.js';
 
 /*
@@ -1145,6 +1146,18 @@ function _getWorldClassUpgradeText(wi) {
 }
 
 /**
+ * Story lines for the world tooltip: meetings watched and co-op encounters
+ * cleared. A line is left out when the world has none for the picked hero.
+ */
+function _getWorldStoryHtml(wi) {
+    if (!STATE || !STATE.playerCharacter) return '';
+    const { meetings, coops } = wdStoryProgress(wi);
+    const line = (key, c) => c.total
+        ? `<div class="mv-tooltip-sub">${t(key).replace('{done}', c.done).replace('{total}', c.total)}</div>` : '';
+    return line('scr_world_story_meetings', meetings) + line('scr_world_coop_encounters', coops);
+}
+
+/**
  * Tooltip text for a locked campaign world: which Ascension Trial opens it.
  */
 function _lockedWorldText(wi) {
@@ -1185,6 +1198,7 @@ function _buildTooltipContent(wi, isDone, isLocked, healingTier) {
     const progressHtml =
         `<div class="mv-tooltip-sub">${_getWorldStoxelProgressText(wi)}</div>` +
         `<div class="mv-tooltip-sub">${_getWorldConvergenceText(wi)}</div>` +
+        _getWorldStoryHtml(wi) +
         `<div class="mv-tooltip-sub">${_getWorldClassUpgradeText(wi)}</div>`;
 
     const remainingHtml = (isDone)
@@ -1993,6 +2007,7 @@ export function showMapView() {
     _updateToggleButtonLabels();
     _buildMapViewTopBar();
     _buildMapCanvas();
+    ensureTrustButton('screen-map-view');
 
     switchScreen('screen-map-view');
 }

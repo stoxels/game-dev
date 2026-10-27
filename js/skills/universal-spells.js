@@ -7,6 +7,8 @@ import { _applyManaCostModifiers, _bloodMagicActive, _scaleAbilityManaCost, canA
 import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellManaCostOverrideForSkill, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill, isSkillCharmUnlocked, noteCharmCast } from './skill-charms.js';
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
 import { SKILL_REGISTRY } from './skill-registry.js';
+import { SUMMON_SPELL_DEFS } from './summon-spells.js';
+import { castSummonSpell } from './summon-cast.js';
 import { _uspAnchorMarkerClear, _uspCastFlourish, _uspAnchorMarkerShow, _uspArrowFan, _uspAuraClear, _uspAuraPulse, _uspAuraShow, _uspBladeBlastPlant, _uspBarrierRaise, _uspBarrierStart, _uspBulwarkClear, _uspBulwarkWall, _uspWindwardClear, _uspWindwardGale, _uspAegisWardClear, _uspAegisWardHit, _uspAegisWardShow, _uspRetributionClear, _uspRetributionFlare, _uspRetributionShow, _uspWindstepClear, _uspWindstepTailwind, _uspBlinkFX, _uspRenewalBloom, _uspRenewalClear, _uspRenewalPulse, _uspMendHearts, _uspFireThemedProjectile, _uspMeleeSwing, _uspMoveSpriteOffset, _uspLeapImpactFX, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph, _uspZoneBlast, _uspZoneRain } from './universal-spell-fx.js';
 import { beginSpellTargeting, cancelSpellTargeting, getAvatarCentre, getCursorPoint, isSpellTargeting, resolveGroundShape, shapeHitsRect, showSpellZone } from './spell-casttime.js';
 import { updateQuestStats } from '../inference/inference-stats.js';
@@ -1004,6 +1006,11 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'classSelected',
     },
 ];
+
+// The three Summon charms (summon-spells.js) are universal spells that call a
+// friend instead of dealing damage; they join the list so the hotbar, tooltip
+// and charm book treat them like every other spell.
+UNIVERSAL_SPELL_DEFS.push(...SUMMON_SPELL_DEFS);
 
 export const UNIVERSAL_SPELL_MAP = {};
 UNIVERSAL_SPELL_DEFS.forEach((d) => { UNIVERSAL_SPELL_MAP[d.id] = d; });
@@ -3671,6 +3678,9 @@ export function castUniversalSpell(spellId, opts) {
     try {
         if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return false;
     } catch (e) {}
+
+    // Summon charms call a friend onto the grid: no target, mana or cooldown.
+    if (spell.behavior === 'summon') return castSummonSpell(spell);
 
     // One reticle at a time. Pressing the spell that is already aiming
     // cancels it (tap again to back out); any other cast replaces it.

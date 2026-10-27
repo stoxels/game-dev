@@ -5,6 +5,10 @@ import { _renderTopBarClassStatus, _renderTopBarNextCode, _renderTopBarQuestBadg
 import { WD_WORLD_CONFIGS } from './screens-world-levels-config.js';
 import { switchScreen } from './screens.js';
 import { STATE } from '../state.js';
+import { coopAnchor, coopAvailable, coopCleared, coopFriend, coopName, startCoopEncounter } from '../storyline/coop-levels.js';
+import { ensureTrustButton } from '../storyline/trust-panel.js';
+import { getTrustPoints } from '../storyline/companion-trust.js';
+import { COMPANION_CAST, COMPANION_LOOKS, companionSceneTitle } from '../storyline/companion-scenes.js';
 /*
     ========================================================================
     SCREENS-WORLD-LEVELS.JS
@@ -199,7 +203,7 @@ function _wdGetNodePos(cfg, nodeRef) {
     if (nodeRef === 'trial') return cfg.trialNode;
     if (nodeRef === 'ascension') return cfg.ascensionNode;
     if (typeof nodeRef === 'string' && nodeRef.startsWith('comp:')) {
-        return (cfg.companionNodes || []).find(c => 'comp:' + c.id === nodeRef);
+        return (cfg.companionNodes || []).concat(cfg.coopNodes || [], cfg.aftermathNodes || [], cfg.revealNodes || []).find(c => 'comp:' + c.id === nodeRef);
     }
     return cfg.nodes[nodeRef];
 }
@@ -303,6 +307,35 @@ function _wdBuildRoads(cfg, wi) {
             n1: cn.from,
             n2: 'comp:' + cn.id,
             waypoints: [cfg.nodes[cn.from], cn],
+        });
+    }
+
+    // The story chain continues past the meeting: the road to a co-op encounter
+    // starts at the story node it follows, and the road to the scene after it
+    // starts at the encounter (level -> story node -> co-op -> scene after).
+    for (const cn of _wdCoopNodesForWorld(wi)) {
+        const story = (cfg.companionNodes || []).find(c => c.id === coopAnchor(cn.id));
+        roads.push({
+            n1: story ? 'comp:' + story.id : cn.from,
+            n2: 'comp:' + cn.id,
+            waypoints: [story || cfg.nodes[cn.from], cn],
+        });
+    }
+    for (const an of _wdAftermathNodesForWorld(wi)) {
+        const coop = (cfg.coopNodes || []).find(c => c.id === an.coop);
+        roads.push({
+            n1: coop ? 'comp:' + coop.id : an.from,
+            n2: 'comp:' + an.id,
+            waypoints: [coop || cfg.nodes[an.from], an],
+        });
+    }
+    // A hero's secret half is told at the story node of its world: the road starts there.
+    for (const rn of _wdRevealNodesForWorld(wi)) {
+        const story = (cfg.companionNodes || []).find(c => c.id === rn.after);
+        roads.push({
+            n1: story ? 'comp:' + story.id : rn.from,
+            n2: 'comp:' + rn.id,
+            waypoints: [story || cfg.nodes[rn.from], rn],
         });
     }
 
@@ -1469,6 +1502,7 @@ function _wdBuildTopBar(wi) {
     _renderTopBarQuestBadge('wd');
     _renderTopBarTreePoints('wd');
     _wireTopBarButtons('wd');
+    ensureTrustButton();
     // Class-change token entry button - only visible while a token is held.
     if (typeof globalThis.updateClassChangeButtons === 'function') globalThis.updateClassChangeButtons();
 
@@ -1562,6 +1596,9 @@ function _wdAppendLevelNodes(canvas, wi, cfg, levelCount) {
     const ascPos = _wdAscensionNodeForWorld(wi);
     if (ascPos) canvas.appendChild(_wdBuildAscensionNode(wi, ascPos));
     for (const cn of _wdCompanionNodesForWorld(wi)) canvas.appendChild(_wdBuildCompanionNode(wi, cn));
+    for (const cn of _wdCoopNodesForWorld(wi)) canvas.appendChild(_wdBuildCoopNode(wi, cn));
+    for (const an of _wdAftermathNodesForWorld(wi)) canvas.appendChild(_wdBuildAftermathNode(wi, an, AFTERMATH_LOOK));
+    for (const rn of _wdRevealNodesForWorld(wi)) canvas.appendChild(_wdBuildAftermathNode(wi, rn, REVEAL_LOOK));
 }
 
 //------------------------------------------------------------------------
@@ -1585,13 +1622,43 @@ function _wdCompanionNodesForWorld(wi) {
 }
 
 /**
- * Builds a companion node: the companion's face in the circle, green once
- * the meeting has been watched. Clicking walks the sprite there and offers
- * the "talk" button.
+ * Returns the heroes a meeting scene has besides the player, as cast entries
+ * ({ name, ... }): one hero, or two when the script has a second companion.
+ */
+function _wdMeetingCast(pairing) {
+    return [pairing.companion, pairing.companion2].filter(Boolean)
+        .map(id => ({ id, ...globalThis.COMPANION_CAST[id] }));
+}
+
+/**
+ * Builds the face(s) shown in a meeting node's circle: one face, or two side
+ * by side (each in its own half) when two heroes are at the meeting.
+ */
+function _wdMeetingFacesHtml(pairing) {
+    const faces = _wdMeetingCast(pairing).map(({ id }) => {
+        const cap = id.charAt(0).toUpperCase() + id.slice(1);
+        const look = pairing.looks[id];
+        const img = `<img class="wd-companion-face" src="animations/${cap}/idle/${look}/down/${cap}_${look}_idle_down_1.webp" alt="" draggable="false">`;
+        return pairing.companion2 ? `<span class="wd-companion-half">${img}</span>` : img;
+    });
+    return pairing.companion2 ? `<div class="wd-companion-duo">${faces.join('')}</div>` : faces[0];
+}
+
+/**
+ * Joins the names of the heroes at a meeting: "Stox" or "Stox & Syla".
+ */
+function _wdMeetingNames(cast) {
+    return cast.map(c => c.name).join(' & ');
+}
+
+/**
+ * Builds a companion node: the companion's face (or both faces) in the circle,
+ * green once the meeting has been watched. Clicking walks the sprite there and
+ * offers the "talk" button.
  */
 function _wdBuildCompanionNode(wi, cn) {
     const pairing = globalThis.getCompanionPairing(cn.id);
-    const cast = globalThis.COMPANION_CAST[pairing.companion];
+    const cast = _wdMeetingCast(pairing);
     const node = document.createElement('div');
     node.className = 'wd-level-node wd-companion-node';
     node.dataset.companionNode = cn.id;
@@ -1599,19 +1666,235 @@ function _wdBuildCompanionNode(wi, cn) {
 
     const isDone = globalThis.hasMetCompanion(cn.id);
     if (isDone) node.classList.add('done');
-    const cap = pairing.companion.charAt(0).toUpperCase() + pairing.companion.slice(1);
-    const face = `<img class="wd-companion-face" src="animations/${cap}/idle/${pairing.looks[pairing.companion]}/down/${cap}_${pairing.looks[pairing.companion]}_idle_down_1.webp" alt="" draggable="false">`;
-    node.innerHTML = _wdBuildNodeEffectsHtml(face, '', '', '', '');
+    node.innerHTML = _wdBuildNodeEffectsHtml(_wdMeetingFacesHtml(pairing), '', '', '', '');
 
     node.addEventListener('click', () => {
         const existing = document.getElementById('wd-enter-btn');
         if (existing) existing.remove();
         _wdWalkSpriteTo(wi, 'comp:' + cn.id, () => _wdShowCompanionButton(wi, cn, cast));
     });
-    node.addEventListener('mouseenter', (e) => _wdShowCompanionTooltip(e, cast, isDone));
+    node.addEventListener('mouseenter', (e) => _wdShowCompanionTooltip(e, cn.id, cast, isDone));
     node.addEventListener('mousemove', (e) => _wdMoveTooltip(e));
     node.addEventListener('mouseleave', () => _wdHideTooltip());
     return node;
+}
+
+/**
+ * Counts a world's story meetings and co-op encounters for the world tooltip:
+ * how many exist for the picked hero and how many were watched / cleared.
+ * Returns { meetings: { done, total }, coops: { done, total } }.
+ */
+export function wdStoryProgress(wi) {
+    const cfg = WD_WORLD_CONFIGS[wi];
+    const meetings = ((cfg && cfg.companionNodes) || []).filter(cn => !!globalThis.getCompanionPairing(cn.id));
+    const coops = ((cfg && cfg.coopNodes) || []).filter(cn => !!coopFriend(cn.id));
+    return {
+        meetings: { done: meetings.filter(cn => globalThis.hasMetCompanion(cn.id)).length, total: meetings.length },
+        coops: { done: coops.filter(cn => coopCleared(cn.id)).length, total: coops.length },
+    };
+}
+
+/**
+ * Returns the world's co-op nodes that should be on the map: the player has a
+ * friend for the encounter, has watched the meeting it follows, and the level
+ * it hangs off is cleared.
+ */
+function _wdCoopNodesForWorld(wi) {
+    const cfg = WD_WORLD_CONFIGS[wi];
+    if (!cfg || !cfg.coopNodes || !STATE) return [];
+    return cfg.coopNodes.filter(cn => cfg.nodes[cn.from] && coopAvailable(cn.id)
+        && !!STATE.done && STATE.done.includes(globalThis.WORLD_START_GI[wi] + cn.from));
+}
+
+/**
+ * Builds a co-op node: the friend's face with a gold ring, ticked once the
+ * encounter was cleared. Clicking walks the sprite there and offers to play.
+ */
+function _wdBuildCoopNode(wi, cn) {
+    const friend = coopFriend(cn.id);
+    const cast = COMPANION_CAST[friend];
+    const look = COMPANION_LOOKS[friend].base;
+    const cap = friend.charAt(0).toUpperCase() + friend.slice(1);
+    const node = document.createElement('div');
+    node.className = 'wd-level-node wd-companion-node wd-coop-node';
+    node.dataset.coopNode = cn.id;
+    _wdPositionNodeOnCanvas(node, wi, cn);
+    const isDone = coopCleared(cn.id);
+    if (isDone) node.classList.add('done');
+    node.style.boxShadow = '0 0 0 3px #ffd93d, 0 0 14px 2px #ffd93d';
+    const face = `<img class="wd-companion-face" src="animations/${cap}/idle/${look}/down/${cap}_${look}_idle_down_1.webp" alt="" draggable="false">`;
+    node.innerHTML = _wdBuildNodeEffectsHtml(face, '', '', '', '');
+    node.addEventListener('click', () => {
+        const existing = document.getElementById('wd-enter-btn');
+        if (existing) existing.remove();
+        _wdWalkSpriteTo(wi, 'comp:' + cn.id, () => _wdShowCoopButton(wi, cn, cast));
+    });
+    node.addEventListener('mouseenter', (e) => _wdShowCoopTooltip(e, cn.id, cast, isDone));
+    node.addEventListener('mousemove', (e) => _wdMoveTooltip(e));
+    node.addEventListener('mouseleave', () => _wdHideTooltip());
+    return node;
+}
+
+/**
+ * Shows the "Play with <hero>" button above a co-op node; pressing it opens the encounter.
+ */
+function _wdShowCoopButton(wi, cn, cast) {
+    const existing = document.getElementById('wd-enter-btn');
+    if (existing) existing.remove();
+    const cfg = WD_WORLD_CONFIGS[wi];
+    const canvas = _wdGetCanvas();
+    const pct = _wdImgPctToCanvasPct(cn.x, cn.y, canvas, cfg);
+    const btn = document.createElement('button');
+    btn.id = 'wd-enter-btn';
+    btn.textContent = (LANG === 'de' ? '▶ Gemeinsam mit ' + cast.name : '▶ Play with ' + cast.name);
+    btn.style.cssText = `
+        position: absolute;
+        left: ${pct.x}%;
+        top: calc(${pct.y}% - 56px);
+        transform: translateX(-50%);
+        z-index: 10;
+        font-family: var(--PX, monospace);
+        font-size: 11px;
+        padding: 5px 12px;
+        background: #9a7a1f;
+        color: #fff8dc;
+        border: none;
+        cursor: pointer;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    `;
+    btn.addEventListener('click', () => {
+        btn.remove();
+        startCoopEncounter(cn.id);
+    });
+    _wdWireEnterButtonDismiss(btn);
+    if (canvas) canvas.appendChild(btn);
+}
+
+// How the two kinds of scene node look: the scene after a co-op (green) and a
+// hero's secret half (violet).
+const AFTERMATH_LOOK = {
+    cls: 'wd-aftermath-node', attr: 'aftermathNode', ring: '#7fe0b0', button: '#2f7a5a', icon: '📜',
+    en: 'After your adventure together', de: 'Nach dem gemeinsamen Abenteuer',
+};
+const REVEAL_LOOK = {
+    cls: 'wd-reveal-node', attr: 'revealNode', ring: '#c8a0ff', button: '#6a4a9a', icon: '🗝️',
+    en: 'Something they have not told you yet', de: 'Etwas, das sie dir noch nicht erzählt haben',
+};
+
+/**
+ * Returns the world's secret-half scene nodes that should be on the map: the
+ * teller is another hero, the player's hero trusts them enough, the story node
+ * of the world was watched, and the scene has a script for the picked character.
+ */
+function _wdRevealNodesForWorld(wi) {
+    const cfg = WD_WORLD_CONFIGS[wi];
+    if (!cfg || !cfg.revealNodes || !STATE) return [];
+    return cfg.revealNodes.filter(rn => cfg.nodes[rn.from] && rn.teller !== STATE.playerCharacter
+        && getTrustPoints(STATE.companionTrust, STATE.playerCharacter, rn.teller) >= rn.needPoints
+        && globalThis.hasMetCompanion(rn.after) && !!globalThis.getCompanionPairing(rn.id));
+}
+
+/**
+ * Returns the world's "after the co-op" scene nodes that should be on the map:
+ * the encounter they follow was cleared and the scene has a script for the
+ * picked character.
+ */
+function _wdAftermathNodesForWorld(wi) {
+    const cfg = WD_WORLD_CONFIGS[wi];
+    if (!cfg || !cfg.aftermathNodes || !STATE) return [];
+    return cfg.aftermathNodes.filter(an => cfg.nodes[an.from] && coopCleared(an.coop)
+        && !!globalThis.getCompanionPairing(an.id));
+}
+
+/**
+ * Builds an after-the-co-op scene node: the friend's face with a soft green
+ * ring, ticked once the scene was watched. Clicking walks the sprite there and
+ * offers the "talk" button.
+ */
+function _wdBuildAftermathNode(wi, an, style) {
+    const pairing = globalThis.getCompanionPairing(an.id);
+    const cast = COMPANION_CAST[pairing.companion];
+    const cap = pairing.companion.charAt(0).toUpperCase() + pairing.companion.slice(1);
+    const look = pairing.looks[pairing.companion];
+    const node = document.createElement('div');
+    node.className = 'wd-level-node wd-companion-node ' + style.cls;
+    node.dataset[style.attr] = an.id;
+    _wdPositionNodeOnCanvas(node, wi, an);
+    const isDone = globalThis.hasMetCompanion(an.id);
+    if (isDone) node.classList.add('done');
+    node.style.boxShadow = `0 0 0 3px ${style.ring}, 0 0 14px 2px ${style.ring}`;
+    const face = `<img class="wd-companion-face" src="animations/${cap}/idle/${look}/down/${cap}_${look}_idle_down_1.webp" alt="" draggable="false">`;
+    node.innerHTML = _wdBuildNodeEffectsHtml(face, '', '', '', '');
+    node.addEventListener('click', () => {
+        const existing = document.getElementById('wd-enter-btn');
+        if (existing) existing.remove();
+        _wdWalkSpriteTo(wi, 'comp:' + an.id, () => _wdShowAftermathButton(wi, an, cast, style));
+    });
+    node.addEventListener('mouseenter', (e) => {
+        const tip = _wdEnsureTooltip();
+        const de = LANG === 'de';
+        const label = de ? style.de : style.en;
+        tip.innerHTML = `<div class="wd-tip-title">${style.icon} ${cast.name}</div>`
+            + `<div class="wd-tip-status">${isDone ? (de ? 'Gehört ✓' : 'Heard ✓') : label}</div>`;
+        tip.classList.add('show');
+        _wdMoveTooltip(e);
+    });
+    node.addEventListener('mousemove', (e) => _wdMoveTooltip(e));
+    node.addEventListener('mouseleave', () => _wdHideTooltip());
+    return node;
+}
+
+/**
+ * Shows the "Talk to <hero>" button above an after-the-co-op node; pressing it
+ * plays the scene and then redraws the map.
+ */
+function _wdShowAftermathButton(wi, an, cast, style) {
+    const existing = document.getElementById('wd-enter-btn');
+    if (existing) existing.remove();
+    const cfg = WD_WORLD_CONFIGS[wi];
+    const canvas = _wdGetCanvas();
+    const pct = _wdImgPctToCanvasPct(an.x, an.y, canvas, cfg);
+    const btn = document.createElement('button');
+    btn.id = 'wd-enter-btn';
+    btn.textContent = (LANG === 'de' ? '▶ Mit ' + cast.name + ' sprechen' : '▶ Talk to ' + cast.name);
+    btn.style.cssText = `
+        position: absolute;
+        left: ${pct.x}%;
+        top: calc(${pct.y}% - 56px);
+        transform: translateX(-50%);
+        z-index: 10;
+        font-family: var(--PX, monospace);
+        font-size: 11px;
+        padding: 5px 12px;
+        background: ${style.button};
+        color: #f4fff8;
+        border: none;
+        cursor: pointer;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    `;
+    btn.addEventListener('click', () => {
+        btn.remove();
+        globalThis.playCompanionScene(an.id, () => showWorldDetail(wi));
+    });
+    _wdWireEnterButtonDismiss(btn);
+    if (canvas) canvas.appendChild(btn);
+}
+
+/**
+ * Co-op node tooltip: the encounter's name, the friend and whether it was cleared.
+ */
+function _wdShowCoopTooltip(e, coopId, cast, isDone) {
+    const tip = _wdEnsureTooltip();
+    const de = LANG === 'de';
+    const status = isDone ? (de ? 'Gemeinsam geschafft ✓' : 'Cleared together ✓') : (de ? 'Gemeinsame Begegnung' : 'Co-op encounter');
+    tip.innerHTML = `<div class="wd-tip-title">🤝 ${coopName(coopId)}</div>`
+        + `<div class="wd-tip-status">${(de ? 'Mit ' : 'With ') + cast.name} · ${status}</div>`;
+    tip.classList.add('show');
+    _wdMoveTooltip(e);
 }
 
 /**
@@ -1628,7 +1911,8 @@ function _wdShowCompanionButton(wi, cn, cast) {
 
     const btn = document.createElement('button');
     btn.id = 'wd-enter-btn';
-    btn.textContent = (LANG === 'de' ? '▶ Mit ' + cast.name + ' sprechen' : '▶ Talk to ' + cast.name);
+    const names = _wdMeetingNames(cast);
+    btn.textContent = (LANG === 'de' ? '▶ Mit ' + names + ' sprechen' : '▶ Talk to ' + names);
     btn.style.cssText = `
         position: absolute;
         left: ${pct.x}%;
@@ -1655,15 +1939,19 @@ function _wdShowCompanionButton(wi, cn, cast) {
 }
 
 /**
- * Companion-node tooltip: who is there and whether the meeting was seen.
+ * Companion-node tooltip: the meeting's name, who is there and whether it was
+ * seen. A meeting without a name falls back to the heroes' names as the title.
  */
-function _wdShowCompanionTooltip(e, cast, isDone) {
+function _wdShowCompanionTooltip(e, sceneId, cast, isDone) {
     const tip = _wdEnsureTooltip();
-    const status = LANG === 'de'
+    const de = LANG === 'de';
+    const names = _wdMeetingNames(cast);
+    const title = companionSceneTitle(sceneId, LANG) || names;
+    const status = de
         ? (isDone ? 'Getroffen ✓' : 'Optionale Begegnung')
         : (isDone ? 'Met ✓' : 'Optional meeting');
-    tip.innerHTML = `<div class="wd-tip-title">💬 ${cast.name}</div>`
-        + `<div class="wd-tip-status">${status}</div>`;
+    tip.innerHTML = `<div class="wd-tip-title">💬 ${title}</div>`
+        + `<div class="wd-tip-status">${(de ? 'Mit ' : 'With ') + names} · ${status}</div>`;
     tip.classList.add('show');
     _wdMoveTooltip(e);
 }
