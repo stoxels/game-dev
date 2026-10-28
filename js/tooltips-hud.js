@@ -85,10 +85,11 @@ export function getGameTooltip() {
                tooltip used to sit UNDER the book's own chrome (scrollbars,
                sticky headers) on the right-hand edge of the frame. */
             z-index: 10050;
-            background: #12121e;
-            border: 1px solid var(--accent, #5555aa);
-            border-left: 3px solid var(--accent2, #aaaaff);
-            color: var(--accent2, #ccc);
+            background: linear-gradient(180deg, #25202b, #16131b);
+            border: 2px solid #b8913a;
+            border-radius: 6px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+            color: #e9e2cf;
             font-family: var(--PX, monospace);
             font-size: 11px;
             line-height: 1.6;
@@ -459,9 +460,30 @@ function _buildInventoryLabelTooltipHTML() {
 // is selected (.mod-per-desc), but as a hover tooltip so the effect can
 // also be read before activating it. Reads the live sibling span, so a
 // language switch is always reflected.
+// Setup-screen modifier tooltip: the modifier's name, one plain sentence about what it does, and
+// (for the five that change the score) the bonus, read from the tag printed under the tombstone.
+const _MOD_TIP_TARGETS = '.setup-opt-mod, .setup-fig';
+const _MOD_TIP_KEYS = {
+    timetrial: ['mod_tt', 'mod_tip_tt'],
+    hardcore: ['mod_hc', 'mod_tip_hc'],
+    ironman: ['mod_im', 'mod_tip_im'],
+    classless: ['mod_cl', 'mod_tip_cl'],
+    treeless: ['mod_tl', 'mod_tip_tl'],
+    monsterless: ['mod_ml', 'mod_tip_ml'],
+    superTutor: ['mod_super_tutor', 'mod_tip_pro'],
+};
+
 function _buildModTombstoneTooltipHTML(btn) {
-    const desc = btn.parentElement.querySelector(':scope > .mod-per-desc');
-    return desc ? desc.innerHTML : '';
+    const keys = _MOD_TIP_KEYS[btn.dataset.mod];
+    if (!keys) return '';
+    const tag = btn.parentElement.querySelector(':scope > .mod-score-tag');
+    const pct = tag ? /(\d+)%/.exec(tag.textContent) : null;
+    const scoreLine = pct ? `<div class="sx-mod-tip-score">${t('mod_tip_score').replace('{n}', pct[1])}</div>` : '';
+    return `<div class="sx-mod-tip">`
+        + `<div class="sx-mod-tip-title">${t(keys[0])}</div>`
+        + `<div class="sx-mod-tip-text">${t(keys[1])}</div>`
+        + scoreLine
+        + `</div>`;
 }
 
 // 7. Title-screen expansion logo - expansion history.
@@ -470,13 +492,13 @@ function _buildModTombstoneTooltipHTML(btn) {
 // "Cartographers of Chance" (characters, cutscenes, world map,
 // large visual overhaul), Base Game.
 function _buildExpansionHistoryTooltipHTML() {
-    return `<strong style="color:#d4b8ff">${t('scr_expansion_tooltip_title')}</strong>`
+    return `<div class="sx-exp-tip"><strong class="sx-exp-tip-title" style="color:#d4b8ff">${t('scr_expansion_tooltip_title')}</strong>`
         + `<br><br><span style="color:#c39bd3">• ${t('scr_expansion_2_badge')}: ${t('scr_expansion_2_name')}</span>`
         + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_2_note')}</span>`
         + `<br><br><span style="color:#e6d6ff">• ${t('scr_expansion_badge')}: ${t('scr_expansion_1_name')}</span>`
         + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_1_note')}</span>`
         + `<br><br><span style="color:#e6d6ff">• ${t('scr_expansion_base')}</span>`
-        + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_base_note')}</span>`;
+        + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_base_note')}</span></div>`;
 }
 
 
@@ -540,19 +562,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const setupScreen = document.getElementById('screen-setup');
     if (setupScreen) {
         setupScreen.addEventListener('mouseover', (e) => {
-            const btn = e.target.closest ? e.target.closest('.setup-opt-mod') : null;
+            const btn = e.target.closest ? e.target.closest(_MOD_TIP_TARGETS) : null;
             if (!btn) return;
             const html = _buildModTombstoneTooltipHTML(btn);
             if (html) showGameTooltip(html, e);
         });
         setupScreen.addEventListener('mousemove', (e) => {
             // moveGameTooltip no-ops while the tooltip is hidden.
-            if (e.target.closest && e.target.closest('.setup-opt-mod')) moveGameTooltip(e);
+            if (e.target.closest && e.target.closest(_MOD_TIP_TARGETS)) moveGameTooltip(e);
         });
         setupScreen.addEventListener('mouseout', (e) => {
-            const btn = e.target.closest ? e.target.closest('.setup-opt-mod') : null;
+            const btn = e.target.closest ? e.target.closest(_MOD_TIP_TARGETS) : null;
             if (!btn) return;
-            const to = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('.setup-opt-mod') : null;
+            const to = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest(_MOD_TIP_TARGETS) : null;
             if (to !== btn) hideGameTooltip();
         });
     }
@@ -606,12 +628,12 @@ function _highestCompletedMapTier(egAtlasCompleted) {
 
 // One "label value" line of the tooltip.
 function _statLine(labelKey, value) {
-    return `<br>${t(labelKey)} <b>${value}</b>`;
+    return `<div class="sx-slot-tip-line">${t(labelKey)} <b>${value}</b></div>`;
 }
 
 // A small heading that starts a group of lines.
 function _statGroup(labelKey) {
-    return `<br><span style="opacity:.7">${t(labelKey)}</span>`;
+    return `<div class="sx-slot-tip-group">${t(labelKey)}</div>`;
 }
 
 // Builds the lifetime-stats tooltip for a save-slot card.
@@ -628,7 +650,7 @@ export function _buildSaveSlotTooltipHTML(summary) {
         (summary.ascendencySkill2Level - 1);
     const story = getStoryProgress(summary.slot, summary.playerCharacter);
 
-    let html = `<strong>${t('cg_slot_stats').replace('{n}', summary.slot)}</strong>`;
+    let html = `<div class="sx-slot-tip-title">${t('cg_slot_stats').replace('{n}', summary.slot)}</div>`;
     html += _statLine('cg_stat_playtime', _fmtPlaytime(summary.totalTimePlayedSecs));
     html += _statLine('cg_stat_level', summary.playerLevel);
 
@@ -656,9 +678,9 @@ export function _buildSaveSlotTooltipHTML(summary) {
     html += _statLine('cg_stat_max_map_tier', _highestCompletedMapTier(summary.egAtlasCompleted));
     html += _statLine('cg_stat_maps', summary.atlasMapsCompleted);
 
-    html += `<br><br><span style="opacity:.7">${t('cg_completion')}</span>`;
-    html += `<br>&nbsp;&nbsp;${t('cg_comp_levels')} <b>${_pctOf(summary.levelsDone, totalLevels)}</b>`;
-    html += `<br>&nbsp;&nbsp;${t('cg_comp_bonus')} <b>${_pctOf(summary.bonusDone.length, totalLevels)}</b>`;
-    html += `<br>&nbsp;&nbsp;${t('cg_comp_hard_mods')} <b>${_pctOf(_countHardAllModsClears(summary.levelHS), totalLevels)}</b>`;
-    return html;
+    html += `<div class="sx-slot-tip-group">${t('cg_completion')}</div>`;
+    html += `<div class="sx-slot-tip-line">${t('cg_comp_levels')} <b>${_pctOf(summary.levelsDone, totalLevels)}</b></div>`;
+    html += `<div class="sx-slot-tip-line">${t('cg_comp_bonus')} <b>${_pctOf(summary.bonusDone.length, totalLevels)}</b></div>`;
+    html += `<div class="sx-slot-tip-line">${t('cg_comp_hard_mods')} <b>${_pctOf(_countHardAllModsClears(summary.levelHS), totalLevels)}</b></div>`;
+    return `<div class="sx-slot-tip">${html}</div>`;
 }

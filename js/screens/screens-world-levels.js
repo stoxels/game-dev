@@ -2550,7 +2550,8 @@ function _wdGetStars(gi) {
  */
 function _wdBuildTooltipModTags(hs) {
     if (!hs || !hs.mods) return '';
-    const active = Object.keys(hs.mods).filter(m => hs.mods[m]);
+    // The temporary Professor beta flag is never shown on a level's tooltip.
+    const active = Object.keys(hs.mods).filter(m => hs.mods[m] && m !== 'superTutor');
     if (!active.length) return '';
     const tags = active.map(m =>
         `<span class="wd-tip-mod-tag ${WD_MOD_CLASSES[m] || ''}">${WD_MOD_LABELS[m] || m}</span>`

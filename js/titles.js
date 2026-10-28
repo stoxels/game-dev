@@ -361,7 +361,7 @@ function _titlesButtonTipHTML() {
             .replace('{score}', next.score.toLocaleString())
             .replace('{n}', Math.max(0, next.score - _score()).toLocaleString())
         : `🏆 ${t('ls_all_titles')}`;
-    return `${t('tip_titles_ribbon')}<br><b>${line}</b>`;
+    return `<div class="sx-ttl-tip">${t('tip_titles_ribbon')}<div class="sx-ttl-tip-next">${line}</div></div>`;
 }
 
 // Clicking the score banner of any map / level screen opens the titles list.

@@ -136,7 +136,8 @@
     align-items: center;
     gap: 10px;
     font-family: var(--C, 'Cinzel', serif);
-    font-size: clamp(10px, 1.3vw, 18px);
+    font-size: clamp(13px, 1.7vw, 23px);
+    font-weight: 700;
     color: #3a2510; /* dark brown - readable on parchment */
     letter-spacing: 0.5px;
     line-height: 1;
@@ -145,7 +146,7 @@
 /* Unlocked badge next to title */
 .mc-unlocked-badge {
     font-family: var(--PX);
-    font-size: clamp(6px, 0.7vw, 9px);
+    font-size: clamp(9px, 1vw, 13px);
     color: var(--green);
     border: 1px solid var(--green);
     padding: 1px 5px;
@@ -156,7 +157,8 @@
 /* The actual code string shown once unlocked */
 .mc-code-reveal {
     font-family: var(--PX);
-    font-size: clamp(7px, 0.85vw, 11px);
+    font-size: clamp(10px, 1.2vw, 16px);
+    font-weight: 700;
     color: #1a0a00;
     letter-spacing: 1px;
     background: rgba(255,240,200,0.35);
@@ -175,16 +177,18 @@
 }
 
 .mc-req-label {
-    font-family: var(--F);
-    font-size: clamp(8px, 0.9vw, 12px);
-    color: #3a2510;
+    font-family: var(--PX);
+    font-size: clamp(11px, 1.25vw, 17px);
+    font-weight: 600;
+    color: #2e1b0a;
     white-space: nowrap;
 }
 
 .mc-req-values {
-    font-family: var(--F);
-    font-size: clamp(8px, 0.9vw, 12px);
-    color: #3a2510;
+    font-family: var(--PX);
+    font-size: clamp(11px, 1.25vw, 17px);
+    font-weight: 700;
+    color: #2e1b0a;
 }
 
     .mc-req-values.met {
@@ -193,7 +197,7 @@
 
 .mc-check {
     color: var(--green);
-    font-size: clamp(10px, 1.1vw, 16px);
+    font-size: clamp(13px, 1.5vw, 21px);
     filter: drop-shadow(0 0 3px rgba(61,220,132,0.7));
     flex-shrink: 0;
 }

@@ -352,7 +352,7 @@ html.file-protocol #boot-loader .boot-logo-shimmer {
     transform: translateX(-50%);
     white-space: nowrap;
     font-family: var(--PX);
-    font-size: clamp(7px, 0.95cqw, 11px);
+    font-size: clamp(10px, 1.45cqw, 17px);
     color: rgba(255, 110, 110, 0.9);
     letter-spacing: 0.1em;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
@@ -363,11 +363,11 @@ html.file-protocol #boot-loader .boot-logo-shimmer {
     position: absolute;
     right: 0.8%;
     bottom: 0.9%;
-    max-width: 46%;
+    max-width: 60%;
     font-family: var(--PX);
-    font-size: clamp(6px, 0.85cqw, 9px);
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.48);
+    font-size: clamp(11px, 1.15cqw, 15px);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.7);
     text-align: right;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
     pointer-events: none;

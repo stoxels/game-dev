@@ -313,7 +313,7 @@ function buildCodesScreen() {
             <img class="mc-logo" src="images/Moodle_Codes_Screen/Moodle_Codes_logo.webp" alt="Moodle Codes">
 
             <!-- BACK button - top-left (unified .back-btn stone slab) -->
-            <button class="back-btn back-btn-corner mc-menu-btn" id="btn-codes-back" data-t="btn_back">◀ BACK</button>
+            <button class="back-btn back-btn-corner mc-menu-btn" id="btn-codes-back" data-t="btn_back">BACK</button>
 
 
             <!-- 5 parchment row overlays (text + bars only, no icons) -->

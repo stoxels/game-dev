@@ -217,7 +217,7 @@
 /* Left side of a row: setting name + optional hint text stacked vertically */
 .settings-label {
     font-family: var(--PX);
-    font-size: clamp(10px, 1.2vw, 13px);
+    font-size: clamp(13px, 1.5vw, 17px);
     color: var(--yellow);
     display: flex;
     flex-direction: column;
@@ -225,12 +225,16 @@
     position: relative;
     top: 5%;
     left: 5%;
+    /* Take the room left of the control and wrap long hints inside it, never behind the control. */
+    flex: 1 1 0;
+    min-width: 0;
+    padding-right: 8%;
 }
 
 /* Small descriptive text shown below the setting name */
 .settings-hint {
     font-family: var(--PX);
-    font-size: clamp(8px, 0.9vw, 10px);
+    font-size: clamp(11px, 1.1vw, 14px);
     color: cornsilk;
     font-style: normal;
 }
@@ -283,6 +287,12 @@
     align-items: center;
     justify-content: space-between;
     box-sizing: border-box;
+}
+
+/* A toggle that is a direct child of a row (Visuals / Controls) gets the same 3% inward
+   shift as .settings-controls, so it lines up with the Audio rows and clears the frame. */
+.settings-row > .settings-toggle {
+    right: 3%;
 }
 
     .settings-toggle:hover {
@@ -413,9 +423,10 @@
    displayed value, so the toggle + slider never shift position. */
 .settings-val {
     font-family: var(--PX);
-    font-size: clamp(9px, 1.1vw, 12px);
+    font-size: clamp(13px, 1.5vw, 17px);
+    font-weight: 700;
     color: #2c1a0c;
-    width: clamp(34px, 3.6vw, 42px);
+    width: clamp(46px, 4.6vw, 58px);
     flex: 0 0 auto;
     text-align: right;
 }

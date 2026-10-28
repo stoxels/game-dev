@@ -131,10 +131,13 @@ export function diffTipHTML(diff) {
     const caps = CAMPAIGN_MISTAKE_CAPS[diff];
     if (!cfg || !caps) return '';
     const [a, b, c, d] = cfg.pens;
-    return `<strong>${t('diff_' + diff)}</strong>`
-        + `<br>${t('diff_tip_score').replace('{n}', String(cfg.scoreMult))}`
-        + `<br>${t('diff_tip_pen').replace('{a}', a).replace('{b}', b).replace('{c}', c).replace('{d}', d)}`
-        + `<br>${t('diff_tip_cap').replace('{s}', caps.small).replace('{m}', caps.medium).replace('{l}', caps.large)}`;
+    const hi = (v) => `<b>${v}</b>`; // the numbers stand out from the sentence around them
+    return `<div class="sx-diff-tip sx-diff-tip-${diff}">`
+        + `<div class="sx-diff-tip-title">${t('diff_' + diff)}</div>`
+        + `<div class="sx-diff-tip-row">${t('diff_tip_score').replace('{n}', hi(cfg.scoreMult))}</div>`
+        + `<div class="sx-diff-tip-row">${t('diff_tip_pen').replace('{a}', hi(a)).replace('{b}', hi(b)).replace('{c}', hi(c)).replace('{d}', hi(d))}</div>`
+        + `<div class="sx-diff-tip-row">${t('diff_tip_cap').replace('{s}', hi(caps.small)).replace('{m}', hi(caps.medium)).replace('{l}', hi(caps.large))}</div>`
+        + `</div>`;
 }
 
 // Keeps the difficulty buttons' tooltip text fresh (language, tuning) each

@@ -25,8 +25,8 @@
     --hs-mod-im: #6b3fa0;        /* Ironman     (IM)        */
     --hs-mod-cl: #16606b;        /* Classless   (CL)        */
     --hs-mod-tl: #1d6b3e;        /* Treeless    (TL)        */
-    --hs-score: #8a5a00;         /* score numbers - old gold */
-    --hs-slot-text: #5d5346;     /* slot column - quiet ink  */
+    --hs-score: #5c3700;         /* score numbers - dark bronze, readable on the parchment */
+    --hs-slot-text: #2f2415;     /* slot column - dark ink   */
     --hs-row: #2b2620;           /* default row text         */
     --hs-row-alt: rgba(120, 90, 40, 0.08);   /* zebra stripe */
     --hs-row-hover: rgba(120, 90, 40, 0.16); /* hover wash   */
@@ -97,7 +97,7 @@
     top: 2%;
     left: 1.5%;
     z-index: 10;
-    font-size: clamp(10px, 1.6vw, 16px);
+    font-size: clamp(12px, 1.7vw, 18px);
 }
 
 /* ---- Title plaque (carved stone banner, from the ledger/modal header) ----
@@ -172,10 +172,11 @@
 
 .hs-slot-chip {
     font-family: var(--PX);
-    font-size: clamp(7px, 0.9vw, 12px);
-    color: #2b2620;
+    font-size: clamp(9px, 1.15vw, 15px);
+    font-weight: 700;
+    color: #231a0e;
     background: linear-gradient(180deg, #e9d9b1, #d8c08c);
-    border: 1px solid #8a6a34;
+    border: 1px solid #6b4f22;
     border-radius: 4px;
     padding: clamp(2px, 0.35%, 5px) clamp(5px, 0.8vw, 12px);
     cursor: pointer;
@@ -234,11 +235,11 @@
        (the art's raised end caps occupy the outer ~7% of each bar). */
     padding: 0 8%;
     font-family: var(--C, 'Cinzel', serif);
-    font-size: clamp(8px, 1.25vw, 16px);
+    font-size: clamp(10px, 1.55vw, 21px);
     font-weight: 700;
-    letter-spacing: clamp(0.4px, 0.25vw, 2px);
-    color: #31200f;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+    letter-spacing: clamp(0.4px, 0.2vw, 2px);
+    color: #f6e9c6;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.5);
     white-space: nowrap;
     overflow: hidden;
 }
@@ -309,6 +310,7 @@
         border-bottom: 1px solid var(--hs-divider);
         padding: clamp(2px, 0.6%, 8px) clamp(3px, 1vw, 9px);
         font-family: var(--PX);
+        font-weight: 700;
         font-size: clamp(9px, 1.3vw, 17px);
         color: var(--hs-row);
         text-align: center; /* match the centered header labels */

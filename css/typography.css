@@ -43,3 +43,28 @@
     font-size: clamp(9px, 30cqw, 20px);
     letter-spacing: 0.04em;
 }
+
+/* Overworld and world-detail title plaque ("SELECT LEVEL" / world name): the display font, larger. */
+#screen-map-view .ls-title {
+    font-family: var(--C);
+    font-weight: 700;
+    font-size: clamp(13px, 1.75vw, 34px);
+    letter-spacing: 0.08em;
+}
+
+#screen-world-detail .ls-title {
+    font-family: var(--C);
+    font-weight: 700;
+    font-size: clamp(11px, 1.5vw, 26px);
+    letter-spacing: 0.05em;
+    /* long world names wrap onto two lines inside the centred plaque */
+    white-space: normal;
+    text-align: center;
+    line-height: 1.15;
+    padding: 0 clamp(16px, 2.2vw, 40px);
+    text-wrap: balance;
+}
+
+@media (max-width: 1150px) {
+    #screen-map-view .ls-title { font-size: clamp(13px, 2.2vw, 30px); }
+}

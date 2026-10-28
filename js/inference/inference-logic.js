@@ -248,9 +248,12 @@ function _banner_buildElement(ms, cat, rewardParts) {
             </div>
             <div class="qcb-rewards">${rewardParts.join('&nbsp;&nbsp;')}</div>
         </div>
-        <button class="qcb-close"
-                onclick="document.getElementById('quest-claim-banner')?.remove()">✕</button>
+        <button class="qcb-close" type="button">✕</button>
     </div>`;
+
+    // A left or right click anywhere on the banner (or its X) closes it.
+    banner.addEventListener('click', () => banner.remove());
+    banner.addEventListener('contextmenu', (e) => { e.preventDefault(); banner.remove(); });
 
     return banner;
 }

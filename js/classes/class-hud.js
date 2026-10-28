@@ -190,10 +190,11 @@ function getHUDTooltip() {
                z-index 10000 (css/pause.css) and the hotbar to 10010 while it
                is open, which used to render skill tooltips behind the book. */
             z-index: 10050;
-            background: #12121e;
-            border: 1px solid var(--accent, #5555aa);
-            border-left: 3px solid var(--accent2, #aaaaff);
-            color: var(--accent2, #ccc);
+            background: linear-gradient(180deg, #25202b, #16131b);
+            border: 2px solid #b8913a;
+            border-radius: 6px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+            color: #e9e2cf;
             font-family: var(--PX, monospace);
             font-size: 10px;
             line-height: 1.6;

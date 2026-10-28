@@ -638,12 +638,13 @@ function ensureLSTooltipStyles() {
     style.id = 'ls-tooltip-style';
     style.textContent = `
         .lc-tooltip {
-            position: fixed; z-index: 9999; background: #1a1a2e;
-            border: 1px solid var(--accent); color: var(--accent2);
+            position: fixed; z-index: 9999;
+            background: linear-gradient(180deg, #25202b, #16131b);
+            border: 2px solid #b8913a; border-radius: 6px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55); color: #e9e2cf;
             font-family: var(--PX); font-size: 10px; padding: 8px 12px;
             max-width: 280px; line-height: 1.6; pointer-events: none;
             opacity: 0; transition: opacity 0.15s;
-            border-left: 3px solid var(--purple);
         }
         .lc-tooltip.show { opacity: 1; }
         .lc-items-hint {

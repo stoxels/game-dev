@@ -233,7 +233,6 @@
        later-loaded .mv-tooltip / .mv-tooltip.show rules (equal class
        specificity, 220/280px) can never narrow it regardless of load order. */
     padding: 12px 16px;
-    border-left-color: var(--tip-accent, #c8a84b);
     box-shadow: 0 6px 24px rgba(0, 0, 0, .6);
 }
 
@@ -593,3 +592,16 @@
         opacity: 0;
     }
 }
+
+/* Character dossier tooltip: bigger text, and the "Recommended for" line in cream so it no longer
+   shares the colour of the category labels (which use the hero's accent colour). */
+#csi-tooltip { font-size: 15px; line-height: 1.5; }
+#csi-tooltip .mv-tooltip-title { font-family: var(--C); font-weight: 700; font-size: 22px; letter-spacing: 0.08em; }
+#csi-tooltip .mv-tooltip-sub { font-size: 15px; }
+#csi-tooltip .csi-tip-section { margin-top: 8px; }
+#csi-tooltip .csi-tip-label { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; opacity: 1; margin-bottom: 2px; }
+#csi-tooltip .csi-tip-trait { gap: 9px; margin-top: 6px; }
+#csi-tooltip .csi-tip-trait-icon { font-size: 17px; }
+#csi-tooltip .csi-tip-trait-name { font-size: 15px; font-weight: 700; }
+#csi-tooltip .csi-tip-trait-desc { opacity: 0.92; font-size: 14px; }
+#csi-tooltip, #csi-tooltip.show { max-width: min(620px, calc(100vw - 24px)); }

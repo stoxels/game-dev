@@ -1304,17 +1304,19 @@ function _buildEnterButton(wi) {
     btn.style.cssText = `
         position: absolute;
         left: ${x}%;
-        top: calc(${y}% - 52px);
+        top: calc(${y}% - 64px);
         transform: translateX(-50%);
         z-index: 10;
-        font-family: var(--PX, monospace);
-        font-size: 11px;
-        padding: 5px 12px;
+        font-family: var(--C, var(--PX, monospace));
+        font-weight: 700;
+        font-size: 18px;
+        padding: 8px 20px;
         background: #c8a84b;
         color: #1a0d00;
-        border: none;
+        border: 2px solid #6b4a12;
+        border-radius: 4px;
         cursor: pointer;
-        letter-spacing: 1px;
+        letter-spacing: 0.06em;
         white-space: nowrap;
         box-shadow: 0 2px 8px rgba(0,0,0,0.7);
     `;

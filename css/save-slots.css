@@ -388,6 +388,16 @@
     height: clamp(44px, 6vw, 60px);
 }
 
+/* The reset-achievements dialog has a longer title ("RESET ACHIEVEMENTS" / "ERFOLGE ZURÜCKSETZEN"),
+   so its box and plaque are wider than the name dialog's. */
+.slot-name-box.ach-reset-box {
+    width: min(780px, 94vw);
+}
+
+.ach-reset-box .reset-header {
+    width: min(78%, 600px);
+}
+
 /* Cream plate that carries a dialog's text. The parchment frame is mid-brown,
    so thin brown text printed straight on it was unreadable. */
 .dialog-plate {

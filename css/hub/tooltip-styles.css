@@ -362,3 +362,40 @@
     border-color: #f1c40f !important;
     color: #f1c40f;
 }
+
+/* Title-screen expansion history tooltip: bigger text and more room than the usual tooltip
+   (matched by its content, like the equipment tooltips above; the engine's inline max-width needs !important). */
+#ghud-floating-tip:has(.sx-exp-tip) { max-width: 520px !important; padding: 12px 16px; }
+.sx-exp-tip { font-size: 15px; line-height: 1.55; }
+.sx-exp-tip .sx-exp-tip-title { font-size: 17px; letter-spacing: 0.04em; }
+
+/* Save-slot lifetime stats tooltip: larger lines, gold group headings with a rule under them. */
+#ghud-floating-tip:has(.sx-slot-tip) { max-width: 460px !important; padding: 14px 18px; }
+.sx-slot-tip { font-size: 15px; line-height: 1.35; }
+.sx-slot-tip .sx-slot-tip-title { font-size: 18px; font-weight: 700; color: #ffe9a8; padding-bottom: 6px; margin-bottom: 4px; border-bottom: 1px solid rgba(255, 215, 110, 0.45); }
+.sx-slot-tip .sx-slot-tip-group { margin-top: 8px; padding-bottom: 2px; font-size: 14px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #f0b43c; border-bottom: 1px solid rgba(240, 180, 60, 0.3); }
+.sx-slot-tip .sx-slot-tip-line { padding-left: 4px; }
+.sx-slot-tip .sx-slot-tip-line b { color: #fff3c4; }
+
+/* Setup screen: difficulty tooltip - title in the difficulty's own colour, gold-and-white lines. */
+#ghud-floating-tip:has(.sx-diff-tip) { max-width: 440px !important; padding: 14px 18px; }
+.sx-diff-tip { font-size: 16px; line-height: 1.45; color: #e9e2cf; }
+.sx-diff-tip .sx-diff-tip-title { font-family: var(--C); font-weight: 700; font-size: 20px; letter-spacing: 0.12em; padding-bottom: 5px; margin-bottom: 6px; border-bottom: 1px solid rgba(255, 215, 110, 0.4); }
+.sx-diff-tip-easy .sx-diff-tip-title { color: #6fe08e; }
+.sx-diff-tip-normal .sx-diff-tip-title { color: #ffd76e; }
+.sx-diff-tip-hard .sx-diff-tip-title { color: #ff7b6b; }
+.sx-diff-tip .sx-diff-tip-row { margin-top: 4px; }
+.sx-diff-tip .sx-diff-tip-row b { color: #ffd76e; }
+
+/* Setup screen: modifier tooltip - name, plain sentence, score bonus. */
+#ghud-floating-tip:has(.sx-mod-tip) { max-width: 400px !important; padding: 14px 18px; }
+.sx-mod-tip { font-size: 16px; line-height: 1.45; color: #e9e2cf; }
+.sx-mod-tip .sx-mod-tip-title { font-family: var(--C); font-weight: 700; font-size: 19px; letter-spacing: 0.12em; color: #ffd76e; padding-bottom: 5px; margin-bottom: 6px; border-bottom: 1px solid rgba(255, 215, 110, 0.4); }
+.sx-mod-tip .sx-mod-tip-score { margin-top: 8px; font-weight: 700; color: #7fe39a; }
+
+/* Titles scroll tooltip (select-level top bar): heading in the display font, readable lines. */
+#ghud-floating-tip:has(.sx-ttl-tip) { max-width: 400px !important; padding: 14px 18px; }
+.sx-ttl-tip { font-size: 16px; line-height: 1.45; color: #e9e2cf; }
+.sx-ttl-tip .sx-ttl-tip-title { font-family: var(--C); font-weight: 700; font-size: 20px; letter-spacing: 0.12em; color: #ffd76e; padding-bottom: 5px; margin-bottom: 6px; border-bottom: 1px solid rgba(255, 215, 110, 0.4); }
+.sx-ttl-tip .sx-ttl-tip-hint { margin-top: 8px; font-size: 14px; color: #b9b19a; }
+.sx-ttl-tip .sx-ttl-tip-next { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 215, 110, 0.3); font-weight: 700; color: #7fe39a; }

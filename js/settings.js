@@ -253,11 +253,11 @@ function initSliderControl(cfg) {
         saveSettings(SETTINGS);
         applySettings();
 
-        // Preview the new volume with a random SFX (debounced while dragging)
+        // Preview the new volume with the same short button sound every time (debounced while dragging)
         if (cfg.key === 'sfxVolume') {
             clearTimeout(_sfxPreviewTimeout);
             _sfxPreviewTimeout = setTimeout(() => {
-                Audio_Manager.playRandomSFX();
+                Audio_Manager.playSFX('button');
             }, 150);
         }
     });

@@ -170,7 +170,7 @@ function _buildOverlay(pairing, playerId, replay) {
         ${pairing.companion2 ? `<img class="cmp-hero cmp-mid" src="${_spritePath(pairing.companion2, pairing.looks[pairing.companion2])}" alt="" draggable="false">` : ''}
         ${_petHtml(pairing, playerId)}
         <div class="cmp-bubble"><div class="cmp-name"></div><div class="cmp-text"></div></div>
-        <button class="cmp-skip" type="button">${LANG === 'de' ? 'Überspringen ▶' : 'Skip ▶'}</button>
+        <button class="cmp-skip" type="button">${LANG === 'de' ? 'überspringen' : 'skip'}</button>
         <div class="cmp-hint">${LANG === 'de' ? 'Klicken zum Fortfahren' : 'Click to continue'}</div>`;
     root.dataset.player = playerId;
     return root;

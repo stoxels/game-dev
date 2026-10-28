@@ -53,7 +53,7 @@ function _buildReplayRow(entry, unlocked, titleText) {
     } else {
         const num = document.createElement('span');
         num.className = 'replay-track-thumb-num';
-        num.textContent = _romanRegionNumber(entry.beatId);
+        num.textContent = entry.placeholder || _romanRegionNumber(entry.beatId);
         thumbWrap.appendChild(num);
     }
 
@@ -145,7 +145,8 @@ function _buildStoryReplayRow(scene) {
     const row = _buildReplayRow({
         id: 'story_' + scene.id,
         label: name,
-        thumb: getCompanionPairing(scene.id, scene.heroes[0]).bg,
+        thumb: anyUnlocked ? getCompanionPairing(scene.id, scene.heroes[0]).bg : '',
+        placeholder: '?',
         descKey: '',
     }, anyUnlocked, name);
     row.querySelector('.replay-track-desc').textContent = `${de ? 'Welt' : 'World'} ${scene.world} \u00b7 ${kind}`;

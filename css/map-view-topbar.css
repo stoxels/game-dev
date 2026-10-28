@@ -44,6 +44,7 @@
 
 #screen-map-view .ls-topbar,
 #screen-world-detail .ls-topbar {
+    position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -78,9 +79,11 @@
 
 #screen-map-view #mv-btn-back,
 #screen-world-detail #wd-btn-back {
-    font-size: clamp(10px, 1.2vw, 14px);
-    min-width: clamp(90px, 9vw, 160px);
-    padding: 10px 18px;
+    font-size: clamp(13px, 1.5vw, 19px);
+    /* a larger slab, so the carved arrow reads against the tall top bar */
+    min-width: clamp(120px, 13vw, 210px);
+    min-height: clamp(54px, 6.4vw, 86px);
+    padding: 10px 20px 10px 46px;
 }
 
     #screen-map-view #mv-btn-back:hover,
@@ -137,7 +140,7 @@
     /* Wide enough for the longest line this scroll holds - the
        "3/24 Titles collected" progress caption (Press Start 2P advances
        a full 1em per glyph, so 21 glyphs need ~21x the font size). */
-    width: clamp(200px, 18vw, 340px);
+    width: clamp(210px, 17vw, 400px);
     height: auto;
     aspect-ratio: 3.75 / 1;
     box-sizing: border-box;
@@ -164,8 +167,9 @@
 #screen-map-view .mv-ribbon-label,
 #screen-world-detail .mv-ribbon-label {
     font-family: var(--PX, monospace);
-    font-size: clamp(8px, 1vw, 12px);
-    font-weight: bold;
+    font-family: var(--C);
+    font-size: clamp(11px, 1.3vw, 17px);
+    font-weight: 700;
     letter-spacing: clamp(1px, 0.25vw, 3px);
     color: #f0d090;
     text-shadow: 1px 1px 0 #000, 0 0 8px rgba(255, 200, 80, 0.45);
@@ -176,7 +180,7 @@
 /* Line 1 - total score (e.g. "12,345") */
 #screen-map-view #mv-ls-score,
 #screen-world-detail #wd-ls-score {
-    font-size: clamp(9px, 1.3vw, 15px);
+    font-size: clamp(14px, 1.8vw, 24px);
     font-weight: bold;
     color: #ffffff;
     text-shadow: 1px 1px 2px #000, 0 0 8px rgba(255, 215, 0, 0.3);
@@ -189,8 +193,9 @@
    overflows the scroll at any width (min 6.5px, max 9.5px). */
 #screen-map-view #mv-ls-pts-next,
 #screen-world-detail #wd-ls-pts-next {
-    font-size: clamp(6.5px, 0.7vw, 9.5px);
-    color: #010101;
+    font-size: clamp(10px, 1.1vw, 15px);
+    font-weight: 600;
+    color: #1a0d00;
     opacity: 1;
     letter-spacing: 0;
     line-height: 1.25;
@@ -240,6 +245,19 @@
     margin-top: calc(-1 * clamp(4px, 1vw, 6px));
     margin-bottom: calc(-1 * clamp(4px, 1vw, 6px));
     box-sizing: border-box;
+    /* On wide screens the plaque hangs in the exact middle of the bar (the
+       bigger back button and ribbon would otherwise push it off-centre). */
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    height: auto;
+    margin: 0;
+    transform: translateX(-50%);
+    flex: none;
+    /* as wide as the free middle of the bar: screen width minus the back button,
+       portrait and titles scroll on the left, mirrored so it stays centred */
+    width: clamp(190px, calc(100vw - 2 * (52px + min(13vw, 210px) + min(8vw, 100px) + min(17vw, 400px))), 640px);
     padding: 0 clamp(4px, 1vw, 10px);
     text-shadow: 1px 1px 0 #000, 2px 2px 4px #000, 0 0 18px rgba(255, 200, 80, 0.35);
     white-space: nowrap;
@@ -531,6 +549,15 @@
 /* Narrow desktops: the 2 x 3 button grid takes more of the row, so the
    title plaque text shrinks a little to stay inside its banner. */
 @media (max-width: 1150px) {
+    /* too narrow to keep it dead-centre: back to sitting in the row */
+    #screen-map-view .ls-title,
+    #screen-world-detail .ls-title {
+        position: static;
+        transform: none;
+        flex: 1 1 clamp(100px, 13vw, 500px);
+        width: auto;
+        top: auto;
+    }
     #screen-map-view .ls-title {
         font-size: clamp(10px, 1.7vw, 30px);
         letter-spacing: clamp(1px, 0.25vw, 6px);
@@ -581,4 +608,13 @@
 #screen-map-view .tb-gold:not(:empty) + .ls-topbar-right,
 #screen-world-detail .tb-gold:not(:empty) + .ls-topbar-right {
     margin-left: 0;
+}
+
+/* phones: the title takes its own full-width row (must come after the 1150px rule) */
+@media (max-width: 760px) {
+    #screen-map-view .ls-title,
+    #screen-world-detail .ls-title {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
 }

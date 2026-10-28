@@ -108,24 +108,43 @@
     transition: opacity var(--quest-anim-banner-fade);
 }
 
-/* --- Banner: visible card shell --- */
+/* --- Banner: visible card shell - a parchment plate with a dark-wood rim, like the Inference ledger --- */
+#quest-claim-banner {
+    cursor: pointer;
+    user-select: none;
+}
+
 .qcb-inner {
     display: flex;
     align-items: center;
-    gap: var(--quest-space-banner-gap);
-    padding: var(--quest-space-banner-pad);
-    border-radius: var(--quest-radius-banner);
-    background: var(--quest-color-bg-banner);
-    border: var(--quest-border-banner-ring);
-    border-left: var(--quest-border-banner-left);
-    box-shadow: 0 4px 16px var(--quest-color-shadow-banner);
+    gap: 16px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #f8edcc 0%, #e8d09a 100%);
+    border: 3px solid #5a3a14;
+    box-shadow: inset 0 0 0 1px rgba(255, 246, 214, 0.8),
+                inset 0 0 18px rgba(120, 80, 20, 0.25),
+                0 6px 22px rgba(0, 0, 0, 0.55);
 }
 
-/* --- Banner: left icon --- */
+#quest-claim-banner:hover .qcb-inner {
+    filter: brightness(1.04);
+}
+
+/* --- Banner: left icon, in a dark round badge with a gold ring --- */
 .qcb-icon {
-    font-size: var(--quest-size-icon-banner);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    font-size: 28px;
     line-height: 1;
     flex-shrink: 0; /* never let the icon collapse */
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #5a3c18, #24140a);
+    border: 3px solid #d4a017;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7);
 }
 
 /* --- Banner: text column (title + sub + rewards stacked) --- */
@@ -138,32 +157,35 @@
 
 /* --- Banner: small uppercase label above the main message --- */
 .qcb-title {
-    font-family: var(--quest-font-mono);
-    font-size: var(--quest-size-text-xs);
-    color: var(--quest-color-success);
+    font-family: var(--C);
+    font-weight: 700;
+    font-size: 14px;
+    color: #8a5a00;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.14em;
 }
 
 /* --- Banner: main descriptive message --- */
 .qcb-sub {
-    font-family: var(--quest-font-mono);
-    font-size: var(--quest-size-text-sm);
-    color: var(--quest-color-text-primary);
+    font-family: var(--C);
+    font-weight: 700;
+    font-size: 18px;
+    color: #2c1a0c;
 }
 
     /* <em> inside .qcb-sub is used for secondary/de-emphasized info (not italic) */
     .qcb-sub em {
-        color: var(--quest-color-text-secondary);
+        color: #7a3f08;
         font-style: normal;
     }
 
 /* --- Banner: reward summary (gold text below message) --- */
 .qcb-rewards {
-    font-family: var(--quest-font-mono);
-    font-size: var(--quest-size-text-xs);
-    color: var(--quest-color-reward);
-    margin-top: 2px;
+    font-family: var(--PX);
+    font-weight: 700;
+    font-size: 15px;
+    color: #5c3700;
+    margin-top: 4px;
 }
 
 /* Puzzle-item art inside the claim banner + ledger chips: emoji-sized. */
@@ -179,8 +201,8 @@
 .qcb-close {
     background: transparent;
     border: none;
-    color: var(--quest-color-text-muted);
-    font-size: var(--quest-size-text-md);
+    color: #7a5a30;
+    font-size: 18px;
     cursor: pointer;
     padding: 2px 4px;
     flex-shrink: 0; /* never shrink the close button */
@@ -189,7 +211,7 @@
 }
 
     .qcb-close:hover {
-        color: var(--quest-color-text-primary);
+        color: #2c1a0c;
     }
 
 

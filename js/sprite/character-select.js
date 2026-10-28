@@ -26,14 +26,12 @@ export const CHARACTERS = {
         nameDE: 'STOX',
         tagline: 'The Analyst',
         taglineDE: 'Der Analytiker',
-        recommended: 'Melee damage focused gameplay',
-        recommendedDE: 'Nahkampfschaden-fokussiertes Spiel',
         background: 'Raised in the Cartographers\' Guild archive, Stox has read every record of the day the Apex broke - and none of it adds up. He\'s out of pages to search, so now he searches in person.',
         backgroundDE: 'Im Archiv der Kartografengilde aufgewachsen, hat Stox jede Aufzeichnung über den Tag gelesen, an dem der Apex zerbrach - und nichts ergibt einen Sinn. Ihm sind die Seiten ausgegangen, also sucht er jetzt selbst.',
         personality: 'Dry, methodical, and quietly relentless. He trusts data over instinct, and a good pattern over a good feeling.',
         personalityDE: 'Trocken, methodisch und still unerbittlich. Er vertraut Daten mehr als Instinkt, und einem guten Muster mehr als einem guten Gefühl.',
-        strength: 'Reads patterns fast and rarely panics under pressure - mistakes are just data points to him, not setbacks.',
-        strengthDE: 'Erkennt Muster schnell und gerät selten in Panik - Fehler sind für ihn nur Datenpunkte, keine Rückschläge.',
+        strength: 'Starts in the middle of the melee nodes of the Probability Tree: Strength, Brute Force and Quick Strike make his melee hits stronger, while Plated Growth and Bulwark Endurance make him tougher. Built to hit hard up close.',
+        strengthDE: 'Startet mitten zwischen den Nahkampf-Knoten des Wahrscheinlichkeitsbaums: Stärke, Rohe Gewalt und Schneller Schlag machen seine Nahkampftreffer stärker, Gepanzertes Wachstum und Bollwerk-Ausdauer machen ihn zäher. Gebaut, um aus der Nähe hart zuzuschlagen.',
         image: 'images/sprites/Stox_noclass.webp',
         accentColor: '#4fc3f7',
         glowColor: 'rgba(79,195,247,0.35)',
@@ -60,14 +58,12 @@ export const CHARACTERS = {
         nameDE: 'TRIX',
         tagline: 'The Trickster',
         taglineDE: 'Die Trickserin',
-        recommended: 'Spell damage focused gameplay',
-        recommendedDE: 'Zauberschaden-fokussiertes Spiel',
         background: 'The last of a colony exiled for claiming the Variance Collapse was no accident, Trix grew up alone in a dying observatory deep in the Regression Rift. Now its readings are sliding toward zero, and she\'s come for answers.',
         backgroundDE: 'Als Letzte einer Kolonie, die verbannt wurde, weil sie behauptete, der Varianz-Kollaps sei kein Unfall gewesen, wuchs Trix allein in einem sterbenden Observatorium tief im Regressionsrift auf. Jetzt nähern sich dessen Messwerte der Null, und sie sucht Antworten.',
         personality: 'Cocky, sharp-tongued, and supremely confident - mostly because she\'s usually right.',
         personalityDE: 'Frech, schlagfertig und überaus selbstbewusst - meist, weil sie meistens recht hat.',
-        strength: 'Thrives on risk and reads dangerous situations like a game she already knows how to win.',
-        strengthDE: 'Blüht im Risiko auf und liest gefährliche Situationen wie ein Spiel, das sie schon gewonnen hat.',
+        strength: 'Starts in the middle of the spellcasting nodes of the Probability Tree: Spell Thread, Spell Focus and Cast Speed make her spells hit harder and come faster, while Arcane Reserve and Absorptive Core keep her power topped up. Built to win from a distance with magic.',
+        strengthDE: 'Startet mitten zwischen den Zauber-Knoten des Wahrscheinlichkeitsbaums: Zauberfaden, Zauberfokus und Zaubergeschwindigkeit lassen ihre Zauber härter treffen und schneller kommen, Arkane Reserve und Absorptiver Kern halten ihre Kraft oben. Gebaut, um aus der Ferne mit Magie zu gewinnen.',
         image: 'images/sprites/Trix_noclass.webp',
         accentColor: '#ce93d8',
         glowColor: 'rgba(206,147,216,0.35)',
@@ -96,14 +92,12 @@ export const CHARACTERS = {
         nameDE: 'SYLA',
         tagline: 'The Naturalist',
         taglineDE: 'Die Naturalistin',
-        recommended: 'Reveal projectile damage focused gameplay',
-        recommendedDE: 'Enthüllungs-Projektilschaden-fokussiertes Spiel',
         background: 'Syla spent years listening to her home forest - until corruption locked inside it for three hundred quiet years began spreading. Her notebooks have the proof. She came to the Outpost to find help.',
         backgroundDE: 'Syla verbrachte Jahre damit, ihrem Heimatwald zuzuhören - bis die Korruption, die dreihundert ruhige Jahre lang darin eingeschlossen war, sich auszubreiten begann. Ihre Notizbücher liefern den Beweis. Sie kam zum Außenposten um Hilfe zu finden.',
         personality: 'Warm, patient, and endlessly forgiving of mistakes - she sees every setback as just part of growing.',
         personalityDE: 'Warmherzig, geduldig und unendlich nachsichtig bei Fehlern - sie sieht jeden Rückschlag einfach als Teil des Wachsens.',
-        strength: 'Stays calm and steady no matter how badly things are going, and bounces back quickly from setbacks.',
-        strengthDE: 'Bleibt ruhig und gefasst, egal wie schlecht es läuft, und erholt sich schnell von Rückschlägen.',
+        strength: 'Starts in the middle of the reveal-projectile nodes of the Probability Tree: Keen Volley, Sharpshot and Swift Flight make her reveal projectiles hit harder and fly faster, while Agility and Hardy Footing keep her light on her feet. Built to uncover the grid with a rain of shots.',
+        strengthDE: 'Startet mitten zwischen den Enthüllungs-Projektil-Knoten des Wahrscheinlichkeitsbaums: Scharfe Salve, Scharfschuss und Schneller Flug lassen ihre Enthüllungsprojektile härter treffen und schneller fliegen, Beweglichkeit und Fester Stand halten sie leichtfüßig. Gebaut, um das Gitter mit einem Schusshagel aufzudecken.',
         image: 'images/sprites/Syla_noclass.webp',
         accentColor: '#66bb6a',
         glowColor: 'rgba(102,187,106,0.35)',
@@ -244,8 +238,6 @@ function _buildCharacterSelectTipContent(char) {
     const labelPersonality = lang === 'de' ? 'Persönlichkeit' : 'Personality';
     const labelStrength = lang === 'de' ? 'Stärke' : 'Strength';
     const labelTraits = lang === 'de' ? 'Fähigkeiten' : 'Traits';
-    const labelRecommended = lang === 'de' ? 'Empfohlen für' : 'Recommended for';
-    const recommended = lang === 'de' ? char.recommendedDE : char.recommended;
 
     const traitsHtml = (char.traits || []).map(tr => {
         const trName = lang === 'de' ? tr.nameDE : tr.nameEn;
@@ -260,7 +252,6 @@ function _buildCharacterSelectTipContent(char) {
 
     return `<div class="mv-tooltip-title" style="color:${char.accentColor}">${charName}</div>`
         + `<div class="mv-tooltip-sub" style="color:${char.accentColor};opacity:.85">${tagline}</div>`
-        + (recommended ? `<div class="csi-tip-section csi-tip-recommended" style="color:${char.accentColor}"><span class="csi-tip-label">${labelRecommended}</span>${recommended}</div>` : '')
         + `<div class="csi-tip-section"><span class="csi-tip-label">${labelBackground}</span>${background}</div>`
         + `<div class="csi-tip-section"><span class="csi-tip-label">${labelPersonality}</span>${personality}</div>`
         + `<div class="csi-tip-section"><span class="csi-tip-label">${labelStrength}</span>${strength}</div>`

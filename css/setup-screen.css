@@ -519,3 +519,13 @@
     text-shadow: 0 2px 3px #000;
     pointer-events: none;
 }
+
+/* Score bonus under each tombstone: dark green ink, readable on the parchment page (the old grey-blue
+   faded into it). */
+.mod-score-tag {
+    color: #24531f;
+    opacity: 1;
+    font-weight: 700;
+    font-size: 16px;
+    text-shadow: 0 1px 0 rgba(255, 246, 214, 0.6);
+}

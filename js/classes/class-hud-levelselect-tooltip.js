@@ -175,10 +175,11 @@ function _getLsClassTooltipEl() {
         tip.style.cssText = `
             position: fixed;
             z-index: 9999;
-            background: #12121e;
-            border: 1px solid var(--accent, #5555aa);
-            border-left: 3px solid var(--purple, #9b59b6);
-            color: var(--accent2, #ccc);
+            background: linear-gradient(180deg, #25202b, #16131b);
+            border: 2px solid #b8913a;
+            border-radius: 6px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+            color: #e9e2cf;
             font-family: var(--PX, monospace);
             font-size: 11px;
             line-height: 1.6;

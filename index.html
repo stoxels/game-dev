@@ -14,30 +14,30 @@
     </script>
     <link rel="icon" type="image/png" href="images/favicon.png">
     <title>STOXELS - v0.34 BETA</title>
-    <link rel="stylesheet" href="css/base.css?v=6">
+    <link rel="stylesheet" href="css/base.css?v=8">
     <link rel="stylesheet" href="css/pause.css?v=8">
-    <link rel="stylesheet" href="css/settings.css">
+    <link rel="stylesheet" href="css/settings.css?v=3">
     <link rel="stylesheet" href="css/touch-controls.css">
-    <link rel="stylesheet" href="css/title-screen.css?v=4">
-    <link rel="stylesheet" href="css/save-slots.css?v=9">
+    <link rel="stylesheet" href="css/title-screen.css?v=6">
+    <link rel="stylesheet" href="css/save-slots.css?v=10">
     <link rel="stylesheet" href="css/screens.css">
     <link rel="stylesheet" href="css/world-proto.css?v=1">
     <link rel="stylesheet" href="css/game.css?v=5">
-    <link rel="stylesheet" href="css/setup-screen.css?v=12">
+    <link rel="stylesheet" href="css/setup-screen.css?v=13">
     <link rel="stylesheet" href="css/inventory.css">
     <link rel="stylesheet" href="css/overlays.css?v=15">
-    <link rel="stylesheet" href="css/modals.css?v=3">
+    <link rel="stylesheet" href="css/modals.css?v=4">
     <link rel="stylesheet" href="css/class.css?v=5">
     <link rel="stylesheet" href="css/skills.css?v=26">
     <link rel="stylesheet" href="css/spellbook-redesign.css?v=28">
     <link rel="stylesheet" href="css/universal-spells.css?v=16">
     <link rel="stylesheet" href="css/spell-fx-kit.css?v=2">
     <link rel="stylesheet" href="css/spell-charge-fx.css?v=1">
-    <link rel="stylesheet" href="css/achievements.css?v=5">
+    <link rel="stylesheet" href="css/achievements.css?v=7">
     <link rel="stylesheet" href="css/item_effects.css?v=2">
     <link rel="stylesheet" href="css/probability_tree.css?v=9">
     <link rel="stylesheet" href="css/passive_effects.css">
-    <link rel="stylesheet" href="css/quests.css">
+    <link rel="stylesheet" href="css/quests.css?v=2">
     <link rel="stylesheet" href="css/passive-tracker.css">
     <link rel="stylesheet" href="css/changelog.css?v=2">
     <link rel="stylesheet" href="css/classes/actuary.css">
@@ -65,16 +65,16 @@
     <link rel="stylesheet" href="css/hub/vendor.css?v=4">
     <link rel="stylesheet" href="css/hub/crafting-bench.css?v=2">
     <link rel="stylesheet" href="css/hub/hub-dialogs.css?v=2">
-    <link rel="stylesheet" href="css/hub/tooltip-styles.css">
+    <link rel="stylesheet" href="css/hub/tooltip-styles.css?v=6">
     <link rel="stylesheet" href="css/combat/objectives_hud.css">
     <link rel="stylesheet" href="css/combat/run-summary.css">
     <link rel="stylesheet" href="css/combat/chain-countdown.css">
-    <link rel="stylesheet" href="css/character-select.css?v=8">
-    <link rel="stylesheet" href="css/map-view.css?v=4">
-    <link rel="stylesheet" href="css/map-view-topbar.css?v=26">
+    <link rel="stylesheet" href="css/character-select.css?v=10">
+    <link rel="stylesheet" href="css/map-view.css?v=7">
+    <link rel="stylesheet" href="css/map-view-topbar.css?v=32">
     <link rel="stylesheet" href="css/quiz-exercises.css?v=6">
-    <link rel="stylesheet" href="css/highscore.css?v=5">
-    <link rel="stylesheet" href="css/moodle-codes.css?v=3">
+    <link rel="stylesheet" href="css/highscore.css?v=7">
+    <link rel="stylesheet" href="css/moodle-codes.css?v=4">
     <link rel="stylesheet" href="css/inference.css">
     <link rel="stylesheet" href="css/titles.css?v=3">
     <link rel="stylesheet" href="css/tutorial.css?v=18">
@@ -82,12 +82,12 @@
     <link rel="stylesheet" href="css/class_selection.css?v=3">
     <link rel="stylesheet" href="css/class_spell_upgrade.css">
     <link rel="stylesheet" href="css/class_ascendency_selection.css">
-    <link rel="stylesheet" href="css/reset-game.css?v=3">
+    <link rel="stylesheet" href="css/reset-game.css?v=6">
     <link rel="stylesheet" href="css/trial-intro.css?v=2">
-    <link rel="stylesheet" href="css/replay.css">
-    <link rel="stylesheet" href="css/companion-stage.css">
+    <link rel="stylesheet" href="css/replay.css?v=2">
+    <link rel="stylesheet" href="css/companion-stage.css?v=2">
     <link rel="stylesheet" href="css/dev-mode-select.css">
-    <link rel="stylesheet" href="css/typography.css?v=5">
+    <link rel="stylesheet" href="css/typography.css?v=6d">
     <!-- Boot: discover title art as early as possible -->
     <link rel="preload" as="image" href="images/Title_Screen/RiseOfTheBeasts_TitleScreen_Background.webp" fetchpriority="high">
     <link rel="preload" as="image" href="images/Title_Screen/STOXELS.webp" fetchpriority="high">
@@ -302,7 +302,7 @@
     <!-- SAVE SLOT SELECT SCREEN -->
     <div id="screen-save-slots" class="screen">
         <div class="ss-topbar">
-            <button class="back-btn back-btn-corner" id="btn-save-slots-back" data-t="btn_back">◀ BACK</button>
+            <button class="back-btn back-btn-corner" id="btn-save-slots-back" data-t="btn_back">BACK</button>
             <span class="ss-title" data-t="scr_save_file_title">SELECT SAVE FILE</span>
         </div>
         <div class="ss-grid" id="save-slots-grid"></div>
@@ -405,7 +405,7 @@
                      with natural-size (huge) art - inline styles cannot be
                      lost that way. Active-state visuals are additionally
                      mirrored as inline styles from syncDiffModButtons(). -->
-                <button class="setup-fig setup-fig-monsterless" data-mod="monsterless" aria-pressed="false" data-tip-t="mod_desc_ml"
+                <button class="setup-fig setup-fig-monsterless" data-mod="monsterless" aria-pressed="false"
                         style="position:absolute; left:-10%; top:16%; width:190px; height:190px; z-index:6; background:transparent; border:none; padding:0; cursor:pointer; line-height:0; transition:transform .12s, filter .12s;">
                     <span class="mod-title mod-title-gray setup-fig-title" data-t="mod_ml"
                           style="position:absolute; top:-46px; left:50%; transform:translateX(-50%);">MONSTERLESS</span>
@@ -415,7 +415,7 @@
                           style="position:absolute; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-family:var(--PX, monospace); font-size:125px; font-weight:bold; color:#e02c2c; text-shadow:0 0 18px rgba(224,44,44,0.85), 0 3px 6px rgba(0,0,0,0.7); pointer-events:none; line-height:1; opacity:0; transform:scale(0.4) rotate(-12deg); transition:opacity .15s ease, transform .25s cubic-bezier(.2,2,.4,1);">✕</span>
                 </button>
                 <!-- BETA TEST ONLY: Super Tutor is temporary and stays anchored separately. -->
-                <button class="setup-fig setup-fig-super-tutor" id="btn-super-tutor" data-mod="superTutor" aria-pressed="false" data-tip-t="mod_desc_super_tutor"
+                <button class="setup-fig setup-fig-super-tutor" id="btn-super-tutor" data-mod="superTutor" aria-pressed="false"
                         style="position:absolute; right:-10%; top:16%; width:145px; height:224px; z-index:6; background:transparent; border:none; padding:0; cursor:pointer; line-height:0; transition:transform .12s, filter .12s;">
                     <span class="mod-title mod-title-gold setup-fig-title" data-t="mod_super_tutor"
                           style="position:absolute; top:-46px; left:50%; transform:translateX(-50%);">PROFESSOR</span>
@@ -429,7 +429,7 @@
             </div>
             <!-- ============ END BOOK ============ -->
 
-            <button class="setup-back-corner-btn back-btn back-btn-corner" id="btn-setup-back" data-t="btn_back">◀ BACK</button>
+            <button class="setup-back-corner-btn back-btn back-btn-corner" id="btn-setup-back" data-t="btn_back">BACK</button>
             <div class="setup-btns">
                 <button class="title-btn setup-btn-img" id="btn-start-setup" data-t="btn_confirm">▶ SELECT LEVEL</button>
                 <button class="title-btn setup-btn-img" id="btn-enter-nexus-setup" data-t="scr_enter_nexus_short" style="display:none;">🌌 Enter the Nexus</button>
@@ -441,7 +441,7 @@
 
     <!-- TEMP: DEV MODE SELECT SCREEN - remove once Adventure Mode replaces the world map -->
     <div id="screen-mode-select" class="screen">
-        <button class="back-btn back-btn-corner dms-back" id="btn-mode-select-back" data-t="btn_back">◀ BACK</button>
+        <button class="back-btn back-btn-corner dms-back" id="btn-mode-select-back" data-t="btn_back">BACK</button>
         <div class="dms-wrap">
             <div class="dms-title" data-t="scr_select_mode">SELECT MODE</div>
             <div class="dms-sub"></div>
@@ -1041,7 +1041,7 @@
     <div id="screen-levels" class="screen">
         <div class="ls-topbar">
             <div class="ls-topbar-row1">
-                <button class="back-btn" id="btn-levels-back" data-t="btn_back">◀ BACK</button>
+                <button class="back-btn" id="btn-levels-back" data-t="btn_back">BACK</button>
                 <span class="ls-title" data-t="ls_title">SELECT LEVEL</span>
                 <button id="btn-toggle-map-view" class="btn-toggle-view" data-t="scr_btn_map">🗺️ MAP VIEW</button>
                 <button id="btn-levels-cartographer" class="btn-toggle-view" data-t="scr_btn_cartographer">🛖 CARTOGRAPHER</button>
@@ -1066,7 +1066,7 @@
     <!-- MAP - VIEW OF LEVEL SELECT SCREEN  -->
     <div id="screen-map-view" class="screen">
         <div class="ls-topbar">
-            <button class="back-btn" id="mv-btn-back" data-t="btn_back">◀ BACK</button>
+            <button class="back-btn" id="mv-btn-back" data-t="btn_back">BACK</button>
             <div class="mv-char-portrait-wrap" id="mv-char-portrait-wrap"></div>
             <div class="mv-ribbon-wrap" role="button" tabindex="0" data-tip-t="tip_titles_ribbon">
                 <span class="mv-ribbon-label" data-t="titles_ribbon_label">TITLES</span>
@@ -1121,7 +1121,7 @@
              difference: the plaque shows the CURRENT WORLD NAME instead of
              SELECT LEVEL. Populated by _wdBuildTopBar(). -->
         <div class="ls-topbar">
-            <button class="back-btn" id="wd-btn-back" data-t="btn_back">◀ BACK</button>
+            <button class="back-btn" id="wd-btn-back" data-t="btn_back">BACK</button>
             <div class="mv-char-portrait-wrap" id="wd-char-portrait-wrap"></div>
             <div class="mv-ribbon-wrap" role="button" tabindex="0" data-tip-t="tip_titles_ribbon">
                 <span class="mv-ribbon-label" data-t="titles_ribbon_label">TITLES</span>
@@ -1278,7 +1278,7 @@
 
     <!-- HIGHSCORES SCREEN -->
     <div id="screen-hs" class="screen hs-redesign">
-        <button class="back-btn" id="btn-hs-back" data-t="btn_back">◀ BACK</button>
+        <button class="back-btn" id="btn-hs-back" data-t="btn_back">BACK</button>
         <div class="hs-scroll-frame">
 
             <!-- top row: title plaque (center); back button is a direct
@@ -1541,7 +1541,7 @@
     <!-- PROBABILITY TREE SCREEN -->
     <div class="screen" id="screen-passive-tree">
         <div class="pt-topbar">
-            <button class="back-btn" id="btn-pt-back" data-t="btn_back">◀ BACK</button>
+            <button class="back-btn" id="btn-pt-back" data-t="btn_back">BACK</button>
             <span class="pt-title">🌿 <span data-t="scr_probability_tree">PROBABILITY TREE</span></span>
             <div id="pt-search-wrap"></div>
             <div id="pt-zoom-wrap">

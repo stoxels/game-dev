@@ -150,7 +150,7 @@ function _buildToastElement(def, tier) {
             <div class="ach-toast-text">
                 <div class="ach-toast-title">🏆 ${t('qa_achievement_unlocked')}</div>
                 <div class="ach-toast-name">${name}: <em>${tierLabel}</em></div>
-                <div class="ach-toast-requirement">📋 ${requirementText}</div>
+                <div class="ach-toast-requirement">${requirementText}</div>
             </div>
         </div>`;
     return el;
@@ -159,6 +159,8 @@ function _buildToastElement(def, tier) {
 // _dismissAchToast - fades the toast out, removes it from the DOM,
 //   then schedules the next queued toast after a brief gap.
 function _dismissAchToast(el) {
+    if (el.dataset.dismissed) return; // already on its way out (e.g. clicked, then the timer fired)
+    el.dataset.dismissed = '1';
     el.classList.remove('show');
     setTimeout(() => {
         el.remove();
@@ -178,6 +180,10 @@ function _showAchToast(def, tier) {
 
     requestAnimationFrame(() => el.classList.add('show'));
     setTimeout(() => _dismissAchToast(el), 5000);
+
+    // A left or right click on the toast closes it right away.
+    el.addEventListener('click', () => _dismissAchToast(el));
+    el.addEventListener('contextmenu', (e) => { e.preventDefault(); _dismissAchToast(el); });
 
     globalThis.Audio_Manager.playSFX('achievement'); // bridge: audio.js reaches achievements.js (cycle)
 }

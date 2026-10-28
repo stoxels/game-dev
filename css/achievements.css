@@ -943,30 +943,32 @@
     .ach-cat-detail .ach-card .ach-card-name {
         font-family: var(--C, serif);
         font-weight: 700;
-        font-size: clamp(13px, 1.5cqw, 17px);
+        font-size: clamp(16px, 1.95cqw, 23px);
         letter-spacing: 0.03em;
-        color: #3a1f05;
+        color: #2c1503;
         text-shadow: none;
         margin-bottom: 2px;
     }
 
     .ach-cat-detail .ach-card .ach-card-desc {
-        font-size: clamp(12px, 1.2cqw, 15px);
+        font-family: var(--PX);
+        font-size: clamp(14px, 1.5cqw, 18px);
+        font-weight: 500;
         line-height: 1.4;
-        color: #5d4326;
+        color: #3d2610;
     }
 
     .ach-cat-detail .ach-card .ach-card-earned {
-        font-family: inherit;
+        font-family: var(--PX);
         font-weight: 700;
-        font-size: clamp(12px, 1.2cqw, 14px);
-        color: #8a5a12;
+        font-size: clamp(14px, 1.45cqw, 18px);
+        color: #6b4308;
         margin-top: 4px;
         letter-spacing: 0.02em;
     }
 
     .ach-cat-detail .ach-card .ach-tier-dot {
-        font-size: clamp(13px, 1.4cqw, 17px);
+        font-size: clamp(16px, 1.8cqw, 22px);
     }
 
     .ach-cat-detail .ach-card .ach-tier-dot.locked {
@@ -986,22 +988,22 @@
     }
 
     .ach-cat-detail .ach-card .ach-card-progress-label {
-        font-family: inherit;
-        font-size: clamp(11px, 1.1cqw, 14px);
+        font-family: var(--PX);
+        font-size: clamp(14px, 1.45cqw, 18px);
         font-weight: 700;
-        color: #4a2c12;
+        color: #2e1b0a;
     }
 
     .ach-cat-detail .ach-card .ach-card-progress-label em {
-        color: #6d3fa0;
+        color: #54278c;
     }
 
     .ach-cat-detail .ach-card.partial .ach-card-progress-label em {
-        color: #a3540e;
+        color: #8c4308;
     }
 
     .ach-cat-detail .ach-card.complete .ach-card-progress-label em {
-        color: #8a5a12;
+        color: #6b4308;
     }
 
 
@@ -1016,66 +1018,109 @@
    Visibility is toggled by adding / removing the .show class via JS.
    ------------------------------------------------------------------------- */
 
-/* Toast container - parked off-screen to the right by default */
+/* Toast container - parked off-screen to the right by default. A carved dark-stone plate with a
+   gold rim; clicking it (left or right button) closes it. */
 #ach-toast {
     position: fixed;
     top: 250px;
-    right: -420px; /* off-screen starting position */
+    right: -460px; /* off-screen starting position */
     z-index: 9999;
-    width: 360px;
+    width: 400px;
     max-width: calc(100vw - 24px);
-    background: var(--surface);
-    border: 1px solid var(--yellow);
-    border-left: 4px solid var(--yellow);
-    box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 12px rgba(253,215,0,0.15);
+    background: linear-gradient(180deg, #38333f 0%, #211d28 100%);
+    border: 2px solid #c79a3d;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgba(255, 224, 140, 0.28),
+                inset 0 0 22px rgba(0, 0, 0, 0.55),
+                0 6px 26px rgba(0, 0, 0, 0.6),
+                0 0 20px rgba(240, 180, 60, 0.28);
     transition: right 0.5s cubic-bezier(0.22,1,0.36,1);
-    pointer-events: none; /* must never block game interactions */
+    cursor: pointer;
+    user-select: none;
 }
+
+    /* thin gold highlight along the top edge */
+    #ach-toast::before {
+        content: '';
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        top: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #ffe08a, transparent);
+    }
 
     /* Adding .show slides the toast into the visible viewport */
     #ach-toast.show {
         right: 16px;
     }
 
-/* Inner flex row: icon on the left, text on the right */
+    #ach-toast:hover {
+        filter: brightness(1.1);
+    }
+
+/* Inner flex row: icon badge on the left, text on the right */
 .ach-toast-inner {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 12px 16px;
+    gap: 16px;
+    padding: 14px 18px;
 }
 
-/* Large icon with a gold drop-shadow glow */
+/* Round gold-ringed badge, like the icon on the achievement cards */
 .ach-toast-icon {
-    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
     flex-shrink: 0;
-    filter: drop-shadow(0 0 6px rgba(253,215,0,0.6));
+    font-size: 30px;
+    line-height: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #5a3c18, #24140a);
+    border: 3px solid #d4a017;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7), 0 0 12px rgba(253, 215, 0, 0.45);
 }
 
-/* Text column - allows truncation if the name is very long */
+/* Text column - allows wrapping if the name is very long */
 .ach-toast-text {
     flex: 1;
     min-width: 0;
 }
 
-/* Small all-caps label above the achievement name (e.g. "ACHIEVEMENT UNLOCKED") */
+/* All-caps label above the achievement name ("ACHIEVEMENT UNLOCKED") */
 .ach-toast-title {
-    font-family: var(--PX);
-    font-size: 9px;
-    color: var(--yellow);
-    letter-spacing: 2px;
+    font-family: var(--C);
+    font-weight: 700;
+    font-size: 13px;
+    color: #f0b43c;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     margin-bottom: 4px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-/* Achievement name line - muted base color with an accented em for the tier */
+/* Achievement name line - cream, with the tier name in gold */
 .ach-toast-name {
-    font-size: 12px;
-    color: var(--accent2);
-    line-height: 1.4;
+    font-family: var(--C);
+    font-weight: 700;
+    font-size: 19px;
+    color: #f6ecd0;
+    line-height: 1.25;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-    /* <em> wraps the tier name inside the toast - brighter accent color */
     .ach-toast-name em {
-        color: var(--accent);
+        color: #ffd76e;
         font-style: normal;
     }
+
+/* What the player did to earn it */
+.ach-toast-requirement {
+    margin-top: 6px;
+    font-family: var(--PX);
+    font-size: 14px;
+    line-height: 1.35;
+    color: #d3c8ad;
+}
