@@ -1,0 +1,45 @@
+/* TYPOGRAPHY TIERS - loaded last. Base text uses --PX (readable serif, see css/base.css);
+   this file lifts the display text (buttons, tabs, plaques, titles) to Cinzel and keeps
+   numbers in the mono face. Add a selector here instead of switching a single rule to a
+   pixel font; --PIXEL is the old Press Start 2P look for the few places that keep it. */
+
+.title-btn,
+.back-btn,
+.modal-title,
+.modal-close,
+.egn-topbar-title,
+.replay-header-title,
+#screen-vendor .sx-vendor-tab-btn,
+#screen-vendor .sx-vendor-buy-btn,
+#screen-vendor .sx-vendor-filter-btn,
+#screen-vendor .sx-vendor-gold-balance {
+    font-family: var(--C);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+/* Title screen buttons (Play, Settings, Replay, Highscores, ...): Alegreya SC, chosen from the
+   font specimen. Only these buttons use it for now; other screens are reviewed one by one. */
+#screen-title .title-overlay-btn {
+    font-family: 'Alegreya SC', var(--C);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+/* The label sizes in title-screen.css were tuned for the wide pixel font, so the narrower
+   Alegreya SC looked tiny on the plates. Bigger and more widely spaced (container-relative, so
+   the longest German labels like EINSTELLUNGEN still fit). */
+#screen-title .title-overlay-btn .btn-label {
+    font-size: clamp(8px, 7.9cqw, 30px);
+    letter-spacing: 0.1em;
+}
+
+#screen-title #btn-play .btn-label {
+    font-size: clamp(14px, 14cqw, 42px);
+    letter-spacing: 0.14em;
+}
+
+#screen-title .lang-btn .btn-label {
+    font-size: clamp(9px, 30cqw, 20px);
+    letter-spacing: 0.04em;
+}

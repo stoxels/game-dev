@@ -25,19 +25,27 @@
 
 
 /* -----------------------------------------------------------------------
-   ------------------------- EXTERNAL FONT IMPORTS -----------------------
-   ----------------------------------------------------------------------- */
-/* -----------------------------------------------------------------------
-   Press Start 2P : pixel-style font used for titles and buttons
-   Share Tech Mono : monospace tech font used for general UI text
-   ----------------------------------------------------------------------- */
+   ------------------------- FONTS (self-hosted, css/fonts/) -------------
+   -----------------------------------------------------------------------
+   Four roles (see 2l. TYPOGRAPHY below):
+     Stoxels UI      - readable serif for buttons, labels and short text (Lora, sized up
+                       so it matches the visual size the old pixel font had)
+     Cinzel          - display type for plaques, titles and tab names
+     Lora            - prose on parchment cards and dialogs
+     Share Tech Mono - numbers and stat lines
+     Press Start 2P  - the retro pixel look, kept for a few small counters
+   Files are served from this repository so the game looks the same offline. */
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@700&display=swap');
-/* Lora: readable proportional serif for prose on parchment (How-To-Play,
-   changelog, dialogs). The mono/pixel fonts stay for HUD-style text. */
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&display=swap');
+@font-face { font-family: 'Press Start 2P'; src: url('fonts/PressStart2P-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Share Tech Mono'; src: url('fonts/ShareTechMono-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Cinzel'; src: url('fonts/Cinzel-Bold.ttf') format('truetype'); font-weight: 400 700; font-display: swap; }
+@font-face { font-family: 'Lora'; src: url('fonts/Lora-Medium.ttf') format('truetype'); font-weight: 400 500; font-display: swap; }
+@font-face { font-family: 'Lora'; src: url('fonts/Lora-SemiBold.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Lora'; src: url('fonts/Lora-Bold.ttf') format('truetype'); font-weight: 700 900; font-display: swap; }
+@font-face { font-family: 'Alegreya SC'; src: url('fonts/AlegreyaSC-Bold.ttf') format('truetype'); font-weight: 400 900; size-adjust: 108%; font-display: swap; }
+@font-face { font-family: 'Stoxels UI'; src: url('fonts/Lora-Medium.ttf') format('truetype'); font-weight: 400 500; size-adjust: 122%; font-display: swap; }
+@font-face { font-family: 'Stoxels UI'; src: url('fonts/Lora-SemiBold.ttf') format('truetype'); font-weight: 600; size-adjust: 122%; font-display: swap; }
+@font-face { font-family: 'Stoxels UI'; src: url('fonts/Lora-Bold.ttf') format('truetype'); font-weight: 700 900; size-adjust: 122%; font-display: swap; }
 
 
 
@@ -170,12 +178,16 @@
     --pw-anim-shadow-hi: rgba(245, 197, 24, 0.7);
     /* -------------------------------------------------------------------
        2l. TYPOGRAPHY
-       Two fonts cover all text needs in the game.
-       Use --F for interface text and --PX for titles.
+       --PX  buttons, labels and short interface text (readable serif)
+       --F   numbers and stat lines (Share Tech Mono)
+       --C   display type: plaques, titles, tab names (Cinzel)
+       --B   prose on parchment cards and dialogs (Lora)
+       --PIXEL  the old Press Start 2P look, for the few places that keep it
        ------------------------------------------------------------------- */
 
-    --F: 'Share Tech Mono', monospace; /* General UI text, descriptions, stats     */ /*'Georgia', 'Times New Roman', serif;*/
-    --PX: 'Press Start 2P', monospace; /* Titles, buttons, and retro display text  */
+    --PIXEL: 'Press Start 2P', monospace;
+    --PX: 'Stoxels UI', 'Lora', Georgia, 'Times New Roman', serif; /* was Press Start 2P everywhere */
+    --F: 'Share Tech Mono', monospace; /* Numbers, stats and short technical text */
     --C: 'Cinzel', serif;
     --B: 'Lora', Georgia, 'Times New Roman', serif; /* Prose on parchment cards and dialogs */
 }
