@@ -1189,7 +1189,9 @@ function _charmTetherStoneHTML() {
     const stones = Math.max(0, Math.floor(Number(STATE && STATE.tetherStones) || 0));
     const owns = (STATE.charmInventory || []).some((c) => c && /^usp_summon_/.test(c.skillId));
     if (!owns && !stones) return '';
-    return `<span class="sb3-lemma" title="${t('charm_tether_stones_tip')}"><b>${stones}</b> ${t('charm_tether_stones')}</span>`;
+    const tipAttrs = ` onmouseenter="handleCharmCurrencyTip(event,'tether')"`
+        + ` onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()"`;
+    return `<span class="sb3-lemma"${tipAttrs}><b>${stones}</b> ${t('charm_tether_stones')}</span>`;
 }
 
 // Element of a skill's charm for the list filter, or '' when the skill has
@@ -1427,6 +1429,16 @@ function buildCharmOptionTipHTML(kind) {
 function buildCharmCurrencyTipHTML(kind) {
     ensureCharmState();
     if (kind === 'maxrank' || kind === 'autoup') return buildCharmOptionTipHTML(kind);
+    if (kind === 'tether') {
+        const stones = Math.max(0, Math.floor(Number(STATE && STATE.tetherStones) || 0));
+        return `<div class="skl-tip charm-tip">`
+            + `<div class="skl-tip-title">${t('charm_tether_stones')}</div>`
+            + `<div class="skl-tip-tags">${t('charm_tether_tags')}</div>`
+            + `<div class="skl-tip-stat">${t('charm_tether_owned')}: <b style="color:#ffd76e">${stones}</b></div>`
+            + `<div class="skl-tip-sep"></div>`
+            + `<div class="skl-tip-desc">${t('charm_tether_stones_tip')}</div>`
+            + `</div>`;
+    }
     const isOrb = (kind === 'orbs');
     const count = isOrb ? ((STATE && STATE.charmOrbs) || 0) : ((STATE && STATE.charmShards) || 0);
     // No emoji in the title either - the currency is named in words

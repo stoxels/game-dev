@@ -408,3 +408,8 @@
         width: 80vw;
     }
 }
+
+/* ── readability pass: ascendency tooltip ── */
+#class-selection-overlay[data-mode="ascend-select"] .cs-tooltip .cs-ability-tag { font-size: 14px; }
+#class-selection-overlay[data-mode="ascend-select"] .cs-tooltip .cs-ability-name { font-family: var(--C, serif); font-weight: 700; font-size: 18px; }
+#class-selection-overlay[data-mode="ascend-select"] .cs-tooltip .cs-ability-desc { font-family: var(--PX, serif); font-size: 16px; line-height: 1.4; }

@@ -2190,3 +2190,119 @@ img.sx-art-img {
 .sx-item-chip .sx-item-ilvl { font-family: var(--C, serif); font-weight: 700; font-size: 14px; left: 2px; top: 1px; color: #fff3c4; text-shadow: 0 0 3px #000, 0 0 3px #000, 0 1px 3px #000; }
 .sx-item-chip-large .sx-item-ilvl { font-size: 18px; }
 #screen-endgame-gate .sx-inv-cell .sx-item-ilvl { font-size: 15px; }
+
+/* ==========================================================================
+   Loot filter + Mass sell filter dialogs: same plate look as the tooltips, display font titles,
+   readable body text. (Two-class selectors so they win over the injected dialog styles.)
+   ========================================================================== */
+#sx-loot-filter-modal .sx-lf-box .sx-lf-head-title, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-head-title {
+    font-family: var(--C, serif); font-weight: 700; font-size: clamp(18px, 1.7vw, 24px); letter-spacing: 0.1em; color: #ffe9a8; text-shadow: 0 2px 3px #000;
+}
+#sx-loot-filter-modal .sx-lf-box .sx-lf-body, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-body { padding: 16px 18px; gap: 14px; }
+
+/* "how it works" notes */
+#sx-loot-filter-modal .sx-lf-box .sx-lf-how, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-how { border-left-color: #b8913a; background: rgba(184, 145, 58, 0.08); padding: 12px 14px; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-how-title, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-how-title { font-family: var(--C, serif); font-weight: 700; font-size: 14px; letter-spacing: 0.16em; color: #d6c99f; opacity: 1; margin-bottom: 8px; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-how-li, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-how-li { font-family: var(--PX, serif); font-size: 16px; line-height: 1.45; color: #f1e8cf; opacity: 1; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-how-b, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-how-b { color: #ffd76e; }
+
+/* section titles */
+#sx-loot-filter-modal .sx-lf-box .sx-lf-section-title, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-section-title { font-family: var(--C, serif); font-weight: 700; font-size: 15px; letter-spacing: 0.14em; color: #ffd76e; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-section-count { font-family: var(--PX, serif); font-size: 15px; color: #cfc6ad; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-section-line, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-section-line { background: #b8913a; opacity: 0.5; }
+
+/* rows, toggles, checkboxes */
+#sx-loot-filter-modal .sx-lf-box .sx-lf-toggle, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-toggle, #sx-mass-sell-modal .sx-mass-sell-box .sx-mass-sell-row { font-family: var(--PX, serif); font-weight: 600; font-size: 17px; color: #f1e8cf; padding: 7px 10px; }
+#sx-mass-sell-modal .sx-mass-sell-box .sx-mass-sell-rarity-name { font-weight: 700; }
+#sx-mass-sell-modal .sx-mass-sell-box .sx-mass-sell-keep-hint { font-family: var(--PX, serif); font-size: 14px; opacity: 0.75; }
+#sx-mass-sell-modal .sx-mass-sell-box .sx-mass-sell-dot { width: 14px; height: 14px; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-check, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-check { width: 22px; height: 22px; border-color: #b8913a; border-radius: 4px; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-check:checked, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-check:checked { background: #e0b143; border-color: #ffe08a; box-shadow: 0 0 8px rgba(224, 177, 67, 0.6); }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-check:checked::after, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-check:checked::after { font-size: 16px; color: #1c1408; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-toggle-gold span, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-toggle-gold span { color: #ffe27a; }
+
+/* rules and fields */
+#sx-loot-filter-modal .sx-lf-box .sx-lf-rule { border-left-color: #b8913a; padding: 12px 14px 14px; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-rule-title { font-family: var(--C, serif); font-weight: 700; font-size: 16px; letter-spacing: 0.08em; color: #ffe9a8; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-rule-del { width: 30px; height: 30px; font-size: 15px; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-field > label, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-field > label { font-family: var(--C, serif); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; color: #d6c99f; white-space: normal; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-field select, #sx-loot-filter-modal .sx-lf-box .sx-lf-field input[type="number"], #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-field input[type="number"] { font-family: var(--PX, serif); font-weight: 600; font-size: 17px; padding: 6px 10px; color: #f6ecd0; border-color: #6b5a30; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-zero-hint, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-zero-hint { font-family: var(--PX, serif); font-size: 14px; color: #cfc6ad; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-empty { font-family: var(--PX, serif); font-size: 16px; color: #cfc6ad; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-add { font-family: var(--C, serif); font-weight: 700; font-size: 15px; letter-spacing: 0.1em; padding: 12px; color: #ffd76e; border-color: #b8913a; }
+
+/* footer, preview, buttons */
+#sx-loot-filter-modal .sx-lf-box .sx-lf-foot, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-foot { padding: 12px 18px 16px; border-top: 2px solid rgba(184, 145, 58, 0.45); }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-preview, #sx-mass-sell-modal .sx-mass-sell-box .sx-mass-sell-preview { font-family: var(--PX, serif); font-weight: 600; font-size: 18px; color: #f6ecd0; margin-bottom: 12px; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-n-keep, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-n-keep { color: #7fe39a; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-n-vendor, #sx-mass-sell-modal .sx-mass-sell-box .sx-ms-n-sell { color: #ffb35c; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-btn, #sx-mass-sell-modal .sx-mass-sell-box .sx-mass-sell-btn, #sx-mass-sell-modal .sx-mass-sell-box .sx-mass-sell-btn {
+    font-family: var(--C, serif); font-weight: 700; font-size: 16px; letter-spacing: 0.08em; padding: 12px 30px;
+    color: #f6ecd0; border: 2px solid #8a7a4a; background: linear-gradient(180deg, #3a3444, #221d29);
+}
+#sx-loot-filter-modal .sx-lf-box .sx-lf-btn:hover, #sx-mass-sell-modal .sx-mass-sell-box .sx-mass-sell-btn:hover { color: #fff3c4; border-color: #ffd76e; }
+#sx-loot-filter-modal .sx-lf-box .sx-lf-btn.sx-lf-save, #sx-mass-sell-modal .sx-mass-sell-box .sx-mass-sell-btn.sx-mass-sell-save { color: #1c1408; background: linear-gradient(180deg, #f0cf78, #c79a3a); border-color: #ffe08a; }
+#sx-mass-sell-modal #sx-mass-sell-confirm .sx-mass-sell-confirm-text { font-family: var(--PX, serif); font-size: 18px; color: #f6ecd0; }
+#sx-mass-sell-modal #sx-mass-sell-confirm .sx-mass-sell-btn.sx-mass-sell-confirm { color: #fff; background: linear-gradient(180deg, #d9543f, #a3362a); border-color: #ff8f80; }
+
+/* stash header buttons and tabs: inventory / uniques / quest and their counts */
+#screen-hub .sx-stash-tab { font-size: clamp(15px, 1.2vw, 19px); letter-spacing: 0.06em; color: #e6dcc0; }
+#screen-hub .sx-stash-tab.active { color: #ffe9a8; }
+#screen-hub .sx-stash-tab .sx-tab-count { font-family: var(--C, serif); font-weight: 700; font-size: 15px; padding: 3px 11px; color: #ffe9a8; background: rgba(0, 0, 0, 0.55); border: 1px solid rgba(184, 145, 58, 0.6); }
+#screen-hub .sx-stash-btn { font-size: clamp(14px, 1.1vw, 17px); }
+
+/* Essence filters: same gold-on-plum look as the rest of the UI (was cyan) */
+#screen-hub .sx-essence-filter-select,
+#screen-hub .sx-essence-filter-input {
+    font-family: var(--PX, serif);
+    font-weight: 600;
+    color: #f1e8cf;
+    background: linear-gradient(180deg, #25202b, #16131b);
+    border: 2px solid #8a7a4a;
+    border-radius: 4px;
+}
+#screen-hub .sx-essence-filter-input::placeholder { color: #a89978; opacity: 1; }
+#screen-hub .sx-essence-filter-select:hover,
+#screen-hub .sx-essence-filter-input:focus,
+#screen-hub .sx-essence-filter-select:focus { border-color: #ffd76e; box-shadow: 0 0 6px rgba(255, 215, 110, 0.35); outline: none; }
+#screen-hub .sx-essence-filter-owned {
+    font-family: var(--C, serif);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #f1e8cf;
+    padding: 4px 10px;
+    background: linear-gradient(180deg, #25202b, #16131b);
+    border: 2px solid #8a7a4a;
+    border-radius: 4px;
+}
+#screen-hub .sx-essence-filter-owned:hover { border-color: #ffd76e; color: #ffe9a8; }
+#screen-hub .sx-essence-filter-owned input { accent-color: #e0b143; width: 16px; height: 16px; }
+
+/* Back button in the character sheet top bar: larger */
+#screen-hub .sx-topbar .sx-back-btn { font-family: var(--C, serif); font-weight: 700; font-size: clamp(16px, 1.3vw, 21px); letter-spacing: 0.08em; min-width: clamp(130px, 11vw, 180px); padding: 14px 24px; }
+
+/* ==========================================================================
+   Readability pass: Probability Gate, Atlas, Nexus (`body` prefix beats the injected single-class styles)
+   ========================================================================== */
+body .egn-door-label { font-family: var(--C, serif); font-weight: 700; font-size: 17px; letter-spacing: 0.1em; }
+body .egn-topbar .title-btn { font-family: var(--C, serif); font-weight: 700; font-size: 15px; letter-spacing: 0.06em; }
+body .sx-potential-drops-title { font-family: var(--C, serif); font-weight: 700; font-size: 17px; letter-spacing: 0.08em; }
+body .sx-potential-drops-legend { font-family: var(--PX, serif); font-size: 14px; }
+body .sx-potential-drop-row { font-family: var(--PX, serif); font-weight: 600; font-size: 16px; }
+body .sx-potential-drop-current { font-family: var(--C, serif); font-weight: 700; font-size: 13px; }
+body .sx-potential-drops-empty { font-family: var(--PX, serif); font-size: 15px; }
+body .eg-gate-info-btn, body .eg-gate-info-btn-static { font-size: 15px; width: 30px; height: 30px; line-height: 28px; }
+body .eg-gate-level-chip .sx-lvl-chip { font-size: 15px; }
+body .eg-map-tab { font-family: var(--C, serif); font-weight: 700; font-size: 14px; letter-spacing: 0.06em; }
+body .eg-map-tab-count { font-size: 12px; }
+body .eg-atlas-legend-hint { font-size: 13px; }
+body .ega-tier-progress-label { font-family: var(--C, serif); font-weight: 700; font-size: 14px; }
+body .ega-tier-cell .ega-tier-num { font-size: 13px; font-weight: 700; }
+body .ega-tier-cell .ega-tier-count { font-size: 14px; }
+body .ega-header-progress, body .ega-header-highest, body .ega-header-bonus { font-family: var(--C, serif); font-weight: 700; font-size: 16px; letter-spacing: 0.06em; }
+body .ega-search { font-family: var(--PX, serif); font-weight: 600; font-size: 16px; }
+body .ega-node-label { font-family: var(--PX, serif); font-weight: 700; font-size: 14px; }
+body .ega-node-done { font-size: 12px; }
+body .ega-node-count { font-size: 12px; }
+body .ega-zoom-btn { font-family: var(--C, serif); font-weight: 700; font-size: 15px; }
+body .ega-zoom-level { font-size: 14px; }

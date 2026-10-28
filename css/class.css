@@ -1042,3 +1042,23 @@
     from { opacity: 1; }
     to   { opacity: 0; }
 }
+
+/* ── readability pass: class selection tags, skip button and the in-puzzle class panel ── */
+.cs-ability-tag { font-family: var(--C, serif); font-weight: 700; font-size: 14px; letter-spacing: 0.06em; }
+.cs-charms-head { font-family: var(--C, serif); font-weight: 700; font-size: 14px; letter-spacing: 0.1em; }
+.cs-charm-rank-badge { font-family: var(--C, serif); font-weight: 700; font-size: 12px; }
+.cs-skip-btn { font-family: var(--C, serif); font-weight: 700; font-size: 15px; letter-spacing: 0.08em; }
+.cs-archetype-tag { font-family: var(--C, serif); font-weight: 700; font-size: 14px; letter-spacing: 0.08em; }
+#class-hud-panel { font-family: var(--PX, serif); font-size: 14px; }
+#class-hud-drag-handle { font-size: 12px; }
+#chud-mini-bar { font-family: var(--C, serif); font-weight: 700; font-size: 14px; }
+.chud-name { font-family: var(--C, serif); font-weight: 700; font-size: 15px; letter-spacing: 0.06em; }
+.chud-label { font-family: var(--C, serif); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; }
+.chud-lv { font-family: var(--C, serif); font-weight: 700; font-size: 13px; }
+.chud-skill-name { font-family: var(--C, serif); font-weight: 700; font-size: 15px; }
+.chud-skill-desc { font-family: var(--PX, serif); font-size: 15px; line-height: 1.35; }
+.chud-cooldown { font-family: var(--C, serif); font-weight: 700; font-size: 14px; }
+.chud-rank { font-family: var(--C, serif); font-weight: 700; font-size: 13px; }
+.chud-armed-hint { font-family: var(--PX, serif); font-size: 13px; }
+.chud-cd-label { font-family: var(--C, serif); font-weight: 700; font-size: 12px; }
+#class-hud-minimize-btn { font-size: 14px; }

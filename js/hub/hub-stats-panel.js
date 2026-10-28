@@ -58,12 +58,12 @@ export function _renderStatsList() {
 // uncapped gear total and the effective cap are revealed (the row itself
 // shows the capped value).
 export function _buildStatDescTooltipHTML(descKey, label, row) {
-    let html = `<strong style="color:var(--accent,#66fcf1)">${label}</strong>`;
+    let html = `<div class="sx-ttl-tip sx-hud-tip"><div class="sx-ttl-tip-title">${label}</div>`;
     if (descKey) {
         const desc = t(descKey);
         // t() falls back to the raw key when a translation is missing
         if (desc && desc !== descKey) {
-            html += `<br><span style="opacity:.75;font-size:.9em">${desc}</span>`;
+            html += `<div>${desc}</div>`;
         }
         // Resistance rows carry data-res-total / data-res-cap: show the
         // uncapped total, and flag when the cap is clipping it.
@@ -71,13 +71,13 @@ export function _buildStatDescTooltipHTML(descKey, label, row) {
             const total = parseFloat(row.dataset.resTotal);
             const cap = parseFloat(row.dataset.resCap);
             const capped = total > cap;
-            html += `<br><span style="color:var(--accent,#66fcf1)">`
+            html += `<div class="sx-hud-tip-val">`
                 + t('eg_statdesc_res_total').replace('{t}', total.toFixed(0))
                 + (capped ? ` - ${t('eg_statdesc_res_capped').replace('{c}', cap.toFixed(0))}` : '')
-                + `</span>`;
+                + `</div>`;
             const penalty = parseFloat(row.dataset.resPenalty) || 0;
             if (penalty > 0) {
-                html += `<br><span style="color:#ff8a6a">${t('eg_statdesc_res_penalty').replace('{p}', penalty.toFixed(0))}</span>`;
+                html += `<div class="sx-hud-tip-bad">${t('eg_statdesc_res_penalty').replace('{p}', penalty.toFixed(0))}</div>`;
             }
         }
         const stats = _computePlayerStats();
@@ -106,7 +106,7 @@ export function _buildStatDescTooltipHTML(descKey, label, row) {
                 const labelPart = t('eg_statdesc_armour_value').replace('{p}', reductionPct.toFixed(1));
                 return `${labelPart} (L${lvl})`;
             });
-            html += `<br><span style="color:var(--accent,#66fcf1)">${lines.join('<br>')}</span>`;
+            html += `<div class="sx-hud-tip-val">${lines.join('<br>')}</div>`;
         } else if (descKey === 'eg_statdesc_evasion') {
             // Show dodge chance vs monster levels: playerLevel-1 .. playerLevel+3
             const levels = [];
@@ -122,7 +122,7 @@ export function _buildStatDescTooltipHTML(descKey, label, row) {
                 const labelPart = t('eg_statdesc_evasion_value').replace('{p}', dodgeChance.toFixed(1));
                 return `${labelPart} (L${lvl})`;
             });
-            html += `<br><span style="color:var(--accent,#66fcf1)">${lines.join('<br>')}</span>`;
+            html += `<div class="sx-hud-tip-val">${lines.join('<br>')}</div>`;
         } else if (descKey === 'eg_statdesc_accuracy') {
             // Miss chance scaled to the character's own level and the next
             // three monster levels (e.g. at player level 12 -> 12/13/14/15).
@@ -140,10 +140,10 @@ export function _buildStatDescTooltipHTML(descKey, label, row) {
                     .replace('{p}', missPct.toFixed(1))
                     .replace('{n}', lvl);
             });
-            html += `<br><span style="color:var(--accent,#66fcf1)">${lines.join('<br>')}</span>`;
+            html += `<div class="sx-hud-tip-val">${lines.join('<br>')}</div>`;
         }
     }
-    return html;
+    return html + '</div>';
 }
 
 // Wires delegated mouseover tooltips onto the three stat list containers

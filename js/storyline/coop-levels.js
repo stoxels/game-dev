@@ -7,6 +7,8 @@ import { _doStartLevel } from '../start-level.js';
 import { goToLevelSelect } from '../screens/screens.js';
 import { companionBotSay, dismissCompanionBot, summonCompanionBot } from '../companion-bot/companion-bot.js';
 import { grantSummonCharm } from '../skills/summon-cast.js';
+import { summonSpellId } from '../skills/summon-spells.js';
+import { getCharmArtForSkill } from '../skills/skill-charms.js';
 import { startCoopBoss, stopCoopBoss } from './coop-boss.js';
 import { grantQuestItem, hasQuestItem, questIconHtml, questItemFor } from './quest-items.js';
 import { COMPANION_CAST, hasMetCompanion } from './companion-scenes.js';
@@ -350,24 +352,42 @@ function _showResult(friend, firstClear, pointsBefore, pointsAfter, unlockedChar
     const friendName = COMPANION_CAST[friend].name;
     const affinity = firstClear ? ''
         : (de ? 'Schon geschafft: keine weitere Verbundenheit, nur zum Spaß.' : 'Done before: no more affinity, just for fun.');
-    const charm = !unlockedCharm ? ''
-        : (de ? `Neues Amulett: Beschwöre ${friendName}. Bindungssteine droppen bei Bestien.` : `New charm: Summon ${friendName}. Tether Stones drop from beasts.`);
     const title = de ? `Gemeinsam mit ${friendName} gelöst!` : `Solved together with ${friendName}!`;
-    const text = [affinity, charm].filter(Boolean).join('\n');
+    const text = affinity;
     _showBox(title, text, [[de ? 'Zurück zur Karte' : 'Back to the map', 'cmp-ask-yes', () => { dismissCompanionBot(); _removeMist(); stopCoopBoss(); goToLevelSelect(); }]],
-        _resultExtras(friend, firstClear, pointsBefore, pointsAfter, friendName, questItem));
+        _resultExtras(friend, firstClear, pointsBefore, pointsAfter, friendName, questItem, unlockedCharm));
 }
 
 // What the result box shows below its text: the affinity bar of a first clear
 // and the quest item, or nothing.
-function _resultExtras(friend, firstClear, pointsBefore, pointsAfter, friendName, questItem) {
+function _resultExtras(friend, firstClear, pointsBefore, pointsAfter, friendName, questItem, unlockedCharm) {
     const parts = [];
     if (firstClear) parts.push(buildAffinityGainCard(friend, pointsBefore, pointsAfter));
+    if (unlockedCharm) parts.push(_buildCharmCard(friend, friendName));
     if (questItem) parts.push(_buildRewardCard(friendName, questItem));
     if (!parts.length) return null;
     const wrap = document.createElement('div');
     parts.forEach(p => wrap.appendChild(p));
     return wrap;
+}
+
+// "New charm" card: the Summon charm's picture, its name and where it lives now, so the
+// player cannot miss that this clear gave them a new spell.
+function _buildCharmCard(friend, friendName) {
+    const de = LANG === 'de';
+    const art = getCharmArtForSkill(summonSpellId(friend), 1);
+    const card = document.createElement('div');
+    card.style.cssText = 'margin: 14px 0 18px; text-align: center;';
+    card.innerHTML = `<div style="font-family:var(--C,serif); font-weight:700; letter-spacing:.14em; text-transform:uppercase; font-size:16px; color:#d6c99f; margin-bottom:10px;">${de ? 'Neues Amulett' : 'New charm'}</div>
+        <div style="display:inline-flex; align-items:center; gap:16px; padding:12px 26px; background:linear-gradient(180deg,#2a2140,#171126); border:2px solid #c39bff; border-radius:8px; box-shadow:0 0 18px rgba(195,155,255,.45);">
+            ${art ? `<img src="${art}" alt="" draggable="false" style="width:72px;height:72px;object-fit:contain;">` : '<span style="font-size:54px;">✨</span>'}
+            <div style="text-align:left;">
+                <div style="font-family:var(--C,serif); font-weight:700; font-size:21px; color:#e6d2ff;">${de ? `Beschwöre ${friendName}` : `Summon ${friendName}`}</div>
+                <div style="color:#cfc6ad; font-size:16px; margin-top:4px;">${de ? 'Du findest es in deinem Zauberbuch.' : 'You will find it in your spellbook.'}</div>
+            </div>
+        </div>
+        <div style="color:#cfc6ad; font-size:16px; line-height:1.4; margin-top:10px;">${de ? 'Bindungssteine droppen bei Bestien und bezahlen die Beschwörung.' : 'Tether Stones drop from beasts and pay for the summon.'}</div>`;
+    return card;
 }
 
 // The reward block of a first clear: "You found:", the item's picture and

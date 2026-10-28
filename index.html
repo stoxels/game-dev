@@ -19,15 +19,15 @@
     <link rel="stylesheet" href="css/settings.css?v=3">
     <link rel="stylesheet" href="css/touch-controls.css">
     <link rel="stylesheet" href="css/title-screen.css?v=6">
-    <link rel="stylesheet" href="css/save-slots.css?v=10">
-    <link rel="stylesheet" href="css/screens.css">
+    <link rel="stylesheet" href="css/save-slots.css?v=13">
+    <link rel="stylesheet" href="css/screens.css?v=2">
     <link rel="stylesheet" href="css/world-proto.css?v=1">
     <link rel="stylesheet" href="css/game.css?v=7">
     <link rel="stylesheet" href="css/setup-screen.css?v=15">
     <link rel="stylesheet" href="css/inventory.css?v=3">
-    <link rel="stylesheet" href="css/overlays.css?v=15">
-    <link rel="stylesheet" href="css/modals.css?v=4">
-    <link rel="stylesheet" href="css/class.css?v=5">
+    <link rel="stylesheet" href="css/overlays.css?v=16">
+    <link rel="stylesheet" href="css/modals.css?v=5">
+    <link rel="stylesheet" href="css/class.css?v=6">
     <link rel="stylesheet" href="css/skills.css?v=27">
     <link rel="stylesheet" href="css/spellbook-redesign.css?v=29">
     <link rel="stylesheet" href="css/universal-spells.css?v=16">
@@ -35,7 +35,7 @@
     <link rel="stylesheet" href="css/spell-charge-fx.css?v=1">
     <link rel="stylesheet" href="css/achievements.css?v=7">
     <link rel="stylesheet" href="css/item_effects.css?v=2">
-    <link rel="stylesheet" href="css/probability_tree.css?v=12">
+    <link rel="stylesheet" href="css/probability_tree.css?v=18">
     <link rel="stylesheet" href="css/passive_effects.css">
     <link rel="stylesheet" href="css/quests.css?v=2">
     <link rel="stylesheet" href="css/passive-tracker.css">
@@ -61,11 +61,11 @@
     <link rel="stylesheet" href="css/combat/projectiles.css?v=2">
     <link rel="stylesheet" href="css/combat/weapon-swing.css">
     <link rel="stylesheet" href="css/combat/hazards.css">
-    <link rel="stylesheet" href="css/hub/hub.css?v=17">
+    <link rel="stylesheet" href="css/hub/hub.css?v=23">
     <link rel="stylesheet" href="css/hub/vendor.css?v=6">
     <link rel="stylesheet" href="css/hub/crafting-bench.css?v=2">
-    <link rel="stylesheet" href="css/hub/hub-dialogs.css?v=2">
-    <link rel="stylesheet" href="css/hub/tooltip-styles.css?v=8">
+    <link rel="stylesheet" href="css/hub/hub-dialogs.css?v=5">
+    <link rel="stylesheet" href="css/hub/tooltip-styles.css?v=9">
     <link rel="stylesheet" href="css/combat/objectives_hud.css?v=2">
     <link rel="stylesheet" href="css/combat/run-summary.css?v=2">
     <link rel="stylesheet" href="css/combat/chain-countdown.css">
@@ -77,11 +77,11 @@
     <link rel="stylesheet" href="css/moodle-codes.css?v=4">
     <link rel="stylesheet" href="css/inference.css?v=3">
     <link rel="stylesheet" href="css/titles.css?v=4">
-    <link rel="stylesheet" href="css/tutorial.css?v=18">
-    <link rel="stylesheet" href="css/dialogs-rune.css?v=2">
-    <link rel="stylesheet" href="css/class_selection.css?v=3">
-    <link rel="stylesheet" href="css/class_spell_upgrade.css">
-    <link rel="stylesheet" href="css/class_ascendency_selection.css">
+    <link rel="stylesheet" href="css/tutorial.css?v=19">
+    <link rel="stylesheet" href="css/dialogs-rune.css?v=4">
+    <link rel="stylesheet" href="css/class_selection.css?v=4">
+    <link rel="stylesheet" href="css/class_spell_upgrade.css?v=2">
+    <link rel="stylesheet" href="css/class_ascendency_selection.css?v=2">
     <link rel="stylesheet" href="css/reset-game.css?v=6">
     <link rel="stylesheet" href="css/trial-intro.css?v=2">
     <link rel="stylesheet" href="css/replay.css?v=2">
@@ -954,15 +954,6 @@
 
                 <div class="retry-setup-section-label" data-t="setup_mod">OPTIONAL MODIFIERS</div>
                 <div class="retry-setup-mods-row">
-                    <div class="mod-wrapper mod-wrapper-monsterless">
-                        <span class="mod-title mod-title-gray" data-t="mod_ml">MONSTERLESS</span>
-                        <button class="setup-opt setup-opt-mod mod-monsterless" data-mod="monsterless">
-                            <span class="mod-icon mod-icon-monsterless"></span>
-                            <span class="mod-monsterless-skull" aria-hidden="true">💀</span>
-                        </button>
-                        <span class="mod-score-tag">×1.0 (NO BONUS)</span>
-                        <span class="mod-per-desc" data-t="mod_desc_ml"></span>
-                    </div>
                     <div class="mod-wrapper">
                         <span class="mod-title mod-title-orange" data-t="mod_tt">TIME TRIAL</span>
                         <button class="setup-opt setup-opt-mod mod-timetrial" data-mod="timetrial">
@@ -1541,13 +1532,13 @@
     <div class="screen" id="screen-passive-tree">
         <div class="pt-topbar">
             <button class="back-btn" id="btn-pt-back" data-t="btn_back">BACK</button>
-            <span class="pt-title">🌿 <span data-t="scr_probability_tree">PROBABILITY TREE</span></span>
             <div id="pt-search-wrap"></div>
+            <span class="pt-title"><span data-t="scr_probability_tree">PROBABILITY TREE</span></span>
             <div id="pt-zoom-wrap">
                 <span id="pt-zoom-label">110%</span>
                 <input type="range" id="pt-zoom-bar" min="0" max="100" value="50" step="1">
             </div>
-            <button class="gtb-btn" id="btn-pt-refund-all" data-t="pt_refund_all_btn">♻ REFUND ALL</button>
+            <button class="gtb-btn" id="btn-pt-refund-all" data-t="pt_refund_all_btn">REFUND ALL</button>
             <span class="pt-points" id="pt-points"></span>
         </div>
         <div class="pt-canvas" id="pt-canvas"></div>

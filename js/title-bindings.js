@@ -619,6 +619,8 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function showEgForfeitConfirm(onConfirm) {
         // Reuse existing modal infrastructure - build a one-off modal overlay.
+        // A campaign trial has its own wording (no map, no Atlas); a map run keeps the map texts.
+        const k = (typeof globalThis._isTrialRun === 'function' && globalThis._isTrialRun()) ? 'trial' : 'map';
         let modal = document.getElementById('sx-forfeit-modal');
         if (!modal) {
             modal = document.createElement('div');
@@ -630,19 +632,23 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.innerHTML = `
             <div class="modal-box modal-box-danger">
                 <button class="modal-close" id="sx-forfeit-close">✕ CLOSE</button>
-                <div class="modal-title text-red">${t('scr_leave_map')}</div>
+                <div class="modal-title text-red" id="sx-forfeit-title"></div>
                 <div class="modal-section">
-                    <p class="reset-body-text">
-                        ${t('scr_leave_map_body')}
-                    </p>
+                    <p class="reset-body-text" id="sx-forfeit-body"></p>
                 </div>
                 <div class="modal-actions">
-                    <button class="title-btn back-btn" id="sx-forfeit-confirm">${t('scr_leave_map_confirm')}</button>
-                    <button class="title-btn back-btn" id="sx-forfeit-cancel">${t('scr_stay_in_map')}</button>
+                    <button class="title-btn back-btn" id="sx-forfeit-confirm"></button>
+                    <button class="title-btn back-btn" id="sx-forfeit-cancel"></button>
                 </div>
             </div>`;
             document.body.appendChild(modal);
         }
+        // Texts are set on every open, so the dialog matches what is being left right now.
+        const pre = k === 'trial' ? 'scr_leave_trial' : 'scr_leave_map';
+        document.getElementById('sx-forfeit-title').textContent = t(pre);
+        document.getElementById('sx-forfeit-body').innerHTML = t(pre + '_body');
+        document.getElementById('sx-forfeit-confirm').textContent = t(pre + '_confirm');
+        document.getElementById('sx-forfeit-cancel').textContent = t(k === 'trial' ? 'scr_stay_in_trial' : 'scr_stay_in_map');
 
         modal.classList.add('show');
 

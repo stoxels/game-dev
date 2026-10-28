@@ -784,3 +784,24 @@
 #screen-save-slots .ssc-info .ssc-levels { grid-column: 2; font-size: 13px; color: #cdbf95; }
 /* No title earned yet: the divider moves onto the name / ribbon row instead */
 #screen-save-slots .ssc-info .ssc-name:last-of-type { margin-bottom: 0; }
+
+/* ── readability pass ── */
+#screen-save-slots .ss-title { font-weight: 700; font-size: clamp(16px, 1.5vw, 24px); }
+#screen-save-slots .ssc-num, #screen-save-slots .ssc-info .ssc-num { font-family: var(--C, serif); font-weight: 700; font-size: clamp(13px, 1.1vw, 17px); letter-spacing: 0.12em; padding: 3px 14px; color: #ffe9a8; }
+#screen-save-slots .save-slot-card.empty .ssc-empty { font-family: var(--C, serif); font-weight: 700; font-size: clamp(14px, 1.2vw, 19px); letter-spacing: 0.1em; color: #e6dcc0; }
+#screen-save-slots .ssc-info .ssc-name { font-family: var(--C, serif); font-weight: 700; font-size: clamp(14px, 1.1vw, 18px); color: #fff3d6; }
+#screen-save-slots .ssc-info .ssc-title { font-family: var(--PX, serif); font-weight: 600; font-size: clamp(14px, 1.05vw, 17px); color: #f3dc9a; }
+#screen-save-slots .ssc-info .ssc-score { font-family: var(--C, serif); font-weight: 700; font-size: clamp(16px, 1.25vw, 20px); }
+#screen-save-slots .ssc-info .ssc-levels { font-family: var(--PX, serif); font-weight: 600; font-size: clamp(14px, 1.05vw, 17px); color: #e6dcc0; }
+#screen-save-slots .ssc-info .ssc-player-level { font-family: var(--C, serif); font-weight: 700; font-size: clamp(13px, 1vw, 16px); }
+.slot-name-hint, .slot-name-count { font-family: var(--PX, serif); font-weight: 600; }
+.slot-name-count { font-size: 16px; }
+.slot-name-box .reset-btn { font-family: var(--C, serif); font-weight: 700; font-size: clamp(14px, 1.5vw, 18px); }
+#screen-save-slots .ssc-info .ssc-score { font-size: clamp(13px, 0.95vw, 16px); }
+#screen-save-slots .ssc-info .ssc-levels { font-size: clamp(12px, 0.85vw, 14px); }
+#screen-save-slots .ssc-info .ssc-name { font-size: clamp(13px, 1vw, 16px); }
+#screen-save-slots .ssc-info .ssc-title { font-size: clamp(12px, 0.9vw, 15px); }
+#screen-save-slots .ssc-info .ssc-score, #screen-save-slots .ssc-info .ssc-levels { white-space: nowrap; }
+#screen-save-slots .ssc-info .ssc-score, #screen-save-slots .ssc-info .ssc-levels { white-space: normal; }
+#screen-save-slots .ssc-info .ssc-score { font-size: 14px; }
+#screen-save-slots .ssc-info .ssc-levels { font-size: 13px; }

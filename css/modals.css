@@ -2088,3 +2088,17 @@
     .tut-section p strong[style*="color"] {
         filter: brightness(0.62) saturate(1.35);
     }
+
+/* ── readability pass: shared modal bits, leave-map confirmation, danger dialogs ── */
+.modal-title { font-family: var(--C, serif); font-weight: 700; }
+.modal-section p { font-family: var(--PX, serif); font-size: 16px; line-height: 1.5; }
+.modal-section h3 { font-family: var(--C, serif); font-weight: 700; font-size: 14px; letter-spacing: 0.12em; }
+.modal-box-danger .modal-actions .back-btn,
+.mg-tutor-btn, .mg-new-q-btn { font-family: var(--C, serif); font-weight: 700; font-size: 15px; letter-spacing: 0.06em; }
+.mg-footer { font-family: var(--PX, serif); font-size: 14px; }
+#sx-forfeit-modal .modal-title.text-red { font-family: var(--C, serif); font-weight: 700; font-size: clamp(18px, 3.2cqw, 26px); }
+#sx-forfeit-modal .reset-body-text { font-family: var(--PX, serif); font-weight: 600; font-size: clamp(17px, 3.6cqw, 21px); color: #f6ecd0; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9); }
+#sx-forfeit-modal .sx-forfeit-keep { color: #7fe39a; }
+#sx-forfeit-modal .sx-forfeit-lose { color: #ff8a80; }
+#sx-forfeit-modal .modal-actions .title-btn,
+#sx-forfeit-modal .modal-actions .back-btn { font-family: var(--C, serif); font-weight: 700; font-size: clamp(15px, 2.8cqw, 18px); letter-spacing: 0.06em; }

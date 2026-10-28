@@ -416,3 +416,52 @@
     background: url('../../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
     filter: brightness(1.28);
 }
+
+/* ==========================================================================
+   Crafting Bench readability pass: display font for titles and buttons, readable body text,
+   gold instead of the old cyan accent.
+   ========================================================================== */
+#sx-crafting-bench-overlay .sx-craft-head-title { font-family: var(--C, serif); font-weight: 700; font-size: clamp(18px, 1.7vw, 24px); letter-spacing: 0.1em; color: #ffe9a8; }
+#sx-crafting-bench-overlay .sx-craft-ilvl { font-family: var(--C, serif); font-weight: 700; font-size: 17px; letter-spacing: 0.06em; color: #ffe9a8; padding: 8px 10px; }
+#sx-crafting-bench-overlay .sx-craft-capacity { font-family: var(--PX, serif); font-weight: 600; font-size: 16px; letter-spacing: 0.02em; color: #f1e8cf; }
+#sx-crafting-bench-overlay .sx-craft-capacity-bar { width: 110px; height: 11px; }
+#sx-crafting-bench-overlay .sx-craft-legend { font-family: var(--PX, serif); font-weight: 600; font-size: 15px; letter-spacing: 0.02em; color: #f1e8cf; }
+#sx-crafting-bench-overlay .sx-crafting-slot { font-family: var(--PX, serif); font-size: 16px; color: #cfc6ad; letter-spacing: 0.02em; }
+#sx-crafting-bench-overlay .sx-craft-empty { font-family: var(--PX, serif); font-size: 17px; line-height: 1.6; letter-spacing: 0.02em; color: #cfc6ad; }
+#sx-crafting-bench-overlay .sx-craft-selected-label { font-family: var(--C, serif); font-weight: 700; font-size: 15px; letter-spacing: 0.08em; color: #ffe9a8; }
+#sx-crafting-bench-overlay .sx-craft-col-head { font-family: var(--C, serif); font-weight: 700; font-size: 16px; letter-spacing: 0.12em; padding: 12px 14px; }
+#sx-crafting-bench-overlay .sx-craft-col-head.prefix { color: #9fe3ff; }
+#sx-crafting-bench-overlay .sx-craft-col-head.suffix { color: #ffe9a8; }
+
+/* mod families and tiers */
+#sx-crafting-bench-overlay .sx-craft-family { padding: 12px; }
+#sx-crafting-bench-overlay .sx-craft-family:hover { border-color: rgba(255, 215, 110, 0.4); }
+#sx-crafting-bench-overlay .sx-craft-family-badge { font-family: var(--C, serif); font-weight: 700; font-size: 12px; letter-spacing: 0.1em; padding: 3px 9px; }
+#sx-crafting-bench-overlay .sx-craft-family-name { font-family: var(--C, serif); font-size: 16px; letter-spacing: 0.04em; }
+#sx-crafting-bench-overlay .sx-craft-family-count { font-family: var(--C, serif); font-weight: 700; font-size: 13px; letter-spacing: 0.06em; padding: 3px 10px; }
+#sx-crafting-bench-overlay .sx-craft-tier { font-family: var(--PX, serif); font-weight: 600; font-size: 16px; letter-spacing: 0.01em; padding: 10px 12px; color: #f1e8cf; }
+#sx-crafting-bench-overlay .sx-craft-tier .tier-range { font-size: 17px; color: #fff3d6; }
+#sx-crafting-bench-overlay .sx-craft-tier .tier-label { color: #ffd76e; font-family: var(--C, serif); font-weight: 700; }
+#sx-crafting-bench-overlay .sx-craft-tier.ready:hover,
+#sx-crafting-bench-overlay .sx-craft-tier.selected { border-color: #ffd76e; background: rgba(255, 215, 110, 0.12); box-shadow: 0 0 0 1px rgba(255, 215, 110, 0.4); }
+#sx-crafting-bench-overlay .sx-craft-pill { font-family: var(--C, serif); font-weight: 700; font-size: 12px; letter-spacing: 0.08em; padding: 3px 10px; }
+#sx-crafting-bench-overlay .sx-craft-chip { font-size: 14px; padding: 3px 9px 3px 6px; gap: 6px; }
+#sx-crafting-bench-overlay .sx-craft-chip-icon { font-size: 17px; }
+#sx-crafting-bench-overlay .sx-craft-chip-name { font-size: 13px; color: #d6c99f; }
+#sx-crafting-bench-overlay .sx-craft-chip-qty { font-size: 15px; }
+#sx-crafting-bench-overlay .sx-craft-cost { font-size: 15px; }
+
+/* apply button + footer */
+#sx-crafting-bench-overlay .sx-craft-apply {
+    font-family: var(--C, serif); font-weight: 700; font-size: 18px; letter-spacing: 0.1em; padding: 14px 24px;
+    color: #1c1408; background: linear-gradient(180deg, #f0cf78, #c79a3a); border: 2px solid #ffe08a; border-radius: 4px;
+}
+#sx-crafting-bench-overlay .sx-craft-apply:not(:disabled):hover { box-shadow: 0 0 14px rgba(255, 215, 110, 0.55); filter: brightness(1.06); }
+#sx-crafting-bench-overlay .sx-craft-apply:disabled { color: #8a8272; background: rgba(255, 255, 255, 0.05); border-color: #4a4660; }
+
+/* Crafting Bench: close button in the top-right corner of the whole dialog (not on the title plaque) */
+#sx-crafting-bench-overlay .sx-craft-head { position: static; }
+#sx-crafting-bench-overlay .sx-craft-close { top: -26px; right: -26px; transform: none; width: 44px; height: 44px; z-index: 5; }
+#sx-crafting-bench-overlay .sx-craft-bench-item { font-family: var(--PX, serif); font-weight: 600; font-size: 18px; color: #cfc6ad; min-height: 80px; }
+#sx-crafting-bench-overlay .sx-craft-bench-item span { font-family: inherit; font-size: inherit; }
+#sx-crafting-bench-overlay .sx-craft-close { width: 52px; height: 52px; top: -30px; right: -30px; }

@@ -471,3 +471,20 @@
     color: #8fd9a0;
     filter: none;
 }
+
+/* ── readability pass: retry setup + keep/revert dialogs ── */
+#retry-setup-modal .retry-setup-box .modal-title,
+#retry-keep-modal .modal-box-danger .modal-title { font-family: var(--C, serif); font-weight: 700; font-size: clamp(18px, 2.6cqw, 26px); letter-spacing: 0.1em; }
+#retry-setup-modal .retry-setup-hint { font-family: var(--PX, serif); font-weight: 600; font-size: clamp(16px, 2.4cqw, 19px); line-height: 1.45; }
+#retry-setup-modal .retry-setup-section-label { font-family: var(--C, serif); font-weight: 700; font-size: 16px; letter-spacing: 0.14em; color: #ffd76e; }
+#retry-setup-modal .retry-setup-mods-row .mod-title { font-weight: 700; font-size: clamp(11px, 1.8cqw, 15px); }
+#retry-setup-modal .retry-setup-mods-row .mod-per-desc { font-family: var(--PX, serif); font-size: clamp(13px, 1.9cqw, 16px); }
+#retry-keep-modal .reset-body-text { font-family: var(--PX, serif); font-weight: 600; font-size: clamp(17px, 2.8cqw, 21px); }
+#retry-keep-modal .retry-keep-compare { font-size: clamp(16px, 2.6cqw, 20px); }
+#retry-keep-modal .retry-keep-label { font-size: 0.85em; letter-spacing: 0.12em; color: #d6c99f; }
+#retry-setup-modal .retry-start-btn,
+#retry-keep-modal .retry-keep-btn,
+#retry-keep-modal .retry-again-btn,
+#retry-keep-modal .retry-revert-btn { font-family: var(--C, serif); font-weight: 700; font-size: clamp(15px, 2.4cqw, 19px); letter-spacing: 0.06em; }
+#retry-setup-modal .retry-setup-mods-row .mod-score-tag { font-size: 11px; padding: 2px 6px; letter-spacing: 0.02em; max-width: 100%; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis; }
+#retry-setup-modal .retry-setup-mods-row .mod-title { font-size: clamp(9px, 1.4cqw, 12px); letter-spacing: 0; }

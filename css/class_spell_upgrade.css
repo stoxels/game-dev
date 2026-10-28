@@ -675,3 +675,11 @@
     background-image: url('../images/Class_Spell_Upgrade/drifter.webp');
     background-size: cover;
 }
+/* ── readability pass: spell upgrade tooltip ── */
+#class-selection-overlay[data-mode="ascend-upgrade"] .cs-tooltip .cs-ability-tag { font-size: 14px; }
+#class-selection-overlay[data-mode="ascend-upgrade"] .cs-tooltip .cs-ability-name { font-family: var(--C, serif); font-weight: 700; font-size: 18px; }
+#class-selection-overlay[data-mode="ascend-upgrade"] .cs-tooltip .cs-tooltip-current,
+#class-selection-overlay[data-mode="ascend-upgrade"] .cs-tooltip .cs-tooltip-new { font-family: var(--PX, serif); font-size: 16px; }
+#class-selection-overlay[data-mode="ascend-upgrade"] .cs-tooltip .cs-tooltip-compare-label { font-family: var(--C, serif); font-weight: 700; font-size: 13px; }
+#class-selection-overlay[data-mode="ascend-upgrade"] .cs-tooltip .cs-tooltip-arrow { font-size: 18px; }
+#class-selection-overlay[data-mode="ascend-upgrade"] .cs-tooltip .cs-tooltip-maxed-tag { font-size: 13px; }

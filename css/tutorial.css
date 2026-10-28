@@ -664,3 +664,15 @@ body.tq-intermission-active #screen-hub .sx-topbar .sx-level-btn {
 /* Puzzle 3: choose the starter weapon (sword or wand) */
 .tq-bubble-choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 10px; }
 .tq-bubble-choices .tq-bubble-choice { margin-top: 0; }
+
+/* ── readability pass: tutorial and primer text ── */
+.tut-box-title { font-family: var(--C, serif); font-weight: 700; font-size: clamp(16px, 1.6vw, 22px); letter-spacing: 0.06em; }
+.tut-box-text { font-family: var(--PX, serif); font-weight: 500; font-size: clamp(15px, 1.5vw, 19px); line-height: 1.5; }
+.tut-step-counter { font-family: var(--C, serif); font-weight: 700; font-size: clamp(14px, 1.4vw, 18px); }
+.tut-skip-btn { font-family: var(--C, serif); font-weight: 700; font-size: clamp(14px, 1.4vw, 18px); }
+.tut-nav-btn { font-family: var(--C, serif); font-weight: 700; font-size: clamp(14px, 1.4vw, 18px); letter-spacing: 0.06em; }
+.tq-aside-bubble { font-family: var(--PX, serif); font-size: clamp(14px, 1.4vw, 17px); }
+#tq-professor-wrap .tq-bubble-continue { font-family: var(--C, serif); font-weight: 700; font-size: 14px; }
+#tq-chest-modal .tq-chest-box-hint { font-family: var(--PX, serif); font-size: 16px; }
+#tq-chest-modal .tq-chest-item-sub { font-size: 14px; }
+#tq-chest-modal .tq-chest-item-state { font-size: 13px; }

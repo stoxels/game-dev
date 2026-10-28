@@ -505,3 +505,80 @@
 .pt-topbar { gap: 12px; }
 .pt-title { letter-spacing: 0.06em; padding: 7px 16px; }
 .pt-points { white-space: normal; max-width: 250px; text-align: right; line-height: 1.15; margin-left: 4px; }
+
+/* Refund All: carved stone button instead of a thin outlined box */
+#btn-pt-refund-all {
+    background: url('../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+    border: none;
+    padding: 12px 26px;
+    font-size: 15px;
+    color: #ffb35c;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
+    transition: filter 0.15s, transform 0.12s;
+}
+#btn-pt-refund-all:hover { background-color: transparent; border: none; color: #ffd9a8; filter: brightness(1.25); transform: translateY(-1px); }
+
+/* Refund All confirmation */
+#pt-refund-modal .modal-title.text-red {
+    font-family: var(--C, serif);
+    font-weight: 700;
+    font-size: clamp(18px, 2.6cqw, 26px);
+    letter-spacing: 0.1em;
+    color: #ff9a6a;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
+}
+#pt-refund-modal .reset-body-text {
+    font-family: var(--PX, serif);
+    font-weight: 600;
+    font-size: clamp(17px, 2.8cqw, 22px);
+    line-height: 1.5;
+    color: #f6ecd0;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+#pt-refund-modal .modal-actions .title-btn { font-family: var(--C, serif); font-weight: 700; font-size: clamp(14px, 2.6cqw, 18px); letter-spacing: 0.06em; }
+#pt-refund-modal #pt-refund-confirm { color: #ffb35c; }
+#pt-refund-modal #pt-refund-cancel { color: #ffe9a8; }
+
+/* Top bar order: back | search | centred plaque | zoom | refund | points */
+.pt-topbar .pt-title {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 clamp(30px, 3.2vw, 56px);
+    background: url('../images/Settings/settings_title_plague.webp') center / 100% 100% no-repeat;
+    border: none;
+    border-radius: 0;
+    color: var(--yellow, #f3dc9a);
+    z-index: 2;
+    pointer-events: none;
+}
+#pt-search-wrap { flex: 0 1 240px; min-width: 150px; max-width: 260px; }
+#pt-zoom-wrap { margin-left: auto; }
+#pt-zoom-bar { width: 80px; }
+#btn-pt-refund-all { margin-left: 0; }
+.pt-points { max-width: 190px; margin-left: 0; }
+.pt-topbar .pt-title { padding: 0 clamp(22px, 2.2vw, 40px); font-size: clamp(14px, 1.2vw, 19px); }
+#pt-zoom-bar { width: 60px; }
+#pt-zoom-label { min-width: 42px; }
+#btn-pt-refund-all { padding: 12px 18px; }
+.pt-points { max-width: 170px; }
+
+/* Wide screens: let the top bar items grow with the window instead of leaving empty space */
+.pt-topbar .back-btn { font-size: clamp(15px, 1.1vw, 22px); min-width: clamp(130px, 10vw, 230px); padding: 10px 18px; }
+#pt-search-wrap { flex: 0 1 clamp(240px, 22vw, 460px); max-width: 460px; }
+#pt-search-input { font-size: clamp(16px, 1.1vw, 21px) !important; }
+.pt-topbar .pt-title { padding: 0 clamp(22px, 3vw, 70px); font-size: clamp(14px, 1.3vw, 26px); }
+#pt-zoom-wrap { padding: 7px clamp(10px, 1vw, 20px); gap: clamp(8px, 0.8vw, 16px); }
+#pt-zoom-bar { width: clamp(60px, 7vw, 160px); }
+#pt-zoom-label { font-size: clamp(15px, 1.1vw, 21px); min-width: clamp(42px, 3.2vw, 64px); }
+#btn-pt-refund-all { font-size: clamp(15px, 1.1vw, 21px); padding: 12px clamp(18px, 1.8vw, 42px); }
+.pt-points { font-size: clamp(14px, 1.2vw, 24px); max-width: clamp(170px, 16vw, 420px); }
+.pt-topbar .pt-title { padding: 0 clamp(22px, 1.8vw, 44px); }
+.pt-points { max-width: clamp(170px, 12.5vw, 280px); }
+#pt-zoom-bar { width: clamp(46px, 5.5vw, 160px); }
+#pt-zoom-wrap { padding: 7px clamp(8px, 0.9vw, 20px); }
