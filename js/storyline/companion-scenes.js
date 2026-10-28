@@ -989,12 +989,12 @@ export function companionSceneTitle(sceneId, lang) {
     return title ? (lang === 'de' ? title.de : title.en) : '';
 }
 
-// The current player's script for a scene (companion id, sprite look, lines,
-// background), or null when the scene doesn't exist or has no script for the
+// A hero's script for a scene (the current player's unless `heroId` is given;
+// companion id, sprite look, lines, background), or null when the scene doesn't exist or has no script for the
 // chosen character.
-export function getCompanionPairing(sceneId) {
+export function getCompanionPairing(sceneId, heroId = STATE && STATE.playerCharacter) {
     const scene = COMPANION_SCENES[sceneId] || COOP_AFTERMATH_SCENES[sceneId] || REVEAL_SCENES[sceneId];
-    const pairing = scene && scene.pairings[STATE && STATE.playerCharacter];
+    const pairing = scene && scene.pairings[heroId];
     if (!pairing) return null;
     // A script with no English text yet is still a draft from the story editor: keep it hidden.
     if (!pairing.lines.some(l => l.en && l.en.trim())) return null;
@@ -1023,6 +1023,58 @@ export function resolveCompanionLayout(pairing, path) {
     const pic = (pairing.pictureLayouts || {})[path] || {};
     const hero = pairing.heroLayout || {};
     return { sprites: { ...base.sprites, ...pic.sprites, ...hero.sprites }, bubbles: { ...base.bubbles, ...pic.bubbles, ...hero.bubbles } };
+}
+
+// Every story scene the Replay gallery lists, in story order: [id, world, kind, English
+// title, German title]. `kind` is 'meeting', 'reveal' (a hero's secret half) or 'coop' (the
+// scene after a co-op encounter, named after the encounter).
+const REPLAY_SCENE_ROWS = [
+    ['home_stox', 1, 'meeting'],
+    ['den_reunion', 2, 'meeting'],
+    ['w3_assembly', 3, 'meeting'],
+    ['w4_forest', 4, 'meeting'],
+    ['after_coop_w4', 4, 'coop', 'Through the Vortex, Together', 'Gemeinsam durch den Strudel'],
+    ['home_trix', 5, 'meeting'],
+    ['home_syla', 6, 'meeting'],
+    ['after_coop_w6', 6, 'coop', 'The Grove Does Not Sing Alone', 'Der Hain singt nicht allein'],
+    ['reveal_syla', 6, 'reveal', "Syla's Secret", 'Sylas Geheimnis'],
+    ['w7_loom', 7, 'meeting'],
+    ['w8_fieldbase', 8, 'meeting'],
+    ['after_coop_w8', 8, 'coop', 'Before the Lantern Goes Out', 'Bevor die Laterne erlischt'],
+    ['reveal_stox', 8, 'reveal', "Stox's Secret", "Stox' Geheimnis"],
+    ['w9_vortex', 9, 'meeting'],
+    ['after_coop_w9', 9, 'coop', 'The Whirl at the Delta', 'Der Wirbel im Delta'],
+    ['w10_enclave', 10, 'meeting'],
+    ['w11_ghost', 11, 'meeting'],
+    ['after_coop_w11', 11, 'coop', 'What the Mist Hides', 'Was der Nebel verbirgt'],
+    ['reveal_trix', 11, 'reveal', "Trix's Secret", "Trix' Geheimnis"],
+    ['w12_wreck', 12, 'meeting'],
+    ['w13_peak', 13, 'meeting'],
+    ['after_coop_w13', 13, 'coop', 'The Sentinel on the Plateau', 'Der Sentinel auf dem Plateau'],
+    ['w14_sanctum', 14, 'meeting'],
+];
+
+// The scenes for the Replay gallery: { id, world, kind, en, de, heroes } where `heroes` are the
+// player heroes that have a (non-draft) script for it. Scenes with no script at all are left out.
+export function getReplayScenes() {
+    return REPLAY_SCENE_ROWS.map(([id, world, kind, en, de]) => ({
+        id, world, kind,
+        en: en || COMPANION_SCENE_TITLES[id].en,
+        de: de || COMPANION_SCENE_TITLES[id].de,
+        heroes: Object.keys(COMPANION_LOOKS).filter(h => getCompanionPairing(id, h)),
+    })).filter(sc => sc.heroes.length > 0);
+}
+
+// How many of the story scenes a save has watched or skipped, out of all scenes its hero has a
+// version of: { watched, total }. Read from that slot's own "seen" marks, so deleting the slot
+// (which clears them) resets it.
+export function getStoryProgress(slotNum, heroId) {
+    const own = getReplayScenes().filter(sc => sc.heroes.includes(heroId));
+    let watched = 0;
+    try {
+        watched = own.filter(sc => localStorage.getItem(`storyline_seen_slot${slotNum}_companion_scene_${sc.id}`) === '1').length;
+    } catch (e) { /* storage unavailable */ }
+    return { watched, total: own.length };
 }
 
 // True once the player has watched this scene in the current save.

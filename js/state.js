@@ -927,6 +927,12 @@ export function getSlotSummary(slotNum) {
         classAbilitiesUsed: (raw.questStats && raw.questStats.classAbilitiesUsed) || 0,
         passivePointsObtained: (raw.questStats && raw.questStats.lifetimePassivePointsObtained) || 0,
         questionsCorrect: (raw.questStats && raw.questStats.questionsCorrect) || 0,
+        monstersSlain: (raw.questStats && raw.questStats.monstersSlain) || 0,
+        bossesSlain: (raw.questStats && raw.questStats.bossesSlain) || 0,
+        flawlessLevels: (raw.questStats && raw.questStats.levelsNomiss) || 0,
+        ascensionTrialsDoneCount: Array.isArray(raw.ascensionTrialsDone) ? raw.ascensionTrialsDone.length : 0,
+        questItemsCount: (raw.questItems && typeof raw.questItems === 'object') ? Object.keys(raw.questItems).length : 0,
+        atlasMapsCompleted: Object.values((raw.egAtlasCompleted && typeof raw.egAtlasCompleted === 'object') ? raw.egAtlasCompleted : {}).filter(Boolean).length,
     };
 }
 

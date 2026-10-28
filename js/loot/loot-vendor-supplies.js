@@ -181,7 +181,11 @@ function _vendorCurrencyPrice(id) {
 
 // Builds purchase cards for every known currency orb.
 export function _vendorBuildCurrencyTabHTML() {
-    const defs = Object.values(CURRENCY_DEFS);
+    // Cheapest first; cores with the same price keep their own order.
+    const defs = Object.values(CURRENCY_DEFS)
+        .map((def, i) => ({ def, i, price: _vendorCurrencyPrice(def.id) }))
+        .sort((a, b) => a.price - b.price || a.i - b.i)
+        .map(x => x.def);
     const cards = defs.map(def => _vendorBuildCardHTML({
         icon: _vendorIconHTML(def.id, def.icon),
         title: def.name,
@@ -322,7 +326,7 @@ export function _vendorBuildItemsTabHTML(ignoreFilter) {
         buyCall: `_vendorBuyPuzzleItem('${def.id}')`,
     })).join('');
     const bar = ignoreFilter ? '' : _vendorBuildChipBarHTML(ITEM_GROUPS.map(g => ({ id: g.label, label: t(g.labelKey) })), filter, '_vendorSetItemFilter');
-    return `${bar}<div class="sx-vendor-cards">${cards}</div>`;
+    return `${bar}<div class="sx-vendor-cards sx-vendor-cards-wide">${cards}</div>`;
 }
 
 // Buys a regular puzzle item straight into the persistent main inventory.
@@ -390,7 +394,7 @@ function _vendorCharmOwned(skillId, rank) {
 export function _vendorBuildCharmsTabHTML(ignoreFilter) {
     const lv = _vendorPlayerLevel();
     const gold = getGold();
-    const ids = ignoreFilter ? _vendorCharmSkillIds() : _vendorFilterCharmIds(_vendorCharmSkillIds());
+    const ids = _vendorFilterCharmIds(_vendorCharmSkillIds(), ignoreFilter);
     const cards = ids.map(id => {
         const def = globalThis.getSkillDef(id);
         const art = globalThis.getCharmArtForSkill(id, 1);

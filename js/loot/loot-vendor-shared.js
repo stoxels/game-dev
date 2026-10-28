@@ -159,10 +159,27 @@ export function _vendorBuildCharmFilterBarHTML() {
         VENDOR_CHARM_FILTERS.map(f => chip(f.id, t('eg_vendor_charm_filter_' + f.id))).join('')}</div>`;
 }
 
-// Keeps only the spell ids that match the chosen chip.
-export function _vendorFilterCharmIds(ids) {
-    const filter = VENDOR_CHARM_FILTERS.find(f => f.id === _vendorCharmFilter);
-    return filter ? ids.filter(id => filter.test(_vendorUniversalDef(id))) : ids;
+// The elements charms are grouped by in the shop, in display order: fire first, then cold, ...
+// (the first six chips). Charms with no element come last.
+const VENDOR_CHARM_ELEMENT_ORDER = VENDOR_CHARM_FILTERS.slice(0, 6);
+
+// Position of a spell's element in the display order (the first matching one; no element = last).
+function _vendorCharmElementRank(id) {
+    const def = _vendorUniversalDef(id);
+    const i = VENDOR_CHARM_ELEMENT_ORDER.findIndex(f => f.test(def));
+    return i === -1 ? VENDOR_CHARM_ELEMENT_ORDER.length : i;
+}
+
+// Sorts the spell ids by element (fire, cold, lightning, shadow, holy, physical, then the
+// rest), keeping their own order inside each element, and keeps only the ones that match the
+// chosen chip - unless `ignoreFilter` is set (the all-tabs search).
+export function _vendorFilterCharmIds(ids, ignoreFilter) {
+    const filter = ignoreFilter ? null : VENDOR_CHARM_FILTERS.find(f => f.id === _vendorCharmFilter);
+    const kept = filter ? ids.filter(id => filter.test(_vendorUniversalDef(id))) : ids.slice();
+    return kept
+        .map((id, i) => ({ id, i, rank: _vendorCharmElementRank(id) }))
+        .sort((a, b) => a.rank - b.rank || a.i - b.i)
+        .map(x => x.id);
 }
 
 //------------------------------------------------------------------------

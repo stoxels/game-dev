@@ -78,7 +78,7 @@
 }
 #screen-vendor .sx-vendor-tab-btn { font-size: 14px; padding: 15px 30px; }
 #screen-vendor .sx-vendor-buy-btn { font-size: 13px; padding: 13px 26px; }
-#screen-vendor .sx-vendor-filter-btn { font-size: 13px; padding: 9px 20px; color: #cfc6ad; }
+#screen-vendor .sx-vendor-filter-btn { font-size: 12px; padding: 6px 14px; color: #cfc6ad; }
 #screen-vendor .sx-vendor-tab-btn:hover,
 #screen-vendor .sx-vendor-buy-btn:hover,
 #screen-vendor .sx-vendor-filter-btn:hover {
@@ -150,17 +150,25 @@
 #screen-vendor .sx-vendor-base-wrap { max-height: 52vh; }
 
 /* Essences: compact cards so the long list scrolls less */
-#screen-vendor .sx-vendor-cards-essence { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
-#screen-vendor .sx-vendor-essence-card { padding: 9px 11px; gap: 6px; }
-#screen-vendor .sx-vendor-essence-card .sx-vendor-card-name { font-size: 14px; }
-#screen-vendor .sx-vendor-essence-card .sx-vendor-card-desc { font-size: 12px; margin-top: 2px; }
+#screen-vendor .sx-vendor-essence-card { padding: 10px 14px; gap: 8px; }
 #screen-vendor .sx-vendor-essence-card .sx-vendor-buy-btn { padding: 10px 20px; }
-/* Cores: two wide cards per row, so the description gets room and the icon, name and buy button breathe */
-#screen-vendor .sx-vendor-cards-core { grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 10px; }
-#screen-vendor .sx-vendor-cards-core .sx-vendor-card { padding: 12px 16px; gap: 10px; }
-#screen-vendor .sx-vendor-cards-core .sx-vendor-card-icon img.sx-art-img { width: 52px; height: 52px; }
-#screen-vendor .sx-vendor-cards-core .sx-vendor-card-name { font-size: 15px; }
-#screen-vendor .sx-vendor-cards-core .sx-vendor-card-desc { font-size: 13px; margin-top: 4px; }
+/* Cores, essences and puzzle items: two wide cards per row, so the description gets room and the
+   icon, name and buy button breathe (the narrow four-per-row cards squeezed the text into slivers) */
+#screen-vendor .sx-vendor-cards-core,
+#screen-vendor .sx-vendor-cards-essence,
+#screen-vendor .sx-vendor-cards-wide { grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 10px; }
+#screen-vendor .sx-vendor-cards-core .sx-vendor-card,
+#screen-vendor .sx-vendor-cards-essence .sx-vendor-card,
+#screen-vendor .sx-vendor-cards-wide .sx-vendor-card { padding: 12px 16px; gap: 10px; }
+#screen-vendor .sx-vendor-cards-core .sx-vendor-card-icon img.sx-art-img,
+#screen-vendor .sx-vendor-cards-essence .sx-vendor-card-icon img.sx-art-img,
+#screen-vendor .sx-vendor-cards-wide .sx-vendor-card-icon img.sx-art-img { width: 52px; height: 52px; }
+#screen-vendor .sx-vendor-cards-core .sx-vendor-card-name,
+#screen-vendor .sx-vendor-cards-essence .sx-vendor-card-name,
+#screen-vendor .sx-vendor-cards-wide .sx-vendor-card-name { font-size: 15px; }
+#screen-vendor .sx-vendor-cards-core .sx-vendor-card-desc,
+#screen-vendor .sx-vendor-cards-essence .sx-vendor-card-desc,
+#screen-vendor .sx-vendor-cards-wide .sx-vendor-card-desc { font-size: 13px; margin-top: 4px; }
 /* Long card lists scroll instead of squashing the cards */
 #screen-vendor .sx-vendor-tab-content > * { flex-shrink: 0; }
 #screen-vendor .sx-vendor-card { min-height: min-content; }

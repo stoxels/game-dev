@@ -1,7 +1,7 @@
 import { LANG } from '../translation/translations.js';
 import { COMPANION_CAST, getCompanionPairing, resolveCompanionLayout } from './companion-scenes.js';
 import { STATE, save } from '../state.js';
-import { _setReplayGloballyUnlocked, markSeen } from './storyline-progress.js';
+import { _setReplayGloballyUnlocked, markSeen, markStoryReplayUnlocked } from './storyline-progress.js';
 import { recordMeetingWatched } from './companion-affinity.js';
 import { grantSceneQuestItem } from './quest-items.js';
 
@@ -44,11 +44,18 @@ function _playerSpritePath(playerId, pose = 'down') {
     return _spritePath(playerId, look, pose);
 }
 
+// Picture of the player's hero on the left. In a replay the hero wears the look the scene was
+// written for, since the save may be another hero's or at another stage.
+function _playerSpot(pairing, playerId, replay, pose = 'down') {
+    if (replay) return _spritePath(playerId, pairing.looks[playerId], pose);
+    return pairing.stage === 'none' ? _spritePath(playerId, 'noclass', pose) : _playerSpritePath(playerId, pose);
+}
+
 // Picture of whoever stands on `spot` ('left' = the player, 'right' = the
 // companion, 'mid' = the second companion), facing `pose`.
 function _spotSpritePath(spot, pose) {
-    const { pairing, playerId } = _stage;
-    if (spot === 'left') return pairing.stage === 'none' ? _spritePath(playerId, 'noclass', pose) : _playerSpritePath(playerId, pose);
+    const { pairing, playerId, replay } = _stage;
+    if (spot === 'left') return _playerSpot(pairing, playerId, replay, pose);
     const heroId = spot === 'right' ? pairing.companion : pairing.companion2;
     return _spritePath(heroId, pairing.looks[heroId], pose);
 }
@@ -152,13 +159,13 @@ function _petHtml(pairing, playerId) {
 
 // Builds the overlay: background, two hero sprites, the bubble and the skip
 // button. Returns the root element (not yet attached).
-function _buildOverlay(pairing, playerId) {
+function _buildOverlay(pairing, playerId, replay) {
     const root = document.createElement('div');
     root.className = 'cmp-stage';
     root.innerHTML = `
         <div class="cmp-bg" style="background-image:${_bgCss(pairing.bg, pairing.fallbackBg)}"></div>
         <div class="cmp-vignette"></div>
-        <img class="cmp-hero cmp-left" src="${pairing.stage === 'none' ? _spritePath(playerId, 'noclass') : _playerSpritePath(playerId)}" alt="" draggable="false">
+        <img class="cmp-hero cmp-left" src="${_playerSpot(pairing, playerId, replay)}" alt="" draggable="false">
         <img class="cmp-hero cmp-right" src="${_spritePath(pairing.companion, pairing.looks[pairing.companion])}" alt="" draggable="false">
         ${pairing.companion2 ? `<img class="cmp-hero cmp-mid" src="${_spritePath(pairing.companion2, pairing.looks[pairing.companion2])}" alt="" draggable="false">` : ''}
         ${_petHtml(pairing, playerId)}
@@ -214,10 +221,18 @@ function _earnAffinity(sceneId, playerId, pairing) {
 // skipped; only a watched scene earns affinity.
 function _finish(watched) {
     if (!_stage) return;
-    const { root, sceneId, onComplete, onKey, playerId, pairing } = _stage;
+    const { root, sceneId, onComplete, onKey, playerId, pairing, replay } = _stage;
     _stage = null;
     document.removeEventListener('keydown', onKey, true);
+    if (replay) {
+        // A replay from the title screen changes nothing: no seen mark, no quest item, no affinity.
+        root.classList.add('cmp-out');
+        setTimeout(() => root.remove(), 250);
+        if (typeof onComplete === 'function') onComplete();
+        return;
+    }
     markSeen('companion_scene', { sceneId });
+    markStoryReplayUnlocked(sceneId, playerId);
     // The meetings in worlds 12 and 13 hand over the Nexus key halves, watched or skipped.
     if (STATE.questItems && grantSceneQuestItem(STATE.questItems, sceneId)) save();
     // Only meetings earn affinity: the scenes after a co-op encounter never do.
@@ -277,20 +292,22 @@ function _advance() {
     _showItem(_stage.index + 1);
 }
 
-// Plays the companion scene `sceneId` for the current player's character.
-// Does nothing (but still calls onComplete) when there is no script for them.
-export function playCompanionScene(sceneId, onComplete) {
-    const pairing = getCompanionPairing(sceneId);
+// Plays the companion scene `sceneId` for the current player's character, or for the hero in
+// `options.asHero` as a replay (the Replay gallery: changes no progress). Does nothing (but
+// still calls onComplete) when there is no script for them.
+export function playCompanionScene(sceneId, onComplete, options = {}) {
+    const playerId = options.asHero || STATE.playerCharacter;
+    const replay = !!options.asHero;
+    const pairing = getCompanionPairing(sceneId, playerId);
     if (!pairing || _stage) { if (typeof onComplete === 'function') onComplete(); return; }
 
-    const playerId = STATE.playerCharacter;
-    const root = _buildOverlay(pairing, playerId);
+    const root = _buildOverlay(pairing, playerId, replay);
     const onKey = (e) => {
         if (_stage && _stage.flashback) return;
         if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); e.stopPropagation(); _advance(); }
         else if (e.code === 'Escape') { e.preventDefault(); e.stopPropagation(); _finish(false); }
     };
-    _stage = { root, pairing, playerId, sceneId, onComplete, onKey, index: 0, pic: pairing.bg };
+    _stage = { root, pairing, playerId, sceneId, onComplete, onKey, index: 0, pic: pairing.bg, replay };
     _applySpriteLayout();
 
     root.addEventListener('click', _advance);

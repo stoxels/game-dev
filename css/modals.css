@@ -1981,52 +1981,27 @@
     border-radius: 6px;
 }
 
-/* 3-COLUMN GRID - drops to 2 columns ≤1000px and 1 column ≤700px.
-   minmax(0, 1fr) instead of plain 1fr: long German compound words would
-   otherwise inflate a track's min-content and make the columns unequal.
-   align-items: stretch (the default) makes every card in a row grow to its
-   row's tallest sibling, so rows align cleanly for the alternating tint. */
+/* 3-COLUMN MASONRY - the cards differ a lot in length (Controls is far longer
+   than What is a nonogram), so a row grid left big gaps under the short cards.
+   CSS columns pack the cards top to bottom and balance the three columns;
+   break-inside keeps each card whole. Drops to 2 columns <=1000px, 1 <=700px. */
 .tut-columns {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(10px, 1.4vw, 18px);
-    align-items: start; /* cards keep their own height instead of stretching to the row */
+    column-count: 3;
+    column-gap: clamp(10px, 1.4vw, 18px);
 }
 
-    /* 2 columns → a row is 2 cards; even rows are the 4n+3/4 cycle
-       (cards 3–4, 7–8, …). First reset the 3-column tint. */
-    @media (max-width: 1000px) {
-        .tut-columns {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
+.tut-columns > .tut-section {
+    break-inside: avoid;
+    margin-bottom: clamp(10px, 1.4vw, 18px);
+}
 
-        .tut-section:nth-child(6n + 4),
-        .tut-section:nth-child(6n + 5),
-        .tut-section:nth-child(6n + 6) {
-            background: rgba(255, 248, 226, 0.95);
-        }
+@media (max-width: 1000px) {
+    .tut-columns { column-count: 2; }
+}
 
-        .tut-section:nth-child(4n + 3),
-        .tut-section:nth-child(4n + 4) {
-            background: rgba(242, 224, 186, 0.95);
-        }
-    }
-
-    /* Single column: one card per row, so alternate per card (even cards). */
-    @media (max-width: 700px) {
-        .tut-columns {
-            grid-template-columns: 1fr;
-        }
-
-        .tut-section:nth-child(4n + 3),
-        .tut-section:nth-child(4n + 4) {
-            background: rgba(255, 248, 226, 0.95);
-        }
-
-        .tut-section:nth-child(even) {
-            background: rgba(242, 224, 186, 0.95);
-        }
-    }
+@media (max-width: 700px) {
+    .tut-columns { column-count: 1; }
+}
 
 /* On narrow windows drop the fixed frame aspect ratio: the box grows with
    its content up to the viewport height (minus backdrop padding), after
@@ -2074,13 +2049,6 @@
 .tut-section-diff        { --tut-accent: #c0762a; }
 .tut-section-combat      { --tut-accent: #b03a2e; }
 .tut-section-progression { --tut-accent: #8a5a12; }
-
-    /* 2nd, 4th, ... rows - slightly deeper cream so rows read as stripes. */
-    .tut-section:nth-child(6n + 4),
-    .tut-section:nth-child(6n + 5),
-    .tut-section:nth-child(6n + 6) {
-        background: rgba(242, 224, 186, 0.95);
-    }
 
 /* Section heading - Cinzel, dark ink, underlined in the card's accent. */
 .tut-section h3 {

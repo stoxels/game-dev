@@ -2,7 +2,7 @@ import { Audio_Manager } from './audio/audio.js';
 import { showAchievements } from './achievements/achievements-ui.js';
 import { showResetAchievementsModal } from './achievements/achievements.js';
 import { stopTimer } from './timer/timer.js';
-import { setLang, t } from './translation/translations.js';
+import { LANG, setLang, t } from './translation/translations.js';
 import { toggleTouchpadMarkMode } from './mouse-button-handlers.js';
 import { clearHover } from './mouse-over.js';
 import { showHS } from './screens/screens-highscore.js';
@@ -15,6 +15,9 @@ import { showQuestLog } from './inference/inference-ui.js';
 import { _ptRefundAllPoints } from './probability-tree/probability-tree-state-points.js';
 import { STATE, save } from './state.js';
 import { cur } from './state.js';
+import { getCompanionPairing, getReplayScenes } from './storyline/companion-scenes.js';
+import { playCompanionScene } from './storyline/companion-stage.js';
+import { isStoryReplayUnlocked } from './storyline/storyline-progress.js';
 
 //------------------------------------------------------------------------
 //-------------------REPLAY GALLERY--------------------------------------------
@@ -96,6 +99,109 @@ function _buildReplayRow(entry, unlocked, titleText) {
     return row;
 }
 
+// The three heroes a story scene can be watched as, in the order of the buttons.
+const _REPLAY_HEROES = [
+    { id: 'stox', name: 'Stox' },
+    { id: 'trix', name: 'Trix' },
+    { id: 'syla', name: 'Syla' },
+];
+
+// One "watch as <hero>" button of a story row: the hero's portrait, locked until that
+// hero's version of the scene was watched. A replay changes nothing in the save.
+function _buildHeroReplayButton(scene, hero, unlocked) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'replay-hero-btn' + (unlocked ? '' : ' replay-hero-btn-locked');
+    const label = LANG === 'de' ? `Als ${hero.name} ansehen` : `Watch as ${hero.name}`;
+    btn.setAttribute('aria-label', label);
+    const img = document.createElement('img');
+    img.src = `images/sprites/${hero.name}_noclass.webp`;
+    img.alt = hero.name;
+    btn.appendChild(img);
+    if (unlocked) {
+        btn.addEventListener('click', () => {
+            hideModal('replay-modal');
+            globalThis.hideGameTooltip();
+            playCompanionScene(scene.id, null, { asHero: hero.id });
+        });
+    } else {
+        btn.disabled = true;
+        const lock = document.createElement('span');
+        lock.className = 'replay-hero-lock';
+        lock.textContent = '🔒';
+        btn.appendChild(lock);
+    }
+    return btn;
+}
+
+// One story row: the scene's picture, its name and world, and one button per hero that
+// has a version of it. A scene nobody has watched yet hides its name.
+function _buildStoryReplayRow(scene) {
+    const unlockedHeroes = scene.heroes.filter(h => isStoryReplayUnlocked(scene.id, h));
+    const anyUnlocked = unlockedHeroes.length > 0;
+    const de = LANG === 'de';
+    const kind = { meeting: de ? 'Begegnung' : 'Meeting', reveal: de ? 'Geheimnis' : 'Secret half', coop: de ? 'Koop-Ereignis' : 'Co-op event' }[scene.kind];
+    const name = anyUnlocked ? (de ? scene.de : scene.en) : '???';
+    const row = _buildReplayRow({
+        id: 'story_' + scene.id,
+        label: name,
+        thumb: getCompanionPairing(scene.id, scene.heroes[0]).bg,
+        descKey: '',
+    }, anyUnlocked, name);
+    row.querySelector('.replay-track-desc').textContent = `${de ? 'Welt' : 'World'} ${scene.world} \u00b7 ${kind}`;
+    // The row's single play button gives way to one button per hero.
+    row.querySelector('.replay-track-play').remove();
+    const heroes = document.createElement('div');
+    heroes.className = 'replay-hero-btns';
+    _REPLAY_HEROES.filter(h => scene.heroes.includes(h.id))
+        .forEach(h => heroes.appendChild(_buildHeroReplayButton(scene, h, unlockedHeroes.includes(h.id))));
+    row.appendChild(heroes);
+    return row;
+}
+
+// The progress counter under the story heading: scenes unlocked out of all scenes, overall
+// and per hero (each hero has their own version of every scene), with a bar for the total.
+function _buildStoryProgress(scenes) {
+    const de = LANG === 'de';
+    const perHero = _REPLAY_HEROES.map(hero => {
+        const own = scenes.filter(s => s.heroes.includes(hero.id));
+        return { hero, total: own.length, done: own.filter(s => isStoryReplayUnlocked(s.id, hero.id)).length };
+    });
+    const total = perHero.reduce((n, h) => n + h.total, 0);
+    const done = perHero.reduce((n, h) => n + h.done, 0);
+    const wrap = document.createElement('div');
+    wrap.className = 'replay-progress';
+    const pct = total ? Math.round(100 * done / total) : 0;
+    wrap.innerHTML = `
+        <div class="replay-progress-top">
+            <span class="replay-progress-label">${de ? 'Story-Fortschritt' : 'Story progress'}</span>
+            <span class="replay-progress-count">${done} / ${total} (${pct}%)</span>
+        </div>
+        <div class="replay-progress-bar"><div class="replay-progress-fill" style="width:${pct}%"></div></div>
+        <div class="replay-progress-heroes">${perHero.map(h => `
+            <span class="replay-progress-hero"><img src="images/sprites/${h.hero.name}_noclass.webp" alt="${h.hero.name}">${h.hero.name} ${h.done} / ${h.total}</span>`).join('')}
+        </div>`;
+    return wrap;
+}
+
+// The story part of the gallery: a heading, the progress counter and one row per scene, in story order.
+function _appendStoryReplaySection(container) {
+    const de = LANG === 'de';
+    const title = document.createElement('div');
+    title.className = 'replay-section-title';
+    title.textContent = de ? 'STORY-SZENEN' : 'STORY SCENES';
+    const hint = document.createElement('div');
+    hint.className = 'replay-section-hint';
+    hint.textContent = de
+        ? 'Sieh dir eine Szene als den Helden an, der sie erlebt hat. Eine Wiederholung ändert nichts an deinem Spielstand.'
+        : 'Watch a scene as the hero who lived it. A replay changes nothing in your save.';
+    const scenes = getReplayScenes();
+    container.appendChild(title);
+    container.appendChild(hint);
+    container.appendChild(_buildStoryProgress(scenes));
+    scenes.forEach(scene => container.appendChild(_buildStoryReplayRow(scene)));
+}
+
 // Rebuilds the replay modal from unlocked gallery entries and tutorial progress.
 function renderReplayModal() {
     const container = document.getElementById('replay-content');
@@ -121,6 +227,8 @@ function renderReplayModal() {
             isTutorial: true
         }, true, t('scr_replay_tutorial')));
     }
+
+    _appendStoryReplaySection(container);
 
     if (!anyUnlocked) {
         const empty = document.createElement('p');
@@ -158,11 +266,11 @@ document.addEventListener('mousemove', (e) => {
     }
 
     const topEl = document.elementFromPoint(e.clientX, e.clientY);
-    const btn = (topEl && topEl.closest) ? topEl.closest('.replay-track-play') : null;
+    const btn = (topEl && topEl.closest) ? topEl.closest('.replay-track-play, .replay-hero-btn') : null;
     if (btn) {
         if (_replayTipBtn !== btn) {
             _replayTipBtn = btn;
-            const isLocked = btn.classList.contains('replay-track-play-locked');
+            const isLocked = btn.classList.contains('replay-track-play-locked') || btn.classList.contains('replay-hero-btn-locked');
             const text = isLocked ? t('scr_replay_locked') : (btn.getAttribute('aria-label') || '');
             globalThis.showGameTooltip(text, e);
         } else {

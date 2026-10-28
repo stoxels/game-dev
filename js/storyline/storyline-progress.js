@@ -8,7 +8,7 @@
 // and character-select.js call the reset/unlock helpers directly.
 //-----------------------------------------------------------------------------
 
-import { getActiveSlot } from '../state.js';
+import { SAVE_SLOT_COUNT, getActiveSlot, loadRawSaveFromSlot } from '../state.js';
 import { REPLAY_GALLERY_ENTRIES } from './storyline-beats.js';
 
 // ---------------------------------------------------------------------------
@@ -61,6 +61,30 @@ export function _setReplayGloballyUnlocked(entryId) {
     try {
         localStorage.setItem(_replayGlobalKey(entryId), '1');
     } catch (e) { /* storage unavailable */ }
+}
+
+// Story scenes in the Replay gallery unlock per hero: a scene's version for hero H opens
+// once it was watched (or skipped) as H in any save. New viewings set a flag that survives
+// save resets; saves from before the flag existed are found by reading each slot's own
+// "seen" mark together with the hero that slot plays.
+function _storyReplayId(sceneId, heroId) {
+    return `story_${sceneId}_${heroId}`;
+}
+
+export function markStoryReplayUnlocked(sceneId, heroId) {
+    _setReplayGloballyUnlocked(_storyReplayId(sceneId, heroId));
+}
+
+export function isStoryReplayUnlocked(sceneId, heroId) {
+    if (_isReplayGloballyUnlocked(_storyReplayId(sceneId, heroId))) return true;
+    try {
+        for (let slot = 1; slot <= SAVE_SLOT_COUNT; slot++) {
+            if (localStorage.getItem(`storyline_seen_slot${slot}_companion_scene_${sceneId}`) !== '1') continue;
+            const raw = loadRawSaveFromSlot(slot);
+            if (raw && raw.playerCharacter === heroId) return true;
+        }
+    } catch (e) { /* storage unavailable */ }
+    return false;
 }
 
 // isReplayEntryUnlocked - replayable when flagged globalUnlock (always

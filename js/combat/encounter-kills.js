@@ -112,6 +112,10 @@ export function _killMonster(monsterId) {
 
     _updateTargetAfterKill();
 
+    // Lifetime tally of this save for the save-slot tooltip (the achievement counters below are
+    // shared by every save).
+    if (dying) globalThis._incDirect(dying.isBoss ? 'bossesSlain' : 'monstersSlain');
+
     // Character banter: kill / kill-streak / boss-down quips.
     if (dying && typeof globalThis.triggerKillBanter === 'function') globalThis.triggerKillBanter(!!dying.isBoss);
 

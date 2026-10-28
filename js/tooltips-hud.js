@@ -6,7 +6,10 @@ import { _egMapModAffects } from './loot/loot-map-mod-tables.js';
 import { _egResolveMapBoss } from './loot/loot-map-implicit-parts.js';
 import { _buildMergedModLines } from './combat/combat-player-stats.js';
 import { _isActive } from './combat/combat-state.js';
-import { ALL, lvText } from './levels/levels.js';
+import { lvText } from './levels/levels.js';
+import { WORLDS } from './levels/level-world-data.js';
+import { getStoryProgress } from './storyline/companion-scenes.js';
+import { QUEST_ITEMS } from './storyline/quest-items.js';
 import { ptHasSkill } from './probability-tree/probability-tree-state-points.js';
 import { _getAsymptoticMasteryReduction, _getPenaltySecondsAtCount } from './penalty.js';
 import { RESHUFFLE_GOAL } from './puzzle-item-inventory/puzzle-item-reshuffle.js';
@@ -582,47 +585,80 @@ function _pctOf(part, total) {
     return `${Math.round((part / total) * 100)}%`;
 }
 
-// Builds the lifetime-stats tooltip for a save-slot card.
-// `summary` comes from getSlotSummary() in state.js.
-export function _buildSaveSlotTooltipHTML(summary) {
-    const totalLevels = (typeof ALL !== 'undefined' && ALL.length) ? ALL.length : 0;
+// Number of campaign levels (every world, the Nexus included). ALL itself cannot be used for
+// this: the combat code appends generated puzzle levels to it while a session runs.
+function _campaignLevelCount() {
+    return WORLDS.reduce((n, w) => n + w.data.length, 0);
+}
 
+// Highest atlas map tier a save has completed, read from the slot's own save.
+function _highestCompletedMapTier(egAtlasCompleted) {
+    let highestTier = 0;
+    const lookup = globalThis.egAtlasNodeById;
+    if (typeof lookup === 'function' && egAtlasCompleted) {
+        for (const id in egAtlasCompleted) {
+            const node = egAtlasCompleted[id] ? lookup(id) : null;
+            if (node && node.tier > highestTier) highestTier = node.tier;
+        }
+    }
+    return highestTier;
+}
+
+// One "label value" line of the tooltip.
+function _statLine(labelKey, value) {
+    return `<br>${t(labelKey)} <b>${value}</b>`;
+}
+
+// A small heading that starts a group of lines.
+function _statGroup(labelKey) {
+    return `<br><span style="opacity:.7">${t(labelKey)}</span>`;
+}
+
+// Builds the lifetime-stats tooltip for a save-slot card.
+// `summary` comes from getSlotSummary() in state.js. Everything shown belongs to that one
+// save (it lives in the slot's own save data or its seen-marks), so deleting the slot resets it.
+export function _buildSaveSlotTooltipHTML(summary) {
+    const totalLevels = _campaignLevelCount();
+    const trialTotal = typeof globalThis._trialCount === 'function' ? globalThis._trialCount() : 0;
     const upgradesAchieved =
         (summary.classPassiveLevel - 1) +
         (summary.classActive1Level - 1) +
         (summary.classActive2Level - 1) +
         (summary.ascendencySkill1Level - 1) +
         (summary.ascendencySkill2Level - 1);
-
-    const pctLevels = _pctOf(summary.levelsDone, totalLevels);
-    const pctBonus = _pctOf(summary.bonusDone.length, totalLevels);
-    const pctHardAllMods = _pctOf(_countHardAllModsClears(summary.levelHS), totalLevels);
+    const story = getStoryProgress(summary.slot, summary.playerCharacter);
 
     let html = `<strong>${t('cg_slot_stats').replace('{n}', summary.slot)}</strong>`;
-    html += `<br>${t('cg_stat_revealed')} <b>${summary.lifetimeTilesRevealed}</b>`;
-    html += `<br>${t('cg_stat_filled')} <b>${summary.lifetimeTilesFilled}</b>`;
-    html += `<br>${t('cg_stat_mistakes')} <b>${summary.lifetimeMistakesMade}</b>`;
-    html += `<br>${t('cg_stat_questions')} <b>${summary.questionsCorrect}</b>`;
-    html += `<br>${t('cg_stat_items_used')} <b>${summary.itemsUsedTotal}</b>`;
-    html += `<br>${t('cg_stat_abilities')} <b>${summary.classAbilitiesUsed}</b>`;
-    html += `<br>${t('cg_stat_passive_pts')} <b>${summary.passivePointsObtained}</b>`;
-    html += `<br>${t('cg_stat_inference')} <b>${summary.questsClaimedCount}</b>`;
-    html += `<br>${t('cg_stat_upgrades')} <b>${upgradesAchieved}</b>`;
-    html += `<br>${t('cg_stat_playtime')} <b>${_fmtPlaytime(summary.totalTimePlayedSecs)}</b>`;
-    html += `<br>${t('cg_stat_trials')} <b>${summary.trialsDoneCount || 0}</b>`;
-    // Highest atlas tier with a completed map, read from this slot's own save.
-    let highestTier = 0;
-    const lookup = globalThis.egAtlasNodeById;
-    if (typeof lookup === 'function' && summary.egAtlasCompleted) {
-        for (const id in summary.egAtlasCompleted) {
-            const node = summary.egAtlasCompleted[id] ? lookup(id) : null;
-            if (node && node.tier > highestTier) highestTier = node.tier;
-        }
-    }
-    html += `<br>${t('cg_stat_max_map_tier')} <b>${highestTier}</b>`;
+    html += _statLine('cg_stat_playtime', _fmtPlaytime(summary.totalTimePlayedSecs));
+    html += _statLine('cg_stat_level', summary.playerLevel);
+
+    html += _statGroup('cg_group_puzzles');
+    html += _statLine('cg_stat_revealed', summary.lifetimeTilesRevealed);
+    html += _statLine('cg_stat_filled', summary.lifetimeTilesFilled);
+    html += _statLine('cg_stat_mistakes', summary.lifetimeMistakesMade);
+    html += _statLine('cg_stat_flawless', summary.flawlessLevels);
+    html += _statLine('cg_stat_questions', summary.questionsCorrect);
+    html += _statLine('cg_stat_items_used', summary.itemsUsedTotal);
+
+    html += _statGroup('cg_group_combat');
+    html += _statLine('cg_stat_monsters', summary.monstersSlain);
+    html += _statLine('cg_stat_bosses', summary.bossesSlain);
+    html += _statLine('cg_stat_abilities', summary.classAbilitiesUsed);
+    html += _statLine('cg_stat_upgrades', upgradesAchieved);
+    html += _statLine('cg_stat_passive_pts', summary.passivePointsObtained);
+
+    html += _statGroup('cg_group_journey');
+    html += _statLine('cg_stat_story', `${story.watched} / ${story.total}`);
+    html += _statLine('cg_stat_quest_items', `${summary.questItemsCount} / ${QUEST_ITEMS.length}`);
+    html += _statLine('cg_stat_worlds', `${summary.ascensionTrialsDoneCount} / ${trialTotal}`);
+    html += _statLine('cg_stat_trials', `${summary.trialsDoneCount || 0} / ${trialTotal}`);
+    html += _statLine('cg_stat_inference', summary.questsClaimedCount);
+    html += _statLine('cg_stat_max_map_tier', _highestCompletedMapTier(summary.egAtlasCompleted));
+    html += _statLine('cg_stat_maps', summary.atlasMapsCompleted);
+
     html += `<br><br><span style="opacity:.7">${t('cg_completion')}</span>`;
-    html += `<br>&nbsp;&nbsp;${t('cg_comp_levels')} <b>${pctLevels}</b>`;
-    html += `<br>&nbsp;&nbsp;${t('cg_comp_bonus')} <b>${pctBonus}</b>`;
-    html += `<br>&nbsp;&nbsp;${t('cg_comp_hard_mods')} <b>${pctHardAllMods}</b>`;
+    html += `<br>&nbsp;&nbsp;${t('cg_comp_levels')} <b>${_pctOf(summary.levelsDone, totalLevels)}</b>`;
+    html += `<br>&nbsp;&nbsp;${t('cg_comp_bonus')} <b>${_pctOf(summary.bonusDone.length, totalLevels)}</b>`;
+    html += `<br>&nbsp;&nbsp;${t('cg_comp_hard_mods')} <b>${_pctOf(_countHardAllModsClears(summary.levelHS), totalLevels)}</b>`;
     return html;
 }
