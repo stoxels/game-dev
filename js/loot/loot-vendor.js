@@ -58,6 +58,7 @@ function _vendorBuildTopbarHTML() {
 <div class="egn-topbar">
     <button class="back-btn" onclick="goToPreviousScreen()">${t('btn_back')}</button>
     <span class="egn-topbar-title">${t('eg_vendor_title')}</span>
+    <div class="sx-vendor-gold-balance" id="sx-vendor-gold-balance"></div>
 </div>`;
 }
 
@@ -71,17 +72,18 @@ function _vendorBuildTabBarHTML() {
 }
 
 // Assembles the full vendor layout:
-// topbar → gold balance → tab bar → tab content → hint text.
+// topbar (with the gold balance) → category list + shelves → hint text → search.
 function _vendorBuildFullScreenHTML() {
     return `
 <div class="egn-hub-layout sx-vendor-layout">
     ${_vendorBuildTopbarHTML()}
     <div class="sx-vendor-body">
-        <div class="sx-vendor-gold-balance" id="sx-vendor-gold-balance"></div>
-        <div class="sx-vendor-search-row"><input type="search" id="sx-vendor-search" class="sx-vendor-search" autocomplete="off" spellcheck="false" placeholder="${t('eg_vendor_search_ph')}"></div>
-        ${_vendorBuildTabBarHTML()}
-        <div class="sx-vendor-tab-content" id="sx-vendor-tab-content"></div>
+        <div class="sx-vendor-main">
+            ${_vendorBuildTabBarHTML()}
+            <div class="sx-vendor-tab-content" id="sx-vendor-tab-content"></div>
+        </div>
         <div class="sx-vendor-hint" id="sx-vendor-hint"></div>
+        <div class="sx-vendor-search-row"><input type="search" id="sx-vendor-search" class="sx-vendor-search" autocomplete="off" spellcheck="false" placeholder="${t('eg_vendor_search_ph')}"></div>
     </div>
 </div>`;
 }

@@ -2129,7 +2129,7 @@ function _wdShowAscensionTooltip(e, wi, isDone, isLocked) {
             if (def) bossName = ' · ' + (def.emoji ? def.emoji + ' ' : '') + (def.name || '');
         } catch (err) { /* boss preview is optional */ }
         const lvlLabel = t('scr_trial_level');
-        detail = `<div class="wd-tip-sub">${(lvlLabel && lvlLabel !== 'scr_trial_level' ? lvlLabel : 'Monster level')}: ${ml}${bossName}</div>`;
+        detail = `<div class="mv-tooltip-sub">${(lvlLabel && lvlLabel !== 'scr_trial_level' ? lvlLabel : 'Monster level')}: ${ml}${bossName}</div>`;
     }
     let hint = '';
     if (!isLocked && !isDone) {
@@ -2137,8 +2137,8 @@ function _wdShowAscensionTooltip(e, wi, isDone, isLocked) {
         hint = `<div class="wd-tip-bonus">${(rawAsc && rawAsc !== 'scr_ascension_trial_hint') ? rawAsc : '⚗️ Trial chain - ends in a boss fight'}</div>`;
     }
     const badge = t('scr_ascension_badge');
-    tip.innerHTML = `<div class="wd-tip-title">${(badge && badge.indexOf('scr_') !== 0 ? badge + ' · ' : '⚗️ ')}${name}</div>`
-        + `<div class="wd-tip-status">${status}</div>${detail}${hint}`;
+    tip.innerHTML = `<div class="wd-tip-header"><span class="mv-tooltip-title">${(badge && badge.indexOf('scr_') !== 0 ? badge + ' · ' : '⚗️ ')}${name}</span></div>`
+        + `<div class="mv-tooltip-sub">${status}</div>${detail}${hint}`;
     tip.classList.add('show');
     _wdMoveTooltip(e);
 }
@@ -2272,7 +2272,7 @@ function _wdShowTrialTooltip(e, wi, isDone, isLocked) {
             }
         } catch (err) {}
         const lvlLabel = (typeof t === 'function' ? t('scr_trial_level') : null);
-        detail = `<div class="wd-tip-sub">${(lvlLabel && lvlLabel !== 'scr_trial_level' ? lvlLabel : 'Monster level')}: ${ml}${bossName}</div>`;
+        detail = `<div class="mv-tooltip-sub">${(lvlLabel && lvlLabel !== 'scr_trial_level' ? lvlLabel : 'Monster level')}: ${ml}${bossName}</div>`;
     }
     let reward = '';
     if (!isLocked && !isDone) {
@@ -2280,8 +2280,8 @@ function _wdShowTrialTooltip(e, wi, isDone, isLocked) {
         reward = `<div class="wd-tip-bonus">${(rw && rw !== 'scr_trial_reward' ? rw : '🌿 First clear: +1 passive point')}</div>`;
     }
     const badge = (typeof t === 'function' ? t('scr_convergence_badge') : null);
-    tip.innerHTML = `<div class="wd-tip-title">${(badge && badge.indexOf('scr_') !== 0 ? badge + ' · ' : '🌿 ')}${name}</div>`
-        + `<div class="wd-tip-status">${status}</div>${detail}${reward}`;
+    tip.innerHTML = `<div class="wd-tip-header"><span class="mv-tooltip-title">${(badge && badge.indexOf('scr_') !== 0 ? badge + ' · ' : '🌿 ')}${name}</span></div>`
+        + `<div class="mv-tooltip-sub">${status}</div>${detail}${reward}`;
     // The tooltip is opacity-driven via .mv-tooltip.show - use the class,
     // NOT an inline display style, or the tip stays invisible (opacity 0).
     tip.classList.add('show');

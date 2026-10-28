@@ -205,3 +205,83 @@
 }
 .cmp-ask-yes { background: #2f5f9a !important; border-color: #6fb0ff !important; }
 .cmp-ask-buttons button:hover { filter: brightness(1.25); }
+
+/* ---------- readability pass: story bubbles in the UI serif, name on a dark tag ---------- */
+.cmp-bubble {
+    font-family: var(--PX, serif);
+    font-weight: 600;
+    font-size: clamp(16px, 1.9vw, 23px);
+    line-height: 1.42;
+    padding: 16px 22px;
+    color: #17110a;
+}
+.cmp-name {
+    display: inline-block;
+    font-family: var(--C, serif);
+    font-weight: 700;
+    font-size: 0.74em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding: 2px 12px;
+    border-radius: 4px;
+    background: #16131b;
+    border: 1px solid var(--cmp-color, #888);
+    filter: none;
+}
+.cmp-hint { font-family: var(--PX, serif); font-size: 15px; }
+
+/* Question / result dialogs (story catch-up, co-op intro and result): rune-stone frame, title plaque, stone buttons */
+.cmp-ask { background: radial-gradient(ellipse at center, rgba(8, 10, 22, 0.7), rgba(0, 0, 0, 0.9)); }
+.cmp-ask-box {
+    position: relative;
+    box-sizing: border-box;
+    width: min(640px, 94vw);
+    max-width: none;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 26px 14px 20px;
+    background: transparent;
+    border: 46px solid transparent;
+    border-image: url('../images/Settings/settings_background.webp') 46 fill / 46px stretch;
+    box-shadow: none;
+    filter: drop-shadow(0 12px 34px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 22px rgba(140, 90, 220, 0.3));
+    font-family: var(--PX, serif);
+    color: #f1e8cf;
+}
+.cmp-ask-title {
+    box-sizing: border-box;
+    width: min(560px, 104%);
+    min-height: 62px;
+    margin: -86px auto 14px;
+    padding: 6px 12%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: url('../images/Settings/settings_title_plague.webp') center / 100% 100% no-repeat;
+    font-family: var(--C, serif);
+    font-weight: 700;
+    font-size: clamp(15px, 1.7vw, 21px);
+    letter-spacing: 0.1em;
+    text-align: center;
+    color: #ffe9a8;
+    text-shadow: 0 2px 3px #000;
+}
+.cmp-ask-text { font-size: clamp(17px, 1.7vw, 21px); line-height: 1.5; margin-bottom: 18px; color: #f1e8cf; }
+.cmp-ask-buttons { gap: 14px; flex-wrap: wrap; }
+.cmp-ask-buttons button {
+    font-family: var(--C, serif);
+    font-weight: 700;
+    font-size: clamp(15px, 1.5vw, 18px);
+    letter-spacing: 0.06em;
+    padding: 15px 34px;
+    border: none;
+    background: url('../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
+    color: #eadfc0;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
+}
+.cmp-ask-yes { color: #ffe9a8 !important; background: url('../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent !important; filter: drop-shadow(0 0 8px rgba(255, 190, 70, 0.6)); }
+.cmp-ask-buttons button:hover { filter: brightness(1.25) drop-shadow(0 0 8px rgba(255, 190, 70, 0.6)); }
+.cmp-ask-text .coop-note { display: block; margin-top: 10px; font-size: 0.85em; opacity: 0.85; }
+.cmp-ask-box { overflow: visible; max-height: none; }
+.cmp-ask { overflow-y: auto; padding: 100px 0 30px; box-sizing: border-box; }

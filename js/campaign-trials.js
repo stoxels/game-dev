@@ -251,24 +251,24 @@ function _trialIntroText() {
         convergence: de ? 'Konvergenz-Prüfung' : 'Convergence Trial',
         ascension: de ? 'Aufstiegs-Prüfung' : 'Ascension Trial',
         lead: de
-            ? 'Das ist KEIN normales Rätsel. Eine Prüfung ist ein kurzer Lauf aus mehreren verbundenen Etappen, der mit einem Bosskampf endet.'
-            : 'This is NOT a normal puzzle level. A trial is a short run through several connected stages that ends in a boss fight.',
-        puzzles: (n) => (de ? `Löse ${n} Rätsel nacheinander.` : `Solve ${n} puzzles, one after another.`),
+            ? 'Eine Prüfung ist ein kurzer Lauf aus verbundenen Etappen, der mit einem Bosskampf endet.'
+            : 'A trial is a short run of linked stages that ends in a boss fight.',
+        puzzles: (n) => (de ? `Löse ${n} Rätsel hintereinander.` : `Solve ${n} puzzles in a row.`),
         questions: (n) => (de
-            ? `Beantworte ${n} Quizfragen zu dieser Welt zwischen den Rätseln.`
-            : `Answer ${n} quiz question${n === 1 ? '' : 's'} about this world between the puzzles.`),
+            ? `Beantworte dazwischen ${n} Quizfrage${n === 1 ? '' : 'n'}.`
+            : `Answer ${n} quiz question${n === 1 ? '' : 's'} in between.`),
         monsters: (max, total, lvl) => (de
-            ? `Monster greifen währenddessen an (bis zu ${max} gleichzeitig, insgesamt ${total}, Stufe ${lvl}). Besiege sie mit Projektilen, Zaubern und Nahkampf.`
-            : `Monsters attack while you work (up to ${max} at once, ${total} in total, level ${lvl}). Beat them with grid projectiles, spells and melee.`),
-        boss: (name) => (de ? `Besiege am Ende den Boss: ${name}.` : `Defeat the boss at the end: ${name}.`),
-        finish: de ? 'Danach „Prüfung beenden“ wählen, um die Belohnung zu erhalten.' : 'Then choose "Finish Trial" to claim your reward.',
+            ? `Monster greifen an, während du spielst (bis zu ${max} gleichzeitig, ${total} insgesamt, Stufe ${lvl}).`
+            : `Monsters attack as you play (up to ${max} at once, ${total} in total, level ${lvl}).`),
+        boss: (name) => (de ? `Besiege den Boss: ${name}.` : `Defeat the boss: ${name}.`),
+        finish: de ? 'Wähle danach „Prüfung beenden“, um die Belohnung zu erhalten.' : 'Then press "Finish Trial" to claim your reward.',
         rules: (min, mistakes) => (de
-            ? `⏱ Zeitlimit ${min} Min · ✖ höchstens ${mistakes} Fehler · stirbst du, endet der Lauf (du kannst es jederzeit erneut versuchen).`
-            : `⏱ ${min} min time limit · ✖ at most ${mistakes} mistakes · if you fail the run ends (you can retry any time).`),
-        rewardConv: de ? 'Belohnung (erster Abschluss): +1 Talentpunkt und Erfahrung.' : 'Reward (first clear): +1 passive point and XP.',
+            ? `⏱ ${min} Min · ✖ max. ${mistakes} Fehler · bei Scheitern endet der Lauf (jederzeit wiederholbar).`
+            : `⏱ ${min} min · ✖ max ${mistakes} mistakes · if you fail, the run ends (retry any time).`),
+        rewardConv: de ? 'Erster Abschluss: +1 Talentpunkt und Erfahrung.' : 'First clear: +1 passive point and XP.',
         rewardAsc: de
-            ? 'Belohnung (erster Abschluss): Kodex der Vollendung, Weltabschluss-Boni und Klassenereignis.'
-            : 'Reward (first clear): Codex of Completion, world-completion rewards and the class event.',
+            ? 'Erster Abschluss: Kodex der Vollendung, Weltbelohnungen und Klassenereignis.'
+            : 'First clear: Codex of Completion, world rewards and the class event.',
         begin: de ? 'PRÜFUNG BEGINNEN' : 'BEGIN TRIAL',
         back: de ? 'Zurück' : 'Back',
         monsterless: de ? 'Monsterlos: nur Rätsel und Fragen, kein Boss.' : 'Monsterless: puzzles and questions only, no boss.',

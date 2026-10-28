@@ -1342,3 +1342,24 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     pointer-events: auto;
     cursor: help;
 }
+
+/* readability pass: banter bubbles use the UI serif at a readable size */
+.char-speech-bubble {
+    max-width: clamp(220px, 28vw, 340px);
+    padding: 10px 16px;
+    font-family: var(--PX, serif);
+    font-weight: 600;
+    font-size: clamp(15px, 1.35vw, 18px);
+    line-height: 1.38;
+}
+/* a friend's name sits on a dark tag, so any name colour (yellow, green...) stays readable on the white bubble */
+.companion-bubble .char-speech-bubble-text b {
+    display: inline-block;
+    margin-bottom: 4px;
+    padding: 1px 10px;
+    border-radius: 4px;
+    background: #16131b;
+    font-family: var(--C, serif);
+    font-size: 0.9em;
+    letter-spacing: 0.08em;
+}

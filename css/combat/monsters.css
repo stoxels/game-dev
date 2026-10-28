@@ -3706,3 +3706,12 @@ body:has(#screen-game.active) #sx-xp-bar { display: block; }
     from { transform: scale(0.6); }
     to { transform: scale(1); }
 }
+
+/* Status chips above a monster: always drawn on top of the card art. On boss cards the (scaled-up) art and
+   crown used to cover the second row of chips, so ignite/chill/etc. were hard to see. */
+.sx-status-strip { position: relative; z-index: 9; margin-bottom: 4px; }
+.sx-boss-card .sx-status-strip { margin-bottom: 8px; }
+.sx-status-icon { font-weight: 700; text-shadow: 0 1px 2px #000; }
+
+/* The old chip row under the grid (block cooldown, bleed, poison...) is replaced by the labels above the hero. */
+#sx-player-status-bar { display: none !important; }

@@ -425,3 +425,18 @@
     padding: 10px 12px;
     margin-bottom: 0;
 }
+
+/* ── readability pass: display font, larger text on every part of the game menu ── */
+#pause-overlay #pause-label { font-family: var(--C, serif); font-weight: 700; font-size: 20px; letter-spacing: 0.18em; }
+#pause-overlay .pause-stat-label { font-family: var(--C, serif); font-weight: 700; font-size: 13px; letter-spacing: 0.16em; color: #d6c99f; }
+#pause-overlay .pause-stat .gtb-lvl,
+#pause-overlay .pause-stat-value { font-family: var(--C, serif); font-weight: 700; font-size: 26px; }
+#pause-overlay .pause-section,
+#pause-overlay #top-hint { font-size: clamp(15px, 1.4vw, 18px); color: #f1e8cf; }
+#pause-overlay .pause-bonus-label { font-family: var(--C, serif); font-weight: 700; font-size: 14px; letter-spacing: 0.1em; }
+#pause-overlay .pause-bonus-text { font-size: clamp(15px, 1.4vw, 17px); color: #f1e8cf; }
+#pause-overlay .pm-section-label { font-family: var(--C, serif); font-weight: 700; font-size: 14px; letter-spacing: 0.2em; color: #d6c99f; }
+#pause-overlay .pm-btn { font-family: var(--C, serif); font-weight: 700; font-size: 15px; letter-spacing: 0.06em; min-height: 46px; }
+#pause-overlay .pm-ico { font-size: 18px; }
+#pause-overlay .pm-resume { font-size: 18px; min-height: 54px; }
+#pause-overlay #pause-hint { font-family: var(--PX, serif); font-size: 15px; color: rgba(255, 255, 255, 0.6); letter-spacing: 0.04em; }

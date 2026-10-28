@@ -356,8 +356,11 @@
 #screen-world-detail .tb-label {
     display: block;
     max-width: 100%;
-    font-size: clamp(6px, calc((6.6vw - 14px) / 10 - 0.5px), 10px);
-    line-height: 1.1;
+    font-family: var(--C, serif);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    font-size: clamp(8px, calc((6.6vw - 10px) / 7.4), 13px);
+    line-height: 1.15;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: clip;

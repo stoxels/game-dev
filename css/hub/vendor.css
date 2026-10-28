@@ -172,3 +172,112 @@
 /* Long card lists scroll instead of squashing the cards */
 #screen-vendor .sx-vendor-tab-content > * { flex-shrink: 0; }
 #screen-vendor .sx-vendor-card { min-height: min-content; }
+
+/* ==========================================================================
+   Layout pass: gold in the top bar, categories in a left column, filters in a right column that stays put
+   while the cards scroll, search at the bottom.
+   ========================================================================== */
+#screen-vendor .egn-topbar { position: relative; }
+#screen-vendor .egn-topbar .sx-vendor-gold-balance {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 8px 22px;
+    font-family: var(--C, serif);
+    font-weight: 700;
+    font-size: clamp(16px, 1.4vw, 22px);
+    letter-spacing: 0.06em;
+    color: #ffe27a;
+    background: linear-gradient(180deg, #25202b, #16131b);
+    border: 2px solid #b8913a;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+#screen-vendor .egn-topbar-title { font-family: var(--C, serif); font-weight: 700; font-size: clamp(16px, 1.4vw, 22px); }
+
+#screen-vendor .sx-vendor-body { width: min(1560px, 97vw); align-items: stretch; }
+#screen-vendor .sx-vendor-main { display: flex; gap: 16px; align-items: flex-start; width: 100%; }
+#screen-vendor .sx-vendor-main > .sx-vendor-tab-content { flex: 1 1 0; min-width: 0; width: auto; }
+#screen-vendor .sx-vendor-hint { align-self: center; font-size: 15px; }
+#screen-vendor .sx-vendor-search-row { padding-bottom: 4px; }
+#screen-vendor .sx-vendor-search { width: min(560px, 92%); font-family: var(--PX, serif); font-size: 17px; }
+
+/* categories: one stone button under the other, on the left */
+#screen-vendor .sx-vendor-tab-bar { flex: 0 0 clamp(190px, 17vw, 250px); flex-direction: column; flex-wrap: nowrap; gap: 8px; justify-content: flex-start; }
+#screen-vendor .sx-vendor-tab-btn {
+    width: 100%;
+    font-family: var(--C, serif);
+    font-weight: 700;
+    font-size: clamp(15px, 1.25vw, 19px);
+    letter-spacing: 0.05em;
+    padding: 18px 14px;
+}
+
+/* shelves: cards on the left, the filter chips as a sticky column on the right */
+#screen-vendor .sx-vendor-tab-content:has(.sx-vendor-charm-filters):not(.sx-vendor-searching) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(170px, 14vw, 210px);
+    column-gap: 14px;
+    align-items: start;
+    align-content: start;
+}
+#screen-vendor .sx-vendor-tab-content:not(.sx-vendor-searching) > .sx-vendor-cards { grid-column: 1; grid-row: 1; }
+#screen-vendor .sx-vendor-tab-content:not(.sx-vendor-searching) > .sx-vendor-charm-filters {
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    top: 0;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 6px;
+    margin: 0;
+}
+#screen-vendor .sx-vendor-filter-btn {
+    font-family: var(--C, serif);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    padding: 9px 12px;
+    text-align: center;
+}
+
+/* base items: list on the left, filter column on the right */
+#screen-vendor .sx-vendor-base-wrap { display: grid; grid-template-columns: minmax(0, 1fr) clamp(170px, 14vw, 210px); column-gap: 14px; align-items: start; }
+#screen-vendor .sx-vendor-base-wrap .sx-vendor-base-list { grid-column: 1; grid-row: 1; max-height: 50vh; }
+#screen-vendor .sx-vendor-base-controls {
+    grid-column: 2;
+    grid-row: 1;
+    position: static;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 0 4px 0 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+}
+#screen-vendor .sx-vendor-filter-group { display: flex; flex-direction: column; gap: 6px; }
+#screen-vendor .sx-vendor-filter-title { font-family: var(--C, serif); font-weight: 700; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; color: #d6c99f; text-align: center; padding-bottom: 2px; border-bottom: 1px solid rgba(214, 201, 159, 0.35); }
+#screen-vendor .sx-vendor-filter-chips { display: flex; flex-direction: column; gap: 6px; }
+
+/* readable card text */
+#screen-vendor .sx-vendor-card-name { font-family: var(--C, serif); font-weight: 700; font-size: 18px; }
+#screen-vendor .sx-vendor-card-sub { font-size: 14px; }
+#screen-vendor .sx-vendor-card-desc { font-size: 15px; }
+#screen-vendor .sx-vendor-buy-btn { font-family: var(--C, serif); font-weight: 700; font-size: 15px; }
+#screen-vendor .sx-vendor-charm-rank { font-size: 14px; }
+#screen-vendor .sx-vendor-charm-rank small { font-size: 12px; }
+#screen-vendor .sx-vendor-tab-content,
+#screen-vendor .sx-vendor-base-wrap { max-height: calc(100vh - 330px); }
+#screen-vendor .sx-vendor-base-wrap .sx-vendor-base-list,
+#screen-vendor .sx-vendor-base-controls { max-height: calc(100vh - 380px); }
+#screen-vendor .sx-vendor-tab-content:not(.sx-vendor-searching) > .sx-vendor-charm-filters { max-height: calc(100vh - 380px); overflow-y: auto; scrollbar-width: thin; }
+#screen-vendor .sx-vendor-charm-filters .sx-vendor-filter-btn,
+#screen-vendor .sx-vendor-filter-chips .sx-vendor-filter-btn { padding: 6px 10px; font-size: 14px; }

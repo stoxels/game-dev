@@ -713,3 +713,26 @@
     font-size: 12.5px;
     color: #cfc8e0;
 }
+
+/* ── readability pass: Trial / Ascension / Map complete screen ── */
+.sx-leave-map-title { font-size: min(clamp(18px, 2.2vw, 30px), 4.2vh); letter-spacing: 0.14em; }
+.sx-leave-map-name { font-size: clamp(18px, 2.2vw, 26px); }
+.sx-leave-map-subline,
+.sx-leave-map-keep-hint,
+.sx-leave-map-first-clear { font-family: var(--PX, serif); font-size: clamp(15px, 1.6vw, 19px); padding: 8px 16px; }
+.sx-leave-summary-title { font-size: clamp(14px, 1.5vw, 18px); }
+.sx-leave-summary-empty { font-family: var(--PX, serif); font-size: 16px; }
+.sx-leave-summary-hint { font-size: 15px; }
+.sx-leave-summary-chip { width: 52px; height: 52px; }
+.sx-leave-summary-count { font-family: var(--C, serif); font-size: 15px; }
+.sx-leave-map-return-btn { font-family: var(--C, serif); font-weight: 700; font-size: clamp(15px, 1.5vw, 19px); letter-spacing: 0.06em; }
+.rs-panel { font-size: 15px; }
+.rs-title { font-size: 19px; }
+.rs-section-head { font-size: 15px; }
+.rs-stat-val { font-size: 26px; }
+.rs-stat-label { font-size: 14px; }
+.rs-stat-sub { font-size: 14px; }
+.rs-kind-name, .rs-src-name { font-size: 15px; }
+.rs-src-val, .rs-kind-sub, .rs-pill { font-size: 14px; }
+.rs-hist-axis, .rs-hist-cap { font-size: 13px; }
+.rs-log-row { font-size: 15px; }

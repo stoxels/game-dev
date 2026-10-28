@@ -74,18 +74,18 @@ export function buildAffinityGainCard(friendId, fromPoints, toPoints) {
     const look = COMPANION_LOOKS[friendId].base;
     const level = _levelAt(fromPoints);
     const card = document.createElement('div');
-    card.style.cssText = `margin: 14px 0 6px; display: flex; align-items: center; gap: 12px; text-align: left; --c: ${color};`;
+    card.style.cssText = `margin: 12px 0 18px; padding: 12px 16px; display: flex; align-items: center; gap: 16px; text-align: left; background: rgba(0,0,0,.35); border: 1px solid rgba(214,201,159,.35); border-radius: 8px; --c: ${color};`;
     card.innerHTML = `
-        <img src="animations/${cap}/idle/${look}/down/${cap}_${look}_idle_down_1.webp" alt="" draggable="false" style="width:64px;height:64px;object-fit:contain;flex:none;">
+        <img src="animations/${cap}/idle/${look}/down/${cap}_${look}_idle_down_1.webp" alt="" draggable="false" style="width:84px;height:84px;object-fit:contain;flex:none;">
         <div style="flex:1;min-width:0;">
-            <div style="color:${color};font-weight:700;">${_tr(`Affinity with ${name}`, `Verbundenheit zu ${name}`)}
-                <span class="tg-level" style="opacity:.85;font-weight:400;margin-left:8px;">${_tr(`Level ${level}`, `Stufe ${level}`)}</span>
-                <span class="tg-flash" style="opacity:0;transition:opacity .4s;color:#ffd93d;margin-left:8px;">${_tr('Level up!', 'Stufe gestiegen!')}</span>
+            <div style="color:${color};font-family:var(--C,serif);font-weight:700;font-size:19px;letter-spacing:.03em;">${_tr(`Affinity with ${name}`, `Verbundenheit zu ${name}`)}
+                <span class="tg-level" style="color:#f1e8cf;opacity:.95;font-weight:700;margin-left:10px;">${_tr(`Level ${level}`, `Stufe ${level}`)}</span>
+                <span class="tg-flash" style="opacity:0;transition:opacity .4s;color:#ffd93d;margin-left:10px;">${_tr('Level up!', 'Stufe gestiegen!')}</span>
             </div>
-            <div class="tg-bar" style="height:10px;background:#2a2a48;border-radius:5px;margin:6px 0 2px;overflow:hidden;">
+            <div class="tg-bar" style="height:16px;background:#1b1b30;border:1px solid rgba(255,255,255,.2);border-radius:8px;margin:8px 0 6px;overflow:hidden;">
                 <i style="display:block;height:100%;width:0%;background:${color};transition:width 1.1s ease-out;"></i>
             </div>
-            <div style="opacity:.75;font-size:12px;">${_tr(`+${toPoints - fromPoints} affinity points (${toPoints} in all)`, `+${toPoints - fromPoints} Verbundenheitspunkte (insgesamt ${toPoints})`)}</div>
+            <div style="color:#e9e2cf;font-size:16px;">${_tr(`+${toPoints - fromPoints} affinity points (${toPoints} in all)`, `+${toPoints - fromPoints} Verbundenheitspunkte (insgesamt ${toPoints})`)}</div>
         </div>`;
     // The fill waits a beat so the player sees the bar before it moves.
     setTimeout(() => _animate(card, fromPoints, toPoints), 50);

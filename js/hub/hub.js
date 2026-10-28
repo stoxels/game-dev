@@ -296,11 +296,6 @@ export function _buildStashPanelHTML() {
         </div>
         <div id="sx-stash-info" class="sx-stash-info" aria-live="polite"></div>
         <div class="sx-stash-actions">
-            <button class="sx-stash-btn sx-stash-btn-config" id="sx-toggle-ilvl-btn"
-                     onclick="_toggleItemLevelDisplay()"
-                     onmouseenter="_showItemLevelToggleTooltip(event)"
-                     onmousemove="moveGameTooltip(event)"
-                     onmouseleave="hideGameTooltip()">${t(_showItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</button>
             <button class="sx-stash-btn sx-stash-btn-config" id="sx-loot-filter-btn"
                      onclick="_openLootFilterModal()"
                      onmouseenter="_showLootFilterTooltip(event)"

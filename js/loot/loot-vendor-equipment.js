@@ -163,8 +163,9 @@ function _vendorBuildReqSummaryText(base) {
 export function _vendorSetBaseFilter(value) {
     _vendorBaseFilterSlot = value;
     _vendorBaseFilterWeaponType = 'all';
+    // A defence filter picked earlier must not silently stay on where its chips are hidden.
+    if (!_vendorSlotHasDefences()) _vendorBaseFilterDefense = 'all';
     _vendorRenderBaseListOnly();
-    _vendorRefreshWeaponTypeControl();
 }
 
 // Applies the weapon-type sub-filter (swords, axes, maces, ...).
@@ -176,8 +177,6 @@ export function _vendorSetWeaponTypeFilter(value) {
 // Toggles the "usable only" filter button.
 export function _vendorToggleUsableFilter() {
     _vendorBaseFilterUsable = !_vendorBaseFilterUsable;
-    const btn = document.getElementById('sx-vendor-usable-btn');
-    if (btn) btn.classList.toggle('sx-vendor-filter-btn-on', _vendorBaseFilterUsable);
     _vendorRenderBaseListOnly();
 }
 
@@ -187,23 +186,14 @@ export function _vendorSetDefenseFilter(value) {
     _vendorRenderBaseListOnly();
 }
 
-// Shows/hides the weapon-type dropdown to match the slot filter.
-function _vendorRefreshWeaponTypeControl() {
-    const wrap = document.getElementById('sx-vendor-weapon-type-wrap');
-    if (!wrap) return;
-    wrap.style.display = _vendorBaseFilterSlot === 'weapon' ? '' : 'none';
-    const sel = document.getElementById('sx-vendor-weapon-type-select');
-    if (sel) sel.value = _vendorBaseFilterWeaponType;
-}
-
 // Re-renders only the base item list + filter controls (keeps focus/state).
 export function _vendorRenderBaseListOnly() {
     _vendorHideBaseTooltip(); // hovered card may be replaced by the re-render
     const listEl = document.getElementById('sx-vendor-base-list');
     if (listEl) listEl.innerHTML = _vendorBuildBaseListHTML();
-    // Also refresh the filter dropdown selected state
-    const sel = document.getElementById('sx-vendor-base-filter-select');
-    if (sel) sel.value = _vendorBaseFilterSlot;
+    // Redraw the filter column so the chosen chips and the slot-specific groups match
+    const controls = document.getElementById('sx-vendor-base-controls');
+    if (controls) controls.innerHTML = _vendorBuildBaseControlsInnerHTML();
     _vendorRefreshGoldDisplay();
 }
 
@@ -239,57 +229,48 @@ function _vendorGetFilteredSortedBases() {
     return bases;
 }
 
-// Builds the Base tab's slot-filter dropdown options.
-function _vendorBuildBaseFilterOptionsHTML() {
-    const slotOrder = _vendorGetSlotOrder();
-    const options = [`<option value="all"${_vendorBaseFilterSlot === 'all' ? ' selected' : ''}>${t('eg_vendor_filter_all')}</option>`];
-    slotOrder.forEach(slot => {
-        const selected = _vendorBaseFilterSlot === slot ? ' selected' : '';
-        options.push(`<option value="${slot}"${selected}>${t(`eg_slot_${slot}`)}</option>`);
-    });
-    return options.join('');
+// True when any base in the chosen slot carries a defence stat (armour, evasion, absorption), so the
+// defence filter only shows where it means something (not for weapons, rings, ...).
+function _vendorSlotHasDefences() {
+    return ALL_BASE_TYPES.some(b => !VENDOR_FREE_BASE_IDS.has(b.id)
+        && (_vendorBaseFilterSlot === 'all' || b.slotType === _vendorBaseFilterSlot)
+        && ['armour', 'evasion', 'absorption'].some(k => ((b.defenses || {})[k] || 0) > 0));
 }
 
-// Builds the defence-type dropdown options.
-function _vendorBuildDefenseOptionsHTML() {
-    const options = [`<option value="all"${_vendorBaseFilterDefense === 'all' ? ' selected' : ''}>${t('eg_vendor_defense_all')}</option>`];
-    Object.keys(VENDOR_DEFENSE_TYPES).forEach(key => {
-        const selected = _vendorBaseFilterDefense === key ? ' selected' : '';
-        options.push(`<option value="${key}"${selected}>${t(`eg_vendor_defense_${key}`)}</option>`);
-    });
-    return options.join('');
+// One filter chip of the base-items filter column.
+function _vendorBaseChip(label, on, call) {
+    return `<button type="button" class="sx-vendor-filter-btn${on ? ' sx-vendor-filter-btn-on' : ''}" onclick="${call}">${label}</button>`;
 }
 
-// Builds the weapon-type dropdown options.
-function _vendorBuildWeaponTypeOptionsHTML() {
-    const options = [`<option value="all"${_vendorBaseFilterWeaponType === 'all' ? ' selected' : ''}>${t('eg_vendor_weapon_type_all')}</option>`];
-    VENDOR_WEAPON_TYPES.forEach(wt => {
-        const selected = _vendorBaseFilterWeaponType === wt ? ' selected' : '';
-        options.push(`<option value="${wt}"${selected}>${t(`eg_vendor_weapon_type_${wt}`)}</option>`);
-    });
-    return options.join('');
+// A titled group of chips in the filter column.
+function _vendorBaseChipGroup(title, chips) {
+    return `<div class="sx-vendor-filter-group"><div class="sx-vendor-filter-title">${title}</div><div class="sx-vendor-filter-chips">${chips}</div></div>`;
+}
+
+// Builds the filter column of the base tab: slot, weapon type (weapons only), defence (armour only), usable.
+function _vendorBuildBaseControlsInnerHTML() {
+    const slotChips = [_vendorBaseChip(t('eg_vendor_filter_all'), _vendorBaseFilterSlot === 'all', "_vendorSetBaseFilter('all')")]
+        .concat(_vendorGetSlotOrder().map(slot => _vendorBaseChip(t(`eg_slot_${slot}`), _vendorBaseFilterSlot === slot, `_vendorSetBaseFilter('${slot}')`))).join('');
+    let html = _vendorBaseChipGroup(t('eg_vendor_filter_type'), slotChips);
+    if (_vendorBaseFilterSlot === 'weapon') {
+        const weaponChips = [_vendorBaseChip(t('eg_vendor_weapon_type_all'), _vendorBaseFilterWeaponType === 'all', "_vendorSetWeaponTypeFilter('all')")]
+            .concat(VENDOR_WEAPON_TYPES.map(wt => _vendorBaseChip(t(`eg_vendor_weapon_type_${wt}`), _vendorBaseFilterWeaponType === wt, `_vendorSetWeaponTypeFilter('${wt}')`))).join('');
+        html += _vendorBaseChipGroup(t('eg_vendor_weapon_type'), weaponChips);
+    }
+    if (_vendorSlotHasDefences()) {
+        const defChips = [_vendorBaseChip(t('eg_vendor_defense_all'), _vendorBaseFilterDefense === 'all', "_vendorSetDefenseFilter('all')")]
+            .concat(Object.keys(VENDOR_DEFENSE_TYPES).map(key => _vendorBaseChip(t(`eg_vendor_defense_${key}`), _vendorBaseFilterDefense === key, `_vendorSetDefenseFilter('${key}')`))).join('');
+        html += _vendorBaseChipGroup(t('eg_vendor_defense_type'), defChips);
+    }
+    return html + `<button type="button" id="sx-vendor-usable-btn" class="sx-vendor-filter-btn sx-vendor-usable${_vendorBaseFilterUsable ? ' sx-vendor-filter-btn-on' : ''}" onclick="_vendorToggleUsableFilter()">${t('eg_vendor_usable_only')}</button>`;
 }
 
 // Builds the filterable, non-starter equipment base list.
 export function _vendorBuildBaseTabHTML() {
     return `
 <div class="sx-vendor-base-wrap">
-    <div class="sx-vendor-base-controls">
-        <label class="sx-vendor-base-control-label">
-            <span>${t('eg_vendor_filter_type')}</span>
-            <select id="sx-vendor-base-filter-select" onchange="_vendorSetBaseFilter(this.value)">${_vendorBuildBaseFilterOptionsHTML()}</select>
-        </label>
-        <label class="sx-vendor-base-control-label">
-            <span>${t('eg_vendor_defense_type')}</span>
-            <select id="sx-vendor-defense-select" onchange="_vendorSetDefenseFilter(this.value)">${_vendorBuildDefenseOptionsHTML()}</select>
-        </label>
-        <button type="button" id="sx-vendor-usable-btn" class="sx-vendor-filter-btn${_vendorBaseFilterUsable ? ' sx-vendor-filter-btn-on' : ''}" onclick="_vendorToggleUsableFilter()">${t('eg_vendor_usable_only')}</button>
-        <label class="sx-vendor-base-control-label" id="sx-vendor-weapon-type-wrap"${_vendorBaseFilterSlot === 'weapon' ? '' : ' style="display:none"'}>
-            <span>${t('eg_vendor_weapon_type')}</span>
-            <select id="sx-vendor-weapon-type-select" onchange="_vendorSetWeaponTypeFilter(this.value)">${_vendorBuildWeaponTypeOptionsHTML()}</select>
-        </label>
-    </div>
     <div class="sx-vendor-base-list" id="sx-vendor-base-list">${_vendorBuildBaseListHTML()}</div>
+    <div class="sx-vendor-base-controls" id="sx-vendor-base-controls">${_vendorBuildBaseControlsInnerHTML()}</div>
 </div>`;
 }
 

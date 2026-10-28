@@ -48,6 +48,11 @@ export function _buildTopbarHTML() {
          onchange="globalThis._autoCompare=this.checked;try{localStorage.setItem('stoxels_auto_compare',this.checked?'1':'0')}catch(e){}">
         ${t('eg_auto_compare')}
     </label>
+    <button class="sx-level-btn sx-ilvl-toggle" id="sx-toggle-ilvl-btn"
+         onclick="_toggleItemLevelDisplay()"
+         onmouseenter="_showItemLevelToggleTooltip(event)"
+         onmousemove="moveGameTooltip(event)"
+         onmouseleave="hideGameTooltip()">${t(_showItemLevel ? 'eg_ilvl_mode_item' : 'eg_ilvl_mode_req')}</button>
     <button class="sx-info-btn" id="sx-hub-info-btn" aria-label="Info"
          onmouseenter="_showHubInfoTooltip(event)"
          onmousemove="moveGameTooltip(event)"
@@ -153,7 +158,7 @@ export function _toggleItemLevelDisplay() {
 export function _updateItemLevelToggleButton() {
     const btn = document.getElementById('sx-toggle-ilvl-btn');
     if (btn) {
-        btn.innerHTML = `${t(_showItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}`;
+        btn.innerHTML = `${t(_showItemLevel ? 'eg_ilvl_mode_item' : 'eg_ilvl_mode_req')}`;
     }
 }
 

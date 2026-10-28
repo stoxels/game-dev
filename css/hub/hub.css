@@ -2119,3 +2119,74 @@ img.sx-art-img {
     background: #f3c85a;
     border: 1px solid #5a3a14;
 }
+
+/* ==========================================================================
+   Character & Inventory readability pass
+   ========================================================================== */
+/* top bar: title plaque truly centred, buttons in the display font */
+#screen-hub .sx-topbar { position: relative; }
+#screen-hub .sx-topbar-title {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-50%);
+    align-self: auto;
+    z-index: 2;
+    font-family: var(--C, serif);
+    font-weight: 700;
+    font-size: clamp(14px, 1.25vw, 20px);
+    letter-spacing: 0.12em;
+    padding: 0 clamp(34px, 3.6vw, 64px);
+    pointer-events: none;
+}
+#screen-hub .sx-level-btn,
+#screen-hub .sx-stash-btn {
+    font-family: var(--C, serif);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+#screen-hub .sx-level-btn { font-size: clamp(12px, 0.95vw, 15px); padding: 13px clamp(10px, 1vw, 18px); }
+#screen-hub .sx-stash-btn { font-size: clamp(13px, 1vw, 16px); padding: 12px clamp(14px, 1.3vw, 24px); }
+#screen-hub .sx-stash-tab { font-family: var(--C, serif); font-weight: 700; letter-spacing: 0.05em; }
+#screen-hub .sx-ilvl-toggle { margin-left: auto; color: #ffe9a8; }
+#screen-hub #sx-hub-info-btn { margin-left: 0; }
+
+/* character stats: readable sizes */
+#screen-hub .sx-stats-header { font-family: var(--C, serif); font-weight: 700; font-size: clamp(12px, 0.95vw, 15px); letter-spacing: 0.2em; }
+#screen-hub .sx-stats-category-title { font-family: var(--C, serif); font-weight: 700; font-size: clamp(12px, 0.95vw, 15px); letter-spacing: 0.1em; opacity: 1; }
+#screen-hub .sx-stat-name { font-size: clamp(12px, 0.95vw, 15px); letter-spacing: 0.02em; color: #ddd3b8; white-space: normal; }
+#screen-hub .sx-stat-value { font-size: clamp(12px, 0.95vw, 15px); font-weight: 700; letter-spacing: 0.02em; }
+#screen-hub .sx-stat-row { padding: 3px 4px; }
+#screen-hub .sx-stat-placeholder .sx-stat-name { font-size: clamp(12px, 0.95vw, 15px); opacity: 0.7; }
+#screen-hub .sx-lvl-chip { font-family: var(--C, serif); font-weight: 700; font-size: 15px; }
+#screen-hub .sx-lvl-chip-bar { width: 84px; height: 8px; }
+
+/* stack counts on cores / fragments / essences */
+#screen-hub .sx-stack-badge {
+    font-family: var(--C, serif);
+    font-size: 14px;
+    bottom: 2px;
+    right: 3px;
+    color: #fff3c4;
+    text-shadow: 0 0 3px #000, 0 0 3px #000, 0 1px 4px #000;
+}
+
+/* crafting bench launcher + essence filters */
+#screen-hub .sx-crafting-open-btn { font-family: var(--C, serif); font-weight: 700; font-size: clamp(13px, 1vw, 16px); letter-spacing: 0.08em; padding: 9px 6px; }
+#screen-hub .sx-crafting-slot { font-family: var(--PX, serif); font-size: clamp(13px, 1vw, 15px); letter-spacing: 0.02em; color: #cdbf9a; min-height: 44px; }
+#screen-hub .sx-essence-filter-select { font-size: 14px; }
+#screen-hub .sx-essence-filter-input { font-size: 14px; }
+#screen-hub .sx-essence-filter-input.sx-essence-filter-ilvl { flex: 0 0 64px; width: 64px; }
+#screen-hub .sx-essence-filter-owned { font-size: 14px; }
+
+/* level-chip tooltip tiers */
+.sx-hud-tip .sx-xp-tiers { margin: 6px 0 2px; display: flex; flex-direction: column; gap: 2px; }
+.sx-hud-tip .sx-xp-tier { font-size: 16px; opacity: 1; }
+#screen-hub .sx-essence-filter-row { flex-wrap: wrap; row-gap: 4px; }
+#screen-hub .sx-essence-filter-owned { flex: 0 0 auto; }
+
+/* Level number on item slots (item level / required level): larger and bolder */
+.sx-item-chip .sx-item-ilvl { font-family: var(--C, serif); font-weight: 700; font-size: 14px; left: 2px; top: 1px; color: #fff3c4; text-shadow: 0 0 3px #000, 0 0 3px #000, 0 1px 3px #000; }
+.sx-item-chip-large .sx-item-ilvl { font-size: 18px; }
+#screen-endgame-gate .sx-inv-cell .sx-item-ilvl { font-size: 15px; }

@@ -476,9 +476,10 @@
 }
 
     .setup-btn-img:hover {
-        filter: brightness(1.25) saturate(1.1);
-        transform: translateY(-3px) scale(1.03);
-        box-shadow: 0 0 24px rgba(102,252,241,0.5);
+        /* glow follows the button art (a box-shadow drew a hard rectangle around it) */
+        filter: brightness(1.18) saturate(1.1) drop-shadow(0 0 8px rgba(255, 214, 120, 0.7)) drop-shadow(0 0 18px rgba(255, 190, 80, 0.35));
+        transform: translateY(-2px) scale(1.025);
+        box-shadow: none;
     }
 
     .setup-btn-img:active {
@@ -520,13 +521,21 @@
     pointer-events: none;
 }
 
-/* Score bonus under each tombstone: dark green ink, readable on the parchment page (the old grey-blue
-   faded into it). */
+/* Score bonus under each tombstone: a small dark plate with gold lettering so it reads against the stone. */
 .mod-score-tag {
-    color: #3a2008; /* the same dark ink as the page headings */
+    display: inline-block;
+    margin-top: 6px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #2f2418, #1c140c);
+    border: 1px solid rgba(200, 168, 75, 0.75);
+    color: #ffe6a0;
     opacity: 1;
+    font-family: var(--C);
     font-weight: 700;
-    font-size: 17px;
-    letter-spacing: 0.04em;
-    text-shadow: 0 1px 0 rgba(255, 246, 214, 0.7);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 }

@@ -981,17 +981,11 @@ function _buildLevelBtnTooltipHTML() {
             .replace('{need}', _getXpForNextLevel(lvl).toLocaleString());
     const xpTiers = _buildXpTiersHTML();
 
-    return `
-<div class="sx-tt-frame" style="--tt-border:#c8a84b;">
-    <div class="sx-tt-header">
-        <div class="sx-tt-icon">✦</div>
-        <div class="sx-tt-name" style="color:#f5d98a;">${t('eg_lvl_window_title')}</div>
-    </div>
-    <div class="sx-tt-section">
-        <div class="sx-tt-mod">${t('eg_lvl_short').replace('{n}', lvl)} · ${xpLine}</div>
-    </div>
+    return `<div class="sx-ttl-tip sx-hud-tip">
+    <div class="sx-ttl-tip-title">${t('eg_lvl_window_title').replace(/^\u2726\s*/, '')}</div>
+    <div>${t('eg_lvl_short').replace('{n}', lvl)} \u00b7 ${xpLine}</div>
     ${xpTiers ? `<div class="sx-xp-tiers">${xpTiers}</div>` : ''}
-    <div class="sx-tt-section">${t('eg_lvl_hint')}</div>
+    <div class="sx-ttl-tip-hint">${t('eg_lvl_hint')}</div>
 </div>`;
 }
 

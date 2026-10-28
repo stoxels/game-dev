@@ -441,3 +441,10 @@
     25%  { transform: translate(-50%, -50%) scale(1) translateX(-5px); }
     75%  { transform: translate(-50%, -50%) scale(1) translateX(5px); }
 }
+
+/* ── readability pass: larger numbers and labels, display font on the buttons ── */
+.sx-obj-seg { min-width: clamp(150px, 14vw, 210px); padding: 9px 20px 9px 54px; gap: 9px; }
+.sx-obj-seg-icon { width: 52px; height: 52px; }
+.sx-obj-seg-val { font-size: clamp(20px, 1.9vw, 26px); }
+.sx-obj-seg-label { font-size: clamp(13px, 1.25vw, 16px); letter-spacing: 0.1em; color: #f1ead4; }
+.sx-obj-action-btn { font-family: var(--C, serif); font-weight: 700; font-size: clamp(14px, 1.3vw, 18px); letter-spacing: 0.06em; padding: 14px 34px; }

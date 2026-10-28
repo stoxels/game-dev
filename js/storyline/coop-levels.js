@@ -319,16 +319,18 @@ function _removeMist() {
 // DIALOGS
 //------------------------------------------------------------------------
 
-// A small centred box with a text and buttons, drawn over the game (same look as the story catch-up question).
-// `extra` (optional) is an element shown between the text and the buttons.
-function _showBox(text, buttons, extra) {
+// A framed box with a title plaque, a text and buttons, drawn over the game (same look as the story
+// catch-up question). `extra` (optional) is an element shown between the text and the buttons.
+function _showBox(title, text, buttons, extra) {
     const root = document.createElement('div');
     root.className = 'cmp-ask';
-    root.innerHTML = `<div class="cmp-ask-box"><div class="cmp-ask-text"></div><div class="cmp-ask-buttons"></div></div>`;
+    root.innerHTML = `<div class="cmp-ask-box"><div class="cmp-ask-title"></div><div class="cmp-ask-text"></div><div class="cmp-ask-buttons"></div></div>`;
+    root.querySelector('.cmp-ask-title').textContent = title;
     const textEl = root.querySelector('.cmp-ask-text');
     textEl.textContent = text;
     textEl.style.whiteSpace = 'pre-line';
-    if (extra) textEl.after(extra);
+    if (!text) textEl.remove();
+    if (extra) root.querySelector('.cmp-ask-buttons').before(extra);
     const row = root.querySelector('.cmp-ask-buttons');
     for (const [label, cls, action] of buttons) {
         const b = document.createElement('button');
@@ -347,11 +349,12 @@ function _showResult(friend, firstClear, pointsBefore, pointsAfter, unlockedChar
     const de = LANG === 'de';
     const friendName = COMPANION_CAST[friend].name;
     const affinity = firstClear ? ''
-        : (de ? 'Schon früher geschafft: diesmal gibt es keine weitere Verbundenheit, nur den Spaß.' : 'Done before: no more affinity this time, just for fun.');
+        : (de ? 'Schon geschafft: keine weitere Verbundenheit, nur zum Spaß.' : 'Done before: no more affinity, just for fun.');
     const charm = !unlockedCharm ? ''
-        : (de ? `\nNeues Amulett: Beschwöre ${friendName}. Bindungssteine findest du bei Bestien.` : `\nNew charm: Summon ${friendName}. Tether Stones drop from beasts.`);
-    const text = (de ? `Gemeinsam mit ${friendName} gelöst!\n` : `Solved together with ${friendName}!\n`) + affinity + charm;
-    _showBox(text, [[de ? 'Zurück zur Karte' : 'Back to the map', 'cmp-ask-yes', () => { dismissCompanionBot(); _removeMist(); stopCoopBoss(); goToLevelSelect(); }]],
+        : (de ? `Neues Amulett: Beschwöre ${friendName}. Bindungssteine droppen bei Bestien.` : `New charm: Summon ${friendName}. Tether Stones drop from beasts.`);
+    const title = de ? `Gemeinsam mit ${friendName} gelöst!` : `Solved together with ${friendName}!`;
+    const text = [affinity, charm].filter(Boolean).join('\n');
+    _showBox(title, text, [[de ? 'Zurück zur Karte' : 'Back to the map', 'cmp-ask-yes', () => { dismissCompanionBot(); _removeMist(); stopCoopBoss(); goToLevelSelect(); }]],
         _resultExtras(friend, firstClear, pointsBefore, pointsAfter, friendName, questItem));
 }
 
@@ -372,13 +375,13 @@ function _resultExtras(friend, firstClear, pointsBefore, pointsAfter, friendName
 function _buildRewardCard(friendName, item) {
     const de = LANG === 'de';
     const card = document.createElement('div');
-    card.style.cssText = 'margin: 16px 0 6px; text-align: center;';
-    card.innerHTML = `<div style="opacity:.8; margin-bottom: 8px;">${de ? 'Du hast gefunden:' : 'You found:'}</div>
-        <div class="coop-reward-item" style="display:inline-block; padding:10px 18px; background:#10231b; border:2px solid #7fe0b0; border-radius:6px; cursor:help; box-shadow:0 0 16px rgba(127,224,176,.45);">
-            <div style="font-size:54px; line-height:1.1;">${questIconHtml(item, 72)}</div>
-            <div style="margin-top:6px; font-weight:700; color:#7fe0b0;">${de ? item.nameDE : item.nameEn}</div>
+    card.style.cssText = 'margin: 14px 0 18px; text-align: center;';
+    card.innerHTML = `<div style="font-family:var(--C,serif); font-weight:700; letter-spacing:.14em; text-transform:uppercase; font-size:16px; color:#d6c99f; margin-bottom:10px;">${de ? 'Du hast gefunden' : 'You found'}</div>
+        <div class="coop-reward-item" style="display:inline-block; padding:12px 26px; background:linear-gradient(180deg,#16301f,#0e1d14); border:2px solid #7fe0b0; border-radius:8px; cursor:help; box-shadow:0 0 18px rgba(127,224,176,.45);">
+            <div style="font-size:54px; line-height:1.1;">${questIconHtml(item, 80)}</div>
+            <div style="margin-top:8px; font-family:var(--C,serif); font-weight:700; font-size:21px; color:#9af0c4;">${de ? item.nameDE : item.nameEn}</div>
         </div>
-        <div style="opacity:.7; font-size:12px; margin-top:8px;">${de
+        <div style="color:#cfc6ad; font-size:16px; line-height:1.4; margin-top:12px;">${de
         ? `Du findest ihn im Reiter QUEST deines Inventars. Sprich auf der Karte mit ${friendName} darüber.`
         : `You can find it in the QUEST tab of your inventory. Talk to ${friendName} on the map about it.`}</div>`;
     const tile = card.querySelector('.coop-reward-item');
@@ -405,7 +408,7 @@ export function startCoopEncounter(coopId) {
     const hint = item && !hasQuestItem(STATE.questItems, item.id)
         ? (de ? '\n\nHier wartet ein Gegenstand für eure Geschichte (Reiter QUEST im Inventar).' : '\n\nA story item waits here (see the QUEST tab in your inventory).')
         : '';
-    _showBox(`${coopName(coopId)}\n${intro}${hint}`, [
+    _showBox(coopName(coopId), `${intro}${hint.replace(/^\n\n/, '\n')}`, [
         [de ? 'Beginnen' : 'Begin', 'cmp-ask-yes', () => _doStartLevel(_levelFor(coopId).gIdx)],
         [de ? 'Abbrechen' : 'Cancel', 'cmp-ask-no', () => {}],
     ]);

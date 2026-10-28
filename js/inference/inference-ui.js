@@ -26,6 +26,9 @@ let _ledger_activeGroupId = 'progression'; // Default tab
 /** Currently open category id, or null when showing the grid overview. */
 let _ledger_activeCategoryId = null;
 
+/** List filters: only show things that can be claimed now / hide finished things. */
+const _ledger_filters = { ready: false, hideDone: false };
+
 /**
  * Category icons layered on top of the shared stone-and-parchment card
  * frame (that frame is one shared image set in CSS, .ledger-card-art -
@@ -361,12 +364,10 @@ function _ledger_buildCategoryCard(cat) {
             ? 'ledger-card ledger-card-done'
             : 'ledger-card';
 
-    const notifyDot = hasReady ? `<span class="ledger-card-dot"></span>` : '';
     const iconUrl = _ledger_getCategoryIcon(cat.id);
 
     return `
         <div class="${cardClass}" onclick="_ledger_openCategory('${cat.id}')">
-            ${notifyDot}
             <div class="ledger-card-art">
                 <div class="ledger-card-icon-img" style="background-image:${iconUrl};"></div>
             </div>
@@ -398,6 +399,25 @@ function _ledger_buildGrid(cats) {
 }
 
 /**
+ * Builds the two filter toggles shown above the lists (grid and detail view).
+ * @returns {string} HTML string
+ */
+function _ledger_buildFilterBar() {
+    const chip = (key, label) =>
+        `<button class="ledger-filter-btn${_ledger_filters[key] ? ' on' : ''}" onclick="_ledger_toggleFilter('${key}')">${_ledger_filters[key] ? '✓ ' : ''}${label}</button>`;
+    return `<div class="ledger-filter-bar">${chip('ready', t('qa_filter_ready'))}${chip('hideDone', t('qa_filter_hide_done'))}</div>`;
+}
+
+/**
+ * Turns one list filter on or off and redraws the open view.
+ * @param {string} key - 'ready' or 'hideDone'
+ */
+export function _ledger_toggleFilter(key) {
+    _ledger_filters[key] = !_ledger_filters[key];
+    renderQuestLog();
+}
+
+/**
  * Renders the full grid overview (tabs + summary strip + category grid)
  * into the modal element, for the currently active group tab.
  * @param {HTMLElement} modal
@@ -409,20 +429,13 @@ function _ledger_renderGridView(modal) {
     const tabsHtml = LEDGER_GROUPS.map(g => {
         const isActive = g.id === _ledger_activeGroupId;
         const label = de ? g.labelDE : g.labelEn;
-        const groupHasClaimable = LEDGER_CATEGORIES
-            .filter(c => c.groupId === g.id)
-            .some(c => c.milestones.some(ms => _milestone_isComplete(ms) && !_milestone_isClaimed(ms)));
-        const dot = groupHasClaimable
-            ? `<span class="ledger-tab-dot"></span>`
-            : '';
-        return `<button class="ledger-tab-btn ${isActive ? 'active' : ''}" 
-                    onclick="_ledger_switchGroup('${g.id}')">
-                ${label}${dot}
-            </button>`;
+        return `<button class="ledger-tab-btn ${isActive ? 'active' : ''}" onclick="_ledger_switchGroup('${g.id}')">${label}</button>`;
     }).join('');
 
     // Filter categories to only show the active group
-    const visibleCats = LEDGER_CATEGORIES.filter(c => c.groupId === _ledger_activeGroupId);
+    const visibleCats = LEDGER_CATEGORIES.filter(c => c.groupId === _ledger_activeGroupId)
+        .filter(c => !_ledger_filters.hideDone || !c.milestones.every(ms => _milestone_isClaimed(ms)))
+        .filter(c => !_ledger_filters.ready || c.milestones.some(ms => _milestone_isComplete(ms) && !_milestone_isClaimed(ms)));
 
     // Render the modal
     modal.innerHTML = `
@@ -442,8 +455,10 @@ function _ledger_renderGridView(modal) {
             ${tabsHtml}
         </div>
 
+        ${_ledger_buildFilterBar()}
+
         <div class="ledger-scroll-region">
-            ${_ledger_buildGrid(visibleCats)}
+            ${visibleCats.length ? _ledger_buildGrid(visibleCats) : `<div class="ledger-empty">${t('qa_filter_empty')}</div>`}
         </div>
     </div>`;
     
@@ -594,6 +609,9 @@ function _ledger_renderDetailView(modal) {
     if (!cat) { _ledger_backToGrid(); return; }
 
     const iconUrl = _ledger_getCategoryIcon(cat.id);
+    const rows = cat.milestones
+        .filter(ms => !_ledger_filters.hideDone || !_milestone_isClaimed(ms))
+        .filter(ms => !_ledger_filters.ready || (_milestone_isComplete(ms) && !_milestone_isClaimed(ms)));
 
     modal.innerHTML = `
     <div class="modal-box quest-log-box">
@@ -608,9 +626,11 @@ function _ledger_renderDetailView(modal) {
 
         <div class="ledger-cat-desc">${de ? cat.descDE : cat.descEn}</div>
 
+        ${_ledger_buildFilterBar()}
+
         <div class="ledger-scroll-region">
             <div class="quest-list">
-                ${cat.milestones.map(ms => _ledger_buildMilestoneRow(ms)).join('')}
+                ${rows.length ? rows.map(ms => _ledger_buildMilestoneRow(ms)).join('') : `<div class="ledger-empty">${t('qa_filter_empty')}</div>`}
             </div>
         </div>
     </div>`;

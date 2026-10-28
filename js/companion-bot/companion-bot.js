@@ -79,10 +79,12 @@ function _ensureStyles() {
         50% { box-shadow: inset 0 0 0 3px var(--cb-c), 0 0 14px 3px var(--cb-c); }
     }
     #companion-bot-badge {
-        position: fixed; left: 12px; top: 66px; z-index: 9000; padding: 6px 12px;
-        background: rgba(10, 14, 24, 0.85); border: 2px solid; border-radius: 6px;
-        font: 12px var(--PX, monospace); letter-spacing: 1px; pointer-events: none;
-    }`;
+        position: fixed; left: 12px; top: 66px; z-index: 9000; padding: 6px 14px;
+        background: rgba(10, 14, 24, 0.88); border: 2px solid; border-radius: 6px;
+        font: 700 16px var(--C, serif); letter-spacing: 0.06em; pointer-events: none;
+    }
+    /* inside the top-left HUD stack it sits under the clock, mistakes, clue buttons and objectives */
+    #companion-bot-badge.in-hud { position: static; align-self: flex-start; margin-top: 6px; }`;
     document.head.appendChild(style);
 }
 
@@ -95,8 +97,12 @@ function _renderBadge() {
         badge.id = 'companion-bot-badge';
         document.body.appendChild(badge);
     }
+    // Park the badge in the HUD stack (top left) so it never overlaps the mistakes / clue buttons.
+    const host = document.getElementById('game-hud-corner');
+    badge.classList.toggle('in-hud', !!host);
+    if (host && badge.parentElement !== host) host.appendChild(badge);
     badge.dataset.hero = _bot.heroId;
-    badge.textContent = `${COMPANION_CAST[_bot.heroId].name} · Affinity ${_bot.tuning.level}`;
+    badge.textContent = `${COMPANION_CAST[_bot.heroId].name} · ${LANG === 'de' ? 'Verbundenheit' : 'Affinity'} ${_bot.tuning.level}`;
 }
 
 // Takes every hint glow off the grid.

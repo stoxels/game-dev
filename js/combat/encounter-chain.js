@@ -1073,9 +1073,12 @@ export function _grantMapCompletionReward() {
 export function _buildBonusLootTooltipHTML() {
     const pct = Math.round(_getBonusLootChance() * 100);
 
-    let html = `<strong style="color:#f5d98a">${t('eg_bonus_chance_title')}</strong>`;
-    html += `<br>${t('eg_bonus_loot_tooltip')}`;
-    html += `<br>${t('eg_bonus_current').replace('{p}', pct)}`;
+    let html = `<div class="sx-ttl-tip sx-hud-tip"><div class="sx-ttl-tip-title">${t('eg_bonus_chance_title')}</div>`;
+    html += `<div>${t('eg_bonus_tip_intro')}</div>`;
+    html += `<div>${t('eg_bonus_tip_puzzles')}</div>`;
+    html += `<div>${t('eg_bonus_tip_quiz')}</div>`;
+    html += `<div class="sx-ttl-tip-hint">${t('eg_bonus_tip_rule')}</div>`;
+    html += `<div>${t('eg_bonus_current').replace('{p}', pct)}</div></div>`;
     return html;
 }
 
