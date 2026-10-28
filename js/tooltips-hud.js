@@ -290,8 +290,6 @@ function _buildLevelsButtonTooltipHTML() {
 }
 
 // 4. Level name
-const _MOD_SHORT = { timetrial: 'tt', hardcore: 'hc', ironman: 'im', classless: 'cl', treeless: 'tl' };
-
 // Builds the mod lines of an active map-device run map, grouped by their
 // affects category with the same colors as the map item tooltip:
 // monster → orange, player → red, puzzle → blue.
@@ -400,13 +398,13 @@ function _buildLevelNameTooltipHTML() {
     // tooltip shows ONLY the map identity + its rolled launch modifiers.
     if (typeof _egActiveMapItem !== 'undefined' && _egActiveMapItem
         && typeof _egMapModAffects === 'function') {
-        return _buildMapRunTooltipHTML();
+        return `<div class="sx-ttl-tip sx-hud-tip">${_buildMapRunTooltipHTML()}</div>`;
     }
 
     // Campaign trial run: the corner HUD shows the trial's name, so the
     // tooltip describes the trial - not the chained puzzle behind it.
     const trial = _activeTrialStamp();
-    if (trial) return _buildTrialRunTooltipHTML(trial);
+    if (trial) return `<div class="sx-ttl-tip sx-hud-tip">${_buildTrialRunTooltipHTML(trial)}</div>`;
 
     if (!cur) return '';
     const gi = cur.gIdx;
@@ -414,37 +412,40 @@ function _buildLevelNameTooltipHTML() {
     const bonusDone = STATE.bonusDone.includes(gi);
     const bonusHintText = lvText(cur, 'bonusHint') || '';
 
-    let html = `<strong>${t('lvl_prefix')} ${cur.world}-${cur.li}</strong>`;
-    html += `<br>${t('cg_tt_bonus').replace('{x}', bonusHintText)}`;
-    html += `<br>${t('cg_tt_bonus_claimed')} <b style="color:${bonusDone ? '#2ecc71' : '#e74c3c'}">${bonusDone ? t('cg_yes') : t('cg_no')}</b>`;
+    const row = (label, value) => `<div>${label} ${value}</div>`;
+    let html = `<div class="sx-ttl-tip sx-hud-tip"><div class="sx-ttl-tip-title">${t('lvl_prefix')} ${cur.world}-${cur.li}</div>`;
+    html += `<div>${t('cg_tt_bonus').replace('{x}', bonusHintText)}</div>`;
+    html += row(t('cg_tt_bonus_claimed'), `<b class="${bonusDone ? 'sx-hud-tip-good' : 'sx-hud-tip-bad'}">${bonusDone ? t('cg_yes') : t('cg_no')}</b>`);
 
     if (hs) {
-        const mods = Object.keys(hs.mods || {}).filter(m => hs.mods[m]);
-        html += `<br>${t('cg_tt_best_diff')} <b>${t('diff_' + hs.diff)}</b>`;
-        html += `<br>${t('cg_tt_best_score')} <b>${hs.score}</b>`;
+        // The Professor modifier is never shown to the player; every other modifier is named by its tombstone label.
+        const mods = Object.keys(hs.mods || {}).filter(m => hs.mods[m] && _MOD_TIP_KEYS[m] && m !== 'superTutor');
+        html += row(t('cg_tt_best_diff'), `<b>${t('diff_' + hs.diff)}</b>`);
+        html += row(t('cg_tt_best_score'), `<b>${hs.score}</b>`);
         if (mods.length) {
-            html += `<br>${t('cg_tt_mods_used')} <b>${mods.map(m => t('mod_' + _MOD_SHORT[m])).join(', ')}</b>`;
+            html += row(t('cg_tt_mods_used'), `<b>${mods.map(m => t(_MOD_TIP_KEYS[m][0])).join(', ')}</b>`);
         }
     } else {
-        html += `<br><span style="opacity:.6">${t('cg_tt_not_cleared')}</span>`;
+        html += `<div class="sx-hud-tip-dim">${t('cg_tt_not_cleared')}</div>`;
     }
 
     if (STATE.levelMistakes && STATE.levelMistakes[gi] !== undefined) {
-        html += `<br>${t('cg_tt_best_mistakes')} <b>${STATE.levelMistakes[gi]}</b>`;
+        html += row(t('cg_tt_best_mistakes'), `<b>${STATE.levelMistakes[gi]}</b>`);
     }
 
     if (ptHasSkill('grid_awareness')) {
         const tierLabels = { small: 'cg_grid_small', medium: 'cg_grid_medium', large: 'cg_grid_large', massive: 'cg_grid_massive' };
         const tier = _getGridSizeTier(cur.grid.length, cur.grid[0].length);
-        html += `<br>${t('cg_tt_grid_class')} <b>${t(tierLabels[tier])}</b>`;
+        html += row(t('cg_tt_grid_class'), `<b>${t(tierLabels[tier])}</b>`);
     }
 
     // Regular last levels are normal levels now (ascension trials live on
     // their own nodes), so only the Nexus Point earns a special tooltip line.
     const { isConvergence, isNexusPoint } = _getLevelSpecialStatus(cur);
-    if (isNexusPoint) html += `<br><span style="color:#7fd4ff">${t('scr_nexus_point_badge')}</span>`;
-    if (isConvergence) html += `<br><span style="color:#6dbf40">${t('cg_convergence_lvl')}</span>`;
+    if (isNexusPoint) html += `<div style="color:#7fd4ff">${t('scr_nexus_point_badge')}</div>`;
+    if (isConvergence) html += `<div style="color:#6dbf40">${t('cg_convergence_lvl')}</div>`;
 
+    html += '</div>';
     return html;
 }
 

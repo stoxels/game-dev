@@ -411,3 +411,5 @@
 .sx-hud-tip b.sx-hud-tip-bad { color: #ff8a80; }
 .sx-hud-tip .sx-hud-tip-warn { color: #ff8a80; }
 .sx-hud-tip .sx-hud-tip-dim { color: #b9b19a; }
+
+.sx-hud-tip strong { font-family: var(--C); font-size: 20px; font-weight: 700; letter-spacing: 0.08em; color: #ffd76e; }

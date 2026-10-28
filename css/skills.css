@@ -1138,22 +1138,23 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box { /* neutralized - see s
 /* Skill tooltips need more room than the tiny class-HUD tooltips. */
 /* !important: getHUDTooltip() sets an inline max-width:260px that would
    otherwise always win, which made these tooltips tall and narrow. */
-#chud-floating-tip:has(.skl-tip) { max-width: 440px !important; min-width: 320px; }
+#chud-floating-tip:has(.skl-tip) { max-width: 560px !important; min-width: 400px; padding: 14px 18px; }
 
-.skl-tip { font-size: 11px; line-height: 1.55; }
+.skl-tip { font-family: var(--PX, serif); font-size: 15px; line-height: 1.5; }
 
 .skl-tip-art {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     object-fit: contain;
-    vertical-align: -7px;
+    vertical-align: -9px;
     margin-right: 6px;
     filter: drop-shadow(0 0 5px rgba(245, 197, 24, .5));
 }
 
 .skl-tip-title {
-    font-size: 13px;
-    font-weight: bold;
+    font-family: var(--C, serif);
+    font-size: 20px;
+    font-weight: 700;
     color: #f5d98b;
     text-align: center;
     letter-spacing: .02em;
@@ -1163,7 +1164,7 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box { /* neutralized - see s
 .skl-tip-tags {
     text-align: center;
     color: #7fb3ff;
-    font-size: 10px;
+    font-size: 14px;
     margin-bottom: 3px;
 }
 
@@ -1182,18 +1183,18 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box { /* neutralized - see s
 .skl-tip-dmg b { color: #a9ccff; }
 
 .skl-tip-scaling { color: #b8a9ff; margin-top: 4px; }
-.skl-tip-note { color: #9a9ab0; font-size: 10px; margin-top: 4px; }
-.skl-tip-combo { border-top: 1px solid rgba(127,217,255,0.25); margin: 6px 0 4px; padding-top: 4px; color: #cfeaf5; font-size: 11px; line-height: 1.35; }
-.skl-tip-combo-sec { color: #f1c40f; margin-top: 4px; font-size: 10px; letter-spacing: 0.04em; }
+.skl-tip-note { color: #a9a9c0; font-size: 13px; margin-top: 4px; }
+.skl-tip-combo { border-top: 1px solid rgba(127,217,255,0.25); margin: 6px 0 4px; padding-top: 4px; color: #cfeaf5; font-size: 14px; line-height: 1.4; }
+.skl-tip-combo-sec { color: #f1c40f; margin-top: 4px; font-size: 13px; letter-spacing: 0.04em; }
 .skl-tip-combo-row { margin: 3px 0 3px 6px; }
-.skl-tip-combo-note { color: #9aa7bd; font-size: 10px; font-style: italic; margin: 1px 0 2px; }
+.skl-tip-combo-note { color: #a9b6cc; font-size: 13px; font-style: italic; margin: 1px 0 2px; }
 .skl-tip-combo b { color: #9fe7ff; }
-.skl-tip-warn { color: #ff6b6b; font-size: 10px; margin-top: 4px; }
+.skl-tip-warn { color: #ff8a80; font-size: 13px; margin-top: 4px; }
 
 .skl-tip-foot {
     margin-top: 6px;
-    font-size: 9px;
-    color: #7a7a92;
+    font-size: 12px;
+    color: #8e8ea8;
     font-style: italic;
     text-align: center;
 }
