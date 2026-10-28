@@ -212,6 +212,7 @@ export function _buildMonsterCardHTML(m) {
 
             <div class="sx-monster-compact-tooltip">
                 <div class="sx-tooltip-name">${m.name}</div>
+                <div class="sx-tooltip-sub">${t('eg_lv_badge').replace('{n}', m.level)}</div>
                 <div class="sx-tooltip-hp" id="sx-hp-label-${m.id}">${m.currentHP} / ${m.maxHP} HP</div>
             </div>
         </div>

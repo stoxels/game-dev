@@ -892,12 +892,15 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     }
 
     .game-hud-corner .timer-val {
-        font-family: var(--PX);
-        font-size: clamp(15px, 2.4vw, 24px);
+        font-family: var(--C);
+        font-weight: 700;
+        font-variant-numeric: lining-nums tabular-nums;
+        font-size: clamp(20px, 3vw, 32px);
         color: var(--accent);
         line-height: 1;
-        letter-spacing: 1px;
+        letter-spacing: 0.04em;
         white-space: nowrap;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
     }
 
     .game-hud-corner .gtb-pen {
@@ -908,10 +911,13 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     }
 
     .game-hud-corner .gtb-mistakes {
-        font-family: var(--PX);
-        font-size: clamp(11px, 1.4vw, 14px);
+        font-family: var(--C);
+        font-weight: 700;
+        font-size: clamp(15px, 1.9vw, 21px);
+        letter-spacing: 0.06em;
         color: var(--red);
         white-space: nowrap;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
     }
 
     .game-hud-corner .clue-toggle-slot {
@@ -1327,11 +1333,11 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
 
 
 .game-hud-corner .timer-val {
-    font-family: var(--PX);
-    font-size: clamp(15px, 2.4vw, 24px);
+    font-family: var(--C);
+    font-size: clamp(20px, 3vw, 32px);
     color: var(--accent);
     line-height: 1;
-    letter-spacing: 1px;
+    letter-spacing: 0.04em;
     white-space: nowrap;
     pointer-events: auto;
     cursor: help;

@@ -294,7 +294,7 @@ function _buildPuzzleRows(rowClues, maxRowWidth, sol, cellSize, fontSize, isAdjM
 //   to a clue toggle button. The button's current tip text lives in its
 //   data-tip attribute so the toggle handlers can update it in place.
 function _wireClueBtnTooltip(btn) {
-    btn.addEventListener('mouseenter', (e) => globalThis.showGameTooltip(btn.dataset.tip, e));
+    btn.addEventListener('mouseenter', (e) => globalThis.showGameTooltip(`<div class="sx-ttl-tip sx-hud-tip">${btn.dataset.tip}</div>`, e));
     btn.addEventListener('mousemove', globalThis.moveGameTooltip);
     btn.addEventListener('mouseleave', globalThis.hideGameTooltip);
 }
@@ -311,14 +311,16 @@ function _buildRowClueToggle() {
     if (!host) return;
 
     const baseCss = `
-        font-family: var(--PX);
-        font-size: 9px;
-        padding: 3px 7px;
+        font-family: var(--C);
+        font-weight: 700;
+        font-size: 13px;
+        padding: 4px 10px;
         background: rgba(10,10,18,0.7);
-        border: 1px solid var(--border2);
-        color: var(--accent2);
+        border: 1px solid rgba(200,168,75,0.6);
+        border-radius: 4px;
+        color: #f0d090;
         cursor: pointer;
-        letter-spacing: 1px;
+        letter-spacing: 0.08em;
     `;
 
     // Row clues button - flips row clues left/right

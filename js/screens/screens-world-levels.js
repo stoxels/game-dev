@@ -2412,19 +2412,21 @@ function _wdCreateEnterButton(wi, li, cfg) {
     btn.style.cssText = `
         position: absolute;
         left: ${pct.x}%;
-        top: calc(${pct.y}% - 56px);
+        top: calc(${pct.y}% - 74px);
         transform: translateX(-50%);
         z-index: 10;
-        font-family: var(--PX, monospace);
-        font-size: 11px;
-        padding: 5px 12px;
-        background: #c8a84b;
+        font-family: var(--C, var(--PX, monospace));
+        font-weight: 700;
+        font-size: 21px;
+        padding: 10px 26px;
+        background: linear-gradient(180deg, #e0c066, #c8a84b);
         color: #1a0d00;
-        border: none;
+        border: 2px solid #6b4a12;
+        border-radius: 5px;
         cursor: pointer;
-        letter-spacing: 1px;
+        letter-spacing: 0.06em;
         white-space: nowrap;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+        box-shadow: 0 3px 12px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,244,200,0.6);
     `;
 
     return btn;

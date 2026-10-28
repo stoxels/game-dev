@@ -32,13 +32,14 @@ function _ensureStyles() {
     const st = document.createElement('style');
     st.id = 'affinity-panel-style';
     st.textContent = `
-    .affinity-panel-btn { position: absolute; left: 12px; bottom: 12px; z-index: 30; font-family: var(--PX, monospace); font-size: 11px;
-        padding: 6px 12px; background: rgba(20,20,40,.88); color: #ffd93d; border: 1px solid #ffd93d; cursor: pointer; letter-spacing: 1px; }
-    .affinity-panel-btn:hover { background: rgba(60,50,10,.92); }
+    /* the button is a stone slab like the six menu buttons (css/map-view-topbar.css); it only needs its spacing here */
+    .affinity-panel-btn { flex: 0 0 auto; margin-left: clamp(8px, 1vw, 16px); }
+    .affinity-panel-btn .tb-label { font-size: clamp(7px, 0.7vw, 10px); }
+    #screen-map-view .affinity-panel-btn + .ls-topbar-right, #screen-world-detail .affinity-panel-btn + .ls-topbar-right { margin-left: clamp(8px, 1vw, 16px); }
     #affinity-panel { position: fixed; inset: 0; z-index: 9500; background: rgba(8,6,4,.78); display: flex; align-items: center; justify-content: center; }
     #affinity-panel .tp-box { position: relative; width: min(1500px, 108vw, calc(105vh * 1376 / 768)); aspect-ratio: 1376 / 768;
         background: url('images/Inference/ledger-parchment-bg.webp') center / 100% 100% no-repeat; filter: drop-shadow(0 14px 40px rgba(0,0,0,.7));
-        color: #1f160a; font: clamp(12px, 1.2vw, 15px)/1.35 var(--F, sans-serif); }
+        color: #1f160a; font: clamp(14px, 1.25vw, 17px)/1.45 var(--PX, serif); }
     #affinity-panel .tp-title { position: absolute; left: 50%; top: -3.6%; transform: translateX(-50%); width: 34%; aspect-ratio: 668 / 190;
         background: url('images/Inference/detailed-title-banner.webp') center / 100% 100% no-repeat; display: flex; align-items: center; justify-content: center;
         font: 700 clamp(14px, 2.1vw, 22px) var(--PX, monospace); letter-spacing: 3px; color: #f6e3a8; text-shadow: 0 2px 3px #000, 0 0 10px rgba(224,177,67,.5); }
@@ -46,7 +47,7 @@ function _ensureStyles() {
         background: url('images/Inference/close-button.webp') center / contain no-repeat; font-size: 0; cursor: pointer; transition: transform .15s; }
     #affinity-panel .tp-close:hover { transform: scale(1.08) rotate(-4deg); }
     #affinity-panel .tp-body { position: absolute; left: 13%; right: 17%; top: 14%; bottom: 11%; overflow-y: auto; padding-right: 6px; scrollbar-width: thin; scrollbar-color: #8a6a30 transparent; }
-    #affinity-panel .tp-sub { margin: 0 0 8px; text-align: center; font-size: .92em; color: #1f160a; }
+    #affinity-panel .tp-sub { margin: 0 0 12px; text-align: center; font-size: 1.02em; line-height: 1.5; color: #2c2112; }
     #affinity-panel .tp-row { display: flex; gap: 14px; padding: 12px 14px; margin-bottom: 10px; border-radius: 8px;
         background: rgba(90,70,40,.14); border: 1px solid rgba(90,70,40,.45); box-shadow: inset 0 1px 0 rgba(255,244,214,.35); }
     #affinity-panel .tp-portrait { position: relative; flex: none; width: 140px; height: 110px; align-self: flex-start;
@@ -54,20 +55,20 @@ function _ensureStyles() {
     #affinity-panel .tp-face { position: absolute; left: 50%; bottom: 14%; height: 108%; width: auto; transform: translateX(-50%); filter: drop-shadow(0 3px 3px rgba(0,0,0,.6)); }
     #affinity-panel .tp-main { flex: 1; min-width: 0; }
     #affinity-panel .tp-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    #affinity-panel .tp-name { font: 700 17px var(--PX, monospace); letter-spacing: 1px; color: #2c2112; text-shadow: 0 1px 0 rgba(255,244,214,.5); }
+    #affinity-panel .tp-name { font: 700 22px var(--C, serif); letter-spacing: 2px; color: #2c2112; text-shadow: 0 1px 0 rgba(255,244,214,.5); }
     #affinity-panel .tp-name b { display: inline-block; width: 10px; height: 10px; margin-right: 8px; transform: rotate(45deg); background: var(--c); border: 1px solid #2c2112; }
     #affinity-panel .tp-pips { display: inline-flex; gap: 5px; }
     #affinity-panel .tp-pip { width: 13px; height: 13px; transform: rotate(45deg); border: 2px solid #5a4526; background: rgba(40,30,16,.35); box-sizing: border-box; }
     #affinity-panel .tp-pip.on { background: var(--c); border-color: #2c2112; box-shadow: 0 0 6px var(--c); }
-    #affinity-panel .tp-level { margin-left: auto; font: 700 12px var(--PX, monospace); color: #4a3612; letter-spacing: 1px; }
+    #affinity-panel .tp-level { margin-left: auto; font: 700 17px var(--C, serif); color: #3a2a0c; letter-spacing: 2px; }
     #affinity-panel .tp-bar { height: 15px; margin: 8px 0 3px; padding: 2px; background: #2b2217; border: 2px solid #5a4526; border-radius: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,.6); }
     #affinity-panel .tp-bar i { display: block; height: 100%; border-radius: 5px; background: linear-gradient(var(--c), color-mix(in srgb, var(--c) 55%, #000)); box-shadow: 0 0 8px var(--c); }
-    #affinity-panel .tp-progress { font-weight: 700; color: #2c2112; }
+    #affinity-panel .tp-progress { font-family: var(--PX, serif); font-size: 1.05em; font-weight: 700; color: #2c2112; }
     #affinity-panel .tp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px; }
-    #affinity-panel .tp-chip { padding: 2px 9px; font-size: .88em; color: #1f160a; background: rgba(224,177,67,.22); border: 1px solid rgba(139,105,30,.55); border-radius: 10px; }
+    #affinity-panel .tp-chip { padding: 3px 11px; font-size: .95em; color: #1f160a; background: rgba(224,177,67,.22); border: 1px solid rgba(139,105,30,.55); border-radius: 10px; }
     #affinity-panel .tp-lv { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    #affinity-panel .tp-lv > div { padding: 6px 9px; font-size: .9em; border-radius: 6px; background: rgba(255,246,222,.62); border: 1px solid rgba(90,70,40,.4); }
-    #affinity-panel .tp-lv h4 { margin: 0 0 3px; font: 700 11px var(--PX, monospace); letter-spacing: 1px; text-transform: uppercase; color: #4a3612; }
+    #affinity-panel .tp-lv > div { padding: 8px 11px; font-size: 1em; line-height: 1.45; border-radius: 6px; background: rgba(255,246,222,.62); border: 1px solid rgba(90,70,40,.4); }
+    #affinity-panel .tp-lv h4 { margin: 0 0 5px; font: 700 15px var(--C, serif); letter-spacing: 1.5px; text-transform: uppercase; color: #4a3612; }
     #affinity-panel .tp-lv .tp-next { background: rgba(236,196,96,.4); border-color: rgba(139,105,30,.7); }
     #affinity-panel .tp-lv .tp-next h4 { color: #6b3f00; }
     #affinity-panel .tp-lv .tp-solo { grid-column: 1 / -1; }
@@ -207,10 +208,15 @@ export function ensureAffinityButton(screenId = 'screen-world-detail') {
     let btn = screen.querySelector('.affinity-panel-btn');
     if (!btn) {
         btn = document.createElement('button');
-        btn.className = 'affinity-panel-btn';
+        btn.className = 'affinity-panel-btn tb-slab';
         btn.type = 'button';
+        btn.setAttribute('data-tip-t', 'tip_tb_affinity');
         btn.addEventListener('click', openAffinityPanel);
-        screen.appendChild(btn);
+        // lives in the top bar, right after the gold balance and before the six menu buttons
+        const bar = screen.querySelector('.ls-topbar');
+        const gold = bar && bar.querySelector('.tb-gold');
+        if (gold) gold.after(btn);
+        else (bar || screen).appendChild(btn);
     }
-    btn.textContent = '🤝 ' + _tr('Affinity', 'Verbundenheit');
+    btn.innerHTML = `<span class="tb-ico">🤝</span><span class="tb-label">${_tr('AFFINITY', 'VERBUNDENHEIT')}</span>`;
 }

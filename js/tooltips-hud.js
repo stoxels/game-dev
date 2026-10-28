@@ -245,48 +245,48 @@ function _buildMistakesTooltipHTML() {
     const nextPenalty = Math.max(0, base - reduction);
 
     const isHardcore = typeof curMods !== 'undefined' && !!curMods.hardcore;
-    let html = `<strong style="color:#ff5555">${t('cg_tt_mistakes')}</strong>`;
+    let html = `<div class="sx-ttl-tip sx-hud-tip"><div class="sx-ttl-tip-title sx-hud-tip-red">${t('cg_tt_mistakes')}</div>`;
     if (isHardcore) {
-        html += `<br><span style="color:#ff5555;font-weight:700;">${t('hc_fail_title') || 'HARDCORE'}</span> - <span style="color:#ff7777;">${t('eg_too_many_mistakes') || '0 mistakes allowed - next mistake ends the run!'}</span>`;
+        html += `<div class="sx-hud-tip-warn"><b>${t('hc_fail_title') || 'HARDCORE'}</b> - ${t('eg_too_many_mistakes') || '0 mistakes allowed - next mistake ends the run!'}</div>`;
         // When hardcore is active also show the 0-limit explicitly
-        html += `<br>${t('cg_tt_total_level')} <b>${globalThis.mistakeCount} / 0</b>`;
+        html += `<div>${t('cg_tt_total_level')} <b>${globalThis.mistakeCount} / 0</b></div>`;
     } else {
-        html += `<br>${t('cg_tt_total_level')} <b>${globalThis.mistakeCount}</b>`;
+        html += `<div>${t('cg_tt_total_level')} <b>${globalThis.mistakeCount}</b></div>`;
     }
     if (typeof absorbedMistakes !== 'undefined' && globalThis.absorbedMistakes > 0) {
-        html += `<br>${t('cg_tt_absorbed')} <b>${globalThis.absorbedMistakes}</b>`;
+        html += `<div>${t('cg_tt_absorbed')} <b>${globalThis.absorbedMistakes}</b></div>`;
     }
     if (typeof _levelMistakesErased !== 'undefined' && globalThis._levelMistakesErased > 0) {
-        html += `<br>${t('cg_tt_erased')} <b>${globalThis._levelMistakesErased}</b>`;
+        html += `<div>${t('cg_tt_erased')} <b>${globalThis._levelMistakesErased}</b></div>`;
     }
     // Endgame: show remaining vs max when a limit exists (hardcore already shown above)
     if (!isHardcore && typeof _isActive === 'function' && _isActive() && typeof _getMaxAllowedMistakes === 'function') {
         const max = _getMaxAllowedMistakes();
         if (max != null) {
             const remaining = Math.max(0, max - (typeof mistakeCount !== 'undefined' ? globalThis.mistakeCount : 0));
-            html += `<br><span style="opacity:.7;">${t('eg_stat_allowed_mistakes') || 'Allowed'}: <b>${max}</b> - ${remaining} ${t('eg_mistakes_warning_1') ? '' : 'remaining'}</span>`;
+            html += `<div class="sx-hud-tip-dim">${t('eg_stat_allowed_mistakes') || 'Allowed'}: <b>${max}</b> - ${remaining} ${t('eg_mistakes_warning_1') ? '' : 'remaining'}</div>`;
         }
     }
-    html += `<br>${t('cg_tt_next_cost')} <b>−${_fmtSecsAsMinSec(nextPenalty)}</b>`;
+    html += `<div>${t('cg_tt_next_cost')} <b class="sx-hud-tip-bad">−${_fmtSecsAsMinSec(nextPenalty)}</b></div>`;
     if (reduction > 0) {
-        html += `<br><span style="opacity:.6;font-size:.85em">${t('cg_tt_reduction').replace('{n}', reduction)}</span>`;
+        html += `<div class="sx-ttl-tip-hint">${t('cg_tt_reduction').replace('{n}', reduction)}</div>`;
     }
-    html += `<br><span style="opacity:.55;font-size:.85em">${t('cg_tt_class_note')}</span>`;
+    html += `<div class="sx-ttl-tip-hint">${t('cg_tt_class_note')}</div></div>`;
     return html;
 }
 
 // 2. Timer
 function _buildTimerTooltipHTML() {
-    let html = `<strong style="color:var(--accent,#66fcf1)">${t('cg_tt_timer')}</strong>`;
-    html += `<br>${t('cg_tt_time_added')} <b>+${_fmtSecsAsMinSec(globalThis._levelTimeAdded || 0)}</b>`;
-    html += `<br>${t('cg_tt_time_lost')} <b>−${_fmtSecsAsMinSec(globalThis._levelTimeLost || 0)}</b>`;
-    html += `<br><span style="opacity:.55;font-size:.85em">${t('cg_tt_includes')}</span>`;
+    let html = `<div class="sx-ttl-tip sx-hud-tip"><div class="sx-ttl-tip-title">${t('cg_tt_timer')}</div>`;
+    html += `<div>${t('cg_tt_time_added')} <b class="sx-hud-tip-good">+${_fmtSecsAsMinSec(globalThis._levelTimeAdded || 0)}</b></div>`;
+    html += `<div>${t('cg_tt_time_lost')} <b class="sx-hud-tip-bad">−${_fmtSecsAsMinSec(globalThis._levelTimeLost || 0)}</b></div>`;
+    html += `<div class="sx-ttl-tip-hint">${t('cg_tt_includes')}</div></div>`;
     return html;
 }
 
 // 3. Levels/back button
 function _buildLevelsButtonTooltipHTML() {
-    return t('cg_return_levels');
+    return `<div class="sx-ttl-tip sx-hud-tip">${t('cg_return_levels')}</div>`;
 }
 
 // 4. Level name
