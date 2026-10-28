@@ -189,7 +189,7 @@ export function _vendorBuildCurrencyTabHTML() {
         price: _vendorCurrencyPrice(def.id),
         buyCall: `_vendorBuyCurrency('${def.id}')`,
     })).join('');
-    return `<div class="sx-vendor-cards">${cards}</div>`;
+    return `<div class="sx-vendor-cards sx-vendor-cards-core">${cards}</div>`;
 }
 
 // Buys one currency orb and adds it to the hub stash.

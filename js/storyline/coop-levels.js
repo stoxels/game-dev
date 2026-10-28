@@ -122,14 +122,14 @@ export const COOP_ENCOUNTERS = {
         friendFor: { stox: 'trix', trix: 'syla', syla: 'stox' },
         // The finale: two rounds in a row, the heroes swap sides in the second.
         boss: {
-            monsterId: 'starspawn', bossNameEn: 'The Plateau Warden', bossNameDE: 'Der Plateau-Wächter',
+            monsterId: 'starspawn', bossNameEn: 'The Plateau Sentinel', bossNameDE: 'Der Plateau-Sentinel',
             hpMult: 9, dmgMult: 1.15, rounds: 2, holdMs: 2500, spotWaitMs: 24000,
             firstMs: 12000, everyMs: 24000, openMs: 9000, convergenceShare: 0.25,
         },
-        nameEn: 'The Warden on the Plateau',
-        nameDE: 'Der Wächter auf dem Plateau',
-        introEn: 'The last climb. The Warden raises its shield twice over: stand on the runes together, then again on the other side. {friend} knows the way. Beat the Warden, then finish the picture.',
-        introDE: 'Der letzte Aufstieg. Der Wächter hebt seinen Schild doppelt: steht gemeinsam auf den Runen, dann noch einmal auf der anderen Seite. {friend} kennt den Weg. Besiege den Wächter, dann vollende das Bild.',
+        nameEn: 'The Sentinel on the Plateau',
+        nameDE: 'Der Sentinel auf dem Plateau',
+        introEn: 'The last climb. The Sentinel raises its shield twice over: stand on the runes together, then again on the other side. {friend} knows the way. Beat the Sentinel, then finish the picture.',
+        introDE: 'Der letzte Aufstieg. Der Sentinel hebt seinen Schild doppelt: steht gemeinsam auf den Runen, dann noch einmal auf der anderen Seite. {friend} kennt den Weg. Besiege den Sentinel, dann vollende das Bild.',
         timer: 900,
         // A peak above the plateau (one single solution).
         grid: [

@@ -51,7 +51,7 @@ export const QUEST_ITEMS = [
         textDE: 'Eine Seite aus dem Buch, das Verun schrieb und dem niemand glaubte. Am Rand steht in zittriger Schrift: Sie hat meine Seiten benutzt, und sie lächelte, als sie sie nahm.',
     },
     {
-        id: 'q_proof_shard', from: 'coop_w13', fromEn: 'The Warden on the Plateau', fromDE: 'Der Wächter auf dem Plateau', icon: '💎',
+        id: 'q_proof_shard', from: 'coop_w13', fromEn: 'The Sentinel on the Plateau', fromDE: 'Der Sentinel auf dem Plateau', icon: '💎',
         art: 'images/items/quest/q_proof_shard.webp',
         nameEn: 'Proof Stone Shard', nameDE: 'Splitter des Beweissteins',
         textEn: 'A shard of the proof stone on the Plateau. It was defaced recently, the cuts are still sharp: someone is still erasing.',

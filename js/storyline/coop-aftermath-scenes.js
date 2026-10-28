@@ -26,6 +26,9 @@ export const COOP_AFTERMATH_SCENES = {
             stox: {
                 companion: 'syla',
                 bg: 'images/story/after_coop_w4/aftermath.webp',
+                heroLayout: {
+                    sprites: { item: { x: 60.7, y: 86.7, s: 0.39, r: -2 } },
+                },
                 lines: [
                     { who: 'companion', en: 'Stox, look! The path unwound itself, and this was lying in the middle.', de: 'Stox, schau! Der Pfad hat sich selbst aufgerollt, und das hier lag in der Mitte.' },
                     { who: 'player', en: 'A Guild chart of the vortex. Torn, then redrawn by a steadier hand than the Guild\'s.', de: 'Eine Gildenkarte des Strudels. Zerrissen und von einer ruhigeren Hand neu gezeichnet als der der Gilde.' },
@@ -45,14 +48,17 @@ export const COOP_AFTERMATH_SCENES = {
                     { who: 'companion', en: 'Trix. That spiral had an exit, and you found it before I finished the calculation.', de: 'Trix. Diese Spirale hatte einen Ausgang, und du hast ihn gefunden, bevor ich die Rechnung fertig hatte.' },
                     { who: 'player', en: 'Obviously. What is that in your hand?', de: 'Offensichtlich. Was hast du da in der Hand?' },
                     { who: 'companion', en: 'A chart of the vortex, torn along an old fold. Its edge is drawn much wider than the Guild\'s.', de: 'Eine Karte des Strudels, an einer alten Falte zerrissen. Ihr Rand ist viel weiter eingezeichnet als bei der Gilde.' },
-                    { who: 'player', en: 'Wider. So it is not leaving, it is gathering. I said that on day one.', de: 'Weiter. Also geht er nicht fort, er sammelt sich. Das habe ich am ersten Tag gesagt.' },
-                    { who: 'companion', en: 'You said it as a feeling. This is a measurement.', de: 'Du hast es als Gefühl gesagt. Das hier ist eine Messung.' },
-                    { who: 'player', en: 'Fine. Keep it. But I want credit for the feeling.', de: 'Gut. Behalte sie. Aber ich will Anerkennung für das Gefühl.' },
+                    { who: 'player', en: 'Wider. So it is not leaving, it is gathering. Forest Girl called it, and I rolled my eyes.', de: 'Weiter. Also geht er nicht fort, er sammelt sich. Waldmädchen hat es erkannt, und ich habe die Augen verdreht.' },
+                    { who: 'companion', en: 'She said it as a feeling. This is a measurement.', de: 'Sie hat es als Gefühl gesagt. Das hier ist eine Messung.' },
+                    { who: 'player', en: 'Fine. Keep it. But Forest Girl gets the credit.', de: 'Gut. Behalte sie. Aber das Verdienst gehört dem Waldmädchen.' },
                 ],
             },
             syla: {
                 companion: 'trix',
                 bg: 'images/story/after_coop_w4/aftermath.webp',
+                heroLayout: {
+                    sprites: { item: { x: 48.9, y: 90.5, s: 0.39, r: -2 } },
+                },
                 lines: [
                     { who: 'companion', en: 'Forest Girl, you hum while you solve. I nearly lost the thread twice.', de: 'Waldmädchen, du summst beim Lösen. Ich hätte zweimal fast den Faden verloren.' },
                     { who: 'player', en: 'Sorry! But look, the picture left this behind.', de: 'Entschuldigung! Aber schau, das Bild hat das hier zurückgelassen.' },
@@ -94,7 +100,7 @@ export const COOP_AFTERMATH_SCENES = {
                     { who: 'companion', en: 'You hit them so hard the whole Grove shook. I think the trees were impressed.', de: 'Du hast so fest zugeschlagen, dass der ganze Hain gebebt hat. Ich glaube, die Bäume waren beeindruckt.' },
                     { who: 'player', en: 'Naturally. What did that creature drop?', de: 'Natürlich. Was hat das Vieh fallen lassen?' },
                     { who: 'companion', en: 'A page of music. Eight notes, written by hand.', de: 'Eine Seite Musik. Acht Töne, von Hand geschrieben.' },
-                    { who: 'player', en: 'Eight notes, same order, same pause, three hundred years. That is not a song, that is a lock.', de: 'Acht Töne, dieselbe Reihenfolge, dieselbe Pause, dreihundert Jahre. Das ist kein Lied, das ist ein Schloss.' },
+                    { who: 'player', en: 'Eight notes, same order, over and over, for three hundred years. That is not a song, that is a lock.', de: 'Acht Töne, dieselbe Reihenfolge, immer wieder, dreihundert Jahre lang. Das ist kein Lied, das ist ein Schloss.' },
                     { who: 'companion', en: 'A lock? I always thought it was a lullaby.', de: 'Ein Schloss? Ich habe es immer für ein Wiegenlied gehalten.' },
                     { who: 'player', en: 'It can be both. Keep it close. I want to know what it opens.', de: 'Es kann beides sein. Behalte es nah bei dir. Ich will wissen, was es öffnet.' },
                 ],
@@ -193,9 +199,9 @@ export const COOP_AFTERMATH_SCENES = {
                     { who: 'companion', en: 'Trix. You have not said a word since the whirl fell.', de: 'Trix. Du hast kein Wort gesagt, seit der Wirbel gefallen ist.' },
                     { who: 'player', en: 'I read the stamp on the survey stone. \'V. Vors\'.', de: 'Ich habe den Stempel auf dem Vermessungsstein gelesen. \'V. Vors\'.' },
                     { who: 'companion', en: 'You know it?', de: 'Du kennst ihn?' },
-                    { who: 'player', en: '...Not yet. Give me the rubbing. I want to look at it alone for a while.', de: '...Noch nicht. Gib mir den Abrieb. Ich will ihn eine Weile allein ansehen.' },
-                    { who: 'companion', en: 'Take it. But tell me when you know.', de: 'Nimm ihn. Aber sag mir, wenn du es weißt.' },
-                    { who: 'player', en: 'When I know, you will be the first. Do not make it a big thing.', de: 'Wenn ich es weiß, bist du der Erste. Mach kein großes Ding daraus.' },
+                    { who: 'player', en: '...I know where I have seen it. Give me the rubbing. I want to look at it alone for a while.', de: '...Ich weiß, wo ich ihn gesehen habe. Gib mir den Abrieb. Ich will ihn eine Weile allein ansehen.' },
+                    { who: 'companion', en: 'Take it. But tell me when you are ready.', de: 'Nimm ihn. Aber sag mir, wenn du bereit bist.' },
+                    { who: 'player', en: 'When I am ready, you will be the first. Do not make it a big thing.', de: 'Wenn ich bereit bin, bist du der Erste. Mach kein großes Ding daraus.' },
                 ],
             },
             syla: {
@@ -231,7 +237,7 @@ export const COOP_AFTERMATH_SCENES = {
                     { who: 'companion', en: 'The mist is thinning. And look, one single sheet pinned in the cloud like washing on a line.', de: 'Der Nebel lichtet sich. Und schau, ein einzelnes Blatt hängt in der Wolke wie Wäsche an der Leine.' },
                     { who: 'player', en: 'A page of handwriting. In the margin: she used my pages, and she smiled when she took them.', de: 'Eine handgeschriebene Seite. Am Rand: Sie hat meine Seiten benutzt, und sie lächelte, als sie sie nahm.' },
                     { who: 'companion', en: 'She. Who is she?', de: 'Sie. Wer ist sie?' },
-                    { who: 'player', en: 'I do not know. But the hand matches the stamp on the survey stone.', de: 'Ich weiß es nicht. Aber die Schrift passt zum Stempel auf dem Vermessungsstein.' },
+                    { who: 'player', en: 'I do not know. But the V in the margin matches the survey stone.', de: 'Ich weiß es nicht. Aber das V am Rand passt zum Vermessungsstein.' },
                     { who: 'voice', en: '...Keep it. And say my name, when you find the place where they can hear it.', de: '...Behaltet sie. Und sagt meinen Namen, wenn ihr den Ort findet, an dem sie ihn hören können.' },
                     { who: 'companion', en: 'A ghost with a filing system. I like him already. We keep the page.', de: 'Ein Geist mit Ablagesystem. Ich mag ihn jetzt schon. Wir behalten die Seite.' },
                 ],
@@ -263,7 +269,7 @@ export const COOP_AFTERMATH_SCENES = {
         },
     },
     after_coop_w13: {
-        note: 'World 13, after the Warden. Quest item: Proof Stone Shard (the proof stone was defaced recently: someone is still erasing).',
+        note: 'World 13, after the Sentinel. Quest item: Proof Stone Shard (the proof stone was defaced recently: someone is still erasing).',
         coop: 'coop_w13',
         noAffinity: true,
         bg: 'images/backgrounds/Expectation-Plateau-Background.webp',
@@ -278,10 +284,10 @@ export const COOP_AFTERMATH_SCENES = {
                 companion: 'trix',
                 bg: 'images/story/after_coop_w13/aftermath.webp',
                 lines: [
-                    { who: 'companion', en: 'The Warden is down, and the proof stone is bare. Look at the cuts, they are still sharp.', de: 'Der Wächter ist gefallen, und der Beweisstein liegt frei. Schau dir die Schnitte an, sie sind noch scharf.' },
+                    { who: 'companion', en: 'The Sentinel is down, and the proof stone is bare. Look at the cuts, they are still sharp.', de: 'Der Sentinel ist gefallen, und der Beweisstein liegt frei. Schau dir die Schnitte an, sie sind noch scharf.' },
                     { who: 'player', en: 'Recent. A chisel, perhaps a week old.', de: 'Frisch. Ein Meißel, vielleicht eine Woche alt.' },
                     { who: 'companion', en: 'Someone is still erasing.', de: 'Jemand löscht immer noch.' },
-                    { who: 'player', en: 'And someone is still ahead of us. This shard fell when the Warden did. The half-line on it is the one before the cut.', de: 'Und jemand ist uns immer noch voraus. Dieser Splitter fiel, als der Wächter fiel. Die halbe Zeile darauf ist die vor dem Schnitt.' },
+                    { who: 'player', en: 'And someone is still ahead of us. This shard fell when the Sentinel did. The half-line on it is the one before the cut.', de: 'Und jemand ist uns immer noch voraus. Dieser Splitter fiel, als der Sentinel fiel. Die halbe Zeile darauf ist die vor dem Schnitt.' },
                     { who: 'companion', en: 'Keep it. It is the only proof that something stood here.', de: 'Behalte ihn. Er ist der einzige Beweis, dass hier etwas stand.' },
                     { who: 'player', en: 'I always keep the evidence.', de: 'Ich behalte immer die Beweise.' },
                 ],
@@ -302,7 +308,7 @@ export const COOP_AFTERMATH_SCENES = {
                 companion: 'stox',
                 bg: 'images/story/after_coop_w13/aftermath.webp',
                 lines: [
-                    { who: 'companion', en: 'The shard fell when the Warden did. The edge is fresh: the stone was defaced recently.', de: 'Der Splitter fiel, als der Wächter fiel. Die Kante ist frisch: der Stein wurde erst kürzlich entstellt.' },
+                    { who: 'companion', en: 'The shard fell when the Sentinel did. The edge is fresh: the stone was defaced recently.', de: 'Der Splitter fiel, als der Sentinel fiel. Die Kante ist frisch: der Stein wurde erst kürzlich entstellt.' },
                     { who: 'player', en: 'Stox, that means whoever did it is close.', de: 'Stox, das heißt, wer es getan hat, ist in der Nähe.' },
                     { who: 'companion', en: 'Or was, recently. Both are bad.', de: 'Oder war es, vor Kurzem. Beides ist schlecht.' },
                     { who: 'player', en: 'But the letters on the shard still say something.', de: 'Aber die Buchstaben auf dem Splitter sagen immer noch etwas.' },

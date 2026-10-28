@@ -435,7 +435,9 @@ function _getWorldLabel(wi) {
 //------------------------------------------------------------------------
 
 /**
- * Returns true if the player has completed the final level of a given world.
+ * Returns true if the player has completed a world: its final level is
+ * cleared and, for worlds that have one, its Ascension Trial is beaten too.
+ * This drives the green ring on the world node.
  *
  * @param {number} wi - World index
  * @returns {boolean}
@@ -443,7 +445,9 @@ function _getWorldLabel(wi) {
 function _isWorldComplete(wi) {
     if (!STATE || !globalThis.WORLDS || !globalThis.WORLDS[wi]) return false;
     const finalGi = globalThis.WORLD_START_GI[wi] + (globalThis.WORLDS[wi].data.length - 1);
-    return STATE.done && STATE.done.includes(finalGi);
+    if (!(STATE.done && STATE.done.includes(finalGi))) return false;
+    const hasTrial = globalThis._trialWorlds().includes(wi);
+    return !hasTrial || globalThis._isAscensionTrialDone(wi);
 }
 
 /**

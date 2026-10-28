@@ -233,7 +233,7 @@ export const WD_WORLD_CONFIGS = [
         ],
         // Scenes after a co-op encounter (js/storyline/coop-aftermath-scenes.js): open once the encounter was cleared.
         aftermathNodes: [
-            { id: 'after_coop_w6', coop: 'coop_w6', from: 3, x: 38.6, y: 82.6 },
+            { id: 'after_coop_w6', coop: 'coop_w6', from: 3, x: 47, y: 79 },
         ],
         // A hero's secret half (js/storyline/reveal-scenes.js): opens once the player's hero has enough affinity with the teller.
         revealNodes: [
@@ -316,7 +316,7 @@ export const WD_WORLD_CONFIGS = [
         ],
         // Scenes after a co-op encounter (js/storyline/coop-aftermath-scenes.js): open once the encounter was cleared.
         aftermathNodes: [
-            { id: 'after_coop_w8', coop: 'coop_w8', from: 6, x: 90, y: 75 },
+            { id: 'after_coop_w8', coop: 'coop_w8', from: 6, x: 68, y: 90 },
         ],
         // A hero's secret half (js/storyline/reveal-scenes.js): opens once the player's hero has enough affinity with the teller.
         revealNodes: [
@@ -367,7 +367,7 @@ export const WD_WORLD_CONFIGS = [
         ],
         // Scenes after a co-op encounter (js/storyline/coop-aftermath-scenes.js): open once the encounter was cleared.
         aftermathNodes: [
-            { id: 'after_coop_w9', coop: 'coop_w9', from: 15, x: 53, y: 27 },
+            { id: 'after_coop_w9', coop: 'coop_w9', from: 15, x: 40, y: 25 },
         ],
     },
 
