@@ -105,11 +105,14 @@ function _calcCellSize(maxDim) {
 //   Follows the same breakpoints as _calcCellSize so clue text fits neatly
 //   inside the clue header columns.
 function _calcFontSize(maxDim) {
-    if (maxDim <= 5) return 17;
-    if (maxDim <= 10) return 15;
-    if (maxDim <= 15) return 13;
-    if (maxDim <= 20) return 12;
-    return 10;
+    let size = 10;
+    if (maxDim <= 5) size = 17;
+    else if (maxDim <= 10) size = 15;
+    else if (maxDim <= 15) size = 13;
+    else if (maxDim <= 20) size = 12;
+    // "Clue Number Size" setting: normal, large, larger
+    const step = (globalThis.SETTINGS && globalThis.SETTINGS.clueSize) || 0;
+    return Math.round(size * [1, 1.2, 1.4][step] || size);
 }
 
 

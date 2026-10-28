@@ -1682,9 +1682,10 @@ function _syncSupportBuffBarChips(now) {
         _syncBuffBarChip(id, {
             chipClass: `sx-buff-chip sx-buff-usp sx-buff-usp-${b.kind}`,
             iconHtml: b.icon || '',
+            labelText: label,
             stacksText: (b.kind === 'ward' && _uspWardCharges > 0) ? `x${_uspWardCharges}` : '',
             msLeft,
-            tipHtml: desc ? `<b>${label}</b><br>${desc}` : `<b>${label}</b>`,
+            tipHtml: `<div class="sx-ttl-tip sx-hud-tip"><div class="sx-ttl-tip-title">${label}</div>${desc || ''}</div>`,
         });
     }
     for (const id of [..._uspBuffBarIds]) {

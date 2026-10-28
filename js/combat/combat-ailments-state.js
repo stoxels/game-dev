@@ -609,10 +609,11 @@ function _powerMsLeft() {
 // frame; only touches the DOM when the displayed second or count changed.
 function _syncChargeBuffChip(kind, count, msLeft) {
     const def = _BUFF_CHIP_DEFS[kind];
-    const tip = `<b>${t(def.nameKey)} x${count}</b><br>${t(def.descKey)}`;
+    const tip = `<div class="sx-ttl-tip sx-hud-tip"><div class="sx-ttl-tip-title">${t(def.nameKey)} x${count}</div>${t(def.descKey)}</div>`;
     _syncBuffBarChip(`sx-buff-${kind}`, {
         chipClass: `sx-buff-chip sx-buff-${kind}`,
         iconHtml: '<span class="sx-buff-dot"></span>',
+        labelText: t(def.nameKey),
         stacksText: count > 0 ? `x${count}` : '',
         msLeft: count > 0 ? msLeft : 0,
         tipHtml: tip,
@@ -633,7 +634,7 @@ export function _syncBuffBarChip(id, opts) {
     const o = opts || {};
     const msLeft = Math.max(0, Number(o.msLeft) || 0);
     const secs = msLeft > 0 ? Math.ceil(msLeft / 1000) : 0;
-    const sig = `${o.iconHtml || ''}|${o.stacksText || ''}|${secs}|${o.tipHtml || ''}`;
+    const sig = `${o.iconHtml || ''}|${o.labelText || ''}|${o.stacksText || ''}|${secs}|${o.tipHtml || ''}`;
     // A matching signature alone is not enough: the hotbar rebuild wipes its
     // children (see renderSkillHotbar), dropping the node while the cache
     // still matches. The chip must exist too, or it is rebuilt here.
@@ -658,7 +659,8 @@ export function _syncBuffBarChip(id, opts) {
         chip.className = o.chipClass || 'sx-buff-chip';
         chip.innerHTML = '<span class="sx-buff-icon"></span>'
             + '<span class="sx-buff-stacks"></span>'
-            + '<span class="sx-buff-secs"></span>';
+            + '<span class="sx-buff-secs"></span>'
+            + '<span class="sx-buff-label"></span>';
         bar.appendChild(chip);
     }
     // data-tip holds ready-made HTML (rendered via innerHTML by the tooltip
@@ -667,6 +669,7 @@ export function _syncBuffBarChip(id, opts) {
     chip.children[0].innerHTML = o.iconHtml || '';
     chip.children[1].textContent = o.stacksText || '';
     chip.children[2].textContent = `${secs}s`;
+    chip.children[3].textContent = o.labelText || '';
 }
 
 // Removes one buff-bar chip by id (spell buff expiry / encounter cleanup).

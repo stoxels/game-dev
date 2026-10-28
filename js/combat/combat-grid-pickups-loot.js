@@ -281,7 +281,12 @@ export function _checkLootClaim(row, col) {
         .replace('{icon} ', '')
         .replace('{icon}', '')
         .replace('{name}', item.name + nameSuffix);
-    showHtmlToast(`${GAME_ART.html('item', _lootArtId(item), item.isUnique ? '✨' : (item.icon || '📦'))} ${_escapeToastHtml(lootClaimText)}`, _rarityToastColor(item.rarity));
+    // "Loot Notifications" setting: quieter pickups can be left out of the message list.
+    const rarityRank = item.isUnique ? 4 : ({ common: 0, uncommon: 1, rare: 2, epic: 3 }[item.rarity] ?? 0);
+    const minRank = (globalThis.SETTINGS && globalThis.SETTINGS.lootToastMinRarity) || 0;
+    if (rarityRank >= minRank) {
+        showHtmlToast(`${GAME_ART.html('item', _lootArtId(item), item.isUnique ? '✨' : (item.icon || '📦'))} ${_escapeToastHtml(lootClaimText)}`, _rarityToastColor(item.rarity));
+    }
     Audio_Manager.playSFX('player_equip_pickup');
     return true;
 }

@@ -45,6 +45,16 @@ export const SETTINGS_DEFAULTS = {
     invertMouseButtons: false,  // swap fill (left-click) and mark (right-click)
     meleeAutoRetarget: false,   // a melee hit on a non-selected monster also selects it
     hidePassiveTrackerInEndgame: false, // hide passive tracker during endgame maps
+    uiTextScale: 0,             // 0..3: size of tooltips, dialogs, notifications and the top-left HUD
+    clueSize: 0,                // 0..2: size of the puzzle clue numbers (next puzzle)
+    strongHighlight: false,     // brighter row / column highlight under the cursor
+    dimSolvedLines: false,      // fade the cells of rows and columns that are already solved
+    colorMode: 0,               // 0 standard, 1 red-green friendly, 2 blue-yellow friendly
+    autoPauseOnFocusLoss: false, // pause the puzzle when the window loses focus
+    confirmLeave: true,         // ask before leaving a map or trial run
+    damageNumbers: true,        // show floating damage numbers
+    damageNumberSize: 0,        // 0..2: size of the floating damage numbers
+    lootToastMinRarity: 0,      // 0 all, 1 uncommon+, 2 rare+, 3 epic+ : hides quieter loot pickup toasts
     lang: 'en',                 // persisted interface language
 };
 
@@ -66,23 +76,48 @@ const TOGGLE_CONFIGS = [
     { key: 'lowHealthVignette', btnId: 'stt-lhv' },
     { key: 'penaltyFlash', btnId: 'stt-penflash' },
     { key: 'hidePassiveTrackerInEndgame', btnId: 'stt-hidepassiveendgame' },
+    { key: 'strongHighlight', btnId: 'stt-stronghl' },
+    { key: 'dimSolvedLines', btnId: 'stt-dimsolved' },
+    { key: 'autoPauseOnFocusLoss', btnId: 'stt-autopause' },
+    { key: 'confirmLeave', btnId: 'stt-confirmleave' },
+    { key: 'damageNumbers', btnId: 'stt-dmgnum' },
 ];
 
 // Describes every slider control in the settings modal.
 // Each entry maps a settings key to its slider and display-value element IDs.
 // mode: 'percent' (default) stores a 0–1 float and shows a % label;
-//       'seconds' stores the raw slider value and shows an "Ns" label.
+//       'seconds' stores the raw slider value and shows an "Ns" label;
+//       'choice' stores the step number and shows the translated name of that step.
 const SLIDER_CONFIGS = [
     { key: 'bgmVolume', sliderId: 'sld-bgm', valueId: 'val-bgm' },
     { key: 'sfxVolume', sliderId: 'sld-sfx', valueId: 'val-sfx' },
     { key: 'toastDuration', sliderId: 'sld-toast', valueId: 'val-toast', mode: 'seconds' },
+    { key: 'uiTextScale', sliderId: 'sld-uiscale', valueId: 'val-uiscale', mode: 'choice', labels: ['set_ch_normal', 'set_ch_large', 'set_ch_larger', 'set_ch_largest'] },
+    { key: 'clueSize', sliderId: 'sld-cluesize', valueId: 'val-cluesize', mode: 'choice', labels: ['set_ch_normal', 'set_ch_large', 'set_ch_larger'] },
+    { key: 'colorMode', sliderId: 'sld-colormode', valueId: 'val-colormode', mode: 'choice', labels: ['set_ch_standard', 'set_ch_redgreen', 'set_ch_blueyellow'] },
+    { key: 'damageNumberSize', sliderId: 'sld-dmgsize', valueId: 'val-dmgsize', mode: 'choice', labels: ['set_ch_normal', 'set_ch_large', 'set_ch_larger'] },
+    { key: 'lootToastMinRarity', sliderId: 'sld-loottoast', valueId: 'val-loottoast', mode: 'choice', labels: ['set_ch_all', 'set_ch_uncommon', 'set_ch_rare', 'set_ch_epic'] },
 ];
+
+// Size steps behind the "choice" sliders above.
+const UI_SCALES = [1, 1.1, 1.2, 1.35];
+const DAMAGE_SCALES = [1, 1.3, 1.6];
 
 // Returns the value transforms for a slider config:
 //   toStored - converts the raw 0–100 slider integer to the stored settings value
 //   toRaw    - converts the stored settings value back to the slider integer
 //   label    - formats the stored value for the on-screen text
 function _sliderTransforms(cfg) {
+    if (cfg.mode === 'choice') {
+        return {
+            toStored: raw => parseInt(raw),
+            toRaw: stored => Math.round(stored),
+            label: stored => {
+                const key = cfg.labels[Math.max(0, Math.min(cfg.labels.length - 1, Math.round(stored)))];
+                return typeof globalThis.t === 'function' ? globalThis.t(key) : key;
+            },
+        };
+    }
     if (cfg.mode === 'seconds') {
         return {
             toStored: raw => parseInt(raw),
@@ -151,10 +186,34 @@ function applyAudioSettings() {
 function _initFocusMuteListeners() {
     window.addEventListener('blur', () => {
         if (SETTINGS.muteOnFocusLoss) Audio_Manager.setFocusMuted(true);
+        _autoPauseOnBlur();
     });
     window.addEventListener('focus', () => {
         if (SETTINGS.muteOnFocusLoss) Audio_Manager.setFocusMuted(false);
     });
+}
+
+// Pauses the running puzzle when the window loses focus ("auto-pause" setting).
+// Only while a level is on screen, never during the tutorial quest.
+function _autoPauseOnBlur() {
+    if (!SETTINGS.autoPauseOnFocusLoss) return;
+    const game = document.getElementById('screen-game');
+    if (!game || !game.classList.contains('active')) return;
+    if (globalThis.cur && globalThis.cur.isTutorialQuest) return;
+    if (typeof globalThis.pauseGame === 'function') globalThis.pauseGame();
+}
+
+// Pushes the look-related settings (text size, colour mode, highlights, damage numbers)
+// to the page as CSS variables and classes; css/display-settings.css does the rest.
+function applyDisplaySettings() {
+    const root = document.documentElement;
+    root.style.setProperty('--ui-scale', String(UI_SCALES[SETTINGS.uiTextScale] || 1));
+    root.style.setProperty('--dmg-scale', String(DAMAGE_SCALES[SETTINGS.damageNumberSize] || 1));
+    root.classList.toggle('set-cb-rg', SETTINGS.colorMode === 1);
+    root.classList.toggle('set-cb-by', SETTINGS.colorMode === 2);
+    root.classList.toggle('set-strong-hover', !!SETTINGS.strongHighlight);
+    root.classList.toggle('set-dim-solved', !!SETTINGS.dimSolvedLines);
+    root.classList.toggle('set-no-dmg', !SETTINGS.damageNumbers);
 }
 
 // Pushes gameplay settings to the relevant game-state variables.
@@ -175,6 +234,7 @@ function applyGameplaySettings() {
 export function applySettings() {
     applyAudioSettings();
     applyGameplaySettings();
+    applyDisplaySettings();
 }
 
 
@@ -282,6 +342,11 @@ export function initSettingsControls() {
     initToggleControl('stt-lhv', 'lowHealthVignette', false);
     initToggleControl('stt-penflash', 'penaltyFlash', false);
     initToggleControl('stt-hidepassiveendgame', 'hidePassiveTrackerInEndgame', false);
+    initToggleControl('stt-stronghl', 'strongHighlight');
+    initToggleControl('stt-dimsolved', 'dimSolvedLines');
+    initToggleControl('stt-autopause', 'autoPauseOnFocusLoss', false);
+    initToggleControl('stt-confirmleave', 'confirmLeave', false);
+    initToggleControl('stt-dmgnum', 'damageNumbers');
 
 
     // Sliders (volume + toast duration)

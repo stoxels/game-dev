@@ -618,6 +618,8 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {Function} onConfirm - Called if the player confirms leaving
      */
     function showEgForfeitConfirm(onConfirm) {
+        // "Confirm Leaving Maps" setting: when off, leaving happens straight away.
+        if (globalThis.SETTINGS && globalThis.SETTINGS.confirmLeave === false) { onConfirm(); return; }
         // Reuse existing modal infrastructure - build a one-off modal overlay.
         // A campaign trial has its own wording (no map, no Atlas); a map run keeps the map texts.
         const k = (typeof globalThis._isTrialRun === 'function' && globalThis._isTrialRun()) ? 'trial' : 'map';

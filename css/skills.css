@@ -1754,3 +1754,29 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box { /* neutralized - see s
     z-index: 3;
 }
 .skill-hotbar-slot.reaction-ready .skill-hotbar-react { color: #fff3b0; }
+
+/* ── readability pass: buff chips above the hotbar (charges and support buffs) ── */
+#sx-buff-bar { gap: 8px; }
+.sx-buff-chip {
+    gap: 8px;
+    padding: 5px 12px;
+    background: linear-gradient(180deg, #25202b, #16131b);
+    border: 2px solid #b8913a;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    font-family: var(--C, serif);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.04em;
+    color: #ffe9a8;
+    text-shadow: 0 1px 2px #000;
+}
+.sx-buff-chip .sx-buff-icon { order: 0; font-size: 20px; }
+.sx-buff-chip .sx-buff-icon img { width: 22px; height: 22px; }
+.sx-buff-chip .sx-buff-label { order: 1; }
+.sx-buff-chip .sx-buff-stacks { order: 2; color: #fff3d6; font-size: 18px; }
+.sx-buff-chip .sx-buff-secs { order: 3; font-family: var(--PX, serif); font-weight: 700; font-size: 16px; color: #d6c99f; opacity: 1; min-width: 3.2ch; }
+.sx-buff-dot { width: 15px; height: 15px; }
+.sx-buff-endurance { border-color: #ff9b2f; }
+.sx-buff-power { border-color: #5aa2ff; }
+.sx-buff-frenzy { border-color: #4ade80; }

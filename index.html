@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="css/overlays.css?v=16">
     <link rel="stylesheet" href="css/modals.css?v=5">
     <link rel="stylesheet" href="css/class.css?v=6">
-    <link rel="stylesheet" href="css/skills.css?v=27">
+    <link rel="stylesheet" href="css/skills.css?v=28">
     <link rel="stylesheet" href="css/spellbook-redesign.css?v=29">
     <link rel="stylesheet" href="css/universal-spells.css?v=16">
     <link rel="stylesheet" href="css/spell-fx-kit.css?v=2">
@@ -86,6 +86,7 @@
     <link rel="stylesheet" href="css/trial-intro.css?v=2">
     <link rel="stylesheet" href="css/replay.css?v=2">
     <link rel="stylesheet" href="css/companion-stage.css?v=5">
+    <link rel="stylesheet" href="css/display-settings.css?v=2">
     <link rel="stylesheet" href="css/dev-mode-select.css">
     <link rel="stylesheet" href="css/typography.css?v=6d">
     <!-- Boot: discover title art as early as possible -->
@@ -808,10 +809,110 @@
                         <span class="tgl-off-txt" data-t="stt_off">OFF</span>
                     </button>
                 </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_ui_scale">Text Size</span>
+                        <span class="settings-hint" data-t="settings_ui_scale_hint">Size of tooltips, dialogs, notifications and the top-left HUD</span>
+                    </label>
+                    <div class="settings-controls">
+                        <input type="range" class="settings-slider" id="sld-uiscale" min="0" max="3" value="0" step="1">
+                        <span class="settings-val settings-val-wide" id="val-uiscale">-</span>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_color_mode">Colour Mode</span>
+                        <span class="settings-hint" data-t="settings_color_mode_hint">Colour-blind friendly colours for cells, marks and rarities</span>
+                    </label>
+                    <div class="settings-controls">
+                        <input type="range" class="settings-slider" id="sld-colormode" min="0" max="2" value="0" step="1">
+                        <span class="settings-val settings-val-wide" id="val-colormode">-</span>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_clue_size">Clue Number Size</span>
+                        <span class="settings-hint" data-t="settings_clue_size_hint">Size of the clue numbers (applies from the next puzzle)</span>
+                    </label>
+                    <div class="settings-controls">
+                        <input type="range" class="settings-slider" id="sld-cluesize" min="0" max="2" value="0" step="1">
+                        <span class="settings-val settings-val-wide" id="val-cluesize">-</span>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_strong_hl">Strong Row/Column Highlight</span>
+                        <span class="settings-hint" data-t="settings_strong_hl_hint">Brighter highlight of the row and column under your cursor</span>
+                    </label>
+                    <button class="settings-toggle" id="stt-stronghl">
+                        <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                        <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                    </button>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_dim_solved">Dim Solved Lines</span>
+                        <span class="settings-hint" data-t="settings_dim_solved_hint">Fade rows and columns that are already solved</span>
+                    </label>
+                    <button class="settings-toggle" id="stt-dimsolved">
+                        <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                        <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                    </button>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_dmg_numbers">Damage Numbers</span>
+                        <span class="settings-hint" data-t="settings_dmg_numbers_hint">Show floating damage numbers in fights</span>
+                    </label>
+                    <button class="settings-toggle" id="stt-dmgnum">
+                        <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                        <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                    </button>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_dmg_size">Damage Number Size</span>
+                        <span class="settings-hint" data-t="settings_dmg_size_hint">How big the floating damage numbers are</span>
+                    </label>
+                    <div class="settings-controls">
+                        <input type="range" class="settings-slider" id="sld-dmgsize" min="0" max="2" value="0" step="1">
+                        <span class="settings-val settings-val-wide" id="val-dmgsize">-</span>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_loot_toast">Loot Notifications</span>
+                        <span class="settings-hint" data-t="settings_loot_toast_hint">Hide loot pickup messages below this rarity</span>
+                    </label>
+                    <div class="settings-controls">
+                        <input type="range" class="settings-slider" id="sld-loottoast" min="0" max="3" value="0" step="1">
+                        <span class="settings-val settings-val-wide" id="val-loottoast">-</span>
+                    </div>
+                </div>
             </div>
             <div class="settings-section sec-controls">
                 <div class="settings-section-title" data-t="settings_controls">CONTROLS</div>
 
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_autopause">Pause When Unfocused</span>
+                        <span class="settings-hint" data-t="settings_autopause_hint">Pauses the puzzle when the window loses focus</span>
+                    </label>
+                    <button class="settings-toggle" id="stt-autopause">
+                        <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                        <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                    </button>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_confirm_leave">Confirm Leaving Maps</span>
+                        <span class="settings-hint" data-t="settings_confirm_leave_hint">Ask before leaving a map or trial run</span>
+                    </label>
+                    <button class="settings-toggle" id="stt-confirmleave">
+                        <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                        <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                    </button>
+                </div>
                 <div class="settings-row">
                     <label class="settings-label">
                         <span data-t="settings_axis_lock">Axis Lock</span>

@@ -1,0 +1,70 @@
+/* ==========================================================================
+   Display settings (Settings > Text Size, Colour Mode, highlights, damage numbers).
+   js/settings.js writes the variables / html classes used here:
+     --ui-scale, --dmg-scale, .set-cb-rg, .set-cb-by, .set-strong-hover, .set-dim-solved, .set-no-dmg
+   ========================================================================== */
+
+/* ---- Text size: bigger tooltips, dialogs, notifications and the top-left HUD ---- */
+.sx-ttl-tip,
+.skl-tip,
+.modal-box,
+.pause-menu,
+.cmp-ask-box,
+.toast-stack,
+.combat-toast-stack,
+.game-hud-corner { zoom: var(--ui-scale, 1); }
+
+/* ---- Damage numbers ---- */
+.sx-damage-number, .sx-player-damage { zoom: var(--dmg-scale, 1); }
+.set-no-dmg .sx-damage-number,
+.set-no-dmg .sx-player-damage { display: none !important; }
+
+/* ---- Strong row / column highlight under the cursor ---- */
+.set-strong-hover td.cch.hov-col,
+.set-strong-hover td.rct.hov-row { background: rgba(255, 215, 110, 0.75) !important; color: #000; }
+.set-strong-hover div.gc.hov-r:not(.filled):not(.wrong-mark),
+.set-strong-hover div.gc.hov-c:not(.filled):not(.wrong-mark) { background: #3a4d78; }
+.set-strong-hover div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) { background: #5a74b0; border-color: #ffd76e; }
+
+/* ---- Dim solved lines ---- */
+.set-dim-solved .rct.clue-line-solved,
+.set-dim-solved .cch.clue-line-solved { background: rgba(0, 0, 0, 0.45); }
+.set-dim-solved .clue-done { opacity: 0.25; }
+
+/* ---- Colour-blind friendly colours ---- */
+/* Red-green friendly: errors in orange, "revealed / good" in blue, uncommon/rare apart from each other */
+.set-cb-rg {
+    --red: #ff9f1c;
+    --green: #4aa3ff;
+    --clue-done: #4aa3ff;
+    --clue-over: #ff9f1c;
+    --cell-wrong-bg: #3a2406;
+    --cell-wrong-border: #ff9f1c;
+    --cell-revealed-bg: #12304d;
+    --cell-revealed-border: #4aa3ff;
+    --rarity-uncommon: #00d1ff;
+    --rarity-rare: #ffd166;
+}
+.set-cb-rg .gc.marked::after { color: rgba(255, 159, 28, .75); }
+.set-cb-rg .gc.wrong-mark::after { color: #ff9f1c; }
+.set-cb-rg .gtb-mistakes { color: #ff9f1c; }
+.set-cb-rg .sx-buff-endurance, .set-cb-rg .sx-buff-frenzy { border-color: #4aa3ff; }
+
+/* Blue-yellow friendly: filled cells in white, revealed cells in pink, warm yellow accents become pink/white */
+.set-cb-by {
+    --cell-filled: #f2f2f2;
+    --cell-filled-border: #b8b8b8;
+    --cell-revealed-bg: #4d1d3a;
+    --cell-revealed-border: #e0689a;
+    --cell-hover-intersect-border: rgba(255, 255, 255, 0.6);
+    --rarity-uncommon: #ff7aa8;
+    --rarity-rare: #ffffff;
+}
+.set-cb-by .gc.questioned::after { color: #ff7aa8; }
+.set-cb-by .sx-buff-power { border-color: #ffffff; }
+
+/* Choice sliders show a word ("Large", "Red-green friendly"), so their label is wider */
+.settings-val.settings-val-wide { width: clamp(110px, 12vw, 170px); font-size: clamp(12px, 1.2vw, 15px); white-space: nowrap; }
+/* The settings dialog itself keeps its size, so its controls never get squeezed while you change the text size */
+#settings-modal .modal-box { zoom: 1; }
+.settings-val.settings-val-wide { width: clamp(90px, 9vw, 130px); font-size: clamp(11px, 1.05vw, 14px); white-space: normal; line-height: 1.15; }

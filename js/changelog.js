@@ -29,6 +29,13 @@ export const CHANGELOG_DATA = [
                 ],
             },
             {
+                category: ["Settings", "Einstellungen"],
+                items: [
+                    ["New display settings: Text Size (tooltips, dialogs, notifications, top-left HUD), Colour Mode (red-green and blue-yellow friendly colours), Clue Number Size, Strong Row/Column Highlight, Dim Solved Lines, Damage Numbers on/off and their size.", "Neue Anzeige-Einstellungen: Textgröße (Tooltips, Dialoge, Meldungen, Anzeige oben links), Farbmodus (rot-grün- und blau-gelb-freundlich), Größe der Hinweiszahlen, starke Zeilen-/Spaltenhervorhebung, gelöste Linien abdunkeln, Schadenszahlen an/aus und ihre Größe."],
+                    ["New play settings: Pause When Unfocused, Confirm Leaving Maps, and Loot Notifications to hide pickup messages below a chosen rarity.", "Neue Spiel-Einstellungen: Pause bei Fokusverlust, Verlassen von Karten bestätigen und Beute-Meldungen, um Aufheb-Meldungen unterhalb einer gewählten Seltenheit auszublenden."],
+                ],
+            },
+            {
                 category: ["Shop", "Shop"],
                 items: [
                     ["New shop layout: your gold is in the top bar, the categories are a list on the left, the filter buttons stay on the right while you scroll the cards, and the search is at the bottom.", "Neues Shop-Layout: Dein Gold steht in der Kopfleiste, die Kategorien sind links untereinander, die Filterknöpfe bleiben rechts stehen, während du durch die Karten scrollst, und die Suche ist unten."],
