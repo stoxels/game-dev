@@ -372,7 +372,7 @@ function _ptTooltipBuildStatusHtml(id, state, lang) {
         const text = canRemove
             ? t('pt_tooltip_active_removable')
             : t('pt_tooltip_active_not_removable');
-        return `<div style="margin-top:7px;font-size:11px;color:${color};">${text}</div>`;
+        return `<div style="margin-top:7px;font-size:14px;color:${color};">${text}</div>`;
     }
 
     if (state === 'unlockable') {
@@ -381,12 +381,12 @@ function _ptTooltipBuildStatusHtml(id, state, lang) {
         const text = noPoints
             ? t('pt_tooltip_no_points')
             : t('pt_tooltip_click_unlock');
-        return `<div style="margin-top:7px;font-size:11px;color:${color};">${text}</div>`;
+        return `<div style="margin-top:7px;font-size:14px;color:${color};">${text}</div>`;
     }
 
     // locked
     const lockedText = t('pt_tooltip_locked');
-    return `<div style="margin-top:7px;font-size:11px;color:#555;">${lockedText}</div>`;
+    return `<div style="margin-top:7px;font-size:14px;color:#8a8a98;">${lockedText}</div>`;
 }
 
 // Blue "awaiting approval" block of the ARPG-port review overlay: the
@@ -398,8 +398,8 @@ function _ptTooltipBuildProposalHtml(proposal) {
     const planLines = (plan.lines && plan.lines.length)
         ? plan.lines.map(esc).join('<br>')
         : '<i>(left empty for now)</i>';
-    return `<div style="margin-top:8px;padding:6px 8px;border:1px solid #4da3ff;border-radius:4px;background:rgba(40,90,160,0.18);font-size:11px;color:#bcd9ff;">`
-        + `<div style="font-size:10px;letter-spacing:1px;color:#4da3ff;">PROPOSAL - AWAITING APPROVAL</div>`
+    return `<div style="margin-top:8px;padding:6px 8px;border:1px solid #4da3ff;border-radius:4px;background:rgba(40,90,160,0.18);font-size:14px;color:#bcd9ff;">`
+        + `<div style="font-size:12px;letter-spacing:1px;color:#4da3ff;">PROPOSAL - AWAITING APPROVAL</div>`
         + `<div style="margin-top:4px;color:#8fb4e0;">Original: ${esc(proposal.reference.name || '')}</div>`
         + `<div>${referenceLines}</div>`
         + `<div style="margin-top:5px;color:#8fb4e0;">Planned${plan.name ? ': ' + esc(plan.name) : ''}</div>`
@@ -422,25 +422,25 @@ function _ptTooltipBuildHtml(id) {
     const reworkHtml = proposal ? _ptTooltipBuildProposalHtml(proposal)
         : isPassiveTreeNodeReworked(id)
         ? ''
-        : `<div style="margin-top:6px;font-size:10px;letter-spacing:1px;color:#ff5d7e;">${lang === 'de' ? 'NICHT VOLLSTÄNDIG ÜBERARBEITET' : 'NOT FULLY REWORKED'}</div>`;
+        : `<div style="margin-top:6px;font-size:12px;letter-spacing:1px;color:#ff5d7e;">${lang === 'de' ? 'NICHT VOLLSTÄNDIG ÜBERARBEITET' : 'NOT FULLY REWORKED'}</div>`;
 
     // Tier caption above the name - keystones and notables introduce
     // themselves, plain travel markers stay uncaptioned.
     const tier = _ptGetNodeTier(def);
     let typeHtml = '';
     if (tier === PT_TIER_START) {
-        typeHtml = `<div style="font-size:10px;letter-spacing:1.5px;color:#ffd700;margin-bottom:3px;">${lang === 'de' ? 'KLASSENSTART' : 'CLASS START'}</div>`;
+        typeHtml = `<div style="font-size:13px;letter-spacing:1.5px;color:#ffd700;margin-bottom:3px;">${lang === 'de' ? 'KLASSENSTART' : 'CLASS START'}</div>`;
     } else if (tier === PT_TIER_KEYSTONE) {
-        typeHtml = `<div style="font-size:10px;letter-spacing:1.5px;color:#e8a020;margin-bottom:3px;">${t('pt_node_keystone')}</div>`;
+        typeHtml = `<div style="font-size:13px;letter-spacing:1.5px;color:#e8a020;margin-bottom:3px;">${t('pt_node_keystone')}</div>`;
     } else if (tier === PT_TIER_NOTABLE) {
-        typeHtml = `<div style="font-size:10px;letter-spacing:1.5px;color:#93a7bd;margin-bottom:3px;">${t('pt_node_notable')}</div>`;
+        typeHtml = `<div style="font-size:13px;letter-spacing:1.5px;color:#aab9cc;margin-bottom:3px;">${t('pt_node_notable')}</div>`;
     }
 
     return `
         ${typeHtml}
-        <div style="font-size:13px;font-weight:bold;color:#66fcf1;margin-bottom:5px;">${name}</div>
-        ${desc ? `<div style="color:#bba870;">${desc}</div>` : ''}
-        <div style="margin-top:6px;font-size:10px;letter-spacing:0.5px;color:#7d8da1;">ID ${id}</div>
+        <div style="font-family:var(--C, serif);font-size:20px;font-weight:700;letter-spacing:0.05em;color:#ffd76e;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid rgba(255,215,110,0.35);">${name}</div>
+        ${desc ? `<div style="color:#e9e2cf;">${desc}</div>` : ''}
+        <div style="margin-top:6px;font-size:12px;letter-spacing:0.5px;color:#8f9db0;">ID ${id}</div>
         ${reworkHtml}
         ${statusHtml}
     `;
@@ -462,16 +462,16 @@ function _ptCreateTooltip() {
         position: fixed;
         z-index: 9999;
         pointer-events: none;
-        max-width: 350px;
-        background: rgba(10,10,20,0.97);
-        border: 1px solid rgba(184,154,80,0.5);
+        max-width: 460px;
+        background: linear-gradient(180deg, #25202b, #16131b);
+        border: 2px solid #b8913a;
         border-radius: 6px;
-        padding: 10px 13px;
-        font-family: var(--PX, monospace);
-        font-size: 12px;
-        color: #d4b870;
-        box-shadow: 0 4px 18px rgba(0,0,0,0.7);
-        line-height: 1.5;
+        padding: 14px 18px;
+        font-family: var(--PX, serif);
+        font-size: 16px;
+        color: #e9e2cf;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.55);
+        line-height: 1.45;
         opacity: 0;
         transition: opacity 0.1s;
     `;

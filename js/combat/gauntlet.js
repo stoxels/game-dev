@@ -473,9 +473,9 @@ const _MODIFIERS = ['lava', 'shrink', 'shrine'];
 // healing shrine).
 function _modInfo(id) {
     return {
-        lava:   { icon: '🌋', en: 'Drifting lava pools burn you - keep clear of them', de: 'Wandernde Lavapfützen verbrennen dich - meide sie' },
-        shrink: { icon: '🕳', en: 'The floor shrinks as time passes', de: 'Der Boden schrumpft mit der Zeit' },
-        shrine: { icon: '✨', en: 'A healing shrine moves around - stand in it to recover', de: 'Ein Heilschrein wandert umher - steh darin, um dich zu erholen' },
+        lava:   { icon: '🌋', name: 'Lava pools', nameDe: 'Lavapfützen', en: 'Drifting lava pools burn you - keep clear of them', de: 'Wandernde Lavapfützen verbrennen dich - meide sie' },
+        shrink: { icon: '🕳', name: 'Shrinking floor', nameDe: 'Schrumpfender Boden', en: 'The floor shrinks as time passes', de: 'Der Boden schrumpft mit der Zeit' },
+        shrine: { icon: '✨', name: 'Healing shrine', nameDe: 'Heilschrein', en: 'A healing shrine moves around - stand in it to recover', de: 'Ein Heilschrein wandert umher - steh darin, um dich zu erholen' },
     }[id];
 }
 
@@ -840,26 +840,54 @@ function _goldFor(lvl, challengesMet) {
     return Math.round(base * _tierCfg().gold * (1 + cfg.challengeGoldShare * challengesMet));
 }
 
+// One hoverable chip of the intro card: icon + short name, with the detailed
+// explanation in the tooltip so the card itself stays short.
+function _introChip(icon, name, tipTitle, tipText, extraClass) {
+    const tip = `<div class="sx-ttl-tip sx-hud-tip"><div class="sx-ttl-tip-title">${tipTitle}</div>${tipText}</div>`
+        .replace(/"/g, '&quot;');
+    return `<span class="ga-chip${extraClass ? ' ' + extraClass : ''}" data-tip="${tip}"><span class="ga-chip-ico">${icon}</span>${name}</span>`;
+}
+
+// One labelled row of chips on the intro card.
+function _introRow(label, chips) {
+    return `<div class="ga-row"><span class="ga-row-label">${label}</span><span class="ga-row-chips">${chips}</span></div>`;
+}
+
 // Draws the intro card where the player picks a tier and starts the run.
+// Only the essentials are visible; the details sit in hover tips on the chips.
 function _renderIntro(lvl) {
     const mod = _modInfo(_g.modifier);
     const tierBtn = (id, label) =>
         `<button class="ga-btn ga-tier${_g.tier === id ? ' ga-tier-on' : ''}" data-tier="${id}">${label}</button>`;
     const total = _g.waves.reduce((sum, n) => sum + n, 0);
+    const monsters = _introRow(_tr('Monsters', 'Monster'),
+        _introChip('🛡', _tr('Warded', 'Geschützt'), _tr('Warded', 'Geschützt'),
+            _tr('Takes 65% less damage from spells. Use melee.', 'Nimmt 65% weniger Schaden durch Zauber. Nutze Nahkampf.'))
+        + _introChip('👻', _tr('Phased', 'Phasend'), _tr('Phased', 'Phasend'),
+            _tr('Takes 65% less damage from melee. Use spells.', 'Nimmt 65% weniger Schaden durch Nahkampf. Nutze Zauber.'))
+        + _introChip('👑', _tr('Champion', 'Champion'), _tr('Champion', 'Champion'),
+            _tr('A champion leads the final wave. It is tougher and hits harder.', 'Ein Champion führt die letzte Welle an. Er ist zäher und schlägt härter zu.'))
+        + _introChip('⚡', _tr('Combo', 'Kombo'), _tr('Combo', 'Kombo'),
+            _tr('Spell then melee = combo damage.', 'Zauber, dann Nahkampf = Kombo-Schaden.')));
+    const arena = _introRow(_tr('This run', 'Dieser Lauf'),
+        _introChip(mod.icon, _tr(mod.name, mod.nameDe), _tr(mod.name, mod.nameDe), _tr(mod.en, mod.de), 'ga-chip-run'));
+    const rewards = _introRow(_tr('Rewards', 'Belohnung'),
+        _introChip('💰', `${_goldFor(lvl, 0)}+ ${_tr('gold', 'Gold')}`, _tr('Gold', 'Gold'),
+            _tr('Every side goal you meet raises the gold. Dying only forfeits the bonus.', 'Jedes erfüllte Nebenziel erhöht das Gold. Sterben verwirft nur den Bonus.'))
+        + _introChip('🎯', _tr('Side goals', 'Nebenziele'), _tr('Side goals', 'Nebenziele'),
+            `${_tr('Untouched', 'Unberührt')} · ${_tr('Swift', 'Flink')} · ${_tr('Bruiser (10+ melee hits)', 'Haudegen (10+ Nahkampftreffer)')}`));
     _setCenter(`
         <div class="ga-card">
             <div class="ga-card-title">⚔ ${_tr('Gauntlet', 'Gauntlet')}</div>
-            <p>${_tr('Defeat every monster to claim the bonus.', 'Besiege jedes Monster, um den Bonus zu erhalten.')}</p>
-            <p class="ga-sub">🛡 ${_tr('Warded: use melee', 'Geschützt: Nahkampf nutzen')} · 👻 ${_tr('Phased: use spells', 'Phasend: Zauber nutzen')} · ${_tr('Spell then melee = combo damage', 'Zauber, dann Nahkampf = Kombo-Schaden')}</p>
-            <p class="ga-sub ga-mod">${mod.icon} ${_tr(mod.en, mod.de)}</p>
-            <p class="ga-sub">👑 ${_tr('A champion leads the final wave', 'Ein Champion führt die letzte Welle an')}</p>
+            <p class="ga-lead">${_tr('Defeat every monster to claim the bonus.', 'Besiege jedes Monster, um den Bonus zu erhalten.')}</p>
             <div class="ga-tiers">
                 ${tierBtn('normal', _tr('Normal', 'Normal'))}
                 ${tierBtn('hard', _tr('Hard', 'Schwer'))}
                 ${tierBtn('brutal', _tr('Brutal', 'Brutal'))}
             </div>
-            <p class="ga-sub">${_g.waves.length} ${_tr('waves', 'Wellen')} · ${total} ${_tr('monsters', 'Monster')} · 💰 ${_goldFor(lvl, 0)}+ ${_tr('gold', 'Gold')} · ${_tr('Dying only forfeits the bonus', 'Sterben verwirft nur den Bonus')}</p>
-            <p class="ga-sub">${_tr('Side goals', 'Nebenziele')}: ${_tr('Untouched', 'Unberührt')} · ${_tr('Swift', 'Flink')} · ${_tr('Bruiser (10+ melee hits)', 'Haudegen (10+ Nahkampftreffer)')}</p>
+            <p class="ga-count">${_g.waves.length} ${_tr('waves', 'Wellen')} · ${total} ${_tr('monsters', 'Monster')}</p>
+            <div class="ga-rows">${monsters}${arena}${rewards}</div>
+            <p class="ga-hint">${_tr('Hover a symbol for details', 'Symbol anfahren für Details')}</p>
             <div class="ga-actions">
                 <button class="ga-btn ga-go" id="ga-go">${_tr('ENTER', 'BETRETEN')}</button>
                 <button class="ga-btn ga-skip" id="ga-skip">${_tr('Skip', 'Überspringen')}</button>

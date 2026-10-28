@@ -960,3 +960,34 @@
     .quest-reward-item-tip:hover {
         filter: brightness(1.2);
     }
+
+
+/* -----------------------------------------------------------------------
+   READABILITY PASS - larger counts and category names on the dock, and the
+   item tooltip in the same plate as the other tooltips.
+   ----------------------------------------------------------------------- */
+
+.inv-panel-label { font-family: var(--C); font-weight: 700; font-size: clamp(12px, 1.2vw, 16px); letter-spacing: 0.08em; }
+#reshuffle-counter, .reshuffle-counter-mini { font-family: var(--PX); font-size: clamp(11px, 1.05vw, 14px); color: #c9c3b4; }
+
+.inv-cat-icon { font-size: clamp(15px, 1.9vw, 20px); }
+.inv-cat-label { font-family: var(--C); font-weight: 700; font-size: clamp(8px, 0.85vw, 11px); letter-spacing: 0.06em; color: #b4ae9e; }
+.inv-cat-count { top: 0; right: 2px; font-family: var(--C); font-weight: 700; font-size: clamp(12px, 1.3vw, 16px); }
+
+.inv-slot-count { bottom: 0; right: 2px; font-family: var(--C); font-weight: 700; font-size: clamp(12px, 1.3vw, 16px); text-shadow: 0 0 3px #000, 0 0 3px #000, 1px 1px 0 #000; }
+.inv-group-label { font-size: clamp(9px, 0.95vw, 12px); color: #8f8a7c; }
+
+#inv-slot-tooltip {
+    width: 320px;
+    padding: 12px 16px 12px;
+    background: linear-gradient(180deg, #25202b, #16131b);
+    border: 2px solid #b8913a;
+    border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+    color: #e9e2cf;
+}
+.inv-tip-name { font-family: var(--C); font-weight: 700; font-size: 20px; letter-spacing: 0.05em; margin-bottom: 3px; }
+.inv-tip-rarity { font-family: var(--C); font-size: 13px; letter-spacing: 0.12em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255, 215, 110, 0.35); opacity: 0.9; }
+.inv-tip-desc { font-family: var(--PX); font-size: 16px; color: #e9e2cf; line-height: 1.45; margin-bottom: 9px; }
+.inv-tip-stack { font-family: var(--PX); font-size: 15px; font-weight: 700; color: #ffd76e; margin-bottom: 6px; }
+.inv-tip-hint { font-family: var(--PX); font-size: 13px; color: #b9b19a; border-top-color: rgba(255, 215, 110, 0.3); padding-top: 6px; }
