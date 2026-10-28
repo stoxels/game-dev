@@ -13,6 +13,46 @@ export const CHANGELOG_DATA = [
 
 
     {
+        version: "v0.35 BETA",
+        date: "28.10.2026",
+        changes: [
+            {
+                category: ["Interface", "Oberfläche"],
+                items: [
+                    ["Readability pass across the whole game: one display font for headings and buttons and one readable font for body text, with much larger small text on almost every screen (top bars, Inference, Spellbook and its status guide, Probability Tree bar, Character sheet, pause menu, toasts, objective tracker and the Trial, Ascension and map complete screens).", "Lesbarkeits-Überarbeitung im ganzen Spiel: eine Schrift für Überschriften und Knöpfe und eine gut lesbare Schrift für Fließtext, dazu deutlich größerer kleiner Text auf fast jedem Bildschirm (Kopfleisten, Inferenz, Zauberbuch samt Statusführer, Leiste des Wahrscheinlichkeitsbaums, Charakterbogen, Pausenmenü, Meldungen, Zielanzeige sowie die Abschlussbildschirme von Prüfungen, Aufstieg und Karten)."],
+                    ["Tooltips share one look: Gold, Inference, Spellbook, Tree, Character, Shop and Settings buttons, puzzle HUD, XP bar, monsters, level names, spells, tree nodes, puzzle items, Trial nodes and the bonus loot chance. The bonus loot tooltip is much shorter.", "Tooltips haben ein einheitliches Aussehen: Knöpfe der Kopfleiste, Rätsel-Anzeige, EP-Leiste, Monster, Levelnamen, Zauber, Baumknoten, Rätselgegenstände, Prüfungsknoten und die Bonusbeute-Chance. Der Tooltip zur Bonusbeute ist viel kürzer."],
+                    ["Setup screen: the score bonus under each modifier is a clear plate with gold text, and the Select Level button glows along its shape.", "Setup-Bildschirm: Der Punktebonus unter jedem Modifikator ist eine klare Plakette mit goldener Schrift, und der Knopf Level wählen leuchtet entlang seiner Form."],
+                    ["Inference: clearer cards and milestone rows, no more orange new-reward dots, and a Hide completed button.", "Inferenz: klarere Karten und Meilenstein-Zeilen, keine orangen Neu-Punkte mehr und ein Knopf zum Ausblenden erledigter Einträge."],
+                    ["Character sheet: the title plaque is centred, the level display toggle moved to the top bar and shows which mode is active, stats, stack counts and item level numbers on slots are bigger, and the essence filter says ilvl.", "Charakterbogen: Die Titelplakette ist zentriert, der Umschalter für die Levelanzeige wurde in die Kopfleiste verschoben und zeigt den aktiven Modus, Werte, Stapelzahlen und Itemlevel-Zahlen auf den Feldern sind größer, und der Essenz-Filter zeigt ilvl."],
+                    ["Gauntlet card redesigned: only the essentials are shown, details appear when you hover the symbols.", "Gauntlet-Karte neu gestaltet: Nur das Wichtigste ist sichtbar, Details erscheinen beim Überfahren der Symbole."],
+                    ["Character select tooltip explains where each hero starts on the passive tree. Affinity button moved into the top bar, the Titles and Affinity windows got larger text, and the AI notice on the title screen is bigger.", "Der Tooltip der Charakterauswahl erklärt, wo jeder Held im Passivbaum startet. Der Verbundenheits-Knopf ist in die Kopfleiste gewandert, die Fenster für Titel und Verbundenheit haben größere Schrift, und der KI-Hinweis auf dem Titelbildschirm ist größer."],
+                ],
+            },
+            {
+                category: ["Shop", "Shop"],
+                items: [
+                    ["New shop layout: your gold is in the top bar, the categories are a list on the left, the filter buttons stay on the right while you scroll the cards, and the search is at the bottom.", "Neues Shop-Layout: Dein Gold steht in der Kopfleiste, die Kategorien sind links untereinander, die Filterknöpfe bleiben rechts stehen, während du durch die Karten scrollst, und die Suche ist unten."],
+                    ["Base items use filter buttons instead of drop-downs, and the Defence filter only appears for gear that has defences.", "Basis-Gegenstände nutzen Filterknöpfe statt Auswahllisten, und der Defensiv-Filter erscheint nur für Ausrüstung mit Defensivwerten."],
+                ],
+            },
+            {
+                category: ["Story & Co-op", "Story & Gemeinsam"],
+                items: [
+                    ["Story speech bubbles use the new readable font. Names sit on a dark tag, so Syla's yellow name can be read.", "Story-Sprechblasen nutzen die neue lesbare Schrift. Namen stehen auf einem dunklen Schild, sodass Sylas gelber Name lesbar ist."],
+                    ["Co-op intro and result dialogs were redesigned with the stone frame, a title plaque and a bigger affinity bar and quest item card.", "Die Dialoge vor und nach gemeinsamen Abenteuern wurden mit Steinrahmen, Titelplakette sowie größerer Verbundenheitsleiste und Quest-Gegenstand neu gestaltet."],
+                    ["Your friend's affinity badge now sits in the top-left stack below the clues and objectives instead of on top of them.", "Das Verbundenheits-Schild deines Freundes sitzt jetzt in der Stapelanzeige oben links unter Hinweisen und Zielen statt darüber."],
+                ],
+            },
+            {
+                category: ["Fixes", "Korrekturen"],
+                items: [
+                    ["Trial and Ascension intro texts are shorter, and their map tooltips match the normal level nodes.", "Die Einleitungstexte von Prüfung und Aufstieg sind kürzer, und ihre Tooltips auf der Karte passen zu den normalen Level-Knoten."],
+                    ["Status effects such as ignite and chill are no longer hidden behind a boss's art. The old status chips under the grid are gone. The level tooltip no longer shows an undefined modifier.", "Statuseffekte wie Entzünden und Frieren werden nicht mehr von der Grafik eines Bosses verdeckt. Die alten Status-Chips unter dem Gitter sind entfernt. Der Level-Tooltip zeigt keinen undefinierten Modifikator mehr."],
+                ],
+            },
+        ],
+    },
+    {
         version: "v0.34 BETA",
         date: "27.10.2026",
         changes: [
