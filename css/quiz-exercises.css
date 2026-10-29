@@ -193,7 +193,7 @@
    ============================================================ */
 
 .qr-question {
-    font-family: "STIX Two Math", "Cambria Math", "DejaVu Sans", var(--F), monospace;
+    font-family: var(--MATH);
     font-size: clamp(10px, 1.9vw, 26px);
     color: #e8d8b0;
     line-height: 1.55;
@@ -334,7 +334,7 @@
     background: url('../images/quiz/skip-button.webp') center / 100% 100% no-repeat;
     border: none;
     cursor: pointer;
-    font-family: var(--F);
+    font-family: var(--MATH);
     font-size: clamp(9px, 1.45vw, 18px);
     color: #d8c898;
     text-align: center;
@@ -428,7 +428,7 @@
    ============================================================ */
 
 .qr-hint {
-    font-family: "STIX Two Math", "Cambria Math", "DejaVu Sans", var(--F), monospace;
+    font-family: var(--MATH);
     font-size: clamp(15px, 1.2vw, 22px);
     color: #c8a8e8;
     text-align: center;
@@ -754,7 +754,7 @@
 }
 
 .qr-explain {
-    font-family: var(--F);
+    font-family: var(--MATH);
     font-size: clamp(9px, 1.5vw, 19px);
     color: #d8c898;
     line-height: 1.5;
@@ -798,3 +798,9 @@
     object-position: 50% 12%;
     pointer-events: none;
 }
+
+/* Typed subscripts/exponents in quiz text (f_X, e^(-x)) - raised/lowered
+   without stretching the line height. */
+.sx-mt-sub, .sx-mt-sup { font-size: 0.72em; line-height: 0; }
+.sx-mt-sub { vertical-align: sub; }
+.sx-mt-sup { vertical-align: super; }

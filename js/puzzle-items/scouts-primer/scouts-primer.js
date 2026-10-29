@@ -12,6 +12,7 @@ import { LANG, t } from '../../translation/translations.js';
 import { PT } from '../../probability-tree/probability-tree.js';
 import { questStat_mcWrongAnswerEliminated, questStat_tutorAnsweredCorrect, updateQuestStats } from '../../inference/inference-stats.js';
 import { _refreshQuestionModalFlag } from '../../screens/screens.js';
+import { setMathText } from '../../quiz-exercise/mathgate.js';
 import { save } from '../../state.js';
 import { pauseTimer, resumeTimer } from '../../timer/timer.js';
 import { buildInventoryPanel } from '../../puzzle-item-inventory/puzzle-item-inventory-panel.js';
@@ -175,7 +176,7 @@ function _primerPopulateMultiChoiceOptions(optsEl) {
     primerQuestion.opts.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'quiz-opt';
-        btn.textContent = opt.text;
+        setMathText(btn, opt.text);
         if (opt.isCorrect) btn.dataset.isCorrect = '1';
         btn.onclick = () => submitPrimerMCQ(opt.isCorrect, optsEl, btn);
         optsEl.appendChild(btn);
@@ -219,6 +220,7 @@ export function showPrimerModal(streak = 0) {
     overlay.innerHTML = _primerBuildModalHtml(primerQuestion, streak);
 
     document.body.appendChild(overlay);
+    setMathText(document.getElementById('primer-question-text'), primerQuestion.q);
     if (typeof _refreshQuestionModalFlag === 'function') _refreshQuestionModalFlag();
 
     // Inject character portrait

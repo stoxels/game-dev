@@ -17,7 +17,7 @@ import { _charIs, _getPlayerCharacterImage } from '../sprite/player_sprite.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { MATH_GATE_POOLS } from './mathgate-questions.js';
-import { mgFormatTutorAnswer } from './mathgate.js';
+import { mgFormatTutorAnswer, setMathText } from './mathgate.js';
 import { BONUS_QUIZ_POOLS } from './quiz-questions.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
@@ -317,7 +317,7 @@ function quizToggleExplain() {
         box.style.display = 'none';
         return;
     }
-    box.textContent = '💡 ' + text;
+    setMathText(box, '💡 ' + text);
     box.style.display = 'block';
     questStat_primerHintShown && questStat_primerHintShown(); // optional: reuse existing stat, or drop this line
 }
@@ -533,7 +533,7 @@ function _quizRenderMcOptions(q) {
     q.opts.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'quiz-opt';
-        btn.textContent = opt.text;
+        setMathText(btn, opt.text);
         if (opt.isCorrect) btn.dataset.isCorrect = '1';
         btn.onclick = () => answerQuiz(opt.isCorrect, optsEl, btn);
         optsEl.appendChild(btn);
@@ -717,7 +717,7 @@ export function showQuiz(worldNum, isRetry = false) {
     _quizWorldNum = worldNum;
     if (!isRetry) _quizRetryUsed = false;
 
-    document.getElementById('quiz-q').textContent = q.q;
+    setMathText(document.getElementById('quiz-q'), q.q);
 
     _quizResetOverlay();
 

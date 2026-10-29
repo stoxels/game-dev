@@ -187,6 +187,7 @@
 
     --PIXEL: 'Press Start 2P', monospace;
     --PX: 'Stoxels UI', 'Lora', Georgia, 'Times New Roman', serif; /* was Press Start 2P everywhere */
+    --MATH: "STIX Two Math", "Cambria Math", "Segoe UI Symbol", "DejaVu Sans", 'Stoxels UI', serif; /* quiz text with math symbols (bars, sub/superscripts, arrows) */
     --F: 'Share Tech Mono', monospace; /* Numbers, stats and short technical text */
     --C: 'Cinzel', serif;
     --B: 'Lora', Georgia, 'Times New Roman', serif; /* Prose on parchment cards and dialogs */

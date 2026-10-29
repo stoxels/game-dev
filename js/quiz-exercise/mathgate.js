@@ -295,9 +295,44 @@ export function mgFormatTutorAnswer(question) {
 //------------------------------------------------------------------------
 
 
+// Splits question text into plain, subscript and superscript pieces. Typed
+// notation is recognised: f_X, f_{X|Y}, S_xy become subscripts; e^(-x), x^2,
+// x^{n} become superscripts. Returns a list of [kind, text] pairs.
+function _mathTextPieces(text) {
+    const re = /_\{([^}]*)\}|_([A-Za-zΑ-ω0-9]+)|\^\{([^}]*)\}|\^(\([^()]*(?:\([^()]*\)[^()]*)*\))|\^(\d+(?:[.,]\d+)?|[A-Za-zα-ω])/g;
+    const pieces = [];
+    let last = 0;
+    let m;
+    while ((m = re.exec(text)) !== null) {
+        if (m.index > last) pieces.push(['text', text.slice(last, m.index)]);
+        if (m[1] !== undefined) pieces.push(['sub', m[1]]);
+        else if (m[2] !== undefined) pieces.push(['sub', m[2]]);
+        else if (m[3] !== undefined) pieces.push(['sup', m[3]]);
+        else if (m[4] !== undefined) pieces.push(['sup', m[4].slice(1, -1)]);
+        else pieces.push(['sup', m[5]]);
+        last = re.lastIndex;
+    }
+    if (last < text.length) pieces.push(['text', text.slice(last)]);
+    return pieces;
+}
+
+// Puts quiz text into an element, turning typed subscripts and exponents
+// (f_X, z_{1-a/2}, e^(-x)) into real raised/lowered text. Safe for any text:
+// it never inserts HTML. Used by the quiz, the Scout's Primer and the gate.
+export function setMathText(el, text) {
+    el.textContent = '';
+    for (const [kind, piece] of _mathTextPieces(String(text))) {
+        if (kind === 'text') { el.appendChild(document.createTextNode(piece)); continue; }
+        const node = document.createElement(kind === 'sub' ? 'sub' : 'sup');
+        node.className = 'sx-mt-' + kind;
+        node.textContent = piece;
+        el.appendChild(node);
+    }
+}
+
 // Writes the current question's localized text into the modal question element.
 function mgPopulateQuestion(question) {
-    document.getElementById('mg-question').textContent = mgGetLocalizedQuestion(question);
+    setMathText(document.getElementById('mg-question'), mgGetLocalizedQuestion(question));
 }
 
 // Updates the unit label displayed next to the answer input.
@@ -363,7 +398,7 @@ function mgToggleExplain() {
         box.style.display = 'none';
         return;
     }
-    box.textContent = '💡 ' + text;
+    setMathText(box, '💡 ' + text);
     box.style.display = 'block';
 }
 
@@ -687,7 +722,7 @@ export function mgCalcHintThreshold() {
 // Also tracks the hint-shown quest stat.
 function mgShowHint() {
     const hint = mgGetLocalizedHint(currentGateQuestion);
-    document.getElementById('mg-hint-text').textContent = '💡 ' + hint;
+    setMathText(document.getElementById('mg-hint-text'), '💡 ' + hint);
     document.getElementById('mg-hint-box').style.display = 'block';
     questStat_primerHintShown();
 }
