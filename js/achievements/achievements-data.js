@@ -2936,7 +2936,7 @@ export const ACHIEVEMENT_DEFS = [
             { threshold: 25, labelEn: 'Collector', labelDE: 'Sammler' },
             { threshold: 100, labelEn: 'Hoarder', labelDE: 'Horter' },
             { threshold: 250, labelEn: 'Vault Filler', labelDE: 'Tresorfüller' },
-            { threshold: 500, labelEn: 'Currency Tycoon', labelDE: 'Währungstycoon' },
+            { threshold: 500, labelEn: 'Core Tycoon', labelDE: 'Kerntycoon' },
         ]
     },
 

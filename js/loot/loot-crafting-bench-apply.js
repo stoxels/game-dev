@@ -56,7 +56,7 @@ export function _craftingBenchApply() {
             const have = _craftCurrencyCount(cost.id);
             return `${cost.count - have} more ${def.name || cost.id}`;
         }).join(', ');
-        showToast(`Insufficient currency: need ${missing}`, '#e87d70');
+        showToast(`Insufficient cores: need ${missing}`, '#e87d70');
         return;
     }
 

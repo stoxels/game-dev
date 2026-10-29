@@ -356,7 +356,7 @@ import { confirmReset } from '../../js/save-reset.js';
 import { advanceTutStep, finishTutorial, prevTutStep, replayTutorialFromTitle, showTutorial } from '../../js/tutorial.js';
 import { _tqIsTutorialActive, startTutorialQuest } from '../../js/tutorial-quest.js';
 import { MATH_GATE_POOLS } from '../../js/quiz-exercise/mathgate-questions.js';
-import { isGatedLevel, isMathGatePassed, mgCalcHintThreshold, mgCloseToLevelSelect, mgContinueToLevel, mgFormatTutorAnswer, mgNewQuestion, mgUseTutor, submitMathGate, tryStartGatedLevel } from '../../js/quiz-exercise/mathgate.js';
+import { isGatedLevel, isMathGatePassed, mgCalcHintThreshold, mgCloseToLevelSelect, mgContinueToLevel, mgFormatTutorAnswer, mgNewQuestion, mgUseTutor, setMathText, submitMathGate, tryStartGatedLevel } from '../../js/quiz-exercise/mathgate.js';
 import { CHARACTERS, maybeShowCharacterSelect, renderLSCharacterAvatar, renderMapViewCharacterPortrait } from '../../js/sprite/character-select.js';
 import { getGameTooltip, _calcGameTooltipPos, showGameTooltip, moveGameTooltip, hideGameTooltip, _tipAttr, _buildSaveSlotTooltipHTML } from '../../js/tooltips-hud.js';
 import { CHANGELOG_DATA, _buildCategoryGroupHtml, _buildVersionBlockHtml, _changelogLangIndex, openChangelog, renderChangelog } from '../../js/changelog.js';

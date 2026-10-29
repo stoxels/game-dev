@@ -36,7 +36,7 @@ export function _craftingBenchTooltipHTML(entry, tier, costs, disabled, affordab
     html += `<br><span style="color:#a8c8e8">Cost:</span> ${_craftingBenchCostTooltip(costs)}`;
     if (entry.isReplace) html += `<br><span style="color:#f1d27b">Replaces the existing crafted ${entry.type} (includes +1 Hollow Core)</span>`;
     if (disabled) html += `<br><span style="color:#e87d70">Requires item level ${tier.ilvl}</span>`;
-    else if (!affordable) html += '<br><span style="color:#e87d70">Not enough currency for this craft</span>';
+    else if (!affordable) html += '<br><span style="color:#e87d70">Not enough cores for this craft</span>';
     return html;
 }
 
