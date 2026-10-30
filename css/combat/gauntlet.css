@@ -286,7 +286,7 @@ body.gauntlet-open td.corner { z-index: 1; }
 .ga-card > p.ga-count { margin: 2px 0 12px; font-size: 19px; color: #e9ddc0; }
 .ga-rows { display: flex; flex-direction: column; gap: 9px; margin: 0 auto; width: min(780px, 100%); }
 .ga-row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px; background: rgba(20, 12, 8, 0.42); border: 1px solid rgba(255, 215, 110, 0.22); }
-.ga-row-label { flex: 0 0 96px; text-align: left; font-family: var(--C, serif); font-weight: 700; font-size: 15px; letter-spacing: 0.12em; text-transform: uppercase; color: #cdbd93; }
+.ga-row-label { flex: 0 0 136px; text-align: left; font-family: var(--C, serif); font-weight: 700; font-size: 15px; letter-spacing: 0.12em; text-transform: uppercase; color: #cdbd93; }
 .ga-row-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .ga-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; cursor: help; font-family: var(--PX, serif); font-weight: 700; font-size: 17px; color: #fbf1d6; background: linear-gradient(180deg, #4a4252, #2b2531); border: 2px solid #8f7a44; text-shadow: 0 1px 2px #000; transition: filter 0.12s, border-color 0.12s; }
 .ga-chip:hover { filter: brightness(1.25); border-color: #ffd76e; }

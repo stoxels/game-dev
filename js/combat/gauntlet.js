@@ -474,7 +474,7 @@ const _MODIFIERS = ['lava', 'shrink', 'shrine'];
 function _modInfo(id) {
     return {
         lava:   { icon: '🌋', name: 'Lava pools', nameDe: 'Lavapfützen', en: 'Drifting lava pools burn you - keep clear of them', de: 'Wandernde Lavapfützen verbrennen dich - meide sie' },
-        shrink: { icon: '🕳', name: 'Shrinking floor', nameDe: 'Schrumpfender Boden', en: 'The floor shrinks as time passes', de: 'Der Boden schrumpft mit der Zeit' },
+        shrink: { icon: '📉', name: 'Shrinking floor', nameDe: 'Schrumpfender Boden', en: 'The floor shrinks as time passes', de: 'Der Boden schrumpft mit der Zeit' },
         shrine: { icon: '✨', name: 'Healing shrine', nameDe: 'Heilschrein', en: 'A healing shrine moves around - stand in it to recover', de: 'Ein Heilschrein wandert umher - steh darin, um dich zu erholen' },
     }[id];
 }
@@ -866,16 +866,29 @@ function _renderIntro(lvl) {
         + _introChip('👻', _tr('Phased', 'Phasend'), _tr('Phased', 'Phasend'),
             _tr('Takes 65% less damage from melee. Use spells.', 'Nimmt 65% weniger Schaden durch Nahkampf. Nutze Zauber.'))
         + _introChip('👑', _tr('Champion', 'Champion'), _tr('Champion', 'Champion'),
-            _tr('A champion leads the final wave. It is tougher and hits harder.', 'Ein Champion führt die letzte Welle an. Er ist zäher und schlägt härter zu.'))
-        + _introChip('⚡', _tr('Combo', 'Kombo'), _tr('Combo', 'Kombo'),
-            _tr('Spell then melee = combo damage.', 'Zauber, dann Nahkampf = Kombo-Schaden.')));
+            _tr('A champion leads the final wave. It is tougher and hits harder.', 'Ein Champion führt die letzte Welle an. Er ist zäher und schlägt härter zu.')));
     const arena = _introRow(_tr('This run', 'Dieser Lauf'),
         _introChip(mod.icon, _tr(mod.name, mod.nameDe), _tr(mod.name, mod.nameDe), _tr(mod.en, mod.de), 'ga-chip-run'));
-    const rewards = _introRow(_tr('Rewards', 'Belohnung'),
+    // Side goals: optional extra conditions; each one met adds bonus gold.
+    const cfg = GAUNTLET_CONFIG;
+    const goalPct = Math.round(cfg.challengeGoldShare * 100);
+    const goalGold = _tr(`Side goal: meeting it adds +${goalPct}% gold.`, `Nebenziel: Erfüllt es, gibt es +${goalPct}% Gold.`);
+    const swiftSecs = Math.round((cfg.swiftBaseMs + cfg.swiftPerMonsterMs * total) / 1000);
+    const swiftTime = `${Math.floor(swiftSecs / 60)}:${String(swiftSecs % 60).padStart(2, '0')}`;
+    const goals = _introRow(_tr('Side goals', 'Nebenziele'),
+        _introChip('🛡', _tr('Untouched', 'Unberührt'), _tr('Untouched', 'Unberührt'),
+            `${_tr('Win without taking any damage.', 'Gewinne, ohne Schaden zu nehmen.')}<br>${goalGold}`)
+        + _introChip('⏱', _tr('Swift', 'Flink'), _tr('Swift', 'Flink'),
+            `${_tr(`Win within ${swiftTime} minutes.`, `Gewinne innerhalb von ${swiftTime} Minuten.`)}<br>${goalGold}`)
+        + _introChip('⚔', _tr('Bruiser', 'Haudegen'), _tr('Bruiser', 'Haudegen'),
+            `${_tr(`Land ${cfg.bruiserStrikes} or more melee hits.`, `Lande ${cfg.bruiserStrikes} oder mehr Nahkampftreffer.`)}<br>${goalGold}`));
+    const rewards = _introRow(_tr('Reward', 'Belohnung'),
         _introChip('💰', `${_goldFor(lvl, 0)}+ ${_tr('gold', 'Gold')}`, _tr('Gold', 'Gold'),
-            _tr('Every side goal you meet raises the gold. Dying only forfeits the bonus.', 'Jedes erfüllte Nebenziel erhöht das Gold. Sterben verwirft nur den Bonus.'))
-        + _introChip('🎯', _tr('Side goals', 'Nebenziele'), _tr('Side goals', 'Nebenziele'),
-            `${_tr('Untouched', 'Unberührt')} · ${_tr('Swift', 'Flink')} · ${_tr('Bruiser (10+ melee hits)', 'Haudegen (10+ Nahkampftreffer)')}`));
+            _tr(`Gold for clearing the gauntlet. Each side goal you meet adds +${goalPct}%. Dying only forfeits the bonus.`,
+                `Gold fürs Bestehen des Gauntlets. Jedes erfüllte Nebenziel gibt +${goalPct}%. Sterben verwirft nur den Bonus.`)));
+    const tips = _introRow(_tr('Tip', 'Tipp'),
+        _introChip('⚡', _tr('Combo', 'Kombo'), _tr('Combo', 'Kombo'),
+            _tr('Hit with a spell, then follow up with melee right away for extra combo damage.', 'Triff mit einem Zauber und schlage direkt danach im Nahkampf zu, für zusätzlichen Kombo-Schaden.')));
     _setCenter(`
         <div class="ga-card">
             <div class="ga-card-title">⚔ ${_tr('Gauntlet', 'Gauntlet')}</div>
@@ -886,8 +899,7 @@ function _renderIntro(lvl) {
                 ${tierBtn('brutal', _tr('Brutal', 'Brutal'))}
             </div>
             <p class="ga-count">${_g.waves.length} ${_tr('waves', 'Wellen')} · ${total} ${_tr('monsters', 'Monster')}</p>
-            <div class="ga-rows">${monsters}${arena}${rewards}</div>
-            <p class="ga-hint">${_tr('Hover a symbol for details', 'Symbol anfahren für Details')}</p>
+            <div class="ga-rows">${monsters}${arena}${goals}${rewards}${tips}</div>
             <div class="ga-actions">
                 <button class="ga-btn ga-go" id="ga-go">${_tr('ENTER', 'BETRETEN')}</button>
                 <button class="ga-btn ga-skip" id="ga-skip">${_tr('Skip', 'Überspringen')}</button>

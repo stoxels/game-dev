@@ -440,3 +440,38 @@
 #pause-overlay .pm-ico { font-size: 18px; }
 #pause-overlay .pm-resume { font-size: 18px; min-height: 54px; }
 #pause-overlay #pause-hint { font-family: var(--PX, serif); font-size: 15px; color: rgba(255, 255, 255, 0.6); letter-spacing: 0.04em; }
+
+/* ── Run-info panel: clean dark slab ───────────────────────────────────────
+   The stretched Note-Banner art behind the level info warped its texture and
+   clipped long bonus text, so the panel is now a plain framed slab that grows
+   with its content (same look the trial pause already used). */
+#pause-overlay .pm-info {
+    gap: 14px;
+    margin-bottom: 0;
+    padding: 20px 22px;
+    background: linear-gradient(180deg, rgba(20, 22, 38, 0.94), rgba(8, 9, 18, 0.96));
+    border: 1px solid rgba(176, 154, 92, 0.6);
+    border-radius: 6px;
+    box-shadow:
+        inset 0 0 0 3px rgba(0, 0, 0, 0.45),
+        inset 0 0 0 4px rgba(176, 154, 92, 0.18),
+        inset 0 0 34px rgba(0, 0, 0, 0.6);
+}
+
+/* Level / score row sits above a thin gold rule that separates it from the details. */
+#pause-overlay .pm-info .pause-stats-row {
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(176, 154, 92, 0.35);
+}
+#pause-overlay .pm-info .pause-stat-divider { background: rgba(176, 154, 92, 0.4); }
+
+/* Bonus objective: its own card so it reads as a separate note. */
+#pause-overlay .pm-info .pause-bonus {
+    gap: 4px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid var(--orange);
+    border-radius: 0 4px 4px 0;
+}
+#pause-overlay .pm-info .pause-bonus-text { text-align: left; }
+#pause-overlay .pm-info .pause-bonus { align-items: flex-start; }
