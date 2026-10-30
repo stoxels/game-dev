@@ -132,7 +132,7 @@ export const T = {
         ls_title: 'SELECT LEVEL',
 
         // Inventory panel
-        inv_title: '🎒 INVENTORY',
+        inv_title: '🧰 TOOLKIT',
         item_cost: 'Use: −',   // prefix before the score cost of using an item
         item_sell: 'Sell +',   // prefix before the sell value of an item
         inv_empty: '<strong style="color:var(--white)">No items yet. Complete bonus objectives or repeat levels to earn items!</strong>',
@@ -287,8 +287,8 @@ export const T = {
         mod_desc_super_tutor: '100% correct answers; no Tutor item required. Temporary beta feature.',
 
         // Inventory strip header
-        inv_strip_header: '🎒 INVENTORY - Left Click to use an item - Right Click to add to the reshuffle pile',
-        inv_strip_header_static: '🎒 INVENTORY',
+        inv_strip_header: '🧰 TOOLKIT - Left Click to use an item - Right Click to add to the reshuffle pile',
+        inv_strip_header_static: '🧰 TOOLKIT',
         inv_strip_header_mouseover: 'Left Click to use an item - Right Click to add to the reshuffle pile',
 
         // Tutorial steps
@@ -296,7 +296,7 @@ export const T = {
         tut2_s0_text: 'This quick tutorial walks you through the game interface. Use <strong>NEXT ▶</strong> to advance or skip straight to playing.<br><br>STOXELS is a nonogram puzzle game themed around <strong>stochastics & statistics</strong>. Solve puzzles, earn items, choose a class, advance the Probability Tree and unlock Achievements to earn Moodle Badges!',
 
         tut2_s1_title: 'The Game Screen',
-        tut2_s1_text: 'Here is what a typical game session looks like. You will see:<br>• A <strong>puzzle grid</strong> in the centre<br>• <strong>Clue numbers</strong> on the rows and columns<br>• A <strong>timer</strong> counting down<br>• Your <strong>inventory</strong> of items below<br><br>Let\'s go through each part.',
+        tut2_s1_text: 'Here is what a typical game session looks like. You will see:<br>• A <strong>puzzle grid</strong> in the centre<br>• <strong>Clue numbers</strong> on the rows and columns<br>• A <strong>timer</strong> counting down<br>• Your <strong>toolkit</strong> of puzzle items below<br><br>Let\'s go through each part.',
 
         tut2_s2_title: 'The Puzzle Grid',
         tut2_s2_text: '<strong>Left-click</strong> a cell to fill it.<br><strong>Right-click</strong> to mark it empty (✕).<br><strong>Drag</strong> to paint multiple cells at once.<br><br>Filling a cell that should be <em>empty</em> costs you time - so think before you click!',
@@ -316,7 +316,7 @@ export const T = {
         tut2_s7_title: 'Bonus Objective',
         tut2_s7_text: 'Every level has a <strong>bonus objective</strong> shown here - for example: finish in under 20 seconds, or make no mistakes.<br><br>Meet the objective ➜ earn a random item when you finish.<br>If the bonus type is <strong>Quiz</strong>, answering a statistics question correctly gives +50 points and an extra item.',
 
-        tut2_s8_title: 'Inventory',
+        tut2_s8_title: 'Toolkit',
         tut2_s8_text: 'Items you have earned are shown here. <strong>Click an item to use it</strong> during a level.<br><br>Items include:<br>• 🔦 <em>Reveal</em> - shows correct tiles in green<br>• 🛡️ <em>Shield</em> - absorbs your next mistake<br>• ⏳ <em>+Time</em> - adds seconds to the clock<br>• ☠️ <em>Cursed</em> - powerful but risky, locked for 3 min<br><br><strong>Ironman</strong> mode disables all items for a score bonus.',
 
         tut2_s9_title: 'Probability Tree',
@@ -341,7 +341,7 @@ export const T = {
         tq_p1_s7: 'An ✕ is an axiom of absence. Eliminate what cannot be, fill what must be.',
         tq_p1_s8: 'Now finish it yourself - the clues are enough.',
         tq_p1_s9: 'Magnificent. The shape stands complete... save for two cells that resist every proof.',
-        tq_p1_s10: 'The corner is undecidable - a coin flip dressed as a theorem. Take my Candle and use it from your inventory below the grid: its flame reveals one cell logic cannot decide.',
+        tq_p1_s10: 'The corner is undecidable - a coin flip dressed as a theorem. Take my Candle and use it from your toolkit below the grid: its flame reveals one cell logic cannot decide.',
         tq_p1_s11b: 'The flame revealed the top-left corner. Cells revealed by items look slightly different (teal) from your own deductions. Now finish the picture - the clues tell you the remaining corners.',
         tq_p1_s12: 'Excellent work. A flawless deduction... with a little illumination. On to the next lesson.',
         tq_p2_s0: 'Look sharp! A creature has wandered onto the board. Fear not - it is more scared of you than you are of it.',
@@ -733,7 +733,7 @@ export const T = {
         ls_title: 'LEVEL WÄHLEN',
 
         // Inventory panel
-        inv_title: '🎒 INVENTAR',
+        inv_title: '🧰 WERKZEUGKASTEN',
         item_cost: 'Nutzung: −',
         item_sell: 'Verkauf +',
         inv_empty: '<strong style="color:var(--white)">Noch keine Items. Erfülle Bonusziele oder löse bereits abgeschlossene Levels nochmal!</strong>',
@@ -879,8 +879,8 @@ export const T = {
         quiz_skip: 'SKIP',
 
         // Inventory strip header
-        inv_strip_header: '🎒 INVENTAR - Links Klick um ein Item zu verwenden - Rechts Klick um ein Item zum Tausch-Stapel hinzuzufügen ',
-        inv_strip_header_static: '🎒 INVENTAR',
+        inv_strip_header: '🧰 WERKZEUGKASTEN - Links Klick um ein Item zu verwenden - Rechts Klick um ein Item zum Tausch-Stapel hinzuzufügen ',
+        inv_strip_header_static: '🧰 WERKZEUGKASTEN',
         inv_strip_header_mouseover: 'Links Klick um ein Item zu verwenden - Rechts Klick um ein Item zum Tausch-Stapel hinzuzufügen',
 
         // Tutorial steps
@@ -888,7 +888,7 @@ export const T = {
         tut2_s0_text: 'Dieses kurze Tutorial führt dich durch die Spieloberfläche. Nutze <strong>WEITER ▶</strong> oder überspringe es gleich.<br><br>STOXELS ist ein Nonogramm-Puzzle-Spiel zum Thema <strong> Stochastik & Statistik</strong>. Löse Puzzles, sammle Items, wähle eine Klasse, baue den Wahrscheinlichkeitsbaum aus und schalte Achievements für Moodle Badges frei!',
 
         tut2_s1_title: 'Der Spielbildschirm',
-        tut2_s1_text: 'So sieht eine typische Spielsitzung aus:<br>• Ein <strong>Puzzlegitter</strong> in der Mitte<br>• <strong>Hinweiszahlen</strong> an Zeilen und Spalten<br>• Ein <strong>Timer</strong>, der herunterläuft<br>• Dein <strong>Inventar</strong> unten<br><br>Gehen wir jeden Bereich durch.',
+        tut2_s1_text: 'So sieht eine typische Spielsitzung aus:<br>• Ein <strong>Puzzlegitter</strong> in der Mitte<br>• <strong>Hinweiszahlen</strong> an Zeilen und Spalten<br>• Ein <strong>Timer</strong>, der herunterläuft<br>• Dein <strong>Werkzeugkasten</strong> unten<br><br>Gehen wir jeden Bereich durch.',
 
         tut2_s2_title: 'Das Puzzlegitter',
         tut2_s2_text: '<strong>Linksklick</strong> füllt ein Feld.<br><strong>Rechtsklick</strong> markiert es als leer (✕).<br><strong>Ziehen</strong> malt mehrere Felder auf einmal.<br><br>Ein falsch gefülltes Feld kostet Zeit - also erst denken, dann klicken!',
@@ -908,7 +908,7 @@ export const T = {
         tut2_s7_title: 'Bonusziel',
         tut2_s7_text: 'Jedes Level hat ein <strong>Bonusziel</strong> - z.B. unter 20 Sekunden fertig werden oder keine Fehler machen.<br><br>Ziel erreicht ➜ zufälliges Item als Belohnung, wenn du fertig bist.<br>Beim Typ <strong>Quiz</strong> gibt eine korrekte Antwort auf eine Statistikfrage +50 Punkte und ein Extra-Item.',
 
-        tut2_s8_title: 'Inventar',
+        tut2_s8_title: 'Werkzeugkasten',
         tut2_s8_text: 'Hier werden deine Items angezeigt. <strong>Klicke ein Item um es zu benutzen</strong>.<br><br>Items umfassen:<br>• 🔦 <em>Enthüllen</em> - zeigt richtige Felder grün<br>• 🛡️ <em>Schild</em> - absorbiert den nächsten Fehler<br>• ⏳ <em>+Zeit</em> - fügt Sekunden hinzu<br>• ☠️ <em>Verflucht</em> - mächtig, aber riskant.<br><br><strong>Ironman</strong>-Modus deaktiviert alle Items für einen Punktebonus.',
 
         tut2_s9_title: 'Wahrscheinlichkeitsbaum',
@@ -933,7 +933,7 @@ export const T = {
         tq_p1_s7: 'Ein ✕ ist ein Axiom der Abwesenheit. Eliminiere, was nicht sein kann, fülle, was sein muss.',
         tq_p1_s8: 'Jetzt vollende es selbst - die Hinweise genügen.',
         tq_p1_s9: 'Großartig. Die Gestalt steht vollständig... bis auf zwei Zellen, die jedem Beweis trotzen.',
-        tq_p1_s10: 'Die Ecke ist unentscheidbar - ein Münzwurf als Theorem verkleidet. Nimm meine Kerze und benutze sie in deinem Inventar unter dem Gitter: Ihre Flamme enthüllt eine Zelle, die Logik nicht entscheiden kann.',
+        tq_p1_s10: 'Die Ecke ist unentscheidbar - ein Münzwurf als Theorem verkleidet. Nimm meine Kerze und benutze sie in deinem Werkzeugkasten unter dem Gitter: Ihre Flamme enthüllt eine Zelle, die Logik nicht entscheiden kann.',
         tq_p1_s11b: 'Die Flamme hat die obere linke Ecke enthüllt. Durch Gegenstände enthüllte Zellen sehen etwas anders (türkis) aus als deine eigenen Schlüsse. Vollende nun das Bild - die Hinweise verraten dir die restlichen Ecken.',
         tq_p1_s12: 'Ausgezeichnet. Eine tadellose Deduktion... mit etwas Beleuchtung. Zur nächsten Lektion.',
         tq_p2_s0: 'Achtung! Eine Kreatur ist auf das Brett gewandert. Keine Angst - sie hat mehr Angst vor dir als du vor ihr.',
@@ -1789,7 +1789,7 @@ Object.assign(T.en, {
     eg_vendor_cannot_equip: 'Cannot equip - missing {list}',
     eg_vendor_hint_currency: 'Purchased cores go to your core stash in the Endgame Hub. Right-click a core, then left-click an item to apply it.',
     eg_vendor_hint_essences: 'Purchased essences go to the essence tab in the Endgame Hub. Right-click an essence, then left-click an equipment item to re-forge it as Epic (4–6 mods) with one guaranteed specific modifier. Only works on compatible bases.',
-    eg_vendor_hint_items: 'Purchased puzzle items go straight into your puzzle items inventory and can be used in any puzzle.',
+    eg_vendor_hint_items: 'Purchased puzzle items go straight into your toolkit and can be used in any puzzle.',
     eg_vendor_hint_base: 'Base items are bought as Normal (white) items at their minimum item level and stored in your Endgame Hub stash. Red cards cannot be equipped yet - level or attribute requirements are unmet. Hold Alt while hovering a card to compare it with your equipped gear.',
     eg_vendor_essence_all_gear: 'all gear',
     eg_vendor_essence_works_on: 'Works on:',
@@ -4043,10 +4043,10 @@ Object.assign(T.en, {
     itm_group_special: 'Special',
     itm_group_time: 'Time',
     itm_group_utility: 'Utility',
-    itm_item_added: '{n} added to your inventory!',
+    itm_item_added: '{n} added to your toolkit!',
     itm_no_class: 'No class equipped!',
     itm_not_consumed: ' ♻ Not consumed!',
-    itm_panel_inventory: 'INVENTORY',
+    itm_panel_inventory: 'TOOLKIT',
     itm_primer_correct_next: '✓ Correct! {n}/{m} - next question…',
     itm_primer_footer_full_start: 'Correct: next question appears. Up to 5 rows + 5 columns possible!',
     itm_primer_footer_full_streak: 'Correct so far: {n} - keep going for more headstart!',
@@ -5318,7 +5318,7 @@ Object.assign(T.de, {
     eg_vendor_cannot_equip: 'Nicht ausrüstbar - es fehlt {list}',
     eg_vendor_hint_currency: 'Gekaufte Kerne werden im Kernlager des Endgame-Hubs gelagert. Rechtsklick auf einen Kern, dann Linksklick auf einen Gegenstand, um ihn anzuwenden.',
     eg_vendor_hint_essences: 'Gekaufte Essenzen werden im Essenzen-Tab des Endgame-Hubs gelagert. Rechtsklick auf eine Essenz, dann Linksklick auf einen Ausrüstungsgegenstand, um ihn als Episch (4–6 Mods) mit einem garantierten spezifischen Modifier neu zu schmieden. Nur auf kompatiblen Basen anwendbar.',
-    eg_vendor_hint_items: 'Gekaufte Puzzle-Gegenstände landen direkt in deinem Puzzle-Gegenstände-Inventar und können in jedem Puzzle verwendet werden.',
+    eg_vendor_hint_items: 'Gekaufte Puzzle-Gegenstände landen direkt in deinem Werkzeugkasten und können in jedem Puzzle verwendet werden.',
     eg_vendor_hint_base: 'Basis-Gegenstände werden als Normale (weiße) Gegenstände auf ihrer Mindest-Gegenstandsstufe gekauft und im Lager des Endgame-Hubs abgelegt. Rote Karten sind noch nicht ausrüstbar - Stufen- oder Attributanforderungen sind nicht erfüllt. Halte Alt gedrückt, während du über eine Karte fährst, um sie mit deiner Ausrüstung zu vergleichen.',
     eg_vendor_essence_all_gear: 'alle Ausrüstung',
     eg_vendor_essence_works_on: 'Funktioniert auf:',
@@ -7573,10 +7573,10 @@ Object.assign(T.de, {
     itm_group_special: 'Spezial',
     itm_group_time: 'Zeit',
     itm_group_utility: 'Hilfsmittel',
-    itm_item_added: '{n} zu deinem Inventar hinzugefügt!',
+    itm_item_added: '{n} zu deinem Werkzeugkasten hinzugefügt!',
     itm_no_class: 'Keine Klasse ausgewählt!',
     itm_not_consumed: ' ♻ Nicht verbraucht!',
-    itm_panel_inventory: 'INVENTAR',
+    itm_panel_inventory: 'WERKZEUGKASTEN',
     itm_primer_correct_next: '✓ Richtig! {n}/{m} - nächste Frage…',
     itm_primer_footer_full_start: 'Richtig: nächste Frage erscheint. Bis zu 5 Zeilen + 5 Spalten möglich!',
     itm_primer_footer_full_streak: 'Bisher richtig: {n} - weiter für mehr Vorsprung!',

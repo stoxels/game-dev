@@ -117,12 +117,14 @@ const TQ_P2 = [
 // defensive identity: armour.) Four pieces, all wearable fresh (level 1,
 // 20/20/20 base attributes cover every requirement).
 const TQ_STARTER_BASE_IDS = ['wpn_1h_1', 'ranged_1', 'chest_str_1', 'pants_str_1'];
-// Fills allowed during the combat lesson before the Professor pauses the
-// board - exactly half of the 25 solution cells. The rat always dies well
-// inside that cap (see the campaignMonsterHp comment in _tqStampLevel), so
-// in practice the kill - not the cap - ends the combat phase; the cap only
-// remains as a backstop.
+// Fills after which the Professor steps in if the rat is somehow still alive
+// (half of the 25 solution cells). The rat normally dies well inside that
+// (see the campaignMonsterHp comment in _tqStampLevel), but projectiles can
+// miss - then he finishes the rat himself (see _tqFinishRat) instead of
+// leaving a player with no weapon facing a 1-HP rat.
 const TQ_P2_FILLS_LIMIT = 12;
+// How long to let in-flight shots land before the Professor finishes the rat.
+const TQ_P2_RESCUE_DELAY_MS = 2500;
 // Puzzle 2 drag lesson: cells that must be painted in ONE stroke.
 const TQ_P2_DRAG_CELLS = 4;
 const TQ_P3 = [
@@ -1740,6 +1742,7 @@ function _tqOnPuzzleSolved() {
     if (_tqPhase === 'p2' && !_tqP2RatDead
         && typeof _monsters !== 'undefined' && globalThis._monsters.length > 0) {
         globalThis.dead = false;
+        _tqFinishRat();   // no cells left to shoot with - the Professor ends the fight
         _tqStepIdx = TQ_P2_STEP_KILL_RAT;   // re-run the defeat-the-rat task (s1b)
         _tqRunCurrentPhase();
         return;
@@ -2184,6 +2187,7 @@ function _tqPointAtGearDrop() {
 // TQ_P2_FILLS_LIMIT solution cells, and the rat's HP budget guarantees the
 // fight is won inside that cap. The count freezes when the rat dies.
 function _tqArmFillsGate() {
+    if (_tqRatRescueTimer) { clearTimeout(_tqRatRescueTimer); _tqRatRescueTimer = null; }
     _tqP2MaxDragStack = 0;
     _tqP2FillsGate = true;
     _tqP2FillsCount = 0;
@@ -2229,8 +2233,35 @@ function _tqLiftGearFillsGate() {
 // half-fill gate is armed this drives the fill-limit task; the count is
 // frozen once the rat is dead so post-kill fills never consume the cap.
 function _tqCountCorrectFill() {
-    if (_tqP2FillsGate && !_tqP2RatDead) _tqP2FillsCount++;
+    if (_tqP2FillsGate && !_tqP2RatDead) {
+        _tqP2FillsCount++;
+        if (_tqP2FillsCount >= TQ_P2_FILLS_LIMIT) _tqScheduleRatRescue();
+    }
     _tqRefreshGridLockBorder();
+}
+
+// Finishes every monster still on the board with one overkill hit through
+// the normal damage path, so the usual kill flow (heart drop, next lesson)
+// runs exactly as if a projectile had landed.
+function _tqFinishRat() {
+    const alive = (globalThis._monsters || []).slice();
+    for (const m of alive) {
+        try { _damageTargetById(m.id, (m.currentHP || 0) + (m.maxHP || 0) + 1, ['physical'], {}); } catch (e) {}
+    }
+}
+
+// Rescue for a missed-shot soft-lock: after the fill cap the player has no
+// weapon and few cells left, so if the rat survived (projectiles can miss)
+// the Professor finishes it once the shots in flight have had time to land.
+let _tqRatRescueTimer = null;
+function _tqScheduleRatRescue() {
+    if (_tqRatRescueTimer) return;
+    _tqRatRescueTimer = setTimeout(() => {
+        _tqRatRescueTimer = null;
+        if (_tqPhase !== 'p2' || _tqP2RatDead) return;
+        if (typeof cur === 'undefined' || !cur || !cur.isTutorialQuest) return;
+        _tqFinishRat();
+    }, TQ_P2_RESCUE_DELAY_MS);
 }
 
 // Safety backstop, polled by the gear-fills task: fires once when the LAST
@@ -2973,16 +3004,6 @@ const TQ_FIREBALL_ID = 'usp_fireball';
                         || (typeof _pickups !== 'undefined' && _pickups.has(key));
                     if (!isDropCell || pval !== 1) { _tqGridLockToast(); return true; }
                     return false;  // genuine handler performs the fill claim
-                }
-                // Puzzle-2 half-fill lock: the limit was reached while the
-                // rat still lives - the Professor pauses the board for the
-                // gear lesson. Once the rat is down the lock must never
-                // fire again (a death at exactly fill 12 would otherwise
-                // soft-lock the claim and remaining-fill steps).
-                if (_tqPhase === 'p2' && _tqP2FillsGate && !_tqP2RatDead
-                    && _tqP2FillsCount >= TQ_P2_FILLS_LIMIT) {
-                    _tqGridLockToast();
-                    return true;
                 }
                 // Undecidable corner: no manual fills anywhere in the 2x2
                 // corner before the candle - filling the anti-diagonal would
