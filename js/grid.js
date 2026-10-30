@@ -348,6 +348,40 @@ function _buildRowClueToggle() {
 }
 
 
+// _repositionGridOverlays - after the clue numbers move to another side, the
+//   puzzle grid sits in a new spot; this nudges every effect that is drawn
+//   around or on top of it (shield borders, tutorial lock border, agents)
+//   so they follow.
+function _repositionGridOverlays() {
+    // Shield border (if active)
+    const border = document.getElementById('fx-shield-border');
+    if (border?._reposition) border._reposition();
+
+    // Red tutorial lock border (if the Professor is holding the board)
+    const lockBorder = document.getElementById('tq-grid-lock-border');
+    if (lockBorder?._tqReposition) lockBorder._tqReposition();
+
+    // Variance shield bubble (Mathmagician passive)
+    const vsBubble = document.getElementById('variance-shield-bubble');
+    if (vsBubble?._reposition) vsBubble._reposition();
+
+    // Random Walker agents (bears / drifter) and their path overlay
+    if (typeof window._repositionRandomWalkerAgents === 'function') {
+        window._repositionRandomWalkerAgents();
+    }
+
+    // Residual skeletons
+    if (typeof window._repositionResidualSkeletons === 'function') {
+        window._repositionResidualSkeletons();
+    }
+
+    // DoF zombie
+    if (typeof window._repositionDoFZombie === 'function') {
+        window._repositionDoFZombie();
+    }
+}
+
+
 // _toggleRowCluesSide - flips row-clue cells between the left and right
 //   side of the puzzle table by rebuilding the <colgroup> and physically
 //   moving the existing <td> elements within each row (no HTML regen).
@@ -397,28 +431,7 @@ function _toggleRowCluesSide() {
         }
     }
 
-    // Keep the shield border (if active) aligned with the grid's new position
-    const border = document.getElementById('fx-shield-border');
-    if (border?._reposition) border._reposition();
-
-    // Keep the variance shield bubble (Mathmagician passive) aligned too
-    const vsBubble = document.getElementById('variance-shield-bubble');
-    if (vsBubble?._reposition) vsBubble._reposition();
-
-    // Keep Random Walker agents (bears / drifter) and their path overlay aligned
-    if (typeof window._repositionRandomWalkerAgents === 'function') {
-        window._repositionRandomWalkerAgents();
-    }
-
-    // Keep Residual skeletons aligned with the grid's new position
-    if (typeof window._repositionResidualSkeletons === 'function') {
-        window._repositionResidualSkeletons();
-    }
-
-    // Keep the DoF zombie aligned with the grid's new position
-    if (typeof window._repositionDoFZombie === 'function') {
-        window._repositionDoFZombie();
-    }
+    _repositionGridOverlays();
 }
 
 
@@ -453,28 +466,7 @@ function _toggleColCluesSide() {
         }
     }
 
-    // Keep the shield border (if active) aligned with the grid's new position
-    const border = document.getElementById('fx-shield-border');
-    if (border?._reposition) border._reposition();
-
-    // Keep the variance shield bubble (Mathmagician passive) aligned too
-    const vsBubble = document.getElementById('variance-shield-bubble');
-    if (vsBubble?._reposition) vsBubble._reposition();
-
-    // Keep Random Walker agents (bears / drifter) and their path overlay aligned
-    if (typeof window._repositionRandomWalkerAgents === 'function') {
-        window._repositionRandomWalkerAgents();
-    }
-
-    // Keep Residual skeletons aligned with the grid's new position
-    if (typeof window._repositionResidualSkeletons === 'function') {
-        window._repositionResidualSkeletons();
-    }
-
-    // Keep the DoF zombie aligned with the grid's new position
-    if (typeof window._repositionDoFZombie === 'function') {
-        window._repositionDoFZombie();
-    }
+    _repositionGridOverlays();
 }
 
 

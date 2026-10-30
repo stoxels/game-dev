@@ -1279,6 +1279,8 @@ const TQ_TASKS = {
     open_spellbook: () => typeof isSpellbookOpen === 'function' && isSpellbookOpen(),
     // Puzzle 3: the Scroll of Fireball was dragged into a spell slot, which
     // unlocks the Fireball on the matching hotbar key (slot N = hotbar key N).
+    // Puzzle 3: the player closed the book again after slotting Fireball.
+    close_spellbook: () => TQ_TASKS.slot_fireball() && typeof isSpellbookOpen === 'function' && !isSpellbookOpen(),
     slot_fireball: () => typeof STATE !== 'undefined' && STATE && Array.isArray(STATE.charmSlots)
         && STATE.charmSlots.indexOf(TQ_FIREBALL_ID + '#1') !== -1,
     // Puzzle 1: guided demos on the locked grid.
@@ -1366,6 +1368,10 @@ function _tqStepsFor(phase) {
             { task: 'open_spellbook' },
             { say: 'tq_p3_s6', wait: true, fn: () => { _tqClearHighlights(); _tqPointAtDrop('.charm-item[data-charm-key="' + TQ_FIREBALL_ID + '#1"]'); } },
             { task: 'slot_fireball' },
+            // The book stays open until the player closes it (P again) - closing it
+            // for them made the next P press re-open it instead of closing it.
+            { fn: () => { _tqShowKeycapChip('spellbook', t('tq_chip_spellbook_close')); } },
+            { task: 'close_spellbook' },
             { fn: () => { try { if (typeof isSpellbookOpen === 'function' && isSpellbookOpen() && typeof closeSpellbook === 'function') closeSpellbook(); } catch (e) {} _tqClearHighlights(); try { if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar(); } catch (e) {} } },
             // Fireball lesson: the ghost is immune to blades - burn it down.
             // The ghost spawns HERE, before the player is told to cast, so a
