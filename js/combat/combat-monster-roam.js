@@ -186,7 +186,8 @@ const ZONE_REGIONS = {
 // Fixed HUD block in the top-left corner (timer, mistakes, CLUES buttons).
 const ZONE_TOPLEFT_HUD = { l: 0, t: 0, r: 272, b: 98 };
 // Elements that must stay clear (read live, only when visible).
-const ZONE_OBSTACLE_SELECTORS = ['#inv-panel', '.skill-hotbar', '#zoom-bar', '#hud-level-name', '#class-hud-panel'];
+// (#sx-objectives-strip = the trial's objective tracker chips, top-left.)
+const ZONE_OBSTACLE_SELECTORS = ['#inv-panel', '.skill-hotbar', '#zoom-bar', '#hud-level-name', '#class-hud-panel', '#sx-objectives-strip'];
 
 let _zoneLayoutTimer = null;
 let _zoneLayoutSig = '';

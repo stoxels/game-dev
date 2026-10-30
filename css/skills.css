@@ -38,6 +38,10 @@
     backdrop-filter: blur(4px);
     user-select: none;
     touch-action: none;
+    /* Shrunk toward the bottom-right corner when it would cover the grid's
+       corner (--sx-hbs is set by _fitHotbarToGrid in skill-hotbar.js). */
+    transform: scale(var(--sx-hbs, 1));
+    transform-origin: bottom right;
 }
 
 /* While the spell book is open the bar is moved onto <body> and must sit

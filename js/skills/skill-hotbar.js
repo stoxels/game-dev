@@ -253,6 +253,39 @@ export function _hotbarClasslessHasSpells() {
     return false;
 }
 
+// Smallest scale the bar may shrink to when it would cover the grid's corner.
+const HOTBAR_MIN_SCALE = 0.6;
+
+// Shrinks the whole bar (toward its bottom-right corner) just enough that it
+// stops covering the puzzle grid - it then fits in the free strip to the right
+// of or below the grid. Never goes below HOTBAR_MIN_SCALE; whatever still
+// overlaps after that is handled by the see-through slots below. Measures the
+// bar's unscaled size (offsetWidth/Height), so the result does not feed back.
+function _fitHotbarToGrid(bar, gr) {
+    let scale = 1;
+    if (gr && gr.width > 0 && gr.height > 0) {
+        const r = bar.getBoundingClientRect();
+        const w = bar.offsetWidth;
+        const h = bar.offsetHeight;
+        if (w > 0 && h > 0) {
+            const natLeft = r.right - w;
+            const natTop = r.bottom - h;
+            const covers = natLeft < gr.right - 2 && natTop < gr.bottom - 2
+                && r.right > gr.left + 2 && r.bottom > gr.top + 2;
+            if (covers) {
+                const gap = 6;
+                const fitRight = (r.right - gr.right - gap) / w;    // clear of the grid's right edge
+                const fitBelow = (r.bottom - gr.bottom - gap) / h;  // clear of the grid's bottom edge
+                scale = Math.min(1, Math.max(HOTBAR_MIN_SCALE, fitRight, fitBelow));
+            }
+        }
+    }
+    const rounded = Math.round(scale * 100) / 100;
+    const cur = bar.style.getPropertyValue('--sx-hbs');
+    if (rounded === 1) { if (cur) bar.style.removeProperty('--sx-hbs'); }
+    else if (cur !== String(rounded)) bar.style.setProperty('--sx-hbs', String(rounded));
+}
+
 // Slots overlapping the puzzle grid get .over-grid (css/skills.css): the bar
 // paints above the grid so cooldowns stay visible, and those slots turn
 // see-through and click-through. Same idea as the monster cards
@@ -269,6 +302,7 @@ function _syncHotbarGridOverlap() {
     }
     const grid = document.getElementById('ptable');
     const gr = (grid && !document.body.classList.contains('spellbook-open')) ? grid.getBoundingClientRect() : null;
+    _fitHotbarToGrid(bar, gr);
     let any = false;
     bar.querySelectorAll('.skill-hotbar-slot').forEach(slot => {
         let over = false;
