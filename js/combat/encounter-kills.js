@@ -212,6 +212,25 @@ export function _killMonster(monsterId) {
 export function _onAllMonstersDead() { }
 
 // Triggers the game-over sequence when the player's HP reaches zero.
+// Number of tips there are (eg_death_hint_1 ... N) and which one comes next,
+// so repeated defeats show different advice.
+const DEATH_HINT_COUNT = 4;
+let _deathHintNext = 0;
+
+// Shows a short "how to get stronger" tip under the defeat message, cycling
+// through the tips on each defeat.
+function _showDeathHint(subEl) {
+    let hint = document.getElementById('lose-hint');
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'lose-hint';
+        hint.className = 'ov-sub lose-hint';
+        subEl.insertAdjacentElement('afterend', hint);
+    }
+    hint.textContent = t('eg_death_hint_' + (_deathHintNext % DEATH_HINT_COUNT + 1));
+    _deathHintNext++;
+}
+
 export function _gameOver() {
     // Gauntlet arena: dying only forfeits the bonus (the level is already won).
     if (_gauntletOnDefeat()) return;
@@ -228,6 +247,7 @@ export function _gameOver() {
             const subEl = document.getElementById('lose-sub');
             if (titleEl && typeof t === 'function') titleEl.textContent = t('eg_game_over');
             if (subEl && typeof t === 'function') subEl.textContent = t('eg_monsters_overwhelmed');
+            if (subEl) _showDeathHint(subEl);
             lose.classList.add('show');
             if (globalThis.RunStats) globalThis.RunStats.renderInto('lose');
         }

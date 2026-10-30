@@ -48,6 +48,7 @@ const BONUS_ICONS = {
     noitem: '🎒',
     quiz: '🧠',
     gauntlet: '⚔️',
+    movement: '🏃',
     combo: '🔥',
     lowmiss: '🎯',
     noitem_nomiss: '🎒✨',

@@ -226,6 +226,14 @@ export function _vendorEnsureStyles() {
         .sx-vendor-charm-buy.sx-vendor-charm-short { opacity: 0.5; border-color: #8a4a3a; color: #e0a090; }
         .sx-vendor-charm-owned { border-color: #3f8f5a; color: #86e0a0; background: rgba(30,80,45,0.35); }
         .sx-vendor-charm-locked { opacity: 0.45; }
+        /* Spell is currently in a spell slot: gold badge, glowing card, ringed rank */
+        .sx-vendor-charm-card-slotted { border-color: #ffd76e; box-shadow: 0 0 12px rgba(255, 215, 110, 0.35); }
+        .sx-vendor-slot-badge {
+            display: inline-block; margin-top: 4px; padding: 1px 8px; border-radius: 10px;
+            background: rgba(255, 215, 110, 0.18); border: 1px solid #ffd76e; color: #ffd76e;
+            font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+        }
+        .sx-vendor-charm-slotted { box-shadow: 0 0 0 2px #ffd76e; }
         .sx-vendor-hint {
             font-size: 10px; letter-spacing: 1px; color: rgba(232, 218, 239, 0.55);
             max-width: 520px; text-align: center; line-height: 1.6;

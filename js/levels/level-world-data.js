@@ -1,4 +1,5 @@
 import { applyGauntletBonuses } from './gauntlet-levels.js';
+import { applyMovementBonuses } from './movement-trial-levels.js';
 // Helper function to convert shorthand rows [1,0,1] into objects {v:1, m:0}
 //------------------------------------------------------------------------
 
@@ -3946,3 +3947,5 @@ export const WORLDS = [
 // Gauntlet bonus levels (2-3 per world, deterministic seed): stamped onto the
 // level objects once at load so every consumer sees the same bonusType.
 applyGauntletBonuses(WORLDS);
+// Movement trial bonus (1 per world): replaces a plain bonus on a non-gauntlet level.
+applyMovementBonuses(WORLDS);

@@ -15,6 +15,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { _isActive } from '../combat/combat-state.js';
 import { _onPuzzleComplete } from '../combat/encounter-chain.js';
 import { _gauntletPlayable, startGauntlet } from '../combat/gauntlet.js';
+import { startMovementTrial } from '../combat/movement-trial.js';
 import { resetRecursionistState } from '../classes/class-recursionist.js';
 import { _arcaneFreeze_clearAllFrostAndStalagmites } from '../classes/class-mathmagician-absolute-zero.js';
 import { _endBlackSwan } from '../classes/class-outlier-black-swan.js';
@@ -219,6 +220,17 @@ function checkWin() {
         setTimeout(() => {
             if (cur !== levelAtWin) return;   // player already left the level
             startGauntlet((success) => {
+                if (cur !== levelAtWin) return;
+                completeWin(!!success);
+            });
+        }, 900);
+    } else if (cur.bonusType === 'movement') {
+        // Movement trial bonus: a timed walking challenge opens over the
+        // solved grid; the win overlay follows once it reports back.
+        const levelAtWin = cur;
+        setTimeout(() => {
+            if (cur !== levelAtWin) return;   // player already left the level
+            startMovementTrial(levelAtWin.bonusParam, (success) => {
                 if (cur !== levelAtWin) return;
                 completeWin(!!success);
             });

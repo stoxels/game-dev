@@ -40,8 +40,9 @@ export const LOOT_DROP_CHANCE_NORMAL = 0.35;  // 35% per normal monster kill
 export const LOOT_DROP_CHANCE_BOSS = 1.00;  // bosses always drop
 
 // Lifetime of an uncollected loot drop on the grid (ms).
-// Intentionally longer than heart pickups - no rush to grab loot.
-export const LOOT_DROP_LIFETIME_MS = 60000;
+// Intentionally much longer than heart pickups - no rush to grab loot. The
+// clock also stops while no monster is alive (see _calmWatchTick).
+export const LOOT_DROP_LIFETIME_MS = 120000;
 
 // How long (ms) before a drop expires its countdown timer appears above it.
 // Applies to every grid drop type: hearts, equipment, currency, items, maps.

@@ -389,6 +389,12 @@ function _vendorCharmOwned(skillId, rank) {
     return !!globalThis.getCharmByKey(globalThis.charmKeyFor(skillId, rank));
 }
 
+// Spell slot numbers (1-based, = hotbar key) holding this spell: { rank: slot }.
+function _vendorCharmSlots(skillId) {
+    const charms = (STATE.charmSlots || []).map(key => globalThis.getCharmByKey(key));
+    return Object.fromEntries(charms.map((c, i) => [c && c.skillId === skillId ? c.rank : -1, i + 1]).filter(([rank]) => rank > 0));
+}
+
 // Builds one card per spell with a buy button for every sold rank. The
 // all-tabs search passes ignoreFilter so a query still covers every spell.
 export function _vendorBuildCharmsTabHTML(ignoreFilter) {
@@ -399,13 +405,15 @@ export function _vendorBuildCharmsTabHTML(ignoreFilter) {
         const def = globalThis.getSkillDef(id);
         const art = globalThis.getCharmArtForSkill(id, 1);
         const icon = art ? `<img class="sx-art-img" src="${art}" alt="" draggable="false">` : (def.icon || '💫');
+        const slotted = _vendorCharmSlots(id), slotNums = Object.values(slotted).sort((a, b) => a - b);
+        const badge = slotNums.length ? `<div class="sx-vendor-slot-badge">${t('eg_vendor_charm_slotted').replace('{n}', slotNums.join(', '))}</div>` : '';
         const ranks = VENDOR_CHARM_RANK_PRICES.map((price, i) => {
             const rank = i + 1;
             const tip = ` onmouseenter="handleSkillTipRank(event, '${id}', ${rank})" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()"`;
             if (_vendorCharmOwned(id, rank)) {
                 // Owned ranks show a universal green checkmark (no text,
                 // no translation needed) - the green pill already says it all.
-                return `<span class="sx-vendor-charm-rank sx-vendor-charm-owned"${tip}>R${rank}<small>✓</small></span>`;
+                return `<span class="sx-vendor-charm-rank sx-vendor-charm-owned${slotted[rank] ? ' sx-vendor-charm-slotted' : ''}"${tip}>R${rank}<small>✓</small></span>`;
             }
             const need = globalThis.getCharmRankMinPlayerLevel(rank, id);
             if (lv < need) {
@@ -415,10 +423,10 @@ export function _vendorBuildCharmsTabHTML(ignoreFilter) {
             return `<button class="sx-vendor-charm-rank sx-vendor-charm-buy${cls}"${tip} onclick="_vendorBuyCharm('${id}', ${rank})">R${rank}<small>🪙 ${price.toLocaleString()}</small></button>`;
         }).join('');
         return `
-<div class="sx-vendor-card sx-vendor-charm-card">
+<div class="sx-vendor-card sx-vendor-charm-card${slotNums.length ? ' sx-vendor-charm-card-slotted' : ''}">
     <div class="sx-vendor-card-top" onmouseenter="handleSkillTipRank(event, '${id}', 1)" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">
         <div class="sx-vendor-card-icon">${icon}</div>
-        <div class="sx-vendor-card-info"><div class="sx-vendor-card-name">${globalThis.getSkillName(id)}</div></div>
+        <div class="sx-vendor-card-info"><div class="sx-vendor-card-name">${globalThis.getSkillName(id)}</div>${badge}</div>
     </div>
     <div class="sx-vendor-charm-ranks">${ranks}</div>
 </div>`;

@@ -179,6 +179,7 @@ export function evaluateBonusObjective(elapsed) {
         case 'noitem': return globalThis.itemsUsedThisLevel === 0;
         case 'quiz': return true;   // quiz bonus is evaluated separately via showQuiz()
         case 'gauntlet': return false; // decided by the arena after the win (combat/gauntlet.js)
+        case 'movement': return false; // decided by the movement trial after the win (combat/movement-trial.js)
         case 'combo': return elapsed <= bp && globalThis.mistakeCount === 0;
         case 'noitem_nomiss': return globalThis.itemsUsedThisLevel === 0 && globalThis.mistakeCount === 0;
         case 'noitem_fast': return globalThis.itemsUsedThisLevel === 0 && elapsed <= bp;

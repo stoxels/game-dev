@@ -80,6 +80,12 @@
     text-align: center;
 }
 
+.lose-hint {
+    margin-top: 10px;
+    max-width: 640px;
+    color: #ffd76e;
+}
+
 /* Generic line � used inside .ov-col blocks (score / time columns) */
 .ov-sub-line {
     font-size: clamp(11px, 1.8vw, 20px);
@@ -882,3 +888,73 @@ body.question-modal-open #player-avatar-simple {
 #ov-win .rs-col, #ov-lose .rs-col { font-size: clamp(14px, 1.9vh, 17px); }
 #ov-win .ov-note { font-size: 0.95em; opacity: 0.95; }
 .ov-btns button, .ov-btns .gtb-btn { font-family: var(--C, serif); font-weight: 700; letter-spacing: 0.06em; }
+
+
+/* ── Movement trial (js/combat/movement-trial.js): bonus modal with a walking arena ── */
+#mt-overlay { z-index: 9600; align-items: center; justify-content: center; }
+.mt-box {
+    position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px;
+    padding: 18px 22px 16px; max-width: 96vw; box-sizing: border-box;
+    background: linear-gradient(180deg, #1c1a24, #121018); border: 3px solid #b8913a; border-radius: 12px;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+}
+.mt-head { display: flex; gap: 14px; align-items: baseline; }
+.mt-title { font-family: var(--C, serif); font-weight: 800; font-size: 26px; letter-spacing: 0.08em; color: #ffd76e; }
+.mt-name { font-family: var(--C, serif); font-size: 16px; color: #cfd6e6; }
+.mt-hint { font-family: var(--PX, serif); font-size: 17px; color: #e9e2cf; text-align: center; }
+.mt-hud { display: flex; align-items: center; gap: 12px; width: 100%; }
+.mt-bar { flex: 1; height: 16px; background: #0b0a10; border: 2px solid #5a4a22; border-radius: 8px; overflow: hidden; }
+.mt-bar-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #4ade80, #facc15 70%, #f87171); transition: width 0.08s linear; }
+.mt-time { font-family: var(--C, serif); font-weight: 800; font-size: 22px; color: #fff; min-width: 4.2ch; text-align: right; }
+.mt-progress { font-family: var(--C, serif); font-weight: 800; font-size: 20px; color: #86efac; min-width: 4ch; }
+.mt-arena-wrap { position: relative; overflow: hidden; border: 2px solid #5a4a22; border-radius: 6px; }
+.mt-arena {
+    position: absolute; top: 0; left: 0; transform-origin: 0 0; overflow: hidden;
+    background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 72px),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 72px), #24283a;
+}
+.mt-wall {
+    position: absolute; box-sizing: border-box; border-radius: 4px;
+    background: linear-gradient(135deg, #6b7280, #3b4252 55%, #2a2f3d);
+    border: 2px solid #1a1d27; box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.18), inset -3px -3px 0 rgba(0, 0, 0, 0.35);
+}
+.mt-avatar { position: absolute; width: 44px; height: 44px; background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 3; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.7)); }
+.mt-circle {
+    position: absolute; z-index: 2; border-radius: 50%; box-sizing: border-box;
+    border: 4px solid #86efac; background: radial-gradient(circle, rgba(134, 239, 172, 0.45), rgba(74, 222, 128, 0.12) 75%);
+    box-shadow: 0 0 22px rgba(74, 222, 128, 0.85); animation: mt-pulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes mt-pulse { from { transform: scale(0.94); } to { transform: scale(1.06); } }
+.mt-chest { position: absolute; z-index: 2; width: 80px; height: 80px; filter: drop-shadow(0 0 14px rgba(255, 215, 110, 0.9)); }
+.mt-chest img { width: 100%; height: 100%; object-fit: contain; }
+.mt-banner {
+    position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center;
+    font-family: var(--C, serif); font-weight: 900; font-size: 150px; color: #fff; pointer-events: none;
+    text-shadow: 0 4px 0 #000, 0 0 30px rgba(0, 0, 0, 0.9); background: rgba(8, 8, 14, 0.35);
+}
+.mt-banner.mt-go, .mt-banner.mt-win, .mt-banner.mt-lose { font-size: 96px; background: transparent; }
+.mt-banner.mt-win { color: #86efac; }
+.mt-banner.mt-lose { color: #f87171; }
+.mt-skip {
+    font-family: var(--C, serif); font-size: 14px; padding: 5px 14px; cursor: pointer;
+    background: transparent; color: #9ca3af; border: 1px solid #4b5563; border-radius: 6px;
+}
+.mt-skip:hover { color: #fff; border-color: #9ca3af; }
+.mt-chest-panel {
+    position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    background: rgba(10, 9, 16, 0.94); border-radius: 10px;
+}
+.mt-chest-img { width: 120px; height: 120px; object-fit: contain; filter: drop-shadow(0 0 16px rgba(255, 215, 110, 0.8)); }
+.mt-chest-title { font-family: var(--C, serif); font-weight: 800; font-size: 24px; letter-spacing: 0.08em; color: #ffd76e; }
+.mt-chest-items { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.mt-chest-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px; width: 170px; padding: 10px; cursor: pointer;
+    background: #1f1b2a; border: 2px solid #b8913a; border-radius: 8px; color: #fff; font-family: var(--PX, serif); font-size: 15px;
+}
+.mt-chest-item:hover:not(:disabled) { box-shadow: 0 0 14px rgba(255, 215, 110, 0.6); }
+.mt-chest-icon { font-size: 34px; }
+.mt-chest-taken { opacity: 0.5; border-color: #3f8f5a; cursor: default; }
+.mt-chest-continue {
+    font-family: var(--C, serif); font-weight: 700; font-size: 17px; padding: 8px 22px; cursor: pointer;
+    background: #b8913a; color: #1a1408; border: 0; border-radius: 8px;
+}

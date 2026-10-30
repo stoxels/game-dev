@@ -342,6 +342,7 @@ import { EG_ATLAS_REGION_BOSSES } from '../../js/combat/bosses/boss-rosters.js';
 import { SETTINGS, SETTINGS_DEFAULTS, applySettings, initSettingsControls, loadSettingsUI, saveSettings } from '../../js/settings.js';
 import { _keybindNormalize, closeKeybindsModal, keybindDisplayLabel, keybindKeyFor, keybindMatches, onKeybindAction, openKeybindsModal, resetKeybinds, tutUpdateKeybinds } from '../../js/keybinds.js';
 import { DIFF_CFG, beginRetrySetupRun, cancelRetrySetupModal, curDiff, curMods, isClassless, isMonsterless, isTreeless, openRetrySetupModal, retrySetupDefer, retrySetupIsActive, retrySetupResolve, scoreMultiplier, selDiff, syncDiffModButtons, togMod, updDiffDesc, updModDesc, updateRetryKeepModal } from '../../js/difficulty-modifiers.js';
+import { applyMovementBonuses } from '../../js/levels/movement-trial-levels.js';
 import { GAUNTLET_HINT, GAUNTLET_HINT_DE, GAUNTLET_MIN_LEVEL_INDEX, GAUNTLET_MIN_SPACING, GAUNTLET_SKIP_WORLDS, applyGauntletBonuses, pickGauntletLevelIndices } from '../../js/levels/gauntlet-levels.js';
 import { G, W1, W10, W11, W12, W13, W14, W15, W16, W17, W18, W19, W2, W20, W21, W22, W3, W4, W5, W6, W7, W8, W9, WORLDS, W_ENDGAME } from '../../js/levels/level-world-data.js';
 import { ALL, NEXUS_WORLD_INDEX, WORLD_START_GI, getNexusPointGi, isAscensionLevel, isNexusPointLevel, isNexusUnlocked, isNexusWorld, isNexusWorldUnlocked, lvText, setNexusUnlocked } from '../../js/levels/levels.js';
@@ -426,6 +427,7 @@ import { LIFE_REGEN_INTERVAL_MS, STAGGER_DURATION_MS, _attachBossStylesheet, _ca
 import { _animateMonsterMelee, _animateMonsterProjectile, _applyMeleeImpact, _fireMonsterAttack, _flashMonsterAttackCard, _resolveAttackType, _rollPreemptiveDodge } from '../../js/combat/encounter-monster-attacks.js';
 import { MONSTER_SPELL_CONFIG, _maybeCastMonsterSpell, _monsterSpellChance } from '../../js/combat/monster-spells.js';
 import { _gauntletActive, _gauntletFighting, _gauntletSummonRevealCells, _gauntletOnDefeat, _gauntletPlayable, startGauntlet, startParryTutorial } from '../../js/combat/gauntlet.js';
+import { startMovementTrial } from '../../js/combat/movement-trial.js';
 import { _applyPlayerBlockFeedback, _applyPlayerBlockLockoutFeedback, _applyPlayerHitFeedback, _applyPlayerMissFeedback, _blockLockoutOverlayTimer, _hideBlockLockoutOverlay, _showBlockLockoutOverlay } from '../../js/combat/encounter-monster-attack-feedback.js';
 import { _animatePlayerProjectile, _consumeOnHitGearBonus, _onMistake, _releaseChannelAtMax, _resolveProjectileImpact, _tickCorrectCellGearProcs, _trackRecentFill } from '../../js/combat/encounter-player-attacks.js';
 import { _applyGroundedReduction, _applyPlayerDeflectFeedback, _applyPlayerParryFeedback, _getDeflectChancePct, _getDeflectDamagePct, _getDualWieldParryChancePct, _getParryChancePct, _isDualWieldParryActive, _rollFateNegation, _rollParry, _tryDeflectProjectile } from '../../js/combat/encounter-player-mitigation.js';

@@ -48,7 +48,12 @@ export function _pauseGridDrops() {
         globalThis._pickupSpawnTimer = null;
         _pickupSpawnerInfo.timer = null;
     }
-    // Pause each drop expiry timer
+    _pauseDropExpiries(now);
+}
+
+// Stops every drop's expiry timer and countdown badge, remembering the time
+// each had left. Safe to call again: already-stopped ones are skipped.
+function _pauseDropExpiries(now) {
     globalThis._dropExpiryEntries.forEach(entry => {
         if (entry.timer) {
             clearTimeout(entry.timer);
@@ -60,6 +65,8 @@ export function _pauseGridDrops() {
     });
     // Pause countdown badges
     globalThis._expireCountdownEntries.forEach(cd => {
+        if (cd.paused) return;
+        cd.paused = true;
         if (cd.timeout) { clearTimeout(cd.timeout); cd.timeout = null; }
         if (cd.interval) { clearInterval(cd.interval); cd.interval = null; }
         // remaining until the warning badge should appear, and remaining until expiry
@@ -89,7 +96,12 @@ export function _resumeGridDrops() {
         _pickupSpawnerInfo.timer = timer;
         globalThis._pickupTimers.push(timer);
     }
-    // Resume each drop expiry timer
+    if (!_dropsCalm) _resumeDropExpiries(now);
+}
+
+// Re-arms every stopped drop expiry timer and countdown badge with the time
+// it had left.
+function _resumeDropExpiries(now) {
     globalThis._dropExpiryEntries.forEach(entry => {
         if (entry.remaining != null && entry.timer == null) {
             const remaining = entry.remaining;
@@ -109,6 +121,8 @@ export function _resumeGridDrops() {
     });
     // Resume countdown badges
     globalThis._expireCountdownEntries.forEach(cd => {
+        if (!cd.paused) return;
+        cd.paused = false;
         // shift startedAt / expiresAt so tick math stays correct
         const elapsedBeforePause = cd.lifetimeMs - cd.expiryRemaining;
         cd.startedAt = now - elapsedBeforePause;
@@ -129,6 +143,21 @@ export function _resumeGridDrops() {
             }, cd.delayRemaining);
         }
     });
+}
+
+// Grid drops only run down while monsters are alive: once the room is clear
+// they wait (no hurry to collect), and the clocks restart when the next
+// monster appears. _dropsCalm is true while they are frozen this way.
+let _dropsCalm = false;
+let _calmWatch = null;
+
+// Freezes / unfreezes the drop clocks as monsters die and arrive. Runs twice
+// a second; drops created while calm are frozen on the next check.
+function _calmWatchTick() {
+    if (globalThis._gamePaused || !_isActive()) return;
+    const calm = !(globalThis._monsters || []).some(m => m && m.currentHP > 0);
+    if (calm) { _dropsCalm = true; _pauseDropExpiries(Date.now()); }
+    else if (_dropsCalm) { _dropsCalm = false; _resumeDropExpiries(Date.now()); }
 }
 
 // Schedules the next pickup spawn attempt with a random delay in the configured range.
@@ -225,6 +254,7 @@ export function _dropHeartPickup(opts) {
 
 // Starts the recurring pickup spawn loop.
 export function _startPickupSpawner() {
+    if (!_calmWatch) _calmWatch = setInterval(_calmWatchTick, 500);
     if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return;
     _scheduleNextPickupSpawn();
 }
@@ -232,6 +262,9 @@ export function _startPickupSpawner() {
 // Cancels all pickup timers and clears every pickup from the board.
 // Called on encounter stop or level exit.
 export function _stopPickupSpawner() {
+    clearInterval(_calmWatch);
+    _calmWatch = null;
+    _dropsCalm = false;
     if (globalThis._pickupSpawnTimer) {
         clearTimeout(globalThis._pickupSpawnTimer);
         globalThis._pickupSpawnTimer = null;

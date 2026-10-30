@@ -119,11 +119,29 @@ function _playToastSfx(accentColor) {
 const TOAST_MIN_SCALE = 0.65;
 let _toastFitTimer = null;
 
+// Widest and total height the visible toasts would have at full size,
+// measured from the text itself (canvas) rather than the laid-out boxes, so
+// the answer does not change when the font shrinks (wrapping would make the
+// laid-out width jump and the scale flicker). Returns { w, h } in screen px.
+function _toastNaturalSize(stack, cur) {
+    const ctx = document.createElement('canvas').getContext('2d');
+    const zoom = parseFloat(getComputedStyle(stack).zoom) || 1;
+    const maxW = parseFloat(getComputedStyle(stack).maxWidth) || 520;
+    let w = 0, h = 0;
+    activeToasts.forEach(t => {
+        const cs = getComputedStyle(t.el);
+        const fs = parseFloat(cs.fontSize) / cur;
+        ctx.font = cs.fontWeight + ' ' + fs + 'px ' + cs.fontFamily;
+        w = Math.max(w, ctx.measureText(t.el.textContent).width);
+        h += fs * 1.3 + 5;
+    });
+    return { w: Math.min(w, maxW) * zoom, h: h * zoom };
+}
+
 // Shrinks the bottom-left toast text (CSS variable --sx-toast-s, read by
 // .toast-msg) just enough that the widest message stops reaching into the
-// puzzle grid or its row clue numbers. Works from the message's unscaled
-// size, so shrinking never makes it grow back and flicker. Combat toasts
-// (centre of the grid) are not affected.
+// puzzle grid or its row clue numbers. Combat toasts (centre of the grid)
+// are not affected.
 function _fitToastsToGrid() {
     const stack = document.getElementById('toast-stack');
     if (!stack) return;
@@ -133,12 +151,9 @@ function _fitToastsToGrid() {
     let scale = 1;
     if (gr && gr.width > 0 && gr.height > 0 && activeToasts.length > 0) {
         const r = stack.getBoundingClientRect();
-        const natW = r.width / cur;
-        const natTop = r.bottom - (r.height / cur);
-        const reachesRows = natTop < gr.bottom && r.bottom > gr.top;
-        if (natW > 0 && reachesRows) {
-            const avail = gr.left - r.left - 8;
-            scale = Math.min(1, Math.max(TOAST_MIN_SCALE, avail / natW));
+        const nat = _toastNaturalSize(stack, cur);
+        if (nat.w > 0 && r.bottom - nat.h < gr.bottom && r.bottom > gr.top) {
+            scale = Math.min(1, Math.max(TOAST_MIN_SCALE, (gr.left - r.left - 8) / nat.w));
         }
     }
     const rounded = Math.round(scale * 100) / 100;
