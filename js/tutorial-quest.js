@@ -34,7 +34,7 @@ import { _consumeItem } from './puzzle-items/use-item.js';
 import { questStat_revealItemUsed } from './inference/inference-stats.js';
 import { isPuzzleSolved } from './scoring/scoring-core.js';
 import { hideResultOverlays, showSetup } from './screens/screens.js';
-import { _charmMake, _charmRenderOverlay, _charmDrops, grantCharm, isSkillCharmUnlocked } from './skills/skill-charms.js';
+import { _charmMake, _charmRenderOverlay, _charmDrops, getCharmByKey, grantCharm, isSkillCharmUnlocked } from './skills/skill-charms.js';
 import { SKILL_REGISTRY, getSkillName } from './skills/skill-registry.js';
 import { closeSpellbook, isSpellbookOpen } from './skills/skill-spellbook.js';
 import { getUniversalSpellManaCost } from './skills/universal-spells.js';
@@ -1980,6 +1980,25 @@ function _tqGrantSwordToStash() {
     _tqP3SwordClaimed = true;
 }
 
+// True when the player already owns this exact charm (skill + rank). Used so
+// replaying the tutorial never pays out a reward twice.
+function _tqOwnsCharm(skillId, rank) {
+    try { return !!getCharmByKey(`${skillId}#${rank}`); } catch (e) { return false; }
+}
+
+// True when a tutorial chest piece (matched by base type) is already worn or
+// sitting in the stash - the chest gear is a one-time gift.
+function _tqOwnsChestGear(baseId) {
+    const re = new RegExp('^' + baseId + '_chest_');
+    const hit = (item) => !!(item && typeof item.id === 'string' && re.test(item.id));
+    const inGrid = (grid) => Array.isArray(grid) && grid.some((row) => Array.isArray(row) && row.some(hit));
+    try { if (STATE && STATE.egEquipped && Object.values(STATE.egEquipped).some(hit)) return true; } catch (e) {}
+    try { if (STATE && inGrid(STATE.egInventory)) return true; } catch (e) {}
+    try { if (inGrid(_inventory)) return true; } catch (e) {}
+    try { if (typeof _getAllEquippedItems === 'function' && _getAllEquippedItems().some(hit)) return true; } catch (e) {}
+    return false;
+}
+
 // Puzzle 3: the defeated bat drops a Fireball charm (rank 1) onto the grid.
 // Placed on the solution cell (2,0) with no expiry - claimed with a single
 // left-click through the same drop gate as the sword. grantCharm lands it
@@ -1989,6 +2008,13 @@ function _tqPlaceCharmDrop() {
     _tqP3DropCell = null;
     _tqP3CharmKey = null;
     _tqP3DropButton = 1;
+    // Replaying the tutorial must not hand out the charm again (a second
+    // copy would turn into a shard / Lemma) - the lesson just moves on.
+    if (_tqOwnsCharm(TQ_FIREBALL_ID, 1)) {
+        _tqP3CharmClaimed = true;
+        _tqRefreshGridLockBorder();
+        return;
+    }
     try {
         if (typeof _charmMake !== 'function'
             || typeof _charmDrops === 'undefined'
@@ -2636,9 +2662,11 @@ function _tqClaimChestItem(i, btn) {
     let ok = false;
     try {
         if (entry.kind === 'charm') {
-            if (typeof grantCharm === 'function') { grantCharm(entry.skillId, entry.rank); ok = true; }
+            // Already owned (tutorial replayed): count it as claimed, grant nothing.
+            if (_tqOwnsCharm(entry.skillId, entry.rank)) ok = true;
+            else if (typeof grantCharm === 'function') { grantCharm(entry.skillId, entry.rank); ok = true; }
         } else {
-            ok = _tqGrantChestGear(entry, i);
+            ok = _tqOwnsChestGear(entry.baseId) || _tqGrantChestGear(entry, i);
         }
     } catch (e) { ok = false; }
     if (!ok) return;   // never mark something claimed that was not granted
