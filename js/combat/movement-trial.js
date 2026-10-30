@@ -1,11 +1,13 @@
 import { LANG } from '../translation/translations.js';
-import { cur } from '../state.js';
+import { STATE, cur } from '../state.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { keybindKeyFor } from '../keybinds.js';
-import { _getPlayerCharacterImage } from '../sprite/player_sprite.js';
+import { _animSetDefaultDownImage, _animShouldMirrorFor, _animWarmCacheFor, _playAvatarWalkAnimation, _startAvatarIdleAnimation, _stopAvatarWalkAnimation } from '../sprite/sprite_animations.js';
 import { _campaignMonsterLevel } from '../hub/hub-leveling.js';
 import { _addItemToStash } from '../hub/hub-stash.js';
 import { _generateEquipmentDrop } from '../loot/loot-equipment-generator.js';
+import { _showHubTooltip } from '../loot/loot-currency-tooltip.js';
+import { _clearTooltip, _moveTooltip } from '../hub/hub-tooltips.js';
 
 //------------------------------------------------------------------------
 // MOVEMENT TRIAL
@@ -198,13 +200,32 @@ function _drawWalls(arena, rows) {
     }
 }
 
-// Creates the player's sprite element.
+const AVATAR_ID = 'mt-avatar-img';
+const AVATAR_SIZE = 64;             // drawn size of the sprite (collision box stays HALF)
+
+// Creates the player's sprite: an <img> driven by the regular idle / walk
+// animation frames (the same ones the avatar uses on the puzzle screen).
 function _makeAvatar(arena) {
     const el = document.createElement('div');
     el.className = 'mt-avatar';
-    el.style.backgroundImage = `url('${_getPlayerCharacterImage()}')`;
+    el.innerHTML = `<img id="${AVATAR_ID}" alt="" draggable="false">`;
     arena.appendChild(el);
+    const img = el.firstChild;
+    _animSetDefaultDownImage(img);
+    _animWarmCacheFor(STATE.playerCharacter, STATE.playerAscendency || STATE.playerClass || 'noclass');
+    _startAvatarIdleAnimation(AVATAR_ID);
     return el;
+}
+
+// Plays the walk animation for the held direction and mirrors the sprite
+// the way the regular avatar does (only the right-facing fallback art
+// mirrors when heading left).
+function _animateWalk(avatar, dir) {
+    if (!dir.dx && !dir.dy) return;
+    const face = Math.abs(dir.dx) >= Math.abs(dir.dy) ? (dir.dx > 0 ? 'right' : 'left') : (dir.dy > 0 ? 'down' : 'up');
+    _playAvatarWalkAnimation(AVATAR_ID, face);
+    const variant = STATE.playerAscendency || STATE.playerClass || 'noclass';
+    avatar.firstChild.style.transform = _animShouldMirrorFor(STATE.playerCharacter, variant, face) ? 'scaleX(-1)' : 'scaleX(1)';
 }
 
 // Places an element so its centre is at (x, y) in the arena.
@@ -252,6 +273,7 @@ function _openChest(modal, done) {
         if (taken.has(i)) return;
         taken.add(i);
         try { _addItemToStash(items[i]); } catch (e) { /* stash failure must not trap the player */ }
+        _clearTooltip();
         btn.classList.add('mt-chest-taken');
         btn.disabled = true;
         try { Audio_Manager.playSFX('item_equip'); } catch (e) { /* sound is cosmetic */ }
@@ -261,10 +283,15 @@ function _openChest(modal, done) {
         btn.className = 'mt-chest-item';
         btn.innerHTML = `<span class="mt-chest-icon">${it.icon || '📦'}</span><span class="mt-chest-name">${it.name || ''}</span>`;
         btn.addEventListener('click', () => take(i, btn));
+        // Hover shows the same item tooltip as the stash.
+        btn.addEventListener('mouseenter', (e) => { try { _showHubTooltip(it, e); } catch (err) { /* tooltip is cosmetic */ } });
+        btn.addEventListener('mousemove', _moveTooltip);
+        btn.addEventListener('mouseleave', _clearTooltip);
         list.appendChild(btn);
     });
     panel.querySelector('.mt-chest-continue').addEventListener('click', () => {
         list.querySelectorAll('.mt-chest-item').forEach((btn, i) => take(i, btn));
+        _clearTooltip();
         panel.remove();
         done();
     });
@@ -309,22 +336,31 @@ export function startMovementTrial(variantIndex, onDone) {
     const startCell = maze ? _findCell(rows, 'S') : { x: 7, y: 3 };
     const pos = _cellCentre(startCell);
     const avatar = _makeAvatar(modal.arena);
-    _place(avatar, pos.x, pos.y, 44);
+    _place(avatar, pos.x, pos.y, AVATAR_SIZE);
 
     let goal = null, goalEl = null, reached = 0, timeLeft = 0, timeMax = 0;
     const held = new Set();
     let phase = 'countdown', raf = 0, last = 0, finished = false;
     const timers = [];
 
+    // Stops capturing keys, so Alt (item compare) and Esc behave normally in
+    // the chest screen once the run itself is over.
+    const releaseKeys = () => {
+        held.clear();
+        document.removeEventListener('keydown', onKeyDown, true);
+        document.removeEventListener('keyup', onKeyUp, true);
+    };
+
     const finish = (success) => {
         if (finished) return;
         finished = true;
         cancelAnimationFrame(raf);
         timers.forEach(clearTimeout);
-        document.removeEventListener('keydown', onKeyDown, true);
-        document.removeEventListener('keyup', onKeyUp, true);
+        releaseKeys();
         window.removeEventListener('resize', modal.fit);
         modal.root.remove();
+        _stopAvatarWalkAnimation();
+        _startAvatarIdleAnimation('avatar-sprite-img-simple');
         onDone(success);
     };
 
@@ -344,6 +380,7 @@ export function startMovementTrial(variantIndex, onDone) {
 
     const end = (success) => {
         phase = 'result';
+        releaseKeys();
         _banner(modal.arena, success ? _tr('SUCCESS!', 'GESCHAFFT!') : _tr("TIME'S UP!", 'ZEIT ABGELAUFEN!'), success ? 'mt-win' : 'mt-lose');
         try { Audio_Manager.playSFX(success ? 'win' : 'lose'); } catch (e) { /* sound is cosmetic */ }
         timers.push(setTimeout(() => {
@@ -365,8 +402,10 @@ export function startMovementTrial(variantIndex, onDone) {
         const dtS = Math.min(0.05, (ts - last) / 1000);
         last = ts;
         if (phase === 'play') {
-            _step(rows, pos, _readDirection(held), dtS);
-            _place(avatar, pos.x, pos.y, 44);
+            const dir = _readDirection(held);
+            _step(rows, pos, dir, dtS);
+            _animateWalk(avatar, dir);
+            _place(avatar, pos.x, pos.y, AVATAR_SIZE);
             timeLeft -= dtS;
             updateHud();
             const reach = maze ? CHEST_REACH_PX : CIRCLE_R;
