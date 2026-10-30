@@ -1253,6 +1253,44 @@ export function _getBossTotalForHUD() {
     return 0;
 }
 
+// Smallest scale the objective chips may shrink to beside a large grid.
+const OBJ_MIN_SCALE = 0.55;
+let _objFitTimer = null;
+
+// Shrinks the objective chips (toward their top-left corner) just enough that
+// they stop covering the grid's row clue numbers on large puzzles. Measures
+// the chips' unscaled width, so the result does not feed back. Stops its own
+// timer when the strip is gone or hidden.
+function _fitObjectivesToGrid() {
+    const strip = document.getElementById('sx-objectives-strip');
+    if (!strip || strip.classList.contains('sx-hidden') || !strip.firstChild) {
+        clearInterval(_objFitTimer);
+        _objFitTimer = null;
+        return;
+    }
+    const grid = document.getElementById('ptable');
+    const gr = grid ? grid.getBoundingClientRect() : null;
+    let scale = 1;
+    const w = strip.offsetWidth;
+    if (gr && gr.width > 0 && w > 0) {
+        const r = strip.getBoundingClientRect();
+        const cur = parseFloat(strip.style.getPropertyValue('--sx-obj-s')) || 1;
+        const natBottom = r.top + (r.height / cur);
+        if (r.top < gr.bottom && natBottom > gr.top) {
+            scale = Math.min(1, Math.max(OBJ_MIN_SCALE, (gr.left - r.left - 6) / w));
+        }
+    }
+    const rounded = Math.round(scale * 100) / 100;
+    const had = strip.style.getPropertyValue('--sx-obj-s');
+    if (rounded === 1) {
+        if (had) { strip.style.removeProperty('--sx-obj-s'); strip.style.transform = ''; }
+    } else if (had !== String(rounded)) {
+        strip.style.setProperty('--sx-obj-s', String(rounded));
+        strip.style.transform = 'scale(' + rounded + ')';
+        strip.style.transformOrigin = 'top left';
+    }
+}
+
 export function _updateObjectivesHUD() {
     const strip = document.getElementById('sx-objectives-strip');
     if (!strip) return;
@@ -1375,6 +1413,8 @@ export function _updateObjectivesHUD() {
     }
 
     strip.innerHTML = `${lineHTML}${actionsHTML}`;
+    _fitObjectivesToGrid();
+    if (!_objFitTimer) _objFitTimer = setInterval(_fitObjectivesToGrid, 400);
 }
 
 // Kind ('convergence' | 'ascension') of the running campaign trial, else null.

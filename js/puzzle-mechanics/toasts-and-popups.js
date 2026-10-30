@@ -115,6 +115,47 @@ function _playToastSfx(accentColor) {
     Audio_Manager.playSFX(key);
 }
 
+// Smallest scale the bottom-left toast text may shrink to on a large grid.
+const TOAST_MIN_SCALE = 0.65;
+let _toastFitTimer = null;
+
+// Shrinks the bottom-left toast text (CSS variable --sx-toast-s, read by
+// .toast-msg) just enough that the widest message stops reaching into the
+// puzzle grid or its row clue numbers. Works from the message's unscaled
+// size, so shrinking never makes it grow back and flicker. Combat toasts
+// (centre of the grid) are not affected.
+function _fitToastsToGrid() {
+    const stack = document.getElementById('toast-stack');
+    if (!stack) return;
+    const grid = document.getElementById('ptable');
+    const gr = grid ? grid.getBoundingClientRect() : null;
+    const cur = parseFloat(stack.style.getPropertyValue('--sx-toast-s')) || 1;
+    let scale = 1;
+    if (gr && gr.width > 0 && gr.height > 0 && activeToasts.length > 0) {
+        const r = stack.getBoundingClientRect();
+        const natW = r.width / cur;
+        const natTop = r.bottom - (r.height / cur);
+        const reachesRows = natTop < gr.bottom && r.bottom > gr.top;
+        if (natW > 0 && reachesRows) {
+            const avail = gr.left - r.left - 8;
+            scale = Math.min(1, Math.max(TOAST_MIN_SCALE, avail / natW));
+        }
+    }
+    const rounded = Math.round(scale * 100) / 100;
+    if (rounded === 1) { if (stack.style.getPropertyValue('--sx-toast-s')) stack.style.removeProperty('--sx-toast-s'); }
+    else if (cur !== rounded) stack.style.setProperty('--sx-toast-s', String(rounded));
+}
+
+// Keeps the fit up to date (grid size can change) while any toast is visible.
+function _startToastFit() {
+    _fitToastsToGrid();
+    if (_toastFitTimer) return;
+    _toastFitTimer = setInterval(() => {
+        _fitToastsToGrid();
+        if (activeToasts.length === 0) { clearInterval(_toastFitTimer); _toastFitTimer = null; }
+    }, 250);
+}
+
 // Appends a pre-built toast element to the stack: dedupes identical
 // messages, caps the visible count, and arms the fade-out timer.
 // Shared by the plain-text showToast() and the HTML showHtmlToast().
@@ -131,6 +172,7 @@ function _appendToastEl(el, key, accentColor) {
 
     const entry = { msg: key, el, removing: false, timeoutId: null };
     activeToasts.push(entry);
+    _startToastFit();
 
     // Cap how many messages can pile up - trim the oldest first.
     if (activeToasts.length > TOAST_MAX_VISIBLE) {

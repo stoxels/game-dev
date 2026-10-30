@@ -1760,7 +1760,7 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box { /* neutralized - see s
 .skill-hotbar-slot.reaction-ready .skill-hotbar-react { color: #fff3b0; }
 
 /* ── readability pass: buff chips above the hotbar (charges and support buffs) ── */
-#sx-buff-bar { gap: 8px; }
+#sx-buff-bar { gap: 6px; flex-direction: column; align-items: flex-end; } /* chips stack upward, right-aligned, instead of spreading over the grid */
 .sx-buff-chip {
     gap: 8px;
     padding: 5px 12px;

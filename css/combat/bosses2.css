@@ -2276,27 +2276,6 @@ body.sx-firefly-drag-cursor, body.sx-firefly-drag-cursor * { cursor: grabbing !i
     filter: drop-shadow(0 0 14px rgba(248, 113, 113, 0.95));
 }
 
-/* Weaver tripwires */
-.sx-nk-thread-h {
-    position: fixed; left: 0; right: 0; width: 100vw; height: 12px;
-    pointer-events: none; z-index: 9001;
-    background: rgba(148, 163, 184, 0.25);
-}
-.sx-nk-thread-v {
-    position: fixed; top: 0; bottom: 0; width: 12px; height: 100vh;
-    pointer-events: none; z-index: 9001;
-    background: rgba(148, 163, 184, 0.25);
-}
-.sx-nk-thread-warn {
-    background: rgba(250, 204, 21, 0.35) !important;
-    animation: sx-nk-warn-pulse 0.3s ease-in-out infinite alternate;
-}
-.sx-nk-thread-live {
-    background: rgba(192, 132, 252, 0.75) !important;
-    box-shadow: 0 0 22px rgba(192, 132, 252, 1) !important;
-    animation: none !important;
-}
-
 /* Velocity speed lanes */
 .sx-nk-speedlane {
     position: fixed; left: 0; right: 0; width: 100vw;
@@ -2352,18 +2331,6 @@ body.sx-firefly-drag-cursor, body.sx-firefly-drag-cursor * { cursor: grabbing !i
     border-top: 2px solid rgba(207, 250, 254, 0.9);
     border-bottom: 2px solid rgba(207, 250, 254, 0.9);
     box-shadow: 0 0 22px rgba(34, 211, 238, 0.8);
-}
-
-/* Executioner pendulum */
-.sx-nk-pendulum-arm {
-    position: fixed;
-    pointer-events: none; z-index: 9001;
-    transform-origin: 50% 0%;
-    background: rgba(148, 163, 184, 0.7);
-}
-.sx-nk-pendulum {
-    width: 60px; height: 60px; font-size: 2.4rem;
-    filter: drop-shadow(0 0 14px rgba(226, 232, 240, 0.9));
 }
 
 /* Leviathan tide + debris */
@@ -5216,6 +5183,8 @@ body:has(#screen-hub.active) [class*="sx-gal-"] { display: none !important; }
 .sx-nk-fin-water { --nk-fin: #7dd3fc; }
 .sx-nk-fin-dance { --nk-fin: #f9a8d4; }
 .sx-nk-fin-cyc { --nk-fin: #fb923c; }
+.sx-nk-fin-wvr { --nk-fin: #c084fc; }
+.sx-nk-fin-exe { --nk-fin: #f87171; }
 
 /* ------------------------------------------------------------------
    THE TACTICIAN - persistent chess-siege arena (boss-tactician.js)
@@ -12943,3 +12912,74 @@ body.sx-shp-flash::after {
     border: 0; background: linear-gradient(90deg, #fff, rgba(254, 215, 170, 0.95) 8%, rgba(249, 115, 22, 0.85) 60%, rgba(249, 115, 22, 0.5));
     box-shadow: 0 0 30px rgba(249, 115, 22, 0.95);
 }
+
+/* THE WEAVER: loom threads, the open green lane, and the spoked web wheel. */
+.sx-wvr-thread { position: fixed; top: 0; left: 0; z-index: 9001; pointer-events: none; }
+.sx-wvr-thread-v { width: 10px; height: 100vh; }
+.sx-wvr-thread-h { width: 100vw; height: 10px; }
+.sx-wvr-thread-v.sx-wvr-warn { background: repeating-linear-gradient(180deg, rgba(216, 180, 254, 0.8) 0 14px, transparent 14px 28px); }
+.sx-wvr-thread-h.sx-wvr-warn { background: repeating-linear-gradient(90deg, rgba(216, 180, 254, 0.8) 0 14px, transparent 14px 28px); }
+.sx-wvr-thread-v.sx-wvr-live { background: linear-gradient(90deg, transparent, #e9d5ff 30%, #fff 50%, #e9d5ff 70%, transparent); }
+.sx-wvr-thread-h.sx-wvr-live { background: linear-gradient(180deg, transparent, #e9d5ff 30%, #fff 50%, #e9d5ff 70%, transparent); }
+.sx-wvr-live {
+    box-shadow: 0 0 16px #c084fc, 0 0 36px rgba(126, 34, 206, 0.8);
+    animation: sx-wvr-flick 0.1s steps(2) infinite;
+}
+@keyframes sx-wvr-flick { from { filter: brightness(1); } to { filter: brightness(1.7); } }
+.sx-wvr-spent { animation: sx-wvr-fade 0.35s ease-out forwards !important; }
+@keyframes sx-wvr-fade { from { opacity: 1; } to { opacity: 0; } }
+.sx-wvr-lane { position: fixed; top: 0; left: 0; z-index: 8997; pointer-events: none; box-sizing: border-box; background: rgba(74, 222, 128, 0.14); }
+.sx-wvr-lane-v { height: 100vh; border-left: 3px dashed rgba(134, 239, 172, 0.9); border-right: 3px dashed rgba(134, 239, 172, 0.9); }
+.sx-wvr-lane-h { width: 100vw; border-top: 3px dashed rgba(134, 239, 172, 0.9); border-bottom: 3px dashed rgba(134, 239, 172, 0.9); }
+.sx-wvr-lane-live { background: rgba(74, 222, 128, 0.07); }
+.sx-wvr-ring { position: fixed; z-index: 8996; pointer-events: none; box-sizing: border-box; border-radius: 50%; border: 2px solid rgba(216, 180, 254, 0.3); }
+.sx-wvr-hub {
+    position: fixed; z-index: 9002; pointer-events: none; box-sizing: border-box;
+    width: 64px; height: 64px; border-radius: 50%;
+    background: radial-gradient(circle, #f5d0fe 0 14%, #7e22ce 16% 58%, #2e1065 60%);
+    border: 3px solid #e9d5ff; box-shadow: 0 0 24px rgba(192, 132, 252, 0.95);
+}
+.sx-wvr-hub-flash { filter: brightness(2.6); box-shadow: 0 0 40px 10px rgba(255, 255, 255, 0.95); }
+.sx-wvr-spoke { position: fixed; top: 0; left: 0; z-index: 9001; pointer-events: none; height: 14px; margin-top: -7px; transform-origin: 0 50%; border-radius: 7px; }
+.sx-wvr-spoke-warn { background: repeating-linear-gradient(90deg, rgba(216, 180, 254, 0.8) 0 16px, transparent 16px 30px); height: 6px; margin-top: -3px; }
+.sx-wvr-spoke:not(.sx-wvr-spoke-warn) {
+    background: linear-gradient(90deg, #fff, #e9d5ff 5%, rgba(192, 132, 252, 0.9) 60%, rgba(126, 34, 206, 0.6));
+    box-shadow: 0 0 14px rgba(192, 132, 252, 0.95);
+}
+
+/* THE EXECUTIONER: floor arcs, chain and axe, and the condemned lanes. */
+.sx-exe-arc { position: fixed; top: 0; left: 0; z-index: 8998; pointer-events: none; }
+.sx-exe-arc path { fill: none; stroke: rgba(251, 191, 36, 0.8); stroke-width: 14; stroke-dasharray: 20 14; stroke-linecap: round; }
+.sx-exe-arc-live path { stroke: rgba(239, 68, 68, 0.5); stroke-dasharray: none; }
+.sx-exe-pivot {
+    position: fixed; top: 0; left: 0; z-index: 9001; pointer-events: none; width: 36px; height: 36px; border-radius: 50%; box-sizing: border-box;
+    background: radial-gradient(circle, #94a3b8 0 30%, #334155 34%); border: 3px solid #0f172a;
+}
+.sx-exe-chain {
+    position: fixed; top: 0; left: 0; z-index: 9000; pointer-events: none; height: 6px; margin-top: -3px; transform-origin: 0 50%;
+    background: repeating-linear-gradient(90deg, #cbd5e1 0 12px, #475569 12px 18px);
+}
+.sx-exe-axe {
+    position: fixed; top: 0; left: 0; z-index: 9002; pointer-events: none; box-sizing: border-box;
+    width: 120px; height: 100px; border-radius: 60px 60px 0 0 / 100px 100px 0 0;
+    background: linear-gradient(180deg, #f8fafc 0, #cbd5e1 14%, #64748b 55%, #1e293b 100%);
+    border: 3px solid #0f172a; border-bottom: 0;
+    box-shadow: 0 0 22px rgba(248, 113, 113, 0.9);
+}
+.sx-exe-axe-ghost { opacity: 0.35; box-shadow: none; }
+.sx-exe-lane { position: fixed; top: 0; left: 0; height: 100vh; z-index: 8999; pointer-events: none; box-sizing: border-box; }
+.sx-exe-lane-warn {
+    border-left: 3px dashed rgba(251, 191, 36, 0.9); border-right: 3px dashed rgba(251, 191, 36, 0.9);
+    background: repeating-linear-gradient(135deg, rgba(251, 191, 36, 0.16) 0 16px, rgba(120, 53, 15, 0.22) 16px 32px);
+}
+.sx-exe-lane-lock {
+    border-color: rgba(239, 68, 68, 0.98);
+    background: repeating-linear-gradient(135deg, rgba(239, 68, 68, 0.34) 0 16px, rgba(127, 29, 29, 0.4) 16px 32px);
+    animation: sx-nk-warn-pulse 0.15s ease-in-out infinite alternate;
+}
+.sx-exe-lane-slam {
+    background: linear-gradient(90deg, #7f1d1d, #fecaca 30%, #fff 50%, #fecaca 70%, #7f1d1d);
+    box-shadow: 0 0 34px rgba(239, 68, 68, 0.95);
+    animation: sx-exe-slam 0.14s ease-in forwards, sx-wvr-fade 0.25s ease-out 0.13s forwards;
+}
+@keyframes sx-exe-slam { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }

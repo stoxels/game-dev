@@ -320,13 +320,13 @@ import { _mechLockOn } from '../../js/combat/bosses/boss-guardian.js';
 import { _mechFlurry } from '../../js/combat/bosses/boss-duelist.js';
 import { _mechSegHitsRect, _mechSelfDestruct } from '../../js/combat/bosses/boss-mech.js';
 import { _mechVentAmbush } from '../../js/combat/bosses/boss-phantom.js';
-import { _mechThreadGrid } from '../../js/combat/bosses/boss-weaver.js';
+import { _mechThreadGrid, _mechWebWheel } from '../../js/combat/bosses/boss-weaver.js';
 import { _mechSpeedLanes } from '../../js/combat/bosses/boss-velocity.js';
 import { _teleportAvatarTo, _mechPortalWisp } from '../../js/combat/bosses/boss-wormhole.js';
 import { _mechUmbralDashes } from '../../js/combat/bosses/boss-eclipse.js';
 import { _mechDarkHunt } from '../../js/combat/bosses/boss-nightmare.js';
 import { _mechTentacleSweep } from '../../js/combat/bosses/boss-kraken.js';
-import { _mechAxePendulum } from '../../js/combat/bosses/boss-executioner.js';
+import { _mechAxePendulum, _mechGuillotine } from '../../js/combat/bosses/boss-executioner.js';
 import { _mechRisingTide } from '../../js/combat/bosses/boss-leviathan.js';
 import { _mechSpiralStorm, _mechReaperFans } from '../../js/combat/bosses/boss-nemesis.js';
 import { _mechSingularity, _mechEventBeams } from '../../js/combat/bosses/boss-oblivion.js';
@@ -1315,12 +1315,14 @@ try { globalThis["_mechFlurry"] = _mechFlurry; } catch (e) {} // PHASE3-SHIM (js
 try { globalThis["_mechSelfDestruct"] = _mechSelfDestruct; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-mech.js)
 try { globalThis["_mechVentAmbush"] = _mechVentAmbush; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-phantom.js)
 try { globalThis["_mechThreadGrid"] = _mechThreadGrid; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-weaver.js)
+try { globalThis["_mechWebWheel"] = _mechWebWheel; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-weaver.js)
 try { globalThis["_mechSpeedLanes"] = _mechSpeedLanes; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-velocity.js)
 try { globalThis["_mechPortalWisp"] = _mechPortalWisp; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-wormhole.js)
 try { globalThis["_mechUmbralDashes"] = _mechUmbralDashes; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-eclipse.js)
 try { globalThis["_mechDarkHunt"] = _mechDarkHunt; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-nightmare.js)
 try { globalThis["_mechTentacleSweep"] = _mechTentacleSweep; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-kraken.js)
 try { globalThis["_mechAxePendulum"] = _mechAxePendulum; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-executioner.js)
+try { globalThis["_mechGuillotine"] = _mechGuillotine; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-executioner.js)
 try { globalThis["_mechRisingTide"] = _mechRisingTide; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-leviathan.js)
 try { globalThis["_mechReaperFans"] = _mechReaperFans; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-nemesis.js)
 try { globalThis["_mechSpiralStorm"] = _mechSpiralStorm; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-nemesis.js)
