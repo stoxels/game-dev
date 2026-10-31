@@ -298,6 +298,16 @@ function _levelRunning() {
 function _tick() {
     if (!_bot) return;
     const now = Date.now();
+    // The character sheet opened over the running puzzle (B): the friend waits
+    // out of sight and carries on when it closes, instead of leaving.
+    const sprite = document.getElementById('companion-bot-sprite');
+    const sheetOpen = typeof globalThis.isHubGameOverlay === 'function' && globalThis.isHubGameOverlay();
+    if (sprite) sprite.style.visibility = sheetOpen ? 'hidden' : '';
+    if (sheetOpen) {
+        _bot.nextActionAt += TICK_MS;
+        _bot.nextHitAt += TICK_MS;
+        return;
+    }
     // The friend leaves with the player: off the level screen, or the level is over.
     const onLevelScreen = !!document.getElementById('screen-game')?.classList.contains('active');
     if (!cur || !onLevelScreen) { dismissCompanionBot(); return; }

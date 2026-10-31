@@ -2518,9 +2518,12 @@ function _tqChestItemName(entry, item) {
 // The item's real art (equipment art by base id, charm art by spell + rank),
 // falling back to the emoji while / if no art exists. Returns ready HTML.
 function _tqChestIconFor(entry, fallbackEmoji) {
-    if (entry.kind === 'currency' || entry.kind === 'essence') return _tqChestIconHTML(fallbackEmoji);
     try {
-        if (entry.kind === 'charm') {
+        if (entry.kind === 'currency' || entry.kind === 'essence') {
+            // Same art lookup the inventory and tooltips use (emoji until it loads).
+            const h = globalThis.GAME_ART.html('item', entry.id, fallbackEmoji);
+            if (h) return h;
+        } else if (entry.kind === 'charm') {
             const art = globalThis.getCharmArtForSkill(entry.skillId, entry.rank);
             if (art) return `<img src="${art}" alt="" draggable="false">`;
         } else {
@@ -2650,12 +2653,6 @@ function _tqOpenChestModal() {
         // Hover tooltips: the equipment stat block for gear, the spell tooltip
         // (at the granted rank) for the charm.
         const entry = TQ_CHEST_LOOT[Number(btn.dataset.i)];
-        if (entry.kind === 'currency' || entry.kind === 'essence') {
-            // Orbs and essences have no item tooltip: the native one carries the description.
-            const def = entry.kind === 'currency' ? CURRENCY_DEFS[entry.id] : ESSENCE_DEFS[entry.id];
-            if (def) btn.title = def.description;
-            return;
-        }
         btn.addEventListener('mouseenter', (e) => _tqChestShowTip(entry, e));
         btn.addEventListener('mousemove', (e) => {
             if (entry.kind === 'charm') globalThis.handleSkillTipMove(e); else globalThis.moveGameTooltip(e);
@@ -2668,6 +2665,11 @@ function _tqChestShowTip(entry, e) {
     try {
         if (entry.kind === 'charm') {
             globalThis.handleSkillTipRank(e, entry.skillId, entry.rank);
+            return;
+        }
+        if (entry.kind === 'currency' || entry.kind === 'essence') {
+            const def = entry.kind === 'currency' ? CURRENCY_DEFS[entry.id] : ESSENCE_DEFS[entry.id];
+            if (def) globalThis._showHubTooltip({ ...def, count: 1, category: entry.kind === 'currency' ? 'currency' : 'essence' }, e);
             return;
         }
         const base = ALL_BASE_TYPES.find((b) => b && b.id === entry.baseId);
