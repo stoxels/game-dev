@@ -1783,8 +1783,10 @@ export function _charmCheckClaim(row, col) {
     const res = grantCharm(charm.skillId, charm.rank);
     const name = getSkillName(charm.skillId);
     if (res.duplicate) {
-        let msg = `💠 ${t('charm_pickup_duplicate')}: ${name} (${t('skill_tip_rank')} ${charm.rank}) - +1 ${t('charm_currency_shard_one')} (${res.shards}/${CHARM_SHARDS_PER_ORB})`;
-        if (res.orbsMade > 0) msg += ` - 🔮 ${t('charm_orb_forged')}`;
+        let msg = `💠 ${t('charm_pickup_duplicate_msg')
+            .replace('{name}', name).replace('{rank}', charm.rank)
+            .replace('{n}', res.shards).replace('{max}', CHARM_SHARDS_PER_ORB)}`;
+        if (res.orbsMade > 0) msg += ` 🔮 ${t('charm_orb_forged')}`;
         showToast(msg, '#c39bd3');
     } else {
         showToast(`💫 ${t('charm_pickup_found')}: ${name} (${t('skill_tip_rank')} ${charm.rank})`, '#f5d98b');

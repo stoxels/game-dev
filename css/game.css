@@ -877,7 +877,19 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
        under the right-hand HUD (level name / zoom bar). Desktop is unaffected
        (40vw is far wider than the clock + mistake counter ever get). */
     max-width: 40vw;
+    /* The box can be wider than the visible lines (the objective strip is
+       scaled down by a transform but keeps its full layout width), so the
+       box itself is click-through and only its lines take clicks. */
+    pointer-events: none;
 }
+
+    .game-hud-corner > * {
+        pointer-events: auto;
+    }
+
+    .game-hud-corner > #sx-objectives-strip {
+        pointer-events: none;
+    }
 
     .game-hud-corner .game-meta-clock {
         position: static;

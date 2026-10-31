@@ -111,7 +111,12 @@
     animation: sx-cc-drop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both;
 }
 
+    /* Beside the taller bonus-loot chip this chip stretches to the same
+       height, so its text is centred in the extra space. */
     .sx-cc-chip-reward {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
         border-color: #8a3a2a;
         animation-delay: 0.12s;
     }

@@ -50,6 +50,14 @@ export const CAMPAIGN_MONSTER_CONFIG = {
     earlyCountBase: 3,
     earlyCountLevelDivisor: 4,
     minCellsPerMonster: 5,    // small puzzles support fewer monsters
+    // New-player ease (playtest feedback: fighting and puzzling at once was too
+    // much at the start). Pack size is capped per world for the first worlds
+    // (index 0 = world 1); later worlds are uncapped. Applies on top of the
+    // level cap above, whichever is lower wins.
+    earlyWorldCountCaps: [2, 3, 3, 4],
+    // Seconds added to the puzzle timer for every campaign monster killed, so
+    // clearing a pack in melee first does not eat the puzzle's time.
+    killTimeBonusSecs: 10,
     // Raw per-hit damage is LEVEL-driven, never a share of the player's own
     // life (that made every point of max life raise the damage taken, so life
     // never paid off and gear could not be balanced). Anchors are the old
@@ -72,7 +80,7 @@ export const CAMPAIGN_MONSTER_CONFIG = {
     // The first monster levels hit softer and wind up slower; both ease
     // linearly back to 1.0 at earlyEaseLevels, so nothing changes later.
     earlyEaseLevels: 10,
-    earlyDamageMult: 1.0,     // monster level 1 damage multiplier (1 = ease off; was 0.9)
+    earlyDamageMult: 0.75,    // monster level 1 damage multiplier (eases back to 1.0 by monster level 10; was 1.0)
     earlyChargeSlow: 1.0,     // monster level 1 charge-time multiplier (1 = ease off; was 1.15)
 };
 
@@ -182,6 +190,8 @@ export function _prepareCampaignEncounter() {
     count = Math.max(1, Math.min(cfg.countMax, count));
     count += Math.min(cfg.sizeBonusMax, Math.floor(cells / cfg.cellsPerExtraMonster));
     count = Math.min(count, cfg.earlyCountBase + Math.ceil(level / cfg.earlyCountLevelDivisor));
+    const worldCap = cfg.earlyWorldCountCaps[world - 1];
+    if (worldCap != null) count = Math.min(count, worldCap);
     count = Math.min(count, Math.max(1, Math.floor(cells / cfg.minCellsPerMonster)));
     // A co-op boss encounter fields one big monster instead of a pack.
     const boss = cur.coopBoss || null;

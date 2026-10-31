@@ -37,6 +37,7 @@ import { _computePlayerStats } from './combat-player-stats.js';
 import { _isActive, _isCampaignRun } from './combat-state.js';
 import { _gainEnduranceCharge, _gainFrenzyCharge, _gainOnslaught, _gainPowerCharge } from './combat-ailments-state.js';
 import { _handleBossKill, _handleNormalMonsterKill } from './encounter-kill-rewards.js';
+import { CAMPAIGN_MONSTER_CONFIG } from './encounter-campaign-spawns.js';
 
 
 
@@ -55,12 +56,13 @@ export function _updateTargetAfterKill() {
     }
 }
 
-// Passive-tree puzzle rewards for a kill: timer seconds (more for bosses and
-// elites), and a chance to reveal one correct / mark one wrong cell.
+// Puzzle rewards for a kill: timer seconds (a flat bonus for each campaign
+// monster, plus passive-tree extras, more for bosses and elites), and a chance to reveal one correct / mark one wrong cell.
 function _treeKillPuzzleLines(dying, stats) {
     if (!dying) return;
     const isElite = !!(dying.isBoss || dying.isElite || (Number(dying.baseHP) || 0) >= 110);
-    const secs = (Number(stats.timeOnKill) || 0) + (isElite ? (Number(stats.timeOnElite) || 0) : 0);
+    const baseSecs = (!dying.isBoss && _isCampaignRun()) ? CAMPAIGN_MONSTER_CONFIG.killTimeBonusSecs : 0;
+    const secs = baseSecs + (Number(stats.timeOnKill) || 0) + (isElite ? (Number(stats.timeOnElite) || 0) : 0);
     if (secs > 0) addTimeSecs(secs);
     if (!cur || !cur.grid || !globalThis.userGrid) return;
     const reveal = Math.min(100, Number(stats.cellOnKillPct) || 0);

@@ -11,6 +11,14 @@
     align-items: flex-start;
     gap: 6px;
     margin-top: 4px;
+    /* The strip is scaled down with a transform beside big grids, but its
+       layout box keeps the full size. Only the visible chips and buttons take
+       clicks, so the empty box never blocks the grid cells under it. */
+    pointer-events: none;
+}
+
+#sx-objectives-strip .sx-obj-seg,
+#sx-objectives-strip .sx-obj-action-btn {
     pointer-events: auto;
 }
 
