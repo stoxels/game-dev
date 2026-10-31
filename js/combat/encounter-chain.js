@@ -669,6 +669,7 @@ export function _findBossArenaPuzzleGi() {
             maxRows: BOSS_ARENA_MAX_ROWS,
             maxCols: BOSS_ARENA_MAX_COLS,
             minCells: BOSS_ARENA_MIN_CELLS,
+            maxCells: pool.maxCells,     // a trial's size cap holds for its boss arena too
             rng,
         });
         if (gi !== null) {
@@ -909,11 +910,19 @@ export function _pickMapRunPuzzleGi(criteria) {
     }
 
     if (criteria.generated) {
+        // A seeded chain (campaign trials) rolls every step from the seed and
+        // the step number, so the same trial always hands out the same puzzles.
+        let rng = null;
+        if (criteria.chainSeed != null && typeof egAtlasMakeRng === 'function') {
+            criteria._genStep = (criteria._genStep || 0) + 1;
+            rng = egAtlasMakeRng((criteria.chainSeed + criteria._genStep * 7919) >>> 0);
+        }
         const gi = generate({
             mode: criteria.genMode,
             tier: criteria.genTier,
             minCells: criteria.minCells,
             maxCells: criteria.maxCells,
+            rng,
         });
         if (gi !== null) { _trackChainRecentGi(gi, criteria.recentWindow); return gi; }
         console.warn('EG chain: puzzle generation failed, falling back to story pool');

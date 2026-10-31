@@ -48,7 +48,7 @@ import { INV_COLS, _ensureInvRows, _equipped, _getInvCapacity, _getInvRows, _inv
 import { _buildTopbarHTML, _updateItemLevelToggleButton, _updatePassiveTreeButton } from './hub-topbar.js';
 import { UNIQUE_ITEMS } from '../loot/unique-item-data.js';
 // Imported last so the module evaluation order inside the hub import cycle is unchanged.
-import { _buildUniqueGridHTML, _renderUniqueStash } from './hub-unique-ui.js';
+import { _buildUniqueGridHTML, _isUniqueFilterOn, _renderUniqueStash } from './hub-unique-ui.js';
 import { _renderStatsList } from './hub-stats-panel.js';
 
 
@@ -320,6 +320,7 @@ export function _buildStashPanelHTML() {
         <div class="sx-unique-hint">${t('eg_unique_stash_hint')}</div>
         <div class="sx-unique-count" id="sx-unique-count">${t('eg_uniques_collected').replace('{found}', foundUniques).replace('{total}', totalUniques)}</div>
         <div class="sx-unique-progress"><i id="sx-unique-progress-fill" style="width:${totalUniques ? Math.round(foundUniques / totalUniques * 100) : 0}%"></i></div>
+        <button class="sx-unique-filter-btn ${_isUniqueFilterOn() ? 'active' : ''}" id="sx-unique-filter-btn" onclick="_toggleUniqueCollectedFilter()">${t('sx_unique_filter_collected')}</button>
         <div class="sx-unique-grid" id="sx-unique-grid" data-eg-dropzone="uniques" ondragover="hubDragOver(event)" ondragleave="hubDragLeave(event)">
             ${_buildUniqueGridHTML()}
         </div>
@@ -958,6 +959,8 @@ export {
     _onUniqueCellRightClick,
     _renderUniqueStash,
     _switchStashTab,
+    _isUniqueFilterOn,
+    _toggleUniqueCollectedFilter,
 } from './hub-unique-ui.js';
 
 export { _injectMassSellStyles } from './hub-mass-sell-styles.js';

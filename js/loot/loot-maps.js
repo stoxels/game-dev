@@ -81,7 +81,7 @@ export function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts =
     const rarity = _rollRarity();
     const { prefixCount, suffixCount } = _rollModCounts(rarity);
     const mods = (prefixCount + suffixCount) > 0
-        ? _rollMods(prefixCount, suffixCount, EG_MAP_MOD_TABLES, monsterLevel, null)
+        ? _rollMods(prefixCount, suffixCount, EG_MAP_MOD_TABLES, monsterLevel, null, false)
         : [];
 
     // Prefer a concrete atlas region for this tier; fall back to the

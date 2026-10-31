@@ -27,8 +27,8 @@ Object.assign(BOSS_MECHANICS, {
     boss_jester: {
         phases: [
             { threshold: 1.00, chargeMax: 10, damageMultiplier: 1.00 },
-            { threshold: 0.60, chargeMax: 8, damageMultiplier: 1.55 },
-            { threshold: 0.30, chargeMax: 5, damageMultiplier: 2.10 },
+            { threshold: 0.60, chargeMax: 9, damageMultiplier: 1.25 },
+            { threshold: 0.30, chargeMax: 8, damageMultiplier: 1.50 },
         ],
         immunityDuration: 2500,
         mechanics: [

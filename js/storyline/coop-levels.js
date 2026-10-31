@@ -10,7 +10,7 @@ import { grantSummonCharm } from '../skills/summon-cast.js';
 import { summonSpellId } from '../skills/summon-spells.js';
 import { getCharmArtForSkill } from '../skills/skill-charms.js';
 import { startCoopBoss, stopCoopBoss } from './coop-boss.js';
-import { grantQuestItem, hasQuestItem, questIconHtml, questItemFor } from './quest-items.js';
+import { grantQuestItem, questIconHtml } from './quest-items.js';
 import { COMPANION_CAST, hasMetCompanion } from './companion-scenes.js';
 import { getAffinityPoints, recordCoopClear } from './companion-affinity.js';
 import { buildAffinityGainCard } from './affinity-gain-card.js';
@@ -423,12 +423,7 @@ export function startCoopEncounter(coopId) {
     const de = LANG === 'de';
     const name = COMPANION_CAST[friend].name;
     const intro = (de ? def.introDE : def.introEn).replace('{friend}', name);
-    // The first time, hint at the story item waiting here (it is explained afterwards, in the scene after the clear).
-    const item = questItemFor(coopId);
-    const hint = item && !hasQuestItem(STATE.questItems, item.id)
-        ? (de ? '\n\nHier wartet ein Gegenstand für eure Geschichte (Reiter QUEST im Inventar).' : '\n\nA story item waits here (see the QUEST tab in your inventory).')
-        : '';
-    _showBox(coopName(coopId), `${intro}${hint.replace(/^\n\n/, '\n')}`, [
+    _showBox(coopName(coopId), intro, [
         [de ? 'Beginnen' : 'Begin', 'cmp-ask-yes', () => _doStartLevel(_levelFor(coopId).gIdx)],
         [de ? 'Abbrechen' : 'Cancel', 'cmp-ask-no', () => {}],
     ]);

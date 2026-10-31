@@ -20,10 +20,10 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'levelsCompleted',
         tiers: [
             { threshold: 1, labelEn: 'First Step', labelDE: 'Erster Schritt' },
-            { threshold: 10, labelEn: 'Getting Started', labelDE: 'Am Anfang' },
-            { threshold: 50, labelEn: 'Puzzle Enthusiast', labelDE: 'Rätsel-Enthusiast' },
-            { threshold: 100, labelEn: 'Dedicated Solver', labelDE: 'Engagierter Löser' },
-            { threshold: 250, labelEn: 'Puzzle Veteran', labelDE: 'Rätsel-Veteran' },
+            { threshold: 13, labelEn: 'Getting Started', labelDE: 'Am Anfang' },
+            { threshold: 65, labelEn: 'Puzzle Enthusiast', labelDE: 'Rätsel-Enthusiast' },
+            { threshold: 130, labelEn: 'Dedicated Solver', labelDE: 'Engagierter Löser' },
+            { threshold: 325, labelEn: 'Puzzle Veteran', labelDE: 'Rätsel-Veteran' },
         ]
     },
 
@@ -40,10 +40,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level ohne einen einzigen Fehler ab.',
         stat: 'perfectLevels',
         tiers: [
-            { threshold: 10, labelEn: 'Clean Slate', labelDE: 'Reiner Tisch' },
-            { threshold: 30, labelEn: 'Flawless', labelDE: 'Makellos' },
-            { threshold: 60, labelEn: 'Untouchable', labelDE: 'Unberührbar' },
-            { threshold: 100, labelEn: 'Diamond Mind', labelDE: 'Diamantgeist' },
+            { threshold: 13, labelEn: 'Clean Slate', labelDE: 'Reiner Tisch' },
+            { threshold: 39, labelEn: 'Flawless', labelDE: 'Makellos' },
+            { threshold: 80, labelEn: 'Untouchable', labelDE: 'Unberührbar' },
+            { threshold: 130, labelEn: 'Diamond Mind', labelDE: 'Diamantgeist' },
         ]
     },
 
@@ -60,10 +60,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level ohne den Einsatz von Items ab.',
         stat: 'noItemLevels',
         tiers: [
-            { threshold: 10, labelEn: 'Going Solo', labelDE: 'Alleingang' },
-            { threshold: 30, labelEn: 'Minimalist', labelDE: 'Minimalist' },
-            { threshold: 60, labelEn: 'Ironclad', labelDE: 'Eisenhart' },
-            { threshold: 100, labelEn: 'True Purist', labelDE: 'Echter Purist' },
+            { threshold: 13, labelEn: 'Going Solo', labelDE: 'Alleingang' },
+            { threshold: 39, labelEn: 'Minimalist', labelDE: 'Minimalist' },
+            { threshold: 80, labelEn: 'Ironclad', labelDE: 'Eisenhart' },
+            { threshold: 130, labelEn: 'True Purist', labelDE: 'Echter Purist' },
         ]
     },
 
@@ -80,9 +80,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level ohne Fehler und ohne den Einsatz von Items ab.',
         stat: 'pureLevels',
         tiers: [
-            { threshold: 10, labelEn: 'Crystal Clear', labelDE: 'Glasklar' },
-            { threshold: 50, labelEn: 'Unassisted', labelDE: 'Ohne Hilfe' },
-            { threshold: 100, labelEn: 'Logical Ascendant', labelDE: 'Logischer Aufsteiger' },
+            { threshold: 13, labelEn: 'Crystal Clear', labelDE: 'Glasklar' },
+            { threshold: 65, labelEn: 'Unassisted', labelDE: 'Ohne Hilfe' },
+            { threshold: 130, labelEn: 'Logical Ascendant', labelDE: 'Logischer Aufsteiger' },
         ]
     },
 
@@ -98,13 +98,13 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Wiederhole ein Level das du bereits abgeschlossen hast.',
         stat: 'levelsReplayed',
         tiers: [
-            { threshold: 5, labelEn: 'Try Again', labelDE: 'Nochmal versuchen' },
-            { threshold: 20, labelEn: 'Stubborn', labelDE: 'Stur' },
-            { threshold: 50, labelEn: 'Obsessed', labelDE: 'Besessen' },
-            { threshold: 100, labelEn: 'Relentless', labelDE: 'Unnachgiebig' }, 
-            { threshold: 200, labelEn: 'Persistent', labelDE: 'Beharrlich' }, 
-            { threshold: 500, labelEn: 'Unyielding', labelDE: 'Unbeugsam' }, 
-            { threshold: 1000, labelEn: 'Indomitable', labelDE: 'Unbezwingbar' },
+            { threshold: 7, labelEn: 'Try Again', labelDE: 'Nochmal versuchen' },
+            { threshold: 26, labelEn: 'Stubborn', labelDE: 'Stur' },
+            { threshold: 65, labelEn: 'Obsessed', labelDE: 'Besessen' },
+            { threshold: 130, labelEn: 'Relentless', labelDE: 'Unnachgiebig' }, 
+            { threshold: 250, labelEn: 'Persistent', labelDE: 'Beharrlich' }, 
+            { threshold: 650, labelEn: 'Unyielding', labelDE: 'Unbeugsam' }, 
+            { threshold: 1300, labelEn: 'Indomitable', labelDE: 'Unbezwingbar' },
         ]
     },
 
@@ -372,11 +372,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level auf Leicht ab.',
         stat: 'easyLevels',
         tiers: [
-            { threshold: 5, labelEn: 'Casual Solver', labelDE: 'Gelegenheitsknacker' },
-            { threshold: 15, labelEn: 'Puzzle Tourist', labelDE: 'Puzzle-Tourist' },
-            { threshold: 30, labelEn: 'Gentle Navigator', labelDE: 'Sanfter Navigator' },
-            { threshold: 60, labelEn: 'Easy Expert', labelDE: 'Leicht-Experte' },
-            { threshold: 100, labelEn: 'Master of Leisure', labelDE: 'Meister der Gelassenheit' },
+            { threshold: 7, labelEn: 'Casual Solver', labelDE: 'Gelegenheitsknacker' },
+            { threshold: 20, labelEn: 'Puzzle Tourist', labelDE: 'Puzzle-Tourist' },
+            { threshold: 39, labelEn: 'Gentle Navigator', labelDE: 'Sanfter Navigator' },
+            { threshold: 80, labelEn: 'Easy Expert', labelDE: 'Leicht-Experte' },
+            { threshold: 130, labelEn: 'Master of Leisure', labelDE: 'Meister der Gelassenheit' },
         ]
     },
 
@@ -391,11 +391,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level auf Normal ab.',
         stat: 'normalLevels',
         tiers: [
-            { threshold: 10, labelEn: 'Steady Mind', labelDE: 'Solider Geist' },
-            { threshold: 25, labelEn: 'Reliable Solver', labelDE: 'Verlässlicher Löser' },
-            { threshold: 45, labelEn: 'Methodical Thinker', labelDE: 'Methodischer Denker' },
-            { threshold: 70, labelEn: 'Puzzle Veteran', labelDE: 'Puzzle-Veteran' },
-            { threshold: 100, labelEn: 'Master of Balance', labelDE: 'Meister der Balance' },
+            { threshold: 13, labelEn: 'Steady Mind', labelDE: 'Solider Geist' },
+            { threshold: 33, labelEn: 'Reliable Solver', labelDE: 'Verlässlicher Löser' },
+            { threshold: 60, labelEn: 'Methodical Thinker', labelDE: 'Methodischer Denker' },
+            { threshold: 90, labelEn: 'Puzzle Veteran', labelDE: 'Puzzle-Veteran' },
+            { threshold: 130, labelEn: 'Master of Balance', labelDE: 'Meister der Balance' },
         ]
     },
 
@@ -411,11 +411,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level auf Schwer ab.',
         stat: 'hardLevels',
         tiers: [
-            { threshold: 5, labelEn: 'Hard Starter', labelDE: 'Schwer-Einsteiger' },
-            { threshold: 15, labelEn: 'Hard Gainer', labelDE: 'Schwer-Aufsteiger' },
-            { threshold: 30, labelEn: 'Masochist', labelDE: 'Masochist' },
-            { threshold: 60, labelEn: 'Glutton for Pain', labelDE: 'Schmerzenssucher' },
-            { threshold: 100, labelEn: 'Punishment Incarnate', labelDE: 'Verkörperte Strafe' },
+            { threshold: 7, labelEn: 'Hard Starter', labelDE: 'Schwer-Einsteiger' },
+            { threshold: 20, labelEn: 'Hard Gainer', labelDE: 'Schwer-Aufsteiger' },
+            { threshold: 39, labelEn: 'Masochist', labelDE: 'Masochist' },
+            { threshold: 80, labelEn: 'Glutton for Pain', labelDE: 'Schmerzenssucher' },
+            { threshold: 130, labelEn: 'Punishment Incarnate', labelDE: 'Verkörperte Strafe' },
         ]
     },
 
@@ -431,10 +431,10 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'hardcoreLevels',
         tiers: [
             { threshold: 3, labelEn: 'Daredevil', labelDE: 'Draufgänger' },
-            { threshold: 10, labelEn: 'Fearless', labelDE: 'Furchtlos' },
-            { threshold: 25, labelEn: 'Immortal', labelDE: 'Unsterblich' },
-            { threshold: 50, labelEn: 'Death Denier', labelDE: 'Todverweigerer' },
-            { threshold: 100, labelEn: 'Legend Unbroken', labelDE: 'Ungebrochene Legende' },
+            { threshold: 13, labelEn: 'Fearless', labelDE: 'Furchtlos' },
+            { threshold: 33, labelEn: 'Immortal', labelDE: 'Unsterblich' },
+            { threshold: 65, labelEn: 'Death Denier', labelDE: 'Todverweigerer' },
+            { threshold: 130, labelEn: 'Legend Unbroken', labelDE: 'Ungebrochene Legende' },
         ]
     },
 
@@ -450,10 +450,10 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'timeTrialLevels',
         tiers: [
             { threshold: 3, labelEn: 'Against the Clock', labelDE: 'Gegen die Uhr' },
-            { threshold: 10, labelEn: 'Quick Fingers', labelDE: 'Schnelle Finger' },
-            { threshold: 25, labelEn: 'Lightning Solver', labelDE: 'Blitz-Löser' },
-            { threshold: 50, labelEn: 'Time Bender', labelDE: 'Zeitbezwinger' },
-            { threshold: 100, labelEn: 'Chronomancer', labelDE: 'Chronomant' },
+            { threshold: 13, labelEn: 'Quick Fingers', labelDE: 'Schnelle Finger' },
+            { threshold: 33, labelEn: 'Lightning Solver', labelDE: 'Blitz-Löser' },
+            { threshold: 65, labelEn: 'Time Bender', labelDE: 'Zeitbezwinger' },
+            { threshold: 130, labelEn: 'Chronomancer', labelDE: 'Chronomant' },
         ]
     },
 
@@ -470,10 +470,10 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'ironmanLevels',
         tiers: [
             { threshold: 3, labelEn: 'Iron Will', labelDE: 'Eiserner Wille' },
-            { threshold: 10, labelEn: 'Man of Steel', labelDE: 'Stahlmann' },
-            { threshold: 25, labelEn: 'Unyielding', labelDE: 'Unbeugsam' },
-            { threshold: 50, labelEn: 'Titanium Mind', labelDE: 'Titan-Geist' },
-            { threshold: 100, labelEn: 'Adamant Champion', labelDE: 'Adamant-Champion' },
+            { threshold: 13, labelEn: 'Man of Steel', labelDE: 'Stahlmann' },
+            { threshold: 33, labelEn: 'Unyielding', labelDE: 'Unbeugsam' },
+            { threshold: 65, labelEn: 'Titanium Mind', labelDE: 'Titan-Geist' },
+            { threshold: 130, labelEn: 'Adamant Champion', labelDE: 'Adamant-Champion' },
         ]
     },
 
@@ -489,10 +489,10 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'classlessLevels',
         tiers: [
             { threshold: 3, labelEn: 'No Magic Needed', labelDE: 'Keine Magie nötig' },
-            { threshold: 10, labelEn: 'Self Made Scholar', labelDE: 'Selbstgemachter Gelehrter' },
-            { threshold: 25, labelEn: 'Independent Thinker', labelDE: 'Unabhängiger Denker' },
-            { threshold: 50, labelEn: 'Natural Genius', labelDE: 'Naturtalent' },
-            { threshold: 100, labelEn: 'Mind Over Matter', labelDE: 'Geist über Materie' },
+            { threshold: 13, labelEn: 'Self Made Scholar', labelDE: 'Selbstgemachter Gelehrter' },
+            { threshold: 33, labelEn: 'Independent Thinker', labelDE: 'Unabhängiger Denker' },
+            { threshold: 65, labelEn: 'Natural Genius', labelDE: 'Naturtalent' },
+            { threshold: 130, labelEn: 'Mind Over Matter', labelDE: 'Geist über Materie' },
         ]
     },
 
@@ -508,10 +508,10 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'treelessLevels',
         tiers: [
             { threshold: 3, labelEn: 'Rootless Victory', labelDE: 'Wurzelloser Sieg' },
-            { threshold: 10, labelEn: 'Branching Out Solo', labelDE: 'Einzelgänger' },
-            { threshold: 25, labelEn: 'Forest Exile', labelDE: 'Waldverbannter' },
-            { threshold: 50, labelEn: 'Lumber Legend', labelDE: 'Holzfäller-Legende' },
-            { threshold: 100, labelEn: 'Enemy of Nature', labelDE: 'Feind der Natur' },
+            { threshold: 13, labelEn: 'Branching Out Solo', labelDE: 'Einzelgänger' },
+            { threshold: 33, labelEn: 'Forest Exile', labelDE: 'Waldverbannter' },
+            { threshold: 65, labelEn: 'Lumber Legend', labelDE: 'Holzfäller-Legende' },
+            { threshold: 130, labelEn: 'Enemy of Nature', labelDE: 'Feind der Natur' },
         ]
     },
 
@@ -535,11 +535,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Fülle richtige Zellen manuell im Puzzle.',
         stat: 'cellsFilled',
         tiers: [
-            { threshold: 100, labelEn: 'First Hundred', labelDE: 'Erste Hundert' },
-            { threshold: 500, labelEn: 'Builder', labelDE: 'Erbauer' },
-            { threshold: 2000, labelEn: 'Architect', labelDE: 'Architekt' },
-            { threshold: 10000, labelEn: 'Master Builder', labelDE: 'Meister-Erbauer' },
-            { threshold: 50000, labelEn: 'God of Reveals', labelDE: 'Gott der Enthüllungen' },
+            { threshold: 130, labelEn: 'First Hundred', labelDE: 'Erste Hundert' },
+            { threshold: 650, labelEn: 'Builder', labelDE: 'Erbauer' },
+            { threshold: 2600, labelEn: 'Architect', labelDE: 'Architekt' },
+            { threshold: 13000, labelEn: 'Master Builder', labelDE: 'Meister-Erbauer' },
+            { threshold: 65000, labelEn: 'God of Reveals', labelDE: 'Gott der Enthüllungen' },
         ]
     },
 
@@ -554,11 +554,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Enthülle richtige Felder mit Enthüllungs-Items oder Klassenfähigkeiten.',
         stat: 'tilesRevealed',
         tiers: [
-            { threshold: 100, labelEn: 'First Light', labelDE: 'Erstes Licht' },
-            { threshold: 500, labelEn: 'Torch Bearer', labelDE: 'Fackelträger' },
-            { threshold: 2000, labelEn: 'Floodlight', labelDE: 'Flutlicht' },
-            { threshold: 5000, labelEn: 'Oracle', labelDE: 'Orakel' },
-            { threshold: 10000, labelEn: 'All-Seeing', labelDE: 'Allsehend' },
+            { threshold: 130, labelEn: 'First Light', labelDE: 'Erstes Licht' },
+            { threshold: 650, labelEn: 'Torch Bearer', labelDE: 'Fackelträger' },
+            { threshold: 2600, labelEn: 'Floodlight', labelDE: 'Flutlicht' },
+            { threshold: 6500, labelEn: 'Oracle', labelDE: 'Orakel' },
+            { threshold: 13000, labelEn: 'All-Seeing', labelDE: 'Allsehend' },
         ]
     },
 
@@ -576,11 +576,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Markiere leere Felder manuell mit ✕.',
         stat: 'tilesMarked',
         tiers: [
-            { threshold: 100, labelEn: 'First Cross', labelDE: 'Erstes Kreuz' },
-            { threshold: 500, labelEn: 'Crossword Fan', labelDE: 'Kreuzworträtsel-Fan' },
-            { threshold: 2000, labelEn: 'Eliminator', labelDE: 'Eliminator' },
-            { threshold: 10000, labelEn: 'Master Deducer', labelDE: 'Meisterdetektiv' },
-            { threshold: 50000, labelEn: 'God of Marks', labelDE: 'Gott der Markierungen' },
+            { threshold: 130, labelEn: 'First Cross', labelDE: 'Erstes Kreuz' },
+            { threshold: 650, labelEn: 'Crossword Fan', labelDE: 'Kreuzworträtsel-Fan' },
+            { threshold: 2600, labelEn: 'Eliminator', labelDE: 'Eliminator' },
+            { threshold: 13000, labelEn: 'Master Deducer', labelDE: 'Meisterdetektiv' },
+            { threshold: 65000, labelEn: 'God of Marks', labelDE: 'Gott der Markierungen' },
         ]
     },
 
@@ -596,11 +596,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Markiere falsche Felder mit Markierungs-Items oder Klassenfähigkeiten.',
         stat: 'tilesMarkedWrong',
         tiers: [
-            { threshold: 100, labelEn: 'First Marks', labelDE: 'Erste Markierungen' },
-            { threshold: 500, labelEn: 'Error Spotter', labelDE: 'Fehlersucher' },
-            { threshold: 2000, labelEn: 'Systematic Hunter', labelDE: 'Systematischer Jäger' },
-            { threshold: 5000, labelEn: 'Master Eliminator', labelDE: 'Meister-Eliminator' },
-            { threshold: 10000, labelEn: 'God of Error Detection', labelDE: 'Gott der Fehlererkennung' },
+            { threshold: 130, labelEn: 'First Marks', labelDE: 'Erste Markierungen' },
+            { threshold: 650, labelEn: 'Error Spotter', labelDE: 'Fehlersucher' },
+            { threshold: 2600, labelEn: 'Systematic Hunter', labelDE: 'Systematischer Jäger' },
+            { threshold: 6500, labelEn: 'Master Eliminator', labelDE: 'Meister-Eliminator' },
+            { threshold: 13000, labelEn: 'God of Error Detection', labelDE: 'Gott der Fehlererkennung' },
         ]
     },
 
@@ -618,8 +618,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'smallPerfectClears',
         tiers: [
             { threshold: 1, labelEn: 'Perfect Starter', labelDE: 'Perfekter Start' },
-            { threshold: 10, labelEn: 'Mini Master', labelDE: 'Mini-Meister' },
-            { threshold: 25, labelEn: 'Pure and Simple', labelDE: 'Schlicht und einfach' },
+            { threshold: 13, labelEn: 'Mini Master', labelDE: 'Mini-Meister' },
+            { threshold: 33, labelEn: 'Pure and Simple', labelDE: 'Schlicht und einfach' },
         ]
     },
     {
@@ -633,8 +633,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'mediumPerfectClears',
         tiers: [
             { threshold: 1, labelEn: 'Steady Mind', labelDE: 'Ruhiger Verstand' },
-            { threshold: 10, labelEn: 'Standard Expert', labelDE: 'Standard-Experte' },
-            { threshold: 25, labelEn: 'Flawless Routine', labelDE: 'Makellose Routine' },
+            { threshold: 13, labelEn: 'Standard Expert', labelDE: 'Standard-Experte' },
+            { threshold: 33, labelEn: 'Flawless Routine', labelDE: 'Makellose Routine' },
         ]
     },
     {
@@ -648,8 +648,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'largePerfectClears',
         tiers: [
             { threshold: 1, labelEn: 'Macro Precision', labelDE: 'Makro-Präzision' },
-            { threshold: 10, labelEn: 'Grand Master', labelDE: 'Großmeister' },
-            { threshold: 25, labelEn: 'Calculated Perfection', labelDE: 'Berechnete Perfektion' },
+            { threshold: 13, labelEn: 'Grand Master', labelDE: 'Großmeister' },
+            { threshold: 33, labelEn: 'Calculated Perfection', labelDE: 'Berechnete Perfektion' },
         ]
     },
     {
@@ -663,8 +663,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'massivePerfectClears',
         tiers: [
             { threshold: 1, labelEn: 'Universal Mind', labelDE: 'Universeller Verstand' },
-            { threshold: 10, labelEn: 'Infinite Patience', labelDE: 'Unendliche Geduld' },
-            { threshold: 25, labelEn: 'Omniscient Solver', labelDE: 'Allwissender Löser' },
+            { threshold: 13, labelEn: 'Infinite Patience', labelDE: 'Unendliche Geduld' },
+            { threshold: 33, labelEn: 'Omniscient Solver', labelDE: 'Allwissender Löser' },
         ]
     },
 
@@ -680,9 +680,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe ein Level ab, bei dem mehr als die Hälfte der Zellen gefüllt werden muss.',
         stat: 'denseGridClears',
         tiers: [
-            { threshold: 10, labelEn: 'Packed', labelDE: 'Vollgepackt' },
-            { threshold: 30, labelEn: 'Dense', labelDE: 'Dicht' },
-            { threshold: 50, labelEn: 'Solid Block', labelDE: 'Massiv' },
+            { threshold: 13, labelEn: 'Packed', labelDE: 'Vollgepackt' },
+            { threshold: 39, labelEn: 'Dense', labelDE: 'Dicht' },
+            { threshold: 65, labelEn: 'Solid Block', labelDE: 'Massiv' },
         ]
     },
 
@@ -699,9 +699,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'luckyTilesFound',
         tiers: [
             { threshold: 1, labelEn: 'First Find', labelDE: 'Erster Fund' },
-            { threshold: 25, labelEn: 'Lucky Streak', labelDE: 'Glückssträhne' },
-            { threshold: 50, labelEn: 'Fortune Hunter', labelDE: 'Glücksjäger' },
-            { threshold: 100, labelEn: 'Four-Leaf Expert', labelDE: 'Kleeblatt-Experte' },
+            { threshold: 33, labelEn: 'Lucky Streak', labelDE: 'Glückssträhne' },
+            { threshold: 65, labelEn: 'Fortune Hunter', labelDE: 'Glücksjäger' },
+            { threshold: 130, labelEn: 'Four-Leaf Expert', labelDE: 'Kleeblatt-Experte' },
         ]
     },
 
@@ -724,11 +724,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Sammle Gesamtpunkte über alle Spielläufe.',
         stat: 'totalScoreEarned',
         tiers: [
-            { threshold: 1000, labelEn: 'Thousand Points', labelDE: 'Tausend Punkte' },
-            { threshold: 10000, labelEn: 'Ten Thousand', labelDE: 'Zehntausend' },
-            { threshold: 50000, labelEn: 'Fifty Grand', labelDE: 'Fünfzigtausend' },
-            { threshold: 100000, labelEn: 'Century', labelDE: 'Jahrhundert' },
-            { threshold: 200000, labelEn: 'Double Century', labelDE: 'Doppeltes Jahrhundert' },
+            { threshold: 1300, labelEn: 'Thousand Points', labelDE: 'Tausend Punkte' },
+            { threshold: 13000, labelEn: 'Ten Thousand', labelDE: 'Zehntausend' },
+            { threshold: 65000, labelEn: 'Fifty Grand', labelDE: 'Fünfzigtausend' },
+            { threshold: 130000, labelEn: 'Century', labelDE: 'Jahrhundert' },
+            { threshold: 260000, labelEn: 'Double Century', labelDE: 'Doppeltes Jahrhundert' },
         ]
     },
 
@@ -745,9 +745,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Verdiene 500 oder mehr Punkte in einem einzigen Level.',
         stat: 'highScoreLevels',
         tiers: [
-            { threshold: 10, labelEn: 'Big Points', labelDE: 'Viele Punkte' },
-            { threshold: 30, labelEn: 'Point Machine', labelDE: 'Punktemaschine' },
-            { threshold: 50, labelEn: 'Overachiever', labelDE: 'Überflieger' },
+            { threshold: 13, labelEn: 'Big Points', labelDE: 'Viele Punkte' },
+            { threshold: 39, labelEn: 'Point Machine', labelDE: 'Punktemaschine' },
+            { threshold: 65, labelEn: 'Overachiever', labelDE: 'Überflieger' },
         ]
     },
 
@@ -763,9 +763,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Übertreffe deinen eigenen Rekord in einem bereits abgeschlossenen Level.',
         stat: 'personalBestsBroken',
         tiers: [
-            { threshold: 10, labelEn: 'New Record', labelDE: 'Neuer Rekord' },
-            { threshold: 30, labelEn: 'Record Breaker', labelDE: 'Rekordbrechter' },
-            { threshold: 50, labelEn: 'Self-Improver', labelDE: 'Selbstoptimierer' },
+            { threshold: 13, labelEn: 'New Record', labelDE: 'Neuer Rekord' },
+            { threshold: 39, labelEn: 'Record Breaker', labelDE: 'Rekordbrechter' },
+            { threshold: 65, labelEn: 'Self-Improver', labelDE: 'Selbstoptimierer' },
         ]
     },
 
@@ -781,9 +781,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe ein Level mit einem Punktemultiplikator von 2,0 oder mehr ab.',
         stat: 'highMultiplierWins',
         tiers: [
-            { threshold: 10, labelEn: 'Double Trouble', labelDE: 'Doppelter Ertrag' },
-            { threshold: 30, labelEn: 'Stacked', labelDE: 'Gestapelt' },
-            { threshold: 50, labelEn: 'Max Power', labelDE: 'Volle Kraft' },
+            { threshold: 13, labelEn: 'Double Trouble', labelDE: 'Doppelter Ertrag' },
+            { threshold: 39, labelEn: 'Stacked', labelDE: 'Gestapelt' },
+            { threshold: 65, labelEn: 'Max Power', labelDE: 'Volle Kraft' },
         ]
     },
 
@@ -806,12 +806,12 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Füge dem Timer Sekunden durch Items, Klassenfähigkeiten oder Wahrscheinlichkeitsbaum-Knoten hinzu.',
         stat: 'timeAdded',  // in seconds
         tiers: [
-            { threshold: 600, labelEn: 'Extra Minutes', labelDE: 'Extra Minuten' },
-            { threshold: 5000, labelEn: 'Time Stretcher', labelDE: 'Zeitstrecker' },
-            { threshold: 10000, labelEn: 'Quarter-Hour', labelDE: 'Viertelstunde' },
-            { threshold: 50000, labelEn: 'Chronomancer', labelDE: 'Chronomant' },
-            { threshold: 100000, labelEn: 'God of Time', labelDE: 'Gott der Zeit' },
-            { threshold: 500000, labelEn: 'At the End of Time', labelDE: 'Am Ende der Zeit' },
+            { threshold: 775, labelEn: 'Extra Minutes', labelDE: 'Extra Minuten' },
+            { threshold: 6500, labelEn: 'Time Stretcher', labelDE: 'Zeitstrecker' },
+            { threshold: 13000, labelEn: 'Quarter-Hour', labelDE: 'Viertelstunde' },
+            { threshold: 65000, labelEn: 'Chronomancer', labelDE: 'Chronomant' },
+            { threshold: 130000, labelEn: 'God of Time', labelDE: 'Gott der Zeit' },
+            { threshold: 650000, labelEn: 'At the End of Time', labelDE: 'Am Ende der Zeit' },
         ]
     },
 
@@ -829,8 +829,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'clutchWins',
         tiers: [
             { threshold: 1, labelEn: 'Photo Finish', labelDE: 'Fotofinish' },
-            { threshold: 5, labelEn: 'Last Second Hero', labelDE: 'Held in letzter Sekunde' },
-            { threshold: 15, labelEn: 'Adrenaline Junkie', labelDE: 'Adrenalinjunkie' },
+            { threshold: 7, labelEn: 'Last Second Hero', labelDE: 'Held in letzter Sekunde' },
+            { threshold: 20, labelEn: 'Adrenaline Junkie', labelDE: 'Adrenalinjunkie' },
         ]
     },
 
@@ -847,10 +847,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe ein Level in unter 30 Sekunden ab.',
         stat: 'fastClears',
         tiers: [
-            { threshold: 10, labelEn: 'Speed Demon', labelDE: 'Speedläufer' },
-            { threshold: 50, labelEn: 'Blink and Miss', labelDE: 'Im Nu vorbei' },
-            { threshold: 100, labelEn: 'Flash Solver', labelDE: 'Blitzlöser' },
-            { threshold: 200, labelEn: 'Speedforce', labelDE: 'Speedforce' },
+            { threshold: 13, labelEn: 'Speed Demon', labelDE: 'Speedläufer' },
+            { threshold: 65, labelEn: 'Blink and Miss', labelDE: 'Im Nu vorbei' },
+            { threshold: 130, labelEn: 'Flash Solver', labelDE: 'Blitzlöser' },
+            { threshold: 250, labelEn: 'Speedforce', labelDE: 'Speedforce' },
         ]
     },
 
@@ -865,9 +865,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Gewinne ein Level mit mehr als 30 Minuten auf der Uhr.',
         stat: 'bigTimeLeftWins',
         tiers: [
-            { threshold: 10, labelEn: 'Early Bird', labelDE: 'Frühaufsteher' },
-            { threshold: 25, labelEn: 'Ahead of Time', labelDE: 'Zeitvorsprung' },
-            { threshold: 50, labelEn: 'No Sweat', labelDE: 'Kein Problem' },
+            { threshold: 13, labelEn: 'Early Bird', labelDE: 'Frühaufsteher' },
+            { threshold: 33, labelEn: 'Ahead of Time', labelDE: 'Zeitvorsprung' },
+            { threshold: 65, labelEn: 'No Sweat', labelDE: 'Kein Problem' },
         ]
     },
 
@@ -883,8 +883,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'freezeClutches',
         tiers: [
             { threshold: 1, labelEn: 'Ice Cold', labelDE: 'Eiskalt' },
-            { threshold: 5, labelEn: 'Cryogenic', labelDE: 'Kryogenisch' },
-            { threshold: 10, labelEn: 'Absolute Zero', labelDE: 'Absoluter Nullpunkt' },
+            { threshold: 7, labelEn: 'Cryogenic', labelDE: 'Kryogenisch' },
+            { threshold: 13, labelEn: 'Absolute Zero', labelDE: 'Absoluter Nullpunkt' },
         ]
     },
 
@@ -908,10 +908,10 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'mistakesMade',
         tiers: [
             { threshold: 1, labelEn: 'First Blood', labelDE: 'Erste Fehler' },
-            { threshold: 15, labelEn: 'Learning Curve', labelDE: 'Lernkurve' },
-            { threshold: 50, labelEn: 'Serial Wrongdoer', labelDE: 'Serientäter' },
-            { threshold: 100, labelEn: 'Mistake Machine', labelDE: 'Fehlermaschine' },
-            { threshold: 250, labelEn: 'Chaos Agent', labelDE: 'Chaos-Agent' },
+            { threshold: 20, labelEn: 'Learning Curve', labelDE: 'Lernkurve' },
+            { threshold: 65, labelEn: 'Serial Wrongdoer', labelDE: 'Serientäter' },
+            { threshold: 130, labelEn: 'Mistake Machine', labelDE: 'Fehlermaschine' },
+            { threshold: 325, labelEn: 'Chaos Agent', labelDE: 'Chaos-Agent' },
         ]
     },
 
@@ -927,9 +927,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Gewinne ein Level trotz 5 oder mehr Fehlern.',
         stat: 'comebackWins',
         tiers: [
-            { threshold: 5, labelEn: 'Never Give Up', labelDE: 'Niemals aufgeben' },
-            { threshold: 25, labelEn: 'Resilient', labelDE: 'Belastbar' },
-            { threshold: 50, labelEn: 'Unbreakable', labelDE: 'Unzerstörbar' },
+            { threshold: 7, labelEn: 'Never Give Up', labelDE: 'Niemals aufgeben' },
+            { threshold: 33, labelEn: 'Resilient', labelDE: 'Belastbar' },
+            { threshold: 65, labelEn: 'Unbreakable', labelDE: 'Unzerstörbar' },
         ]
     },
 
@@ -946,8 +946,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'penaltyClutchwins',
         tiers: [
             { threshold: 2, labelEn: 'Lucky Escape', labelDE: 'Glückliche Flucht' },
-            { threshold: 10, labelEn: 'Danger Zone Pro', labelDE: 'Profi der Gefahrenzone' },
-            { threshold: 25, labelEn: 'Indestructible', labelDE: 'Unzerstörbar' },
+            { threshold: 13, labelEn: 'Danger Zone Pro', labelDE: 'Profi der Gefahrenzone' },
+            { threshold: 33, labelEn: 'Indestructible', labelDE: 'Unzerstörbar' },
         ]
     },
 
@@ -964,9 +964,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Wiederhole und gewinne sofort ein Level, das du gerade verloren hast.',
         stat: 'bouncebackWins',
         tiers: [
-            { threshold: 5, labelEn: 'Back on Track', labelDE: 'Wieder auf Kurs' },
-            { threshold: 15, labelEn: 'Determined', labelDE: 'Entschlossen' },
-            { threshold: 30, labelEn: 'Relentless', labelDE: 'Unerbittlich' },
+            { threshold: 7, labelEn: 'Back on Track', labelDE: 'Wieder auf Kurs' },
+            { threshold: 20, labelEn: 'Determined', labelDE: 'Entschlossen' },
+            { threshold: 39, labelEn: 'Relentless', labelDE: 'Unerbittlich' },
         ]
     },
 
@@ -983,7 +983,7 @@ export const ACHIEVEMENT_DEFS = [
         tiers: [
             { threshold: 1, labelEn: 'Perfect World', labelDE: 'Perfekte Welt' },
             { threshold: 3, labelEn: 'Double Perfection', labelDE: 'Doppelte Perfektion' },
-            { threshold: 5, labelEn: 'Transcendent', labelDE: 'Transzendent' },
+            { threshold: 7, labelEn: 'Transcendent', labelDE: 'Transzendent' },
         ]
     },
 
@@ -1008,10 +1008,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze Items aus deinem Inventar.',
         stat: 'itemsUsed',
         tiers: [
-            { threshold: 10, labelEn: 'First Use', labelDE: 'Erste Nutzung' },
-            { threshold: 50, labelEn: 'Resourceful', labelDE: 'Einfallsreich' },
-            { threshold: 200, labelEn: 'Power User', labelDE: 'Powernutzer' },
-            { threshold: 500, labelEn: 'Item Addict', labelDE: 'Item-Süchtiger' },
+            { threshold: 13, labelEn: 'First Use', labelDE: 'Erste Nutzung' },
+            { threshold: 65, labelEn: 'Resourceful', labelDE: 'Einfallsreich' },
+            { threshold: 250, labelEn: 'Power User', labelDE: 'Powernutzer' },
+            { threshold: 650, labelEn: 'Item Addict', labelDE: 'Item-Süchtiger' },
         ]
     },
 
@@ -1029,9 +1029,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'cursedItemsUsed',
         tiers: [
             { threshold: 1, labelEn: 'First Curse', labelDE: 'Erster Fluch' },
-            { threshold: 15, labelEn: 'Dabbling in Darkness', labelDE: 'Im Dunkel tastend' },
-            { threshold: 50, labelEn: 'Cursed Devotee', labelDE: 'Fluch-Geweihter' },
-            { threshold: 100, labelEn: 'Servant of Entropy', labelDE: 'Diener der Entropie' },
+            { threshold: 20, labelEn: 'Dabbling in Darkness', labelDE: 'Im Dunkel tastend' },
+            { threshold: 65, labelEn: 'Cursed Devotee', labelDE: 'Fluch-Geweihter' },
+            { threshold: 130, labelEn: 'Servant of Entropy', labelDE: 'Diener der Entropie' },
         ]
     },
 
@@ -1065,9 +1065,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Besitze gleichzeitig mindestens ein Item jeder Seltenheitsstufe.',
         stat: 'collectorAllRarities',
         tiers: [
-            { threshold: 10, labelEn: 'Full Collection', labelDE: 'Vollständige Sammlung' },
-            { threshold: 50, labelEn: 'Curator', labelDE: 'Kurator' },
-            { threshold: 100, labelEn: 'Connoisseur', labelDE: 'Kenner' },
+            { threshold: 13, labelEn: 'Full Collection', labelDE: 'Vollständige Sammlung' },
+            { threshold: 65, labelEn: 'Curator', labelDE: 'Kurator' },
+            { threshold: 130, labelEn: 'Connoisseur', labelDE: 'Kenner' },
         ]
     },
 
@@ -1085,9 +1085,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze 3 oder mehr Items in einem einzigen Level.',
         stat: 'threeItemsOneLevelCount',
         tiers: [
-            { threshold: 20, labelEn: 'Spendthrift', labelDE: 'Verschwender' },
-            { threshold: 50, labelEn: 'Power Shopper', labelDE: 'Power-Shopper' },
-            { threshold: 100, labelEn: 'Item Addict', labelDE: 'Item-Süchtig' },
+            { threshold: 26, labelEn: 'Spendthrift', labelDE: 'Verschwender' },
+            { threshold: 65, labelEn: 'Power Shopper', labelDE: 'Power-Shopper' },
+            { threshold: 130, labelEn: 'Item Addict', labelDE: 'Item-Süchtig' },
         ]
     },
 
@@ -1107,8 +1107,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'cursedFirstAttempts',
         tiers: [
             { threshold: 1, labelEn: 'Leap of Faith', labelDE: 'Sprung ins Ungewisse' },
-            { threshold: 10, labelEn: 'Born Reckless', labelDE: 'Zum Draufgänger geboren' },
-            { threshold: 25, labelEn: 'Cursed by Default', labelDE: 'Standardmäßig verflucht' },
+            { threshold: 13, labelEn: 'Born Reckless', labelDE: 'Zum Draufgänger geboren' },
+            { threshold: 33, labelEn: 'Cursed by Default', labelDE: 'Standardmäßig verflucht' },
         ]
     },
 
@@ -1126,10 +1126,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Tausche Items aus deinem Inventar.',
         stat: 'itemsSold',
         tiers: [
-            { threshold: 5, labelEn: 'Bargain Hunter', labelDE: 'Schnäppchenjäger' },
-            { threshold: 20, labelEn: 'Trader', labelDE: 'Händler' },
-            { threshold: 50, labelEn: 'Merchant', labelDE: 'Kaufmann' },
-            { threshold: 100, labelEn: 'Tycoon', labelDE: 'Tycoon' },
+            { threshold: 7, labelEn: 'Bargain Hunter', labelDE: 'Schnäppchenjäger' },
+            { threshold: 26, labelEn: 'Trader', labelDE: 'Händler' },
+            { threshold: 65, labelEn: 'Merchant', labelDE: 'Kaufmann' },
+            { threshold: 130, labelEn: 'Tycoon', labelDE: 'Tycoon' },
         ]
     },
 
@@ -1151,10 +1151,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze Schild-Gegenstände um Fehler abzublocken.',
         stat: 'shieldsUsed',
         tiers: [
-            { threshold: 5, labelEn: 'Shielded', labelDE: 'Abgeschirmt' },
-            { threshold: 25, labelEn: 'Fortified', labelDE: 'Befestigt' },
-            { threshold: 50, labelEn: 'Impenetrable', labelDE: 'Undurchdringlich' },
-            { threshold: 100, labelEn: 'Unbreakable', labelDE: 'Unzerbrechlich' },
+            { threshold: 7, labelEn: 'Shielded', labelDE: 'Abgeschirmt' },
+            { threshold: 33, labelEn: 'Fortified', labelDE: 'Befestigt' },
+            { threshold: 65, labelEn: 'Impenetrable', labelDE: 'Undurchdringlich' },
+            { threshold: 130, labelEn: 'Unbreakable', labelDE: 'Unzerbrechlich' },
 ]
     },
 
@@ -1175,8 +1175,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'freezeUsed',
         tiers: [
             { threshold: 1, labelEn: 'First Freeze', labelDE: 'Erstes Einfrieren' },
-            { threshold: 15, labelEn: 'Cold Shoulder', labelDE: 'Kalte Schulter' },
-            { threshold: 35, labelEn: 'Permafrost', labelDE: 'Permafrost' },
+            { threshold: 20, labelEn: 'Cold Shoulder', labelDE: 'Kalte Schulter' },
+            { threshold: 46, labelEn: 'Permafrost', labelDE: 'Permafrost' },
         ]
     },
 
@@ -1196,8 +1196,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'eraserUsed',
         tiers: [
             { threshold: 1, labelEn: 'Second Chance', labelDE: 'Zweite Chance' },
-            { threshold: 20, labelEn: 'Clean Record', labelDE: 'Saubere Akte' },
-            { threshold: 50, labelEn: 'Revisionist', labelDE: 'Revisionist' },
+            { threshold: 26, labelEn: 'Clean Record', labelDE: 'Saubere Akte' },
+            { threshold: 65, labelEn: 'Revisionist', labelDE: 'Revisionist' },
         ]
     },
 
@@ -1216,10 +1216,10 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'scoutPrimerUsed',
         tiers: [
             { threshold: 1, labelEn: 'First Consultation', labelDE: 'Erste Befragung' },
-            { threshold: 5, labelEn: 'Field Ready', labelDE: 'Einsatzbereit' },
-            { threshold: 15, labelEn: 'Veteran Scout', labelDE: 'Erfahrener Pfadfinder' },
-            { threshold: 30, labelEn: 'Eagle Scout', labelDE: 'Adler - Pfadfinder' },
-            { threshold: 50, labelEn: 'Master Navigator', labelDE: 'Meister-Navigator' },
+            { threshold: 7, labelEn: 'Field Ready', labelDE: 'Einsatzbereit' },
+            { threshold: 20, labelEn: 'Veteran Scout', labelDE: 'Erfahrener Pfadfinder' },
+            { threshold: 39, labelEn: 'Eagle Scout', labelDE: 'Adler - Pfadfinder' },
+            { threshold: 65, labelEn: 'Master Navigator', labelDE: 'Meister-Navigator' },
         ]
     },
 
@@ -1238,9 +1238,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze Zeilen- oder Spalten-Löse-Items.',
         stat: 'rowColSolved',
         tiers: [
-            { threshold: 10, labelEn: 'Shortcut Taker', labelDE: 'Abkürzer' },
-            { threshold: 35, labelEn: 'Line Breaker', labelDE: 'Zeilenbrecher' },
-            { threshold: 75, labelEn: 'Grid Surgeon', labelDE: 'Gitter-Chirurg' },
+            { threshold: 13, labelEn: 'Shortcut Taker', labelDE: 'Abkürzer' },
+            { threshold: 46, labelEn: 'Line Breaker', labelDE: 'Zeilenbrecher' },
+            { threshold: 100, labelEn: 'Grid Surgeon', labelDE: 'Gitter-Chirurg' },
         ]
     },
 
@@ -1283,9 +1283,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'cursedLensUsed',
         tiers: [
             { threshold: 1, labelEn: 'Dark Glance', labelDE: 'Dunkler Blick' },
-            { threshold: 10, labelEn: 'Shadowed Eye', labelDE: 'Beschattetes Auge' },
-            { threshold: 30, labelEn: 'Cursed Gaze', labelDE: 'Verfluchter Blick' },
-            { threshold: 50, labelEn: 'Eyes of Shadow', labelDE: 'Schattenaugen' },
+            { threshold: 13, labelEn: 'Shadowed Eye', labelDE: 'Beschattetes Auge' },
+            { threshold: 39, labelEn: 'Cursed Gaze', labelDE: 'Verfluchter Blick' },
+            { threshold: 65, labelEn: 'Eyes of Shadow', labelDE: 'Schattenaugen' },
         ]
     },
 
@@ -1304,9 +1304,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'cursedClockUsed',
         tiers: [
             { threshold: 1, labelEn: 'Warped Time', labelDE: 'Verzerrte Zeit' },
-            { threshold: 10, labelEn: 'Time Gambler', labelDE: 'Zeit-Spieler' },
-            { threshold: 30, labelEn: 'Bound to the Clock', labelDE: 'An die Uhr gebunden' },
-            { threshold: 50, labelEn: 'Temporal Pact', labelDE: 'Zeitpakt' },
+            { threshold: 13, labelEn: 'Time Gambler', labelDE: 'Zeit-Spieler' },
+            { threshold: 39, labelEn: 'Bound to the Clock', labelDE: 'An die Uhr gebunden' },
+            { threshold: 65, labelEn: 'Temporal Pact', labelDE: 'Zeitpakt' },
         ]
     },
 
@@ -1323,9 +1323,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'demonEyeUsed',
         tiers: [
             { threshold: 1, labelEn: 'Eye Opened', labelDE: 'Auge geöffnet' },
-            { threshold: 10, labelEn: 'Infernal Guard', labelDE: 'Höllenwacht' },
-            { threshold: 30, labelEn: 'Unwavering Stare', labelDE: 'Unverwandter Blick' },
-            { threshold: 50, labelEn: 'Abyssal Sight', labelDE: 'Abyssaler Blick' },
+            { threshold: 13, labelEn: 'Infernal Guard', labelDE: 'Höllenwacht' },
+            { threshold: 39, labelEn: 'Unwavering Stare', labelDE: 'Unverwandter Blick' },
+            { threshold: 65, labelEn: 'Abyssal Sight', labelDE: 'Abyssaler Blick' },
         ]
     },
 
@@ -1340,9 +1340,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'tidalWaveUsed',
         tiers: [
             { threshold: 1, labelEn: 'First Wave', labelDE: 'Erste Welle' },
-            { threshold: 10, labelEn: 'Rising Tide', labelDE: 'Steigende Flut' },
-            { threshold: 25, labelEn: 'Tidal Force', labelDE: 'Gezeitenkraft' },
-            { threshold: 50, labelEn: 'Tsunami', labelDE: 'Tsunami' },
+            { threshold: 13, labelEn: 'Rising Tide', labelDE: 'Steigende Flut' },
+            { threshold: 33, labelEn: 'Tidal Force', labelDE: 'Gezeitenkraft' },
+            { threshold: 65, labelEn: 'Tsunami', labelDE: 'Tsunami' },
         ]
     },
 
@@ -1357,9 +1357,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'vortexUsed',
         tiers: [
             { threshold: 1, labelEn: 'First Gust', labelDE: 'Erster Windstoß' },
-            { threshold: 10, labelEn: 'Spinning Up', labelDE: 'Im Aufwind' },
-            { threshold: 25, labelEn: 'Cyclone', labelDE: 'Zyklon' },
-            { threshold: 50, labelEn: 'Eye of the Storm', labelDE: 'Auge des Sturms' },
+            { threshold: 13, labelEn: 'Spinning Up', labelDE: 'Im Aufwind' },
+            { threshold: 33, labelEn: 'Cyclone', labelDE: 'Zyklon' },
+            { threshold: 65, labelEn: 'Eye of the Storm', labelDE: 'Auge des Sturms' },
         ]
     },
 
@@ -1374,9 +1374,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'chaosGridUsed',
         tiers: [
             { threshold: 1, labelEn: 'Anarchy', labelDE: 'Anarchie' },
-            { threshold: 10, labelEn: 'Entropy Unleashed', labelDE: 'Entropie entfesselt' },
-            { threshold: 25, labelEn: 'Mayhem', labelDE: 'Chaos' },
-            { threshold: 50, labelEn: 'Total Chaos', labelDE: 'Totales Chaos' },
+            { threshold: 13, labelEn: 'Entropy Unleashed', labelDE: 'Entropie entfesselt' },
+            { threshold: 33, labelEn: 'Mayhem', labelDE: 'Chaos' },
+            { threshold: 65, labelEn: 'Total Chaos', labelDE: 'Totales Chaos' },
         ]
     },
 
@@ -1393,9 +1393,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'pearlsUsed',
         tiers: [
             { threshold: 1, labelEn: 'First Pearl', labelDE: 'Erste Perle' },
-            { threshold: 10, labelEn: 'Deep Diver', labelDE: 'Tiefseetaucher' },
-            { threshold: 30, labelEn: 'Pearl Collector', labelDE: 'Perlensammler' },
-            { threshold: 50, labelEn: 'Ocean\'s Bounty', labelDE: 'Ozeanische Beute' },
+            { threshold: 13, labelEn: 'Deep Diver', labelDE: 'Tiefseetaucher' },
+            { threshold: 39, labelEn: 'Pearl Collector', labelDE: 'Perlensammler' },
+            { threshold: 65, labelEn: 'Ocean\'s Bounty', labelDE: 'Ozeanische Beute' },
         ]
     },
 
@@ -1413,9 +1413,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'witchUsed',
         tiers: [
             { threshold: 1, labelEn: 'First Summoning', labelDE: 'Erste Beschwörung' },
-            { threshold: 10, labelEn: 'Familiar Bond', labelDE: 'Vertraute Verbindung' },
-            { threshold: 30, labelEn: 'Coven Master', labelDE: 'Hexenzirkel-Meister' },
-            { threshold: 50, labelEn: 'Scarlet Witch', labelDE: 'Scharlachrote Hexe' },
+            { threshold: 13, labelEn: 'Familiar Bond', labelDE: 'Vertraute Verbindung' },
+            { threshold: 39, labelEn: 'Coven Master', labelDE: 'Hexenzirkel-Meister' },
+            { threshold: 65, labelEn: 'Scarlet Witch', labelDE: 'Scharlachrote Hexe' },
         ]
     },
 
@@ -1431,9 +1431,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'goldenClockUsed',
         tiers: [
             { threshold: 1, labelEn: 'Golden Moment', labelDE: 'Goldener Moment' },
-            { threshold: 10, labelEn: 'Time is Gold', labelDE: 'Zeit ist Gold' },
-            { threshold: 30, labelEn: 'Gilded Timekeeper', labelDE: 'Vergoldeter Zeithüter' },
-            { threshold: 50, labelEn: 'Midas Touch', labelDE: 'Midas-Touch' },
+            { threshold: 13, labelEn: 'Time is Gold', labelDE: 'Zeit ist Gold' },
+            { threshold: 39, labelEn: 'Gilded Timekeeper', labelDE: 'Vergoldeter Zeithüter' },
+            { threshold: 65, labelEn: 'Midas Touch', labelDE: 'Midas-Touch' },
         ]
     },
 
@@ -1449,9 +1449,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'shadowSealUsed',
         tiers: [
             { threshold: 1, labelEn: 'Sealed in Shadow', labelDE: 'Im Schatten versiegelt' },
-            { threshold: 10, labelEn: 'Dark Covenant', labelDE: 'Dunkler Bund' },
-            { threshold: 30, labelEn: 'Eclipse Keeper', labelDE: 'Finsterwächter' },
-            { threshold: 50, labelEn: 'Shadow Master', labelDE: 'Schattenmeister' },
+            { threshold: 13, labelEn: 'Dark Covenant', labelDE: 'Dunkler Bund' },
+            { threshold: 39, labelEn: 'Eclipse Keeper', labelDE: 'Finsterwächter' },
+            { threshold: 65, labelEn: 'Shadow Master', labelDE: 'Schattenmeister' },
         ]
     },
 
@@ -1477,12 +1477,12 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Beantworte Multiple Choice Fragen und löse Aufgaben richtig.',
         stat: 'questionsCorrect',
         tiers: [
-            { threshold: 5, labelEn: 'First Answers', labelDE: 'Erste Antworten' },
-            { threshold: 20, labelEn: 'Sharp Mind', labelDE: 'Scharfer Verstand' },
-            { threshold: 50, labelEn: 'Scholar', labelDE: 'Gelehrter' },
-            { threshold: 100, labelEn: 'Professor', labelDE: 'Professor' },
-            { threshold: 200, labelEn: 'Stochastic Sage', labelDE: 'Stochastischer Weise' },
-            { threshold: 500, labelEn: 'Master of Stochastics', labelDE: 'Meister der Stochastik' },
+            { threshold: 7, labelEn: 'First Answers', labelDE: 'Erste Antworten' },
+            { threshold: 26, labelEn: 'Sharp Mind', labelDE: 'Scharfer Verstand' },
+            { threshold: 65, labelEn: 'Scholar', labelDE: 'Gelehrter' },
+            { threshold: 130, labelEn: 'Professor', labelDE: 'Professor' },
+            { threshold: 250, labelEn: 'Stochastic Sage', labelDE: 'Stochastischer Weise' },
+            { threshold: 650, labelEn: 'Master of Stochastics', labelDE: 'Meister der Stochastik' },
         ]
     },
 
@@ -1497,9 +1497,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Werde von einem Wahrscheinlichkeitstor abgewiesen.',
         stat: 'gateRejections',
         tiers: [
-            { threshold: 15, labelEn: 'Wrong Answer', labelDE: 'Falsche Antwort' },
-            { threshold: 50, labelEn: 'Persistent', labelDE: 'Ausdauernd' },
-            { threshold: 100, labelEn: 'Never Gives Up', labelDE: 'Gibt nie auf' },
+            { threshold: 20, labelEn: 'Wrong Answer', labelDE: 'Falsche Antwort' },
+            { threshold: 65, labelEn: 'Persistent', labelDE: 'Ausdauernd' },
+            { threshold: 130, labelEn: 'Never Gives Up', labelDE: 'Gibt nie auf' },
         ]
     },
 
@@ -1515,10 +1515,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Beantworte eine Pfadfinder-Kompass-Frage richtig.',
         stat: 'primerCorrect',
         tiers: [
-            { threshold: 5, labelEn: 'Prepared', labelDE: 'Vorbereitet' },
-            { threshold: 25, labelEn: 'Always Ready', labelDE: 'Immer bereit' },
-            { threshold: 50, labelEn: 'Eagle Scout', labelDE: 'Adlerpfadfinder' },
-            { threshold: 100, labelEn: 'Master Pathfinder', labelDE: 'Meister-Pfadfinder' },
+            { threshold: 7, labelEn: 'Prepared', labelDE: 'Vorbereitet' },
+            { threshold: 33, labelEn: 'Always Ready', labelDE: 'Immer bereit' },
+            { threshold: 65, labelEn: 'Eagle Scout', labelDE: 'Adlerpfadfinder' },
+            { threshold: 130, labelEn: 'Master Pathfinder', labelDE: 'Meister-Pfadfinder' },
         ]
     },
 
@@ -1593,10 +1593,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level als Statistiker ab.',
         stat: 'levelsAsStatistician',
         tiers: [
-            { threshold: 5, labelEn: 'Data Recruit', labelDE: 'Daten-Rekrut' },
-            { threshold: 20, labelEn: 'Sample Warrior', labelDE: 'Stichproben-Krieger' },
-            { threshold: 50, labelEn: 'Distribution Knight', labelDE: 'Verteilungsritter' },
-            { threshold: 100, labelEn: 'Grand Statistician', labelDE: 'Großer Statistiker' },
+            { threshold: 7, labelEn: 'Data Recruit', labelDE: 'Daten-Rekrut' },
+            { threshold: 26, labelEn: 'Sample Warrior', labelDE: 'Stichproben-Krieger' },
+            { threshold: 65, labelEn: 'Distribution Knight', labelDE: 'Verteilungsritter' },
+            { threshold: 130, labelEn: 'Grand Statistician', labelDE: 'Großer Statistiker' },
         ]
     },
 
@@ -1612,10 +1612,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level als Mathemagier ab.',
         stat: 'levelsAsMathmagician',
         tiers: [
-            { threshold: 5, labelEn: 'Apprentice Mage', labelDE: 'Lehrlings-Magier' },
-            { threshold: 20, labelEn: 'Arcane Student', labelDE: 'Arkaner Schüler' },
-            { threshold: 50, labelEn: 'Spellweaver', labelDE: 'Zauberwirker' },
-            { threshold: 100, labelEn: 'Grand Mathmagician', labelDE: 'Großer Mathemagier' },
+            { threshold: 7, labelEn: 'Apprentice Mage', labelDE: 'Lehrlings-Magier' },
+            { threshold: 26, labelEn: 'Arcane Student', labelDE: 'Arkaner Schüler' },
+            { threshold: 65, labelEn: 'Spellweaver', labelDE: 'Zauberwirker' },
+            { threshold: 130, labelEn: 'Grand Mathmagician', labelDE: 'Großer Mathemagier' },
         ]
     },
 
@@ -1632,10 +1632,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level als Probabilist ab.',
         stat: 'levelsAsProbabilist',
         tiers: [
-            { threshold: 5, labelEn: 'Probability Novice', labelDE: 'Wahrscheinlichkeits-Novize' },
-            { threshold: 20, labelEn: 'Bayesian Scout', labelDE: 'Bayesianischer Scout' },
-            { threshold: 50, labelEn: 'Field Ranger', labelDE: 'Feld-Ranger' },
-            { threshold: 100, labelEn: 'Grand Probabilist', labelDE: 'Großer Probabilist' },
+            { threshold: 7, labelEn: 'Probability Novice', labelDE: 'Wahrscheinlichkeits-Novize' },
+            { threshold: 26, labelEn: 'Bayesian Scout', labelDE: 'Bayesianischer Scout' },
+            { threshold: 65, labelEn: 'Field Ranger', labelDE: 'Feld-Ranger' },
+            { threshold: 130, labelEn: 'Grand Probabilist', labelDE: 'Großer Probabilist' },
         ]
     },
 
@@ -1653,9 +1653,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Löse den Momentum-Zeitbonus aus.',
         stat: 'momentumTriggered',
         tiers: [
-            { threshold: 10, labelEn: 'Snowball', labelDE: 'Schneeball' },
-            { threshold: 100, labelEn: 'Avalanche', labelDE: 'Lawine' },
-            { threshold: 1000, labelEn: 'Perpetual Motion', labelDE: 'Perpetuum Mobile' },
+            { threshold: 13, labelEn: 'Snowball', labelDE: 'Schneeball' },
+            { threshold: 130, labelEn: 'Avalanche', labelDE: 'Lawine' },
+            { threshold: 1300, labelEn: 'Perpetual Motion', labelDE: 'Perpetuum Mobile' },
         ]
     },
 
@@ -1670,9 +1670,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Lass Fehler vom Varianzschild absorbieren.',
         stat: 'mistakesAbsorbed',
         tiers: [
-            { threshold: 10, labelEn: 'Cushioned', labelDE: 'Abgepuffert' },
-            { threshold: 100, labelEn: 'Protected', labelDE: 'Geschützt' },
-            { threshold: 300, labelEn: 'Teflon', labelDE: 'Teflon' },
+            { threshold: 13, labelEn: 'Cushioned', labelDE: 'Abgepuffert' },
+            { threshold: 130, labelEn: 'Protected', labelDE: 'Geschützt' },
+            { threshold: 400, labelEn: 'Teflon', labelDE: 'Teflon' },
         ]
     },
 
@@ -1688,9 +1688,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Lass falsche Zellen automatisch mit der Bayesianischen Einsicht markieren.',
         stat: 'bayesianInsightUsed',
         tiers: [
-            { threshold: 10, labelEn: 'Prior Belief', labelDE: 'Vorannahme' },
-            { threshold: 100, labelEn: 'Posterior Update', labelDE: 'Posterior-Update' },
-            { threshold: 500, labelEn: 'Maximum Likelihood', labelDE: 'Maximale Wahrscheinlichkeit' },
+            { threshold: 13, labelEn: 'Prior Belief', labelDE: 'Vorannahme' },
+            { threshold: 130, labelEn: 'Posterior Update', labelDE: 'Posterior-Update' },
+            { threshold: 650, labelEn: 'Maximum Likelihood', labelDE: 'Maximale Wahrscheinlichkeit' },
         ]
     },
 
@@ -1706,9 +1706,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze die Datenhieb-Fähigkeit.',
         stat: 'skillDataStrikeUsed',
         tiers: [
-            { threshold: 10, labelEn: 'First Strike', labelDE: 'Erster Hieb' },
-            { threshold: 50, labelEn: 'Assault Mode', labelDE: 'Angriffsmodus' },
-            { threshold: 100, labelEn: 'Data Berserker', labelDE: 'Daten-Berserker' },
+            { threshold: 13, labelEn: 'First Strike', labelDE: 'Erster Hieb' },
+            { threshold: 65, labelEn: 'Assault Mode', labelDE: 'Angriffsmodus' },
+            { threshold: 130, labelEn: 'Data Berserker', labelDE: 'Daten-Berserker' },
         ]
     },
 
@@ -1723,9 +1723,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze die Arkane-Enthüllung-Fähigkeit.',
         stat: 'skillArcaneRevealUsed',
         tiers: [
-            { threshold: 10, labelEn: 'First Reveals', labelDE: 'Erste Enthüllungen' },
-            { threshold: 50, labelEn: 'Seer', labelDE: 'Seher' },
-            { threshold: 100, labelEn: 'All is Known', labelDE: 'Alles ist bekannt' },
+            { threshold: 13, labelEn: 'First Reveals', labelDE: 'Erste Enthüllungen' },
+            { threshold: 65, labelEn: 'Seer', labelDE: 'Seher' },
+            { threshold: 130, labelEn: 'All is Known', labelDE: 'Alles ist bekannt' },
         ]
     },
 
@@ -1740,9 +1740,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze die Präzisionsmarkierung-Fähigkeit.',
         stat: 'skillPrecisionMarkUsed',
         tiers: [
-            { threshold: 10, labelEn: 'Marked', labelDE: 'Markiert' },
-            { threshold: 50, labelEn: 'Sharpshooter', labelDE: 'Scharfschütze' },
-            { threshold: 100, labelEn: 'Dead Eye', labelDE: 'Scharfes Auge' },
+            { threshold: 13, labelEn: 'Marked', labelDE: 'Markiert' },
+            { threshold: 65, labelEn: 'Sharpshooter', labelDE: 'Scharfschütze' },
+            { threshold: 130, labelEn: 'Dead Eye', labelDE: 'Scharfes Auge' },
         ]
     },
 
@@ -1757,9 +1757,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze die Diagonalschlag-Fähigkeit.',
         stat: 'skillDiagonalStrikeUsed',
         tiers: [
-            { threshold: 10, labelEn: 'Cross-Cutter', labelDE: 'Kreuzschneider' },
-            { threshold: 50, labelEn: 'Slash Artist', labelDE: 'Schnitt-Künstler' },
-            { threshold: 100, labelEn: 'X-Factor', labelDE: 'X-Faktor' },
+            { threshold: 13, labelEn: 'Cross-Cutter', labelDE: 'Kreuzschneider' },
+            { threshold: 65, labelEn: 'Slash Artist', labelDE: 'Schnitt-Künstler' },
+            { threshold: 130, labelEn: 'X-Factor', labelDE: 'X-Faktor' },
         ]
     },
 
@@ -1774,9 +1774,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze die Absolute-Nullpunkt-Fähigkeit.',
         stat: 'skillAbsoluteZeroUsed',
         tiers: [
-            { threshold: 10, labelEn: 'First Freeze', labelDE: 'Erstes Einfrieren' },
-            { threshold: 50, labelEn: 'Cryomancer', labelDE: 'Kryomant' },
-            { threshold: 100, labelEn: 'Permafrost', labelDE: 'Permafrost' },
+            { threshold: 13, labelEn: 'First Freeze', labelDE: 'Erstes Einfrieren' },
+            { threshold: 65, labelEn: 'Cryomancer', labelDE: 'Kryomant' },
+            { threshold: 130, labelEn: 'Permafrost', labelDE: 'Permafrost' },
         ]
     },
 
@@ -1791,9 +1791,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze die Feldscan-Fähigkeit.',
         stat: 'skillFieldScanUsed',
         tiers: [
-            { threshold: 10, labelEn: 'Radar Ping', labelDE: 'Radar-Ping' },
-            { threshold: 50, labelEn: 'Sonar Expert', labelDE: 'Sonar-Experte' },
-            { threshold: 100, labelEn: 'Full Sweep', labelDE: 'Vollständiger Scan' },
+            { threshold: 13, labelEn: 'Radar Ping', labelDE: 'Radar-Ping' },
+            { threshold: 65, labelEn: 'Sonar Expert', labelDE: 'Sonar-Experte' },
+            { threshold: 130, labelEn: 'Full Sweep', labelDE: 'Vollständiger Scan' },
         ]
     },
     // ── CLASS-SPECIFIC FLAVOUR ────────────────────
@@ -1808,8 +1808,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'statistician3MomentumOneLevel',
         tiers: [
             { threshold: 1, labelEn: 'On a Roll', labelDE: 'Im Schwung' },
-            { threshold: 10, labelEn: 'Unstoppable', labelDE: 'Unaufhaltbar' },
-            { threshold: 25, labelEn: 'Perpetual Motion', labelDE: 'Perpetuum Mobile' },
+            { threshold: 13, labelEn: 'Unstoppable', labelDE: 'Unaufhaltbar' },
+            { threshold: 33, labelEn: 'Perpetual Motion', labelDE: 'Perpetuum Mobile' },
         ]
     },
     {
@@ -1823,8 +1823,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'mathmagician3AbsorbOneLevel',
         tiers: [
             { threshold: 1, labelEn: 'Shielded Master', labelDE: 'Schild-Meister' },
-            { threshold: 10, labelEn: 'Fortress', labelDE: 'Festung' },
-            { threshold: 25, labelEn: 'Untouchable Mage', labelDE: 'Unberührbarer Magier' },
+            { threshold: 13, labelEn: 'Fortress', labelDE: 'Festung' },
+            { threshold: 33, labelEn: 'Untouchable Mage', labelDE: 'Unberührbarer Magier' },
         ]
     },
 
@@ -1839,8 +1839,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'probabilistBigScan',
         tiers: [
             { threshold: 1, labelEn: 'Sharp Vision', labelDE: 'Scharfe Sicht' },
-            { threshold: 10, labelEn: 'Hawk Eye', labelDE: 'Habichtauge' },
-            { threshold: 25, labelEn: 'Omniscient', labelDE: 'Allwissend' },
+            { threshold: 13, labelEn: 'Hawk Eye', labelDE: 'Habichtauge' },
+            { threshold: 33, labelEn: 'Omniscient', labelDE: 'Allwissend' },
         ]
     },
 
@@ -1855,9 +1855,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level als Ausreißer ab.',
         stat: 'levelsAsOutlier',
         tiers: [
-            { threshold: 5, labelEn: 'Anomaly', labelDE: 'Anomalie' },
-            { threshold: 25, labelEn: 'Statistical Ghost', labelDE: 'Statistischer Geist' },
-            { threshold: 50, labelEn: 'Outlier', labelDE: 'Ausreißer' },
+            { threshold: 7, labelEn: 'Anomaly', labelDE: 'Anomalie' },
+            { threshold: 33, labelEn: 'Statistical Ghost', labelDE: 'Statistischer Geist' },
+            { threshold: 65, labelEn: 'Outlier', labelDE: 'Ausreißer' },
         ]
     },
 
@@ -1873,9 +1873,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level als Rekursionist ab.',
         stat: 'levelsAsRecursionist',
         tiers: [
-            { threshold: 5, labelEn: 'Iteration', labelDE: 'Iteration' },
-            { threshold: 25, labelEn: 'Infinite Depth', labelDE: 'Unendliche Tiefe' },
-            { threshold: 50, labelEn: 'Recursionist', labelDE: 'Rekursionist' },
+            { threshold: 7, labelEn: 'Iteration', labelDE: 'Iteration' },
+            { threshold: 33, labelEn: 'Infinite Depth', labelDE: 'Unendliche Tiefe' },
+            { threshold: 65, labelEn: 'Recursionist', labelDE: 'Rekursionist' },
         ]
     },
 
@@ -1890,9 +1890,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level als Bayesianer ab.',
         stat: 'levelsAsBayesian',
         tiers: [
-            { threshold: 5, labelEn: 'Belief Updated', labelDE: 'Überzeugung aktualisiert' },
-            { threshold: 25, labelEn: 'Posterior Truth', labelDE: 'A-posteriori Wahrheit' },
-            { threshold: 50, labelEn: 'Bayesian', labelDE: 'Bayesianer' },
+            { threshold: 7, labelEn: 'Belief Updated', labelDE: 'Überzeugung aktualisiert' },
+            { threshold: 33, labelEn: 'Posterior Truth', labelDE: 'A-posteriori Wahrheit' },
+            { threshold: 65, labelEn: 'Bayesian', labelDE: 'Bayesianer' },
         ]
     },
 
@@ -1908,9 +1908,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze die Tail Risk Fähigkeit.',
         stat: 'skillTailRiskUsed',
         tiers: [
-            { threshold: 10, labelEn: 'Calculated Gamble', labelDE: 'Kalkuliertes Risiko' },
-            { threshold: 50, labelEn: 'Fat Tails', labelDE: 'Fat Tails' },
-            { threshold: 100, labelEn: 'Tail Risk Master', labelDE: 'Tail-Risk-Meister' },
+            { threshold: 13, labelEn: 'Calculated Gamble', labelDE: 'Kalkuliertes Risiko' },
+            { threshold: 65, labelEn: 'Fat Tails', labelDE: 'Fat Tails' },
+            { threshold: 130, labelEn: 'Tail Risk Master', labelDE: 'Tail-Risk-Meister' },
         ]
     },
 
@@ -1925,9 +1925,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze die Residual Fähigkeit.',
         stat: 'skillResidualUsed',
         tiers: [
-            { threshold: 10, labelEn: 'Lingering Error', labelDE: 'Verweilender Fehler' },
-            { threshold: 50, labelEn: 'Ghost in the Data', labelDE: 'Geist in den Daten' },
-            { threshold: 100, labelEn: 'Infinite Recursion', labelDE: 'Unendliche Rekursion' },
+            { threshold: 13, labelEn: 'Lingering Error', labelDE: 'Verweilender Fehler' },
+            { threshold: 65, labelEn: 'Ghost in the Data', labelDE: 'Geist in den Daten' },
+            { threshold: 130, labelEn: 'Infinite Recursion', labelDE: 'Unendliche Rekursion' },
         ]
     },
 
@@ -1942,9 +1942,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze die Bayes - Fallen Fähigkeit.',
         stat: 'skillBayesTrapsUsed',
         tiers: [
-            { threshold: 10, labelEn: 'Prior Belief', labelDE: 'Prior-Annahme' },
-            { threshold: 50, labelEn: 'Updated Posterior', labelDE: 'Aktualisierter Posterior' },
-            { threshold: 100, labelEn: 'Perfect Inference', labelDE: 'Perfekte Inferenz' },
+            { threshold: 13, labelEn: 'Prior Belief', labelDE: 'Prior-Annahme' },
+            { threshold: 65, labelEn: 'Updated Posterior', labelDE: 'Aktualisierter Posterior' },
+            { threshold: 130, labelEn: 'Perfect Inference', labelDE: 'Perfekte Inferenz' },
 
         ]
     },
@@ -1962,9 +1962,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze die SPEEDFORCE-Fähigkeit.',
         stat: 'skillSpeedforceUsed',
         tiers: [
-            { threshold: 10, labelEn: 'Flow State', labelDE: 'Flow-Zustand' },
-            { threshold: 50, labelEn: 'Time Distortion', labelDE: 'Zeitverzerrung' },
-            { threshold: 100, labelEn: 'SPEEDFORCE Master', labelDE: 'SPEEDFORCE-Meister' },
+            { threshold: 13, labelEn: 'Flow State', labelDE: 'Flow-Zustand' },
+            { threshold: 65, labelEn: 'Time Distortion', labelDE: 'Zeitverzerrung' },
+            { threshold: 130, labelEn: 'SPEEDFORCE Master', labelDE: 'SPEEDFORCE-Meister' },
         ]
     },
 
@@ -1978,9 +1978,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Bestätige und löse Zellen mit Degrees of Freedom.',
         stat: 'skillDoFUsed',
         tiers: [
-            { threshold: 10, labelEn: 'Boundless', labelDE: 'Grenzenlos' },
-            { threshold: 50, labelEn: 'Unshackled', labelDE: 'Entfesselt' },
-            { threshold: 100, labelEn: 'Degree of Freedom', labelDE: 'Freiheitsgrad' },
+            { threshold: 13, labelEn: 'Boundless', labelDE: 'Grenzenlos' },
+            { threshold: 65, labelEn: 'Unshackled', labelDE: 'Entfesselt' },
+            { threshold: 130, labelEn: 'Degree of Freedom', labelDE: 'Freiheitsgrad' },
         ]
     },
 
@@ -1994,9 +1994,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze den Typ 1 Fehler Schild.',
         stat: 'skillType1ErrorShieldUsed',
         tiers: [
-            { threshold: 10, labelEn: 'Noise Filtered', labelDE: 'Rauschen gefiltert' },
-            { threshold: 50, labelEn: 'False Positives Blocked', labelDE: 'Falschpositive blockiert' },
-            { threshold: 100, labelEn: 'Type I Nullification', labelDE: 'Typ-I-Neutralisierung' },
+            { threshold: 13, labelEn: 'Noise Filtered', labelDE: 'Rauschen gefiltert' },
+            { threshold: 65, labelEn: 'False Positives Blocked', labelDE: 'Falschpositive blockiert' },
+            { threshold: 130, labelEn: 'Type I Nullification', labelDE: 'Typ-I-Neutralisierung' },
         ]
     },
 
@@ -2012,8 +2012,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'outlierInfiniteHunger20Reveals',
         tiers: [
             { threshold: 1, labelEn: 'Edge Observation', labelDE: 'Randbeobachtung' },
-            { threshold: 10, labelEn: 'Tail Exposure', labelDE: 'Tailsrisiko-Exposition' },
-            { threshold: 25, labelEn: 'Hunger Satisfied', labelDE: 'Hunger gestillt' },
+            { threshold: 13, labelEn: 'Tail Exposure', labelDE: 'Tailsrisiko-Exposition' },
+            { threshold: 33, labelEn: 'Hunger Satisfied', labelDE: 'Hunger gestillt' },
         ]
     },
 
@@ -2029,9 +2029,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Lass Residual Totems Suchstrahlen abfeuern, um Zellen zu lösen.',
         stat: 'residualBeamsFired',
         tiers: [
-            { threshold: 50, labelEn: 'Laser Show', labelDE: 'Lasershow' },
-            { threshold: 250, labelEn: 'Orbital Strike', labelDE: 'Orbitaler Schlag' },
-            { threshold: 500, labelEn: 'Crossfire', labelDE: 'Kreuzfeuer' },
+            { threshold: 65, labelEn: 'Laser Show', labelDE: 'Lasershow' },
+            { threshold: 325, labelEn: 'Orbital Strike', labelDE: 'Orbitaler Schlag' },
+            { threshold: 650, labelEn: 'Crossfire', labelDE: 'Kreuzfeuer' },
         ]
     },
 
@@ -2046,8 +2046,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'bayesTrapsAllPlaced',
         tiers: [
             { threshold: 1, labelEn: 'Prepared', labelDE: 'Vorbereitet' },
-            { threshold: 25, labelEn: 'Master Trapper', labelDE: 'Meister-Fallensteller' },
-            { threshold: 50, labelEn: 'Minefield', labelDE: 'Minenfeld' },
+            { threshold: 33, labelEn: 'Master Trapper', labelDE: 'Meister-Fallensteller' },
+            { threshold: 65, labelEn: 'Minefield', labelDE: 'Minenfeld' },
         ]
     },
 
@@ -2062,8 +2062,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'speedforceNaturalCompletions',
         tiers: [
             { threshold: 1, labelEn: 'Unbroken Focus', labelDE: 'Ungebrochener Fokus' },
-            { threshold: 10, labelEn: 'Swan Tamer', labelDE: 'Schwanenbändiger' },
-            { threshold: 25, labelEn: 'Riding the Swan', labelDE: 'Auf dem Schwan reiten' },
+            { threshold: 13, labelEn: 'Swan Tamer', labelDE: 'Schwanenbändiger' },
+            { threshold: 33, labelEn: 'Riding the Swan', labelDE: 'Auf dem Schwan reiten' },
         ]
     },
 
@@ -2081,9 +2081,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Beantworte die Herausforderungen des Freiheitsgrade-Zombies, um Zellen zu verfluchen.',
         stat: 'dofZombieChallengesWon',
         tiers: [
-            { threshold: 10, labelEn: 'First Whispers', labelDE: 'Erstes Flüstern' },
-            { threshold: 50, labelEn: 'Cursed Grid', labelDE: 'Verfluchtes Raster' },
-            { threshold: 100, labelEn: 'Master of the Dead', labelDE: 'Meister der Toten' },
+            { threshold: 13, labelEn: 'First Whispers', labelDE: 'Erstes Flüstern' },
+            { threshold: 65, labelEn: 'Cursed Grid', labelDE: 'Verfluchtes Raster' },
+            { threshold: 130, labelEn: 'Master of the Dead', labelDE: 'Meister der Toten' },
         ]
     },
 
@@ -2098,9 +2098,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Lass ein Type I Shield einen Fehler abfangen und umwandeln.',
         stat: 'type1Intercepts',
         tiers: [
-            { threshold: 5, labelEn: 'Shielded', labelDE: 'Abgeschirmt' },
-            { threshold: 25, labelEn: 'Aegis', labelDE: 'Aegis' },
-            { threshold: 50, labelEn: 'False Positive', labelDE: 'Falsch Positiv' },
+            { threshold: 7, labelEn: 'Shielded', labelDE: 'Abgeschirmt' },
+            { threshold: 33, labelEn: 'Aegis', labelDE: 'Aegis' },
+            { threshold: 65, labelEn: 'False Positive', labelDE: 'Falsch Positiv' },
         ]
     },
 
@@ -2119,9 +2119,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level als Aktuar ab.',
         stat: 'levelsAsActuary',
         tiers: [
-            { threshold: 5, labelEn: 'Calculated Risk', labelDE: 'Kalkuliertes Risiko' },
-            { threshold: 25, labelEn: 'Actuarial Master', labelDE: 'Aktuar-Meister' },
-            { threshold: 50, labelEn: 'Actuary', labelDE: 'Aktuar' },
+            { threshold: 7, labelEn: 'Calculated Risk', labelDE: 'Kalkuliertes Risiko' },
+            { threshold: 33, labelEn: 'Actuarial Master', labelDE: 'Aktuar-Meister' },
+            { threshold: 65, labelEn: 'Actuary', labelDE: 'Aktuar' },
         ]
     },
 
@@ -2136,9 +2136,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level als Markovianer ab.',
         stat: 'levelsAsMarkovian',
         tiers: [
-            { threshold: 5, labelEn: 'State Shift', labelDE: 'Zustandswechsel' },
-            { threshold: 25, labelEn: 'Memoryless Master', labelDE: 'Gedächtnisloser Meister' },
-            { threshold: 50, labelEn: 'Markovian', labelDE: 'Markovianer' },
+            { threshold: 7, labelEn: 'State Shift', labelDE: 'Zustandswechsel' },
+            { threshold: 33, labelEn: 'Memoryless Master', labelDE: 'Gedächtnisloser Meister' },
+            { threshold: 65, labelEn: 'Markovian', labelDE: 'Markovianer' },
         ]
     },
 
@@ -2154,9 +2154,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Level als Random Walker ab.',
         stat: 'levelsAsRandom_walker',
         tiers: [
-            { threshold: 5, labelEn: 'Stochastic Steps', labelDE: 'Stochastische Schritte' },
-            { threshold: 25, labelEn: 'Pathfinder', labelDE: 'Pfadfinder' },
-            { threshold: 50, labelEn: 'Random Walker', labelDE: 'Random Walker' },
+            { threshold: 7, labelEn: 'Stochastic Steps', labelDE: 'Stochastische Schritte' },
+            { threshold: 33, labelEn: 'Pathfinder', labelDE: 'Pfadfinder' },
+            { threshold: 65, labelEn: 'Random Walker', labelDE: 'Random Walker' },
         ]
     },
 
@@ -2172,9 +2172,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze Regression to Prior, um Fehler zu löschen.',
         stat: 'skillRegressionPriorUsed',
         tiers: [
-            { threshold: 10, labelEn: 'Error Erased', labelDE: 'Fehler gelöscht' },
-            { threshold: 50, labelEn: 'Time Heals', labelDE: 'Die Zeit heilt' },
-            { threshold: 100, labelEn: 'Revert to Mean', labelDE: 'Rückkehr zum Mittelwert' },
+            { threshold: 13, labelEn: 'Error Erased', labelDE: 'Fehler gelöscht' },
+            { threshold: 65, labelEn: 'Time Heals', labelDE: 'Die Zeit heilt' },
+            { threshold: 130, labelEn: 'Revert to Mean', labelDE: 'Rückkehr zum Mittelwert' },
         ]
     },
 
@@ -2189,9 +2189,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze die Zustandsrücksetzer Fähigkeit.',
         stat: 'skillRollbackUsed',
         tiers: [
-            { threshold: 10, labelEn: 'Recent History Erased', labelDE: 'Jüngste Vergangenheit gelöscht' },
-            { threshold: 50, labelEn: 'State Rewritten', labelDE: 'Zustand umgeschrieben' },
-            { threshold: 100, labelEn: 'Markov Chain', labelDE: 'Markov-Kette' },
+            { threshold: 13, labelEn: 'Recent History Erased', labelDE: 'Jüngste Vergangenheit gelöscht' },
+            { threshold: 65, labelEn: 'State Rewritten', labelDE: 'Zustand umgeschrieben' },
+            { threshold: 130, labelEn: 'Markov Chain', labelDE: 'Markov-Kette' },
         ]
     },
 
@@ -2206,9 +2206,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Beschwäre Browney und Wiener herbei.',
         stat: 'skillBrowneyWienerSummon',
         tiers: [
-            { threshold: 10, labelEn: 'Random Walk Initiated', labelDE: 'Zufallsweg gestartet' },
-            { threshold: 50, labelEn: 'Diffusion Stabilized', labelDE: 'Diffusion stabilisiert' },
-            { threshold: 100, labelEn: 'Brownian Ensemble', labelDE: 'Brownsches Ensemble' },
+            { threshold: 13, labelEn: 'Random Walk Initiated', labelDE: 'Zufallsweg gestartet' },
+            { threshold: 65, labelEn: 'Diffusion Stabilized', labelDE: 'Diffusion stabilisiert' },
+            { threshold: 130, labelEn: 'Brownian Ensemble', labelDE: 'Brownsches Ensemble' },
         ]
     },
 
@@ -2223,9 +2223,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: '',
         stat: 'skillSignificanceTreshold',
         tiers: [
-            { threshold: 10, labelEn: 'Noise Ignored', labelDE: 'Rauschen ignoriert' },
-            { threshold: 50, labelEn: 'Significant Signal', labelDE: 'Signifikantes Signal' },
-            { threshold: 100, labelEn: 'Statistical Authority', labelDE: 'Statistische Autorität' },
+            { threshold: 13, labelEn: 'Noise Ignored', labelDE: 'Rauschen ignoriert' },
+            { threshold: 65, labelEn: 'Significant Signal', labelDE: 'Signifikantes Signal' },
+            { threshold: 130, labelEn: 'Statistical Authority', labelDE: 'Statistische Autorität' },
         ]
     },
 
@@ -2240,9 +2240,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nutze die Übergangssmatrix Fähigkeit.',
         stat: 'skillTransitionMatrixUsed',
         tiers: [
-            { threshold: 10, labelEn: 'State Shift Detected', labelDE: 'Zustandswechsel erkannt' },
-            { threshold: 50, labelEn: 'Transition Network Formed', labelDE: 'Transitionsnetzwerk gebildet' },
-            { threshold: 100, labelEn: 'Markov Engine Online', labelDE: 'Markov-Engine aktiv' },
+            { threshold: 13, labelEn: 'State Shift Detected', labelDE: 'Zustandswechsel erkannt' },
+            { threshold: 65, labelEn: 'Transition Network Formed', labelDE: 'Transitionsnetzwerk gebildet' },
+            { threshold: 130, labelEn: 'Markov Engine Online', labelDE: 'Markov-Engine aktiv' },
         ]
     },
 
@@ -2257,9 +2257,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Beschwöre Drifter auf das Feld.',
         stat: 'skillSummonDrifter',
         tiers: [
-            { threshold: 10, labelEn: 'Summoned Companion', labelDE: 'Beschworener Begleiter' },
-            { threshold: 50, labelEn: 'Bonded Wanderer', labelDE: 'Gebundener Wanderer' },
-            { threshold: 100, labelEn: 'Loyal Drifter', labelDE: 'Loyaler Drifter' },
+            { threshold: 13, labelEn: 'Summoned Companion', labelDE: 'Beschworener Begleiter' },
+            { threshold: 65, labelEn: 'Bonded Wanderer', labelDE: 'Gebundener Wanderer' },
+            { threshold: 130, labelEn: 'Loyal Drifter', labelDE: 'Loyaler Drifter' },
         ]
     },
 
@@ -2278,8 +2278,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'correct120smistake',
         tiers: [
             { threshold: 1, labelEn: 'Minor Setback', labelDE: 'Kleiner Rückschlag' },
-            { threshold: 10, labelEn: 'Time Healer', labelDE: 'Zeitheiler' },
-            { threshold: 25, labelEn: 'Master of Time', labelDE: 'Meister der Zeit' },
+            { threshold: 13, labelEn: 'Time Healer', labelDE: 'Zeitheiler' },
+            { threshold: 33, labelEn: 'Master of Time', labelDE: 'Meister der Zeit' },
         ]
     },
 
@@ -2296,8 +2296,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'rollbackSaves',
         tiers: [
             { threshold: 1, labelEn: 'Not Today', labelDE: 'Nicht heute' },
-            { threshold: 5, labelEn: 'Time Traveler', labelDE: 'Zeitreisender' },
-            { threshold: 10, labelEn: 'Cheat Death', labelDE: 'Dem Tod entronnen' },
+            { threshold: 7, labelEn: 'Time Traveler', labelDE: 'Zeitreisender' },
+            { threshold: 13, labelEn: 'Cheat Death', labelDE: 'Dem Tod entronnen' },
         ]
     },
 
@@ -2313,9 +2313,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Enthülle Zellen durch Brownsche Bewegung.',
         stat: 'brownianCellsRevealed',
         tiers: [
-            { threshold: 10, labelEn: 'Drifting', labelDE: 'Treiben' },
-            { threshold: 100, labelEn: 'Scattered', labelDE: 'Verstreut' },
-            { threshold: 200, labelEn: 'Dust in the Wind', labelDE: 'Staub im Wind' },
+            { threshold: 13, labelEn: 'Drifting', labelDE: 'Treiben' },
+            { threshold: 130, labelEn: 'Scattered', labelDE: 'Verstreut' },
+            { threshold: 250, labelEn: 'Dust in the Wind', labelDE: 'Staub im Wind' },
         ]
     },
 
@@ -2332,8 +2332,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'sigThresholdIntercepts',
         tiers: [
             { threshold: 1, labelEn: 'Access Denied', labelDE: 'Zugriff verweigert' },
-            { threshold: 10, labelEn: 'Statistically Significant', labelDE: 'Statistisch signifikant' },
-            { threshold: 25, labelEn: 'Highly Significant', labelDE: 'Hoch signifikant' },
+            { threshold: 13, labelEn: 'Statistically Significant', labelDE: 'Statistisch signifikant' },
+            { threshold: 33, labelEn: 'Highly Significant', labelDE: 'Hoch signifikant' },
         ]
     },
 
@@ -2349,9 +2349,9 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Löse Kombi-Kaskaden mit der Transition Matrix Fähigkeit aus.',
         stat: 'transitionMatrixCascades',
         tiers: [
-            { threshold: 10, labelEn: 'Chain Reaction', labelDE: 'Kettenreaktion' },
-            { threshold: 100, labelEn: 'Markov Chain', labelDE: 'Markov-Kette' },
-            { threshold: 250, labelEn: 'Markov Cascade', labelDE: 'Markov-Kaskade' },
+            { threshold: 13, labelEn: 'Chain Reaction', labelDE: 'Kettenreaktion' },
+            { threshold: 130, labelEn: 'Markov Chain', labelDE: 'Markov-Kette' },
+            { threshold: 325, labelEn: 'Markov Cascade', labelDE: 'Markov-Kaskade' },
         ]
     },
 
@@ -2367,8 +2367,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'drifterLevelUps',
         tiers: [
             { threshold: 1, labelEn: 'Woof', labelDE: 'Woof' },
-            { threshold: 20, labelEn: 'Alpha Beast', labelDE: 'Alpha-Tier' },
-            { threshold: 50, labelEn: 'Good Boy', labelDE: 'Guter Junge' },
+            { threshold: 26, labelEn: 'Alpha Beast', labelDE: 'Alpha-Tier' },
+            { threshold: 65, labelEn: 'Good Boy', labelDE: 'Guter Junge' },
 
         ]
     },
@@ -2698,10 +2698,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Atlas-Regionen auf ihrer erforderlichen Schwierigkeit ab.',
         stat: 'egAtlasRegions',
         tiers: [
-            { threshold: 5, labelEn: 'Scout', labelDE: 'Kundschafter' },
-            { threshold: 15, labelEn: 'Explorer', labelDE: 'Entdecker' },
-            { threshold: 30, labelEn: 'Pathfinder', labelDE: 'Pfadfinder' },
-            { threshold: 50, labelEn: 'Master Cartographer', labelDE: 'Meisterkartograf' },
+            { threshold: 7, labelEn: 'Scout', labelDE: 'Kundschafter' },
+            { threshold: 20, labelEn: 'Explorer', labelDE: 'Entdecker' },
+            { threshold: 39, labelEn: 'Pathfinder', labelDE: 'Pfadfinder' },
+            { threshold: 65, labelEn: 'Master Cartographer', labelDE: 'Meisterkartograf' },
             { threshold: 86, labelEn: 'Atlas Complete', labelDE: 'Atlas vollständig' },
         ]
     },
@@ -2752,11 +2752,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Endgame-Karten ab.',
         stat: 'egMapsCompleted',
         tiers: [
-            { threshold: 10, labelEn: 'Wayfarer', labelDE: 'Wanderer' },
-            { threshold: 30, labelEn: 'Voyager', labelDE: 'Reisender' },
-            { threshold: 75, labelEn: 'Expedition Leader', labelDE: 'Expeditionsleiter' },
-            { threshold: 150, labelEn: 'Atlas Conqueror', labelDE: 'Atlas-Eroberer' },
-            { threshold: 300, labelEn: 'Endless Cartographer', labelDE: 'Endloser Kartograf' },
+            { threshold: 13, labelEn: 'Wayfarer', labelDE: 'Wanderer' },
+            { threshold: 39, labelEn: 'Voyager', labelDE: 'Reisender' },
+            { threshold: 100, labelEn: 'Expedition Leader', labelDE: 'Expeditionsleiter' },
+            { threshold: 195, labelEn: 'Atlas Conqueror', labelDE: 'Atlas-Eroberer' },
+            { threshold: 400, labelEn: 'Endless Cartographer', labelDE: 'Endloser Kartograf' },
         ]
     },
 
@@ -2772,9 +2772,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'egMapsT16Completed',
         tiers: [
             { threshold: 1, labelEn: 'First T16', labelDE: 'Erste T16' },
-            { threshold: 5, labelEn: 'Pinnacle Grinder', labelDE: 'Gipfel-Schleifer' },
-            { threshold: 15, labelEn: 'Pinnacle Master', labelDE: 'Gipfelmeister' },
-            { threshold: 30, labelEn: 'Pinnacle Overlord', labelDE: 'Gipfel-Overlord' },
+            { threshold: 7, labelEn: 'Pinnacle Grinder', labelDE: 'Gipfel-Schleifer' },
+            { threshold: 20, labelEn: 'Pinnacle Master', labelDE: 'Gipfelmeister' },
+            { threshold: 39, labelEn: 'Pinnacle Overlord', labelDE: 'Gipfel-Overlord' },
         ]
     },
 
@@ -2789,10 +2789,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Karten mit 4 oder mehr Modifikatoren ab.',
         stat: 'egMapsHeavilyModded',
         tiers: [
-            { threshold: 5, labelEn: 'Daredevil', labelDE: 'Draufgänger' },
-            { threshold: 15, labelEn: 'High Roller', labelDE: 'High Roller' },
-            { threshold: 40, labelEn: 'Masochist', labelDE: 'Masochist' },
-            { threshold: 80, labelEn: 'Glutton for Punishment', labelDE: 'Unersättlich' },
+            { threshold: 7, labelEn: 'Daredevil', labelDE: 'Draufgänger' },
+            { threshold: 20, labelEn: 'High Roller', labelDE: 'High Roller' },
+            { threshold: 50, labelEn: 'Masochist', labelDE: 'Masochist' },
+            { threshold: 105, labelEn: 'Glutton for Punishment', labelDE: 'Unersättlich' },
         ]
     },
 
@@ -2807,10 +2807,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Karten mit Elementargefahren ab (Lava, Blizzard, Blitz usw.).',
         stat: 'egMapsHazardCompleted',
         tiers: [
-            { threshold: 5, labelEn: 'Hazard Scout', labelDE: 'Gefahrenkundschafter' },
-            { threshold: 15, labelEn: 'Storm Chaser', labelDE: 'Sturmjäger' },
-            { threshold: 30, labelEn: 'Cataclysm Survivor', labelDE: 'Katastrophen-Überlebender' },
-            { threshold: 60, labelEn: 'Force of Nature', labelDE: 'Naturgewalt' },
+            { threshold: 7, labelEn: 'Hazard Scout', labelDE: 'Gefahrenkundschafter' },
+            { threshold: 20, labelEn: 'Storm Chaser', labelDE: 'Sturmjäger' },
+            { threshold: 39, labelEn: 'Cataclysm Survivor', labelDE: 'Katastrophen-Überlebender' },
+            { threshold: 80, labelEn: 'Force of Nature', labelDE: 'Naturgewalt' },
         ]
     },
 
@@ -2825,10 +2825,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Schließe Karten ohne einen einzigen Fehler ab.',
         stat: 'egMapsFlawless',
         tiers: [
-            { threshold: 5, labelEn: 'Steady Hand', labelDE: 'Ruhige Hand' },
-            { threshold: 15, labelEn: 'Precision Mapping', labelDE: 'Präzise Kartierung' },
-            { threshold: 30, labelEn: 'Immaculate', labelDE: 'Makellos' },
-            { threshold: 50, labelEn: 'Perfection Incarnate', labelDE: 'Perfektion in Person' },
+            { threshold: 7, labelEn: 'Steady Hand', labelDE: 'Ruhige Hand' },
+            { threshold: 20, labelEn: 'Precision Mapping', labelDE: 'Präzise Kartierung' },
+            { threshold: 39, labelEn: 'Immaculate', labelDE: 'Makellos' },
+            { threshold: 65, labelEn: 'Perfection Incarnate', labelDE: 'Perfektion in Person' },
         ]
     },
 
@@ -2843,10 +2843,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Starte Karten durch das Wahrscheinlichkeitstor.',
         stat: 'egMapsLaunched',
         tiers: [
-            { threshold: 10, labelEn: 'First Steps', labelDE: 'Erste Schritte' },
-            { threshold: 30, labelEn: 'Commuter', labelDE: 'Pendler' },
-            { threshold: 75, labelEn: 'Gate Veteran', labelDE: 'Torveteran' },
-            { threshold: 150, labelEn: 'Gate Master', labelDE: 'Tormeister' },
+            { threshold: 13, labelEn: 'First Steps', labelDE: 'Erste Schritte' },
+            { threshold: 39, labelEn: 'Commuter', labelDE: 'Pendler' },
+            { threshold: 100, labelEn: 'Gate Veteran', labelDE: 'Torveteran' },
+            { threshold: 195, labelEn: 'Gate Master', labelDE: 'Tormeister' },
         ]
     },
 
@@ -2862,8 +2862,8 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'egNexusVisits',
         tiers: [
             { threshold: 1, labelEn: 'Arrival', labelDE: 'Ankunft' },
-            { threshold: 10, labelEn: 'Frequent Traveller', labelDE: 'Vielreisender' },
-            { threshold: 30, labelEn: 'Nexus Dweller', labelDE: 'Nexus-Bewohner' },
+            { threshold: 13, labelEn: 'Frequent Traveller', labelDE: 'Vielreisender' },
+            { threshold: 39, labelEn: 'Nexus Dweller', labelDE: 'Nexus-Bewohner' },
         ]
     },
 
@@ -2878,11 +2878,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Besiege Monster.',
         stat: 'egMonstersSlain',
         tiers: [
-            { threshold: 100, labelEn: 'Hunter', labelDE: 'Jäger' },
-            { threshold: 500, labelEn: 'Slayer', labelDE: 'Schlächter' },
-            { threshold: 2000, labelEn: 'Eradicator', labelDE: 'Ausrotter' },
-            { threshold: 5000, labelEn: 'Annihilator', labelDE: 'Vernichter' },
-            { threshold: 10000, labelEn: 'Extinction Event', labelDE: 'Auslöschung' },
+            { threshold: 130, labelEn: 'Hunter', labelDE: 'Jäger' },
+            { threshold: 650, labelEn: 'Slayer', labelDE: 'Schlächter' },
+            { threshold: 2600, labelEn: 'Eradicator', labelDE: 'Ausrotter' },
+            { threshold: 6500, labelEn: 'Annihilator', labelDE: 'Vernichter' },
+            { threshold: 13000, labelEn: 'Extinction Event', labelDE: 'Auslöschung' },
         ]
     },
 
@@ -2897,11 +2897,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Besiege Bosse.',
         stat: 'egBossKills',
         tiers: [
-            { threshold: 5, labelEn: 'Boss Novice', labelDE: 'Boss-Neuling' },
-            { threshold: 20, labelEn: 'Boss Slayer', labelDE: 'Boss-Schlächter' },
-            { threshold: 50, labelEn: 'Demon Slayer', labelDE: 'Dämonenschlächter' },
-            { threshold: 100, labelEn: 'Pinnacle Slayer', labelDE: 'Gipfelschlächter' },
-            { threshold: 250, labelEn: 'God Slayer', labelDE: 'Götterschlächter' },
+            { threshold: 7, labelEn: 'Boss Novice', labelDE: 'Boss-Neuling' },
+            { threshold: 26, labelEn: 'Boss Slayer', labelDE: 'Boss-Schlächter' },
+            { threshold: 65, labelEn: 'Demon Slayer', labelDE: 'Dämonenschlächter' },
+            { threshold: 130, labelEn: 'Pinnacle Slayer', labelDE: 'Gipfelschlächter' },
+            { threshold: 325, labelEn: 'God Slayer', labelDE: 'Götterschlächter' },
         ]
     },
 
@@ -2933,10 +2933,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Sammle Realitätskerne von Monstern.',
         stat: 'egCurrencyLooted',
         tiers: [
-            { threshold: 25, labelEn: 'Collector', labelDE: 'Sammler' },
-            { threshold: 100, labelEn: 'Hoarder', labelDE: 'Horter' },
-            { threshold: 250, labelEn: 'Vault Filler', labelDE: 'Tresorfüller' },
-            { threshold: 500, labelEn: 'Core Tycoon', labelDE: 'Kerntycoon' },
+            { threshold: 33, labelEn: 'Collector', labelDE: 'Sammler' },
+            { threshold: 130, labelEn: 'Hoarder', labelDE: 'Horter' },
+            { threshold: 325, labelEn: 'Vault Filler', labelDE: 'Tresorfüller' },
+            { threshold: 650, labelEn: 'Core Tycoon', labelDE: 'Kerntycoon' },
         ]
     },
 
@@ -2951,10 +2951,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Wende Realitätskerne auf Ausrüstung oder Karten an.',
         stat: 'egCurrencyApplied',
         tiers: [
-            { threshold: 10, labelEn: 'Tinkerer', labelDE: 'Bastler' },
-            { threshold: 50, labelEn: 'Artificer', labelDE: 'Kunsthandwerker' },
-            { threshold: 150, labelEn: 'Transmuter', labelDE: 'Transmutator' },
-            { threshold: 300, labelEn: 'Master Alchemist', labelDE: 'Meisteralchemist' },
+            { threshold: 13, labelEn: 'Tinkerer', labelDE: 'Bastler' },
+            { threshold: 65, labelEn: 'Artificer', labelDE: 'Kunsthandwerker' },
+            { threshold: 195, labelEn: 'Transmuter', labelDE: 'Transmutator' },
+            { threshold: 400, labelEn: 'Master Alchemist', labelDE: 'Meisteralchemist' },
         ]
     },
 
@@ -2971,7 +2971,7 @@ export const ACHIEVEMENT_DEFS = [
         tiers: [
             { threshold: 1, labelEn: 'First Reflection', labelDE: 'Erste Reflexion' },
             { threshold: 3, labelEn: 'Hall of Mirrors', labelDE: 'Spiegelkabinett' },
-            { threshold: 5, labelEn: 'Infinite Regress', labelDE: 'Unendlicher Regress' },
+            { threshold: 7, labelEn: 'Infinite Regress', labelDE: 'Unendlicher Regress' },
         ]
     },
 
@@ -2986,10 +2986,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Sammle Essenzen von Monstern.',
         stat: 'egEssencesLooted',
         tiers: [
-            { threshold: 25, labelEn: 'Gatherer', labelDE: 'Sammler' },
-            { threshold: 100, labelEn: 'Harvester', labelDE: 'Ernter' },
-            { threshold: 250, labelEn: 'Essence Hoarder', labelDE: 'Essenz-Horter' },
-            { threshold: 500, labelEn: 'Essence Overlord', labelDE: 'Essenz-Overlord' },
+            { threshold: 33, labelEn: 'Gatherer', labelDE: 'Sammler' },
+            { threshold: 130, labelEn: 'Harvester', labelDE: 'Ernter' },
+            { threshold: 325, labelEn: 'Essence Hoarder', labelDE: 'Essenz-Horter' },
+            { threshold: 650, labelEn: 'Essence Overlord', labelDE: 'Essenz-Overlord' },
         ]
     },
 
@@ -3004,10 +3004,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Wende Essenzen an, um Ausrüstung neu zu schmieden.',
         stat: 'egEssencesApplied',
         tiers: [
-            { threshold: 5, labelEn: 'First Infusion', labelDE: 'Erste Infusion' },
-            { threshold: 25, labelEn: 'Adept Weaver', labelDE: 'Adeptenweber' },
-            { threshold: 75, labelEn: 'Master Weaver', labelDE: 'Meisterweber' },
-            { threshold: 150, labelEn: 'Essence God', labelDE: 'Essenzgott' },
+            { threshold: 7, labelEn: 'First Infusion', labelDE: 'Erste Infusion' },
+            { threshold: 33, labelEn: 'Adept Weaver', labelDE: 'Adeptenweber' },
+            { threshold: 100, labelEn: 'Master Weaver', labelDE: 'Meisterweber' },
+            { threshold: 195, labelEn: 'Essence God', labelDE: 'Essenzgott' },
         ]
     },
 
@@ -3022,10 +3022,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Fertige Modifikatoren an der Werkbank.',
         stat: 'egBenchCrafts',
         tiers: [
-            { threshold: 5, labelEn: 'Apprentice', labelDE: 'Lehrling' },
-            { threshold: 25, labelEn: 'Journeyman', labelDE: 'Geselle' },
-            { threshold: 75, labelEn: 'Artisan', labelDE: 'Kunsthandwerker' },
-            { threshold: 150, labelEn: 'Grandmaster Smith', labelDE: 'Großmeister-Schmied' },
+            { threshold: 7, labelEn: 'Apprentice', labelDE: 'Lehrling' },
+            { threshold: 33, labelEn: 'Journeyman', labelDE: 'Geselle' },
+            { threshold: 100, labelEn: 'Artisan', labelDE: 'Kunsthandwerker' },
+            { threshold: 195, labelEn: 'Grandmaster Smith', labelDE: 'Großmeister-Schmied' },
         ]
     },
 
@@ -3040,10 +3040,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Sammle epische (lila) Ausrüstung.',
         stat: 'egEpicLooted',
         tiers: [
-            { threshold: 10, labelEn: 'First Epics', labelDE: 'Erste Epik' },
-            { threshold: 40, labelEn: 'Epic Collector', labelDE: 'Epiksammler' },
-            { threshold: 100, labelEn: 'Epic Hoarder', labelDE: 'Epik-Horter' },
-            { threshold: 250, labelEn: 'Drowning in Epics', labelDE: 'Ertrinkt in Epik' },
+            { threshold: 13, labelEn: 'First Epics', labelDE: 'Erste Epik' },
+            { threshold: 50, labelEn: 'Epic Collector', labelDE: 'Epiksammler' },
+            { threshold: 130, labelEn: 'Epic Hoarder', labelDE: 'Epik-Horter' },
+            { threshold: 325, labelEn: 'Drowning in Epics', labelDE: 'Ertrinkt in Epik' },
         ]
     },
 
@@ -3059,9 +3059,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'egSixModLooted',
         tiers: [
             { threshold: 1, labelEn: 'Jackpot', labelDE: 'Jackpot' },
-            { threshold: 5, labelEn: 'High Roller', labelDE: 'High Roller' },
-            { threshold: 15, labelEn: 'God-Tier', labelDE: 'Göttlich' },
-            { threshold: 40, labelEn: 'Mirror-Tier', labelDE: 'Spiegelstufe' },
+            { threshold: 7, labelEn: 'High Roller', labelDE: 'High Roller' },
+            { threshold: 20, labelEn: 'God-Tier', labelDE: 'Göttlich' },
+            { threshold: 50, labelEn: 'Mirror-Tier', labelDE: 'Spiegelstufe' },
         ]
     },
 
@@ -3077,9 +3077,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'egBlessingsUsed',
         tiers: [
             { threshold: 1, labelEn: 'First Blessing', labelDE: 'Erster Segen' },
-            { threshold: 10, labelEn: 'Anointed', labelDE: 'Gesalbt' },
-            { threshold: 30, labelEn: 'Divinely Touched', labelDE: 'Göttlich berührt' },
-            { threshold: 60, labelEn: 'Avatar of Blessing', labelDE: 'Avatar des Segens' },
+            { threshold: 13, labelEn: 'Anointed', labelDE: 'Gesalbt' },
+            { threshold: 39, labelEn: 'Divinely Touched', labelDE: 'Göttlich berührt' },
+            { threshold: 80, labelEn: 'Avatar of Blessing', labelDE: 'Avatar des Segens' },
         ]
     },
 
@@ -3094,10 +3094,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Sammle einzigartige (legendäre) Gegenstände.',
         stat: 'egUniquesCollected',
         tiers: [
-            { threshold: 5, labelEn: 'Curator', labelDE: 'Kurator' },
-            { threshold: 15, labelEn: 'Connoisseur', labelDE: 'Kenner' },
-            { threshold: 30, labelEn: 'Legend Seeker', labelDE: 'Legendensucher' },
-            { threshold: 45, labelEn: 'Vault of Legends', labelDE: 'Tresor der Legenden' },
+            { threshold: 7, labelEn: 'Curator', labelDE: 'Kurator' },
+            { threshold: 20, labelEn: 'Connoisseur', labelDE: 'Kenner' },
+            { threshold: 39, labelEn: 'Legend Seeker', labelDE: 'Legendensucher' },
+            { threshold: 60, labelEn: 'Vault of Legends', labelDE: 'Tresor der Legenden' },
         ]
     },
 
@@ -3131,11 +3131,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Verdiene Gold durch Kartenabschluss-Belohnungen.',
         stat: 'egGoldEarned',
         tiers: [
-            { threshold: 1000, labelEn: 'Pocket Change', labelDE: 'Kleingeld' },
-            { threshold: 5000, labelEn: 'Coin Purse', labelDE: 'Münzbeutel' },
-            { threshold: 20000, labelEn: 'Treasure Chest', labelDE: 'Schatztruhe' },
-            { threshold: 50000, labelEn: 'Dragon Hoard', labelDE: 'Drachenhort' },
-            { threshold: 100000, labelEn: 'Kingdom Wealth', labelDE: 'Königreichsreichtum' },
+            { threshold: 1300, labelEn: 'Pocket Change', labelDE: 'Kleingeld' },
+            { threshold: 6500, labelEn: 'Coin Purse', labelDE: 'Münzbeutel' },
+            { threshold: 26000, labelEn: 'Treasure Chest', labelDE: 'Schatztruhe' },
+            { threshold: 65000, labelEn: 'Dragon Hoard', labelDE: 'Drachenhort' },
+            { threshold: 130000, labelEn: 'Kingdom Wealth', labelDE: 'Königreichsreichtum' },
         ]
     },
 
@@ -3150,10 +3150,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Gib Gold beim Händler und anderswo aus.',
         stat: 'egGoldSpent',
         tiers: [
-            { threshold: 1000, labelEn: 'First Purchase', labelDE: 'Erster Kauf' },
-            { threshold: 5000, labelEn: 'Patron', labelDE: 'Gönner' },
-            { threshold: 20000, labelEn: 'Whale', labelDE: 'Wal' },
-            { threshold: 50000, labelEn: 'Money to Burn', labelDE: 'Geld zum Verbrennen' },
+            { threshold: 1300, labelEn: 'First Purchase', labelDE: 'Erster Kauf' },
+            { threshold: 6500, labelEn: 'Patron', labelDE: 'Gönner' },
+            { threshold: 26000, labelEn: 'Whale', labelDE: 'Wal' },
+            { threshold: 65000, labelEn: 'Money to Burn', labelDE: 'Geld zum Verbrennen' },
         ]
     },
 
@@ -3168,10 +3168,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Kaufe Gegenstände beim Händler.',
         stat: 'egVendorPurchases',
         tiers: [
-            { threshold: 5, labelEn: 'Window Shopper', labelDE: 'Schaufensterbummler' },
-            { threshold: 20, labelEn: 'Regular', labelDE: 'Stammkunde' },
-            { threshold: 50, labelEn: 'VIP', labelDE: 'VIP' },
-            { threshold: 100, labelEn: 'Bazaar Lord', labelDE: 'Basar-Lord' },
+            { threshold: 7, labelEn: 'Window Shopper', labelDE: 'Schaufensterbummler' },
+            { threshold: 26, labelEn: 'Regular', labelDE: 'Stammkunde' },
+            { threshold: 65, labelEn: 'VIP', labelDE: 'VIP' },
+            { threshold: 130, labelEn: 'Bazaar Lord', labelDE: 'Basar-Lord' },
         ]
     },
 
@@ -3186,10 +3186,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Verkaufe Gegenstände für Fragmente (Strg+Klick im Lager).',
         stat: 'egItemsSold',
         tiers: [
-            { threshold: 10, labelEn: 'Scrapper', labelDE: 'Schrotthändler' },
-            { threshold: 50, labelEn: 'Salvage Expert', labelDE: 'Verwertungsexperte' },
-            { threshold: 150, labelEn: 'Recycling Plant', labelDE: 'Recyclinganlage' },
-            { threshold: 300, labelEn: 'Industrial Salvager', labelDE: 'Industrieller Verwerter' },
+            { threshold: 13, labelEn: 'Scrapper', labelDE: 'Schrotthändler' },
+            { threshold: 65, labelEn: 'Salvage Expert', labelDE: 'Verwertungsexperte' },
+            { threshold: 195, labelEn: 'Recycling Plant', labelDE: 'Recyclinganlage' },
+            { threshold: 400, labelEn: 'Industrial Salvager', labelDE: 'Industrieller Verwerter' },
         ]
     },
 
@@ -3204,10 +3204,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Wandle volle Fragmentenstapel in Kerne um.',
         stat: 'egShardsConverted',
         tiers: [
-            { threshold: 10, labelEn: 'First Conversions', labelDE: 'Erste Umwandlungen' },
-            { threshold: 30, labelEn: 'Fragment Weaver', labelDE: 'Fragmentenweber' },
-            { threshold: 75, labelEn: 'Fragment Master', labelDE: 'Fragmentenmeister' },
-            { threshold: 150, labelEn: 'Fragment God', labelDE: 'Fragmentengott' },
+            { threshold: 13, labelEn: 'First Conversions', labelDE: 'Erste Umwandlungen' },
+            { threshold: 39, labelEn: 'Fragment Weaver', labelDE: 'Fragmentenweber' },
+            { threshold: 100, labelEn: 'Fragment Master', labelDE: 'Fragmentenmeister' },
+            { threshold: 195, labelEn: 'Fragment God', labelDE: 'Fragmentengott' },
         ]
     },
 
@@ -3222,10 +3222,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Beantworte Quizfragen während Karten korrekt.',
         stat: 'egQuizCorrect',
         tiers: [
-            { threshold: 10, labelEn: 'Student', labelDE: 'Student' },
-            { threshold: 50, labelEn: 'Scholar', labelDE: 'Gelehrter' },
-            { threshold: 150, labelEn: 'Professor', labelDE: 'Professor' },
-            { threshold: 300, labelEn: 'Sage of the Atlas', labelDE: 'Weiser des Atlas' },
+            { threshold: 13, labelEn: 'Student', labelDE: 'Student' },
+            { threshold: 65, labelEn: 'Scholar', labelDE: 'Gelehrter' },
+            { threshold: 195, labelEn: 'Professor', labelDE: 'Professor' },
+            { threshold: 400, labelEn: 'Sage of the Atlas', labelDE: 'Weiser des Atlas' },
         ]
     },
 
@@ -3240,10 +3240,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Füge Monstern Elementarzustände zu (Entzünden, Kälte, Schock usw.).',
         stat: 'egAilmentsInflicted',
         tiers: [
-            { threshold: 25, labelEn: 'First Ailments', labelDE: 'Erste Leiden' },
-            { threshold: 100, labelEn: 'Afflictor', labelDE: 'Peiniger' },
-            { threshold: 250, labelEn: 'Plague Bringer', labelDE: 'Seuchenbringer' },
-            { threshold: 500, labelEn: 'Master of Maladies', labelDE: 'Meister der Leiden' },
+            { threshold: 33, labelEn: 'First Ailments', labelDE: 'Erste Leiden' },
+            { threshold: 130, labelEn: 'Afflictor', labelDE: 'Peiniger' },
+            { threshold: 325, labelEn: 'Plague Bringer', labelDE: 'Seuchenbringer' },
+            { threshold: 650, labelEn: 'Master of Maladies', labelDE: 'Meister der Leiden' },
         ]
     },
 
@@ -3258,10 +3258,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Lass den Lootfilter Gegenstände automatisch verwerten.',
         stat: 'egLootFilterVendored',
         tiers: [
-            { threshold: 10, labelEn: 'First Filtered', labelDE: 'Erst gefiltert' },
-            { threshold: 50, labelEn: 'Assembly Line', labelDE: 'Fließband' },
-            { threshold: 150, labelEn: 'Automated', labelDE: 'Automatisiert' },
-            { threshold: 300, labelEn: 'Full Automation', labelDE: 'Vollautomatisiert' },
+            { threshold: 13, labelEn: 'First Filtered', labelDE: 'Erst gefiltert' },
+            { threshold: 65, labelEn: 'Assembly Line', labelDE: 'Fließband' },
+            { threshold: 195, labelEn: 'Automated', labelDE: 'Automatisiert' },
+            { threshold: 400, labelEn: 'Full Automation', labelDE: 'Vollautomatisiert' },
         ]
     },
 
@@ -3470,11 +3470,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Lande kritische Treffer.',
         stat: 'combatCrits',
         tiers: [
-            { threshold: 25, labelEn: 'Lucky Strike', labelDE: 'Glückstreffer' },
-            { threshold: 100, labelEn: 'Sharp Eye', labelDE: 'Scharfes Auge' },
-            { threshold: 500, labelEn: 'Crit Machine', labelDE: 'Krit-Maschine' },
-            { threshold: 2000, labelEn: 'Deadly Precision', labelDE: 'Tödliche Präzision' },
-            { threshold: 5000, labelEn: 'Executioner', labelDE: 'Henker' },
+            { threshold: 33, labelEn: 'Lucky Strike', labelDE: 'Glückstreffer' },
+            { threshold: 130, labelEn: 'Sharp Eye', labelDE: 'Scharfes Auge' },
+            { threshold: 650, labelEn: 'Crit Machine', labelDE: 'Krit-Maschine' },
+            { threshold: 2600, labelEn: 'Deadly Precision', labelDE: 'Tödliche Präzision' },
+            { threshold: 6500, labelEn: 'Executioner', labelDE: 'Henker' },
         ]
     },
 
@@ -3488,11 +3488,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Füge Monstern Schaden zu (alle Kämpfe, alle Spielstände).',
         stat: 'combatDamageDealt',
         tiers: [
-            { threshold: 1000, labelEn: 'Scratches', labelDE: 'Kratzer' },
-            { threshold: 10000, labelEn: 'Bruiser', labelDE: 'Raufbold' },
-            { threshold: 100000, labelEn: 'Wrecking Crew', labelDE: 'Abrissbirne' },
-            { threshold: 1000000, labelEn: 'Million Club', labelDE: 'Millionenclub' },
-            { threshold: 5000000, labelEn: 'Calamity', labelDE: 'Katastrophe' },
+            { threshold: 1300, labelEn: 'Scratches', labelDE: 'Kratzer' },
+            { threshold: 13000, labelEn: 'Bruiser', labelDE: 'Raufbold' },
+            { threshold: 130000, labelEn: 'Wrecking Crew', labelDE: 'Abrissbirne' },
+            { threshold: 1300000, labelEn: 'Million Club', labelDE: 'Millionenclub' },
+            { threshold: 6500000, labelEn: 'Calamity', labelDE: 'Katastrophe' },
         ]
     },
 
@@ -3506,11 +3506,11 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Verteile einen einzelnen Treffer mit mindestens so viel Schaden.',
         stat: 'combatBiggestHit',
         tiers: [
-            { threshold: 100, labelEn: 'Solid Hit', labelDE: 'Solider Treffer' },
-            { threshold: 500, labelEn: 'Haymaker', labelDE: 'Hammerschlag' },
-            { threshold: 1500, labelEn: 'Bone Breaker', labelDE: 'Knochenbrecher' },
-            { threshold: 5000, labelEn: 'Wall Crusher', labelDE: 'Mauerbrecher' },
-            { threshold: 15000, labelEn: 'Cataclysm', labelDE: 'Kataklysmus' },
+            { threshold: 130, labelEn: 'Solid Hit', labelDE: 'Solider Treffer' },
+            { threshold: 650, labelEn: 'Haymaker', labelDE: 'Hammerschlag' },
+            { threshold: 1950, labelEn: 'Bone Breaker', labelDE: 'Knochenbrecher' },
+            { threshold: 6500, labelEn: 'Wall Crusher', labelDE: 'Mauerbrecher' },
+            { threshold: 19500, labelEn: 'Cataclysm', labelDE: 'Kataklysmus' },
         ]
     },
 
@@ -3524,10 +3524,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Nimm im Kampf Schaden und kämpfe weiter.',
         stat: 'combatDamageTaken',
         tiers: [
-            { threshold: 500, labelEn: 'Bruised', labelDE: 'Angeschlagen' },
-            { threshold: 5000, labelEn: 'Battle-Scarred', labelDE: 'Kampfnarben' },
-            { threshold: 25000, labelEn: 'Veteran Tank', labelDE: 'Veteranen-Tank' },
-            { threshold: 100000, labelEn: 'Immovable', labelDE: 'Unbeweglich' },
+            { threshold: 650, labelEn: 'Bruised', labelDE: 'Angeschlagen' },
+            { threshold: 6500, labelEn: 'Battle-Scarred', labelDE: 'Kampfnarben' },
+            { threshold: 32500, labelEn: 'Veteran Tank', labelDE: 'Veteranen-Tank' },
+            { threshold: 130000, labelEn: 'Immovable', labelDE: 'Unbeweglich' },
         ]
     },
 
@@ -3541,10 +3541,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Weiche eingehenden Angriffen aus.',
         stat: 'combatDodges',
         tiers: [
-            { threshold: 10, labelEn: 'Nimble', labelDE: 'Flink' },
-            { threshold: 50, labelEn: 'Slippery', labelDE: 'Glitschig' },
-            { threshold: 200, labelEn: 'Shadow Step', labelDE: 'Schattenschritt' },
-            { threshold: 750, labelEn: 'Ghost', labelDE: 'Geist' },
+            { threshold: 13, labelEn: 'Nimble', labelDE: 'Flink' },
+            { threshold: 65, labelEn: 'Slippery', labelDE: 'Glitschig' },
+            { threshold: 250, labelEn: 'Shadow Step', labelDE: 'Schattenschritt' },
+            { threshold: 975, labelEn: 'Ghost', labelDE: 'Geist' },
         ]
     },
 
@@ -3558,10 +3558,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Blocke eingehende Angriffe.',
         stat: 'combatBlocks',
         tiers: [
-            { threshold: 10, labelEn: 'Steady Guard', labelDE: 'Feste Deckung' },
-            { threshold: 50, labelEn: 'Bulwark', labelDE: 'Bollwerk' },
-            { threshold: 200, labelEn: 'Fortress', labelDE: 'Festung' },
-            { threshold: 750, labelEn: 'Unbreakable', labelDE: 'Unzerbrechlich' },
+            { threshold: 13, labelEn: 'Steady Guard', labelDE: 'Feste Deckung' },
+            { threshold: 65, labelEn: 'Bulwark', labelDE: 'Bollwerk' },
+            { threshold: 250, labelEn: 'Fortress', labelDE: 'Festung' },
+            { threshold: 975, labelEn: 'Unbreakable', labelDE: 'Unzerbrechlich' },
         ]
     },
 
@@ -3575,10 +3575,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Pariere eingehende Angriffe.',
         stat: 'combatParries',
         tiers: [
-            { threshold: 5, labelEn: 'Quick Wrist', labelDE: 'Flinke Hand' },
-            { threshold: 25, labelEn: 'Duelist', labelDE: 'Duellant' },
-            { threshold: 100, labelEn: 'Swordmaster', labelDE: 'Schwertmeister' },
-            { threshold: 400, labelEn: 'Flawless Form', labelDE: 'Makellose Form' },
+            { threshold: 7, labelEn: 'Quick Wrist', labelDE: 'Flinke Hand' },
+            { threshold: 33, labelEn: 'Duelist', labelDE: 'Duellant' },
+            { threshold: 130, labelEn: 'Swordmaster', labelDE: 'Schwertmeister' },
+            { threshold: 525, labelEn: 'Flawless Form', labelDE: 'Makellose Form' },
         ]
     },
 
@@ -3592,10 +3592,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Lande Nahkampftreffer.',
         stat: 'combatMeleeHits',
         tiers: [
-            { threshold: 50, labelEn: 'Brawler', labelDE: 'Raufer' },
-            { threshold: 250, labelEn: 'Blademaster', labelDE: 'Klingenmeister' },
-            { threshold: 1000, labelEn: 'Warlord', labelDE: 'Kriegsherr' },
-            { threshold: 4000, labelEn: 'Avatar of War', labelDE: 'Kriegsavatar' },
+            { threshold: 65, labelEn: 'Brawler', labelDE: 'Raufer' },
+            { threshold: 325, labelEn: 'Blademaster', labelDE: 'Klingenmeister' },
+            { threshold: 1300, labelEn: 'Warlord', labelDE: 'Kriegsherr' },
+            { threshold: 5200, labelEn: 'Avatar of War', labelDE: 'Kriegsavatar' },
         ]
     },
 
@@ -3609,10 +3609,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Triff Monster mit Projektilen.',
         stat: 'combatProjectileHits',
         tiers: [
-            { threshold: 50, labelEn: 'Marksman', labelDE: 'Schütze' },
-            { threshold: 250, labelEn: 'Sniper', labelDE: 'Sniper' },
-            { threshold: 1000, labelEn: 'Eagle Eye', labelDE: 'Adlerauge' },
-            { threshold: 4000, labelEn: 'Rain of Arrows', labelDE: 'Pfeilhagel' },
+            { threshold: 65, labelEn: 'Marksman', labelDE: 'Schütze' },
+            { threshold: 325, labelEn: 'Sniper', labelDE: 'Sniper' },
+            { threshold: 1300, labelEn: 'Eagle Eye', labelDE: 'Adlerauge' },
+            { threshold: 5200, labelEn: 'Rain of Arrows', labelDE: 'Pfeilhagel' },
         ]
     },
 
@@ -3626,10 +3626,10 @@ export const ACHIEVEMENT_DEFS = [
         descDE: 'Triff Monster mit Zaubern.',
         stat: 'combatSpellHits',
         tiers: [
-            { threshold: 50, labelEn: 'Apprentice', labelDE: 'Lehrling' },
-            { threshold: 250, labelEn: 'Evoker', labelDE: 'Beschwörer' },
-            { threshold: 1000, labelEn: 'Archmage', labelDE: 'Erzmagier' },
-            { threshold: 4000, labelEn: 'Arcane Storm', labelDE: 'Arkanes Sturm' },
+            { threshold: 65, labelEn: 'Apprentice', labelDE: 'Lehrling' },
+            { threshold: 325, labelEn: 'Evoker', labelDE: 'Beschwörer' },
+            { threshold: 1300, labelEn: 'Archmage', labelDE: 'Erzmagier' },
+            { threshold: 5200, labelEn: 'Arcane Storm', labelDE: 'Arkanes Sturm' },
         ]
     },
 
@@ -3644,9 +3644,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'combatUntouchedWins',
         tiers: [
             { threshold: 1, labelEn: 'Lucky Day', labelDE: 'Glückstag' },
-            { threshold: 5, labelEn: 'Clean Fighter', labelDE: 'Sauberer Kampf' },
-            { threshold: 15, labelEn: 'Dancer', labelDE: 'Tänzer' },
-            { threshold: 40, labelEn: 'Phantom Fighter', labelDE: 'Phantomkämpfer' },
+            { threshold: 7, labelEn: 'Clean Fighter', labelDE: 'Sauberer Kampf' },
+            { threshold: 20, labelEn: 'Dancer', labelDE: 'Tänzer' },
+            { threshold: 50, labelEn: 'Phantom Fighter', labelDE: 'Phantomkämpfer' },
         ]
     },
 
@@ -3661,9 +3661,9 @@ export const ACHIEVEMENT_DEFS = [
         stat: 'combatClutchWins',
         tiers: [
             { threshold: 1, labelEn: 'Close Call', labelDE: 'Knapp' },
-            { threshold: 5, labelEn: 'Nerves of Steel', labelDE: 'Nerven aus Stahl' },
-            { threshold: 15, labelEn: 'Living Dangerously', labelDE: 'Gefährlich gelebt' },
-            { threshold: 40, labelEn: 'Death Defier', labelDE: 'Todesverächter' },
+            { threshold: 7, labelEn: 'Nerves of Steel', labelDE: 'Nerven aus Stahl' },
+            { threshold: 20, labelEn: 'Living Dangerously', labelDE: 'Gefährlich gelebt' },
+            { threshold: 50, labelEn: 'Death Defier', labelDE: 'Todesverächter' },
         ]
     },
 

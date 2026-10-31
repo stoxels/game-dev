@@ -14,20 +14,11 @@ import { SLOT_MOD_TABLE_MAP, _getModTable } from './loot-equipment-mod-tables.js
 //--------------------------CONSTANTS & STATE---------------------------
 //----------------------------------------------------------------------
 
-// Essence stash dimensions - fixed tab with pre-assigned slots
-// (mirrors the Orbs & Shards currency tab). Every essence id has a
-// dedicated cell; hovering an empty cell still shows its essence tooltip.
-// 12 rows × 8 cols = 96 cells → 95 modifier essences + 1 decorative empty.
-export const ESSENCE_ROWS = 12;
+// Essence stash width - a fixed tab with pre-assigned slots (mirrors the
+// Orbs & Shards currency tab). Every essence id has a dedicated cell;
+// hovering an empty cell still shows its essence tooltip. The number of
+// rows follows from the category layout further down.
 export const ESSENCE_COLS = 8;
-
-// Essence stash: 2D grid of stacked essence items (null = empty cell)
-export let _essenceStash = Array.from({ length: ESSENCE_ROWS }, () => Array(ESSENCE_COLS).fill(null));
-
-// The grid is also written from outside this file (drag-and-drop moves
-// cells, hub-save.js swaps the whole grid on load), so it is re-exposed
-// as a live globalThis property whose writes go straight back.
-try { Object.defineProperty(globalThis, '_essenceStash', { get() { return _essenceStash; }, set(v) { _essenceStash = v; }, configurable: true }); } catch (e) {}
 
 
 //----------------------------------------------------------------------
@@ -65,18 +56,57 @@ export const _ESSENCE_ICON_CYCLE = [
     '🔬', '📚', '🎭', '🎨', '🎼', '🎵', '🎶', '🔔', '📯', '⚓', '🧭', '🗺️'
 ];
 
-// Fixed assignment: essence id → {r,c}. Mirrors the Orbs & Shards tab.
-export const ESSENCE_SLOT_MAP = {};
-(function _buildEssenceSlotMap() {
-    let idx = 0;
-    for (const fam of _ESSENCE_FAMILIES) {
-        const id = 'essence_' + fam;
-        const r = Math.floor(idx / ESSENCE_COLS);
-        const c = idx % ESSENCE_COLS;
-        ESSENCE_SLOT_MAP[id] = { r, c };
-        idx++;
+// The groups the essence tab is sorted into, in display order. Each group
+// starts on a fresh row under its own heading. A family missing from every
+// list lands in a trailing "other" group, so a new essence never vanishes.
+export const ESSENCE_CATEGORIES = [
+    { id: 'life_mana', families: ['flat_health', 'inc_health', 'life_regen', 'life_leech', 'life_on_kill', 'flat_mana', 'mana_regen', 'mana_on_kill', 'mana_on_mistake', 'heart_heal', 'inc_heart_heal', 'mana_heal', 'inc_mana_heal', 'healing_power', 'inc_healing_power'] },
+    { id: 'armour', families: ['flat_armour', 'inc_armour', 'block_chance', 'block_recovery', 'spell_block_chance', 'deflect', 'deflect_damage', 'parry', 'warding', 'grounded'] },
+    { id: 'evasion', families: ['flat_evasion', 'inc_evasion', 'dodge', 'preemptive_dodge', 'spell_dodge'] },
+    { id: 'absorption', families: ['flat_absorption', 'inc_absorption', 'absorption_on_kill', 'absorption_regen_rate', 'faster_absorption_regen_start'] },
+    { id: 'hybrid', families: ['hybrid_armour_absorption', 'hybrid_armour_evasion', 'hybrid_evasion_absorption', 'hybrid_evasion_armour', 'hybrid_life_absorption', 'hybrid_life_armour', 'hybrid_life_evasion', 'hybrid_mana_absorption', 'hybrid_mana_armour', 'hybrid_mana_evasion'] },
+    { id: 'resist', families: ['fire_resist', 'cold_resist', 'lightning_resist', 'shadow_resist'] },
+    { id: 'elemental', families: ['fire_damage', 'cold_damage', 'lightning_damage', 'shadow_damage', 'chance_to_ignite', 'chance_to_freeze', 'chance_to_shock', 'chance_to_blind', 'chance_to_convert'] },
+    { id: 'attack', families: ['flat_physical_damage', 'inc_physical_damage', 'attack_speed', 'accuracy', 'crit_chance', 'crit_multiplier', 'cleave', 'chain', 'pierce', 'multishot', 'splash_damage', 'stagger', 'overkill', 'snipe', 'echo', 'precision_damage', 'shield_bash', 'pushback'] },
+    { id: 'spells', families: ['spell_damage', 'inc_spell_damage', 'arcane_surge', 'channel', 'mana_to_damage'] },
+    { id: 'attributes', families: ['strength', 'agility', 'intelligence'] },
+    { id: 'puzzle', families: ['mistake_count', 'mistake_not_count', 'time_added', 'reveal_hint', 'chance_for_new_question', 'first_step', 'focus', 'fate', 'precision_regen', 'movement_speed'] },
+];
+
+// Lays the groups out on the grid: each starts at column 0 of a new row.
+// Returns the essence id → {r,c} map, the first row of every group and the row count.
+function _layoutEssenceCategories() {
+    const placed = new Set(ESSENCE_CATEGORIES.flatMap(cat => cat.families));
+    const leftover = _ESSENCE_FAMILIES.filter(fam => !placed.has(fam));
+    const groups = leftover.length ? [...ESSENCE_CATEGORIES, { id: 'other', families: leftover }] : ESSENCE_CATEGORIES;
+    const slotMap = {};
+    const firstRows = {};
+    let row = 0;
+    for (const cat of groups) {
+        firstRows[row] = cat.id;
+        cat.families.forEach((fam, i) => {
+            slotMap['essence_' + fam] = { r: row + Math.floor(i / ESSENCE_COLS), c: i % ESSENCE_COLS };
+        });
+        row += Math.ceil(cat.families.length / ESSENCE_COLS);
     }
-})();
+    return { slotMap, firstRows, rows: row };
+}
+const _ESSENCE_LAYOUT = _layoutEssenceCategories();
+
+// Rows of the essence tab, and which group heading sits above which row.
+export const ESSENCE_ROWS = _ESSENCE_LAYOUT.rows;
+export const ESSENCE_CATEGORY_FIRST_ROWS = _ESSENCE_LAYOUT.firstRows;
+
+// Essence stash: 2D grid of stacked essence items (null = empty cell)
+export let _essenceStash = Array.from({ length: ESSENCE_ROWS }, () => Array(ESSENCE_COLS).fill(null));
+
+// The grid is also written from outside this file (drag-and-drop moves
+// cells, hub-save.js swaps the whole grid on load), so it is re-exposed
+// as a live globalThis property whose writes go straight back.
+try { Object.defineProperty(globalThis, '_essenceStash', { get() { return _essenceStash; }, set(v) { _essenceStash = v; }, configurable: true }); } catch (e) {}
+
+// Fixed assignment: essence id → {r,c}. Mirrors the Orbs & Shards tab.
+export const ESSENCE_SLOT_MAP = _ESSENCE_LAYOUT.slotMap;
 export const ESSENCE_SLOT_REVERSE = (() => {
     const m = {};
     for (const [id, pos] of Object.entries(ESSENCE_SLOT_MAP)) m[`${pos.r}-${pos.c}`] = id;

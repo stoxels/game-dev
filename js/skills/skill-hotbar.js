@@ -2,7 +2,9 @@ import { Audio_Manager } from '../audio/audio.js';
 import { _abilityHotkeysBlocked, _formatCooldown, _isModalOpen } from '../classes/class-cooldown-state.js';
 import { hideHUDTooltip } from '../classes/class-hud.js';
 import { SKILL_HOTBAR_COLS, SKILL_HOTBAR_SIZE, activateHotbarSlot, canAffordSkill, getHotbarSkill, getSkillCooldownRemaining, getSkillDef, getSkillImage, getSkillName, isSkillUsableNow } from './skill-registry.js';
-import { isSpellbookOpen, renderSpellbook, toggleSpellbook } from './skill-spellbook.js';
+import { getTetherStones, summonAffinityLevel } from './summon-cast.js';
+import { tetherStoneCost } from './summon-spells.js';
+import { isSpellbookOpen,renderSpellbook, toggleSpellbook } from './skill-spellbook.js';
 import { isSkillHoldCast, tryBeginHoldCast } from './spell-casttime.js';
 import { getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellReaction, isUniversalAuraActive } from './universal-spells.js';
 import { LANG } from '../translation/translations.js';
@@ -163,6 +165,9 @@ function _buildHotbarSlotHTML(slotIndex, skillId) {
     const isOnCD = cdRemaining > 0;
     const canAfford = canAffordSkill(skillId);
     const noMana = !canAfford && !isOnCD;
+    // A Summon charm greys out while the Tether Stones to pay for it are missing.
+    const noStones = !!(def.usp && def.usp.behavior === 'summon' && def.usp.summonHero)
+        && getTetherStones() < tetherStoneCost(summonAffinityLevel(def.usp.summonHero));
     const isArmed = (typeof globalThis.activeAbilityMode !== 'undefined') && globalThis.activeAbilityMode
         && STATE.classActiveChoice === def.legacySlot;
     const usableNow = isSkillUsableNow(skillId);
@@ -179,6 +184,7 @@ function _buildHotbarSlotHTML(slotIndex, skillId) {
         isArmed ? 'armed' : '',
         isOnCD ? 'on-cd' : '',
         noMana ? 'no-mana' : '',
+        noStones ? 'no-stones' : '',
         locked ? 'locked' : '',
         holdCast ? 'has-cast' : '',
         isUniversalAuraActive(skillId) ? 'is-toggled' : '',

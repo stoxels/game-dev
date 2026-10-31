@@ -39,6 +39,21 @@ export function _switchStashTab(tab) {
     else _renderInventory();
 }
 
+// When on, the collection grid hides every unique that was never found.
+let _showOnlyCollected = false;
+
+// True while the "only collected" filter is switched on (used to draw the button).
+export function _isUniqueFilterOn() {
+    return _showOnlyCollected;
+}
+
+// Flips the "only collected" filter and redraws the grid.
+export function _toggleUniqueCollectedFilter() {
+    Audio_Manager.playSFX('ui_tab_switch');
+    _showOnlyCollected = !_showOnlyCollected;
+    _renderUniqueStash();
+}
+
 // HTML for the unique collection grid: locked '?' cells, collected cells with
 // a copy count, and collected-but-empty cells.
 export function _buildUniqueGridHTML() {
@@ -48,6 +63,7 @@ export function _buildUniqueGridHTML() {
         const def = UNIQUE_ITEMS[i];
         const uid = def.uniqueId;
         const collected = _isUniqueCollected(uid);
+        if (_showOnlyCollected && !collected) continue;
         const count = _getUniqueCount(uid);
         const items = collected ? (globalThis._uniqueStash[uid] || []) : [];
         const displayName = (LANG === 'de' ? (def.nameDe || def.nameEn) : def.nameEn) || uid;
@@ -83,6 +99,8 @@ export function _renderUniqueStash() {
     if (cntEl) cntEl.textContent = t('eg_uniques_collected').replace('{found}', found).replace('{total}', total);
     const fillEl = document.getElementById('sx-unique-progress-fill');
     if (fillEl) fillEl.style.width = (total ? Math.round(found / total * 100) : 0) + '%';
+    const filterBtn = document.getElementById('sx-unique-filter-btn');
+    if (filterBtn) filterBtn.classList.toggle('active', _showOnlyCollected);
     _updateUniqueTabBadge();
 }
 

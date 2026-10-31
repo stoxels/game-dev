@@ -4,6 +4,7 @@ import { t } from '../translation/translations.js';
 import { _addGold, getGold, spendGold } from './loot-gold.js';
 import { saveHubState } from '../hub/hub.js';
 import { GAME_ART } from '../combat/combat-art.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------CARD HELPERS------------------------------------------
@@ -152,10 +153,21 @@ export function _vendorSetCharmFilter(id) {
     _vendorRefreshTabContent();
 }
 
-// One chip per spell type, with the chosen one highlighted.
+// Spell ids currently in the player's spell slots (charm keys look like "<skillId>#<rank>").
+function _vendorSlottedSkillIds() {
+    const ids = new Set();
+    (STATE.charmSlots || []).forEach(key => {
+        const h = typeof key === 'string' ? key.lastIndexOf('#') : -1;
+        if (h > 0) ids.add(key.slice(0, h));
+    });
+    return ids;
+}
+
+// One chip per spell type, with the chosen one highlighted. The "in my spell
+// slots" chip comes first, before All.
 export function _vendorBuildCharmFilterBarHTML() {
     const chip = (id, label) => `<button type="button" class="sx-vendor-filter-btn${_vendorCharmFilter === id ? ' sx-vendor-filter-btn-on' : ''}" onclick="_vendorSetCharmFilter('${id}')">${label}</button>`;
-    return `<div class="sx-vendor-charm-filters">${chip('all', t('eg_vendor_charm_filter_all'))}${
+    return `<div class="sx-vendor-charm-filters">${chip('slotted', t('eg_vendor_charm_filter_slotted'))}${chip('all', t('eg_vendor_charm_filter_all'))}${
         VENDOR_CHARM_FILTERS.map(f => chip(f.id, t('eg_vendor_charm_filter_' + f.id))).join('')}</div>`;
 }
 
@@ -175,7 +187,9 @@ function _vendorCharmElementRank(id) {
 // chosen chip - unless `ignoreFilter` is set (the all-tabs search).
 export function _vendorFilterCharmIds(ids, ignoreFilter) {
     const filter = ignoreFilter ? null : VENDOR_CHARM_FILTERS.find(f => f.id === _vendorCharmFilter);
-    const kept = filter ? ids.filter(id => filter.test(_vendorUniversalDef(id))) : ids.slice();
+    const slotted = !ignoreFilter && _vendorCharmFilter === 'slotted' ? _vendorSlottedSkillIds() : null;
+    const kept = slotted ? ids.filter(id => slotted.has(id))
+        : filter ? ids.filter(id => filter.test(_vendorUniversalDef(id))) : ids.slice();
     return kept
         .map((id, i) => ({ id, i, rank: _vendorCharmElementRank(id) }))
         .sort((a, b) => a.rank - b.rank || a.i - b.i)

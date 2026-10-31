@@ -244,8 +244,33 @@ function _placeBubble() {
     const r = s.root.getBoundingClientRect();
     const w = _bubble.offsetWidth || 200;
     const h = _bubble.offsetHeight || 50;
-    _bubble.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width * 0.45)) + 'px';
-    _bubble.style.top = Math.max(4, r.top - h - 12) + 'px';
+    const clampX = (x) => Math.max(8, Math.min(window.innerWidth - w - 8, x));
+    const clampY = (y) => Math.max(4, Math.min(window.innerHeight - h - 4, y));
+    // Spots to try, best first: above the friend (with the speech tail), then
+    // beside and below. The first one that keeps the puzzle (grid and clue
+    // numbers) free wins; if none does, the one covering the least.
+    const spots = [
+        { x: clampX(r.left + r.width * 0.45), y: Math.max(4, r.top - h - 12), tail: true },
+        { x: clampX(r.right + 12), y: clampY(r.top), tail: false },
+        { x: clampX(r.left - w - 12), y: clampY(r.top), tail: false },
+        { x: clampX(r.left + r.width * 0.45), y: clampY(r.bottom + 12), tail: false },
+    ];
+    const grid = document.getElementById('ptable');
+    const g = grid ? grid.getBoundingClientRect() : null;
+    const overlap = (p) => {
+        if (!g || !g.width) return 0;
+        const ox = Math.min(p.x + w, g.right) - Math.max(p.x, g.left);
+        const oy = Math.min(p.y + h, g.bottom) - Math.max(p.y, g.top);
+        return ox > 0 && oy > 0 ? ox * oy : 0;
+    };
+    let best = spots[0];
+    for (const p of spots) {
+        if (overlap(p) === 0) { best = p; break; }
+        if (overlap(p) < overlap(best)) best = p;
+    }
+    _bubble.style.left = Math.round(best.x) + 'px';
+    _bubble.style.top = Math.round(best.y) + 'px';
+    _bubble.classList.toggle('no-tail', !best.tail);
 }
 
 // Keeps the bubble glued to the friend (who may be walking) until it fades.

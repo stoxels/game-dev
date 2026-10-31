@@ -58,15 +58,42 @@ export function _eligibleTiers(family, itemLevel) {
 //----------------------------------------------------------------------
 // Picks one tier from an array of tier objects using their .weight field.
 
-export function _pickTier(tiers) {
+// With an itemLevel, high-level items lean towards their better tiers: tiers
+// far below the item level are dropped (see _tiersForLevel) and the rest are
+// made a little rarer the further they sit below it. Without one, the plain
+// table weights apply.
+
+export function _pickTier(tiers, itemLevel) {
     if (!tiers || tiers.length === 0) return null;
-    const total = tiers.reduce((s, t) => s + t.weight, 0);
+    const pickable = itemLevel == null ? tiers : _tiersForLevel(tiers, itemLevel);
+    const weightOf = t => (itemLevel == null ? t.weight : t.weight * _tierDepthFactor(t, itemLevel));
+    const total = pickable.reduce((s, t) => s + weightOf(t), 0);
     let roll = Math.random() * total;
-    for (const tier of tiers) {
-        roll -= tier.weight;
+    for (const tier of pickable) {
+        roll -= weightOf(tier);
         if (roll <= 0) return tier;
     }
-    return tiers[tiers.length - 1];
+    return pickable[pickable.length - 1];
+}
+
+// How many item levels a tier may sit below the item before it stops rolling,
+// and how quickly the remaining low tiers fade (a tier this many levels below
+// the item has half the usual weight).
+const TIER_FLOOR_GAP = 45;
+const TIER_FADE_GAP = 30;
+const TIER_MIN_KEPT = 2;
+
+// Tiers a high-level item can still roll: those within TIER_FLOOR_GAP levels of
+// the item, but always at least the TIER_MIN_KEPT best ones.
+function _tiersForLevel(tiers, itemLevel) {
+    const near = tiers.filter(t => t.ilvl >= itemLevel - TIER_FLOOR_GAP);
+    if (near.length >= Math.min(TIER_MIN_KEPT, tiers.length)) return near;
+    return [...tiers].sort((a, b) => a.tier - b.tier).slice(0, TIER_MIN_KEPT);
+}
+
+// Weight multiplier (1 = unchanged) that shrinks as a tier falls further below the item level.
+function _tierDepthFactor(tier, itemLevel) {
+    return 1 / (1 + Math.max(0, itemLevel - tier.ilvl) / TIER_FADE_GAP);
 }
 
 
@@ -185,7 +212,8 @@ export function _pickModFromPool(pool) {
 // Rolls prefixCount prefixes and suffixCount suffixes from the slot's mod table.
 // Returns an array of resolved mod objects ready to attach to the item.
 
-export function _rollMods(prefixCount, suffixCount, modTable, itemLevel, defenses) {
+// levelBias = false keeps the plain table weights (used for map mods).
+export function _rollMods(prefixCount, suffixCount, modTable, itemLevel, defenses, levelBias = true) {
     const chosen = [];
     const chosenFamilyIds = new Set();
 
@@ -196,7 +224,7 @@ export function _rollMods(prefixCount, suffixCount, modTable, itemLevel, defense
         const entry = _pickModFromPool(pool);
         if (!entry) break;
 
-        const tier = _pickTier(entry.tiers);
+        const tier = _pickTier(entry.tiers, levelBias ? itemLevel : null);
         if (!tier) break;
 
         chosenFamilyIds.add(entry.familyId);
@@ -215,7 +243,7 @@ export function _rollMods(prefixCount, suffixCount, modTable, itemLevel, defense
         const entry = _pickModFromPool(pool);
         if (!entry) break;
 
-        const tier = _pickTier(entry.tiers);
+        const tier = _pickTier(entry.tiers, levelBias ? itemLevel : null);
         if (!tier) break;
 
         chosenFamilyIds.add(entry.familyId);

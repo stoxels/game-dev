@@ -77,7 +77,7 @@ export function _roamSync() {
 // _hideMonsterPanel (encounter over) and safe to call anytime.
 export function _roamTeardown() {
     _roamClearLegacyLayer();
-    _zoneBandAsked = false;
+    _zoneBandAsked = 0;
 }
 
 // No-op kept so any stale rAF handle from a pre-patch session settles.
@@ -191,7 +191,7 @@ const ZONE_OBSTACLE_SELECTORS = ['#inv-panel', '.skill-hotbar', '#zoom-bar', '#h
 
 let _zoneLayoutTimer = null;
 let _zoneLayoutSig = '';
-let _zoneBandAsked = false;     // the grid was already shrunk once this encounter to make room
+let _zoneBandAsked = 0;         // cell count of the grid that was already shrunk to make room (0 = none yet)
 
 function _zoneRect(el, pad) {
     if (!el) return null;
@@ -374,8 +374,11 @@ export function _layoutSpawnZones(opts) {
     // A grid that fills the whole screen leaves no room for any card: shrink it
     // a little (once per encounter) so a band above it can hold them.
     const totalCap = Object.values(ZONE_REGIONS).reduce((n, z) => n + (Number(document.getElementById(z).dataset.egCap) || 0), 0);
-    if (totalCap < ZONE_MIN_SLOTS && !_zoneBandAsked) {
-        _zoneBandAsked = true;
+    // The ask is remembered per puzzle size, so each new arena grid in a chain
+    // (e.g. the wide boss arena) gets its own chance to make room.
+    const gridKey = document.querySelectorAll('#ptable [id^="g-"]').length;
+    if (totalCap < ZONE_MIN_SLOTS && _zoneBandAsked !== gridKey) {
+        _zoneBandAsked = gridKey;
         const band = Math.min(210, ZONE_EDGE + Math.round(refArt * 0.8) + ZONE_CARD_PAD_H + ZONE_GAP + 6);
         setPuzzleMonsterRoom(true, band);
         _zoneLayoutSig = '';        // measure again on the next tick, the grid just moved
@@ -390,7 +393,12 @@ export function _layoutSpawnZones(opts) {
         if (!ours) return;
         const here = m.zoneId === ZONE_FALLBACK ? null : document.getElementById(m.zoneId);
         if (here && Number(here.dataset.egCap) > 0) return;
-        if (!usable.length) return;
+        // No zone has room: park the card in the bottom-right dock rather than
+        // leaving it inside a switched-off (display:none) panel, where it is invisible.
+        if (!usable.length) {
+            if (m.zoneId !== ZONE_FALLBACK) { m.zoneId = ZONE_FALLBACK; moved = true; }
+            return;
+        }
         const to = _pickRoomyZone(m.zoneId, m.id);
         if (to && to !== m.zoneId) { m.zoneId = to; moved = true; }
     });

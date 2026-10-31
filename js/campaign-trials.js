@@ -321,9 +321,9 @@ function _showTrialIntro(wi, kind, info, onBegin) {
     <div class="reset-note-banner"><p class="ti-rules">${esc(tx.rules(Math.round(info.timeLimitSecs / 60), info.maxMistakes))}</p></div>
     <div class="ti-reward"><span class="ti-reward-text">${esc(rewardText)}</span></div>
     <div class="reset-footer">
-        <button class="reset-btn" id="ti-back">${esc(tx.back)}</button>
-        <div class="reset-portal-deco"></div>
         <button class="reset-btn reset-btn-confirm" id="ti-go">${esc(tx.begin)}</button>
+        <div class="reset-portal-deco"></div>
+        <button class="reset-btn" id="ti-back">${esc(tx.back)}</button>
     </div>
 </div>`;
     document.body.appendChild(el);
@@ -398,7 +398,8 @@ export function _launchTrialRun(wi, kind, opts) {
         requiredQuestions: chain.requiredQuestions,
         chainTimeLimit: 1200,
         chainMaxMistakes: 10,
-        puzzlePool: { generated: true, genMode: 'mixed', genTier: 1, maxCells: _trialMaxCells(wi, kind) },
+        // chainSeed: a trial always hands out the same puzzles (same world and kind = same seed).
+        puzzlePool: { generated: true, genMode: 'mixed', genTier: 1, maxCells: _trialMaxCells(wi, kind), chainSeed: 0x7141a100 + wi * 211 + (kind === 'ascension' ? 97 : 0) },
     };
 
     let gi = null;

@@ -5,6 +5,7 @@ import { summonCompanionBot } from '../companion-bot/companion-bot.js';
 import { getAffinityLevel } from '../storyline/companion-affinity.js';
 import { COMPANION_CAST } from '../storyline/companion-scenes.js';
 import { grantCharm } from './skill-charms.js';
+import { renderSkillHotbar } from './skill-hotbar.js';
 import { SUMMON_HEROES, TETHER_STONE_DROP_CHANCE, summonSpellId, tetherStoneCost } from './summon-spells.js';
 
 //------------------------------------------------------------------------
@@ -66,10 +67,11 @@ export function castSummonSpell(spell) {
             `${name} braucht ${cost} Bindungssteine (du hast ${getTetherStones()}).`), '#ff8a65');
         return false;
     }
-    if (!summonCompanionBot(hero)) return false;
+    if (!summonCompanionBot(hero, { timed: true })) return false;
     STATE.tetherStones = getTetherStones() - cost;
     cur._summonUsed = true;
     save();
+    renderSkillHotbar();
     showToast(_say(`${name} joins you! (Affinity ${summonAffinityLevel(hero)})`, `${name} schließt sich dir an! (Verbundenheit ${summonAffinityLevel(hero)})`), '#7fe0b0');
     return true;
 }
@@ -93,6 +95,7 @@ export function rollTetherStoneDrop(isBoss) {
     if (!isBoss && Math.random() >= TETHER_STONE_DROP_CHANCE) return false;
     STATE.tetherStones = getTetherStones() + 1;
     save();
+    renderSkillHotbar();
     showToast(_say('Tether Stone found!', 'Bindungsstein gefunden!'), '#ffd93d');
     return true;
 }

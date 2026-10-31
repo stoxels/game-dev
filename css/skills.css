@@ -1784,3 +1784,7 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box { /* neutralized - see s
 .sx-buff-endurance { border-color: #ff9b2f; }
 .sx-buff-power { border-color: #5aa2ff; }
 .sx-buff-frenzy { border-color: #4ade80; }
+
+/* Summon charm without enough Tether Stones: greyed out */
+.skill-hotbar-slot.no-stones { filter: grayscale(1); opacity: .5; }
+.skill-hotbar-slot.no-stones .skill-hotbar-icon { opacity: .55; }

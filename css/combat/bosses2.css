@@ -2355,11 +2355,7 @@ body.sx-firefly-drag-cursor, body.sx-firefly-drag-cursor * { cursor: grabbing !i
     animation: sx-nk-spin 1.1s linear infinite;
 }
 
-/* Dreadnought shells + searchlight */
-.sx-nk-shell {
-    width: 28px; height: 28px; font-size: 1.2rem;
-    filter: drop-shadow(0 0 10px rgba(248, 113, 113, 0.95));
-}
+/* Dreadnought searchlight (lane / port / shell styles are with the other boss blocks at the end) */
 .sx-nk-searchlight {
     position: fixed; left: 0; top: 0;
     pointer-events: none; z-index: 9001;
@@ -2386,11 +2382,7 @@ div.sx-nk-pillar.sx-nk-pillar-holy {
     animation: sx-nk-wiggle 0.45s ease-in-out infinite alternate;
 }
 
-/* Zenith crown rings */
-.sx-nk-ring-crown {
-    border-color: rgba(250, 204, 21, 0.95) !important;
-    box-shadow: 0 0 34px rgba(250, 204, 21, 0.9), inset 0 0 40px rgba(250,204,21,0.3) !important;
-}
+/* Zenith crown rings, crown and exile decrees are with the other boss blocks at the end. */
 
 
 
@@ -12983,3 +12975,154 @@ body.sx-shp-flash::after {
     animation: sx-exe-slam 0.14s ease-in forwards, sx-wvr-fade 0.25s ease-out 0.13s forwards;
 }
 @keyframes sx-exe-slam { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+
+
+/* THE DREADNOUGHT: marked lanes with a gun port at the muzzle end and a racing shell; the creeping searchlight. */
+.sx-nk-fin-dre { --nk-fin: #fb923c; }
+.sx-dre-lane { position: fixed; top: 0; left: 0; width: 100vw; z-index: 8999; pointer-events: none; box-sizing: border-box; }
+.sx-dre-lane-warn {
+    border-top: 3px dashed rgba(251, 146, 60, 0.95); border-bottom: 3px dashed rgba(251, 146, 60, 0.95);
+    background: repeating-linear-gradient(45deg, rgba(251, 146, 60, 0.16) 0 16px, rgba(124, 45, 18, 0.24) 16px 32px);
+    animation: sx-nk-warn-pulse 0.3s ease-in-out infinite alternate;
+}
+.sx-dre-lane-live {
+    border-top: 3px solid rgba(239, 68, 68, 0.9); border-bottom: 3px solid rgba(239, 68, 68, 0.9);
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.1), rgba(251, 146, 60, 0.22), rgba(239, 68, 68, 0.1));
+}
+.sx-dre-port {
+    position: fixed; top: 0; left: 0; width: 46px; height: 46px; z-index: 9002; pointer-events: none; border-radius: 50%; box-sizing: border-box;
+    background: radial-gradient(circle at 40% 35%, #94a3b8 0 25%, #334155 45%, #0f172a 70%); border: 3px solid #1e293b;
+}
+.sx-dre-port-warn { box-shadow: 0 0 18px rgba(251, 146, 60, 0.95), inset 0 0 8px rgba(251, 146, 60, 0.9); animation: sx-nk-warn-pulse 0.25s ease-in-out infinite alternate; }
+.sx-dre-port-fire { box-shadow: 0 0 36px rgba(254, 240, 138, 1), 0 0 70px rgba(239, 68, 68, 0.95), inset 0 0 14px #fff; }
+.sx-dre-shell {
+    position: fixed; top: 0; left: 0; width: 106px; z-index: 9002; pointer-events: none; box-sizing: border-box;
+    border-radius: 12px 70px 70px 12px / 12px 50% 50% 12px;
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0) 0, rgba(251, 146, 60, 0.85) 40%, #fef08a 80%, #fff 100%);
+    box-shadow: 0 0 34px rgba(251, 146, 60, 0.95);
+}
+.sx-dre-shell-left {
+    border-radius: 70px 12px 12px 70px / 50% 12px 12px 50%;
+    background: linear-gradient(270deg, rgba(239, 68, 68, 0) 0, rgba(251, 146, 60, 0.85) 40%, #fef08a 80%, #fff 100%);
+}
+.sx-dre-lamp-lock {
+    border-color: rgba(239, 68, 68, 0.98);
+    background: radial-gradient(circle, rgba(254, 202, 202, 0.4), rgba(239, 68, 68, 0.42) 60%, rgba(127, 29, 29, 0.35) 72%);
+    box-shadow: 0 0 34px rgba(239, 68, 68, 0.95);
+    animation: sx-nk-warn-pulse 0.15s ease-in-out infinite alternate;
+}
+.sx-dre-lamp-boom {
+    border-color: #fff;
+    background: radial-gradient(circle, #fff, rgba(254, 240, 138, 0.95) 45%, rgba(239, 68, 68, 0.8) 75%);
+    box-shadow: 0 0 60px rgba(254, 240, 138, 1);
+    animation: sx-wvr-fade 0.4s ease-out forwards;
+}
+
+/* THE ZENITH: crown, rings with a gap, and the exile decrees. */
+.sx-nk-fin-zen { --nk-fin: #facc15; }
+.sx-zen-crown {
+    position: fixed; top: 0; left: 0; width: 68px; height: 68px; z-index: 9002; pointer-events: none;
+    display: flex; align-items: center; justify-content: center; font-size: 3rem;
+    filter: drop-shadow(0 0 14px rgba(250, 204, 21, 1)) drop-shadow(0 0 30px rgba(245, 158, 11, 0.8));
+    animation: sx-nk-warn-pulse 0.4s ease-in-out infinite alternate;
+}
+.sx-zen-ring {
+    position: fixed; top: 0; left: 0; z-index: 9001; pointer-events: none; box-sizing: border-box; border-radius: 50%;
+    border: 34px solid rgba(250, 204, 21, 0.72);
+    box-shadow: inset 0 0 22px rgba(245, 158, 11, 0.95), inset 0 0 6px #fff;
+    -webkit-mask-image: conic-gradient(from var(--gap-from, 0deg), transparent 0 var(--gap-deg, 60deg), #000 0);
+    mask-image: conic-gradient(from var(--gap-from, 0deg), transparent 0 var(--gap-deg, 60deg), #000 0);
+}
+.sx-zen-exile {
+    position: fixed; z-index: 8998; pointer-events: none; box-sizing: border-box;
+    background: rgba(185, 28, 28, 0.4); border: 4px dashed rgba(250, 204, 21, 0.95);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    animation: sx-nk-warn-pulse 0.35s ease-in-out infinite alternate;
+}
+.sx-zen-exile-text {
+    font-family: var(--PX, monospace); font-size: clamp(18px, 3vw, 40px); letter-spacing: 0.2em; color: #fecaca;
+    text-shadow: 0 0 18px rgba(239, 68, 68, 1), 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+.sx-zen-exile-count {
+    font-family: var(--PX, monospace); font-size: clamp(26px, 4.4vw, 60px); color: #fde68a;
+    text-shadow: 0 0 18px rgba(250, 204, 21, 1), 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+.sx-zen-exile-strike { animation: sx-wvr-fade 0.45s ease-out forwards; background: rgba(254, 240, 138, 0.55); }
+.sx-zen-exile-hit { animation: sx-wvr-fade 0.45s ease-out forwards; background: rgba(239, 68, 68, 0.7); }
+
+
+/* THE EXARCH: the burning outside of the safe circle, its drift target, ember circles. */
+.sx-nk-fin-exa { --nk-fin: #fdba74; }
+.sx-nk-fin-arb { --nk-fin: #c4b5fd; }
+.sx-exa-zone { position: fixed; inset: 0; z-index: 8998; pointer-events: none; }
+.sx-exa-flare { box-shadow: 0 0 60px rgba(254, 240, 138, 1), inset 0 0 60px rgba(251, 146, 60, 0.7) !important; border-color: #fef08a !important; }
+.sx-exa-target {
+    position: fixed; width: 68px; height: 68px; z-index: 9001; pointer-events: none; box-sizing: border-box; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 2rem;
+    border: 3px dashed rgba(253, 186, 116, 0.95); background: rgba(251, 146, 60, 0.18);
+    animation: sx-nk-warn-pulse 0.4s ease-in-out infinite alternate;
+}
+.sx-exa-ember {
+    position: fixed; z-index: 8999; pointer-events: none; box-sizing: border-box; border-radius: 50%;
+    border: 4px dashed rgba(251, 146, 60, 0.95);
+    background: radial-gradient(circle, rgba(251, 146, 60, 0.12), rgba(239, 68, 68, 0.3));
+    animation: sx-nk-warn-pulse 0.3s ease-in-out infinite alternate;
+}
+.sx-exa-ember-boom {
+    border-style: solid; border-color: #fff;
+    background: radial-gradient(circle, #fff, rgba(254, 240, 138, 0.95) 40%, rgba(239, 68, 68, 0.75) 75%);
+    box-shadow: 0 0 50px rgba(254, 240, 138, 1);
+    animation: sx-wvr-fade 0.4s ease-out forwards;
+}
+
+/* Soul Tithe: fill progress on the shielded boss, and a green pulse when the shield drops */
+.sx-tithe-badge {
+    position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%);
+    z-index: 5; white-space: nowrap; pointer-events: none;
+    padding: 1px 8px; border-radius: 10px;
+    font-size: 0.8rem; font-weight: 800; color: #0c4a6e;
+    background: linear-gradient(180deg, #e0f2fe, #7dd3fc);
+    border: 2px solid #bae6fd;
+    box-shadow: 0 0 10px rgba(125, 211, 252, 0.9);
+}
+.sx-nk-vulnerable {
+    outline: 3px solid rgba(74, 222, 128, 0.95) !important;
+    outline-offset: 3px;
+    box-shadow: 0 0 26px rgba(74, 222, 128, 0.95) !important;
+    position: relative;
+    animation: sx-nk-vuln-pulse 0.45s ease-in-out 4 alternate;
+}
+.sx-nk-vulnerable::after {
+    content: '\1F4A5';
+    position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+    white-space: nowrap; font-size: 0.85rem; font-weight: 800; color: #4ade80;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.9); pointer-events: none;
+}
+@keyframes sx-nk-vuln-pulse {
+    from { filter: brightness(1); }
+    to   { filter: brightness(1.45); }
+}
+
+/* Boss shield dome: drawn over the art, above the gold targeting frame */
+.sx-shield-dome {
+    position: absolute; inset: -8px; z-index: 8;
+    border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.6), rgba(125, 211, 252, 0.34) 42%, rgba(14, 165, 233, 0.6) 100%);
+    border: 4px solid #e0f2fe;
+    box-shadow: 0 0 30px 8px rgba(56, 189, 248, 0.95), inset 0 0 30px rgba(186, 230, 253, 0.95);
+    animation: sx-shield-dome-pulse 0.9s ease-in-out infinite alternate;
+}
+.sx-shield-dome::after {
+    content: '\1F6E1\FE0F';
+    position: absolute; top: -26px; left: 50%; transform: translateX(-50%);
+    font-size: 2rem; line-height: 1;
+    filter: drop-shadow(0 0 8px rgba(56, 189, 248, 1));
+}
+.sx-emoji-wrapper.sx-shielded-wrap,
+.sx-emoji-wrapper.sx-boss-emoji-wrapper.sx-shielded-wrap.sx-compact-targeted {
+    border-color: #7dd3fc !important;
+}
+@keyframes sx-shield-dome-pulse {
+    from { opacity: 0.8; transform: scale(0.97); }
+    to   { opacity: 1;   transform: scale(1.04); }
+}

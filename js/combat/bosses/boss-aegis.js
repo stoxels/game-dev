@@ -28,8 +28,8 @@ Object.assign(BOSS_MECHANICS, {
     boss_aegis: {
         phases: [
             { threshold: 1.00, chargeMax: 14, damageMultiplier: 1.00 },
-            { threshold: 0.60, chargeMax: 10, damageMultiplier: 1.45 },
-            { threshold: 0.30, chargeMax: 7, damageMultiplier: 1.90 },
+            { threshold: 0.60, chargeMax: 12, damageMultiplier: 1.25 },
+            { threshold: 0.30, chargeMax: 10, damageMultiplier: 1.50 },
         ],
         immunityDuration: 2500,
         mechanics: [

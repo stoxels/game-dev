@@ -186,9 +186,16 @@ export function _buildMonsterCardHTML(m) {
     const bossCls = m.isBoss ? ' sx-boss-card' : '';
     const targetedCls = isTarget ? ' sx-card-targeted' : '';
     const traitCls = m.gauntletTrait ? ` ga-trait-${m.gauntletTrait}` : '';
+    // Boss shield (redrawn each time the card is rebuilt): glow, dome over the art, tithe progress.
+    const shielded = !!(m.soulTithe || m.aegisUp || m._phaseShield);
+    const shieldCls = shielded ? ' sx-nk-shielded' : '';
+    const shieldDome = shielded ? '<span class="sx-shield-dome"></span>' : '';
+    const vulnCls = (m._vulnUntil && Date.now() < m._vulnUntil) ? ' sx-nk-vulnerable' : '';
+    const titheBadge = m.soulTithe ? `<span class="sx-tithe-badge">🛡️ ${m.soulTithe.have}/${m.soulTithe.need}</span>` : '';
 
     return `
-    <div class="sx-monster-card-compact${bossCls}${targetedCls}${traitCls}" id="sx-card-${m.id}" onclick="_selectTarget('${m.id}')" style="--sx-art:${m.artScale || 1}">
+    <div class="sx-monster-card-compact${bossCls}${targetedCls}${traitCls}${shieldCls}${vulnCls}" id="sx-card-${m.id}" onclick="_selectTarget('${m.id}')" style="--sx-art:${m.artScale || 1}">
+        ${titheBadge}
         <!-- Bars stacked top-to-bottom: Charge bar then HP bar above the icon -->
         <div class="sx-compact-bars">
             <div class="sx-charge-track-compact">
@@ -203,7 +210,8 @@ export function _buildMonsterCardHTML(m) {
         <div class="sx-status-strip" id="sx-status-${m.id}"></div>
 
         <!-- Emoji icon with level badge and hover tooltip -->
-        <div class="sx-emoji-wrapper${m.isBoss ? ' sx-boss-emoji-wrapper' : ''}${((m.enrageStacks || 0) > 0 || m.enraged) ? ' sx-boss-enraged' : ''} ${isTarget ? 'sx-compact-targeted' : ''}">
+        <div class="sx-emoji-wrapper${m.isBoss ? ' sx-boss-emoji-wrapper' : ''}${((m.enrageStacks || 0) > 0 || m.enraged) ? ' sx-boss-enraged' : ''} ${isTarget ? 'sx-compact-targeted' : ''}${shielded ? ' sx-shielded-wrap' : ''}">
+            ${shieldDome}
             ${m.isBoss ? '<span class="sx-boss-crown">👑</span><span class="sx-boss-rage-fire"></span><span class="sx-boss-rage-badge">😡</span>' : ''}
             <span class="sx-monster-emoji-compact${m.isBoss ? ' sx-boss-emoji' : ''}">${GAME_ART.html('monster', m.artId || m.baseId, m.emoji, true)}</span>
             <span class="sx-level-bottom-left">${m.level}</span>

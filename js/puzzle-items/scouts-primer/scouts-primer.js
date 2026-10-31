@@ -494,9 +494,9 @@ function _primerHandleTutorFailure(fb) {
 }
 
 // Shows or hides the Tutor chip on the top-left corner gem. Mirrors the quiz
-// modal: corner chip with 🎓 (📚 + unlimited uses when the super-tutor modifier
-// is active), and the item-count detail lives in the hover tooltip, not the
-// chip label.
+// modal: corner chip with 🎓 (the Professor's portrait + unlimited uses when
+// the super-tutor modifier is active), and the item-count detail lives in the
+// hover tooltip, not the chip label.
 function _primerRefreshTutorButton() {
     const btn = document.getElementById('primer-tutor-btn');
     if (!btn) return;
@@ -507,7 +507,10 @@ function _primerRefreshTutorButton() {
 
     if (canUseTutor && (superTutorEnabled || tutorCount > 0)) {
         btn.style.display = 'flex';
-        btn.textContent = superTutorEnabled ? '📚' : '🎓';
+        // Super Tutor shows the Professor's portrait on the bigger chip, like the quiz.
+        btn.classList.toggle('qr-corner--prof', superTutorEnabled);
+        if (superTutorEnabled) btn.innerHTML = '<img src="images/Tutorial/Professor.webp" alt="" draggable="false">';
+        else btn.textContent = '🎓';
         btn.dataset.tipT = superTutorEnabled ? 'qz_super_tutor' : 'qz_ask_tutor';
         btn.dataset.tipN = superTutorEnabled ? '' : tutorCount;
     } else {

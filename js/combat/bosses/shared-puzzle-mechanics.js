@@ -600,8 +600,19 @@ export function _titheDrop(monster) {
     clearTimeout(monster.soulTithe.decayTimer);
     monster.soulTithe = null;
     monster.bossImmune = false;
+    // Brief green "now vulnerable" pulse on the card so the player sees the
+    // boss can be hit again (the panel redraw keeps it for its short life).
+    monster._vulnUntil = Date.now() + 1800;
     const card = document.getElementById('sx-card-' + monster.id);
-    if (card) card.classList.remove('sx-nk-shielded');
+    if (card) {
+        card.classList.remove('sx-nk-shielded');
+        card.classList.add('sx-nk-vulnerable');
+        card.querySelector('.sx-tithe-badge')?.remove();
+        setTimeout(() => {
+            const c2 = document.getElementById('sx-card-' + monster.id);
+            if (c2) c2.classList.remove('sx-nk-vulnerable');
+        }, 1800);
+    }
 }
 
 // Boss mechanic handler - phase variants:

@@ -32,7 +32,7 @@ export function _rollGuaranteedMod(modTable, preferredFamilies, itemLevel, defen
             if (!_familyAllowedOnBase(familyId, defenses)) continue;
             const tiers = _eligibleTiers(family, itemLevel);
             if (!tiers || tiers.length === 0) continue;
-            const tier = _pickTier(tiers);
+            const tier = _pickTier(tiers, itemLevel);
             if (!tier) continue;
             return {
                 familyId,
@@ -93,7 +93,7 @@ export function _applyEssenceCraft(item, def) {
         const sec = options[Math.floor(Math.random() * options.length)];
         const entry = _pickModFromPool(sec.pool);
         if (!entry) break;
-        const tier = _pickTier(entry.tiers);
+        const tier = _pickTier(entry.tiers, itemLevel);
         if (!tier) break;
         chosenFamilyIds.add(entry.familyId);
         if (sec.type === 'prefix') preCount++; else sufCount++;

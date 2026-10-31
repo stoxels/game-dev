@@ -498,6 +498,7 @@ const RIGS = {
         mechanics: {
             constriction: { anim: 'exa_constrict', ms: () => 2400 },
             prior_bomb: { anim: 'exa_bomb', ms: () => 1900 },
+            ember_rain: { anim: 'exa_bomb', ms: () => 1900 },
         },
     },
     // <<< rig boss_exarch

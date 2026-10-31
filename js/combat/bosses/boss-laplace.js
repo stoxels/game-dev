@@ -1,5 +1,6 @@
 import { _damageTargetById } from '../encounter-monster-damage.js';
 import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _teleportAvatarTo } from './boss-wormhole.js';
 import { _nkAbilityHitToast, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkRuns, _nkToast, _ptSegDist } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
@@ -35,8 +36,8 @@ Object.assign(BOSS_MECHANICS, {
     boss_laplace: {
         phases: [
             { threshold: 1.00, chargeMax: 11, damageMultiplier: 1.00 },
-            { threshold: 0.60, chargeMax: 8, damageMultiplier: 1.55 },
-            { threshold: 0.30, chargeMax: 5, damageMultiplier: 2.10 },
+            { threshold: 0.60, chargeMax: 10, damageMultiplier: 1.25 },
+            { threshold: 0.30, chargeMax: 9, damageMultiplier: 1.50 },
         ],
         immunityDuration: 2500,
         mechanics: [
@@ -56,7 +57,7 @@ export const LAP_LANCE_SPEED  = 640;    // px/s along its path
 export const LAP_LANCE_HIT    = 0.16;   // %maxHP caught in the corridor
 export const LAP_LANCE_END    = 0.14;   // %maxHP endpoint pin-blast (R120)
 export const LAP_GHOST_LEAD   = 3000;   // ms the ghost runs ahead of the real lance
-export const LAP_BRANCH_HIT   = 0.10;   // %maxHP true-future detonation (R90)
+export const LAP_BRANCH_HIT   = 0.14;   // %maxHP true-future detonation (R90)
 export const LAP_GHOST_FORM   = 2000;   // ms of ghost-form from a fake future
 export const LAP_FRAY_RECALL  = 6;      // s of movement the clone replays
 export const LAP_FRAY_CD_MS   = 9000;   // between player-swaps
@@ -189,6 +190,8 @@ export function _lapRealLance(run, ax, ay, bx, by, travelMs, level) {
         const y = ay + (by - ay) * f;
         head.style.left = Math.round(x - 16) + 'px';
         head.style.top = Math.round(y - 16) + 'px';
+        // The lit corridor grows with the head: it is lit exactly where it hurts.
+        corridor.style.width = Math.max(1, Math.round(Math.hypot(bx - ax, by - ay) * f)) + 'px';
         // Corridor damage: within the width AND behind the head.
         const pc = _lapPC();
         const behind = ((pc.x - ax) * (bx - ax) + (pc.y - ay) * (by - ay)) /
@@ -398,14 +401,11 @@ export function _mechLapFray(monster, phase) {
             const pastT = Math.max(t0, recT - 2000 * _LAP_DEBUG_MULT);
             let p = buf[0];
             for (const q of buf) { if (q.t <= pastT) p = q; else break; }
-            const el = document.getElementById('player-avatar-wrapper')
-                || document.getElementById('player-avatar-simple');
-            if (el) {
-                el.style.left = Math.round(p.x) + 'px';
-                el.style.top = Math.round(p.y) + 'px';
-                document.body.classList.add('sx-lap-dizzy');
-                setTimeout(() => { try { document.body.classList.remove('sx-lap-dizzy'); } catch (e) {} }, 600);
-            }
+            // Through the game's own mover - writing left/top directly is ignored
+            // (or snapped back) because the avatar's position lives in its move state.
+            _teleportAvatarTo(p.x, p.y);
+            document.body.classList.add('sx-lap-dizzy');
+            setTimeout(() => { try { document.body.classList.remove('sx-lap-dizzy'); } catch (e) {} }, 600);
             _nkToast('eg_mech_lap_swap', '👁️ Your past replaced your present - disoriented!', '#f0abfc');
             return false;
         }

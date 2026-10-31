@@ -821,6 +821,29 @@
 }
 
 
+/* ── Equipment / map drop ring ───────────────────────────────────────────── */
+/*
+   A dark plate with a rarity-coloured rim behind equipment and map drops, so
+   they stay easy to spot on big grids where the cells (and the art) are small.
+   Sizes are in em, so the ring scales with the cell like the icon does.
+*/
+.sx-loot-overlay {
+    --loot-ring: #b0b0b0;
+    box-sizing: content-box;
+    padding: 0.14em;
+    border: 0.09em solid var(--loot-ring);
+    border-radius: 0.3em;
+    background: rgba(8, 6, 14, 0.72);
+}
+.sx-loot-overlay.sx-pickup-rarity-uncommon { --loot-ring: #2ecc71; }
+.sx-loot-overlay.sx-pickup-rarity-rare { --loot-ring: #3498db; }
+.sx-loot-overlay.sx-pickup-rarity-epic { --loot-ring: #9b59b6; }
+.sx-loot-overlay.sx-pickup-rarity-legendary { --loot-ring: #f5b642; }
+.sx-loot-overlay.sx-pickup-rarity-cursed { --loot-ring: #e74c3c; }
+.sx-loot-overlay.sx-pickup-rarity-artifact { --loot-ring: #f1c40f; }
+.sx-loot-overlay.sx-unique-drop { --loot-ring: #ffd778; }
+
+
 /* ── Unique drop overlay (golden tier) ───────────────────────────────────── */
 /*
    Uniques replace the gentle rarity pulse with a rotating golden ray

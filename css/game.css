@@ -1375,3 +1375,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     font-size: 0.9em;
     letter-spacing: 0.08em;
 }
+
+/* Companion bubble placed beside/below the friend (to keep the puzzle free): no tail pointing down */
+.companion-bubble.no-tail::before,
+.companion-bubble.no-tail::after { display: none; }

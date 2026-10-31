@@ -44,7 +44,7 @@ export function _addOneModToItem(item, rarityForCaps) {
     const entry = _pickModFromPool(pool);
     if (!entry) return item;
 
-    const tier = _pickTier(entry.tiers);
+    const tier = _pickTier(entry.tiers, item.itemLevel || 1);
     const newMod = {
         familyId: entry.familyId,
         type: chosen.type,

@@ -2,7 +2,9 @@ import { STATE, cur } from '../state.js';
 import { LANG } from '../translation/translations.js';
 import { renderCell, updClues } from '../grid.js';
 import { _applyCellEffect } from '../puzzle-mechanics/cell-fx.js';
-import { _damageTargetById, _showStatusLabel } from '../combat/encounter-monster-damage.js';
+import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
+import { _isMapRun } from '../combat/combat-state.js';
+import { _damageTargetById,_showStatusLabel } from '../combat/encounter-monster-damage.js';
 import { getAffinityLevel } from '../storyline/companion-affinity.js';
 import { COMPANION_CAST } from '../storyline/companion-scenes.js';
 import {
@@ -102,7 +104,12 @@ function _renderBadge() {
     badge.classList.toggle('in-hud', !!host);
     if (host && badge.parentElement !== host) host.appendChild(badge);
     badge.dataset.hero = _bot.heroId;
-    badge.textContent = `${COMPANION_CAST[_bot.heroId].name} · ${LANG === 'de' ? 'Verbundenheit' : 'Affinity'} ${_bot.tuning.level}`;
+    let left = '';
+    if (_bot.timeLeftMs != null) {
+        const s = Math.max(0, Math.ceil(_bot.timeLeftMs / 1000));
+        left = ` · ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    }
+    badge.textContent = `${COMPANION_CAST[_bot.heroId].name} · ${LANG === 'de' ? 'Verbundenheit' : 'Affinity'} ${_bot.tuning.level}${left}`;
 }
 
 // Takes every hint glow off the grid.
@@ -293,6 +300,19 @@ function _levelRunning() {
     return !!cur && !globalThis.dead && !!globalThis.userGrid;
 }
 
+// Counts down a summoned friend's stay (not while the game is paused) and
+// sends them off with a short goodbye when it runs out. Friends without a
+// timer (co-op) are untouched. Returns true when the friend just left.
+function _tickStayTimer() {
+    if (_bot.timeLeftMs == null || globalThis._gamePaused) return false;
+    _bot.timeLeftMs -= TICK_MS;
+    if (_bot.timeLeftMs > 0) { _renderBadge(); return false; }
+    const name = COMPANION_CAST[_bot.heroId].name;
+    showToast(LANG === 'de' ? `${name} muss weiter - bis bald!` : `${name} has to go - see you!`, BOT_TINTS[_bot.heroId]);
+    dismissCompanionBot();
+    return true;
+}
+
 // Every half second: lets the friend leave when the level is over, drops old
 // hints, and does the next puzzle action / monster hit when it is due.
 function _tick() {
@@ -314,11 +334,17 @@ function _tick() {
     if (globalThis.dead) {
         _bot.deadSince = _bot.deadSince || now;
         // A co-op friend stays for the result screen (it says its closing line).
-        if (now - _bot.deadSince > LEAVE_AFTER_MS && !cur.isChainedPuzzle && !cur.isCoop) dismissCompanionBot();
+        // In a map run / trial chain a solved puzzle also counts as "over"
+        // (the quiz and countdown before the next one take longer than
+        // LEAVE_AFTER_MS), so the friend stays for the whole run - the first
+        // puzzle of a chain is not flagged as chained, hence the run check.
+        const inChainRun = cur.isChainedPuzzle || _isMapRun();
+        if (now - _bot.deadSince > LEAVE_AFTER_MS && !inChainRun && !cur.isCoop) dismissCompanionBot();
         return;
     }
     _bot.deadSince = 0;
     if (!_levelRunning()) return;
+    if (_tickStayTimer()) return;
     _expireHints(now);
     _banterTick(now);
     if (now >= _bot.nextActionAt) {
@@ -338,7 +364,8 @@ function _tick() {
 // Calls the friend onto the running level. The player cannot call themselves,
 // only one friend at a time, and only while a level is running. Affinity with
 // that friend sets how strong they are. Returns true when the friend came.
-// `opts.markFocus` (a multiplier) makes them favour wrong-marks.
+// `opts.markFocus` (a multiplier) makes them favour wrong-marks. `opts.timed`
+// makes them leave after their affinity-based stay (charm summons only).
 export function summonCompanionBot(friendId, opts = {}) {
     if (_bot || !_levelRunning() || !BOT_TINTS[friendId] || friendId === STATE.playerCharacter) return false;
     const affinity = getAffinityLevel(STATE.companionAffinity || {}, STATE.playerCharacter, friendId);
@@ -353,7 +380,7 @@ export function summonCompanionBot(friendId, opts = {}) {
     _ensureStyles();
     const now = Date.now();
     _bot = {
-        heroId: friendId, tuning, fills: 0, marks: 0, hints: new Map(), deadSince: 0, busy: false,
+        heroId: friendId, tuning, timeLeftMs: opts.timed ? tuning.stayMs : null, fills: 0, marks: 0, hints: new Map(), deadSince: 0, busy: false,
         lastSayAt: 0, lastMistakes: Number(globalThis.mistakeCount) || 0, nextIdleAt: now + 11000,
         nextActionAt: now + 2000, nextHitAt: now + 3000, timer: setInterval(_tick, TICK_MS),
     };

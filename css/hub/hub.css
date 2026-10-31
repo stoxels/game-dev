@@ -267,6 +267,19 @@ Layout Architecture:
         min-height: 22px;
     }
 
+/* Group heading above each block of essences (Life & Mana, Resistances, ...). */
+.sx-essence-cat-header {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+    padding: 2px 4px;
+    font-family: var(--PX);
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: var(--yellow);
+    border-bottom: 1px solid var(--border2);
+}
+.sx-essence-cat-header:first-child { margin-top: 0; }
+
 /* Centers and constrains the character panel so the hub reads as a
    compact screen rather than a full-width sheet.
    Left/right padding equals the flanking tab widths so the centered
@@ -1737,6 +1750,23 @@ img.sx-art-img {
     letter-spacing: 1px;
     color: var(--yellow);
     padding: 0 10px 6px;
+}
+.sx-unique-filter-btn {
+    align-self: flex-start;
+    margin: 0 10px 4px;
+    padding: 4px 10px;
+    font-family: var(--PX);
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: var(--setup-opt-inactive);
+    background: transparent;
+    border: 1px solid var(--border2);
+    cursor: pointer;
+}
+.sx-unique-filter-btn:hover { color: var(--yellow); }
+.sx-unique-filter-btn.active {
+    color: var(--yellow);
+    border-color: var(--yellow);
 }
 .sx-unique-grid {
     display: grid;

@@ -409,9 +409,18 @@ export function _bossTransition(monster, newPhase) {
         }
     }
 
+    // Shield bubble on the card for the whole window, green pulse when it ends.
+    monster._phaseShield = true;
+    _renderPanel();
     setTimeout(() => {
+        monster._phaseShield = false;
         if (!globalThis._monsters.find(m => m.id === monster.id)) return; // boss died mid-window
         monster.bossImmune = false;
+        monster._vulnUntil = Date.now() + 1800;
+        setTimeout(() => {
+            const c = document.getElementById('sx-card-' + monster.id);
+            if (c) c.classList.remove('sx-nk-vulnerable');
+        }, 1800);
         _bossScheduleMechanics(monster, newPhase);
         _renderPanel();
     }, monster.bossDef.immunityDuration);

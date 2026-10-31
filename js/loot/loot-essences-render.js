@@ -13,7 +13,7 @@ import { _dndBuildCurrencyChipHTML } from '../hub/hub-drag-and-drop.js';
 import { t } from '../translation/translations.js';
 import { ALL_BASE_TYPES } from './equipment-base-items.js';
 import { SLOT_MOD_TABLE_MAP } from './loot-equipment-mod-tables.js';
-import { ESSENCE_COLS, ESSENCE_ROWS, _ESSENCE_FAMILIES, _essenceCompatibleSlotTypes, _essenceIdForSlot, _essenceItemLevelBySlot, _essenceStash } from './loot-essences.js';
+import { ESSENCE_CATEGORY_FIRST_ROWS, ESSENCE_COLS, ESSENCE_ROWS, _ESSENCE_FAMILIES, _essenceCompatibleSlotTypes, _essenceIdForSlot, _essenceItemLevelBySlot, _essenceStash } from './loot-essences.js';
 import { _essenceDefForId, _essenceResolveFamilyId } from './loot-essences-defs.js';
 import { _essenceFamilyDisplayName } from './loot-essences-names.js';
 import { _buildEssenceDetailHTML } from './loot-essences-tooltip.js';
@@ -163,10 +163,19 @@ export function _buildEssenceCellHTML(row, col) {
 </div>`;
 }
 
+// The heading text of one essence group, in the current language.
+function _essenceCategoryName(catId) {
+    const key = 'sx_essence_cat_' + catId;
+    const name = t(key);
+    return name && name !== key ? name : catId;
+}
+
 // Assembles the essence tab panel: label + the essence cell grid.
 export function _buildEssenceTabHTML() {
     let cellsHTML = '';
     for (let r = 0; r < ESSENCE_ROWS; r++) {
+        const catId = ESSENCE_CATEGORY_FIRST_ROWS[r];
+        if (catId) cellsHTML += `<div class="sx-essence-cat-header">${_essenceCategoryName(catId)}</div>`;
         for (let c = 0; c < ESSENCE_COLS; c++) {
             cellsHTML += _buildEssenceCellHTML(r, c);
         }

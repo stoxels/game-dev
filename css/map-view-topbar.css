@@ -257,7 +257,7 @@
     flex: none;
     /* as wide as the free middle of the bar: screen width minus the back button,
        portrait and titles scroll on the left, mirrored so it stays centred */
-    width: clamp(190px, calc(100vw - 2 * (52px + min(13vw, 210px) + min(8vw, 100px) + min(17vw, 400px))), 640px);
+    width: clamp(190px, calc(100vw - 2 * (52px + min(13vw, 210px) + min(8vw, 100px) + min(17vw, 400px) + min(2.5vw, 48px))), 640px);
     padding: 0 clamp(4px, 1vw, 10px);
     text-shadow: 1px 1px 0 #000, 2px 2px 4px #000, 0 0 18px rgba(255, 200, 80, 0.35);
     white-space: nowrap;

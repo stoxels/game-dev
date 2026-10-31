@@ -17,6 +17,8 @@ export const BOT_TINTS = { stox: '#6c7bff', trix: '#e056c8', syla: '#ffd93d' };
 
 // Seconds between two puzzle actions at affinity level 1..5 (index 0 = level 1).
 const ACTION_SECONDS = [20, 17, 14, 12, 10];
+// Seconds a summoned friend stays (only time spent actually playing counts).
+const STAY_SECONDS = [60, 90, 120, 150, 180];
 // Chance weights of hint / fill / mark per affinity level.
 const ACTION_WEIGHTS = [
     { hint: 1, fill: 0, mark: 0 },
@@ -60,6 +62,7 @@ export function botTuning(heroId, affinityLevel) {
         heroId,
         level: i + 1,
         actionMs: Math.round(ACTION_SECONDS[i] * hero.speed * 1000),
+        stayMs: STAY_SECONDS[i] * 1000,
         weights,
         fillCapShare: FILL_CAP_SHARE[i],
         monsterStyle: hero.monster,

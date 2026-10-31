@@ -26,9 +26,9 @@ Object.assign(BOSS_MECHANICS, {
     boss_demolitionist: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
-            { threshold: 0.75, chargeMax: 10, damageMultiplier: 1.35 },
-            { threshold: 0.50, chargeMax: 8, damageMultiplier: 1.70 },
-            { threshold: 0.25, chargeMax: 6, damageMultiplier: 2.10 },
+            { threshold: 0.75, chargeMax: 11, damageMultiplier: 1.20 },
+            { threshold: 0.50, chargeMax: 10, damageMultiplier: 1.40 },
+            { threshold: 0.25, chargeMax: 9, damageMultiplier: 1.55 },
         ],
         immunityDuration: 2500,
         mechanics: [
