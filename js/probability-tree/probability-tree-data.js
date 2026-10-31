@@ -1219,7 +1219,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_disciple_of_the_forbidden_397",
    "effects": [
     "power_on_kill:8",
-    "power_damage:8"
+    "power_damage:8",
+    "time_on_kill:2"
    ],
    "tier": "notable"
   },
@@ -1305,7 +1306,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_executioner_201",
    "effects": [
     "dmg_vs_low_life:60",
-    "aoe_recent_kill:15"
+    "aoe_recent_kill:15",
+    "time_on_kill:2"
    ],
    "tier": "notable"
   },
@@ -1415,7 +1417,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_vampirism_138",
    "effects": [
     "life_on_kill_flat:3",
-    "life_recoup_pct:12"
+    "life_recoup_pct:12",
+    "time_on_kill:2"
    ],
    "tier": "notable"
   },
@@ -3856,7 +3859,8 @@ export const TALENT_TREE_DATA = {
     "endurance_min:1",
     "endurance_on_kill:8",
     "damage_per_endurance:8",
-    "endurance_on_line:12"
+    "endurance_on_line:12",
+    "time_on_kill:2"
    ],
    "tier": "notable"
   },
@@ -4926,7 +4930,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_trophy_30075",
    "tier": "small",
    "effects": [
-    "cell_on_kill:5"
+    "cell_on_kill:5",
+    "time_on_kill:1"
    ]
   },
   {
@@ -5091,7 +5096,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_trophy_30087",
    "tier": "small",
    "effects": [
-    "cell_on_kill:5"
+    "cell_on_kill:5",
+    "time_on_kill:1"
    ]
   },
   {
@@ -6289,7 +6295,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_sunder_20045",
    "effects": [
     "melee_kill_explode:20",
-    "melee_aoe_pct:20"
+    "melee_aoe_pct:20",
+    "time_on_kill:2"
    ],
    "tier": "notable"
   },
@@ -7515,7 +7522,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_trophy_30225",
    "tier": "small",
    "effects": [
-    "cell_on_kill:5"
+    "cell_on_kill:5",
+    "time_on_kill:1"
    ]
   },
   {
@@ -18839,7 +18847,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_elder_power_20222",
    "effects": [
     "power_on_kill:10",
-    "mark_on_kill:12"
+    "mark_on_kill:12",
+    "time_on_kill:2"
    ],
    "tier": "notable"
   },

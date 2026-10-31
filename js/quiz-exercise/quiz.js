@@ -508,7 +508,7 @@ export function answerQuizInput() {
     inputEl.disabled = true;
     document.getElementById('quiz-input-submit').disabled = true;
 
-    const correct = Math.abs(entered - currentQuizQuestion.answer) <= currentQuizQuestion.tolerance;
+    const correct = Math.abs(entered - currentQuizQuestion.answer) <= currentQuizQuestion.tolerance + 1e-9;
 
     if (!correct) {
         _quizShowInputHint();

@@ -1,5 +1,5 @@
 import { Audio_Manager } from '../audio/audio.js';
-import { SAVE_SLOT_COUNT, getSlotName, getSlotSummary, loadStateFromSlot, setSlotName } from '../state.js';
+import { SAVE_SLOT_COUNT, exportSlotBundle, getSlotName, getSlotSummary, importSlotBundle, loadStateFromSlot, setSlotName } from '../state.js';
 import { t } from '../translation/translations.js';
 import { hideModal, showModal, switchScreen } from './screens.js';
 //------------------------------------------------------------------------
@@ -64,7 +64,8 @@ function _buildSlotCardHtml(slotNum, summary) {
     if (summary.empty) {
         return `${headingHtml}
                 <div class="ssc-empty">${t('scr_new_game')}</div>
-                <button class="ssc-name-btn" data-slot="${slotNum}" data-tip-t="scr_slot_name_edit" aria-label="${t('scr_slot_name_edit')}">✏️</button>`;
+                <button class="ssc-name-btn" data-slot="${slotNum}" data-tip-t="scr_slot_name_edit" aria-label="${t('scr_slot_name_edit')}">✏️</button>
+                ${_buildImportButtonHtml(slotNum)}`;
     }
 
     // UPDATE HERE: Pass the full summary object instead of just the character ID
@@ -90,7 +91,14 @@ function _buildSlotCardHtml(slotNum, summary) {
                 </div>
               </div>
               <button class="ssc-name-btn" data-slot="${slotNum}" data-tip-t="scr_slot_name_edit" aria-label="${t('scr_slot_name_edit')}">✏️</button>
-              <button class="ssc-delete-btn" data-slot="${slotNum}" data-tip-t="scr_delete_save" aria-label="${t('scr_delete_save')}">❌</button>`;
+              <button class="ssc-delete-btn" data-slot="${slotNum}" data-tip-t="scr_delete_save" aria-label="${t('scr_delete_save')}">❌</button>
+              <button class="ssc-export-btn" data-slot="${slotNum}" data-tip-t="scr_export_save" aria-label="${t('scr_export_save')}">💾</button>
+              ${_buildImportButtonHtml(slotNum)}`;
+}
+
+// The small "import a save file into this slot" button every card carries.
+function _buildImportButtonHtml(slotNum) {
+    return `<button class="ssc-import-btn" data-slot="${slotNum}" data-tip-t="scr_import_save" aria-label="${t('scr_import_save')}">📥</button>`;
 }
 
 
@@ -106,8 +114,7 @@ function _buildSlotTitleHtml(summary) {
 // Wires up click-to-select and delete-button behavior on a slot card.
 function _attachSlotCardListeners(card, slotNum) {
     card.addEventListener('click', (e) => {
-        if (e.target.classList.contains('ssc-delete-btn')) return;
-        if (e.target.classList.contains('ssc-name-btn')) return;
+        if (e.target.closest('button')) return;
         onSaveSlotChosen(slotNum);
     });
 
@@ -116,6 +123,22 @@ function _attachSlotCardListeners(card, slotNum) {
         delBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             showDeleteSlotConfirm(slotNum);
+        });
+    }
+
+    const exportBtn = card.querySelector('.ssc-export-btn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            exportSlotToFile(slotNum);
+        });
+    }
+
+    const importBtn = card.querySelector('.ssc-import-btn');
+    if (importBtn) {
+        importBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            pickSaveFileFor(slotNum);
         });
     }
 
@@ -148,6 +171,71 @@ export function onSaveSlotChosen(slotNum) {
     const cb = window._pendingSaveSlotCallback;
     window._pendingSaveSlotCallback = null;
     if (typeof cb === 'function') cb();
+}
+
+//------------------------------------------------------------------------
+//-------------------SAVE EXPORT / IMPORT----------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// For players whose browser clears site data: a slot can be saved to a file
+// on their PC and loaded back into any slot later.
+
+// Biggest transfer file we will read (a real save is well below 5 MB).
+const MAX_IMPORT_BYTES = 20 * 1024 * 1024;
+
+// A file-name-safe version of the slot name (or "slot-N").
+function _exportFileName(slotNum) {
+    const name = getSlotName(slotNum).replace(/[^\w-]+/g, '_').replace(/^_+|_+$/g, '');
+    const day = new Date().toISOString().slice(0, 10);
+    return `stoxels-${name || 'slot-' + slotNum}-${day}.json`;
+}
+
+// Downloads the given slot as a .json file through the browser's normal download.
+function exportSlotToFile(slotNum) {
+    const bundle = exportSlotBundle(slotNum);
+    if (!bundle) { globalThis.showToast(t('scr_export_empty')); return; }
+    const blob = new Blob([JSON.stringify(bundle)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = _exportFileName(slotNum);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    globalThis.showToast(t('scr_export_done').replace('{n}', slotNum));
+}
+
+// Reads the chosen file and writes it into `slotNum` (after asking before it
+// replaces an existing save). Every failure ends in a toast; nothing is
+// changed unless the file passed all checks.
+async function importFileIntoSlot(file, slotNum) {
+    if (!file) return;
+    if (file.size > MAX_IMPORT_BYTES) { globalThis.showToast(t('scr_import_bad')); return; }
+    let bundle;
+    try {
+        bundle = JSON.parse(await file.text());
+    } catch {
+        globalThis.showToast(t('scr_import_bad'));
+        return;
+    }
+    if (!getSlotSummary(slotNum).empty && !window.confirm(t('scr_import_overwrite').replace('{n}', slotNum))) return;
+    const res = importSlotBundle(slotNum, bundle);
+    if (!res.ok) {
+        globalThis.showToast(t(res.reason === 'storage' ? 'scr_import_storage' : 'scr_import_bad'));
+        return;
+    }
+    renderSaveSlotScreen();
+    globalThis.showToast(t('scr_import_done').replace('{n}', slotNum));
+}
+
+// Opens the PC's file picker, then imports the picked file into `slotNum`.
+function pickSaveFileFor(slotNum) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.addEventListener('change', () => importFileIntoSlot(input.files && input.files[0], slotNum));
+    input.click();
 }
 
 //------------------------------------------------------------------------

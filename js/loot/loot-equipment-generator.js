@@ -114,11 +114,23 @@ export function _rollModCounts(rarity) {
 export const EARLY_ARMOUR_BIAS_MAX_LEVEL = 12;
 export const EARLY_ARMOUR_BIAS_WEIGHT = 3;
 
+// Higher-tier bias: any base the monster is high enough for can still drop
+// (a high-level monster may drop a low-level base), but bases close to the
+// monster's own level are favoured. A base's weight is
+// 1 + TIER_BIAS_BONUS * (baseMinLevel / monsterLevel)^2: a base at the monster's
+// level counts 5x, one at half its level about 2x, a very low one about 1x.
+export const TIER_BIAS_BONUS = 4;
+
+// Picks one base from `eligible`: tier bias for every monster level, and the
+// extra early-game armour bias on top while the monster is low level.
 export function _pickBaseWithEarlyArmourBias(eligible, monsterLevel) {
-    if (!(monsterLevel <= EARLY_ARMOUR_BIAS_MAX_LEVEL)) {
-        return eligible[Math.floor(Math.random() * eligible.length)];
-    }
-    const weights = eligible.map(b => ((b.defenses && b.defenses.armour > 0) ? EARLY_ARMOUR_BIAS_WEIGHT : 1));
+    const lvl = Math.max(1, Number(monsterLevel) || 1);
+    const earlyArmour = monsterLevel <= EARLY_ARMOUR_BIAS_MAX_LEVEL;
+    const weights = eligible.map(b => {
+        const tier = 1 + TIER_BIAS_BONUS * Math.pow(Math.min(1, (b.minLevel || 0) / lvl), 2);
+        const armour = (earlyArmour && b.defenses && b.defenses.armour > 0) ? EARLY_ARMOUR_BIAS_WEIGHT : 1;
+        return tier * armour;
+    });
     const total = weights.reduce((s, w) => s + w, 0);
     let roll = Math.random() * total;
     for (let i = 0; i < eligible.length; i++) {

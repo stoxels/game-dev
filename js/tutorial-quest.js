@@ -15,6 +15,9 @@ import { _renderItemDropOverlay } from './combat/combat-grid-pickups-items.js';
 import { closeHubToGame, isHubGameOverlay, openHubFromGame, showHub } from './hub/hub.js';
 import { _addItemToStash, _inventory } from './hub/hub-stash.js';
 import { saveHubState } from './hub/hub-save.js';
+import { addCurrency } from './hub/hub-drag-and-drop.js';
+import { addEssence } from './loot/loot-essences-stash.js';
+import { ESSENCE_DEFS } from './loot/loot-essences-defs.js';
 import { _resetQuizDamageBuff } from './combat/combat-quiz-buffs.js';
 import { _getAllEquippedItems } from './combat/combat-player-stats.js';
 import { _currencyDrops, _itemDrops, _lootDrops, _pickups } from './combat/combat-state.js';
@@ -215,6 +218,9 @@ let _tqChestEl = null;
 let _tqChestModalEl = null;
 let _tqChestProxTimer = null;
 const _tqChestClaimed = new Set();
+// Crafting lesson (after the chest): what the uniform looked like when the
+// orb / essence step began, so the step can tell when it was really used.
+let _tqCraftBaseline = null;
 // Puzzle-1 guided demos: while _tqGridLocked is true, EVERY grid click is
 // swallowed (checkSpecialIntercepts wrap) unless it matches the active demo
 // cell + button - the player can only interact when the Professor asks.
@@ -1311,6 +1317,13 @@ const TQ_TASKS = {
     // and every item inside has been claimed.
     chest_opened: () => _tqChestOpened,
     chest_claimed: () => _tqChestAllClaimed,
+    // Crafting lesson: the Awaken Core turned a white uniform piece green (or
+    // no white piece is left to try it on), then the essence re-forged one.
+    orb_used: () => _tqCraftBaseline !== null
+        && (_tqStarterGearItems().filter((i) => i.rarity !== 'common').length > _tqCraftBaseline.nonCommon
+            || !_tqStarterGearItems().some((i) => i.rarity === 'common')),
+    essence_used: () => _tqCraftBaseline !== null
+        && (_tqModSignature() !== _tqCraftBaseline.signature || _tqStarterGearItems().length === 0),
 };
 
 // Steps per phase (see keys in translations-strings.js).
@@ -1400,6 +1413,10 @@ function _tqStepsFor(phase) {
             // vest, greaves + a rank 1 Renewal charm).
             { say: 'tq_p4_s1', task: 'chest_opened', fn: () => { _tqEnterChestScene(); } },
             { say: 'tq_p4_s2', task: 'chest_claimed' },
+            // Crafting lesson: right-click an orb / essence in the inventory
+            // to pick it up, then left-click a uniform piece to use it.
+            { say: 'tq_p4_s2b', task: 'orb_used', fn: () => { _tqSnapshotCraftBaseline(); } },
+            { say: 'tq_p4_s2c', task: 'essence_used', fn: () => { _tqSnapshotCraftBaseline(); } },
             { say: 'tq_p4_s3', wait: true },
         ];
         default: return [];
@@ -2467,6 +2484,10 @@ const TQ_CHEST_LOOT = [
     { kind: 'gear', baseId: 'chest_str_1', nameKey: 'tq_uniform_chest' },
     { kind: 'gear', baseId: 'pants_str_1', nameKey: 'tq_uniform_pants' },
     { kind: 'charm', skillId: 'usp_renewal', rank: 1, icon: '📜' },
+    // Crafting lesson supplies: the weakest orb (common -> uncommon) and a
+    // low-tier essence, used on the new uniform right after the chest.
+    { kind: 'currency', id: 'orb_transmutation' },
+    { kind: 'essence', id: 'essence_flat_health' },
 ];
 // Treasure chest art (webp converted from the PNG the artist supplied).
 const TQ_CHEST_IMG = 'images/Tutorial/Treasure_Chest.webp';
@@ -2497,6 +2518,7 @@ function _tqChestItemName(entry, item) {
 // The item's real art (equipment art by base id, charm art by spell + rank),
 // falling back to the emoji while / if no art exists. Returns ready HTML.
 function _tqChestIconFor(entry, fallbackEmoji) {
+    if (entry.kind === 'currency' || entry.kind === 'essence') return _tqChestIconHTML(fallbackEmoji);
     try {
         if (entry.kind === 'charm') {
             const art = globalThis.getCharmArtForSkill(entry.skillId, entry.rank);
@@ -2521,6 +2543,10 @@ document.addEventListener('sx-art-loaded', () => {
 
 // Display data for one loot entry: { icon, name, sub }.
 function _tqChestEntryInfo(entry) {
+    if (entry.kind === 'currency' || entry.kind === 'essence') {
+        const def = entry.kind === 'currency' ? CURRENCY_DEFS[entry.id] : ESSENCE_DEFS[entry.id];
+        return { icon: def ? def.icon : '📦', name: def ? def.name : entry.id, sub: '' };
+    }
     if (entry.kind === 'charm') {
         let name = entry.skillId;
         try { name = getSkillName(entry.skillId) || name; } catch (e) {}
@@ -2532,12 +2558,35 @@ function _tqChestEntryInfo(entry) {
     return { icon: item.icon, name: _tqChestItemName(entry, item), sub: '' };
 }
 
+// The uniform pieces the player owns (worn or in the stash).
+function _tqStarterGearItems() {
+    const items = [];
+    try { _getAllEquippedItems().forEach((it) => { if (it) items.push(it); }); } catch (e) {}
+    try { _inventory.forEach((row) => (row || []).forEach((it) => { if (it) items.push(it); })); } catch (e) {}
+    return items.filter((it) => it.isTutorialStarterGear);
+}
+
+// A text fingerprint of the uniform's rarity and modifiers; it changes the
+// moment any orb or essence reshapes a piece.
+function _tqModSignature() {
+    return JSON.stringify(_tqStarterGearItems().map((it) => [it.rarity, (it.mods || []).length, it.name]));
+}
+
+// Remembers how the uniform looks right now (start of an orb / essence step).
+function _tqSnapshotCraftBaseline() {
+    _tqCraftBaseline = {
+        nonCommon: _tqStarterGearItems().filter((i) => i.rarity !== 'common').length,
+        signature: _tqModSignature(),
+    };
+}
+
 // Returns the player to the puzzle 3 screen as a free-roaming scene:
 // encounter off, board inert, avatar visible and steerable, chest spawned.
 function _tqEnterChestScene() {
     _tqChestOpened = false;
     _tqChestAllClaimed = false;
     _tqChestClaimed.clear();
+    _tqCraftBaseline = null;
     _tqChestScene = true;
     try { if (typeof _stopEncounter === 'function') _stopEncounter(); } catch (e) {}
     globalThis.dead = false;   // the arena/solve left the run "finished"; the sprite is hidden while dead
@@ -2601,6 +2650,12 @@ function _tqOpenChestModal() {
         // Hover tooltips: the equipment stat block for gear, the spell tooltip
         // (at the granted rank) for the charm.
         const entry = TQ_CHEST_LOOT[Number(btn.dataset.i)];
+        if (entry.kind === 'currency' || entry.kind === 'essence') {
+            // Orbs and essences have no item tooltip: the native one carries the description.
+            const def = entry.kind === 'currency' ? CURRENCY_DEFS[entry.id] : ESSENCE_DEFS[entry.id];
+            if (def) btn.title = def.description;
+            return;
+        }
         btn.addEventListener('mouseenter', (e) => _tqChestShowTip(entry, e));
         btn.addEventListener('mousemove', (e) => {
             if (entry.kind === 'charm') globalThis.handleSkillTipMove(e); else globalThis.moveGameTooltip(e);
@@ -2661,7 +2716,13 @@ function _tqClaimChestItem(i, btn) {
     if (!entry) return;
     let ok = false;
     try {
-        if (entry.kind === 'charm') {
+        if (entry.kind === 'currency') {
+            ok = addCurrency(entry.id, 1);
+            if (ok) saveHubState();
+        } else if (entry.kind === 'essence') {
+            ok = addEssence(entry.id, 1);
+            if (ok) saveHubState();
+        } else if (entry.kind === 'charm') {
             // Already owned (tutorial replayed): count it as claimed, grant nothing.
             if (_tqOwnsCharm(entry.skillId, entry.rank)) ok = true;
             else if (typeof grantCharm === 'function') { grantCharm(entry.skillId, entry.rank); ok = true; }

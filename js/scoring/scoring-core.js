@@ -200,13 +200,17 @@ export function countFilledCells(sol, rows, cols) {
     return count;
 }
 
-// Counts how many cells the player has cross-marked (userGrid value === 2).
+// Counts how many cells the player has cross-marked by hand (userGrid value
+// === 2). Crosses placed by items, passives or abilities are flagged in
+// systemMarkedGrid and are left out, so the "mark manually" achievement only
+// counts the player's own marks.
 export function countMarkedCells(rows, cols) {
     if (!globalThis.userGrid) return 0;
+    const system = globalThis.systemMarkedGrid;
     let count = 0;
     for (let r = 0; r < rows; r++)
         for (let c = 0; c < cols; c++)
-            if (globalThis.userGrid[r][c] === 2) count++;
+            if (globalThis.userGrid[r][c] === 2 && !(system && system[r] && system[r][c])) count++;
     return count;
 }
 

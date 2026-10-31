@@ -854,6 +854,7 @@ function _evaluateZombieChallenge(zombie) {
 
     // Correct click!
     Audio_Manager.playSFX('questRewardClaimed');
+    trackAchStat('dofZombieChallengesWon');
     _zombieCurseNearbyCell(zombie, row, col);
     // Double Curse (Recursionist wheel): a second cell is cursed as well.
     if (ptHasAscendencySkill('recursionist', 'double_curse')) _zombieCurseNearbyCell(zombie, row, col);

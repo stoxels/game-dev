@@ -1107,6 +1107,75 @@ export function loadStateFromSlot(slotNum) {
     return STATE;
 }
 
+// Story flags ("scene already seen") belong to a slot and live under their own
+// keys; the transfer file carries them so imported saves do not replay cutscenes.
+function _slotStoryPrefix(slotNum) {
+    return `storyline_seen_slot${slotNum}_`;
+}
+
+// Builds a plain object describing one slot (save, name, seen-story flags) that
+// can be written to a file and imported again later, even in another browser.
+// Returns null for an empty slot.
+export function exportSlotBundle(slotNum) {
+    const raw = loadRawSaveFromSlot(slotNum);
+    if (!raw) return null;
+    const prefix = _slotStoryPrefix(slotNum);
+    const storySeen = {};
+    try {
+        Object.keys(localStorage).filter(k => k.startsWith(prefix)).forEach(k => {
+            storySeen[k.slice(prefix.length)] = localStorage.getItem(k);
+        });
+    } catch { /* story flags are cosmetic - export without them */ }
+    return {
+        format: 'stoxels-save',
+        formatVersion: 1,
+        exportedAt: new Date().toISOString(),
+        slot: slotNum,
+        name: getSlotName(slotNum),
+        save: raw,
+        storySeen,
+    };
+}
+
+// Checks that a parsed transfer file really holds a Stoxels save. Returns an
+// error code ('format') or null when it looks usable.
+function _bundleProblem(bundle) {
+    if (!bundle || typeof bundle !== 'object' || bundle.format !== 'stoxels-save') return 'format';
+    const save = bundle.save;
+    if (!save || typeof save !== 'object' || Array.isArray(save)) return 'format';
+    if (!Array.isArray(save.done) && typeof save.playerLevel !== 'number') return 'format';
+    return null;
+}
+
+// Writes an exported bundle into `slotNum`, replacing whatever the slot held
+// (the old save is first copied into the slot's rolling backup key so a wrong
+// import can be undone with tools/save-doctor.html). Returns { ok: true } or
+// { ok: false, reason }.
+export function importSlotBundle(slotNum, bundle) {
+    const problem = _bundleProblem(bundle);
+    if (problem) return { ok: false, reason: problem };
+    if (!(slotNum >= 1 && slotNum <= SAVE_SLOT_COUNT)) return { ok: false, reason: 'slot' };
+    const key = _slotKey(slotNum);
+    try {
+        const old = localStorage.getItem(key);
+        if (old) localStorage.setItem(key + '_backup_1', old);
+        localStorage.setItem(key, JSON.stringify(bundle.save));
+    } catch {
+        return { ok: false, reason: 'storage' };
+    }
+    window._saveLastSavedKey = null;
+    setSlotName(slotNum, typeof bundle.name === 'string' ? bundle.name : '');
+    try {
+        const prefix = _slotStoryPrefix(slotNum);
+        Object.keys(localStorage).filter(k => k.startsWith(prefix)).forEach(k => localStorage.removeItem(k));
+        const seen = (bundle.storySeen && typeof bundle.storySeen === 'object') ? bundle.storySeen : {};
+        Object.keys(seen).forEach(k => {
+            if (typeof seen[k] === 'string') localStorage.setItem(prefix + k, seen[k]);
+        });
+    } catch { /* story flags are cosmetic */ }
+    return { ok: true };
+}
+
 // Wipes ONLY the given slot's save data. Used by the "Reset Progress" flow
 // on the title screen - achievements live in their own global key
 // (ACH_SAVE_KEY, achievements.js) and are never touched by this.

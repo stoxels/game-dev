@@ -7,7 +7,7 @@
 // Kill orchestration: target cycling, monster removal, achievements,
 // on-kill stats, full-clear detection, and game over.
 
-import { ACH_STATE, saveAchState, setAchStat, trackAchStat } from '../achievements/achievements.js';
+import { ACH_STATE, saveAchState, setAchStat, trackAchStat, trackAchUnique } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { gainMana } from '../classes/class-mana.js';
 
@@ -31,7 +31,7 @@ import { cur } from '../state.js';
 
 
 import { _grantMonsterXP, _showXpGainText } from '../hub/hub-leveling.js';
-import { _egMapKillRecoveryMult } from '../endgame/endgame-map-launch.js';
+import { _egActiveMapItem, _egMapKillRecoveryMult } from '../endgame/endgame-map-launch.js';
 
 import { _computePlayerStats } from './combat-player-stats.js';
 import { _isActive, _isCampaignRun } from './combat-state.js';
@@ -54,6 +54,18 @@ export function _updateTargetAfterKill() {
         globalThis._targetId = null;
         _onAllMonstersDead();
     }
+}
+
+// Pantheon achievement: remembers which of the four Tier 16 region bosses
+// (the ones the atlas assigns to its tier-16 regions) were defeated, counting
+// only kills inside a Tier 16 map - never in the campaign or lower maps.
+function _trackPantheonBoss(dying) {
+    const tier = (_egActiveMapItem && _egActiveMapItem.mapTier) || (globalThis._mapDef && globalThis._mapDef.mapTier) || 0;
+    if (tier < 16 || _isCampaignRun()) return;
+    const roster = globalThis.EG_ATLAS_REGION_BOSSES || {};
+    const t16Bosses = Object.keys(roster).filter(k => k.indexOf('atlas_t16_') === 0).map(k => roster[k]);
+    const bossId = dying.baseId || dying.id || '';
+    if (t16Bosses.includes(bossId)) trackAchUnique('egT16BossTypesSlain', bossId);
 }
 
 // Puzzle rewards for a kill: timer seconds (a flat bonus for each campaign
@@ -142,6 +154,7 @@ export function _killMonster(monsterId) {
                 else trackAchStat(_bossStatKey, 1);
             }
         }
+        if (dying && dying.isBoss) _trackPantheonBoss(dying);
     } catch(e){}
 
     // Score: campaign kills add to the level's combat tally (see scoring-core.js)

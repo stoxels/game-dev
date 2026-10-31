@@ -269,6 +269,12 @@ function _trialIntroText() {
         rewardAsc: de
             ? 'Erster Abschluss: Kodex der Vollendung, Weltbelohnungen und Klassenereignis.'
             : 'First clear: Codex of Completion, world rewards and the class event.',
+        doneConv: de
+            ? 'Bereits abgeschlossen: Der Talentpunkt wurde schon vergeben. Eine Wiederholung bringt nur etwas Erfahrung.'
+            : 'Already completed: the passive point has been claimed. Replaying only earns a little XP.',
+        doneAsc: de
+            ? 'Bereits abgeschlossen: Kodex der Vollendung und Weltbelohnungen wurden schon vergeben. Eine Wiederholung bringt keine Belohnung mehr.'
+            : 'Already completed: the Codex of Completion and world rewards have been claimed. Replaying gives no reward.',
         begin: de ? 'PRÜFUNG BEGINNEN' : 'BEGIN TRIAL',
         back: de ? 'Zurück' : 'Back',
         monsterless: de ? 'Monsterlos: nur Rätsel und Fragen, kein Boss.' : 'Monsterless: puzzles and questions only, no boss.',
@@ -290,6 +296,14 @@ function _showTrialIntro(wi, kind, info, onBegin) {
     }
     steps.push({ icon: 'finish', text: tx.finish });
     const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    // Beaten trials say so instead of promising the first-clear reward again.
+    _ensureTrialState();
+    const isDone = kind === 'convergence'
+        ? STATE.trialsDone.includes(_trialIdForWorld(wi))
+        : STATE.ascensionTrialsDone.includes('asc_' + (wi + 1));
+    const rewardText = kind === 'convergence'
+        ? (isDone ? tx.doneConv : tx.rewardConv)
+        : (isDone ? tx.doneAsc : tx.rewardAsc);
     // Shell classes (.reset-*, .dialog-plate, .modal-bg) are shared with the
     // reset / save-slot dialogs; trial-specific ones live in css/trial-intro.css.
     const el = document.createElement('div');
@@ -305,7 +319,7 @@ function _showTrialIntro(wi, kind, info, onBegin) {
     </div>
     <ol class="ti-steps">${steps.map((st) => `<li class="ti-step${st.boss ? ' ti-step-boss' : ''}${st.wide ? ' ti-step-wide' : ''}"><div class="ti-step-icon ti-icon-${st.icon}"></div><span class="ti-step-text">${esc(st.text)}</span></li>`).join('')}</ol>
     <div class="reset-note-banner"><p class="ti-rules">${esc(tx.rules(Math.round(info.timeLimitSecs / 60), info.maxMistakes))}</p></div>
-    <div class="ti-reward"><span class="ti-reward-text">${esc(kind === 'convergence' ? tx.rewardConv : tx.rewardAsc)}</span></div>
+    <div class="ti-reward"><span class="ti-reward-text">${esc(rewardText)}</span></div>
     <div class="reset-footer">
         <button class="reset-btn" id="ti-back">${esc(tx.back)}</button>
         <div class="reset-portal-deco"></div>
@@ -440,7 +454,6 @@ export function _launchTrialRun(wi, kind, opts) {
     window._egMapDeviceLaunching = true;
     try {
         if (typeof showToast === 'function') showToast('⚔ ' + stamp.name);
-        if (typeof trackAchStat === 'function') try { trackAchStat('egMapsLaunched', 1); } catch (e) {}
         globalThis.startLevel(gi);
     } finally {
         window._egMapDeviceLaunching = false;

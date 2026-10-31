@@ -5,7 +5,7 @@ import { summonCompanionBot } from '../companion-bot/companion-bot.js';
 import { getAffinityLevel } from '../storyline/companion-affinity.js';
 import { COMPANION_CAST } from '../storyline/companion-scenes.js';
 import { grantCharm } from './skill-charms.js';
-import { SUMMON_HEROES, TETHER_STONE_COST, TETHER_STONE_DROP_CHANCE, summonSpellId } from './summon-spells.js';
+import { SUMMON_HEROES, TETHER_STONE_DROP_CHANCE, summonSpellId, tetherStoneCost } from './summon-spells.js';
 
 //------------------------------------------------------------------------
 //-------------------SUMMON CASTING----------------------------------------
@@ -60,13 +60,14 @@ export function castSummonSpell(spell) {
         showToast(_say(`A friend already came to this puzzle.`, 'In diesem Rätsel war schon ein Freund da.'), '#ff8a65');
         return false;
     }
-    if (getTetherStones() < TETHER_STONE_COST) {
-        showToast(_say(`${name} needs ${TETHER_STONE_COST} Tether Stones (you have ${getTetherStones()}).`,
-            `${name} braucht ${TETHER_STONE_COST} Bindungssteine (du hast ${getTetherStones()}).`), '#ff8a65');
+    const cost = tetherStoneCost(summonAffinityLevel(hero));
+    if (getTetherStones() < cost) {
+        showToast(_say(`${name} needs ${cost} Tether Stones (you have ${getTetherStones()}).`,
+            `${name} braucht ${cost} Bindungssteine (du hast ${getTetherStones()}).`), '#ff8a65');
         return false;
     }
     if (!summonCompanionBot(hero)) return false;
-    STATE.tetherStones = getTetherStones() - TETHER_STONE_COST;
+    STATE.tetherStones = getTetherStones() - cost;
     cur._summonUsed = true;
     save();
     showToast(_say(`${name} joins you! (Affinity ${summonAffinityLevel(hero)})`, `${name} schließt sich dir an! (Verbundenheit ${summonAffinityLevel(hero)})`), '#7fe0b0');

@@ -1000,7 +1000,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X ~ Exp(1). Calculate the value of the distribution function of X at x=1. Enter as a decimal rounded to 3 places. (Use e ≈ 2.718)',
             qDE: 'X ~ Exp(1). Berechne den Wert der Verteilungsfunktion von X an der Stelle x=1. Gib auf 3 Stellen gerundet an. (e ≈ 2,718)',
-            answer: 0.632, tolerance: 0.005, unit: '',
+            answer: 0.632, tolerance: 0.001, unit: '',
             hintEn: 'F(x) = 1 − e^(−x)',
             hintDE: 'F(x) = 1 − e^(−x)',
             explain: "Plugging x = 1 into the exponential CDF gives F(1) = 1 − e^(−1) ≈ 1 − 0.368 = 0.632.",
@@ -1009,7 +1009,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X ~ Exp(2). What is P(X > 1)? Enter as a decimal rounded to 3 places. (Use e ≈ 2.718)',
             qDE: 'X ~ Exp(2). Verteilungsfunktion: F(x) = 1 − e^(−2x) für x ≥ 0. Was ist P(X > 1)? Gib auf 3 Stellen gerundet an. (e ≈ 2,718)',
-            answer: 0.135, tolerance: 0.005, unit: '',
+            answer: 0.135, tolerance: 0.001, unit: '',
             hintEn: 'F(x) = 1 − e^(−2x) for x ≥ 0.',
             hintDE: 'F(x) = 1 − e^(−2x) für x ≥ 0.',
             explain: "Since P(X > 1) = 1 − F(1), and F(1) = 1 − e^(−2), this simplifies directly to e^(−2) ≈ 0.135.",
@@ -1046,7 +1046,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X has density function f_X(x) = 2x for x ∈ [0,1]. Y = 3X. What is f_Y(y) for y ∈ [0,3]? Enter the coefficient c where f_Y(y) = c·y. Round to 3 decimal places.',
             qDE: 'X hat Dichtefunktion f_X(x) = 2x für x ∈ [0,1]. Y = 3X. Was ist f_Y(y) für y ∈ [0,3]? Gib den Koeffizienten c an, sodass f_Y(y) = c·y gilt. Runde auf 3 Nachkommastellen.',
-            answer: 0.222, tolerance: 0.005, unit: '',
+            answer: 0.222, tolerance: 0.001, unit: '',
             hintEn: 'f_Y(y) = f_X(y/3) · (1/3)',
             hintDE: 'f_Y(y) = f_X(y/3) · (1/3)',
             explain: "Substituting y/3 into f_X and scaling by 1/3 gives f_Y(y) = 2(y/3)·(1/3) = (2/9)y, so c = 2/9 ≈ 0.222.",
@@ -1166,7 +1166,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'Z ~ N(0,1). What is P(Z > 1.0)? Round to 3 decimal places.',
             qDE: 'Z ~ N(0,1). Was ist P(Z > 1,0)? Runde auf 3 Nachkommastellen.',
-            answer: 0.159, tolerance: 0.002, unit: '',
+            answer: 0.159, tolerance: 0.001, unit: '',
             hintEn: 'P(Z > 1) = 1 − Φ(1) = 1 − 0.841',
             hintDE: 'P(Z > 1) = 1 − Φ(1) = 1 − 0,841',
             explain: "Using the complement rule, P(Z > 1) = 1 − Φ(1) = 1 − 0.841 = 0.159.",
@@ -1175,7 +1175,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'Z ~ N(0,1). Using symmetry Φ(−z) = 1 − Φ(z) and Φ(1.0) ≈ 0.841. What is P(−1 ≤ Z ≤ 1)? Round to 3 decimal places.',
             qDE: 'Z ~ N(0,1). Mit Φ(−z) = 1 − Φ(z) und Φ(1,0) ≈ 0,841, was ist P(−1 ≤ Z ≤ 1)? Runde auf 3 Nachkommastellen.',
-            answer: 0.682, tolerance: 0.002, unit: '',
+            answer: 0.682, tolerance: 0.001, unit: '',
             hintEn: 'P(−1 ≤ Z ≤ 1) = Φ(1) − Φ(−1) = 0.841 − (1−0.841)',
             hintDE: 'P(−1 ≤ Z ≤ 1) = Φ(1) − Φ(−1) = 0,841 − (1−0,841)',
             explain: "By symmetry of the standard normal distribution, P(−1 ≤ Z ≤ 1) = Φ(1) − Φ(−1) = 0.841 − (1−0.841) = 0.682.",
@@ -1196,7 +1196,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X has density f(x) = 2x for x ∈ [0,1]. What is E[X]? Round to 3 decimal places.',
             qDE: 'X hat Dichtefunktion f(x) = 2x für x ∈ [0,1]. Was ist E[X]? Runde auf 3 Nachkommastellen.',
-            answer: 0.667, tolerance: 0.005, unit: '',
+            answer: 0.667, tolerance: 0.001, unit: '',
             hintEn: 'Integrate x*2x from 0 to 1',
             hintDE: 'Integriere x*2x von 0 bis 1',
             explain: "For continuous variables, E[X] = ∫x·f(x)dx; integrating x·2x from 0 to 1 gives [2x³/3]₀¹ = 2/3 ≈ 0.667.",
@@ -1415,7 +1415,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X ~ U[0,1]. What is E[X²]? Enter as a decimal rounded to 3 places.',
             qDE: 'X ~ U[0,1]. Was ist E[X²]? Gib auf 3 Dezimalstellen gerundet an.',
-            answer: 0.333, tolerance: 0.002, unit: '',
+            answer: 0.333, tolerance: 0.001, unit: '',
             hintEn: 'Transformation Theorem',
             hintDE: 'Transformationssatz',
             explain: "Integrating x²·f(x) over the support gives E[X²] = ∫₀¹x²dx = [x³/3]₀¹ = 1/3 ≈ 0.333.",
@@ -1436,7 +1436,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X ~ Bin(4,0.5). What is P(X=2)? Round to 3 decimal places.',
             qDE: 'X ~ Bin(4,0,5). Was ist P(X=2)? Runde auf 3 Nachkommastellen.',
-            answer: 0.375, tolerance: 0.002, unit: '',
+            answer: 0.375, tolerance: 0.001, unit: '',
             hintEn: 'P(X=2) = binomialcoefficient(4,2)·0.5²·0.5²',
             hintDE: 'P(X=2) = binomialkoeffizient(4,2)·0,5²·0,5²',
             explain: "Using the binomial PMF, P(X=2) = C(4,2)·0.5²·0.5² = 6×0.0625 = 0.375.",
@@ -1572,7 +1572,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X ~ Ge(0.4): number of trials until first success. What is P(X=3)? Round to 3 decimal places.',
             qDE: 'X ~ Geo(0,4): Anzahl Versuche bis zum ersten Erfolg. Was ist P(X=3)? Runde auf 3 Nachkommastellen.',
-            answer: 0.144, tolerance: 0.002, unit: '',
+            answer: 0.144, tolerance: 0.001, unit: '',
             hintEn: 'P(X=3) = 0.6²·0.4',
             hintDE: 'P(X=3) = 0,6²·0,4',
             explain: "The geometric distribution requires two failures followed by a success: P(X=3) = (1−p)²·p = 0.6²×0.4 = 0.144.",
@@ -1613,8 +1613,8 @@ export const MATH_GATE_POOLS = {
             answer: 0.3125, tolerance: 0.001, unit: '',
             hintEn: 'C(5,3)·0.5³·0.5² with C as binomial coefficient.',
             hintDE: 'C(5,3)·0,5³·0,5² mit C als Binomialkoeffizient',
-            explain: "This is a binomial probability: C(5,3)·p³·(1−p)² = 10×0.125×0.25 = 0.3125.",
-            explainDE: "Dies ist eine Binomialwahrscheinlichkeit: C(5,3)·p³·(1−p)² = 10×0,125×0,25 = 0,3125."
+            explain: "This is a binomial probability: C(5,3)·p³·(1−p)² = 10×0.125×0.25 = 0.3125, which rounds to 0.313.",
+            explainDE: "Dies ist eine Binomialwahrscheinlichkeit: C(5,3)·p³·(1−p)² = 10×0,125×0,25 = 0,3125; auf drei Dezimalstellen gerundet ist das 0,313."
         },
         {
             q: 'A Bernoulli sequence has p=0.2. What is the probability that the first success occurs on trial 4 or later? Round to 3 decimal places.',
@@ -1630,11 +1630,11 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X ~ NegBin(r=2, p=0.5): number of trials until 2nd success. What is P(X=4)? Round to 3 decimal places.',
             qDE: 'X ~ NegBin(r=2, p=0,5): Anzahl Versuche bis zum 2. Erfolg. Was ist P(X=4)? Runde auf 3 Nachkommastellen.',
-            answer: 0.1875, tolerance: 0.002, unit: '',
+            answer: 0.1875, tolerance: 0.001, unit: '',
             hintEn: 'P(X=4) = C(3,1)·0.5²·0.5² with C as binomial coefficient',
             hintDE: 'P(X=4) = C(3,1)·0,5²·0,5² mit C als Binomialkoeffizient',
-            explain: "The negative binomial PMF requires the 2nd success to fall exactly on trial 4, meaning exactly 1 success among the first 3 trials, followed by a success: P(X=4) = C(3,1)·p²·(1−p)² = 3×0.25×0.25 = 0.1875.",
-            explainDE: "Die Zähldichte der negativen Binomialverteilung erfordert, dass der 2. Erfolg genau beim 4. Versuch eintritt, d.h. genau 1 Erfolg unter den ersten 3 Versuchen, gefolgt von einem Erfolg: P(X=4) = C(3,1)·p²·(1−p)² = 3×0,25×0,25 = 0,1875."
+            explain: "The negative binomial PMF requires the 2nd success to fall exactly on trial 4, meaning exactly 1 success among the first 3 trials, followed by a success: P(X=4) = C(3,1)·p²·(1−p)² = 3×0.25×0.25 = 0.1875, which rounds to 0.188.",
+            explainDE: "Die Zähldichte der negativen Binomialverteilung erfordert, dass der 2. Erfolg genau beim 4. Versuch eintritt, d.h. genau 1 Erfolg unter den ersten 3 Versuchen, gefolgt von einem Erfolg: P(X=4) = C(3,1)·p²·(1−p)² = 3×0,25×0,25 = 0,1875; auf drei Dezimalstellen gerundet ist das 0,188."
         },
         {
             q: 'X ~ NegBin(r=3, p=0.4). What is E[X]? Round to 3 decimal places.',
@@ -1662,17 +1662,17 @@ export const MATH_GATE_POOLS = {
             answer: 0.0498, tolerance: 0.001, unit: '',
             hintEn: 'P(X=0) = e^(−3)·3⁰/0!',
             hintDE: 'P(X=0) = e^(−3)·3⁰/0!',
-            explain: "The Poisson PMF at 0 reduces to e^(−λ): P(X=0) = e^(−3)·3⁰/0! = e^(−3) ≈ 0.0498.",
-            explainDE: "Die Zähldichte der Poissonverteilung reduziert sich bei 0 auf e^(−λ): P(X=0) = e^(−3)·3⁰/0! = e^(−3) ≈ 0,0498."
+            explain: "The Poisson PMF at 0 reduces to e^(−λ): P(X=0) = e^(−3)·3⁰/0! = e^(−3) ≈ 0.0498, which rounds to 0.050 at three decimal places.",
+            explainDE: "Die Zähldichte der Poissonverteilung reduziert sich bei 0 auf e^(−λ): P(X=0) = e^(−3)·3⁰/0! = e^(−3) ≈ 0,0498; auf drei Dezimalstellen gerundet ist das 0,050."
         },
         {
             q: 'X ~ Poi(2). What is P(X=2)? Round to 3 decimal places.',
             qDE: 'X ~ Poi(2). Was ist P(X=2)? Runde auf 3 Nachkommastellen.',
-            answer: 0.2707, tolerance: 0.002, unit: '',
+            answer: 0.2707, tolerance: 0.001, unit: '',
             hintEn: 'P(X=2) = e^(−2)·2²/2!',
             hintDE: 'P(X=2) = e^(−2)·2²/2!',
-            explain: "Plugging into the Poisson PMF: P(X=2) = e^(−2)·2²/2! = e^(−2)×2 ≈ 0.2707.",
-            explainDE: "Einsetzen in die Zähldichte der Poissonverteilung: P(X=2) = e^(−2)·2²/2! = e^(−2)×2 ≈ 0,2707."
+            explain: "Plugging into the Poisson PMF: P(X=2) = e^(−2)·2²/2! = e^(−2)×2 ≈ 0.2707, which rounds to 0.271 at three decimal places.",
+            explainDE: "Einsetzen in die Zähldichte der Poissonverteilung: P(X=2) = e^(−2)·2²/2! = e^(−2)×2 ≈ 0,2707; auf drei Dezimalstellen gerundet ist das 0,271."
         },
         {
             q: 'X ~ Poi(5). What is E[X] and Var(X)? Enter the value.',
@@ -1697,11 +1697,11 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X ~ Bin(200,0.01). Using the Poisson approximation with λ=n·p, what is P(X=0)? Round to 3 decimal places.',
             qDE: 'X ~ Bin(200,0,01). Mit der Poisson-Näherung λ=n·p: Was ist P(X=0)? Runde auf 3 Nachkommastellen.',
-            answer: 0.1353, tolerance: 0.002, unit: '',
+            answer: 0.1353, tolerance: 0.001, unit: '',
             hintEn: 'λ = 2. P(X=0).',
             hintDE: 'λ = 2. P(X=0).',
-            explain: "With λ = n·p = 200×0.01 = 2, the Poisson approximation gives P(X=0) = e^(−2) ≈ 0.1353.",
-            explainDE: "Mit λ = n·p = 200×0,01 = 2 ergibt die Poisson-Näherung P(X=0) = e^(−2) ≈ 0,1353."
+            explain: "With λ = n·p = 200×0.01 = 2, the Poisson approximation gives P(X=0) = e^(−2) ≈ 0.1353, which rounds to 0.135 at three decimal places.",
+            explainDE: "Mit λ = n·p = 200×0,01 = 2 ergibt die Poisson-Näherung P(X=0) = e^(−2) ≈ 0,1353; auf drei Dezimalstellen gerundet ist das 0,135."
         },
         {
             q: 'For the Poisson limit theorem, the approximation Bin(n,p) ≈ Poi(λ) is good when n is large and p is small. If n=1000 and λ=2, what is p? Round to 4 decimal places.',
@@ -1755,16 +1755,16 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X ~ Exp(2). What is P(X ≤ 1)? Round to 3 decimal places.',
             qDE: 'X ~ Exp(λ=2). Was ist P(X ≤ 1)? Runde auf 3 Nachkommastellen.',
-            answer: 0.8647, tolerance: 0.002, unit: '',
+            answer: 0.8647, tolerance: 0.001, unit: '',
             hintEn: 'F(1) = 1 − e^(−2)',
             hintDE: 'F(1) = 1 − e^(−2)',
-            explain: "Using the exponential CDF: P(X ≤ 1) = 1 − e^(−λ·1) = 1 − e^(−2) ≈ 0.8647.",
-            explainDE: "Mit der Verteilungsfunktion der Exponentialverteilung: P(X ≤ 1) = 1 − e^(−λ·1) = 1 − e^(−2) ≈ 0,8647."
+            explain: "Using the exponential CDF: P(X ≤ 1) = 1 − e^(−λ·1) = 1 − e^(−2) ≈ 0.8647, which rounds to 0.865 at three decimal places.",
+            explainDE: "Mit der Verteilungsfunktion der Exponentialverteilung: P(X ≤ 1) = 1 − e^(−λ·1) = 1 − e^(−2) ≈ 0,8647; auf drei Dezimalstellen gerundet ist das 0,865."
         },
         {
             q: 'X ~ Exp(3). What is Var(X)? Enter as a decimal rounded to 2 places.',
             qDE: 'X ~ Exp(3). Was ist Var(X)? Auf 2 Stellen runden.',
-            answer: 0.11, tolerance: 0.02, unit: '',
+            answer: 0.11, tolerance: 0.01, unit: '',
             hintEn: 'Var(X) = 1/λ² = 1/9.',
             hintDE: 'Var(X) = 1/λ² = 1/9.',
             explain: "The variance of the exponential distribution is Var(X) = 1/λ² = 1/9 ≈ 0.11.",
@@ -1785,7 +1785,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X ~ N(0,1). What is P(−1.96 ≤ X ≤ 1.96)? Round to 3 decimal places.',
             qDE: 'X ~ N(μ=0, σ=1). Was ist P(−1,96 ≤ X ≤ 1,96)? Runde auf 3 Nachkommastellen.',
-            answer: 0.95, tolerance: 0.002, unit: '',
+            answer: 0.95, tolerance: 0.001, unit: '',
             hintEn: 'P(−1.96 ≤ Z ≤ 1.96) = Φ(1.96) − Φ(−1.96) ',
             hintDE: 'P(−1,96 ≤ Z ≤ 1,96) = Φ(1,96) − Φ(−1,96) ',
             explain: "This is the well-known 95% interval of the standard normal distribution: Φ(1.96) − Φ(−1.96) ≈ 0.975 − 0.025 = 0.95.",
@@ -1978,7 +1978,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'Joint density f(x,y) = 2 for 0 ≤ y ≤ x ≤ 1. The marginal f_X(x) = 2x. What is f_{Y|X}(y|x)? Enter the value at x=0.6, y=0.3. Round to 3 decimal places.',
             qDE: 'Gemeinsame Dichte f(x,y) = 2 für 0 ≤ y ≤ x ≤ 1. Randdichte f_X(x) = 2x. Was ist f_{Y|X}(y|x) bei x=0,6, y=0,3? Runde auf 3 Nachkommastellen.',
-            answer: 1.667, tolerance: 0.005, unit: '',
+            answer: 1.667, tolerance: 0.001, unit: '',
             hintEn: 'f_{Y|X}(y|x) = 2 / 2x = 1/x.',
             hintDE: 'f_{Y|X}(y|x) = 2 / 2x = 1/x.',
             explain: "Since f_X(x) = 2x, the conditional density is f_{Y|X}(y|x) = f(x,y)/f_X(x) = 2/(2x) = 1/x; at x=0.6, this gives 1/0.6 ≈ 1.667.",
@@ -3021,7 +3021,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X̄ₙ = 50, σ = 8, n = 16. Compute the margin of error for a two-sided 95% CI for μ using z_{0.975} = 1.96. Round to 2 decimal places.',
             qDE: 'X̄ₙ = 50, σ = 8, n = 16. Berechne die Fehlerspanne für ein zweiseitiges 95%-KI für μ mit z_{0,975} = 1,96. Auf 2 Dezimalstellen runden.',
-            answer: 3.92, tolerance: 0.05, unit: '',
+            answer: 3.92, tolerance: 0.01, unit: '',
             hintEn: 'Margin = z_{1−α/2} · σ/√n = 1.96 × 8/√16 = 1.96 × 2 = 3.92.',
             hintDE: 'Fehlerspanne = z_{1−α/2} · σ/√n = 1,96 × 8/√16 = 1,96 × 2 = 3,92.',
             explain: "Plugging in the values: margin = z_{1−α/2}·σ/√n = 1.96 × 8/√16 = 1.96 × 2 = 3.92.",
@@ -3030,7 +3030,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X̄ₙ = 100, σ = 15, n = 25, z_{0.95} = 1.645. What is the upper bound of the one-sided (upper) 95% CI for μ? Round to 2 decimal places.',
             qDE: 'X̄ₙ = 100, σ = 15, n = 25, z_{0,95} = 1,645. Wie lautet die obere Grenze des einseitigen (oberen) 95%-KI für μ? Auf 2 Dezimalstellen runden.',
-            answer: 104.94, tolerance: 0.1, unit: '',
+            answer: 104.94, tolerance: 0.01, unit: '',
             hintEn: 'Upper bound = X̄ₙ + z_{1−α} · σ/√n = 100 + 1.645 × 15/5 = 100 + 4.935.',
             hintDE: 'Obere Grenze = X̄ₙ + z_{1−α} · σ/√n = 100 + 1,645 × 15/5 = 100 + 4,935.',
             explain: "Computing the upper bound: X̄ₙ + z_{1−α}·σ/√n = 100 + 1.645 × 15/5 = 100 + 4.935 = 104.935 ≈ 104.94.",
@@ -3051,7 +3051,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'X̄ₙ = 20, Sₙ = 4, n = 9, t_{8, 0.975} = 2.306. Compute the margin of error of the two-sided 95% CI for μ. Round to 2 decimal places.',
             qDE: 'X̄ₙ = 20, Sₙ = 4, n = 9, t_{8; 0,975} = 2,306. Berechne die Fehlerspanne des zweiseitigen 95%-KI für μ. Auf 2 Dezimalstellen runden.',
-            answer: 3.07, tolerance: 0.05, unit: '',
+            answer: 3.07, tolerance: 0.01, unit: '',
             hintEn: 'Margin = t_{n−1, 1−α/2} · Sₙ/√n = 2.306 × 4/3 ≈ 3.07.',
             hintDE: 'Fehlerspanne = t_{n−1; 1−α/2} · Sₙ/√n = 2,306 × 4/3 ≈ 3,07.',
             explain: "Plugging in: margin = t_{n−1,1−α/2}·Sₙ/√n = 2.306 × 4/3 = 2.306 × 1.333 ≈ 3.07.",
@@ -3081,7 +3081,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'n = 15, Sₙ² = 6, χ²_{14, 0.975} = 26.12. Compute the lower bound of the two-sided 95% CI for σ². Round to 2 decimal places.',
             qDE: 'n = 15, Sₙ² = 6, χ²_{14; 0,975} = 26,12. Berechne die untere Grenze des zweiseitigen 95%-KI für σ². Auf 2 Dezimalstellen runden.',
-            answer: 3.22, tolerance: 0.05, unit: '',
+            answer: 3.22, tolerance: 0.01, unit: '',
             hintEn: 'Lower bound = (n−1)·Sₙ² / χ²_{n−1, 1−α/2} = 14×6/26.12 ≈ 3.22.',
             hintDE: 'Untere Grenze = (n−1)·Sₙ² / χ²_{n−1; 1−α/2} = 14×6/26,12 ≈ 3,22.',
             explain: "Plugging in: lower bound = (n−1)·Sₙ²/χ²_{n−1,1−α/2} = 14×6/26.12 = 84/26.12 ≈ 3.22.",
@@ -3102,7 +3102,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'p̂ = 0.2, n = 200, z_{0.975} = 1.96. Compute the margin of error of the approximate two-sided 95% CI for p. Round to 3 decimal places.',
             qDE: 'p̂ = 0,2, n = 200, z_{0,975} = 1,96. Berechne die Fehlerspanne des approximativen zweiseitigen 95%-KI für p. Auf 3 Dezimalstellen runden.',
-            answer: 0.055, tolerance: 0.003, unit: '',
+            answer: 0.055, tolerance: 0.001, unit: '',
             hintEn: 'Margin = z_{1−α/2}·√(p̂(1−p̂)/n) = 1.96×√(0.2×0.8/200) ≈ 1.96×0.0283 ≈ 0.055.',
             hintDE: 'Fehlerspanne = z_{1−α/2}·√(p̂(1−p̂)/n) = 1,96×√(0,2×0,8/200) ≈ 1,96×0,0283 ≈ 0,055.',
             explain: "Plugging in: margin = z_{1−α/2}·√(p̂(1−p̂)/n) = 1.96×√(0.2×0.8/200) = 1.96×√0.0008 ≈ 1.96×0.0283 ≈ 0.055.",
@@ -3144,7 +3144,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'H₀: μ = 50. X̄ₙ = 53, σ = 6, n = 36. Compute the test statistic Z of the one-sample Gauß-test. Round to 2 decimal places.',
             qDE: 'H₀: μ = 50. X̄ₙ = 53, σ = 6, n = 36. Berechne die Teststatistik Z des Ein-Stichproben-Gauß-Tests. Auf 2 Dezimalstellen runden.',
-            answer: 3, tolerance: 0.05, unit: '',
+            answer: 3, tolerance: 0.01, unit: '',
             hintEn: 'Z = (X̄ₙ − μ₀)/(σ/√n) = (53−50)/(6/6) = 3/1 = 3.',
             hintDE: 'Z = (X̄ₙ − μ₀)/(σ/√n) = (53−50)/(6/6) = 3/1 = 3.',
             explain: "Plugging into the test statistic formula: Z = (X̄ₙ − μ₀)/(σ/√n) = (53−50)/(6/√36) = 3/1 = 3.",
@@ -3174,7 +3174,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'H₀: μ = 10. X̄ₙ = 11.5, Sₙ = 3, n = 16. Compute the test statistic T of the one-sample t-test. Round to 2 decimal places.',
             qDE: 'H₀: μ = 10. X̄ₙ = 11,5, Sₙ = 3, n = 16. Berechne die Teststatistik T des Ein-Stichproben-t-Tests. Auf 2 Dezimalstellen runden.',
-            answer: 2, tolerance: 0.05, unit: '',
+            answer: 2, tolerance: 0.01, unit: '',
             hintEn: 'T = (X̄ₙ − μ₀)/(Sₙ/√n) = (11.5−10)/(3/4) = 1.5/0.75 = 2.',
             hintDE: 'T = (X̄ₙ − μ₀)/(Sₙ/√n) = (11,5−10)/(3/4) = 1,5/0,75 = 2.',
             explain: "Plugging into the t-test statistic: T = (X̄ₙ − μ₀)/(Sₙ/√n) = (11.5−10)/(3/√16) = 1.5/0.75 = 2.",
@@ -3243,7 +3243,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'A two-sided Gauß-test gives Z = 2. Using Φ(2) ≈ 0.9772, compute the p-value. Round to 4 decimal places.',
             qDE: 'Ein zweiseitiger Gauß-Test ergibt Z = 2. Mit Φ(2) ≈ 0,9772: Berechne den p-Wert. Auf 4 Dezimalstellen runden.',
-            answer: 0.0456, tolerance: 0.002, unit: '',
+            answer: 0.0456, tolerance: 0.0001, unit: '',
             hintEn: 'p-value = 2·(1 − Φ(|Z|)) = 2·(1 − 0.9772) = 2×0.0228 = 0.0456.',
             hintDE: 'p-Wert = 2·(1 − Φ(|Z|)) = 2·(1 − 0,9772) = 2×0,0228 = 0,0456.',
             explain: "For a two-sided test, the p-value is p = 2·(1 − Φ(|Z|)) = 2·(1 − 0.9772) = 2×0.0228 = 0.0456.",
@@ -3261,14 +3261,14 @@ export const MATH_GATE_POOLS = {
         {
             q: 'H₀: p = 0.5. n = 100, p̂ = 0.58. Compute the test statistic Z of the asymptotic binomial test. Round to 2 decimal places.',
             qDE: 'H₀: p = 0,5. n = 100, p̂ = 0,58. Berechne die Teststatistik Z des asymptotischen Binomialtests. Auf 2 Dezimalstellen runden.',
-            answer: 1.6, tolerance: 0.05, unit: '',
+            answer: 1.6, tolerance: 0.01, unit: '',
             hintEn: 'Z = (p̂ − p₀)/√(p₀(1−p₀)/n) = 0.08/√(0.25/100) = 0.08/0.05 = 1.6.',
             hintDE: 'Z = (p̂ − p₀)/√(p₀(1−p₀)/n) = 0,08/√(0,25/100) = 0,08/0,05 = 1,6.'
         },
         {
             q: 'H₀: p = 0.3. n = 200, X = 70 successes. Compute p̂. Round to 2 decimal places.',
             qDE: 'H₀: p = 0,3. n = 200, X = 70 Erfolge. Berechne p̂. Auf 2 Dezimalstellen runden.',
-            answer: 0.35, tolerance: 0.005, unit: '',
+            answer: 0.35, tolerance: 0.01, unit: '',
             hintEn: 'p̂ = X/n = 70/200 = 0.35.',
             hintDE: 'p̂ = X/n = 70/200 = 0,35.'
         },
@@ -3292,7 +3292,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'Paired-sample test: n = 9, D̄ = 4, S_D = 6. Compute the test statistic T = √n · D̄ / S_D. Round to 2 decimal places.',
             qDE: 'Test bei verbundenen Stichproben: n = 9, D̄ = 4, S_D = 6. Berechne die Teststatistik T = √n · D̄ / S_D. Auf 2 Dezimalstellen runden.',
-            answer: 2, tolerance: 0.05, unit: '',
+            answer: 2, tolerance: 0.01, unit: '',
             hintEn: 'T = √9 · 4/6 = 3 · 0.667 = 2.',
             hintDE: 'T = √9 · 4/6 = 3 · 0,667 = 2.'
         },
@@ -3316,7 +3316,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'Two independent samples give S_X² = 25 and S_Y² = 16. Compute the F-test statistic F = S_X²/S_Y². Round to 2 decimal places.',
             qDE: 'Zwei unabhängige Stichproben ergeben S_X² = 25 und S_Y² = 16. Berechne die F-Teststatistik F = S_X²/S_Y². Auf 2 Dezimalstellen runden.',
-            answer: 1.56, tolerance: 0.02, unit: '',
+            answer: 1.56, tolerance: 0.01, unit: '',
             hintEn: 'F = 25/16 = 1.5625.',
             hintDE: 'F = 25/16 = 1,5625.'
         },
@@ -3340,14 +3340,14 @@ export const MATH_GATE_POOLS = {
         {
             q: 'Two-sample t-test: m = 10, n = 12, S_X² = 4, S_Y² = 5. Compute the pooled variance S_p² using S_p² = [(m−1)S_X² + (n−1)S_Y²]/(m+n−2). Round to 2 decimal places.',
             qDE: 'Zwei-Stichproben-t-Test: m = 10, n = 12, S_X² = 4, S_Y² = 5. Berechne die gepoolte Varianz S_p² mit S_p² = [(m−1)S_X² + (n−1)S_Y²]/(m+n−2). Auf 2 Dezimalstellen runden.',
-            answer: 4.55, tolerance: 0.05, unit: '',
+            answer: 4.55, tolerance: 0.01, unit: '',
             hintEn: 'S_p² = (9×4 + 11×5)/(20) = (36+55)/20 = 91/20 = 4.55.',
             hintDE: 'S_p² = (9×4 + 11×5)/(20) = (36+55)/20 = 91/20 = 4,55.'
         },
         {
             q: 'Two-sample t-test: X̄ = 20, Ȳ = 17, S_p = 3, m = 10, n = 10. Compute T = (X̄ − Ȳ)/(S_p·√(1/m + 1/n)). Round to 2 decimal places.',
             qDE: 'Zwei-Stichproben-t-Test: X̄ = 20, Ȳ = 17, S_p = 3, m = 10, n = 10. Berechne T = (X̄ − Ȳ)/(S_p·√(1/m + 1/n)). Auf 2 Dezimalstellen runden.',
-            answer: 2.24, tolerance: 0.05, unit: '',
+            answer: 2.24, tolerance: 0.01, unit: '',
             hintEn: 'T = 3/(3·√0.2) = 3/(3×0.447) = 3/1.342 ≈ 2.24.',
             hintDE: 'T = 3/(3·√0,2) = 3/(3×0,447) = 3/1,342 ≈ 2,24.'
         },
@@ -3364,7 +3364,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'Welch test: X̄ = 15, Ȳ = 12, S_X² = 9, S_Y² = 4, m = 12, n = 9. Compute T = (X̄ − Ȳ)/√(S_X²/m + S_Y²/n). Round to 2 decimal places.',
             qDE: 'Welch-Test: X̄ = 15, Ȳ = 12, S_X² = 9, S_Y² = 4, m = 12, n = 9. Berechne T = (X̄ − Ȳ)/√(S_X²/m + S_Y²/n). Auf 2 Dezimalstellen runden.',
-            answer: 2.75, tolerance: 0.05, unit: '',
+            answer: 2.75, tolerance: 0.01, unit: '',
             hintEn: 'T = 3/√(9/12 + 4/9) = 3/√(0.75+0.444) = 3/√1.194 = 3/1.093 ≈ 2.75',
             hintDE: 'T = 3/√(9/12 + 4/9) = 3/√(0,75+0,444) = 3/√1,194 ≈ 3/1,093 ≈ 2,75.'
         },
@@ -3398,7 +3398,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'Two-sample binomial test: p̂_X = 0.4, p̂_Y = 0.3, m = n = 100, pooled p̂ = 0.35. Compute Z = (p̂_X − p̂_Y)/√(p̂(1−p̂)(1/m+1/n)). Round to 2 decimal places.',
             qDE: 'Zwei-Stichproben-Binomialtest: p̂_X = 0,4, p̂_Y = 0,3, m = n = 100, gepoolt p̂ = 0,35. Berechne Z = (p̂_X − p̂_Y)/√(p̂(1−p̂)(1/m+1/n)). Auf 2 Dezimalstellen runden.',
-            answer: 1.48, tolerance: 0.05, unit: '',
+            answer: 1.48, tolerance: 0.01, unit: '',
             hintEn: 'Z = 0.1/√(0.35×0.65×0.02) = 0.1/√0.00455 = 0.1/0.0675 ≈ 1.48.',
             hintDE: 'Z = 0,1/√(0,35×0,65×0,02) = 0,1/√0,00455 = 0,1/0,0675 ≈ 1,48.'
         },
@@ -3437,7 +3437,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'For the centered cross-product S_xy = Σᵢxᵢyᵢ − nx̄ȳ, the displayed quantities are Σᵢxᵢyᵢ = 93.50 and nx̄ȳ = 81.60. Compute S_xy, rounded to two decimal places.',
             qDE: 'Für das zentrierte Kreuzprodukt S_xy = Σᵢxᵢyᵢ − nx̄ȳ sind die angegebenen Größen Σᵢxᵢyᵢ = 93,50 und nx̄ȳ = 81,60. Berechne S_xy, gerundet auf zwei Dezimalstellen.',
-            answer: 11.9, tolerance: 0.15, unit: '',
+            answer: 11.9, tolerance: 0.01, unit: '',
             hintEn: 'Subtract the displayed quantities: S_xy = 93.50 − 81.60 = 11.90.',
             hintDE: 'Subtrahiere die angegebenen Größen: S_xy = 93,50 − 81,60 = 11,90.',
             explain: 'Using exactly the displayed values, S_xy = Σᵢxᵢyᵢ − nx̄ȳ = 93.50 − 81.60 = 11.90. This is the numerator used in the least-squares slope b̂ = S_xy/S_x².',
@@ -3455,7 +3455,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'A least-squares line has ȳ = 2.91429, estimated slope b̂ = 0.4293 and x̄ = 4. Compute the intercept â = ȳ − b̂x̄, rounded to two decimal places.',
             qDE: 'Eine Ausgleichsgerade hat ȳ = 2,91429, die geschätzte Steigung b̂ = 0,4293 und x̄ = 4. Berechne den Achsenabschnitt â = ȳ − b̂x̄, gerundet auf zwei Dezimalstellen.',
-            answer: 1.2, tolerance: 0.05, unit: '',
+            answer: 1.2, tolerance: 0.01, unit: '',
             hintEn: 'â = 2.91429 − (0.4293·4) = 2.91429 − 1.71720 = 1.19709 ≈ 1.20.',
             hintDE: 'â = 2,91429 − (0,4293·4) = 2,91429 − 1,71720 = 1,19709 ≈ 1,20.',
             explain: 'The slope contribution at the mean predictor is 0.4293·4 = 1.71720. Subtracting it from ȳ gives 1.19709, which rounds to 1.20.',
@@ -3464,7 +3464,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'A sample has correlation r = 0.6 and size n = 12. Compute T = r√(n−2)/√(1−r²), rounded to two decimal places.',
             qDE: 'Eine Stichprobe hat den Korrelationskoeffizienten r = 0,6 und den Umfang n = 12. Berechne T = r√(n−2)/√(1−r²), gerundet auf zwei Dezimalstellen.',
-            answer: 2.37, tolerance: 0.05, unit: '',
+            answer: 2.37, tolerance: 0.01, unit: '',
             hintEn: 'T = 0.6√10/√0.64 ≈ 1.89737/0.8 ≈ 2.37.',
             hintDE: 'T = 0,6√10/√0,64 ≈ 1,89737/0,8 ≈ 2,37.',
             explain: 'Substituting the values gives T ≈ 2.37. To decide about H₀: ρ = 0, compare |T| with the appropriate critical value from a t-distribution with n−2 = 10 degrees of freedom.',
@@ -3482,7 +3482,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'For n=7 and S_xy=12.02, the sample variance is s_x²=4, where s_x² = (1/n)Σᵢ(xᵢ−x̄)². Compute b̂ = S_xy/(n·s_x²), rounded to three decimal places.',
             qDE: 'Für n=7 und S_xy=12,02 ist die Stichprobenvarianz s_x²=4, wobei s_x² = (1/n)Σᵢ(xᵢ−x̄)² gilt. Berechne b̂ = S_xy/(n·s_x²), gerundet auf drei Dezimalstellen.',
-            answer: 0.429, tolerance: 0.002, unit: '',
+            answer: 0.429, tolerance: 0.001, unit: '',
             hintEn: 'First calculate n·s_x² = 7·4 = 28. Then b̂ = 12.02/(7·4) = 12.02/28 ≈ 0.429286.',
             hintDE: 'Berechne zuerst n·s_x² = 7·4 = 28. Dann gilt b̂ = 12,02/(7·4) = 12,02/28 ≈ 0,429286.',
             explain: 'Because s_x²=4 already includes the factor 1/n, the slope denominator is n·s_x²=7·4=28. Thus b̂ = 12.02/28 = 0.4292857…, which rounds to 0.429 at three decimal places.',
@@ -3509,7 +3509,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'A fitted line is ŷ = 1.1928 + 0.4293x. Compute the fitted value ŷ at x=7, rounded to two decimal places.',
             qDE: 'Eine Ausgleichsgerade ist ŷ = 1,1928 + 0,4293x. Berechne den Prognosewert ŷ für x=7, gerundet auf zwei Dezimalstellen.',
-            answer: 4.2, tolerance: 0.05, unit: '',
+            answer: 4.2, tolerance: 0.01, unit: '',
             hintEn: 'Substitute x=7: ŷ = 1.1928 + 0.4293·7 = 1.1928 + 3.0051 = 4.1979.',
             hintDE: 'Setze x=7 ein: ŷ = 1,1928 + 0,4293·7 = 1,1928 + 3,0051 = 4,1979.',
             explain: 'The fitted value is the line evaluated at x=7. The unrounded result 4.1979 rounds to 4.20.',
@@ -3518,7 +3518,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'An observation has observed value y=4.6 and fitted value ŷ=4.2. Compute the residual ê = y−ŷ, rounded to two decimal places.',
             qDE: 'Eine Beobachtung hat den Wert y=4,6 und den Prognosewert ŷ=4,2. Berechne das Residuum ê = y−ŷ, gerundet auf zwei Dezimalstellen.',
-            answer: 0.4, tolerance: 0.02, unit: '',
+            answer: 0.4, tolerance: 0.01, unit: '',
             hintEn: 'Observed minus fitted gives ê = 4.6−4.2 = 0.4.',
             hintDE: 'Beobachteter Wert minus Prognosewert ergibt ê = 4,6−4,2 = 0,4.',
             explain: 'A residual is the observed value minus the fitted value. The positive result 0.4 means this observation lies 0.4 units above the fitted line.',
@@ -3650,7 +3650,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'Under H₀ in the independent two-sample Wilcoxon rank-sum test with no tied observations, W=45, E₀(W)=36, and Var₀(W)=30. Compute T=(W−E₀(W))/√Var₀(W), rounded to two decimal places.',
             qDE: 'Unter H₀ im unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich ohne Rangbindungen gelten W=45, E₀(W)=36 und Var₀(W)=30. Berechne T=(W−E₀(W))/√Var₀(W), gerundet auf zwei Dezimalstellen.',
-            answer: 1.64, tolerance: 0.02, unit: '',
+            answer: 1.64, tolerance: 0.01, unit: '',
             hintEn: 'Center and scale W: T=(45−36)/√30=9/√30≈1.64.',
             hintDE: 'Zentriere und skaliere W: T=(45−36)/√30=9/√30≈1,64.',
             explain: 'Subtracting the null mean gives 45−36=9, and dividing by the null standard deviation √30 gives T=9/√30≈1.64. This is the positive standardized rank sum.',
@@ -3677,7 +3677,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'For one cell of a contingency table, the observed count is Nᵢⱼ=14 and the expected count is Êᵢⱼ=10. Compute its contribution (Nᵢⱼ−Êᵢⱼ)²/Êᵢⱼ, rounded to two decimal places.',
             qDE: 'Für eine Zelle einer Kontingenztafel beträgt die beobachtete Anzahl Nᵢⱼ=14 und die erwartete Anzahl Êᵢⱼ=10. Berechne den Beitrag (Nᵢⱼ−Êᵢⱼ)²/Êᵢⱼ, gerundet auf zwei Dezimalstellen.',
-            answer: 1.6, tolerance: 0.02, unit: '',
+            answer: 1.6, tolerance: 0.01, unit: '',
             hintEn: 'Square the difference and divide by the expected count: (14−10)²/10=16/10=1.6.',
             hintDE: 'Quadriere die Differenz und teile durch die erwartete Anzahl: (14−10)²/10=16/10=1,6.',
             explain: 'This cell differs from its expectation by 14−10=4. Its standardized squared contribution is 4²/10=1.6, which is added to the other cells’ contributions to form Q.',
@@ -3695,7 +3695,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'For a 2×2 contingency table with a in the upper-left cell, b in the upper-right cell, c in the lower-left cell, and d in the lower-right cell, let n=a+b+c+d. For a=20, b=10, c=10, and d=20, compute Q=n(ad−bc)²/[(a+b)(c+d)(a+c)(b+d)], rounded to two decimal places.',
             qDE: 'Für eine 2×2-Kontingenztafel mit a in der linken oberen Zelle, b in der rechten oberen Zelle, c in der linken unteren Zelle und d in der rechten unteren Zelle gilt n=a+b+c+d. Berechne für a=20, b=10, c=10 und d=20 den Wert Q=n(ad−bc)²/[(a+b)(c+d)(a+c)(b+d)], gerundet auf zwei Dezimalstellen.',
-            answer: 6.67, tolerance: 0.05, unit: '',
+            answer: 6.67, tolerance: 0.01, unit: '',
             hintEn: 'Here n=60 and ad−bc=400−100=300, so Q=60·300²/(30·30·30·30)≈6.67.',
             hintDE: 'Hier sind n=60 und ad−bc=400−100=300, also Q=60·300²/(30·30·30·30)≈6,67.',
             explain: 'The four marginal totals are all 30. The determinant ad−bc is 300, so the shortcut gives Q=60·300²/(30·30·30·30)=6.666…, which rounds to 6.67.',
@@ -3770,7 +3770,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'A histogram encodes relative frequency fⱼ=0.4 by the area of a class of width bⱼ=2.5. Compute the bar height lⱼ=fⱼ/bⱼ, rounded to three decimal places.',
             qDE: 'Ein Histogramm stellt die relative Häufigkeit fⱼ=0,4 als Fläche einer Klasse mit der Gruppenbreite bⱼ=2,5 dar. Berechne die Balkenhöhe lⱼ=fⱼ/bⱼ, auf drei Dezimalstellen gerundet.',
-            answer: 0.16, tolerance: 0.002, unit: '',
+            answer: 0.16, tolerance: 0.001, unit: '',
             hintEn: 'Divide relative frequency by class width: lⱼ=0.4/2.5=0.16.',
             hintDE: 'Teile die relative Häufigkeit durch die Gruppenbreite: lⱼ=0,4/2,5=0,16.',
             explain: 'The rectangle area is bⱼlⱼ and must equal fⱼ. Hence lⱼ=fⱼ/bⱼ=0.4/2.5=0.16; multiplying height and width recovers the relative frequency.',
@@ -3779,7 +3779,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'The sum of 13 ozone readings is Σᵢ xᵢ = 974. Compute the sample mean x̄ = Σᵢ xᵢ/n, rounded to two decimal places.',
             qDE: 'Die Summe von 13 Ozonmesswerten beträgt Σᵢ xᵢ = 974. Berechne den Stichprobenmittelwert x̄ = Σᵢ xᵢ/n, auf zwei Dezimalstellen gerundet.',
-            answer: 74.92, tolerance: 0.02, unit: '',
+            answer: 74.92, tolerance: 0.01, unit: '',
             hintEn: 'Divide the sum by the number of readings: x̄=974/13=74.923….',
             hintDE: 'Teile die Summe durch die Anzahl der Messwerte: x̄=974/13=74,923….',
             explain: 'The sample mean is the sum divided by the number of observations. Thus x̄=974/13=74.923…, which rounds to 74.92.',
@@ -3788,7 +3788,7 @@ export const MATH_GATE_POOLS = {
         {
             q: 'Five grouped solar-radiation classes have frequencies hⱼ=[5,1,7,12,5] and class midpoints mⱼ=[211.25,213.75,216.25,218.75,221.25]. Compute the grouped mean x̄_g=Σfⱼmⱼ, where fⱼ=hⱼ/n, and round to two decimal places.',
             qDE: 'Fünf gruppierte Klassen der Solarstrahlung haben die Häufigkeiten hⱼ=[5,1,7,12,5] und die Klassenmitten mⱼ=[211,25;213,75;216,25;218,75;221,25]. Berechne den gruppierten Mittelwert x̄_g=Σfⱼmⱼ mit fⱼ=hⱼ/n und runde auf zwei Dezimalstellen.',
-            answer: 217.17, tolerance: 0.1, unit: '',
+            answer: 217.17, tolerance: 0.01, unit: '',
             hintEn: 'There are n=30 observations, so x̄_g=(1/30)Σⱼhⱼmⱼ. The weighted sum is 6515, and 6515/30=217.166… .',
             hintDE: 'Es gibt n=30 Beobachtungen, also x̄_g=(1/30)Σⱼhⱼmⱼ. Die gewichtete Summe beträgt 6515, und 6515/30=217,166… .',
             explain: 'The five frequencies sum to n=30, so fⱼ=hⱼ/30. The weighted mean is (5·211.25+1·213.75+7·216.25+12·218.75+5·221.25)/30=6515/30=217.166…, which rounds to 217.17.',

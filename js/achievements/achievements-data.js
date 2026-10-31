@@ -2072,18 +2072,18 @@ export const ACHIEVEMENT_DEFS = [
 
 
     {
-        id: 'recursionist_DoF_time_recovered',
+        id: 'recursionist_dof_curses',
         category: 'class',
-        icon: '⏳',
-        nameEn: 'Time Reclaimer',
-        nameDE: 'Zeitzurückgewinner',
-        descEn: 'Use Degrees of Freedom to recover atleast 5 minutes.',
-        descDE: 'Verwende Freiheitsgrade um mindestens 5 Minuten zurückzuerhalten.',
-        stat: 'doftimerecovered',
+        icon: '🧟',
+        nameEn: 'Grave Whisperer',
+        nameDE: 'Grabflüsterer',
+        descEn: "Answer the Degrees of Freedom zombie's challenges to curse cells.",
+        descDE: 'Beantworte die Herausforderungen des Freiheitsgrade-Zombies, um Zellen zu verfluchen.',
+        stat: 'dofZombieChallengesWon',
         tiers: [
-            { threshold: 1, labelEn: 'Broken Timeline Fixed', labelDE: 'Gebrochene Zeitlinie repariert' },
-            { threshold: 10, labelEn: 'State Rewritten', labelDE: 'Zustand umgeschrieben' },
-            { threshold: 25, labelEn: 'Entropy Reclaimed', labelDE: 'Entropie zurückgewonnen' },
+            { threshold: 10, labelEn: 'First Whispers', labelDE: 'Erstes Flüstern' },
+            { threshold: 50, labelEn: 'Cursed Grid', labelDE: 'Verfluchtes Raster' },
+            { threshold: 100, labelEn: 'Master of the Dead', labelDE: 'Meister der Toten' },
         ]
     },
 
@@ -2874,8 +2874,8 @@ export const ACHIEVEMENT_DEFS = [
         icon: '👹',
         nameEn: 'Monster Slayer',
         nameDE: 'Monsterschlächter',
-        descEn: 'Defeat monsters in endgame encounters.',
-        descDE: 'Besiege Monster in Endgame-Begegnungen.',
+        descEn: 'Defeat monsters.',
+        descDE: 'Besiege Monster.',
         stat: 'egMonstersSlain',
         tiers: [
             { threshold: 100, labelEn: 'Hunter', labelDE: 'Jäger' },
@@ -2893,8 +2893,8 @@ export const ACHIEVEMENT_DEFS = [
         icon: '👁️',
         nameEn: 'Boss Hunter',
         nameDE: 'Bossjäger',
-        descEn: 'Defeat endgame bosses.',
-        descDE: 'Besiege Endgame-Bosse.',
+        descEn: 'Defeat bosses.',
+        descDE: 'Besiege Bosse.',
         stat: 'egBossKills',
         tiers: [
             { threshold: 5, labelEn: 'Boss Novice', labelDE: 'Boss-Neuling' },
@@ -2912,13 +2912,13 @@ export const ACHIEVEMENT_DEFS = [
         icon: '💫',
         nameEn: 'Pantheon',
         nameDE: 'Pantheon',
-        descEn: 'Defeat each of the 5 unique endgame bosses at least once.',
-        descDE: 'Besiege jeden der 5 einzigartigen Endgame-Bosse mindestens einmal.',
-        stat: 'egBossTypesSlain',
+        descEn: 'Defeat each of the four Tier 16 bosses in Tier 16 maps.',
+        descDE: 'Besiege jeden der vier Bosse der Stufe 16 in Karten der Stufe 16.',
+        stat: 'egT16BossTypesSlain',
         tiers: [
             { threshold: 2, labelEn: 'Duo', labelDE: 'Duo' },
             { threshold: 3, labelEn: 'Trinity', labelDE: 'Trinität' },
-            { threshold: 5, labelEn: 'Pantheon Vanquished', labelDE: 'Pantheon bezwungen' },
+            { threshold: 4, labelEn: 'Pantheon Vanquished', labelDE: 'Pantheon bezwungen' },
         ]
     },
 

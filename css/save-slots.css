@@ -805,3 +805,24 @@
 #screen-save-slots .ssc-info .ssc-score, #screen-save-slots .ssc-info .ssc-levels { white-space: normal; }
 #screen-save-slots .ssc-info .ssc-score { font-size: 14px; }
 #screen-save-slots .ssc-info .ssc-levels { font-size: 13px; }
+
+/* 💾 export (bottom-left) and 📥 import (bottom-right) buttons: move a save
+   to and from a file on the player's PC. */
+.ssc-export-btn,
+.ssc-import-btn {
+    position: absolute;
+    bottom: 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    opacity: 0.6;
+}
+
+.ssc-export-btn { left: 4px; }
+.ssc-import-btn { right: 4px; }
+
+    .ssc-export-btn:hover,
+    .ssc-import-btn:hover {
+        opacity: 1;
+    }

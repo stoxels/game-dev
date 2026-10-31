@@ -13,6 +13,52 @@ export const CHANGELOG_DATA = [
 
 
     {
+        version: "v0.36 BETA",
+        date: "31.10.2026",
+        changes: [
+            {
+                category: ["New Features", "Neue Funktionen"],
+                items: [
+                    ["Save files can now be exported and imported on the Select Save File screen. The disk button on a save slot downloads it as a file, the inbox button on any slot loads a file back in (it asks before replacing an existing save). This is for browsers that clear site data automatically: keep the file somewhere safe and your progress can always come back.", "Spielstände lassen sich jetzt auf dem Bildschirm Spielstand wählen exportieren und importieren. Der Disketten-Knopf an einem Platz lädt ihn als Datei herunter, der Posteingang-Knopf lädt eine Datei in jeden Platz (vorher wird gefragt, ob ein vorhandener Spielstand ersetzt werden soll). Gedacht für Browser, die Website-Daten automatisch löschen: Bewahre die Datei sicher auf, dann kann dein Fortschritt immer zurückkehren."],
+                    ["Movement trial bonus objective with a reward chest. Chest items have tooltips with compare, the character walks normally, and your keys are released when the run ends.", "Neues Bonusziel im Bewegungs-Trial mit Belohnungstruhe. Gegenstände aus der Truhe haben Tooltips mit Vergleich, die Figur läuft normal und deine Tasten werden am Ende des Durchgangs losgelassen."],
+                    ["Tutorial: after the graduation chest the Professor now teaches crafting. The chest holds an Awaken Core and a low-tier Essence, and you learn to right-click one in the inventory and left-click a piece of your uniform to use it.", "Tutorial: Nach der Abschlusstruhe bringt dir der Professor jetzt das Handwerk bei. Die Truhe enthält einen Erweckungskern und eine einfache Essenz, und du lernst, sie im Inventar mit Rechtsklick aufzunehmen und mit Linksklick auf ein Stück deiner Uniform anzuwenden."],
+                    ["Passive tree: nine more nodes (six notables and three small Trophy nodes) now grant seconds on the Timer for each monster killed.", "Passivbaum: Neun weitere Knoten (sechs Notables und drei kleine Trophäen-Knoten) geben jetzt Sekunden auf dem Timer für jedes getötete Monster."],
+                ],
+            },
+            {
+                category: ["Combat & Gameplay", "Kampf & Gameplay"],
+                items: [
+                    ["Easier start: every normal monster you defeat in the campaign adds 10 seconds to the puzzle timer, worlds 1 to 4 field fewer monsters (at most 2, 3, 3 and 4), and monsters in the first levels hit about a quarter softer, fading back to normal by monster level 10.", "Leichterer Einstieg: Jedes normale Monster, das du in der Kampagne besiegst, gibt 10 Sekunden auf dem Puzzle-Timer, die Welten 1 bis 4 haben weniger Monster (höchstens 2, 3, 3 und 4) und Monster in den ersten Levels treffen etwa ein Viertel schwächer, bis das bei Monsterstufe 10 wieder normal ist."],
+                    ["Equipment drops lean towards base items close to the monster's level. Low-level bases can still drop from high-level monsters, just less often.", "Ausrüstungs-Drops bevorzugen jetzt Basisgegenstände nahe der Monsterstufe. Niedrige Basisgegenstände können von hochstufigen Monstern weiter fallen, nur seltener."],
+                    ["Tether Stones are rare now (2.5% per kill instead of 8%, bosses still always drop one), and a summon costs more the closer your bond is: 3, 4, 6, 8 and 10 stones at affinity 1 to 5.", "Bindungssteine sind jetzt selten (2,5% pro Kill statt 8%, Bosse lassen weiter immer einen fallen) und eine Beschwörung kostet mehr, je enger die Bindung ist: 3, 4, 6, 8 und 10 Steine bei Verbundenheit 1 bis 5."],
+                    ["World 7 bosses redesigned: the Weaver and the Executioner.", "Die Bosse von Welt 7 wurden überarbeitet: der Weber und der Henker."],
+                ],
+            },
+            {
+                category: ["Interface", "Oberfläche"],
+                items: [
+                    ["Picking up a charm you already know now reads naturally and shows your progress towards the next Theorem. Loot pickup messages no longer show a package emoji.", "Einen Anhänger aufzuheben, den du schon kennst, liest sich jetzt natürlich und zeigt deinen Fortschritt zum nächsten Theorem. Beute-Meldungen zeigen kein Paket-Emoji mehr."],
+                    ["Pause menu info panel redesigned, the Gauntlet intro card is clearer, and the puzzle item panel is now called Toolkit.", "Info-Bereich im Pausenmenü neu gestaltet, die Gauntlet-Einführungskarte ist klarer und das Puzzle-Item-Fenster heißt jetzt Werkzeugkasten."],
+                    ["Large grids: messages, the buff bar and the objective tracker shrink to fit, monsters stay clear of the tracker, and the hotbar shrinks away from the grid corner.", "Große Raster: Meldungen, Buff-Leiste und Zielanzeige passen sich der Größe an, Monster halten Abstand zur Zielanzeige und die Zauberleiste weicht der Rasterecke aus."],
+                    ["Quiz answers use a math font, and typed notation shows real subscripts and superscripts. Player-facing text says core instead of currency.", "Quiz-Antworten nutzen eine Mathe-Schrift und eingetippte Notation zeigt echte tiefgestellte und hochgestellte Zeichen. Im Spiel steht jetzt Kern statt Währung."],
+                    ["The damage buff in the countdown between puzzles is vertically centred, and the Outlier Bat in the tutorial no longer overlaps the spell hotbar.", "Der Schadens-Buff im Countdown zwischen Puzzles ist jetzt vertikal zentriert und die Ausreißer-Fledermaus im Tutorial verdeckt die Zauberleiste nicht mehr."],
+                ],
+            },
+            {
+                category: ["Fixes", "Korrekturen"],
+                items: [
+                    ["The top-left grid cell could ignore clicks while the objective tracker was shrunk beside a large grid. It reacts again.", "Die Rasterzelle oben links konnte Klicks ignorieren, solange die Zielanzeige neben einem großen Raster verkleinert war. Sie reagiert wieder."],
+                    ["Achievements: Gatekeeper no longer counts campaign trial launches, Mark Incorrect Cells Manually no longer counts crosses placed by items and abilities, Pantheon now needs the four Tier 16 bosses in Tier 16 maps, Time Reclaimer became Grave Whisperer (answer the Degrees of Freedom zombie's challenges), and Monster Slayer and Boss Hunter now count every monster and boss.", "Erfolge: Torwächter zählt keine Kampagnen-Trial-Starts mehr, Felder manuell markieren zählt keine Kreuze von Items und Fähigkeiten mehr, Pantheon verlangt jetzt die vier Bosse der Stufe 16 in Karten der Stufe 16, Zeitzurückgewinner wurde zu Grabflüsterer (beantworte die Herausforderungen des Freiheitsgrade-Zombies) und Monsterschlächter und Bossjäger zählen jetzt alle Monster und Bosse."],
+                    ["Tutorial: replaying no longer hands out the Fireball charm, the chest charm or the chest gear again, a soft-lock with the rat is gone, and the spellbook closes properly. Also fixed the clue-button grid border and the XP tooltip text.", "Tutorial: Beim erneuten Spielen werden der Feuerball-Anhänger, der Truhen-Anhänger und die Truhen-Ausrüstung nicht mehr erneut vergeben, eine Blockade mit der Ratte ist behoben und das Zauberbuch schließt richtig. Außerdem korrigiert: der Rand am Hinweis-Knopf und der Text im EP-Tooltip."],
+                    ["Quiz rounding: questions that ask for a number of decimal places now accept exactly that precision (no more 3-place questions that also accept 2 places), the Poisson and binomial explanations name the rounded value to type, and English and German ask for the same rounding.", "Quiz-Rundung: Fragen, die eine Anzahl Nachkommastellen verlangen, akzeptieren jetzt genau diese Genauigkeit (keine 3-Stellen-Fragen mehr, die auch 2 Stellen durchlassen), die Erklärungen zu Poisson und Binomial nennen den gerundeten Wert zum Eintippen, und Englisch und Deutsch verlangen dieselbe Rundung."],
+                    ["Convergence and Ascension Trial briefings now say when you have already completed the trial and what a replay still gives, instead of promising the first-clear reward again.", "Die Beschreibungen der Konvergenz- und Aufstiegs-Prüfungen sagen jetzt, wenn du die Prüfung schon abgeschlossen hast und was eine Wiederholung noch bringt, statt die Belohnung des ersten Abschlusses erneut zu versprechen."],
+                    ["On GitHub Pages the game now loads as one packed file, so it starts faster.", "Auf GitHub Pages wird das Spiel jetzt als eine gepackte Datei geladen und startet dadurch schneller."],
+                ],
+            },
+        ],
+    },
+
+    {
         version: "v0.35 BETA",
         date: "28.10.2026",
         changes: [

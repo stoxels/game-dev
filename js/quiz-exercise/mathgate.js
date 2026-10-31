@@ -269,8 +269,10 @@ function mgParseAnswer(rawInput) {
 }
 
 // Returns true if the entered value is within the question's accepted tolerance.
+// The tiny extra keeps "exactly one last digit off" (0.683 vs 0.682, tolerance
+// 0.001) from failing on computer rounding noise.
 function mgIsAnswerCorrect(entered, question) {
-    return Math.abs(entered - question.answer) <= question.tolerance;
+    return Math.abs(entered - question.answer) <= question.tolerance + 1e-9;
 }
 
 // Formats a question's numeric answer for the tutor auto-fill: integers as-is,
