@@ -5,7 +5,7 @@ Solve grid puzzles against the clock, learn real maths from the quizzes,
 level up a class, grow a 2,000-node passive tree and push into an
 endgame of loot, maps and bosses - all in the browser, no install.
 
-**[▶ Play it online](https://stoxels.github.io/game-dev/)** · Version 0.34 BETA · English and German
+**[▶ Play it online](https://stoxels.github.io/game-dev/)** · Version 0.36 BETA · English and German · desktop and touch
 
 ---
 
@@ -20,11 +20,13 @@ Around that puzzle sits a full RPG:
 
 - every level is a **race against a timer** - mistakes cost time,
 - levels are linked by a **story** about the broken *Apex* and three
-  playable characters,
+  playable characters who meet each other on the world maps and fight
+  side by side as **companions**,
 - **quizzes and "Probability Gates"** ask real probability and statistics
   questions (sample spaces, Bayes, distributions, ...) to earn bonuses,
-- an **endgame** turns the puzzle into a combat encounter system with
-  monsters, bosses, loot, crafting and an atlas of maps.
+- **monsters and bosses appear from the very first campaign levels** - you
+  fight them with spells and melee strikes while you solve,
+- an **endgame** adds loot, crafting and an atlas of maps on top.
 
 The theme is mathematics: classes are called *Mathmagician*,
 *Statistician* or *Probabilist*, abilities are *Variance Shield* or
@@ -39,7 +41,9 @@ The theme is mathematics: classes are called *Mathmagician*,
 | **Puzzle** | Fill cells with the left mouse button, mark empty cells with the right one, drag to fill several at once. Finish the picture before the timer runs out. |
 | **Mistakes** | A wrong cell costs seconds, and penalties escalate as you keep making mistakes. Free mistakes and penalty reductions come from classes, items and the passive tree. |
 | **Difficulty** | Easy / Normal / Hard change the penalty size and the score multiplier. |
-| **Modifiers** | *Time Trial* (half the time), *Hardcore* (one mistake fails the level) and *Ironman* (no items) trade risk for more score. |
+| **Modifiers** | *Time Trial* (half the time), *Hardcore* (one mistake fails the level) and *Ironman* (no items) trade risk for more score. *Classless*, *Treeless* and *Monsterless* strip a system away for a self-imposed challenge. |
+| **Timer and kills** | Defeating a normal monster in the campaign adds seconds to the puzzle timer, so fighting is part of the pace, not a distraction. |
+| **Movement trials** | Special levels where you move your hero around the arena instead of just clicking cells, with their own bonus objectives and reward chests. |
 | **Bonus objectives** | Completing a level's objective drops a random puzzle item. |
 | **Score and codes** | Score milestones unlock achievement codes, and there is a highscore screen. |
 
@@ -61,15 +65,31 @@ and each starting from their own point in the passive tree:
 - **Trix - the Trickster.**
 - **Syla - the Naturalist.**
 
+You play one of them; the other two become your friends in the story.
+
 ---
 
 ## Worlds and story
 
 The campaign runs through **13 worlds plus the Nexus**, each with its
-own levels and its own quiz topics. Level types include
-normal puzzles, **Ascension** levels (class progression), **Convergence**
-levels (passive tree points) and **Inference** objectives (extra points).
-A storyline engine plays intro beats for each character.
+own levels and its own quiz topics. Worlds unlock one after another.
+Level types include normal puzzles, **Ascension** trials (class
+progression, now their own node at the end of each world map),
+**Convergence** trials (passive tree points) and **Inference**
+objectives (extra points). A storyline engine plays intro beats for each
+character, and a guided **tutorial** (including a crafting lesson) teaches
+the basics.
+
+### Companions and co-op
+
+Every world map has optional **story nodes** where your hero meets the
+other two heroes - 14 dialogue scenes in total, with story pictures.
+Watching meetings and clearing **co-op encounters** (special levels you
+play together with an AI friend, ending in a shared boss mechanic) grows
+your **affinity** with each friend from level 1 to 5 and earns **quest
+items** in their own stash tab. Spend **Tether Stones** to call a friend
+onto any level as a **summon**: they fight with their own look, gear and
+spells, and get stronger as the story moves on.
 
 ---
 
@@ -91,7 +111,9 @@ two further abilities.
 
 ### Charms, spells and the spell book
 
-Skills have ten ranks. **Charms** drop from defeated monsters and are
+Skills have ten ranks. **Charms** drop from defeated monsters (spells can
+also **combo**: enemy debuffs that other spells consume, amplify or spread,
+with element reactions) and are
 slotted into a **spell book** with hotbar keys. Duplicates turn into
 *Lemmas*, and ten Lemmas prove a *Theorem* that you apply to a charm for
 a permanent bonus. A large arsenal of **universal spells** (fire, frost,
@@ -137,7 +159,10 @@ an action RPG than to a puzzle game.
   charged melee strikes and projectiles while you solve. Monsters carry
   resistances, ailments (ignite, chill, shock, bleed, stun, impale, ...)
   and elemental damage; there are **more than 80 bosses**, each with its
-  own mechanics.
+  own mechanics. The campaign's trial bosses (one per world for the
+  Convergence and Ascension trials) are being **reworked one by one** into
+  readable, telegraphed fights with a finale each - during a finale the
+  boss stands still and shielded while you deal with its set-piece.
 - **Atlas and map device.** An atlas of **86 map regions in 16 tiers**
   progresses from the corners towards the centre; maps are items with
   rolled modifiers that make runs harder and more rewarding.
@@ -149,7 +174,24 @@ an action RPG than to a puzzle game.
   suffixes, implicits, requirements and **unique items**.
 - **Crafting.** Currency orbs, essences, shards and a crafting bench.
 - **Hub.** Stash, vendors, mass sell, a configurable loot filter, level
-  and attribute allocation and an achievement list (200+ achievements).
+  and attribute allocation, 50 stackable **titles** and an achievement
+  list (200+ achievements).
+
+---
+
+## Accessibility and quality of life
+
+- **Touch controls** for phones and tablets (grid, clues and long-press
+  marking), plus a layout that scales to the window.
+- **Display settings:** text size, red-green and blue-yellow friendly
+  colour modes, clue number size and strong row highlights.
+- **Play settings:** pause when the window loses focus, confirm before
+  leaving maps, loot notification filter and random background music
+  (a shuffled playlist that does not repeat a track until all have played).
+- **Save slots:** 20 slots, each with portrait, title and score, and
+  **export/import to a file** so your progress survives browsers that
+  clear site data.
+- Full **English and German** text, including tooltips and quizzes.
 
 ---
 
@@ -180,14 +222,15 @@ full local project folder.
 
 ## How it is built
 
-- **Vanilla JavaScript** - no UI framework. About 400 source files under
+- **Vanilla JavaScript** - no UI framework. About 480 source files under
   `js/`, grouped by system (`classes`, `combat`, `hub`, `endgame`, `loot`,
-  `probability-tree`, `skills`, `puzzle-items`, `storyline`, ...).
+  `probability-tree`, `skills`, `puzzle-items`, `storyline`,
+  `companion-bot`, `touch`, ...). Every file is a real ES module.
 - **Bundled with Vite** into one module entry that `index.html` loads;
   the game is a static site served as-is by GitHub Pages.
 - **Data-driven**: levels, quizzes, items, mod tables, bosses and the
   passive tree are plain data files.
-- **Tested**: more than 3,000 automated tests run the real game modules
+- **Tested**: more than 3,500 automated tests run the real game modules
   in a simulated browser; a headless boot check confirms a clean console.
 - **Bilingual**: every player-facing string exists in English and German.
 - Best tested in **Firefox**; Chromium browsers work too.
@@ -196,8 +239,9 @@ full local project folder.
 
 ## Status
 
-STOXELS is a work-in-progress **beta** under active development. The
-passive tree rework is done; balance (mana costs, spell and monster
-scaling) and art are still moving, and saves from older versions may be
-migrated or reset between releases. See the in-game changelog for the
-latest patch notes.
+STOXELS is a work-in-progress **beta** (currently **v0.36**) under active
+development. The passive tree rework is done and the world 1-13 trial
+bosses are being rebuilt one world at a time; balance (monster scaling,
+spell tuning) and art are still moving, and saves from older versions may
+be migrated between releases. See the in-game changelog for the latest
+patch notes, and use the save export if you want a backup.
