@@ -279,7 +279,8 @@ import { _mechTotemPulse, WARDEN_COLOR, _wardenAngDiff, _wardenPC, _wardenPlace,
 import { _mechWardenSentries, _mechWardenSolitary } from '../../js/combat/bosses/boss-warden-hazards.js';
 import '../../js/combat/bosses/boss-warden-lockdown.js';
 import { _mechMaelstromVortex } from '../../js/combat/bosses/boss-maelstrom.js';
-import { _mechStillnessTrial } from '../../js/combat/bosses/boss-arbiter.js';
+import { _mechStillnessTrial, _mechArbScales } from '../../js/combat/bosses/boss-arbiter.js';
+import { _mechArbGavel } from '../../js/combat/bosses/boss-arbiter-court.js';
 import { THW_R, THW_HOVER_SPEED, THW_STOMP_INTERVAL_MS, THW_STOMP_WARN_MS, THW_STOMP_CRASH_MS, THW_STOMP_R, THW_STOMP_DMG, THW_STOMP_FLING, THW_COLLAPSE_MARKS, THW_COLLAPSE_MARK_MS, THW_COLLAPSE_STAGGER_MS, THW_COLLAPSE_DMG, THW_AFTERSHOCK_MS, THW_MINI_N, THW_MINI_HOP_MS, THW_MINI_SPEED, THW_MINI_R, THW_MINI_DMG, THW_MINI_SIEGE_MS, THW_GS_FOLLOW_MS, THW_GS_LOCK_MS, THW_GS_FALL_MS, THW_GS_DMG, THW_GS_SHOCK_R, THW_GS_SHOCK_DMG, _thwWatcher, _thwGrandSlamActive, _thwompSweep, _thwompTeardown, _thwompArenaInit, _thwPickHoverSpot, _thwShockRing, _thwCollapse, _thwSiege, _thwompGrandSlam, _mechThwompSlam } from '../../js/combat/bosses/boss-thwomp.js';
 import { _MD_DEBUG_SLOW, _MD_DEBUG_MULT, MD_GAZE_DMG, MD_SNAKE_DMG, MD_WAVE_DMG, MD_COIL_DMG, MD_STARE_DMG, MD_HIT_CD_MS, _mdHitCd, _mdTouch, _mdEyesEl, _mdShards, MD_GAZE_W, MD_GAZE_SPEED, _mechMdStoneGaze, MD_SNAKE_COUNT, MD_SNAKE_BITES, MD_BITE_R, _mechMdSnakeStrikes, MD_WAVE_COUNT, MD_WAVE_SPEED, MD_WAVE_GAP, MD_WAVE_ROT, _mechMdPetrifyWaves, MD_COIL_SEGS, MD_COIL_R0, MD_COIL_R1, MD_COIL_LIFE, MD_COIL_ROT, MD_COIL_GAP, _mechMdCoilCage, MD_FINAL_TICK_MS, MD_FINAL_TICKS, MD_SHADOW_H, _mdFinal, _mdFinalActive, _mdOnPhaseEnter, _mdStartFinalWatcher, _mdRaiseStatue, _mdFinalStart, _mdStartGazeSweep, _mdFinalEnd, _mdTeardown } from '../../js/combat/bosses/boss-medusa.js';
 import { _RZR_DEBUG_SLOW, _RZR_DEBUG_MULT, RZR_TOUCH_CD_MS, _rzrHitCd, _rzrTouch, _rzrPC, _rzrHeal, RZR_FAN_N, RZR_OUT_SPD, RZR_BACK_SPD, RZR_STAGGER_MS, RZR_OUT_DMG, RZR_BACK_DMG, _mechRzrCyclone, RZR_WIRE_N, RZR_WIRE_WARN, RZR_WIRE_HOLD, RZR_WIRE_DPS, RZR_WIRE_WHIP, RZR_WHIP_R, _mechRzrWires, RZR_HONE_MS, RZR_STONE_R, RZR_STONE_HP, RZR_GRIND_R, RZR_GRIND_DPS, RZR_SCYTHE_DMG, RZR_SCYTHE_WARN, RZR_SCYTHE_SPD, RZR_HEAL_CANCEL, _mechRzrHone, RZR_SPOKES, RZR_SPOKE_LEN_F, RZR_SPOKE_DPS, RZR_CYCLES, RZR_CYCLE_MS, RZR_REV_SPD, RZR_FAN_BLADES, RZR_LAST_DMG, RZR_POCKET_R, RZR_POCKET_DPS, RZR_FAILSAFE_MS, _rzrFinal, _rzrFinalActive, _rzrOnPhaseEnter, _rzrEnsureFinalWatcher, _rzrWatcherRun, _rzrAfter, _rzrFinalStart, _rzrFinalEnd, _rzrTeardown } from '../../js/combat/bosses/boss-razor.js';
@@ -1240,7 +1241,9 @@ try { globalThis["_mechTotemPulse"] = _mechTotemPulse; } catch (e) {} // PHASE3-
 try { globalThis["_mechWardenSentries"] = _mechWardenSentries; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-warden-hazards.js)
 try { globalThis["_mechWardenSolitary"] = _mechWardenSolitary; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-warden-hazards.js)
 try { globalThis["_mechMaelstromVortex"] = _mechMaelstromVortex; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-maelstrom.js)
+try { globalThis["_mechArbScales"] = _mechArbScales; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-arbiter.js)
 try { globalThis["_mechStillnessTrial"] = _mechStillnessTrial; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-arbiter.js)
+try { globalThis["_mechArbGavel"] = _mechArbGavel; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-arbiter-court.js)
 try { globalThis["_thwompTeardown"] = _thwompTeardown; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-thwomp.js)
 try { globalThis["_mdTeardown"] = _mdTeardown; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-medusa.js)
 try { globalThis["_mechMdCoilCage"] = _mechMdCoilCage; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-medusa.js)

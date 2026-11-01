@@ -72,6 +72,8 @@ const RIGS = {
             stillness_trial: { anim: 'verdict', ms: () => 2400 },
             fated_cell: { anim: 'fate', ms: () => 1900 },
             probability_shift: { anim: 'dieshift', ms: () => 1600 },
+            scales_verdict: { anim: 'dieshift', ms: () => 1600 },
+            gavel_waves: { anim: 'fate', ms: () => 1900 },
         },
     },
     boss_architect: {

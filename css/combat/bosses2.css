@@ -13446,3 +13446,40 @@ body.sx-shp-flash::after {
 .sx-wvr-lane { z-index: 9002; background: rgba(74, 222, 128, 0.24); }
 
 .sx-stk-next-label { display: none; }   /* the preview piece needs no caption */
+
+/* ============ Arbiter rework: stillness trial, scales, gavel waves ============ */
+/* Stillness trial: a coloured border fades in (rule coming), then pulses (rule live). */
+@keyframes sx-arb-trial-in { from { opacity: 0.12; } to { opacity: 0.7; } }
+@keyframes sx-arb-trial-pulse { from { opacity: 0.75; } to { opacity: 1; } }
+.sx-arb-trial {
+    position: fixed; inset: 0; z-index: 8997; pointer-events: none; box-sizing: border-box;
+    border: 8px solid; opacity: 0.12;
+    animation: sx-arb-trial-in var(--arb-warn, 1.2s) linear forwards;
+}
+.sx-arb-trial-blue { border-color: rgba(96, 165, 250, 0.95); background: rgba(37, 99, 235, 0.14); box-shadow: inset 0 0 90px rgba(96, 165, 250, 0.7); }
+.sx-arb-trial-orange { border-color: rgba(251, 146, 60, 0.95); background: rgba(194, 65, 12, 0.14); box-shadow: inset 0 0 90px rgba(251, 146, 60, 0.7); }
+.sx-arb-trial-live { opacity: 1; animation: sx-arb-trial-pulse 0.4s ease-in-out infinite alternate; }
+.sx-arb-trial-label {
+    position: fixed; left: 50%; top: 24%; transform: translate(-50%, -50%);
+    pointer-events: none; z-index: 9002; font-size: 2rem; font-weight: 900; letter-spacing: 0.12em;
+    text-shadow: 0 0 18px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+.sx-arb-trial-label-blue { color: #bfdbfe; }
+.sx-arb-trial-label-orange { color: #fed7aa; }
+
+/* Scales of judgement: the heavy half fills with red, the light half stays green. */
+@keyframes sx-arb-half-fill { from { opacity: 0.05; } to { opacity: 1; } }
+.sx-arb-half { position: fixed; z-index: 8998; pointer-events: none; box-sizing: border-box; }
+.sx-arb-half-light { background: rgba(74, 222, 128, 0.1); border: 4px solid rgba(134, 239, 172, 0.8); box-shadow: inset 0 0 70px rgba(74, 222, 128, 0.35); }
+.sx-arb-half-heavy { background: rgba(239, 68, 68, 0.1); border: 4px dashed rgba(251, 146, 60, 0.95); }
+.sx-arb-half-heavy::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, rgba(239, 68, 68, 0.55) 0 16px, rgba(127, 29, 29, 0.5) 16px 32px);
+    opacity: 0.05; animation: sx-arb-half-fill var(--arb-warn, 1.2s) linear forwards;
+}
+.sx-arb-half-slam { border-style: solid; border-color: #fff; background: rgba(254, 240, 138, 0.85); animation: sx-wvr-fade 0.45s ease-out forwards; }
+.sx-arb-half-slam::after { display: none; }
+.sx-arb-half-ok { animation: sx-wvr-fade 0.45s ease-out forwards; }
+
+/* Gavel waves: one canvas holds every ring and green gap wedge. */
+.sx-arb-canvas { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 8999; pointer-events: none; }
