@@ -49,11 +49,12 @@ export const BOSS_LEVEL_DAMAGE_SCALE = 0.12; // +12% damage per level above 1
 // every ~30 levels from weapon + phys/power creep). A convex multiplier
 // on top of the linear curve keeps early bosses (≈L1-40) almost unchanged
 // but massively inflates HP towards the true endgame (T13-T16, L71-90).
-// Balance pass (high-level builds hit 10-60k per action): up to L68 (T1) the
-// curve is unchanged (boss ~50k), then it climbs geometrically (x1.135 per
-// level) so an unmodified T16 boss (L90, ~1k base HP) has about 1M HP.
-// Anchors: 1→1.0, 50→1.15, 60→1.7, 68→2.4, 75→5.8, 80→11.2, 85→21.6, 90→38.6, 95→70
-export const BOSS_LATE_HP_ANCHORS = [[1,1.0],[50,1.15],[60,1.7],[68,2.4],[75,5.8],[80,11.2],[85,21.6],[90,38.6],[95,70]];
+// Balance pass (high-level builds hit 10-60k per action): flat up to L40, then
+// steeper from campaign world 10 (L45+) because a geared L61 build was
+// one-shotting trial bosses (2026-11-01). Beyond L68 (T1) it climbs
+// geometrically (x1.135 per level) so a T16 boss (L90) has about 1M HP.
+// Anchors: 1→1.0, 40→1.0, 48→1.5, 55→2.3, 60→3.0, 68→4.2, 75→5.8, 80→11.2, 85→21.6, 90→38.6, 95→70
+export const BOSS_LATE_HP_ANCHORS = [[1,1.0],[40,1.0],[48,1.5],[55,2.3],[60,3.0],[68,4.2],[75,5.8],[80,11.2],[85,21.6],[90,38.6],[95,70]];
 
 
 export function _getBossLateHpMult(lvl) {

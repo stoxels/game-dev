@@ -1,19 +1,21 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { _renderPanel } from '../encounter.js';
-import { BOSS_DEFS, BOSS_MECHANICS, _bossScheduleMechanics } from './boss-framework.js';
-import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkDotHit, _nkEl, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkMaxHP, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkRuns, _nkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHit, _nkLoop, _nkMaxHP, _nkNewRun, _nkPlayerCenter, _nkPlayerRect } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE JESTER (boss_jester)------------------------
 //------------------------------------------------------------------------
-// Rework stage performance: bouncing mayhem orbs in rhythm, card tosses
-// that stick as hazards, jinx/luck orbit balls, and HP-gated encore acts.
-// THE GRAND FINALE at ≤10%: cards spiral in spelling one safe suit -
-// stand on it at each reveal, faster every time.
+// A stage show with three acts, one idea each (red = hurts, gold = good):
+//  - JUGGLING BALLS (all fight): thin red lines show where the balls will fly,
+//    then he throws them one after another and they bounce off the walls.
+//  - CARD TOSS (60%+): playing cards fall onto marked circles; each circle
+//    fills with red until its card lands.
+//  - JUGGLER'S JINX (60%+): purple jinx balls drift after you; a gold luck
+//    ball is a small heal if you dare.
+//  - THE GRAND FINALE (10%, boss-jester-finale.js): the stage is dealt out
+//    like a card table; stand on the green cards.
+// Clue Swap is a shared mechanic referenced by handler-name string.
 //------------------------------------------------------------------------
-
-export const __JS_DEBUG_SLOW = false;
-export const _JS_DEBUG_MULT = __JS_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(BOSS_DEFS, {
     boss_jester: {
@@ -32,60 +34,48 @@ Object.assign(BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'bouncing_mayhem', intervalBase: 19000, intervalVariance: 4500, handler: '_mechJsOrbs' },
+            { name: 'bouncing_mayhem', intervalBase: 16000, intervalVariance: 3500, handler: '_mechJsOrbs' },
             { name: 'clue_swap', intervalBase: 18000, intervalVariance: 4000, handler: '_mechClueSwap' },
-            { name: 'card_toss', intervalBase: 21000, intervalVariance: 5000, handler: '_mechJsCards', phase2Only: true },
+            { name: 'card_toss', intervalBase: 19000, intervalVariance: 4000, handler: '_mechJsCards', phase2Only: true },
             { name: 'jugglers_jinx', intervalBase: 23000, intervalVariance: 5000, handler: '_mechJsJinx', phase2Only: true },
         ],
-        onPhaseEnter: _jsOnPhaseEnter,
     },
 });
 
 
-// ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-export const JS_ORB_COUNT   = [0, 5, 6, 8];       // mayhem orbs per cast
-export const JS_ORB_SPEED   = [0, 200, 230, 260]; // px/s per phase
-export const JS_ORB_DMG     = [0, 0.05, 0.06, 0.08]; // %maxHP per orb touch
-export const JS_CARD_DMG    = [0, 0, 0.07, 0.09];    // %maxHP per card touch
-export const JS_JINX_DMG    = [0, 0, 0.09, 0.11];    // %maxHP jinx-ball touch
-export const JS_LUCK_HEAL   = 0.05;               // %maxHP per luck-ball touch
-export const JS_REVEAL_DMG  = 0.10;               // %maxHP wrong suit at a reveal
-export const JS_SWEEP_DMG   = 0.12;               // %maxHP curtain-call sweep
-export const JS_HIT_CD_MS   = 600;                // shared touch cooldown
-
-
 //------------------------------------------------------------------------
-//-------------------SHARED VISUAL HELPERS---------------------------------
+//-------------------SHARED HELPERS---------------------------------------------
 //------------------------------------------------------------------------
+const JS_HIT_CD_MS = 600;                          // shared touch cooldown
+let _jsHitUntil = 0;
 
-// Flat heal + HUD refresh (mirrors the Dancer - no shared helper exists).
-export function _jsHeal(amount) {
+// One hit with the boss-ability flash and number, behind a short shared
+// cooldown so overlapping hazards never stack several hits at once.
+export function _jsStrike(pct, level, label) {
+    const now = performance.now();
+    if (now < _jsHitUntil) return false;
+    _jsHitUntil = now + JS_HIT_CD_MS;
+    _nkAbilityHitToast(_nkHit(pct, 'shadow', level), 'The Jester', label, true);
+    return true;
+}
+
+export function _jsPhase(phase) {
+    return Math.max(1, Math.min(3, Number(phase) || 1));
+}
+
+// Flat heal of the player + HUD refresh.
+function _jsHeal(amount) {
     try {
         if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
         if (globalThis.playerCurrentHP <= 0) return;
         const before = globalThis.playerCurrentHP;
-        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._lifeGain ? globalThis._lifeGain(amount) : (amount)));
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._lifeGain ? globalThis._lifeGain(amount) : amount));
         if (globalThis.playerCurrentHP !== before) Audio_Manager.playSFX('boss_heal');
         if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
     } catch (e) {}
 }
 
-// Touch damage helper shared by all Jester hazards. Returns true if a hit
-// was rolled (respects the per-touch cooldown).
-export let _jsHitCd = 0;
-export function _jsTouch(pct, level, label) {
-    const now = performance.now();
-    if (now < _jsHitCd) return false;
-    const pr = _nkPlayerRect();
-    if (!pr) return false;
-    _jsHitCd = now + JS_HIT_CD_MS;
-    const dealt = _nkHit(pct, 'shadow', level);
-    _nkAbilityHitToast(dealt, 'The Jester', label);
-    return true;
-}
-
-// Confetti puff where a show event lands (visual only, body-level so it
-// survives the run ending in the same frame).
+// Confetti puff where a show event lands (body-level so it survives the run ending).
 export function _jsConfetti(x, y, big) {
     const layer = document.createElement('div');
     layer.className = 'sx-js-confetti' + (big ? ' sx-js-confetti-big' : '');
@@ -105,233 +95,205 @@ export function _jsConfetti(x, y, big) {
         s.style.animationDelay = (Math.random() * 110) + 'ms';
         layer.appendChild(s);
     }
-    setTimeout(() => { try { layer.remove(); } catch (e) {} }, __JS_DEBUG_SLOW ? 1900 : 950);
+    setTimeout(() => { try { layer.remove(); } catch (e) {} }, 950);
+}
+
+// Centre of the Jester's card (where his throws start); the top middle if it is gone.
+function _jsBossCentre(monster) {
+    const card = monster ? document.getElementById('sx-card-' + monster.id) : null;
+    if (card) {
+        const r = card.getBoundingClientRect();
+        if (r.width) return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+    return { x: window.innerWidth / 2, y: 90 };
 }
 
 
 //------------------------------------------------------------------------
-//-------------------MECHANIC: BOUNCING MAYHEM (signature, upgraded)--------
+//-------------------JUGGLING BALLS (thrown along marked lines)------------------------
 //------------------------------------------------------------------------
-// The juggling orbs now bounce IN RHYTHM: between beats they glide calmly
-// (easy to track); on each beat (every ~1.1s) they all HOP at once and
-// re-randomize their velocity - the swarm reshuffles its pattern on the
-// beat, so dodging is about reading the rhythm, not just the vectors.
-export const JS_MAYHEM_BEAT = 1100;
+const BALL_COUNT = [0, 4, 5, 6];                   // balls per throw, by phase
+const BALL_SPEED = [0, 300, 330, 360];             // px/s
+const BALL_DMG = [0, 0.07, 0.09, 0.11];            // share of max life
+const BALL_R = 13;
+const BALL_WARN_MS = [0, 1100, 1000, 900];         // aim lines shown before the first throw
+const BALL_GAP_MS = 230;                           // time between two throws
+const BALL_BOUNCES = 2;                            // wall bounces before a ball is gone
+const BALL_FAN = 15 * Math.PI / 180;               // angle between neighbouring lines
 
+// Distance from (x, y) along (dx, dy) to the screen edge.
+function _jsRayLength(x, y, dx, dy) {
+    const W = window.innerWidth, H = window.innerHeight;
+    const tx = dx > 0 ? (W - x) / dx : dx < 0 ? -x / dx : Infinity;
+    const ty = dy > 0 ? (H - y) / dy : dy < 0 ? -y / dy : Infinity;
+    return Math.max(40, Math.min(tx, ty));
+}
+
+// The Jester fans out several thin red lines (one through you); a moment
+// later balls fly down them one after another and bounce off the walls.
 export function _mechJsOrbs(monster, phase) {
     if (_nkDodgeBusy() || _nkFrozen()) return;
-    const p = Math.max(1, Math.min(3, Number(phase) || 1));
-    const count = JS_ORB_COUNT[p];
-    const speed = JS_ORB_SPEED[p] / _JS_DEBUG_MULT;
-    const radius = 12;
-    const dmgPct = JS_ORB_DMG[p];
-    const durMs = 9500 * _JS_DEBUG_MULT;
-    const beatMs = JS_MAYHEM_BEAT * _JS_DEBUG_MULT;
+    const p = _jsPhase(phase);
     const run = _nkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
-    const orbs = [];
-    for (let i = 0; i < count; i++) {
-        const el = _nkEl(run, 'div', 'sx-nk-dot sx-nk-orb-jester');
-        const a = Math.random() * Math.PI * 2;
-        orbs.push({
-            x: 60 + Math.random() * Math.max(60, W - 120),
-            y: 60 + Math.random() * Math.max(60, H - 120),
-            vx: Math.cos(a) * speed, vy: Math.sin(a) * speed,
-            hop: 0, cdUntil: 0, el,
-        });
+    const o = _jsBossCentre(monster);
+    const pc = _nkPlayerCenter() || { x: W / 2, y: H / 2 };
+    const base = Math.atan2(pc.y - o.y, pc.x - o.x);
+    const balls = [];
+    for (let i = 0; i < BALL_COUNT[p]; i++) {
+        const a = base + (i - (BALL_COUNT[p] - 1) / 2) * BALL_FAN;
+        const dx = Math.cos(a), dy = Math.sin(a);
+        const line = _nkEl(run, 'div', 'sx-js-aim');
+        line.style.left = Math.round(o.x) + 'px';
+        line.style.top = Math.round(o.y - 3) + 'px';
+        line.style.width = Math.round(_jsRayLength(o.x, o.y, dx, dy)) + 'px';
+        line.style.transform = 'rotate(' + a + 'rad)';
+        line.style.setProperty('--js-warn', BALL_WARN_MS[p] + 'ms');
+        balls.push({ x: o.x, y: o.y, vx: dx * BALL_SPEED[p], vy: dy * BALL_SPEED[p], bounces: 0, line, el: null, thrown: false, gone: false });
     }
-    _nkToast('eg_mech_juggle', '🤹 The Jester: Bouncing Mayhem! Watch every angle!');
-    let e = 0, nextBeat = beatMs, touchCd = 0;
-    _nkLoop(run, (dtS, now) => {
+    let e = 0;
+    _nkLoop(run, (dtS) => {
         e += dtS * 1000;
         const pr = _nkPlayerRect();
-        // The BEAT: every orb hops at once - a little squash-and-hop pulse
-        // plus a fresh random velocity. Reading the rhythm IS the dodge.
-        if (e >= nextBeat) {
-            nextBeat = e + beatMs;
-            orbs.forEach(o => {
-                const a = Math.random() * Math.PI * 2;
-                o.vx = Math.cos(a) * speed;
-                o.vy = Math.sin(a) * speed;
-                o.hop = 320;
-                o.el.classList.remove('sx-js-orb-hop');
-                void o.el.offsetWidth;
-                o.el.classList.add('sx-js-orb-hop');
-            });
-        }
-        orbs.forEach(o => {
-            if (o.hop > 0) o.hop -= dtS * 1000;
-            o.x += o.vx * dtS;
-            o.y += o.vy * dtS;
-            if (o.x < radius || o.x > W - radius) o.vx *= -1;
-            if (o.y < radius || o.y > H - radius) o.vy *= -1;
-            o.x = Math.max(radius, Math.min(W - radius, o.x));
-            o.y = Math.max(radius, Math.min(H - radius, o.y));
-            o.el.style.transform = 'translate(' + Math.round(o.x - 9) + 'px,' + Math.round(o.y - 9) + 'px)';
-            if (pr && now >= touchCd && _nkDotHit(o.el, pr, 2)) {
-                touchCd = now + JS_HIT_CD_MS;
-                _jsTouch(dmgPct, level, 'Bouncing Mayhem');
+        balls.forEach((b, i) => {
+            if (b.gone) return;
+            if (!b.thrown && e >= BALL_WARN_MS[p] + i * BALL_GAP_MS) {
+                b.thrown = true;
+                b.el = _nkEl(run, 'div', 'sx-js-ball sx-js-ball-' + (i % 3));
+                try { b.line.remove(); } catch (er) {}
             }
+            if (!b.thrown) return;
+            b.x += b.vx * dtS; b.y += b.vy * dtS;
+            if (b.x < BALL_R || b.x > W - BALL_R) { b.vx *= -1; b.bounces++; b.x = Math.max(BALL_R, Math.min(W - BALL_R, b.x)); }
+            if (b.y < BALL_R || b.y > H - BALL_R) { b.vy *= -1; b.bounces++; b.y = Math.max(BALL_R, Math.min(H - BALL_R, b.y)); }
+            if (b.bounces > BALL_BOUNCES) { b.gone = true; try { b.el.remove(); } catch (er) {} return; }
+            b.el.style.transform = 'translate(' + Math.round(b.x - BALL_R) + 'px,' + Math.round(b.y - BALL_R) + 'px)';
+            if (_nkCircleHit(b.x, b.y, BALL_R, pr, 0)) _jsStrike(BALL_DMG[p], level, 'Juggling Balls');
         });
-        return e < durMs;
+        return balls.some(b => !b.gone);
     });
 }
 
 
 //------------------------------------------------------------------------
-//-------------------MECHANIC: ACT II - CARD TOSS (phase 2+)----------------
+//-------------------CARD TOSS (falling cards on marked circles)------------------------
 //------------------------------------------------------------------------
-// A fan of oversized playing cards arcs across the stage and STICKS where
-// they land, face-up, as hazards for a while - the arena becomes the
-// Jester's card table. Volley 1 litters the middle; volley 2 aims at your
-// position. Phase 3 throws a third volley.
-export const JS_CARD_LIFE = 6500;
-export const JS_CARD_W = 46;
-export const JS_CARD_H = 64;
+const CARD_VOLLEYS = [0, 0, 2, 3];                 // volleys per cast, by phase
+const CARD_COUNT = [0, 0, 4, 5];                   // cards per volley
+const CARD_R = 78;                                 // landing circle = hit radius
+const CARD_WARN_MS = [0, 0, 1250, 1100];           // circle fills while the card falls
+const CARD_STEP_MS = [0, 0, 1900, 1600];           // time from one volley to the next
+const CARD_DMG = [0, 0, 0.14, 0.17];               // share of max life
+const CARD_SUITS = ['♠', '♥', '♦', '♣'];
 
+// Landing spots for one volley: the first on the player, the rest spread out.
+function _jsCardSpots(count, pc) {
+    const W = window.innerWidth, H = window.innerHeight;
+    const spots = [{ x: Math.max(100, Math.min(W - 100, pc.x)), y: Math.max(130, Math.min(H - 150, pc.y)) }];
+    for (let i = 1; i < count; i++) {
+        for (let tries = 0; tries < 30; tries++) {
+            const s = { x: 100 + Math.random() * (W - 200), y: 130 + Math.random() * (H - 300) };
+            if (spots.every(q => Math.hypot(q.x - s.x, q.y - s.y) >= 2 * CARD_R + 40)) { spots.push(s); break; }
+        }
+    }
+    return spots;
+}
+
+// Playing cards drop from the top of the stage onto red circles that fill
+// until the card lands; being inside a circle at that moment hurts. One
+// circle is always on you.
 export function _mechJsCards(monster, phase) {
     if (_nkDodgeBusy() || _nkFrozen()) return;
-    const p = Math.max(2, Math.min(3, Number(phase) || 2));
-    const level = monster ? monster.level : 1;
+    const p = Math.max(2, _jsPhase(phase));
     const run = _nkNewRun(monster && monster.id, true);
-    const W = window.innerWidth, H = window.innerHeight;
-    const volleys = p >= 3 ? 3 : 2;
-    const volleyGap = 2400 * _JS_DEBUG_MULT;
-    const lifeMs = JS_CARD_LIFE * _JS_DEBUG_MULT;
-    const dmgPct = JS_CARD_DMG[p];
-
-    const suits = ['♠', '♥', '♦', '♣'];
-    const cards = [];   // { el, x0, y0, tx, ty, born, stuck, until }
-    let volley = 0, vt = 0, nextVolleyAt = 600 * _JS_DEBUG_MULT;
-
-    const throwVolley = (aimX, aimY) => {
-        const n = 5;
-        for (let i = 0; i < n; i++) {
-            // A fan: spread around the aim with growing offset.
-            const spread = (i - (n - 1) / 2) * 130;
-            const tx = Math.max(60, Math.min(W - 60, aimX + spread + (Math.random() * 40 - 20)));
-            const ty = Math.max(90, Math.min(H - 90, aimY + (Math.random() * 200 - 100)));
-            const el = _nkEl(run, 'div', 'sx-js-card', suits[Math.floor(Math.random() * 4)]);
-            const startX = i % 2 === 0 ? -70 : W + 70;
-            const startY = 90 + Math.random() * 120;
-            el.style.left = Math.round(startX) + 'px';
-            el.style.top = Math.round(startY) + 'px';
-            cards.push({ el, x0: startX, y0: startY, tx, ty, born: 0, stuck: false, until: 0 });
+    const level = monster ? monster.level : 1;
+    const volleys = [];
+    let launched = 0, untilNext = 500, tail = 0;
+    _nkLoop(run, (dtS) => {
+        const dt = dtS * 1000;
+        untilNext -= dt;
+        if (launched < CARD_VOLLEYS[p] && untilNext <= 0) {
+            const pc = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            const cards = _jsCardSpots(CARD_COUNT[p], pc).map(s => {
+                const ring = _nkEl(run, 'div', 'sx-js-spot');
+                ring.style.left = Math.round(s.x - CARD_R) + 'px';
+                ring.style.top = Math.round(s.y - CARD_R) + 'px';
+                ring.style.width = ring.style.height = (CARD_R * 2) + 'px';
+                ring.style.setProperty('--js-warn', CARD_WARN_MS[p] + 'ms');
+                const card = _nkEl(run, 'div', 'sx-js-card' + (Math.random() < 0.5 ? ' sx-js-card-red' : ''), CARD_SUITS[Math.floor(Math.random() * 4)]);
+                return { ...s, ring, card, spin: (Math.random() * 2 - 1) * 40 };
+            });
+            volleys.push({ cards, t: 0 });
+            launched++;
+            untilNext = CARD_STEP_MS[p];
         }
-    };
-
-    _nkToast('eg_mech_js_cards', '🤹 The Jester: CARD TOSS - the table is set!', '#e9d5ff');
-
-    let touchCd = 0;
-    _nkLoop(run, (dtS, now) => {
-        vt += dtS * 1000;
-        if (volley < volleys && vt >= nextVolleyAt) {
-            volley++;
-            nextVolleyAt = vt + volleyGap;
-            const aim = (volley === 1)
-                ? { x: W * (0.3 + Math.random() * 0.4), y: H * (0.35 + Math.random() * 0.3) }
-                : (_nkPlayerCenter() || { x: W / 2, y: H / 2 });
-            throwVolley(aim.x, aim.y);
+        for (let i = volleys.length - 1; i >= 0; i--) {
+            const v = volleys[i];
+            v.t += dt;
+            const k = Math.min(1, v.t / CARD_WARN_MS[p]);
+            v.cards.forEach(c => {
+                c.card.style.left = Math.round(c.x - 23) + 'px';
+                c.card.style.top = Math.round(-90 + (c.y - 32 + 90) * k * k) + 'px';
+                c.card.style.rotate = (c.spin * (1 - k)) + 'deg';
+            });
+            if (k < 1) continue;
+            const pc = _nkPlayerCenter();
+            const hit = pc && v.cards.some(c => Math.hypot(pc.x - c.x, pc.y - c.y) < CARD_R);
+            v.cards.forEach(c => {
+                c.ring.classList.add('sx-js-spot-boom');
+                c.card.classList.add('sx-js-card-landed');
+                _jsConfetti(c.x, c.y, false);
+                setTimeout(() => { try { c.ring.remove(); c.card.remove(); } catch (er) {} }, 600);
+            });
+            if (hit) _jsStrike(CARD_DMG[p], level, 'Card Toss');
+            volleys.splice(i, 1);
         }
-        const pr = _nkPlayerRect();
-        const flightMs = 900 * _JS_DEBUG_MULT;
-        for (let i = cards.length - 1; i >= 0; i--) {
-            const c = cards[i];
-            if (!c.born) c.born = vt;
-            const age = vt - c.born;
-            if (!c.stuck) {
-                const k = Math.min(1, age / flightMs);
-                const ex = k * k; // ease-in (a tossed card accelerates)
-                c.el.style.left = Math.round(c.x0 + (c.tx - c.x0) * ex) + 'px';
-                c.el.style.top = Math.round(c.y0 + (c.ty - c.y0) * ex - Math.sin(k * Math.PI) * 120) + 'px';
-                c.el.style.rotate = (k * 540) + 'deg';
-                if (k >= 1) {
-                    c.stuck = true;
-                    // Expiry is stored RELATIVE to the card's age (age runs
-                    // from the card's own birth), so volley timing never
-                    // drifts with when the volley was thrown.
-                    c.until = age + lifeMs;
-                    c.el.classList.add('sx-js-card-stuck');
-                    c.el.style.left = Math.round(c.tx) + 'px';
-                    c.el.style.top = Math.round(c.ty) + 'px';
-                    c.el.style.rotate = ((Math.random() * 2 - 1) * 26) + 'deg';
-                    _jsConfetti(c.tx, c.ty, false);
-                }
-            } else {
-                if (pr && now >= touchCd) {
-                    const pc = { x: pr.left + pr.width / 2, y: pr.top + pr.height / 2 };
-                    if (Math.abs(pc.x - c.tx) < JS_CARD_W / 2 + 10 && Math.abs(pc.y - c.ty) < JS_CARD_H / 2 + 10) {
-                        touchCd = now + JS_HIT_CD_MS;
-                        _jsTouch(dmgPct, level, 'Card Toss');
-                    }
-                }
-                if (age >= c.until) {
-                    c.el.classList.add('sx-js-card-out');
-                    cards.splice(i, 1);
-                    const rm = setTimeout(() => { try { c.el.remove(); } catch (e2) {} }, 320);
-                    run.timers.push(rm);
-                    continue;
-                }
-            }
-        }
-        if (volley >= volleys && cards.length === 0) return false;
-        return true;
+        if (launched < CARD_VOLLEYS[p] || volleys.length > 0) return true;
+        tail += dt;
+        return tail < 600;
     });
 }
 
 
 //------------------------------------------------------------------------
-//-------------------MECHANIC: JUGGLER'S JINX (phase 2+)--------------------
+//-------------------JUGGLER'S JINX (purple bites, gold heals)------------------------
 //------------------------------------------------------------------------
-// Three balls orbit the stage in wide loops: two JINX balls (🟣, touching
-// them bites) and one LUCK ball (💛, touching it heals a little). The luck
-// ball drifts deliberately THROUGH the mayhem - greed bait. Phase 3 adds a
-// third jinx ball and tightens the loops.
-export const JS_JINX_LIFE = 8000;
-export const JS_ORBIT_TURN = 1.4;   // rad/s course change (readable loops)
+const JINX_LIFE_MS = 8000;
+const JINX_TURN = 1.4;                             // rad/s course change (wide loops, never a tight chase)
+const JINX_DMG = [0, 0, 0.10, 0.12];               // share of max life
+const LUCK_HEAL = 0.06;                            // share of max life
 
+// Purple jinx balls drift after you in wide loops (slower than you walk);
+// one gold luck ball drifts through the same space - touching it heals a
+// little and pops it. Phase 3 adds a third jinx ball.
 export function _mechJsJinx(monster, phase) {
     if (_nkDodgeBusy() || _nkFrozen()) return;
-    const p = Math.max(2, Math.min(3, Number(phase) || 2));
+    const p = Math.max(2, _jsPhase(phase));
     const level = monster ? monster.level : 1;
     const run = _nkNewRun(monster && monster.id, true);
     const W = window.innerWidth, H = window.innerHeight;
-    const lifeMs = JS_JINX_LIFE * _JS_DEBUG_MULT;
-    const jinxSpeed = (p >= 3 ? 190 : 160) / _JS_DEBUG_MULT;
-    const luckSpeed = 150 / _JS_DEBUG_MULT;
-    const turn = JS_ORBIT_TURN * (p >= 3 ? 1.25 : 1);
-
-    const mk = (emoji, cls, speed) => {
-        const el = _nkEl(run, 'div', 'sx-js-ball ' + cls, emoji);
+    const turn = JINX_TURN * (p >= 3 ? 1.25 : 1);
+    const mk = (cls, speed, luck) => {
         const side = Math.floor(Math.random() * 4);
         return {
             x: side === 0 ? 50 : side === 1 ? W - 50 : W * (0.2 + Math.random() * 0.6),
             y: side === 2 ? 60 : side === 3 ? H - 60 : H * (0.2 + Math.random() * 0.6),
-            ang: Math.random() * Math.PI * 2, speed, el, done: false,
+            ang: Math.random() * Math.PI * 2, speed, luck, done: false, el: _nkEl(run, 'div', 'sx-js-orb ' + cls),
         };
     };
     const balls = [];
-    const nJinx = p >= 3 ? 3 : 2;
-    for (let i = 0; i < nJinx; i++) balls.push(mk('🟣', 'sx-js-ball-jinx', jinxSpeed));
-    balls.push(mk('💛', 'sx-js-ball-luck', luckSpeed));
-
-    _nkToast('eg_mech_js_jinx', '🤹 The Jester: JUGGLER\u2019S JINX - grab the gold, dodge the purple!', '#e9d5ff');
-
-    let t = 0, touchCd = 0;
-    _nkLoop(run, (dtS, now) => {
+    for (let i = 0; i < (p >= 3 ? 3 : 2); i++) balls.push(mk('sx-js-orb-jinx', p >= 3 ? 190 : 160, false));
+    balls.push(mk('sx-js-orb-luck', 150, true));
+    let t = 0;
+    _nkLoop(run, (dtS) => {
         t += dtS * 1000;
-        const c = _nkPlayerCenter();
-        const pr = _nkPlayerRect();
-        let active = false;
+        const c = _nkPlayerCenter(), pr = _nkPlayerRect();
         balls.forEach(b => {
             if (b.done) return;
-            active = true;
-            // Wide looping course: steer toward the player but only slowly
-            // (the cap makes them draw loops, not chase lines).
             if (c) {
                 const want = Math.atan2(c.y - b.y, c.x - b.x);
-                let diff = ((want - b.ang + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+                const diff = ((want - b.ang + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
                 const max = turn * dtS;
                 b.ang += Math.max(-max, Math.min(max, diff));
             }
@@ -339,393 +301,17 @@ export function _mechJsJinx(monster, phase) {
             b.y += Math.sin(b.ang) * b.speed * dtS;
             if (b.x < 34 || b.x > W - 34) { b.ang = Math.PI - b.ang; b.x = Math.max(34, Math.min(W - 34, b.x)); }
             if (b.y < 34 || b.y > H - 34) { b.ang = -b.ang; b.y = Math.max(34, Math.min(H - 34, b.y)); }
-            b.el.style.left = Math.round(b.x - 16) + 'px';
-            b.el.style.top = Math.round(b.y - 16) + 'px';
-            if (pr && now >= touchCd && _nkCircleHit(b.x, b.y, 16, pr, 0)) {
-                touchCd = now + JS_HIT_CD_MS;
-                if (b.speed === luckSpeed) {
-                    // The LUCK ball: a small heal, then it pops.
-                    const maxHP = ((typeof _nkMaxHP === 'function') ? _nkMaxHP() : 0) || 100;
-                    const heal = Math.max(1, Math.round(maxHP * JS_LUCK_HEAL));
-                    _jsHeal(heal);
-                    globalThis.showCombatToast('💛 +' + heal);
-                    _jsConfetti(b.x, b.y, false);
-                    b.done = true;
-                    try { b.el.remove(); } catch (e) {}
-                    return;
-                }
-                _jsTouch(JS_JINX_DMG[p], level, 'Jinx Ball');
+            b.el.style.transform = 'translate(' + Math.round(b.x - 17) + 'px,' + Math.round(b.y - 17) + 'px)';
+            if (!_nkCircleHit(b.x, b.y, 17, pr, 0)) return;
+            if (b.luck) {
+                _jsHeal(Math.max(1, Math.round(_nkMaxHP() * LUCK_HEAL)));
                 _jsConfetti(b.x, b.y, false);
+                b.done = true;
+                try { b.el.remove(); } catch (e) {}
+                return;
             }
+            if (_jsStrike(JINX_DMG[p], level, 'Jinx Ball')) _jsConfetti(b.x, b.y, false);
         });
-        if (t >= lifeMs || !active) {
-            balls.forEach(b => { if (!b.done) { b.done = true; try { b.el.remove(); } catch (e) {} } });
-            return false;
-        }
-        return true;
+        return t < JINX_LIFE_MS && balls.some(b => !b.done);
     });
-}
-
-
-//------------------------------------------------------------------------
-//-------------------🎪… THE GRAND FINALE (≤10% HP one-shot finale)---------
-//------------------------------------------------------------------------
-// The stage curtain drops, the boss bows (immune), and the FULL HOUSE
-// builds: oversized cards deal onto the grid in a closing spiral - every
-// card shows a suit, and each REVEAL names one SAFE suit. Stand on the
-// safe suit when the reveal lands; wrong suit = hit. Reveals accelerate,
-// then the BLACKOUT: all cards flip face-down except the safe suit, and
-// the CURTAIN CALL sweeps barrage lanes across the stage. Charge bar
-// frozen for the whole set-piece (gate in _tickPlayer via _jsFinalActive).
-export const JS_FINAL_SHOWS = 3;      // suit reveals
-export const JS_SHOW_CHARGE = 1400;   // ms telegraph per reveal (shrinks)
-export const JS_SHOW_CHARGE_MIN = 800;
-export const JS_CARD_COLS = 6;
-export const JS_CARD_ROWS = 4;
-
-// Set while the finale runs (read by _tickPlayer's charge-freeze gate).
-export let _jsFinal = null;
-
-// Pause-safe timeout: while the game is frozen the callback retries every
-// 200ms instead of firing mid-pause (the freeze guard the other finales
-// run inside their loop ticks - this show runs on timeouts instead).
-export function _jsAfter(g, fn, ms) {
-    const id = setTimeout(() => {
-        if (!g || g.finished || _jsFinal !== g) return;
-        if (_nkFrozen()) { _jsAfter(g, fn, 200); return; }
-        fn();
-    }, ms);
-    if (g && g.timers) g.timers.push(id);
-    return id;
-}
-
-export function _jsFinalActive() {
-    return !!_jsFinal && !_jsFinal.finished;
-}
-
-// Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
-// onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-export function _jsOnPhaseEnter(monster, newPhase) {
-    if (newPhase !== 3) return false;
-    try { _jsStartFinalWatcher(monster); } catch (e) {}
-    return false;
-}
-
-export function _jsStartFinalWatcher(monster) {
-    if (!monster || _jsFinal) return;
-    const run = _nkNewRun(monster.id, true);
-    run.passive = true;
-    _nkLoop(run, () => {
-        if (_jsFinal) return false;
-        try {
-            if (monster.currentHP <= monster.maxHP * 0.10) {
-                _jsFinalStart(monster);
-                return false;
-            }
-        } catch (e) { return false; }
-        return true;
-    });
-}
-
-export function _jsFinalStart(monster) {
-    if (_jsFinal || !monster) return;
-
-    // The house lights dim: kill every other run of this boss (the finale
-    // owns the stage).
-    Array.from(_nkRuns.values()).forEach(r => {
-        if (r.bossId === monster.id) { try { _nkKillRun(r); } catch (e) {} }
-    });
-
-    const W = window.innerWidth, H = window.innerHeight;
-    const g = {
-        monsterId: monster.id,
-        finished: false,
-        fxRun: null, curtain: null, overlay: null, gridEl: null,
-        cards: [], showTimer: null, sweepEls: [], timers: [],
-    };
-    _jsFinal = g;
-
-    // Freeze the auto-attack charge bar for the whole set-piece (the gate
-    // lives in _tickPlayer; this class is the visual twin).
-    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('sx-charge-paused');
-    });
-
-    // FX run (passive): holds curtain, cards and the show timeline.
-    g.fxRun = _nkNewRun(monster.id, true);
-    g.fxRun.passive = true;
-
-    // The curtain drops.
-    const curtain = document.createElement('div');
-    curtain.className = 'sx-js-curtain';
-    document.body.appendChild(curtain);
-    g.curtain = curtain;
-    requestAnimationFrame(() => curtain.classList.add('sx-js-curtain-on'));
-
-    // The card table: an evenly spaced grid of face-down cards.
-    const grid = document.createElement('div');
-    grid.className = 'sx-js-table';
-    document.body.appendChild(grid);
-    g.gridEl = grid;
-    g.fxRun.els.push(grid);
-    const padX = W * 0.09, padY = H * 0.16;
-    for (let r = 0; r < JS_CARD_ROWS; r++) {
-        for (let c2 = 0; c2 < JS_CARD_COLS; c2++) {
-            const el = document.createElement('div');
-            el.className = 'sx-js-card sx-js-tablecard';
-            el.style.left = Math.round(padX + (W - 2 * padX) * c2 / (JS_CARD_COLS - 1) - JS_CARD_W / 2) + 'px';
-            el.style.top = Math.round(padY + (H - 2 * padY) * r / (JS_CARD_ROWS - 1) - JS_CARD_H / 2) + 'px';
-            grid.appendChild(el);
-            g.cards.push({ el, col: c2, row: r });
-        }
-    }
-
-    // Countdown overlay.
-    const ov = document.createElement('div');
-    ov.className = 'sx-js-cd';
-    ov.innerHTML =
-        '<div class="sx-js-cd-label">🎪 THE GRAND FINALE</div>' +
-        '<div class="sx-js-cd-hint">Read the reveal - stand on the safe suit!</div>';
-    document.body.appendChild(ov);
-    g.overlay = ov;
-
-    _nkToast('eg_mech_js_final_cd', '🎪💀 THE GRAND FINALE - mind the reveal!', '#e9d5ff');
-
-    // Boss immunity for the whole set-piece (released at the end).
-    monster.bossImmune = true;
-
-    // The boss bows.
-    const card = document.getElementById('sx-card-' + monster.id);
-    const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
-    if (wrap) {
-        wrap.classList.add('sx-js-bowing');
-        wrap.classList.add('sx-nk-shielded');
-    }
-
-    const level = monster.level || 1;
-    const suits = ['♠', '♥', '♦', '♣'];
-    const reds = { '♥': 1, '♦': 1 };
-    const show = (idx) => {
-        if (!_jsFinal || _jsFinal !== g || g.finished) return;
-        if (idx >= JS_FINAL_SHOWS) {
-            _jsBlackout(g, monster, level);
-            return;
-        }
-        const charge = Math.max(JS_SHOW_CHARGE_MIN,
-            JS_SHOW_CHARGE - idx * 250) * (__JS_DEBUG_SLOW ? 8 : 1);
-        // Deal the safe suit onto a random third of the table.
-        const safe = suits[Math.floor(Math.random() * suits.length)];
-        g.cards.forEach(cd => {
-            const face = Math.random() < 0.34 ? safe : suits[Math.floor(Math.random() * suits.length)];
-            cd.el.textContent = face;
-            cd.el.classList.toggle('sx-js-card-red', !!reds[face]);
-            cd.el.classList.remove('sx-js-card-safe');
-            if (face === safe) cd.el.classList.add('sx-js-card-faceup');
-        });
-        g.cards.forEach(cd => cd.el.classList.add('sx-js-card-dealt'));
-        _nkToast('eg_mech_js_reveal', '🎪 The reveal is coming - stand on the glowing suit!', '#e9d5ff');
-        _jsAfter(g, () => {
-            // REVEAL: cards flip down; the SAFE suit stays lit and judges.
-            const pr = _nkPlayerRect();
-            let onSafe = false;
-            g.cards.forEach(cd => {
-                cd.el.classList.remove('sx-js-card-faceup');
-                cd.el.classList.add('sx-js-card-down');
-                if (cd.el.textContent === safe) {
-                    cd.el.classList.add('sx-js-card-safe');
-                    if (pr) {
-                        const pc = { x: pr.left + pr.width / 2, y: pr.top + pr.height / 2 };
-                        const cx = parseFloat(cd.el.style.left) + JS_CARD_W / 2;
-                        const cy = parseFloat(cd.el.style.top) + JS_CARD_H / 2;
-                        if (Math.abs(pc.x - cx) < JS_CARD_W / 2 + 14 && Math.abs(pc.y - cy) < JS_CARD_H / 2 + 14) onSafe = true;
-                    }
-                }
-            });
-            _jsConfetti(W / 2, H / 2, !onSafe);
-            if (pr && !onSafe) {
-                _jsTouch(JS_REVEAL_DMG, level, 'Wrong Suit');
-            }
-            _jsAfter(g, () => {
-                g.cards.forEach(cd => cd.el.classList.remove('sx-js-card-safe', 'sx-js-card-down'));
-                show(idx + 1);
-            }, __JS_DEBUG_SLOW ? 1400 : 700);
-        }, charge);
-    };
-    g.showTimer = _jsAfter(g, () => show(0), __JS_DEBUG_SLOW ? 4000 : 1600);
-}
-
-// The BLACKOUT + CURTAIN CALL: all cards flip face-down except the safe
-// suit; sweeping barrage lanes cross the stage - the last show of shows.
-export function _jsBlackout(g, monster, level) {
-    if (!g || g.finished) return;
-    g.phase = 'blackout';
-    const W = window.innerWidth, H = window.innerHeight;
-    const safeSuit = ['♠', '♥', '♦', '♣'][Math.floor(Math.random() * 4)];
-    g.cards.forEach(cd => {
-        cd.el.textContent = '🂠';
-        cd.el.classList.add('sx-js-card-down');
-        cd.el.classList.remove('sx-js-card-safe');
-    });
-    // Light up only the safe-suit columns (2 of 6 columns per row).
-    const safeCols = new Set([Math.floor(Math.random() * 3), 3 + Math.floor(Math.random() * 3)]);
-    const safeCells = [];
-    g.cards.forEach(cd => {
-        if (safeCols.has(cd.col)) {
-            cd.el.classList.add('sx-js-card-safe');
-            cd.el.textContent = safeSuit;
-            cd.el.classList.remove('sx-js-card-down');
-            safeCells.push(cd);
-        }
-    });
-    _nkToast('eg_mech_js_blackout', '🎪💀 BLACKOUT + CURTAIN CALL - stand in the lit columns!', '#e9d5ff');
-
-    // CURTAIN CALL: 3 barrage waves sweep the rows; standing on a safe cell
-    // inside the swept row shelters you - the show's final read.
-    const rows = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
-    const waveGap = 900 * _JS_DEBUG_MULT;
-    let wi = 0;
-    const sweepNext = () => {
-        if (!_jsFinal || _jsFinal !== g || g.finished) return;
-        if (wi >= rows.length) {
-            _jsAfter(g, () => _jsFinalEnd(g), __JS_DEBUG_SLOW ? 5500 : 1200);
-            return;
-        }
-        const r = rows[wi++];
-        const y = H * 0.16 + (H - 2 * H * 0.16) * r / (JS_CARD_ROWS - 1);
-        const fromLeft = Math.random() < 0.5;
-        const bandH = 110;
-        const warn = document.createElement('div');
-        warn.className = 'sx-js-sweepwarn';
-        warn.style.left = '0px';
-        warn.style.width = W + 'px';
-        warn.style.top = Math.round(y - bandH / 2) + 'px';
-        warn.style.height = bandH + 'px';
-        document.body.appendChild(warn);
-        g.sweepEls.push(warn);
-        _jsAfter(g, () => {
-            const idxW = g.sweepEls.indexOf(warn);
-            if (idxW >= 0) g.sweepEls.splice(idxW, 1);
-            try { warn.remove(); } catch (e) {}
-            if (!_jsFinal || _jsFinal !== g || g.finished) return;
-            const sweep = document.createElement('div');
-            sweep.className = 'sx-js-sweep' + (fromLeft ? ' sx-js-from-left' : ' sx-js-from-right');
-            sweep.style.top = Math.round(y - bandH * 0.4) + 'px';
-            sweep.style.height = Math.round(bandH * 0.8) + 'px';
-            document.body.appendChild(sweep);
-            g.sweepEls.push(sweep);
-            const speed = 760 / _JS_DEBUG_MULT;
-            let sx = fromLeft ? -160 : W + 40;
-            sweep.style.left = Math.round(sx) + 'px';
-            let touchCd = 0;
-            _nkLoop(g.fxRun, (dtS, now) => {
-                sx += (fromLeft ? 1 : -1) * speed * dtS;
-                sweep.style.left = Math.round(sx) + 'px';
-                const pr = _nkPlayerRect();
-                if (pr && now >= touchCd) {
-                    const pc = { x: pr.left + pr.width / 2, y: pr.top + pr.height / 2 };
-                    if (Math.abs(pc.y - y) < bandH / 2 + 6) {
-                        let sheltered = false;
-                        safeCells.forEach(cd => {
-                            const cy = parseFloat(cd.el.style.top) + JS_CARD_H / 2;
-                            const cx = parseFloat(cd.el.style.left) + JS_CARD_W / 2;
-                            if (Math.abs(pc.y - cy) < JS_CARD_H / 2 + 14 && Math.abs(pc.x - cx) < JS_CARD_W / 2 + 14) sheltered = true;
-                        });
-                        if (!sheltered) {
-                            touchCd = now + JS_HIT_CD_MS;
-                            _jsTouch(JS_SWEEP_DMG, level, 'Curtain Call');
-                        }
-                    }
-                }
-                if ((!fromLeft && sx < -200) || (fromLeft && sx > W + 200)) {
-                    try { sweep.remove(); } catch (e) {}
-                    _jsAfter(g, sweepNext, waveGap);
-                    return false;
-                }
-                return true;
-            });
-        }, 1000 * _JS_DEBUG_MULT);
-    };
-    sweepNext();
-}
-
-export function _jsFinalEnd(g) {
-    if (!g || g.finished) return;
-    g.finished = true;
-    if (g.showTimer) { clearTimeout(g.showTimer); g.showTimer = null; }
-    (g.timers || []).forEach(id => { clearTimeout(id); });
-    g.timers = [];
-    if (g.overlay) { try { g.overlay.remove(); } catch (e) {} g.overlay = null; }
-    if (g.curtain) { try { g.curtain.remove(); } catch (e) {} g.curtain = null; }
-    if (g.gridEl) { try { g.gridEl.remove(); } catch (e) {} g.gridEl = null; }
-    g.sweepEls.forEach(el => { try { el.remove(); } catch (e) {} });
-    g.sweepEls = [];
-    if (g.fxRun) { try { _nkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
-    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.remove('sx-charge-paused');
-    });
-    document.querySelectorAll('.sx-js-bowing').forEach(el => el.classList.remove('sx-js-bowing'));
-
-    const m = (g.monsterId && typeof _monsters !== 'undefined')
-        ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
-    if (m && m.bossImmune) {
-        m.bossImmune = false;
-        if (typeof _bossScheduleMechanics === 'function') {
-            try { _bossScheduleMechanics(m, 3); } catch (e) {}
-        }
-        if (typeof _renderPanel === 'function') { try { _renderPanel(); } catch (e2) {} }
-    }
-    if (_jsFinal === g) _jsFinal = null;
-}
-
-
-//------------------------------------------------------------------------
-//-------------------TEARDOWN-----------------------------------------------
-//------------------------------------------------------------------------
-// Called from _bossCleanup on boss death AND from the encounter stop -
-// removes every run element, overlay and body class this boss ever created.
-export function _jsTeardown() {
-    if (_jsFinal) { try { _jsFinalEnd(_jsFinal); } catch (e) {} _jsFinal = null; }
-    document.querySelectorAll('.sx-nk-orb-jester, .sx-js-card, .sx-js-ball, ' +
-        '.sx-js-curtain, .sx-js-table, .sx-js-cd, .sx-js-sweepwarn, .sx-js-sweep, ' +
-        '.sx-js-confetti').forEach(el => {
-        try { el.remove(); } catch (e) {}
-    });
-    document.querySelectorAll('.sx-js-bowing').forEach(el => el.classList.remove('sx-js-bowing'));
-    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.remove('sx-charge-paused');
-    });
-}
-
-
-//------------------------------------------------------------------------
-//-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
-//------------------------------------------------------------------------
-// Tiny console API for playtesting with stretched debug timings:
-//   _JS_DEBUG.fire('orbs'|'cards'|'jinx', phase) - runs one now
-//   _JS_DEBUG.final()                            - GRAND FINALE now
-if (typeof window !== 'undefined') {
-    window._JS_DEBUG = {
-        fire: (name, phase) => {
-            const monster = (typeof _monsters !== 'undefined')
-                ? globalThis._monsters.find(m => m && m.baseId === 'boss_jester') : null;
-            if (!monster) return 'no jester alive';
-            const fn = name === 'orbs' ? _mechJsOrbs
-                : name === 'cards' ? _mechJsCards
-                : name === 'jinx' ? _mechJsJinx : null;
-            if (!fn) return 'unknown: ' + name;
-            if (name !== 'orbs' && _nkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for the field to clear)';
-            fn(monster, phase || monster.bossPhase || 1);
-            return 'fired ' + name;
-        },
-        final: () => {
-            const monster = (typeof _monsters !== 'undefined')
-                ? globalThis._monsters.find(m => m && m.baseId === 'boss_jester') : null;
-            if (!monster) return 'no jester alive';
-            _jsFinalStart(monster);
-            return 'THE GRAND FINALE started';
-        },
-    };
 }

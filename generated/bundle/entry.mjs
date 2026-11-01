@@ -271,7 +271,8 @@ import { _MN_DEBUG_SLOW, _MN_DEBUG_MULT, MN_BAND_DMG, MN_BOLT_DMG, MN_SURGE_DMG,
 import { _BZ_DEBUG_SLOW, _BZ_DEBUG_MULT, BZ_RICOCHET_DMG, BZ_FLOOR_DMG, BZ_CUT_DMG, BZ_TRAP_DMG, BZ_PEND_DMG, BZ_FINAL_DMG, BZ_WALL_DMG, BZ_HIT_CD_MS, _bzGridCenter, _bzSawEl, _bzSparks, _bzHitCd, _bzTouch, BZ_RIC_BOUNCE_MS, BZ_FLOOR_LIFE_MS, _mechBzRicochetSaws, BZ_CUT_WINDUP_MS, BZ_CUT_BAND_W, _mechBzCutLine, BZ_TRAP_COUNT, BZ_TRAP_WINDUP_MS, BZ_TRAP_LIFE_MS, _mechBzSawTraps, BZ_PEND_SWINGS, _mechBzPendulumBlades, BZ_FINAL_CD_TICK_MS, BZ_FINAL_CD_TICKS, BZ_FINAL_POCKET_PCT, _bzFinal, _bzFinalActive, _bzOnPhaseEnter, _bzStartFinalWatcher, _bzFinalStart, _bzFinalBang, _bzFinalEnd, _bzTeardown } from '../../js/combat/bosses/boss-buzz.js';
 import { _COLO_DEBUG_SLOW, _COLO_DEBUG_MULT, COLO_FOOT_DMG, COLO_WAVE_DMG, COLO_BOULDER_DMG, COLO_FRAG_DMG, COLO_GOLEM_DMG, COLO_GOLEM_BOOM_DMG, COLO_AVALANCHE_DMG, COLO_CHUTE_DMG, COLO_SEAL_HITS, COLO_CHARGE_DMG, COLO_CAVEIN_DMG, COLO_HIT_CD_MS, _coloHitCd, _coloTouch, _coloPC, _coloRubble, _coloShake, COLO_STRIDE_STEPS, COLO_FOOT_WARN_MS, COLO_WAVE_SPEED, COLO_WAVE_MAX_FRAC, _mechSeismicSlam, BOULDER_COUNT, BOULDER_FALL_MS, BOULDER_FRAGS, _mechColoBoulders, AVALANCHE_WALLS, _mechColoAvalanche, GOLEM_COUNT, GOLEM_SPEED, GOLEM_HITS, GOLEM_LIFE_MS, _mechColoGolems, COLO_FINALE_SEAL_MS, COLO_CHUTE_PERIOD_MS, COLO_CHUTE_WARN_MS, _coloFinal, _coloFinalActive, _coloOnPhaseEnter, _coloStartFinalWatcher, _coloAfter, _coloFinalStart, _coloCaveIn, _coloFinalEnd, _coloTeardown } from '../../js/combat/bosses/boss-colossus.js';
 import { _GL_DEBUG_SLOW, _GL_DEBUG_MULT, GL_LATTICE_WAVES, GL_LATTICE_DMG, GL_LATTICE_STAGGER, GL_TOWER_COUNT, GL_TOWER_DMG, GL_ORB_SPEED, GL_ORB_DMG, GL_TRAIL_DMG, GL_TRAIL_LIFE, GL_WIRE_DMG, GL_JAM_DMG, GL_SURGE_DMG, GL_HIT_CD_MS, _glHitCd, _glTouch, _glSpark, _glDistToSeg, _mechGlLattice, GL_SCRAMBLE_WARN, GL_SCRAMBLE_LIVE, _mechGlScramble, GL_SURGE_LIFE, GL_SURGE_TURN, _mechGlSurge, GL_FINAL_BEATS, GL_BEAT_CHARGE, GL_BEAT_LIVE, GL_JAM_CHARGE, GL_JAM_LIVE, GL_WIRE_COUNT_H, GL_WIRE_COUNT_V, _glFinal, _glFinalActive, _glOnPhaseEnter, _glStartFinalWatcher, _glFinalStart, _glFinalEnd, _glTeardown } from '../../js/combat/bosses/boss-gridlock.js';
-import { __JS_DEBUG_SLOW, _JS_DEBUG_MULT, JS_ORB_COUNT, JS_ORB_SPEED, JS_ORB_DMG, JS_CARD_DMG, JS_JINX_DMG, JS_LUCK_HEAL, JS_REVEAL_DMG, JS_SWEEP_DMG, JS_HIT_CD_MS, _jsHeal, _jsHitCd, _jsTouch, _jsConfetti, JS_MAYHEM_BEAT, _mechJsOrbs, JS_CARD_LIFE, JS_CARD_W, JS_CARD_H, _mechJsCards, JS_JINX_LIFE, JS_ORBIT_TURN, _mechJsJinx, JS_FINAL_SHOWS, JS_SHOW_CHARGE, JS_SHOW_CHARGE_MIN, JS_CARD_COLS, JS_CARD_ROWS, _jsFinal, _jsAfter, _jsFinalActive, _jsOnPhaseEnter, _jsStartFinalWatcher, _jsFinalStart, _jsBlackout, _jsFinalEnd, _jsTeardown } from '../../js/combat/bosses/boss-jester.js';
+import { _mechJsOrbs, _mechJsCards, _mechJsJinx } from '../../js/combat/bosses/boss-jester.js';
+import { _jsTeardown } from '../../js/combat/bosses/boss-jester-finale.js';
 import { _mechAbyssDark } from '../../js/combat/bosses/boss-abyss.js';
 import { _architectSpotTaken, _architectNewSpot, _mechRisingPlats } from '../../js/combat/bosses/boss-architect.js';
 import { _mechTotemPulse, WARDEN_COLOR, _wardenAngDiff, _wardenPC, _wardenPlace, _wardenSetGap, _wardenSparks, _wardenTouch } from '../../js/combat/bosses/boss-warden.js';
@@ -743,6 +744,9 @@ try { Object.defineProperty(globalThis, "_markovSnapshotTick", { get() { return 
 try { Object.defineProperty(globalThis, "_marksGauntletActive", { get() { return _marksGauntletActive; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_marksGauntletChargePaused", { get() { return _marksGauntletChargePaused; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_marksGauntletGridLockToast", { get() { return _marksGauntletGridLockToast; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_mechJsCards", { get() { return _mechJsCards; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_mechJsJinx", { get() { return _mechJsJinx; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_mechJsOrbs", { get() { return _mechJsOrbs; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_meleeFindVictim", { get() { return _meleeFindVictim; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_moveTooltip", { get() { return _moveTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_notifyCorrectFill", { get() { return _notifyCorrectFill; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -1226,10 +1230,10 @@ try { globalThis["_glTeardown"] = _glTeardown; } catch (e) {} // PHASE3-SHIM (js
 try { globalThis["_mechGlLattice"] = _mechGlLattice; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-gridlock.js)
 try { globalThis["_mechGlScramble"] = _mechGlScramble; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-gridlock.js)
 try { globalThis["_mechGlSurge"] = _mechGlSurge; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-gridlock.js)
-try { globalThis["_jsTeardown"] = _jsTeardown; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-jester.js)
 try { globalThis["_mechJsCards"] = _mechJsCards; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-jester.js)
 try { globalThis["_mechJsJinx"] = _mechJsJinx; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-jester.js)
 try { globalThis["_mechJsOrbs"] = _mechJsOrbs; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-jester.js)
+try { globalThis["_jsTeardown"] = _jsTeardown; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-jester-finale.js)
 try { globalThis["_mechAbyssDark"] = _mechAbyssDark; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-abyss.js)
 try { globalThis["_mechRisingPlats"] = _mechRisingPlats; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-architect.js)
 try { globalThis["_mechTotemPulse"] = _mechTotemPulse; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/boss-warden.js)
