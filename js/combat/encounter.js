@@ -441,6 +441,7 @@ export {
     CAMPAIGN_STAMPED_FIELDS,
     _buildCampaignMonsterList,
     _campaignRefDamage,
+    _monsterHpForLevel,
     _clearCampaignLevelFields,
     _countSolutionCells,
     _earlyEaseBlend,

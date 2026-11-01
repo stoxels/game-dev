@@ -1,6 +1,6 @@
 import { MONSTER_DEFS } from './combat-monsters-data.js';
 import { GAME_ART } from './combat-art.js';
-import { CAMPAIGN_MONSTER_CONFIG, _earlyEaseBlend } from './encounter-campaign-spawns.js';
+import { CAMPAIGN_MONSTER_CONFIG, _earlyEaseBlend, _monsterHpForLevel } from './encounter-campaign-spawns.js';
 import { _egApplyMapModsToMonster } from '../endgame/endgame-map-launch.js';
 import { _isCampaignRun } from './combat-state.js';
 import { cur } from '../state.js';
@@ -13,7 +13,7 @@ import { cur } from '../state.js';
 
 // Monster level scaling 
 // Applied per level above 1. 
-const LEVEL_HP_SCALE = 0.28; // +28% HP per level above 1 - tuned for T1-easy / T16-spongy curve (see _getTierBalance)
+const LEVEL_HP_SCALE = 0.28; // legacy (kept for the pin test): monster HP now comes from _monsterHpForLevel; the hp part of _getTierBalance is unused
 const LEVEL_DAMAGE_SCALE = 0.26; // +26% damage per level above 1 - raised from 0.12 so high tiers stay threatening even with on-level gear; T1 eased via tier balance
 
 // Hard cap on how many monsters (including bosses) can be alive simultaneously.
@@ -102,38 +102,6 @@ function _roamSpeedFor(monster) {
 // Accepts either a string id (looks up MONSTER_DEFS) or a def object directly.
 // hpMult: optional multiplier for boss max HP only (e.g., 500k HP test mode);
 // damage is left at its normal scaled value.
-// Campaign trials (convergence / ascension) run on the atlas HP curve, which
-// assumes projectile-sized hits. A character whose real power is a charged
-// melee strike or a spell cast then deletes every monster in one or two
-// hits. The trial HP is therefore floored on the player's best action - the
-// larger of an average projectile hit and 60% of a charged melee strike /
-// spell cast (same share the gauntlet uses) - times a small hit count that
-// grows with monster level. Only ever raises HP; never touches bosses.
-const TRIAL_POWER_HIT_SHARE = 0.6;
-const TRIAL_HITS_BASE = 4;
-const TRIAL_HITS_PER_LEVEL = 0.08;
-
-function _trialPowerHit() {
-    let best = 5;
-    try {
-        let sum = 0;
-        const n = 4;
-        for (let i = 0; i < n; i++) sum += Number(globalThis._calcPlayerDamage()) || 0;
-        best = Math.max(best, sum / n);
-    } catch (e) { /* sample failed */ }
-    try {
-        const st = globalThis._computePlayerStats() || {};
-        const mid = (a, b) => ((Number(a) || 0) + (Number(b) || 0)) / 2;
-        const melee = (mid(st.meleePhysMin, st.meleePhysMax)
-            + mid(st.meleeFireMin, st.meleeFireMax) + mid(st.meleeColdMin, st.meleeColdMax)
-            + mid(st.meleeLightningMin, st.meleeLightningMax) + mid(st.meleeShadowMin, st.meleeShadowMax))
-            * (1 + (Number(st.meleePhysIncPct) || 0) / 100);
-        const spell = ((Number(st.spellDamageFlat) || 0) + 22 * (function(){const lv=Number(typeof globalThis._getPlayerLevel==='function'?globalThis._getPlayerLevel():0)||1;return lv<=50?1:Math.pow(75,Math.min(1,(lv-50)/40));})()) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
-        best = Math.max(best, melee * TRIAL_POWER_HIT_SHARE, spell * TRIAL_POWER_HIT_SHARE);
-    } catch (e) { /* stats optional */ }
-    return best;
-}
-
 export function _buildMonster(defOrId, level = 1, hpMult = 1) {
     const def = (typeof defOrId === 'string') ? MONSTER_DEFS[defOrId] : defOrId;
 
@@ -158,10 +126,12 @@ export function _buildMonster(defOrId, level = 1, hpMult = 1) {
 
     let maxHP, damage, scaledCharge;
     if (isCampaign) {
-        const hpTarget = (cur && cur.campaignMonsterHp > 0) ? cur.campaignMonsterHp : def.baseHP;
+        // Stamped by _prepareCampaignEncounter (= _monsterHpForLevel); the tutorial
+        // and the gauntlet stamp their own fixed values the same way.
+        const hpTarget = (cur && cur.campaignMonsterHp > 0) ? cur.campaignMonsterHp : _monsterHpForLevel(lvl);
         const dmgTarget = (cur && cur.campaignMonsterDamage > 0) ? cur.campaignMonsterDamage : 6;
-        // ±15% spread so a pack doesn't feel flat; never below a few hits.
-        maxHP = Math.max(10, Math.round(hpTarget * (0.85 + Math.random() * 0.30) * hpMult));
+        // One fixed value per level: no random spread (damage keeps its spread).
+        maxHP = Math.max(10, Math.round(hpTarget * hpMult));
         damage = Math.max(1, Math.round(dmgTarget * (0.85 + Math.random() * 0.30)));
         // A monster far above the player's level hits much harder.
         try {
@@ -183,20 +153,14 @@ export function _buildMonster(defOrId, level = 1, hpMult = 1) {
         } catch (e) { easeCharge = 1; }
         scaledCharge = Math.max(4, def.chargeMax * chargeMult * easeCharge);
     } else {
-        // Tier-aware balance: T1 is forgiving (no gear yet), difficulty ramps
-        // smoothly so adequate gear feels normal, lacking feels spongy/dangerous,
-        // outgearing feels easy. Multipliers are smooth, not stepped, to avoid
-        // abrupt walls between tiers.
+        // Tier-aware balance still shapes damage and charge speed. Health is the
+        // same fixed per-level value as in the campaign (_monsterHpForLevel), so
+        // trials and maps never differ from it except through map modifiers.
         const tierBalance = _getTierBalance(lvl);
-        const hpScale = (1 + LEVEL_HP_SCALE * (lvl - 1)) * tierBalance.hp;
         const dmgScale = (1 + LEVEL_DAMAGE_SCALE * (lvl - 1)) * tierBalance.dmg;
 
-        maxHP = Math.round(def.baseHP * hpScale);
+        maxHP = Math.round(_monsterHpForLevel(lvl) * hpMult);
         damage = Math.round(def.baseDamage * dmgScale);
-        if (cur && cur.campaignTrial) {
-            const hits = TRIAL_HITS_BASE + TRIAL_HITS_PER_LEVEL * lvl;
-            maxHP = Math.max(maxHP, Math.round(_trialPowerHit() * hits * hpMult));
-        }
 
         // Charge bar scales down with level so high-level monsters attack faster.
         // ~62% faster at L90 (0.38x), ~28% faster at L41 (0.72x), clamped to 2.2s minimum.

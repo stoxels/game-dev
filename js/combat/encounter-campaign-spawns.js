@@ -15,7 +15,7 @@ try { Object.defineProperty(globalThis, '_shouldPrepareCampaignEncounter', { get
 //------------------------------------------------------------------------
 // Every campaign level spawns a small, gently-tuned pack of monsters so the
 // player earns XP and loot while solving. Health is purely LEVEL-driven:
-// each monster survives `hitsToKill` full-power actions (a spell cast or a
+// each monster survives a set number of full-power actions (hitsAnchors) (a spell cast or a
 // charged melee strike) of a level-appropriate character. It does not look
 // at the puzzle size, the pack size or the player's gear: projectile reveals,
 // spells and melee are all valid ways to deal damage, so no single one of
@@ -24,18 +24,22 @@ try { Object.defineProperty(globalThis, '_shouldPrepareCampaignEncounter', { get
 //
 // Campaign packs never respawn and never include bosses.
 export const CAMPAIGN_MONSTER_CONFIG = {
-    // Per-monster HP = refHit(level) * hitsToKill * early ramp * spread.
+    // Per-monster HP = refHit(level) * hits(level), ONE value per monster level
+    // for every run type (campaign, trials, maps) and every gear set; only map
+    // modifiers multiply it afterwards. See _monsterHpForLevel.
     // refHit anchors [level, best single-action damage] were measured from
     // real character exports (L7 geared 138, L10 spell build 176, L42 melee
-    // build 370); between anchors it is linear, past the last it keeps
-    // refHitSlopeBeyond per level. L1 is the un-geared base spell (22).
-    // Balance pass: anchors past L42 follow the high-level target (average geared
-    // build ~11k per main action at L90, so a campaign monster ~33k).
-    refHitAnchors: [[1, 22], [7, 138], [10, 176], [42, 370], [50, 520], [68, 1200], [80, 4500], [90, 11000]],
+    // build 370, L61 spell build ~1000); between anchors it is linear, past the
+    // last it keeps refHitSlopeBeyond per level. L1 is the un-geared base spell (22).
+    // Balance pass: anchors past L68 follow the high-level target (average geared
+    // build ~11k per main action at L90, so a monster ~33k).
+    refHitAnchors: [[1, 22], [7, 138], [10, 176], [42, 370], [50, 620], [68, 1250], [80, 4500], [90, 11000]],
     refHitSlopeBeyond: 300,
-    hitsToKill: 3,             // full actions a monster survives
-    earlyHitsFraction: 0.65,   // level-1 share of hitsToKill; ramps to 1 by earlyHpRampLevels (tutorial now hands out sword, bow, coat, greaves + Renewal)
-    earlyHpRampLevels: 24,
+    // Full actions a monster survives, by level [level, hits]. The first levels
+    // ramp up from ~2 hits (new players), 3 hits through the early game, then
+    // 6 hits for the L53-68 stretch where spell builds take off, back to 3 for
+    // the geometric endgame curve.
+    hitsAnchors: [[1, 1.95], [25, 3], [42, 3], [53, 6], [68, 6], [80, 3], [90, 3]],
     minHp: 18,
     countBase: 3,
     countPerWorlds: 3,        // +1 monster every N worlds
@@ -91,19 +95,35 @@ export function _earlyEaseBlend(level) {
     return Math.max(0, Math.min(1, 1 - (Math.max(1, Number(level) || 1) - 1) / (n - 1)));
 }
 
-// Best single-action damage of a level-appropriate character (see
-// refHitAnchors). Gear-independent by design.
-function _campaignRefHit(level) {
-    const cfg = CAMPAIGN_MONSTER_CONFIG;
-    const pts = cfg.refHitAnchors;
+// Linear lookup in a [[level, value], ...] table; flat before the first and
+// after the last point (the ref-hit table adds its own slope past the end).
+function _anchorLerp(pts, level) {
     const l = Math.max(1, Number(level) || 1);
     if (l <= pts[0][0]) return pts[0][1];
     for (let i = 0; i < pts.length - 1; i++) {
         const [x0, y0] = pts[i], [x1, y1] = pts[i + 1];
         if (l <= x1) return y0 + (y1 - y0) * (l - x0) / (x1 - x0);
     }
+    return pts[pts.length - 1][1];
+}
+
+// Best single-action damage of a level-appropriate character (see
+// refHitAnchors). Gear-independent by design.
+function _campaignRefHit(level) {
+    const cfg = CAMPAIGN_MONSTER_CONFIG;
+    const pts = cfg.refHitAnchors;
     const [xn, yn] = pts[pts.length - 1];
-    return yn + cfg.refHitSlopeBeyond * (l - xn);
+    const l = Math.max(1, Number(level) || 1);
+    if (l > xn) return yn + cfg.refHitSlopeBeyond * (l - xn);
+    return _anchorLerp(pts, l);
+}
+
+// THE health of a regular monster of this level: the same in the campaign,
+// the trials and the maps, and independent of the player's gear. Map modifiers
+// that raise monster life multiply this afterwards, nothing else does.
+export function _monsterHpForLevel(level) {
+    const cfg = CAMPAIGN_MONSTER_CONFIG;
+    return Math.max(cfg.minHp, Math.round(_campaignRefHit(level) * _anchorLerp(cfg.hitsAnchors, level)));
 }
 
 // Raw per-hit damage of a campaign monster at `level` (see refDamageAnchors).
@@ -197,9 +217,7 @@ export function _prepareCampaignEncounter() {
     const boss = cur.coopBoss || null;
     if (boss) count = 1;
 
-    const ramp = Math.max(0, Math.min(1, (level - 1) / Math.max(1, cfg.earlyHpRampLevels)));
-    const hits = cfg.hitsToKill * (cfg.earlyHitsFraction + (1 - cfg.earlyHitsFraction) * ramp);
-    const perHp = Math.max(cfg.minHp, Math.round(_campaignRefHit(level) * hits * (boss ? boss.hpMult : 1)));
+    const perHp = Math.max(cfg.minHp, Math.round(_monsterHpForLevel(level) * (boss ? boss.hpMult : 1)));
     const easeDamage = 1 - (1 - cfg.earlyDamageMult) * _earlyEaseBlend(level);
     const damage = Math.max(1, Math.round(_campaignRefDamage(level) * easeDamage * (boss ? boss.dmgMult : 1)));
 
