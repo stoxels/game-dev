@@ -1122,6 +1122,8 @@ function _tickMonsterStatuses(now, deltaS) {
     globalThis._monsters.forEach(m => {
         if (!m.statuses) return;
         _expireFromMap(m.statuses, now);
+        // An immune boss (phase shield, finale) takes no damage over time either.
+        if (m.bossImmune) return;
 
         let dotTotal = 0;
         Object.keys(m.statuses).forEach(key => {
