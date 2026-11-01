@@ -4,6 +4,7 @@ import { hideGameTooltip, moveGameTooltip, showGameTooltip } from '../tooltips-h
 import {
     CRAFTED_MOD_CAPS,
     _craftingBenchItem,
+    _craftingBenchSearch,
     _craftingBenchSelection,
 } from './loot-crafting-bench-state.js';
 import {
@@ -123,11 +124,22 @@ export function _craftingBenchCostHTML() {
     return '';
 }
 
+// True when a modifier family matches the search box: every typed word must
+// appear in its English / German name or its id (so "health" finds life mods).
+function _craftingBenchMatchesSearch(entry) {
+    const words = _craftingBenchSearch.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!words.length) return true;
+    const fam = entry.family;
+    const hay = `${fam.label || ''} ${fam.labelDe || ''} ${String(entry.familyId).replace(/_/g, ' ')}`.toLowerCase();
+    return words.every(word => hay.includes(word));
+}
+
 // Builds the complete crafting panel for the item and selection in state.
 export function _craftingBenchBuildHTML() {
     const item = _craftingBenchItem;
     const valid = _craftingBenchCanUseItem(item);
-    const families = valid ? _craftingBenchFamilies(item) : [];
+    const allFamilies = valid ? _craftingBenchFamilies(item) : [];
+    const families = allFamilies.filter(_craftingBenchMatchesSearch);
     const prefixFamilies = families.filter(family => family.type === 'prefix');
     const suffixFamilies = families.filter(family => family.type === 'suffix');
 
@@ -182,7 +194,9 @@ export function _craftingBenchBuildHTML() {
     let options = '';
     if (prefixFamilies.length) options += `<div class="sx-craft-col prefix"><div class="sx-craft-col-head prefix">PREFIX · ${prefixFamilies.length}</div>${buildCards(prefixFamilies)}</div>`;
     if (suffixFamilies.length) options += `<div class="sx-craft-col suffix"><div class="sx-craft-col-head suffix">SUFFIX · ${suffixFamilies.length}</div>${buildCards(suffixFamilies)}</div>`;
+    if (!options && allFamilies.length) options = `<div class="sx-craft-empty">No modifier matches "${_craftingBenchSearch.replace(/[<>&"]/g, '')}".</div>`;
     if (!options) options = `<div class="sx-craft-empty">${status}</div>`;
+    const searchHTML = valid ? `<input type="search" id="sx-craft-search" class="sx-craft-search" placeholder="Search modifiers (e.g. health, resist, damage)" value="${_craftingBenchSearch.replace(/[<>&"]/g, '')}" autocomplete="off">` : '';
 
     const capacityHTML = item ? _craftingBenchCapacityHTML(item) : '';
     // Footer: cost of the currently selected modifier, have / need per currency.
@@ -194,5 +208,5 @@ export function _craftingBenchBuildHTML() {
             if (tier) selectedCostHTML = `<span class="sx-craft-selected-label">Cost</span>${_craftingBenchCostChipsHTML(_craftingBenchEffectiveCosts(entry, tier))}`;
         }
     }
-    return `<div class="sx-craft-bench-panel"><div class="sx-craft-head"><span class="sx-craft-head-icon">⚒</span><span class="sx-craft-head-title">CRAFTING BENCH</span><button class="sx-craft-close" onclick="_closeCraftingBench()" data-tip-t="ui_close" aria-label="${t('ui_close')}">✕</button></div><h2>⚒ CRAFTING BENCH</h2><div class="sx-craft-body"><div class="sx-craft-bench-item" id="sx-crafting-bench-item" data-eg-dropzone="crafting" ondragover="hubDragOver(event)"><span>${item ? _buildItemChipHTML(item, 'large') : 'Drop an equipment item here'}</span></div><div class="sx-craft-ilvl">${item ? `Item level: ${item.itemLevel || 1}` : status}</div>${capacityHTML}${valid ? '<div class="sx-craft-legend"><span class="sx-craft-pill ready">✓ READY</span> can craft now <span class="sx-craft-pill short">✗ MISSING</span> not enough currency <span class="sx-craft-pill locked">🔒 ILVL</span> item level too low</div>' : ''}<div class="sx-craft-options">${options || `<div class="sx-craft-empty">${status}</div>`}</div></div><div class="sx-craft-footer"><div class="sx-craft-selected-cost">${_craftingBenchCostHTML()}${selectedCostHTML}</div><button class="sx-craft-apply" onclick="_craftingBenchApply()" ${!_craftingBenchSelection ? 'disabled' : ''}>CRAFT SELECTED MODIFIER</button></div></div>`;
+    return `<div class="sx-craft-bench-panel"><div class="sx-craft-head"><span class="sx-craft-head-icon">⚒</span><span class="sx-craft-head-title">CRAFTING BENCH</span><button class="sx-craft-close" onclick="_closeCraftingBench()" data-tip-t="ui_close" aria-label="${t('ui_close')}">✕</button></div><h2>⚒ CRAFTING BENCH</h2><div class="sx-craft-body"><div class="sx-craft-bench-item" id="sx-crafting-bench-item" data-eg-dropzone="crafting" ondragover="hubDragOver(event)"><span>${item ? _buildItemChipHTML(item, 'large') : 'Drop an equipment item here'}</span></div><div class="sx-craft-ilvl">${item ? `Item level: ${item.itemLevel || 1}` : status}</div>${capacityHTML}${valid ? '<div class="sx-craft-legend"><span class="sx-craft-pill ready">✓ READY</span> can craft now <span class="sx-craft-pill short">✗ MISSING</span> not enough currency <span class="sx-craft-pill locked">🔒 ILVL</span> item level too low</div>' : ''}${searchHTML}<div class="sx-craft-options">${options || `<div class="sx-craft-empty">${status}</div>`}</div></div><div class="sx-craft-footer"><div class="sx-craft-selected-cost">${_craftingBenchCostHTML()}${selectedCostHTML}</div><button class="sx-craft-apply" onclick="_craftingBenchApply()" ${!_craftingBenchSelection ? 'disabled' : ''}>CRAFT SELECTED MODIFIER</button></div></div>`;
 }

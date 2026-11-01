@@ -210,7 +210,7 @@ function _blzRing(run, spot, r) {
     const el = _nkEl(run, 'div', 'sx-shp-hearth');
     el.style.width = el.style.height = (r * 2) + 'px';
     _shpPlace(el, spot.x, spot.y, r, r);
-    el.innerHTML = '<i class="sx-shp-hearth-glow"></i><b>🔥</b>';
+    el.innerHTML = '<i class="sx-shp-hearth-glow"></i><b></b>';
     return { x: spot.x, y: spot.y, el };
 }
 

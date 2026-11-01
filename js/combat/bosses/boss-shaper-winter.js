@@ -74,7 +74,7 @@ function _winterArms(g) {
 // Three cores at 120 spacing on the monolith. The lit one is the safe spot.
 function _winterCores(g) {
     g.cores = [0, 120, 240].map((ang) => {
-        const el = _nkEl(g.fxRun, 'div', 'sx-shp-core', '💎');
+        const el = _nkEl(g.fxRun, 'div', 'sx-shp-core');
         const x = g.px + Math.cos(ang * Math.PI / 180) * WIN_CORE_R;
         const y = g.py + Math.sin(ang * Math.PI / 180) * WIN_CORE_R;
         _shpPlace(el, x, y, 20, 20);
@@ -86,9 +86,9 @@ function _winterCores(g) {
 function _winterBanner(g) {
     const ov = _nkEl(g.fxRun, 'div', 'sx-shp-cd');
     ov.innerHTML =
-        '<div class="sx-shp-cd-label">⛄ THE SHAPED WINTER</div>' +
+        '<div class="sx-shp-cd-label">THE SHAPED WINTER</div>' +
         '<div class="sx-shp-cd-num sx-bmb-cd-pop">' + g.coresUp + '</div>' +
-        '<div class="sx-shp-cd-hint">Shielded! Stand on the lit core - it shelters you from the arms.</div>';
+        '';
     g.overlay = ov;
 }
 
@@ -96,7 +96,7 @@ function _winterBanner(g) {
 // monolith, so it is clear WHY it cannot be hurt.
 function _winterShield(g, monster) {
     g.dome = _nkEl(g.fxRun, 'div', 'sx-shp-dome');
-    g.dome.innerHTML = '<i class="sx-shp-dome-ring"></i><b class="sx-shp-dome-tag">🛡️ SHIELDED</b>';
+    g.dome.innerHTML = '<i class="sx-shp-dome-ring"></i>';
     g.tether = _nkEl(g.fxRun, 'div', 'sx-shp-tether');
     const card = document.getElementById('sx-card-' + monster.id);
     const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;

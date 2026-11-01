@@ -446,12 +446,8 @@ function _danStepRhythm(st, live, dtS, now, p, finale) {
         st.link.style.opacity = String(Math.min(1, 0.35 + st.outS / DAN_OUT_GRACE_S * 0.65));
         _danPlaceLane(st.link, b.x, b.y, ang);
     } else st.link.style.display = 'none';
-    const hint = (now - st.born) < DAN_HINT_MS;
-    let text = t('eg_dan_hud_in');
-    if (show) text = t('eg_dan_hud_show');
-    else if (!inRing) text = t('eg_dan_hud_out');
-    else if (hint) text = t('eg_dan_hud_hint');
-    _danSetHud(st, text, state, st.rhythm);
+    // The bar and the ring colour say it all - no words.
+    _danSetHud(st, '', state, st.rhythm);
 }
 
 

@@ -59,10 +59,23 @@ export function _respawnRandomMonster() {
     _spawnMonster(def.id, _rollMonsterLevel(baseLevel));
 }
 
+// Trial runs refill the field slower than maps: 10-16s between a kill and its
+// replacement, so a strong build is not buried in endless new packs.
+const TRIAL_RESPAWN_MIN_MS = 10000;
+const TRIAL_RESPAWN_RANGE_MS = 6000;
+
+// The respawn delay range for the current encounter (slower during a trial).
+function _respawnTiming() {
+    const resp = (typeof _getRespawnDelayMs === 'function') ? _getRespawnDelayMs(_getEncounterBaseLevel()) : { min: RESPAWN_DELAY_MIN_MS, range: RESPAWN_DELAY_RANGE_MS };
+    const inTrial = typeof globalThis._isTrialRun === 'function' && !!globalThis._isTrialRun();
+    if (!inTrial) return resp;
+    return { min: Math.max(resp.min, TRIAL_RESPAWN_MIN_MS), range: Math.max(resp.range, TRIAL_RESPAWN_RANGE_MS) };
+}
+
 // Schedules a single replacement monster to spawn after a short random delay.
 // Called whenever a normal monster dies and the kill gate is not yet reached.
 export function _scheduleRespawn() {
-    const resp = (typeof _getRespawnDelayMs === 'function') ? _getRespawnDelayMs(_getEncounterBaseLevel()) : { min: RESPAWN_DELAY_MIN_MS, range: RESPAWN_DELAY_RANGE_MS };
+    const resp = _respawnTiming();
     const delay = resp.min + Math.random() * resp.range;
     const t = setTimeout(() => {
         if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) {
@@ -89,7 +102,7 @@ export function _calcSpawnDelay(index, immediateCount, cumulativeDelay) {
         // Tiny stagger so the first batch doesn't all land simultaneously
         return { delay: INITIAL_SPAWN_STAGGER_BASE_MS + index * INITIAL_SPAWN_STAGGER_STEP_MS, cumulative: cumulativeDelay };
     }
-    const resp = (typeof _getRespawnDelayMs === 'function') ? _getRespawnDelayMs(_getEncounterBaseLevel()) : { min: RESPAWN_DELAY_MIN_MS, range: RESPAWN_DELAY_RANGE_MS };
+    const resp = _respawnTiming();
     const extra = resp.min + Math.random() * resp.range;
     const newCumulative = cumulativeDelay + extra;
     return { delay: newCumulative, cumulative: newCumulative };

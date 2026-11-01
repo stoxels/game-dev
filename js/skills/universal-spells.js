@@ -2290,7 +2290,7 @@ function _uspApplyMovementSpell(spell) {
                 : _uspAvatarWrite(pos.el, pos.x + v.x * dist, pos.y + v.y * dist, dir);
             _uspBlinkFX(spell, pos.x, pos.y, landed.x, landed.y);
             _uspSupportCastFX(spell, `${dir}`, 'buff');
-            return { text: `${de ? 'teleportiert' : 'blinked'} ${dir} ${dist}px`, flavor: 'buff' };
+            return { text: '', flavor: 'buff' };
         }
 
         case 'dash':
@@ -2324,10 +2324,11 @@ function _uspApplyMovementSpell(spell) {
                 speed = _uspCalcMoveSpeedPct(spell);
                 if (speed > 0) _uspAddBuff(spell, { speedPct: speed });
             }
-            _uspSupportCastFX(spell, `${dist}px`, 'buff');
             const label = spell.behavior === 'disengage' ? (de ? 'Rückzug' : 'leapt back') : (de ? 'gesprintet' : 'dashed');
+            _uspSupportCastFX(spell, label, 'buff');
+            // No distance in the toast - only the speed boost is news to the player.
             return {
-                text: `${label} ${dist}px${speed ? ` · +${speed}% ${de ? 'Tempo' : 'speed'} ${spell.buffSeconds}s` : ''}`,
+                text: speed ? `+${speed}% ${de ? 'Tempo' : 'speed'} ${spell.buffSeconds}s` : '',
                 flavor: 'buff',
             };
         }
@@ -2369,11 +2370,9 @@ function _uspApplyMovementSpell(spell) {
                     } catch (e) { /* label is cosmetic */ }
                 }
             });
-            _uspSupportCastFX(spell, `${Math.round(travel)}px`, 'buff');
+            _uspSupportCastFX(spell, de ? 'Sprung' : 'leap', 'buff');
             return {
-                text: connects
-                    ? (de ? `Sprung ${Math.round(travel)}px auf ${tgt.mon.name || 'das Ziel'}` : `leapt ${Math.round(travel)}px onto ${tgt.mon.name || 'the target'}`)
-                    : (de ? 'zu kurz gesprungen!' : 'fell short!'),
+                text: connects ? '' : (de ? 'zu kurz gesprungen!' : 'fell short!'),
                 flavor: connects ? 'buff' : 'wasted',
             };
         }

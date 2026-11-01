@@ -80,7 +80,7 @@ function _crpBuildTrail(run, line, pc) {
     for (let i = 0; i < n; i++) {
         const s = line.len * i / (n - 1);
         const x = line.x1 + line.dx * s, y = line.y1 + line.dy * s;
-        const el = _nkEl(run, 'div', 'sx-nk-dot sx-crp-tnt', 'TNT');
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-crp-tnt');
         el.style.transform = 'translate(' + Math.round(x - 24) + 'px,' + Math.round(y - 16) + 'px)';
         crates.push({ s, x, y, el, lit: false, blown: false, near: pc ? Math.hypot(x - pc.x, y - pc.y) : 0 });
     }

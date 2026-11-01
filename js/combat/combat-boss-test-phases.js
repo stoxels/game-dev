@@ -80,7 +80,7 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'Shield Charge', desc: _bossTestTr('eg_boss_test_ag_charge', 'All fight: the boss picks your row and BARRELS across it behind its shield, two to three times per cast. Out of the lane!') },
         { name: 'Sentry Shields', desc: _bossTestTr('eg_boss_test_ag_sentries', 'At 60% HP: sentry shields plant at the edges and hurl slow tracking orbs at you. Strafe the orbs!') },
         { name: 'Guard Rotor', desc: _bossTestTr('eg_boss_test_ag_rotor', 'At 60% HP: two guardian orbs tether a beam that sweeps around a pivot like a radar blade. Stay off the arms!') },
-        { name: 'THE LAST BASTION', desc: _bossTestTr('eg_boss_test_ag_final', 'At 10% HP: a bastion plants at the centre and sweeps the field with two beams that spin faster every beat - then the VANGUARD: three rapid shield charges, the last one huge! (charge bar frozen)') },
+        { name: 'THE LAST BASTION', desc: _bossTestTr('eg_boss_test_ag_final', 'At 10% HP: the boss turns immune behind a citadel and a bastion sweeps two beams across the field. Green rings appear one at a time - stand in one until it fills (the beams cross it, so step out and back; the hub in the middle is safe). Four rings break the shield and the beams speed up with each one. (charge bar frozen)') },
     ],
     'boss_gridlock': () => [
         { name: 'Laser Lattice', desc: _bossTestTr('eg_boss_test_gl_lattice', 'All fight: alternating full-screen laser waves sweep the lit lanes - each wave STAGGER-FIRES line by line. Clear the lane whose turn is coming!') },
@@ -141,9 +141,9 @@ const SPECIAL_PHASE_ROWS = {
     ],
     'boss_laplace': () => [
         { name: 'Demonstrated Fate', desc: _bossTestTr('eg_boss_test_lap_fate', 'All fight: every cast shows a harmless GHOST pre-run ~3s ahead, then the REAL fire lance follows the same path - and pins its ENDPOINT, exactly where the ghost ended. Never stand where the ghost dies! Phase 3 crosses two lances.') },
-        { name: 'Conditional Branches', desc: _bossTestTr('eg_boss_test_lap_branches', 'At 60% HP: three phantoms walk dashed paths and each plants a future cell - ONE is ✅ real and detonates; the other two are fakes. Stand on a FAKE when it resolves for 2s GHOST-FORM: untouchable, so greed the next lance!') },
-        { name: 'Timeline Fray', desc: _bossTestTr('eg_boss_test_lap_fray', 'At 60% HP: a 👣 clone walks a recording of YOUR last 6 seconds (path pre-drawn as dots). Touch it and you swap with where it was 2s ago - no damage, just dizzying. Watch the dots!') },
-        { name: 'THE CLOSED TIMELINE', desc: _bossTestTr('eg_boss_test_lap_final', 'At 10% HP: the same gauntlet loops every 20s with IDENTICAL telegraphs - learn it! Break the ⛓️ timeline node each loop (stand on it); three breaks close the loop and kill the Demon. Failed dodges extend the loop and add a hunting phantom! (charge bar frozen)') },
+        { name: 'Conditional Branches', desc: _bossTestTr('eg_boss_test_lap_branches', 'At 60% HP: three phantoms walk dashed paths and each plants a future cell. ONE is 💥 real and detonates; the other two are 👻 fakes. Stand on a FAKE when it resolves for 2s GHOST-FORM: untouchable, so greed the next lance!') },
+        { name: 'Timeline Fray', desc: _bossTestTr('eg_boss_test_lap_fray', 'At 60% HP: a purple copy of YOU walks a recording of your last 6 seconds (path pre-drawn as dots). Touch it and you swap with where it was 2s ago - no damage, just dizzying. Watch the dots!') },
+        { name: 'THE CLOSED TIMELINE', desc: _bossTestTr('eg_boss_test_lap_final', 'At 10% HP: one glowing clock node at a time sits in the path of a repeating fire pattern (the bar at the top shows the strike times). Stand on the node until its ring fills - step off when the fire is about to land. Three nodes close the loop and kill the Demon. (charge bar frozen)') },
     ],
     'boss_inferno': () => [
         { name: 'Magma Tides', desc: _bossTestTr('eg_boss_test_infv_tides', 'All fight: 🌊 lava floods half the arena in alternating tides (quartered in phase 3) - a heavy DoT. The tide edge leaves COOLING OBSIDIAN TILES that crack in 3 states before sinking: stand on them to cool your HEAT meter, and keep moving - standing still heats you up!') },
@@ -196,7 +196,7 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'Conductor Network', desc: _bossTestTr('eg_boss_test_dynamo_conductors', '🔌 conductors roam (tanky: 18% of boss HP) and wire a beam network + hull field: on beams 0.06%/s, inside the hull 0.10%/s. Kill them to reclaim ground. Pillars add horizontal then diagonal lanes per phase.') }
     ],
     'boss_demolitionist': () => [
-        { name: 'Bomb Maze', desc: _bossTestTr('eg_boss_test_demolitionist_bomb_maze', 'At ≤25% HP: 5…1 countdown → teleport into a serpentine corridor walled by bombs that detonate behind you. ~1s later a SUPER BOMB slams onto your start and rolls the corridor after you - caught = instant defeat. Outrun it to the 🏁 (charge bar frozen).') }
+        { name: 'Bomb Maze', desc: _bossTestTr('eg_boss_test_demolitionist_bomb_maze', 'At ≤25% HP: 5…1 countdown → teleport into a serpentine corridor walled by bombs that detonate behind you. ~1s later a SUPER BOMB slams onto your start and rolls the corridor after you - caught = instant defeat. Outrun it to the green chequered exit (charge bar frozen).') }
     ],
     'boss_bumper': () => [
         { name: 'TILT! Flipper Frenzy', desc: _bossTestTr('eg_boss_test_bumper_tilt', 'At 60% HP: 9s - alternating flipper arcs slap the lower arena while bumpers enrage (1.7× speed). Play top/mid.') },

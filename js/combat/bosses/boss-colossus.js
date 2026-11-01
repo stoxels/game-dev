@@ -681,8 +681,8 @@ export function _coloFinalStart(monster) {
     const ov = document.createElement('div');
     ov.className = 'sx-colo-cd';
     ov.innerHTML =
-        '<div class="sx-colo-cd-label">🗿 TITAN\u2019S FALL</div>' +
-        '<div class="sx-colo-cd-hint">WALK into the glowing seal, step back out, then walk into it again - 3 times!</div>';
+        '<div class="sx-colo-cd-label">TITAN\u2019S FALL</div>' +
+        '';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -711,7 +711,7 @@ export function _coloFinalStart(monster) {
     g.sealEls = sealSpots.map(s => {
         const el = document.createElement('div');
         el.className = 'sx-colo-seal';
-        el.innerHTML = '<span class="sx-colo-seal-n"></span><span class="sx-colo-seal-cap">WALK INTO IT</span>';
+        el.innerHTML = '<span class="sx-colo-seal-n"></span>';
         document.body.appendChild(el);
         g.fxRun.els.push(el);
         return { el, fx: s.fx, fy: s.fy, x: 0, y: 0, hp: COLO_SEAL_HITS };

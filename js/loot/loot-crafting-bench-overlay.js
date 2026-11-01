@@ -1,5 +1,6 @@
 import {
     _craftingBenchScroll,
+    _setCraftingBenchSearchState,
     _setCraftingBenchSelectionState,
 } from './loot-crafting-bench-state.js';
 import { _craftingBenchBindTooltips, _craftingBenchBuildHTML } from './loot-crafting-bench-render.js';
@@ -7,6 +8,17 @@ import { _craftingBenchBindTooltips, _craftingBenchBuildHTML } from './loot-craf
 //------------------------------------------------------------------------
 //-------------------OVERLAY LIFECYCLE------------------------------------
 //------------------------------------------------------------------------
+
+// Applies the typed search: rebuilds the panel with only the matching
+// modifiers and puts the cursor back at the end of the search box.
+function _craftingBenchApplySearch(overlay, text) {
+    _setCraftingBenchSearchState(text);
+    _refreshCraftingBench();
+    const box = overlay.querySelector('#sx-craft-search');
+    if (!box) return;
+    box.focus();
+    box.setSelectionRange(box.value.length, box.value.length);
+}
 
 // Creates the crafting overlay once and binds its persistent listeners.
 export function _ensureCraftingBenchOverlay() {
@@ -19,6 +31,9 @@ export function _ensureCraftingBenchOverlay() {
         if (event.target === overlay) _closeCraftingBench();
     });
     overlay.addEventListener('scroll', () => _craftingBenchSyncScrollStore(overlay), true);
+    overlay.addEventListener('input', event => {
+        if (event.target.id === 'sx-craft-search') _craftingBenchApplySearch(overlay, event.target.value);
+    });
     document.body.appendChild(overlay);
     _craftingBenchBindDrop(overlay);
     _craftingBenchBindTooltips(overlay);

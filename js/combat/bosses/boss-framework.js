@@ -441,11 +441,9 @@ function _bossHeartBursts(monster) {
     while (given + due < BOSS_HEART_THRESHOLDS.length && ratio <= BOSS_HEART_THRESHOLDS[given + due]) due++;
     if (!due) return;
     monster._heartBursts = given + due;
-    let placed = 0;
     for (let i = 0; i < due * BOSS_HEARTS_PER_BURST; i++) {
-        if (_dropHeartPickup({ ignoreCap: true })) placed++;
+        _dropHeartPickup({ ignoreCap: true });
     }
-    if (placed > 0) globalThis.showCombatToast(t('eg_boss_hearts_spawned'), '#f9a8d4');
 }
 
 export function _bossCheckPhase(monster) {

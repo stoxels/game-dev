@@ -298,7 +298,7 @@ export function _galeArenaInit(monster) {
 export function _galeShowWindBanner(st, dir) {
     try { if (st.windBanner) st.windBanner.remove(); } catch (e) {}
     const el = _nkEl(st.run, 'div', 'sx-gal-wind-banner');
-    el.textContent = dir < 0 ? '◀◀ CROSSWIND' : 'CROSSWIND ▶▶';
+    el.textContent = dir < 0 ? '◀◀◀' : '▶▶▶';
     st.windBanner = el;
     setTimeout(() => { try { if (st.windBanner === el) el.remove(); } catch (e) {} }, 1800);
     // Streaks: recycled drifting lines on the windward side.

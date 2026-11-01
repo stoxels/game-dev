@@ -603,6 +603,20 @@ function _animGetWalkFramesSync(char, variant, direction) {
     return (_WALK_FRAMES[char] && _WALK_FRAMES[char][variant]) || [];
 }
 
+// Walk frames of the current player for one direction, for copies of the
+// player (boss echoes). `directional` is true when the frames are real art
+// for that direction (never mirrored); false means the right-facing
+// fallback set, which a copy must mirror when heading left. `frames` is
+// empty when the player has no walk art at all.
+export function _animPlayerWalkFrames(direction) {
+    const char = STATE?.playerCharacter;
+    if (!char) return { frames: [], directional: false };
+    return {
+        frames: _animGetWalkFramesSync(char, _animVariant(), direction),
+        directional: _animHasDirectionalWalkSync(char, _animVariant(), direction),
+    };
+}
+
 // Sync idle-frame lookup: directional idle art (already discovered) ->
 // omnidirectional idle art (already discovered). Empty when neither exists,
 // and callers fall back to the static portrait. Menus always use the static

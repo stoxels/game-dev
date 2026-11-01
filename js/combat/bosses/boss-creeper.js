@@ -89,16 +89,9 @@ export function _crpReset() {
 
 // One short instruction chip at the top of the arena, shown once per fight
 // per key (it replaces the old combat toasts).
-export function _crpHint(key, fallback) {
-    if (_crpHinted.has(key)) return;
+export function _crpHint(key) {
+    // No words on screen any more: the red rings, lanes and circles explain themselves.
     _crpHinted.add(key);
-    let msg = fallback;
-    try { const raw = t(key); if (raw && raw !== key) msg = raw; } catch (e) {}
-    const el = document.createElement('div');
-    el.className = 'sx-crp-hint';
-    el.textContent = msg;
-    document.body.appendChild(el);
-    setTimeout(() => { try { el.remove(); } catch (e) {} }, 4600);
 }
 
 // A floor circle of a blast's real reach. Its red pie fills clockwise as the
@@ -243,8 +236,6 @@ function _crpIgnite(run, cr, fuseLeftMs) {
     cr.state = 'hiss';
     cr.hiss = Math.max(0, cr.hissMs - fuseLeftMs);
     cr.ring = _crpFuseRing(run, cr.x, cr.y, cr.R, cr.charged ? 'charged' : '');
-    cr.label = _nkEl(run, 'div', 'sx-crp-hiss', 'SSSS…');
-    cr.label.style.transform = 'translate(' + Math.round(cr.x - 28) + 'px,' + Math.round(cr.y - 58) + 'px)';
 }
 
 // Removes a finished creeperling's sprite, ring and tag.

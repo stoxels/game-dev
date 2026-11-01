@@ -220,7 +220,7 @@ export function _sirEnsureChip() {
     _nkLoop(run, () => {
         const stacks = _sirChargeNow();
         chip.style.display = stacks > 0 ? '' : 'none';
-        chip.textContent = '⚡ CHARGE ' + stacks + '/' + SIR_CHARGE_MAX + ' - the storm hunts you faster';
+        chip.textContent = '⚡ ' + stacks + '/' + SIR_CHARGE_MAX;
         chip.classList.toggle('sx-sir-charge-full', stacks >= SIR_CHARGE_MAX);
         return true;
     });
@@ -787,8 +787,8 @@ export function _sirFinalStart(monster) {
     const ov = document.createElement('div');
     ov.className = 'sx-sir-cd';
     ov.innerHTML =
-        '<div class="sx-sir-cd-label">⛈️ PERFECT STORM</div>' +
-        '<div class="sx-sir-cd-hint">Get out of the lightning circles.</div>';
+        '<div class="sx-sir-cd-label">PERFECT STORM</div>' +
+        '';
     document.body.appendChild(ov);
     g.overlay = ov;
     g.fxRun.els.push(ov);
@@ -829,7 +829,6 @@ export function _sirFinalStart(monster) {
         const mark = _nkEl(g.fxRun, 'div', 'sx-sir-fin-mark sx-sir-fin-safe');
         mark.style.left = Math.round(tgt.l) + 'px'; mark.style.top = Math.round(tgt.t) + 'px';
         mark.style.width = mark.style.height = side + 'px';
-        mark.innerHTML = '<span>GET IN</span>';
         // Four storm panels fill everything outside the hole; the edge glows.
         const panels = [0, 1, 2, 3].map(() => _nkEl(g.fxRun, 'div', 'sx-sir-storm sx-sir-storm-live'));
         const edge = _nkEl(g.fxRun, 'div', 'sx-sir-box sx-sir-box-in');

@@ -11,6 +11,9 @@ export let _craftingBenchSelection = null;
 // Surviving per-column scroll positions keyed by 'prefix' and 'suffix'.
 export let _craftingBenchScroll = {};
 
+// Text typed in the bench's modifier search box ('' = show every modifier).
+export let _craftingBenchSearch = '';
+
 // Crafted modifier limits, separate from naturally rolled affix limits.
 export const CRAFTED_MOD_CAPS = {
     maxPre: 1,
@@ -35,6 +38,11 @@ export function _setCraftingBenchItemState(item) {
 // Replaces or clears the player's pending craft selection.
 export function _setCraftingBenchSelectionState(selection) {
     _craftingBenchSelection = selection;
+}
+
+// Stores the modifier search text.
+export function _setCraftingBenchSearchState(text) {
+    _craftingBenchSearch = String(text || '');
 }
 
 // Clears remembered column scroll positions when a new item is selected.

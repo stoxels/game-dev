@@ -187,7 +187,7 @@ function _wlkWarn(run, wk) {
 // The walker rises out of its circle.
 function _wlkRise(run, wk) {
     try { wk.ring.remove(); } catch (e) { /* run already cleaned up */ }
-    wk.el = _nkEl(run, 'div', 'sx-shp-walker', '⛄');
+    wk.el = _nkEl(run, 'div', 'sx-shp-walker');
     _shpPlace(wk.el, wk.x, wk.y, 18, 18);
     wk.state = 'live'; wk.age = 0;
 }
@@ -209,7 +209,7 @@ function _wlkShatter(run, wk, shards) {
     for (let i = 0; i < WLK_SHARDS; i++) {
         const a = (i / WLK_SHARDS) * Math.PI * 2 + Math.random() * 0.5;
         const spd = (230 + Math.random() * 90) / _SHP_DEBUG_MULT;
-        const el = _nkEl(run, 'div', 'sx-shp-shardlet', '❄');
+        const el = _nkEl(run, 'div', 'sx-shp-shardlet');
         _shpPlace(el, wk.x, wk.y, 8, 8);
         shards.push({ x: wk.x, y: wk.y, vx: Math.cos(a) * spd, vy: Math.sin(a) * spd, age: 0, el });
     }

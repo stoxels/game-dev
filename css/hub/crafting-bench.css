@@ -84,3 +84,5 @@
 .sx-craft-footer { flex-shrink:0; border-top:1px solid var(--border,#4a5475); background:rgba(0,0,0,0.18); padding:10px 14px 12px; display:flex; flex-direction:column; gap:9px; }
 .sx-craft-cost { margin-right:12px; color:#d8c58d; font-size:.75rem; }
 .sx-craft-cost-missing { color:#e87d70; font-weight:bold; }
+.sx-craft-search { width:100%; box-sizing:border-box; padding:7px 10px; font-family:var(--PX, monospace); font-size:11px; color:var(--text,#e6dfc9); background:rgba(0,0,0,0.3); border:1px solid var(--border,#4a5475); border-radius:4px; outline:none; }
+.sx-craft-search:focus { border-color:#ffd700; }

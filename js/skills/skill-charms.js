@@ -455,8 +455,7 @@ export function ensureCharmState() {
     STATE.charmMaxRankOnly = STATE.charmMaxRankOnly === true;
     STATE.charmAutoUpgrade = STATE.charmAutoUpgrade === true;
     // Element filter for the charm list ('all' = no filtering).
-    if (STATE.charmElementFilter !== 'all'
-        && !CHARM_ELEMENT_FILTERS.some((f) => f.id === STATE.charmElementFilter)) STATE.charmElementFilter = 'all';
+    if (!_charmIsValidFilter(STATE.charmElementFilter)) STATE.charmElementFilter = 'all';
 
     // Drop slot references whose charm is no longer owned (save edits,
     // class resets) so a slot can never unlock a spell that isn't held.
@@ -1211,14 +1210,29 @@ function _charmElementOf(skillId) {
     return '';
 }
 
+// True for a value the charm-list filter understands: 'all', 'class'
+// (the hero's own class skills) or one of the elements.
+function _charmIsValidFilter(value) {
+    return value === 'all' || value === 'class' || CHARM_ELEMENT_FILTERS.some((f) => f.id === value);
+}
+
+// True when the skill is one of the hero's class skills: anything that is
+// not a universal spell (those are the ones that carry an element or none).
+function _charmIsClassSkill(skillId) {
+    const defs = (typeof globalThis !== 'undefined' && Array.isArray(globalThis.UNIVERSAL_SPELL_DEFS))
+        ? globalThis.UNIVERSAL_SPELL_DEFS : [];
+    return !defs.some((d) => d && d.id === skillId);
+}
+
 // Element dropdown for the charm list. A <select> (not chips like the
 // vendor) so it fits next to the checkboxes on the book frame. Labels reuse
 // the vendor's filter strings so both languages come for free.
 function _charmBuildElementFilterHTML() {
     const cur = (STATE && STATE.charmElementFilter) || 'all';
     const opt = (id) => `<option value="${id}"${cur === id ? ' selected' : ''}>${t('eg_vendor_charm_filter_' + id)}</option>`;
+    const classOpt = `<option value="class"${cur === 'class' ? ' selected' : ''}>${t('charm_filter_class')}</option>`;
     return `<span class="sb3-maxrank sb3-elemfilter">`
-        + `<select class="charm-elem-select">${opt('all')}${CHARM_ELEMENT_FILTERS.map((f) => opt(f.id)).join('')}</select>`
+        + `<select class="charm-elem-select">${opt('all')}${classOpt}${CHARM_ELEMENT_FILTERS.map((f) => opt(f.id)).join('')}</select>`
         + `</span>`;
 }
 
@@ -1260,7 +1274,7 @@ export function handleCharmMaxRankToggle(checked) {
 // Stores the charm-list element filter and re-renders the book.
 function _charmSetElementFilter(value) {
     if (!STATE) return;
-    STATE.charmElementFilter = (value === 'all' || CHARM_ELEMENT_FILTERS.some((f) => f.id === value)) ? value : 'all';
+    STATE.charmElementFilter = _charmIsValidFilter(value) ? value : 'all';
     if (save) { try { save(); } catch (e) { /* best effort */ } }
     _charmRefreshSpellbook();
 }
@@ -1281,10 +1295,11 @@ function _charmApplyRankFilter(charms) {
 
 // Keeps only charms of the chosen element. Slotted charms are not exempt:
 // they stay visible in the spell slots on the right page, so the list can be
-// strict. Skills without an element (class skills) only show under 'All'.
+// strict. Class skills have no element, so they show under 'All' and 'Class skills'.
 function _charmApplyElementFilter(charms) {
     const filter = (STATE && STATE.charmElementFilter) || 'all';
     if (filter === 'all') return charms;
+    if (filter === 'class') return charms.filter((c) => _charmIsClassSkill(c.skillId));
     return charms.filter((c) => _charmElementOf(c.skillId) === filter);
 }
 

@@ -1,76 +1,104 @@
 import { _getPlayerMaxMana, gainMana } from '../classes/class-mana.js';
 import { _egMapHasBloodMagic } from '../endgame/endgame-map-launch.js';
+import { _lifeGain } from '../hub/hub-leveling.js';
 
 // combat-quiz-buffs.js
 //------------------------------------------------------------------------
-//-------------------ENDGAME QUIZ REWARD BUFFS-----------------------------
+//-------------------QUIZ REWARD BUFFS-------------------------------------
 //------------------------------------------------------------------------
-// Correctly answering an endgame question (interstitial quiz OR math gate)
-// rolls one of three temporary rewards:
-//   • +10% damage multiplier per stack, stacks additively (e.g. 3 correct = +30%),
-//     each stack lasts 30 minutes (QUIZ_BUFF_DURATION_MS)
-//   • heal for 25% of max life
-//   • restore 25% of max mana
-// The damage buff shows a red aura ring around the character sprite while
-// active; it grows brighter and wider with every stack. Every reward fires a toast
-// and is summarised on the next chain-countdown transition screen.
+// Correctly answering a question (interstitial quiz OR math gate) in a
+// campaign trial or endgame map rolls ONE random temporary reward:
+//   • heal all missing life            • restore all missing mana
+//   • +2% damage per stack             • +5% to all resistances per stack
+//   • +5% melee charge-up speed        • +5% cast speed
+//   • +3% movement speed
+// Timed rewards stack additively and each stack lasts 30 minutes
+// (QUIZ_BUFF_DURATION_MS); they are wiped when the trial / map ends.
+// The damage buff also shows a red aura ring around the character sprite.
+// Every reward fires a toast and is summarised, together with everything
+// still active, on the next chain-countdown transition screen.
 //
 // Consumed by:
 //   • quiz.js (_resolveQuizAnswer → _applyQuizRewardBuff)
 //   • mathgate.js (mgHandleCorrectAnswer → _applyQuizRewardBuff)
 //   • combat-calculations.js (_quizDamageBuffMult)
+//   • combat-player-stats.js (_quizRewardStatBonuses)
 //   • encounter-chain.js (_chainCleanup → _resetQuizDamageBuff,
 //     _buildChainBonusGainHTML → _consumePendingQuizRewardHTML)
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Damage per stack - each correct quiz answer adds +10% additively
-// (3 stacks = +30%, etc.). Each stack lasts QUIZ_BUFF_DURATION_MS.
-const QUIZ_BUFF_DAMAGE_PER_STACK = 0.10;
-// Legacy constant - single-stack multiplier, kept for backward compatibility.
+
+//------------------------------------------------------------------------
+//-------------------REWARD CATALOG AND STATE-----------------------------
+//------------------------------------------------------------------------
+
+// Damage per stack - each correct quiz answer adds +2% additively.
+const QUIZ_BUFF_DAMAGE_PER_STACK = 0.02;
+// Single-stack multiplier, kept as an export for debug / backward compat.
 export const QUIZ_BUFF_DAMAGE_MULT = 1 + QUIZ_BUFF_DAMAGE_PER_STACK;
-// Duration of each damage stack (30 minutes).
+// Duration of each timed stack (30 minutes).
 const QUIZ_BUFF_DURATION_MS = 30 * 60 * 1000;
-// Array of expiry timestamps (one entry per active +10% stack).
-let _quizDmgBuffStacks = [];
-// Timestamp until which at least one stack is still active (0 = inactive).
-// Derived as max(_quizDmgBuffStacks); kept for debug / backward compat.
+
+// Everything a correct answer can give. "per" is the size of one stack in
+// percent for timed rewards; heal / mana are instant and have no stacks.
+const QUIZ_REWARDS = {
+    heal:   { icon: '💚', name: 'Life restored',          color: '#7fd67f', burst: '#4caf50', instant: true },
+    mana:   { icon: '🔮', name: 'Mana restored',          color: '#7fb8ff', burst: '#4fc3f7', instant: true },
+    damage: { icon: '⚔️', name: 'Increased damage',       color: '#ff8a70', burst: '#ff5533', per: 2 },
+    resist: { icon: '🛡️', name: 'All resistances',        color: '#d6b3ff', burst: '#b07cff', per: 5 },
+    charge: { icon: '⚡', name: 'Melee charge-up speed',  color: '#ffd76a', burst: '#ffc233', per: 5 },
+    cast:   { icon: '✨', name: 'Cast speed',             color: '#8fe6ff', burst: '#5fd0ff', per: 5 },
+    move:   { icon: '👟', name: 'Movement speed',         color: '#9df0b4', burst: '#5fe08a', per: 3 },
+};
+const QUIZ_TIMED_TYPES = ['damage', 'resist', 'charge', 'cast', 'move'];
+
+// Expiry timestamps, one entry per live stack of each timed reward.
+const _quizStacks = { damage: [], resist: [], charge: [], cast: [], move: [] };
+// Timestamp until which at least one damage stack is still active (0 = inactive).
 export let _quizDmgBuffUntil = 0;
 
-// Timeout handle for the barrier visual's expiry.
+// Timeout handle for the damage aura's expiry.
 let _quizShieldTimer = null;
 
-// Summary lines of every reward granted since the last chain countdown.
-// Each correctly answered interstitial question pushes one entry; all are
-// joined and consumed together by _buildChainBonusGainHTML. This fixes
-// the map_extra_questions mod (+# additional Quiz Questions per Puzzle)
-// which previously overwrote a single string and only the last reward was shown.
-let _pendingQuizRewardLines = [];
-// Legacy alias - kept for backward compatibility / debug inspection.
-let _pendingQuizRewardLine = '';
+// Rewards granted since the last chain countdown: { type, amount } entries,
+// consumed together by _buildChainBonusGainHTML (map_extra_questions can
+// grant several per interstitial).
+let _pendingQuizRewards = [];
 
-// Removes expired stacks and refreshes the derived _quizDmgBuffUntil.
-// Returns the number of still-active stacks.
-function _pruneQuizDamageStacks() {
+// Removes expired stacks of one reward type and returns how many are left.
+function _pruneQuizStacks(type) {
     const now = Date.now();
-    if (_quizDmgBuffStacks.length) {
-        _quizDmgBuffStacks = _quizDmgBuffStacks.filter(t => t > now);
+    const list = _quizStacks[type];
+    if (list.length) _quizStacks[type] = list.filter(t => t > now);
+    if (type === 'damage') {
+        _quizDmgBuffUntil = _quizStacks.damage.length ? Math.max(..._quizStacks.damage) : 0;
     }
-    _quizDmgBuffUntil = _quizDmgBuffStacks.length ? Math.max(..._quizDmgBuffStacks) : 0;
-    return _quizDmgBuffStacks.length;
+    return _quizStacks[type].length;
 }
 
-// Returns the number of active +10% stacks (pruning expired ones first).
+function _pruneQuizDamageStacks() {
+    return _pruneQuizStacks('damage');
+}
+
+// Returns the number of active damage stacks (pruning expired ones first).
 export function _quizDamageBuffStacks() {
     return _pruneQuizDamageStacks();
 }
 
 // Returns the active damage multiplier (1 when no buff is running).
-// Stacks additively: 1 stack = 1.10, 3 stacks = 1.30, etc.
+// Stacks additively: 1 stack = 1.02, 5 stacks = 1.10, etc.
 export function _quizDamageBuffMult() {
     const active = _pruneQuizDamageStacks();
     if (active === 0) return 1;
     return 1 + active * QUIZ_BUFF_DAMAGE_PER_STACK;
+}
+
+// Total percentage the live stacks give for each non-damage reward, read
+// by _computePlayerStats and added on top of the character's own stats.
+export function _quizRewardStatBonuses() {
+    const pct = type => _pruneQuizStacks(type) * QUIZ_REWARDS[type].per;
+    return { resist: pct('resist'), charge: pct('charge'), cast: pct('cast'), move: pct('move') };
 }
 
 // Human-readable duration for toasts / labels (e.g. "30m").
@@ -84,79 +112,75 @@ function _formatQuizBuffDuration(ms) {
     return `${mins}m`;
 }
 
-// Schedules the shield visual to re-evaluate at the next stack expiry.
-// When the earliest stack expires we prune and either reschedule for the
-// next expiry or remove the wings if no stacks remain.
-function _scheduleQuizShieldExpiry() {
-    if (_quizShieldTimer) {
-        clearTimeout(_quizShieldTimer);
-        _quizShieldTimer = null;
-    }
-    const active = _pruneQuizDamageStacks();
-    if (active === 0) {
-        _removeQuizShieldFX(false);
-        return;
-    }
-    _syncQuizAuraIntensity();
-    const nextExpiry = Math.min(..._quizDmgBuffStacks);
-    const delay = Math.max(0, nextExpiry - Date.now());
-    _quizShieldTimer = setTimeout(() => {
-        _quizShieldTimer = null;
-        const remaining = _pruneQuizDamageStacks();
-        if (remaining === 0) {
-            _removeQuizShieldFX(false);
-        } else {
-            // Another stack is still active - keep the shield and wait for the next expiry.
-            _scheduleQuizShieldExpiry();
-        }
-    }, delay);
-}
-
-// Clears any active quiz damage buff and its barrier visual.
+// Clears every quiz reward and the damage aura, plus any reward lines that
+// were never shown (e.g. run aborted before the countdown screen).
 export function _resetQuizDamageBuff() {
-    _quizDmgBuffStacks = [];
+    QUIZ_TIMED_TYPES.forEach(type => { _quizStacks[type] = []; });
     _quizDmgBuffUntil = 0;
     if (_quizShieldTimer) {
         clearTimeout(_quizShieldTimer);
         _quizShieldTimer = null;
     }
     _removeQuizShieldFX(true);
-    // Also clear any pending reward lines that were never displayed
-    // (e.g. run aborted before the countdown screen).
-    _pendingQuizRewardLines = [];
-    _pendingQuizRewardLine = '';
+    _pendingQuizRewards = [];
 }
 
-// Returns and clears the summary lines for the countdown transition screen.
-// Joins all accumulated lines with a line-break so multi-question interstitials
-// (map_extra_questions) display every reward, not just the last one.
-// Duplicate damage-buff lines from the same interstitial batch are coalesced
-// to the final total so two correct answers that both roll damage show only
-// a single "+20% damage (x2 stacks)" (or the final xN total later in a chain).
+
+//------------------------------------------------------------------------
+//-------------------COUNTDOWN SCREEN PANEL-------------------------------
+//------------------------------------------------------------------------
+
+// Text for one amount of a reward: "+120 life", "+6%", ...
+function _quizRewardValueText(type, amount) {
+    if (type === 'heal') return `+${amount}`;
+    if (type === 'mana') return `+${amount}`;
+    return `+${Number(amount.toFixed(1))}%`;
+}
+
+// One line of the panel: icon, name, value and an optional "xN" stack tag.
+function _quizRewardRowHTML(type, amount, stacks, isNew) {
+    const def = QUIZ_REWARDS[type];
+    const tag = stacks > 1 ? `<span class="sx-cc-rw-stack">x${stacks}</span>` : '';
+    return `<div class="sx-cc-rw-row${isNew ? ' sx-cc-rw-new' : ''}" style="--rw:${def.color}">`
+        + `<span class="sx-cc-rw-ico">${def.icon}</span>`
+        + `<span class="sx-cc-rw-name">${def.name}</span>`
+        + `${tag}<span class="sx-cc-rw-val">${_quizRewardValueText(type, amount)}</span></div>`;
+}
+
+// What the last question(s) gave, merged per type (two heals show once with
+// the summed amount, two stacks of the same buff show as "x2").
+function _quizPendingRowsHTML() {
+    const merged = {};
+    _pendingQuizRewards.forEach(r => {
+        const m = merged[r.type] || (merged[r.type] = { amount: 0, count: 0 });
+        m.amount += r.amount;
+        m.count += 1;
+    });
+    return Object.keys(merged).map(type => {
+        const m = merged[type];
+        return _quizRewardRowHTML(type, m.amount, QUIZ_REWARDS[type].instant ? 1 : m.count, true);
+    }).join('');
+}
+
+// Everything timed that is still running, with its combined value.
+function _quizActiveRowsHTML() {
+    return QUIZ_TIMED_TYPES.map(type => {
+        const stacks = _pruneQuizStacks(type);
+        return stacks ? _quizRewardRowHTML(type, stacks * QUIZ_REWARDS[type].per, stacks, false) : '';
+    }).join('');
+}
+
+// Returns and clears the reward panel for the countdown transition screen:
+// a "just earned" list plus an "active until the run ends" list. Empty
+// string when nothing was earned since the last countdown.
 export function _consumePendingQuizRewardHTML() {
-    const _isDmgLine = l => l.includes('⚔️') && l.includes('damage');
-    const _coalesce = lines => {
-        const dmgLines = lines.filter(_isDmgLine);
-        if (dmgLines.length <= 1) return lines;
-        const lastDmg = dmgLines[dmgLines.length - 1];
-        const nonDmg = lines.filter(l => !_isDmgLine(l));
-        // Keep non-damage rewards in original order and append the final
-        // damage total at the end (chronologically last reward).
-        return [...nonDmg, lastDmg];
-    };
-    let line = '';
-    if (_pendingQuizRewardLines.length > 0) {
-        const coalesced = _coalesce(_pendingQuizRewardLines);
-        line = coalesced.join('<br>');
-        _pendingQuizRewardLines = [];
-    } else if (_pendingQuizRewardLine) {
-        // Fallback for legacy single-string value - may already contain <br>
-        const parts = _pendingQuizRewardLine.split('<br>');
-        const coalesced = _coalesce(parts);
-        line = coalesced.join('<br>');
-    }
-    _pendingQuizRewardLine = '';
-    return line;
+    if (!_pendingQuizRewards.length) return '';
+    const earned = _quizPendingRowsHTML();
+    const active = _quizActiveRowsHTML();
+    _pendingQuizRewards = [];
+    return `<div class="sx-cc-rw-title">Scholar's Rewards</div>`
+        + `<div class="sx-cc-rw-head">Just earned</div>${earned}`
+        + (active ? `<div class="sx-cc-rw-head">Active until this run ends</div>${active}` : '');
 }
 
 
@@ -164,19 +188,12 @@ export function _consumePendingQuizRewardHTML() {
 //-------------------VISUAL EFFECTS---------------------------------------
 //------------------------------------------------------------------------
 
-// Spark burst colours per reward type (heal / mana bursts).
-const QUIZ_BUFF_COLORS = {
-    damage: '#ff5533',
-    heal: '#4caf50',
-    mana: '#4fc3f7',
-};
-
 const QUIZ_BUFF_SPARK_COUNT = 12;
 const QUIZ_BUFF_FX_DURATION_MS = 900;
 const QUIZ_SHIELD_FADE_MS = 400;
 
-// Stacks at which the aura reaches full intensity.
-const QUIZ_AURA_FULL_STACKS = 8;
+// Stacks at which the aura reaches full intensity (2% each, so 20 = +40%).
+const QUIZ_AURA_FULL_STACKS = 20;
 
 // Sets the aura's intensity (0..1) from the number of live damage stacks.
 function _syncQuizAuraIntensity() {
@@ -188,34 +205,41 @@ function _syncQuizAuraIntensity() {
     });
 }
 
+// Schedules the aura to re-evaluate at the next damage stack expiry; once
+// no stacks remain the aura fades out.
+function _scheduleQuizShieldExpiry() {
+    if (_quizShieldTimer) {
+        clearTimeout(_quizShieldTimer);
+        _quizShieldTimer = null;
+    }
+    const active = _pruneQuizDamageStacks();
+    if (active === 0) {
+        _removeQuizShieldFX(false);
+        return;
+    }
+    _syncQuizAuraIntensity();
+    const nextExpiry = Math.min(..._quizStacks.damage);
+    const delay = Math.max(0, nextExpiry - Date.now());
+    _quizShieldTimer = setTimeout(() => {
+        _quizShieldTimer = null;
+        _scheduleQuizShieldExpiry();
+    }, delay);
+}
+
 // Adds the damage-buff aura: a red ring around the character sprite that
 // pulses while at least one damage stack is active and scales with stacks.
-function _addQuizShieldFX(durationMs) {
+function _addQuizShieldFX() {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
 
-    // Create the aura only if it doesn't already exist - stacking should not
-    // flicker the visual. Each new stack just updates intensity + the expiry
-    // scheduler.
+    // Create the aura only once - stacking should not flicker the visual.
     if (!document.querySelector('.sx-quiz-aura')) {
         const aura = document.createElement('div');
         aura.className = 'sx-quiz-shield-wing sx-quiz-aura';
         hud.appendChild(aura);
     }
     _syncQuizAuraIntensity();
-
-    // (Re)schedule expiry based on the earliest stack's remaining time.
-    // durationMs is kept as optional legacy param but the true schedule
-    // derives from _quizDmgBuffStacks so stacks expire independently.
-    if (typeof _scheduleQuizShieldExpiry === 'function') {
-        _scheduleQuizShieldExpiry();
-    } else if (durationMs) {
-        if (_quizShieldTimer) clearTimeout(_quizShieldTimer);
-        _quizShieldTimer = setTimeout(() => {
-            _quizShieldTimer = null;
-            _removeQuizShieldFX(false);
-        }, durationMs);
-    }
+    _scheduleQuizShieldExpiry();
 }
 
 // Removes the aura - immediately, or after a short fade-out.
@@ -231,11 +255,11 @@ function _removeQuizShieldFX(immediate) {
     setTimeout(() => wings.forEach(w => w.remove()), QUIZ_SHIELD_FADE_MS);
 }
 
-// Spark burst + floating label anchored to the player HUD. Used for the
-// heal / mana rewards; the damage buff uses the barrier wings instead.
+// Spark burst + floating label anchored to the player HUD, in the colour of
+// the reward. Heal / mana also flash their bar briefly.
 function _showQuizBuffBurst(type, labelText) {
     const hud = document.getElementById('player-avatar-wrapper');
-    const color = QUIZ_BUFF_COLORS[type] || '#ffffff';
+    const color = QUIZ_REWARDS[type].burst;
 
     if (!hud) return;
 
@@ -272,7 +296,6 @@ function _showQuizBuffBurst(type, labelText) {
     hud.appendChild(float);
     setTimeout(() => float.remove(), QUIZ_BUFF_FX_DURATION_MS);
 
-    // Brief glow pulse on the matching bar
     const barEl = (type === 'heal')
         ? document.getElementById('avatar-hp-fill')
         : (type === 'mana') ? document.getElementById('chud-mana-fill') : null;
@@ -284,122 +307,72 @@ function _showQuizBuffBurst(type, labelText) {
 
 
 //------------------------------------------------------------------------
-//-------------------REWARD ROLL-------------------------------------------
+//-------------------GRANTING A REWARD------------------------------------
 //------------------------------------------------------------------------
 
-// Helper: grant one stacking +10% damage stack and its visuals/toast.
-function _grantQuizDamageReward() {
+// Adds one stack of a timed reward (30 min), then toasts and bursts it.
+function _grantQuizTimedReward(type) {
     // DEV_EFFECT_TIME_SCALE (dev testing harness, see js/dev/dev-testing.js):
     // ×1 = exact shipped behaviour (30 min stacks are unobservable in tests).
     const scale = (typeof window !== 'undefined' && window.DEV_EFFECT_TIME_SCALE > 0 && window.DEV_EFFECT_TIME_SCALE !== 1)
         ? window.DEV_EFFECT_TIME_SCALE : 1;
     const durationMs = QUIZ_BUFF_DURATION_MS * scale;
-    _quizDmgBuffStacks.push(Date.now() + durationMs);
-    _pruneQuizDamageStacks();
-    const stacks = _quizDmgBuffStacks.length;
-    const totalPct = Number((stacks * QUIZ_BUFF_DAMAGE_PER_STACK * 100).toFixed(1));
-    // Strip trailing .0 so integers display as "30" not "30.0"
-    const totalPctLabel = Number.isInteger(totalPct) ? String(Math.round(totalPct)) : String(totalPct);
-    const durLabel = _formatQuizBuffDuration(durationMs);
-    if (typeof showToast === 'function') {
-        const stackInfo = stacks > 1 ? ` (x${stacks} → +${totalPctLabel}% total)` : '';
-        globalThis.showToast(`⚔️ Scholar's Wrath: +10% damage for ${durLabel}${stackInfo}!`);
-    }
-    _addQuizShieldFX(durationMs);
-
-    const label = document.createElement('div');
-    label.className = 'sx-damage-number sx-quiz-buff-label';
-    label.textContent = stacks > 1 ? `+${totalPctLabel}% DMG (x${stacks})` : '+10% DMG';
-    label.style.setProperty('--sx-hit-color', QUIZ_BUFF_COLORS.damage);
-    const hud = document.getElementById('player-avatar-wrapper');
-    if (hud) {
-        label.style.color = QUIZ_BUFF_COLORS.damage;
-        hud.appendChild(label);
-        setTimeout(() => label.remove(), QUIZ_BUFF_FX_DURATION_MS);
-    }
-
-    const dmgLine = stacks > 1
-        ? `<span style="color:#ff8a70">⚔️ +${totalPctLabel}% damage</span> <span style="opacity:.6">(x${stacks} stacks)</span>`
-        : `<span style="color:#ff8a70">⚔️ +10% damage</span>`;
-    // Consolidate multiple damage rewards inside the same interstitial batch:
-    // two correct answers that both roll damage should show a single final
-    // line (e.g. "+20% damage (x2 stacks)") instead of two lines
-    // "+10%" and "+20% (x2)". Later chain segments where stacks already
-    // existed similarly collapse to the final total (e.g. x4). Other reward
-    // types (heal / mana) are kept as separate lines.
-    const _isDmgLine = l => l.includes('⚔️') && l.includes('damage');
-    _pendingQuizRewardLines = _pendingQuizRewardLines.filter(l => !_isDmgLine(l));
-    _pendingQuizRewardLines.push(dmgLine);
-    _pendingQuizRewardLine = _pendingQuizRewardLines.join('<br>');
+    _quizStacks[type].push(Date.now() + durationMs);
+    const stacks = _pruneQuizStacks(type);
+    const def = QUIZ_REWARDS[type];
+    const total = stacks * def.per;
+    const stackInfo = stacks > 1 ? ` (x${stacks} → +${total}% total)` : '';
+    globalThis.showToast(`${def.icon} Scholar's Reward: +${def.per}% ${def.name.toLowerCase()} for ${_formatQuizBuffDuration(durationMs)}${stackInfo}!`);
+    if (type === 'damage') _addQuizShieldFX();
+    _showQuizBuffBurst(type, stacks > 1 ? `+${total}% (x${stacks})` : `+${def.per}%`);
+    _pendingQuizRewards.push({ type, amount: def.per });
 }
 
-// Rolls one of the three quiz rewards and applies it (damage buff, life
-// heal or mana restore). Called after a correct ENDGAME question.
-// When the player is already at full life / full mana that reward is
-// excluded from the roll so no reward is wasted (e.g. full HP → no heal
-// offered, full mana → no mana offered, both full → always damage).
-export function _applyQuizRewardBuff() {
-    // ── Build eligible pool ──────────────────────────────────────────
-    const needsHeal = typeof playerCurrentHP !== 'undefined'
-        && typeof playerMaxHP !== 'undefined'
-        && globalThis.playerMaxHP > 0
-        && globalThis.playerCurrentHP < globalThis.playerMaxHP;
-    let needsMana = false;
-    // Mana is irrelevant on Blood Magic maps (costs are paid from life)
-    const bloodMagic = (typeof _egMapHasBloodMagic === 'function') && _egMapHasBloodMagic();
-    if (!bloodMagic && typeof _getPlayerMaxMana === 'function') {
+// Heals every point of missing life. Returns false when nothing was healed
+// (e.g. life can only come from leech), so the caller can roll something else.
+function _grantQuizHeal() {
+    const missing = Math.round(globalThis.playerMaxHP - globalThis.playerCurrentHP);
+    const heal = Math.min(missing, Math.round(_lifeGain(missing)));
+    if (heal <= 0) return false;
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+    globalThis._renderPlayerHealth();
+    globalThis.showToast(`💚 Scholar's Blessing: restored ${heal} HP!`);
+    _showQuizBuffBurst('heal', `+${heal} HP`);
+    _pendingQuizRewards.push({ type: 'heal', amount: heal });
+    return true;
+}
+
+// Refills every point of missing mana. Returns false when nothing was gained.
+function _grantQuizMana() {
+    const gained = gainMana(_getPlayerMaxMana() - Math.round(globalThis.playerCurrentMana));
+    if (gained <= 0) return false;
+    globalThis.showToast(`🔮 Scholar's Insight: restored ${gained} mana!`);
+    _showQuizBuffBurst('mana', `+${gained} Mana`);
+    _pendingQuizRewards.push({ type: 'mana', amount: gained });
+    return true;
+}
+
+// Which rewards can be rolled right now: the five timed ones always, heal
+// only while hurt, mana only while below max (never on Blood Magic maps,
+// where costs are paid from life).
+function _eligibleQuizRewards() {
+    const eligible = [...QUIZ_TIMED_TYPES];
+    if (globalThis.playerMaxHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP) eligible.push('heal');
+    if (!_egMapHasBloodMagic()) {
         const maxMana = _getPlayerMaxMana();
-        const curMana = (typeof playerCurrentMana !== 'undefined') ? Math.round(globalThis.playerCurrentMana) : 0;
-        needsMana = maxMana > 0 && curMana < maxMana;
+        if (maxMana > 0 && Math.round(globalThis.playerCurrentMana) < maxMana) eligible.push('mana');
     }
+    return eligible;
+}
 
-    const eligible = ['damage'];
-    if (needsHeal) eligible.push('heal');
-    if (needsMana) eligible.push('mana');
-
+// Rolls one reward at random and applies it. Called after a correct
+// question. If the instant reward turns out to do nothing, a damage stack
+// is given instead so no answer is wasted.
+export function _applyQuizRewardBuff() {
+    const eligible = _eligibleQuizRewards();
     const pick = eligible[Math.floor(Math.random() * eligible.length)];
 
-    if (pick === 'damage') {
-        _grantQuizDamageReward();
-    } else if (pick === 'heal') {
-        // ── Life heal ────────────────────────────────────────────────────
-        const heal = Math.max(1, Math.round(globalThis.playerMaxHP * 0.25));
-        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._lifeGain ? globalThis._lifeGain(heal) : (heal)));
-        if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
-        if (typeof showToast === 'function') globalThis.showToast(`💚 Scholar's Blessing: restored ${heal} HP!`);
-        _showQuizBuffBurst('heal', `+${heal} HP`);
-        const healLine =
-            `<span style="color:#7fd67f">💚 +${heal} life restored</span>`;
-        _pendingQuizRewardLines.push(healLine);
-        _pendingQuizRewardLine = _pendingQuizRewardLines.join('<br>');
-    } else {
-        // ── Mana restore ─────────────────────────────────────────────────
-        const gain = Math.max(1, Math.round(_getPlayerMaxMana() * 0.25));
-        const gained = (typeof gainMana === 'function') ? gainMana(gain) : 0;
-        if (gained > 0) {
-            if (typeof showToast === 'function') globalThis.showToast(`🔮 Scholar's Insight: restored ${gained} mana!`);
-            _showQuizBuffBurst('mana', `+${gained} Mana`);
-            const manaLine =
-                `<span style="color:#7fb8ff">🔮 +${gained} mana restored</span>`;
-            _pendingQuizRewardLines.push(manaLine);
-            _pendingQuizRewardLine = _pendingQuizRewardLines.join('<br>');
-        } else {
-            // No mana gained (e.g. Blood Magic or reduced gain) - fall back
-            // Prefer heal if not at full life, otherwise fall back to damage.
-            if (needsHeal) {
-                const heal = Math.max(1, Math.round(globalThis.playerMaxHP * 0.25));
-                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._lifeGain ? globalThis._lifeGain(heal) : (heal)));
-                if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
-                if (typeof showToast === 'function') globalThis.showToast(`💚 Scholar's Blessing: restored ${heal} HP!`);
-                _showQuizBuffBurst('heal', `+${heal} HP`);
-                const fbLine =
-                    `<span style="color:#7fd67f">💚 +${heal} life restored</span>`;
-                _pendingQuizRewardLines.push(fbLine);
-                _pendingQuizRewardLine = _pendingQuizRewardLines.join('<br>');
-            } else {
-                // Both resources full - give damage instead of wasting the reward
-                _grantQuizDamageReward();
-            }
-        }
-    }
+    if (pick === 'heal' && _grantQuizHeal()) return;
+    if (pick === 'mana' && _grantQuizMana()) return;
+    _grantQuizTimedReward(QUIZ_REWARDS[pick].instant ? 'damage' : pick);
 }

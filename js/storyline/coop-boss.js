@@ -1,8 +1,7 @@
 import { cur } from '../state.js';
 import { LANG } from '../translation/translations.js';
-import { Audio_Manager } from '../audio/audio.js';
 import { _damageTargetById } from '../combat/encounter-monster-damage.js';
-import { botSpriteGoTo, botSpriteRelease, botSpriteSay } from '../companion-bot/companion-bot-sprite.js';
+import { _playerFeet, botSpriteGoTo, botSpriteRelease, botSpriteSay } from '../companion-bot/companion-bot-sprite.js';
 import { holdCompanionBot } from '../companion-bot/companion-bot.js';
 import { BOT_TINTS } from '../companion-bot/companion-bot-profiles.js';
 import { COMPANION_CAST } from './companion-scenes.js';
@@ -12,8 +11,8 @@ import { COMPANION_CAST } from './companion-scenes.js';
 //------------------------------------------------------------------------
 // The boss of a co-op encounter is one big beast whose shield holds until
 // the two heroes stand on two glowing runes at the same time. The friend
-// walks to their rune by themselves; the player steps on theirs with a click
-// (click again to step off). While both stand there a bar fills; when it is
+// walks to their rune by themselves; the player walks onto theirs (it lights
+// up while the hero's feet are on it). While both stand there a bar fills; when it is
 // full the shield breaks and the boss takes a heavy blow. Then it is open for
 // a while and the shield returns. Later encounters ask for several rounds in a
 // row (the heroes swap sides each round). The boss itself is an ordinary
@@ -26,6 +25,8 @@ import { COMPANION_CAST } from './companion-scenes.js';
 const TICK_MS = 250;
 // The player's rune wears the familiar cyan of the player's own marks.
 const PLAYER_RUNE_COLOR = '#4fd8ff';
+// How close (px) the hero's feet must be to the rune's centre to count as standing on it.
+const RUNE_REACH = 60;
 
 // The running mechanic, or null: { def, level, bossId, friend, timer, mode, nextAt,
 // round, spots, playerOn, friendOn, holdStart, spotsUntil, openUntil, onDefeated }.
@@ -53,7 +54,6 @@ function _ensureStyles() {
         border: 3px dashed var(--rune, #fff); background: radial-gradient(circle, rgba(255,255,255,.18), rgba(255,255,255,.04) 70%);
         color: var(--rune, #fff); font: 700 12px sans-serif; display: flex; align-items: center; justify-content: center;
         text-align: center; pointer-events: none; box-shadow: 0 0 18px var(--rune, #fff); animation: coopRunePulse 1.4s ease-in-out infinite; }
-    .coop-rune.mine { pointer-events: auto; cursor: pointer; }
     .coop-rune.lit { border-style: solid; background: radial-gradient(circle, var(--rune, #fff), transparent 75%); color: #000; }
     @keyframes coopRunePulse { 50% { transform: scale(1.08); } }
     #coop-boss-strip { position: fixed; left: 50%; top: 52px; transform: translateX(-50%); z-index: 8100; padding: 6px 14px;
@@ -92,17 +92,32 @@ function _spotsFor(round) {
     return round % 2 === 0 ? { player: left, friend: right } : { player: right, friend: left };
 }
 
-// Creates one rune at a spot. The player's rune is clickable.
-function _makeRune(spot, label, color, mine, onClick) {
+// Creates one rune at a spot (it is only a marker; standing on it is checked
+// from where the hero's feet are).
+function _makeRune(spot, label, color) {
     const r = document.createElement('div');
-    r.className = 'coop-rune' + (mine ? ' mine' : '');
+    r.className = 'coop-rune';
     r.style.left = spot.x + 'px';
     r.style.top = spot.y + 'px';
     r.style.setProperty('--rune', color);
     r.textContent = label;
-    if (mine) r.addEventListener('click', onClick);
     document.body.appendChild(r);
     return r;
+}
+
+// True while the player's hero stands on the player's rune (feet inside its circle).
+function _playerOnRune(spot) {
+    const feet = _playerFeet();
+    return Math.hypot(feet.x - spot.x, (feet.y - spot.y) * 1.4) <= RUNE_REACH;
+}
+
+// Keeps the player's rune lit exactly while the hero stands on it.
+function _updatePlayerRune() {
+    const on = _playerOnRune(_run.spots.player);
+    if (on !== _run.playerOn) {
+        _run.playerOn = on;
+        _run.runes[0].classList.toggle('lit', on);
+    }
 }
 
 // Removes both runes and the strip, and lets the friend move freely again.
@@ -135,11 +150,7 @@ function _startRound() {
     const me = PLAYER_RUNE_COLOR;
     const friendColor = BOT_TINTS[run.friend];
     run.runes = [
-        _makeRune(spots.player, _tr('YOU', 'DU'), me, true, () => {
-            run.playerOn = !run.playerOn;
-            run.runes[0].classList.toggle('lit', run.playerOn);
-            Audio_Manager.playSFX('click');
-        }),
+        _makeRune(spots.player, _tr('YOU', 'DU'), me, false),
         _makeRune(spots.friend, COMPANION_CAST[run.friend].name, friendColor, false),
     ];
     holdCompanionBot(true);
@@ -190,6 +201,7 @@ function _failRound() {
 function _watchSpots(now) {
     const run = _run;
     const holdMs = run.def.boss.holdMs;
+    _updatePlayerRune();
     if (run.playerOn && run.friendOn) {
         run.holdStart = run.holdStart || now;
         const pct = Math.min(1, (now - run.holdStart) / holdMs);
@@ -203,7 +215,7 @@ function _watchSpots(now) {
     }
     run.holdStart = 0;
     _strip(run.friendOn
-        ? _tr('Click your rune to stand on it!', 'Klick auf deine Rune, um dich darauf zu stellen!')
+        ? _tr('Walk onto your rune!', 'Lauf auf deine Rune!')
         : _tr('Your friend is on the way...', 'Dein Freund ist unterwegs...'));
     if (now > run.spotsUntil) _failRound();
 }

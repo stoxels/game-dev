@@ -21,7 +21,12 @@ export function _showRequirementsToast(context, missingOrGate, item) {
         if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
         return;
     }
-    const missing = Array.isArray(missingOrGate) ? missingOrGate : (missingOrGate && missingOrGate.missing) || [];
+    const allMissing = Array.isArray(missingOrGate) ? missingOrGate : (missingOrGate && missingOrGate.missing) || [];
+    // Equipping: what the new item itself lacks, apart from other worn gear
+    // that would lose its requirements once the old item leaves the slot.
+    const splitEquip = context === 'equip' && typeof item === 'object'
+        && allMissing.some(u => u.item === item) && allMissing.some(u => u.item !== item);
+    const missing = splitEquip ? allMissing.filter(u => u.item === item) : allMissing;
     const list = _getUnmetRequirementsText(missing);
     let msg;
     const chain = context === 'equip' ? _getSwapChainBreak(item) : null;
@@ -35,8 +40,21 @@ export function _showRequirementsToast(context, missingOrGate, item) {
             ? t('eg_cannot_unequip').replace('{name}', itemName).replace('{list}', list)
             : t('eg_cannot_equip').replace('{name}', itemName).replace('{list}', list);
     }
+    if (splitEquip) msg += ' ' + _alsoBreaksText(item, allMissing.filter(u => u.item !== item));
     if (typeof showToast === 'function') globalThis.showToast(msg, '#e74c3c');
     if (typeof _showStashInfo === 'function') _showStashInfo(msg, { type: 'error' });
+}
+
+// Second sentence of an equip rejection: the gear currently in the slot gives
+// stats that other worn items need, so taking it off would break them too.
+function _alsoBreaksText(item, others) {
+    const target = _dndFindTargetSlot(item);
+    const occupant = target ? _equipped[target] : null;
+    const names = Array.from(new Set(others.map(u => u.item && u.item.name).filter(Boolean)));
+    return t('eg_cannot_equip_also')
+        .replace('{equipped}', (occupant && occupant.name) || '?')
+        .replace('{other}', names.length === 1 ? names[0] : t('eg_cannot_equip_other_gear'))
+        .replace('{list}', _getUnmetRequirementsText(others));
 }
 
 // Computes attributes shown by the equip tooltip for a prospective item.

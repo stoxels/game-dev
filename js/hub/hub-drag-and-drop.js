@@ -8,6 +8,7 @@ import { _essenceIdForSlot } from '../loot/loot-essences.js';
 import { _renderEssenceCell } from '../loot/loot-essences-render.js';
 import { _egRenderMapSlot, _egRenderMapStash, _egRenderMapStashCell, _egSwitchMapStashTier } from '../endgame/endgame-gate.js';
 import { _clearTooltip } from './hub-tooltips.js';
+import { _bindEquipFlyout, _equipFromInventory, _slotAcceptsItem } from './hub-equip-flyout.js';
 import { _addUniqueToCollection, _updateUniqueTabBadge } from './hub-uniques.js';
 import { CURRENCY_COLS, INV_COLS, EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_TIER_ROMANS, _addItemToStash, _currencyDefForId, _currencyIdForSlot, _currencySlotForId, _currencyStash, _ensureInvRows, _egEnsureMapTierRows, _equipped, _findFreeInvCell, _egFindFreeMapCellForTier, _getInvRows, _egGetMapTierGrid, _inventory, _egMapStash, _renderEquipSlot, _renderEquipSlots, _renderInventory, _renderInventoryCell, _renderStatsList, _renderUniqueStash, _showStashInfo, _stashTab, _switchStashTab, _updateCraftingBenchLauncherSlot, _updateInvCount, saveHubState } from './hub.js';
 import { _canEquipInSlot, _checkMoveAllowed, _checkUnequipSlot, _getWeaponHands, _isTwoHandedWeapon, _showRequirementsToast, _tryAutoUnequipOffhandForTwoHander } from '../loot/loot-requirements.js';
@@ -113,22 +114,10 @@ function _dndZoneAccepts(targetZone) {
     return false;
 }
 
-// Returns true when the dragged item's slotType matches what the given char slot accepts.
-// weapon1: melee weapons only (any hands, never shields).
-// weapon2: shields or ONE-handed weapons only (dual-wield off-hand; 2H rejected).
+// Returns true when the dragged item fits the given char slot (the rules live
+// in hub-equip-flyout.js, shared with the slot hover list).
 function _dndSlotAcceptsItem(slotId) {
-    if (!_dnd.item || _dnd.item.category !== 'equip') return false;
-    if (slotId === 'weapon1') return _dnd.item.slotType === 'weapon';
-    if (slotId === 'weapon2') {
-        if (_dnd.item.slotType === 'shield') return true;
-        if (_dnd.item.slotType !== 'weapon') return false;
-        if (typeof _getWeaponHands === 'function') {
-            return _getWeaponHands(_dnd.item) === 1;
-        }
-        return _dnd.item.hands !== 2;
-    }
-    const required = SLOT_ACCEPTS[slotId];
-    return required && required === _dnd.item.slotType;
+    return _slotAcceptsItem(slotId, _dnd.item);
 }
 
 
@@ -828,39 +817,7 @@ function _dndQuickEquipFromStash(invCell) {
 
     const slotId = _dndFindTargetSlot(item);
     if (!slotId) return; // no matching paperdoll slot exists for this item type
-
-    const gate = _canEquipInSlot(item, slotId);
-    if (!gate.ok) {
-        // Two-hand rule: quick-equipping a 2H weapon auto-unequips the off-hand.
-        if (gate.handError === 'two_handed_blocks_offhand' && slotId === 'weapon1'
-            && typeof _tryAutoUnequipOffhandForTwoHander === 'function'
-            && _tryAutoUnequipOffhandForTwoHander()) {
-            const retry = _canEquipInSlot(item, slotId);
-            if (!retry.ok) {
-                _showRequirementsToast('equip', retry, item);
-                invCell.classList.add('sx-slot-reject');
-                setTimeout(() => invCell.classList.remove('sx-slot-reject'), 600);
-                return;
-            }
-        } else {
-            _showRequirementsToast('equip', gate, item);
-            invCell.classList.add('sx-slot-reject');
-            setTimeout(() => invCell.classList.remove('sx-slot-reject'), 600);
-            return;
-        }
-    }
-
-    const displaced = _equipped[slotId] || null;
-    _equipped[slotId] = item;
-    Audio_Manager.playSFX('item_equip');
-    _inventory[r][c] = displaced; // displaced may be null - that's fine
-    _renderEquipSlot(slotId);
-    _renderInventoryCell(r, c);
-    _renderInventory();      // blocked-state flags may change loadout-wide
-    _renderEquipSlots();
-    _updateInvCount();
-    _renderStatsList();
-    saveHubState();
+    _equipFromInventory(r, c, slotId, invCell);
 }
 
 // Right-click on a paperdoll slot item → send it to the first free stash cell.
@@ -1369,6 +1326,7 @@ export function hubDragOver(event) {
 export function initHubDnD() {
     _dndInjectStyles();
     _dndBindListeners();
+    _bindEquipFlyout();
 }
 
 // Called from hub.js _createScreen() - alias so the hub bootstrap

@@ -140,9 +140,57 @@
     color: #e6dcc0;
 }
 
-.sx-cc-reward-lines {
-    margin-top: 0;
+/* ---- Scholar's Rewards panel: what was just earned + what is active ----- */
+.sx-cc-chip-reward {
+    min-width: clamp(230px, 24vw, 300px);
+    text-align: left;
 }
+
+.sx-cc-rw-title {
+    font-family: var(--C);
+    font-weight: 700;
+    font-size: clamp(12px, 1.4vw, 15px);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-align: center;
+    color: #ffb59c;
+    padding-bottom: 5px;
+    margin-bottom: 2px;
+    border-bottom: 1px solid rgba(138, 58, 42, 0.7);
+}
+
+.sx-cc-rw-head {
+    margin: 7px 0 2px;
+    font-family: var(--C);
+    font-size: clamp(10px, 1.1vw, 12px);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #a89a78;
+}
+
+.sx-cc-rw-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 8px;
+    margin-top: 3px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border-left: 3px solid var(--rw, #d9cfae);
+    font-family: var(--B);
+    font-weight: 700;
+    font-size: clamp(12.5px, 1.5vw, 15px);
+    color: #e6dcc0;
+}
+
+.sx-cc-rw-new {
+    background: rgba(255, 255, 255, 0.09);
+    box-shadow: 0 0 10px -2px var(--rw, transparent);
+}
+
+.sx-cc-rw-name { flex: 1; }
+.sx-cc-rw-val { color: var(--rw, #fff); white-space: nowrap; }
+.sx-cc-rw-stack { font-size: 0.85em; opacity: 0.7; }
 
 .sx-cc-src b { font-size: 1.12em; }
 .sx-cc-gain-puzzle { color: #7fd67f; }

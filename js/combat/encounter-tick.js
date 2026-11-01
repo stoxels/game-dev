@@ -21,6 +21,15 @@ import { _checkMistakeLimit, _tickLifeRegen } from './encounter-tick-support.js'
 // Encounter tick-loop owner: monster and player charge, melee feedback,
 // and the 10Hz encounter orchestration loop.
 
+// True while a boss is in its finale set-piece. Every finale holds the boss
+// immune from the moment its life drops to 10% (outside the short shield
+// that frames a phase change); a boss whose set-piece starts higher up
+// (the Demolitionist's Bomb Maze) sets `_finaleHold` itself.
+function _bossInFinale(m) {
+    if (m._finaleHold) return true;
+    return !!m.bossImmune && !m._phaseShield && m.maxHP > 0 && m.currentHP <= m.maxHP * 0.10;
+}
+
 // Advances a single monster's charge bar by one tick (0.1s at 10Hz).
 // Fires the monster's attack when the charge bar fills completely.
 export function _tickMonster(m) {
@@ -77,6 +86,9 @@ export function _tickMonster(m) {
     // the bow volley IS his attack while the gauntlet holds the arena
     // (boss-marksman.js).
     if (m.isBoss && typeof _marksGauntletChargePaused === 'function' && globalThis._marksGauntletChargePaused()) return;
+    // A boss in its finale does not attack: the set-piece is the whole fight
+    // until it resolves.
+    if (m.isBoss && _bossInFinale(m)) return;
     // Ailments: frozen monsters don't charge, chilled ones charge at 50%
     const chargeMult = (typeof _getMonsterChargeMultiplier === 'function') ? _getMonsterChargeMultiplier(m) : 1;
     m.currentCharge += 0.1 * chargeMult;

@@ -143,7 +143,7 @@ export function _mechBarCurtain(monster, phase) {
     const pieces = [[0, gapLo], [gapHi, span]].map(([lo, hi]) => ({
         lo, hi, el: _nkEl(run, 'div', cls),
     }));
-    const gapEl = _nkEl(run, 'div', 'sx-bar-gap' + (fromTop ? ' sx-bar-gap-v' : ''), 'GAP');
+    const gapEl = _nkEl(run, 'div', 'sx-bar-gap' + (fromTop ? ' sx-bar-gap-v' : ''));
 
     let x = reverse ? reach : -BAR_CURTAIN_W;
     const sign = reverse ? -1 : 1;
@@ -258,7 +258,7 @@ export function _mechBarSupplyDrop(monster, phase) {
             warnEls.forEach(el => { try { el.remove(); } catch (e) {} });
             // Landed crates → artillery jammers.
             spots.forEach(s => {
-                const el = _nkEl(run, 'div', 'sx-bar-jammer', '📦');
+                const el = _nkEl(run, 'div', 'sx-bar-jammer');
                 el.style.left = Math.round(s.x - 26) + 'px';
                 el.style.top = Math.round(s.y - 26) + 'px';
                 s.jammerEl = el;
@@ -291,7 +291,7 @@ export function _mechBarSupplyDrop(monster, phase) {
                 s.lastLob = now;
                 const targetX = pc.x + (Math.random() * 160 - 80);
                 const targetY = pc.y + (Math.random() * 160 - 80);
-                const shell = _nkEl(run, 'div', 'sx-nk-dot sx-bar-mortar', '💥');
+                const shell = _nkEl(run, 'div', 'sx-nk-dot sx-bar-mortar');
                 shell.style.left = Math.round(s.x - 9) + 'px';
                 shell.style.top = Math.round(s.y - 9) + 'px';
                 const dist = Math.hypot(targetX - s.x, targetY - s.y);
@@ -388,7 +388,7 @@ export function _mechBarShotShells(monster, phase) {
                 // Shrapnel scatter: 6 spokes per burst, keeps travelling.
                 for (let k = 0; k < 6; k++) {
                     const a = (k / 6) * Math.PI * 2 + Math.random() * 0.35;
-                    const el = _nkEl(run, 'div', 'sx-nk-dot sx-bar-shrap', '🔥');
+                    const el = _nkEl(run, 'div', 'sx-nk-dot sx-bar-shrap');
                     shrap.push({ x: s.x, y: s.y, vx: Math.cos(a) * BAR_SHRAP_SPD, vy: Math.sin(a) * BAR_SHRAP_SPD, t: 0, hitDone: false, el });
                 }
             }
@@ -518,7 +518,7 @@ export function _mechBarBombBarrage(monster, phase) {
                 if (c.landed) return;
                 c.landed = true;
                 try { c.warn.remove(); } catch (e) {}
-                c.el = _nkEl(run, 'div', 'sx-bar-jammer sx-bar-cover-crate', '📦');
+                c.el = _nkEl(run, 'div', 'sx-bar-jammer sx-bar-cover-crate');
                 c.el.style.left = Math.round(c.x - 26) + 'px';
                 c.el.style.top = Math.round(c.y - 26) + 'px';
                 c.ring = ringFor(c);
@@ -532,7 +532,7 @@ export function _mechBarBombBarrage(monster, phase) {
             const aimed = spawned % 3 === 0;
             const bx = aimed ? pc.x + (Math.random() * 60 - 30) : W * (0.05 + Math.random() * 0.9);
             const by = aimed ? pc.y + (Math.random() * 60 - 30) : H * (0.08 + Math.random() * 0.84);
-            const warn = _nkEl(run, 'div', 'sx-bar-bomb-warn', '💣');
+            const warn = _nkEl(run, 'div', 'sx-bar-bomb-warn');
             warn.style.left = Math.round(bx - BAR_BOMB_RADIUS) + 'px';
             warn.style.top = Math.round(by - BAR_BOMB_RADIUS) + 'px';
             bombs.push({ x: bx, y: by, warn, born: t });
@@ -681,8 +681,8 @@ export function _barFinalStart(monster) {
     const ov = document.createElement('div');
     ov.className = 'sx-bar-cd';
     ov.innerHTML =
-        '<div class="sx-bar-cd-label">🍎 FINAL BOMBARDMENT</div>' +
-        '<div class="sx-bar-cd-hint">Three strikes - then the ALL-OUT SALVO. Run to a GREEN tile each time!</div>';
+        '<div class="sx-bar-cd-label">FINAL BOMBARDMENT</div>' +
+        '';
     document.body.appendChild(ov);
     g.overlay = ov;
 

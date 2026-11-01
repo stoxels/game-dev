@@ -9,8 +9,8 @@ import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkEl, _nkFrozen, _nkHi
 //------------------------------------------------------------------------
 // Walking-castle bulwark gauntlet: a guard squad shields the boss until
 // killed, shield charges barrel down your row, sentry orbs and a sweeping
-// guard rotor join at 60%; at ≤10% THE LAST BASTION spins faster and faster
-// beams before a final triple vanguard charge.
+// guard rotor join at 60%; at ≤10% THE LAST BASTION: sweeping beams, and
+// green breach rings to fill one by one to crack the boss's shield.
 //------------------------------------------------------------------------
 
 export const _AG_DEBUG_SLOW = false;
@@ -47,9 +47,7 @@ Object.assign(BOSS_MECHANICS, {
 export const AG_CHARGE_DMG = [0, 0.18, 0.21, 0.24];   // shield charge lane
 export const AG_ORB_DMG    = [0, 0, 0.13, 0.16];      // sentry orb contact
 export const AG_ROTOR_DMG  = [0, 0, 0.12, 0.15];      // rotor arm contact
-export const AG_BEAM_DMG   = 0.10;                    // bastion beam contact
-export const AG_VANG_DMG   = 0.12;                    // vanguard charge clip
-export const AG_FINAL_DMG  = 0.32;                    // the final vanguard charge
+export const AG_BEAM_DMG   = 0.12;                    // bastion beam contact
 export const AG_HIT_CD_MS  = 700;                     // shared touch cooldown
 
 
@@ -116,7 +114,7 @@ export function _agDebris(x, y, big) {
 // pulsing guardian ring and the arena glows while the aegis is up, so the
 // state reads at a glance.
 export function _mechAgAegisProtocol(monster, phase) {
-    if (!monster || monster.aegisUp || _nkFrozen()) return;
+    if (!monster || monster.aegisUp || _nkFrozen() || _agFinalActive()) return;
     if (typeof _spawnMonster !== 'function') return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const count = p >= 3 ? 3 : 2;
@@ -155,6 +153,7 @@ export function _mechAgAegisProtocol(monster, phase) {
         }
         const alive = (typeof _monsters !== 'undefined')
             && globalThis._monsters.some(m => m.aegisOf === monster.id && m.currentHP > 0);
+        if (_agFinalActive()) { _agAegisGlow(false); return false; }
         if (!alive || e > 40000) {
             boss.aegisUp = false;
             boss.bossImmune = false;
@@ -351,6 +350,7 @@ export function _mechAgSentries(monster, phase) {
 export const AG_ROTOR_LIFE = [0, 0, 6500, 7500];
 export const AG_ROTOR_OMEGA = [0, 0, 75, 95];
 export const AG_ROTOR_INNER = 80;
+const AG_ROTOR_HALF = 11;                  // half the drawn arm width
 
 export function _mechAgGuardRotor(monster, phase) {
     if (_nkDodgeBusy() || _nkFrozen()) return;
@@ -397,17 +397,11 @@ export function _mechAgGuardRotor(monster, phase) {
         arms.forEach((el, i) => { el.style.rotate = (ang + i * 180) + 'deg'; });
         const pc = _nkPlayerCenter();
         if (pc && now >= touchCd) {
-            const dx = pc.x - px, dy = pc.y - py;
-            const d = Math.hypot(dx, dy);
-            if (d > AG_ROTOR_INNER) {
-                const pa = Math.atan2(dy, dx) * 180 / Math.PI;
-                for (let i = 0; i < 2; i++) {
-                    const diff = ((pa - (ang + i * 180)) % 360 + 360) % 360;
-                    if (diff < 4 || diff > 356) {
-                        touchCd = now + AG_HIT_CD_MS;
-                        _agTouch(dmgPct, level, 'Guard Rotor');
-                        break;
-                    }
+            for (let i = 0; i < 2; i++) {
+                if (_agArmTouches(pc, px, py, ang + i * 180, AG_ROTOR_INNER, AG_ROTOR_HALF)) {
+                    touchCd = now + AG_HIT_CD_MS;
+                    _agTouch(dmgPct, level, 'Guard Rotor');
+                    break;
                 }
             }
         }
@@ -417,25 +411,46 @@ export function _mechAgGuardRotor(monster, phase) {
 
 
 //------------------------------------------------------------------------
-//-------------------🏰… THE LAST BASTION (≤10% HP one-shot finale)---------
+//-------------------THE LAST BASTION (≤10% HP finale)---------------------
 //------------------------------------------------------------------------
-// The boss goes immune + shielded and FORTIFIES while a stone citadel
-// swallows the arena. A bastion plants at the centre and sweeps the field
-// with two opposite beams - each beat they spin faster. Then the VANGUARD:
-// the beams retract and three shield charges barrel across your row, the
-// last one huge. Charge bar frozen for the whole set-piece (gate in
-// _tickPlayer via _agFinalActive).
-export const AG_FINAL_TICK_MS = 1200;
-export const AG_FINAL_TICKS = 3;
-export const AG_BEAM_OMEGAS = [80, 115, 150];   // deg/s per stage
-export const AG_VANG_GAP = 900;
-export const AG_VANG_WARN = 450;
+// The boss goes immune behind a stone citadel. A bastion hub at the centre
+// sweeps two opposite beams that speed up each time you succeed. Green
+// breach rings light up one at a time; stand inside one until it fills to
+// crack the shield. The beams cross every ring, so you step out, wait for
+// the beam to pass, and step back. The hub itself is safe: cross the arena
+// through it. Four rings and the shield breaks. Charge bar frozen for the
+// whole set-piece (gate in _tickPlayer via _agFinalActive).
+const AG_FINAL_RINGS = 4;
+const AG_RING_R = 78;                      // breach ring radius (px)
+const AG_RING_HOLD_MS = 2200;              // time inside a ring to fill it
+const AG_RING_DRAIN = 0.6;                 // fill lost per second spent outside (× hold speed)
+const AG_RING_DIST = [230, 320];           // ring distance from the hub
+const AG_HUB_R = 70;                       // safe hub radius (drawn = hit)
+const AG_BEAM_HALF = 13;                   // half the drawn beam width
+const AG_PLAYER_PAD = 14;                  // the hero's body counts this far from its centre
+const AG_BEAM_OMEGA_START = 45;            // deg/s
+const AG_BEAM_OMEGA_STEP = 12;             // faster after each ring
+const AG_FINAL_INTRO_MS = 2200;            // beams are only a faint warning for this long
+const AG_FINAL_RING_GAP_MS = 700;          // pause before the next ring appears
+const AG_FINAL_FAILSAFE_MS = 90000;        // the shield never holds forever
 
 // Set while the finale runs (read by _tickPlayer's charge-freeze gate).
 export let _agFinal = null;
 
 export function _agFinalActive() {
     return !!_agFinal && !_agFinal.finished;
+}
+
+// True when a point (the hero's centre) touches a straight arm that leaves a
+// pivot at `arm` degrees: farther than `inner` from the pivot, and closer to
+// the arm's centre line than half its drawn width plus the hero's body.
+function _agArmTouches(pc, px, py, arm, inner, half) {
+    const dx = pc.x - px, dy = pc.y - py;
+    if (Math.hypot(dx, dy) <= inner) return false;
+    const a = arm * Math.PI / 180;
+    const ux = Math.cos(a), uy = Math.sin(a);
+    if (dx * ux + dy * uy <= 0) return false;
+    return Math.abs(dx * uy - dy * ux) <= half + AG_PLAYER_PAD;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
@@ -462,6 +477,107 @@ export function _agStartFinalWatcher(monster) {
     });
 }
 
+// Picks where the next breach ring goes: 230-320 px from the hub, on the
+// opposite half of the arena from the last one, kept fully on screen.
+function _agPickRing(g) {
+    const W = window.innerWidth, H = window.innerHeight;
+    for (let tries = 0; tries < 24; tries++) {
+        const ang = (g.lastRingAng == null ? Math.random() * 360 : g.lastRingAng + 110 + Math.random() * 140) * Math.PI / 180;
+        const dist = AG_RING_DIST[0] + Math.random() * (AG_RING_DIST[1] - AG_RING_DIST[0]);
+        const x = g.px + Math.cos(ang) * dist, y = g.py + Math.sin(ang) * dist;
+        if (x > AG_RING_R + 30 && x < W - AG_RING_R - 30 && y > AG_RING_R + 90 && y < H - AG_RING_R - 90) {
+            g.lastRingAng = ang * 180 / Math.PI;
+            return { x, y };
+        }
+    }
+    g.lastRingAng = null;
+    return { x: g.px + AG_RING_DIST[0], y: g.py };
+}
+
+// Shows the next breach ring.
+function _agSpawnRing(g) {
+    const spot = _agPickRing(g);
+    const el = document.createElement('div');
+    el.className = 'sx-ag-breach';
+    el.style.left = Math.round(spot.x - AG_RING_R) + 'px';
+    el.style.top = Math.round(spot.y - AG_RING_R) + 'px';
+    el.style.width = el.style.height = (AG_RING_R * 2) + 'px';
+    document.body.appendChild(el);
+    g.fxRun.els.push(el);
+    g.ring = { x: spot.x, y: spot.y, el, p: 0 };
+}
+
+// One look at the ring: fills while the hero stands inside, drains slowly
+// while outside, and finishes the step (faster beams, next ring) when full.
+function _agRingStep(g, dtS) {
+    const ring = g.ring;
+    if (!ring) {
+        g.ringWait -= dtS * 1000;
+        if (g.ringWait <= 0) _agSpawnRing(g);
+        return;
+    }
+    const pc = _nkPlayerCenter();
+    const inside = !!pc && Math.hypot(pc.x - ring.x, pc.y - ring.y) <= AG_RING_R - 8;
+    ring.p = Math.max(0, Math.min(1, ring.p + (inside ? dtS * 1000 : -dtS * 1000 * AG_RING_DRAIN) / AG_RING_HOLD_MS));
+    ring.el.style.setProperty('--p', (ring.p * 100).toFixed(1));
+    ring.el.classList.toggle('sx-ag-breach-on', inside);
+    if (ring.p < 1) return;
+    ring.el.classList.add('sx-ag-breach-done');
+    g.pips[g.ringIdx].classList.add('on');
+    g.ringIdx++;
+    g.omega += AG_BEAM_OMEGA_STEP;
+    g.ring = null;
+    g.ringWait = AG_FINAL_RING_GAP_MS;
+}
+
+// Sweeps the two beams and hurts a hero standing on one.
+function _agBeamStep(g, dtS, now, level) {
+    g.arm += g.omega * dtS;
+    g.beams.forEach((el, i) => { el.style.rotate = (g.arm + i * 180) + 'deg'; });
+    const pc = _nkPlayerCenter();
+    if (!pc || now < g.touchCd) return;
+    for (let i = 0; i < 2; i++) {
+        if (_agArmTouches(pc, g.px, g.py, g.arm + i * 180, AG_HUB_R, AG_BEAM_HALF)) {
+            g.touchCd = now + AG_HIT_CD_MS;
+            _agTouch(AG_BEAM_DMG, level, 'Bastion Beam');
+            return;
+        }
+    }
+}
+
+// Builds the citadel, hub, beams, ring pips and the title that fades away.
+function _agBuildFinale(g) {
+    const W = window.innerWidth, H = window.innerHeight;
+    g.px = W / 2;
+    g.py = H / 2;
+    const add = (cls, parent) => {
+        const el = document.createElement('div');
+        el.className = cls;
+        (parent || document.body).appendChild(el);
+        if (!parent) g.fxRun.els.push(el);
+        return el;
+    };
+    g.citadel = add('sx-ag-citadel');
+    requestAnimationFrame(() => { if (g.citadel) g.citadel.classList.add('sx-ag-citadel-on'); });
+    g.bastion = add('sx-ag-bastion');
+    g.bastion.style.left = Math.round(g.px - AG_HUB_R) + 'px';
+    g.bastion.style.top = Math.round(g.py - AG_HUB_R) + 'px';
+    g.bastion.style.width = g.bastion.style.height = (AG_HUB_R * 2) + 'px';
+    const maxR = Math.hypot(W, H);
+    g.beams = [0, 180].map(() => {
+        const el = add('sx-ag-beam sx-ag-beam-warn');
+        el.style.left = Math.round(g.px) + 'px';
+        el.style.top = Math.round(g.py - AG_BEAM_HALF) + 'px';
+        el.style.width = Math.round(maxR) + 'px';
+        return el;
+    });
+    const pips = add('sx-ag-pips');
+    g.pips = [];
+    for (let i = 0; i < AG_FINAL_RINGS; i++) g.pips.push(add('sx-ag-pip', pips));
+    const title = add('sx-ag-cd');
+    title.innerHTML = '<div class="sx-ag-cd-label">THE LAST BASTION</div>';
+}
+
 export function _agFinalStart(monster) {
     if (_agFinal || !monster) return;
 
@@ -471,21 +587,19 @@ export function _agFinalStart(monster) {
         if (r.bossId === monster.id) { try { _nkKillRun(r); } catch (e) {} }
     });
     monster.aegisUp = false;
+    _agAegisGlow(false);
 
     const g = {
         monsterId: monster.id,
         finished: false,
-        count: AG_FINAL_TICKS,
-        omega: AG_BEAM_OMEGAS[0],
+        t: 0,
+        omega: AG_BEAM_OMEGA_START,
         arm: Math.random() * 360,
-        beamOn: true,
         px: 0, py: 0,
-        bastion: null,
-        beams: [],
-        citadel: null,
-        overlay: null,
+        bastion: null, beams: [], citadel: null, pips: [],
+        ring: null, ringIdx: 0, ringWait: AG_FINAL_INTRO_MS, lastRingAng: null,
+        touchCd: 0,
         fxRun: null,
-        cdTimer: null,
     };
     _agFinal = g;
 
@@ -496,58 +610,16 @@ export function _agFinalStart(monster) {
         if (el) el.classList.add('sx-charge-paused');
     });
 
-    // FX run (passive): holds bastion, beams and the sweep loop.
+    // One loop owns everything. Every way the run can die (boss death,
+    // encounter stop, finishing) resolves the set-piece through onKill, so
+    // the boss can never stay immune behind a leftover citadel.
+    // Not passive: an active dodge run makes every other Aegis mechanic stand down.
     g.fxRun = _nkNewRun(monster.id, true);
-    g.fxRun.passive = true;
-
-    // Stone citadel overlay.
-    const citadel = document.createElement('div');
-    citadel.className = 'sx-ag-citadel';
-    document.body.appendChild(citadel);
-    g.citadel = citadel;
-    requestAnimationFrame(() => citadel.classList.add('sx-ag-citadel-on'));
-
-    // Bastion pivot at the arena centre.
-    const W = window.innerWidth, H = window.innerHeight;
-    g.px = W / 2;
-    g.py = H / 2;
-    const bastion = document.createElement('div');
-    bastion.className = 'sx-ag-bastion';
-    bastion.style.left = Math.round(g.px - 46) + 'px';
-    bastion.style.top = Math.round(g.py - 46) + 'px';
-    document.body.appendChild(bastion);
-    g.bastion = bastion;
-    g.fxRun.els.push(bastion);
-
-    // Two opposite sweeping beams, anchored at the pivot.
-    const maxR = Math.hypot(W, H);
-    g.beams = [0, 180].map(() => {
-        const el = document.createElement('div');
-        el.className = 'sx-ag-beam';
-        el.style.left = Math.round(g.px) + 'px';
-        el.style.top = Math.round(g.py - 13) + 'px';
-        el.style.width = Math.round(maxR) + 'px';
-        document.body.appendChild(el);
-        g.fxRun.els.push(el);
-        return el;
-    });
-
-    // Countdown overlay.
-    const ov = document.createElement('div');
-    ov.className = 'sx-ag-cd';
-    ov.innerHTML =
-        '<div class="sx-ag-cd-label">🛡️ THE LAST BASTION</div>' +
-        '<div class="sx-ag-cd-num sx-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="sx-ag-cd-hint">The bastion sweeps the field - stay off the beams!</div>';
-    document.body.appendChild(ov);
-    g.overlay = ov;
-
-    _nkToast('eg_mech_ag_final_cd', '🏰💀 THE LAST BASTION - off the beams!', '#e2e8f0');
+    g.fxRun.onKill = () => _agFinalEnd(g, false);
+    _agBuildFinale(g);
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
-
-    // The boss fortifies.
     const card = document.getElementById('sx-card-' + monster.id);
     const wrap = card ? (card.querySelector('.sx-emoji-wrapper') || card) : null;
     if (wrap) {
@@ -555,174 +627,62 @@ export function _agFinalStart(monster) {
         wrap.classList.add('sx-nk-shielded');
     }
 
-    // The sweep: beams rotate; each metronome beat they spin faster. Pause /
-    // death / inactive hold the sweep (debug: extra-long beats).
     const level = monster.level || 1;
-    let touchCd = 0;
+    let live = false;
     _nkLoop(g.fxRun, (dtS, now) => {
-        if (!g.beamOn) return true;   // idle - the vanguard's loop now drives the run
+        if (g.finished) return false;
         if (_nkFrozen()) return true;
-        g.arm += g.omega * dtS;
-        g.beams.forEach((el, i) => { el.style.rotate = (g.arm + i * 180) + 'deg'; });
-        const c = _nkPlayerCenter();
-        if (c && now >= touchCd) {
-            const dx = c.x - g.px, dy = c.y - g.py;
-            const d = Math.hypot(dx, dy);
-            if (d > 70) {
-                const pa = Math.atan2(dy, dx) * 180 / Math.PI;
-                for (let i = 0; i < 2; i++) {
-                    const diff = ((pa - (g.arm + i * 180)) % 360 + 360) % 360;
-                    if (diff < 4 || diff > 356) {
-                        touchCd = now + AG_HIT_CD_MS;
-                        _agTouch(AG_BEAM_DMG, level, 'Bastion Beam');
-                        break;
-                    }
-                }
-            }
+        g.t += dtS * 1000;
+        // Nothing may lift the shield early (a late guard-squad release would).
+        monster.bossImmune = true;
+        if (g.t >= AG_FINAL_FAILSAFE_MS) { _agFinalEnd(g, false); return false; }
+        if (!live && g.t >= AG_FINAL_INTRO_MS) {
+            live = true;
+            g.beams.forEach(b => b.classList.remove('sx-ag-beam-warn'));
         }
-        return true;
-    });
-
-    // Metronome: each beat the beams spin faster; at zero, the VANGUARD.
-    const cdTick = AG_FINAL_TICK_MS * (_AG_DEBUG_SLOW ? 8 : 1);
-    g.cdTimer = setInterval(() => {
-        if (!_agFinal || _agFinal !== g || g.finished) return;
-        if (_nkFrozen()) return;
-        g.count--;
-        if (g.count <= 0) {
-            clearInterval(g.cdTimer);
-            g.cdTimer = null;
-            try { g.overlay.remove(); } catch (e) {}
-            g.overlay = null;
-            // Beams retract; the vanguard charges begin.
-            g.beamOn = false;
-            g.beams.forEach(b => b.classList.add('sx-ag-beam-retract'));
-            _nkToast('eg_mech_ag_final_bang', '🏰💀 VANGUARD CHARGE!', '#e2e8f0');
-            _agVanguard(g, monster);
-            return;
+        // Beams turn from the start (faint while they only warn) but hurt only once live.
+        if (live) _agBeamStep(g, dtS, now, level);
+        else {
+            g.arm += g.omega * dtS;
+            g.beams.forEach((el, i) => { el.style.rotate = (g.arm + i * 180) + 'deg'; });
         }
-        g.omega = AG_BEAM_OMEGAS[AG_FINAL_TICKS - g.count];
-        const num = g.overlay && g.overlay.querySelector('.sx-ag-cd-num');
-        if (num) {
-            num.textContent = g.count;
-            num.classList.remove('sx-bmb-cd-pop');
-            void num.offsetWidth;
-            num.classList.add('sx-bmb-cd-pop');
-        }
-    }, cdTick);
-}
-
-// THE VANGUARD: three rapid shield charges barrel across the player's row,
-// the last one huge. Then the bastion stands down.
-export function _agVanguard(g, monster) {
-    const level = monster ? monster.level : 1;
-    const W = window.innerWidth, H = window.innerHeight;
-    const bandH = 150;
-    const speed = 820 / _AG_DEBUG_MULT;
-    const warnMs = AG_VANG_WARN * _AG_DEBUG_MULT;
-    const gapMs = AG_VANG_GAP * _AG_DEBUG_MULT;
-
-    const c0 = _nkPlayerCenter() || { x: W / 2, y: H / 2 };
-    const lanes = [];
-    let lastY = c0.y;
-    for (let i = 0; i < 3; i++) {
-        const y = i === 0 ? lastY
-            : Math.max(90, Math.min(H - 90, lastY + (Math.random() * 2 - 1) * 240));
-        lastY = y;
-        lanes.push({ y, at: i * gapMs, fired: false, el: null, x: 0, fromLeft: Math.random() < 0.5, done: false });
-    }
-
-    let t = 0, touchCd = 0;
-    _nkLoop(g.fxRun, (dtS, now) => {
-        t += dtS * 1000;
-        const pr = _nkPlayerRect();
-        let active = false;
-        lanes.forEach((ln, i) => {
-            if (ln.done) return;
-            if (!ln.el) {
-                if (t < ln.at) return;
-                const el = document.createElement('div');
-                el.className = 'sx-ag-vangwarn';
-                el.style.left = '0px';
-                el.style.width = W + 'px';
-                el.style.top = Math.round(ln.y - bandH / 2) + 'px';
-                el.style.height = bandH + 'px';
-                document.body.appendChild(el);
-                g.fxRun.els.push(el);
-                ln.el = { warn: el, charger: null };
-                ln.warnAt = t + warnMs;
-                return;
-            }
-            if (!ln.el.charger) {
-                if (t < ln.warnAt) { active = true; return; }
-                try { ln.el.warn.remove(); } catch (e) {}
-                const big = i === 2;
-                const charger = document.createElement('div');
-                charger.className = 'sx-ag-charger' + (big ? ' sx-ag-charger-big' : '');
-                charger.style.top = Math.round(ln.y - bandH * (big ? 0.5 : 0.45)) + 'px';
-                charger.style.height = Math.round(bandH * (big ? 1 : 0.9)) + 'px';
-                ln.x = ln.fromLeft ? -130 : W + 30;
-                charger.style.left = Math.round(ln.x) + 'px';
-                document.body.appendChild(charger);
-                g.fxRun.els.push(charger);
-                ln.el.charger = charger;
-                _agDebris(ln.fromLeft ? 40 : W - 40, ln.y, big);
-                return;
-            }
-            ln.x += (ln.fromLeft ? 1 : -1) * speed * dtS;
-            ln.el.charger.style.left = Math.round(ln.x) + 'px';
-            if (ln.x < -150 || ln.x > W + 150) {
-                ln.done = true;
-                try { ln.el.charger.remove(); } catch (e) {}
-                if (i === 2) {
-                    document.body.classList.add('sx-ag-flash');
-                    const fid = setTimeout(() => document.body.classList.remove('sx-ag-flash'), 700);
-                    g.fxRun.timers.push(fid);
-                }
-                return;
-            }
-            active = true;
-            if (pr && now >= touchCd) {
-                const py = pr.top + pr.height / 2;
-                if (Math.abs(py - ln.y) < bandH / 2 + 8) {
-                    touchCd = now + AG_HIT_CD_MS;
-                    _agTouch(i === 2 ? AG_FINAL_DMG : AG_VANG_DMG, level,
-                        i === 2 ? 'THE LAST BASTION' : 'Vanguard Charge');
-                }
-            }
-        });
-        if (!active && lanes.every(ln => ln.done)) {
-            const id = setTimeout(() => _agFinalEnd(g), _AG_DEBUG_SLOW ? 5500 : 1200);
-            g.fxRun.timers.push(id);
-            return false;
-        }
+        _agRingStep(g, dtS);
+        if (g.ringIdx >= AG_FINAL_RINGS) { _agFinalEnd(g, true); return false; }
         return true;
     });
 }
 
-export function _agFinalEnd(g) {
+// Ends the set-piece and hands the boss back, damageable again. `won` (all
+// rings filled) cracks the shield with a flash; the other paths (failsafe,
+// boss death, encounter stop) just clean up.
+export function _agFinalEnd(g, won) {
     if (!g || g.finished) return;
     g.finished = true;
-    g.beamOn = false;
-    if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
-    if (g.overlay) { try { g.overlay.remove(); } catch (e) {} g.overlay = null; }
     if (g.citadel) { try { g.citadel.remove(); } catch (e) {} g.citadel = null; }
-    if (g.bastion) { try { g.bastion.remove(); } catch (e) {} g.bastion = null; }
-    g.beams.forEach(b => { try { b.remove(); } catch (e) {} });
     g.beams = [];
-    if (g.fxRun) { try { _nkKillRun(g.fxRun); } catch (e) {} g.fxRun = null; }
+    const run = g.fxRun;
+    g.fxRun = null;
+    if (run) { try { _nkKillRun(run); } catch (e) {} }
     ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.remove('sx-charge-paused');
     });
-    document.body.classList.remove('sx-ag-flash');
     _agAegisGlow(false);
     document.querySelectorAll('.sx-ag-fortified').forEach(el => el.classList.remove('sx-ag-fortified'));
+    if (won) {
+        document.body.classList.add('sx-ag-flash');
+        setTimeout(() => document.body.classList.remove('sx-ag-flash'), 700);
+    }
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
+        const c = document.getElementById('sx-card-' + g.monsterId);
+        if (c) {
+            c.classList.remove('sx-nk-shielded');
+            c.querySelectorAll('.sx-nk-shielded').forEach(el => el.classList.remove('sx-nk-shielded'));
+        }
         if (typeof _bossScheduleMechanics === 'function') {
             try { _bossScheduleMechanics(m, 3); } catch (e) {}
         }
@@ -738,10 +698,10 @@ export function _agFinalEnd(g) {
 // Called from _bossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 export function _agTeardown() {
-    if (_agFinal) { try { _agFinalEnd(_agFinal); } catch (e) {} _agFinal = null; }
+    if (_agFinal) { try { _agFinalEnd(_agFinal, false); } catch (e) {} _agFinal = null; }
     document.querySelectorAll('.sx-ag-chargewarn, .sx-ag-charger, .sx-ag-vangwarn, .sx-ag-sentry, ' +
         '.sx-ag-orb, .sx-ag-rotor-pivot, .sx-ag-rotor-arm, .sx-ag-bastion, .sx-ag-beam, ' +
-        '.sx-ag-citadel, .sx-ag-cd, .sx-ag-debris').forEach(el => {
+        '.sx-ag-citadel, .sx-ag-cd, .sx-ag-debris, .sx-ag-breach, .sx-ag-pips').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
     document.body.classList.remove('sx-ag-flash');

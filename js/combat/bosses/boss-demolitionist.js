@@ -142,8 +142,8 @@ export function _crashBoom(run, x, y, radius, pct, level, label) {
 }
 
 // Places a visible bomb dot + its dashed danger ring at (x, y).
-export function _crashArmDot(run, x, y, cls, sizePx, ringR, text) {
-    const el = _nkEl(run, 'div', 'sx-nk-dot ' + cls, text || '💣');
+export function _crashArmDot(run, x, y, cls, sizePx, ringR) {
+    const el = _nkEl(run, 'div', 'sx-nk-dot sx-crash-bomb ' + cls);
     el.style.width = sizePx + 'px';
     el.style.height = sizePx + 'px';
     el.style.transform = 'translate(' + Math.round(x - sizePx / 2) + 'px,' + Math.round(y - sizePx / 2) + 'px)';
@@ -176,8 +176,6 @@ export function _mechStickyBombs(monster, phase) {
     const bombs = [];                        // index = bomb slot
     let t = -150;                            // ms since the cast (allows the loop to settle)
 
-    _nkToast('eg_mech_sticky', '💣 The Demolitionist: Sticky Bombs! Keep moving!', '#fb923c');
-
     _nkLoop(run, (dtS) => {
         t += dtS * 1000;
         let pending = false;
@@ -193,7 +191,7 @@ export function _mechStickyBombs(monster, phase) {
             const cy = c ? c.y : window.innerHeight / 2;
             const x = Math.max(50, Math.min(window.innerWidth - 50, cx + _crashRand(-55, 55)));
             const y = Math.max(60, Math.min(window.innerHeight - 60, cy + _crashRand(-55, 55)));
-            bombs[i] = _crashArmDot(run, x, y, 'sx-nk-bomb sx-crash-mini', 44, blastR, '💣');
+            bombs[i] = _crashArmDot(run, x, y, 'sx-nk-bomb sx-crash-mini', 44, blastR);
             bombs[i].x = x;
             bombs[i].y = y;
             bombs[i].t = 0;
@@ -245,13 +243,9 @@ export function _mechBigBomb(monster, phase) {
     const dmgPct = CRASH_MEGA_DMG[p];
     const spots = _crashPickMegaSpots(count, blastR);
     const bombs = spots.map(s => {
-        const armed = _crashArmDot(run, s.x, s.y, 'sx-crash-mega', 84, blastR, '💣');
+        const armed = _crashArmDot(run, s.x, s.y, 'sx-crash-mega', 84, blastR);
         return { x: s.x, y: s.y, t: 0, exploded: false, armed };
     });
-
-    _nkToast('eg_mech_crash_mega',
-        '💣 The Demolitionist: MEGA BOMB on the grid! Get clear of the ring!',
-        '#f87171');
 
     let t = 0;
     const chainDelays = [];   // corrupted-cell detonation delays (ms after the boom)
@@ -370,7 +364,6 @@ export function _crashChainCells(run, x, y, r, level, phase, chainDelays) {
         if (Array.isArray(chainDelays)) chainDelays.push(delay);
         const fuseEl = document.createElement('span');
         fuseEl.className = 'sx-crash-cell-fuse';
-        fuseEl.textContent = '💥';
         const host = document.getElementById('g-' + cell.cr + '-' + cell.cc);
         if (host) host.appendChild(fuseEl);
         const timer = setTimeout(() => {
@@ -640,17 +633,16 @@ export function _crashMazeStart(monster) {
         finaleAt: 0,
         cascadeI: 0,
         cascadeT: 0,
+        hotI: 0,          // next corridor tile to scorch as the wave passes
         won: false,
         super: null,      // SUPER BOMB chase state, built in _crashMazeGo
         offL: 0,
         offT: 0,
     };
     _crashMaze = g;
+    monster._finaleHold = true;
     _crashMazeSetShield(true);
     _crashMazeShowOverlay(g);
-    _nkToast('eg_mech_crash_maze_cd',
-        '💣 The Demolitionist: BOMB MAZE IN 5…1 - the corridor is the only safe place!',
-        '#fb923c');
 
     g.cdTimer = setInterval(() => {
         if (!_crashMaze || _crashMaze !== g || g.finished) return;
@@ -736,24 +728,32 @@ export function _crashMazeGo(g, monster) {
     g.startedAt = performance.now();
     g.wT = 0;
 
-    const ARROW = { up: '↑', down: '↓', right: '→', left: '←' };
+    // The board: a dark slab under the whole maze, so the lit corridor and the
+    // bomb walls stand out from the game screen behind them.
+    const board = _nkEl(run, 'div', 'sx-crash-board');
+    board.style.left = g.originX + 'px';
+    board.style.top = g.originY + 'px';
+    board.style.width = (lanes * g.P) + 'px';
+    board.style.height = (rows * g.P) + 'px';
+    document.body.classList.add('sx-crash-maze-on');
+
+    // Corridor tiles: one lit tile per step, full tile size so they join into
+    // one continuous lane, each with a chevron pointing the way to the exit.
     g.path.forEach((t, i) => {
-        const floorCls = 'sx-nk-dot sx-crash-floor'
+        const last = i === g.path.length - 1;
+        const floor = _nkEl(run, 'div', 'sx-nk-dot sx-crash-floor'
             + (i === 0 ? ' sx-crash-floor-start' : '')
-            + (i === g.path.length - 1 ? ' sx-crash-goal' : '');
-        const floor = _nkEl(run, 'div', floorCls);
-        floor.style.width = (g.P * 0.9) + 'px';
-        floor.style.height = (g.P * 0.9) + 'px';
-        floor.style.transform = 'translate(' + Math.round(t.x - g.P * 0.45) + 'px,' + Math.round(t.y - g.P * 0.45) + 'px)';
-        if (i === 0) floor.textContent = '⬇';                 // start: go down
-        else if (i === g.path.length - 1) floor.textContent = '🏁'; // exit marker
-        else floor.textContent = ARROW[t.dir] || '·';
+            + (last ? ' sx-crash-goal' : ' sx-crash-dir-' + (t.dir || 'down')));
+        floor.style.width = g.P + 'px';
+        floor.style.height = g.P + 'px';
+        floor.style.transform = 'translate(' + Math.round(t.x - g.P / 2) + 'px,' + Math.round(t.y - g.P / 2) + 'px)';
         t.floor = floor;
     });
 
+    // Wall bombs: drawn as the same square the collision uses (a hair smaller).
     g.walls.forEach(w => {
-        const size = Math.max(52, Math.round(g.P * 0.62));
-        const el = _nkEl(run, 'div', 'sx-nk-dot sx-crash-wall', '💣');
+        const size = g.P - 4;
+        const el = _nkEl(run, 'div', 'sx-nk-dot sx-crash-wall');
         el.style.width = size + 'px';
         el.style.height = size + 'px';
         el.style.transform = 'translate(' + Math.round(w.x - size / 2) + 'px,' + Math.round(w.y - size / 2) + 'px)';
@@ -766,14 +766,13 @@ export function _crashMazeGo(g, monster) {
     // removes it with everything else.
     const supStart = _crashSuperPos(g, 0);
     const supSize = Math.max(96, Math.round(g.P * CRASH_SUPER_SIZE_MULT));
-    const supEl = _nkEl(run, 'div', 'sx-crash-super sx-crash-super-falling', '💣');
+    const supEl = _nkEl(run, 'div', 'sx-crash-super sx-crash-super-falling');
     supEl.style.width = supSize + 'px';
     supEl.style.height = supSize + 'px';
-    supEl.style.fontSize = Math.round(supSize * 0.94) + 'px';
     supEl.style.left = Math.round(supStart.x - supSize / 2) + 'px';
     supEl.style.top = Math.round(supStart.y - CRASH_SUPER_FALL_PX - supSize / 2) + 'px';
     const supWarn = _nkEl(run, 'div', 'sx-crash-warn sx-crash-super-warn');
-    const warnR = g.P * 1.35;
+    const warnR = g.P * CRASH_SUPER_CATCH_MULT; // the real catch distance
     supWarn.style.width = (warnR * 2) + 'px';
     supWarn.style.height = (warnR * 2) + 'px';
     supWarn.style.left = Math.round(supStart.x - warnR) + 'px';
@@ -783,10 +782,6 @@ export function _crashMazeGo(g, monster) {
         landed: false, done: false, caught: false,
         rollPx: 0, fallX: supStart.x, fallY: supStart.y,
     };
-
-    _nkToast('eg_mech_crash_maze_go',
-        '💣💥 BOMB MAZE - RUN! The bombs behind you are going off!',
-        '#f87171');
 
     // One hit cooldown shared by wall contact AND wave blasts, so a player
     // caught in several overlapping detonations never melts in a single
@@ -895,6 +890,19 @@ export function _crashMazeGo(g, monster) {
             g.wavePx = (g.wT - CRASH_MAZE_GRACE_MS) * CRASH_MAZE_WAVE_PXPS / 1000;
         }
         const frontIdx = Math.floor(g.wavePx / g.P);
+        // Walls about to blow flicker white-hot; corridor tiles the wave has
+        // passed flash red once and burn out dark.
+        for (const w of g.walls) {
+            if (!w.gone && !w.fused && w.nearest * g.P <= g.wavePx + g.P * 2.5) {
+                w.fused = true;
+                if (w.el) w.el.classList.add('sx-crash-wall-fuse');
+            }
+        }
+        while (g.wavePx > 0 && g.hotI < g.path.length && g.hotI * g.P <= g.wavePx) {
+            const f = g.path[g.hotI].floor;
+            if (f) f.classList.add('sx-crash-floor-hot');
+            g.hotI++;
+        }
         if (g.wavePx > 0) {
             let popped = false;
             for (const w of g.walls) {
@@ -1052,9 +1060,6 @@ export function _crashSuperLand(g, level) {
     }
     _crashSuperMove(g);
     _crashBoom(g.run, sup.fallX, sup.fallY, g.P * 0.95, 0, level, '');
-    _nkToast('eg_mech_crash_super_land',
-        '💣💥 The Demolitionist hurls a SUPER BOMB onto your start - RUN!',
-        '#fb923c');
 }
 
 // The bomb caught the player: one-hit defeat. A colossal fire hit runs the
@@ -1116,6 +1121,7 @@ export function _crashMazeEnd(g) {
 
     const m = (g.monsterId && typeof _monsters !== 'undefined')
         ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
+    if (m) m._finaleHold = false;
     if (m && m.bossPhase === 4 && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _bossScheduleMechanics === 'function') {
@@ -1127,6 +1133,7 @@ export function _crashMazeEnd(g) {
     // defensively by _crashTeardown if the encounter dies mid-maze).
     _crashSetChargePause(false);
     _crashMazeSetShield(false);
+    document.body.classList.remove('sx-crash-maze-on');
     if (_crashMaze === g) _crashMaze = null;
 }
 
@@ -1137,12 +1144,15 @@ export function _crashTeardown() {
     const g = _crashMaze;
     if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
     g.finished = true;
+    const mt = (typeof _monsters !== 'undefined') ? globalThis._monsters.find(x => x && x.id === g.monsterId) : null;
+    if (mt) mt._finaleHold = false;
     if (g.overlay) { try { g.overlay.remove(); } catch (e) {} g.overlay = null; }
     if (g.banner) { try { g.banner.remove(); } catch (e) {} g.banner = null; }
     if (g.tint) { try { g.tint.remove(); } catch (e) {} g.tint = null; }
     if (g.run) { try { _nkKillRun(g.run); } catch (e) {} g.run = null; }
     _crashSetChargePause(false);
     _crashMazeSetShield(false);
+    document.body.classList.remove('sx-crash-maze-on');
     _crashMaze = null;
 }
 
@@ -1154,9 +1164,8 @@ export function _crashMazeShowOverlay(g) {
     ov.className = 'sx-crash-cd';
     ov.id = 'sx-crash-cd';
     ov.innerHTML =
-        '<div class="sx-crash-cd-label">💣 BOMB MAZE IN</div>' +
-        '<div class="sx-crash-cd-num sx-crash-cd-pop">' + g.count + '</div>' +
-        '<div class="sx-crash-cd-hint">Run the corridor - the bombs detonate from the start!</div>';
+        '<div class="sx-crash-cd-label">BOMB MAZE</div>' +
+        '<div class="sx-crash-cd-num sx-crash-cd-pop">' + g.count + '</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
     const r = g.region;
@@ -1169,7 +1178,7 @@ export function _crashMazeShowBanner(g) {
     const r = g.region;
     const banner = document.createElement('div');
     banner.className = 'sx-crash-run-banner';
-    banner.textContent = '💣 BOMB MAZE - RUN!';
+    banner.textContent = 'RUN!';
     document.body.appendChild(banner);
     banner.style.left = Math.round(r.cx) + 'px';
     banner.style.top = Math.round(Math.max(120, r.cy - (g.geom ? g.geom.rows * g.P : 400) / 2 - 70)) + 'px';

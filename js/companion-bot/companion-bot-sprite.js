@@ -104,7 +104,7 @@ function _playerSpriteHeight() {
 }
 
 // Where the player's hero stands right now: the middle of the feet, in screen pixels.
-function _playerFeet() {
+export function _playerFeet() {
     const img = _playerSpriteImg();
     const r = img ? img.getBoundingClientRect() : null;
     if (!r || !r.width) return { x: window.innerWidth * 0.3, y: window.innerHeight * 0.3 };

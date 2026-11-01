@@ -1,6 +1,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
 import { RESIST_CAP_PCT } from './combat-calculations-resistances.js';
+import { _quizRewardStatBonuses } from './combat-quiz-buffs.js';
 import { DEFLECT_BASE_DMG_PCT, DEFLECT_BASE_PCT, PARRY_BASE_PCT, _getDeflectChancePct, _getDeflectDamagePct, _getDualWieldParryChancePct, _getParryChancePct } from './encounter.js';
 import { _equipped } from '../hub/hub.js';
 import { _getPlayerLevel, _syncBaseAttributes } from '../hub/hub-leveling.js';
@@ -1668,6 +1669,21 @@ function _applyMapRunStatMods(s) {
     }
 }
 
+// Adds the temporary quiz-answer rewards (all resistances, melee charge-up
+// speed, cast speed, movement speed) on top of the finished stats.
+function _applyQuizRewardStats(s) {
+    const q = _quizRewardStatBonuses();
+    if (q.resist) {
+        s.fireResist += q.resist;
+        s.coldResist += q.resist;
+        s.lightningResist += q.resist;
+        s.shadowResist += q.resist;
+    }
+    s.meleeChargeSpeedPct += q.charge;
+    s.castSpeedPct += q.cast;
+    s.movementSpeedPct += q.move;
+}
+
 // Aggregates every equipped item's implicit defenses + rolled mods into one
 // stats object. Recomputed on demand (cheap - ~19 slots, ≤6 mods each) so it
 // never goes stale after an equip/unequip.
@@ -1682,6 +1698,7 @@ export function _computePlayerStats() {
     _applyAccuracyAttributesAndLevelBonus(s);
     _composePoolsAndDefences(s);
     _applyMapRunStatMods(s);
+    _applyQuizRewardStats(s);
 
     return s;
 }

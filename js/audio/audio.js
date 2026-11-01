@@ -297,13 +297,38 @@ export const Audio_Manager = (() => {
         });
     }
 
+    // Shuffle bag for random mode: every track plays once before any repeats,
+    // and the next track never comes from the same family as the last one
+    // (aegis_1 then aegis_2 sound alike). Refills when empty or when tracks
+    // were dropped for failing to load.
+    let _randomBag = [];
+    let _lastRandomFamily = '';
+    const _bgmFamily = (key) => String(BGM_TRACKS[key] || key)
+        .split('/').pop().replace(/\.[a-z0-9]+$/i, '').replace(/[_\- ]?\d+$/, '');
+    function _nextRandomKey(keys) {
+        const valid = new Set(keys);
+        _randomBag = _randomBag.filter(k => valid.has(k));
+        if (_randomBag.length === 0) {
+            _randomBag = keys.slice();
+            for (let i = _randomBag.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [_randomBag[i], _randomBag[j]] = [_randomBag[j], _randomBag[i]];
+            }
+        }
+        let idx = _randomBag.findIndex(k => _bgmFamily(k) !== _lastRandomFamily);
+        if (idx < 0) idx = 0;
+        const key = _randomBag.splice(idx, 1)[0];
+        _lastRandomFamily = _bgmFamily(key);
+        return key;
+    }
+
     // Plays a random BGM track from BGM_TRACKS.
     // Pass excludeSpecial = false to also include title / convergence tracks.
     // Useful for menus, random events, or any context without a fixed track.
     function playRandomBGM(excludeSpecial = true) {
         const keys = _getAllBGMKeys(excludeSpecial);
         if (keys.length === 0) return;
-        const randomKey = keys[Math.floor(Math.random() * keys.length)];
+        const randomKey = _nextRandomKey(keys);
         playBGM(randomKey);
     }
 
@@ -319,7 +344,7 @@ export const Audio_Manager = (() => {
         if (attemptsLeft === undefined) attemptsLeft = keys.length;
         if (attemptsLeft <= 0) return;
 
-        const randomKey = keys[Math.floor(Math.random() * keys.length)];
+        const randomKey = _nextRandomKey(keys);
         const src = BGM_TRACKS[randomKey];
         if (!src) return;
 

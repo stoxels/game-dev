@@ -332,8 +332,7 @@ export function _mechNulErasure(monster, phase) {
         (target === 'clues' ? 'clue numbers' : target === 'charge' ? 'charge bar' : 'class HUD') + ' for 8s!', '#a5b4fc');
 
     const marker = document.createElement('div');
-    marker.className = 'sx-nul-erase-marker';
-    marker.textContent = '🧿';
+    marker.className = 'sx-nul-erase-marker sx-nul-orb';
     let host = null;
     if (target === 'clues') {
         globalThis._blackoutActive = true;
@@ -401,7 +400,7 @@ export function _mechNulRays(monster, phase) {
     _nulEnsureRecRun(monster);
 
     const cx = W / 2, cy = H * 0.45;
-    const anchor = _nkEl(run, 'div', 'sx-nul-anchor', '🧿');
+    const anchor = _nkEl(run, 'div', 'sx-nul-anchor');
     anchor.style.left = Math.round(cx - 26) + 'px';
     anchor.style.top = Math.round(cy - 26) + 'px';
     const len = Math.hypot(W, H);
@@ -554,10 +553,9 @@ export function _nulFinalStart(monster) {
     const ov = document.createElement('div');
     ov.className = 'sx-nul-cd';
     ov.innerHTML =
-        '<div class="sx-nul-cd-label">🧿💀 PROOF BY CONTRADICTION</div>' +
-        '<div class="sx-nul-cd-status">SHELLS ○○○   MISSES 0/3</div>' +
-        '<div class="sx-nul-cd-timer">-</div>' +
-        '<div class="sx-nul-cd-hint">Stand in the glowing ring. Avoid the red circle.</div>';
+        '<div class="sx-nul-cd-label">PROOF BY CONTRADICTION</div>' +
+        '<div class="sx-nul-cd-status">○○○   ○○○</div>' +
+        '<div class="sx-nul-cd-timer">-</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
     g.statusEl = ov.querySelector('.sx-nul-cd-status');
@@ -590,7 +588,7 @@ export function _nulFinalStart(monster) {
         const t0 = performance.now();
         const walkMs = NUL_STRIKE_WALK * _NUL_DEBUG_MULT;
 
-        const phantom = _nkEl(g.fxRun, 'div', 'sx-nul-phantom', '👤');
+        const phantom = _nkEl(g.fxRun, 'div', 'sx-nul-phantom');
         const startS = buf[0];
         phantom.style.left = Math.round(startS.x - 16) + 'px';
         phantom.style.top = Math.round(startS.y - 16) + 'px';
@@ -632,11 +630,10 @@ export function _nulFinalStart(monster) {
             safe.style.left = Math.round(endS.x - NUL_EXPOSE_R) + 'px';
             safe.style.top = Math.round(endS.y - NUL_EXPOSE_R) + 'px';
             safe.style.width = safe.style.height = (NUL_EXPOSE_R * 2) + 'px';
-            safe.innerHTML = '<span class="sx-nul-ring-label">STAND HERE</span><span class="sx-nul-ring-count"></span>';
+            safe.innerHTML = '<span class="sx-nul-ring-count"></span>';
             const warn = _nkEl(g.fxRun, 'div', 'sx-nul-strike-warn');
             warn.style.left = Math.round(sx - 55) + 'px';
             warn.style.top = Math.round(sy - 55) + 'px';
-            warn.innerHTML = '<span class="sx-nul-ring-label sx-nul-danger-label">DANGER</span>';
 
             // Visible 3-2-1 on the ring.
             g.counting = true;
@@ -680,8 +677,8 @@ export function _nulFinalStart(monster) {
                     _nulTouch(NUL_STRIKE_HIT, level, 'Void Strike');
                     _nkToast('eg_mech_nul_fail', '🧿 You were not in the ring - the hypothesis holds!', '#f87171');
                 }
-                if (g.statusEl) g.statusEl.textContent = 'SHELLS ' + '●'.repeat(g.shatters) + '○'.repeat(Math.max(0, NUL_EXPOSE_GOAL - g.shatters))
-                    + '   MISSES ' + g.fails + '/3';
+                if (g.statusEl) g.statusEl.textContent = '●'.repeat(g.shatters) + '○'.repeat(Math.max(0, NUL_EXPOSE_GOAL - g.shatters))
+                    + '   ' + '✕'.repeat(g.fails) + '○'.repeat(Math.max(0, 3 - g.fails));
                 try { phantom.remove(); } catch (e) {}
 
                 if (g.shatters >= NUL_EXPOSE_GOAL) {

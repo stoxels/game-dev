@@ -126,7 +126,7 @@ function _decreeDrawRect(run, rc) {
     el.style.top = Math.round(rc.t) + 'px';
     el.style.width = Math.round(rc.r - rc.l) + 'px';
     el.style.height = Math.round(rc.b - rc.t) + 'px';
-    el.innerHTML = '<span class="sx-zen-exile-text">EXILED</span><span class="sx-zen-exile-count"></span>';
+    el.innerHTML = '<span class="sx-zen-exile-count"></span>';
     return el;
 }
 
@@ -230,7 +230,7 @@ export function _mechCrownRings(monster, phase) {
     const start = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const crown = _ringCrownPoint(start);
     const rMax = Math.hypot(window.innerWidth, window.innerHeight);
-    const crownEl = _nkEl(run, 'div', 'sx-zen-crown', '👑');
+    const crownEl = _nkEl(run, 'div', 'sx-zen-crown');
     crownEl.style.transform = 'translate(' + Math.round(crown.x - 34) + 'px,' + Math.round(crown.y - 34) + 'px)';
     const rings = [];
     let e = 0, launched = 0;

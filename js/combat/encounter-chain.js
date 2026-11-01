@@ -1147,9 +1147,7 @@ export function _buildChainBonusGainHTML() {
             <div class="sx-cc-chip-total">${t('eg_bonus_total').replace('{p}', total)}</div>
         </div>` : '';
     const rewardChip = quizRewardLine ? `
-        <div class="sx-cc-chip sx-cc-chip-reward">
-            <div class="sx-cc-chip-body sx-cc-reward-lines">${quizRewardLine}</div>
-        </div>` : '';
+        <div class="sx-cc-chip sx-cc-chip-reward">${quizRewardLine}</div>` : '';
     return `<div class="sx-cc-chips">${lootChip}${rewardChip}</div>`;
 }
 

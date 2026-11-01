@@ -3186,69 +3186,142 @@ div.sx-nk-pillar.sx-nk-pillar-holy {
     45%  { opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
 }
-.sx-crash-cd-hint {
-    font-size: clamp(0.8rem, 1.8vw, 1.05rem);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: #fdba74;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
-    max-width: 90vw;
-}
-
-/* Run banner + arena tint once the maze starts */
+/* Run banner (fades after a moment) + dimmed screen behind the maze */
 .sx-crash-run-banner {
     position: fixed;
     transform: translateX(-50%);
     z-index: 9003;
     pointer-events: none;
-    padding: 8px 22px;
+    padding: 8px 26px;
     border-radius: 999px;
     background: rgba(60, 10, 0, 0.88);
     border: 2px solid rgba(251, 146, 60, 0.95);
     box-shadow: 0 0 30px rgba(249, 115, 22, 0.6);
     color: #fff1e2;
     font-weight: 900;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.16em;
     font-size: clamp(1.1rem, 2.8vw, 1.8rem);
     white-space: nowrap;
-    animation: sx-crash-warn-pulse 0.4s ease-in-out infinite alternate;
+    animation: sx-crash-banner-fade 2.4s ease-out forwards;
+}
+@keyframes sx-crash-banner-fade {
+    0%, 55% { opacity: 1; }
+    100%    { opacity: 0; }
 }
 .sx-crash-maze-tint {
     position: fixed;
     inset: 0;
+    z-index: 8998;
+    pointer-events: none;
+    background: rgba(10, 2, 0, 0.5);
+}
+/* The maze slab: a dark board under the lit corridor and the bomb walls */
+.sx-crash-board {
+    position: fixed;
     z-index: 8999;
     pointer-events: none;
-    background: radial-gradient(circle at 50% 50%, rgba(120, 20, 0, 0) 42%, rgba(90, 10, 0, 0.34) 100%);
+    box-sizing: border-box;
+    border-radius: 12px;
+    background: rgba(8, 4, 4, 0.86);
+    border: 2px solid rgba(251, 146, 60, 0.7);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 22px rgba(249, 115, 22, 0.35);
+}
+/* While the maze runs the hero is drawn above the maze layers, never under them */
+body.sx-crash-maze-on #player-avatar-wrapper,
+body.sx-crash-maze-on #player-avatar-simple {
+    z-index: 9100 !important;
 }
 
-/* Corridor floor (faint amber), wall bombs and the exit */
+/* Drawn bombs (no emoji): a dark sphere with a shine, a red rim and a
+   sparking fuse. Used by sticky/mega bombs, the maze walls and the super bomb. */
+.sx-crash-bomb::before,
+.sx-crash-wall::before,
+.sx-crash-super::before {
+    content: '';
+    position: absolute;
+    inset: 14% 12% 8% 12%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, #9ca3af 0 7%, #374151 22%, #0b0f16 72%);
+    box-shadow: 0 0 0 2px rgba(255, 150, 60, 0.6), 0 0 14px rgba(239, 68, 68, 0.75);
+}
+.sx-crash-bomb::after,
+.sx-crash-wall::after,
+.sx-crash-super::after {
+    content: '';
+    position: absolute;
+    top: 3%;
+    right: 20%;
+    width: 18%;
+    height: 18%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0 25%, #ffd166 45%, #f97316 70%, transparent 74%);
+    box-shadow: 0 0 8px 3px rgba(255, 160, 60, 0.9);
+    animation: sx-crash-spark-flicker 0.22s ease-in-out infinite alternate;
+}
+@keyframes sx-crash-spark-flicker {
+    from { opacity: 0.55; }
+    to   { opacity: 1; }
+}
+
+/* Corridor: lit tiles that join into one lane, each with a chevron toward the exit */
 .sx-crash-floor {
-    font-size: 1.05rem;
-    color: rgba(253, 230, 138, 0.75);
-    text-shadow: 0 0 8px rgba(250, 204, 21, 0.35);
     z-index: 9000;
+    background: linear-gradient(180deg, rgba(74, 222, 128, 0.34), rgba(34, 197, 94, 0.18));
+    box-shadow: inset 0 0 0 1px rgba(187, 247, 208, 0.45);
 }
+.sx-crash-dir-up::before,
+.sx-crash-dir-down::before,
+.sx-crash-dir-left::before,
+.sx-crash-dir-right::before {
+    content: '';
+    width: 30%;
+    height: 30%;
+    border-right: 7px solid rgba(240, 253, 244, 0.92);
+    border-bottom: 7px solid rgba(240, 253, 244, 0.92);
+    filter: drop-shadow(0 0 6px rgba(74, 222, 128, 0.9));
+}
+.sx-crash-dir-down::before  { transform: translateY(-12%) rotate(45deg); }
+.sx-crash-dir-right::before { transform: translateX(-12%) rotate(-45deg); }
+.sx-crash-dir-up::before    { transform: translateY(12%) rotate(-135deg); }
+.sx-crash-dir-left::before  { transform: translateX(12%) rotate(135deg); }
 .sx-crash-floor-start {
-    color: #fde68a;
-    text-shadow: 0 0 12px rgba(250, 204, 21, 0.9);
+    box-shadow: inset 0 0 0 3px #bbf7d0, inset 0 0 22px rgba(134, 239, 172, 0.85);
 }
+/* The exit: a green chequered pad that pulses */
 .sx-crash-goal {
-    font-size: 2.2rem;
-    filter: drop-shadow(0 0 16px rgba(74, 222, 128, 1));
+    border-radius: 12%;
+    background: repeating-conic-gradient(#f0fdf4 0 25%, #14532d 0 50%) 50% / 28% 28%;
+    box-shadow: inset 0 0 0 3px #86efac, 0 0 22px 4px rgba(74, 222, 128, 0.9);
     animation: sx-crash-goal-pulse 0.55s ease-in-out infinite alternate;
 }
 @keyframes sx-crash-goal-pulse {
-    from { opacity: 0.65; }
+    from { opacity: 0.7; }
     to   { opacity: 1; }
 }
-.sx-crash-wall {
-    font-size: 1.9rem;
-    filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.9));
-    animation: sx-crash-wall-warn 0.5s ease-in-out infinite alternate;
+/* A tile the blast wave has passed: flashes red once, then burns out dark */
+.sx-crash-floor-hot {
+    animation: sx-crash-floor-burn 1.1s ease-out forwards;
 }
-@keyframes sx-crash-wall-warn {
-    from { opacity: 0.82; filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.6)); }
-    to   { opacity: 1; filter: drop-shadow(0 0 18px rgba(239, 68, 68, 1)); }
+.sx-crash-floor-hot::before { opacity: 0; }
+@keyframes sx-crash-floor-burn {
+    0%   { background: rgba(239, 68, 68, 0.9); box-shadow: inset 0 0 26px rgba(255, 200, 120, 0.9); }
+    100% { background: rgba(40, 24, 22, 0.6); box-shadow: inset 0 0 0 1px rgba(120, 70, 50, 0.4); }
+}
+
+/* Wall bombs: solid dark red blocks the same size as their collision square */
+.sx-crash-wall {
+    z-index: 9000;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #4a1d1d, #1c0d0d);
+    box-shadow: inset 0 0 0 2px rgba(239, 68, 68, 0.7), 0 0 10px rgba(239, 68, 68, 0.4);
+}
+/* About to blow: white-hot flicker */
+.sx-crash-wall-fuse {
+    animation: sx-crash-wall-fuse-kf 0.18s steps(2) infinite;
+}
+@keyframes sx-crash-wall-fuse-kf {
+    from { background: linear-gradient(145deg, #4a1d1d, #1c0d0d); box-shadow: inset 0 0 0 2px rgba(239, 68, 68, 0.7), 0 0 10px rgba(239, 68, 68, 0.4); }
+    to   { background: linear-gradient(145deg, #ea580c, #7f1d1d); box-shadow: inset 0 0 0 3px #fff3d6, 0 0 22px 4px rgba(255, 190, 90, 0.95); }
 }
 
 /* Demolitionist - Bomb Maze SUPER BOMB: a giant bomb that slams onto the
@@ -3258,13 +3331,12 @@ div.sx-nk-pillar.sx-nk-pillar-holy {
    the other crash layers. */
 .sx-crash-super {
     position: fixed;
-    z-index: 960;
+    z-index: 9050;
     pointer-events: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
     user-select: none;
+}
+.sx-crash-super::before {
+    box-shadow: 0 0 0 3px rgba(255, 150, 60, 0.85), 0 0 26px 8px rgba(239, 68, 68, 0.85);
 }
 .sx-crash-super-falling {
     filter: drop-shadow(0 0 10px rgba(251, 146, 60, 0.55));
@@ -3287,8 +3359,7 @@ div.sx-nk-pillar.sx-nk-pillar-holy {
     from { transform: rotate(-8deg); }
     to   { transform: rotate(8deg); }
 }
-/* Landing-zone ring (reuses the dashed warn-ring look from the sticky
-   bombs) - brighter while the bomb is still falling. */
+/* Landing-zone ring: the real catch area of the falling bomb */
 .sx-crash-super-warn {
     animation: sx-crash-super-warnpulse 0.3s ease-in-out infinite alternate;
 }
@@ -7373,24 +7444,24 @@ body.sx-nd-flash::after {
     to   { opacity: 0.95; }
 }
 .sx-ag-chargewarn.sx-ag-from-left::after, .sx-ag-vangwarn.sx-ag-from-left::after {
-    content: '▶';
+    content: '';
     position: absolute;
-    left: 8px; top: 50%;
+    left: 14px; top: 50%;
     transform: translateY(-50%);
-    color: #93c5fd;
-    font-size: 26px;
-    font-weight: 900;
-    text-shadow: 0 0 10px rgba(147, 197, 253, 0.9);
+    border-style: solid;
+    border-width: 18px 0 18px 30px;
+    border-color: transparent transparent transparent #93c5fd;
+    filter: drop-shadow(0 0 8px rgba(147, 197, 253, 0.9));
 }
 .sx-ag-chargewarn.sx-ag-from-right::after, .sx-ag-vangwarn.sx-ag-from-right::after {
-    content: '◀';
+    content: '';
     position: absolute;
-    right: 8px; top: 50%;
+    right: 14px; top: 50%;
     transform: translateY(-50%);
-    color: #93c5fd;
-    font-size: 26px;
-    font-weight: 900;
-    text-shadow: 0 0 10px rgba(147, 197, 253, 0.9);
+    border-style: solid;
+    border-width: 18px 30px 18px 0;
+    border-color: transparent #93c5fd transparent transparent;
+    filter: drop-shadow(0 0 8px rgba(147, 197, 253, 0.9));
 }
 /* The charging tower shield. */
 .sx-ag-charger {
@@ -7441,12 +7512,13 @@ body.sx-nd-flash::after {
 /* Guard rotor: pivot + sweeping arms. */
 .sx-ag-rotor-pivot {
     position: fixed;
-    width: 56px; height: 56px;
+    width: 160px; height: 160px;
     border-radius: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 8640;
-    background: radial-gradient(circle at 42% 38%, #bfdbfe 0 30%, #3b82f6 65%, #172554);
+    background: radial-gradient(circle, #bfdbfe 0 14%, rgba(59, 130, 246, 0.55) 15% 55%, rgba(23, 37, 84, 0.45) 56%);
+    border: 3px solid rgba(147, 197, 253, 0.85);
     box-shadow: 0 0 22px rgba(96, 165, 250, 0.7);
 }
 .sx-ag-rotor-arm {
@@ -7476,14 +7548,11 @@ body.sx-nd-flash::after {
 /* The bastion pivot. */
 .sx-ag-bastion {
     position: fixed;
-    width: 92px; height: 92px;
-    border-radius: 50% 50% 12px 12px / 44% 44% 12px 12px;
+    border-radius: 50%;
     pointer-events: none;
     z-index: 8850;
-    background:
-        radial-gradient(circle at 34% 30%, rgba(254, 249, 231, 0.5) 0 10%, transparent 16%),
-        radial-gradient(circle at 66% 30%, rgba(254, 249, 231, 0.5) 0 10%, transparent 16%),
-        linear-gradient(180deg, #93c5fd, #1e3a8a);
+    border: 4px solid rgba(147, 197, 253, 0.9);
+    background: radial-gradient(circle at 40% 36%, #dbeafe 0 12%, #3b82f6 38%, #172554 85%);
     box-shadow: 0 0 36px rgba(96, 165, 250, 0.8), inset 0 0 18px rgba(254, 249, 231, 0.4);
     animation: sx-ag-bastion-thrum 0.9s ease-in-out infinite alternate;
 }
@@ -7502,9 +7571,41 @@ body.sx-nd-flash::after {
     border-radius: 13px;
     box-shadow: 0 0 24px rgba(96, 165, 250, 0.7);
 }
-.sx-ag-beam.sx-ag-beam-retract {
-    transition: opacity 0.6s ease-out;
-    opacity: 0;
+.sx-ag-beam.sx-ag-beam-warn { opacity: 0.28; }
+/* Green breach ring: the goal. A pie fills inside it while the hero stands in it. */
+.sx-ag-breach {
+    position: fixed;
+    box-sizing: border-box;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 8830;
+    border: 4px solid rgba(74, 222, 128, 0.95);
+    background: conic-gradient(rgba(74, 222, 128, 0.6) calc(var(--p, 0) * 1%), rgba(74, 222, 128, 0.1) 0);
+    box-shadow: 0 0 26px rgba(74, 222, 128, 0.7), inset 0 0 30px rgba(74, 222, 128, 0.25);
+    animation: sx-ag-warn-pulse 0.6s ease-in-out infinite alternate;
+}
+.sx-ag-breach.sx-ag-breach-on { box-shadow: 0 0 40px rgba(134, 239, 172, 1), inset 0 0 30px rgba(74, 222, 128, 0.4); }
+.sx-ag-breach.sx-ag-breach-done { animation: none; opacity: 0; transition: opacity 0.5s ease-out; }
+/* Progress pips: one per ring, green when that ring is done. */
+.sx-ag-pips {
+    position: fixed;
+    left: 50%; top: 14%;
+    transform: translateX(-50%);
+    z-index: 9004;
+    pointer-events: none;
+    display: flex;
+    gap: 12px;
+}
+.sx-ag-pip {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 3px solid rgba(147, 197, 253, 0.8);
+    background: rgba(15, 23, 42, 0.7);
+}
+.sx-ag-pip.on {
+    border-color: #86efac;
+    background: #4ade80;
+    box-shadow: 0 0 14px rgba(74, 222, 128, 0.9);
 }
 /* Countdown overlay (steel-blue theme, mirrors the others). */
 .sx-ag-cd {
@@ -7519,6 +7620,11 @@ body.sx-nd-flash::after {
     align-items: center;
     gap: 6px;
     text-align: center;
+    animation: sx-ag-title-fade 2.6s ease-out forwards;
+}
+@keyframes sx-ag-title-fade {
+    0%, 60% { opacity: 1; }
+    100%    { opacity: 0; }
 }
 .sx-ag-cd-label {
     font-weight: 900;
@@ -7538,14 +7644,6 @@ body.sx-nd-flash::after {
 }
 .sx-ag-cd-num.sx-bmb-cd-pop {
     animation: sx-bmb-cd-pop 0.8s ease-out;
-}
-.sx-ag-cd-hint {
-    font-size: clamp(0.8rem, 1.8vw, 1.05rem);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: #fde68a;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
-    max-width: 90vw;
 }
 /* White-blue flash at the final charge. */
 body.sx-ag-flash::after {
@@ -8190,9 +8288,9 @@ body.sx-ag-flash::after {
 .sx-shp-hearth {
     position: fixed; z-index: 9002; pointer-events: none;
     box-sizing: border-box; border-radius: 50%;
-    border: 3px solid rgba(251, 191, 36, 0.95);
-    background: radial-gradient(circle, rgba(253, 224, 71, 0.32), rgba(251, 146, 60, 0.22) 60%, rgba(251, 146, 60, 0.07) 86%);
-    box-shadow: 0 0 34px rgba(251, 191, 36, 0.75), inset 0 0 34px rgba(251, 146, 60, 0.4);
+    border: 3px solid rgba(134, 239, 172, 0.95);
+    background: radial-gradient(circle, rgba(134, 239, 172, 0.3), rgba(74, 222, 128, 0.18) 60%, rgba(74, 222, 128, 0.06) 86%);
+    box-shadow: 0 0 34px rgba(74, 222, 128, 0.75), inset 0 0 34px rgba(74, 222, 128, 0.35);
     display: flex; align-items: center; justify-content: center;
     animation: sx-shp-fade-in 0.3s ease-out;
     transition: opacity 0.5s ease;
@@ -8412,10 +8510,11 @@ body.sx-ag-flash::after {
     position: fixed; z-index: 9002; pointer-events: none;
     width: 260px; height: 260px;
     transform: translate(-50%, -50%);
-    border: 4px dashed rgba(125, 211, 252, 0.95);
+    border: 4px dashed rgba(134, 239, 172, 0.95);
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(224, 242, 254, 0.35) 0%, rgba(125, 211, 252, 0.12) 45%, transparent 70%);
-    box-shadow: 0 0 26px rgba(56, 189, 248, 0.8), inset 0 0 26px rgba(56, 189, 248, 0.5);
+    background: radial-gradient(circle, rgba(134, 239, 172, 0.3) 0%, rgba(134, 239, 172, 0.1) 45%, transparent 70%);
+    /* the huge spread paints everything OUTSIDE the ring red: red hurts, green is safe */
+    box-shadow: 0 0 26px rgba(74, 222, 128, 0.8), inset 0 0 26px rgba(74, 222, 128, 0.4), 0 0 0 150vmax rgba(220, 38, 38, 0.3);
     animation: sx-shp-breakring-pulse 0.5s ease-in-out infinite alternate;
 }
 .sx-shp-breakring { display: flex; align-items: center; justify-content: center; }
@@ -9209,7 +9308,8 @@ body.sx-shp-flash::after {
     border-radius: 50%;
     border: 4px solid rgba(134, 239, 172, 0.95);
     background: radial-gradient(circle, rgba(134, 239, 172, 0.28), rgba(134, 239, 172, 0.06) 70%);
-    box-shadow: 0 0 30px rgba(74, 222, 128, 0.8), inset 0 0 24px rgba(74, 222, 128, 0.4);
+    /* the huge spread paints everything OUTSIDE the ring red: red hurts, green is safe */
+    box-shadow: 0 0 30px rgba(74, 222, 128, 0.8), inset 0 0 24px rgba(74, 222, 128, 0.4), 0 0 0 150vmax rgba(220, 38, 38, 0.3);
     display: flex; align-items: center; justify-content: center;
     animation: sx-colo-seal-kf 0.6s ease-in-out infinite alternate;
 }
@@ -9834,7 +9934,7 @@ body.sx-shp-flash::after {
     position: fixed;
     border: 2px dashed rgba(240, 171, 252, 0.55);
     background: repeating-linear-gradient(90deg, rgba(240, 171, 252, 0.06) 0px, rgba(240, 171, 252, 0.06) 14px, transparent 14px, transparent 28px);
-    z-index: 8540;
+    z-index: 9060;
     pointer-events: none;
     opacity: 0.8;
 }
@@ -9842,7 +9942,7 @@ body.sx-shp-flash::after {
     position: fixed;
     font-size: 1.5rem;
     line-height: 1;
-    z-index: 8550;
+    z-index: 9070;
     pointer-events: none;
     filter: drop-shadow(0 0 8px rgba(240, 171, 252, 0.9));
     opacity: 0.85;
@@ -9855,7 +9955,7 @@ body.sx-shp-flash::after {
     border-top: 2px solid rgba(253, 224, 71, 0.9);
     border-bottom: 2px solid rgba(253, 224, 71, 0.9);
     box-shadow: 0 0 24px rgba(251, 146, 60, 0.7);
-    z-index: 8600;
+    z-index: 9120;
     pointer-events: none;
 }
 .sx-lap-lance-full {
@@ -9866,7 +9966,7 @@ body.sx-shp-flash::after {
     position: fixed;
     font-size: 1.5rem;
     line-height: 1;
-    z-index: 8610;
+    z-index: 9130;
     pointer-events: none;
     filter: drop-shadow(0 0 10px rgba(253, 224, 71, 1));
 }
@@ -9878,7 +9978,7 @@ body.sx-shp-flash::after {
     border: 5px solid rgba(253, 224, 71, 0.95);
     background: radial-gradient(circle, rgba(253, 224, 71, 0.35) 0%, rgba(251, 146, 60, 0.18) 55%, transparent 75%);
     box-shadow: 0 0 30px rgba(253, 224, 71, 0.8);
-    z-index: 8590;
+    z-index: 9110;
     pointer-events: none;
     animation: sx-lap-pin-kf 0.7s ease-out forwards;
 }
@@ -9891,7 +9991,7 @@ body.sx-shp-flash::after {
 .sx-lap-walk-line {
     position: fixed;
     background: repeating-linear-gradient(90deg, rgba(240, 171, 252, 0.7) 0px, rgba(240, 171, 252, 0.7) 10px, transparent 10px, transparent 20px);
-    z-index: 8530;
+    z-index: 9050;
     pointer-events: none;
     opacity: 0.65;
 }
@@ -9899,7 +9999,7 @@ body.sx-shp-flash::after {
     position: fixed;
     font-size: 1.6rem;
     line-height: 1;
-    z-index: 8560;
+    z-index: 9080;
     pointer-events: none;
     filter: drop-shadow(0 0 8px rgba(240, 171, 252, 0.9));
     opacity: 0.9;
@@ -9921,20 +10021,21 @@ body.sx-shp-flash::after {
     background: rgba(30, 16, 48, 0.88);
     border: 2px solid rgba(240, 171, 252, 0.7);
     color: #f0abfc;
-    z-index: 8565;
+    z-index: 9085;
     pointer-events: none;
     box-shadow: 0 0 12px rgba(240, 171, 252, 0.4);
     transition: transform 0.2s ease;
 }
 .sx-lap-branch-true {
-    border-color: rgba(134, 239, 172, 0.95);
-    color: #bbf7d0;
-    box-shadow: 0 0 18px rgba(134, 239, 172, 0.7);
-    transform: scale(1.1);
+    border-color: rgba(248, 113, 113, 1);
+    background: rgba(90, 16, 16, 0.92);
+    box-shadow: 0 0 22px rgba(248, 113, 113, 0.9);
+    transform: scale(1.15);
 }
 .sx-lap-branch-fake {
-    border-color: rgba(167, 243, 208, 0.8);
-    color: #a7f3d0;
+    border-color: rgba(167, 243, 208, 0.9);
+    background: rgba(16, 60, 44, 0.9);
+    box-shadow: 0 0 14px rgba(167, 243, 208, 0.6);
 }
 
 /* ── Ghost-form (greed window) + dizzy swap ── */
@@ -9959,19 +10060,27 @@ body.sx-shp-flash::after {
 /* ── Timeline Fray: recorded path dots + the clone ── */
 .sx-lap-fray-dot {
     position: fixed;
-    width: 6px;
-    height: 6px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background: rgba(240, 171, 252, 0.8);
     box-shadow: 0 0 6px rgba(240, 171, 252, 0.7);
-    z-index: 8520;
+    z-index: 9040;
     pointer-events: none;
+}
+/* The fray clone is a purple copy of the player (see .sx-lap-echo) with a
+   ring showing how close you may get to it. */
+.sx-lap-fray-clone::before {
+    content: ''; position: absolute; left: 50%; top: 50%; width: 72px; height: 72px;
+    transform: translate(-50%, -50%); border-radius: 50%;
+    border: 2px dashed rgba(240, 171, 252, 0.85);
+    background: radial-gradient(circle, rgba(192, 132, 252, 0.22), transparent 70%);
 }
 .sx-lap-clone {
     position: fixed;
     font-size: 1.6rem;
     line-height: 1;
-    z-index: 8560;
+    z-index: 9080;
     pointer-events: none;
     filter: drop-shadow(0 0 8px rgba(196, 181, 253, 0.95));
     animation: sx-lap-clone-kf 0.9s ease-in-out infinite alternate;
@@ -9984,45 +10093,179 @@ body.sx-shp-flash::after {
 /* ── THE CLOSED TIMELINE: nodes, loop warn bands, collapse ── */
 .sx-lap-node {
     position: fixed;
-    width: 48px;
-    height: 48px;
+    width: 72px;
+    height: 72px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem;
+    font-size: 2rem;
     background:
-        radial-gradient(closest-side, rgba(30, 16, 48, 0.9) 74%, transparent 76% 100%),
-        conic-gradient(#a7f3d0 calc(var(--node-prog, 0) * 100%), rgba(167, 243, 208, 0.22) 0);
-    border: 2px solid rgba(167, 243, 208, 0.85);
-    box-shadow: 0 0 14px rgba(167, 243, 208, 0.55);
-    z-index: 8570;
+        radial-gradient(closest-side, rgba(20, 40, 36, 0.4) 70%, transparent 72% 100%),
+        conic-gradient(#d9fff0 calc(var(--node-prog, 0) * 100%), rgba(167, 243, 208, 0.22) 0);
+    border: 3px solid rgba(167, 243, 208, 0.95);
+    box-shadow: 0 0 28px rgba(167, 243, 208, 0.9), 0 0 60px rgba(167, 243, 208, 0.35);
+    z-index: 9090;
     pointer-events: none;
+    animation: sx-lap-node-spawn 0.5s cubic-bezier(0.2, 1.5, 0.4, 1) both;
 }
-.sx-lap-node-breaking {
-    animation: sx-lap-node-kf 0.4s ease-in-out infinite alternate;
+/* Two ripples keep radiating outward so the node is easy to spot. */
+.sx-lap-node::before, .sx-lap-node::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 2px solid rgba(167, 243, 208, 0.8);
+    animation: sx-lap-node-ripple 1.8s ease-out infinite;
 }
-@keyframes sx-lap-node-kf {
-    from { filter: brightness(0.95); }
-    to   { filter: brightness(1.5); }
+.sx-lap-node::after { animation-delay: 0.9s; }
+@keyframes sx-lap-node-ripple {
+    from { transform: scale(1); opacity: 0.9; }
+    to   { transform: scale(2.1); opacity: 0; }
+}
+@keyframes sx-lap-node-spawn {
+    from { transform: scale(0.2); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+.sx-lap-node-breaking { filter: brightness(1.4); }
+/* The node's face: a small clock whose hand keeps turning - time that loops. */
+.sx-lap-node-core {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 3px solid #d9fff0;
+    box-shadow: 0 0 10px rgba(217, 255, 240, 0.9), inset 0 0 8px rgba(167, 243, 208, 0.6);
+}
+.sx-lap-node-core::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 3px;
+    height: 11px;
+    margin-left: -1.5px;
+    margin-top: -11px;
+    border-radius: 2px;
+    background: #fff;
+    transform-origin: 50% 100%;
+    animation: sx-lap-node-hand 2.4s linear infinite;
+}
+.sx-lap-node-core::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    margin: -3.5px 0 0 -3.5px;
+    border-radius: 50%;
+    background: #fff;
+}
+@keyframes sx-lap-node-hand {
+    to { transform: rotate(360deg); }
+}
+.sx-lap-node-pop {
+    position: fixed;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 4px solid #d9fff0;
+    box-shadow: 0 0 40px rgba(167, 243, 208, 1);
+    z-index: 9095;
+    pointer-events: none;
+    animation: sx-lap-node-pop-kf 0.8s ease-out forwards;
+}
+@keyframes sx-lap-node-pop-kf {
+    from { transform: scale(1); opacity: 1; }
+    to   { transform: scale(4.5); opacity: 0; }
 }
 .sx-lap-loop-warn {
     position: fixed;
-    border: 2px dashed rgba(253, 224, 71, 0.85);
-    background: repeating-linear-gradient(90deg, rgba(253, 224, 71, 0.14) 0px, rgba(253, 224, 71, 0.14) 16px, transparent 16px, transparent 32px);
-    z-index: 8590;
+    box-sizing: border-box;
+    overflow: hidden;
+    border: 3px dashed rgba(255, 120, 70, 0.95);
+    background: repeating-linear-gradient(45deg, rgba(255, 90, 50, 0.16) 0px, rgba(255, 90, 50, 0.16) 14px, rgba(0, 0, 0, 0.12) 14px, rgba(0, 0, 0, 0.12) 28px);
+    box-shadow: 0 0 22px rgba(255, 110, 60, 0.55), inset 0 0 26px rgba(255, 110, 60, 0.35);
+    z-index: 9110;
     pointer-events: none;
-    animation: sx-lap-warn-kf 0.45s ease-in-out infinite alternate;
+    animation: sx-lap-warn-kf 0.4s ease-in-out infinite alternate;
+}
+/* The wipe that fills the warning shows how long until the strike. */
+.sx-lap-loop-warn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(255, 70, 30, 0.55), rgba(255, 190, 80, 0.7));
+    transform-origin: left center;
+    animation: sx-lap-warn-fill var(--warn-ms, 1300ms) linear forwards;
+}
+.sx-lap-loop-warn-col::before { transform-origin: center top; background: linear-gradient(180deg, rgba(255, 70, 30, 0.55), rgba(255, 190, 80, 0.7)); }
+.sx-lap-loop-warn-round::before { transform-origin: center; background: radial-gradient(circle, rgba(255, 190, 80, 0.75), rgba(255, 70, 30, 0.5)); }
+@keyframes sx-lap-warn-fill {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+}
+.sx-lap-loop-warn-col::before { animation-name: sx-lap-warn-fill-y; }
+@keyframes sx-lap-warn-fill-y {
+    from { transform: scaleY(0); }
+    to   { transform: scaleY(1); }
+}
+.sx-lap-loop-warn-round::before { animation-name: sx-lap-warn-fill-r; }
+@keyframes sx-lap-warn-fill-r {
+    from { transform: scale(0); }
+    to   { transform: scale(1); }
 }
 @keyframes sx-lap-warn-kf {
     from { opacity: 0.55; }
     to   { opacity: 1; }
 }
+.sx-lap-lance-full { animation: sx-lap-strike-kf 0.7s ease-out forwards; }
+@keyframes sx-lap-strike-kf {
+    0%   { filter: brightness(3) saturate(0.4); opacity: 1; }
+    25%  { filter: brightness(1.6); opacity: 1; }
+    100% { filter: brightness(1); opacity: 0; }
+}
+.sx-lap-lance-col {
+    background: linear-gradient(180deg, rgba(251, 146, 60, 0.2) 0%, rgba(253, 224, 71, 0.75) 12%, rgba(251, 146, 60, 0.75) 50%, rgba(253, 224, 71, 0.75) 88%, rgba(251, 146, 60, 0.2) 100%);
+}
+.sx-lap-loop-warn-round { border-radius: 50%; }
+.sx-lap-loop-warn-round::before { border-radius: 50%; }
+.sx-lap-cd-label-out { opacity: 0; transition: opacity 1.2s ease; }
+.sx-lap-cd-bar {
+    display: flex; align-items: center; gap: 14px; margin-top: 8px; padding: 6px 14px;
+    border-radius: 999px; background: rgba(14, 8, 28, 0.72);
+    border: 1px solid rgba(240, 171, 252, 0.45); box-shadow: 0 0 16px rgba(167, 139, 250, 0.35);
+}
+.sx-lap-cd-pips { display: flex; gap: 8px; }
+/* The loop: a playhead sweeps the bar; a marker sits where each strike lands. */
+.sx-lap-tl { position: relative; width: min(240px, 38vw); height: 10px; border-radius: 5px; background: rgba(240, 171, 252, 0.18); }
+.sx-lap-tl-head {
+    position: absolute; top: -4px; width: 4px; height: 18px; margin-left: -2px; border-radius: 2px;
+    background: #fff; box-shadow: 0 0 10px #f0abfc, 0 0 4px #fff;
+}
+.sx-lap-tl-idle { opacity: 0.35; }
+.sx-lap-tl-mark { position: absolute; top: -3px; width: 12px; height: 16px; margin-left: -6px; border-radius: 3px; background: #ff8a50; box-shadow: 0 0 8px rgba(255, 120, 70, 0.9); }
+.sx-lap-tl-col { width: 6px; margin-left: -3px; }
+.sx-lap-tl-burst { width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: #ffd23f; }
+.sx-lap-vignette {
+    position: fixed; inset: 0; z-index: 9001; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 45%, rgba(88, 28, 135, 0.45) 100%);
+    animation: sx-lap-vig-kf 2.4s ease-in-out infinite alternate;
+}
+@keyframes sx-lap-vig-kf { from { opacity: 0.55; } to { opacity: 1; } }
+.sx-lap-pip {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid rgba(167, 243, 208, 0.7);
+    background: rgba(30, 16, 48, 0.8);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.sx-lap-pip-on { background: #a7f3d0; box-shadow: 0 0 14px rgba(167, 243, 208, 1); }
 .sx-lap-collapse {
     position: fixed;
     inset: 0;
     background: radial-gradient(circle at 50% 50%, rgba(240, 171, 252, 0.9) 0%, rgba(167, 139, 250, 0.5) 40%, rgba(167, 139, 250, 0) 75%);
-    z-index: 8700;
+    z-index: 9220;
     pointer-events: none;
     animation: sx-lap-collapse-kf 1.5s ease-out forwards;
 }
@@ -10043,42 +10286,31 @@ body.sx-shp-flash::after {
 /* ── Finale countdown overlay (mirrors the shared cd pattern) ── */
 .sx-lap-cd {
     position: fixed;
-    left: 50%;
-    top: 20%;
-    transform: translate(-50%, -50%);
-    z-index: 9003;
+    left: 0;
+    top: 0;
+    width: 100%;
+    z-index: 9210;
     pointer-events: none;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
-    text-align: center;
 }
 .sx-lap-cd-label {
+    position: fixed;
+    left: 50%;
+    top: 22%;
+    transform: translateX(-50%);
+    white-space: nowrap;
     font-weight: 900;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.22em;
     font-size: clamp(1.4rem, 3.6vw, 2.6rem);
     color: #f5d0fe;
     text-shadow: 0 0 18px rgba(240, 171, 252, 0.9), 0 2px 6px rgba(0, 0, 0, 0.9);
+    animation: sx-lap-title-in 0.8s ease-out backwards;
 }
-.sx-lap-cd-loop {
-    font-weight: 900;
-    letter-spacing: 0.22em;
-    font-size: clamp(0.95rem, 2vw, 1.3rem);
-    color: #a7f3d0;
-    text-shadow: 0 0 10px rgba(167, 243, 208, 0.8), 0 1px 4px rgba(0, 0, 0, 0.9);
-}
-.sx-lap-cd-timer {
-    font-weight: 900;
-    font-size: clamp(1.1rem, 2.4vw, 1.7rem);
-    color: #fde68a;
-    text-shadow: 0 0 12px rgba(253, 230, 138, 0.8), 0 1px 4px rgba(0, 0, 0, 0.9);
-}
-.sx-lap-cd-hint {
-    font-size: 0.95rem;
-    color: #f0abfc;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
-    max-width: 90vw;
+@keyframes sx-lap-title-in {
+    from { opacity: 0; letter-spacing: 0.6em; }
+    to   { opacity: 1; letter-spacing: 0.22em; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -10532,7 +10764,8 @@ body.sx-shp-flash::after {
     border-radius: 50%;
     border: 5px solid rgba(34, 197, 94, 0.95);
     background: radial-gradient(circle, rgba(74, 222, 128, 0.28) 0%, rgba(74, 222, 128, 0.12) 65%, transparent 72%);
-    box-shadow: 0 0 26px rgba(34, 197, 94, 0.8), inset 0 0 22px rgba(34, 197, 94, 0.45);
+    /* the huge spread paints everything OUTSIDE the ring red: not in the ring = hurt */
+    box-shadow: 0 0 26px rgba(34, 197, 94, 0.8), inset 0 0 22px rgba(34, 197, 94, 0.45), 0 0 0 150vmax rgba(220, 38, 38, 0.26);
     z-index: 8540;
     pointer-events: none;
     display: flex;
@@ -10916,7 +11149,6 @@ body.sx-shp-flash::after {
     font: 900 clamp(0.7rem, 1.6vw, 1.15rem)/1 system-ui, sans-serif; letter-spacing: 0.18em;
     color: #052e16; text-shadow: 0 0 8px rgba(255, 255, 255, 0.95);
 }
-.sx-bar-strike-safe::after { content: 'SAFE'; }
 .sx-bar-safe-pulse {
     animation: sx-bar-safe-pulse-kf 0.9s ease-in-out infinite alternate;
 }
@@ -12376,7 +12608,7 @@ body.sx-shp-flash::after {
 }
 .sx-sir-fin-dark {
     position: fixed; inset: 0; z-index: 8986; pointer-events: none;
-    background: radial-gradient(circle at var(--ex) var(--ey), transparent calc(var(--er) - 2px), rgba(250, 204, 21, 0.18) var(--er), rgba(15, 23, 42, 0.62) calc(var(--er) + 30px));
+    background: radial-gradient(circle at var(--ex) var(--ey), transparent calc(var(--er) - 2px), rgba(250, 204, 21, 0.18) var(--er), rgba(150, 24, 24, 0.5) calc(var(--er) + 30px));
     animation: sx-sr-cd-in 0.4s ease-out;
 }
 .sx-sir-fin-flash { animation: sx-sr-fin-flash 1.1s ease-out forwards; }
@@ -12640,6 +12872,7 @@ body.sx-shp-flash::after {
 }
 /* Per-boss accents */
 .sx-nk-fin-storm { --nk-fin: #fde047; }
+.sx-nk-fin-storm .sx-nk-fin-hint, .sx-crp-fin .sx-nk-fin-hint { display: none; }
 
 /* ============================================================
    THE WARDEN (boss_warden) - storm pylons, sentries, solitary
@@ -12941,8 +13174,9 @@ body.sx-shp-flash::after {
 
 /* THE EXECUTIONER: floor arcs, chain and axe, and the condemned lanes. */
 .sx-exe-arc { position: fixed; top: 0; left: 0; z-index: 8998; pointer-events: none; }
-.sx-exe-arc path { fill: none; stroke: rgba(251, 191, 36, 0.8); stroke-width: 14; stroke-dasharray: 20 14; stroke-linecap: round; }
-.sx-exe-arc-live path { stroke: rgba(239, 68, 68, 0.5); stroke-dasharray: none; }
+/* the red band is as wide as the blade that sweeps it (blade 100 + player allowance) */
+.sx-exe-arc path { fill: none; stroke: rgba(239, 68, 68, 0.3); stroke-width: 130; stroke-dasharray: none; stroke-linecap: butt; }
+.sx-exe-arc-live path { stroke: rgba(239, 68, 68, 0.55); stroke-dasharray: none; }
 .sx-exe-pivot {
     position: fixed; top: 0; left: 0; z-index: 9001; pointer-events: none; width: 36px; height: 36px; border-radius: 50%; box-sizing: border-box;
     background: radial-gradient(circle, #94a3b8 0 30%, #334155 34%); border: 3px solid #0f172a;
@@ -13035,7 +13269,7 @@ body.sx-shp-flash::after {
 }
 .sx-zen-exile {
     position: fixed; z-index: 8998; pointer-events: none; box-sizing: border-box;
-    background: rgba(185, 28, 28, 0.4); border: 4px dashed rgba(250, 204, 21, 0.95);
+    background: rgba(185, 28, 28, 0.5); border: 4px dashed rgba(248, 113, 113, 0.95);
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
     animation: sx-nk-warn-pulse 0.35s ease-in-out infinite alternate;
 }
@@ -13126,3 +13360,145 @@ body.sx-shp-flash::after {
     from { opacity: 0.8; transform: scale(0.97); }
     to   { opacity: 1;   transform: scale(1.04); }
 }
+
+/* Past Echo: purple copies of the player that replay the trail, then hunt */
+.sx-lap-echo {
+    position: fixed; z-index: 9140; pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+.sx-lap-echo-sprite {
+    display: block; width: auto; opacity: 0.85;
+    filter: grayscale(1) sepia(1) hue-rotate(245deg) saturate(4) brightness(1.15) drop-shadow(0 0 10px rgba(192, 132, 252, 0.95));
+}
+.sx-lap-echo-flip .sx-lap-echo-sprite { transform: scaleX(-1); }
+.sx-lap-echo-ghost { opacity: 0.45; animation: sx-lap-echo-blink 0.25s ease-in-out infinite alternate; }
+@keyframes sx-lap-echo-blink { from { opacity: 0.25; } to { opacity: 0.6; } }
+.sx-lap-echo-boom { animation: sx-lap-echo-boom-kf 0.5s ease-out forwards; }
+.sx-lap-echo-boom::after {
+    content: ''; position: absolute; left: 50%; top: 50%; width: 240px; height: 240px;
+    transform: translate(-50%, -50%); border-radius: 50%;
+    border: 4px solid rgba(240, 171, 252, 0.95);
+    background: radial-gradient(circle, rgba(192, 132, 252, 0.5), transparent 70%);
+    box-shadow: 0 0 34px rgba(192, 132, 252, 0.9);
+}
+@keyframes sx-lap-echo-boom-kf {
+    from { opacity: 1; transform: translate(-50%, -50%) scale(0.7); }
+    to   { opacity: 0; transform: translate(-50%, -50%) scale(1.25); }
+}
+
+/* Cause and Effect: the 3x3 memory board */
+.sx-lap-mem-frame {
+    position: fixed; box-sizing: border-box; z-index: 9095; pointer-events: none;
+    border: 4px solid rgba(240, 171, 252, 0.9);
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.8), inset 0 0 40px rgba(168, 85, 247, 0.3);
+}
+.sx-lap-mem-tile {
+    position: fixed; box-sizing: border-box; z-index: 9100; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 4.2rem; font-weight: 900; color: #fff7ae;
+    text-shadow: 0 0 12px rgba(0, 0, 0, 0.95);
+    background: rgba(40, 20, 70, 0.55);
+    border: 2px solid rgba(240, 171, 252, 0.45);
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+.sx-lap-mem-lit { background: rgba(253, 224, 71, 0.55); border-color: #fde047; box-shadow: inset 0 0 40px rgba(253, 224, 71, 0.8); }
+.sx-lap-mem-ok  { background: rgba(74, 222, 128, 0.4); border-color: #4ade80; }
+.sx-lap-mem-bad { background: rgba(239, 68, 68, 0.6); border-color: #ef4444; }
+.sx-lap-mem-label {
+    position: fixed; text-align: center; z-index: 9150; pointer-events: none;
+    font-size: 1.8rem; font-weight: 900; color: #f5d0fe;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.95);
+}
+
+/* ── Boss rework audit: CSS-drawn sprites instead of emoji ── */
+/* Barrage: supply crate, mortar shell, shrapnel ember */
+.sx-bar-jammer {
+    font-size: 0;
+    border: 3px solid #3b2610;
+    background:
+        linear-gradient(45deg, transparent 44%, rgba(70, 42, 14, 0.95) 44% 56%, transparent 56%),
+        linear-gradient(-45deg, transparent 44%, rgba(70, 42, 14, 0.95) 44% 56%, transparent 56%),
+        linear-gradient(180deg, #a8773a, #7a5226);
+}
+.sx-bar-mortar {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: radial-gradient(circle, #fff 0 18%, #ffb347 38%, #ff5a1f 70%, rgba(255, 90, 31, 0) 72%) !important;
+    box-shadow: 0 0 12px rgba(255, 120, 40, 0.9);
+}
+.sx-bar-shrap {
+    width: 11px; height: 11px; border-radius: 50%;
+    background: radial-gradient(circle, #fff3c4 0 25%, #ff9a3c 55%, rgba(255, 90, 31, 0) 70%) !important;
+    box-shadow: 0 0 8px rgba(255, 138, 61, 0.95);
+}
+.sx-bar-bomb-warn { font-size: 0; }
+
+/* Shaper: ice walker, shardlets, shield cores, hearth flame, monolith crystals */
+.sx-shp-walker { font-size: 0; }
+.sx-shp-walker::after {
+    content: ''; position: absolute; inset: 0 5px;
+    clip-path: polygon(50% 0, 100% 35%, 80% 100%, 20% 100%, 0 35%);
+    background: linear-gradient(100deg, #1e3a8a 0%, #60a5fa 30%, #e0f2fe 50%, #38bdf8 75%, #1e3a8a 100%);
+}
+.sx-shp-shardlet {
+    width: 8px; height: 12px; font-size: 0;
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    background: linear-gradient(135deg, #f0f9ff, #38bdf8);
+}
+.sx-shp-core { font-size: 0; }
+.sx-shp-core::after {
+    content: ''; width: 20px; height: 22px;
+    clip-path: polygon(50% 0, 100% 38%, 50% 100%, 0 38%);
+    background: linear-gradient(120deg, #f0f9ff 0%, #7dd3fc 45%, #1d4ed8 100%);
+}
+.sx-shp-hearth b {
+    width: 30px; height: 44px; font-size: 0;
+    border-radius: 50% 50% 45% 45% / 70% 70% 30% 30%;
+    background: radial-gradient(ellipse at 50% 78%, #fff7d6 0 16%, #fde047 34%, #fb923c 60%, #dc2626 100%);
+}
+.sx-shp-mono-body::after, .sx-shp-gmono-body::after { content: ''; }
+
+/* Null: the eye orb (rays anchor + erased-HUD marker) and the phantom figure */
+.sx-nul-anchor { width: 40px; height: 40px; font-size: 0; border-radius: 50%;
+    background: radial-gradient(circle, #e0e7ff 0 12%, #6366f1 14% 38%, #1e1b4b 40% 66%, #6366f1 68% 100%); }
+.sx-nul-orb { display: inline-block; width: 22px; height: 22px; border-radius: 50%;
+    background: radial-gradient(circle, #e0e7ff 0 12%, #6366f1 14% 38%, #1e1b4b 40% 66%, #6366f1 68% 100%);
+    box-shadow: 0 0 10px rgba(129, 140, 248, 0.9); }
+.sx-nul-phantom { width: 24px; height: 34px; font-size: 0;
+    border-radius: 50% 50% 8px 8px / 42% 42% 8px 8px;
+    background: radial-gradient(circle at 50% 20%, #e0e7ff 0 19%, transparent 21%), linear-gradient(180deg, transparent 0 40%, #818cf8 40% 100%); }
+
+/* Zenith: the crown */
+.sx-zen-crown { font-size: 0; }
+.sx-zen-crown::after {
+    content: ''; width: 56px; height: 40px;
+    clip-path: polygon(0 100%, 0 28%, 24% 58%, 50% 0, 76% 58%, 100% 28%, 100% 100%);
+    background: linear-gradient(180deg, #fde68a, #f59e0b 60%, #b45309);
+}
+
+/* ── Boss rework rules: finale titles fade after a moment, finale hint lines are never shown ── */
+.sx-nk-fin-hint, .sx-crp-hint { display: none !important; }
+.sx-nul-cd-label, .sx-shp-cd-label, .sx-nk-fin-banner,
+.sx-sir-cd, .sx-bar-cd, .sx-colo-cd {   /* these three hold nothing but the title: fade the whole plate */
+    animation: sx-fin-title-out 0.8s ease 2.6s forwards;
+}
+@keyframes sx-fin-title-out { to { opacity: 0; } }
+
+/* ── Boss rework audit: danger reads red, safe reads green ── */
+/* Gale: tornado-ladder lanes */
+.sx-gal-lane {
+    border-left-color: rgba(248, 113, 113, 0.85); border-right-color: rgba(248, 113, 113, 0.85);
+    background:
+        repeating-linear-gradient(0deg, rgba(248, 113, 113, 0) 0 46px, rgba(248, 113, 113, 0.14) 46px 92px),
+        linear-gradient(0deg, rgba(248, 113, 113, 0.26), rgba(248, 113, 113, 0.05));
+}
+.sx-gal-lane.hot { border-color: rgba(254, 202, 202, 0.95); background: linear-gradient(0deg, rgba(248, 113, 113, 0.45), rgba(248, 113, 113, 0.14)); }
+.sx-gal-lane-chev { color: rgba(254, 226, 226, 0.95); text-shadow: 0 0 10px rgba(239, 68, 68, 0.9); }
+/* Weaver: the threads that hurt are red, the open lane is a clear green */
+.sx-wvr-thread-v.sx-wvr-warn { background: repeating-linear-gradient(180deg, rgba(248, 113, 113, 0.9) 0 14px, transparent 14px 28px); }
+.sx-wvr-thread-h.sx-wvr-warn { background: repeating-linear-gradient(90deg, rgba(248, 113, 113, 0.9) 0 14px, transparent 14px 28px); }
+.sx-wvr-thread-v.sx-wvr-live { background: linear-gradient(90deg, transparent, #fecaca 30%, #fff 50%, #fecaca 70%, transparent); }
+.sx-wvr-thread-h.sx-wvr-live { background: linear-gradient(180deg, transparent, #fecaca 30%, #fff 50%, #fecaca 70%, transparent); }
+.sx-wvr-spoke-warn { background: repeating-linear-gradient(90deg, rgba(248, 113, 113, 0.9) 0 16px, transparent 16px 30px); }
+.sx-wvr-lane { z-index: 9002; background: rgba(74, 222, 128, 0.24); }
+
+.sx-stk-next-label { display: none; }   /* the preview piece needs no caption */
