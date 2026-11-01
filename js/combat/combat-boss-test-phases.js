@@ -92,7 +92,7 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'Bouncing Mayhem', desc: _bossTestTr('eg_boss_test_js_orbs', 'All fight: thin red lines fan out from the Jester, then juggling balls fly down them one after another and bounce off the walls. Step out of the lines.') },
         { name: 'Card Toss', desc: _bossTestTr('eg_boss_test_js_cards', 'At 60% HP: red circles fill on the floor (one on you) while playing cards fall into them. Be outside a circle when its card lands.') },
         { name: 'Juggler\u2019s Jinx', desc: _bossTestTr('eg_boss_test_js_jinx', 'At 60% HP: purple jinx balls drift after you in wide loops and bite; one gold luck ball drifts through the same space - touching it heals a little.') },
-        { name: 'THE GRAND FINALE', desc: _bossTestTr('eg_boss_test_js_final', 'At 10% HP: the stage becomes a 3x3 card table. Each round the red cards fill and strike - stand on a green card. Ten rounds, faster and harder each time (charge bar frozen).') },
+        { name: 'THE GRAND FINALE', desc: _bossTestTr('eg_boss_test_js_final', 'At 10% HP: the stage becomes a 3x3 card table. Each round the red cards fill and strike - stand on a green card. Six rounds, faster and harder each time (charge bar frozen).') },
     ],
     'boss_shaper': () => [
         { name: 'Glacier Rift', desc: _bossTestTr('eg_boss_test_shp_rift', 'All fight: an ICE WALL sweeps the whole arena, far faster than you can run. Green SAFE LANES (arrows show which way the wall travels) are cut into it - stand in one while it passes; red-hatched ground is the danger. Phase 2 sends a second wall from the other side, phase 3 one from above or below!') },

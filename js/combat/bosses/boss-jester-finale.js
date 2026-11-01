@@ -16,14 +16,13 @@ import { _nkBossAlive, _nkEl, _nkFrozen, _nkLoop, _nkNewRun, _nkPlayerCenter, _n
 
 const FIN_COLS = 3, FIN_ROWS = 3;
 const FIN_TOP = 84, FIN_BOTTOM = 70;               // keep clear of the HUD above and the toolbar below
-const FIN_INTRO_MS = 2200;
-const FIN_GAP_MS = 700;                            // pause between rounds
+const FIN_INTRO_MS = 1800;
+const FIN_GAP_MS = 500;                            // pause between rounds
 const FIN_FAILSAFE_MS = 120000;
 const FIN_SUITS = ['♠', '♥', '♦', '♣'];
-const FIN_ROUNDS = [                               // time until the strike, share of max life
-    { ms: 3000, dmg: 0.12 }, { ms: 2800, dmg: 0.13 }, { ms: 2700, dmg: 0.14 }, { ms: 2500, dmg: 0.15 },
-    { ms: 2300, dmg: 0.16 }, { ms: 2200, dmg: 0.18 }, { ms: 2100, dmg: 0.19 }, { ms: 2000, dmg: 0.20 },
-    { ms: 1900, dmg: 0.22 }, { ms: 1900, dmg: 0.24 },
+const FIN_ROUNDS = [                               // time until the strike, share of max life + shield
+    { ms: 2600, dmg: 0.22 }, { ms: 2300, dmg: 0.26 }, { ms: 2100, dmg: 0.30 },
+    { ms: 1900, dmg: 0.34 }, { ms: 1800, dmg: 0.38 }, { ms: 1700, dmg: 0.44 },
 ];
 
 let _finale = null;                                // the running finale (one at a time)
@@ -61,7 +60,7 @@ function _finPickSafe(round) {
         }
     }
     const safe = new Set([near[Math.floor(Math.random() * near.length)]]);
-    const want = round < 4 ? 3 : 2;
+    const want = round < 2 ? 3 : 2;
     while (safe.size < want) safe.add(Math.floor(Math.random() * FIN_COLS * FIN_ROWS));
     return safe;
 }

@@ -2182,13 +2182,24 @@ export function _nkShieldUp() {
 export let _nkLastHitAbsorbed = false;
 
 
+// What a boss-ability percentage is a share of: max life PLUS the full
+// absorption shield. Shield-heavy builds (L61 mathmagician: 1500 life, 2200
+// absorption) shrugged off every boss hit when it was life only; builds
+// without a shield are unaffected.
+function _nkHitBase() {
+    let shield = 0;
+    try { shield = Number(globalThis._computePlayerStats().absorption) || 0; } catch (e) { shield = 0; }
+    return _nkMaxHP() + Math.max(0, shield);
+}
+
 // Direct %maxHP hit through the normal intake (resists apply). The percent
 // itself is tier-scaled (_nkTierDamageFactor) so failed dodges sting less
 // on gentle bosses and harder on brutal ones - the damage companion to the
 // NK_TIER_FACTOR timing curve.
 export function _nkHit(pct, element, level) {
     const shielded = _nkShieldUp();
-    const dmg = Math.max(1, Math.round(_nkBoostFailedDodge(_nkMaxHP() * pct * _nkTierDamageFactor(level), _nkMaxHP())));
+    const base = _nkHitBase();
+    const dmg = Math.max(1, Math.round(_nkBoostFailedDodge(base * pct * _nkTierDamageFactor(level), base)));
     const dealt = (typeof _playerTakeDamage === 'function')
         ? _playerTakeDamage(dmg, true, element || null, level || 1, { isBossAbility: true }) : 0;
     _nkLastHitAbsorbed = shielded && dealt <= 0;
