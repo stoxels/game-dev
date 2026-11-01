@@ -1033,8 +1033,6 @@ export function _mechPriorBomb(monster, phase) {
     const targets = pool.slice(0, Math.min(count, pool.length));
     const mid = monster ? monster.id : null;
 
-    globalThis.showCombatToast(t(p >= 3 ? 'eg_mech_prior_bomb_cascade'
-        : (p >= 2 ? 'eg_mech_prior_bomb_fuse' : 'eg_mech_prior_bomb')).replace('{n}', targets.length));
     targets.forEach(([r, c]) => _priorBombArmCell(r, c, mid, fuseMs));
 
     // P3 keeps the pressure on: a delayed second bomb on the freshest fill.
@@ -2053,6 +2051,7 @@ export function _nkKillRun(run) {
 // Cancels only runs owned by one boss - add deaths must never nuke the
 // boss's own active mechanic. Called from _bossCleanup.
 export function _nkTeardownBoss(bossId) {
+    _nkSeenToasts.clear();
     Array.from(_nkRuns.values()).forEach(r => {
         if (r.bossId === bossId) _nkKillRun(r);
     });
@@ -2319,7 +2318,72 @@ export function _nkAbilityHitToast(dealt, bossName, abilityName, quiet) {
 }
 
 
+// Mechanic announcements are shown once per fight - the telegraph already
+// explains the attack, and repeating the toast on every cast buried the
+// combat log. Cleared when the boss is torn down.
+const _NK_ONCE_TOASTS = new Set([
+    'eg_mech_corrupt_cells', 'eg_mech_corrupt_spread', 'eg_mech_corrupt_rage', 'eg_mech_frozen_cells',
+    'eg_mech_frozen_creep', 'eg_mech_frozen_drift', 'eg_frozen_spread', 'eg_mech_tithe', 'eg_mech_tithe_lapse',
+    'eg_mech_tithe_debt', 'eg_mech_nul_window', 'eg_mech_bar_volley',
+    'eg_mech_nul_lattice',
+    'eg_mech_nul_rays',
+    'eg_mech_nul_erasure',
+    'eg_mech_nul_chilled',
+    'eg_gale_ladder',
+    'eg_gale_contract',
+    'eg_mech_bar_curtain_corrupt',
+    'eg_mech_bar_curtain',
+    'eg_mech_bar_supply',
+    'eg_mech_bar_shells',
+    'eg_mech_bar_bombs',
+    'eg_mech_sir_ion',
+    'eg_mech_sir_chain',
+    'eg_mech_sir_eye',
+    'eg_mech_quake',
+    'eg_mech_colo_boulder',
+    'eg_mech_colo_avalanche',
+    'eg_mech_colo_golem',
+    'eg_mech_warden_sentries',
+    'eg_mech_warden_solitary',
+    'eg_mech_warden_shift',
+    'eg_mech_totems',
+    'eg_mech_shp_monos',
+    'eg_mech_shp_walker',
+    'eg_mech_shp_icicles',
+    'eg_mech_shp_blizzard',
+    'eg_mech_shp_rift',
+    'eg_stk_place',
+    'eg_stk_hold',
+    'eg_stk_harddrop',
+    'eg_stk_lineclear',
+    'eg_stk_garbage',
+    'eg_stk_hd_end',
+    'eg_stk_lc_end',
+    'eg_stk_gr_end',
+    'eg_mech_cyclops',
+    'eg_mech_cyclops_gaze',
+    'eg_mech_weaver',
+    'eg_mech_weaver_wheel',
+    'eg_mech_executioner',
+    'eg_mech_executioner_guillotine',
+    'eg_mech_dreadnought',
+    'eg_mech_searchlight',
+    'eg_mech_zenith',
+    'eg_mech_crown',
+]);
+const _nkSeenToasts = new Set();
+// Finale announcements are skipped: the finale's own title already shows the name.
+const _NK_TITLE_TOASTS = new Set([
+    'eg_mech_nul_final_cd', 'eg_mech_bar_final_cd', 'eg_mech_sir_final_cd', 'eg_mech_colo_final_cd',
+    'eg_mech_shp_final_cd', 'eg_mech_warden_final',
+]);
+
 export function _nkToast(key, fallback, color) {
+    if (_NK_TITLE_TOASTS.has(key)) return;
+    if (_NK_ONCE_TOASTS.has(key)) {
+        if (_nkSeenToasts.has(key)) return;
+        _nkSeenToasts.add(key);
+    }
     let msg = fallback;
     try {
         const raw = t(key);
@@ -2335,6 +2399,9 @@ export function _nkToast(key, fallback, color) {
         const m = String(fallback).match(/-?\d+(?:\.\d+)?/);
         if (m) msg = msg.replace('{n}', m[0]);
     }
+    // An announcement is just the attack's name: the instruction half ("... - stand in the
+    // green lane!") is cut, the telegraph on screen already shows what to do.
+    if (_NK_ONCE_TOASTS.has(key)) msg = msg.replace(/(?: - |! ).*$/, '');
     if (typeof showCombatToast === 'function') return globalThis.showCombatToast(msg, color);
 }
 
