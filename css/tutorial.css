@@ -219,6 +219,45 @@ body.tq-spellbook-open .tq-aside-bubble {
 .tq-bubble.show {
     pointer-events: auto;        /* Continue button clickable only while shown */
 }
+/* Small screens: when the bubble would cover the puzzle grid, JS adds
+   .tq-stacked (see _tqLayoutProfessor). The Professor then stands in the free
+   strip right of the grid with the bubble ABOVE him, sized to that strip. */
+#tq-professor-wrap.tq-stacked {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 14px;
+    top: 8px;
+    transform: none;
+    max-width: var(--tq-free-w, 100vw);
+}
+#tq-professor-wrap.tq-stacked .tq-professor-avatar {
+    width: clamp(64px, 7vw, 110px);
+}
+#tq-professor-wrap.tq-stacked .tq-bubble {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    order: -1;
+    width: var(--tq-bubble-w, 220px);
+    box-sizing: border-box;
+    padding: 8px 12px;
+    font-size: clamp(12px, 1.2vw, 15px);
+    transform-origin: bottom right;
+}
+#tq-professor-wrap.tq-stacked .tq-bubble::after {
+    right: 34px;
+    bottom: -9px;
+    border: 9px solid transparent;
+    border-bottom: 0;
+    border-top-color: #222;
+}
+#tq-professor-wrap.tq-stacked .tq-bubble::before {
+    right: 36px;
+    bottom: -6px;
+    border: 7px solid transparent;
+    border-bottom: 0;
+    border-top-color: #fdfdfd;
+}
 /* Tail on the RIGHT edge of the bubble pointing AT the Professor - he sits
    to the bubble's right, so game.css's down-left avatar tail is fully
    re-aimed: apex out of the bubble's right border, reaching his portrait. */

@@ -459,6 +459,42 @@ function _tqFormatLine(textKey) {
     return line;
 }
 
+// Keeps the Professor and his speech bubble clear of the puzzle grid on small
+// screens. Normally the bubble sits left of him. When that would cover the
+// grid, he switches to a stacked layout (bubble above him) and everything is
+// squeezed into the free strip right of the grid. Checked every frame because
+// the grid is re-fitted whenever the window or the puzzle changes.
+function _tqLayoutProfessor(wrap) {
+    const first = document.getElementById('g-0-0');
+    if (!first || wrap.style.display === 'none') return;
+    const cols = (typeof cur !== 'undefined' && cur && cur.cols) ? cur.cols : 5;
+    const rows = (typeof cur !== 'undefined' && cur && cur.rows) ? cur.rows : 5;
+    const last = document.getElementById(`g-${rows - 1}-${cols - 1}`) || first;
+    const gridRight = last.getBoundingClientRect().right;
+    const margin = 18;
+    const free = window.innerWidth - margin - (gridRight + 14);
+    const avatarW = Math.max(84, Math.min(140, window.innerWidth * 0.10));
+    const sideBubbleW = Math.min(420, window.innerWidth * 0.46);
+    const fitsBeside = free >= avatarW + 12 + sideBubbleW;
+    const bubbleW = fitsBeside ? sideBubbleW : Math.max(170, Math.min(sideBubbleW, free));
+    wrap.classList.toggle('tq-stacked', !fitsBeside);
+    wrap.style.setProperty('--tq-bubble-w', Math.round(bubbleW) + 'px');
+    wrap.style.setProperty('--tq-free-w', Math.round(Math.max(free, 0)) + 'px');
+    // The meet-circle hangs off the Professor, so it follows him.
+    if (_tqMeetCircle && _tqMeetCircle.el._tqPlace) _tqMeetCircle.el._tqPlace();
+}
+
+// Starts the per-frame layout check for the Professor (stops by itself once
+// his wrap is removed from the page).
+function _tqStartProfessorLayoutLoop(wrap) {
+    const tick = () => {
+        if (!wrap.isConnected) return;
+        try { _tqLayoutProfessor(wrap); } catch (e) { /* grid not built yet */ }
+        requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+}
+
 // Ensures the Professor's avatar + speech bubble exist on the game screen.
 // The bubble reuses the player's banter bubble markup/styles
 // (.char-speech-bubble in css/game.css) so both speakers share the same
@@ -479,6 +515,7 @@ function _tqEnsureBubbleDom() {
             </div>
         </div>`;
     document.getElementById('screen-game').appendChild(wrap);
+    _tqStartProfessorLayoutLoop(wrap);
     // stopPropagation: the Continue click must not reach document-level
     // handlers - the inventory flyout's "click outside un-pins" listener
     // would otherwise close the flyout the tutorial just pinned open.
@@ -691,7 +728,10 @@ function _tqShowMeetCircle() {
         // Circle centre: below-left of the Professor, clear of the speech
         // bubble (which floats above him) - comfortably reachable from the
         // avatar's start anchor in the top-left.
-        const cx = rect.left - r - 30;
+        // Stacked (small-screen) layout: the left side is the puzzle grid,
+        // so the circle goes straight below the Professor instead.
+        const stacked = wrap.classList.contains('tq-stacked');
+        const cx = stacked ? rect.right - r : rect.left - r - 30;
         const cy = Math.min(window.innerHeight - r - 20, rect.bottom + r + 24);
         el.style.left = Math.round(cx - r) + 'px';
         el.style.top = Math.round(cy - r) + 'px';
@@ -865,6 +905,7 @@ function _tqHighlightCell(row, col) {
 function _tqClearHighlights() {
     document.querySelectorAll('.tq-hl').forEach(el => el.classList.remove('tq-hl'));
     document.querySelectorAll('.tq-cell-hl').forEach(el => el.classList.remove('tq-cell-hl'));
+    document.querySelectorAll('.tq-point-target').forEach(el => el.classList.remove('tq-point-target'));
     _tqHidePointerLine();
     _tqClearKeycapChip();
 }
@@ -934,7 +975,7 @@ function _tqUpdatePointerLine() {
     // Current target: the pulsing cell first (the usual case), else any
     // generic .tq-hl highlight (HUD widget, clue headers, candle slot).
     const cell = document.querySelector('.tq-cell-hl');
-    const other = document.querySelector('.tq-hl');
+    const other = document.querySelector('.tq-point-target') || document.querySelector('.tq-hl');
     const target = cell || other;
     if (!target) { _tqHidePointerLine(); return; }
     const p = prof.getBoundingClientRect();
@@ -1006,6 +1047,9 @@ function _tqPointAt(sel) {
 function _tqHighlightCandleSlot() {
     _tqHighlight('.inv-slot[data-def-id="reveal1"]');
     _tqHighlight('.inv-cat-btn[data-group="Reveal"]');
+    // The pointer line aims at the candle itself, not at the button.
+    document.querySelectorAll('.inv-slot[data-def-id="reveal1"]')
+        .forEach(el => el.classList.add('tq-point-target'));
 }
 
 // Opens (pins) the Reveal inventory flyout so the candle slot actually
@@ -1130,6 +1174,15 @@ function _tqShowGridLockBorder() {
     border._tqReposition = place;
     window.addEventListener('resize', place, { passive: true });
     wrap.addEventListener('wheel', place, { passive: true });
+    // The grid is re-fitted to the window after this border appears (and on
+    // every browser resize / zoom), so keep following it every frame until
+    // the border is removed.
+    const follow = () => {
+        if (!border.isConnected) return;
+        place();
+        requestAnimationFrame(follow);
+    };
+    requestAnimationFrame(follow);
 }
 
 // Hides the red lock border (idempotent).
@@ -1502,6 +1555,20 @@ function _tqStartParryArena() {
     }
 }
 
+// Candle lesson: the inventory bar redraws its slots after the candle is
+// granted, which wipes the highlight (and with it the Professor's pointer
+// line) from the new slot. Re-applies both whenever the slot has lost them.
+function _tqKeepCandleHighlight() {
+    let slot = document.querySelector('.inv-slot[data-def-id="reveal1"]');
+    if (!slot) {
+        _tqOpenRevealFlyout();
+        slot = document.querySelector('.inv-slot[data-def-id="reveal1"]');
+    }
+    if (!slot || slot.classList.contains('tq-hl')) return;
+    _tqHighlightCandleSlot();
+    _tqShowPointerLine();
+}
+
 // Starts polling for a task's completion.
 function _tqStartTask(name) {
     if (_tqPollTimer) clearInterval(_tqPollTimer);
@@ -1509,6 +1576,7 @@ function _tqStartTask(name) {
     if (!pred) { _tqRunCurrentPhase(); return; }
     _tqPollTimer = setInterval(() => {
         try { _tqScanDemoOutcome(); } catch (e) {}
+        if (name === 'use_candle') _tqKeepCandleHighlight();
         let done = false;
         try { done = pred(); } catch (e) { done = false; }
         if (done) {

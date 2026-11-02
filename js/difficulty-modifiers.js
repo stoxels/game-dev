@@ -77,9 +77,11 @@ export function campaignMistakeCap(diff, cells, bonus = 0) {
 }
 
 // Mistake cap for a level object (needs .grid) at the current difficulty,
-// or null while the budget is off / the level has no grid.
+// or null while the budget is off / the level has no grid. The tutorial never
+// has a cap: learners may make as many mistakes as they like.
 export function campaignCapForLevel(level, bonus = 0) {
     if (!CAMPAIGN_BUDGET_ACTIVE || !level || !level.grid || !level.grid[0]) return null;
+    if (level.isTutorialQuest) return null;
     return campaignMistakeCap(curDiff, level.grid.length * level.grid[0].length, bonus);
 }
 
