@@ -34,6 +34,16 @@ const BEAR_TIME_LOSS_S_BY_RANK = {
     3: 5,
 };
 
+// CSS-drawn companion icons (styled in css/classes/random-walker.css).
+// Sizes are in em, so the same markup fits the grid and the HUD cards.
+const BEAR_ICON_HTML = '<span class="sx-rw-bear sx-rw-bear--brown"><span class="sx-rw-bear-body"></span>'
+    + '<span class="sx-rw-bear-head"><span class="sx-rw-bear-eyes"></span><span class="sx-rw-bear-snout"></span></span></span>';
+const PANDA_ICON_HTML = BEAR_ICON_HTML.replace('sx-rw-bear--brown', 'sx-rw-bear--panda');
+const DOG_ICON_HTML = '<span class="sx-rw-dog"><span class="sx-rw-dog-tail"></span><span class="sx-rw-dog-body"></span>'
+    + '<span class="sx-rw-dog-collar"></span><span class="sx-rw-dog-head"><span class="sx-rw-dog-eye"></span></span></span>';
+const POOP_ICON_HTML = '<span class="sx-rw-poop"><span></span></span>';
+const BURST_ICON_HTML = '<span class="sx-rw-burst"></span>';
+
 // Path generation safety cap - prevents infinite loops on large grids
 const BEAR_PATH_EMERGENCY_STOP = 1500;
 
@@ -186,7 +196,7 @@ function _buildBearPath(startR, rows, cols, startC = 0) {
 //------------------------------------------------------------------------
 
 // Creates the floating bear DOM element and sets its initial CSS.
-// Layout: remaining-time number on top, bear emoji below.
+// Layout: remaining-time number on top, CSS-drawn bear below.
 function _createBearElement(icon, stepDurationMs) {
     const el = document.createElement('div');
     el.className = 'random-walker-agent bear-agent';
@@ -338,14 +348,14 @@ export function _executeBrownianMotion(row, col, paths, rank) {
             'avatar-companion-brownian',
             path1[0].r, path1[0].c,
             () => {
-                _startBearAnimation(path1, "🐻", stepDurationMs, "Browney", "#f1c40f", rank);
-                if (path2) _startBearAnimation(path2, "🐼", stepDurationMs, "Wiener", "#95a5a6", rank);
+                _startBearAnimation(path1, BEAR_ICON_HTML, stepDurationMs, "Browney", "#f1c40f", rank);
+                if (path2) _startBearAnimation(path2, PANDA_ICON_HTML, stepDurationMs, "Wiener", "#95a5a6", rank);
             },
             null
         );
     } else {
-        _startBearAnimation(path1, "🐻", stepDurationMs, "Browney", "#f1c40f", rank);
-        if (path2) _startBearAnimation(path2, "🐼", stepDurationMs, "Wiener", "#95a5a6", rank);
+        _startBearAnimation(path1, BEAR_ICON_HTML, stepDurationMs, "Browney", "#f1c40f", rank);
+        if (path2) _startBearAnimation(path2, PANDA_ICON_HTML, stepDurationMs, "Wiener", "#95a5a6", rank);
     }
 
     return true;
@@ -405,7 +415,7 @@ function _createDrifterElement(intervalMs) {
         <div style="width:30px;height:5px;background:rgba(0,0,0,0.7);border:1px solid #48c9b0;border-radius:3px;margin-bottom:4px;overflow:hidden;">
             <div id="drifter-healthbar" style="width:0%;height:100%;background:#1abc9c;transition:width 0.3s;"></div>
         </div>
-        <div id="drifter-icon">🐶</div>
+        <div id="drifter-icon">${DOG_ICON_HTML}</div>
         <div id="drifter-timer-text" style="font-size:12px;color:#f1c40f;font-family:monospace;font-weight:bold;margin-top:2px;">${_drifterTimeRemainingSeconds}s</div>
     `;
     document.body.appendChild(el);
@@ -502,7 +512,7 @@ window.feedDrifter = function () {
 //--------------------DRIFTER - EXPLOSION PHASE--------------------------
 //------------------------------------------------------------------------
 
-// Strips the drifter's level UI and replaces the icon with a poop emoji
+// Strips the drifter's level UI and replaces the dog with the CSS poop bomb
 // to signal the incoming explosion.
 function _drifterPrepareExplosionVisual(el) {
     document.getElementById('drifter-lvl-text')?.remove();
@@ -512,7 +522,7 @@ function _drifterPrepareExplosionVisual(el) {
     el.style.transition = 'none';
 
     const iconEl = document.getElementById('drifter-icon');
-    if (iconEl) iconEl.innerHTML = "💩";
+    if (iconEl) iconEl.innerHTML = POOP_ICON_HTML;
 
     return iconEl; // Returned so the fuse countdown can be inserted before it
 }
@@ -569,7 +579,7 @@ function _drifterPoopExplosion(el, r, c, rows, cols) {
 
     const iconEl = _drifterPrepareExplosionVisual(el);
     const fuseEl = _drifterCreateFuseElement(el, iconEl, 3);
-    const hudUid = _spawnWalkerHudIndicator("💥", t('cls_fuse_countdown'), 3);
+    const hudUid = _spawnWalkerHudIndicator(BURST_ICON_HTML, t('cls_fuse_countdown'), 3);
 
     Audio_Manager.playSFX('drifterPoop');
 
@@ -687,7 +697,7 @@ export function _executeSummonDrifter(duration, interval, smartTarget) {
     // Avatar combat animation is handled centrally in
     // _dispatchAscendencyAbility (slot active4 → drifter).
 
-    const hudUid = _spawnWalkerHudIndicator("🐶", "Drifter", _drifterTimeRemainingSeconds, true);
+    const hudUid = _spawnWalkerHudIndicator(DOG_ICON_HTML, "Drifter", _drifterTimeRemainingSeconds, true);
 
     // Charge the dog companion sprite to the starting cell, then begin roaming
     const _beginDrifterRoam = () => {
@@ -760,7 +770,7 @@ function _createHudCard(uniqueId, icon, label, initialSeconds) {
         animation: walkerHudSlide 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
     `;
     el.innerHTML = `
-        <span style="font-weight: bold;">${icon} ${label}</span>
+        <span style="font-weight: bold;"><span class="sx-rw-hud-icon">${icon}</span> ${label}</span>
         <span id="${uniqueId}-timer" style="color:#f1c40f;font-weight:bold;font-family:monospace;">${initialSeconds}s</span>
     `;
     return el;
