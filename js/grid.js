@@ -1278,8 +1278,13 @@ export function buildReveal() {
     const ct = document.getElementById('ov-reveal');
     const wrap = document.getElementById('ov-top-half'); // new container
 
-    const availW = wrap.clientWidth * 0.94;
-    const availH = wrap.clientHeight * 0.94;
+    // The container's padding (the win screen keeps room for the title plaque
+    // there) is not drawing space.
+    const wrapStyle = getComputedStyle(wrap);
+    const padX = parseFloat(wrapStyle.paddingLeft) + parseFloat(wrapStyle.paddingRight);
+    const padY = parseFloat(wrapStyle.paddingTop) + parseFloat(wrapStyle.paddingBottom);
+    const availW = (wrap.clientWidth - padX) * 0.94;
+    const availH = (wrap.clientHeight - padY) * 0.94;
     const gap = 3;
 
     // Fit independently on each axis, then take the smaller cell size

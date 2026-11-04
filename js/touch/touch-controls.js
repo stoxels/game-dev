@@ -25,9 +25,12 @@ import { keybindKeyFor } from '../keybinds.js';
 import { t } from '../translation/translations.js';
 
 const ZONE_SIZE_PX = 190;     // side of the square touch zone
-const STICK_RADIUS_PX = 52;   // how far the knob can travel from its base
-const AXIS_THRESHOLD = 0.38;  // fraction of the radius before a direction engages
-const VISIBILITY_POLL_MS = 400;
+const STICK_RADIUS_PX = 56;   // how far the knob can travel from its base
+const DEAD_ZONE = 0.22;       // fraction of the radius the thumb must leave the centre before walking starts
+const DEAD_ZONE_RELEASE = 0.14; // ...and walking only stops again inside this smaller circle (no flicker)
+const DIAGONAL_SIN = 0.42;    // a direction engages when the thumb points this far (sine of the angle) toward it
+const DIAGONAL_SIN_HOLD = 0.3; // an already-pressed direction stays on until the angle drops below this
+const VISIBILITY_POLL_MS = 150;
 
 // Action buttons. `action` is a keybind id (js/keybinds.js); `key` sends a
 // fixed key instead (Escape = pause / close, not rebindable in this game);
@@ -136,6 +139,11 @@ function onPointerDown(e) {
     e.preventDefault();
 }
 
+// Moves the knob to where the thumb is and presses the matching keys. The
+// base follows the thumb when it is dragged past the edge, so reversing
+// direction never needs a long swipe back across the whole stick. Directions
+// come from the angle of the thumb (8 ways), so pushing mostly "up" no longer
+// also triggers a sideways step from a little drift.
 function onPointerMove(e) {
     if (e.pointerId !== activePointer) return;
     let dx = e.clientX - originX;
@@ -143,17 +151,25 @@ function onPointerMove(e) {
     const radius = STICK_RADIUS_PX * stickScale;
     const dist = Math.hypot(dx, dy);
     if (dist > radius) {
-        dx = (dx / dist) * radius;
-        dy = (dy / dist) * radius;
+        originX += (dx / dist) * (dist - radius);
+        originY += (dy / dist) * (dist - radius);
+        dx = e.clientX - originX;
+        dy = e.clientY - originY;
+        const r = zone.getBoundingClientRect();
+        placeBase((originX - r.left) / stickScale, (originY - r.top) / stickScale);
     }
+    const len = Math.hypot(dx, dy);
     knob.style.transform = `translate(calc(-50% + ${dx / stickScale}px), calc(-50% + ${dy / stickScale}px))`;
-    const thr = radius * AXIS_THRESHOLD;
-    setDirections({
-        up: dy < -thr,
-        down: dy > thr,
-        left: dx < -thr,
-        right: dx > thr,
-    });
+    const moving = pressed.up || pressed.down || pressed.left || pressed.right;
+    const dead = radius * (moving ? DEAD_ZONE_RELEASE : DEAD_ZONE);
+    if (len <= dead) {
+        releaseAll();
+    } else {
+        const ux = dx / len;
+        const uy = dy / len;
+        const on = (dir, component) => component > (pressed[dir] ? DIAGONAL_SIN_HOLD : DIAGONAL_SIN);
+        setDirections({ up: on('up', -uy), down: on('down', uy), left: on('left', -ux), right: on('right', ux) });
+    }
     e.preventDefault();
 }
 
@@ -300,11 +316,30 @@ function placeCluster() {
     cluster.style.bottom = bottom + 'px';
 }
 
+// Keep the joystick zone above the inventory / toolkit bar and above its open
+// item tray. The zone is a big invisible square that grabs every touch and
+// mouse move inside it, so where it covered the bar or the tray (Reveal and
+// its candle) taps moved the joystick and the tray closed under the pointer.
+// A zone the player dragged somewhere in the layout editor (explicit top) stays put.
+function placeZone() {
+    if (zone.style.top) return;
+    let top = window.innerHeight;
+    for (const id of ['inv-panel', 'inv-flyout']) {
+        const el = document.getElementById(id);
+        if (!el || (id === 'inv-flyout' && !el.classList.contains('open'))) continue;
+        const r = el.getBoundingClientRect();
+        if (r.height > 0 && r.top < top) top = r.top;
+    }
+    const bottom = top < window.innerHeight ? Math.round(window.innerHeight - top + 6) : 12;
+    zone.style.bottom = bottom + 'px';
+}
+
 function refreshVisibility() {
     const show = !!SETTINGS.touchControls && avatarVisible();
     cluster.hidden = !show;
     document.documentElement.classList.toggle('touch-controls-on', show);
     if (show) {
+        placeZone();
         placeCluster();
         syncModeButton();
     }

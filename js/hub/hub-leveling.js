@@ -3,6 +3,7 @@ import { setAchStat } from '../achievements/achievements.js';
 import { _resetPlayerMana, gainMana } from '../classes/class-mana.js';
 import { _incDirect } from '../inference/inference-stats.js';
 import { ptEffectChannels, ptNodeHasEffects } from '../probability-tree/pt-effects.js';
+import { isMonsterless } from '../difficulty-modifiers.js';
 import { STATE, cur, save } from '../state.js';
 import { t } from '../translation/translations.js';
 import { _getRevealProjectileDamagePct } from '../combat/combat-class-projectiles-reveal.js';
@@ -16,6 +17,7 @@ import { _cancelAbsorptionRegen, _computePlayerStats, _getAllEquippedItems } fro
 import { PLAYER_BASE_ATTRIBUTES, _findUnmetRequirements, _getUnmetRequirementsText } from '../loot/loot-requirements.js';
 import { _isActive } from '../combat/combat-state.js';
 import { TALENT_TREE_DATA } from '../probability-tree/probability-tree-data.js';
+import { MONSTERLESS_TREE_DATA } from '../probability-tree/probability-tree-data-monsterless.js';
 
 //------------------------------------------------------------------------
 //-------------------CHARACTER LEVELING-----------------------------------
@@ -165,11 +167,19 @@ const _PASSIVE_TREE_NOTABLE_BONUSES = {};
 // keep granting nothing.
 const _PASSIVE_TREE_SMALL_BONUSES = {};
 
-const _PASSIVE_TREE_NODES_BY_ID = new Map(
-    Array.isArray(TALENT_TREE_DATA?.nodes)
-        ? TALENT_TREE_DATA.nodes.map(node => [node.id, node])
-        : []
-);
+const _passiveTreeNodeMaps = new Map();   // tree data -> id lookup
+
+// The id lookup for the save's passive tree (monsterless saves use their own).
+function _passiveTreeNodesById() {
+    const state = globalThis.STATE;
+    const data = state && state.monsterless ? MONSTERLESS_TREE_DATA : TALENT_TREE_DATA;
+    let map = _passiveTreeNodeMaps.get(data);
+    if (!map) {
+        map = new Map(Array.isArray(data.nodes) ? data.nodes.map(node => [node.id, node]) : []);
+        _passiveTreeNodeMaps.set(data, map);
+    }
+    return map;
+}
 
 function _getPassiveTreeTravelBonuses() {
     const totals = { glassClockTimerLessPct: 0, glassClockGain: 0, noFillTimeGain: 0, mistakeTimeCostMorePct: 0, marathon: 0, str: 0, agi: 0, int: 0, mana: 0, armourFlat: 0, armourIncPct: 0, lifeRegenPct: 0, lifeRegenFlat: 0, accuracy: 0, accuracyIncPct: 0, movementSpeedPct: 0, absorptionFlat: 0, absorptionIncPct: 0, absorptionRegenRatePct: 0, spellDamageIncPct: 0, meleePhysIncPct: 0, meleePhys1HIncPct: 0, meleePhysHeavyIncPct: 0, meleeChargeSpeedPct: 0, attackSpeedPct: 0, physDamageIncPct: 0, elementalDamageIncPct: 0, fireDamageIncPct: 0, coldDamageIncPct: 0, lightningDamageIncPct: 0, castSpeedPct: 0, fireCastSpeedPct: 0, coldCastSpeedPct: 0, lightningCastSpeedPct: 0, fireResistFlat: 0, coldResistFlat: 0, lightningResistFlat: 0, fireResistMax: 0, healthFlat: 0, healthIncPct: 0, manaIncPct: 0, manaLessPct: 0, allElementalResist: 0, castingAilmentAvoidPct: 0, reflectPhysFlat: 0, blockChanceTree: 0, blockRecoveryPct: 0, blockArmorPulse: 0, igniteDurationPct: 0, bleedDurationPct: 0, meleeRangeM: 0, meleeSplashBaseM: 0, lifeLeechMeleePct: 0, timerStartSecs: 0, mistakeCountTree: 0, mistakeNotCountTreePct: 0, lifeOnLine: 0, absorptionOnLine: 0, manaOnLine: 0, chargeOnLinePct: 0, enduranceOnLinePct: 0, frenzyOnLinePct: 0, powerOnLinePct: 0, armourPerStreak: 0, blockFlawlessPct: 0, mistakeHeal: 0, damagePerStreakPct: 0, damageFlawlessPct: 0, damageLowTimePct: 0, damageAfterLinePct: 0, revealProjectileDamagePct: 0, damageOnMistakePct: 0, timeOnKill: 0, timeOnElite: 0, timerFreezeOnStun: 0, cellOnKillPct: 0, markOnKillPct: 0, quickFillStreakPct: 0, firstStepTreeSecs: 0, pickupLifetimeSecs: 0, luckyTileRewardAmount: 0, regenLowTimePct: 0, quizHintPct: 0, quizRetryPct: 0, quizTimeSecs: 0, itemDropPct: 0, itemEffectPct: 0, retaliationWardBleed: 0, retaliationWardIgnite: 0, meleeAoEPct: 0, lifeLeechPct: 0, impaleChanceHeavyPct: 0, impaleEffectHeavyPct: 0, impaleEffectFreshPct: 0, impaleDurationPct: 0, blockChanceShieldPct: 0, meleePhysShieldIncPct: 0, attackPhysShieldIncPct: 0, shieldDefencePct: 0, enduranceOnKillShieldPct: 0, enduranceChargesMax: 0, enduranceDurationPct: 0, lifeRegenPerEndurancePct: 0, meleePhysSwordIncPct: 0, meleePhysAxeIncPct: 0, swordChargeSpeedPct: 0, accuracySwordFlat: 0, ignorePhysReductionPct: 0, intimidateChanceMeleePct: 0, intimidateMeleeAmpPct: 0, bleedChanceMeleePct: 0, bleedChanceAttackPct: 0, bleedSpeedPct: 0, lifeRegenRatePct: 0, axeChargeSpeedPct: 0, rageOnHitAxe: 0, rageMeleeMorePct: 0, rageMax: 0, meleePhysMaceIncPct: 0, areaOfEffectPct: 0, stunChanceMaceChargedPct: 0, stunDurationPct: 0, coldResistMax: 0, lightningResistMax: 0, allElementalResistMax: 0, stunChanceHeavyPct: 0, stunDurationHeavyPct: 0, stunDoubleChancePct: 0, meleeDoubleDamageChancePct: 0, meleeSpellManaCostReducedPct: 0, meleeSpellLifeCostPct: 0, meleeKillExplodeChancePct: 0, healthMorePct: 0, manaRemoved: 0, spellsCostLife: 0, spellCostIncPct: 0, damageToFirePct: 0, onlyFireDamage: 0, critChanceMeleeMacePct: 0, critMultiplierMeleeMacePct: 0, igniteDamageMorePct: 0, physDotMorePct: 0, physAsExtraFirePct: 0, physAsExtraFireTimedPct: 0, crushPhysReductionPct: 0, lifeRegenLessPct: 0, lifeLeechLessPct: 0, absorptionRechargesLife: 0, projectileDamageIncPct: 0, projectileSpeedPct: 0, projectileCritChancePct: 0, bowSpellDamageIncPct: 0, bowSpellDotIncPct: 0, stunAvoidPct: 0, evasionFlat: 0, evasionIncPct: 0, manaHealIncPct: 0, manaOnMeleeHitChargedPct: 0, parrySpellChancePct: 0, critChanceMeleePct: 0, projectileElementalDamageIncPct: 0, projectileCritMultiplierPct: 0, heartHealFlat: 0, manaOnProjectileHitPct: 0, bowSpellManaCostReducedPct: 0, frenzyChargesMax: 0, frenzyDurationPct: 0, evasionPerFrenzyChargePct: 0, lifeOnProjectileHit: 0, lifeBurstOnProjectileHitChancePct: 0, heartSpawnIncPct: 0, manaSpawnIncPct: 0, poisonChanceAttackPct: 0, poisonDotMultiPct: 0, lifeOnMeleeHit: 0, lifeOnAttackHit: 0, dotIncPct: 0, skillEffectDurationPct: 0, lifeLeechEffectIncPct: 0, shadowResistFlat: 0, critChanceFlat: 0, dotIncDaggerPct: 0, critMultiplierDaggerPct: 0, poisonDurationPct: 0, critDotMultiPct: 0, shadowDamageIncPct: 0, manaOnKillFlat: 0, damageIncPct: 0, critChanceDaggerPct: 0, bleedAvoidPct: 0, poisonAvoidPct: 0, lifeOnKillFlat: 0, critMultiplierFlatPct: 0, manaRegenIncPct: 0, spellCritChancePct: 0, spellCritMultiplierPct: 0, chillEffectIncPct: 0, absorptionLeechSpellPct: 0, absorptionLeechEffectIncPct: 0, physAsExtraShadowPct: 0, lifeRecoupPct: 0, daggerDamageIncPct: 0, lifeLeechAsAbsorption: 0, absorptionNoRecharge: 0, daggerChargeSpeedPct: 0, absorptionOnKillFlat: 0, shockAvoidPct: 0, igniteAvoidPct: 0, chillAvoidPct: 0, elementalAilmentAvoidPct: 0, igniteChancePct: 0, attacksNeverMiss: 0, movementSpeedLessPct: 0, noRepeatTarget: 0, singleElementMorePct: 0, lastElementResistPct: 0, absorptionStopsWhileAttacking: 0, absorptionRegenDelaySecs: 0, evasionToArmour: 0, agilityNoEvasion: 0, lifeLeechInstant: 0, lifeOnlyFromLeech: 0, windDancerLessPct: 0, windDancerEvadePct: 0, windDancerMorePct: 0, lifeBecomesOne: 0, shadowImmune: 0, chilledColdTaken: 0, damageToColdPct: 0, onlyColdDamage: 0, bleedStackMax: 0, bleedLessPct: 0, absorptionRemoved: 0, manaToLifePct: 0, elementalOverloadPct: 0, critsNoExtraDamage: 0, dotMultiEqualsCrit: 0, nonCritNoAilments: 0, absorptionRegenUninterrupted: 0, absorptionRegenLessPct: 0, armourDefendDouble: 0, maxDamageReductionCap: 0, spellDmgLowLifeMorePct: 0, damageFromManaPct: 0, ghostDance: 0, ghostShroudMax: 0, ghostShroudRecoverPct: 0, blockDoubled: 0, blockedHitTakenPct: 0, damageToLightningPct: 0, onlyLightningDamage: 0, lightningMaxMorePct: 0, lightningMinLessPct: 0, cannotEvade: 0, cannotBeStunned: 0, pointBlankPct: 0, blockMaxAttackLess: 0, blockMaxSpellLess: 0, spellBlockPerOvercap: 0, dodgeChanceTreePct: 0, armourLessPct: 0, absorptionLessPct: 0, spellCostFromAbsorption: 0, strengthSpellDamage: 0, lifeRegenToAbsorption: 0, preciseTechniquePct: 0, neverCrit: 0, impaleSpread: 0, impaleExtra: 0, impaleLockout: 0, secondaryDamagePct: 0, pierceChanceTreePct: 0, pierceTargetsExtra: 0, chainChanceTreePct: 0, chainCountExtra: 0, forkChancePct: 0, forkExtraChancePct: 0, multishotChanceTreePct: 0, costEfficiencyPct: 0, onslaughtEffectPct: 0, onslaughtOnKillPct: 0, onslaughtDefencePct: 0, leechEffectRecentCritPct: 0, wandLightningDamageIncPct: 0, bowAoePct: 0, dmgFullAbsorptionPct: 0, critMultiHeavy: 0, dmgVsLowLifePct: 0, aoeRecentKillPct: 0, ailmentDurationTakenPct: 0, chillShockTakenPct: 0, spellDotMultiPct: 0, manaLeechAttackPct: 0, spellBlockFlat: 0, dmgRecentShockPct: 0, shockDurationPct: 0, shockEffectPct: 0, lifePulsePct: 0, dotFasterPct: 0, enduranceMin: 0, enduranceOnKillPct: 0, damagePerEndurancePct: 0, enduranceWhenHitPct: 0, lowLifeRegenPct: 0, physTakenFlat: 0, manaLeechEffectPct: 0, critVsBleedingPct: 0, critMultiVsBleedingPct: 0, avoidPhysHitPct: 0, armourIfHitPct: 0, evasionIfNotHitPct: 0, igniteFasterPct: 0, freezeDurationPct: 0, critVsShockedPct: 0, shadowResDouble: 0, armourPerEndurancePct: 0, moveSpeedPerFrenzyPct: 0, chargeSpeedPerFrenzyPct: 0, stunPerEndurancePct: 0, aoePerEndurancePct: 0, areaDamagePct: 0, shieldElementalRes: 0, ailmentEffectTreePct: 0, blindDurationPct: 0, chillDurationPct: 0, poisonChanceSpellPct: 0, igniteDurationTakenPct: 0, shockEffectTakenPct: 0, chillEffectTakenPct: 0, freezeDurationTakenPct: 0, spellDotIncPct: 0, critPerPowerCharge: 0, manaRegenPerPowerPct: 0, critMultiPerPowerCharge: 0, shieldCastSpeedPct: 0, shieldSpellDamagePct: 0, spellDamagePerPowerPct: 0, shieldAbsorptionPct: 0, rageDecaySlowerPct: 0, ragePerArmourPct: 0, rageWhenHitAmount: 0, powerChargesMax: 0, powerDurationPct: 0, powerOnCritPct: 0, powerOnKillPct: 0, powerOnBlockPct: 0, powerOnStunPct: 0, powerDamagePerChargePct: 0, frenzyOnKillPct: 0, frenzyOnBlockPct: 0, enduranceOnBlockPct: 0, enduranceOnMeleeCritPct: 0, blindChancePct: 0, blindEffectIncPct: 0, critChanceVsBlindedPct: 0, fortifyMax: 0, fortifyDurationPct: 0, fortifyOnStunPct: 0, fortifyEffectIncPct: 0, fortifiedDefencePct: 0, stunChancePct: 0, riposteDamagePct: 0, riposteDurationPct: 0, poisonChanceDaggerPct: 0, daggerCritPoisons: 0, staffBlockPct: 0, staffSpellBlockPct: 0, shieldSpellBlockPct: 0, critChanceSwordPct: 0, critMultiplierSwordPct: 0, critChanceAxePct: 0, critMultiplierAxePct: 0, staffDamageIncPct: 0, staffChargeSpeedPct: 0, critChanceStaffPct: 0, critMultiplierStaffPct: 0, wandDamageIncPct: 0, wandChargeSpeedPct: 0, critChanceWandPct: 0, critMultiplierWandPct: 0, dualDamageIncPct: 0, dualChargeSpeedPct: 0, dualAccuracyIncPct: 0, dualCritChancePct: 0, dualCritMultiPct: 0, dualCastSpeedPct: 0, dualSpellDamagePct: 0, dualMoveSpeedPct: 0, dualBlockPct: 0, physAsExtraColdPct: 0, physAsExtraLightningPct: 0, freezeChancePct: 0, shockChancePct: 0, penFirePct: 0, penColdPct: 0, penLightningPct: 0, penShadowPct: 0, penElementalPct: 0 };
@@ -192,8 +202,9 @@ function _getPassiveTreeTravelBonuses() {
     if (!state || !state.passiveTreeAllocated) return totals;
     if (typeof globalThis.isTreeless === 'function' && globalThis.isTreeless()) return totals;
 
+    const nodesById = _passiveTreeNodesById();
     for (const nodeId of state.passiveTreeAllocated) {
-        const node = _PASSIVE_TREE_NODES_BY_ID.get(Number(nodeId));
+        const node = nodesById.get(Number(nodeId));
         if (!node) continue;
         let bonus = null;
         if (node.tier === 'travel') {
@@ -439,6 +450,9 @@ export function _awardXP(xpGain) {
     // Dev level lock (js/dev/dev-testing.js): freezes XP so balance tests
     // run at a constant character level. Never set outside the dev harness.
     if (globalThis.__devLevelLock) return 0;
+    // Monsterless saves do not level up by XP at all (their points come from
+    // puzzle trials instead).
+    if (isMonsterless()) return 0;
     const c = LEVELING_CONFIG;
 
     if (_getPlayerLevel() >= c.maxLevel) {
@@ -752,16 +766,17 @@ function _playLevelUpReward() {
 //-------------------LEVEL-UP EFFECT--------------------------------------
 //------------------------------------------------------------------------
 
-const LEVELUP_FX_MS = 3800;
-const LEVELUP_SPARK_COUNT = 18;
+const LEVELUP_FX_MS = 3300;
+const LEVELUP_SPARK_COUNT = 16;
 
-// A burst of gold sparks flying outward from the banner; each spark gets its
-// own direction, distance and delay through CSS variables.
-function _buildLevelUpSparksHTML() {
+// A burst of gold sparks flying outward from the player; each spark gets its
+// own direction, distance and delay through CSS variables. `scale` shrinks the
+// burst on short windows.
+function _buildLevelUpSparksHTML(scale) {
     let html = '';
     for (let i = 0; i < LEVELUP_SPARK_COUNT; i++) {
         const angle = (i / LEVELUP_SPARK_COUNT) * 360 + Math.random() * 14;
-        const dist = 150 + Math.random() * 170;
+        const dist = (80 + Math.random() * 120) * scale;
         const delay = Math.random() * 0.25;
         html += `<i class="sx-levelup-spark" style="--a:${angle.toFixed(1)}deg;--d:${dist.toFixed(0)}px;--t:${delay.toFixed(2)}s"></i>`;
     }
@@ -781,21 +796,38 @@ function _buildLevelUpKeyPromptHTML(passiveGained) {
         <span class="sx-levelup-pts">+${passiveGained}</span></div>`;
 }
 
-// Level-up celebration: gold flash, spinning light rays, a shockwave ring,
-// flying sparks and a stone banner with the new level and the passive-point
-// key prompt. Pure CSS animation; the element removes itself afterwards and
-// ignores the mouse, so it is safe mid-combat.
+// Where the burst starts: the middle of the player's sprite when it is on
+// screen, else the middle of the window.
+function _levelUpOrigin() {
+    const avatar = document.getElementById('player-avatar-wrapper');
+    if (avatar) {
+        const r = avatar.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+    return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+}
+
+// Level-up celebration: a golden glow around the screen edge, a light pillar,
+// rings and sparks bursting from the player, and a compact stone banner near
+// the top with the new level and the passive-point key prompt. The middle of
+// the screen stays clear; pure CSS animation; the element removes itself
+// afterwards and ignores the mouse, so it is safe mid-combat.
 function _playLevelUpEffect(newLevel, passiveGained) {
     Audio_Manager.playSFX('level_up');
     // Character banter: lands just after the kill / quest line that caused it.
     if (typeof globalThis.triggerBanter === 'function') setTimeout(() => globalThis.triggerBanter('level_up'), 700);
+    const scale = Math.max(0.55, Math.min(1, window.innerHeight / 800));
+    const origin = _levelUpOrigin();
     const el = document.createElement('div');
     el.className = 'sx-levelup-fx';
     el.innerHTML = `
-<div class="sx-levelup-rays"></div>
-<div class="sx-levelup-ring"></div>
-<div class="sx-levelup-ring sx-levelup-ring2"></div>
-${_buildLevelUpSparksHTML()}
+<div class="sx-levelup-edge"></div>
+<div class="sx-levelup-burst" style="left:${origin.x.toFixed(0)}px;top:${origin.y.toFixed(0)}px;--lv-ring:${(5 * scale).toFixed(2)};--lv-w:${(70 * scale).toFixed(0)}px;--lv-h:${(340 * scale).toFixed(0)}px">
+    <div class="sx-levelup-pillar"></div>
+    <div class="sx-levelup-ring"></div>
+    <div class="sx-levelup-ring sx-levelup-ring2"></div>
+    ${_buildLevelUpSparksHTML(scale)}
+</div>
 <div class="sx-levelup-banner">
     <div class="sx-levelup-plate">
         <div class="sx-levelup-title">${t('eg_lvl_banner')}</div>
@@ -1056,118 +1088,151 @@ function _injectLevelingStyles() {
 .sx-xp-tier-label.avg { color: #f5d98a; }
 .sx-xp-tier-label.poor { color: #e06c55; }
 
-/* ── Level-up effect ── */
+/* ── Level-up effect ──
+   A golden glow around the screen edge, a burst of light and rising sparks from
+   the player, and a compact banner near the top. Nothing covers the middle of
+   the screen, so the puzzle stays readable (also on short laptop windows). */
 .sx-levelup-fx {
     position: fixed;
     inset: 0;
     z-index: 10050;
     pointer-events: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(circle at center, rgba(245,185,66,.34) 0%, rgba(245,185,66,.1) 38%, transparent 68%);
-    animation: sx-lvl-flash 3.8s ease-out forwards;
+    overflow: hidden;
 }
-@keyframes sx-lvl-flash {
+.sx-levelup-edge {
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 clamp(60px, 12vh, 130px) clamp(6px, 1.4vh, 16px) rgba(245,185,66,.75);
+    opacity: 0;
+    animation: sx-lvl-edge 2.6s ease-out forwards;
+}
+@keyframes sx-lvl-edge {
     0% { opacity: 0; }
-    8% { opacity: 1; }
-    75% { opacity: 1; }
+    12% { opacity: 1; }
     100% { opacity: 0; }
 }
-.sx-levelup-rays {
+.sx-levelup-burst {
     position: absolute;
-    width: 160vmax; height: 160vmax;
-    background: repeating-conic-gradient(from 0deg, rgba(255,220,130,.22) 0deg 7deg, transparent 7deg 22deg);
-    -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 38%);
-    mask-image: radial-gradient(circle, #000 0%, transparent 38%);
-    animation: sx-lvl-rays 3.8s linear forwards;
+    width: 0; height: 0;
 }
-@keyframes sx-lvl-rays {
-    from { transform: rotate(0deg) scale(.6); }
-    to { transform: rotate(50deg) scale(1.1); }
+.sx-levelup-pillar {
+    position: absolute;
+    left: calc(var(--lv-w, 70px) / -2);
+    bottom: 0;
+    width: var(--lv-w, 70px);
+    height: var(--lv-h, 340px);
+    background: linear-gradient(0deg, rgba(255,226,150,.85), rgba(255,226,150,.25) 55%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 35%, #000 65%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 35%, #000 65%, transparent);
+    transform-origin: 50% 100%;
+    opacity: 0;
+    animation: sx-lvl-pillar 1.5s ease-out forwards;
+}
+@keyframes sx-lvl-pillar {
+    0% { transform: scaleY(.05); opacity: 0; }
+    20% { transform: scaleY(1); opacity: 1; }
+    100% { transform: scaleY(1.08) scaleX(1.5); opacity: 0; }
 }
 .sx-levelup-ring {
     position: absolute;
-    width: 120px; height: 120px;
+    left: 0; top: 0;
+    width: 100px; height: 100px;
     border-radius: 50%;
-    border: 4px solid rgba(255,226,150,.95);
-    box-shadow: 0 0 24px rgba(245,185,66,.8), inset 0 0 18px rgba(245,185,66,.6);
+    border: 3px solid rgba(255,226,150,.95);
+    box-shadow: 0 0 20px rgba(245,185,66,.8), inset 0 0 14px rgba(245,185,66,.5);
     opacity: 0;
-    animation: sx-lvl-ring 1.3s ease-out .1s forwards;
+    animation: sx-lvl-ring 1.2s ease-out .05s forwards;
 }
-.sx-levelup-ring2 { border-color: rgba(160,255,200,.8); animation-delay: .35s; }
+.sx-levelup-ring2 { border-color: rgba(160,255,200,.8); animation-delay: .3s; }
 @keyframes sx-lvl-ring {
-    0% { transform: scale(.2); opacity: .95; }
-    100% { transform: scale(9); opacity: 0; }
+    0% { transform: translate(-50%, -50%) scale(.2); opacity: .95; }
+    100% { transform: translate(-50%, -50%) scale(var(--lv-ring, 5)); opacity: 0; }
 }
 .sx-levelup-spark {
     position: absolute;
-    width: 8px; height: 8px;
+    left: 0; top: 0;
+    width: 7px; height: 7px;
     border-radius: 50%;
     background: radial-gradient(circle, #fff 0%, #f5d98a 45%, rgba(245,185,66,0) 75%);
     opacity: 0;
-    animation: sx-lvl-spark 1.4s ease-out var(--t) forwards;
+    animation: sx-lvl-spark 1.5s ease-out var(--t) forwards;
 }
 @keyframes sx-lvl-spark {
-    0% { transform: rotate(var(--a)) translateX(0) scale(1.4); opacity: 1; }
+    0% { transform: rotate(var(--a)) translateX(0) scale(1.3); opacity: 1; }
     100% { transform: rotate(var(--a)) translateX(var(--d)) scale(.2); opacity: 0; }
 }
 .sx-levelup-banner {
-    position: relative;
+    position: absolute;
+    left: 50%;
+    top: clamp(54px, 13vh, 130px);
     display: flex; flex-direction: column; align-items: center;
-    gap: 14px;
+    gap: clamp(6px, 1.2vh, 12px);
     text-align: center;
-    animation: sx-lvl-pop 3.8s ease-out forwards;
+    transform: translateX(-50%);
+    animation: sx-lvl-pop 3.2s ease-out forwards;
 }
 @keyframes sx-lvl-pop {
-    0% { transform: scale(.3); opacity: 0; }
-    10% { transform: scale(1.18); opacity: 1; }
-    16% { transform: scale(.96); }
-    21% { transform: scale(1); }
-    84% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(1.04) translateY(-16px); opacity: 0; }
+    0% { transform: translateX(-50%) translateY(-24px) scale(.85); opacity: 0; }
+    10% { transform: translateX(-50%) translateY(0) scale(1.06); opacity: 1; }
+    16% { transform: translateX(-50%) translateY(0) scale(1); }
+    84% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-14px) scale(1); opacity: 0; }
 }
 .sx-levelup-plate {
-    width: min(86vw, 520px);
-    padding: clamp(26px, 5vh, 46px) 40px;
+    position: relative;
+    width: min(86vw, 400px);
+    padding: clamp(14px, 3vh, 28px) clamp(20px, 4vw, 40px);
     box-sizing: border-box;
     background: url('images/Game-Reset/Title-Plate.webp') center / 100% 100% no-repeat;
-    filter: drop-shadow(0 0 22px rgba(245,185,66,.6));
+    filter: drop-shadow(0 0 18px rgba(245,185,66,.6));
+    overflow: hidden;
+}
+.sx-levelup-plate::after {
+    content: '';
+    position: absolute; top: 0; bottom: 0; left: -40%;
+    width: 30%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
+    transform: skewX(-18deg);
+    animation: sx-lvl-sheen 1.1s ease-out .35s forwards;
+}
+@keyframes sx-lvl-sheen {
+    from { left: -40%; }
+    to { left: 130%; }
 }
 .sx-levelup-title {
     font-family: var(--C, serif);
-    font-size: clamp(26px, 5vw, 44px);
+    font-size: clamp(20px, min(3.6vw, 5vh), 34px);
     font-weight: 900;
-    letter-spacing: 5px;
+    letter-spacing: 4px;
     color: #f5d98a;
-    text-shadow: 0 0 18px rgba(245,185,66,.9), 0 0 40px rgba(245,185,66,.5), 0 3px 0 #4a3510;
+    text-shadow: 0 0 14px rgba(245,185,66,.9), 0 0 30px rgba(245,185,66,.45), 0 3px 0 #4a3510;
 }
 .sx-levelup-sub {
-    margin-top: 6px;
+    margin-top: 4px;
     font-family: var(--B, serif);
-    font-size: clamp(14px, 2vw, 18px);
+    font-size: clamp(13px, min(1.8vw, 2.6vh), 17px);
     letter-spacing: 1px;
     color: #e6dcc0;
     text-shadow: 0 2px 3px rgba(0,0,0,.9);
 }
-.sx-levelup-sub b { color: #fff; font-size: 1.5em; text-shadow: 0 0 10px rgba(245,185,66,.9); }
+.sx-levelup-sub b { color: #fff; font-size: 1.45em; text-shadow: 0 0 10px rgba(245,185,66,.9); }
 .sx-levelup-prompt {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 8px 18px;
+    padding: 6px 14px;
     border-radius: 10px;
     background: rgba(18,14,12,.92);
     border: 2px solid #7a5a2c;
     box-shadow: 0 4px 14px rgba(0,0,0,.6), 0 0 18px rgba(245,185,66,.35);
     font-family: var(--B, serif);
     font-weight: 700;
-    font-size: clamp(13px, 1.8vw, 17px);
+    font-size: clamp(12px, min(1.6vw, 2.4vh), 16px);
     color: #e6dcc0;
     animation: sx-lvl-prompt 1s ease-in-out .9s infinite;
 }
 .sx-levelup-key {
     display: inline-block;
     min-width: 1.6em;
-    padding: 2px 9px;
+    padding: 1px 8px;
     border-radius: 6px;
     border: 2px solid #f5d98a;
     border-bottom-width: 4px;
@@ -1188,8 +1253,9 @@ function _injectLevelingStyles() {
     50% { transform: translateY(-3px); filter: brightness(1.25); }
 }
 @media (prefers-reduced-motion: reduce) {
-    .sx-levelup-rays, .sx-levelup-ring, .sx-levelup-spark, .sx-levelup-prompt { animation: none; }
-    .sx-levelup-spark, .sx-levelup-ring { display: none; }
+    .sx-levelup-edge, .sx-levelup-pillar, .sx-levelup-ring, .sx-levelup-spark, .sx-levelup-prompt, .sx-levelup-plate::after { animation: none; }
+    .sx-levelup-pillar, .sx-levelup-spark, .sx-levelup-ring { display: none; }
+    .sx-levelup-edge { opacity: .6; }
 }
 
 `;

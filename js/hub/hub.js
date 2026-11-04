@@ -10,6 +10,7 @@
 
 import '../audio/audio.js';
 import { cur } from '../state.js';
+import { isMonsterless } from '../difficulty-modifiers.js';
 
 // Accessor: other files reassign the previewed item through globalThis.
 try { Object.defineProperty(globalThis, '_tooltipItem', { get() { return _tooltipItem; }, set(v) { _tooltipItem = v; }, configurable: true }); } catch (e) {}
@@ -626,7 +627,10 @@ export function ensureHubScreen() {
 
 // Transitions to the Endgame Hub screen and fully refreshes all rendered zones.
 // This is the main entry point called from elsewhere in the codebase.
+// MONSTERLESS saves never deal or take damage, so they have no gear: the
+// character sheet & inventory is closed to them.
 export function showHub() {
+    if (isMonsterless()) return;
     ensureHubScreen();
 
     switchScreen('screen-hub');
@@ -720,6 +724,7 @@ export function _hubShowAvatars() {
 
 // Opens the sheet over a running puzzle (B keybind path).
 export function openHubFromGame(returnScreen = 'screen-game') {
+    if (isMonsterless()) return;
     _hubGameOverlay = true;
     _hubReturnScreen = returnScreen;
     // Only a running puzzle has anything to pause or hide; on the world map

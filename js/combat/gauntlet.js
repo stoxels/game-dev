@@ -397,10 +397,32 @@ function _planWaves(level) {
 //-------------------OVERLAY----------------------------------------------
 //------------------------------------------------------------------------
 
+// During the tutorial the Professor and his speech bubble sit at the right edge of
+// the screen. Returns the left edge of that area, so the arena can stop short of
+// it instead of covering him; null when he is not on screen or there is no room
+// to shrink (the arena would drop below 640px wide).
+function _tutorialProfessorLeft() {
+    const wrap = document.getElementById('tq-professor-wrap');
+    if (!wrap || wrap.style.display === 'none') return null;
+    let left = Infinity;
+    const avatar = document.getElementById('tq-professor-avatar');
+    const bubble = document.getElementById('tq-bubble');
+    if (avatar) left = Math.min(left, avatar.getBoundingClientRect().left);
+    if (bubble && bubble.classList.contains('show')) left = Math.min(left, bubble.getBoundingClientRect().left);
+    if (!Number.isFinite(left) || left < window.innerWidth * 0.5) return null;
+    return left - 12 - 16 >= 640 ? left : null;
+}
+
 // The arena is a large centred modal - independent of the puzzle grid.
 function _arenaRect() {
-    const w = Math.min(window.innerWidth - 32, 1180);
     const h = Math.min(window.innerHeight - 110, 760);
+    const reserved = _tutorialProfessorLeft();
+    if (reserved !== null) {
+        const room = reserved - 12 - 16;
+        const w = Math.min(room, 1180);
+        return { left: 16 + Math.round((room - w) / 2), top: Math.max(8, Math.round((window.innerHeight - h) / 2) - 24), width: w, height: h };
+    }
+    const w = Math.min(window.innerWidth - 32, 1180);
     return {
         left: Math.round((window.innerWidth - w) / 2),
         top: Math.max(8, Math.round((window.innerHeight - h) / 2) - 24),
@@ -826,7 +848,10 @@ function _parryTick() {
     const maxHP = Number(globalThis.playerMaxHP) || 0;
     const floor = Math.round(maxHP * cfg.keepHpPct);
     if (maxHP > 0 && globalThis.playerCurrentHP < floor) {
-        globalThis.playerCurrentHP = floor;
+        // Silent: the floor top-up is bookkeeping, not a heal the player should see
+        // as a green "+N" right after each hit.
+        globalThis._healSilent = true;
+        try { globalThis.playerCurrentHP = floor; } finally { globalThis._healSilent = false; }
         if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
     }
     if (_g.parries >= cfg.targetParries) { _finish(true); return; }

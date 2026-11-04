@@ -461,6 +461,18 @@
     }
 }
 
+/* Short windows (laptops): the box is ~770px tall at full size and keeps its
+   frame proportions, so on a short window it used to run off the bottom and the
+   player had to scroll. Shrink the whole box (text, icons and buttons together)
+   in steps so it fits. The narrow-screen fallback above handles small widths. */
+@media (min-width: 641px) and (max-height: 840px) { .reset-modal-box { zoom: 0.93; } }
+@media (min-width: 641px) and (max-height: 780px) { .reset-modal-box { zoom: 0.85; } }
+@media (min-width: 641px) and (max-height: 720px) { .reset-modal-box { zoom: 0.77; } }
+@media (min-width: 641px) and (max-height: 660px) { .reset-modal-box { zoom: 0.71; } }
+@media (min-width: 641px) and (max-height: 600px) { .reset-modal-box { zoom: 0.64; } }
+@media (min-width: 641px) and (max-height: 540px) { .reset-modal-box { zoom: 0.56; } }
+@media (min-width: 641px) and (max-height: 480px) { .reset-modal-box { zoom: 0.48; } }
+
 /* Tiny phones: the plaque's 340px width floor would exceed the box itself
    (box = 94vw − backdrop padding), so pin the plaque to the box and drop
    the title font a step (same fix as tut-box / changelog / replay). */

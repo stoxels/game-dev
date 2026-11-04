@@ -39,7 +39,7 @@ let _manaRegenInterval = null;
 // Active map runs can further inflate costs; tooltips and actual charges
 // both use this helper.
 export function _scaleAbilityManaCost(cost) {
-    if (!cost || cost <= 0) return 0;
+    if (!cost || cost <= 0 || !_manaEnabled()) return 0;
     return _applyManaCostModifiers(cost * MANA_COST_GLOBAL_MULT);
 }
 
@@ -47,7 +47,7 @@ export function _scaleAbilityManaCost(cost) {
 // override (SPELL_MANA_COST_OVERRIDES in skill-charms.js) is a listed cost,
 // so it comes through here and skips the global multiplier and rank curve.
 export function _applyManaCostModifiers(cost) {
-    if (!cost || cost <= 0) return 0;
+    if (!cost || cost <= 0 || !_manaEnabled()) return 0;
     let scaled = cost;
     // "% increased Cost of all spells" (passive tree, Blood Magic keystone).
     scaled *= 1 + _treeChannel('spellCostIncPct') / 100;
@@ -63,7 +63,8 @@ export function _applyManaCostModifiers(cost) {
 
 // Mana is enabled in both story levels and endgame maps.
 function _manaEnabled() {
-    return true;
+    // Monsterless saves have no mana at all: class spells are free.
+    return !(STATE && STATE.monsterless);
 }
 
 
@@ -149,6 +150,7 @@ function _absorptionCostShare(cost) {
 
 // Returns true when the current mana pool covers a cost.
 export function canAffordMana(cost) {
+    if (!(cost > 0)) return true;
     return Math.round(globalThis.playerCurrentMana) >= cost;
 }
 
@@ -257,7 +259,7 @@ export function updateClassHUDManaBar() {
         try {
             classlessSpells = _hotbarClasslessHasSpells();
         } catch (e) { /* best-effort */ }
-        if ((!STATE.playerClass && !tqActive && !classlessSpells) || _manaRemovedByTree()) {
+        if ((!STATE.playerClass && !tqActive && !classlessSpells) || _manaRemovedByTree() || !_manaEnabled()) {
             avatarWrap.style.display = 'none';
         } else {
             avatarWrap.style.display = '';

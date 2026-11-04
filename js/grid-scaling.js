@@ -151,8 +151,16 @@ function _calcAvailableSpace() {
     const fillToggleH = (fillToggle && !fillToggle.classList.contains('hidden'))
         ? fillToggle.offsetHeight + 16
         : 0;
+    // The thin "completion glimpse" bar sits in the normal flow above the grid
+    // and pushes it down; without counting it the last row ended under the
+    // inventory bar on short windows.
+    const glimpse = document.getElementById('completion-glimpse-bar');
+    const glimpseH = glimpse && glimpse.offsetHeight > 0
+        ? glimpse.offsetHeight + (parseFloat(getComputedStyle(glimpse).marginTop) || 0)
+        : 0;
     const usedH = (metaBar ? metaBar.offsetHeight : 0)
         + (invStrip ? invStrip.offsetHeight : 0)
+        + glimpseH
         + fillToggleH;
 
     return {

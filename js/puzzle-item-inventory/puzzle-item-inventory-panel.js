@@ -513,7 +513,11 @@ export function buildInventoryPanel() {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             _invCancelFlyoutClose();
-            if (_invPinnedFlyoutGroup === group.label) {
+            // On touch screens a tap on the button of an already open category keeps
+            // it open (the tutorial opens Reveal by itself, and a tap used to shut
+            // it); a tap outside the bar closes it instead.
+            const touchScreen = !!window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+            if (_invPinnedFlyoutGroup === group.label && !touchScreen) {
                 _invPinnedFlyoutGroup = null;
                 closeInventoryFlyout();
             } else {

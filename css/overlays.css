@@ -715,7 +715,9 @@ body.question-modal-open #player-avatar-simple {
 #ov-win { overflow-x: hidden; }
 #ov-win .ov-top-half { flex: 0 1 24%; padding-bottom: 58px; }
 #ov-win .ov-bottom-half {
-    flex: 1 1 auto;
+    /* never shorter than its content, or the stone frame ends above the stats */
+    flex: 1 0 auto;
+    min-height: auto;
     width: min(1640px, 98vw);
     margin: 0 auto 8px;
     gap: clamp(4px, 0.8vh, 8px);
@@ -820,7 +822,7 @@ body.question-modal-open #player-avatar-simple {
     background: url('../images/Game-Reset/Button-Stone.webp') center / 100% 100% no-repeat transparent;
 }
 /* room for the full "Projectiles" label in the win-screen damage bars */
-#ov-win .rs-col .rs-kind { grid-template-columns: 112px minmax(0, 1fr) 42px; }
+#ov-win .rs-col .rs-kind { grid-template-columns: 150px minmax(0, 1fr) 42px; }
 
 
 /* ── Win screen: reward notes (lucky drop / bonus already claimed / item earned)

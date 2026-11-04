@@ -84,7 +84,6 @@ export function applyConvergenceReward(gi) {
 // Builds the Nexus Point unlock card shown in the win overlay's reward zone.
 // MONSTERLESS runs end after World 14: no Nexus unlock, no card.
 export function applyNexusPointReward(irz) {
-    if (_liveMods() && _liveMods().monsterless) return;
     if (isMonsterless()) return;
     setNexusUnlocked();
     if (!irz) return;
@@ -270,7 +269,8 @@ function grantBonusLoot(gi) {
 // Builds the HTML for a guaranteed first-time bonus reward (a puzzle item
 // most of the time, otherwise loot), adds it to the player's stash and saves.
 function grantBonusItem(gi) {
-    if (Math.random() >= BONUS_PUZZLE_ITEM_SHARE) {
+    // Monsterless saves have no use for gear, cores or essences: puzzle items only.
+    if (!isMonsterless() && Math.random() >= BONUS_PUZZLE_ITEM_SHARE) {
         const lootCard = grantBonusLoot(gi);
         if (lootCard) return lootCard;
     }
@@ -384,10 +384,38 @@ export function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, monsterP
     // a fully hidden column must collapse so the row re-centres instead of
     // leaving an empty gap (ascension / Nexus Point wins hide Next+Replay).
     const nextCol = nextBtn ? nextBtn.closest('.ov-btns-col') : null;
-    if (nextCol) nextCol.style.display = endOfLine ? 'none' : '';
+    // The story shortcut lives in this column too, so it stays when only that is left.
+    if (nextCol) nextCol.style.display = (endOfLine && !storyTarget) ? 'none' : '';
     _updateNexusWinButton(isNexusPoint);
     _updateConvergenceTrialWinButton(gi);
     _updateAscensionTrialWinButton(gi, isAscensionLevel);
+    _setWinButtonTips();
+}
+
+// Hover tooltips for every button on the win screen, in the same look as the
+// game setup screen's tooltips: a gold title over one plain sentence. The
+// trial, Nexus and Story buttons are created or shown on the fly, so the
+// tips are (re)written each time the screen is built.
+const _WIN_BUTTON_TIPS = {
+    'btn-win-levels': 'levels',
+    'btn-win-retry': 'retry',
+    'btn-win-retry-setup': 'retry_setup',
+    'btn-next-lvl': 'next',
+    'btn-win-story': 'story',
+    'btn-enter-asc-trial-win': 'asc',
+    'btn-enter-trial-win': 'conv',
+    'btn-enter-nexus-win': 'nexus',
+};
+
+function _setWinButtonTips() {
+    Object.entries(_WIN_BUTTON_TIPS).forEach(([id, key]) => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        btn.setAttribute('data-tip', '<div class="sx-mod-tip">'
+            + `<div class="sx-mod-tip-title">${t('tip_win_' + key + '_t')}</div>`
+            + `<div class="sx-mod-tip-text">${t('tip_win_' + key)}</div>`
+            + '</div>');
+    });
 }
 
 // Ensures the win overlay has a dedicated "Enter Convergence Trial" button.
@@ -476,8 +504,7 @@ function _updateAscensionTrialWinButton(gi, isAscensionLevel) {
 // it never collides with the static Next/Levels handlers.
 // MONSTERLESS runs end after World 14: the button never shows.
 function _updateNexusWinButton(show) {
-    if (_liveMods() && _liveMods().monsterless) show = false;
-    else if (isMonsterless()) show = false;
+    if (isMonsterless()) show = false;
     const container = document.querySelector('#ov-win .ov-btns');
     if (!container) return;
     // Prefer the NEXT column wrapper (the Nexus button occupies Next's slot

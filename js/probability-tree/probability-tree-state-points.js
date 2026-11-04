@@ -1,10 +1,11 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { setAchStat, trackAchStat, trackAchUnique } from '../achievements/achievements.js';
 import { save } from '../state.js';
-import { LANG, t } from '../translation/translations.js';
 import { TALENT_TREE_DATA } from './probability-tree-data.js';
+import { MONSTERLESS_TREE_DATA } from './probability-tree-data-monsterless.js';
+import { LANG, t } from '../translation/translations.js';
 import { _ptRefreshAllStyles } from './probability-tree-ui.js';
-import { getPassiveTreeRootId, isPassiveTreeStartNode, _ptInitTreeData } from './probability-tree.js';
+import { getPassiveTreeRootId, isPassiveTreeStartNode, _ptSyncTreeToSave } from './probability-tree.js';
 import { STATE } from '../state.js';
 // Accessors: other files reassign these through globalThis.
 try { Object.defineProperty(globalThis, '_pt_skills', { get() { return _pt_skills; }, set(v) { _pt_skills = v; }, configurable: true }); } catch (e) {}
@@ -520,14 +521,17 @@ const PT_ASCENDENCY_FIRST = 41031;        // 6 ascendency wheels x 8 notables
 const PT_ASCENDENCY_WHEELS = 6;
 const PT_ASCENDENCY_WHEEL_SIZE = 8;
 
-let _ptNodeIndex = null;
-// Looks a node up by id in the tree data (lazy index).
+const _ptNodeIndexes = new Map();   // tree data -> id index
+// Looks a node up by id in the save's tree data (lazy index per tree).
 function _ptNodeById(id) {
-    if (!_ptNodeIndex) {
-        _ptNodeIndex = new Map();
-        for (const node of TALENT_TREE_DATA.nodes) _ptNodeIndex.set(Number(node.id), node);
+    const data = STATE && STATE.monsterless ? MONSTERLESS_TREE_DATA : TALENT_TREE_DATA;
+    let index = _ptNodeIndexes.get(data);
+    if (!index) {
+        index = new Map();
+        for (const node of data.nodes) index.set(Number(node.id), node);
+        _ptNodeIndexes.set(data, index);
     }
-    return _ptNodeIndex.get(Number(id));
+    return index.get(Number(id));
 }
 
 // True for keystones that are not one of the god nodes.
@@ -698,14 +702,9 @@ export function ptHasSkill(statKey) {
     // Treeless modifier: treat all nodes as unallocated
     if (typeof globalThis.isTreeless === 'function' && globalThis.isTreeless()) return false;
 
-    // Ensure the skill map is populated before querying it.
-    // Self-heal via the real init. (This branch used to call
-    // PT.loadInline - a function that never existed anywhere; the
-    // latent bug was unreachable while classic load order guaranteed
-    // _ptInitTreeData populated the map before any ptHasSkill call.)
-    if (!_pt_skills.length && typeof TALENT_TREE_DATA !== 'undefined') {
-        _ptInitTreeData();
-    }
+    // Make sure the skill map is populated, and built from the tree this
+    // save uses (monsterless saves have their own).
+    _ptSyncTreeToSave();
 
     ensurePassiveTreeRoot();
     const wanted = _ptCanonicalStatKey(statKey);

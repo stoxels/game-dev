@@ -116,7 +116,7 @@ export function _mechStillnessTrial(monster, phase) {
         t = 0;
         tint = _nkEl(run, 'div', 'sx-arb-trial ' + (blue ? 'sx-arb-trial-blue' : 'sx-arb-trial-orange'));
         tint.style.setProperty('--arb-warn', TRIAL_WARN_MS[p] + 'ms');
-        label = _nkEl(run, 'div', 'sx-arb-trial-label ' + (blue ? 'sx-arb-trial-label-blue' : 'sx-arb-trial-label-orange'), blue ? 'HOLD STILL' : 'KEEP MOVING');
+        label = _nkEl(run, 'div', 'sx-arb-trial-label ' + (blue ? 'sx-arb-trial-label-blue' : 'sx-arb-trial-label-orange'), (blue ? '✋ NEXT: HOLD STILL' : '➤ NEXT: KEEP MOVING'));
     };
     _nkLoop(run, (dtS) => {
         t += dtS * 1000;
@@ -132,6 +132,8 @@ export function _mechStillnessTrial(monster, phase) {
                 stage = 'live';
                 t = 0;
                 tint.classList.add('sx-arb-trial-live');
+                label.classList.add('sx-arb-trial-label-live');
+                label.textContent = blue ? '✋ HOLD STILL' : '➤ KEEP MOVING';
                 anchor = _nkPlayerCenter();
                 stepT = 0;
             }
@@ -153,7 +155,7 @@ export function _mechStillnessTrial(monster, phase) {
                 }
             }
         }
-        if (label) label.textContent = (blue ? 'HOLD STILL ' : 'KEEP MOVING ') + Math.max(0, Math.ceil((TRIAL_LIVE_MS[p] - t) / 1000));
+        if (label) label.textContent = (blue ? '✋ HOLD STILL ' : '➤ KEEP MOVING ') + Math.max(0, Math.ceil((TRIAL_LIVE_MS[p] - t) / 1000));
         if (t >= TRIAL_LIVE_MS[p]) { clearWave(); stage = 'idle'; t = 0; }
         return true;
     });

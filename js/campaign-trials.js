@@ -1,7 +1,7 @@
 import { Audio_Manager } from './audio/audio.js';
 import { trackAchStat } from './achievements/achievements.js';
 import { areAllWorldLevelsDone, grantClassChangeToken, triggerClassEventIfPending } from './classes/class-ui.js';
-import { curMods } from './difficulty-modifiers.js';
+import { curMods, isMonsterless } from './difficulty-modifiers.js';
 import { BOSS_DEFS } from './combat/bosses/boss-framework.js';
 import { _canLeaveMap, _cancelChainCountdown, _rollBonusMapLoot, _showLeaveMapTransition } from './combat/encounter-chain.js';
 import { _buildChainPool } from './combat/encounter-chain-pool.js';
@@ -278,6 +278,19 @@ function _trialIntroText() {
         begin: de ? 'PRÜFUNG BEGINNEN' : 'BEGIN TRIAL',
         back: de ? 'Zurück' : 'Back',
         monsterless: de ? 'Monsterlos: nur Rätsel und Fragen, kein Boss.' : 'Monsterless: puzzles and questions only, no boss.',
+        // monsterless saves: no boss, no XP, points instead
+        mlLead: de
+            ? 'Eine Prüfung ist ein kurzer Lauf aus verbundenen Etappen.'
+            : 'A trial is a short run of linked stages.',
+        mlRewardConv: de
+            ? `Erster Abschluss: +${MONSTERLESS_CONVERGENCE_POINTS} Talentpunkte.`
+            : `First clear: +${MONSTERLESS_CONVERGENCE_POINTS} passive points.`,
+        mlRewardAsc: de
+            ? `Erster Abschluss: +${MONSTERLESS_ASCENSION_POINTS} Talentpunkt, Kodex der Vollendung, Weltbelohnungen und Klassenereignis.`
+            : `First clear: +${MONSTERLESS_ASCENSION_POINTS} passive point, Codex of Completion, world rewards and the class event.`,
+        mlDoneConv: de
+            ? 'Bereits abgeschlossen: Die Talentpunkte wurden schon vergeben. Eine Wiederholung bringt keine Belohnung mehr.'
+            : 'Already completed: the passive points have been claimed. Replaying gives no reward.',
     };
 }
 
@@ -301,9 +314,10 @@ function _showTrialIntro(wi, kind, info, onBegin) {
     const isDone = kind === 'convergence'
         ? STATE.trialsDone.includes(_trialIdForWorld(wi))
         : STATE.ascensionTrialsDone.includes('asc_' + (wi + 1));
+    const ml = !!info.monsterless;
     const rewardText = kind === 'convergence'
-        ? (isDone ? tx.doneConv : tx.rewardConv)
-        : (isDone ? tx.doneAsc : tx.rewardAsc);
+        ? (isDone ? (ml ? tx.mlDoneConv : tx.doneConv) : (ml ? tx.mlRewardConv : tx.rewardConv))
+        : (isDone ? tx.doneAsc : (ml ? tx.mlRewardAsc : tx.rewardAsc));
     // Shell classes (.reset-*, .dialog-plate, .modal-bg) are shared with the
     // reset / save-slot dialogs; trial-specific ones live in css/trial-intro.css.
     const el = document.createElement('div');
@@ -315,7 +329,7 @@ function _showTrialIntro(wi, kind, info, onBegin) {
     <div class="reset-header"><div class="reset-title">${esc(name)}</div></div>
     <div class="dialog-plate">
         <div class="ti-kind">${esc(kind === 'convergence' ? tx.convergence : tx.ascension)}</div>
-        <p class="ti-lead">${esc(tx.lead)}</p>
+        <p class="ti-lead">${esc(ml ? tx.mlLead : tx.lead)}</p>
     </div>
     <ol class="ti-steps">${steps.map((st) => `<li class="ti-step${st.boss ? ' ti-step-boss' : ''}${st.wide ? ' ti-step-wide' : ''}"><div class="ti-step-icon ti-icon-${st.icon}"></div><span class="ti-step-text">${esc(st.text)}</span></li>`).join('')}</ol>
     <div class="reset-note-banner"><p class="ti-rules">${esc(tx.rules(Math.round(info.timeLimitSecs / 60), info.maxMistakes))}</p></div>
@@ -361,7 +375,7 @@ export function _launchTrialRun(wi, kind, opts) {
 
     if (!(opts && opts.confirmed)) {
         const bossDef = (typeof BOSS_DEFS !== 'undefined' && BOSS_DEFS && bossId) ? BOSS_DEFS[bossId] : null;
-        const isMonsterless = !!(typeof curMods !== 'undefined' && curMods && curMods.monsterless);
+        const monsterlessRun = isMonsterless();
         _showTrialIntro(wi, kind, {
             requiredPuzzles: chain.requiredPuzzles,
             requiredQuestions: chain.requiredQuestions,
@@ -369,7 +383,7 @@ export function _launchTrialRun(wi, kind, opts) {
             totalMonsters: chain.totalMonsters,
             monsterLevel,
             bossName: (bossDef && (bossDef.name || bossDef.id)) || '???',
-            monsterless: isMonsterless,
+            monsterless: monsterlessRun,
             timeLimitSecs: 1200,
             maxMistakes: 10,
         }, () => _launchTrialRun(wi, kind, { confirmed: true }));
@@ -378,7 +392,7 @@ export function _launchTrialRun(wi, kind, opts) {
     const trialId = kind === 'convergence' ? _trialIdForWorld(wi) : ('asc_' + (wi + 1));
     // MONSTERLESS: trials stay puzzle chains with question intermissions but
     // run with no monsters and no boss finale.
-    const monsterless = !!(typeof curMods !== 'undefined' && curMods && curMods.monsterless);
+    const monsterless = isMonsterless();
     const trialBossId = monsterless ? null : bossId;
     const stamp = {
         kind, wi, trialId,
@@ -494,7 +508,14 @@ export function _isAscensionTrialUnlocked(wi) {
 //-------------------COMPLETION--------------------------------------------
 //------------------------------------------------------------------------
 
-// Convergence Trial first-clear reward: +1 passive point (same pool the
+// Convergence Points a first trial clear pays. Monsterless saves have no XP,
+// so trials are their only source of points: 2 per Convergence Trial, 1 per
+// Ascension Trial. Everyone else gets 1 per Convergence Trial (and none here
+// for an Ascension Trial).
+const MONSTERLESS_CONVERGENCE_POINTS = 2;
+const MONSTERLESS_ASCENSION_POINTS = 1;
+
+// Convergence Trial first-clear reward: passive points (same pool the
 // level-ups feed; the tree itself is wired separately) + convergence modal.
 export function _grantConvergenceTrialReward(wi) {
     _ensureTrialState();
@@ -502,9 +523,10 @@ export function _grantConvergenceTrialReward(wi) {
     const isFirstClear = !STATE.trialsDone.includes(id);
     if (isFirstClear) {
         STATE.trialsDone.push(id);
-        STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + 1;
+        const points = isMonsterless() ? MONSTERLESS_CONVERGENCE_POINTS : 1;
+        STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + points;
         Audio_Manager.playSFX('passive_point_gain');
-        if (typeof _incDirect === 'function') try { _incDirect('lifetimePassivePointsObtained', 1); } catch (e) {}
+        if (typeof _incDirect === 'function') try { _incDirect('lifetimePassivePointsObtained', points); } catch (e) {}
         // Trials are the new convergence milestones - keep the Inference
         // ledger's convergence counter moving (legacy levels no longer feed it).
         if (typeof _incDirect === 'function') try { _incDirect('convergenceLevels', 1); } catch (e) {}
@@ -543,6 +565,13 @@ export function _grantAscensionTrialReward(wi) {
     const isFirstClear = !STATE.ascensionTrialsDone.includes(key);
     if (isFirstClear) {
         STATE.ascensionTrialsDone.push(key);
+        // Monsterless saves: the ascension trial also pays a Convergence Point.
+        if (isMonsterless()) {
+            STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + MONSTERLESS_ASCENSION_POINTS;
+            Audio_Manager.playSFX('passive_point_gain');
+            if (typeof _incDirect === 'function') try { _incDirect('lifetimePassivePointsObtained', MONSTERLESS_ASCENSION_POINTS); } catch (e) {}
+            showToast('✦ +' + MONSTERLESS_ASCENSION_POINTS + ' ' + t('mod_ml_point_toast'));
+        }
         // Codex of Completion (the ascension reward). Ironman mode disables
         // item rewards, mirroring the old last-level grant.
         try {

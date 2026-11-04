@@ -18,7 +18,7 @@ import { SLOT_MOD_TABLE_MAP, _getModTable } from './loot-equipment-mod-tables.js
 // Orbs & Shards currency tab). Every essence id has a dedicated cell;
 // hovering an empty cell still shows its essence tooltip. The number of
 // rows follows from the category layout further down.
-export const ESSENCE_COLS = 8;
+export const ESSENCE_COLS = 5;
 
 
 //----------------------------------------------------------------------

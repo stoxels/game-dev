@@ -1,4 +1,5 @@
 import { Audio_Manager } from '../audio/audio.js';
+import { isMonsterless } from '../difficulty-modifiers.js';
 import { LANG, t } from '../translation/translations.js';
 import { initMapViewToggle, showMapView } from './screens-map-view.js';
 import { _wdCurrentWi, showWorldDetail } from './screens-world-levels.js';
@@ -92,12 +93,12 @@ function buildModTagSpan(modKey, labelMap, classMap) {
 
 // Renders the active modifier tags (TT / HC / IM / etc.) and the current difficulty
 // tag into the #ls-mods element in the top bar.
-// MONSTERLESS is a content toggle (no score, no stars) so it is not in
-// SCORE_MODS - it is appended explicitly so the active mod stays visible.
+// MONSTERLESS is a save-wide mode (no score, no stars) so it is not in
+// SCORE_MODS - it is appended explicitly so the tag stays visible.
 function renderLSTopBar() {
     const modEl = document.getElementById('ls-mods');
     const active = Object.keys(globalThis.curMods).filter(m => SCORE_MODS.has(m) && globalThis.curMods[m]);
-    if (globalThis.curMods && globalThis.curMods.monsterless) active.push('monsterless');
+    if (isMonsterless()) active.push('monsterless');
 
     modEl.innerHTML =
         active.map(m => buildModTagSpan(m, MOD_LABELS, MOD_CLASSES)).join(' ') +

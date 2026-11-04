@@ -1,6 +1,7 @@
 import { STATE, cur, save } from '../state.js';
 import { LANG } from '../translation/translations.js';
 import { ALL } from '../levels/levels.js';
+import { isMonsterless } from '../difficulty-modifiers.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { stopTimer } from '../timer/timer.js';
 import { _doStartLevel } from '../start-level.js';
@@ -289,7 +290,13 @@ export function onCoopLevelStart() {
     dismissCompanionBot();
     if (friend) summonCompanionBot(friend, { markFocus: def.markFocus });
     if (def.mist) _addMist();
-    if (def.boss && friend) startCoopBoss(def, friend, _onBossDown);
+    if (_coopHasBoss(def) && friend) startCoopBoss(def, friend, _onBossDown);
+}
+
+// True when this encounter has a beast to beat. Monsterless runs spawn none,
+// so a boss encounter there is just the picture, finished together.
+function _coopHasBoss(def) {
+    return !!(def && def.boss) && !isMonsterless();
 }
 
 // A slow drifting mist laid over the level screen (looks only, never blocks clicks).
@@ -350,7 +357,8 @@ function _showBox(title, text, buttons, extra) {
 function _showResult(friend, firstClear, pointsBefore, pointsAfter, unlockedCharm, questItem) {
     const de = LANG === 'de';
     const friendName = COMPANION_CAST[friend].name;
-    const affinity = firstClear ? ''
+    // Affinity is still counted quietly (story scenes open with it) but a monsterless save is never shown it.
+    const affinity = firstClear || isMonsterless() ? ''
         : (de ? 'Schon geschafft: keine weitere Verbundenheit, nur zum Spaß.' : 'Done before: no more affinity, just for fun.');
     const title = de ? `Gemeinsam mit ${friendName} gelöst!` : `Solved together with ${friendName}!`;
     const text = affinity;
@@ -362,7 +370,7 @@ function _showResult(friend, firstClear, pointsBefore, pointsAfter, unlockedChar
 // and the quest item, or nothing.
 function _resultExtras(friend, firstClear, pointsBefore, pointsAfter, friendName, questItem, unlockedCharm) {
     const parts = [];
-    if (firstClear) parts.push(buildAffinityGainCard(friend, pointsBefore, pointsAfter));
+    if (firstClear && !isMonsterless()) parts.push(buildAffinityGainCard(friend, pointsBefore, pointsAfter));
     if (unlockedCharm) parts.push(_buildCharmCard(friend, friendName));
     if (questItem) parts.push(_buildRewardCard(friendName, questItem));
     if (!parts.length) return null;
@@ -434,7 +442,7 @@ export function startCoopEncounter(coopId) {
 // and shows the result. Never records anything in the campaign progress.
 export function onCoopSolved() {
     // A boss encounter is won by both: the boss down AND the picture finished.
-    if (COOP_ENCOUNTERS[cur.coopId].boss && !cur.coopBossDown) {
+    if (_coopHasBoss(COOP_ENCOUNTERS[cur.coopId]) && !cur.coopBossDown) {
         if (!cur.coopPuzzleDone) {
             cur.coopPuzzleDone = true;
             globalThis.showCombatToast(LANG === 'de' ? 'Das Bild ist fertig. Jetzt besiegt den Gegner!' : 'The picture is done. Now beat the beast together!');
@@ -463,7 +471,8 @@ function _finishCoop() {
     const friend = coopFriend(cur.coopId);
     const pointsBefore = getAffinityPoints(STATE.companionAffinity, STATE.playerCharacter, friend);
     const first = recordCoopClear(STATE.companionAffinity, cur.coopId, STATE.playerCharacter, friend);
-    const unlocked = first && COOP_ENCOUNTERS[cur.coopId].unlocksSummon && grantSummonCharm(friend);
+    // Summon charms are paid with Tether Stones, which a monsterless save can never earn.
+    const unlocked = first && COOP_ENCOUNTERS[cur.coopId].unlocksSummon && !isMonsterless() && grantSummonCharm(friend);
     const questItem = grantQuestItem(STATE.questItems, cur.coopId);
     save();
     const points = getAffinityPoints(STATE.companionAffinity, STATE.playerCharacter, friend);

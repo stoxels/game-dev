@@ -281,10 +281,21 @@ function _csiShowTip(e, char) {
     _csiTrackTip(e);
 }
 
+// True on touch screens, where nothing can be hovered: the tooltip then opens
+// on tap and sits centred at the top instead of following a cursor.
+function _csiIsTouch() {
+    return !!window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+}
+
 function _csiTrackTip(e) {
     const tip = document.getElementById('csi-tooltip');
     if (!tip) return;
     const rect = tip.getBoundingClientRect();
+    if (_csiIsTouch()) {
+        tip.style.left = Math.max(8, (window.innerWidth - rect.width) / 2) + 'px';
+        tip.style.top = '8px';
+        return;
+    }
     let x = e.clientX + 16;
     let y = e.clientY + 16;
     if (x + rect.width > window.innerWidth - 8) x = Math.max(8, e.clientX - rect.width - 14);
@@ -298,6 +309,27 @@ function _csiHideTip() {
     if (tip) tip.classList.remove('show');
 }
 
+// The big "Monsterless save" figure: the abyss boss, crossed out with a red X
+// while the option is on. Click it to switch the option on or off. The choice
+// is read when the hero is confirmed and cannot be changed later.
+function _monsterlessPickHTML() {
+    return `<button type="button" class="cs-ml-fig" id="cs-monsterless" aria-pressed="false" data-tip-t="cs_monsterless_tip">
+        <span class="cs-ml-title">${t('cs_monsterless_label')}</span>
+        <img class="cs-ml-img" src="images/combat/monsters/boss_abyss.webp" alt="" draggable="false">
+        <span class="cs-ml-cross" aria-hidden="true">✕</span>
+    </button>`;
+}
+
+// Makes the monsterless figure toggle on click (aria-pressed drives the look).
+function _wireMonsterlessPick() {
+    const fig = document.getElementById('cs-monsterless');
+    if (!fig) return;
+    fig.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fig.setAttribute('aria-pressed', fig.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+    });
+}
+
 // The shared confirm handler (image UI + legacy card fallback both funnel
 // here): persist the pick, unlock the opening cinematic replay, then carry
 // on. The character's intro is no longer played here - it waits on a story
@@ -305,6 +337,9 @@ function _csiHideTip() {
 function _csiConfirmSelection(selectedId, onSelect) {
     _csiHideTip();
     STATE.playerCharacter = selectedId;
+    // Fixed for the whole save: only ever set here, right at creation.
+    const mlFig = document.getElementById('cs-monsterless');
+    STATE.monsterless = !!(mlFig && mlFig.getAttribute('aria-pressed') === 'true');
     reconcilePassiveTreeForClass(true);
     unlockReplayIntroBundle();
     save();
@@ -331,6 +366,7 @@ function _buildCharacterSelectUI(onSelect) {
         <div class="csi-stage" id="csi-stage">
             <img class="csi-bg" src="${CSI_IMAGE_PATH}" alt="" draggable="false">
             <div class="csi-vignette"></div>
+            ${_monsterlessPickHTML()}
             ${Object.values(CHARACTERS).map(char => {
                 const hs = CSI_HOTSPOTS[char.id] || { left: 50, top: 50, width: 14, height: 46 };
                 const charName = lang === 'de' ? char.nameDE : char.name;
@@ -349,6 +385,7 @@ function _buildCharacterSelectUI(onSelect) {
         </div>`;
 
     const stage = document.getElementById('csi-stage');
+    _wireMonsterlessPick();
     const confirmBtn = document.getElementById('cs-confirm-btn');
 
     // Artwork missing → legacy card UI (also removes the cinema mode).
@@ -381,9 +418,14 @@ function _buildCharacterSelectUI(onSelect) {
         hotspot.addEventListener('click', (e) => {
             e.stopPropagation();
             _csiHideTip();
+            const alreadySelected = selectedId === char.id;
             selectChar(char, hotspot);
+            // Touch has no hover: a first tap selects the hero and shows the dossier.
+            if (_csiIsTouch() && !alreadySelected) _csiShowTip(e, char);
         });
     });
+    // Tapping the empty scene closes the dossier again.
+    stage.addEventListener('click', _csiHideTip);
 
     confirmBtn.addEventListener('click', () => {
         if (!selectedId) return;
@@ -407,12 +449,14 @@ function _buildCharacterSelectCardsUI(onSelect) {
         <div class="cs-title" data-t="cs_title">${lang === 'de' ? 'WÄHLE DEINEN CHARAKTER' : 'CHOOSE YOUR CHARACTER'}</div>
         <div class="cs-tree-start-hint" data-t="scr_character_select_tree_hint">${t('scr_character_select_tree_hint')}</div>
         <div class="cs-cards" id="cs-cards"></div>
+        ${_monsterlessPickHTML()}
         <button class="cs-confirm-btn disabled" id="cs-confirm-btn" disabled>
             ${lang === 'de' ? '▶ BESTÄTIGEN' : '▶ CONFIRM'}
         </button>
     `;
 
     const cardsEl = document.getElementById('cs-cards');
+    _wireMonsterlessPick();
 
     Object.values(CHARACTERS).forEach(char => {
         const card = document.createElement('div');

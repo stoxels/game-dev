@@ -1888,6 +1888,26 @@ img.sx-art-img {
 .sx-unique-grid.sx-dragover { border: 1px dashed #f5b642; }
 #sx-tab-uniques.sx-dragover { box-shadow: 0 0 10px rgba(245,182,66,0.5); border-color: #f5b642 !important; color: #f5d98a !important; }
 
+/* Short laptop windows: the character sheet keeps its height, so the inventory
+   used to be squeezed to nothing. Guarantee the inventory a usable height and let
+   the whole screen scroll when the window is too short for both. */
+#screen-hub .sx-hub-layout { overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; }
+/* Essence tab: the cells are tiny on laptop widths, so an essence the player
+   owns was easy to miss. Owned cells get a bright purple glow and a bigger icon;
+   empty ones stay dim. */
+#screen-hub .sx-essence-cell:has(.sx-item-chip) {
+    border-color: #d9a6ff;
+    background: radial-gradient(circle, rgba(176, 106, 224, 0.55), rgba(176, 106, 224, 0.15));
+    box-shadow: 0 0 9px rgba(190, 120, 240, 0.85), inset 0 0 6px rgba(255, 255, 255, 0.25);
+    z-index: 1;
+}
+#screen-hub .sx-essence-cell .sx-item-chip { padding: 0; }
+#screen-hub .sx-essence-cell .sx-item-chip-icon { font-size: 19px; }
+#screen-hub .sx-essence-cell .sx-item-chip.sx-rarity-essence .sx-item-chip-icon { filter: drop-shadow(0 0 5px #e0b0ff); }
+
+#screen-hub .sx-body { flex: 1 0 auto; overflow: visible; min-height: auto; }
+#screen-hub .sx-panel-inv { flex: 1 1 260px; min-height: 260px; }
+
 /* ════════════════════════════════════════════════════════════════════════
    ART SKIN - character sheet & inventory (rune-stone frames, stone buttons)
    Appended last, id-scoped: only looks change, layout hooks stay as they

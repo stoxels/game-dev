@@ -1,4 +1,5 @@
 import { Audio_Manager } from './audio/audio.js';
+import { isMonsterless } from './difficulty-modifiers.js';
 import { _getPlayerMaxMana, updateClassHUDManaBar } from './classes/class-mana.js';
 import { _onPause, _onResume } from './combat/encounter-tick-support.js';
 import { _stopEncounter } from './combat/encounter-lifecycle.js';
@@ -531,9 +532,14 @@ function _tqEnsureBubbleDom() {
     });
 }
 
-// A line key's wand variant (`<key>_wand`) when the player chose the wand and
-// the dictionary has one, else the key itself.
+// A line key's variant when the dictionary has one: `<key>_ml` on a monsterless
+// save (the lesson ends after puzzle 1), `<key>_wand` when the player chose
+// the wand. Else the key itself.
 function _tqLineKey(textKey) {
+    if (isMonsterless()) {
+        const ml = textKey + '_ml';
+        if (t(ml) !== ml) return ml;
+    }
     if (_tqP3Weapon !== 'wand') return textKey;
     const k = textKey + '_wand';
     return t(k) !== k ? k : textKey;
@@ -1652,13 +1658,14 @@ function _tqPhaseFinished() {
     _tqRefreshGridLockBorder();
     _tqClearHighlights();
     if (_tqPhase === 'p1') {
+        // Monsterless saves have nothing left to learn: puzzle 2 onward is
+        // all about monsters, loot and spells.
+        if (isMonsterless()) { _tqGraduate(); return; }
         _tqHideProfessor();
-        showToast('🎓 ' + t('tq_toast_p1_done'));
         setTimeout(() => _tqStartPuzzle(1), 1600);
     } else if (_tqPhase === 'p2') {
         // No character sheet intermission - head straight into puzzle 3.
         _tqHideProfessor();
-        showToast('🎓 ' + t('tq_toast_p2_done'));
         setTimeout(() => _tqStartPuzzle(2), 1600);
     } else if (_tqPhase === 'p3') {
         // Final lesson: the parry training arena, then graduation. The
@@ -1668,21 +1675,28 @@ function _tqPhaseFinished() {
         _tqStepIdx = 0;
         _tqRunCurrentPhase();
     } else if (_tqPhase === 'p4') {
-        STATE.tutorialDone = true;
-        save();
-        try { if (typeof _stopEncounter === 'function') _stopEncounter(); } catch (e) {}
-        _tqHideProfessor();
-        // Final farewell: as the Professor's graduation line closes, the
-        // player's character signs off BY NAME (tutorial_farewell bank in
-        // character-banter.js). The transition waits out the bubble's ~4.2s
-        // lifetime so the goodbye plays in full.
-        _tqPlayerReply(600, 'tutorial_farewell');
-        setTimeout(() => {
-            showToast('🎓 ' + t('tq_toast_graduated'));
-            _tqTeardownTutorialState();
-            showSetup();
-        }, 4200);
+        _tqGraduate();
     }
+}
+
+// Ends the tutorial: marks it done, says goodbye and returns to the setup
+// screen. Reached after puzzle 4 (the parry lesson) or, on a monsterless
+// save, straight after puzzle 1.
+function _tqGraduate() {
+    STATE.tutorialDone = true;
+    save();
+    try { if (typeof _stopEncounter === 'function') _stopEncounter(); } catch (e) {}
+    _tqHideProfessor();
+    // Final farewell: as the Professor's graduation line closes, the
+    // player's character signs off BY NAME (tutorial_farewell bank in
+    // character-banter.js). The transition waits out the bubble's ~4.2s
+    // lifetime so the goodbye plays in full.
+    _tqPlayerReply(600, 'tutorial_farewell');
+    setTimeout(() => {
+        showToast('🎓 ' + t('tq_toast_graduated'));
+        _tqTeardownTutorialState();
+        showSetup();
+    }, 4200);
 }
 
 
@@ -1885,7 +1899,6 @@ function _tqGiveCandle() {
     if (!STATE.inventory.some(i => i.defId === 'reveal1' && i.isTutorialCandle)) {
         _tqGrantPuzzleItem('reveal1', { isTutorialCandle: true });
     }
-    showToast('🎓 ' + t('tq_toast_candle'));
 }
 
 // The tutorial candle's effect: reveals EXACTLY ONE undecidable cell (the
@@ -2876,7 +2889,6 @@ function _tqShowIntermission() {
             _tqPollTimer = null;
             document.getElementById('tq-intermission').classList.remove('show');
             try { document.body.classList.remove('tq-intermission-active'); } catch (e) {}
-            showToast('🎓 ' + t('tq_toast_equipped'));
             setTimeout(() => _tqStartPuzzle(2), 1200);
         }
     }, 800);

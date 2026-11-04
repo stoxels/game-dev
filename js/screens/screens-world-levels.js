@@ -2277,7 +2277,11 @@ function _wdShowTrialTooltip(e, wi, isDone, isLocked) {
     let reward = '';
     if (!isLocked && !isDone) {
         const rw = (typeof t === 'function') ? t('scr_trial_reward') : null;
-        reward = `<div class="wd-tip-bonus">${(rw && rw !== 'scr_trial_reward' ? rw : '🌿 First clear: +1 passive point')}</div>`;
+        // monsterless saves earn 2 points for a convergence trial
+        const rewardText = STATE.monsterless
+            ? (LANG === 'de' ? '🌿 Erster Abschluss: +2 Talentpunkte' : '🌿 First clear: +2 passive points')
+            : (rw && rw !== 'scr_trial_reward' ? rw : '🌿 First clear: +1 passive point');
+        reward = `<div class="wd-tip-bonus">${rewardText}</div>`;
     }
     const badge = (typeof t === 'function' ? t('scr_convergence_badge') : null);
     tip.innerHTML = `<div class="wd-tip-header"><span class="mv-tooltip-title">${(badge && badge.indexOf('scr_') !== 0 ? badge + ' · ' : '🌿 ')}${name}</span></div>`

@@ -460,6 +460,25 @@ div.tq-hl {
     }
 }
 
+/* Clue number cells sit edge to edge, so an outer glow per cell piles up into
+   fat overlapping blobs. Highlight them from the inside instead: a thin gold
+   ring and a soft gold wash that pulse, with no rounded corners or outer glow. */
+td.cch.tq-hl,
+td.rct.tq-hl {
+    border-radius: 0;
+    animation: tq-clue-pulse 1.2s ease-in-out infinite !important;
+}
+@keyframes tq-clue-pulse {
+    0%, 100% {
+        box-shadow: inset 0 0 0 2px rgba(255, 209, 102, 0.85), inset 0 0 8px 1px rgba(255, 209, 102, 0.35);
+        background-color: rgba(255, 209, 102, 0.12);
+    }
+    50% {
+        box-shadow: inset 0 0 0 2px rgba(255, 224, 140, 1), inset 0 0 14px 3px rgba(255, 209, 102, 0.6);
+        background-color: rgba(255, 209, 102, 0.28);
+    }
+}
+
 /* Focus highlight for one puzzle cell (the .gc div inside its td). */
 .tq-cell-hl {
     animation: tq-cell-pulse 1.2s ease-in-out infinite !important;
@@ -712,6 +731,31 @@ body.tq-intermission-active #screen-hub .sx-topbar .sx-level-btn {
 .tut-nav-btn { font-family: var(--C, serif); font-weight: 700; font-size: clamp(14px, 1.4vw, 18px); letter-spacing: 0.06em; }
 .tq-aside-bubble { font-family: var(--PX, serif); font-size: clamp(14px, 1.4vw, 17px); }
 #tq-professor-wrap .tq-bubble-continue { font-family: var(--C, serif); font-weight: 700; font-size: 14px; }
+
+/* The game is paused until Continue is clicked, so make the button impossible to
+   miss: larger, a gentle bounce, and a ring that ripples outwards. */
+#tq-professor-wrap .tq-bubble-continue {
+    position: relative;
+    font-size: 17px;
+    padding: 9px 26px;
+    animation: tq-continue-glow 1.6s ease-in-out infinite, tq-continue-bounce 1.1s ease-in-out infinite;
+}
+#tq-professor-wrap .tq-bubble-continue::after {
+    content: '';
+    position: absolute; inset: -3px;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 225, 130, 0.9);
+    pointer-events: none;
+    animation: tq-continue-ring 1.4s ease-out infinite;
+}
+@keyframes tq-continue-bounce {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
+}
+@keyframes tq-continue-ring {
+    from { opacity: 0.9; transform: scale(1); }
+    to   { opacity: 0;   transform: scale(1.25, 1.55); }
+}
 #tq-chest-modal .tq-chest-box-hint { font-family: var(--PX, serif); font-size: 16px; }
 #tq-chest-modal .tq-chest-item-sub { font-size: 14px; }
 #tq-chest-modal .tq-chest-item-state { font-size: 13px; }

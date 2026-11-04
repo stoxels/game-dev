@@ -291,7 +291,7 @@
     background: linear-gradient(180deg, rgba(30, 24, 46, 0.97), rgba(14, 12, 24, 0.97));
     color: #f3e6c8;
     border: 2px solid #c8a84b;
-    border-radius: 6px;
+    border-radius: 18px;
     box-shadow:
         inset 0 0 0 1px rgba(255, 233, 168, 0.18),
         inset 0 0 18px rgba(140, 90, 220, 0.15),
@@ -301,8 +301,12 @@
     font-size: clamp(13px, 1.5vw, 16px);
     line-height: 1.5;
 }
-#tq-professor-wrap .tq-bubble::after { border-left-color: #c8a84b; }
-#tq-professor-wrap .tq-bubble::before { border-left-color: #14101e; }
+/* Tail: gold outline triangle with a dark fill on top, pointing at the Professor
+   (sideways when he stands beside the bubble, downwards when it is stacked above him). */
+#tq-professor-wrap .tq-bubble::after { border-left-color: #c8a84b; border-width: 13px; border-right-width: 0; right: -15px; }
+#tq-professor-wrap .tq-bubble::before { border-left-color: #14101e; border-width: 10px; border-right-width: 0; right: -11px; bottom: 21px; }
+#tq-professor-wrap.tq-stacked .tq-bubble::after { border: 13px solid transparent; border-bottom-width: 0; border-top-color: #c8a84b; right: 30px; bottom: -14px; }
+#tq-professor-wrap.tq-stacked .tq-bubble::before { border: 10px solid transparent; border-bottom-width: 0; border-top-color: #14101e; right: 33px; bottom: -10px; }
 #tq-professor-wrap .tq-bubble-name {
     display: inline-block;
     margin-bottom: 6px;
@@ -316,10 +320,10 @@
 #tq-professor-wrap .tq-bubble-text strong,
 #tq-professor-wrap .tq-bubble-text b { color: #ffe9a8; }
 #tq-professor-wrap .tq-bubble-continue {
-    min-width: 130px;
-    padding: 12px 22px;
+    min-width: 150px;
+    padding: 14px 26px;
     font-family: var(--PX);
-    font-size: 10px;
+    font-size: 13px;
     letter-spacing: 2px;
     color: #ffe9a8;
     text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
@@ -328,7 +332,13 @@
     border-radius: 0;
     box-shadow: none;
     filter: drop-shadow(0 0 8px rgba(255, 190, 70, 0.5));
-    animation: none;
+    /* The game waits on this button, so it bounces and glows until clicked. */
+    animation: tq-continue-bounce 1.1s ease-in-out infinite, tq-continue-stone-glow 1.4s ease-in-out infinite;
+}
+#tq-professor-wrap .tq-bubble-continue::after { content: none; }
+@keyframes tq-continue-stone-glow {
+    0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 190, 70, 0.45)); }
+    50%      { filter: drop-shadow(0 0 16px rgba(255, 215, 110, 0.95)); }
 }
 #tq-professor-wrap .tq-bubble-continue:hover {
     color: #fff3c4;

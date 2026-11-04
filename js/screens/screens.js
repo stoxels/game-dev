@@ -26,6 +26,9 @@ try { Object.defineProperty(globalThis, 'switchScreen', { get() { return switchS
 // anchored to the in-level bar and must never survive a screen change.
 export function switchScreen(id) {
     closeInventoryFlyout();
+    // MONSTERLESS saves hide every gear / shop button through this body class
+    // (see css/game.css); switching screens is the one place every load passes.
+    document.body.classList.toggle('sx-monsterless', !!(STATE && STATE.monsterless));
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
 }
@@ -392,6 +395,7 @@ export function launchEndgameTestMode() {
 // this on arrival at the Cartographer's Outpost; `fromScreen` is the screen
 // Back returns to (defaults to the map view).
 export function launchVendor(fromScreen) {
+    if (STATE && STATE.monsterless) return;   // no gold, no gear: no shop
     globalThis.screenHistory.push(typeof fromScreen === 'string' ? fromScreen : 'screen-map-view');
     if (typeof globalThis.showVendor === 'function') globalThis.showVendor();
 }

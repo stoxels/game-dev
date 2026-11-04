@@ -276,9 +276,16 @@ function _maybeShowLowTimeWarning() {
     _showLowTimeWarningBanner(tier);
 }
 
-export function _resetLowTimeWarningState() {
+// Clears the low-time warnings for a fresh level. Pass the level's starting
+// seconds so warnings for thresholds it already starts at or below (a 4-minute
+// puzzle never says "5 minutes remaining") are skipped.
+export function _resetLowTimeWarningState(startSecs) {
     _lowTimeWarningShown = { 300: false, 120: false, 30: false };
     _lowTimeLastSecs = null;
+    if (Number(startSecs) > 0) {
+        for (const tier of [300, 120, 30]) if (startSecs <= tier) _lowTimeWarningShown[tier] = true;
+        _lowTimeLastSecs = startSecs;
+    }
     const banner = document.getElementById('sx-low-time-warning-banner');
     if (banner) banner.remove();
 }

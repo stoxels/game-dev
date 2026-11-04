@@ -165,7 +165,9 @@ let _specCache = [];
 
 // Effect specs of every earned title. Read by the stat aggregation in
 // hub-leveling.js, so it is cached until a new title is earned.
+// Titles are only decoration on a monsterless save: no bonus at all.
 export function getTitleEffectSpecs() {
+    if (STATE && STATE.monsterless) return [];
     const earned = getEarnedTitlesForScore(_score());
     if (earned.length !== _specCacheCount) {
         _specCacheCount = earned.length;
@@ -253,8 +255,9 @@ function _openModal(modal, titleKey, bodyHtml) {
 // not the title is the one shown in front of the character name.
 function _buildTitleRow(def, activeId, index) {
     const earned = _score() >= def.score;
-    const stats = getTitleStatLines(def).map(l => `<div class="tt-stat">${l}</div>`).join('');
-    const always = earned ? `<div class="tt-always">${t('titles_always')}</div>` : '';
+    const cosmetic = !!(STATE && STATE.monsterless);
+    const stats = cosmetic ? '' : getTitleStatLines(def).map(l => `<div class="tt-stat">${l}</div>`).join('');
+    const always = earned && !cosmetic ? `<div class="tt-always">${t('titles_always')}</div>` : '';
     const state = !earned
         ? `<span class="tt-lock">🔒 ${t('titles_locked_at').replace('{n}', def.score.toLocaleString())}</span>`
         : def.id === activeId
@@ -271,6 +274,7 @@ function _buildTitleRow(def, activeId, index) {
 // title, plus the sentence that teaches the stacking rule. Before the
 // first title it becomes a short "how this works" hint instead.
 function _buildTotalBox(earnedCount) {
+    if (STATE && STATE.monsterless) return `<div class="tt-total tt-total-empty">${t('titles_cosmetic_hint')}</div>`;
     if (!earnedCount) return `<div class="tt-total tt-total-empty">${t('titles_empty_hint')}</div>`;
     const lines = getEarnedTitleTotalLines().map(l => `<div class="tt-total-line">${l}</div>`).join('');
     return `<div class="tt-total">

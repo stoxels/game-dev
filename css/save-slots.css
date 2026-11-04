@@ -89,6 +89,48 @@
     margin-top: 2px; /* ← levels-done text position */
 }
 
+/* MONSTERLESS save: bright grey frame + the abyss boss as a big watermark
+   behind the card's text (z-index -1 inside the card's own stacking context) */
+.save-slot-card.ssc-monsterless {
+    isolation: isolate;
+    overflow: hidden;
+    border: 2px solid #dfe2e8;
+    box-shadow: 0 0 14px rgba(223,226,232,0.45), inset 0 0 22px rgba(223,226,232,0.14);
+}
+
+.save-slot-card.ssc-monsterless::before {
+    content: "";
+    position: absolute;
+    right: -6%;
+    top: 50%;
+    height: 135%;
+    aspect-ratio: 1;
+    transform: translateY(-50%);
+    background: url("../images/combat/monsters/boss_abyss.webp") center / contain no-repeat;
+    opacity: .5;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* ...struck through: a red "no monsters" sign (ring + slash) over the boss */
+.save-slot-card.ssc-monsterless::after {
+    content: "";
+    position: absolute;
+    right: 3%;
+    top: 50%;
+    height: 92%;
+    aspect-ratio: 1;
+    transform: translateY(-50%);
+    box-sizing: border-box;
+    border: 5px solid rgba(214, 48, 48, 0.9);
+    border-radius: 50%;
+    background: linear-gradient(to top right,
+        transparent calc(50% - 4px), rgba(214, 48, 48, 0.9) calc(50% - 4px),
+        rgba(214, 48, 48, 0.9) calc(50% + 4px), transparent calc(50% + 4px));
+    z-index: -1;
+    pointer-events: none;
+}
+
 /* Player level - only shown on save slot if endgame reached and level > 1 */
 .ssc-player-level {
     font-family: var(--PX);
@@ -545,6 +587,17 @@
     background: url('../images/Settings/settings_title_plague.webp') center / 100% 100% no-repeat;
 }
 
+/* One-line instruction under the title for first-time players. */
+#screen-save-slots .ss-hint {
+    padding: 4px 28px 6px;
+    text-align: center;
+    font-family: var(--C, serif);
+    font-weight: 700;
+    font-size: clamp(14px, 1.1vw, 18px);
+    color: #f3e6c8;
+    text-shadow: 0 2px 3px #000;
+}
+
 #screen-save-slots .ss-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 columns x 5 rows */
     grid-template-rows: repeat(5, minmax(176px, 1fr));
@@ -805,6 +858,13 @@
 #screen-save-slots .ssc-info .ssc-score, #screen-save-slots .ssc-info .ssc-levels { white-space: normal; }
 #screen-save-slots .ssc-info .ssc-score { font-size: 14px; }
 #screen-save-slots .ssc-info .ssc-levels { font-size: 13px; }
+/* Laptop widths: the slot ribbon and level chip share one row, so keep both compact
+   and on one line (the ribbon gives way first) so they never overlap. */
+#screen-save-slots .ssc-info { column-gap: 4px; }
+#screen-save-slots .ssc-info .ssc-num,
+#screen-save-slots .ssc-info .ssc-player-level { white-space: nowrap; min-width: 0; }
+#screen-save-slots .ssc-info .ssc-num { padding: 3px 8px; letter-spacing: 0.04em; font-size: clamp(12px, 0.95vw, 15px); overflow: hidden; }
+#screen-save-slots .ssc-info .ssc-player-level { padding: 1px 6px; font-size: clamp(11px, 0.85vw, 14px); }
 
 /* 💾 export (bottom-left) and 📥 import (bottom-right) buttons: move a save
    to and from a file on the player's PC. */
@@ -826,3 +886,58 @@
     .ssc-import-btn:hover {
         opacity: 1;
     }
+
+/* ------------------------------------------------------------
+   PHONES IN LANDSCAPE
+   Phones lay the page out as a ~560 px tall virtual window (see
+   js/touch/touch-viewport.js), so "short" means 600 px or less. One wide slot
+   per row instead of four cramped columns: portrait on the left; slot ribbon,
+   name and level chip on the top line; title, score and stoxels done on the
+   second line. Text is larger than on laptops because the page is scaled down
+   to fit the phone. The list scrolls.
+   ------------------------------------------------------------ */
+@media (max-height: 600px) {
+    #screen-save-slots .ss-topbar { padding: 8px 20px 2px; }
+    #screen-save-slots .ss-title { padding: 10px 48px; font-size: 16px; min-width: 0; }
+    #screen-save-slots .ss-hint { padding: 2px 20px 4px; font-size: 14px; }
+    #screen-save-slots .ss-grid {
+        grid-template-columns: minmax(0, 880px);
+        justify-content: center;
+        grid-template-rows: none;
+        grid-auto-rows: 128px;
+        gap: 12px;
+        padding: 8px 20px 20px;
+    }
+    #screen-save-slots .save-slot-card { border-width: 14px; border-image-width: 14px; }
+    #screen-save-slots .ssc-body { gap: 18px; padding: 0 6px; }
+    #screen-save-slots .ssc-body .ssc-portrait { max-height: 92px; }
+    #screen-save-slots .ssc-info {
+        grid-template-columns: auto minmax(0, 1fr) auto auto;
+        column-gap: 14px;
+        row-gap: 6px;
+    }
+    #screen-save-slots .ssc-info .ssc-num { grid-column: 1; grid-row: 1; font-size: 15px; padding: 3px 10px; }
+    #screen-save-slots .ssc-info .ssc-name { grid-column: 2 / 4; grid-row: 1; margin: 0; font-size: 17px; }
+    #screen-save-slots .ssc-info .ssc-player-level { grid-column: 4; grid-row: 1; font-size: 14px; padding: 2px 8px; }
+    #screen-save-slots .ssc-info .ssc-title {
+        grid-column: 1 / 3;
+        grid-row: 2;
+        margin: 0;
+        padding: 0;
+        border-bottom: none;
+        font-size: 15px;
+    }
+    #screen-save-slots .ssc-info .ssc-score,
+    #screen-save-slots .ssc-info .ssc-levels {
+        grid-row: 2;
+        margin: 0;
+        padding: 4px 10px;
+        font-size: 15px;
+        white-space: nowrap;
+    }
+    #screen-save-slots .ssc-info .ssc-score { grid-column: 3; }
+    #screen-save-slots .ssc-info .ssc-levels { grid-column: 4; }
+    #screen-save-slots .save-slot-card.empty .ssc-empty { padding: 14px 14px; font-size: 17px; width: 50%; }
+    #screen-save-slots .ssc-export-btn,
+    #screen-save-slots .ssc-import-btn { font-size: 15px; }
+}

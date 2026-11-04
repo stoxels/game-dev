@@ -137,7 +137,8 @@ export function _canLeaveMap() {
 export function _onQuestionAnswered() {
     if (!_isActive()) return;
     _questionsAnswered++;
-    const gain = BONUS_LOOT_CHANCE_PER_QUESTION[
+    // Monsterless saves collect no loot, so no bonus-loot chance either.
+    const gain = STATE.monsterless ? 0 : BONUS_LOOT_CHANCE_PER_QUESTION[
         Math.min(_questionsAnswered - 1, BONUS_LOOT_CHANCE_PER_QUESTION.length - 1)
     ];
     _bonusLootChance = Math.min(BONUS_LOOT_CHANCE_MAX, _bonusLootChance + gain);
@@ -159,7 +160,7 @@ export function _onPuzzleComplete() {
     Audio_Manager.playSFX('win');
 
     _chainPuzzleSolvedCount++;
-    const gain = _getPuzzleBonusLootGain();
+    const gain = STATE.monsterless ? 0 : _getPuzzleBonusLootGain();
     _bonusLootChance = Math.min(BONUS_LOOT_CHANCE_MAX, _bonusLootChance + gain);
     _pendingPuzzleBonusGain += gain;
     _updateObjectivesHUD();
@@ -1107,7 +1108,7 @@ export function _updateBonusLootHUD() {
     const el = document.getElementById('sx-bonus-loot-chance');
     if (!el) return;
 
-    if (!_isActive()) {
+    if (!_isActive() || STATE.monsterless) {
         el.classList.add('hidden');
         return;
     }
@@ -1949,7 +1950,8 @@ export function _showLeaveMapTransition(atlasResult, opts) {
 
     const panel = el.querySelector('.sx-leave-map-panel') || el;
     const container = document.getElementById('sx-leave-summary-container');
-    if (container) {
+    // Monsterless saves collect no loot, so there is no loot summary to show.
+    if (container && !STATE.monsterless) {
         container.innerHTML = _buildLeaveMapSummaryHTML(state.loot, state.items, state.maps, state.currency, state.essences, state.gold);
     }
     // Learning panel: whole-map combat statistics (win or defeat).

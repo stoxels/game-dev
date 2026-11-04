@@ -1,5 +1,6 @@
 import { migrateQuestState } from './inference/inference-stats.js';
 import { TALENT_TREE_DATA } from './probability-tree/probability-tree-data.js';
+import { MONSTERLESS_TREE_DATA } from './probability-tree/probability-tree-data-monsterless.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 3: live globalThis accessors for externally-mutated state.
@@ -285,10 +286,31 @@ export function setSlotName(slotNum, name) {
 //------------------------------------------------------------------------
 
 
-const PT_ACTIVE_TREE_DATA = TALENT_TREE_DATA && Array.isArray(TALENT_TREE_DATA.nodes) && Array.isArray(TALENT_TREE_DATA.connections)
-    ? TALENT_TREE_DATA
-    : { nodes: [], connections: [] };
-const PT_ACTIVE_NODE_IDS = new Set(PT_ACTIVE_TREE_DATA.nodes.map(node => node.id));
+function _ptValidTreeData(data) {
+    return data && Array.isArray(data.nodes) && Array.isArray(data.connections)
+        ? data
+        : { nodes: [], connections: [] };
+}
+
+// The passive tree a save uses: monsterless saves have a tree of their own.
+// (A plain function, no stored copy: the tree screen asks for it while this
+// module is still starting up.)
+export function getPassiveTreeDataFor(s) {
+    return _ptValidTreeData(s && s.monsterless ? MONSTERLESS_TREE_DATA : TALENT_TREE_DATA);
+}
+
+const _ptNodeIdSets = new Map();   // tree data -> set of its node ids
+
+// The set of node ids in the save's tree.
+function _ptActiveNodeIdsFor(s) {
+    const data = getPassiveTreeDataFor(s);
+    let ids = _ptNodeIdSets.get(data);
+    if (!ids) {
+        ids = new Set(data.nodes.map(node => node.id));
+        _ptNodeIdSets.set(data, ids);
+    }
+    return ids;
+}
 const PT_GATE_ID = 1;
 const PT_CHARACTER_ROOT_IDS = Object.freeze({
     stox: 1001,
@@ -318,10 +340,10 @@ function _ptAddAdjacency(map, from, to) {
     map[to].add(from);
 }
 
-function getPassiveTreeCompatibilityAdjacency() {
+function getPassiveTreeCompatibilityAdjacency(data) {
     const map = Object.create(null);
-    for (const node of PT_ACTIVE_TREE_DATA.nodes) map[node.id] = new Set();
-    for (const connection of PT_ACTIVE_TREE_DATA.connections) {
+    for (const node of data.nodes) map[node.id] = new Set();
+    for (const connection of data.connections) {
         _ptAddAdjacency(map, connection.from, connection.to);
     }
     return map;
@@ -428,6 +450,7 @@ function reconcilePassiveTreeState(s, resetFocus = false) {
         changed = true;
     }
 
+    const PT_ACTIVE_NODE_IDS = _ptActiveNodeIdsFor(s);
     const hadLegacyGate = version < 3 && s.passiveTreeAllocated.has(PT_GATE_ID);
     if (version < 2 && s.passiveTreeAllocated.delete(PT_GATE_ID)) changed = true;
 
@@ -452,7 +475,7 @@ function reconcilePassiveTreeState(s, resetFocus = false) {
     const roots = [...s.passiveTreeAllocated].filter(id => PT_CLASS_ROOT_SET.has(id));
     const preserveLegacyAllocations = version < 2 || hadLegacyGate || resetFocus;
     if (roots.length && PT_ACTIVE_NODE_IDS.size && !preserveLegacyAllocations) {
-        const adjacency = getPassiveTreeCompatibilityAdjacency();
+        const adjacency = getPassiveTreeCompatibilityAdjacency(getPassiveTreeDataFor(s));
         const reachable = _ptReachableFromRoots(roots, s.passiveTreeAllocated, adjacency);
         for (const id of [...s.passiveTreeAllocated]) {
             if (id === PT_GATE_ID || !PT_ACTIVE_NODE_IDS.has(id) || reachable.has(id)) continue;
@@ -568,6 +591,10 @@ export function buildFreshState() {
         // the Nexus screen and the setup-screen "Enter the Nexus" button.
         nexusUnlocked: false,
 
+        // MONSTERLESS save: chosen once on the character-select screen and never
+        // changed afterwards. No monsters, no endgame, puzzle-only progression.
+        monsterless: false,
+
         // Resistance penalty stage (ARPG style): 0 = none, 1 = -30% to all
         // resistances (Ascension Trial that opens the ascendency class cleared),
         // 2 = -60% (World 14 / Nexus Point cleared, before the endgame maps).
@@ -652,6 +679,7 @@ export function _migrateCoreFields(s) {
     if (!Number.isFinite(Number(s.tetherStones)) || s.tetherStones < 0) s.tetherStones = 0;
     if (!s.questItems || typeof s.questItems !== 'object' || Array.isArray(s.questItems)) s.questItems = {};
     if (s.nexusUnlocked === undefined) s.nexusUnlocked = false;
+    s.monsterless = !!s.monsterless;
     // Older saves: derive the penalty stage from progress already made.
     if (s.resistPenaltyStage === undefined) s.resistPenaltyStage = s.nexusUnlocked ? 2 : (s.playerAscendency ? 1 : 0);
 
@@ -902,6 +930,7 @@ export function getSlotSummary(slotNum) {
         playerClass: raw.playerClass || null,
         playerAscendency: raw.playerAscendency || null,
         tutorialDone: !!raw.tutorialDone,
+        monsterless: !!raw.monsterless,
         // --- Extended stats for the save-slot tooltip ---
         // NOTE: sourced from raw.questStats (per-slot), NOT raw.achStats
         // (achStats is a cross-slot/global store and is never populated

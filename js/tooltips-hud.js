@@ -470,7 +470,6 @@ const _MOD_TIP_KEYS = {
     ironman: ['mod_im', 'mod_tip_im'],
     classless: ['mod_cl', 'mod_tip_cl'],
     treeless: ['mod_tl', 'mod_tip_tl'],
-    monsterless: ['mod_ml', 'mod_tip_ml'],
     superTutor: ['mod_super_tutor', 'mod_tip_pro'],
 };
 
@@ -652,8 +651,10 @@ export function _buildSaveSlotTooltipHTML(summary) {
     const story = getStoryProgress(summary.slot, summary.playerCharacter);
 
     let html = `<div class="sx-slot-tip-title">${t('cg_slot_stats').replace('{n}', summary.slot)}</div>`;
+    // Monsterless saves say so, and skip the level and the monster / boss counts.
+    if (summary.monsterless) html += `<div class="sx-slot-tip-line"><b>${t('mod_ml')}</b></div>`;
     html += _statLine('cg_stat_playtime', _fmtPlaytime(summary.totalTimePlayedSecs));
-    html += _statLine('cg_stat_level', summary.playerLevel);
+    if (!summary.monsterless) html += _statLine('cg_stat_level', summary.playerLevel);
 
     html += _statGroup('cg_group_puzzles');
     html += _statLine('cg_stat_revealed', summary.lifetimeTilesRevealed);
@@ -664,8 +665,10 @@ export function _buildSaveSlotTooltipHTML(summary) {
     html += _statLine('cg_stat_items_used', summary.itemsUsedTotal);
 
     html += _statGroup('cg_group_combat');
-    html += _statLine('cg_stat_monsters', summary.monstersSlain);
-    html += _statLine('cg_stat_bosses', summary.bossesSlain);
+    if (!summary.monsterless) {
+        html += _statLine('cg_stat_monsters', summary.monstersSlain);
+        html += _statLine('cg_stat_bosses', summary.bossesSlain);
+    }
     html += _statLine('cg_stat_abilities', summary.classAbilitiesUsed);
     html += _statLine('cg_stat_upgrades', upgradesAchieved);
     html += _statLine('cg_stat_passive_pts', summary.passivePointsObtained);

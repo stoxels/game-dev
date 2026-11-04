@@ -1,6 +1,7 @@
 import { _getPlayerMaxMana, gainMana } from '../classes/class-mana.js';
 import { _egMapHasBloodMagic } from '../endgame/endgame-map-launch.js';
 import { _lifeGain } from '../hub/hub-leveling.js';
+import { STATE } from '../state.js';
 
 // combat-quiz-buffs.js
 //------------------------------------------------------------------------
@@ -369,6 +370,8 @@ function _eligibleQuizRewards() {
 // question. If the instant reward turns out to do nothing, a damage stack
 // is given instead so no answer is wasted.
 export function _applyQuizRewardBuff() {
+    // Monsterless saves have no combat: a correct answer earns no buff.
+    if (STATE.monsterless) return;
     const eligible = _eligibleQuizRewards();
     const pick = eligible[Math.floor(Math.random() * eligible.length)];
 

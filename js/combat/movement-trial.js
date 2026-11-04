@@ -1,5 +1,10 @@
 import { LANG } from '../translation/translations.js';
-import { STATE, cur } from '../state.js';
+import { STATE, cur, save } from '../state.js';
+import { isMonsterless } from '../difficulty-modifiers.js';
+import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
+import { itemName, pickRandomItem } from '../puzzle-items/item-pool.js';
+import { puzzleItemIconHtml, showItemGainPopup } from '../puzzle-mechanics/toasts-and-popups.js';
+import { buildInventoryPanel } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { keybindKeyFor } from '../keybinds.js';
 import { _animSetDefaultDownImage, _animShouldMirrorFor, _animWarmCacheFor, _playAvatarWalkAnimation, _startAvatarIdleAnimation, _stopAvatarWalkAnimation } from '../sprite/sprite_animations.js';
@@ -252,15 +257,39 @@ function _banner(arena, text, cls) {
 //-------------------CHEST REWARD-----------------------------------------
 //------------------------------------------------------------------------
 
+// What the chest offers. Monsterless saves have no use for gear, so they are
+// offered puzzle items instead (shaped like the equipment entries: icon,
+// name, and a puzzle flag so taking one goes to the puzzle-item inventory).
+function _rollChestItems(level) {
+    const items = [];
+    for (let i = 0; i < CHEST_ITEMS; i++) {
+        if (isMonsterless()) {
+            const defId = pickRandomItem();
+            const def = defId ? ITEM_DEFS[defId] : null;
+            if (def) items.push({ puzzleDefId: defId, icon: puzzleItemIconHtml(def), name: itemName(def) });
+            continue;
+        }
+        try { const it = _generateEquipmentDrop(level); if (it) items.push(it); } catch (e) { /* skip a failed roll */ }
+    }
+    return items;
+}
+
+// Puts one chest item where it belongs: the puzzle-item inventory for a
+// puzzle item, the stash for a piece of equipment.
+function _claimChestItem(item) {
+    if (!item.puzzleDefId) { _addItemToStash(item); return; }
+    STATE.inventory.push({ defId: item.puzzleDefId, uid: Date.now() + Math.random().toString(36).slice(2) });
+    save();
+    buildInventoryPanel();
+    showItemGainPopup(item.puzzleDefId);
+}
+
 // Opens the chest panel over the arena with a few items to take. Items are
 // taken with a click; "Continue" takes whatever is left, so nothing is lost.
 // Calls done() when the panel closes.
 function _openChest(modal, done) {
     const level = Math.max(1, Math.round(_campaignMonsterLevel(cur ? cur.gIdx : 0) || 1));
-    const items = [];
-    for (let i = 0; i < CHEST_ITEMS; i++) {
-        try { const it = _generateEquipmentDrop(level); if (it) items.push(it); } catch (e) { /* skip a failed roll */ }
-    }
+    const items = _rollChestItems(level);
     const panel = document.createElement('div');
     panel.className = 'mt-chest-panel';
     panel.innerHTML = `<img class="mt-chest-img" src="${CHEST_IMG}" alt="" draggable="false">
@@ -272,7 +301,7 @@ function _openChest(modal, done) {
     const take = (i, btn) => {
         if (taken.has(i)) return;
         taken.add(i);
-        try { _addItemToStash(items[i]); } catch (e) { /* stash failure must not trap the player */ }
+        try { _claimChestItem(items[i]); } catch (e) { /* a failed claim must not trap the player */ }
         _clearTooltip();
         btn.classList.add('mt-chest-taken');
         btn.disabled = true;
@@ -284,9 +313,11 @@ function _openChest(modal, done) {
         btn.innerHTML = `<span class="mt-chest-icon">${it.icon || '📦'}</span><span class="mt-chest-name">${it.name || ''}</span>`;
         btn.addEventListener('click', () => take(i, btn));
         // Hover shows the same item tooltip as the stash.
-        btn.addEventListener('mouseenter', (e) => { try { _showHubTooltip(it, e); } catch (err) { /* tooltip is cosmetic */ } });
-        btn.addEventListener('mousemove', _moveTooltip);
-        btn.addEventListener('mouseleave', _clearTooltip);
+        if (!it.puzzleDefId) {
+            btn.addEventListener('mouseenter', (e) => { try { _showHubTooltip(it, e); } catch (err) { /* tooltip is cosmetic */ } });
+            btn.addEventListener('mousemove', _moveTooltip);
+            btn.addEventListener('mouseleave', _clearTooltip);
+        }
         list.appendChild(btn);
     });
     panel.querySelector('.mt-chest-continue').addEventListener('click', () => {

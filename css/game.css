@@ -645,6 +645,40 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     color: #c9ccd1;
 }
 
+/* MONSTERLESS saves: no gear, no gold, so no character sheet, no shop. */
+body.sx-monsterless #mv-btn-char-sheet,
+body.sx-monsterless #wd-btn-char-sheet,
+body.sx-monsterless #mv-btn-shop,
+body.sx-monsterless #wd-btn-shop,
+body.sx-monsterless #btn-pause-char,
+body.sx-monsterless #btn-pause-shop,
+body.sx-monsterless .mv-home-marker,
+body.sx-monsterless .tb-gold,
+body.sx-monsterless .affinity-panel-btn,
+body.sx-monsterless #sx-xp-bar,
+body.sx-monsterless #sx-char-level-inline,
+body.sx-monsterless .touch-btn[data-touch-id="sheet"] {
+    display: none !important;
+}
+
+/* With Character and Shop gone, the 2 x 3 level-select button grid has four
+   buttons left: lay them out as a tidy 2 x 2 block instead of 3 + 1. */
+body.sx-monsterless #screen-map-view .tb-grid,
+body.sx-monsterless #screen-world-detail .tb-grid {
+    grid-template-columns: repeat(2, auto);
+}
+
+/* The hidden gold pill and hidden Affinity button still count as "there" for
+   the rules that shrink the button group's left margin (map-view-topbar.css and
+   the style injected by affinity-panel.js), so put the group back against the
+   right edge. Phones keep their own centred layout. */
+@media (min-width: 761px) {
+    body.sx-monsterless #screen-map-view .ls-topbar > .ls-topbar-right,
+    body.sx-monsterless #screen-world-detail .ls-topbar > .ls-topbar-right {
+        margin-left: auto !important;
+    }
+}
+
 
 
 

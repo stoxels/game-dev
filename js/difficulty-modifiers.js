@@ -1,5 +1,6 @@
 import { hideModal, showModal } from './screens/screens.js';
 import { t } from './translation/translations.js';
+import { STATE } from './state.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE-------------------------------------
@@ -62,10 +63,15 @@ function _marathonShift() {
 export const CAMPAIGN_OVERSIZE_CELLS = 400;
 export const CAMPAIGN_OVERSIZE_SECS_PER_CELL = 1;
 
+// The budget above was set with gear time bonuses in mind. A monsterless save
+// has no gear, so its base time is scaled up instead.
+const MONSTERLESS_TIME_MULT = 1.5;
+
 // Base level timer (seconds) for a grid with the given cell count.
 export function campaignBaseTimeSecs(cells) {
     const base = CAMPAIGN_BASE_TIME_SECS[campaignGridSizeClass(cells, _marathonShift())];
-    return base + Math.max(0, Math.round((cells - CAMPAIGN_OVERSIZE_CELLS) * CAMPAIGN_OVERSIZE_SECS_PER_CELL));
+    const secs = base + Math.max(0, Math.round((cells - CAMPAIGN_OVERSIZE_CELLS) * CAMPAIGN_OVERSIZE_SECS_PER_CELL));
+    return isMonsterless() ? Math.round(secs * MONSTERLESS_TIME_MULT) : secs;
 }
 
 // Mistake cap for a difficulty and grid size; `bonus` = tree + gear
@@ -88,16 +94,13 @@ export function campaignCapForLevel(level, bonus = 0) {
 // Currently toggled optional modifiers. Keys drive UI, scoring and gameplay
 // checks below - order here also determines score-multiplier application
 // order, so don't reorder without checking scoreMultiplier().
-// MONSTERLESS disables all Rise of the Beasts features (monsters, combat
-// bars, grid pickups, trial bosses, endgame) at x1.0 - it is intentionally
-// absent from MOD_MULT below so scoreMultiplier() ignores it.
+// MONSTERLESS is NOT a modifier any more: it is a property of the save file
+// (STATE.monsterless, see isMonsterless below).
 // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
-export let curMods = { timetrial: false, hardcore: false, ironman: false, classless: false, treeless: false, monsterless: false, superTutor: false };
+export let curMods = { timetrial: false, hardcore: false, ironman: false, classless: false, treeless: false, superTutor: false };
 
 // Score multiplier applied per active modifier (stacks multiplicatively).
-// MONSTERLESS is deliberately missing here: disabling the Beasts expansion
-// costs nothing and grants nothing (x1.0) - scoreMultiplier() only applies
-// keys present in this table.
+// scoreMultiplier() only applies keys present in this table.
 const MOD_MULT = {
     timetrial: 1.2,
     hardcore: 1.3,
@@ -117,7 +120,6 @@ const MOD_SCROLL_TEXT_KEYS = {
     ironman: 'scr_mod_scroll_im',
     classless: 'scr_mod_scroll_cl',
     treeless: 'scr_mod_scroll_tl',
-    monsterless: 'scr_mod_scroll_ml',
 };
 
 
@@ -207,24 +209,17 @@ export function togMod(btn) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// The two setup-screen figures (monsterless boss, super-tutor Professor)
-// carry their BASE styling inline in index.html, so a stale/missed cache of
-// setup-screen.css can no longer leave them as default white buttons with
-// natural-size art. Their ACTIVE visuals are mirrored as inline styles here
-// (red cross over the boss / yellow border on the Professor) for the same
-// reason: they render even when the stylesheet never arrives.
+// The setup-screen figure (super-tutor Professor) carries its BASE styling
+// inline in index.html, so a stale/missed cache of setup-screen.css can no
+// longer leave it as a default white button with natural-size art. Its ACTIVE
+// visual (yellow border) is mirrored as inline styles here for the same
+// reason: it renders even when the stylesheet never arrives.
 
 // Self-healing copy of the base inline styles. _ensureSetupFigBaseStyles()
 // re-applies anything missing, so even a stale cached page (old markup
 // without the inline styles) renders the figures correctly as soon as fresh
 // JS runs. Idempotent: it only fills gaps and never fights the mirror.
 const SETUP_FIG_BASE = {
-    '.setup-fig-monsterless': {
-        btn: 'position:absolute; left:-10%; top:16%; width:190px; height:190px; z-index:6; background:transparent; border:none; padding:0; cursor:pointer; line-height:0;',
-        img: 'display:block; width:170px; height:170px; object-fit:contain; pointer-events:none;',
-        cross: 'position:absolute; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:125px; font-weight:bold; color:#e02c2c; text-shadow:0 0 18px rgba(224,44,44,0.85), 0 3px 6px rgba(0,0,0,0.7); pointer-events:none; line-height:1; opacity:0; transform:scale(0.4) rotate(-12deg); transition:opacity .15s ease, transform .25s cubic-bezier(.2,2,.4,1);',
-        title: 'position:absolute; top:-46px; left:50%; transform:translateX(-50%);'
-    },
     '.setup-fig-super-tutor': {
         btn: 'position:absolute; right:-10%; top:16%; width:145px; height:224px; z-index:6; background:transparent; border:none; padding:0; cursor:pointer; line-height:0;',
         img: 'display:block; width:132px; height:212px; object-fit:contain; pointer-events:none; border-radius:12px; outline:4px solid transparent; outline-offset:2px;',
@@ -241,29 +236,14 @@ function _ensureSetupFigBaseStyles() {
         if (!btn.style.position) btn.style.cssText += base.btn;
         const img = btn.querySelector('.setup-fig-img');
         if (img && !img.style.width) img.style.cssText += base.img;
-        const cross = btn.querySelector('.setup-fig-cross');
-        if (cross && !cross.style.position) cross.style.cssText += base.cross;
         const title = btn.querySelector('.setup-fig-title');
         if (title && !title.style.position) title.style.cssText += base.title;
     }
 }
 
-// Mirrors the ACTIVE state of the two figures as inline styles: the red
-// cross over the boss while monsterless is on, the yellow glow around the
-// Professor while Super Tutor is on.
+// Mirrors the ACTIVE state of the figure as inline styles: the yellow glow
+// around the Professor while Super Tutor is on.
 function _mirrorSetupFigActiveStyles() {
-    const mlBtn = document.querySelector('.setup-fig-monsterless');
-    if (mlBtn) {
-        const active = !!curMods.monsterless;
-        const cross = mlBtn.querySelector('.setup-fig-cross');
-        const img = mlBtn.querySelector('.setup-fig-img');
-        if (cross) {
-            if (!cross.style.opacity) cross.style.opacity = '0'; // hidden by default
-            cross.style.opacity = active ? '1' : '0';
-            cross.style.transform = active ? 'scale(1) rotate(-6deg)' : 'scale(0.4) rotate(-12deg)';
-        }
-        if (img) img.style.filter = active ? 'grayscale(0.55) brightness(0.75)' : '';
-    }
     const stBtn = document.querySelector('.setup-fig-super-tutor');
     if (stBtn) {
         const active = !!curMods.superTutor;
@@ -318,10 +298,10 @@ export function isClassless() { return !!curMods.classless; }
 // Returns true when passive tree nodes should be treated as unallocated.
 export function isTreeless() { return !!curMods.treeless; }
 
-// Returns true when all Rise of the Beasts features should be disabled:
-// no monster packs, no combat bars, no grid pickups, no trial bosses,
-// no endgame. Score multiplier is unaffected (x1.0).
-export function isMonsterless() { return !!curMods.monsterless; }
+// Returns true when this SAVE is a monsterless one (picked once on the
+// character-select screen): no monster packs, no combat bars, no grid
+// pickups, no trial bosses, no endgame. Not a toggle - it never changes.
+export function isMonsterless() { return !!(STATE && STATE.monsterless); }
 
 
 //------------------------------------------------------------------------
@@ -401,7 +381,6 @@ const RETRY_SETUP_MOD_LABEL_KEYS = {
     ironman: 'mod_im',
     classless: 'mod_cl',
     treeless: 'mod_tl',
-    monsterless: 'mod_ml',
     superTutor: 'mod_super_tutor',
 };
 

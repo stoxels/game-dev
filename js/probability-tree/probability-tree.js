@@ -7,6 +7,7 @@ import { pauseTimer, resumeTimer } from '../timer/timer.js';
 import { LANG, t } from '../translation/translations.js';
 import { PassiveTracker } from './probability-tree-tracker.js';
 import { TALENT_TREE_DATA } from './probability-tree-data.js';
+import { MONSTERLESS_TREE_DATA } from './probability-tree-data-monsterless.js';
 import { resolvePassiveTreeLayout } from './probability-tree-layout.js';
 import { ptHasSkill } from './probability-tree-state-points.js';
 import { _ptRender } from './probability-tree-ui.js';
@@ -93,10 +94,32 @@ let _ptReturnWorldIndex = null;
 // _pt_skillMap globals that are declared in probability-tree-ui.js.
 // The development layout is imported from probability-tree-data.js.
 
-// Maps TALENT_TREE_DATA.nodes into internal skill objects and builds
+// Which tree the shared lists were last built from (a monsterless save has a
+// tree of its own). null until the first build.
+let _ptTreeBuiltForMonsterless = null;
+
+// The tree data for the loaded save, and a note of which one was handed out.
+// This also runs while state.js is still starting up (STATE not readable
+// yet): then the regular tree is used and the next sync corrects it.
+function _ptTreeDataForSave() {
+    let monsterless = false;
+    try { monsterless = !!STATE.monsterless; } catch (e) { /* state.js not ready */ }
+    _ptTreeBuiltForMonsterless = monsterless;
+    return monsterless ? MONSTERLESS_TREE_DATA : TALENT_TREE_DATA;
+}
+
+// Rebuilds the shared tree lists when the loaded save needs the other tree
+// than the one currently built (slots can be switched at any time).
+export function _ptSyncTreeToSave() {
+    const wanted = !!(STATE && STATE.monsterless);
+    const upToDate = _ptTreeBuiltForMonsterless === wanted && globalThis._pt_skills && globalThis._pt_skills.length;
+    if (!upToDate) _ptInitTreeData();
+}
+
+// Maps the active tree's nodes into internal skill objects and builds
 // the _pt_skillMap lookup table for fast id-based access.
 export function _ptInitSkills() {
-    const layoutNodes = resolvePassiveTreeLayout(TALENT_TREE_DATA);
+    const layoutNodes = resolvePassiveTreeLayout(_ptTreeDataForSave());
     globalThis._pt_skills = layoutNodes.map(n => ({
         id: n.id,
         x: n.x,
@@ -114,7 +137,7 @@ export function _ptInitSkills() {
 
 // Maps TALENT_TREE_DATA.connections into internal connection objects.
 export function _ptInitConnections() {
-    globalThis._pt_conns = TALENT_TREE_DATA.connections.map(c => ({
+    globalThis._pt_conns = _ptTreeDataForSave().connections.map(c => ({
         id: c.id,
         from: c.from,
         to: c.to,
@@ -197,6 +220,7 @@ function _ptUpdatePointsDisplay(lang, points) {
 // Updates the points counter, shows a brief loading state,
 // then triggers the full tree render.
 function buildPassiveTreeScreen() {
+    _ptSyncTreeToSave();
     const lang = (typeof LANG !== 'undefined') ? LANG : 'en';
     if (reconcilePassiveTreeForClass()) save();
     const points = (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;

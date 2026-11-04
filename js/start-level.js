@@ -4,7 +4,7 @@ import { applyClassPassiveOnLevelStart } from './classes/class-abilities.js';
 import { buildClassHUD } from './classes/class-hud.js';
 import { _resetPlayerMana } from './classes/class-mana.js';
 import { _varianceShield_removeBubble } from './classes/class-mathmagician-variance-shield.js';
-import { CAMPAIGN_BUDGET_ACTIVE, DIFF_CFG, campaignBaseTimeSecs, campaignCapForLevel, curDiff, curMods } from './difficulty-modifiers.js';
+import { CAMPAIGN_BUDGET_ACTIVE, DIFF_CFG, campaignBaseTimeSecs, campaignCapForLevel, curDiff, curMods, isMonsterless } from './difficulty-modifiers.js';
 import { _onPuzzleComplete, _puzzleCompleteFired, _updateObjectivesHUD } from './combat/encounter-chain.js';
 import { _maybeShowMistakesWarning } from './combat/encounter-overlays.js';
 import { _getMaxAllowedMistakes } from './combat/encounter-tick-support.js';
@@ -332,10 +332,10 @@ export function _initTimer() {
     }
     // Low-time vignette thresholds are a share of this level's starting timer.
     globalThis._lowTimeRefSecs = globalThis.timerSecs;
-    // Fresh level - reset low-time center banners (keeps _lowTimeLastSecs
-    // as null so the first updTimer can immediately surface the relevant
-    // 300/120/30 banner if the level already starts below a threshold).
-    if (typeof _resetLowTimeWarningState === 'function') _resetLowTimeWarningState();
+    // Fresh level - reset the low-time warnings. Thresholds the level already
+    // starts at or below are skipped, so a short puzzle is not greeted with
+    // "5 minutes remaining".
+    if (typeof _resetLowTimeWarningState === 'function') _resetLowTimeWarningState(globalThis.timerSecs);
 }
 
 
@@ -359,7 +359,7 @@ function _updateModTags() {
     if (curMods.ironman) mt.innerHTML += `<span class="mod-tag im">${t('mod_im')}</span>`;
     if (curMods.classless) mt.innerHTML += `<span class="mod-tag cl">${t('mod_cl')}</span>`;
     if (curMods.treeless) mt.innerHTML += `<span class="mod-tag tl">${t('mod_tl')}</span>`;
-    if (curMods.monsterless) mt.innerHTML += `<span class="mod-tag ml">${t('mod_ml')}</span>`;
+    if (isMonsterless()) mt.innerHTML += `<span class="mod-tag ml">${t('mod_ml')}</span>`;
     mt.innerHTML += `<span class="mod-tag diff">${t('diff_' + curDiff)}</span>`;
 }
 
@@ -653,7 +653,7 @@ export function _doStartLevel(gi) {
     // the encounter tick build the full avatar so the sprite size is stable.
     // MONSTERLESS never shows combat bars - not even on trial chains that
     // are technically stamped as monster levels.
-    if (!cur.isMonsterLevel || curMods.monsterless) {
+    if (!cur.isMonsterLevel || isMonsterless()) {
         _renderPlayerAvatarSimple();
         _showPlayerAvatarSimple();
         _showPlayerAvatar();
@@ -694,7 +694,7 @@ export function _doStartLevel(gi) {
         _prepareCampaignEncounter();
     }
     if (cur && cur.isMonsterLevel
-        && (cur.campaignTrial || !curMods.monsterless)
+        && (cur.campaignTrial || !isMonsterless())
         && typeof _startEncounter === 'function'
         && !window._suppressEncounterStart) {
         _startEncounter();

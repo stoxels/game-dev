@@ -465,3 +465,28 @@
 #sx-crafting-bench-overlay .sx-craft-bench-item { font-family: var(--PX, serif); font-weight: 600; font-size: 18px; color: #cfc6ad; min-height: 80px; }
 #sx-crafting-bench-overlay .sx-craft-bench-item span { font-family: inherit; font-size: inherit; }
 #sx-crafting-bench-overlay .sx-craft-close { width: 52px; height: 52px; top: -30px; right: -30px; }
+
+/* ── Crafting bench on short windows (laptops) ─────────────────────────
+   The stone frame and the stacked info rows used to leave almost no height for
+   the prefix / suffix lists. Slim the frame and the info rows, give the lists a
+   guaranteed height, and let the body scroll when the window is still too short. */
+@media (max-height: 820px) {
+    #sx-crafting-bench-overlay { padding: 8px; }
+    #sx-crafting-bench-overlay .sx-craft-bench-panel {
+        border-width: 22px;
+        border-image: url('../../images/Settings/settings_background.webp') 46 / 22px stretch;
+        max-height: 98vh;
+    }
+    #sx-crafting-bench-overlay .sx-craft-head { min-height: 44px; margin: -12px 3% 4px; }
+    #sx-crafting-bench-overlay .sx-craft-head-title { font-size: clamp(15px, 1.4vw, 20px); }
+    #sx-crafting-bench-overlay .sx-craft-close { width: 38px; height: 38px; top: -14px; right: -14px; }
+    #sx-crafting-bench-overlay .sx-craft-body { overflow-y: auto; gap: 6px; padding: 4px 6px; }
+    #sx-crafting-bench-overlay .sx-craft-bench-item { min-height: 52px; font-size: 14px; }
+    #sx-crafting-bench-overlay .sx-craft-bench-item .sx-item-chip { width: 48px; height: 48px; }
+    #sx-crafting-bench-overlay .sx-craft-ilvl { padding: 3px 8px; font-size: 14px; }
+    #sx-crafting-bench-overlay .sx-craft-capacity { padding: 3px 8px; font-size: 14px; }
+    #sx-crafting-bench-overlay .sx-craft-legend { padding: 3px 8px; font-size: 13px; }
+    #sx-crafting-bench-overlay .sx-craft-options { flex: 1 0 300px; }
+    #sx-crafting-bench-overlay .sx-craft-footer { padding: 6px 6px 0; }
+    #sx-crafting-bench-overlay .sx-craft-apply { padding: 10px 24px; }
+}

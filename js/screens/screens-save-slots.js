@@ -247,7 +247,8 @@ function pickSaveFileFor(slotNum) {
 function buildSaveSlotCard(slotNum) {
     const summary = getSlotSummary(slotNum);
     const card = document.createElement('div');
-    card.className = 'save-slot-card' + (summary.empty ? ' empty' : '');
+    // Monsterless saves get a grey frame and the abyss boss (css/save-slots.css).
+    card.className = 'save-slot-card' + (summary.empty ? ' empty' : '') + (summary.monsterless ? ' ssc-monsterless' : '');
     card.innerHTML = _buildSlotCardHtml(slotNum, summary);
     _attachSlotCardListeners(card, slotNum);
     return card;
