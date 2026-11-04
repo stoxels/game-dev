@@ -314,10 +314,6 @@ export function _initEgHoldEPauseHotkey() {
     document.addEventListener('keydown', (e) => {
         if (!e || !isParryKey(e)) return;
         if (e.repeat) return;
-        // The Snail: pressing the parry key drops a held broom (it respawns outside the grid).
-        if (typeof _snailDropBroom === 'function') {
-            try { globalThis._snailDropBroom(); } catch (err) {}
-        }
         const tag = document.activeElement?.tagName;
         if (tag === 'INPUT' || tag === 'TEXTAREA') return;
         if (document.querySelector('.modal-bg.show')) return;

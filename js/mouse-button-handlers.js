@@ -132,12 +132,6 @@ export function _checkAllClaims(row, col) {
 // The player must click again afterward to actually fill.
 // Frozen cells simply reject the click until they thaw.
 function checkBossCorruptionIntercept(row, col) {
-    // Slimed cells (The Snail) block ALL interaction until swept clean -
-    // checked first so a slimed cell can never be clicked around.
-    if (typeof globalThis._snailIsCellSlimed === 'function' && globalThis._snailIsCellSlimed(row, col)) {
-        globalThis.showToast(t('eg_snail_slimed_blocked'));
-        return true;
-    }
     if (typeof globalThis._isCellCorrupted === 'function' && globalThis._isCellCorrupted(row, col)) {
         globalThis._dispelCorruption(row, col);
         return true;

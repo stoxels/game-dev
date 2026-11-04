@@ -1169,33 +1169,6 @@
 
 /* ============ Boss Pack 5 - dodge-mechanic visuals ============ */
 
-/* Ember drift - the flame stays pinned to its falling lane: the wobble is
-   a glow/opacity flicker ONLY (never transform/rotate), so the rendered
-   box always matches the collision hitbox and players can dodge by lane.
-   (Rotate-keyframe animations orbit fixed-position dots around the screen
-   origin on some engines, growing with distance from it.) */
-.sx-nk-ember {
-    width: 28px; height: 28px; font-size: 1.2rem;
-    filter: drop-shadow(0 0 8px rgba(251, 146, 60, 0.9));
-    animation: sx-nk-ember-flicker 0.55s ease-in-out infinite alternate;
-}
-@keyframes sx-nk-ember-flicker {
-    from {
-        opacity: 0.85;
-        filter: drop-shadow(0 0 6px rgba(251, 146, 60, 0.7));
-    }
-    to {
-        opacity: 1;
-        filter: drop-shadow(0 0 12px rgba(251, 146, 60, 1));
-    }
-}
-
-/* Doom snail */
-.sx-nk-snail {
-    width: 60px; height: 60px; font-size: 2.4rem;
-    filter: drop-shadow(0 0 12px rgba(248, 113, 113, 0.95));
-}
-
 /* Jelly hopper */
 .sx-nk-jelly {
     width: 44px; height: 44px; font-size: 1.9rem;
@@ -2426,23 +2399,21 @@ div.sx-nk-pillar.sx-nk-pillar-holy {
 #sx-zombie-layer .sx-monster-card-compact:hover {
     filter: brightness(1.12);
 }
-.sx-zombie-poof {
-    position: fixed;
-    z-index: 9002;
-    font-size: 20px;
-    pointer-events: none;
+.sx-zombie-poof {                  /* a grey-green dust puff where a zombie vanished */
+    position: fixed; z-index: 9002; pointer-events: none;
+    width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(209, 213, 219, 0.85), rgba(132, 204, 22, 0.35) 55%, transparent 72%);
     animation: sx-zombie-poof-kf 0.7s ease-out forwards;
 }
 @keyframes sx-zombie-poof-kf {
-    0%   { opacity: 1; transform: translateY(0) scale(1); }
-    100% { opacity: 0; transform: translateY(-26px) scale(1.6); }
+    0%   { opacity: 1; transform: translateY(0) scale(0.6); }
+    100% { opacity: 0; transform: translateY(-26px) scale(1.7); }
 }
 
 /* ── Feed-haste chip on Brutus's card while sacrificial-feed haste is live ──
-   Row 1: live stack count + total attack-charge bonus (+30% per stack).
-   Row 2: drain bar counting down to the NEXT stack expiry, with the seconds
-   until that drop. Redrawn at 10Hz by the feed-HUD timer, so the bar reads
-   as a smooth countdown. Purely cosmetic - pointer-events none.
+   Row 1: one pip per live stack (+30% attack charge each).
+   Row 2: drain bar counting down to the NEXT stack expiry. Redrawn at 10Hz
+   by the feed-HUD timer, so the bar reads as a smooth countdown. Purely cosmetic - pointer-events none.
 
    The chip docks on the card's LEFT side, clear of the ▼ TARGET ▼ pill that
    floats above a targeted boss and clear of the hover tooltip below the
@@ -2469,18 +2440,12 @@ div.sx-nk-pillar.sx-nk-pillar-holy {
     pointer-events: none;
     box-shadow: 0 0 10px rgba(250, 204, 21, 0.45), inset 0 0 6px rgba(250, 204, 21, 0.12);
 }
-.sx-boss-feed-line {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    white-space: nowrap;
-}
-.sx-boss-feed-mult {
-    color: #fde047;
-    opacity: 0.95;
+.sx-boss-feed-pips { display: flex; gap: 3px; justify-content: center; }
+.sx-boss-feed-pips i {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #ef4444; box-shadow: 0 0 5px rgba(239, 68, 68, 0.9);
 }
 .sx-boss-feed-track {
-    flex: 1;
     height: 3px;
     background: rgba(250, 204, 21, 0.22);
     border-radius: 2px;
@@ -2492,10 +2457,6 @@ div.sx-nk-pillar.sx-nk-pillar-holy {
     width: 100%;
     background: linear-gradient(90deg, #facc15, #fde047);
     box-shadow: 0 0 6px rgba(250, 204, 21, 0.9);
-}
-.sx-boss-feed-sec {
-    color: #fde68a;
-    font-variant-numeric: tabular-nums;
 }
 
 /* ── The Jelly: Ice Shell shield + icy floor (boss-jelly.js) ────────────── */
@@ -2739,320 +2700,6 @@ div.sx-nk-pillar.sx-nk-pillar-holy {
 .sx-jelly-bubble-cracked { filter: saturate(0.6) brightness(1.15); border-style: dashed !important; }
 .sx-jelly-shatter-small { animation-duration: 0.45s; opacity: 0.8; }
 .sx-nk-fin-jly { --nk-fin: #86efac; }
-
-/* ============ The Snail - Doom Snail rework ============ */
-
-/* Slimed grid-cell overlay - blocks ALL interaction until swept clean */
-.sx-snail-slime {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85em;
-    color: #d9f99d;
-    text-shadow: 0 0 6px rgba(190, 242, 100, 0.9);
-    background: radial-gradient(circle at 35% 30%, rgba(163, 230, 53, 0.55), rgba(101, 163, 13, 0.75) 70%, rgba(54, 83, 20, 0.88));
-    border: 2px solid #84cc16;
-    border-radius: 3px;
-    pointer-events: none;
-    z-index: 6;
-    overflow: hidden;
-    animation: sx-snail-slime-pulse 1.4s ease-in-out infinite alternate;
-}
-@keyframes sx-snail-slime-pulse {
-    from {
-        background: radial-gradient(circle at 35% 30%, rgba(163, 230, 53, 0.45), rgba(101, 163, 13, 0.65) 70%, rgba(54, 83, 20, 0.78));
-    }
-    to {
-        background: radial-gradient(circle at 35% 30%, rgba(190, 242, 100, 0.6), rgba(132, 204, 22, 0.82) 70%, rgba(63, 98, 18, 0.92));
-    }
-}
-
-/* Sweep-progress fill along the bottom of a slimed cell (the player
-   sprite covers the cell while sweeping, so the readable progress rides
-   on the SWEEPING label above the head - this strip is just the glow). */
-.sx-snail-slime-fill {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 6px;
-    width: 0%;
-    background: #ecfccb;
-    box-shadow: 0 0 8px rgba(217, 249, 157, 0.9);
-    transition: width 0.1s linear;
-    pointer-events: none;
-}
-.sx-snail-slime-sweeping .sx-snail-slime-fill {
-    height: 9px;
-}
-
-/* Cell being actively swept - brighter goo + faster pulse */
-.sx-snail-slime-sweeping {
-    animation: sx-snail-slime-pulse 0.4s ease-in-out infinite alternate;
-    border-color: #ecfccb;
-}
-
-/* Green flash right before the slime is wiped away */
-.sx-snail-slime-cleaned {
-    animation: sx-snail-slime-clean 0.6s ease-out forwards !important;
-    border-color: #d9f99d;
-}
-@keyframes sx-snail-slime-clean {
-    from {
-        opacity: 1;
-        transform: scale(1);
-    }
-    to {
-        opacity: 0;
-        transform: scale(0.3);
-    }
-}
-
-/* 'SWEEPING' label above the player sprite while cleaning */
-.sx-snail-sweep-label {
-    position: absolute;
-    top: -24px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 1px;
-    color: #ecfccb;
-    background: rgba(20, 30, 8, 0.88);
-    border: 1px solid #84cc16;
-    border-radius: 4px;
-    padding: 1px 8px;
-    white-space: nowrap;
-    pointer-events: none;
-    z-index: 1200;
-    text-shadow: 0 1px 2px #000;
-    animation: sx-snail-sweep-pulse 0.8s ease-in-out infinite alternate;
-}
-@keyframes sx-snail-sweep-pulse {
-    from {
-        opacity: 0.75;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-/* Broom - rests outside the grid, pins next to the player while held */
-.sx-snail-broom {
-    position: fixed;
-    left: 0;
-    top: 0;
-    pointer-events: none;
-    z-index: 9001;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    filter: drop-shadow(0 0 10px rgba(163, 230, 53, 0.85));
-    animation: sx-snail-broom-bob 1.1s ease-in-out infinite alternate;
-}
-@keyframes sx-snail-broom-bob {
-    from {
-        transform: translateY(0);
-    }
-    to {
-        transform: translateY(-4px);
-    }
-}
-.sx-snail-broom-ico {
-    font-size: 2rem;
-    line-height: 1;
-}
-.sx-snail-broom-label {
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 0.5px;
-    color: #d9f99d;
-    text-shadow: 0 1px 2px #000;
-    background: rgba(20, 30, 8, 0.8);
-    border: 1px solid rgba(132, 204, 22, 0.6);
-    border-radius: 4px;
-    padding: 0 6px;
-    margin-top: 2px;
-    white-space: nowrap;
-}
-
-/* While held: pinned smaller next to the player sprite */
-.sx-snail-broom-held {
-    animation: none !important;
-    filter: drop-shadow(0 0 8px rgba(190, 242, 100, 0.9));
-}
-.sx-snail-broom-held .sx-snail-broom-ico {
-    font-size: 1.5rem;
-}
-
-/* Respawn pop when the broom is dropped */
-.sx-snail-broom-pop {
-    animation: sx-snail-broom-pop-kf 0.4s ease-out;
-}
-@keyframes sx-snail-broom-pop-kf {
-    0% {
-        transform: scale(1.5);
-        opacity: 0.5;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-/* Doom Snail squish + splash when it crashes into corruption */
-.sx-snail-squish {
-    position: fixed;
-    width: 80px;
-    height: 60px;
-    margin-left: -40px;
-    margin-top: -30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    white-space: nowrap;
-    pointer-events: none;
-    z-index: 9002;
-    animation: sx-snail-squish-kf 0.7s ease-out forwards;
-}
-@keyframes sx-snail-squish-kf {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    30% {
-        transform: scale(1.6);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(0.1);
-        opacity: 0;
-    }
-}
-
-/* Snailgeddon - The Snail's ≤20% HP finisher (countdown over the grid) */
-.sx-snailgeddon-cd {
-    position: fixed;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    z-index: 9010;
-    pointer-events: none;
-    text-align: center;
-    font-family: inherit;
-}
-.sx-snailgeddon-cd-label {
-    font-size: 1rem;
-    font-weight: 800;
-    letter-spacing: 0.22em;
-    color: #fecaca;
-    background: rgba(60, 5, 5, 0.72);
-    border: 1px solid rgba(248, 113, 113, 0.65);
-    border-radius: 999px;
-    padding: 0.3rem 1.1rem 0.25rem;
-    white-space: nowrap;
-}
-.sx-snailgeddon-cd-num {
-    font-size: 5.5rem;
-    font-weight: 900;
-    line-height: 1;
-    color: #fff;
-    text-shadow: 0 0 22px rgba(239, 68, 68, 0.95), 0 0 60px rgba(239, 68, 68, 0.5);
-    animation: sx-snailgeddon-throb 0.45s ease-in-out infinite alternate;
-}
-@keyframes sx-snailgeddon-throb {
-    from { opacity: 0.8; }
-    to { opacity: 1; }
-}
-.sx-snailgeddon-cd-hint {
-    font-size: 0.82rem;
-    color: #fecaca;
-    background: rgba(0, 0, 0, 0.45);
-    border-radius: 0.6rem;
-    padding: 0.3rem 0.8rem;
-    max-width: 460px;
-}
-
-/* Amber immunity dome over The Snail's card while Snailgeddon runs
-   (countdown + ring). Mirrors the Jelly Ice Shell bubble: a FIXED element
-   repositioned every frame by boss-snail.js over the card's emoji, so it
-   survives monster-panel re-renders; it never blocks clicks. Amber is The
-   Snail's signature colour (toasts #f59e0b) - the dome reads as the boss
-   being shielded while it is untouchable. */
-.sx-snail-shield {
-    position: fixed;
-    left: 0;
-    top: 0;
-    pointer-events: none;
-    z-index: 9005;
-    border-radius: 50%;
-    box-sizing: border-box;
-    border: 3px solid rgba(251, 191, 36, 0.95);
-    background: radial-gradient(circle,
-        rgba(251, 191, 36, 0.26) 0%,
-        rgba(217, 119, 6, 0.12) 55%,
-        rgba(251, 191, 36, 0) 76%);
-    box-shadow:
-        0 0 18px rgba(251, 191, 36, 0.75),
-        0 0 44px rgba(217, 119, 6, 0.5),
-        inset 0 0 22px rgba(253, 230, 138, 0.35);
-    animation: sx-snail-shield-pulse 0.8s ease-in-out infinite alternate;
-}
-
-.sx-snail-shield::after {
-    content: '🛡️';
-    position: absolute;
-    top: -7px;
-    right: -7px;
-    font-size: 1.1rem;
-    line-height: 1;
-    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.95));
-}
-
-@keyframes sx-snail-shield-pulse {
-    from {
-        opacity: 0.75;
-        box-shadow:
-            0 0 12px rgba(251, 191, 36, 0.5),
-            0 0 28px rgba(217, 119, 6, 0.3),
-            inset 0 0 14px rgba(253, 230, 138, 0.2);
-    }
-    to {
-        opacity: 1;
-        box-shadow:
-            0 0 24px rgba(251, 191, 36, 0.95),
-            0 0 54px rgba(217, 119, 6, 0.65),
-            inset 0 0 30px rgba(253, 230, 138, 0.45);
-    }
-}
-
-/* Snailgeddon swarm - denser, angrier ring of doom snails */
-.sx-snailgeddon-swarm {
-    filter: drop-shadow(0 0 16px rgba(239, 68, 68, 1));
-}
-/* The one laggard whose gap is the way out - cyan tint + floating zzz */
-.sx-snailgeddon-slow {
-    position: relative;
-    filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.95));
-}
-.sx-snailgeddon-slow::after {
-    content: '💤';
-    position: absolute;
-    top: -15px;
-    right: -10px;
-    font-size: 1.05rem;
-    line-height: 1;
-    pointer-events: none;
-    animation: sx-snailgeddon-sleep 1.15s ease-in-out infinite;
-}
-@keyframes sx-snailgeddon-sleep {
-    0%, 100% { opacity: 0.55; transform: translateY(0); }
-    50% { opacity: 1; transform: translateY(-3px); }
-}
 
 /* ============ The Demolitionist (boss_demolitionist) ============
    Three-act bomb show: sticky volleys, telegraphed mega bombs that chain
@@ -13476,3 +13123,153 @@ body.sx-shp-flash::after {
     animation: sx-nk-anchor-pulse 0.6s ease-in-out infinite alternate;
 }
 .sx-nk-fin-gdn { --nk-fin: #fca5a5; }
+
+/* ============================================================
+   THE EMBER (boss_ember): Ember Rain columns, Fireballs with
+   burning ground, BONFIRE rings with a green gap.
+   ============================================================ */
+.sx-emb-col {
+    position: fixed; top: 0; height: 100vh; z-index: 9001; pointer-events: none; box-sizing: border-box; overflow: hidden;
+    background: rgba(239, 68, 68, 0.1);
+    border-left: 3px dashed rgba(248, 113, 113, 0.95); border-right: 3px dashed rgba(248, 113, 113, 0.95);
+}
+.sx-emb-col::after {               /* the red fill running down from the top */
+    content: ''; position: absolute; inset: 0; transform-origin: center top; transform: scaleY(0);
+    background: repeating-linear-gradient(-45deg, rgba(239, 68, 68, 0.6) 0 14px, rgba(127, 29, 29, 0.5) 14px 28px);
+    animation: sx-mnt-wipe-y var(--emb-warn, 1.1s) linear var(--emb-delay, 0ms) forwards;
+}
+.sx-emb-col::before {              /* the flame that falls when the column is full */
+    content: ''; position: absolute; left: 10%; width: 80%; height: 34vh; top: -36vh; z-index: 1;
+    border-radius: 50% 50% 40% 40% / 30% 30% 70% 70%;
+    background: linear-gradient(to bottom, rgba(254, 240, 138, 0) 0%, #fde68a 55%, #fb923c 78%, #dc2626 100%);
+    filter: drop-shadow(0 0 14px rgba(251, 146, 60, 0.95)); opacity: 0;
+}
+.sx-emb-col.hot { border-style: solid; border-color: #fed7aa; background: rgba(251, 146, 60, 0.35); animation: sx-wvr-fade 0.5s ease-out forwards; }
+.sx-emb-col.hot::before { opacity: 1; animation: sx-emb-fall 0.28s ease-in forwards; }
+@keyframes sx-emb-fall { from { top: -36vh; } to { top: 100vh; } }
+
+.sx-emb-ball {
+    position: fixed; z-index: 9003; pointer-events: none; box-sizing: border-box; border-radius: 50%;
+    border: 3px dashed rgba(248, 113, 113, 0.95); background: rgba(239, 68, 68, 0.08);
+}
+.sx-emb-ball::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.65), rgba(127, 29, 29, 0.55));
+    animation: sx-mnt-grow var(--emb-warn, 1.1s) linear forwards;
+}
+.sx-emb-ball.hot {
+    border-style: solid; border-color: #fde68a;
+    background: radial-gradient(circle, rgba(254, 240, 138, 0.95), rgba(249, 115, 22, 0.75) 45%, rgba(185, 28, 28, 0.4) 68%, transparent 72%);
+    animation: sx-wvr-fade 0.42s ease-out forwards;
+}
+.sx-emb-ball.hot::after { display: none; }
+
+.sx-emb-patch {                    /* burning ground: a red rim around flickering embers */
+    position: fixed; z-index: 9001; pointer-events: none; box-sizing: border-box; border-radius: 50%;
+    border: 3px solid rgba(248, 113, 113, 0.9);
+    background:
+        radial-gradient(circle at 35% 40%, rgba(254, 240, 138, 0.75) 0 8%, transparent 14%),
+        radial-gradient(circle at 64% 58%, rgba(253, 186, 116, 0.7) 0 7%, transparent 13%),
+        radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.55), rgba(127, 29, 29, 0.55) 70%);
+    box-shadow: 0 0 22px rgba(249, 115, 22, 0.7);
+    animation: sx-emb-flicker 0.5s ease-in-out infinite alternate, sx-emb-dieout var(--emb-life, 5s) linear forwards;
+}
+@keyframes sx-emb-flicker { from { filter: brightness(0.9); } to { filter: brightness(1.25); } }
+@keyframes sx-emb-dieout { 0%, 75% { opacity: 1; } 100% { opacity: 0.2; } }
+
+.sx-emb-ring {                     /* a band of fire (outer --emb-th px), its gap green */
+    position: fixed; z-index: 9002; pointer-events: none; border-radius: 50%;
+    background: conic-gradient(from var(--emb-from, 0deg),
+        rgba(74, 222, 128, 0.7) 0deg var(--emb-gap, 30deg),
+        rgba(239, 68, 68, 0.85) var(--emb-gap, 30deg) 360deg);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--emb-th, 56px)), #000 calc(100% - var(--emb-th, 56px)));
+    mask: radial-gradient(farthest-side, transparent calc(100% - var(--emb-th, 56px)), #000 calc(100% - var(--emb-th, 56px)));
+    filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.8));
+}
+.sx-nk-fin-emb { --nk-fin: #fb923c; }
+.sx-emb-blaze { animation: sx-emb-blaze-kf 0.7s ease-in-out infinite alternate !important; }
+@keyframes sx-emb-blaze-kf { from { filter: drop-shadow(0 0 8px #f97316); } to { filter: drop-shadow(0 0 26px #fde047) brightness(1.2); } }
+
+/* ============================================================
+   BRUTUS (boss_brutus): Ground Slam rows / columns that fill red,
+   then shatter. The AFTERSHOCK finale reuses the same bands.
+   ============================================================ */
+.sx-brt-band {
+    position: fixed; z-index: 9001; pointer-events: none; box-sizing: border-box; overflow: hidden;
+    background: rgba(239, 68, 68, 0.1); border: 3px dashed rgba(248, 113, 113, 0.95);
+}
+.sx-brt-band::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, rgba(239, 68, 68, 0.6) 0 16px, rgba(127, 29, 29, 0.5) 16px 32px);
+    transform-origin: center center;
+    animation: sx-mnt-wipe-x var(--brt-warn, 1.2s) linear forwards;
+}
+.sx-brt-band.col::after { animation-name: sx-mnt-wipe-y; }
+.sx-brt-band.hot {
+    border-style: solid; border-color: #fde68a; background: rgba(254, 240, 138, 0.6);
+    box-shadow: 0 0 50px rgba(239, 68, 68, 0.85); animation: sx-wvr-fade 0.45s ease-out forwards;
+}
+.sx-brt-band.hot::after { display: none; }
+.sx-nk-fin-brt { --nk-fin: #f87171; }
+
+/* ============================================================
+   THE SNAIL (boss_snail): a CSS snail (shell spiral + body), slime
+   puddles that slow, Slime Spit circles, SNAILGEDDON rings with a
+   green-glowing slow wedge.
+   ============================================================ */
+.sx-snl-snail {
+    position: fixed; left: 0; top: 0; z-index: 9010; pointer-events: none; width: 60px; height: 44px;
+}
+.sx-snl-snail::before {            /* body with two eye stalks, facing right */
+    content: ''; position: absolute; left: 2px; bottom: 2px; width: 56px; height: 16px; border-radius: 10px 14px 6px 6px;
+    background:
+        radial-gradient(circle at 92% 0%, #1f2937 0 3px, transparent 4px),
+        radial-gradient(circle at 80% 0%, #1f2937 0 3px, transparent 4px),
+        linear-gradient(to bottom, #d9f99d, #84cc16);
+    box-shadow: 0 0 0 2px rgba(63, 98, 18, 0.7);
+}
+.sx-snl-snail::after {             /* the spiral shell */
+    content: ''; position: absolute; left: 8px; top: 0; width: 34px; height: 34px; border-radius: 50%;
+    background:
+        radial-gradient(circle at 55% 55%, #fde68a 0 3px, transparent 4px),
+        repeating-radial-gradient(circle at 55% 55%, #b45309 0 4px, #f59e0b 4px 8px);
+    box-shadow: 0 0 0 2px #78350f, 0 0 12px rgba(248, 113, 113, 0.8);
+}
+.sx-snl-doom::after { box-shadow: 0 0 0 2px #78350f, 0 0 18px rgba(239, 68, 68, 1); }
+.sx-snl-snail.slow::after { box-shadow: 0 0 0 3px #4ade80, 0 0 18px rgba(74, 222, 128, 0.95); }
+.sx-snl-snail.slow::before { box-shadow: 0 0 0 2px #4ade80; }
+
+.sx-snl-slime {                    /* a glossy green puddle that dries up */
+    position: fixed; z-index: 9000; pointer-events: none; box-sizing: border-box;
+    border-radius: 46% 54% 50% 50% / 55% 45% 55% 45%;
+    background:
+        radial-gradient(ellipse 18% 10% at 36% 34%, rgba(236, 252, 203, 0.55), transparent),
+        radial-gradient(circle at 50% 50%, rgba(132, 204, 22, 0.28) 0 55%, rgba(77, 124, 15, 0.32) 80%);
+    border: 2px solid rgba(190, 242, 100, 0.55);
+    animation: sx-snl-dry var(--snl-life, 7s) linear forwards;
+}
+@keyframes sx-snl-dry { 0%, 70% { opacity: 1; } 100% { opacity: 0.15; transform: scale(0.85); } }
+
+.sx-snl-spit {
+    position: fixed; z-index: 9003; pointer-events: none; box-sizing: border-box; border-radius: 50%;
+    border: 3px dashed rgba(248, 113, 113, 0.95); background: rgba(239, 68, 68, 0.08);
+}
+.sx-snl-spit::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.62), rgba(127, 29, 29, 0.5));
+    animation: sx-mnt-grow var(--snl-warn, 1.1s) linear forwards;
+}
+
+.sx-snl-ring {                     /* the outline of a forming ring, faint once it closes */
+    position: fixed; z-index: 9001; pointer-events: none; box-sizing: border-box; border-radius: 50%;
+    border: 3px dashed rgba(248, 113, 113, 0.85); background: rgba(239, 68, 68, 0.06);
+    transition: opacity 0.4s;
+}
+.sx-snl-ring.closing { opacity: 0.25; }
+
+.sx-snl-burst {                    /* the doom snail pops on corruption */
+    position: fixed; z-index: 9011; pointer-events: none; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(236, 252, 203, 0.95), rgba(132, 204, 22, 0.6) 45%, rgba(168, 85, 247, 0.35) 65%, transparent 72%);
+    animation: sx-zombie-poof-kf 0.7s ease-out forwards;
+}
+.sx-nk-fin-snl { --nk-fin: #a3e635; }

@@ -544,12 +544,6 @@ export function _transitionToChainPuzzle(nextGi, isBossArena) {
     globalThis._encounterActive = true;
     _puzzleCompleteFired = false;
 
-    // The Snail (and any other boss field effect tied to grid cells): its
-    // slimed-cell overlays were destroyed with the old table - clear the
-    // stale state so the fresh grid starts clean and the roaming snail
-    // slimes the new puzzle from scratch.
-    if (typeof _snailOnPuzzleTransition === 'function') globalThis._snailOnPuzzleTransition();
-
     _renderPanel();
     // Flush any start-of-puzzle reveals that were queued while the grid rebuilt
     if (typeof _flushPendingRevealProjectiles === 'function') {

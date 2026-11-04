@@ -86,7 +86,7 @@ export let _entrHotAuraTimer = 0;
 export let _entrColdAuraTimer = 0;
 
 // Movement hook (called from _avatarGetMoveSpeed in player_sprite.js,
-// typeof-guarded there - same pattern as _snailBroomHeld). Perfect
+// typeof-guarded there). Perfect
 // crystal during the finale: absolute zero is perfect order.
 export function _entrMoveMult() {
     if (_entrFinalActive()) return 1;

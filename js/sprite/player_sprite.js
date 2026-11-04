@@ -1,6 +1,6 @@
 import { updateClassHUDManaBar } from '../classes/class-mana.js';
 import { _entrMoveMult } from '../combat/bosses/boss-entropy.js';
-import { _snailBroomHeld } from '../combat/bosses/boss-snail.js';
+import { _snailMoveMult } from '../combat/bosses/boss-snail.js';
 import { _playerHasAilment } from '../combat/combat-ailments-core.js';
 import { _getHandChargePct, _getPlayerChargePct, _setHoldEPauseVisual } from
 '../combat/encounter-tick.js';
@@ -511,13 +511,8 @@ export function _avatarGetMoveSpeed() {
             if (pct) base *= (1 + pct / 100);
         }
     } catch (e) {}
-    // The Snail's broom: sweeping slows the player to a crawl so the Doom
-    // Snail can catch up while a slimed cell is being cleaned (see
-    // boss-snail.js - SNAIL_BROOM_SPEED_MULT lives on window).
-    if (typeof _snailBroomHeld === 'function' && _snailBroomHeld()) {
-        base *= (typeof window.SNAIL_BROOM_SPEED_MULT === 'number')
-            ? window.SNAIL_BROOM_SPEED_MULT : 0.10;
-    }
+    // The Snail's slime: standing in a puddle slows you (boss-snail.js).
+    base *= _snailMoveMult();
     // Entropy's order economy: outside the ordered zones the cold makes you
     // progressively sluggish (never locked - floors at 55%). Perfect crystal
     // order during the finale restores full speed (see boss-entropy.js -

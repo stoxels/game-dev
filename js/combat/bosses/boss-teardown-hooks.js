@@ -13,6 +13,10 @@ export const BOSS_TEARDOWN_HOOKS = [
     // (boss_brutus_7), so an exact match would never fire and the roaming
     // zombie cards would survive into the hub / boss overview.
     ['boss_brutus', '_brutusZombieTeardown'],
+    // Brutus: slam bands and the AFTERSHOCK finale (charge bar, immunity).
+    ['boss_brutus', '_brtTeardown'],
+    // The Ember: rain columns, fireballs, burning ground, BONFIRE rings.
+    ['boss_ember', '_embTeardown'],
     // The Dynamo: lightning conductors and beam network.
     ['boss_dynamo', '_dynamoTeardown'],
     // The Gust: persistent storm-siege arena (lanes, water, clouds) plus

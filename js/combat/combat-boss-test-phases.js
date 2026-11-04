@@ -29,7 +29,11 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'Identity Disc', desc: _bossTestTr('eg_boss_test_tron_disc', 'All fight: the Tron throws a disc at you that bounces off the screen edges twice. Its whole path fills red first, then the disc flies it (1 / 2 / 3 discs).') },
         { name: 'END OF LINE', desc: _bossTestTr('eg_boss_test_tron_final', 'At 10% HP: the Tron is immune and sends five waves of 1-3 cycles. Their walls stay up for 8 s, so the arena fills up - keep finding the open lanes. Survive all waves to release it. (charge bar frozen)') },
     ],
-    'boss_ember': () => [],
+    'boss_ember': () => [
+        { name: 'Ember Rain', desc: _bossTestTr('eg_boss_test_ember_rain', 'All fight: a comb of red columns (one on you) fills from the top, then flames fall down them (3 / 4 / 5 columns). From 30% a second comb follows, shifted half a step onto the gaps. Every flame hit sets you on fire.') },
+        { name: 'Fireballs', desc: _bossTestTr('eg_boss_test_ember_balls', 'All fight: red circles fill on your spot one after another (3 / 4 / 5). From 60% every fireball leaves burning ground for a few seconds - standing in it burns.') },
+        { name: 'BONFIRE', desc: _bossTestTr('eg_boss_test_ember_final', 'At 10% HP: the Ember is immune and rolls 14 rings of fire out from itself, faster each time. Every ring has one green gap, a little to the side of where you stand - be in the gap when the ring passes. (charge bar frozen)') },
+    ],
     'boss_bomber': () => [
         { name: 'Mine Collar', desc: _bossTestTr('eg_boss_test_bomber_collar', 'All fight: tethered mines orbit the flying boss, detach and drift to YOUR position, planting proximity mines. Leave the red rings - they detonate when you step in!') },
         { name: 'Carpet Run', desc: _bossTestTr('eg_boss_test_bomber_carpet', 'At 60% HP: a bomber plane 🛩️ banks across the arena through your position, carpeting its lane with fuse bombs. The detonation front rolls the path - leave the highlighted band entirely!') },
@@ -168,7 +172,9 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'PROOF BY CONTRADICTION', desc: _bossTestTr('eg_boss_test_nul_final', 'At 10% HP: the arena turns PURE WHITE and the Null asserts you cannot hit it. Phantoms replay YOUR recent path and strike toward their heading - stand OPPOSITE the strike, near the phantom, to shatter a shell. 3 shells = the hypothesis collapses! Three failures = NULLIFICATION: only the white ring is safe! (charge bar frozen)') },
     ],
     'boss_snail': () => [
-        { name: 'Snailgeddon', desc: _bossTestTr('eg_boss_test_snail_snailgeddon', 'At ≤20% HP: 5s countdown → teleport to centre, closing ring of snails with a lagging wedge. Escape through the gap!') }
+        { name: 'Doom Snail', desc: _bossTestTr('eg_boss_test_snail_doom', 'All fight: one slow homing snail that never gives up. It hurts on touch and leaves slime behind - slime slows you to half speed. Lure it over a corrupted cell: it bursts, the cell is cleaned and the next snail waits 30 s.') },
+        { name: 'Slime Spit', desc: _bossTestTr('eg_boss_test_snail_spit', 'All fight: red circles fill on your spot one after another (2 / 3 / 4); every glob that lands leaves a big slime puddle that slows you.') },
+        { name: 'SNAILGEDDON', desc: _bossTestTr('eg_boss_test_snail_snailgeddon', 'At 10% HP: the Snail is immune and 10 rings of snails form around you, one after another. Each ring stands for a second, then closes in; a green-glowing wedge crawls slower and leaves a gap - escape through it. Touching a snail hurts and shoves you back. (charge bar frozen)') },
     ],
     'boss_jelly': () => [
         { name: 'Jelly Hops', desc: _bossTestTr('eg_boss_test_jelly_hops', 'All fight: one blob hops after you 3 / 4 / 5 times. Its red shadow fills where you stood; it lands when the shadow is full. From 55% every landing leaves a slime puddle that hurts to touch.') },
@@ -177,7 +183,9 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'JELLY ARMY', desc: _bossTestTr('eg_boss_test_jelly_army', 'At 10% HP: the Jelly is immune and sends 15 waves of 2-5 blobs - one shadow on you, the others around you. Every landing leaves a puddle, so the floor fills up. Survive all waves to release it. (charge bar frozen)') },
     ],
     'boss_brutus': () => [
-        { name: 'Zombie Feast', desc: _bossTestTr('eg_boss_test_brutus_feast', '🧟 zombies shamble toward each Ground Slam: every one devoured inside the band supercharges Brutus (+30% charge rate, 15s, stacks to 6). Kill them first!') }
+        { name: 'Ground Slam', desc: _bossTestTr('eg_boss_test_brutus_slam', 'All fight: a red band through you (a row or a column) fills while Brutus rears up, then he smashes it. Every corrupted cell on the grid adds one more slam (max 3). From 30% every slam is a cross: a row AND a column.') },
+        { name: 'Sacrificial Zombies', desc: _bossTestTr('eg_boss_test_brutus_feast', 'All fight: weak zombies shamble toward each row slam. Every zombie a slam lands on is devoured: Brutus attacks faster (+30% charge rate for 15 s, one red pip per stack, up to 6). Kill them first.') },
+        { name: 'AFTERSHOCK', desc: _bossTestTr('eg_boss_test_brutus_final', 'At 10% HP: Brutus is immune and slams 30 times in a row, rows and columns aimed at you, faster and harder each time; near the end some slams are crosses. Survive them to release him. (charge bar frozen)') },
     ],
     'boss_gust': () => [
         { name: 'Storm Front', desc: _bossTestTr('eg_boss_test_gust_storm', 'Persistent ~30s storm cycle: lightning warns on the windward edge, then a 5s blow pushes you (charge paused). Hide behind the windbreak wall; spikes line both edges.') },
