@@ -1,16 +1,15 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
-import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkDotHit, _nkEl, _nkFlingAvatar, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkRectsOverlap, _nkToast } from './shared-boss-abilities.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkEl, _nkFlingAvatar, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BUMPER (boss_bumper)------------------------
 //------------------------------------------------------------------------
-// Pinball-table brawl: drifting bumper flings, ricocheting pinball showers,
-// TILT FLIPPER FRENZY at 60%, MULTIBALL RUSH at 30%, and the telegraphed
-// BUMPER SLAM charge attack.
-//
-// Shared mechanics (fog_bank) live in shared-puzzle-mechanics.js and are
-// referenced by handler-name string.
+// A pinball table. For the whole fight the table is alive: bumpers drift
+// around and fling you on touch, steel balls roll in (a red arrow marks
+// where) and ricochet off bumpers and the corner kickers.
+// BUMPER SLAM, FLIPPER SLAP, TILT (60%), MULTIBALL (30%) and the JACKPOT
+// finale (10%) live in boss-bumper-flippers.js.
 //------------------------------------------------------------------------
 
 Object.assign(BOSS_DEFS, {
@@ -24,488 +23,272 @@ Object.assign(BOSS_DEFS, {
 Object.assign(BOSS_MECHANICS, {
     boss_bumper: {
         phases: [
+            // Basic attacks are steady pressure; the table is the real threat.
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
-            { threshold: 0.60, chargeMax: 9, damageMultiplier: 1.45 },
-            { threshold: 0.30, chargeMax: 7, damageMultiplier: 1.90 },
+            { threshold: 0.60, chargeMax: 11, damageMultiplier: 1.20 },
+            { threshold: 0.30, chargeMax: 10, damageMultiplier: 1.40 },
         ],
         immunityDuration: 2200,
         mechanics: [
+            { name: 'bumper_slam', intervalBase: 14000, intervalVariance: 3500, handler: '_mechBumperSlam' },
+            { name: 'flipper_slap', intervalBase: 16000, intervalVariance: 4000, handler: '_mechBumperFlip', phase2Only: true },
             { name: 'fog_bank', intervalBase: 24000, intervalVariance: 6000, handler: '_mechFogBank' },
         ],
-        onInit: _bumperArenaInit,
     },
 });
 
 
-// ── Carnival tuning ─────────────────────────────────────────────────────
-// Roaming bumpers
-export const BUMP_BUMPER_N = [0, 2, 3, 3];      // alive at once per boss phase
-export const BUMP_BUMPER_R = 30;                // bumper visual radius (el at b.x - 30)
-export const BUMP_BUMPER_SPEED = [0, 34, 46, 60]; // px/s drift
-export const BUMP_FLING = [0, 150, 180, 210];   // px fling impulse per thwack
-export const BUMP_THWACK_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP per bumper touch
-export const BUMP_THWACK_CD_MS = 900;           // per-bumper touch cooldown
-// Pinball shower
-export const BUMP_SHOWER_INTERVAL_MS = [0, 4600, 3600, 2700]; // per boss phase
-export const BUMP_BALL_SPEED = [0, 230, 280, 330]; // px/s
-export const BUMP_BALL_DMG = 0.05;              // %maxHP per ball touch (physical)
-export const BUMP_BALL_CD_MS = 450;             // global ball-hit cooldown
-export const BUMP_BALL_R = 26;                  // ball radius
-export const BUMP_BALL_BOUNCE_BOOST = 55;       // px/s kick when bouncing off a bumper
-export const BUMP_BALL_MAX_SPEED = 640;         // px/s hard cap - kicks can't snowball
-// Slingshots: the two diagonal kickers in the bottom corners - real
-// pinball-table physics for pinballs that hit them.
-export const BUMP_SLING_LEN = 300;              // kicker length (px)
-export const BUMP_SLING_T = 46;                 // collision half-thickness (px)
-export const BUMP_SLING_KICK = 340;             // px/s normal-speed boost on a kick
-export const BUMP_SLING_TILT_KICK = 430;        // px/s during TILT enrage
-// Tilt! Flipper Frenzy (60% gate)
-export const BUMP_FLIP_MS = 9000;               // whole frenzy duration
-export const BUMP_FLIP_WARN_MS = 1000;          // arc band telegraph before a slap
-export const BUMP_FLIP_STRIKE_MS = 380;         // the slap is live
-export const BUMP_FLIP_CYCLE_MS = 1700;         // one flipper slaps per cycle (alternating)
-export const BUMP_FLIP_DMG = 0.13;              // %maxHP per slap (physical)
-export const BUMP_TILT_MS = 6500;               // bumper enrage while flippers rage
-// Multiball Rush (30% gate)
-export const BUMP_MULTIBALL_N = [0, 0, 0, 6];   // balls released (phase 3 gate)
-export const BUMP_MULTIBALL_MS = 12000;         // rush duration
-export const BUMP_MULTIBALL_SPEED = 340;        // px/s ricochet speed
-// Bumper Slam (charge attack)
-export const BUMP_SLAM_WARN_MS = 1050;          // target-ring telegraph
-export const BUMP_SLAM_RING_MS = 420;           // shockwave flash after impact
-export const BUMP_SLAM_R = 130;                 // slam radius (visual + hit)
-export const BUMP_SLAM_DMG = [0, 0.12, 0.15, 0.18]; // %maxHP by boss phase
-export const BUMP_SLAM_FLING = 220;             // px fling away from impact
+//------------------------------------------------------------------------
+//-------------------CONSTANTS AND STATE-------------------------------------------
+//------------------------------------------------------------------------
+const BUMPER_N = [0, 2, 3, 3];                     // bumpers on the table, by phase
+const BUMPER_R = 30;
+const BUMPER_SPEED = [0, 34, 46, 60];              // drift (px/s)
+const BUMPER_FLING = [0, 150, 180, 210];           // fling on touch (px)
+const BUMPER_DMG = [0, 0.10, 0.12, 0.14];
+const BUMPER_CD_MS = 900;                          // per bumper
+const BALL_EVERY_MS = [0, 4400, 3500, 2700];       // a new ball rolls in this often, by phase
+const BALL_SPEED = [0, 240, 290, 340];
+const BALL_DMG = [0, 0.08, 0.09, 0.10];
+const BALL_R = 24;
+const BALL_WARN_MS = 800;                          // the entry arrow shows this long first
+const BALL_BOUNCE_BOOST = 55;                      // kick when bouncing off a bumper
+const BALL_MAX_SPEED = 640;                        // kicks can never snowball past this
+const SLING_LEN = 300;                             // corner kicker length
+const SLING_T = 46;                                // kicker half-thickness for balls
+const SLING_KICK = 340;
+const HIT_CD_MS = 650;                             // shared hit cooldown
+
+export let _bumpWatcher = null;                    // the running table (one at a time)
+let _bumpHitUntil = 0;
 
 
-export let _bumpWatcher = null; // per-fight carnival state
-export let _bumpSlamActive = false; // a slam set-piece is running
+//------------------------------------------------------------------------
+//-------------------LOW-LEVEL HELPERS---------------------------------------------
+//------------------------------------------------------------------------
 
+// The phase number clamped to 1-3.
+export function _bumpPhase(phase) {
+    return Math.max(1, Math.min(3, Number(phase) || 1));
+}
 
-// Hard cap on pinball speed. Sling kicks and bumper boosts ADD velocity on
-// every hit, so without a cap a ball ricocheting around the table could
-// snowball to unbounded speed. Clamp the magnitude after any boost.
-export function _bumpCapBallSpeed(b) {
+// One physical hit with the boss-ability flash and number, behind a short
+// shared cooldown so two table parts touching you together never stack.
+export function _bumpStrike(pct, level, label) {
+    const now = performance.now();
+    if (now < _bumpHitUntil) return false;
+    _bumpHitUntil = now + HIT_CD_MS;
+    _nkAbilityHitToast(_nkHit(pct, null, level), 'The Bumper', label, true);
+    return true;
+}
+
+// Flings the player away from (x, y) and hits them (skipped while the shared
+// hit cooldown runs, so one touch never flings twice).
+export function _bumpFlingHit(level, x, y, flingPx, pct, label) {
+    if (!_bumpStrike(pct, level, label)) return;
+    const c = _nkPlayerCenter();
+    if (!c) return;
+    const dx = c.x - x, dy = c.y - y, d = Math.hypot(dx, dy) || 1;
+    _nkFlingAvatar(dx / d * flingPx, dy / d * flingPx, x, y);
+}
+
+// Plays the table's thwack sound (quietly ignored when audio is off).
+export function _bumpSfx() {
+    try { Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
+}
+
+// Keeps a ball's speed under the cap after a kick.
+function _capSpeed(b) {
     const s = Math.hypot(b.vx, b.vy);
-    if (s > BUMP_BALL_MAX_SPEED) {
-        const k = BUMP_BALL_MAX_SPEED / s;
-        b.vx *= k;
-        b.vy *= k;
+    if (s > BALL_MAX_SPEED) { b.vx *= BALL_MAX_SPEED / s; b.vy *= BALL_MAX_SPEED / s; }
+}
+
+// Flashes a bumper or kicker element for a moment.
+function _flash(el, cls) {
+    el.classList.add(cls);
+    setTimeout(() => { try { el.classList.remove(cls); } catch (e) {} }, 280);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------BALLS (telegraphed entry, ricochet)------------------------------
+//------------------------------------------------------------------------
+
+// Adds a ball at (x, y) moving (vx, vy). It waits warnMs first while a red
+// arrow (or, with aim, a red line) shows where it will go; only then it
+// rolls and can hurt.
+export function _bumpAddBall(st, x, y, vx, vy, opts) {
+    const o = opts || {};
+    const el = _nkEl(st.run, 'div', 'sx-bump-ball' + (o.hot ? ' hot' : ''));
+    el.style.transform = 'translate(' + Math.round(x - BALL_R) + 'px,' + Math.round(y - BALL_R) + 'px)';
+    el.style.opacity = '0.35';
+    const ang = Math.atan2(vy, vx) * 180 / Math.PI;
+    const tel = _nkEl(st.run, 'div', o.aim ? 'sx-bump-aim' : 'sx-bump-entry');
+    tel.style.left = Math.round(x) + 'px';
+    tel.style.top = Math.round(y) + 'px';
+    tel.style.transform = 'rotate(' + ang.toFixed(1) + 'deg)';
+    tel.style.setProperty('--bump-warn', (o.warnMs || BALL_WARN_MS) + 'ms');
+    st.balls.push({ x, y, vx, vy, el, tel, wait: o.warnMs || BALL_WARN_MS, life: o.life || 11000, dmg: o.dmg || 0 });
+}
+
+// Rolls one ball a frame: bounces off bumpers, walls and kickers; hits the
+// player on touch. Returns false once the ball has run out.
+function _stepBall(st, b, dtS, now, p) {
+    const W = window.innerWidth, H = window.innerHeight;
+    if (b.wait > 0) {
+        b.wait -= dtS * 1000;
+        if (b.wait <= 0) { try { b.tel.remove(); } catch (e) {} b.el.style.opacity = ''; }
+        return true;
     }
+    b.x += b.vx * dtS;
+    b.y += b.vy * dtS;
+    st.bumpers.forEach(bp => {
+        const dx = b.x - bp.x, dy = b.y - bp.y, d = Math.hypot(dx, dy) || 1, min = BUMPER_R + BALL_R;
+        if (d >= min) return;
+        b.x = bp.x + dx / d * min; b.y = bp.y + dy / d * min;
+        const dot = (b.vx * dx + b.vy * dy) / d;
+        if (dot >= 0) return;
+        b.vx += (-2 * dot + BALL_BOUNCE_BOOST) * dx / d;
+        b.vy += (-2 * dot + BALL_BOUNCE_BOOST) * dy / d;
+        _capSpeed(b); _flash(bp.el, 'sx-nk-boom'); _bumpSfx();
+    });
+    if (b.x < BALL_R || b.x > W - BALL_R) { b.vx = -b.vx; b.x = Math.max(BALL_R, Math.min(W - BALL_R, b.x)); }
+    if (b.y < BALL_R || b.y > H - BALL_R) { b.vy = -b.vy; b.y = Math.max(BALL_R, Math.min(H - BALL_R, b.y)); }
+    st.slings.forEach(sl => _slingBall(sl, b));
+    b.el.style.transform = 'translate(' + Math.round(b.x - BALL_R) + 'px,' + Math.round(b.y - BALL_R) + 'px)';
+    if (_nkCircleHit(b.x, b.y, BALL_R, _nkPlayerRect(), 0)) _bumpStrike(b.dmg || BALL_DMG[p], st.level, 'Pinball');
+    b.life -= dtS * 1000;
+    return b.life > 0;
 }
 
 
-// Sweep every carnival overlay off the screen. Safe to call twice.
-export function _bumperSweep() {
-    _bumpSlamActive = false;
-    try {
-        document.querySelectorAll('.sx-bump-bumper, .sx-bump-ball, .sx-bump-flip, .sx-bump-slam-ring, .sx-bump-slam-core, .sx-bump-rail').forEach(el => el.remove());
-    } catch (e) {}
+//------------------------------------------------------------------------
+//-------------------CORNER KICKERS (slingshots)-------------------------------------
+//------------------------------------------------------------------------
+
+// Spawns the two slanted kickers above the bottom corners (decoration that
+// also punts balls back into the table).
+function _spawnSlings(st) {
+    const W = window.innerWidth, H = window.innerHeight;
+    [{ side: 'left', x0: 26, y0: H - 60, ang: -42 }, { side: 'right', x0: W - 26, y0: H - 60, ang: 222 }].forEach(d => {
+        const el = _nkEl(st.run, 'div', 'sx-bump-sling ' + d.side);
+        el.style.left = d.x0 + 'px';
+        el.style.top = d.y0 + 'px';
+        el.style.width = SLING_LEN + 'px';
+        el.style.transformOrigin = '0 50%';
+        el.style.transform = 'rotate(' + d.ang + 'deg)';
+        const rad = d.ang * Math.PI / 180;
+        let nx = Math.sin(rad), ny = -Math.cos(rad);
+        if ((d.side === 'left') !== (nx >= 0)) { nx = -nx; ny = -ny; }     // normal points into the table
+        st.slings.push({ x0: d.x0, y0: d.y0, dxu: Math.cos(rad), dyu: Math.sin(rad), nx, ny, el });
+    });
+}
+
+// A ball touching a kicker is reflected and punted back into the table.
+function _slingBall(sl, b) {
+    const t = Math.max(0, Math.min(SLING_LEN, (b.x - sl.x0) * sl.dxu + (b.y - sl.y0) * sl.dyu));
+    const cx = sl.x0 + sl.dxu * t, cy = sl.y0 + sl.dyu * t;
+    const min = SLING_T + BALL_R;
+    if (Math.hypot(b.x - cx, b.y - cy) >= min) return;
+    b.x = cx + sl.nx * min; b.y = cy + sl.ny * min;
+    const dot = b.vx * sl.nx + b.vy * sl.ny;
+    if (dot >= 0) return;
+    b.vx += (-2 * dot + SLING_KICK) * sl.nx;
+    b.vy += (-2 * dot + SLING_KICK) * sl.ny;
+    _capSpeed(b); _flash(sl.el, 'fired'); _bumpSfx();
 }
 
 
-// Called from _bossCleanup (boss-framework.js) on boss death / stop.
+//------------------------------------------------------------------------
+//-------------------THE TABLE (runs the whole fight)----------------------------------
+//------------------------------------------------------------------------
+
+// Drifts the bumpers (faster while TILT is on) and flings a player who
+// touches one.
+function _stepBumpers(st, dtS, now, p) {
+    const W = window.innerWidth, H = window.innerHeight;
+    while (st.bumpers.length < BUMPER_N[p]) {
+        st.bumpers.push({
+            x: 90 + Math.random() * Math.max(120, W - 180), y: 110 + Math.random() * Math.max(120, H - 220),
+            a: Math.random() * Math.PI * 2, cd: 0, el: _nkEl(st.run, 'div', 'sx-bump-bumper'),
+        });
+    }
+    const tilt = now < st.tiltUntil;
+    const spd = BUMPER_SPEED[p] * (tilt ? 1.7 : 1);
+    const pr = _nkPlayerRect();
+    st.bumpers.forEach(b => {
+        b.el.classList.toggle('tilt', tilt);
+        if (Math.random() < dtS * 1.1) b.a += (Math.random() - 0.5) * 2.2;
+        b.x += Math.cos(b.a) * spd * dtS;
+        b.y += Math.sin(b.a) * spd * dtS;
+        if (b.x < 70 || b.x > W - 70) b.a = Math.PI - b.a;
+        if (b.y < 90 || b.y > H - 70) b.a = -b.a;
+        b.x = Math.max(70, Math.min(W - 70, b.x));
+        b.y = Math.max(90, Math.min(H - 70, b.y));
+        b.el.style.transform = 'translate(' + Math.round(b.x - BUMPER_R) + 'px,' + Math.round(b.y - BUMPER_R) + 'px)';
+        if (now < b.cd || !_nkCircleHit(b.x, b.y, BUMPER_R, pr, 0)) return;
+        b.cd = now + BUMPER_CD_MS;
+        _flash(b.el, 'sx-nk-boom');
+        _bumpSfx();
+        _bumpFlingHit(st.level, b.x, b.y, BUMPER_FLING[p] * (tilt ? 1.25 : 1), BUMPER_DMG[p] * (tilt ? 1.3 : 1), 'Bumper');
+    });
+}
+
+// Rolls a new ball in from a random side edge every so often.
+function _feedBalls(st, dtMs, p) {
+    st.feed += dtMs;
+    if (st.feed < BALL_EVERY_MS[p]) return;
+    st.feed = 0;
+    const W = window.innerWidth, H = window.innerHeight, left = Math.random() < 0.5;
+    const spd = BALL_SPEED[p] * (0.85 + Math.random() * 0.3);
+    _bumpAddBall(st, left ? BALL_R + 4 : W - BALL_R - 4, 110 + Math.random() * Math.max(120, H - 220),
+        (left ? 1 : -1) * spd, (Math.random() - 0.5) * spd * 0.6);
+}
+
+// Starts the table when the fight begins: rails, kickers, bumpers and balls,
+// in one passive loop that lives until the boss is gone.
+export function _bumperArenaInit(monster) {
+    if (_bumpWatcher || !monster) return;
+    const run = _nkNewRun(monster.id, true);
+    run.passive = true;                            // must not block the boss's other attacks
+    const st = { monsterId: monster.id, level: monster.level || 1, run, bumpers: [], balls: [], slings: [], feed: 0, tiltUntil: 0, seen: false, born: performance.now() };
+    _bumpWatcher = st;
+    ['left', 'right', 'top'].forEach(side => _nkEl(run, 'div', 'sx-bump-rail ' + side));
+    _spawnSlings(st);
+    run.onKill = () => { if (_bumpWatcher === st) _bumpWatcher = null; };
+    _nkLoop(run, (dtS, now) => {
+        const live = (globalThis._monsters || []).find(m => m && m.id === st.monsterId);
+        if (!live) return !st.seen && now - st.born < 20000;   // the boss card may register a moment later
+        st.seen = true;
+        const p = _bumpPhase(live.bossPhase);
+        const tilt = now < st.tiltUntil;
+        document.querySelectorAll('.sx-bump-rail, .sx-bump-sling').forEach(el => el.classList.toggle('tilt', tilt));
+        _stepBumpers(st, dtS, now, p);
+        _feedBalls(st, dtS * 1000, p);
+        st.balls = st.balls.filter(b => {
+            if (_stepBall(st, b, dtS, now, p)) return true;
+            try { b.el.remove(); b.tel.remove(); } catch (e) {}
+            return false;
+        });
+        return true;
+    });
+}
+
+
+//------------------------------------------------------------------------
+//-------------------TEARDOWN----------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Called from the boss cleanup on boss death AND on encounter stop: ends the
+// table and removes every element the Bumper created.
 export function _bumperTeardown() {
     const st = _bumpWatcher;
     _bumpWatcher = null;
     if (st && st.run) { try { _nkKillRun(st.run); } catch (e) {} }
-    // Always sweep: on boss death the run's onKill may have nulled the
-    // watcher BEFORE this runs - the overlays must go either way.
-    _bumperSweep();
-}
-
-
-// One thwack: fling the player away from (x, y) and deal the touch damage.
-// The fling is animated (decaying slide + tumble + impact burst) so the
-// bump visually reads as a physical bounce instead of a teleport.
-export function _bumpFlingHit(st, x, y, flingPx, dmgPct, label) {
-    const c = _nkPlayerCenter();
-    if (c) {
-        const dx = c.x - x, dy = c.y - y;
-        const d = Math.sqrt(dx * dx + dy * dy) || 1;
-        _nkFlingAvatar((dx / d) * flingPx, (dy / d) * flingPx, x, y);
-    }
-    const dealt = _nkHit(dmgPct, null, st.level);
-    _nkAbilityHitToast(dealt, 'The Bumper', label || 'Bumper');
-}
-
-
-// Spawns the two diagonal slingshot kickers (bottom-left and bottom-right,
-// slanted up-inward like a real table's out-lane guides). Registered on the
-// run so boss death removes them with everything else.
-export function _bumpSpawnSlings(st, run) {
-    const W = window.innerWidth, H = window.innerHeight;
-    const defs = [
-        { side: 'left', x0: 26, y0: H - 60, ang: -42 },   // up-inward from bottom-left
-        { side: 'right', x0: W - 26, y0: H - 60, ang: 222 }, // mirrored on the right
-    ];
-    defs.forEach(d => {
-        const el = _nkEl(run, 'div', 'sx-bump-sling ' + d.side);
-        el.style.left = d.x0 + 'px';
-        el.style.top = d.y0 + 'px';
-        el.style.width = BUMP_SLING_LEN + 'px';
-        el.style.transformOrigin = '0 50%';
-        el.style.transform = 'rotate(' + d.ang + 'deg)';
-        const rad = d.ang * Math.PI / 180;
-        // Unit normal pointing INTO the playfield (perpendicular to the kicker).
-        const nx = Math.sin(rad), ny = -Math.cos(rad);
-        if (nx > 0 || (nx === 0 && ny < 0)) { /* keep pointing inward */ }
-        // Left kicker: normal must point right-ish; right kicker: left-ish.
-        const wantRight = d.side === 'left';
-        const nSign = (wantRight ? (nx >= 0 ? 1 : -1) : (nx <= 0 ? 1 : -1));
-        st.slings.push({
-            side: d.side, x0: d.x0, y0: d.y0,
-            dxu: Math.cos(rad), dyu: Math.sin(rad), // unit along the kicker
-            nx: nx * nSign, ny: ny * nSign,         // inward unit normal
-            len: BUMP_SLING_LEN, flashUntil: 0, el,
-        });
+    document.querySelectorAll('.sx-bump-bumper, .sx-bump-ball, .sx-bump-entry, .sx-bump-aim, .sx-bump-flip, .sx-bump-slam, ' +
+        '.sx-bump-rail, .sx-bump-sling, .sx-bump-target, .sx-bump-pips, .sx-nk-fin-bump').forEach(el => { try { el.remove(); } catch (e) {} });
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('sx-charge-paused');
     });
 }
-
-
-// Slingshot collision for one pinball: treat each kicker as a capsule
-// (segment + half-thickness). On contact, reflect the velocity about the
-// inward normal (like hitting a wall at an angle) and add the kick boost -
-// the ball gets shot back into the playfield, exactly like a real machine.
-export function _bumpSlingBall(st, b, now, tilting) {
-    st.slings.forEach(sl => {
-        // Project the ball onto the kicker segment.
-        const rx = b.x - sl.x0, ry = b.y - sl.y0;
-        let t = rx * sl.dxu + ry * sl.dyu;
-        t = Math.max(0, Math.min(sl.len, t));
-        const cx = sl.x0 + sl.dxu * t, cy = sl.y0 + sl.dyu * t; // closest point
-        const dx = b.x - cx, dy = b.y - cy;
-        const d = Math.hypot(dx, dy) || 1;
-        const minD = BUMP_SLING_T + BUMP_BALL_R;
-        if (d < minD) {
-            // The kicker's normal always points INTO the playfield - use it
-            // directly (a radial sign flip here would silently disable the
-            // kick for balls approaching from the playfield side).
-            const nx = sl.nx, ny = sl.ny;
-            b.x = cx + nx * minD;
-            b.y = cy + ny * minD;
-            const dot = b.vx * nx + b.vy * ny; // v·n
-            if (dot < 0) { // only reflect if the ball moves INTO the kicker
-                b.vx -= 2 * dot * nx;
-                b.vy -= 2 * dot * ny;
-                const kick = tilting ? BUMP_SLING_TILT_KICK : BUMP_SLING_KICK;
-                b.vx += nx * kick;
-                b.vy += ny * kick;
-                _bumpCapBallSpeed(b);
-                sl.flashUntil = now + 260;
-                sl.el.classList.add('fired');
-                setTimeout(() => { try { sl.el.classList.remove('fired'); } catch (e) {} }, 260);
-                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
-            }
-        }
-    });
-}
-
-
-export function _bumperArenaInit(monster) {
-    if (_bumpWatcher) return;
-    const monsterId = monster ? monster.id : null;
-    const st = {
-        monsterId, level: monster ? monster.level : 1,
-        bumpers: [], balls: [], showerAcc: 0, ballCd: 0,
-        slings: [],
-        tiltUntil: 0, flip: null,
-        gate60Done: false, gate30Done: false, rushDone: false,
-        everLive: false, bornAt: performance.now(),
-    };
-    _bumpWatcher = st;
-    _nkToast('eg_bump_intro', '🎪 The Bumper: The carnival ring is OPEN - mind the bumpers!');
-    // Tier-scaled clock: the flipper-slap telegraph and the slam ring breathe
-    // with tier like every other dodge telegraph. `now`-stamp hit cooldowns
-    // stay real-time (fairness floor). Passive run: the watcher lives the
-    // whole fight, so it must not hog _nkDodgeBusy() - the slam and the
-    // shared fog-bank mechanic check that flag.
-    const run = _nkNewRun(monsterId, true);
-    run.passive = true;
-    st.run = run;
-    // Pinball-table side rails: pure decoration that frames the arena for
-    // the whole fight (registered on the run → auto-removed on teardown).
-    ['left', 'right', 'top'].forEach(side => _nkEl(run, 'div', 'sx-bump-rail ' + side));
-    // Slingshots: the two diagonal kickers above the bottom corners. Like a
-    // real machine, they physically punt pinballs that roll into them.
-    _bumpSpawnSlings(st, run);
-    run.onKill = () => {
-        if (_bumpWatcher && _bumpWatcher.run === run) _bumpWatcher = null;
-        _bumperSweep(); // boss died → clear the carnival immediately
-    };
-
-    _nkLoop(run, (dtS, now) => {
-        const live = (typeof _monsters !== 'undefined' && globalThis._monsters)
-            ? (globalThis._monsters.find(m => m && m.id === st.monsterId) || null) : null;
-        // Boss not registered yet → wait for it (spawn races the arena init);
-        // boss vanished AFTER being live → the fight is over, tear down.
-        if (!live) {
-            if (!st.everLive) return (now - st.bornAt < 20000); // wait up to 20s for spawn
-            return false;
-        }
-        st.everLive = true;
-
-        const W = window.innerWidth, H = window.innerHeight;
-        const pr = _nkPlayerRect();
-        const c = _nkPlayerCenter();
-        const p = Math.max(1, Math.min(3, Number(live.bossPhase) || 1));
-        const tilting = now < st.tiltUntil;
-
-        // ── HP gates ──
-        const hpPct = live.maxHP > 0 ? live.currentHP / live.maxHP : 1;
-        if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _bumperFlipperFrenzy(st, now); }
-        if (!st.gate30Done && hpPct <= 0.30) { st.gate30Done = true; _bumperMultiball(st, now); }
-
-        // ── Roaming bumpers: drift, bounce, thwack ──
-        const wantN = BUMP_BUMPER_N[p] || BUMP_BUMPER_N[1];
-        while (st.bumpers.length < wantN) {
-            const el = _nkEl(run, 'div', 'sx-bump-bumper', '🎪');
-            const b = {
-                x: 90 + Math.random() * Math.max(120, W - 180),
-                y: 90 + Math.random() * Math.max(120, H - 180),
-                a: Math.random() * Math.PI * 2, cdUntil: 0, el,
-            };
-            st.bumpers.push(b);
-        }
-        const spd = BUMP_BUMPER_SPEED[p] * (tilting ? 1.7 : 1);
-        st.bumpers.forEach(b => {
-            if (Math.random() < dtS * 1.1) b.a += (Math.random() - 0.5) * 2.2;
-            b.x += Math.cos(b.a) * spd * dtS;
-            b.y += Math.sin(b.a) * spd * dtS;
-            if (b.x < 70 || b.x > W - 70) b.a = Math.PI - b.a;
-            if (b.y < 70 || b.y > H - 70) b.a = -b.a;
-            b.x = Math.max(70, Math.min(W - 70, b.x));
-            b.y = Math.max(70, Math.min(H - 70, b.y));
-            b.el.style.transform = 'translate(' + Math.round(b.x - 30) + 'px,' + Math.round(b.y - 30) + 'px)';
-            if (c && pr && now >= b.cdUntil && _nkDotHit(b.el, pr, 0)) {
-                b.cdUntil = now + BUMP_THWACK_CD_MS;
-                b.el.classList.add('sx-nk-boom');
-                setTimeout(() => b.el.classList.remove('sx-nk-boom'), 300);
-                _bumpFlingHit(st, b.x, b.y, BUMP_FLING[p] * (tilting ? 1.25 : 1),
-                    BUMP_THWACK_DMG[p] * (tilting ? 1.3 : 1), tilting ? 'TILT Thwack' : 'Bumper Party');
-            }
-        });
-
-        // ── Pinball shower: balls roll in and ricochet ──
-        st.showerAcc += dtS * 1000;
-        const sInt = BUMP_SHOWER_INTERVAL_MS[p] || BUMP_SHOWER_INTERVAL_MS[1];
-        if (st.showerAcc >= sInt) {
-            st.showerAcc = 0;
-            const fromLeft = Math.random() < 0.5;
-            const el = _nkEl(run, 'div', 'sx-bump-ball', '🎱');
-            st.balls.push({
-                x: fromLeft ? -BUMP_BALL_R : W + BUMP_BALL_R,
-                y: 70 + Math.random() * Math.max(120, H - 160),
-                vx: (fromLeft ? 1 : -1) * BUMP_BALL_SPEED[p] * (0.85 + Math.random() * 0.3),
-                vy: (Math.random() - 0.5) * BUMP_BALL_SPEED[p] * 0.6,
-                life: 11000, el,
-            });
-        }
-        for (let i = st.balls.length - 1; i >= 0; i--) {
-            const b = st.balls[i];
-            b.x += b.vx * dtS;
-            b.y += b.vy * dtS;
-            // Bumpers are solid: a pinball that hits one bounces off exactly
-            // like it hit a wall on the outer edge - reflect about the
-            // contact normal, seat the ball on the surface, and give it a
-            // lively kick away. The bumper flashes like it does on a thwack.
-            st.bumpers.forEach(bp => {
-                const dx = b.x - bp.x, dy = b.y - bp.y;
-                const d = Math.hypot(dx, dy) || 1;
-                const minD = BUMP_BUMPER_R + BUMP_BALL_R;
-                if (d < minD) {
-                    b.x = bp.x + (dx / d) * minD;
-                    b.y = bp.y + (dy / d) * minD;
-                    const dot = (b.vx * dx + b.vy * dy) / d; // v·n
-                    if (dot < 0) { // only reflect if the ball moves INTO the bumper
-                        b.vx -= 2 * dot * (dx / d);
-                        b.vy -= 2 * dot * (dy / d);
-                        b.vx += (dx / d) * BUMP_BALL_BOUNCE_BOOST;
-                        b.vy += (dy / d) * BUMP_BALL_BOUNCE_BOOST;
-                        _bumpCapBallSpeed(b);
-                        bp.el.classList.add('sx-nk-boom');
-                        setTimeout(() => bp.el.classList.remove('sx-nk-boom'), 300);
-                        try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
-                    }
-                }
-            });
-            if (b.x < BUMP_BALL_R || b.x > W - BUMP_BALL_R) { b.vx = -b.vx; b.x = Math.max(BUMP_BALL_R, Math.min(W - BUMP_BALL_R, b.x)); }
-            if (b.y < BUMP_BALL_R || b.y > H - BUMP_BALL_R) { b.vy = -b.vy; b.y = Math.max(BUMP_BALL_R, Math.min(H - BUMP_BALL_R, b.y)); }
-            b.el.style.transform = 'translate(' + Math.round(b.x - BUMP_BALL_R) + 'px,' + Math.round(b.y - BUMP_BALL_R) + 'px)';
-            // Slingshot kickers: pinballs get punted back into the playfield.
-            _bumpSlingBall(st, b, now, tilting);
-            if (c && pr && now >= st.ballCd && _nkCircleHit(b.x, b.y, BUMP_BALL_R, pr, 0)) {
-                st.ballCd = now + BUMP_BALL_CD_MS;
-                const dealt = _nkHit(BUMP_BALL_DMG, null, st.level);
-                _nkAbilityHitToast(dealt, 'The Bumper', 'Pinball');
-            }
-            if ((b.life -= dtS * 1000) <= 0 || b.x < -60 || b.x > W + 60) {
-                try { b.el.remove(); } catch (e) {}
-                st.balls.splice(i, 1);
-            }
-        }
-
-        // ── Tilt! Flipper Frenzy state machine (60% gate) ──
-        if (st.flip) {
-            const f = st.flip;
-            f.t += dtS * 1000;
-            // Each slap spawns its arc band lazily at its moment, so every
-            // slap carries its own 1s warn → 380ms strike telegraph.
-            while (f.nextIdx < f.slaps.length && f.t >= f.slaps[f.nextIdx].at) {
-                _bumperSpawnBand(st, f.slaps[f.nextIdx], W, H);
-                f.nextIdx++;
-            }
-            f.bands.forEach(bd => {
-                if (!bd || bd.done) return;
-                bd.t += dtS * 1000;
-                if (bd.t >= BUMP_FLIP_WARN_MS && bd.t < BUMP_FLIP_WARN_MS + BUMP_FLIP_STRIKE_MS) {
-                    if (!bd.hot) {
-                        bd.hot = true;
-                        bd.el.classList.add('hot');
-                        // Heavy physical hit if the player stands in the arc.
-                        if (pr && _nkRectsOverlap(bd.rect(), pr)) {
-                            const dealt = _nkHit(BUMP_FLIP_DMG, null, st.level);
-                            _nkAbilityHitToast(dealt, 'The Bumper', 'Flipper');
-                        }
-                    }
-                } else if (bd.t >= BUMP_FLIP_WARN_MS + BUMP_FLIP_STRIKE_MS) {
-                    bd.done = true;
-                    try { bd.el.remove(); } catch (e) {}
-                }
-            });
-            if (f.t >= BUMP_FLIP_MS) {
-                f.bands.forEach(bd => { if (bd && !bd.done) { try { bd.el.remove(); } catch (e) {} } });
-                st.flip = null;
-            }
-        }
-        if (!tilting && st.tiltUntil && now >= st.tiltUntil) st.tiltUntil = 0;
-
-        return true;
-    });
-}
-
-
-// ── 60% gate: Tilt! Flipper Frenzy ──────────────────────────────────────
-// Flippers rage in the bottom corners; each slap sweeps a telegraphed arc
-// band across the lower arena. Bumpers go TILT for the duration.
-
-export function _bumperFlipperFrenzy(st, now) {
-    if (st.flip) return;
-    const slaps = [];
-    const n = Math.floor(BUMP_FLIP_MS / BUMP_FLIP_CYCLE_MS);
-    for (let i = 0; i < n; i++) slaps.push({ at: 600 + i * BUMP_FLIP_CYCLE_MS, side: i % 2 });
-    st.flip = { t: 0, slaps, nextIdx: 0, bands: [] };
-    st.tiltUntil = now + BUMP_TILT_MS;
-    st.bumpers.forEach(b => b.el.classList.add('tilt'));
-    document.querySelectorAll('.sx-bump-rail').forEach(r => r.classList.add('tilt'));
-    document.querySelectorAll('.sx-bump-sling').forEach(r => r.classList.add('tilt'));
-    setTimeout(() => {
-        document.querySelectorAll('.sx-bump-bumper.tilt').forEach(b => { try { b.classList.remove('tilt'); } catch (e) {} });
-        document.querySelectorAll('.sx-bump-rail.tilt').forEach(r => { try { r.classList.remove('tilt'); } catch (e) {} });
-        document.querySelectorAll('.sx-bump-sling.tilt').forEach(r => { try { r.classList.remove('tilt'); } catch (e) {} });
-    }, BUMP_TILT_MS + 400);
-    _nkToast('eg_bump_tilt', '⚠️ TILT! The flippers are furious - stay off the lower lanes!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
-}
-
-
-// Spawns one flipper's arc band: warn (dashed) → hot strike → fade.
-// A wide rotated strip pivoting from a bottom corner, sweeping up-inward.
-export function _bumperSpawnBand(st, slap, W, H) {
-    const pivotX = slap.side === 0 ? 60 : W - 60;
-    const pivotY = H - 80;
-    const len = Math.min(W * 0.62, 620);
-    const angDeg = slap.side === 0 ? -32 : 212; // pointing up-inward
-    const el = _nkEl(st.run, 'div', 'sx-bump-flip');
-    el.style.left = pivotX + 'px';
-    el.style.top = pivotY + 'px';
-    el.style.width = len + 'px';
-    el.style.transformOrigin = '0 50%';
-    el.style.transform = 'rotate(' + angDeg + 'deg)';
-    const rad = angDeg * Math.PI / 180;
-    const ex = pivotX + Math.cos(rad) * len, ey = pivotY + Math.sin(rad) * len;
-    const pad = 22;
-    st.flip.bands.push({
-        t: 0, hot: false, done: false, el,
-        rect: () => ({
-            left: Math.min(pivotX, ex) - pad, right: Math.max(pivotX, ex) + pad,
-            top: Math.min(pivotY, ey) - pad, bottom: Math.max(pivotY, ey) + pad,
-        }),
-    });
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
-}
-
-
-// ── 30% gate: Multiball Rush ────────────────────────────────────────────
-// The machine coughs up a storm of live pinballs that ricochet everywhere.
-
-export function _bumperMultiball(st, now) {
-    if (st.rushDone) return;
-    st.rushDone = true;
-    const W = window.innerWidth, H = window.innerHeight;
-    const n = BUMP_MULTIBALL_N[3] || 6;
-    for (let i = 0; i < n; i++) {
-        const a = Math.random() * Math.PI * 2;
-        const el = _nkEl(st.run, 'div', 'sx-bump-ball hot', '🎱');
-        st.balls.push({
-            x: W / 2, y: H * 0.4,
-            vx: Math.cos(a) * BUMP_MULTIBALL_SPEED,
-            vy: Math.sin(a) * BUMP_MULTIBALL_SPEED,
-            life: BUMP_MULTIBALL_MS, el,
-        });
-    }
-    _nkToast('eg_bump_multiball', '🎯 MULTIBALL! The machine is going wild - keep moving!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
-}
-
-
-//------------------------------------------------------------------------
-//-------------------CHARGE ATTACK: BUMPER SLAM----------------------------
-//------------------------------------------------------------------------
-// The boss's charged attack IS the set-piece: a giant bumper slams onto a
-// telegraphed target ring at the player's position, flinging and hitting
-// everything inside. Wired from _fireMonsterAttack (encounter.js).
-
-export function _bumperSlam(monster) {
-    if (_bumpSlamActive || _nkDodgeBusy() || _nkFrozen()) return;
-    const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
-    const level = monster ? monster.level : 1;
-    const monsterId = monster ? monster.id : null;
-    const run = _nkNewRun(monsterId, true);
-    _bumpSlamActive = true;
-    run.onKill = () => { _bumpSlamActive = false; };
-    const c = _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    const ring = _nkEl(run, 'div', 'sx-bump-slam-ring');
-    ring.style.left = c.x + 'px';
-    ring.style.top = c.y + 'px';
-    ring.style.width = ring.style.height = (BUMP_SLAM_R * 2) + 'px';
-    _nkToast('eg_bump_slam', '🎪 BUMPER SLAM! Clear the target ring!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
-    let t = 0, slammed = false;
-    _nkLoop(run, (dtS) => {
-        t += dtS * 1000;
-        if (!slammed && t >= BUMP_SLAM_WARN_MS) {
-            slammed = true;
-            ring.classList.add('hot');
-            const core = _nkEl(run, 'div', 'sx-bump-slam-core', '🎪');
-            core.style.left = c.x + 'px';
-            core.style.top = c.y + 'px';
-            const pr = _nkPlayerRect();
-            if (pr) {
-                const inside = c.x - BUMP_SLAM_R < pr.right && c.x + BUMP_SLAM_R > pr.left
-                    && c.y - BUMP_SLAM_R < pr.bottom && c.y + BUMP_SLAM_R > pr.top;
-                if (inside) _bumpFlingHit({ level }, c.x, c.y, BUMP_SLAM_FLING, BUMP_SLAM_DMG[p], 'Slam');
-            }
-        }
-        if (t >= BUMP_SLAM_WARN_MS + BUMP_SLAM_RING_MS) return false;
-        return true;
-    });
-}
-
-
-//------------------------------------------------------------------------
-//-------------------LEGACY COMPAT SHIM------------------------------------
-//------------------------------------------------------------------------
-// The old scheduled mechanic is now the persistent arena - keep the handler
-// name alive so any stale schedule entry no-ops instead of erroring.
-export function _mechBumperParty() { void 0; }

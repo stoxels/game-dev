@@ -1,18 +1,19 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { BOSS_DEFS, BOSS_MECHANICS, _bossRecalcDamage } from './boss-framework.js';
-import { _mechSoulTithe } from './shared-puzzle-mechanics.js';
-import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkEl, _nkFlingAvatar, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkToast } from './shared-boss-abilities.js';
+import { BOSS_DEFS, BOSS_MECHANICS } from './boss-framework.js';
+import { _nkAbilityHitToast, _nkCircleHit, _nkDodgeBusy, _nkEl, _nkFlingAvatar, _nkFrozen, _nkHit, _nkKillRun, _nkLoop, _nkNewRun, _nkPlayerCenter, _nkPlayerRect, _nkRectsOverlap } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE TACTICIAN (boss_tactician)------------------
 //------------------------------------------------------------------------
-// Persistent chess siege - every attack is a declared, dodgeable chess move:
-// the gliding queen body, telegraphed battle intents, pawn marches, CHECK
-// rook lanes at 60%, zugzwang hazards at 30%, and the CHECKMATE wall-crush
-// charge attack. One _nkLoop drives every state machine.
-//
-// Shared mechanics (fog_bank by handler-name string, soul_tithe by import)
-// live in shared-puzzle-mechanics.js.
+// A chess siege. For the whole fight the queen glides across the board
+// (touching her flings you) and pawn ranks march up from the bottom with
+// one green gap. The attacks are chess moves:
+//  - ROOK LANES (all fight): rows and columns through you fill red, then a
+//    rook slides through.
+//  - KNIGHT FORK (all fight): a knight jumps in L-shapes; every landing
+//    spot fills red first.
+//  - BISHOP CROSS (60%+) and the CHECKMATE finale (10%):
+//    boss-tactician-board.js.
 //------------------------------------------------------------------------
 
 Object.assign(BOSS_DEFS, {
@@ -26,599 +27,320 @@ Object.assign(BOSS_DEFS, {
 Object.assign(BOSS_MECHANICS, {
     boss_tactician: {
         phases: [
+            // Basic attacks are steady pressure; the chess moves are the real threat.
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
-            { threshold: 0.60, chargeMax: 9, damageMultiplier: 1.50 },
-            { threshold: 0.30, chargeMax: 6, damageMultiplier: 2.00 },
+            { threshold: 0.60, chargeMax: 11, damageMultiplier: 1.20 },
+            { threshold: 0.30, chargeMax: 10, damageMultiplier: 1.40 },
         ],
         immunityDuration: 2500,
         mechanics: [
-            // Kept for schedule compatibility - the persistent watcher now
-            // owns the intent cadence; the handler no-ops (same shim
-            // pattern as the other reworked bosses).
-            { name: 'battle_intent', intervalBase: 21000, intervalVariance: 5000, handler: '_mechBattleIntent' },
-            { name: 'fog_bank', intervalBase: 22000, intervalVariance: 5000, handler: '_mechFogBank' },
+            { name: 'rook_lanes', intervalBase: 14000, intervalVariance: 3500, handler: '_mechTctRook' },
+            { name: 'knight_fork', intervalBase: 16000, intervalVariance: 4000, handler: '_mechTctKnight' },
+            { name: 'bishop_cross', intervalBase: 17000, intervalVariance: 4000, handler: '_mechTctBishop', phase2Only: true },
+            { name: 'fog_bank', intervalBase: 24000, intervalVariance: 5000, handler: '_mechFogBank' },
         ],
-        onInit: _tacticianArenaInit,
     },
 });
 
 
-// ── Board tuning ─────────────────────────────────────────────────────────
-// The Queen's Guard (boss body)
-export const TCT_R = 38;                          // queen visual radius
-export const TCT_GLIDE_SPEED = [0, 42, 58, 76];   // px/s queen glide (queen-fast)
-export const TCT_GLIDE_REPICK_MS = 4200;
-export const TCT_ROOK_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the queen
-export const TCT_ROOK_CD_MS = 1000;
-export const TCT_ROOK_FLING = [0, 140, 165, 190];
-// Battle intent (persistent cadence)
-export const TCT_INTENT_EVERY_MS = [0, 8200, 7000, 5600];
-export const TCT_INTENT_DECLARE_MS = 2000;
-export const TCT_ORB_SPEED = 210;
-export const TCT_ORB_DMG = 0.05;                  // %maxHP per orb
-// Pawn marches
-export const TCT_PAWN_EVERY_MS = [0, 8600, 7300, 5900];
-export const TCT_PAWN_WARN_MS = 800;
-export const TCT_PAWN_SPEED = 130;                // px/s march
-export const TCT_PAWN_DMG = 0.07;                 // %maxHP per pawn touch
-export const TCT_PAWN_GAP_W = 130;                // the safe gap column
-// Check (60% gate)
-export const TCT_CHECK_LANES = 4;                 // 2 horiz + 2 vert
-export const TCT_CHECK_WARN_MS = 1200;
-export const TCT_CHECK_DASH_SPEED = 560;
-export const TCT_CHECK_LANE_H = 76;
-export const TCT_CHECK_DMG = [0, 0.13, 0.15, 0.18];
-export const TCT_CHECK_FLING = [0, 170, 195, 220];
-export const TCT_CHECK_GAP_MS = 1500;
-// Zugzwang (30% gate)
-export const TCT_ZUG_MS = 9000;
-export const TCT_BISHOP_EVERY_MS = 2100;
-export const TCT_BISHOP_WARN_MS = 950;
-export const TCT_BISHOP_DMG = 0.10;               // %maxHP per diagonal beam
-export const TCT_KNIGHT_LEAPS = 4;
-export const TCT_KNIGHT_WARN_MS = 800;
-export const TCT_KNIGHT_R = 130;
-export const TCT_KNIGHT_DMG = [0, 0.11, 0.13, 0.16];
-export const TCT_KNIGHT_FLING = [0, 150, 175, 200];
-// Checkmate (charge attack)
-export const TCT_CM_WARN_MS = 1100;
-export const TCT_CM_CLOSE_MS = 2600;              // walls meet in 2.6s
-export const TCT_CM_THICK = 90;                   // wall thickness px
-export const TCT_CM_DMG = [0, 0.17, 0.20, 0.24];
-export const TCT_CM_FLING = [0, 200, 230, 260];   // inward crush fling
+//------------------------------------------------------------------------
+//-------------------CONSTANTS AND SHARED HELPERS---------------------------------
+//------------------------------------------------------------------------
+const QUEEN_R = 38;
+const QUEEN_SPEED = [0, 42, 58, 76];               // glide (px/s)
+const QUEEN_REPICK_MS = 4200;
+const QUEEN_DMG = [0, 0.10, 0.12, 0.14];
+const QUEEN_FLING = [0, 140, 165, 190];
+const QUEEN_CD_MS = 1000;
+const PAWN_EVERY_MS = [0, 9000, 7500, 6000];
+const PAWN_WARN_MS = 900;
+const PAWN_SPEED = 130;                            // march speed (px/s)
+const PAWN_ROW_H = 54;
+const PAWN_GAP_W = 140;                            // the green gap column
+const PAWN_DMG = 0.12;
+const HIT_CD_MS = 650;                             // shared hit cooldown
 
+export let _tacticianWatcher = null;               // the running board (one at a time)
+let _tctHitUntil = 0;
 
-export let _tacticianWatcher = null; // per-fight chess state
-
-// Phase lookup helper - resolves the boss's current phase (default 1).
-export function _tctPhase(st) {
-    if (typeof _monsters !== 'undefined') {
-        const m = globalThis._monsters.find(x => x && x.id === st.monsterId);
-        if (m) return Math.max(1, Math.min(3, Number(m.bossPhase) || 1));
-    }
-    return 1;
+// The phase number clamped to 1-3.
+export function _tctPhase(phase) {
+    return Math.max(1, Math.min(3, Number(phase) || 1));
 }
 
-// Removes every chess overlay (registered in boss-framework teardown).
-export function _tacticianTeardown() {
-    if (_tacticianWatcher) {
-        const st = _tacticianWatcher;
-        _tacticianWatcher = null;
-        (st.orbs || []).forEach(o => { try { if (o.el) o.el.remove(); } catch (e) {} });
-        (st.pawns || []).forEach(p => { try { if (p.el) p.el.remove(); } catch (e) {} try { if (p.warnEl) p.warnEl.remove(); } catch (e) {} });
-        (st.lanes || []).forEach(l => { try { if (l.el) l.el.remove(); } catch (e) {} });
-        (st.beams || []).forEach(b => { try { if (b.el) b.el.remove(); } catch (e) {} });
-        (st.leaps || []).forEach(l => { try { if (l.el) l.el.remove(); } catch (e) {} try { if (l.knightEl) l.knightEl.remove(); } catch (e) {} });
-        (st.walls || []).forEach(w => { try { if (w.el) w.el.remove(); } catch (e) {} });
-        if (st.intent) { try { if (st.intent.banner) st.intent.banner.remove(); } catch (e) {} }
-        if (st.checkmate) { try { if (st.checkmate.els) st.checkmate.els.forEach(w => w.remove()); } catch (e) {} }
-        try { if (st.run) _nkKillRun(st.run); } catch (e) {} // removes the queen
-    }
-    document.querySelectorAll('.sx-tct-queen, .sx-tct-intent, .sx-tct-orb, .sx-tct-pawn, .sx-tct-pawnwarn, .sx-tct-lane, .sx-tct-beam, .sx-tct-knight, .sx-tct-leap, .sx-tct-wall').forEach(el => el.remove());
+// One physical hit with the boss-ability flash and number, behind a short
+// shared cooldown so two pieces landing together never stack.
+export function _tctStrike(pct, level, label) {
+    const now = performance.now();
+    if (now < _tctHitUntil) return false;
+    _tctHitUntil = now + HIT_CD_MS;
+    _nkAbilityHitToast(_nkHit(pct, null, level), 'The Tactician', label, true);
+    return true;
+}
+
+// Player centre, or the screen centre when there is no avatar.
+export function _tctPC() {
+    return _nkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+}
+
+// Half the player's body width (for line hit tests that use the centre).
+export function _tctBody() {
+    const pr = _nkPlayerRect();
+    return pr ? Math.min(pr.right - pr.left, pr.bottom - pr.top) / 2 - 4 : 0;
+}
+
+// A clock that follows real time (clamped to 0.1 s per frame), so the CSS
+// fills and the strikes in code never drift apart.
+export function _tctClock() {
+    let last = performance.now();
+    return (now) => { const dt = Math.min(100, Math.max(0, now - last)); last = now; return dt; };
+}
+
+// Plays the board's move sound (quietly ignored when audio is off).
+export function _tctSfx() {
+    try { Audio_Manager.playSFX('tct_move'); } catch (e) {}
 }
 
 
-// ── Persistent arena: the queen, the plans, the pawns ───────────────────
+//------------------------------------------------------------------------
+//-------------------THE BOARD (queen + pawn ranks, whole fight)----------------------
+//------------------------------------------------------------------------
+
+// Glides the queen along straight and diagonal lines; touching her hits and
+// flings you. She stays put (and harmless) while the finale holds the board.
+function _stepQueen(st, dtS, now, p) {
+    const q = st.queen, W = window.innerWidth, H = window.innerHeight;
+    q.el.style.display = st.hold ? 'none' : '';
+    if (st.hold) return;
+    q.repick -= dtS * 1000;
+    const dx = q.tx - q.x, dy = q.ty - q.y, d = Math.hypot(dx, dy) || 1, step = QUEEN_SPEED[p] * dtS;
+    if (d <= step || q.repick <= 0) {
+        if (Math.random() < 0.5) { q.tx = 80 + Math.random() * Math.max(60, W - 160); q.ty = q.y; }
+        else {
+            const dd = (Math.random() < 0.5 ? 1 : -1) * (200 + Math.random() * 300);
+            q.tx = Math.max(80, Math.min(W - 80, q.x + dd));
+            q.ty = Math.max(110, Math.min(H - 160, q.y + (Math.random() < 0.5 ? 1 : -1) * Math.abs(dd)));
+        }
+        q.repick = QUEEN_REPICK_MS;
+    } else { q.x += dx / d * step; q.y += dy / d * step; }
+    q.el.style.transform = 'translate(' + Math.round(q.x - QUEEN_R) + 'px,' + Math.round(q.y - QUEEN_R) + 'px)';
+    if (now < q.cd || !_nkCircleHit(q.x, q.y, QUEEN_R * 0.9, _nkPlayerRect(), 0)) return;
+    if (!_tctStrike(QUEEN_DMG[p], st.level, 'Queen')) return;
+    q.cd = now + QUEEN_CD_MS;
+    const c = _tctPC(), fx = c.x - q.x, fy = c.y - q.y, fd = Math.hypot(fx, fy) || 1;
+    _nkFlingAvatar(fx / fd * QUEEN_FLING[p], fy / fd * QUEEN_FLING[p], q.x, q.y);
+    _tctSfx();
+}
+
+// Starts a pawn rank at the bottom: the whole row shows red, its gap column
+// green; after the warning it marches up.
+function _queuePawns(st) {
+    const W = window.innerWidth, H = window.innerHeight;
+    const n = Math.max(3, Math.floor(W / 90)), cw = W / n;
+    const gap = Math.floor(Math.random() * n);
+    const row = _nkEl(st.run, 'div', 'sx-tct-rank warn');
+    row.style.top = Math.round(H - 70) + 'px';
+    row.style.height = PAWN_ROW_H + 'px';
+    for (let k = 0; k < n; k++) {
+        const cell = document.createElement('div');
+        cell.className = k === gap ? 'sx-tct-rank-gap' : 'sx-tct-pawn';
+        row.appendChild(cell);
+    }
+    const lane = _nkEl(st.run, 'div', 'sx-tct-gaplane');
+    lane.style.left = Math.round(gap * cw + cw / 2 - PAWN_GAP_W / 2) + 'px';
+    lane.style.width = PAWN_GAP_W + 'px';
+    st.pawns.push({ y: H - 70, row, lane, gapL: gap * cw + cw / 2 - PAWN_GAP_W / 2, wait: PAWN_WARN_MS, cd: 0 });
+}
+
+// Marches the pawn ranks up; touching a rank outside its gap hits you.
+// While the finale holds the board, every rank is cleared away.
+function _stepPawns(st, dtMs, now, p) {
+    if (st.hold) {
+        st.pawns.forEach(pw => { try { pw.row.remove(); pw.lane.remove(); } catch (e) {} });
+        st.pawns = [];
+        st.pawnAcc = 0;
+        return;
+    }
+    st.pawnAcc += dtMs;
+    if (st.pawnAcc >= PAWN_EVERY_MS[p]) { st.pawnAcc = 0; _queuePawns(st); }
+    const W = window.innerWidth, pr = _nkPlayerRect(), pc = _nkPlayerCenter();
+    st.pawns = st.pawns.filter(pw => {
+        if (pw.wait > 0) {
+            pw.wait -= dtMs;
+            if (pw.wait <= 0) pw.row.classList.remove('warn');
+            return true;
+        }
+        pw.y -= PAWN_SPEED * dtMs / 1000;
+        pw.row.style.top = Math.round(pw.y) + 'px';
+        const inGap = pc && pc.x >= pw.gapL && pc.x <= pw.gapL + PAWN_GAP_W;
+        if (now >= pw.cd && !inGap && _nkRectsOverlap(pr, { left: 0, right: W, top: pw.y + 6, bottom: pw.y + PAWN_ROW_H - 6 })) {
+            if (_tctStrike(PAWN_DMG, st.level, 'Pawn March')) pw.cd = now + 900;
+        }
+        if (pw.y > -PAWN_ROW_H) return true;
+        try { pw.row.remove(); pw.lane.remove(); } catch (e) {}
+        return false;
+    });
+}
+
+// Sets up the board when the fight begins: the queen and the pawn ranks
+// run in one passive loop until the boss is gone.
 export function _tacticianArenaInit(monster) {
-    if (_tacticianWatcher) return;
-    const monsterId = monster ? monster.id : null;
+    if (_tacticianWatcher || !monster) return;
+    const run = _nkNewRun(monster.id, true);
+    run.passive = true;                            // must not block the boss's other attacks
+    const W = window.innerWidth, H = window.innerHeight;
+    const el = _nkEl(run, 'div', 'sx-tct-queen');
+    el.style.width = el.style.height = (QUEEN_R * 2) + 'px';
     const st = {
-        monsterId, level: monster ? monster.level : 1,
-        run: null,
-        queen: null,
-        intent: null, intentAcc: 0,
-        orbs: [],
-        pawns: [], pawnAcc: 0,
-        lanes: [], check: null,
-        beams: [], leaps: [], zug: null, zugAcc: 0, zugKnight: 0,
-        checkmate: null,
-        gate60Done: false, gate30Done: false,
-        everLive: false, bornAt: performance.now(),
+        monsterId: monster.id, level: monster.level || 1, run, hold: false, pawns: [], pawnAcc: 0,
+        queen: { x: W / 2, y: H * 0.3, tx: W / 2, ty: H * 0.3, repick: QUEEN_REPICK_MS, cd: 0, el },
     };
     _tacticianWatcher = st;
-
-    // Persistent watcher FIRST (elements must hang off a run).
-    const run = _nkNewRun(monsterId, true);
-    run.passive = true;
     run.onKill = () => { if (_tacticianWatcher === st) _tacticianWatcher = null; };
-    st.run = run;
-
-    // The Queen's Guard: the boss's arena body.
-    const el = _nkEl(run, 'div', 'sx-tct-queen', '♛');
-    el.style.width = el.style.height = (TCT_R * 2) + 'px';
-    st.queen = {
-        x: window.innerWidth * 0.5, y: window.innerHeight * 0.3,
-        tx: window.innerWidth * 0.5, ty: window.innerHeight * 0.3,
-        repickAt: TCT_GLIDE_REPICK_MS, cdUntil: 0, el,
-    };
-    el.style.transform = 'translate(' + Math.round(st.queen.x - TCT_R) + 'px,' + Math.round(st.queen.y - TCT_R) + 'px)';
-
-    if (monster) st.everLive = true;
-
+    const clock = _tctClock();
     _nkLoop(run, (dtS, now) => {
-        if (_tacticianWatcher !== st) return false;
-        const live = globalThis._monsters ? globalThis._monsters.find(m => m.id === st.monsterId) : null;
+        const dt = clock(now);
+        const live = (globalThis._monsters || []).find(m => m && m.id === st.monsterId);
         if (!live) return false;
-        const W = window.innerWidth, H = window.innerHeight;
-        const c = _nkPlayerCenter();
-        const pr = _nkPlayerRect();
-        const p = Math.max(1, Math.min(3, Number(live.bossPhase) || 1));
-
-        // ── HP gates ──
-        const hpPct = live.maxHP > 0 ? live.currentHP / live.maxHP : 1;
-        if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _tctCheck(st, W, H); }
-        if (!st.gate30Done && hpPct <= 0.30) { st.gate30Done = true; _tctZugzwang(st, p); }
-
-        // ── The Queen's Guard: queen-move glide + ROOK'S CHARGE on touch ──
-        const qn = st.queen;
-        qn.repickAt -= dtS * 1000;
-        const qdx = qn.tx - qn.x, qdy = qn.ty - qn.y;
-        const qd = Math.hypot(qdx, qdy) || 1;
-        const qstep = TCT_GLIDE_SPEED[p] * dtS;
-        if (qd <= qstep || qn.repickAt <= 0) {
-            // Queen moves: pick a new target that shares an axis or diagonal
-            // with the current square (glide along queen lines).
-            const axis = Math.random() < 0.5;
-            if (axis) {
-                qn.tx = 80 + Math.random() * Math.max(60, W - 160);
-                qn.ty = qn.y;
-            } else {
-                const diag = (Math.random() < 0.5 ? 1 : -1) * (200 + Math.random() * 300);
-                qn.tx = Math.max(80, Math.min(W - 80, qn.x + diag));
-                qn.ty = Math.max(80, Math.min(H - 160, qn.y + (Math.random() < 0.5 ? 1 : -1) * Math.abs(diag)));
-            }
-            qn.repickAt = TCT_GLIDE_REPICK_MS;
-        } else {
-            qn.x += (qdx / qd) * qstep;
-            qn.y += (qdy / qd) * qstep;
-        }
-        qn.el.style.transform = 'translate(' + Math.round(qn.x - TCT_R) + 'px,' + Math.round(qn.y - TCT_R) + 'px)';
-        if (c && pr && now >= qn.cdUntil && !st.checkmate && _nkCircleHit(qn.x, qn.y, TCT_R * 0.9, pr, 0)) {
-            qn.cdUntil = now + TCT_ROOK_CD_MS;
-            const dx = c.x - qn.x, dy = c.y - qn.y;
-            const d = Math.hypot(dx, dy) || 1;
-            _nkFlingAvatar((dx / d) * TCT_ROOK_FLING[p], (dy / d) * TCT_ROOK_FLING[p], qn.x, qn.y);
-            const dealt = _nkHit(TCT_ROOK_DMG[p], null, st.level);
-            _nkAbilityHitToast(dealt, 'The Tactician', "Rook's Charge");
-            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('tct_move'); } catch (e2) {}
-        }
-
-        // ── Battle Intent (persistent cadence): declare → execute ──
-        st.intentAcc += dtS * 1000;
-        if (!st.intent && st.intentAcc >= TCT_INTENT_EVERY_MS[p]) {
-            st.intentAcc = 0;
-            const kinds = p >= 3 ? ['swords', 'shield', 'rage'] : (p === 2 ? ['swords', 'rage', 'swords'] : ['swords', 'shield']);
-            _tctDeclare(st, kinds[Math.floor(Math.random() * kinds.length)], live, p);
-        }
-        if (st.intent) {
-            const it = st.intent;
-            it.t += dtS * 1000;
-            if (it.t >= TCT_INTENT_DECLARE_MS) {
-                try { if (it.banner) it.banner.remove(); } catch (e) {}
-                st.intent = null;
-                _tctExecute(st, it, live, p, W, H);
-            }
-        }
-        // Intent orbs: aimed knight-orbs from the top corners.
-        for (let i = st.orbs.length - 1; i >= 0; i--) {
-            const o = st.orbs[i];
-            o.t += dtS * 1000;
-            o.x += o.vx * dtS;
-            o.y += o.vy * dtS;
-            o.el.style.transform = 'translate(' + Math.round(o.x - 10) + 'px,' + Math.round(o.y - 10) + 'px)';
-            if (pr && !o.hit && _nkCircleHit(o.x, o.y, 13, pr, 0)) {
-                o.hit = true;
-                const dealt = _nkHit(TCT_ORB_DMG, null, st.level);
-                _nkAbilityHitToast(dealt, 'The Tactician', 'Volley');
-                try { o.el.remove(); } catch (e) {}
-                st.orbs.splice(i, 1);
-                continue;
-            }
-            if (o.t > 6000 || o.x < -30 || o.x > W + 30 || o.y < -30 || o.y > H + 30) {
-                try { o.el.remove(); } catch (e) {}
-                st.orbs.splice(i, 1);
-            }
-        }
-
-        // ── Pawn marches: lane warn → wall with one gap advances ──
-        st.pawnAcc += dtS * 1000;
-        if (!st.checkmate && st.pawnAcc >= TCT_PAWN_EVERY_MS[p]) {
-            st.pawnAcc = 0;
-            _tctQueuePawn(st, W, H);
-        }
-        for (let i = st.pawns.length - 1; i >= 0; i--) {
-            const pw = st.pawns[i];
-            if (!pw.live) {
-                pw.warnT += dtS * 1000;
-                if (pw.warnT >= TCT_PAWN_WARN_MS) {
-                    pw.live = true;
-                    try { pw.warnEl.remove(); } catch (e) {}
-                    // The marching rank: pawns across the width except the gap.
-                    const el2 = _nkEl(st.run, 'div', 'sx-tct-pawn');
-                    const n = Math.max(2, Math.floor(W / 90));
-                    const gapIdx = Math.floor(pw.gapX / (W / n));
-                    pw.cellW = W / n;
-                    pw.el = el2;
-                    pw.cells = [];
-                    for (let k = 0; k < n; k++) {
-                        if (k === gapIdx) continue; // the safe gap
-                        const pel = document.createElement('div');
-                        pel.className = 'sx-tct-pawn-cell';
-                        pel.textContent = '♟️';
-                        el2.appendChild(pel);
-                        pw.cells.push(pel);
-                    }
-                    pw.gapIdx = gapIdx;
-                    pw.n = n;
-                    // Fill non-gap cells' text; hide the gap cell via visibility.
-                    const pelAll = el2.children;
-                    for (let k = 0; k < pelAll.length; k++) pelAll[k].style.visibility = 'visible';
-                }
-                continue;
-            }
-            // March upward.
-            pw.y -= TCT_PAWN_SPEED * dtS;
-            pw.el.style.transform = 'translateY(' + Math.round(pw.y) + 'px)';
-            if (pr && now >= pw.hitCd) {
-                // Rect vs the rank row (skip the gap column).
-                const inRow = pr.bottom > pw.y && pr.top < pw.y + 54;
-                const col = Math.floor(((c ? c.x : W / 2)) / pw.cellW);
-                if (inRow && col !== pw.gapIdx) {
-                    pw.hitCd = now + 900;
-                    const dealt = _nkHit(TCT_PAWN_DMG, null, st.level);
-                    _nkAbilityHitToast(dealt, 'The Tactician', 'Pawn March');
-                }
-            }
-            if (pw.y < -80) {
-                try { pw.el.remove(); } catch (e) {}
-                st.pawns.splice(i, 1);
-            }
-        }
-
-        // ── CHECK (60% gate): rook-slide lanes warn, then dash ──
-        for (let i = st.lanes.length - 1; i >= 0; i--) {
-            const ln = st.lanes[i];
-            ln.t += dtS * 1000;
-            if (ln.t < TCT_CHECK_WARN_MS) continue;
-            if (!ln.fired) {
-                ln.fired = true;
-                ln.el.classList.add('hot');
-                ln.pos = ln.horiz ? ln.y : ln.x; // dash start at screen edge
-                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('tct_move'); } catch (e) {}
-            }
-            // The lane dashes along its axis.
-            if (ln.horiz) ln.x += ln.dir * TCT_CHECK_DASH_SPEED * dtS;
-            else ln.y += ln.dir * TCT_CHECK_DASH_SPEED * dtS;
-            ln.el.style.left = Math.round(ln.x) + 'px';
-            ln.el.style.top = Math.round(ln.y) + 'px';
-            // Ride the lane: hit test the moving band.
-            if (pr && now >= ln.hitCd) {
-                const bandX = ln.horiz ? ln.x : ln.x - TCT_CHECK_LANE_H / 2;
-                const bandY = ln.horiz ? ln.y - TCT_CHECK_LANE_H / 2 : ln.y;
-                const bw = ln.horiz ? TCT_CHECK_LANE_H : TCT_CHECK_LANE_H;
-                const inBand = pr.right > bandX && pr.left < bandX + bw && pr.bottom > bandY && pr.top < bandY + bw;
-                if (inBand) {
-                    ln.hitCd = now + 900;
-                    const dx = ln.horiz ? ln.dir : 0, dy = ln.horiz ? 0 : ln.dir;
-                    _nkFlingAvatar(dx * TCT_CHECK_FLING[p], dy * TCT_CHECK_FLING[p], ln.horiz ? (c ? c.x : W / 2) : ln.x, ln.horiz ? ln.y : (c ? c.y : H / 2));
-                    const dealt = _nkHit(TCT_CHECK_DMG[p], null, st.level);
-                    _nkAbilityHitToast(dealt, 'The Tactician', 'Check');
-                }
-            }
-            if (ln.x < -TCT_CHECK_LANE_H * 2 || ln.x > W + TCT_CHECK_LANE_H * 2 || ln.y < -TCT_CHECK_LANE_H * 2 || ln.y > H + TCT_CHECK_LANE_H * 2) {
-                try { ln.el.remove(); } catch (e) {}
-                st.lanes.splice(i, 1);
-            }
-        }
-        if (st.check) {
-            st.check.t += dtS * 1000;
-            if (st.check.t >= st.check.wave * TCT_CHECK_GAP_MS && st.check.wave < TCT_CHECK_LANES) {
-                _tctSpawnLane(st, W, H, st.check.wave);
-                st.check.wave++;
-            }
-            if (st.check.wave >= TCT_CHECK_LANES && st.lanes.length === 0) {
-                st.check = null;
-                _nkToast('eg_tct_check_end', '♟️ Check resolved. Your move.', '#93c5fd');
-            }
-        }
-
-        // ── ZUGZWANG (30% gate): bishop diagonals + knight leaps ──
-        if (st.zug) {
-            st.zug.t += dtS * 1000;
-            st.zugAcc += dtS * 1000;
-            if (st.zugAcc >= TCT_BISHOP_EVERY_MS && st.beams.length < 3) {
-                st.zugAcc = 0;
-                _tctQueueBeam(st, qn, W, H);
-            }
-            st.zugKnight += dtS * 1000;
-            if (st.zugKnight >= TCT_ZUG_MS / TCT_KNIGHT_LEAPS && st.leaps.length < 2) {
-                st.zugKnight = 0;
-                _tctQueueLeap(st, qn, W, H);
-            }
-            if (st.zug.t >= TCT_ZUG_MS) {
-                st.zug = null;
-                _nkToast('eg_tct_zug_end', '♟️ The position resolves.', '#93c5fd');
-            }
-        }
-        // Bishop beams: warn then flash.
-        for (let i = st.beams.length - 1; i >= 0; i--) {
-            const b = st.beams[i];
-            b.t += dtS * 1000;
-            if (b.t < TCT_BISHOP_WARN_MS) {
-                b.el.style.opacity = String(0.35 + 0.4 * Math.abs(Math.sin(b.t / 100)));
-                continue;
-            }
-            if (!b.fired) {
-                b.fired = true;
-                b.el.classList.add('hot');
-                const pr5 = _nkPlayerRect();
-                if (pr5 && _tctBeamHits(b, pr5)) {
-                    const dealt = _nkHit(TCT_BISHOP_DMG, null, st.level);
-                    _nkAbilityHitToast(dealt, 'The Tactician', 'Bishop Pin');
-                }
-            }
-            if (b.t >= TCT_BISHOP_WARN_MS + 300) {
-                try { b.el.remove(); } catch (e) {}
-                st.beams.splice(i, 1);
-            }
-        }
-        // Knight leaps: warn ring at the landing square, then burst.
-        for (let i = st.leaps.length - 1; i >= 0; i--) {
-            const lp = st.leaps[i];
-            lp.t += dtS * 1000;
-            if (lp.t < TCT_KNIGHT_WARN_MS) {
-                // The knight piece visibly travels toward the landing square.
-                const k = lp.t / TCT_KNIGHT_WARN_MS;
-                const kx = lp.fromX + (lp.x - lp.fromX) * k;
-                const ky = lp.fromY + (lp.y - lp.fromY) * k;
-                if (lp.knightEl) lp.knightEl.style.transform = 'translate(' + Math.round(kx - 22) + 'px,' + Math.round(ky - 22) + 'px) scale(' + (1 + 0.4 * Math.sin(k * Math.PI)) + ')';
-                continue;
-            }
-            // LAND: burst.
-            const pr6 = _nkPlayerRect();
-            const c6 = _nkPlayerCenter();
-            if (pr6 && _nkCircleHit(lp.x, lp.y, TCT_KNIGHT_R, pr6, 0)) {
-                const dx = (c6 ? c6.x : lp.x) - lp.x, dy = (c6 ? c6.y : lp.y) - lp.y;
-                const d = Math.hypot(dx, dy) || 1;
-                _nkFlingAvatar((dx / d) * TCT_KNIGHT_FLING[p], (dy / d) * TCT_KNIGHT_FLING[p], lp.x, lp.y);
-                const dealt = _nkHit(TCT_KNIGHT_DMG[p], null, st.level);
-                _nkAbilityHitToast(dealt, 'The Tactician', 'Knight Fork');
-            }
-            try { if (lp.knightEl) lp.knightEl.remove(); } catch (e) {}
-            try { lp.el.remove(); } catch (e) {}
-            st.leaps.splice(i, 1);
-            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('tct_move'); } catch (e) {}
-        }
-
-        // ── CHECKMATE (charge attack): four castle walls close in ──
-        if (st.checkmate) {
-            const cm = st.checkmate;
-            cm.t += dtS * 1000;
-            if (cm.phase === 'warn' && cm.t >= TCT_CM_WARN_MS) {
-                cm.phase = 'close';
-                cm.t = 0;
-                cm.els.forEach(w2 => w2.classList.add('closing'));
-            }
-            if (cm.phase === 'close') {
-                const k = Math.min(1, cm.t / TCT_CM_CLOSE_MS);
-                const inset = Math.round((Math.min(W, H) * 0.42) * k);
-                // Four walls: top, bottom, left, right.
-                cm.els[0].style.transform = 'translateY(' + inset + 'px)';
-                cm.els[1].style.transform = 'translateY(' + (-inset) + 'px)';
-                cm.els[2].style.transform = 'translateX(' + inset + 'px)';
-                cm.els[3].style.transform = 'translateX(' + (-inset) + 'px)';
-                // Crush check: anyone outside the safe rect takes the crush.
-                if (pr && now >= cm.hitCd) {
-                    const safeL = inset, safeR = W - inset, safeT = inset, safeB = H - inset;
-                    const outside = pr.left < safeL || pr.right > safeR || pr.top < safeT || pr.bottom > safeB;
-                    if (outside) {
-                        cm.hitCd = now + 800;
-                        const dx = (c ? c.x : W / 2) - W / 2, dy = (c ? c.y : H / 2) - H / 2;
-                        const d = Math.hypot(dx, dy) || 1;
-                        _nkFlingAvatar((dx / d) * TCT_CM_FLING[p], (dy / d) * TCT_CM_FLING[p], W / 2, H / 2);
-                        const dealt = _nkHit(TCT_CM_DMG[p], null, st.level);
-                        _nkAbilityHitToast(dealt, 'The Tactician', 'Checkmate');
-                    }
-                }
-                if (k >= 1) {
-                    cm.els.forEach(w2 => { try { w2.remove(); } catch (e) {} });
-                    st.checkmate = null;
-                    _nkToast('eg_tct_cm_end', '♛ The walls rest. Stalemate.', '#93c5fd');
-                }
-            }
-        }
-
+        const p = _tctPhase(live.bossPhase);
+        _stepQueen(st, dt / 1000, now, p);
+        _stepPawns(st, dt, now, p);
         return true;
     });
 }
 
 
-// Declares an intent with a floating banner at the queen.
-export function _tctDeclare(st, kind, live, p) {
-    const txt = kind === 'swords' ? '⚔️ VOLLEY' : kind === 'shield' ? '🛡️ TITHE' : '😡 ENRAGE';
-    const banner = _nkEl(st.run, 'div', 'sx-tct-intent', txt);
-    banner.style.left = Math.round(st.queen.x) + 'px';
-    banner.style.top = Math.round(st.queen.y - TCT_R - 34) + 'px';
-    st.intent = { kind, t: 0, banner, live, p };
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('tct_move'); } catch (e) {}
+//------------------------------------------------------------------------
+//-------------------ROOK LANES (rows and columns through you)--------------------------
+//------------------------------------------------------------------------
+const ROOK_LANE = 92;
+const ROOK_EVERY_MS = 750;
+const ROOK_BY_PHASE = [null, { n: 2, warnMs: 1250, dmg: 0.18 }, { n: 3, warnMs: 1150, dmg: 0.21 }, { n: 3, warnMs: 1050, dmg: 0.24 }];
+
+// Paints one rook lane (a row or a column through the player) whose red
+// fill wipes in from the rook's side.
+function _rookLane(run, horiz, warnMs) {
+    const W = window.innerWidth, H = window.innerHeight, pc = _tctPC();
+    const fromStart = Math.random() < 0.5;
+    const c = horiz ? Math.max(ROOK_LANE / 2, Math.min(H - ROOK_LANE / 2, pc.y)) : Math.max(ROOK_LANE / 2, Math.min(W - ROOK_LANE / 2, pc.x));
+    const box = horiz ? { left: 0, right: W, top: c - ROOK_LANE / 2, bottom: c + ROOK_LANE / 2 }
+        : { left: c - ROOK_LANE / 2, right: c + ROOK_LANE / 2, top: 0, bottom: H };
+    const el = _nkEl(run, 'div', 'sx-tct-lane sx-tct-lane-' + (horiz ? (fromStart ? 'left' : 'right') : (fromStart ? 'top' : 'bottom')));
+    el.style.left = Math.round(box.left) + 'px';
+    el.style.top = Math.round(box.top) + 'px';
+    el.style.width = Math.round(box.right - box.left) + 'px';
+    el.style.height = Math.round(box.bottom - box.top) + 'px';
+    el.style.setProperty('--tct-warn', warnMs + 'ms');
+    return { el, box, horiz, fromStart };
 }
 
-
-// Executes a declared intent.
-export function _tctExecute(st, it, live, p, W, H) {
-    if (it.kind === 'swords') {
-        // Aimed volley of knight-orbs from the top corners.
-        const c = _nkPlayerCenter();
-        const tx = c ? c.x : W / 2, ty = c ? c.y : H / 2;
-        const corners = [[70, 80], [W - 70, 80]];
-        corners.forEach(([ox, oy]) => {
-            for (let k = -1; k <= 1; k++) {
-                const dx = tx - ox, dy = ty - oy;
-                const base = Math.atan2(dy, dx) + k * 0.22;
-                const el = _nkEl(st.run, 'div', 'sx-tct-orb', '♞');
-                st.orbs.push({ x: ox, y: oy, vx: Math.cos(base) * TCT_ORB_SPEED, vy: Math.sin(base) * TCT_ORB_SPEED, t: 0, hit: false, el });
-            }
+// Rook Lanes: rows and columns through where you stand fill red one after
+// another (alternating); when one is full a rook slides through it.
+export function _mechTctRook(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
+    const cfg = ROOK_BY_PHASE[_tctPhase(phase)];
+    const level = monster ? monster.level : 1;
+    const run = _nkNewRun(monster && monster.id, true);
+    const lanes = [];
+    const clock = _tctClock();
+    const firstHoriz = Math.random() < 0.5;
+    let t = 0;
+    _nkLoop(run, (dtS, now) => {
+        t += clock(now);
+        while (lanes.length < cfg.n && t >= lanes.length * ROOK_EVERY_MS) {
+            const l = _rookLane(run, (lanes.length % 2 === 0) === firstHoriz, cfg.warnMs);
+            l.at = lanes.length * ROOK_EVERY_MS + cfg.warnMs;
+            lanes.push(l);
+        }
+        lanes.forEach(l => {
+            if (l.done || t < l.at) return;
+            l.done = true;
+            l.el.classList.add('hot');
+            _tctSfx();
+            if (_nkRectsOverlap(_nkPlayerRect(), l.box)) _tctStrike(cfg.dmg, level, 'Rook');
+            const el = l.el;
+            run.timers.push(setTimeout(() => { try { el.remove(); } catch (e) {} }, 450));
         });
-    } else if (it.kind === 'shield') {
-        // Tithe: the shared soul-tithe drain.
-        if (typeof _mechSoulTithe === 'function') { try { _mechSoulTithe(live, p); } catch (e) {} }
-    } else {
-        // Rage: +1 soft-enrage stack.
-        live.enrageStacks = Math.min(10, (live.enrageStacks || 0) + 1);
-        if (typeof _bossRecalcDamage === 'function') { try { _bossRecalcDamage(live); } catch (e) {} }
-        _nkToast('eg_tactician_rage', '😡 The Tactician rages! Boss damage rises!', '#f87171');
-    }
-}
-
-
-// Queues a pawn rank advancing from the bottom edge.
-export function _tctQueuePawn(st, W, H) {
-    const gapX = 80 + Math.random() * Math.max(80, W - 160);
-    const warnEl = _nkEl(st.run, 'div', 'sx-tct-pawnwarn');
-    warnEl.style.left = Math.round(gapX - TCT_PAWN_GAP_W / 2) + 'px';
-    warnEl.style.width = TCT_PAWN_GAP_W + 'px';
-    warnEl.style.top = '0px';
-    st.pawns.push({ y: H - 40, gapX, warnT: 0, live: false, warnEl, el: null, cells: [], hitCd: 0, cellW: 0, gapIdx: 0, n: 0 });
-}
-
-
-// ── 60% gate: CHECK - four rook-slide lanes ──────────────────────────────
-export function _tctCheck(st, W, H) {
-    if (st.check) return;
-    st.check = { t: 0, wave: 0 };
-    _nkToast('eg_tct_check', '♟️ CHECK! Read the rook lanes - do not stand in them!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('tct_move'); } catch (e) {}
-}
-
-
-export function _tctSpawnLane(st, W, H, waveIdx) {
-    const horiz = waveIdx % 2 === 0; // first two waves horizontal, then vertical
-    const c = _nkPlayerCenter();
-    const y = horiz ? (c ? c.y : H * 0.4) : 0;
-    const x = horiz ? 0 : (c ? c.x : W * 0.6);
-    const el = _nkEl(st.run, 'div', 'sx-tct-lane' + (horiz ? ' horiz' : ' vert'));
-    if (horiz) {
-        el.style.top = Math.round(y - TCT_CHECK_LANE_H / 2) + 'px';
-        el.style.left = '0px';
-        el.style.width = W + 'px';
-    } else {
-        el.style.left = Math.round(x - TCT_CHECK_LANE_H / 2) + 'px';
-        el.style.top = '0px';
-        el.style.height = H + 'px';
-    }
-    const dir = horiz ? (Math.random() < 0.5 ? 1 : -1) : (Math.random() < 0.5 ? 1 : -1);
-    st.lanes.push({ horiz, x, y, dir, t: 0, fired: false, hitCd: 0, el });
-    void y; void x;
-}
-
-
-// ── 30% gate: ZUGZWANG ───────────────────────────────────────────────────
-export function _tctZugzwang(st, p) {
-    if (st.zug) return;
-    st.zug = { t: 0 };
-    st.zugAcc = 0;
-    st.zugKnight = 0;
-    _nkToast('eg_tct_zug', '♟️ ZUGZWANG! Every move loses - read the bishop lines!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('tct_move'); } catch (e) {}
-}
-
-
-// One bishop diagonal beam through the queen's current square.
-export function _tctQueueBeam(st, qn, W, H) {
-    const diag = Math.random() < 0.5 ? 1 : -1;
-    const el = _nkEl(st.run, 'div', 'sx-tct-beam');
-    // The beam is a rotated long rectangle through the queen square.
-    el.style.left = Math.round(qn.x) + 'px';
-    el.style.top = Math.round(qn.y) + 'px';
-    el.style.width = Math.round(Math.hypot(W, H)) + 'px';
-    el.style.transform = 'rotate(' + (diag > 0 ? 35 : -35) + 'deg)';
-    st.beams.push({ t: 0, fired: false, ang: diag > 0 ? 35 : -35, ox: qn.x, oy: qn.y, len: Math.hypot(W, H), el });
-}
-
-
-// Rect vs rotated beam: approximate by projecting the player center onto
-// the beam axis and measuring the perpendicular distance.
-export function _tctBeamHits(b, pr) {
-    const c = _nkPlayerCenter();
-    if (!c) return false;
-    const rad = b.ang * Math.PI / 180;
-    const px = c.x - b.ox, py = c.y - b.oy;
-    const along = px * Math.cos(rad) + py * Math.sin(rad);
-    const perp = Math.abs(-px * Math.sin(rad) + py * Math.cos(rad));
-    return along > -40 && along < b.len && perp < 34;
-}
-
-
-// One knight leap: the piece jumps an L to a landing square near the player.
-export function _tctQueueLeap(st, qn, W, H) {
-    const c = _nkPlayerCenter();
-    const tx = c ? c.x : W / 2, ty = c ? c.y : H / 2;
-    // L offsets (knight moves).
-    const Ls = [[2, 1], [1, 2], [-2, 1], [-1, 2], [2, -1], [1, -2], [-2, -1], [-1, -2]];
-    const [lx, ly] = Ls[Math.floor(Math.random() * Ls.length)];
-    const cell = Math.min(W, H) / 8;
-    const x = Math.max(60, Math.min(W - 60, tx + lx * cell));
-    const y = Math.max(60, Math.min(H - 120, ty + ly * cell));
-    const warnEl = _nkEl(st.run, 'div', 'sx-tct-leap');
-    warnEl.style.left = Math.round(x) + 'px';
-    warnEl.style.top = Math.round(y) + 'px';
-    warnEl.style.width = warnEl.style.height = Math.round(TCT_KNIGHT_R * 2) + 'px';
-    warnEl.style.marginLeft = warnEl.style.marginTop = (-TCT_KNIGHT_R) + 'px';
-    const knightEl = _nkEl(st.run, 'div', 'sx-tct-knight', '♞');
-    st.leaps.push({ x, y, fromX: qn.x, fromY: qn.y, t: 0, warnEl, knightEl });
-}
-
-
-// ── Charge attack: CHECKMATE ─────────────────────────────────────────────
-export function _tacticianCheckmate(monster) {
-    const st = _tacticianWatcher;
-    if (!st || st.checkmate || _nkDodgeBusy() || _nkFrozen()) return;
-    const W = window.innerWidth, H = window.innerHeight;
-    const els = [];
-    const specs = [
-        { left: '0px', top: '0px', width: W + 'px', height: TCT_CM_THICK + 'px' },
-        { left: '0px', top: (H - TCT_CM_THICK) + 'px', width: W + 'px', height: TCT_CM_THICK + 'px' },
-        { left: '0px', top: '0px', width: TCT_CM_THICK + 'px', height: H + 'px' },
-        { left: (W - TCT_CM_THICK) + 'px', top: '0px', width: TCT_CM_THICK + 'px', height: H + 'px' },
-    ];
-    specs.forEach(spec => {
-        const w = _nkEl(st.run, 'div', 'sx-tct-wall');
-        w.style.left = spec.left;
-        w.style.top = spec.top;
-        w.style.width = spec.width;
-        w.style.height = spec.height;
-        els.push(w);
+        return !(lanes.length >= cfg.n && lanes.every(l => l.done) && t > lanes[lanes.length - 1].at + 500);
     });
-    st.checkmate = { phase: 'warn', t: 0, els, hitCd: 0 };
-    _nkToast('eg_tct_checkmate', '♛ CHECKMATE! The castle closes - get inside the ring!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('tct_move'); } catch (e) {}
 }
 
 
 //------------------------------------------------------------------------
-//-------------------LEGACY COMPAT SHIM------------------------------------
+//-------------------KNIGHT FORK (L-jumps, landings fill red)----------------------------
 //------------------------------------------------------------------------
-// The old scheduled mechanic is now the persistent intent cadence -
-// keep the handler name alive so any stale schedule entry no-ops instead
-// of erroring.
-export function _mechBattleIntent(monster, phase) { void monster; void phase; }
+const KNIGHT_R = 100;
+const KNIGHT_STEP = 115;                           // one "square" of an L-jump (px)
+const KNIGHT_EVERY_MS = 500;
+const KNIGHT_BY_PHASE = [null, { n: 3, warnMs: 1250, dmg: 0.15 }, { n: 3, warnMs: 1150, dmg: 0.18 }, { n: 4, warnMs: 1050, dmg: 0.21 }];
+const L_MOVES = [[2, 1], [1, 2], [-1, 2], [-2, 1], [-2, -1], [-1, -2], [1, -2], [2, -1]];
+
+// The next landing spot of a fork: the first on you, then an L-jump away
+// from the last landing (kept on screen).
+function _knightSpot(prev) {
+    const W = window.innerWidth, H = window.innerHeight;
+    if (!prev) return _tctPC();
+    const [a, b] = L_MOVES[Math.floor(Math.random() * L_MOVES.length)];
+    return {
+        x: Math.max(60, Math.min(W - 60, prev.x + a * KNIGHT_STEP)),
+        y: Math.max(110, Math.min(H - 90, prev.y + b * KNIGHT_STEP)),
+    };
+}
+
+// Knight Fork: a knight jumps in L-shapes - first onto you, then away from
+// its last landing. Every landing circle fills red before the knight lands.
+export function _mechTctKnight(monster, phase) {
+    if (_nkDodgeBusy() || _nkFrozen()) return;
+    const cfg = KNIGHT_BY_PHASE[_tctPhase(phase)];
+    const level = monster ? monster.level : 1;
+    const run = _nkNewRun(monster && monster.id, true);
+    const marks = [];
+    const knight = _nkEl(run, 'div', 'sx-tct-knight');
+    knight.style.display = 'none';
+    const clock = _tctClock();
+    let t = 0, prev = null;
+    _nkLoop(run, (dtS, now) => {
+        t += clock(now);
+        while (marks.length < cfg.n && t >= marks.length * KNIGHT_EVERY_MS) {
+            const s = _knightSpot(prev);
+            prev = s;
+            const el = _nkEl(run, 'div', 'sx-tct-landing');
+            el.style.left = Math.round(s.x - KNIGHT_R) + 'px';
+            el.style.top = Math.round(s.y - KNIGHT_R) + 'px';
+            el.style.width = el.style.height = (KNIGHT_R * 2) + 'px';
+            el.style.setProperty('--tct-warn', cfg.warnMs + 'ms');
+            marks.push({ x: s.x, y: s.y, el, at: marks.length * KNIGHT_EVERY_MS + cfg.warnMs, done: false });
+        }
+        marks.forEach(mk => {
+            if (mk.done || t < mk.at) return;
+            mk.done = true;
+            mk.el.classList.add('hot');
+            knight.style.display = '';
+            knight.style.transform = 'translate(' + Math.round(mk.x - 28) + 'px,' + Math.round(mk.y - 36) + 'px)';
+            _tctSfx();
+            if (_nkCircleHit(mk.x, mk.y, KNIGHT_R, _nkPlayerRect(), 0)) _tctStrike(cfg.dmg, level, 'Knight Fork');
+            const el = mk.el;
+            run.timers.push(setTimeout(() => { try { el.remove(); } catch (e) {} }, 420));
+        });
+        return !(marks.length >= cfg.n && marks.every(mk => mk.done) && t > marks[marks.length - 1].at + 500);
+    });
+}
+
+
+//------------------------------------------------------------------------
+//-------------------TEARDOWN----------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Called from the boss cleanup on boss death AND on encounter stop: ends the
+// board and removes every element the Tactician created.
+export function _tacticianTeardown() {
+    const st = _tacticianWatcher;
+    _tacticianWatcher = null;
+    if (st && st.run) { try { _nkKillRun(st.run); } catch (e) {} }
+    document.querySelectorAll('.sx-tct-queen, .sx-tct-rank, .sx-tct-gaplane, .sx-tct-lane, .sx-tct-landing, .sx-tct-knight, ' +
+        '.sx-tct-diag, .sx-tct-cell, .sx-tct-piece, .sx-nk-fin-tct').forEach(el => { try { el.remove(); } catch (e) {} });
+    ['avatar-charge-fill', 'sx-player-charge-bar'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('sx-charge-paused');
+    });
+}

@@ -1360,7 +1360,6 @@
     from { filter: brightness(1); }
     to { filter: brightness(1.5) saturate(1.4); }
 }
-/* Roaming carnival bumper: glossy golden dome */
 /* Slingshots: the diagonal kickers in the bottom corners. Wooden base,
    rubber-band face; flashes hot when it fires a pinball across the table. */
 .sx-bump-sling {
@@ -1389,88 +1388,108 @@
     border-color: rgba(248, 113, 113, 0.85);
     animation: sx-bump-rail-tilt 0.4s ease-in-out infinite alternate;
 }
+/* Roaming bumper: a classic pinball mushroom bumper (red skirt, white
+   ring, gold cap with a star), drawn in CSS. */
 .sx-bump-bumper {
     position: fixed; left: 0; top: 0; z-index: 9004; pointer-events: none;
-    width: 60px; height: 60px; font-size: 2.2rem;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, rgba(254, 240, 138, 0.5), rgba(250, 204, 21, 0.18) 55%, rgba(120, 53, 15, 0.35));
-    box-shadow: 0 0 14px rgba(250, 204, 21, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.25);
-    border: 2px solid rgba(250, 204, 21, 0.85);
+    width: 60px; height: 60px; border-radius: 50%; box-sizing: border-box;
+    background:
+        radial-gradient(circle at 50% 50%, #fde68a 0 22%, #f59e0b 23% 30%, #fff 31% 40%, #dc2626 41% 66%, #7f1d1d 67% 100%);
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.8), 0 4px 0 #450a0a, inset 0 0 8px rgba(0, 0, 0, 0.5);
     animation: sx-bump-pulse 0.7s ease-in-out infinite alternate;
+}
+.sx-bump-bumper::after {
+    content: ''; position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; transform: translate(-50%, -50%);
+    clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    background: #fff7ed;
 }
 @keyframes sx-bump-pulse {
     from { filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.7)); }
     to { filter: drop-shadow(0 0 16px rgba(253, 224, 71, 1)); }
 }
-/* TILT enrage: red-hot bumpers during the flipper frenzy */
-.sx-bump-bumper.tilt {
-    border-color: rgba(248, 113, 113, 0.95);
-    background: radial-gradient(circle at 35% 30%, rgba(254, 202, 202, 0.55), rgba(239, 68, 68, 0.3) 55%, rgba(127, 29, 29, 0.4));
-    box-shadow: 0 0 18px rgba(239, 68, 68, 0.9), inset 0 0 10px rgba(255, 200, 200, 0.3);
-    animation-duration: 0.3s;
-}
-/* Steel pinballs: glossy metal spheres */
+/* TILT: red-hot bumpers while they race */
+.sx-bump-bumper.tilt { box-shadow: 0 0 22px rgba(239, 68, 68, 0.95), 0 4px 0 #450a0a; animation-duration: 0.3s; }
+/* Steel pinball: chrome sphere with a highlight */
 .sx-bump-ball {
     position: fixed; left: 0; top: 0; z-index: 9004; pointer-events: none;
-    width: 52px; height: 52px; font-size: 2rem;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, rgba(248, 250, 252, 0.9), rgba(148, 163, 184, 0.45) 55%, rgba(30, 41, 59, 0.55));
-    box-shadow: 0 0 12px rgba(226, 232, 240, 0.75), inset -4px -6px 10px rgba(15, 23, 42, 0.5);
+    width: 48px; height: 48px; border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, #fff 0 10%, #e2e8f0 18%, #94a3b8 48%, #334155 80%, #0f172a 100%);
+    box-shadow: 0 0 12px rgba(226, 232, 240, 0.7), 0 3px 6px rgba(0, 0, 0, 0.6);
+    transition: opacity 0.15s;
 }
-.sx-bump-ball.hot {
-    box-shadow: 0 0 18px rgba(253, 224, 71, 0.95), inset -4px -6px 10px rgba(120, 53, 15, 0.55);
-    filter: brightness(1.2);
+.sx-bump-ball.hot { box-shadow: 0 0 18px rgba(248, 113, 113, 0.95), 0 0 6px rgba(253, 224, 71, 0.9); }
+/* Where a ball will roll in: a red arrow at the edge / a red aim line */
+.sx-bump-entry, .sx-bump-aim {
+    position: fixed; z-index: 9003; pointer-events: none; transform-origin: 0 50%; height: 30px; margin-top: -15px;
 }
-/* Flipper arc band: dashed magenta warn → hot slap → fade */
+.sx-bump-entry {
+    width: 90px;
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.9), rgba(239, 68, 68, 0));
+    clip-path: polygon(0 30%, 70% 30%, 70% 0, 100% 50%, 70% 100%, 70% 70%, 0 70%);
+    animation: sx-nk-warn-pulse 0.25s ease-in-out infinite alternate;
+}
+.sx-bump-aim {
+    width: 140vmax; height: 10px; margin-top: -5px;
+    background: repeating-linear-gradient(90deg, rgba(248, 113, 113, 0.9) 0 18px, transparent 18px 30px);
+    animation: sx-nk-warn-pulse 0.25s ease-in-out infinite alternate;
+}
+/* Flipper band: a wide red strip from a bottom corner; the fill runs out
+   from the flipper and the band flashes when it slaps. */
 .sx-bump-flip {
-    position: fixed; z-index: 9002; pointer-events: none;
-    height: 44px;
-    border-radius: 22px;
-    background: linear-gradient(90deg, rgba(217, 70, 239, 0.12), rgba(217, 70, 239, 0.22));
-    border: 2px dashed rgba(232, 121, 249, 0.75);
+    position: fixed; z-index: 9002; pointer-events: none; box-sizing: border-box; overflow: hidden;
+    transform-origin: 0 50%; border-radius: 48px 0 0 48px;
+    background: rgba(239, 68, 68, 0.1); border: 3px dashed rgba(248, 113, 113, 0.95); border-right: none;
 }
-.sx-bump-flip.hot {
-    background: linear-gradient(90deg, rgba(217, 70, 239, 0.5), rgba(244, 114, 182, 0.42));
-    border: 2px solid rgba(251, 207, 232, 0.95);
-    box-shadow: 0 0 22px rgba(217, 70, 239, 0.8);
-    animation: sx-bump-flip-flash 0.38s ease-out 1;
+.sx-bump-flip::after {
+    content: ''; position: absolute; inset: 0; transform-origin: 0 50%;
+    background: repeating-linear-gradient(90deg, rgba(239, 68, 68, 0.6) 0 20px, rgba(127, 29, 29, 0.5) 20px 40px);
+    animation: sx-bump-wipe var(--bump-warn, 1.1s) linear forwards;
 }
+@keyframes sx-bump-wipe { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.sx-bump-flip.hot { border-style: solid; border-color: #fff; background: rgba(254, 240, 138, 0.8); animation: sx-wvr-fade 0.4s ease-out forwards; }
+.sx-bump-flip.hot::after { display: none; }
 @keyframes sx-bump-flip-flash {
     from { filter: brightness(2.1); }
     to { filter: brightness(1); }
 }
-/* Bumper Slam: target-ring telegraph + impact core */
-.sx-bump-slam-ring {
-    position: fixed; z-index: 9005; pointer-events: none;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    border: 3px dashed rgba(250, 204, 21, 0.9);
-    background: radial-gradient(circle, rgba(250, 204, 21, 0.16), rgba(250, 204, 21, 0.04) 70%);
-    animation: sx-bump-ring-charge 1.05s ease-in-out infinite alternate;
+/* Bumper Slam: a red circle fills from the middle, then a giant bumper lands */
+.sx-bump-slam {
+    position: fixed; z-index: 9005; pointer-events: none; box-sizing: border-box; border-radius: 50%;
+    border: 3px dashed rgba(248, 113, 113, 0.95); background: rgba(239, 68, 68, 0.08);
 }
-.sx-bump-slam-ring.hot {
-    border: 4px solid rgba(254, 240, 138, 1);
-    background: radial-gradient(circle, rgba(250, 204, 21, 0.42), rgba(250, 204, 21, 0.1) 70%);
-    box-shadow: 0 0 34px rgba(250, 204, 21, 0.95);
-    animation: none;
+.sx-bump-slam::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.62), rgba(127, 29, 29, 0.5));
+    animation: sx-bump-grow var(--bump-warn, 1.1s) linear forwards;
 }
-@keyframes sx-bump-ring-charge {
-    from { transform: translate(-50%, -50%) scale(1); opacity: 0.75; }
-    to { transform: translate(-50%, -50%) scale(1.09); opacity: 1; }
+@keyframes sx-bump-grow { from { transform: scale(0); } to { transform: scale(1); } }
+.sx-bump-slam.hot {
+    border-style: solid; border-color: #fde68a;
+    background: radial-gradient(circle at 50% 50%, #fde68a 0 12%, #f59e0b 13% 17%, #fff 18% 23%, #dc2626 24% 40%, rgba(254, 240, 138, 0.5) 41% 100%);
+    animation: sx-wvr-fade 0.45s ease-out forwards;
 }
-.sx-bump-slam-core {
-    position: fixed; z-index: 9006; pointer-events: none;
-    transform: translate(-50%, -50%);
-    font-size: 4.4rem;
-    animation: sx-bump-slam-pop 0.42s ease-out 1 forwards;
+.sx-bump-slam.hot::after { display: none; }
+/* JACKPOT finale: green target ring that fills as you stand in it, pips at the top */
+.sx-bump-target {
+    position: fixed; z-index: 9001; pointer-events: none; box-sizing: border-box; border-radius: 50%;
+    border: 4px solid rgba(134, 239, 172, 0.95);
+    background: conic-gradient(rgba(74, 222, 128, 0.55) var(--fill, 0deg), rgba(74, 222, 128, 0.12) 0);
+    box-shadow: 0 0 22px rgba(74, 222, 128, 0.7), inset 0 0 18px rgba(74, 222, 128, 0.4);
+    animation: sx-bump-target-pulse 0.8s ease-in-out infinite alternate;
 }
-@keyframes sx-bump-slam-pop {
-    from { transform: translate(-50%, -50%) scale(0.4); }
-    60% { transform: translate(-50%, -50%) scale(1.25); filter: brightness(1.8); }
-    to { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+.sx-bump-target.on { border-color: #fff; }
+.sx-bump-target.lit { background: rgba(254, 240, 138, 0.85); border-color: #fde68a; animation: sx-wvr-fade 0.5s ease-out forwards; }
+@keyframes sx-bump-target-pulse { from { filter: brightness(0.95); } to { filter: brightness(1.35); } }
+.sx-bump-pips {
+    position: fixed; left: 50%; top: 128px; transform: translateX(-50%); z-index: 9310; pointer-events: none;
+    display: flex; gap: 10px;
 }
+.sx-bump-pips i {
+    width: 20px; height: 20px; border-radius: 50%; border: 3px solid rgba(134, 239, 172, 0.9);
+    background: rgba(2, 6, 23, 0.7); box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+}
+.sx-bump-pips i.lit { background: #4ade80; box-shadow: 0 0 14px rgba(74, 222, 128, 1); }
+.sx-nk-fin-bump { --nk-fin: #fde68a; }
 
 /* ── The Centipede: colony siege ───────────────────────────────────── */
 /* Colony segments: the main body (head 🐛 + 🟤 chain). */
@@ -2607,60 +2626,6 @@ div.sx-nk-pillar.sx-nk-pillar-holy {
     }
 }
 
-/* Bouncing "STAND HERE" pill that floats above the icy cell nearest the
-   avatar while a shell blob is still squishing (rest phase, before it
-   locks). Fixed element positioned every frame by boss-jelly.js; it rides
-   with the gate's run so it is cleaned up when the run dies. The down
-   chevron points at the cell the player should stand on - the blob locks
-   onto wherever the player stands, so standing there makes it slip. */
-.sx-jelly-guide {
-    position: fixed;
-    left: 0;
-    top: 0;
-    pointer-events: none;
-    z-index: 9020;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    background: linear-gradient(180deg, #38bdf8 0%, #0e7490 100%);
-    color: #ffffff;
-    font-family: 'Impact', 'Anton', 'Arial Black', sans-serif;
-    font-weight: 900;
-    font-size: 13px;
-    line-height: 1;
-    letter-spacing: 1.1px;
-    padding: 5px 12px 6px;
-    border-radius: 999px;
-    border: 2px solid #e0f2fe;
-    white-space: nowrap;
-    text-shadow:
-        -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000,
-        0 1px 2px rgba(0, 0, 0, 0.9);
-    box-shadow:
-        0 2px 6px rgba(0, 0, 0, 0.75),
-        0 0 12px rgba(56, 189, 248, 0.90),
-        0 0 22px rgba(125, 211, 252, 0.55);
-    animation: sx-jelly-guide-bounce 0.5s ease-in-out infinite;
-}
-
-/* Down chevron pointing at the icy cell below the pill. */
-.sx-jelly-guide::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 100%;
-    transform: translateX(-50%);
-    border: 7px solid transparent;
-    border-top: 8px solid #0e7490;
-    border-bottom: none;
-}
-
-@keyframes sx-jelly-guide-bounce {
-    0%, 100% { transform: translate(-50%, -100%) translateY(0); }
-    50%      { transform: translate(-50%, -100%) translateY(-4px); }
-}
-
 /* Hop blob that slipped on ice - frosty trail while it launches at the
    boss. Filter-only animation so the translated position stays put. */
 .sx-nk-jelly-slip {
@@ -2709,6 +2674,71 @@ div.sx-nk-pillar.sx-nk-pillar-holy {
         opacity: 0;
     }
 }
+
+/* ── The Jelly rework: CSS blob, filling shadows, slime puddles, split lanes ── */
+.sx-jly-blob {
+    position: fixed; left: 0; top: 0; z-index: 9030; pointer-events: none;
+    width: 44px; height: 44px; border-radius: 52% 48% 44% 44% / 60% 60% 40% 40%;
+    background:
+        radial-gradient(circle at 36% 46%, #052e16 0 7%, transparent 8%),
+        radial-gradient(circle at 64% 46%, #052e16 0 7%, transparent 8%),
+        radial-gradient(ellipse 30% 18% at 32% 22%, rgba(255, 255, 255, 0.85), transparent 70%),
+        radial-gradient(circle at 50% 65%, #86efac, #22c55e 55%, #15803d 100%);
+    box-shadow: 0 0 14px rgba(110, 231, 183, 0.9), inset 0 -6px 10px rgba(5, 46, 22, 0.45);
+    animation: sx-jly-wobble 0.5s ease-in-out infinite alternate;
+}
+.sx-jly-blob-big { width: 75px; height: 75px; }
+@keyframes sx-jly-wobble { from { border-radius: 52% 48% 44% 44% / 60% 60% 40% 40%; } to { border-radius: 46% 54% 48% 40% / 52% 56% 44% 48%; } }
+.sx-jly-blob-burst { animation: sx-jly-burst 0.35s ease-out forwards; }
+@keyframes sx-jly-burst { to { opacity: 0; filter: brightness(1.8); scale: 1.8; } }
+.sx-jly-shadow {
+    position: fixed; z-index: 9002; pointer-events: none; box-sizing: border-box; border-radius: 50%;
+    border: 3px dashed rgba(248, 113, 113, 0.95); background: rgba(239, 68, 68, 0.08);
+}
+.sx-jly-shadow::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.62), rgba(127, 29, 29, 0.5));
+    animation: sx-jly-grow var(--jly-warn, 1s) linear forwards;
+}
+@keyframes sx-jly-grow { from { transform: scale(0); } to { transform: scale(1); } }
+.sx-jly-shadow-hit {
+    border-style: solid; border-color: #e0f2fe;
+    background: radial-gradient(circle, rgba(224, 242, 254, 0.9), rgba(34, 197, 94, 0.55) 60%, transparent 72%);
+    animation: sx-wvr-fade 0.42s ease-out forwards;
+}
+.sx-jly-shadow-hit::after { display: none; }
+.sx-jly-puddle {
+    position: fixed; z-index: 9001; pointer-events: none; box-sizing: border-box;
+    border-radius: 47% 53% 42% 58% / 55% 45% 55% 45%;
+    border: 3px solid rgba(248, 113, 113, 0.85);
+    background: radial-gradient(circle at 40% 40%, rgba(134, 239, 172, 0.55), rgba(21, 128, 61, 0.55) 70%);
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.55), inset 0 0 14px rgba(5, 46, 22, 0.6);
+    animation: sx-jly-dry var(--jly-life, 6s) linear forwards;
+}
+@keyframes sx-jly-dry { 0% { opacity: 1; } 80% { opacity: 0.9; } 100% { opacity: 0.15; transform: scale(0.8); } }
+.sx-jly-lane {
+    position: fixed; z-index: 9002; pointer-events: none; box-sizing: border-box; overflow: hidden;
+    transform-origin: 0 50%;
+    background: rgba(239, 68, 68, 0.1); border: 2px dashed rgba(248, 113, 113, 0.9); border-left: none;
+}
+.sx-jly-lane::after {
+    content: ''; position: absolute; inset: 0; transform-origin: 0 50%;
+    background: repeating-linear-gradient(90deg, rgba(239, 68, 68, 0.6) 0 18px, rgba(127, 29, 29, 0.5) 18px 36px);
+    animation: sx-jly-wipe var(--jly-warn, 0.7s) linear forwards;
+}
+@keyframes sx-jly-wipe { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.sx-jly-lane-hit { border-style: solid; border-color: #fff; background: rgba(254, 240, 138, 0.8); animation: sx-wvr-fade 0.42s ease-out forwards; }
+.sx-jly-lane-hit::after { display: none; }
+.sx-jly-drop {
+    position: fixed; z-index: 9031; pointer-events: none; width: 24px; height: 24px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ecfccb, #4ade80 60%, #15803d);
+    box-shadow: 0 0 12px rgba(134, 239, 172, 0.95);
+    animation: sx-jly-shoot 0.55s linear forwards;
+}
+@keyframes sx-jly-shoot { to { transform: translate(var(--dx), var(--dy)); opacity: 0.2; } }
+.sx-jelly-bubble-cracked { filter: saturate(0.6) brightness(1.15); border-style: dashed !important; }
+.sx-jelly-shatter-small { animation-duration: 0.45s; opacity: 0.8; }
+.sx-nk-fin-jly { --nk-fin: #86efac; }
 
 /* ============ The Snail - Doom Snail rework ============ */
 
@@ -5243,120 +5273,114 @@ body:has(#screen-hub.active) [class*="sx-gal-"] { display: none !important; }
 .sx-nk-fin-exe { --nk-fin: #f87171; }
 
 /* ------------------------------------------------------------------
-   THE TACTICIAN - persistent chess-siege arena (boss-tactician.js)
-   Gliding queen, intent banners, knight orbs, pawn ranks, rook
-   lanes, bishop beams, knight leaps, checkmate walls.
+   THE TACTICIAN - chess siege (boss-tactician.js, boss-tactician-board.js)
+   Gliding queen, pawn ranks with a green gap, rook lanes, knight
+   landings, bishop diagonals and the CHECKMATE board. Pieces are CSS
+   shapes (clip-path), never emoji.
    ------------------------------------------------------------------ */
-/* The Queen's Guard: gliding ♛ = the boss's arena body. */
+/* Shared piece look: an ivory shape (cut by --tct-shape on ::before) with a
+   dark outline glow on the piece itself (a clip-path would cut the glow off). */
+.sx-tct-queen, .sx-tct-knight, .sx-tct-piece, .sx-tct-pawn {
+    filter: drop-shadow(0 0 2px #1c1917) drop-shadow(0 0 2px #1c1917) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.7));
+}
+.sx-tct-queen::before, .sx-tct-knight::before, .sx-tct-piece::before, .sx-tct-pawn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, #fafaf9, #d6d3d1 60%, #a8a29e);
+    clip-path: var(--tct-shape);
+}
+/* The queen: crown with five points on a round body. */
 .sx-tct-queen {
-    position: fixed; left: 0; top: 0; z-index: 9002; pointer-events: none;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 3.2rem; line-height: 1;
-    color: #1f2937;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(250, 250, 250, 0.95) 30%, rgba(203, 213, 225, 0.8));
-    border: 3px solid rgba(30, 30, 30, 0.85);
-    box-shadow: 0 0 16px rgba(250, 250, 250, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.25);
+    position: fixed; left: 0; top: 0; z-index: 9006; pointer-events: none;
+    --tct-shape: polygon(8% 100%, 92% 100%, 84% 70%, 100% 18%, 74% 42%, 66% 6%, 50% 36%, 34% 6%, 26% 42%, 0 18%, 16% 70%);
     will-change: transform;
 }
-/* Battle-intent banner at the queen. */
-.sx-tct-intent {
-    position: fixed; z-index: 9004; pointer-events: none;
-    transform: translate(-50%, 0);
-    font-size: 1.3rem; font-weight: 800; letter-spacing: 0.05em;
-    color: #fde047;
-    text-shadow: 0 0 12px rgba(250, 204, 21, 0.9), 0 2px 2px rgba(0, 0, 0, 0.8);
-    animation: sx-tct-intent-pop 0.3s ease-out;
-    white-space: nowrap;
+/* Pawn rank: a row of pawns with one green gap; the row glows red while it warns. */
+.sx-tct-rank {
+    position: fixed; left: 0; width: 100vw; z-index: 9002; pointer-events: none;
+    display: flex; align-items: stretch;
 }
-@keyframes sx-tct-intent-pop {
-    from { transform: translate(-50%, 0) scale(0.5); opacity: 0; }
-    to { transform: translate(-50%, 0) scale(1); opacity: 1; }
-}
-/* Knight-orb volley projectiles. */
-.sx-tct-orb {
-    position: fixed; left: 0; top: 0; z-index: 9003; pointer-events: none;
-    font-size: 1.3rem; line-height: 1;
-    filter: drop-shadow(0 0 7px rgba(250, 250, 250, 0.8));
-    will-change: transform;
-}
-/* Pawn march: advancing rank + its warn gap column. */
-.sx-tct-pawnwarn {
-    position: fixed; z-index: 9001; pointer-events: none;
-    height: 100vh;
-    background: repeating-linear-gradient(to bottom, rgba(74, 222, 128, 0.13) 0 16px, transparent 16px 32px);
-    border-left: 2px dashed rgba(74, 222, 128, 0.65);
-    border-right: 2px dashed rgba(74, 222, 128, 0.65);
-    animation: sx-tct-warn-blink 0.45s linear infinite;
-}
-@keyframes sx-tct-warn-blink {
-    50% { opacity: 0.5; }
+.sx-tct-rank.warn { background: rgba(239, 68, 68, 0.22); outline: 3px dashed rgba(248, 113, 113, 0.9); }
+.sx-tct-pawn { flex: 1; position: relative; }
+.sx-tct-pawn::before {
+    inset: auto; left: 50%; top: 0; width: 38px; height: 50px; transform: translateX(-50%);
 }
 .sx-tct-pawn {
-    position: fixed; left: 0; z-index: 9002; pointer-events: none;
-    display: flex; width: 100vw; justify-content: space-around;
-    will-change: transform;
+    --tct-shape: polygon(50% 0, 66% 8%, 70% 26%, 60% 40%, 74% 78%, 92% 84%, 92% 100%, 8% 100%, 8% 84%, 26% 78%, 40% 40%, 30% 26%, 34% 8%);
 }
-.sx-tct-pawn-cell {
-    font-size: 2.4rem; line-height: 54px;
-    filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.7));
+.sx-tct-rank-gap { flex: 1; background: rgba(74, 222, 128, 0.18); border-left: 3px solid #86efac; border-right: 3px solid #86efac; }
+.sx-tct-gaplane {
+    position: fixed; top: 0; height: 100vh; z-index: 9000; pointer-events: none;
+    background: linear-gradient(0deg, rgba(74, 222, 128, 0.22), rgba(74, 222, 128, 0.04));
+    border-left: 2px dashed rgba(134, 239, 172, 0.7); border-right: 2px dashed rgba(134, 239, 172, 0.7);
 }
-/* CHECK: rook-slide lanes (warn → hot dash). */
+/* Rook lane: red fill wipes in from the rook's side, then the lane flashes. */
 .sx-tct-lane {
-    position: fixed; z-index: 9001; pointer-events: none;
-    background: rgba(250, 250, 250, 0.10);
-    animation: sx-tct-warn-blink 0.4s linear infinite;
-    will-change: left, top;
+    position: fixed; z-index: 9001; pointer-events: none; box-sizing: border-box; overflow: hidden;
+    background: rgba(239, 68, 68, 0.1); border: 3px dashed rgba(248, 113, 113, 0.95);
 }
-.sx-tct-lane.horiz { height: 76px; margin-top: -38px; left: 0; width: 100vw; top: 0; }
-.sx-tct-lane.vert { width: 76px; margin-left: -38px; top: 0; height: 100vh; left: 0; }
-.sx-tct-lane.hot {
-    background: rgba(250, 250, 250, 0.28);
-    box-shadow: 0 0 24px rgba(250, 250, 250, 0.6);
-    animation: none;
+.sx-tct-lane::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, rgba(239, 68, 68, 0.6) 0 16px, rgba(127, 29, 29, 0.5) 16px 32px);
+    animation: sx-tct-wipe-x var(--tct-warn, 1.2s) linear forwards;
 }
-/* ZUGZWANG: bishop diagonal beams + knight leap squares. */
-.sx-tct-beam {
-    position: fixed; z-index: 9001; pointer-events: none;
-    height: 68px;
-    margin-top: -34px;
-    transform-origin: 0 50%;
-    background: repeating-linear-gradient(90deg, rgba(250, 204, 21, 0.22) 0 26px, transparent 26px 52px);
-    border-top: 2px dashed rgba(250, 204, 21, 0.7);
-    border-bottom: 2px dashed rgba(250, 204, 21, 0.7);
+.sx-tct-lane-left::after { transform-origin: left center; }
+.sx-tct-lane-right::after { transform-origin: right center; }
+.sx-tct-lane-top::after { transform-origin: center top; animation-name: sx-tct-wipe-y; }
+.sx-tct-lane-bottom::after { transform-origin: center bottom; animation-name: sx-tct-wipe-y; }
+@keyframes sx-tct-wipe-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes sx-tct-wipe-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.sx-tct-lane.hot, .sx-tct-diag.hot, .sx-tct-landing.hot {
+    border-style: solid; border-color: #fff; background: rgba(254, 240, 138, 0.85); animation: sx-wvr-fade 0.42s ease-out forwards;
 }
-.sx-tct-beam.hot {
-    background: rgba(250, 204, 21, 0.4);
-    border-color: #fef9c3;
-    box-shadow: 0 0 26px rgba(250, 204, 21, 0.85);
+.sx-tct-lane.hot::after, .sx-tct-diag.hot::after, .sx-tct-landing.hot::after { display: none; }
+/* Knight landing: a red circle fills from the middle out. */
+.sx-tct-landing {
+    position: fixed; z-index: 9002; pointer-events: none; box-sizing: border-box; border-radius: 50%;
+    border: 3px dashed rgba(248, 113, 113, 0.95); background: rgba(239, 68, 68, 0.08);
 }
-.sx-tct-leap {
-    position: fixed; z-index: 9001; pointer-events: none;
-    border-radius: 50%;
-    border: 3px dashed rgba(148, 163, 184, 0.85);
-    background: rgba(148, 163, 184, 0.10);
-    animation: sx-tct-warn-blink 0.4s linear infinite;
+.sx-tct-landing::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.62), rgba(127, 29, 29, 0.5));
+    animation: sx-tct-grow var(--tct-warn, 1.2s) linear forwards;
 }
+@keyframes sx-tct-grow { from { transform: scale(0); } to { transform: scale(1); } }
+/* The knight: a horse head in profile. */
 .sx-tct-knight {
-    position: fixed; left: 0; top: 0; z-index: 9003; pointer-events: none;
-    font-size: 2.6rem; line-height: 1;
-    filter: drop-shadow(0 0 10px rgba(148, 163, 184, 0.9));
-    will-change: transform;
+    position: fixed; left: 0; top: 0; z-index: 9007; pointer-events: none; width: 56px; height: 72px;
+    --tct-shape: polygon(20% 100%, 86% 100%, 80% 78%, 70% 60%, 76% 40%, 100% 52%, 100% 38%, 76% 12%, 56% 0, 46% 8%, 22% 24%, 8% 50%, 30% 52%, 40% 44%, 22% 74%);
+    transition: transform 0.18s ease-out;
 }
-/* CHECKMATE: four castle walls closing in. */
-.sx-tct-wall {
-    position: fixed; z-index: 9002; pointer-events: none;
-    background:
-        repeating-linear-gradient(to bottom, rgba(200, 200, 200, 0.4) 0 22px, rgba(120, 120, 120, 0.4) 22px 44px),
-        linear-gradient(to bottom, rgba(70, 70, 70, 0.95), rgba(45, 45, 45, 0.95));
-    border: 2px solid rgba(220, 220, 220, 0.5);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.55);
-    will-change: transform;
+/* Bishop diagonal: a red band whose fill grows in. */
+.sx-tct-diag {
+    position: fixed; z-index: 9001; pointer-events: none; box-sizing: border-box; overflow: hidden;
+    background: rgba(239, 68, 68, 0.1); border-top: 3px dashed rgba(248, 113, 113, 0.95); border-bottom: 3px dashed rgba(248, 113, 113, 0.95);
 }
-.sx-tct-wall.closing {
-    border-color: #f87171;
-    box-shadow: 0 0 26px rgba(248, 113, 113, 0.7);
+.sx-tct-diag::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg, rgba(239, 68, 68, 0.6) 0 18px, rgba(127, 29, 29, 0.5) 18px 36px);
+    opacity: 0.05; animation: sx-tct-fill var(--tct-warn, 1.2s) linear forwards;
 }
+@keyframes sx-tct-fill { from { opacity: 0.05; } to { opacity: 1; } }
+/* CHECKMATE board: red attacked squares fill up, free squares are green. */
+.sx-tct-cell {
+    position: fixed; z-index: 9001; pointer-events: none; box-sizing: border-box; border-radius: 8px; overflow: hidden;
+}
+.sx-tct-cell.bad { border: 3px dashed rgba(248, 113, 113, 0.95); background: rgba(239, 68, 68, 0.1); }
+.sx-tct-cell.bad::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, rgba(239, 68, 68, 0.6) 0 16px, rgba(127, 29, 29, 0.5) 16px 32px);
+    opacity: 0.05; animation: sx-tct-fill var(--tct-warn, 2s) linear forwards;
+}
+.sx-tct-cell.safe { border: 4px solid rgba(134, 239, 172, 0.95); background: rgba(74, 222, 128, 0.16); box-shadow: inset 0 0 40px rgba(74, 222, 128, 0.35); }
+.sx-tct-cell.dark.safe { background: rgba(21, 128, 61, 0.24); }
+.sx-tct-cell.bad.hot { border-style: solid; border-color: #fff; background: rgba(254, 240, 138, 0.85); animation: sx-wvr-fade 0.45s ease-out forwards; }
+.sx-tct-cell.bad.hot::after { display: none; }
+.sx-tct-cell.safe.hot { animation: sx-wvr-fade 0.45s ease-out forwards; }
+.sx-tct-piece { position: fixed; z-index: 9006; pointer-events: none; width: 56px; height: 68px; }
+.sx-tct-piece.rook { --tct-shape: polygon(10% 100%, 90% 100%, 84% 84%, 74% 78%, 74% 34%, 90% 24%, 90% 0, 72% 0, 72% 10%, 58% 10%, 58% 0, 42% 0, 42% 10%, 28% 10%, 28% 0, 10% 0, 10% 24%, 26% 34%, 26% 78%, 16% 84%); }
+.sx-tct-piece.bishop { --tct-shape: polygon(14% 100%, 86% 100%, 80% 86%, 66% 80%, 74% 46%, 64% 20%, 54% 30%, 58% 14%, 50% 0, 36% 18%, 26% 46%, 34% 80%, 20% 86%); }
+.sx-tct-piece.hot { animation: sx-wvr-fade 0.45s ease-out forwards; }
+.sx-nk-fin-tct { --nk-fin: #e7e5e4; }
 
 
 /* ============================================================
@@ -11307,248 +11331,116 @@ body.sx-shp-flash::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   THE MINOTAUR - "The Labyrinth's Warden" (Tier 8 rework)
-   Labyrinth duel: telegraphed wall slabs carve the arena into lanes, the
-   bull charges the lane at your row, hoof craters + dust storms accumulate
-   terrain, the Thread of Ariadne marks an honest-but-bait safe lane, and
-   THE WARDEN'S LABYRINTH ends in an all-lane TRAMPLE. Elementless - pure
-   physical, amber/gunmetal palette (matches the Minotaur toast color).
+   THE MINOTAUR - "The Labyrinth's Warden"
+   Stone pillars are the bull's walls and your cover. Bull Rush lanes fill
+   red from the bull's side up to the first pillar; a smashed pillar bursts
+   in a red cross; Hoof Stomp circles fill under you; the Stampede canvas
+   paints the arena red with the pillars' green shadows cut out.
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* ── Labyrinth walls: rise telegraph → solid slab → crumble ── */
-.sx-mnt-wall-rise {
-    position: fixed;
-    z-index: 8649;
-    pointer-events: none;
-    border: 2px dashed rgba(217, 180, 106, 0.8);
-    background: rgba(120, 100, 60, 0.12);
-    animation: sx-mnt-rise-kf 1s ease-in-out infinite alternate;
-}
-@keyframes sx-mnt-rise-kf {
-    from { opacity: 0.5; }
-    to   { opacity: 1; }
-}
-.sx-mnt-wall {
-    position: fixed;
-    z-index: 8650;
-    pointer-events: none;
-    border: 2px solid rgba(190, 155, 88, 0.95);
-    background: linear-gradient(180deg, rgba(88, 74, 48, 0.92) 0%, rgba(56, 46, 30, 0.95) 100%);
-    box-shadow: 0 0 14px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(217, 180, 106, 0.25);
-}
-.sx-mnt-wall-crumble {
-    animation: sx-mnt-crumble-kf 0.6s ease-out forwards;
-}
-@keyframes sx-mnt-crumble-kf {
-    0%   { filter: brightness(1); opacity: 1; }
-    100% { filter: brightness(1.8); opacity: 0; transform: scaleY(0.4); }
-}
-
-/* ── Charge lane + trample lanes (extend the shared band) ── */
-.sx-mnt-lane {
-    background: linear-gradient(90deg, rgba(251, 191, 36, 0.05) 0%, rgba(251, 191, 36, 0.18) 50%, rgba(251, 191, 36, 0.05) 100%) !important;
-    border-top: 1px solid rgba(251, 191, 36, 0.45);
-    border-bottom: 1px solid rgba(251, 191, 36, 0.45);
-}
-.sx-mnt-trample-lane {
-    position: fixed;
-    z-index: 8649;
-    pointer-events: none;
-    box-sizing: border-box;
-    border-top: 1px solid rgba(251, 191, 36, 0.3);
-    background: rgba(251, 191, 36, 0.07);
-    transition: background 0.25s ease-out, box-shadow 0.25s ease-out;
-}
-.sx-mnt-trample-safe {
-    background: rgba(134, 239, 172, 0.12);
-    box-shadow: inset 0 0 16px rgba(134, 239, 172, 0.3);
-    border-top: 1px solid rgba(134, 239, 172, 0.8);
-    animation: sx-mnt-safe-kf 0.9s ease-in-out infinite alternate;
-}
-@keyframes sx-mnt-safe-kf {
-    from { filter: brightness(0.9); }
-    to   { filter: brightness(1.5); }
-}
-.sx-mnt-trample-hot {
-    background: rgba(251, 146, 60, 0.34);
-    box-shadow: 0 0 20px rgba(251, 146, 60, 0.7), inset 0 0 16px rgba(180, 83, 9, 0.45);
-    animation: sx-mnt-hot-kf 0.65s ease-in-out infinite alternate;
-}
-@keyframes sx-mnt-hot-kf {
-    from { filter: brightness(0.95); }
-    to   { filter: brightness(1.4); }
-}
-
-/* ── Hoof craters: warn → stamp → lingering hoofprint ── */
-.sx-mnt-crater-warn {
-    position: fixed;
-    z-index: 8650;
-    pointer-events: none;
-    width: 88px;
-    height: 88px;
-    border-radius: 50%;
-    border: 3px dashed rgba(251, 191, 36, 0.9);
-    background: rgba(120, 90, 30, 0.12);
-    animation: sx-mnt-crater-warn-kf 0.55s ease-in-out infinite alternate;
-}
-@keyframes sx-mnt-crater-warn-kf {
-    from { transform: scale(0.92); opacity: 0.7; }
-    to   { transform: scale(1.08); opacity: 1; }
-}
-.sx-mnt-crater-boom {
-    position: fixed;
-    z-index: 8652;
-    pointer-events: none;
-    width: 88px;
-    height: 88px;
-    border-radius: 50%;
-    border: 4px solid rgba(217, 180, 106, 0.95);
-    background: radial-gradient(circle, rgba(217, 180, 106, 0.5) 0%, rgba(120, 90, 30, 0.25) 60%, transparent 78%);
-    animation: sx-bar-boom-kf 0.5s ease-out forwards;
-}
-.sx-mnt-hoofprint {
-    position: fixed;
-    z-index: 8649;
-    pointer-events: none;
-    width: 68px;
-    height: 68px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(56, 46, 30, 0.55) 0%, rgba(56, 46, 30, 0.25) 65%, transparent 80%);
-    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.55);
-}
-
-/* ── Dust storm trailing the charge lane ── */
-.sx-mnt-dust {
-    position: fixed;
-    z-index: 8648;
-    pointer-events: none;
+/* ── Stone pillar: rises, stands, crumbles ── */
+.sx-mnt-pillar {
+    position: fixed; z-index: 9010; pointer-events: none; box-sizing: border-box;
+    border-radius: 10px;
+    border: 3px solid #a8a29e;
     background:
-        radial-gradient(circle at 25% 40%, rgba(180, 140, 80, 0.30) 0%, transparent 45%),
-        radial-gradient(circle at 65% 70%, rgba(140, 105, 55, 0.32) 0%, transparent 50%),
-        radial-gradient(circle at 85% 25%, rgba(180, 140, 80, 0.22) 0%, transparent 45%);
-    filter: blur(2px);
-    animation: sx-mnt-dust-kf 0.8s ease-in-out infinite alternate;
+        linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0 18%, transparent 18% 100%),
+        repeating-linear-gradient(0deg, transparent 0 22px, rgba(28, 25, 23, 0.55) 22px 25px),
+        linear-gradient(160deg, #78716c 0%, #57534e 55%, #292524 100%);
+    box-shadow: 0 10px 0 #1c1917, 0 14px 22px rgba(0, 0, 0, 0.7), inset 0 0 14px rgba(0, 0, 0, 0.55);
+    animation: sx-mnt-pillar-rise 0.6s cubic-bezier(.2, 1.4, .4, 1) both;
 }
-@keyframes sx-mnt-dust-kf {
-    from { opacity: 0.7; }
-    to   { opacity: 1; }
+@keyframes sx-mnt-pillar-rise {
+    from { transform: scale(0.2) translateY(40px); opacity: 0; }
+    to { transform: none; opacity: 1; }
 }
-
-/* ── Thread of Ariadne: honest safe lane, frays, snaps ── */
-.sx-mnt-thread {
-    position: fixed;
-    left: 0;
-    z-index: 8651;
-    pointer-events: none;
-    width: 100%;
-    background: linear-gradient(90deg,
-        rgba(255, 209, 102, 0.0) 0%,
-        rgba(255, 209, 102, 0.45) 18%,
-        rgba(255, 232, 166, 0.75) 50%,
-        rgba(255, 209, 102, 0.45) 82%,
-        rgba(255, 209, 102, 0.0) 100%);
-    border-top: 2px solid rgba(255, 209, 102, 0.85);
-    border-bottom: 2px solid rgba(255, 209, 102, 0.85);
-    box-shadow: 0 0 16px rgba(255, 209, 102, 0.5);
-    animation: sx-mnt-thread-kf 1.2s ease-in-out infinite alternate;
-}
-@keyframes sx-mnt-thread-kf {
-    from { opacity: 0.75; }
-    to   { opacity: 1; }
-}
-.sx-mnt-thread-held {
-    animation: sx-mnt-held-kf 0.5s ease-in-out 3 !important;
-}
-@keyframes sx-mnt-held-kf {
-    from { box-shadow: 0 0 12px rgba(74, 222, 128, 0.5); }
-    to   { box-shadow: 0 0 26px rgba(74, 222, 128, 0.95); }
-}
-.sx-mnt-thread-fray {
-    opacity: 0.55;
-    filter: saturate(0.6);
-}
-.sx-mnt-thread-snap {
-    animation: sx-mnt-snap-kf 0.45s ease-out forwards;
-}
-@keyframes sx-mnt-snap-kf {
-    0%   { opacity: 1; transform: translateX(0); }
-    100% { opacity: 0; transform: translateX(40px); }
+.sx-mnt-pillar-crumble { animation: sx-mnt-pillar-crumble 0.5s ease-in forwards; }
+@keyframes sx-mnt-pillar-crumble {
+    0% { transform: none; filter: brightness(1.6); opacity: 1; }
+    100% { transform: scale(1.25, 0.25) translateY(60px); filter: brightness(0.6) blur(2px); opacity: 0; }
 }
 
-/* ── Mazewall stones (finale body-check targets) ── */
-.sx-mnt-stone {
-    position: fixed;
-    z-index: 8651;
-    pointer-events: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    border-radius: 14px;
-    border: 3px solid rgba(251, 191, 36, 0.95);
-    background: radial-gradient(circle, rgba(88, 74, 48, 0.85) 0%, rgba(40, 34, 22, 0.9) 100%);
-    box-shadow: 0 0 22px rgba(251, 191, 36, 0.7), inset 0 0 16px rgba(0, 0, 0, 0.6);
-    text-shadow: 0 0 12px rgba(251, 191, 36, 0.9);
-    animation: sx-mnt-stone-kf 1s ease-in-out infinite alternate;
+/* ── Bull Rush lane: red wipes in from the bull's side, then the bull runs ── */
+.sx-mnt-lane {
+    position: fixed; z-index: 9001; pointer-events: none; box-sizing: border-box; overflow: hidden;
+    background: rgba(239, 68, 68, 0.12);
+    border: 3px dashed rgba(248, 113, 113, 0.95);
 }
-@keyframes sx-mnt-stone-kf {
-    from { filter: brightness(1); }
-    to   { filter: brightness(1.35); }
+.sx-mnt-lane::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, rgba(239, 68, 68, 0.6) 0 16px, rgba(127, 29, 29, 0.5) 16px 32px);
+    animation: sx-mnt-wipe-x var(--mnt-warn, 1.2s) linear forwards;
 }
-.sx-mnt-stone-hit {
-    animation: sx-mnt-stone-hit-kf 0.3s ease-out 1;
+.sx-mnt-lane-left::after { transform-origin: left center; }
+.sx-mnt-lane-right::after { transform-origin: right center; }
+.sx-mnt-lane-top::after { transform-origin: center top; animation-name: sx-mnt-wipe-y; }
+.sx-mnt-lane-bottom::after { transform-origin: center bottom; animation-name: sx-mnt-wipe-y; }
+@keyframes sx-mnt-wipe-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes sx-mnt-wipe-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.sx-mnt-lane-live { border-style: solid; border-color: #fecaca; box-shadow: 0 0 40px rgba(239, 68, 68, 0.8); }
+
+/* ── The bull: dark body, pale horns, dust behind (drawn facing right, rotated in code) ── */
+.sx-mnt-bull {
+    position: fixed; left: 0; top: 0; z-index: 9020; pointer-events: none;
+    width: 120px; height: 80px; transform-origin: 120px 40px;
 }
-@keyframes sx-mnt-stone-hit-kf {
-    0%   { transform: scale(1); }
-    50%  { transform: scale(1.12); filter: brightness(2); }
-    100% { transform: scale(1); }
+.sx-mnt-bull::before {             /* body, head and two glowing eyes */
+    content: ''; position: absolute; left: 6px; top: 10px; width: 106px; height: 60px; border-radius: 40% 55% 55% 40%;
+    background:
+        radial-gradient(circle at 88% 34%, #fca5a5 0 4%, #dc2626 5% 7%, transparent 8%),
+        radial-gradient(circle at 88% 66%, #fca5a5 0 4%, #dc2626 5% 7%, transparent 8%),
+        radial-gradient(ellipse 30% 46% at 82% 50%, #4a2a17 0 96%, transparent 100%),
+        radial-gradient(ellipse at 38% 50%, #6b4226, #24130a 78%);
+    box-shadow: 0 0 16px rgba(248, 113, 113, 0.85), -46px 0 34px 6px rgba(214, 180, 140, 0.5);
 }
-.sx-mnt-stone-shattered {
-    opacity: 0.85;
-    filter: grayscale(1);
-    animation: none !important;
-}
-.sx-mnt-stone-dim {
-    opacity: 0.35;
-    filter: grayscale(1);
-    animation: none !important;
+.sx-mnt-bull::after {              /* horns: a thick pale crescent, tips pointing forward */
+    content: ''; position: absolute; left: 78px; top: -18px; width: 52px; height: 116px; box-sizing: border-box;
+    border: 13px solid #f5e6c8; border-left-color: transparent; border-radius: 50%;
+    transform: rotate(180deg);
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.9));
 }
 
-/* ── All-in boss card (the warden lowers its horns) ── */
-.sx-mnt-allin {
-    animation: sx-mnt-allin-kf 1.2s ease-in-out infinite alternate !important;
+/* ── Shattered pillar: a red cross fills, then bursts ── */
+.sx-mnt-cross {
+    position: fixed; z-index: 9002; pointer-events: none; box-sizing: border-box; overflow: hidden;
+    background: rgba(239, 68, 68, 0.1); border: 2px dashed rgba(248, 113, 113, 0.9);
 }
+.sx-mnt-cross::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, rgba(239, 68, 68, 0.6) 0 14px, rgba(127, 29, 29, 0.5) 14px 28px);
+    opacity: 0.05; animation: sx-mnt-fill var(--mnt-warn, 1s) linear forwards;
+}
+@keyframes sx-mnt-fill { from { opacity: 0.05; } to { opacity: 1; } }
+.sx-mnt-cross-hit { border-style: solid; border-color: #fff; background: rgba(254, 240, 138, 0.85); animation: sx-wvr-fade 0.42s ease-out forwards; }
+.sx-mnt-cross-hit::after { display: none; }
+
+/* ── Hoof Stomp: a red circle fills from the middle out, then cracks ── */
+.sx-mnt-stomp {
+    position: fixed; z-index: 9003; pointer-events: none; box-sizing: border-box; border-radius: 50%;
+    border: 3px dashed rgba(248, 113, 113, 0.95); background: rgba(239, 68, 68, 0.08);
+}
+.sx-mnt-stomp::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.65), rgba(127, 29, 29, 0.55));
+    animation: sx-mnt-grow var(--mnt-warn, 1.1s) linear forwards;
+}
+@keyframes sx-mnt-grow { from { transform: scale(0); } to { transform: scale(1); } }
+.sx-mnt-stomp-hit {
+    border-style: solid; border-color: #fde68a;
+    background: radial-gradient(circle, rgba(254, 240, 138, 0.9), rgba(180, 83, 9, 0.6) 60%, transparent 72%);
+    animation: sx-wvr-fade 0.42s ease-out forwards;
+}
+.sx-mnt-stomp-hit::after { display: none; }
+
+/* ── Stampede canvas (red arena, green pillar shadows) ── */
+.sx-mnt-canvas { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 9000; pointer-events: none; }
+
+/* ── Finale: banner accent + the boss card lowers its horns ── */
+.sx-nk-fin-mnt { --nk-fin: #fbbf24; }
+.sx-mnt-allin { animation: sx-mnt-allin-kf 1.2s ease-in-out infinite alternate !important; }
 @keyframes sx-mnt-allin-kf {
     from { filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.7)); }
     to   { filter: drop-shadow(0 0 20px rgba(217, 180, 106, 1)) drop-shadow(0 0 34px rgba(180, 83, 9, 0.8)); }
-}
-
-/* ── Finale countdown overlay (mirrors the shared cd pattern) ── */
-.sx-mnt-cd {
-    position: fixed;
-    left: 50%;
-    top: 20%;
-    transform: translate(-50%, -50%);
-    z-index: 9003;
-    pointer-events: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    text-align: center;
-}
-.sx-mnt-cd-label {
-    font-weight: 900;
-    letter-spacing: 0.18em;
-    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
-    color: #fde68a;
-    text-shadow: 0 0 18px rgba(180, 83, 9, 0.9), 0 2px 6px rgba(0, 0, 0, 0.9);
-}
-.sx-mnt-cd-hint {
-    font-size: 0.95rem;
-    color: #fcd34d;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
-    max-width: 90vw;
 }
 
 
@@ -13458,12 +13350,27 @@ body.sx-shp-flash::after {
 }
 .sx-arb-trial-blue { border-color: rgba(96, 165, 250, 0.95); background: rgba(37, 99, 235, 0.14); box-shadow: inset 0 0 90px rgba(96, 165, 250, 0.7); }
 .sx-arb-trial-orange { border-color: rgba(251, 146, 60, 0.95); background: rgba(194, 65, 12, 0.14); box-shadow: inset 0 0 90px rgba(251, 146, 60, 0.7); }
-.sx-arb-trial-live { opacity: 1; animation: sx-arb-trial-pulse 0.4s ease-in-out infinite alternate; }
+/* Warning (rule coming): dashed, faint. Live (rule active): solid, thick, and a different
+   motion per rule so it reads without colour: BLUE = calm steady frame, ORANGE = fast pulse + running stripes. */
+.sx-arb-trial:not(.sx-arb-trial-live) { border-style: dashed; }
+.sx-arb-trial-live { opacity: 1; border-width: 16px; border-style: solid; }
+.sx-arb-trial-blue.sx-arb-trial-live { animation: none; box-shadow: inset 0 0 140px rgba(96, 165, 250, 0.9); }
+.sx-arb-trial-orange.sx-arb-trial-live { animation: sx-arb-trial-pulse 0.25s ease-in-out infinite alternate; }
+@keyframes sx-arb-trial-run { from { background-position: 0 0; } to { background-position: 80px 0; } }
+.sx-arb-trial-orange.sx-arb-trial-live::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(115deg, rgba(251, 146, 60, 0.22) 0 24px, transparent 24px 56px);
+    background-size: 80px 100%; animation: sx-arb-trial-run 0.4s linear infinite;
+}
 .sx-arb-trial-label {
     position: fixed; left: 50%; top: 24%; transform: translate(-50%, -50%);
     pointer-events: none; z-index: 9002; font-size: 2rem; font-weight: 900; letter-spacing: 0.12em;
     text-shadow: 0 0 18px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.9);
 }
+.sx-arb-trial-label { opacity: 0.75; font-size: 1.5rem; }
+.sx-arb-trial-label-live { opacity: 1; font-size: 2.6rem; padding: 6px 22px; border-radius: 10px; background: rgba(0, 0, 0, 0.55); }
+.sx-arb-trial-label-blue.sx-arb-trial-label-live { border: 3px solid #60a5fa; }
+.sx-arb-trial-label-orange.sx-arb-trial-label-live { border: 3px solid #fb923c; }
 .sx-arb-trial-label-blue { color: #bfdbfe; }
 .sx-arb-trial-label-orange { color: #fed7aa; }
 
@@ -13483,3 +13390,89 @@ body.sx-shp-flash::after {
 
 /* Gavel waves: one canvas holds every ring and green gap wedge. */
 .sx-arb-canvas { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 8999; pointer-events: none; }
+
+/* ============================================================
+   THE TRON (boss-tron.js): light cycles, light walls, identity disc.
+   Cyan = the Tron's own light (walls hurt: red-rimmed); red = where
+   something will go next.
+   ============================================================ */
+.sx-trn-bike {
+    position: fixed; left: 0; top: 0; z-index: 9020; pointer-events: none; width: 52px; height: 52px;
+    transform-origin: 26px 26px;
+}
+.sx-trn-bike::before {             /* the bike: a long cyan capsule with a glowing core */
+    content: ''; position: absolute; left: 0; top: 14px; width: 52px; height: 24px; border-radius: 12px 16px 16px 12px;
+    background: radial-gradient(circle at 78% 50%, #ecfeff 0 14%, #22d3ee 30%, #0e7490 70%);
+    box-shadow: 0 0 16px rgba(34, 211, 238, 0.95), 0 0 4px #fff;
+}
+.sx-trn-bike.gone { display: none; }
+.sx-trn-wall {
+    position: fixed; z-index: 9010; pointer-events: none; box-sizing: border-box; border-radius: 7px;
+    background: linear-gradient(90deg, rgba(103, 232, 249, 0.9), rgba(207, 250, 254, 0.95), rgba(103, 232, 249, 0.9));
+    border: 2px solid rgba(248, 113, 113, 0.85);
+    box-shadow: 0 0 14px rgba(34, 211, 238, 0.95), 0 0 4px rgba(239, 68, 68, 0.8);
+}
+.sx-trn-ahead {
+    position: fixed; z-index: 9005; pointer-events: none; box-sizing: border-box; border-radius: 7px;
+    background: repeating-linear-gradient(45deg, rgba(239, 68, 68, 0.55) 0 10px, rgba(127, 29, 29, 0.35) 10px 20px);
+    outline: 2px dashed rgba(248, 113, 113, 0.9);
+    animation: sx-nk-warn-pulse 0.3s ease-in-out infinite alternate;
+}
+.sx-trn-disc {
+    position: fixed; left: 0; top: 0; z-index: 9021; pointer-events: none; width: 44px; height: 44px; border-radius: 50%;
+    background: radial-gradient(circle, #fff 0 18%, #0e7490 20% 46%, #67e8f9 48% 60%, #083344 62% 100%);
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.95);
+    animation: sx-nk-spin 0.4s linear infinite;
+}
+.sx-trn-discline {
+    position: fixed; z-index: 9004; pointer-events: none; transform-origin: 0 50%; box-sizing: border-box; overflow: hidden;
+    border-top: 2px dashed rgba(248, 113, 113, 0.9); border-bottom: 2px dashed rgba(248, 113, 113, 0.9);
+    background: rgba(239, 68, 68, 0.08);
+}
+.sx-trn-discline::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg, rgba(239, 68, 68, 0.55) 0 16px, rgba(127, 29, 29, 0.4) 16px 32px);
+    opacity: 0.05; animation: sx-tct-fill var(--trn-warn, 1s) linear forwards;
+}
+.sx-trn-discline.live { border-style: solid; }
+.sx-nk-fin-trn { --nk-fin: #67e8f9; }
+
+/* ============================================================
+   THE GUARDIAN (boss-guardian.js): lock-on beams, sweep wedges,
+   the three eyes of the finale.
+   ============================================================ */
+.sx-gdn-beam {
+    position: fixed; z-index: 9006; pointer-events: none; transform-origin: 0 50%; box-sizing: border-box; overflow: hidden;
+    background: linear-gradient(180deg, transparent 44%, rgba(248, 113, 113, 0.9) 46% 54%, transparent 56%);
+}
+.sx-gdn-beam.lock {
+    background: rgba(239, 68, 68, 0.1);
+    border-top: 3px dashed rgba(248, 113, 113, 0.95); border-bottom: 3px dashed rgba(248, 113, 113, 0.95);
+}
+.sx-gdn-beam.lock::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg, rgba(239, 68, 68, 0.6) 0 18px, rgba(127, 29, 29, 0.5) 18px 36px);
+    opacity: 0.05; animation: sx-tct-fill var(--gdn-warn, 0.8s) linear forwards;
+}
+.sx-gdn-beam.fire {
+    border: none;
+    background: linear-gradient(180deg, rgba(254, 240, 138, 0.2), #fff 30% 70%, rgba(254, 240, 138, 0.2));
+    box-shadow: 0 0 30px rgba(250, 204, 21, 0.95);
+}
+.sx-gdn-beam.fire::after { display: none; }
+.sx-gdn-wedge {
+    position: fixed; z-index: 9003; pointer-events: none; border-radius: 50%;
+    background: conic-gradient(from var(--gdn-from), rgba(239, 68, 68, 0.5) 0 var(--gdn-span), transparent var(--gdn-span) 360deg);
+    opacity: 0.25; animation: sx-tct-fill var(--gdn-warn, 1.2s) linear forwards;
+}
+.sx-gdn-wedge.hot {
+    background: conic-gradient(from var(--gdn-from), rgba(254, 240, 138, 0.6) 0 var(--gdn-span), transparent var(--gdn-span) 360deg);
+    animation: sx-wvr-fade 0.5s ease-out forwards;
+}
+.sx-gdn-eye {
+    position: fixed; z-index: 9022; pointer-events: none; width: 52px; height: 52px; border-radius: 50%;
+    background: radial-gradient(circle, #fff 0 10%, #f87171 14% 32%, #7f1d1d 36% 56%, #44403c 60% 100%);
+    box-shadow: 0 0 20px rgba(248, 113, 113, 0.9), inset 0 0 6px #000;
+    animation: sx-nk-anchor-pulse 0.6s ease-in-out infinite alternate;
+}
+.sx-nk-fin-gdn { --nk-fin: #fca5a5; }

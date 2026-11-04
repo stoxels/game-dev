@@ -130,9 +130,16 @@ export const BOSS_TEARDOWN_HOOKS = [
     // The Bloom (rework): rot gardens, stamen rotors, seed pods and the
     // FULMINATION set-piece.
     ['boss_bloom', '_blmTeardown'],
-    // The Minotaur (rework): labyrinth walls, hoof craters, dust storms,
-    // Ariadne threads and the WARDEN'S LABYRINTH set-piece.
+    // The Minotaur: pillars, bull lanes, stomps, the stampede canvas and
+    // THE LABYRINTH finale.
     ['boss_minotaur', '_mntTeardown'],
+    // The Jelly: blobs, shadows, slime puddles, split lanes, the ice shell
+    // and the JELLY ARMY finale.
+    ['boss_jelly', '_jlyTeardown'],
+    // The Tron: light cycles, walls, discs and the END OF LINE finale.
+    ['boss_tron', '_trnTeardown'],
+    // The Guardian: lock-on beams, sweep wedges and the TOTAL SURVEILLANCE finale.
+    ['boss_guardian', '_gdnTeardown'],
     // The Overfitter (rework): gradient sweeps, pattern replays,
     // validation rings and the FINAL EPOCH heat-map set-piece.
     ['boss_overfitter', '_ovrTeardown'],

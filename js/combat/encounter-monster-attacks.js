@@ -107,20 +107,6 @@ export function _fireMonsterAttack(monster) {
         globalThis._stackGarbage(monster);
         return;
     }
-    // The Tactician: the four board edges slam inward as castle walls -
-    // get inside the shrinking ring before they meet (boss-tactician.js).
-    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_tactician')
-        && typeof _tacticianCheckmate === 'function') {
-        globalThis._tacticianCheckmate(monster);
-        return;
-    }
-    // The Bumper: a giant carnival bumper slams onto a telegraphed target
-    // ring at the player, flinging anyone inside (boss-bumper.js).
-    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_bumper')
-        && typeof _bumperSlam === 'function') {
-        globalThis._bumperSlam(monster);
-        return;
-    }
     // The Centipede: the whole colony stampedes across a telegraphed lane
     // through the player's row (boss-centipede.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_centipede')

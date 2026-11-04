@@ -19,6 +19,16 @@ export function _bossTestTr(key, fallback) {
 // One row list per boss: the signature phases and arena twists of the fight, shown in the boss tooltip.
 // Bosses without special mechanics map to an empty list.
 const SPECIAL_PHASE_ROWS = {
+    'boss_guardian': () => [
+        { name: 'Lock-On', desc: _bossTestTr('eg_boss_test_guardian_lock', 'All fight: a thin aiming line from the Guardian\'s eye follows you, then FREEZES and fills red - step sideways off the line before it fires (2 / 3 / 3 in a row).') },
+        { name: 'Sweep', desc: _bossTestTr('eg_boss_test_guardian_sweep', 'All fight: a red wedge from the eye that contains you fills up, then the beam swings through it. Leave the wedge sideways (1 / 2 / 3 sweeps).') },
+        { name: 'TOTAL SURVEILLANCE', desc: _bossTestTr('eg_boss_test_guardian_final', 'At 10% HP: the Guardian is immune; three eyes appear at the left, right and bottom edges and take turns locking on (20 lock-ons, overlapping, faster and harder each time). Survive them to release it. (charge bar frozen)') },
+    ],
+    'boss_tron': () => [
+        { name: 'Light Cycle', desc: _bossTestTr('eg_boss_test_tron_cycle', 'All fight: a rider (two from 60%) enters on your row or column and races straight legs with sharp turns, leaving a light wall behind that hurts to touch for ~7 s. Its next straight always shows as a red line ahead.') },
+        { name: 'Identity Disc', desc: _bossTestTr('eg_boss_test_tron_disc', 'All fight: the Tron throws a disc at you that bounces off the screen edges twice. Its whole path fills red first, then the disc flies it (1 / 2 / 3 discs).') },
+        { name: 'END OF LINE', desc: _bossTestTr('eg_boss_test_tron_final', 'At 10% HP: the Tron is immune and sends five waves of 1-3 cycles. Their walls stay up for 8 s, so the arena fills up - keep finding the open lanes. Survive all waves to release it. (charge bar frozen)') },
+    ],
     'boss_ember': () => [],
     'boss_bomber': () => [
         { name: 'Mine Collar', desc: _bossTestTr('eg_boss_test_bomber_collar', 'All fight: tethered mines orbit the flying boss, detach and drift to YOUR position, planting proximity mines. Leave the red rings - they detonate when you step in!') },
@@ -161,8 +171,10 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'Snailgeddon', desc: _bossTestTr('eg_boss_test_snail_snailgeddon', 'At ≤20% HP: 5s countdown → teleport to centre, closing ring of snails with a lagging wedge. Escape through the gap!') }
     ],
     'boss_jelly': () => [
-        { name: 'Ice Shell', desc: _bossTestTr('eg_boss_test_jelly_ice_shell', 'At 50% HP: Boss gains immunity. Lure a hop blob onto ❄️ ice to slip it into the Jelly and shatter the shell.') },
-        { name: 'Jelly Army', desc: _bossTestTr('eg_boss_test_jelly_army', 'At 20% HP: 10 hop blobs spawn staggered, each leaping at you. Dodge the shadows!') }
+        { name: 'Jelly Hops', desc: _bossTestTr('eg_boss_test_jelly_hops', 'All fight: one blob hops after you 3 / 4 / 5 times. Its red shadow fills where you stood; it lands when the shadow is full. From 55% every landing leaves a slime puddle that hurts to touch.') },
+        { name: 'Split', desc: _bossTestTr('eg_boss_test_jelly_split', 'All fight: a big blob lands on your spot, then bursts into droplets that shoot out along red lanes (4, in phase 3: 8). Step off the shadow, then off the lanes.') },
+        { name: 'Ice Shell', desc: _bossTestTr('eg_boss_test_jelly_ice_shell', 'At 55% HP: the Jelly freezes into a shell (immune) and ices a few grid cells. It lobs single blobs at you - stand on a green-glowing ice cell while the shadow fills, then step off: the blob slips into the shell. Two slips break it; after 30 s it melts by itself.') },
+        { name: 'JELLY ARMY', desc: _bossTestTr('eg_boss_test_jelly_army', 'At 10% HP: the Jelly is immune and sends 15 waves of 2-5 blobs - one shadow on you, the others around you. Every landing leaves a puddle, so the floor fills up. Survive all waves to release it. (charge bar frozen)') },
     ],
     'boss_brutus': () => [
         { name: 'Zombie Feast', desc: _bossTestTr('eg_boss_test_brutus_feast', '🧟 zombies shamble toward each Ground Slam: every one devoured inside the band supercharges Brutus (+30% charge rate, 15s, stacks to 6). Kill them first!') }
@@ -199,8 +211,11 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'Bomb Maze', desc: _bossTestTr('eg_boss_test_demolitionist_bomb_maze', 'At ≤25% HP: 5…1 countdown → teleport into a serpentine corridor walled by bombs that detonate behind you. ~1s later a SUPER BOMB slams onto your start and rolls the corridor after you - caught = instant defeat. Outrun it to the green chequered exit (charge bar frozen).') }
     ],
     'boss_bumper': () => [
-        { name: 'TILT! Flipper Frenzy', desc: _bossTestTr('eg_boss_test_bumper_tilt', 'At 60% HP: 9s - alternating flipper arcs slap the lower arena while bumpers enrage (1.7× speed). Play top/mid.') },
-        { name: 'Multiball Rush', desc: _bossTestTr('eg_boss_test_bumper_multiball', 'At 30% HP: 6 balls launch from centre, 12s life. Keep moving - flings chain into other bumpers.') }
+        { name: 'The Table', desc: _bossTestTr('eg_boss_test_bumper_table', 'All fight: 2-3 bumpers drift around and fling you on touch; steel balls roll in from the sides (a red arrow shows where, a moment before) and ricochet off bumpers and the corner kickers.') },
+        { name: 'Bumper Slam', desc: _bossTestTr('eg_boss_test_bumper_slam', 'All fight: red circles fill on your spot one after another (2 / 3 / 3); when one is full a giant bumper lands there and flings you.') },
+        { name: 'Flipper Slap', desc: _bossTestTr('eg_boss_test_bumper_flip', 'From 60%: the flippers in the bottom corners take turns swinging a wide red band through where you stand (3 / 4 slaps). The red fill runs out from the flipper; leave the band before it is full.') },
+        { name: 'TILT! / Multiball', desc: _bossTestTr('eg_boss_test_bumper_tilt', 'At 60% HP: TILT - the bumpers race for 7 s and five flipper slaps follow. At 30% HP: MULTIBALL - six hot balls fly out of the Bumper along red lines, then ricochet for 12 s.') },
+        { name: 'JACKPOT', desc: _bossTestTr('eg_boss_test_bumper_final', 'At 10% HP: the Bumper is immune. Three green targets light up one at a time - stand in one for 5 s to fill it (it drains slowly when you step out). Every 2.3 s a flipper slaps a red band right through the target, so step out and come back. Light all three to release it. (charge bar frozen)') },
     ],
     'boss_striker': () => [
         { name: 'Kick-Off Challenge', desc: _bossTestTr('eg_boss_test_striker_corners', 'At 60% HP: the homing ball leaves - a resting ball drops on the pitch. Run to it, stand next to it to charge, step away to shoot. Score 1 goal into the edge goal.') },
@@ -226,9 +241,11 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'Jackpot Rush', desc: _bossTestTr('eg_boss_test_gambler_rush', 'At 30% HP: 8s - 4 waves of casino symbols; every 7️⃣ detonates a coin burst on hit or expiry. Russian Roulette (charge): leave the R110 cylinder before the ticking ends.') }
     ],
     'boss_tactician': () => [
-        { name: 'CHECK', desc: _bossTestTr('eg_boss_test_tactician_check', 'At 60% HP: 4 rook lanes (2H+2V) dash full-screen staggered. Wait between lanes.') },
-        { name: 'Zugzwang', desc: _bossTestTr('eg_boss_test_tactician_zugzwang', 'At 30% HP (9s): bishop diagonals sweep through the queen + knights L-leap 4×. Read the board - pawn walls always leave one gap column.') },
-        { name: 'Checkmate', desc: _bossTestTr('eg_boss_test_tactician_mate', 'Charge attack: 4 castle walls close over 2.6s - get to the CENTER rect, not the edges.') }
+        { name: 'The Board', desc: _bossTestTr('eg_boss_test_tactician_board', 'All fight: the queen glides along straight and diagonal lines - touching her hits and flings you. Pawn ranks march up from the bottom: the row glows red first, one column stays green - walk through the gap.') },
+        { name: 'Rook Lanes', desc: _bossTestTr('eg_boss_test_tactician_rook', 'All fight: rows and columns through where you stand fill red one after another (2 / 3 / 3), then a rook slides through. Step out of the lane.') },
+        { name: 'Knight Fork', desc: _bossTestTr('eg_boss_test_tactician_knight', 'All fight: a knight jumps in L-shapes - first onto you, then away from its last landing (3 / 3 / 4 jumps). Every landing circle fills red first.') },
+        { name: 'Bishop Cross', desc: _bossTestTr('eg_boss_test_tactician_bishop', 'From 60%: two diagonal bands cross on your spot and fill red, 2 / 3 times in a row. Step off both diagonals.') },
+        { name: 'CHECKMATE', desc: _bossTestTr('eg_boss_test_tactician_mate', 'At 10% HP: the Tactician is immune and the arena becomes a chess board. Each round rooks and bishops are placed: every square they attack turns red, the free squares green (one is always next to you). 10 rounds, faster each time. (charge bar frozen)') },
     ],
     'boss_gourmet': () => [
         { name: 'Dinner Service', desc: _bossTestTr('eg_boss_test_gourmet_dinner', 'At 60% HP: 3 cloches 🍽️ slam your position in sequence, each leaving a grease pool. An eating boss - chomps heal it, don’t get caught.') },
@@ -263,10 +280,10 @@ const SPECIAL_PHASE_ROWS = {
         { name: 'THE FULL CLAMP', desc: _bossTestTr('eg_boss_test_vis_final', 'At 10% HP: three compression waves squeeze the arena - a corridor of SAFE SLABS lights up, reach it before each squeeze. Survive all three for THE IRON VISE: the overclench slams everything except the stress-fracture slab! (charge bar frozen)') },
     ],
     'boss_minotaur': () => [
-        { name: 'Labyrinth Walls', desc: _bossTestTr('eg_boss_test_mnt_labyrinth', 'All fight: 5–6 wall slabs rise and hold ~8s, carving the arena into lanes - then the bull charges the open lane at YOUR row. The maze channels the charge; the bull crumbles one wall per rush. Phase 3: double charges per cast!') },
-        { name: 'Hooftread Terrain', desc: _bossTestTr('eg_boss_test_mnt_hoof', 'At 60% HP: hoof craters stamp down the lane in sequence and plant lingering hoofprints, while a DUST STORM trails the charge lane. The maze accumulates burn terrain the longer the duel runs!') },
-        { name: 'Thread of Ariadne', desc: _bossTestTr('eg_boss_test_mnt_thread', 'At 60% HP: a glowing thread marks the ONE SAFE LANE - honest, and bait. Hold it once for a heal; it frays, snaps and re-forms elsewhere. Travel through it, never live in it!') },
-        { name: "THE WARDEN'S LABYRINTH", desc: _bossTestTr('eg_boss_test_mnt_final', 'At 10% HP: three wall generations rise while the Warden charges each TWICE - body-check the glowing MAZEWALL STONES 3× each to shatter them. Then the TRAMPLE runs EVERY lane at once: only shattered lanes are safe! (charge bar frozen)') },
+        { name: 'Bull Rush', desc: _bossTestTr('eg_boss_test_mnt_rush', 'All fight: stone pillars rise, then a red lane fills toward you and the bull runs it - up to the first pillar on its line. Step out of the lane or hide behind a pillar. 2 rushes (phase 2+: 3). From 60% the pillar the bull smashes bursts in a red cross.') },
+        { name: 'Hoof Stomp', desc: _bossTestTr('eg_boss_test_mnt_stomp', 'All fight: red circles fill under you one after another (3 / 4 / 5) and stomp when full. Keep walking.') },
+        { name: 'Stampede', desc: _bossTestTr('eg_boss_test_mnt_stampede', 'At 70%, 45% and 25% HP: five pillars rise and the herd comes from one side - the whole arena turns red except the green shadows behind the pillars. 2-3 waves; crossfire waves come from two sides, where only the green squares where two shadows cross are safe.') },
+        { name: 'THE LABYRINTH', desc: _bossTestTr('eg_boss_test_mnt_final', 'At 10% HP: the Minotaur is immune and sends 12 stampede waves, faster and harder each time (every third one is crossfire). After every wave one pillar falls and a new one rises. Survive them all to release it. (charge bar frozen)') },
     ],
     'boss_barrage': () => [
         { name: 'Shelling Curtain', desc: _bossTestTr('eg_boss_test_bar_curtain', 'All fight: a creeping wall of shell splashes sweeps the arena - the telegraph stays visible while it rolls, so fight INSIDE the barrage and clear cells between shell lines. The opening shrinks with every corrupted cell - dispel corruption! Phase 3: the wall also comes from the top and bottom - fight the diagonal!') },
